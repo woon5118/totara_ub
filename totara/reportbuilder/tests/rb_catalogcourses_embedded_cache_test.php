@@ -111,11 +111,8 @@ class totara_reportbuilder_rb_catalogcourses_embedded_cache_testcase extends rep
      * - Enable op1cf1 and op1cf2 for course2
      * - Enable op1cf1, op2cf1, op1cf2, op2cf2 for course3
      * - Course4 has no enabled customfield options
-     *
-     * @param int $usecache Use cache or not (1/0)
-     * @dataProvider provider_use_cache
      */
-    public function test_courses($usecache) {
+    public function test_courses() {
         $this->resetAfterTest();
 
         $cfgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
@@ -133,13 +130,8 @@ class totara_reportbuilder_rb_catalogcourses_embedded_cache_testcase extends rep
         $this->loadDataSet($this->createArrayDataSet(array(
                         'report_builder_filters' => $this->report_builder_cf_filters_data)));
 
-        if ($usecache) {
-            $this->enable_caching($this->report_builder_data['id']);
-        }
-
         // No restrictions.
-        $result = $this->get_report_result($this->report_builder_data['shortname'], array(),
-                $usecache);
+        $result = $this->get_report_result($this->report_builder_data['shortname'], array());
         $this->assertCount(4, $result);
 
         // Check one cf, one option.
@@ -147,8 +139,7 @@ class totara_reportbuilder_rb_catalogcourses_embedded_cache_testcase extends rep
             "course-custom_field_{$cfids['cf1']}_text" =>
                 array('operator' => 1, 'value' => array(md5('op1cf1') => 1)));
 
-        $result = $this->get_report_result($this->report_builder_data['shortname'], array(),
-                $usecache, $form);
+        $result = $this->get_report_result($this->report_builder_data['shortname'], array(), false, $form);
         $this->assertCount(2, $result);
         foreach ($result as $res) {
             $this->assertTrue(in_array($res->course_courselinkicon,
@@ -160,8 +151,7 @@ class totara_reportbuilder_rb_catalogcourses_embedded_cache_testcase extends rep
                       "course-custom_field_{$cfids['cf2']}_text" =>
                         array('operator' => 1, 'value' => array(md5('op2cf2') => 1)));
 
-        $result = $this->get_report_result($this->report_builder_data['shortname'], array(),
-                $usecache, $form);
+        $result = $this->get_report_result($this->report_builder_data['shortname'], array(), false, $form);
         $this->assertCount(2, $result);
         foreach ($result as $res) {
             $this->assertTrue(in_array($res->course_courselinkicon,
@@ -175,8 +165,7 @@ class totara_reportbuilder_rb_catalogcourses_embedded_cache_testcase extends rep
                         array('operator' => 1,
                               'value' => array(md5('op1cf2') => 1, md5('op2cf2') => 1)));
 
-        $result = $this->get_report_result($this->report_builder_data['shortname'], array(),
-                $usecache, $form);
+        $result = $this->get_report_result($this->report_builder_data['shortname'], array(), false, $form);
         $this->assertCount(1, $result);
         foreach ($result as $res) {
             $this->assertTrue(in_array($res->course_courselinkicon,

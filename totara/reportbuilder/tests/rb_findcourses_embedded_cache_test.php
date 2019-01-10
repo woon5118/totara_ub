@@ -179,22 +179,16 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
      * - Common part (@see: self::setUp() )
      * - Find all courses
      * - Find courses with name 'Basics'
-     *
-     * @param int $usecache Use cache or not (1/0)
-     * @dataProvider provider_use_cache
      */
-    public function test_courses($usecache) {
+    public function test_courses() {
         $this->resetAfterTest();
-        if ($usecache) {
-            $this->enable_caching($this->report_builder_data['id']);
-        }
 
-        $result = $this->get_report_result($this->report_builder_data['shortname'], array(), $usecache);
+        $result = $this->get_report_result($this->report_builder_data['shortname'], array(), false);
         $this->assertCount(4, $result);
 
         $form = array('course-name_and_summary' => array('operator' => 0, 'value' => 'Basics'));
 
-        $result = $this->get_report_result($this->report_builder_data['shortname'], array(), $usecache, $form);
+        $result = $this->get_report_result($this->report_builder_data['shortname'], array(), false, $form);
         $this->assertCount(1, $result);
         $this->assertEquals('Basics', array_shift($result)->course_courselinkicon);
     }
@@ -207,11 +201,8 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
      * - Find courses with only taga
      * - Find course that has tagc or tagb
      * - Find course with taga and tagb
-     *
-     * @param int $usecache Use cache or not (1/0)
-     * @dataProvider provider_use_cache
      */
-    public function test_courses_tags($usecache) {
+    public function test_courses_tags() {
         global $CFG, $DB;
 
         if ($DB->get_dbfamily() == 'mssql') {
@@ -220,6 +211,7 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
         $this->resetAfterTest();
         // Enable and create tags
         $CFG->usetags = true;
+        $usecache = false;
 
         $objects = core_tag_tag::create_if_missing(core_tag_collection::get_default(), ['taga', 'tagb', 'tagc'], true);
         $tags = [];
@@ -236,10 +228,6 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
         $this->add_tags_info($this->course2->id, $tagab);
         $this->add_tags_info($this->course3->id, array_slice($tags, 2, 1, true)); //tagc
         $this->add_tags_info($this->course4->id, $tagbc);
-
-        if ($usecache) {
-            $this->enable_caching($this->report_builder_data['id']);
-        }
 
         // Find courses with taga
         $form = array('tags-tagids' => array('operator' => 2, 'value' => $taga));
@@ -282,11 +270,8 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
      * - Make one course searchable using all enabled filters
      * - Create report using all enabled filters
      * - Check that course (and only this course) listed in report
-     *
-     * @param int $usecache Use cache or not (1/0)
-     * @dataProvider provider_use_cache
      */
-    public function test_all_filters($usecache) {
+    public function test_all_filters() {
         global $CFG, $DB;
 
         if ($DB->get_dbfamily() == 'mssql') {
@@ -306,6 +291,7 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
 
         // Enable and create tags
         $CFG->usetags = true;
+        $usecache = false;
 
         $objects = core_tag_tag::create_if_missing(core_tag_collection::get_default(), ['taga', 'tagb', 'tagc'], true);
         $tags = [];
@@ -325,9 +311,6 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
             'report_builder_columns' => $this->report_builder_columns_additinal_data,
             'report_builder_filters' => $this->report_builder_filters_additional_data)));
 
-        if ($usecache) {
-            $this->enable_caching($this->report_builder_data['id']);
-        }
         // Filter criteria
         $form = array(
             'course-name_and_summary' => array('operator' => 0, 'value' => 'Big'),
@@ -348,34 +331,6 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
         $this->assertEquals($thatcourse->fullname, $r->course_courselinkicon);
     }
 
-    /**
-     * Test case:
-     * - Common part (@see: self::setUp() )
-     * - Cache report
-     * - Add Filter (with and without join)
-     * - Add Column (with and without join)
-     * - Check that report status changed
-     */
-    public function test_cache_course_settings() {
-        $this->resetAfterTest();
-        $this->enable_caching($this->report_builder_data['id']);
-        $this->assertEquals(RB_CACHE_FLAG_OK, $this->get_report_cache_status($this->report_builder_data['shortname'], array()));
-
-        $this->loadDataSet($this->createArrayDataSet(array(
-            'report_builder_filters' => $this->report_builder_filters_additional_data)));
-
-        $this->assertEquals(RB_CACHE_FLAG_CHANGED, $this->get_report_cache_status($this->report_builder_data['shortname'],
-                                array()));
-
-        $this->enable_caching($this->report_builder_data['id']);
-        $this->assertEquals(RB_CACHE_FLAG_OK, $this->get_report_cache_status($this->report_builder_data['shortname'], array()));
-
-        $this->loadDataSet($this->createArrayDataSet(array(
-            'report_builder_columns' => $this->report_builder_columns_additinal_data)));
-
-        $this->assertEquals(RB_CACHE_FLAG_CHANGED, $this->get_report_cache_status($this->report_builder_data['shortname'],
-                                array()));
-    }
     /**
      * Attach mock tags into a course
      * @param int $courseid - id of the course

@@ -43,7 +43,12 @@ class rb_source_courses extends rb_base_source {
         $this->defaulttoolbarsearchcolumns = $this->define_defaultsearchcolumns();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_courses');
+        list($this->sourcewhere, $this->sourceparams, $this->sourcejoins) = $this->define_source_args();
         $this->usedcomponents[] = 'totara_cohort';
+
+        // Caching is disabled because visibility needs to be calculated using live data that cannot be cached.
+        // This checking involved capability checks.
+        $this->cacheable = false;
 
         parent::__construct();
     }
@@ -208,43 +213,6 @@ class rb_source_courses extends rb_base_source {
         return $defaultsearchcolumns;
     }
 
-    protected function define_requiredcolumns() {
-        $requiredcolumns = array();
-        $requiredcolumns[] = new rb_column(
-            'ctx',
-            'id',
-            '',
-            "ctx.id",
-            array('joins' => 'ctx')
-        );
-        $requiredcolumns[] = new rb_column(
-            'base',
-            'category',
-            '',
-            "base.category"
-        );
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'id',
-            '',
-            "base.id"
-        );
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'visible',
-            '',
-            "base.visible"
-        );
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'audiencevisible',
-            '',
-            "base.audiencevisible"
-        );
-        return $requiredcolumns;
-    }
-
-
     //
     //
     // Source specific column display methods
@@ -304,18 +272,31 @@ class rb_source_courses extends rb_base_source {
         return implode($glue, $out);
     }
 
+    /**
+     * Generates the totara visibility where SQL and params.
+     *
+     * There get stored in private variables, and should only be accessed after calling this method.
+     */
+    protected function define_source_args() {
 
-    public function post_config(reportbuilder $report) {
-        // Don't include the front page (site-level course).
-        $categorysql = $report->get_field('base', 'category', 'base.category') . " <> :sitelevelcategory";
-        $categoryparams = array('sitelevelcategory' => 0);
+        // Only include courses the user is allowed to see.
+        list($sql, $params) = totara_visibility_where(
+            null, // Current user.
+            'base.id',
+            'base.visible',
+            'base.audiencevisible',
+            'base',
+            'course',
+            false
+        );
 
-        $reportfor = $report->reportfor; // ID of the user the report is for.
-        list($visiblesql, $visibleparams) = $report->post_config_visibility_where('course', 'base', $reportfor);
+        // Exclude the site course.
+        $sql = "(base.id != :siteid) AND ({$sql})";
+        $params['siteid'] = SITEID;
 
-        // Combine the results.
-        $report->set_post_config_restrictions(array($categorysql . " AND " . $visiblesql,
-            array_merge($categoryparams, $visibleparams)));
+        $joins = ['ctx'];
+
+        return [$sql, $params, $joins];
     }
 
 } // End of rb_source_courses class.
