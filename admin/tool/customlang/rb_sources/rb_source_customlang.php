@@ -280,7 +280,7 @@ class rb_source_customlang extends rb_base_source {
         $langs = $DB->get_records('tool_customlang', array(), 'lang', 'DISTINCT lang');
         $return = array();
         foreach ($langs as $code => $lang) {
-            $return[$code] = $this->language_code_to_name($code)." ({$code})";
+            $return[$code] = \totara_core\helper::language_code_to_name($code)." ({$code})";
         }
 
         return $return;

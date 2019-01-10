@@ -377,9 +377,9 @@ trait report_trait {
      * @param string $field Name of course id field to join on
      * @param int $contextlevel Name of course id field to join on
      * @param string $jointype Type of join (INNER, LEFT, RIGHT)
+     * @return True
      */
     protected function add_context_tables(&$joinlist, $join, $field, $contextlevel, $jointype = 'LEFT') {
-
         $joinlist[] = new \rb_join(
             'ctx',
             $jointype,
@@ -388,5 +388,7 @@ trait report_trait {
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
+
+        return true;
     }
 }

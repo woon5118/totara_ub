@@ -23,6 +23,10 @@
 
 namespace totara_certification\rb\source;
 
+use program, programcat_helper;
+use program_in_list;
+use report_builder_program_expand_form;
+
 defined('MOODLE_INTERNAL') || die();
 
 trait certification_trait {
@@ -308,5 +312,54 @@ trait certification_trait {
             'text'
         );
         return true;
+    }
+
+    public function rb_filter_recertifydatetype() {
+        return array(
+            CERTIFRECERT_COMPLETION => get_string('editdetailsrccmpl', 'totara_certification'),
+            CERTIFRECERT_EXPIRY => get_string('editdetailsrcexp', 'totara_certification'),
+            CERTIFRECERT_FIXED => get_string('editdetailsrcfixed', 'totara_certification')
+        );
+    }
+
+    /**
+     * Expanding content to display when clicking a certification.
+     * Will be placed inside a table cell which is the width of the table.
+     * Call required_param to get any param data that is needed.
+     * Make sure to check that the data requested is permitted for the viewer.
+     *
+     * Note: this method duplicates the one in the program_trait because we want
+     * to keep them separate.
+     *
+     * @return string
+     */
+    public function rb_expand_prog_details() {
+        global $CFG, $DB, $USER;
+        require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+        require_once($CFG->dirroot . '/totara/program/renderer.php');
+
+        $progid = required_param('expandprogid', PARAM_INT);
+        $userid = $USER->id;
+
+        if (!$program = new program($progid)) {
+            ajax_result(false, get_string('error:programid', 'totara_program'));
+            exit();
+        }
+
+        if (!$program->is_viewable()) {
+            ajax_result(false, get_string('error:inaccessible', 'totara_program'));
+            exit();
+        }
+
+        $formdata = $DB->get_record('prog', array('id' => $progid));
+
+        $phelper = new programcat_helper();
+        $formdata->summary = $phelper->get_program_formatted_summary(new program_in_list($formdata));
+
+        $formdata->assigned = $DB->record_exists('prog_user_assignment', array('userid' => $userid, 'programid' => $progid));
+
+        $mform = new report_builder_program_expand_form(null, (array)$formdata);
+
+        return $mform->render();
     }
 }

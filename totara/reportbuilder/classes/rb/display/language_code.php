@@ -42,7 +42,7 @@ class language_code extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        return $report->src->language_code_to_name($value);
+        return \totara_core\helper::language_code_to_name($value);
     }
 
     /**

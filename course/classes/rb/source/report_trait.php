@@ -25,7 +25,7 @@ namespace core_course\rb\source;
 
 use moodleform, HTML_QuickForm_static, HTML_QuickForm_button, MoodleQuickForm_hidden;
 use context_course, coursecat_helper, completion_completion, course_in_list, moodle_url;
-use report_builder_course_expand_form;
+use report_builder_course_expand_form, core_collator;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -836,4 +836,71 @@ trait report_trait {
                     )
                 basesub)";
     }
+
+    /**
+     * @return array course languages
+     */
+    public function rb_filter_course_languages() {
+        global $DB;
+        $out = array();
+        $langs = $DB->get_records_sql("SELECT DISTINCT lang FROM {course} ORDER BY lang");
+        foreach ($langs as $row) {
+            $out[$row->lang] = \totara_core\helper::language_code_to_name($row->lang);
+        }
+
+        return $out;
+    }
+
+    /**
+     *
+     * @return array possible course types
+     */
+    public function rb_filter_course_types() {
+        global $TOTARA_COURSE_TYPES;
+        $coursetypeoptions = array();
+        foreach ($TOTARA_COURSE_TYPES as $k => $v) {
+            $coursetypeoptions[$v] = get_string($k, 'totara_core');
+        }
+        asort($coursetypeoptions);
+        return $coursetypeoptions;
+    }
+
+    /**
+     *
+     * @return array possible course activities
+     */
+    public function rb_filter_modules_list() {
+        global $DB, $OUTPUT, $CFG;
+
+        $out = array();
+        $mods = $DB->get_records('modules', array('visible' => 1), 'id', 'id, name');
+        foreach ($mods as $mod) {
+            if (get_string_manager()->string_exists('pluginname', $mod->name)) {
+                $mod->localname = get_string('pluginname', $mod->name);
+            }
+        }
+
+        core_collator::asort_objects_by_property($mods, 'localname');
+
+        foreach ($mods as $mod) {
+            if (file_exists($CFG->dirroot . '/mod/' . $mod->name . '/pix/icon.gif') ||
+                file_exists($CFG->dirroot . '/mod/' . $mod->name . '/pix/icon.png')) {
+                $icon = $OUTPUT->pix_icon('icon', $mod->localname, $mod->name) . '&nbsp;';
+            } else {
+                $icon = '';
+            }
+
+            $out[$mod->name] = $icon . $mod->localname;
+        }
+        return $out;
+    }
+
+    public function rb_filter_course_categories_list() {
+        global $CFG;
+        require_once($CFG->libdir . '/coursecatlib.php');
+        $cats = \coursecat::make_categories_list();
+
+        return $cats;
+    }
+
 }

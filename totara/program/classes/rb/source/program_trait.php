@@ -23,6 +23,10 @@
 
 namespace totara_program\rb\source;
 
+use program, programcat_helper;
+use program_in_list;
+use report_builder_program_expand_form;
+
 defined('MOODLE_INTERNAL') || die();
 
 trait program_trait {
@@ -37,7 +41,7 @@ trait program_trait {
      *                     'program id' field
      * @param string $field Name of table containing program id field to join on
      *
-     * @retun bool always true
+     * @return bool always true
      */
     protected function add_totara_program_tables(&$joinlist, $join, $field) {
 
@@ -253,5 +257,43 @@ trait program_trait {
             'date'
         );
         return true;
+    }
+
+    /**
+     * Expanding content to display when clicking a program.
+     * Will be placed inside a table cell which is the width of the table.
+     * Call required_param to get any param data that is needed.
+     * Make sure to check that the data requested is permitted for the viewer.
+     *
+     * @return string
+     */
+    public function rb_expand_prog_details() {
+        global $CFG, $DB, $USER;
+        require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+        require_once($CFG->dirroot . '/totara/program/renderer.php');
+
+        $progid = required_param('expandprogid', PARAM_INT);
+        $userid = $USER->id;
+
+        if (!$program = new program($progid)) {
+            ajax_result(false, get_string('error:programid', 'totara_program'));
+            exit();
+        }
+
+        if (!$program->is_viewable()) {
+            ajax_result(false, get_string('error:inaccessible', 'totara_program'));
+            exit();
+        }
+
+        $formdata = $DB->get_record('prog', array('id' => $progid));
+
+        $phelper = new programcat_helper();
+        $formdata->summary = $phelper->get_program_formatted_summary(new program_in_list($formdata));
+
+        $formdata->assigned = $DB->record_exists('prog_user_assignment', array('userid' => $userid, 'programid' => $progid));
+
+        $mform = new report_builder_program_expand_form(null, (array)$formdata);
+
+        return $mform->render();
     }
 }

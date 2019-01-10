@@ -476,109 +476,6 @@ abstract class rb_base_source {
         return $results;
     }
 
-    /**
-     * Expanding content to display when clicking a program.
-     * Will be placed inside a table cell which is the width of the table.
-     * Call required_param to get any param data that is needed.
-     * Make sure to check that the data requested is permitted for the viewer.
-     *
-     * @return string
-     */
-    public function rb_expand_prog_details() {
-        global $CFG, $DB, $USER;
-        require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
-        require_once($CFG->dirroot . '/totara/program/renderer.php');
-
-        $progid = required_param('expandprogid', PARAM_INT);
-        $userid = $USER->id;
-
-        if (!$program = new program($progid)) {
-            ajax_result(false, get_string('error:programid', 'totara_program'));
-            exit();
-        }
-
-        if (!$program->is_viewable()) {
-            ajax_result(false, get_string('error:inaccessible', 'totara_program'));
-            exit();
-        }
-
-        $formdata = $DB->get_record('prog', array('id' => $progid));
-
-        $phelper = new programcat_helper();
-        $formdata->summary = $phelper->get_program_formatted_summary(new program_in_list($formdata));
-
-        $formdata->assigned = $DB->record_exists('prog_user_assignment', array('userid' => $userid, 'programid' => $progid));
-
-        $mform = new report_builder_program_expand_form(null, (array)$formdata);
-
-        return $mform->render();
-    }
-
-    /**
-     * Helper function to convert a language code to a human-readable string
-     *
-     * @param string $code Language code
-     * @return string
-     */
-    public function language_code_to_name($code) {
-        global $CFG;
-        static $languages = array();
-        $strmgr = get_string_manager();
-        // Populate the static variable if empty
-        if (count($languages) == 0) {
-            // Return all languages available in system (adapted from stringmanager->get_list_of_translations()).
-            $langdirs = get_list_of_plugins('', '', $CFG->langotherroot);
-            $langdirs = array_merge($langdirs, array("{$CFG->dirroot}/lang/en"=>'en'));
-            $curlang = current_language();
-            // Loop through all langs and get info.
-            foreach ($langdirs as $lang) {
-                if (isset($languages[$lang])){
-                    continue;
-                }
-                if (strstr($lang, '_local') !== false) {
-                    continue;
-                }
-                if (strstr($lang, '_utf8') !== false) {
-                    continue;
-                }
-                $string = $strmgr->load_component_strings('langconfig', $lang);
-                if (!empty($string['thislanguage'])) {
-                    $languages[$lang] = $string['thislanguage'];
-                    // If not the current language, provide the English translation also.
-                    if(strpos($lang, $curlang) === false) {
-                        $languages[$lang] .= ' ('. $string['thislanguageint'] .')';
-                    }
-                }
-                unset($string);
-            }
-        }
-
-        if (empty($code)) {
-            return get_string('notspecified', 'totara_reportbuilder');
-        }
-        if (strpos($code, '_') !== false) {
-            list($langcode, $langvariant) = explode('_', $code);
-        } else {
-            $langcode = $code;
-        }
-
-        // Now see if we have a match in "localname (English)" format.
-        if (isset($languages[$code])) {
-            return $languages[$code];
-        } else {
-            // Not an installed language - may have been uninstalled, as last resort try the get_list_of_languages silly function.
-            $langcodes = $strmgr->get_list_of_languages();
-            if (isset($langcodes[$langcode])) {
-                $a = new stdClass();
-                $a->code = $langcode;
-                $a->name = $langcodes[$langcode];
-                return get_string('uninstalledlanguage', 'totara_reportbuilder', $a);
-            } else {
-                return get_string('unknownlanguage', 'totara_reportbuilder', $code);
-            }
-        }
-    }
-
     //
     //
     // Generic select filter methods
@@ -590,32 +487,6 @@ abstract class rb_base_source {
         $yn[1] = get_string('yes');
         $yn[0] = get_string('no');
         return $yn;
-    }
-
-    function rb_filter_modules_list() {
-        global $DB, $OUTPUT, $CFG;
-
-        $out = array();
-        $mods = $DB->get_records('modules', array('visible' => 1), 'id', 'id, name');
-        foreach ($mods as $mod) {
-            if (get_string_manager()->string_exists('pluginname', $mod->name)) {
-                $mod->localname = get_string('pluginname', $mod->name);
-            }
-        }
-
-        core_collator::asort_objects_by_property($mods, 'localname');
-
-        foreach ($mods as $mod) {
-            if (file_exists($CFG->dirroot . '/mod/' . $mod->name . '/pix/icon.gif') ||
-                file_exists($CFG->dirroot . '/mod/' . $mod->name . '/pix/icon.png')) {
-                $icon = $OUTPUT->pix_icon('icon', $mod->localname, $mod->name) . '&nbsp;';
-            } else {
-                $icon = '';
-            }
-
-            $out[$mod->name] = $icon . $mod->localname;
-        }
-        return $out;
     }
 
     function rb_filter_organisations_list($report) {
@@ -679,7 +550,6 @@ abstract class rb_base_source {
         $hierarchy->make_hierarchy_list($orgs, $baseorg, true, false);
 
         return $orgs;
-
     }
 
     function rb_filter_positions_list() {
@@ -691,17 +561,7 @@ abstract class rb_base_source {
         $hierarchy->make_hierarchy_list($positions, null, true, false);
 
         return $positions;
-
     }
-
-    function rb_filter_course_categories_list() {
-        global $CFG;
-        require_once($CFG->libdir . '/coursecatlib.php');
-        $cats = coursecat::make_categories_list();
-
-        return $cats;
-    }
-
 
     function rb_filter_competency_type_list() {
         global $CFG;
@@ -738,33 +598,7 @@ abstract class rb_base_source {
         return $typelist;
     }
 
-    function rb_filter_course_languages() {
-        global $DB;
-        $out = array();
-        $langs = $DB->get_records_sql("SELECT DISTINCT lang
-            FROM {course} ORDER BY lang");
-        foreach ($langs as $row) {
-            $out[$row->lang] = $this->language_code_to_name($row->lang);
-        }
-
-        return $out;
-    }
-
     /**
-     *
-     * @return array possible course types
-     */
-    public function rb_filter_course_types() {
-        global $TOTARA_COURSE_TYPES;
-        $coursetypeoptions = array();
-        foreach ($TOTARA_COURSE_TYPES as $k => $v) {
-            $coursetypeoptions[$v] = get_string($k, 'totara_core');
-        }
-        asort($coursetypeoptions);
-        return $coursetypeoptions;
-    }
-
-    /*
      * Generate a list of options fo the plan status menu.
      * @return array plan status menu options.
      */
@@ -888,14 +722,6 @@ abstract class rb_base_source {
 
         $joinsql = " INNER JOIN ($query) $joinname ON ($joinname.id = $join.$field) ";
         return $joinsql;
-    }
-
-    public function rb_filter_recertifydatetype() {
-        return array(
-            CERTIFRECERT_COMPLETION => get_string('editdetailsrccmpl', 'totara_certification'),
-            CERTIFRECERT_EXPIRY => get_string('editdetailsrcexp', 'totara_certification'),
-            CERTIFRECERT_FIXED => get_string('editdetailsrcfixed', 'totara_certification')
-        );
     }
 
     /**
