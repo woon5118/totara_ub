@@ -147,10 +147,10 @@ class send_messages_task extends \core\task\scheduled_task {
             $messages = $messagesmanager->get_messages();
             $user = $DB->get_record('user', array('id' => $enrolment->userid), '*', MUST_EXIST);
             $isviewable = $program->is_viewable($user);
-            $completion = $DB->get_field('prog_completion', 'status', array('programid' => $enrolment->programid, 'userid' => $enrolment->userid, 'coursesetid' => 0));
 
-            // If the user can view the program and has not previously completed it, carry on.
-            if ($isviewable && (empty($completion) || $completion != STATUS_PROGRAM_COMPLETE)) {
+            // If the user can view the program continue and send.
+            // Note: If the user has already been sent a message of same type, it will not be sent again.
+            if ($isviewable) {
                 // Send notifications to user and (optionally) the user's manager.
                 foreach ($messages as $message) {
                     if ($message->messagetype == MESSAGETYPE_ENROLMENT) {

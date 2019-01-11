@@ -720,7 +720,7 @@ class program {
                                           WHERE pa.id = {prog_future_user_assignment}.assignmentid)",
             array('programid' => $this->id));
 
-        // Delete program enrolment messages for all non-assigned users, so that they can be re-sent if the user is re-assigned.
+        // Delete program enrolment messages for all non-assigned users, who are not complete, so that they can be re-sent if the user is re-assigned.
         $enrolmentmessageids = $DB->get_fieldset_select(
             'prog_message',
             'id',
@@ -730,12 +730,20 @@ class program {
         if (!empty($enrolmentmessageids)) {
             list($enrolmentmessageidssql, $enrolmentmessageidsparams) =
                 $DB->get_in_or_equal($enrolmentmessageids, SQL_PARAMS_NAMED);
-            $sql = "DELETE FROM {prog_messagelog}
-                     WHERE messageid {$enrolmentmessageidssql}
-                       AND userid NOT IN (SELECT pua.userid
-                                            FROM {prog_user_assignment} pua
-                                           WHERE pua.programid = :programid)";
-            $params = array_merge(array('programid' => $this->id), $enrolmentmessageidsparams);
+            $sql = "DELETE FROM {prog_messagelog} pm
+                     WHERE pm.messageid {$enrolmentmessageidssql}
+                       AND NOT EXISTS (SELECT 1
+                                         FROM {prog_user_assignment} pua
+                                        WHERE pua.programid = :programid
+                                          AND pua.userid = pm.userid)
+                       AND NOT EXISTS (SELECT 1
+                                         FROM {prog_completion} pc
+                                        WHERE pc.programid = :programid2
+                                          AND pc.userid = pm.userid
+                                          AND pc.coursesetid = 0
+                                          AND pc.status = :status)";
+            $params = array_merge(array('programid' => $this->id, 'programid2' => $this->id, 'status' => STATUS_PROGRAM_COMPLETE),
+                $enrolmentmessageidsparams);
             $DB->execute($sql, $params);
         }
 
