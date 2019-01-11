@@ -159,7 +159,7 @@ class rb_filter_select extends rb_filter_type {
         }
 
         if ($simplemode) {
-            if (isset($formdata->$field) && $formdata->$field !== '') {
+            if (isset($formdata->$field)) {
                 return array('value'    => (string)$formdata->$field);
             }
         } else {
@@ -221,21 +221,26 @@ class rb_filter_select extends rb_filter_type {
      * @return string active filter label
      */
     function get_label($data) {
-        $value     = $data['value'];
-        $label = format_string($this->label);
-        $options = $this->options['selectchoices'][$value];
+        $value = $data['value'];
         $simplemode = $this->options['simplemode'];
+        $label = format_string($this->label);
+
+        if ($simplemode && $value === '') {
+            $a = new stdClass();
+            $a->label    = $label;
+            $a->value    = get_string('anyvalue', 'filters');
+            $a->operator = get_string('isequalto', 'filters');
+
+            return get_string('selectlabel', 'filters', $a);
+        }
+
+        $options = $this->options['selectchoices'][$value];
 
         if ($simplemode) {
-            if ($value === '') {
-                return '';
-            }
-
             $a = new stdClass();
             $a->label    = $label;
             $a->value    = '"' . s($options) . '"';
             $a->operator = get_string('isequalto', 'filters');
-
         } else {
             $operators = $this->get_operators();
             $operator  = $data['operator'];
