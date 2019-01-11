@@ -33,6 +33,7 @@ use mod_facetoface\signup;
 use mod_facetoface\signup_helper;
 use mod_facetoface\seminar_event;
 use mod_facetoface\notice_sender;
+use mod_facetoface\event_time;
 
 require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->dirroot.'/grade/lib.php');
@@ -44,6 +45,7 @@ require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/room/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/asset/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/libdeprecated.php');
+require_once($CFG->dirroot . '/mod/facetoface/classes/event_time.php');
 
 /**
  * Definitions for setting notification types
@@ -713,7 +715,7 @@ function facetoface_allow_user_cancellation($session) {
     }
 
     // If the attendance has been marked for the user, then do not let him cancel.
-    $attendancecode = array(\mod_facetoface\signup\state\no_show::get_code(), \mod_facetoface\signup\state\partially_attended::get_code(), \mod_facetoface\signup\state\fully_attended::get_code());
+    $attendancecode = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code();
     if ($session->bookedsession && in_array($session->bookedsession->statuscode, $attendancecode)) {
         return false;
     }
@@ -764,9 +766,9 @@ function facetoface_notify_under_capacity() {
                 INNER JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
                 GROUP BY s.id
             ) dates ON dates.sessid = s.id
-            WHERE mincapacity > 0 
-              AND (minstart - cutoff) < :now 
-              AND (minstart - cutoff) >= :lastcron 
+            WHERE mincapacity > 0
+              AND (minstart - cutoff) < :now
+              AND (minstart - cutoff) >= :lastcron
               AND s.cancelledstatus = 0";
 
     $tocheck = $DB->get_records_sql($sql, $params);
@@ -992,8 +994,12 @@ function facetoface_is_session_over($session, $timenow) {
 
 /**
  * Get all of the dates for a given session
+ *
+ * @param int $sessionid
+ * @param boolean $reverseorder true to sort by descending order
+ * @return array
  */
-function facetoface_get_session_dates($sessionid) {
+function facetoface_get_session_dates($sessionid, $reverseorder = false) {
     global $DB;
 
     $ret = array();
@@ -1005,6 +1011,9 @@ function facetoface_get_session_dates($sessionid) {
          WHERE fsd.sessionid = :sessionid
          GROUP BY fsd.id, fsd.sessionid, fsd.sessiontimezone, fsd.timestart, fsd.timefinish, fsd.roomid
          ORDER BY timestart";
+    if ($reverseorder) {
+        $sql .= ' DESC';
+    }
     if ($dates = $DB->get_records_sql($sql, array('sessionid' => $sessionid))) {
         $i = 0;
         foreach ($dates as $date) {
@@ -1042,42 +1051,77 @@ function facetoface_get_session($sessionid) {
 }
 
 /**
- * Get all records from facetoface_sessions for a given facetoface activity and location
+ * Get all records from facetoface_sessions for a given facetoface activity, location and event time in the specific order
  *
  * @param integer $facetofaceid ID of the activity
  * @param string $unsed previously location filter (optional). @deprecated 9.0 No longer used by internal code.
  * @param integer $roomid Room id filter (optional).
+ * @param integer $eventtime One of event_time::xxx
+ * @param boolean $reverseorder true to sort the list by future first
  */
-function facetoface_get_sessions($facetofaceid, $unused = null, $roomid = 0) {
+function facetoface_get_sessions($facetofaceid, $unused = null, $roomid = 0, int $eventtime = event_time::ALL, bool $reverseorder = false) : array {
     global $DB;
 
+    $sqlparams = array('facetoface' => $facetofaceid);
     $roomwhere = '';
-    $roomparams = array();
+    $eventtimewhere = '';
+
     if (!empty($roomid)) {
         $roomwhere = "AND s.id IN (
              SELECT sd.sessionid
                FROM {facetoface_sessions_dates} sd
               WHERE sd.roomid = :roomid)";
-        $roomparams['roomid'] = $roomid;
+        $sqlparams['roomid'] = $roomid;
+    }
+
+    if ($eventtime !== event_time::ALL) {
+        $sqlparams['timenow'] = time();
+        if ($eventtime === event_time::UPCOMING) {
+            // (wait-listed OR first session_date not started) AND (not cancelled)
+            $eventtimewhere = 'AND (m.cntdates IS NULL OR :timenow < m.mintimestart) AND s.cancelledstatus = 0';
+        } else if ($eventtime === event_time::INPROGRESS) {
+            // (first session_date started AND last session_date not finished) AND (not cancelled)
+            $eventtimewhere = 'AND (m.mintimestart <= :timenow AND :timenow2 < m.maxtimefinish) AND s.cancelledstatus = 0';
+            $sqlparams['timenow2'] = time();
+        } else if ($eventtime === event_time::OVER) {
+            // (last session_date finished) OR (cancelled)
+            $eventtimewhere = 'AND (m.maxtimefinish <= :timenow OR s.cancelledstatus = 1)';
+        }
+    }
+
+    // PostgreSQL and MySQL sort NULL in a different order.
+    // We need wait-listed events to be the furthest future events, meaning NULL needs to act as a positive maximum value.
+    // So we use 999999999999999999 as the timestart/timefinish for events that are waitlisted (whose actual timestart/finish is NULL)
+    $max = str_repeat('9', 18);
+    if ($reverseorder) {
+        $orderby = "ORDER BY s.cancelledstatus, coalesce(m.maxtimefinish,{$max}) DESC, coalesce(m.mintimestart,{$max}) DESC, s.id DESC";
+    } else {
+        $orderby = "ORDER BY s.cancelledstatus DESC, coalesce(m.mintimestart,{$max}), coalesce(m.maxtimefinish,{$max}), s.id";
     }
 
     $sessions = $DB->get_records_sql(
-            "SELECT s.*, m.mintimestart, m.maxtimefinish, m.cntdates
+        "SELECT s.*, m.mintimestart, m.maxtimefinish, m.cntdates
             FROM {facetoface_sessions} s
             LEFT JOIN (
-                SELECT fsd.sessionid, COUNT(fsd.id) AS cntdates, MIN(fsd.timestart) AS mintimestart, MAX(fsd.timefinish) AS maxtimefinish
+                SELECT
+                    fsd.sessionid,
+                    COUNT(fsd.id) AS cntdates,
+                    MIN(fsd.timestart) AS mintimestart,
+                    MAX(fsd.timefinish) AS maxtimefinish
                 FROM {facetoface_sessions_dates} fsd
                 WHERE (1=1)
                 GROUP BY fsd.sessionid
             ) m ON m.sessionid = s.id
             WHERE s.facetoface = :facetoface
             $roomwhere
-            ORDER BY m.mintimestart, m.maxtimefinish",
-            array_merge(array('facetoface' => $facetofaceid), $roomparams));
+            $eventtimewhere
+            $orderby",
+        $sqlparams
+    );
 
     if ($sessions) {
         foreach ($sessions as $key => $value) {
-            $sessions[$key]->sessiondates = facetoface_get_session_dates($value->id);
+            $sessions[$key]->sessiondates = facetoface_get_session_dates($value->id, $reverseorder);
         }
     }
     return $sessions;
@@ -1794,7 +1838,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         foreach ($submissions as $submission) {
             if ($session = facetoface_get_session($submission->sessionid)) {
 
-                if (facetoface_is_session_over($session, $timenow)) {
+                if (facetoface_is_session_over($session, $timenow) || !empty($session->cancelledstatus)) {
                     continue;
                 }
 
@@ -1826,7 +1870,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 
             $maximum = $seminar->get_multisignup_maximum();
             if ($checkremaining && (empty($maximum) || count($submissions) < $maximum)) {
-                $allsessions = facetoface_get_sessions($facetoface->id);
+                $allsessions = facetoface_get_sessions($facetoface->id, null, 0, event_time::ALL, true);
                 $numberofeventstodisplay = isset($facetoface->display) ? (int)$facetoface->display : 0;
                 $index = 0;
                 foreach ($allsessions as $id => $session) {
@@ -1834,7 +1878,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                         continue;
                     }
                     // Don't show events that are over.
-                    if (facetoface_is_session_over($session, $timenow)) {
+                    if (facetoface_is_session_over($session, $timenow) || !empty($session->cancelledstatus)) {
                         continue;
                     }
 
@@ -1866,10 +1910,10 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         if ($declareinterest_enable) {
             $output .= $declareinterest_link;
         }
-    } else if ($sessions = facetoface_get_sessions($facetoface->id)) {
+    } else if ($sessions = facetoface_get_sessions($facetoface->id, null, 0, event_time::ALL, true)) {
         if ($facetoface->display > 0) {
             foreach($sessions as $id => $session) {
-                if (facetoface_is_session_over($session, $timenow)) {
+                if (facetoface_is_session_over($session, $timenow) || !empty($session->cancelledstatus)) {
                     // We only want upcoming sessions (or those with no date set).
                     // For now, we've cut down the sessions to loop through to just those displayed.
                     unset($sessions[$id]);
@@ -3651,7 +3695,7 @@ function facetoface_get_env_session($sessionid) {
  * @param bool $objreturn Pass this as true if u want an object to be returned
  * @return array The booking conflicts.
  */
-function facetoface_get_booking_conflicts(array $dates, array $users, string $extrawhere, 
+function facetoface_get_booking_conflicts(array $dates, array $users, string $extrawhere,
                                           array $extraparams, bool $objreturn = false) {
     $bookingconflicts = array();
     foreach ($users as $user) {

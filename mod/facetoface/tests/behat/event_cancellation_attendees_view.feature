@@ -31,7 +31,7 @@ Feature: Seminar event cancellation attendees view
       | Description | Test Seminar |
     And I follow "View all events"
 
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I fill seminar session with relative date in form data:
       | sessiontimezone     | Pacific/Auckland |

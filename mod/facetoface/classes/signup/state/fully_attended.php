@@ -31,29 +31,14 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * This class is used in booking class and responsible for exact state
  */
-class fully_attended extends state {
-    /**
-     * Get conditions and validations of transitions from current state
-     */
-    final public function get_map() : array {
-        return [
-            transition::to(new no_show($this->signup))->with_conditions(
-                event_is_not_cancelled::class,
-                event_in_the_past::class
-            ),
-            transition::to(new partially_attended($this->signup))->with_conditions(
-                event_is_not_cancelled::class,
-                event_in_the_past::class
-            ),
-            // Attendance state can always be reverted back to booked.
-            transition::to(new booked($this->signup))
-        ];
-    }
+class fully_attended extends attendance_state {
 
     /**
      * Code of status as it is stored in DB
      * Numeric statuses are backward compatible except not_set which was not meant to be written into DB.
      * Statuses don't have to follow particular order (except must be unique of course)
+     *
+     * @return int
      */
     public static function get_code() : int {
         return 100;
@@ -61,6 +46,7 @@ class fully_attended extends state {
 
     /**
      * Message for user on entering the state
+     *
      * @return string
      */
     public function get_message(): string {
@@ -69,6 +55,7 @@ class fully_attended extends state {
 
     /**
      * Get action label for getting into state.
+     *
      * @return string
      */
     public function get_action_label(): string {
@@ -77,6 +64,7 @@ class fully_attended extends state {
 
     /**
      * Get the grade value associated with the state.
+     *
      * @return int
      */
     public static function get_grade() : int {
@@ -85,6 +73,7 @@ class fully_attended extends state {
 
     /**
      * Get the fully_attended status string.
+     *
      * @return string
      */
     public static function get_string() : string {

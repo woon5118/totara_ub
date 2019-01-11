@@ -116,7 +116,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
 
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -144,7 +144,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I press "Confirm"
     And I follow "Go back"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -231,7 +231,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     # Course 1 setup
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -259,7 +259,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I press "Confirm"
     And I follow "Go back"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -289,7 +289,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     # Course 2 setup
     And I am on "Course 2" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |
@@ -317,7 +317,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I press "Confirm"
 
     And I follow "Go back"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |

@@ -61,7 +61,7 @@ Feature: Seminar event cancellation notifications
       | Automatically cancel reservations  | No           |
     And I follow "View all events"
 
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 2 |
       | Enable waitlist  | 1 |
@@ -216,16 +216,16 @@ Feature: Seminar event cancellation notifications
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland" in the "11 March 2026" "table_row"
-    And I should see "Booking full" in the "10 February 2025" "table_row"
-    And "Cancel event" "link" should exist in the "10 February 2025" "table_row"
+    And I should see "Booking full" in the "11 March 2026" "table_row"
+    And "Cancel event" "link" should exist in the "11 March 2026" "table_row"
 
-    When I click on "Cancel event" "link" in the "10 February 2025" "table_row"
+    When I click on "Cancel event" "link" in the "11 March 2026" "table_row"
     And I press "Yes"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland" in the "11 March 2026" "table_row"
-    And I should see "3 / 2 (Overbooked)" in the "10 February 2025" "table_row"
-    And I should see "Event cancelled" in the "10 February 2025" "table_row"
-    And "Cancel event" "link" should not exist in the "10 February 2025" "table_row"
+    And I should see "3 / 2 (Overbooked)" in the "11 March 2026" "table_row"
+    And I should see "Event cancelled" in the "11 March 2026" "table_row"
+    And "Cancel event" "link" should not exist in the "11 March 2026" "table_row"
     And I run all adhoc tasks
 
     When I log out
@@ -361,7 +361,7 @@ Feature: Seminar event cancellation notifications
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
-    And I should see "Sign-up unavailable" in the "10 February 2025" "table_row"
+    And I should not see "Sign-up" in the "10 February 2025" "table_row"
 
     When I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
@@ -422,7 +422,7 @@ Feature: Seminar event cancellation notifications
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
-    And I should see "Sign-up unavailable" in the "10 February 2025" "table_row"
+    And I should not see "Sign-up" in the "10 February 2025" "table_row"
 
     When I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"

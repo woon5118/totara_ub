@@ -100,7 +100,7 @@ Feature: Search pre-defined assets in seminar
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
 
     # Find a previously undisplayed asset using a partial search criteria.
     When I click on "Select assets" "link"

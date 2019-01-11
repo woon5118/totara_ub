@@ -90,6 +90,19 @@ class mod_facetoface_mod_form extends moodleform_mod {
             $mform->disabledIf('cancellationscutoffdefault[timeunit]', 'allowcancellationsdefault', 'notchecked', 2);
         }
 
+        $mform->addElement('checkbox', 'sessionattendance', get_string('sessionattendance', 'facetoface'));
+        $mform->addHelpButton('sessionattendance', 'sessionattendance', 'facetoface');
+        $mform->setType('sessionattendance', PARAM_BOOL);
+        $mform->setDefault('sessionattendance', get_config('facetoface', 'sessionattendance'));
+
+        $options = [];
+        $options[\mod_facetoface\seminar::ATTENDANCE_TIME_END] = new lang_string('attendancetime_end', 'facetoface');
+        $options[\mod_facetoface\seminar::ATTENDANCE_TIME_START] = new lang_string('attendancetime_start', 'facetoface');
+        $options[\mod_facetoface\seminar::ATTENDANCE_TIME_ANY] = new lang_string('attendancetime_any', 'facetoface');
+        $mform->addElement('select', 'attendancetime', get_string('attendancetime', 'facetoface'), $options);
+        $mform->addHelpButton('attendancetime', 'attendancetime', 'facetoface');
+        $mform->setDefault('attendancetime', get_config('facetoface', 'attendancetime'));
+
         $mform->addElement('header', 'approvaloptionsheader', get_string('signupworkflowheader', 'facetoface'));
 
         $options = array();
@@ -105,6 +118,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $cbarray[] = $mform->createElement('checkbox', 'multisignuprestrictfully', '', get_string('status_fully_attended', 'mod_facetoface'), 0);
         $cbarray[] = $mform->createElement('checkbox', 'multisignuprestrictpartly', '', get_string('status_partially_attended', 'mod_facetoface'), 1);
         $cbarray[] = $mform->createElement('checkbox', 'multisignuprestrictnoshow', '', get_string('status_no_show', 'mod_facetoface'), 2);
+        $cbarray[] = $mform->createElement('checkbox', 'multisignuprestrictunableto', '', get_string('status_unable_to_attend', 'mod_facetoface'), 3);
         $mform->addGroup($cbarray, 'multisignuprestrictions', get_string('multisignuprestrict', 'mod_facetoface'), ['<br/>'], false);
         $mform->disabledIf('multisignuprestrictions', 'multisignup_amount', 'eq', 1);
         $mform->setType('multisignuprestrictions', PARAM_INT);
@@ -113,6 +127,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->setDefault('multisignuprestrictfully', in_array('multisignuprestrict_fully', $restrictdefaults));
         $mform->setDefault('multisignuprestrictpartly', in_array('multisignuprestrict_partially', $restrictdefaults));
         $mform->setDefault('multisignuprestrictnoshow', in_array('multisignuprestrict_noshow', $restrictdefaults));
+        $mform->setDefault('multisignuprestrictunableto', in_array('multisignuprestrict_unableto', $restrictdefaults));
 
         $mform->addElement('advcheckbox', 'waitlistautoclean', get_string('waitlistautoclean', 'mod_facetoface'), '', array('group' => 1), array(0, 1));
         $mform->setType('waitlistautoclean', PARAM_BOOL);
@@ -476,6 +491,9 @@ class mod_facetoface_mod_form extends moodleform_mod {
         if (empty($data->thirdpartywaitlist)) {
             $data->thirdpartywaitlist = 0;
         }
+        if (empty($data->sessionattendance)) {
+            $data->sessionattendance = 0;
+        }
         if (!empty($data->shortname)) {
             // This needs to match the actual database field size in mod/facetoface/db/install.xml file.
             $data->shortname = core_text::substr($data->shortname, 0, 32);
@@ -497,6 +515,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $data->multisignupfully = empty($data->multisignuprestrictfully) ? 0 : 1;
         $data->multisignuppartly = empty($data->multisignuprestrictpartly) ? 0 : 1;
         $data->multisignupnoshow = empty($data->multisignuprestrictnoshow) ? 0 : 1;
+        $data->multisignupunableto = empty($data->multisignuprestrictunableto) ? 0 : 1;
 
         // Slight hack caused by bad planning.
         $data->multiplesessions = $data->multisignupamount != 1;
@@ -541,6 +560,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
             $defaultvalues['multisignuprestrictfully'] = $defaultvalues['multisignupfully'];
             $defaultvalues['multisignuprestrictpartly'] = $defaultvalues['multisignuppartly'];
             $defaultvalues['multisignuprestrictnoshow'] = $defaultvalues['multisignupnoshow'];
+            $defaultvalues['multisignuprestrictunableto'] = $defaultvalues['multisignupunableto'];
 
             // Slight hack caused by bad planning.
             if ($defaultvalues['multiplesessions'] == 0) {

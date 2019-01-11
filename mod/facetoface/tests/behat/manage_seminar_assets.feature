@@ -19,7 +19,7 @@ Feature: Ability to view the seminar's asset, even though the asset is being use
       | Name        | Seminar 1             |
       | Description | This is description 1 |
     And I follow "Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "Select assets"
     And I follow "asset1"
     And I click on "OK" "button" in the "Choose assets" "totaradialogue"

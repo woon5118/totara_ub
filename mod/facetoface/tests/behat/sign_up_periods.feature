@@ -23,7 +23,7 @@ Feature: Seminar sign-up periods validation
     And I follow "View all events"
 
   Scenario Outline: Test sign-up period validation
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | registrationtimestart[enabled]   | 1                  |
       | registrationtimestart[month]     | July               |

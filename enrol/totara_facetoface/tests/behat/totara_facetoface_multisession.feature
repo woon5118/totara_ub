@@ -28,7 +28,7 @@ Feature: Users can enrol on courses that have several seminar activities and sig
       | Description | Test seminar description 1 |
       | No Approval | 1                          |
     And I follow "Test seminar name 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -49,7 +49,7 @@ Feature: Users can enrol on courses that have several seminar activities and sig
       | Description | Test seminar description 2 |
       | No Approval | 1                          |
     And I follow "Test seminar name 2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |

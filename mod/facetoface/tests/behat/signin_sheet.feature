@@ -30,7 +30,7 @@ Feature: Download a seminar signin sheet
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 10   |
@@ -69,7 +69,7 @@ Feature: Download a seminar signin sheet
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 10   |
@@ -125,7 +125,7 @@ Feature: Download a seminar signin sheet
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 10   |
@@ -181,7 +181,7 @@ Feature: Download a seminar signin sheet
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Delete" "link" in the "Select room" "table_row"
     And I press "Save changes"
     And I click on the link "Attendees" in row 1

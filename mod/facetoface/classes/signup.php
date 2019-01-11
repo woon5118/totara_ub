@@ -259,6 +259,10 @@ final class signup {
 
         $this->delete_customfields();
 
+        // Delete all signup session statuses.
+        session_status::delete_signup($this);
+
+        // Delete all signup event statuses.
         $signupstatuses = new signup_status_list(['signupid' => $this->get_id()]);
         $signupstatuses->delete();
 

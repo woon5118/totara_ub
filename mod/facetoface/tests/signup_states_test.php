@@ -22,20 +22,25 @@
  * @package mod_facetoface
  */
 
-use mod_facetoface\{ seminar, seminar_event, signup };
-use mod_facetoface\signup\condition\condition;
+use mod_facetoface\{ seminar, seminar_event, seminar_session, signup };
+use mod_facetoface\signup\condition\{ condition, event_taking_attendance };
 use mod_facetoface\signup\restriction\restriction;
-use mod_facetoface\signup\state\state;
+use mod_facetoface\signup\state\{ state, booked, event_cancelled };
 use mod_facetoface\signup\transaction;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * A unit test to make sure that all states are the right classes.
- * 
+ * A unit test to make sure that all states and relevant objects are the right classes.
+ *
  * Class mod_facetoface_signup_states_testcase
  */
 class mod_facetoface_signup_states_testcase extends advanced_testcase {
+    protected function setUp() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+    }
+
     /**
      * Walk through the transitions of all states and assert their conditions or restrictions.
      *
@@ -80,9 +85,6 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
      * @return void
      */
     public function test_all_given_conditions_are_classes_of_condition(): void {
-        $this->resetAfterTest(true);
-        $this->setAdminUser();
-
         // test only conditions
         $this->assert_state_transitions('conditions', condition::class);
     }
@@ -91,10 +93,129 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
      * @return void
      */
     public function test_all_given_restrictions_are_classes_of_restriction(): void {
-        $this->resetAfterTest(true);
-        $this->setAdminUser();
-
         // test only restrictions
         $this->assert_state_transitions('restrictions', restriction::class);
+    }
+
+    /**
+     * Test the transition of attendance_state classes.
+     */
+    public function test_all_attendance_states_and_their_transitions(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $seminar = new seminar();
+        $seminar->save();
+        $seminarevent = new seminar_event();
+        $seminarevent->set_facetoface($seminar->get_id());
+        $seminarevent->save();
+        $signup = signup::create($user->id, $seminarevent);
+
+        $attendance_state_classes = mod_facetoface\signup\state\attendance_state::get_all_attendance_states();
+        // add some states if not there
+        $attendance_state_classes = array_unique(array_merge($attendance_state_classes, [ booked::class, event_cancelled::class ]));
+
+        foreach ($attendance_state_classes as $stateclass) {
+            $state = new $stateclass($signup);
+            if ($state instanceof event_cancelled) {
+                // nothing to test
+                continue;
+            }
+            if ($state instanceof booked) {
+                // booked state is slightly different
+                // its transition must have all attendance_state classes
+                $transitions = $state->get_map();
+                // remove booked state
+                $remains = array_diff($attendance_state_classes, [ booked::class ]);
+                foreach ($transitions as $transition) {
+                    $to_class = get_class($transition->get_to());
+                    // remove found attendance_state
+                    $remains = array_diff($remains, [ $to_class ]);
+                }
+                $this->assertCount(0, $remains);
+            } else {
+                // anything else must be attendance_state,
+                // whose transition must have all attendance_state classes and booked state, except itself
+                $this->assertInstanceOf(mod_facetoface\signup\state\attendance_state::class, $state);
+                $transitions = $state->get_map();
+                $this->assertCount(count($attendance_state_classes) - 1, $transitions);
+                foreach ($transitions as $transition) {
+                    $to_class = get_class($transition->get_to());
+                    $this->assertContains($to_class, $attendance_state_classes);
+                    $this->assertNotEquals($to_class, $stateclass);
+                }
+            }
+        }
+    }
+
+    /**
+     * Create a seminar event and add a session to the event.
+     *
+     * @param \mod_facetoface\seminar $seminar
+     * @param integer $timediff
+     * @param integer $duration
+     * @return \mod_facetoface\seminar_event
+     */
+    private function create_event_and_session(seminar $seminar, int $timediff, int $duration) {
+        $seminarevent = new seminar_event();
+        $seminarevent->set_facetoface($seminar->get_id());
+        $seminarevent->save();
+
+        $timestart = time() + $timediff;
+        $sessiondate = new seminar_session();
+        $sessiondate->set_sessionid($seminarevent->get_id())
+            ->set_timestart($timestart)
+            ->set_timefinish($timestart + $duration)
+            ->save();
+
+        return $seminarevent;
+    }
+
+    /**
+     * Data provider - [ human_readable_text, expect, attendancetime, session_duration, time_difference ]
+     *
+     * @return array
+     */
+    public function data_provider_name_expect_attendancetime_duration_timediff() {
+        $before_attendance_start = mod_facetoface\signup\condition\event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START + 300;
+        $after_attendance_start = mod_facetoface\signup\condition\event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START - 300;
+        $dataset = json_decode(
+            '[
+                { "case": "Far past", "expects": [ true, true, true ], "duration": 3600, "timediff": -31536000 },
+                { "case": "Just ended", "expects": [ true, true, true ], "duration": 86390, "timediff": -86400 },
+                { "case": "Just started", "expects": [ false, true, true ], "duration": 3600, "timediff": -1 },
+                { "case": "Starts within attendance unlock period", "expects": [ false, true, true ], "duration": 3600, "timediff": '.$after_attendance_start.' },
+                { "case": "Starts before attendance unlock period", "expects": [ false, false, true ], "duration": 3600, "timediff": '.$before_attendance_start.' },
+                { "case": "Far future", "expects": [ false, false, true ], "duration": 3600, "timediff": 31536000 }
+            ]'
+        );
+        $data = [];
+        foreach ($dataset as $e) {
+            // add seminar::ATTENDANCE_TIME_xxx
+            for ($i = 0; $i <= 2; $i++) {
+                $data[] = [ $e->case, $e->expects[$i], $i, $e->duration, $e->timediff ];
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * Test event_taking_attendance::pass.
+     *
+     * @dataProvider data_provider_name_expect_attendancetime_duration_timediff
+     */
+    public function test_attendance_states_when_attendance_tracking_is_enabled(string $name, bool $expect, int $attendancetime, int $duration, int $timediff) {
+        // some sanity checks
+        $this->assertSame(0, seminar::ATTENDANCE_TIME_END);
+        $this->assertSame(1, seminar::ATTENDANCE_TIME_START);
+        $this->assertSame(2, seminar::ATTENDANCE_TIME_ANY);
+
+        $generator = $this->getDataGenerator();
+
+        $seminar = new seminar();
+        $seminar->set_sessionattendance(1)->set_attendancetime($attendancetime)->save();
+        $event = $this->create_event_and_session($seminar, $timediff, $duration);
+        $user = $generator->create_user();
+        $signup = signup::create($user->id, $event)->save();
+        $condition = new event_taking_attendance($signup);
+        $this->assertSame($expect, $condition->pass(), $name . ' [' . [ 'END', 'START', 'ANY' ][$attendancetime] . ']');
     }
 }

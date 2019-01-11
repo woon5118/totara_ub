@@ -3,6 +3,7 @@ addmanageremailinstruction,mod_facetoface
 addnewnotice,mod_facetoface
 addnewnoticelink,mod_facetoface
 approvaloptionsheader,mod_facetoface
+attendanceinstructions,mod_facetoface
 bulkaddattendeesfromfile,mod_facetoface
 bulkaddattendeesfrominput,mod_facetoface
 bulkaddheading,mod_facetoface
@@ -19,6 +20,7 @@ confirmmanageremailinstruction1,mod_facetoface
 confirmmanageremailinstruction2,mod_facetoface
 costheading,mod_facetoface
 copy,mod_facetoface
+currentstatus,mod_facetoface
 datetimeknownhinttext,mod_facetoface
 declareinterestonlyiffull,mod_facetoface
 declareinterestonlyiffull_help,mod_facetoface

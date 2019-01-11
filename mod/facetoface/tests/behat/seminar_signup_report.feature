@@ -20,7 +20,7 @@ Feature: Users that are in waitlist of seminar's event should be displayed in th
       | Name | Seminar1 |
     And I turn editing mode off
     And I follow "Seminar1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Delete" "link"
     And I click on "Save changes" "button"
     And I follow "Attendees"

@@ -31,29 +31,14 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * This class is used in booking class and responsible for exact state
  */
-class no_show extends state {
-    /**
-     * Get conditions and validations of transitions from current state
-     */
-    final public function get_map() : array {
-        return [
-            transition::to(new partially_attended($this->signup))->with_conditions(
-                event_is_not_cancelled::class,
-                event_in_the_past::class
-            ),
-            transition::to(new fully_attended($this->signup))->with_conditions(
-                event_is_not_cancelled::class,
-                event_in_the_past::class
-            ),
-            // Attendance state can always be reverted back to booked.
-            transition::to(new booked($this->signup))
-        ];
-    }
+class no_show extends attendance_state {
 
     /**
      * Code of status as it is stored in DB
      * Numeric statuses are backward compatible except not_set which was not meant to be written into DB.
      * Statuses don't have to follow particular order (except must be unique of course)
+     *
+     * @return int
      */
     public static function get_code() : int {
         return 80;
@@ -61,6 +46,7 @@ class no_show extends state {
 
     /**
      * Message for user on entering the state
+     *
      * @return string
      */
     public function get_message(): string {
@@ -69,6 +55,7 @@ class no_show extends state {
 
     /**
      * Get action label for getting into state.
+     *
      * @return string
      */
     public function get_action_label(): string {
@@ -77,6 +64,8 @@ class no_show extends state {
 
     /**
      * Get the grade value associated with the state.
+     *
+     * @return int
      */
     public static function get_grade() : int {
         // This is technically a graded state, but its grade is 0.
@@ -85,6 +74,7 @@ class no_show extends state {
 
     /**
      * Get the no_show status string.
+     *
      * @return string
      */
     public static function get_string() : string {

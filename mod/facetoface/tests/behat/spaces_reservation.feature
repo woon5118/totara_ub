@@ -51,7 +51,7 @@ Feature: Reserve spaces for team in seminar
       | Allow manager reservations              | Yes                      |
       | Maximum reservations                    | 10                       |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

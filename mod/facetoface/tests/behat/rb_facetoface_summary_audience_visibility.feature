@@ -23,12 +23,12 @@ Feature: Test the visibility to see the seminar summary report depending on the 
 
     And I am on "Course 17392A" course homepage
     And I follow "Seminar 17392A"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I am on "Course 17392B" course homepage
     And I follow "Seminar 17392B"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I navigate to "Manage user reports" node in "Site administration > Reports"

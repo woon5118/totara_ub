@@ -24,7 +24,7 @@ Feature: Add seminar attendees in bulk and see results
   @_file_upload
   Scenario: Conflict result when choosing Add users via file upload option
     Given I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"
@@ -46,7 +46,7 @@ Feature: Add seminar attendees in bulk and see results
 
   Scenario: Conflict result when choosing Add users via list of IDs option
     Given I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"
@@ -68,7 +68,7 @@ Feature: Add seminar attendees in bulk and see results
   @_file_upload
   Scenario: Success result when choosing Add users via file upload option
     Given I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"
@@ -86,7 +86,7 @@ Feature: Add seminar attendees in bulk and see results
 
   Scenario: Success result when choosing Add users via list of IDs option
     Given I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"
@@ -102,7 +102,7 @@ Feature: Add seminar attendees in bulk and see results
 
   Scenario: Success result when choosing Add users and Remove users options
     Given I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"

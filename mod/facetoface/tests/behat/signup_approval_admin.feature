@@ -57,7 +57,7 @@ Feature: Seminar Signup Admin Approval
     And I click on "Micky Mau" from the search results in the "Select activity level approvers" totara dialogue
     And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
     And I press "Save and display"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

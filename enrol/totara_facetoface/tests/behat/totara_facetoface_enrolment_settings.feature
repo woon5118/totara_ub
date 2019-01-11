@@ -25,7 +25,7 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
       | Description | Test seminar description |
       | No Approval | 1                        |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -36,7 +36,7 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
       | timefinish[year]   | 2020 |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |
@@ -47,7 +47,7 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
       | timefinish[year]   | 2020 |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 3    |

@@ -24,7 +24,7 @@ Feature: User with permission remove seminar's message recipients is able to per
     And I log in as "admin"
     And I am on "Course101" course homepage
     And I follow "Seminar1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
     And I follow "Attendees"
     And I set the field "Attendee actions" to "Add users"

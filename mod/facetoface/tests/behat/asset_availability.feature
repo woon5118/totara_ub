@@ -48,7 +48,7 @@ Feature: Seminar asset availability
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -130,7 +130,7 @@ Feature: Seminar asset availability
     And I should see "Asset 2" in the "January 2026" "table_row"
     And I press "Cancel"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
     And I click on "Edit session" "link"
@@ -158,7 +158,7 @@ Feature: Seminar asset availability
     And I should not see "Asset 2" in the "1 January 2025" "table_row"
     And I press "Cancel"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
     And I click on "Edit session" "link"
@@ -187,7 +187,7 @@ Feature: Seminar asset availability
     And I should see "Asset 2" in the "1 January 2025" "table_row"
     And I press "Cancel"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 40 |
     And I click on "Edit session" "link"
@@ -215,7 +215,7 @@ Feature: Seminar asset availability
     And I should see "Asset 2" in the "1 January 2026" "table_row"
     And I press "Cancel"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 50 |
     And I click on "Edit session" "link"
@@ -259,7 +259,7 @@ Feature: Seminar asset availability
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
     And I click on "Edit session" "link"
@@ -296,7 +296,7 @@ Feature: Seminar asset availability
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -353,7 +353,7 @@ Feature: Seminar asset availability
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
     And I click on "Edit session" "link"
@@ -403,7 +403,7 @@ Feature: Seminar asset availability
     And I press "Save changes"
     And I should see "Upcoming events"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 40 |
     And I click on "Edit session" "link"
@@ -445,7 +445,7 @@ Feature: Seminar asset availability
 
     When I am on "Course 1" course homepage
     And I follow "Test Seminar 2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select asset" "link"
     Then I should not see "Etwas 1"
     And I should see "Etwas 2 (Seminar: Test Seminar 2)"
@@ -459,7 +459,7 @@ Feature: Seminar asset availability
     When I log in as "teacher2"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select asset" "link"
     Then I should not see "Etwas 1"
     And I should not see "Etwas 2"
@@ -471,7 +471,7 @@ Feature: Seminar asset availability
 
     When I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select asset" "link"
     Then I should see "Etwas 1 (Seminar: Test Seminar 1)"
     And I should not see "Etwas 2"
@@ -485,7 +485,7 @@ Feature: Seminar asset availability
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
     And I click on "Edit session" "link"
@@ -505,7 +505,7 @@ Feature: Seminar asset availability
     And I click on "Asset 2" "text" in the "Choose assets" "totaradialogue"
     And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
     And I click on "Edit session" "link"
@@ -562,7 +562,7 @@ Feature: Seminar asset availability
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 40 |
     And I click on "Edit session" "link"
@@ -585,7 +585,7 @@ Feature: Seminar asset availability
       | Allow asset booking conflicts | 1       |
     And I click on "OK" "button" in the "Create new asset" "totaradialogue"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 50 |
     And I click on "Edit session" "link"
@@ -639,7 +639,7 @@ Feature: Seminar asset availability
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
     And I click on "Edit session" "link"
@@ -659,7 +659,7 @@ Feature: Seminar asset availability
     And I click on "Asset 1" "text" in the "Choose assets" "totaradialogue"
     And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
     And I click on "Edit session" "link"
@@ -679,7 +679,7 @@ Feature: Seminar asset availability
     And I click on "Asset 1" "text" in the "Choose assets" "totaradialogue"
     And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
     And I click on "Edit session" "link"

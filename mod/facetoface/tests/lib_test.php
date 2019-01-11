@@ -32,6 +32,7 @@ use \mod_facetoface\signup;
 use \mod_facetoface\signup_helper;
 use \mod_facetoface\signup\state\{not_set, waitlisted, booked, requested, user_cancelled, fully_attended};
 use \mod_facetoface\seminar_event;
+use \mod_facetoface\event_time;
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
@@ -166,6 +167,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         array(3,        3,               900,           1100),
         array(4,        3,              1200,           1400),
         array(5,        6,              1200,           1400),
+        array(6,        1,               900,           1000),
+        array(7,        1,               600,            800),
     );
 
     protected $facetoface_signups_data = array(
@@ -1551,6 +1554,21 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_get_session_dates($sessionid2), $this->msgfalse);
+
+        // Test for order.
+        $default_order = facetoface_get_session_dates(1);
+        $ascending_order = facetoface_get_session_dates(1, false);
+        $descending_order = facetoface_get_session_dates(1, true);
+
+        $this->assertEquals(7, $default_order[0]->id);
+        $this->assertEquals(6, $default_order[1]->id);
+        $this->assertEquals(1, $default_order[2]->id);
+        $this->assertEquals(7, $ascending_order[0]->id);
+        $this->assertEquals(6, $ascending_order[1]->id);
+        $this->assertEquals(1, $ascending_order[2]->id);
+        $this->assertEquals(1, $descending_order[0]->id);
+        $this->assertEquals(6, $descending_order[1]->id);
+        $this->assertEquals(7, $descending_order[2]->id);
     }
 
     function test_facetoface_get_session() {
@@ -1650,6 +1668,91 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         $sessions = facetoface_get_sessions($facetoface2->id, null, -1);
         $this->assertCount(0, $sessions);
+    }
+
+    private function make_session($f2f, $room, $dates, $cancelrightnow = false) : int {
+        $dates = array_map(
+            function ($e) use ($room) {
+                return $this->prepare_date($e, $e + HOURSECS * 3, $room->id);
+            },
+            $dates
+        );
+        $id = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => $dates]);
+        if ($id && $cancelrightnow) {
+            $evt = new seminar_event($id);
+            $evt->cancel();
+        }
+        return $id;
+    }
+
+    private static function select_timestart_from($session) {
+        return array_map(
+            function ($e) {
+                return $e->timestart;
+            },
+            $session->sessiondates
+        );
+    }
+
+    public function test_facetoface_get_sessions_eventtime() {
+        $this->resetAfterTest();
+        $now = time();
+
+        $course = $this->getDataGenerator()->create_course();
+        $room = $this->facetoface_generator->add_site_wide_room(array('name' => 'Chamber', 'allowconflicts' => 1));
+        $f2f = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $date_farpast = $now - (DAYSECS * 99);
+        $date_nearpast = $now - (DAYSECS * 7);
+        $date_present = $now - (HOURSECS / 3);
+        $date_nearfuture = $now + (DAYSECS * 5);
+        $date_farfuture = $now + (DAYSECS * 44);
+        $date_furtherfuture = $now + YEARSECS * 5;
+
+        $sess_wait  = $this->make_session($f2f, $room, []);
+        $sess_up    = $this->make_session($f2f, $room, [$date_nearfuture]);
+        $sess_inp1  = $this->make_session($f2f, $room, [$date_farpast, $date_farfuture]);
+        $sess_inp2  = $this->make_session($f2f, $room, [$date_present]);
+        $sess_over  = $this->make_session($f2f, $room, [$date_nearpast]);
+
+        $can_wait   = $this->make_session($f2f, $room, [], true);
+        $can_future = $this->make_session($f2f, $room, [$date_furtherfuture], true);
+
+        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::ALL, false);
+        $this->assertCount(7, $sessions);
+        $this->assertEquals([$can_future, $can_wait, $sess_inp1, $sess_over, $sess_inp2, $sess_up, $sess_wait], array_keys($sessions));
+        $this->assertEquals([$date_farpast, $date_farfuture], self::select_timestart_from($sessions[$sess_inp1]));
+
+        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::ALL, true);
+        $this->assertCount(7, $sessions);
+        $this->assertEquals([$sess_wait, $sess_inp1, $sess_up, $sess_inp2, $sess_over, $can_wait, $can_future], array_keys($sessions));
+        $this->assertEquals([$date_farfuture, $date_farpast], self::select_timestart_from($sessions[$sess_inp1]));
+
+        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::UPCOMING, false);
+        $this->assertCount(2, $sessions);
+        $this->assertEquals([$sess_up, $sess_wait], array_keys($sessions));
+
+        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::UPCOMING, true);
+        $this->assertCount(2, $sessions);
+        $this->assertEquals([$sess_wait, $sess_up], array_keys($sessions));
+
+        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::INPROGRESS, false);
+        $this->assertCount(2, $sessions);
+        $this->assertEquals([$sess_inp1, $sess_inp2], array_keys($sessions));
+        $this->assertEquals([$date_farpast, $date_farfuture], self::select_timestart_from($sessions[$sess_inp1]));
+
+        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::INPROGRESS, true);
+        $this->assertCount(2, $sessions);
+        $this->assertEquals([$sess_inp1, $sess_inp2], array_keys($sessions));
+        $this->assertEquals([$date_farfuture, $date_farpast], self::select_timestart_from($sessions[$sess_inp1]));
+
+        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::OVER, false);
+        $this->assertCount(3, $sessions);
+        $this->assertEquals([$can_future, $can_wait, $sess_over], array_keys($sessions));
+
+        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::OVER, true);
+        $this->assertCount(3, $sessions);
+        $this->assertEquals([$sess_over, $can_wait, $can_future], array_keys($sessions));
     }
 
     function test_facetoface_get_attendees() {

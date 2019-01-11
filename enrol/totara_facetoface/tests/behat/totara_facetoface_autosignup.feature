@@ -29,7 +29,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | Description | Test seminar description 1 |
       | No Approval | 1                          |
     And I follow "Test seminar name 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -50,7 +50,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | Description | Test seminar description 2 |
       | No Approval | 1                          |
     And I follow "Test seminar name 2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |
@@ -85,7 +85,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | No Approval                | 1                          |
       | Allow manager reservations | Yes                        |
     And I follow "Test seminar name 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Delete" "link" in the "Select room" "table_row"
     And I press "Save changes"
     And I follow "Course 1"
@@ -121,7 +121,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | Description      | Test seminar description 1 |
       | Manager Approval | 1                          |
     And I follow "Test seminar name 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -142,7 +142,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | Description      | Test seminar description 2 |
       | Manager Approval | 1                          |
     And I follow "Test seminar name 2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |

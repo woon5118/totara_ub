@@ -20,13 +20,13 @@ Feature: Displaying seminar's events with settings overlapping
         | Events displayed on course page      | 2                   |
     And I follow "Seminar 1"
     #Creating Event 1 - future event
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Save changes" "button"
     #Creating Event 2 - future event
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Save changes" "button"
     #Creating Event 3 - On going event
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "Edit session"
     And I fill seminar session with relative date in form data:
         | sessiontimezone    | Pacific/Auckland |

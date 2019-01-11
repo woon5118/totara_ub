@@ -24,7 +24,7 @@ Feature: Test deletion of a Seminar event
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select assets" "link"
     And I click on "Create new asset" "link"
     And I set the following fields to these values:
@@ -42,7 +42,7 @@ Feature: Test deletion of a Seminar event
 
     When I press "Continue"
     Then I should see "All events in Test seminar name"
-    And I should see "No upcoming events"
+    And I should see "No events"
     And a seminar custom asset called "Projector" should not exist
 
   # Tests that it is possible to delete a room with custom event and that the room is cleaned up.
@@ -53,7 +53,7 @@ Feature: Test deletion of a Seminar event
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select room" "link"
     And I click on "Create new room" "link"
     And I set the following fields to these values:
@@ -81,5 +81,5 @@ Feature: Test deletion of a Seminar event
 
     When I press "Continue"
     Then I should see "All events in Test seminar name"
-    And I should see "No upcoming events"
+    And I should see "No events"
     And a seminar custom room called "Room 1" should not exist

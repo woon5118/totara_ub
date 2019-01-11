@@ -32,7 +32,7 @@ Feature: Seminar event cancellation rebooking
       | How many times the user can sign-up?   | 1            |
     And I follow "View all events"
 
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |
@@ -75,7 +75,7 @@ Feature: Seminar event cancellation rebooking
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |

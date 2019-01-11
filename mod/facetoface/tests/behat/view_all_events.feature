@@ -24,7 +24,7 @@ Feature: Check previous and upcomings sections are right populated
       | Description                          | Test seminar in progress |
       | How many times the user can sign-up? | Unlimited                |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -73,7 +73,7 @@ Feature: Check previous and upcomings sections are right populated
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -89,7 +89,7 @@ Feature: Check previous and upcomings sections are right populated
     And I press "OK"
     And I press "Save changes"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -110,9 +110,9 @@ Feature: Check previous and upcomings sections are right populated
     Given I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Event in progress" in the ".upcomingsessionlist" "css_element"
-    And I should see "1 January 2020" in the ".upcomingsessionlist" "css_element"
-    And I should see "1 January 1999" in the ".previoussessionlist" "css_element"
+    Then I should see "Event in progress" in the ".mod_facetoface__sessionlist" "css_element"
+    And I should see "1 January 2020" in the ".mod_facetoface__sessionlist" "css_element"
+    And I should see "1 January 1999" in the ".mod_facetoface__sessionlist" "css_element"
 
     When I follow "C1"
     Then I should see "Event in progress"

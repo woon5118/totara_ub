@@ -54,7 +54,7 @@ Feature: Users can enrol themself in courses with selected position where semina
       | Description | Test seminar description |
       | Select job assignment on signup | 1             |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

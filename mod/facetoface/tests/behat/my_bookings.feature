@@ -26,7 +26,7 @@ Feature: Check My bookings displays the right information for future and past ev
       | Description                             | Test seminar description   |
       | How many times the user can sign-up?    | Unlimited                  |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link" in the "Select room" "table_row"
 
     # Future event.
@@ -47,7 +47,7 @@ Feature: Check My bookings displays the right information for future and past ev
     And I click on "Save changes" "button"
 
     # In progress event.
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link" in the "Select room" "table_row"
     And I fill seminar session with relative date in form data:
       | timestart[day]       | -1 |
@@ -83,7 +83,7 @@ Feature: Check My bookings displays the right information for future and past ev
     And I click on "seminar2" "link"
 
     # Past event.
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link" in the "Select room" "table_row"
     And I fill seminar session with relative date in form data:
       | timestart[day]       | -3 |
@@ -109,7 +109,7 @@ Feature: Check My bookings displays the right information for future and past ev
 
      # Future event.
     And I click on "seminar2" "link"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link" in the "Select room" "table_row"
     And I fill seminar session with relative date in form data:
       | timestart[day]       | +4 |

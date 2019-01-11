@@ -41,7 +41,7 @@ Feature: Minimum Seminar bookings
     And I add a "Seminar" to section "1" and I fill the form with:
       | name | test activity |
     And I follow "View all events"
-    When I follow "Add a new event"
+    When I follow "Add event"
     Then the field "Minimum bookings" matches value "5"
 
     When I set the field "Minimum bookings" to "2"
@@ -72,7 +72,7 @@ Feature: Minimum Seminar bookings
     And I add a "Seminar" to section "1" and I fill the form with:
       | name | test activity |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link" in the "Select room" "table_row"
     And I fill seminar session with relative date in form data:
       | timestart[day]       | +1 |

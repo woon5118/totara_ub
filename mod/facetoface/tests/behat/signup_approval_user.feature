@@ -34,7 +34,7 @@ Feature: Seminar Signup User Approval
   Scenario: Student gets approved through manager approval by "learner" role
     And I am on "Course 9360" course homepage
     And I follow "Seminar 9360"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
     And I log out
 

@@ -52,7 +52,7 @@ Feature: Display the rooms in select room dialog when room is booked and hidden
     And I am on "Course 1" course homepage
     And I follow "Seminar TL-9152"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -76,7 +76,7 @@ Feature: Display the rooms in select room dialog when room is booked and hidden
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I press "Save changes"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |

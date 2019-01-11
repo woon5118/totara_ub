@@ -49,7 +49,7 @@ Feature: Seminar Approval required
     And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -136,7 +136,7 @@ Feature: Seminar Approval required
     And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

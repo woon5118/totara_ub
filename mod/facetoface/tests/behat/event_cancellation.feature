@@ -31,7 +31,7 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_100: cancel event with single future date, with attendees and confirm booking status.
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 39 |
     And I follow "show-selectdate0-dialog"
@@ -87,7 +87,7 @@ Feature: Seminar event cancellation basic
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "2 / 39" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
-    And I should see "Sign-up unavailable" in the "10 February 2025" "table_row"
+    And I should not see "Sign-up" in the "10 February 2025" "table_row"
     And "Cancel event" "link" should not exist in the "10 February 2025" "table_row"
     And "Copy event" "link" should exist in the "10 February 2025" "table_row"
     And "Delete event" "link" should exist in the "10 February 2025" "table_row"
@@ -103,7 +103,7 @@ Feature: Seminar event cancellation basic
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "2 / 39" in the "10 February 2025" "table_row"
-    And I should see "Sign-up unavailable" in the "10 February 2025" "table_row"
+    And I should not see "Sign-up" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
     And "Cancel event" "link" should not exist in the "10 February 2025" "table_row"
     And "Copy event" "link" should exist in the "10 February 2025" "table_row"
@@ -113,7 +113,7 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_101: cancel event with multiple future dates, with attendees.
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 39 |
     And I follow "show-selectdate0-dialog"
@@ -166,26 +166,26 @@ Feature: Seminar event cancellation basic
     When I follow "Go back"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland" in the "11 March 2026" "table_row"
-    And I should see "2 / 39" in the "10 February 2025" "table_row"
-    And I should see "Booking open" in the "10 February 2025" "table_row"
-    And "Cancel event" "link" should exist in the "10 February 2025" "table_row"
+    And I should see "2 / 39" in the "11 March 2026" "table_row"
+    And I should see "Booking open" in the "11 March 2026" "table_row"
+    And "Cancel event" "link" should exist in the "11 March 2026" "table_row"
 
-    When I click on "Cancel event" "link" in the "10 February 2025" "table_row"
+    When I click on "Cancel event" "link" in the "11 March 2026" "table_row"
     And I press "Yes"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland" in the "11 March 2026" "table_row"
-    And I should see "2 / 39" in the "10 February 2025" "table_row"
-    And I should see "Event cancelled" in the "10 February 2025" "table_row"
-    And I should see "Sign-up unavailable" in the "10 February 2025" "table_row"
-    And "Cancel event" "link" should not exist in the "10 February 2025" "table_row"
-    And "Copy event" "link" should exist in the "10 February 2025" "table_row"
-    And "Delete event" "link" should exist in the "10 February 2025" "table_row"
-    And "Edit event" "link" should not exist in the "10 February 2025" "table_row"
+    And I should see "2 / 39" in the "11 March 2026" "table_row"
+    And I should see "Event cancelled" in the "11 March 2026" "table_row"
+    And I should not see "Sign-up" in the "11 March 2026" "table_row"
+    And "Cancel event" "link" should not exist in the "11 March 2026" "table_row"
+    And "Copy event" "link" should exist in the "11 March 2026" "table_row"
+    And "Delete event" "link" should exist in the "11 March 2026" "table_row"
+    And "Edit event" "link" should not exist in the "11 March 2026" "table_row"
 
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_102: cancel event with future and past dates, with attendees.
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 39 |
     And I follow "show-selectdate0-dialog"
@@ -246,12 +246,12 @@ Feature: Seminar event cancellation basic
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see date "-10 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland"
-    And I should see "2 / 39" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
-    And I should see "Event in progress" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
-    And "Cancel event" "link" should not exist in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
-    And "Edit event" "link" should exist in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
-    And "Copy event" "link" should exist in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
-    And "Delete event" "link" should exist in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
+    And I should see "2 / 39" in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And I should see "Event in progress" in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Cancel event" "link" should not exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Edit event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Copy event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Delete event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
 
     When I log out
     And I log in as "teacher1"
@@ -260,17 +260,17 @@ Feature: Seminar event cancellation basic
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see date "-10 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland"
-    And I should see "2 / 39" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
-    And I should see "Event in progress" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
-    And "Cancel event" "link" should not exist in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
-    And "Copy event" "link" should exist in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
-    And "Edit event" "link" should exist in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
-    And "Delete event" "link" should exist in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
+    And I should see "2 / 39" in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And I should see "Event in progress" in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Cancel event" "link" should not exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Edit event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Copy event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Delete event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
 
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_103: cancel event with today and future dates, with attendees.
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 39 |
     And I follow "show-selectdate0-dialog"
@@ -327,12 +327,12 @@ Feature: Seminar event cancellation basic
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see date "0 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "12:05 AM - 11:55 PM Pacific/Auckland"
-    And I should see "2 / 39" in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
-    And I should see "Event in progress" in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
-    And "Cancel event" "link" should not exist in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
-    And "Edit event" "link" should exist in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
-    And "Copy event" "link" should exist in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
-    And "Delete event" "link" should exist in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
+    And I should see "2 / 39" in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And I should see "Event in progress" in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Cancel event" "link" should not exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Edit event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Copy event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Delete event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
 
     When I log out
     And I log in as "admin"
@@ -341,17 +341,17 @@ Feature: Seminar event cancellation basic
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see date "0 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "12:05 AM - 11:55 PM Pacific/Auckland"
-    And I should see "2 / 39" in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
-    And I should see "Event in progress" in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
-    And "Cancel event" "link" should not exist in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
-    And "Edit event" "link" should exist in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
-    And "Copy event" "link" should exist in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
-    And "Delete event" "link" should exist in the "12:05 AM - 11:55 PM Pacific/Auckland" "table_row"
+    And I should see "2 / 39" in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And I should see "Event in progress" in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Cancel event" "link" should not exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Edit event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Copy event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
+    And "Delete event" "link" should exist in the "9:00 AM - 3:00 PM Pacific/Auckland" "table_row"
 
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_104: cancel event with today, in 1 hr, with attendees.
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 39 |
     And I follow "show-selectdate0-dialog"
@@ -392,7 +392,7 @@ Feature: Seminar event cancellation basic
     When I click on "Cancel event" "link" in the "2 / 39" "table_row"
     And I press "Yes"
     Then I should see "2 / 39" in the "Event cancelled" "table_row"
-    And I should see "Sign-up unavailable" in the "Event cancelled" "table_row"
+    And I should not see "Sign-up" in the "Event cancelled" "table_row"
     And "Cancel event" "link" should not exist in the "Event cancelled" "table_row"
     And "Edit event" "link" should not exist in the "Event cancelled" "table_row"
     And "Copy event" "link" should exist in the "Event cancelled" "table_row"
@@ -401,7 +401,7 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_105: cancel event with single past date with no attendees.
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 39 |
     And I follow "show-selectdate0-dialog"
@@ -433,7 +433,7 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_106: cancel event with single future date with no attendees.
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 39 |
     And I follow "show-selectdate0-dialog"
@@ -458,7 +458,7 @@ Feature: Seminar event cancellation basic
     And I press "Yes"
     Then I should see date "10 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "Event cancelled" in the "0 / 39" "table_row"
-    And I should see "Sign-up unavailable" in the "Event cancelled" "table_row"
+    And I should not see "Sign-up" in the "Event cancelled" "table_row"
     And "Cancel event" "link" should not exist in the "Event cancelled" "table_row"
     And "Copy event" "link" should exist in the "Event cancelled" "table_row"
     And "Delete event" "link" should exist in the "Event cancelled" "table_row"
@@ -467,7 +467,7 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_107: cancel and delete the whole seminar event
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the field "Maximum bookings" to "20"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
@@ -483,7 +483,7 @@ Feature: Seminar event cancellation basic
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the field "Maximum bookings" to "30"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
@@ -502,7 +502,7 @@ Feature: Seminar event cancellation basic
 
     When I click on "Cancel event" "link" in the "0 / 30" "table_row"
     And I should see "Cancelling event in"
-    And I should see "Are you completely sure you want to cancel this event?"
+    And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
     And I should see "Event cancelled" in the "0 / 30" "table_row"
@@ -518,7 +518,7 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_108: cancel and clone cancelled event
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the field "Maximum bookings" to "20"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
@@ -534,7 +534,7 @@ Feature: Seminar event cancellation basic
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the field "Maximum bookings" to "30"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
@@ -553,18 +553,13 @@ Feature: Seminar event cancellation basic
 
     When I click on "Cancel event" "link" in the "0 / 30" "table_row"
     And I should see "Cancelling event in"
-    And I should see "Are you completely sure you want to cancel this event?"
+    And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
     And I should see "Event cancelled" in the "0 / 30" "table_row"
     And I should not see "Edit event" in the "0 / 30" "table_row"
     And I should see "Booking open" in the "0 / 20" "table_row"
 
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. This is
-    # due to a regression from TL-9110.
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9478" lands
     When I click on "Copy event" "link" in the "0 / 30" "table_row"
     And I set the field "Maximum bookings" to "99"
     And I press "Save changes"

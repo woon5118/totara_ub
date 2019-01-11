@@ -49,7 +49,7 @@ Feature: Use facetoface session roles
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the field "Student1 Midsam1 Sam1" to "1"
     And I set the field "Student3 Sam3" to "1"
     And I press "Save changes"

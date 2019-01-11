@@ -20,7 +20,7 @@ Feature: Seminar with multi session dates compatible with room selection and new
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name | Seminar 1 |
     And I follow "Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "Select room"
     And I follow "room 1"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
@@ -55,7 +55,7 @@ Feature: Seminar with multi session dates compatible with room selection and new
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name | Seminar 2 |
     And I follow "Seminar 2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "Delete"
     And I click on "Save changes" "button"
     When I follow "Edit event"

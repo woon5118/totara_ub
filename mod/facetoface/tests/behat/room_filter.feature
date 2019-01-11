@@ -64,7 +64,7 @@ Feature: Filter session by pre-defined rooms
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -83,7 +83,7 @@ Feature: Filter session by pre-defined rooms
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I press "Save changes"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |
@@ -102,7 +102,7 @@ Feature: Filter session by pre-defined rooms
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I press "Save changes"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 3    |
@@ -121,7 +121,7 @@ Feature: Filter session by pre-defined rooms
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I press "Save changes"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 4    |

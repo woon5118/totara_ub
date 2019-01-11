@@ -32,7 +32,7 @@ Feature: Seminar Signup Role Approval after creating an event
     Given I log in as "admin"
     And I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | capacity              | 10   |
     And I press "Save changes"

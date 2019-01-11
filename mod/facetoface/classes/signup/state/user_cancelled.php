@@ -24,8 +24,6 @@
 namespace mod_facetoface\signup\state;
 
 use mod_facetoface\signup\condition as condition;
-use mod_facetoface\signup\transition as transition;
-use mod_facetoface\signup\restriction as restriction;
 
 defined('MOODLE_INTERNAL') || die();
 

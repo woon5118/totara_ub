@@ -27,8 +27,9 @@ require_once $CFG->dirroot . '/mod/facetoface/renderer.php';
 require_once($CFG->dirroot . '/totara/customfield/field/location/field.class.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
-$f = optional_param('f', 0, PARAM_INT); // facetoface ID
-$roomid = optional_param('roomid', 0, PARAM_INT);
+$f = optional_param(\mod_facetoface_renderer::PARAM_FILTER_F2FID, 0, PARAM_INT); // facetoface ID
+$roomid = optional_param(\mod_facetoface_renderer::PARAM_FILTER_ROOMID, 0, PARAM_INT);
+$eventtime = optional_param(\mod_facetoface_renderer::PARAM_FILTER_EVENTTIME, 0, PARAM_INT);
 
 if ($id) {
     if (!$cm = get_coursemodule_from_id('facetoface', $id)) {
@@ -90,7 +91,13 @@ if (empty($cm->visible) and !has_capability('mod/facetoface:viewemptyactivities'
     notice(get_string('activityiscurrentlyhidden'));
 }
 echo $OUTPUT->box_start();
-echo $OUTPUT->heading(get_string('allsessionsin', 'facetoface', $seminar->get_name()), 2);
+
+if ($roomid || $eventtime) {
+    $stringid = 'allfilteredsessionsin';
+} else {
+    $stringid = 'allsessionsin';
+}
+echo $OUTPUT->heading(get_string($stringid, 'facetoface', $seminar->get_name()), 2);
 
 echo self_completion_form($cm, $course);
 
@@ -101,8 +108,9 @@ if (!empty($seminar->get_intro())) {
 // Display a warning about previously mismatched self approval sessions.
 $f2f_renderer->selfapproval_notice($seminar->get_id());
 
-$roomid = $f2f_renderer->filter_by_room($seminar, $roomid);
-echo $f2f_renderer->print_session_list($seminar, $roomid);
+$f2f_renderer->print_action_bar($seminar);
+$f2f_renderer->print_filter_bar($seminar, $roomid, $eventtime);
+echo $f2f_renderer->print_session_list($seminar, $roomid, $eventtime);
 
 $f2f_renderer->attendees_export_form($seminar);
 

@@ -31,7 +31,7 @@ Feature: Check room details capability view for student and manager
 
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select room" "link"
     And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
@@ -51,7 +51,7 @@ Feature: Check room details capability view for student and manager
   Scenario: Login as a student and check seminar room details
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on "Room details" "link"
+    And I click on "View details" "link"
     When I switch to "popup" window
     Then I should see "View room"
     And I should see "Room 1"
@@ -62,7 +62,7 @@ Feature: Check room details capability view for student and manager
   Scenario: Login as a manager and check seminar room details
     When I log in as "admin"
     And I am on "Course 1" course homepage
-    When I click on "Room details" "link"
+    When I click on "View details" "link"
     When I switch to "popup" window
     Then I should see "View room"
     And I should see "Upcoming sessions in this room"

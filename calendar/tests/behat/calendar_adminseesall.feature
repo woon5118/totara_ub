@@ -36,7 +36,7 @@ Feature: Config setting calendar_adminseesall allows admin to view all events on
       | Description                             | Test seminar description |
       | Show entry on user's calendar           | 1                        |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -59,7 +59,7 @@ Feature: Config setting calendar_adminseesall allows admin to view all events on
       | Description                             | Test seminar description |
       | Show entry on user's calendar           | 1                        |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -82,7 +82,7 @@ Feature: Config setting calendar_adminseesall allows admin to view all events on
       | Description                             | Test seminar description |
       | Show entry on user's calendar           | 1                        |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |

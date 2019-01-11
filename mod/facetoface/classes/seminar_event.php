@@ -24,6 +24,7 @@
 namespace mod_facetoface;
 
 use context_module;
+use mod_facetoface\signup\condition\event_taking_attendance;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -425,25 +426,14 @@ final class seminar_event {
     }
 
     /**
-     * Returns true if the session is over.
-     * @param integer $timenow current time
+     * Returning true, if all the session(s) of this event are already completed.
+     *
+     * @param int $time
      * @return bool
      */
     public function is_over(int $time = 0): bool {
-
-        $time = $time ?: time();
         $sessions = $this->get_sessions();
-
-        // Check that a date has actually been set.
-        if (!$sessions->count()) {
-            return false;
-        }
-
-        $maxtimefinish = $this->get_maxtimefinish();
-        if (!(bool)($maxtimefinish)) {
-            return false;
-        }
-        return $maxtimefinish < $time;
+        return $sessions->is_everything_over($time);
     }
 
     /**
@@ -464,22 +454,29 @@ final class seminar_event {
     }
 
     /**
-     * Is seminar event in progress
+     * Is seminar event in progress, for checking it, the rule is: first session has been started,
+     * and the last session must not be over.
+     *
      * @param int $time
      * @return bool
      */
     public function is_progress(int $time = 0) : bool {
+        if (0 != $this->cancelledstatus) {
+            // Cancelled event
+            return false;
+        }
+
         $timenow = $time ? $time : time();
         $dates = $this->get_sessions();
-        foreach ($dates as $seminarsession) {
-            /**
-             * @var seminar_session $seminarsession
-             */
-            if ($seminarsession->get_timestart() < $timenow && $seminarsession->get_timefinish() >= $timenow) {
-                return true;
-            }
+        if ($dates->is_empty()) {
+            // Wait-listed events
+            return false;
         }
-        return false;
+
+        $first = $dates->get_first();
+        $last = $dates->get_last();
+
+        return $first->is_start($timenow) && !$last->is_over($timenow);
     }
 
     /**
@@ -514,6 +511,10 @@ final class seminar_event {
         return $maxtimefinish;
     }
 
+    /**
+     * Id of seminar event
+     * @return int
+     */
     public function get_id() : int {
         return (int)$this->id;
     }
@@ -559,6 +560,10 @@ final class seminar_event {
         return $this->get_capacity() - $numattendees;
     }
 
+    /**
+     * Check if event has capacity
+     * @return bool
+     */
     public function has_capacity(): bool {
         if ($this->get_free_capacity() > 0) {
             return true;
@@ -873,5 +878,74 @@ final class seminar_event {
     public function set_cancelledstatus(int $cancelledstatus) : seminar_event {
         $this->cancelledstatus = $cancelledstatus;
         return $this;
+    }
+
+    /**
+     * Logic for event->is_attendance_open, there are three possibilities here:
+     *
+     * + Any time, which means that event is able to be taking attendance all the time.
+     * + Time end, which the event is only able to be taking attendnace at when the last session
+     *   is completed.
+     * + Time start, when the first session has started.
+     *
+     * @param int $time
+     * @return bool
+     */
+    public function is_attendance_open(int $time = 0): bool {
+        if (0 !=  $this->cancelledstatus) {
+            // A cancelled event should not open for taking attendance.
+            return false;
+        }
+
+        if (0 >= $time) {
+            $time = time();
+        }
+
+        $seminar = $this->get_seminar();
+        $at = $seminar->get_attendancetime();
+
+        switch ($at) {
+            case seminar::ATTENDANCE_TIME_START:
+                // For checking attendance at time start, which apply that number of minutes
+                // before start.
+                $time += event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
+                return $this->is_started($time);
+            case seminar::ATTENDANCE_TIME_END:
+                return $this->is_over($time);
+            case seminar::ATTENDANCE_TIME_ANY:
+                if ($this->get_sessions()->is_empty()) {
+                    // It is a wait-listed event, so attendance is not open.
+                    return false;
+                }
+                return true;
+        }
+
+        debugging("Attendance time code was invalid: {$at}", DEBUG_DEVELOPER);
+        return false;
+    }
+
+    /**
+     * Extended logic for seminar events to handle the case where attendance is open for a session, but not for
+     * the event itself.
+     *
+     * @param int $time
+     * @return bool
+     */
+    public function is_any_attendance_open(int $time = 0): bool {
+        if (0 >= $time) {
+            $time = time();
+        }
+        $seminar = $this->get_seminar();
+        $at = $seminar->get_attendancetime();
+        $sa = $seminar->get_sessionattendance();
+        // If session attendance tracking is on, and attendance time is at end, then attendance is open for
+        // sessions at the end of the first session.
+        if ($sa && $at == seminar::ATTENDANCE_TIME_END) {
+            $list = $this->get_sessions();
+            $first = $list->get_first();
+            return $first->is_attendance_open($time);
+        } else {
+            return $this->is_attendance_open($time);
+        }
     }
 }

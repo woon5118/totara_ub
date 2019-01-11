@@ -41,7 +41,7 @@ Feature: Seminar availability based on activity completion
     And I press "Save and return to course"
     And I should see "Not available unless: The activity Certificate 1 is marked complete"
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

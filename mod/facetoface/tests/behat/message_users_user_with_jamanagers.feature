@@ -28,7 +28,7 @@ Feature: Assign a manager to a user via the job assignment page and send message
 
     And I am on "Course 1" course homepage
     And I follow "Seminar 15838"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"
@@ -59,7 +59,7 @@ Feature: Assign a manager to a user via the job assignment page and send message
 
     And I am on "Course 1" course homepage
     And I follow "Seminar 15838"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"

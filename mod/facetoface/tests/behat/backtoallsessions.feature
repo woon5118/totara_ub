@@ -24,7 +24,7 @@ Feature: Return to previous page after actions in seminar
       | Description | Test seminar description |
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Save changes" "button"
 
   Scenario: Course page - Seminar edit session actions return to original page

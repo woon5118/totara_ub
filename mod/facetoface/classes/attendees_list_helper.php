@@ -23,16 +23,9 @@
 
 namespace mod_facetoface;
 
-use mod_facetoface\signup\state\not_set;
-use mod_facetoface\signup\state\state;
-use mod_facetoface\signup\state\booked;
-use mod_facetoface\signup\state\waitlisted;
-use mod_facetoface\signup\state\no_show;
-use mod_facetoface\signup\state\partially_attended;
-use mod_facetoface\signup\state\fully_attended;
+use mod_facetoface\signup\state\{not_set, state, booked, waitlisted};
 use mod_facetoface\form\attendees_add_confirm;
 use mod_facetoface\event\attendees_updated;
-use mod_facetoface\import_helper;
 use \context_module;
 
 defined('MOODLE_INTERNAL') || die();
@@ -68,7 +61,7 @@ final class attendees_list_helper {
         $added  = array();
         $errors = array();
 
-        $signedupstates =  [booked::get_code(), no_show::get_code(), partially_attended::get_code(), fully_attended::get_code()];
+        $signedupstates = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with([ booked::class ]);
         if (empty($seminarevent->get_sessions())) {
             $signedupstates[] = waitlisted::get_code();
         }
@@ -110,7 +103,7 @@ final class attendees_list_helper {
                 if (!is_enrolled($context, $attendee)) {
                     $defaultlearnerrole = $DB->get_record('role', array('id' => $CFG->learnerroleid));
                     if (!enrol_try_internal_enrol($seminar->get_course(), $attendee->id, $defaultlearnerrole->id, time())) {
-                        $errors[] = ['idnumber' => $attendee->idnumber, 'name' => fullname($attendee), 'result' =>  get_string('error:enrolmentfailed', 'facetoface', fullname($attendee))];
+                        $errors[] = ['idnumber' => $attendee->idnumber, 'name' => fullname($attendee), 'result' => get_string('error:enrolmentfailed', 'facetoface', fullname($attendee))];
                         continue;
                     }
                 }
@@ -224,7 +217,7 @@ final class attendees_list_helper {
                         break;
                     }
                     $idfield = $header;
-                    switch($idfield) {
+                    switch ($idfield) {
                         case 'idnumber':
                             $erridstr = 'error:idnumbernotfound';
                             break;
@@ -306,7 +299,7 @@ final class attendees_list_helper {
                         try {
                             $jobassignment = \totara_job\job_assignment::get_with_idnumber($user->id, $data['jobassignmentidnumber'], true);
                             $data['jobassignmentid'] = $jobassignment->id;
-                        } catch(dml_missing_record_exception $e) {
+                        } catch (dml_missing_record_exception $e) {
                             $a = new \stdClass();
                             $a->user = fullname($user);
                             $a->idnumber = $data['jobassignmentidnumber'];
@@ -371,7 +364,7 @@ final class attendees_list_helper {
         $addusers = array_filter($addusers);
 
         // Validate list and fetch users.
-        switch($data->idfield) {
+        switch ($data->idfield) {
             case 'idnumber':
                 $field = 'idnumber';
                 $errstr = 'error:idnumbernotfound';
@@ -528,14 +521,9 @@ final class attendees_list_helper {
      */
     public static function get_status($allbooked = false) {
 
-        $statecodes = [
-            not_set::get_code(),
-            partially_attended::get_code(),
-            fully_attended::get_code(),
-            no_show::get_code()
-        ];
+        $statecodes = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with([ not_set::class ]);
         if ($allbooked) {
-            // Look for status fully_attended, partially_attended and no_show.
+            // Look for the status of attendance states.
             $statecodes[] = booked::get_code();
         }
         $statusoptions = [];
@@ -711,7 +699,7 @@ final class attendees_list_helper {
             $allowed_actions[] = 'takeattendance';
             $allowed_actions[] = 'messageusers';
 
-            if ($has_attendees && $session->mintimestart && facetoface_has_session_started($session, time())) {
+            if ($has_attendees && $seminarevent->is_any_attendance_open()) {
                 $available_actions[] = 'takeattendance';
             }
 
@@ -849,23 +837,12 @@ final class attendees_list_helper {
             if ($session->mintimestart) {
                 $get_attendees = facetoface_get_attendees(
                     $session->id,
-                    array(
-                        \mod_facetoface\signup\state\booked::get_code(),
-                        \mod_facetoface\signup\state\no_show::get_code(),
-                        \mod_facetoface\signup\state\partially_attended::get_code(),
-                        \mod_facetoface\signup\state\fully_attended::get_code()
-                    )
+                    \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with([ booked::class ])
                 );
             } else {
                 $get_attendees = facetoface_get_attendees(
                     $session->id,
-                    array(
-                        \mod_facetoface\signup\state\waitlisted::get_code(),
-                        \mod_facetoface\signup\state\booked::get_code(),
-                        \mod_facetoface\signup\state\no_show::get_code(),
-                        \mod_facetoface\signup\state\partially_attended::get_code(),
-                        \mod_facetoface\signup\state\fully_attended::get_code()
-                    )
+                    \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with([ waitlisted::class, booked::class ])
                 );
             }
             if ($get_attendees) {

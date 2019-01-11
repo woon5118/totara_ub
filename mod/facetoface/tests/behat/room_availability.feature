@@ -51,7 +51,7 @@ Feature: Seminar room availability
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -127,7 +127,7 @@ Feature: Seminar room availability
     And I should see "Room 2 (10)" in the "January 2026" "table_row"
     And I press "Save changes"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
     And I click on "Edit session" "link"
@@ -152,7 +152,7 @@ Feature: Seminar room availability
     And I press "Save changes"
     Then I should see "Room 1" in the "0 / 20" "table_row"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
     And I click on "Edit session" "link"
@@ -177,7 +177,7 @@ Feature: Seminar room availability
     And I press "Save changes"
     Then I should see "Room 1" in the "0 / 30" "table_row"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 40 |
     And I click on "Edit session" "link"
@@ -202,7 +202,7 @@ Feature: Seminar room availability
     And I press "Save changes"
     Then I should see "Room 2" in the "0 / 40" "table_row"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 50 |
     And I click on "Edit session" "link"
@@ -245,7 +245,7 @@ Feature: Seminar room availability
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
     And I click on "Edit session" "link"
@@ -282,7 +282,7 @@ Feature: Seminar room availability
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -339,7 +339,7 @@ Feature: Seminar room availability
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
     And I click on "Edit session" "link"
@@ -390,7 +390,7 @@ Feature: Seminar room availability
     And I press "Save changes"
     And I should see "Upcoming events"
 
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 40 |
     And I click on "Edit session" "link"
@@ -433,7 +433,7 @@ Feature: Seminar room availability
 
     When I am on "Course 1" course homepage
     And I follow "Test Seminar 2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select room" "link"
     Then I should not see "Zimmer 1"
     And I should see "Zimmer 2 (Capacity: 40) (Seminar: Test Seminar 2)"
@@ -447,7 +447,7 @@ Feature: Seminar room availability
     When I log in as "teacher2"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select room" "link"
     Then I should not see "Zimmer 1"
     And I should not see "Zimmer 2"
@@ -459,7 +459,7 @@ Feature: Seminar room availability
 
     When I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select room" "link"
     Then I should see "Zimmer 1 (Capacity: 30) (Seminar: Test Seminar 1)"
     And I should not see "Zimmer 2"
@@ -473,7 +473,7 @@ Feature: Seminar room availability
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
     And I click on "Edit session" "link"
@@ -493,7 +493,7 @@ Feature: Seminar room availability
     And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
     And I click on "Edit session" "link"
@@ -552,7 +552,7 @@ Feature: Seminar room availability
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 40 |
     And I click on "Edit session" "link"
@@ -576,7 +576,7 @@ Feature: Seminar room availability
       | Allow room booking conflicts | 1        |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 50 |
     And I click on "Edit session" "link"
@@ -632,7 +632,7 @@ Feature: Seminar room availability
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
     And I click on "Edit session" "link"
@@ -652,7 +652,7 @@ Feature: Seminar room availability
     And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
     And I click on "Edit session" "link"
@@ -672,7 +672,7 @@ Feature: Seminar room availability
     And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
     And I click on "Edit session" "link"

@@ -44,7 +44,7 @@ Feature: Add - Remove manager reservations in Seminar
       | Allow manager reservations | Yes                         |
       | Maximum reservations       | 2                           |
     And I follow "Test Seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

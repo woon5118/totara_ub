@@ -290,7 +290,7 @@ class behat_facetoface extends behat_base {
      */
     public function i_click_to_edit_the_facetoface_session_in_row($term, $row) {
         \behat_hooks::set_step_readonly(false);
-        $summaryliteral = behat_context_helper::escape(get_string('previoussessionslist', 'facetoface'));
+        $summaryliteral = behat_context_helper::escape(get_string('sessionslist', 'facetoface'));
         $titleliteral = behat_context_helper::escape(get_string('editsession', 'facetoface'));
         $xpath = "//table[@summary={$summaryliteral}]/tbody/tr[{$row}]//a/span[@title={$titleliteral}]/parent::a";
         /** @var \Behat\Mink\Element\NodeElement[] $nodes */

@@ -35,7 +35,7 @@ Feature: Sign up status
 
   Scenario: Check session with booking full status is changed when event is cancelled.
     # Create a session with status full and then cancel it.
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -78,7 +78,7 @@ Feature: Sign up status
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "1 / 1" "table_row"
-    And I should see "Are you completely sure you want to cancel this event?"
+    And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     And I should see "Event cancelled" in the ".alert-success" "css_element"
     And I log out
@@ -90,7 +90,7 @@ Feature: Sign up status
     And I log out
 
   Scenario Outline: Event cancelled should be displayed in the status column regardless the signup period
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
       | registrationtimestart[enabled]   | <periodopen>  |
@@ -124,7 +124,7 @@ Feature: Sign up status
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on "Cancel event" "link" in the "<signupperiod>" "table_row"
-    And I should see "Are you completely sure you want to cancel this event?"
+    And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     And I should see "Event cancelled" in the ".alert-success" "css_element"
     And I log out
@@ -136,11 +136,11 @@ Feature: Sign up status
     And I log out
 
     Examples:
-      | periodopen | startyear | startzone        | periodclose | endyear | endzone         | signupavailable     | bookingstatus                | signupperiod                                                                 |
-      | 1          | 2014      | Australia/Perth  | 1           | 2015    | Australia/Perth | Sign-up unavailable | Sign-up period is now closed | 30 July 2014 1:00 AM Australia/Perth to 30 July 2015 1:00 AM Australia/Perth |
-      | 1          | 2014      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open                 | 30 July 2014 1:00 AM Australia/Perth to 30 July 2030 1:00 AM Australia/Perth |
-      | 1          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Sign-up unavailable | Sign-up period not open      | 30 July 2029 1:00 AM Australia/Perth to 30 July 2030 1:00 AM Australia/Perth |
-      | 1          | 2029      | Pacific/Honolulu | 1           | 2030    | Pacific/Fiji    | Sign-up unavailable | Sign-up period not open      | 30 July 2029 7:00 PM Australia/Perth to 29 July 2030 9:00 PM Australia/Perth |
-      | 0          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Join waitlist       | Booking open                 | Booking open                                                                 |
-      | 1          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Sign-up unavailable | Sign-up period not open      | After 30 July 2029 1:00 AM Australia/Perth                                   |
-      | 0          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open                 | Before 30 July 2030 1:00 AM Australia/Perth                                  |
+      | periodopen | startyear | startzone        | periodclose | endyear | endzone         | signupavailable     | bookingstatus       | signupperiod                                                                 |
+      | 1          | 2014      | Australia/Perth  | 1           | 2015    | Australia/Perth | Wait-listed         | Booking closed      | 30 July 2014 1:00 AM Australia/Perth to 30 July 2015 1:00 AM Australia/Perth |
+      | 1          | 2014      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open        | 30 July 2014 1:00 AM Australia/Perth to 30 July 2030 1:00 AM Australia/Perth |
+      | 1          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Wait-listed         | Booking not open    | 30 July 2029 1:00 AM Australia/Perth to 30 July 2030 1:00 AM Australia/Perth |
+      | 1          | 2029      | Pacific/Honolulu | 1           | 2030    | Pacific/Fiji    | Wait-listed         | Booking not open    | 30 July 2029 7:00 PM Australia/Perth to 29 July 2030 9:00 PM Australia/Perth |
+      | 0          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Join waitlist       | Booking open        | Booking open                                                                 |
+      | 1          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Wait-listed         | Booking not open    | After 30 July 2029 1:00 AM Australia/Perth                                   |
+      | 0          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open        | Before 30 July 2030 1:00 AM Australia/Perth                                  |

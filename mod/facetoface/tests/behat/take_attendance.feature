@@ -40,7 +40,7 @@ Feature: Take attendance for seminar sessions
       | Seminar - Test seminar name | 1 |
     And I press "Save changes"
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |

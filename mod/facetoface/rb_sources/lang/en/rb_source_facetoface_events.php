@@ -70,6 +70,7 @@ $string['userstatus:approved'] = 'Approved';
 $string['userstatus:waitlisted'] = 'Waitlisted';
 $string['userstatus:booked'] = 'Booked';
 $string['userstatus:no_show'] = 'Did not attend';
+$string['userstatus:unable_to_attend'] = 'Unable to attend';
 $string['userstatus:partially_attended'] = 'Partially attended';
 $string['userstatus:fully_attended'] = 'Fully attended';
 $string['userstatus:not_set'] = 'Not set';

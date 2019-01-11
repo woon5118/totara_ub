@@ -24,7 +24,7 @@ Feature: Suspend user in different session times
     And I follow "Test seminar name"
 
     # Session in the fututre
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -56,7 +56,7 @@ Feature: Suspend user in different session times
     And I click on "Go back" "link"
 
     # Session is wait-listed
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
       | Maximum bookings | 2 |
@@ -77,7 +77,7 @@ Feature: Suspend user in different session times
     And I click on "Go back" "link"
 
     # Session in the past
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -109,7 +109,7 @@ Feature: Suspend user in different session times
     And I click on "Go back" "link"
 
     # Session in progress
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | timestart[day]     | 0    |

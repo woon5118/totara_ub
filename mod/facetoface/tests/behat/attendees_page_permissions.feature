@@ -41,7 +41,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | Seminar - Test seminar name | 1 |
     And I press "Save changes"
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     # In order to signup create session in future, and then move it back in time
     And I fill seminar session with relative date in form data:
@@ -188,7 +188,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | Seminar - Test seminar2 name | 1 |
     And I press "Save changes"
     And I follow "Test seminar2 name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |

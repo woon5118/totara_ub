@@ -33,7 +33,7 @@ Feature: Add a seminar with select position
       | Description | Test seminar description |
       | Select job assignment on signup | 1    |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]       | 1    |
@@ -77,7 +77,7 @@ Feature: Add a seminar with select position
       | Description | Test seminar description |
       | Select job assignment on signup | 1    |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]       | 1    |
@@ -132,7 +132,7 @@ Feature: Add a seminar with select position
       | Select job assignment on signup | 1    |
       | Prevent signup if no job assignment is selected or can be found | 1 |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]       | 1    |
@@ -175,7 +175,7 @@ Feature: Add a seminar with select position
       | Description | Test seminar description |
       | Select job assignment on signup | 1    |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]       | 1    |

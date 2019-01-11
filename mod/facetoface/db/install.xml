@@ -38,8 +38,11 @@
         <FIELD NAME="multisignupfully" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="multisignuppartly" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="multisignupnoshow" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="multisignupunableto" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="multisignupmaximum" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="waitlistautoclean" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="sessionattendance" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="attendancetime" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for facetoface"/>
@@ -141,6 +144,23 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="signupid" TYPE="foreign" FIELDS="signupid" REFTABLE="facetoface_signups" REFFIELDS="id"/>
         <KEY NAME="facesignstat_cre_fk" TYPE="foreign" FIELDS="createdby" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="facetoface_signups_dates_status" COMMENT="Status of user signups, this table keeps the date for each user signup, no data is deleted">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="signupid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="sessiondateid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="attendancecode" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="superceded" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="0 means this is the current status"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="signupid_fk" TYPE="foreign" FIELDS="signupid" REFTABLE="facetoface_signups" REFFIELDS="id"/>
+        <KEY NAME="sessiondateid_fk" TYPE="foreign" FIELDS="sessiondateid" REFTABLE="facetoface_sessions_dates" REFFIELDS="id"/>
+        <KEY NAME="facesigndatestat_cre_fk" TYPE="foreign" FIELDS="createdby" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="facetoface_session_info_data" COMMENT="Stores custom field data related to event, these fields describe event details">

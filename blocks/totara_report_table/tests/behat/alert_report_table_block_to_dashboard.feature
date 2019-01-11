@@ -1,4 +1,4 @@
-@block @block_totara_report_table @javascript @totara @totara_reportbuilder @dashboard
+@block @block_totara_report_table @javascript @totara @totara_reportbuilder @dashboard @mod_facetoface
 Feature: Only Alerts Report table block on dashboard
   In order to test the Alerts report table block functions on its own on the dashboard
   As a user
@@ -29,7 +29,7 @@ Feature: Only Alerts Report table block on dashboard
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

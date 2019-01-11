@@ -8,13 +8,32 @@ information provided here is intended especially for developers.
 * facetoface_build_user_roles_in_conflict_message() function has been deprecated, please use facetoface_build_user_in_conflict_message() function instead
 * facetoface_cost() function has been deprecated, please use signup::get_cost()
 * facetoface_set_completion() function has been deprecated, please use seminar::set_completion()
+* facetoface_cm_info_view() function now hides cancelled events and displays events by future first
 * seminar_event::get_normalcost() used to return an integer, now returns a string
 * seminar_event::set_normalcost() used to expect an integer as the only argument, now expects a string
 * seminar_event::get_discountcost() used to return an integer, now returns a string
 * seminar_event::set_discountcost() used to expect an integer as the only argument, now expects a string
 * Converted styles.css to less
-* Deprecated room and room_details CSS classes
 * mod_facetoface_renderer::render_seminar_event has been changed to prevent a record not found exception if a user has a deleted job assignment
+* The following changes have been made to the mod_facetoface_renderer class
+  * In print_session_list() function
+    * Added an optional parameter for filtering by event time, to the function
+    * Removed upcomingsessionlist and previoussessionlist CSS classes as session event tables are merged, please use mod_facetoface__sessionlist
+  * In print_session_list_table() function
+    * Added two optional parameters for attendance tracking
+    * The summary text of a session event list table no longer says 'past events'
+    * Added a session status column to the session event list table
+    * Added an attendance tracking column to the session event list table; the column will be hidden if attendance tracking is off
+    * Note that both new columns, session status and attendance tracking, will be hidden if $minimal = true is passed to the function
+    * Changed the name of some columns on the session event list table; Date -> Session dates, Time -> Session times, Status -> Event status, Options -> Actions
+    * The capacity column on the session event list table now hides "(0 Wait-listed)" text when nobody is wait-listed
+    * Removed a "Sign-up unavailable" link from Actions table cells
+    * The Room column on the session event list table does not have room information if a session is over
+    * Deprecated highlight and dimmed_text CSS classes
+  * In get_room_details_html() function
+    * Changed the link text of room information on a session event list table, from "(Room details)" to "View details"
+    * Deprecated room and room_details CSS classes
+  * Added two new overridable functions for session/event status - session_status_table_cell() and event_status_table_cell()
 
 === 12.0 ===
 

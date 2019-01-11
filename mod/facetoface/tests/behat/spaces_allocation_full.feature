@@ -41,7 +41,7 @@ Feature: Allocate spaces in full events
       | Allow manager reservations              | Yes                      |
       | Maximum reservations                    | 1                        |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | capacity           | 1    |
     And I press "Save changes"

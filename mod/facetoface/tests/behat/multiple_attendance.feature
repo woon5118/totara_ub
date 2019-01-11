@@ -37,7 +37,7 @@ Feature: Take attendance for a seminar with multiple sessions
 
     # Add sessions to f2f.
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | timestart[day]       | -10           |
@@ -68,7 +68,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Use Address"
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | timestart[day]       | -40           |
@@ -143,7 +143,8 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete older session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link" in the "earlier session" "table_row"
+    And I click on "earlier session" "option"
+    And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
     And I press exact "add"
@@ -173,7 +174,8 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link" in the "later session" "table_row"
+    And I click on "later session" "option"
+    And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
     And I press exact "add"
@@ -205,7 +207,8 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete newer session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link" in the "later session" "table_row"
+    And I click on "later session" "option"
+    And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
     And I press exact "add"
@@ -238,7 +241,8 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link" in the "earlier session" "table_row"
+    And I click on "earlier session" "option"
+    And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
     And I press exact "add"
@@ -269,7 +273,8 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete newer session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link" in the "later session" "table_row"
+    And I click on "later session" "option"
+    And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
     And I press exact "add"
@@ -293,7 +298,8 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link" in the "earlier session" "table_row"
+    And I click on "earlier session" "option"
+    And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
     And I press exact "add"
@@ -338,7 +344,8 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete older session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link" in the "earlier session" "table_row"
+    And I click on "earlier session" "option"
+    And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
     And I press exact "add"
@@ -362,7 +369,8 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link" in the "later session" "table_row"
+    And I click on "later session" "option"
+    And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
     And I press exact "add"
@@ -419,7 +427,8 @@ Feature: Take attendance for a seminar with multiple sessions
       | taker | course1 | teacher |
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link" in the "earlier session" "table_row"
+    And I click on "earlier session" "option"
+    And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
     And I press exact "add"
@@ -430,7 +439,8 @@ Feature: Take attendance for a seminar with multiple sessions
     When I log in as "taker"
     And I am on "course1" course homepage
     And I click on "seminar1" "link"
-    And I click on "Attendees" "link" in the "earlier session" "table_row"
+    And I click on "earlier session" "option"
+    And I click on "Attendees" "link"
     And I switch to "Take attendance" tab
     And I click on "Fully attended" "option" in the "first1 last1" "table_row"
     And I press "Save attendance"

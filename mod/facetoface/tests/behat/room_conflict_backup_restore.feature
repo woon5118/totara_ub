@@ -44,7 +44,7 @@ Feature: Test room conflicts through backup/restore
     And I am on "Course 1" course homepage
     And I follow "Facetoface TL12734"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -63,7 +63,7 @@ Feature: Test room conflicts through backup/restore
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I press "Save changes"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |
@@ -87,9 +87,9 @@ Feature: Test room conflicts through backup/restore
 
     When I click on "Duplicate" "link" in the "Facetoface TL12734" activity
     And I turn editing mode off
-    Then "//li[@id='section-0']/div[@class='content']/ul/li[1]/div/div/div[2]/div[2]/div/table/tbody/tr[1]/td[3][contains(text(), 'Room 1')]" "xpath_element" should exist
-    And "//li[@id='section-0']/div[@class='content']/ul/li[1]/div/div/div[2]/div[2]/div/table/tbody/tr[2]/td[3][contains(text(), 'Room 2')]" "xpath_element" should exist
+    Then "//li[@id='section-0']/div[@class='content']/ul/li[1]/div/div/div[2]/div[2]/div/table/tbody/tr[1]/td[3][contains(text(), 'Room 2')]" "xpath_element" should exist
+    And "//li[@id='section-0']/div[@class='content']/ul/li[1]/div/div/div[2]/div[2]/div/table/tbody/tr[2]/td[3][contains(text(), 'Room 1')]" "xpath_element" should exist
     # The room with prevent conflict should not appear.
-    And "//li[@id='section-0']/div[@class='content']/ul/li[2]/div/div/div[2]/div[2]/div/table/tbody/tr[1]/td[3][contains(text(), 'Room 1')]" "xpath_element" should not exist
-    And "//li[@id='section-0']/div[@class='content']/ul/li[2]/div/div/div[2]/div[2]/div/table/tbody/tr[2]/td[3][contains(text(), 'Room 2')]" "xpath_element" should exist
+    And "//li[@id='section-0']/div[@class='content']/ul/li[2]/div/div/div[2]/div[2]/div/table/tbody/tr[1]/td[3][contains(text(), 'Room 2')]" "xpath_element" should exist
+    And "//li[@id='section-0']/div[@class='content']/ul/li[2]/div/div/div[2]/div[2]/div/table/tbody/tr[2]/td[3][contains(text(), 'Room 1')]" "xpath_element" should not exist
 

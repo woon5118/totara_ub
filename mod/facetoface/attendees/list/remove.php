@@ -115,11 +115,24 @@ if ($hassessions) {
 
 // Setup attendees array
 if ($hassessions) {
-    $attendees = facetoface_get_attendees($seminareventid, array(\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\no_show::get_code(),
-        \mod_facetoface\signup\state\partially_attended::get_code(), \mod_facetoface\signup\state\fully_attended::get_code()));
+    $attendees = facetoface_get_attendees(
+        $seminareventid,
+        \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
+            [
+                \mod_facetoface\signup\state\booked::class
+            ]
+        )
+    );
 } else {
-    $attendees = facetoface_get_attendees($seminareventid, array(\mod_facetoface\signup\state\waitlisted::get_code(), \mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\no_show::get_code(),
-        \mod_facetoface\signup\state\partially_attended::get_code(), \mod_facetoface\signup\state\fully_attended::get_code()));
+    $attendees = facetoface_get_attendees(
+        $seminareventid,
+        \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
+            [
+                \mod_facetoface\signup\state\waitlisted::class,
+                \mod_facetoface\signup\state\booked::class
+            ]
+        )
+    );
 }
 
 $userlist = $list->get_user_ids();

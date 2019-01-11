@@ -24,7 +24,7 @@ Feature: Seminar actions in upcoming block are correct
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar             |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
     And I log out
     When I log in as "student1"
@@ -51,7 +51,7 @@ Feature: Seminar actions in upcoming block are correct
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | Enable waitlist                       | 1 |
       | Send all bookings to the waiting list | 1 |

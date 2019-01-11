@@ -15,7 +15,7 @@ Feature: Test steps in behat_facetoface.php
       | Name        | Test Seminar |
       | Description | Test Seminar |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |

@@ -25,7 +25,7 @@ namespace mod_facetoface\signup\state;
 
 use mod_facetoface\event\booking_booked;
 use mod_facetoface\signup\condition\{event_allows_cancellation, event_is_cancelled, event_in_the_future, event_in_the_past,
-    event_is_not_cancelled, waitlist_common};
+    event_is_not_cancelled, event_taking_attendance, waitlist_common};
 use mod_facetoface\signup\restriction\actor_can_signuppastevents;
 use mod_facetoface\signup\transition;
 use mod_facetoface\event\abstract_signup_event;
@@ -37,46 +37,57 @@ defined('MOODLE_INTERNAL') || die();
  */
 class booked extends state implements interface_event {
     /**
+     * @return transition[]
+     */
+    final private function get_transitions_to_attendance_states() : array {
+        $transitions = [];
+        $stateclasses = attendance_state::get_all_attendance_states();
+
+        foreach ($stateclasses as $stateclass) {
+            $transitions[] = transition::to(new $stateclass($this->signup))->with_conditions(
+                event_is_not_cancelled::class,
+                event_taking_attendance::class
+            );
+        }
+
+        return $transitions;
+    }
+
+    /**
      * Get conditions and validations of transitions from current state
      *
      * booked -- Event session in the past <br/> Event is not cancelled --> no_show
+     * booked -- Event session in the past <br/> Event is not cancelled --> unable_to_attend
      * booked -- Event session in the past <br/> Event is not cancelled --> partially_attended
      * booked -- Event session in the past <br/> Event is not cancelled --> fully_attended
      * booked -- Attendee request/Session in future <br/> Event is not cancelled --> user_cancelled
      * booked -- Event is cancelled --> event_cancelled
      */
     final public function get_map() : array {
-        return [
-            transition::to(new no_show($this->signup))->with_conditions(
-                event_is_not_cancelled::class,
-                event_in_the_past::class
-            ),
-            transition::to(new partially_attended($this->signup))->with_conditions(
-                event_is_not_cancelled::class,
-                event_in_the_past::class
-            ),
-            transition::to(new fully_attended($this->signup))->with_conditions(
-                event_is_not_cancelled::class,
-                event_in_the_past::class
-            ),
-            transition::to(new user_cancelled($this->signup))->with_conditions(
-                event_is_not_cancelled::class,
-                event_allows_cancellation::class,
-                event_in_the_future::class
-            ),
-            transition::to(new user_cancelled($this->signup))->with_conditions(
-                event_is_not_cancelled::class,
-                event_allows_cancellation::class
-            )->with_restrictions(
-                actor_can_signuppastevents::class
-            ),
-            transition::to(new event_cancelled($this->signup))->with_conditions(
-                event_is_cancelled::class
-            ),
-            transition::to(new waitlisted($this->signup))->with_conditions(
-                waitlist_common::class
-            )
-        ];
+        $transitions = $this->get_transitions_to_attendance_states();
+
+        return array_merge(
+            $transitions,
+            [
+                transition::to(new user_cancelled($this->signup))->with_conditions(
+                    event_is_not_cancelled::class,
+                    event_allows_cancellation::class,
+                    event_in_the_future::class
+                ),
+                transition::to(new user_cancelled($this->signup))->with_conditions(
+                    event_is_not_cancelled::class,
+                    event_allows_cancellation::class
+                )->with_restrictions(
+                    actor_can_signuppastevents::class
+                ),
+                transition::to(new event_cancelled($this->signup))->with_conditions(
+                    event_is_cancelled::class
+                ),
+                transition::to(new waitlisted($this->signup))->with_conditions(
+                    waitlist_common::class
+                )
+            ]
+        );
     }
 
     /**

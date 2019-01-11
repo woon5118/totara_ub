@@ -23,7 +23,7 @@ Feature: My Future Bookings seminar sessions report overview
     And I am on "Course 1" course homepage
     And I follow "Seminar TL-9395"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | sessiontimezone      | Europe/Prague   |
@@ -42,7 +42,7 @@ Feature: My Future Bookings seminar sessions report overview
     And I press "OK"
     And I press "Save changes"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]       | 2               |

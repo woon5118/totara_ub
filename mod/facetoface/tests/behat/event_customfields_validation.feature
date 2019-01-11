@@ -26,14 +26,14 @@ Feature: Seminar event custom field validation works as expected
     And I am on "Course 13901" course homepage
     And I follow "View all events"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "#id_customfields" "css_element"
     And I set the field "customfield_UID" to "20172017"
     When I press "Save changes"
     Then I should see "Unique identifier"
     And I should see "20172017"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "#id_customfields" "css_element"
     And I set the field "customfield_UID" to "20172017"
     When I press "Save changes"

@@ -39,7 +39,7 @@ Feature: Search pre-defined rooms in seminar
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select room" "link"
     And I click on "Search" "link" in the "Choose a room" "totaradialogue"
 
@@ -121,7 +121,7 @@ Feature: Search pre-defined rooms in seminar
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
 
     # Making sure there are results instead of an error. String order is made.
     When I click on "Select room" "link"
@@ -225,7 +225,7 @@ Feature: Search pre-defined rooms in seminar
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
 
     # Find a previously undisplayed room using a partial search criteria.
     When I click on "Select room" "link"
@@ -237,4 +237,4 @@ Feature: Search pre-defined rooms in seminar
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     Then I should see "Room 10278"
     When I press "Save changes"
-    Then I should see "Room 10278" in the "//div[@class='upcomingsessionlist']" "xpath_element"
+    Then I should see "Room 10278" in the "//div[@class='mod_facetoface__sessionlist']" "xpath_element"

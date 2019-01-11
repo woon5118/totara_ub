@@ -66,7 +66,7 @@ Feature: Manage pre-defined rooms
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     When I click on "Select room" "link"
     Then I should see "Room 1, That house, 123 here street (Capacity: 5)" in the "Choose a room" "totaradialogue"
     And I should see "Room 2, Your house, 123 near street (Capacity: 6)" in the "Choose a room" "totaradialogue"
@@ -77,7 +77,7 @@ Feature: Manage pre-defined rooms
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -138,7 +138,7 @@ Feature: Manage pre-defined rooms
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -161,7 +161,7 @@ Feature: Manage pre-defined rooms
     And I wait "1" seconds
     And I press "Save changes"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -221,7 +221,7 @@ Feature: Manage pre-defined rooms
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]       | 1                |
@@ -246,7 +246,7 @@ Feature: Manage pre-defined rooms
     And I wait "1" seconds
     And I press "Save changes"
 
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]       | 1             |
@@ -270,13 +270,13 @@ Feature: Manage pre-defined rooms
     And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
-      | timestart[day]       | 1             |
+      | timestart[day]       | 2             |
       | timestart[month]     | 1             |
       | timestart[year]      | 2020          |
       | timestart[hour]      | 14            |
       | timestart[minute]    | 0             |
       | timestart[timezone]  | Europe/London |
-      | timefinish[day]      | 1             |
+      | timefinish[day]      | 2             |
       | timefinish[month]    | 1             |
       | timefinish[year]     | 2020          |
       | timefinish[hour]     | 15            |

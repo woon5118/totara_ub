@@ -113,8 +113,12 @@ if ($actionallowed) {
     $reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
     $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
-    $attendancestatuses = array(\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\fully_attended::get_code(), \mod_facetoface\signup\state\not_set::get_code(),
-        \mod_facetoface\signup\state\no_show::get_code(), \mod_facetoface\signup\state\partially_attended::get_code());
+    $attendancestatuses = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
+        [
+            \mod_facetoface\signup\state\booked::class,
+            \mod_facetoface\signup\state\not_set::class
+        ]
+    );
 
     $config = (new rb_config())
         ->set_embeddata(['sessionid' => $s, 'status' => $attendancestatuses])

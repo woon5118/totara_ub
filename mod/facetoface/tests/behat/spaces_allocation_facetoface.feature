@@ -50,10 +50,11 @@ Feature: Allocate spaces for team in seminar
       | Fully attended                          | 0                        |
       | Partially attended                      | 0                        |
       | No show                                 | 0                        |
+      | Unable to attend                        | 0                        |
       | Allow manager reservations              | Yes                      |
       | Maximum reservations                    | 10                       |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -70,7 +71,7 @@ Feature: Allocate spaces for team in seminar
     And I set the following fields to these values:
       | capacity           | 3    |
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |
@@ -257,7 +258,7 @@ Feature: Allocate spaces for team in seminar
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I fill seminar session with relative date in form data:
       | sessiontimezone     | Pacific/Auckland |

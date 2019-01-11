@@ -449,5 +449,50 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018120702, 'facetoface');
     }
 
+    // Add support for session attendance tracking
+    if ($oldversion < 2019011100) {
+        // Add columns to facetoface table to support session attendance.
+        $facetoface_fields = [
+            new xmldb_field('multisignupunableto', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'multisignupnoshow'),
+            new xmldb_field('sessionattendance', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0'),
+            new xmldb_field('attendancetime', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0'),
+        ];
+        $table = new xmldb_table('facetoface');
+        foreach ($facetoface_fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        // Create facetoface_signups_dates_status table to track signup attendance per session date.
+        $signupdatestat_fields = [
+            new xmldb_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null),
+            new xmldb_field('signupid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null),
+            new xmldb_field('sessiondateid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null),
+            new xmldb_field('attendancecode', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null),
+            new xmldb_field('superceded', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null),
+            new xmldb_field('createdby', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null),
+            new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null)
+        ];
+        $signupdatestat_keys = [
+            new xmldb_key('primary', XMLDB_KEY_PRIMARY, ['id']),
+            new xmldb_key('signupid_fk', XMLDB_KEY_FOREIGN, ['signupid'], 'facetoface_signups', ['id']),
+            new xmldb_key('sessiondateid_fk', XMLDB_KEY_FOREIGN, ['sessiondateid'], 'facetoface_sessions_dates', ['id']),
+            new xmldb_key('facesigndatestat_cre_fk', XMLDB_KEY_FOREIGN, ['createdby'], 'user', ['id'])
+        ];
+        $table = new xmldb_table('facetoface_signups_dates_status');
+        foreach ($signupdatestat_fields as $field) {
+            $table->addField($field);
+        }
+        foreach ($signupdatestat_keys as $key) {
+            $table->addKey($key);
+        }
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2019011100, 'facetoface');
+    }
+
     return true;
 }

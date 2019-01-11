@@ -23,7 +23,7 @@ Feature: Manage custom assets by non-admin user
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select assets" "link"
     And I click on "Create new asset" "link"
     And I should see "Create new asset" in the "Create new asset" "totaradialogue"
@@ -51,7 +51,7 @@ Feature: Manage custom assets by non-admin user
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select assets" "link"
     And I click on "Create new asset" "link"
     And I should see "Create new asset" in the "Create new asset" "totaradialogue"
@@ -82,7 +82,7 @@ Feature: Manage custom assets by non-admin user
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select assets" "link"
     And I click on "Create new asset" "link"
     And I should see "Create new asset" in the "Create new asset" "totaradialogue"

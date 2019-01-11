@@ -37,7 +37,7 @@ Feature: Seminar Manager approval of waiting list
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

@@ -24,8 +24,7 @@
 
 namespace mod_facetoface;
 
-use Dompdf\Exception;
-use mod_facetoface\signup\state\{no_show, partially_attended, fully_attended, declined, not_set};
+use mod_facetoface\signup\state\{no_show, partially_attended, fully_attended, unable_to_attend, declined, not_set};
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -44,6 +43,13 @@ final class seminar {
     const APPROVAL_ROLE = 2;
     const APPROVAL_MANAGER = 4;
     const APPROVAL_ADMIN = 8;
+
+    /**
+     * Attendance field values
+     */
+    const ATTENDANCE_TIME_END = 0;
+    const ATTENDANCE_TIME_START = 1;
+    const ATTENDANCE_TIME_ANY = 2;
 
     /**
      * @var int {facetoface}.id
@@ -120,6 +126,10 @@ final class seminar {
      */
     private $multisignupnoshow = 0;
     /**
+     * @var int {facetoface}.multisignupunableto
+     */
+    private $multisignupunableto = 0;
+    /**
      * @var int {facetoface}.multisignupmaximum
      */
     private $multisignupmaximum = 0;
@@ -183,6 +193,14 @@ final class seminar {
      * @var string {facetoface}.approvaladmins
      */
     private $approvaladmins = "";
+    /**
+     * @var int {facetoface}.sessionattendance
+     */
+    private $sessionattendance = 1;
+    /**
+     * @var int {facetoface}.attendancetime
+     */
+    private $attendancetime = self::ATTENDANCE_TIME_END;
     /**
      * @var string facetoface table name
      */
@@ -609,6 +627,10 @@ final class seminar {
             $states[no_show::get_code()] = no_show::class;
         }
 
+        if (!empty($this->multisignupunableto)) {
+            $states[unable_to_attend::get_code()] = unable_to_attend::class;
+        }
+
         return $states;
     }
 
@@ -640,6 +662,15 @@ final class seminar {
      */
     public function set_multisignupnoshow(bool $multisignupnoshow) : seminar {
         $this->multisignupnoshow = (int)$multisignupnoshow;
+        return $this;
+    }
+
+    /**
+     * @param int $multisignupunableto
+     * @return this
+     */
+    public function set_multisignupunableto(bool $multisignupunableto) : seminar {
+        $this->multisignupunableto = (int)$multisignupunableto;
         return $this;
     }
 
@@ -859,6 +890,34 @@ final class seminar {
      */
     public function set_approvaladmins(string $approvaladmins) : seminar {
         $this->approvaladmins = $approvaladmins;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_sessionattendance(): int {
+        return (int)$this->sessionattendance;
+    }
+    /**
+     * @param int $sessionattendance
+     */
+    public function set_sessionattendance(int $sessionattendance) : seminar {
+        $this->sessionattendance = $sessionattendance;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_attendancetime(): int {
+        return (int)$this->attendancetime;
+    }
+    /**
+     * @param int $attendancetime
+     */
+    public function set_attendancetime(int $attendancetime) : seminar {
+        $this->attendancetime = $attendancetime;
         return $this;
     }
 

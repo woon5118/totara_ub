@@ -22,6 +22,8 @@
  */
 
 namespace mod_facetoface;
+use mod_facetoface\signup\condition\event_taking_attendance;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -60,6 +62,11 @@ final class seminar_session {
      * @var string facetoface_sessions_dates table name
      */
     const DBTABLE = 'facetoface_sessions_dates';
+    /**
+     * Related to seminar event here
+     * @var seminar_event|null
+     */
+    private $seminarevent = null;
 
     /**
      * Session constructor.
@@ -186,5 +193,156 @@ final class seminar_session {
     public function set_timefinish(int $timefinish) : seminar_session {
         $this->timefinish = $timefinish;
         return $this;
+    }
+
+    /**
+     * @param int $time
+     * @return bool
+     */
+    public function is_over(int $time = 0): bool {
+        if (empty($this->timefinish)) {
+            return false;
+        }
+
+        if (0 >= $time) {
+            $time = time();
+        }
+
+        // If the time finish is already behind the current time. Then this session is
+        // obviously completed.
+        return $this->timefinish < $time;
+    }
+
+    /**
+     * @param int $time
+     * @return bool
+     */
+    public function is_upcoming(int $time = 0): bool {
+        if (empty($this->timestart)) {
+            return false;
+        }
+
+        if (0 >= $time) {
+            $time = time();
+        }
+
+        // If the current time is behind the timestart of the session, then this session
+        // will start in the future, actually.
+        return $this->timestart > $time;
+    }
+
+    /**
+     * Checking whether the session has started or not.
+     *
+     * @param int $time
+     * @return bool
+     */
+    public function is_start(int $time = 0): bool {
+        if (empty($this->timestart)) {
+            return false;
+        }
+
+        if (0 >= $time) {
+            $time = time();
+        }
+
+        // If the current time exceed the timestart, which means that the session
+        // has already started
+        return $this->timestart < $time;
+    }
+
+    /**
+     * Returning the time description of seminar's session.
+     *
+     * @return sting
+     */
+    public function get_time_description($fullformatstring = 'strftimerecentfull', $timeformatstring = 'strftimetime'): string {
+        if (!isset($this->timestart) || !isset($this->timefinish)) {
+            return '';
+        }
+
+        $a = new stdClass();
+        $fullformat = get_string($fullformatstring, 'langconfig');
+        $a->start = userdate($this->timestart, $fullformat);
+
+        $startdate = date("Y-m-d", $this->timestart);
+        $finishdate = date("Y-m-d", $this->timefinish);
+
+        if ($startdate == $finishdate) {
+            // If it is in a same date, then we display Date month Year Hour -> end hour
+            $timeformat = get_string($timeformatstring, 'langconfig');
+            $a->end = userdate($this->timefinish, $timeformat);
+        } else {
+            $a->end = date_format_string($this->timefinish, $fullformat);
+        }
+
+        return get_string('sessiontimedescription', 'mod_facetoface', $a);
+    }
+
+    /**
+     * @return seminar_event
+     */
+    public function get_seminar_event(): seminar_event {
+        if (null == $this->seminarevent) {
+            $this->seminarevent = new seminar_event($this->sessionid);
+        }
+
+        return $this->seminarevent;
+    }
+
+    /**
+     * Checking whether the session is open for taking attendance or not.
+     *
+     * @param int $time
+     * @return bool
+     */
+    public function is_attendance_open(int $time = 0): bool {
+        $seminarevent = $this->get_seminar_event();
+        $seminar = $seminarevent->get_seminar();
+        if (!$seminar->get_sessionattendance() || (0 != $seminarevent->get_cancelledstatus())) {
+            // Attendance tracking is not enabled, or when the seminar event is cancelled.
+            return false;
+        }
+
+        if (0 >= $time) {
+            $time = time();
+        }
+
+        $attendancetime = $seminar->get_attendancetime();
+        switch ($attendancetime) {
+            case seminar::ATTENDANCE_TIME_ANY:
+                if ($seminarevent->get_sessions()->is_empty()) {
+                    // Wait listed event should not open attendance for session.
+                    // This seems to be a nonsense check here, as it is in a session level and it
+                    // should not be checking for wait-listed event, because this made session to
+                    // check for another session, inside of this session.
+                    // However, there is a case where the session/event was not saved previously
+                    // and developer somehow use this checking method for their logic.
+                    return false;
+                } else if (empty($this->timestart) || empty($this->timefinish)) {
+                    // A scenario where developer accidently did not provide timestart or timefinish
+                    // previously, and either saved it to the database or using the logic check
+                    // straight away. Despite of attendance time is set to any time, but it needs
+                    // times to be checked against any time.
+                    return false;
+                }
+
+                return true;
+            case seminar::ATTENDANCE_TIME_START:
+                // For attendance time start, it need to allow actor to mark attendnace number of
+                // minutes before the actual start time.
+                $time += event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
+                return $this->is_start($time);
+            case seminar::ATTENDANCE_TIME_END:
+                return $this->is_over($time);
+        }
+
+        // Last fall back here, and it should probably be an error.
+        debugging(
+            "Unable to find the attendance time: {$attendancetime}",
+            DEBUG_DEVELOPER
+        );
+
+        return false;
     }
 }

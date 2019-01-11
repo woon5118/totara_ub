@@ -31,7 +31,6 @@ use context_coursecat;
 use context_module;
 use context_system;
 use mod_facetoface_facetoface_testcase;
-use phpunit_util;
 use stdClass;
 use totara_core\event\user_suspended;
 use totara_userdata\userdata\item;
@@ -47,7 +46,6 @@ require_once($CFG->dirroot . '/mod/facetoface/tests/facetoface_testcase.php');
  * @group totara_userdata
  */
 class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface_testcase {
-
 
     /**
      * Set up tests.
@@ -94,6 +92,12 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signups[21] = $f2fgenerator->create_signup($student2, $session1);
         $signups[22] = $f2fgenerator->create_signup($student2, $session2);
 
+        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[12]->id, $session2->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[21]->id, $session1->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[22]->id, $session2->sessiondates[0]->id);
+
         $signupcustomfieldids[12] = $f2fgenerator->create_customfield_data($signups[12], 'signup', 1, 3);
         $signupcustomfieldids[21] = $f2fgenerator->create_customfield_data($signups[21], 'signup', 4, 1);
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 1, 4);
@@ -139,6 +143,14 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $select_signups_status = 'SELECT id FROM {facetoface_signups_status} WHERE signupid ';
         list($sqlin, $inparams) = $DB->get_in_or_equal([$signups[21]->id, $signups[22]->id]);
         $this->assertCount(3, $DB->get_records_sql($select_signups_status . $sqlin, $inparams));
+
+        $select_signup_dates_status = 'SELECT id FROM {facetoface_signups_dates_status} WHERE signupid ';
+        list($sqlin, $inparams) = $DB->get_in_or_equal([$signups[11]->id, $signups[12]->id]);
+        $this->assertCount(0, $DB->get_records_sql($select_signup_dates_status . $sqlin, $inparams));
+
+        $select_signup_dates_status = 'SELECT id FROM {facetoface_signups_dates_status} WHERE signupid ';
+        list($sqlin, $inparams) = $DB->get_in_or_equal([$signups[21]->id, $signups[22]->id]);
+        $this->assertCount(2, $DB->get_records_sql($select_signup_dates_status . $sqlin, $inparams));
 
         $this->assert_count_customfield_data('signup', [$signups[11]->id, $signups[12]->id], 0, 0);
         $this->assert_count_customfield_data('signup', [$signups[21]->id], 5, 1);
@@ -194,6 +206,12 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signups[12] = $f2fgenerator->create_signup($student1, $session2);
         $signups[21] = $f2fgenerator->create_signup($student2, $session1);
         $signups[22] = $f2fgenerator->create_signup($student2, $session2);
+
+        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[12]->id, $session2->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[21]->id, $session1->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[22]->id, $session2->sessiondates[0]->id);
 
         $emailsink = $this->redirectMessages();
         $this->execute_adhoc_tasks();
@@ -252,6 +270,11 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->assertEquals(1, $DB->count_records('facetoface_signups_status', ['signupid' => $signups[21]->id]));
         $this->assertEquals(2, $DB->count_records('facetoface_signups_status', ['signupid' => $signups[22]->id]));
 
+        $this->assertEquals(2, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[11]->id]));
+        $this->assertFalse($DB->record_exists('facetoface_signups_dates_status', ['signupid' => $signups[12]->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[21]->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[22]->id]));
+
         $this->assert_count_customfield_data('signup', [$signups[11]->id], 4, 1);
         $this->assert_count_customfield_data('signup', [$signups[12]->id], 0, 0);
         $this->assert_count_customfield_data('signup', [$signups[21]->id], 5, 1);
@@ -301,6 +324,13 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signups[21] = $f2fgenerator->create_signup($student2, $session1);
         $signups[22] = $f2fgenerator->create_signup($student2, $session2);
         $signups[23] = $f2fgenerator->create_signup($student2, $session3);
+
+        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[12]->id, $session2->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[13]->id, $session3->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[21]->id, $session1->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[22]->id, $session2->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[23]->id, $session3->sessiondates[0]->id);
 
         $emailsink = $this->redirectMessages();
         $this->execute_adhoc_tasks();
@@ -366,6 +396,13 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->assertEquals(2, $DB->count_records('facetoface_signups_status', ['signupid' => $signups[22]->id]));
         $this->assertEquals(1, $DB->count_records('facetoface_signups_status', ['signupid' => $signups[23]->id]));
 
+        $this->assertFalse($DB->record_exists('facetoface_signups_dates_status', ['signupid' => $signups[11]->id]));
+        $this->assertFalse($DB->record_exists('facetoface_signups_dates_status', ['signupid' => $signups[12]->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[13]->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[21]->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[22]->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[23]->id]));
+
         $this->assert_count_customfield_data('signup', [$signups[11]->id], 0, 0);
         $this->assert_count_customfield_data('signup', [$signups[12]->id], 0, 0);
         $this->assert_count_customfield_data('signup', [$signups[13]->id], 4, 5);
@@ -423,6 +460,14 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signups[21] = $f2fgenerator->create_signup($student2, $session1);
         $signups[22] = $f2fgenerator->create_signup($student2, $session2);
         $signups[23] = $f2fgenerator->create_signup($student2, $session3);
+
+
+        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[12]->id, $session2->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[13]->id, $session3->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[21]->id, $session1->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[22]->id, $session2->sessiondates[0]->id);
+        $f2fgenerator->add_session_status($signups[23]->id, $session3->sessiondates[0]->id);
 
         $emailsink = $this->redirectMessages();
         $this->execute_adhoc_tasks();
@@ -487,6 +532,13 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->assertEquals(1, $DB->count_records('facetoface_signups_status', ['signupid' => $signups[21]->id]));
         $this->assertEquals(2, $DB->count_records('facetoface_signups_status', ['signupid' => $signups[22]->id]));
         $this->assertEquals(1, $DB->count_records('facetoface_signups_status', ['signupid' => $signups[23]->id]));
+
+        $this->assertEquals(1, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[11]->id]));
+        $this->assertFalse($DB->record_exists('facetoface_signups_dates_status', ['signupid' => $signups[12]->id]));
+        $this->assertFalse($DB->record_exists('facetoface_signups_dates_status', ['signupid' => $signups[13]->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[21]->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[22]->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups_dates_status', ['signupid' => $signups[23]->id]));
 
         $this->assert_count_customfield_data('signup', [$signups[11]->id], 4, 1);
         $this->assert_count_customfield_data('signup', [$signups[12]->id], 0, 0);

@@ -27,29 +27,31 @@
   //               +-------(CL, pk->id, fk->facetofaceid)
   //               |
   //               |
-  //          facetoface                  facetoface_sessions
-  //         (CL, pk->id)-------------(CL, pk->id, fk->facetoface)
-  //                                          |  |  |  |
-  //                                          |  |  |  |
-  //            facetoface_signups------------+  |  |  |
-  //        (UL, pk->id, fk->sessionid)          |  |  |
-  //                     |                       |  |  |
-  //         facetoface_signups_status           |  |  |
-  //         (UL, pk->id, fk->signupid)          |  |  |
-  //                                             |  |  |
-  //                                             |  |  |
-  //         facetoface_session_roles------------+  |  |
-  //        (UL, pk->id, fk->sessionid)             |  |
-  //                                                |  |
-  //                                                |  |
-  //    facetoface_session_info_field               |  |
-  //          (SL, pk->id)  |                       |  |
-  //                        |                       |  |
-  //     facetoface_session_info_data---------------+  |
-  //    (CL, pk->id, fk->sessionid, fk->fieldid)       |
-  //                                                   |
-  //                                    facetoface_sessions_dates
-  //                                    (CL, pk->id, fk->session)
+  //          facetoface                       facetoface_sessions
+  //         (CL, pk->id)------------------(CL, pk->id, fk->facetoface)
+  //                                            |    |           |  |
+  //                                            |    |           |  |
+  //            facetoface_signups--------------+    |           |  |
+  //        (UL, pk->id, fk->sessionid)              |           |  |
+  //                  |             :                |           |  |
+  //    facetoface_signups_status   :                |           |  |
+  //    (UL, pk->id, fk->signupid)  :                |           |  |
+  //                                :  facetoface_sessions_dates |  |
+  //                                :  (CL, pk->id, fk->session) |  |
+  //                                :            |               |  |
+  //         facetoface_signups_dates_status-----+               |  |
+  //             (UL, pk->id, fk->signupid)                      |  |
+  //                                                             |  |
+  //                                                             |  |
+  //         facetoface_session_roles----------------------------+  |
+  //        (UL, pk->id, fk->sessionid)                             |
+  //                                                                |
+  //                                                                |
+  //    facetoface_session_info_field                               |
+  //          (SL, pk->id)  |                                       |
+  //                        |                                       |
+  //     facetoface_session_info_data-------------------------------+
+  //    (CL, pk->id, fk->sessionid, fk->fieldid)
   //
   // Meaning: pk->primary key field of the table
   //          fk->foreign key to link with parent
@@ -67,15 +69,18 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated
-        $facetoface = new backup_nested_element('facetoface', array('id'), array(
-            'name', 'intro', 'introformat', 'thirdparty', 'thirdpartywaitlist', 'display',
-            'timecreated', 'timemodified', 'shortname', 'showoncalendar', 'usercalentry',
-            'multiplesessions', 'completionstatusrequired', 'managerreserve', 'maxmanagerreserves',
-            'reservecanceldays', 'reservedays', 'declareinterest', 'interestonlyiffull',
-            'allowcancellationsdefault', 'cancellationscutoffdefault', 'selectjobassignmentonsignup',
-            'forceselectjobassignment', 'approvaltype', 'approvalrole', 'approvalterms', 'approvaladmins',
-            'multisignupfully', 'multisignuppartly', 'multisignupnoshow', 'multisignupmaximum', 'waitlistautoclean'
-        ));
+        $facetoface = new backup_nested_element(
+            'facetoface', array('id'), array(
+                'name', 'intro', 'introformat', 'thirdparty', 'thirdpartywaitlist', 'display',
+                'timecreated', 'timemodified', 'shortname', 'showoncalendar', 'usercalentry',
+                'multiplesessions', 'completionstatusrequired', 'managerreserve', 'maxmanagerreserves',
+                'reservecanceldays', 'reservedays', 'declareinterest', 'interestonlyiffull',
+                'allowcancellationsdefault', 'cancellationscutoffdefault', 'selectjobassignmentonsignup',
+                'forceselectjobassignment', 'approvaltype', 'approvalrole', 'approvalterms', 'approvaladmins',
+                'multisignupfully', 'multisignuppartly', 'multisignupnoshow', 'multisignupunableto', 'multisignupmaximum',
+                'waitlistautoclean', 'sessionattendance', 'attendancetime'
+            )
+        );
 
         $notifications = new backup_nested_element('notifications');
         $notification = new backup_nested_element('notification', array('id'), array(
@@ -122,6 +127,13 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $sessions_dates = new backup_nested_element('sessions_dates');
         $sessions_date = new backup_nested_element('sessions_date', array('id'), array(
             'sessiontimezone', 'timestart', 'timefinish'));
+
+        $signups_dates_status = new backup_nested_element('signups_dates_status');
+        $signup_date_status = new backup_nested_element(
+            'signup_date_status', array('id'), array(
+                'signupid', 'attendancecode', 'superceded', 'grade', 'createdby', 'timecreated'
+            )
+        );
 
         $room = new backup_nested_element('room', array('id'), array(
             'name', 'description', 'capacity', 'allowconflicts', 'custom', 'hidden', 'usercreated', 'usermodified', 'timecreated', 'timemodified'));
@@ -172,6 +184,9 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session->add_child($sessions_dates);
         $sessions_dates->add_child($sessions_date);
 
+        $sessions_date->add_child($signups_dates_status);
+        $signups_dates_status->add_child($signup_date_status);
+
         $sessions_date->add_child($room);
         $room->add_child($room_fields);
         $room_fields->add_child($room_field);
@@ -210,6 +225,10 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         }
 
         $sessions_date->set_source_table('facetoface_sessions_dates', array('sessionid' => backup::VAR_PARENTID));
+
+        if ($userinfo) {
+            $signup_date_status->set_source_table('facetoface_signups_dates_status', array('sessiondateid' => backup::VAR_PARENTID));
+        }
 
         $room->set_source_sql("SELECT fr.*
                                  FROM {facetoface_room} fr

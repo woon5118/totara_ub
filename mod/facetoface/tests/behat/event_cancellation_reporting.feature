@@ -32,7 +32,7 @@ Feature: Seminar event cancellation reporting
       | Description | Test Seminar |
     And I follow "View all events"
 
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
     And I follow "show-selectdate0-dialog"

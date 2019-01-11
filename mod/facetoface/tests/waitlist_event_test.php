@@ -177,6 +177,13 @@ class mod_facetoface_waitlist_event_testcase extends advanced_testcase {
         $session = $DB->get_record("facetoface_sessions", ['id' => $sessionid]);
         $session->sessiondates = [];
 
+        /** @var mod_facetoface_renderer $f2frenderer */
+        $f2frenderer = $PAGE->get_renderer("mod_facetoface");
+        $rendered = $f2frenderer->print_session_list_table([$session], true, true, true, [], $CFG->wwwroot);
+
+        $expected = "(0 Wait-listed)";
+        $this->assertNotContains($expected, $rendered);
+
         foreach ($users as $user) {
             $this->create_signup($user, $session, \mod_facetoface\signup\state\waitlisted::class);
         }

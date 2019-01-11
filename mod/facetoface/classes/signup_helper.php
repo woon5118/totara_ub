@@ -24,16 +24,14 @@
 namespace mod_facetoface;
 
 use mod_facetoface\exception\signup_exception;
-use mod_facetoface\signup\state\fully_attended;
-use mod_facetoface\signup\state\no_show;
 use mod_facetoface\signup\state\not_set;
-use mod_facetoface\signup\state\partially_attended;
 use \stdClass;
 use mod_facetoface\signup\state\state as state;
 use mod_facetoface\signup\state\booked as booked;
 use mod_facetoface\signup\state\requested as requested;
 use mod_facetoface\signup\state\waitlisted as waitlisted;
 use mod_facetoface\signup\state\user_cancelled as user_cancelled;
+use mod_facetoface\signup\state\attendance_state as attendance_state;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -117,7 +115,8 @@ final class signup_helper {
     }
 
     /**
-     * Cancel a users signup to a seminar event.
+     * Cancel a user signup to a seminar event.
+     *
      * @param signup $signup
      * @param string $cancellationreason
      * @return signup
@@ -183,7 +182,7 @@ final class signup_helper {
     }
 
     /**
-     * Process the attendance records for a seminar event.
+     * Process the attendance records for a seminar event. This is for event taking attendance.
      *
      * @param seminar_event $seminarevent
      * @param array         $attendance
@@ -191,7 +190,9 @@ final class signup_helper {
      */
     public static function process_attendance(seminar_event $seminarevent, array $attendance) : bool {
         global $CFG, $USER;
-        require_once($CFG->dirroot . '/mod/facetoface/lib.php'); // Necessary for facetoface_grade_item_update()
+
+        // Necessary for facetoface_grade_item_update()
+        require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
         foreach ($attendance as $signupid => $value) {
             $signup = new signup($signupid);
@@ -200,11 +201,7 @@ final class signup_helper {
 
             if ($desiredstate == not_set::class) {
                 // If current state is attendance, try fallback to booked, otherwise leave it as is
-                if (
-                    ($currentstate instanceof fully_attended) ||
-                    ($currentstate instanceof partially_attended) ||
-                    ($currentstate instanceof no_show)
-                ){
+                if ($currentstate instanceof attendance_state) {
                     $desiredstate = booked::class;
                 } else {
                     $desiredstate = get_class($currentstate);

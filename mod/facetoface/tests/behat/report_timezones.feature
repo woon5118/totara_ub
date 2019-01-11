@@ -25,7 +25,7 @@ Feature: Seminar timezones in reports
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | sessiontimezone      | Europe/Prague   |
@@ -60,7 +60,7 @@ Feature: Seminar timezones in reports
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
 
     And I press "Save changes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | sessiontimezone      | User timezone   |
@@ -165,7 +165,7 @@ Feature: Seminar timezones in reports
       | Name        | Test seminar 1 name        |
       | Description | Test seminar 1 description |
     And I follow "Test seminar 1 name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | sessiontimezone      | Europe/Prague   |
@@ -188,7 +188,7 @@ Feature: Seminar timezones in reports
       | Name        | Test seminar 2 name        |
       | Description | Test seminar 2 description |
     And I follow "Test seminar 2 name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | sessiontimezone      | User timezone   |

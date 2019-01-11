@@ -218,7 +218,7 @@ Feature: Filter seminar events in calendar by their customfields
       | Name        | Seminar one        |
       | Description | Seminar one desc   |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | timestart[timezone]  | Australia/Perth |
@@ -258,7 +258,7 @@ Feature: Filter seminar events in calendar by their customfields
       | Name        | Seminar two        |
       | Description | Seminar two desc   |
     And I follow "Seminar two"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | timestart[timezone]  | Australia/Perth |

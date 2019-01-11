@@ -15,7 +15,7 @@ Feature: Check seminar notification duplicates recovery functionality
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I click on "Test seminar name" "link"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
   Scenario: Check that duplicates are detected and can be removed
@@ -26,6 +26,7 @@ Feature: Check seminar notification duplicates recovery functionality
     And I reload the page
     Then I should see "Duplicates of auto notifications found"
     And I navigate to "Notifications" node in "Seminar administration"
+    And I reload the page
     And I should see "Duplicates of auto notifications found"
 
     # Remove duplicate

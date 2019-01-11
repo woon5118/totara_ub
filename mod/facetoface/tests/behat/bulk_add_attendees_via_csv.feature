@@ -21,7 +21,7 @@ Feature: Add seminar attendees in bulk via csv file
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
   Scenario: Upload csv file using 'Automatic' csv delimiter option

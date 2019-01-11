@@ -1,4 +1,4 @@
-@totara @totara_reportbuilder
+@totara @totara_reportbuilder @mod_facetoface
 Feature: I am able to edit the custom room
   that is within the seminars rooms report
 
@@ -35,7 +35,7 @@ Feature: I am able to edit the custom room
       | Name        | Seminar 1           |
       | Description | This is description |
     And I follow "Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "Select room"
     And I follow "room2"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"

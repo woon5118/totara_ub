@@ -30,7 +30,7 @@ Feature: Take seminar attendance with job assignment on signup
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |
@@ -223,10 +223,3 @@ Feature: Take seminar attendance with job assignment on signup
     And I should see "job1" in the "Sam1 Student1" "table_row"
     And "//tr[td[contains(.,'Sam1 Student1')]]//a[contains(@class,'attendee-edit-job-assignment')]" "xpath_element" should exist
     And "//tr[td[contains(.,'Bob2 Student2')]]//a[contains(@class,'attendee-edit-job-assignment')]" "xpath_element" should exist
-
-    When I follow "Take attendance"
-    Then I should see "Job assignment on sign up"
-    And I should see "job1" in the "Sam1 Student1" "table_row"
-
-    And I log out
-

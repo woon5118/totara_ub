@@ -57,7 +57,7 @@ Feature: Certification completion date is based on course completion time
       | Seminar - Seminar One | 1 |
     And I press "Save changes"
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     # In order to signup create session in future, and then move it back in time
     And I fill seminar session with relative date in form data:
@@ -106,7 +106,7 @@ Feature: Certification completion date is based on course completion time
     And I click on "Fully attended" "option" in the "Learner One" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
-    When I follow "Go back"
+    When I press "Go to seminar"
     And I click on "Edit" "link" in the ".lastrow" "css_element"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:

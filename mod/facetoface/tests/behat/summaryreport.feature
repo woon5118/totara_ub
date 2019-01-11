@@ -91,7 +91,7 @@ Feature: Seminar sessions report overview
       | Description      | Test seminar description |
       | Manager Approval | 1                           |
     And I follow "Test seminar name 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -136,7 +136,7 @@ Feature: Seminar sessions report overview
       | Name              | Test seminar name 2      |
       | Description       | Test seminar description |
     And I follow "Test seminar name 2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -182,7 +182,7 @@ Feature: Seminar sessions report overview
     And I follow "Go back"
 
     # 3: (2nd activity of C1) Bookings available, upcoming
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -216,7 +216,7 @@ Feature: Seminar sessions report overview
       | Name              | Test seminar name 3      |
       | Description       | Test seminar description |
     And I follow "Test seminar name 3"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -251,7 +251,7 @@ Feature: Seminar sessions report overview
       | Name              | Test seminar name 4      |
       | Description       | Test seminar description |
     And I follow "Test seminar name 4"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |

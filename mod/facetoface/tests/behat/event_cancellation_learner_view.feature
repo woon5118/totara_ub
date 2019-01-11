@@ -40,7 +40,7 @@ Feature: Seminar event cancellation learner views
       | Description | Test Seminar |
     And I follow "View all events"
 
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |
@@ -60,7 +60,7 @@ Feature: Seminar event cancellation learner views
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |
@@ -80,7 +80,7 @@ Feature: Seminar event cancellation learner views
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 29 |
     And I follow "show-selectdate0-dialog"
@@ -129,7 +129,7 @@ Feature: Seminar event cancellation learner views
     And I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
-    And I should see "Sign-up unavailable" in the "10 February 2025" "table_row"
+    And I should not see "Sign-up" in the "10 February 2025" "table_row"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland" in the "10 February 2026" "table_row"
     And I should see "Booking open" in the "10 February 2026" "table_row"
     And I should see "Sign-up" in the "10 February 2026" "table_row"

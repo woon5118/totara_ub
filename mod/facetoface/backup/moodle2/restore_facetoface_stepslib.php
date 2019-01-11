@@ -44,6 +44,9 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
             $paths[] = new restore_path_element('facetoface_cancellation_custom_field', '/activity/facetoface/sessions/session/signups/signup/cancellation_fields/cancellation_field');
         }
         $paths[] = new restore_path_element('facetoface_sessions_date', '/activity/facetoface/sessions/session/sessions_dates/sessions_date');
+        if ($userinfo) {
+            $paths[] = new restore_path_element('facetoface_signups_dates_status', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/signups_dates_status/signup_date_status');
+        }
         $paths[] = new restore_path_element('facetoface_room', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/room');
         $paths[] = new restore_path_element('facetoface_room_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/room/room_fields/room_field');
         $paths[] = new restore_path_element('facetoface_asset', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/assets/asset');
@@ -225,6 +228,27 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_signups_status', $data);
         $this->set_mapping('facetoface_signups_status', $oldid, $newitemid);
+    }
+
+    protected function process_facetoface_signups_dates_status($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->sessiondateid = $this->get_new_parentid('facetoface_sessions_date');
+        if (!$data->sessiondateid) {
+            $this->set_mapping('facetoface_signups_dates_status', $oldid, null);
+            return;
+        }
+
+        $data->timecreated = $this->apply_date_offset($data->timecreated);
+        $data->createdby = (int)$this->get_mappingid('user', $data->createdby);
+        $data->signupid = (int)$this->get_mappingid('facetoface_signup', $data->signupid);
+
+        // insert the entry record
+        $newitemid = $DB->insert_record('facetoface_signups_dates_status', $data);
+        $this->set_mapping('facetoface_signups_dates_status', $oldid, $newitemid);
     }
 
     protected function process_facetoface_session_custom_field($data) {

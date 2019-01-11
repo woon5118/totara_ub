@@ -24,7 +24,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -63,7 +63,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
     And I follow "Test seminar2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Delete" "link"
     And I set the following fields to these values:
       | capacity                  | 5   |
@@ -118,7 +118,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
     And I follow "Test seminar2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 10   |
@@ -183,7 +183,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
     And I follow "Test seminar2"
-    When I follow "Add a new event"
+    When I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -210,7 +210,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
     And I follow "Test seminar2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Delete" "link"
     And I set the following fields to these values:
       | capacity                  | 5   |

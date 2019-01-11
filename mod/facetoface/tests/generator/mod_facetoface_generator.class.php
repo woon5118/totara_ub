@@ -99,11 +99,14 @@ class mod_facetoface_generator extends testing_module_generator {
         $defaults['multisignupnoshow'] = 0;
         $defaults['multisignuppartly'] = 0;
         $defaults['multisignupfully'] = 0;
+        $defaults['multisignupunableto'] = 0;
         $defaults['completionstatusrequired'] = '{"100":1}';
         $defaults['managerreserve'] = 0;
         $defaults['maxmanagerreserves'] = 1;
         $defaults['reservecanceldays'] = 1;
         $defaults['reservedays'] = 2;
+        $defaults['sessionattendance'] = 1;
+        $defaults['attendancetime'] = \mod_facetoface\seminar::ATTENDANCE_TIME_END;
         foreach ($defaults as $field => $value) {
             if (!isset($record->$field)) {
                 $record->$field = $value;
@@ -566,5 +569,37 @@ class mod_facetoface_generator extends testing_module_generator {
     public function create_global_asset_for_behat(array $record) {
         $record['custom'] = 0;
         $this->add_asset($record);
+    }
+
+    /**
+     * Add session attendance status record
+     * @param int $signupid
+     * @param int $sessiondateid
+     * @param array|stdClass $sessionstatus
+     * @return stdClass
+     */
+    public function add_session_status(int $signupid, int $sessiondateid, $sessionstatus = null): stdClass {
+        global $DB, $USER;
+        $sessionstatus = (array)$sessionstatus;
+
+        $sessionstatus['signupid'] = $signupid;
+        $sessionstatus['sessiondateid'] = $sessiondateid;
+        $sessionstatus['superceded'] = 0;
+
+        if (!isset($sessionstatus['attendancecode'])) {
+            $sessionstatus['attendancecode'] = \mod_facetoface\signup\state\partially_attended::get_code();
+        }
+        if (!isset($sessionstatus['createdby'])) {
+            $sessionstatus['createdby'] = $USER->id;
+        }
+        if (!isset($sessionstatus['timecreated'])) {
+            $sessionstatus['timecreated'] = time();
+        }
+        $DB->execute(
+            'UPDATE {facetoface_signups_dates_status} SET superceded = 1 WHERE signupid = :signupid AND sessiondateid = :sessiondateid',
+            ['signupid' => $signupid, 'sessiondateid' => $sessiondateid]
+        );
+        $id = $DB->insert_record('facetoface_signups_dates_status', (object)$sessionstatus);
+        return $DB->get_record('facetoface_signups_dates_status', ['id' => $id]);
     }
 }

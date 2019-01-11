@@ -34,7 +34,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
       | Select job assignment on signup                                 | 1                          |
       | Prevent signup if no job assignment is selected or can be found | 0                          |
     And I follow "Test seminar name 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -58,7 +58,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
       | Select job assignment on signup                                 | 1                          |
       | Prevent signup if no job assignment is selected or can be found | 1                          |
     And I follow "Test seminar name 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

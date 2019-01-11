@@ -106,8 +106,12 @@ class mod_facetoface_sessions_report_testcase extends advanced_testcase {
 
         // Get signup time after user changed the status by using report builder.
         $shortname = 'facetoface_sessions';
-        $attendancestatuses = array(\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\fully_attended::get_code(), \mod_facetoface\signup\state\not_set::get_code(),
-            \mod_facetoface\signup\state\no_show::get_code(), \mod_facetoface\signup\state\partially_attended::get_code());
+        $attendancestatuses = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
+            [
+                \mod_facetoface\signup\state\booked::class,
+                \mod_facetoface\signup\state\not_set::class
+            ]
+        );
         $config = (new rb_config())->set_embeddata(['sessionid' => $session->id, 'status' => $attendancestatuses]);
         $report = reportbuilder::create_embedded($shortname, $config);
 

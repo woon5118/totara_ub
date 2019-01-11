@@ -32,7 +32,7 @@ Feature: Test suitable job assignment for session sign-up
     And I follow "Course 1"
     And I follow "Go to course"
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

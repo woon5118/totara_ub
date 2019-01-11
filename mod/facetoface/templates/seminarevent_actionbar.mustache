@@ -1,0 +1,63 @@
+{{!
+   This file is part of Totara Learn
+
+   Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
+   @package mod_facetoface
+}}
+
+{{!
+
+    @template mod_facetoface/seminarevent_actionbar
+
+    This template generates an action bar for seminar events and sessions.
+
+    Context variables required for this template:
+    * id: string id
+    * align: content alignment (far, center or near)
+    * commandlinks: array containing buttons
+    * commandlinks.name: name used for part of the css class name
+    * commandlinks.primary: true to accent a button
+    * commandlinks.href: link url (MUST be escaped)
+    * commandlinks.text: link text
+
+    Example content (json):
+    {
+        "id" : "id-123456",
+        "align" : "far",
+        "commandlinks" : [
+            {
+                "name" : "back",
+                "primary" : true,
+                "href" : "/index.php",
+                "text" : "Back"
+            },
+            {
+                "name" : "home",
+                "primary" : false,
+                "href" : "/index.php",
+                "text" : "Home"
+            }
+        ]
+    }
+}}
+
+<div class="mod_facetoface__action{{#align}} mod_facetoface__action--{{.}}{{/align}}"{{#id}} id="{{.}}"{{/id}}>
+    {{#commandlinks}}
+        <a href="{{{href}}}" role="button" class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-default{{/primary}} mod_facetoface__action__{{name}}">{{{text}}}</a>
+    {{/commandlinks}}
+</div>

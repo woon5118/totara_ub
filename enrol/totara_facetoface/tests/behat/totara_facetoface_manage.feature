@@ -67,7 +67,7 @@ Feature: Test add/update/delete actions for Seminar direct enrolment method
     Given I click on "Home" in the totara menu
     And I follow "Course 10782"
     And I follow "Seminar 10782"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

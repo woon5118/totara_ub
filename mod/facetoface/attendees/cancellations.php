@@ -162,14 +162,16 @@ if ($show_table) {
         if ($seminarevent->get_cancelledstatus() == 0) {
             $rows = facetoface_get_cancellations($seminarevent->get_id());
         } else {
-            $rows = facetoface_get_attendees($seminarevent->get_id(), array(
-                \mod_facetoface\signup\state\booked::get_code(),
-                \mod_facetoface\signup\state\no_show::get_code(),
-                \mod_facetoface\signup\state\partially_attended::get_code(),
-                \mod_facetoface\signup\state\fully_attended::get_code(),
-                \mod_facetoface\signup\state\user_cancelled::get_code(),
-                \mod_facetoface\signup\state\event_cancelled::get_code()
-            ));
+            $rows = facetoface_get_attendees(
+                $seminarevent->get_id(),
+                \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
+                    [
+                        \mod_facetoface\signup\state\booked::class,
+                        \mod_facetoface\signup\state\user_cancelled::class,
+                        \mod_facetoface\signup\state\event_cancelled::class
+                    ]
+                )
+            );
         }
     }
 

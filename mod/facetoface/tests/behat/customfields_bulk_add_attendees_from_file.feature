@@ -78,7 +78,7 @@ Feature: Add seminar attendess from csv file with custom fields
 
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"
@@ -118,7 +118,7 @@ Feature: Add seminar attendess from csv file with custom fields
 
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"
@@ -132,7 +132,7 @@ Feature: Add seminar attendess from csv file with custom fields
 
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"

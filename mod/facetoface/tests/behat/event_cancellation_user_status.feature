@@ -44,7 +44,7 @@ Feature: Seminar event cancellation status
       | Name                               | Test Seminar |
       | Description                        | Test Seminar |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |
@@ -195,7 +195,7 @@ Feature: Seminar event cancellation status
     And I follow "Test Seminar"
     When I click on "Cancel event" "link" in the "3 / 10" "table_row"
     And I should see "Cancelling event in"
-    And I should see "Are you completely sure you want to cancel this event?"
+    And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
     When I click on "Attendees" "link" in the "3 / 10" "table_row"
@@ -262,7 +262,7 @@ Feature: Seminar event cancellation status
     And I follow "Test Seminar"
     When I click on "Cancel event" "link"
     And I should see "Cancelling event in"
-    And I should see "Are you completely sure you want to cancel this event?"
+    And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
     When I click on "Attendees" "link"

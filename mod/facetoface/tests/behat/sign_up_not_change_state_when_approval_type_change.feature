@@ -32,7 +32,7 @@ Feature: The sign-up status is not changing when the approval type is changed
       | Manager and Administrative approval | 1       |
     And I turn editing mode off
     And I follow "f2f one"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Save changes" "button"
     And I follow "Attendees"
     And I set the field "Attendee actions" to "Add users"

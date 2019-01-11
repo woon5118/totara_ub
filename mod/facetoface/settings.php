@@ -140,6 +140,31 @@ if ($ADMIN->fulltree) { // Improve performance.
 $settings = new admin_settingpage('modfacetofacactivitydefaults', get_string('activitydefaults', 'mod_facetoface'), 'totara/core:modconfig', $module->is_enabled() === false);
 $ADMIN->add('modfacetofacefolder', $settings);
 if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_heading('facetoface/attendancetrackingheader', new lang_string('attendancetrackingheader', 'facetoface'), ''));
+
+    $settings->add(
+        new admin_setting_configcheckbox(
+            'facetoface/sessionattendance',
+            new lang_string('sessionattendance', 'facetoface'),
+            new lang_string('sessionattendance_help', 'facetoface'),
+            1
+        )
+    );
+
+    $options = [];
+    $options[\mod_facetoface\seminar::ATTENDANCE_TIME_END] = new lang_string('attendancetime_end', 'facetoface');
+    $options[\mod_facetoface\seminar::ATTENDANCE_TIME_START] = new lang_string('attendancetime_start', 'facetoface');
+    $options[\mod_facetoface\seminar::ATTENDANCE_TIME_ANY] = new lang_string('attendancetime_any', 'facetoface');
+    $settings->add(
+        new admin_setting_configselect(
+            'facetoface/attendancetime',
+            new lang_string('attendancetime', 'facetoface'),
+            new lang_string('attendancetime_help', 'facetoface'),
+            \mod_facetoface\seminar::ATTENDANCE_TIME_END,
+            $options
+        )
+    );
+
     $settings->add(new admin_setting_heading('facetoface_signupworkflow_header', new lang_string('signupworkflowheader', 'facetoface'), ''));
 
     $amounts = [];
@@ -158,14 +183,21 @@ if ($ADMIN->fulltree) {
     $options['multisignuprestrict_fully'] = new lang_string('status_fully_attended', 'facetoface');
     $options['multisignuprestrict_partially'] = new lang_string('status_partially_attended', 'facetoface');
     $options['multisignuprestrict_noshow'] = new lang_string('status_no_show', 'facetoface');
-    $settings->add(new admin_setting_configmulticheckbox('facetoface_multisignup_restrict',
-        new lang_string('multisignuprestrict', 'facetoface'),
-        new lang_string('multisignuprestrict_help', 'facetoface'),
-        ['multisignuprestrict_fully' => 0,
-         'multisignuprestrict_partially' => 1,
-         'multisignuprestrict_noshow' => 1],
-        $options
-    ));
+    $options['multisignuprestrict_unableto'] = new lang_string('status_unable_to_attend', 'facetoface');
+    $settings->add(
+        new admin_setting_configmulticheckbox(
+            'facetoface_multisignup_restrict',
+            new lang_string('multisignuprestrict', 'facetoface'),
+            new lang_string('multisignuprestrict_help', 'facetoface'),
+            [
+                'multisignuprestrict_fully' => 0,
+                'multisignuprestrict_partially' => 1,
+                'multisignuprestrict_noshow' => 1,
+                'multisignuprestrict_unableto' => 1
+            ],
+            $options
+        )
+    );
 
     $settings->add(new admin_setting_configcheckbox('facetoface_waitlistautoclean',
         new lang_string('waitlistautoclean', 'mod_facetoface'),

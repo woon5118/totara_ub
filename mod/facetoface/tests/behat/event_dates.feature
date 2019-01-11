@@ -22,7 +22,7 @@ Feature: I can add and edit seminar session dates
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click to edit the seminar event date at position 1
     And I set the following fields to these values:
       | timestart[day]       | 1                |
@@ -81,7 +81,7 @@ Feature: I can add and edit seminar session dates
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click to edit the seminar event date at position 1
     And I set the following fields to these values:
       | timestart[day]       | 1                |
@@ -143,7 +143,7 @@ Feature: I can add and edit seminar session dates
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click to edit the seminar event date at position 1
     And I set the following fields to these values:
       | timestart[day]       | 1                |
@@ -215,7 +215,7 @@ Feature: I can add and edit seminar session dates
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click to edit the seminar event date at position 1
     And I set the following fields to these values:
       | timestart[day]       | 1                |

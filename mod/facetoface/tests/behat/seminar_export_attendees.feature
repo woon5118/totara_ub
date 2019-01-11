@@ -28,7 +28,7 @@ Feature: Export seminar attendees
       | Name        | Test seminar name        |
       | Description | Test seminar description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |

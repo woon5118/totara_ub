@@ -27,7 +27,7 @@ Feature: Seminar event cancellation trainer can be reassigned
       | Name        | Test Seminar |
       | Description | Test Seminar |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |
@@ -56,7 +56,7 @@ Feature: Seminar event cancellation trainer can be reassigned
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |
@@ -86,7 +86,7 @@ Feature: Seminar event cancellation trainer can be reassigned
     And I follow "Test Seminar"
     And I follow "Cancel event"
     And I press "Yes"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |

@@ -40,14 +40,13 @@ class attendees_message extends \moodleform {
         $mform->addElement('header', 'recipientgroupsheader', get_string('messagerecipientgroups', 'facetoface'));
 
         // Display select recipient by status
-        $statuses = array(
-            \mod_facetoface\signup\state\user_cancelled::get_code(),
-            \mod_facetoface\signup\state\event_cancelled::get_code(),
-            \mod_facetoface\signup\state\waitlisted::get_code(),
-            \mod_facetoface\signup\state\booked::get_code(),
-            \mod_facetoface\signup\state\no_show::get_code(),
-            \mod_facetoface\signup\state\partially_attended::get_code(),
-            \mod_facetoface\signup\state\fully_attended::get_code()
+        $statuses = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
+            [
+                \mod_facetoface\signup\state\user_cancelled::class,
+                \mod_facetoface\signup\state\event_cancelled::class,
+                \mod_facetoface\signup\state\waitlisted::class,
+                \mod_facetoface\signup\state\booked::class
+            ]
         );
 
         $json_users = array();

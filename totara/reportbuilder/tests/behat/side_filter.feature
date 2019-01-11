@@ -1,4 +1,4 @@
-@totara @totara_reportbuilder @totara_customfield @javascript
+@totara @totara_reportbuilder @totara_customfield @mod_facetoface @javascript
 Feature: Filter reportbuilder results by multicheck filters on sidebar
   As an admin
   I filter reportbuilder results using faceted search
@@ -67,27 +67,27 @@ Feature: Filter reportbuilder results by multicheck filters on sidebar
     # Add seminar events
     And I am on "Course 0" course homepage
     And I follow "Seminar 0"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I am on "Course 1" course homepage
     And I follow "Seminar 1"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I am on "Course 2" course homepage
     And I follow "Seminar 2"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I am on "Course 3" course homepage
     And I follow "Seminar 3"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I am on "Course 13" course homepage
     And I follow "Seminar 13"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     # Create reportbuilder for seminar events with sidebar multi-check filter

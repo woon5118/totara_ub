@@ -140,7 +140,7 @@ Feature: Check room details with all possible custom fields
     # Use the room.
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Select room" "link"
     And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
@@ -149,7 +149,7 @@ Feature: Check room details with all possible custom fields
     And I am on "Course 1" course homepage
 
     # View the room.
-    And I click on "Room details" "link"
+    And I click on "View details" "link"
     And I switch to "popup" window
 
     # Confirm that all of the room customfields saved.

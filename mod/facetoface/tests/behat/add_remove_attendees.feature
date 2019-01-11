@@ -34,7 +34,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -71,7 +71,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -118,7 +118,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
       | capacity              | 1    |
@@ -138,7 +138,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
       | capacity              | 1    |
@@ -165,7 +165,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
       | capacity              | 1    |
@@ -193,7 +193,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -234,7 +234,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -266,7 +266,7 @@ Feature: Add - Remove seminar attendees
       | Name        | Test seminar name two    |
       | Description | Test seminar description |
     And I follow "Test seminar name two"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -312,7 +312,7 @@ Feature: Add - Remove seminar attendees
 
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -350,7 +350,7 @@ Feature: Add - Remove seminar attendees
     And I set the following fields to these values:
       | Select job assignment on signup | 1 |
     And I press "Save and display"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"
@@ -389,7 +389,7 @@ Feature: Add - Remove seminar attendees
     And I set the following fields to these values:
       | Select job assignment on signup | 1 |
     And I press "Save and display"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I press "Save changes"
 
     And I click on "Attendees" "link"
@@ -408,7 +408,7 @@ Feature: Add - Remove seminar attendees
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -473,7 +473,7 @@ Feature: Add - Remove seminar attendees
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |

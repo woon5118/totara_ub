@@ -4,6 +4,8 @@
 @mod_facetoface-upcomming: #daead3;
 @mod_facetoface-warning: #ffffc0;
 @mod_facetoface-full: #b3dab6;
+@mod_facetoface-primary_bg: #297f80;
+@mod_facetoface-primary_color: #fff;
 
 .f2fsessionlinks,
 .f2fsessionnotice {
@@ -167,4 +169,165 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
     color: @mod_facetoface-error-colour;
     display: inline-block;
     width: 50%;
+}
+
+// styles for the seminar event page
+
+.force-link-color() {
+    color: @link-color;
+
+    &:hover,
+    &:focus {
+        color: @link-hover-color;
+        text-decoration: @link-hover-decoration;
+    }
+}
+
+.mod_facetoface {
+    &__action {
+        display: flex;
+        align-items: center;
+
+        &--near {
+            justify-content: flex-start;
+        }
+        &--far {
+            justify-content: flex-end;
+        }
+        &--center {
+            justify-content: center;
+        }
+    }
+
+    .flex-wrap-vertical-center() {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    &__filter {
+        .flex-wrap-vertical-center();
+        padding: 0 @totara_style-spacing_small @totara_style-spacing_small @totara_style-spacing_small;
+        margin: @totara_style-spacing_medium 0;
+        border: 1px #e6e6e6 solid;
+        border-radius: 2px;
+
+        &__item {
+            .flex-wrap-vertical-center();
+            margin: @totara_style-spacing_small 0 0 0;
+            max-width: 100%;
+
+            &__label {
+                font-weight: normal;
+            }
+
+            .selectmenu() {
+                margin: 0 @totara_style-spacing_small;
+                max-width: 100%;
+            }
+
+            &__room-select {
+                .selectmenu();
+                width: 250px;
+            }
+
+            &__eventtime-select {
+                .selectmenu();
+                width: 200px;
+            }
+        }
+    }
+
+    &__sessionlist {
+        &--empty {
+            padding: @totara_style-spacing_medium;
+        }
+
+        &__room {
+            &__link {
+                .force-link-color();
+            }
+        }
+
+        &__action {
+            &__link {
+                .force-link-color();
+            }
+        }
+
+        &__attendance {
+            &--open__link {
+                .force-link-color();
+                font-weight: bold;
+            }
+            &--saved__link {
+                .force-link-color();
+            }
+
+            &--none,
+            &--locked,
+            &--open,
+            &--saved {
+                &__icon,
+                &__icon[class] { // override fontawesome
+                    vertical-align: baseline;
+                }
+            }
+        }
+    }
+}
+
+.dimmed_text {
+    a.mod_facetoface__sessionlist__room__link,
+    a.mod_facetoface__sessionlist__action__link,
+    a.mod_facetoface__sessionlist__attendance--saved__link,
+    a.mod_facetoface__sessionlist__attendance--open__link {
+        &, &:link {
+            .force-link-color();
+        }
+        // Workaround for Firefox 66 / Chrome 72 link color bug, visible on seminar events dashboard.
+        &:not(:focus) {
+            .force-link-color();
+        }
+    }
+}
+
+
+.f2f-inline-box {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 9px;
+}
+
+.custom-facetoface-selection {
+    max-width: unset;
+}
+
+.custom-facetoface-label {
+    font-weight: normal;
+}
+
+form.f2f-attendance-form {
+    margin-top: 7px;
+}
+
+input#f2f-save-taking-attendance {
+    background-color: @mod_facetoface-primary_bg;
+    color: @mod_facetoface-primary_color;
+}
+
+.f2f-takeattendance-event-summary {
+    margin: 16px 0;
+}
+
+.f2f-takeattendance-bulk-action-box {
+    margin-bottom: 16px;
+}
+
+div.mod-facetoface__export-options {
+    margin-top: 16px;
+}
+
+a.mod_facetoface__action_goback {
+    margin: 0 0 3px 5px;
 }

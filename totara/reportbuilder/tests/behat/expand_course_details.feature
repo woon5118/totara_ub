@@ -1,4 +1,4 @@
-@totara @totara_reportbuilder @javascript
+@totara @totara_reportbuilder @javascript @mod_facetoface
 Feature: Test expand course details in Reportbuilder
   As a admin
   I need to be able to expand course details in reports regardless whether the
@@ -37,7 +37,7 @@ Feature: Test expand course details in Reportbuilder
       | Name                                    | Test seminar 2             |
       | Description                             | Test seminar 2 description |
     And I follow "View all events"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |

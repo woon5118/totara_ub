@@ -33,7 +33,7 @@ Feature: Seminar event cancellation calendar views
       | Description | Test Seminar |
     And I follow "View all events"
 
-    Given I follow "Add a new event"
+    Given I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 29 |
     And I follow "show-selectdate0-dialog"
@@ -99,7 +99,7 @@ Feature: Seminar event cancellation calendar views
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Event cancelled" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
-    And I should see "Sign-up unavailable" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
+    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
@@ -132,7 +132,7 @@ Feature: Seminar event cancellation calendar views
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Event cancelled" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
-    And I should see "Sign-up unavailable" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
+    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
@@ -157,7 +157,7 @@ Feature: Seminar event cancellation calendar views
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Event cancelled" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
-    And I should see "Sign-up unavailable" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
+    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
