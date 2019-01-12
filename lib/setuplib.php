@@ -1427,7 +1427,7 @@ function is_major_upgrade_required() {
     global $CFG;
 
     // Totara: do not modify, always keep in sync with Moodle branch!!!
-    $lastmajordbchanges = 2017111306.00;
+    $lastmajordbchanges = 2017111307.00;
 
     // Totara: bump up the following version to match /totara/core/version.php
     //         if your upgrade step prevents users from logging in before upgrade.
