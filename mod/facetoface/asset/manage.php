@@ -97,6 +97,7 @@ $reportrenderer = $PAGE->get_renderer('totara_reportbuilder');
 
 echo $OUTPUT->header();
 
+$report->include_js();
 $report->display_restrictions();
 
 echo $OUTPUT->heading(get_string('manageassets', 'facetoface'));
