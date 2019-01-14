@@ -496,6 +496,14 @@ class core_course_renderer extends plugin_renderer_base {
                 case COMPLETION_COMPLETE_FAIL:
                     $completionicon = 'auto-fail'; break;
             }
+            // Totara: If grade is hidden, do not show pass/fail, only complete.
+            if ($completiondata->completionstate == COMPLETION_COMPLETE_PASS || $completiondata->completionstate == COMPLETION_COMPLETE_FAIL) {
+                require_once($CFG->dirroot . "/lib/grade/grade_item.php");
+                $grade_item = grade_item::fetch(array('courseid' => $course->id, 'itemmodule' => $mod->modname, 'iteminstance' => $mod->instance));
+                if ($grade_item->is_hidden()) {
+                    $completionicon = 'auto-y';
+                }
+            }
         }
         if ($completionicon) {
             $formattedname = $mod->get_formatted_name();

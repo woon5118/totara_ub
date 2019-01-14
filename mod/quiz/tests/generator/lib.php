@@ -95,4 +95,19 @@ class mod_quiz_generator extends testing_module_generator {
 
         return parent::create_instance($record, (array)$options);
     }
+
+    /**
+     * Age a quiz's responses the specified number of seconds
+     *
+     * @param string $quizname Quiz whose responses we want to age
+     * @param int $seconds Number of seconds to age
+     */
+    public function age_quiz_responses($quizname, $seconds) {
+        global $DB;
+        $quiz = $DB->get_record('quiz', array('name' => $quizname), '*', MUST_EXIST);
+        $sql = "UPDATE {quiz_attempts} 
+                   SET timefinish = timefinish - :seconds
+                 WHERE quiz = :quizid";
+        $DB->execute($sql, ['seconds' => $seconds, 'quizid' => $quiz->id]);
+    }
 }

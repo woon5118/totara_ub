@@ -760,36 +760,42 @@ function quiz_grade_item_update($quiz, $grades = null) {
         $params['gradetype'] = GRADE_TYPE_NONE;
     }
 
-    // What this is trying to do:
-    // 1. If the quiz is set to not show grades while the quiz is still open,
-    //    and is set to show grades after the quiz is closed, then create the
-    //    grade_item with a show-after date that is the quiz close date.
-    // 2. If the quiz is set to not show grades at either of those times,
-    //    create the grade_item as hidden.
-    // 3. If the quiz is set to show grades, create the grade_item visible.
-    $openreviewoptions = mod_quiz_display_options::make_from_quiz($quiz,
-            mod_quiz_display_options::LATER_WHILE_OPEN);
-    $closedreviewoptions = mod_quiz_display_options::make_from_quiz($quiz,
-            mod_quiz_display_options::AFTER_CLOSE);
-    if ($openreviewoptions->marks < question_display_options::MARK_AND_MAX &&
-            $closedreviewoptions->marks < question_display_options::MARK_AND_MAX) {
-        $params['hidden'] = 1;
+    // Totara: This block replaces Moodle quiz grade item show/hide logic
+    $immediate = mod_quiz_display_options::make_from_quiz($quiz, mod_quiz_display_options::IMMEDIATELY_AFTER);
+    $later = mod_quiz_display_options::make_from_quiz($quiz, mod_quiz_display_options::LATER_WHILE_OPEN);
+    $closed = mod_quiz_display_options::make_from_quiz($quiz, mod_quiz_display_options::AFTER_CLOSE);
+    $show_marks = question_display_options::MARK_AND_MAX;
 
-    } else if ($openreviewoptions->marks < question_display_options::MARK_AND_MAX &&
-            $closedreviewoptions->marks >= question_display_options::MARK_AND_MAX) {
+    // Note that Moodle logic is to not show and then hide grade items later, and we keep that behaviour.
+    // For example, if marks are set to show immediately and also after the quiz is closed, but not later while open,
+    //   we do not have any way to hide the grade item after two minutes.
+    if ($immediate->marks < $show_marks && $later->marks < $show_marks && $closed->marks < $show_marks) {
+        // All hidden.
+        $params['hidden'] = 1;
+    } else if ($immediate->marks < $show_marks && $later->marks < $show_marks && $closed->marks >= $show_marks) {
+        // Hidden until close.
         if ($quiz->timeclose) {
             $params['hidden'] = $quiz->timeclose;
         } else {
             $params['hidden'] = 1;
         }
-
+    } else if ($immediate->marks < $show_marks && $later->marks >= $show_marks) {
+        // Hidden until later.
+        if (!empty($grades)) {
+            $items = array_values($grades);
+        } else {
+            $items = array();
+        }
+        if (count($items) == 1 && !empty($items[0]->datesubmitted)) {
+            $params['hidden'] = $items[0]->datesubmitted + 120;
+        } else {
+            $params['hidden'] = 1;
+        }
     } else {
-        // Either
-        // a) both open and closed enabled
-        // b) open enabled, closed disabled - we can not "hide after",
-        //    grades are kept visible even after closing.
+        // Not hidden now.
         $params['hidden'] = 0;
     }
+    // End Totara block.
 
     if (!$params['hidden']) {
         // If the grade item is not hidden by the quiz logic, then we need to
