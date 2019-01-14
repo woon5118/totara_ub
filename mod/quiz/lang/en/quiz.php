@@ -147,13 +147,13 @@ $string['cannotstartmissingquestion'] = 'Cannot start an attempt at this quiz. T
 $string['cannotstartnoquestions'] = 'Cannot start an attempt at this quiz. The quiz has not been set up yet. No questions have been added.';
 $string['cannotwrite'] = 'Cannot write to export file ({$a})';
 $string['canredoquestions'] = 'Allow redo within an attempt';
-$string['canredoquestions_desc'] = 'If enabled, then when learners have finished attempting particular question, they will see a Redo question button. This allows them to attempt another version of the same question, without having to submit the entire quiz attempt and start another one. This option is mainly useful for practice quizzes.
+$string['canredoquestions_desc'] = 'If enabled, when learners have finished attempting particular question, they will see a **Redo question** button. This allows them to attempt another version of the same question (or another question from the question bank in case of the *Random* question), without having to submit the entire quiz attempt and start another one. This option is mainly useful for practice quizzes.
 
-This setting only affects questions (for example not Essay questions) and behaviours (for example Immediate feedback, or Interactive with multiple tries) where it is possible for learner to finish the question before the attempt is submitted.';
-$string['canredoquestions_help'] = 'If enabled, then when learners have finished attempting particular question, they will see a **Redo question** button. This allows them to attempt another version of the same question, without having to submit the entire quiz attempt and start another one. This option is mainly useful for practice quizzes.
+This setting only affects questions (for example not *Essay* questions) and behaviours (for example Immediate feedback, or Interactive with multiple tries) where it is possible for learner to finish the question before the attempt is submitted.';
+$string['canredoquestions_help'] = 'If enabled, when learners have finished attempting particular question, they will see a **Redo question** button. This allows them to attempt another version of the same question (or another question from the question bank in case of the *Random* question), without having to submit the entire quiz attempt and start another one. This option is mainly useful for practice quizzes.
 
-This setting only affects **Random** type questions with some behaviours (for example **Immediate feedback**, or **Interactive with multiple tries**) where it is possible for learner to finish the question before the attempt is submitted.';
-$string['canredoquestionsyes'] = 'Learners may redo another version of any finished question';
+This setting only affects questions (for example not *Essay* questions) and behaviours (for example **Immediate feedback**, or **Interactive with multiple tries**) where it is possible for learner to finish the question before the attempt is submitted.';
+$string['canredoquestionsyes'] = 'Learners may redo questions';
 $string['caseno'] = 'No, case is unimportant';
 $string['casesensitive'] = 'Case sensitivity';
 $string['caseyes'] = 'Yes, case must match';
@@ -715,7 +715,7 @@ $string['readytosend'] = 'You are about to send your whole quiz to be graded.  A
 $string['reattemptquiz'] = 'Re-attempt quiz';
 $string['recentlyaddedquestion'] = 'Recently added question!';
 $string['recurse'] = 'Include questions from subcategories too';
-$string['redoquestion'] = 'Try another question like this one';
+$string['redoquestion'] = 'Redo question';
 $string['redoesofthisquestion'] = 'Other questions attempted here: {$a}';
 $string['regrade'] = 'Regrade all attempts';
 $string['regradecomplete'] = 'All attempts have been regraded';
