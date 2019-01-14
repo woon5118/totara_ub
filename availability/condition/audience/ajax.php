@@ -45,9 +45,8 @@ $results = array();
 if ($filter !== '') {
     require_once($CFG->dirroot . '/cohort/lib.php');
 
-    // Limit our results to 50 (more refining will be done
-    // as the user types).
-    $cohorts = cohort_get_all_cohorts(0, 50, $filter);
+    // Limit results to 5,000 - some users have many audiences with similar names.
+    $cohorts = cohort_get_all_cohorts(0, 5000, $filter);
 
     $lcfilter = core_text::strtolower($filter);
 
