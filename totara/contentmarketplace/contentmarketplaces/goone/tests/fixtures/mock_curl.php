@@ -410,8 +410,8 @@ final class mock_curl {
         self::validate_oauth($url, $options);
 
         $basename = self::get_base_filename($url, $options);
-        $path = $CFG->dirroot . "/totara/contentmarketplace/contentmarketplaces/goone/tests/behat/fixtures$basename";
-        $path = clean_param($path, PARAM_PATH);
+        $path = "/totara/contentmarketplace/contentmarketplaces/goone/tests/behat/fixtures$basename";
+        $path = $CFG->dirroot . clean_param($path, PARAM_PATH);
         if (!file_exists($path)) {
             throw new \Exception("File for mock curl response does not exist: $path");
         }
