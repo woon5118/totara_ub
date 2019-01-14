@@ -246,7 +246,8 @@ class behat_config_manager {
         clearstatcache();
         for ($i = 1; $i <= $parallelrun; $i++) {
             // Don't delete links for specified sites, as they should be accessible.
-            if (!empty($CFG->behat_parallel_run['behat_wwwroot'][$i - 1]['behat_wwwroot'])) {
+            // Totara: make parallel runs possible on Windows
+            if (!empty($CFG->behat_parallel_run[$i - 1]['behat_wwwroot'])) {
                 continue;
             }
             $link = $CFG->dirroot . '/' . BEHAT_PARALLEL_SITE_NAME . $i;
@@ -271,7 +272,8 @@ class behat_config_manager {
         clearstatcache();
         for ($i = $fromrun; $i <= $torun; $i++) {
             // Don't create links for specified sites, as they should be accessible.
-            if (!empty($CFG->behat_parallel_run['behat_wwwroot'][$i - 1]['behat_wwwroot'])) {
+            // Totara: make parallel runs possible on Windows
+            if (!empty($CFG->behat_parallel_run[$i - 1]['behat_wwwroot'])) {
                 continue;
             }
             $link = $CFG->dirroot.'/'.BEHAT_PARALLEL_SITE_NAME.$i;

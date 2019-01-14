@@ -403,10 +403,12 @@ function behat_get_run_process() {
             $dirrootrealpath = str_replace("\\", "/", realpath($CFG->dirroot));
             $serverrealpath = str_replace("\\", "/", realpath($_SERVER['SCRIPT_FILENAME']));
             $afterpath = str_replace($dirrootrealpath.'/', '', $serverrealpath);
+            // Totara: replace backslash with slash for Windows
+            $scriptfilename = str_replace("\\", "/", $_SERVER['SCRIPT_FILENAME']);
             if (!$behatrunprocess = preg_filter("#.*/" . BEHAT_PARALLEL_SITE_NAME . "(.+?)/$afterpath#", '$1',
-                $_SERVER['SCRIPT_FILENAME'])) {
+                $scriptfilename)) {
                 throw new Exception("Unable to determine behat process [afterpath=" . $afterpath .
-                    ", scriptfilename=" . $_SERVER['SCRIPT_FILENAME'] . "]!");
+                    ", scriptfilename=" . $scriptfilename . "]!");
             }
         }
     } else if (defined('BEHAT_TEST') || defined('BEHAT_UTIL')) {
