@@ -941,14 +941,16 @@ abstract class base {
             $this->url_mod = (new \moodle_url($this->url_mod))->out();
         }
 
+        $options = ['context' => \context_block::instance($this->blockid)];
+
         if (isset($this->data->heading)) {
-            $this->data->heading = format_string($this->data->heading);
+            $this->data->heading = format_string($this->data->heading, true, $options);
         }
         if (isset($this->data->textbody)) {
-            $this->data->textbody = format_string($this->data->textbody);
+            $this->data->textbody = format_string($this->data->textbody, true, $options);
         }
         if (isset($this->data->alt_text)) {
-            $this->data->alt_text = format_string($this->data->alt_text);
+            $this->data->alt_text = format_string($this->data->alt_text, true, $options);
         }
     }
 
