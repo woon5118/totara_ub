@@ -308,11 +308,8 @@ class item {
         $url =  str_replace($search, $replace, $url);
 
         // Make sure there are no nasty surprises.
-        $html = purify_html(\html_writer::link(new \moodle_url($url), 'xyz'));
-        if (preg_match('/href="([^"].*)"/', $html, $matches)) {
-            $url = $matches[1];
-            $url = str_replace('&amp;', '&', $url);
-        } else {
+        $url = purify_uri($url, false, false);
+        if ($url === '') {
             $url = '#';
         }
 
