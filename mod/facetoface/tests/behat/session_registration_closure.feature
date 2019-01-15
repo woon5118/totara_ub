@@ -49,8 +49,8 @@ Feature: Seminar Event Registration Closure
       | timestart[year]    | 2020 |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
+      | timefinish[day]    | 31   |
+      | timefinish[month]  | 12   |
       | timefinish[year]   | 2020 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
@@ -64,10 +64,10 @@ Feature: Seminar Event Registration Closure
       | registrationtimestart[hour]     | 05   |
       | registrationtimestart[minute]   | 00   |
       | registrationtimefinish[enabled] | 1    |
-      | registrationtimefinish[day]     | 30   |
-      | registrationtimefinish[month]   | 12   |
+      | registrationtimefinish[day]     | 1    |
+      | registrationtimefinish[month]   | 1    |
       | registrationtimefinish[year]    | 2020 |
-      | registrationtimefinish[hour]    | 17   |
+      | registrationtimefinish[hour]    | 09   |
       | registrationtimefinish[minute]  | 00   |
     And I press "Save changes"
     And I click on "Attendees" "link"
