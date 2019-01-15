@@ -690,3 +690,6 @@ $string['configenhancedcatalog'] = 'This setting allows you to specify if the en
     Note: When enabled, the standard catalog remains available for Admins to manage course and program/certification administration in the "backend" (e.g., to assign Instructors to courses and course categories).';
 $string['menuitem:resettodefaultconfirm'] = 'Are you absolutely sure that you want to reset the top navigation to its default configuration? This will permanently erase all customisations.';
 $string['menuitem:topnavigation'] = 'Top navigation';
+
+// Deprecated in 13
+$string['strftimedateshortmonth'] = '%d %b %Y';

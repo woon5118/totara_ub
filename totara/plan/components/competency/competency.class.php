@@ -925,7 +925,7 @@ class dp_competency_component extends dp_base_component {
 
         $currenturl = qualified_me();
 
-        $oldrecords = $DB->get_records_list('dp_plan_competency_assign', 'planid', array($this->plan->id), null, 'id, planid, competencyid, approved, priority');
+        $oldrecords = $DB->get_records_list('dp_plan_competency_assign', 'planid', array($this->plan->id), null, 'id, planid, competencyid, approved, priority, duedate');
         $status = true;
         $stored_records = array();
         if (!empty($evidences)) {
@@ -1078,7 +1078,7 @@ class dp_competency_component extends dp_base_component {
                     if (!empty($record->duedate) && $oldrecords[$itemid]->duedate != $record->duedate) {
                         $updates .= $compprinted ? '' : $compheader;
                         $compprinted = true;
-                        $dateformat = get_string('strftimedateshortmonth', 'langconfig');
+                        $dateformat = get_string('strfdateshortmonth', 'langconfig');
                         $updates .= get_string('duedate', 'totara_plan').' - '.
                             get_string('changedfromxtoy', 'totara_plan', (object)array('before' => empty($oldrecords[$itemid]->duedate) ? '' :
                                     userdate($oldrecords[$itemid]->duedate, $dateformat, 99, false),

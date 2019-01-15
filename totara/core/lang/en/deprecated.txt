@@ -6,3 +6,4 @@ menuitem:resettodefaultconfirm,totara_core
 menuitem:topnavigation,totara_core
 numberofactiveusers,totara_core
 totaranavigation,totara_core
+strftimedateshortmonth,totara_core
