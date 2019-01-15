@@ -158,11 +158,6 @@ class customfield_multiselect extends customfield_base {
             }
         }
 
-        // If no matching option is found set it to empty.
-        if (empty($selected)) {
-            $selected = NULL;
-        }
-
         $syncitem->$fieldname = $selected;
         return $syncitem;
     }
