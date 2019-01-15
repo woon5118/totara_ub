@@ -305,7 +305,7 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
                     $cleaned[$key] = clean_param(trim($value), PARAM_RAW);
                     break;
                 default:
-                    throw new totara_sync_exception($this->get_element_name(), 'importdata', 'nocleaninginstruction');
+                    // This is not an available field to be synced, don't include.
             }
         }
 
