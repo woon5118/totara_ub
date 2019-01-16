@@ -56,7 +56,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         );
         $messages = $this->fetch_messages();
 
-        $this->assertCount(4, $messages);
+        $this->assertCount(5, $messages);
 
         $this->assertEquals('fr title', $messages[$seed->student1->id]->subject);
         $this->assertEquals('fr body', $messages[$seed->student1->id]->fullmessage);
@@ -67,6 +67,11 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->fullmessage);
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->fullmessagehtml);
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->smallmessage);
+
+        $this->assertEquals('ja title', $messages[$seed->tempmanager->id]->subject);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->fullmessage);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->fullmessagehtml);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->smallmessage);
 
         $this->assertEquals('sv title', $messages[$sysadminapprover->id]->subject);
         $this->assertEquals('sv prefixsv body', $messages[$sysadminapprover->id]->fullmessage);
@@ -89,7 +94,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         facetoface_send_registration_closure_notice($seed->facetoface, $seed->session, $seed->student1->id);
         $messages = $this->fetch_messages();
 
-        $this->assertCount(2, $messages);
+        $this->assertCount(3, $messages);
 
         $this->assertEquals('fr title', $messages[$seed->student1->id]->subject);
         $this->assertEquals('fr body', $messages[$seed->student1->id]->fullmessage);
@@ -100,6 +105,11 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->fullmessage);
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->fullmessagehtml);
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->smallmessage);
+
+        $this->assertEquals('ja title', $messages[$seed->tempmanager->id]->subject);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->fullmessage);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->fullmessagehtml);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->smallmessage);
     }
 
     /**
@@ -136,7 +146,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         );
         $messages = $this->fetch_messages();
 
-        $this->assertCount(2, $messages);
+        $this->assertCount(3, $messages);
 
         $this->assertEquals('fr title', $messages[$seed->student1->id]->subject);
         $this->assertEquals('fr body', $messages[$seed->student1->id]->fullmessage);
@@ -147,6 +157,11 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->fullmessage);
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->fullmessagehtml);
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->smallmessage);
+
+        $this->assertEquals('ja title', $messages[$seed->tempmanager->id]->subject);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->fullmessage);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->fullmessagehtml);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->smallmessage);
     }
 
     /**
@@ -206,7 +221,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         facetoface_send_oneperday_notice($seed->facetoface, $seed->session, $seed->student1->id, $params);
         $messages = $this->fetch_messages(true);
 
-        $this->assertCount(2, $messages);
+        $this->assertCount(3, $messages);
 
         for ($i = 0; $i <= 1; $i++) {
             $this->assertEquals('fr title', $messages[$seed->student1->id][$i]->subject);
@@ -218,6 +233,11 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
             $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id][$i]->fullmessage);
             $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id][$i]->fullmessagehtml);
             $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id][$i]->smallmessage);
+
+            $this->assertEquals('ja title', $messages[$seed->tempmanager->id][$i]->subject);
+            $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id][$i]->fullmessage);
+            $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id][$i]->fullmessagehtml);
+            $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id][$i]->smallmessage);
         }
     }
 
@@ -233,7 +253,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         );
         $messages = $this->fetch_messages();
 
-        $this->assertCount(2, $messages);
+        $this->assertCount(3, $messages);
 
         $this->assertEquals('fr title', $messages[$seed->student1->id]->subject);
         $this->assertEquals('fr body', $messages[$seed->student1->id]->fullmessage);
@@ -244,6 +264,11 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->fullmessage);
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->fullmessagehtml);
         $this->assertEquals('he prefixhe body', $messages[$seed->manager1->id]->smallmessage);
+
+        $this->assertEquals('ja title', $messages[$seed->tempmanager->id]->subject);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->fullmessage);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->fullmessagehtml);
+        $this->assertEquals('ja prefixja body', $messages[$seed->tempmanager->id]->smallmessage);
     }
 
     /**
@@ -371,9 +396,16 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $student2 = $this->getDataGenerator()->create_user(['lang' => 'en']);
         $manager1 = $this->getDataGenerator()->create_user(['lang' => 'he']);
         $manager2 = $this->getDataGenerator()->create_user(['lang' => 'tr']);
+        $tempmanager = $this->getDataGenerator()->create_user(['lang' => 'ja']);
 
         $manager1ja = \totara_job\job_assignment::create_default($manager1->id);
-        \totara_job\job_assignment::create_default($student1->id, array('managerjaid' => $manager1ja->id));
+        $tempmanagerja = \totara_job\job_assignment::create_default($tempmanager->id);
+        \totara_job\job_assignment::create_default($student1->id, [
+            'managerjaid' => $manager1ja->id,
+            'tempmanagerjaid' => $tempmanagerja->id,
+            'tempmanagerexpirydate' => time() + DAYSECS
+        ]);
+
         $manager2ja = \totara_job\job_assignment::create_default($manager2->id);
         \totara_job\job_assignment::create_default($student2->id, array('managerjaid' => $manager2ja->id));
 
@@ -431,6 +463,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $seed->student2 = $student2;
         $seed->manager1 = $manager1;
         $seed->manager2 = $manager2;
+        $seed->tempmanager = $tempmanager;
 
         return $seed;
     }
@@ -441,7 +474,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
      */
     private function languages() {
         // Don't forget to add fixture if adding language.
-        return ['de', 'fr', 'en', 'he', 'tr', 'sv', 'hu'];
+        return ['de', 'fr', 'en', 'he', 'tr', 'sv', 'hu', 'ja'];
     }
 
     /**

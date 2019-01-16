@@ -1852,7 +1852,10 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sink = $this->redirectMessages();
         $this->execute_adhoc_tasks();
 
-        $this->assertEquals(get_string(\mod_facetoface\notice_sender::request_manager(\mod_facetoface\signup::create($userid2, new mod_facetoface\seminar_event($sess0id))), 'facetoface'), 'No manager email is set');
+        $this->assertEquals(
+            'No manager email is set',
+            get_string(\mod_facetoface\notice_sender::request_manager(\mod_facetoface\signup::create($userid2, new mod_facetoface\seminar_event($sess0id))), 'facetoface')
+        );
         $sink->close();
     }
 

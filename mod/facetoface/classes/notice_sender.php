@@ -45,21 +45,20 @@ class notice_sender {
     public static function request_manager(signup $signup) {
         $managers = facetoface_get_session_managers($signup->get_userid(), $signup->get_sessionid(), $signup->get_jobassignmentid());
 
-        $sent = false;
+        $hasemail = false;
         foreach ($managers as $manager) {
-            if (empty($manager->email)) {
-                continue;
+            if (!empty($manager->email)) {
+                $hasemail = true;
+                break;
             }
+        }
 
-            $sent = true;
+        if ($hasemail) {
             $params = [
                 'type'          => MDL_F2F_NOTIFICATION_AUTO,
                 'conditiontype' => MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER
             ];
-            static::send($signup, $params);
-        }
-        if ($sent) {
-            return '';
+            return static::send($signup, $params);
         }
         return 'error:nomanagersemailset';
     }
