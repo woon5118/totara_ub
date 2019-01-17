@@ -436,20 +436,49 @@ final class external extends \external_api {
         ]);
     }
     public static function add_group_returns() {
-//        return new external_value(PARAM_BOOL, 'Success or failure');
-        return new external_single_structure([
-            'key'   => new external_value(PARAM_ALPHANUMEXT, 'The group key'),
-            'title'  => new external_value(PARAM_TEXT, 'The display name for the group'),
-            'has_items'  => new external_value(PARAM_BOOL, 'Whether the group has any items'),
-            'item_count' => new external_value(PARAM_INT, 'Number of items in the group'),
-            'items' => new external_multiple_structure(new external_single_structure([
-                'key'   => new external_value(PARAM_ALPHANUMEXT, 'The item key'),
-                'page'  => new external_value(PARAM_TEXT, 'The display name for the item page'),
-                'label' => new external_value(PARAM_TEXT, 'The label displayed in the menu'),
-                'url'   => new external_value(PARAM_URL, 'URL of referred page')
-            ], 'The context object for the newly created item'), ''),
-            'tree_selector'   => new external_value(PARAM_RAW, 'Rendered tree selector')
-        ], 'The context object for the newly created item');
+        //We need to set up a recursive description for the tree selector before adding it to the final description
+        $tree_node_data = new external_single_structure(
+            [
+                'key'   => new external_value(PARAM_TEXT, 'The node key'),
+                'name'  => new external_value(PARAM_TEXT, 'The display name for the node'),
+                'active' => new external_value(PARAM_BOOL, 'Whether the node is active'),
+                'default' => new external_value(PARAM_BOOL, 'Whether this is the default node'),
+                'has_children' => new external_value(PARAM_BOOL, 'Whether the node has any children'),
+            ],
+            ''
+        );
+        $tree_node = new external_multiple_structure($tree_node_data, 'A node for the admin navigation tree', VALUE_OPTIONAL);
+        $tree_node_data->keys['children'] = $tree_node; //set recursive property
+
+        return new external_single_structure(
+            [
+                'key'   => new external_value(PARAM_ALPHANUMEXT, 'The group key'),
+                'title'  => new external_value(PARAM_TEXT, 'The display name for the group'),
+                'has_items'  => new external_value(PARAM_BOOL, 'Whether the group has any items'),
+                'item_count' => new external_value(PARAM_INT, 'Number of items in the group'),
+                'items' => new external_multiple_structure(new external_single_structure(
+                    [
+                        'key'   => new external_value(PARAM_ALPHANUMEXT, 'The item key'),
+                        'page'  => new external_value(PARAM_TEXT, 'The display name for the item page'),
+                        'label' => new external_value(PARAM_TEXT, 'The label displayed in the menu'),
+                        'url'   => new external_value(PARAM_URL, 'URL of referred page')
+                    ],
+                    'The context object for the newly created item'),
+                    ''
+                ),
+                'tree_selector'   => new external_single_structure(
+                    [
+                        'key'   => new external_value(PARAM_TEXT, 'The item key'),
+                        'title' => new external_value(PARAM_TEXT, 'The display name for the group'),
+                        'title_hidden' => new external_value(PARAM_BOOL, 'Whether the group has any items'),
+                        'call_to_action' => new external_value(PARAM_TEXT, 'The display name for the group', VALUE_OPTIONAL),
+                        'options' => $tree_node,
+                    ],
+                    'The context object for the tree selector for new items'
+                ),
+            ],
+            'The context object for the newly created item'
+        );
     }
 
     /**

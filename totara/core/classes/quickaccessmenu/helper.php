@@ -222,7 +222,7 @@ final class helper {
      */
     public static function add_group(int $userid, ?string $groupname): group {
         // Create a group and save the preferences.
-        return group::create_group($groupname, $userid);;
+        return group::create_group($groupname, $userid);
     }
 
     /**

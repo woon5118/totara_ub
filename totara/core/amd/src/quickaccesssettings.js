@@ -117,7 +117,7 @@ define(['core/templates', 'core/str', 'core/ajax'], function(template, str, ajax
                 }
                 return;
             }
-        });
+        }, true); //capture event
 
         /**
          * Inline-edit event to rename item and groups

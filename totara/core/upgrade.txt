@@ -21,6 +21,8 @@ information provided here is intended especially for developers.
   - core/alert_warning
 * Removed deprecated function totara_random_bytes()
 * Removed deprecated function check_string()
+* totara_core\quickaccessmenu\external::add_group returns group context object instead of a boolean
+* totara_core/accordion widget changed default setting of "always_open" to true
 
 === 12.0 ===
 

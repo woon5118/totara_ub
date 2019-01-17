@@ -1,5 +1,6 @@
 @totara_core__QuickAccessMenu_color-bg: @totara_style-color_neutral_7;
 @totara_core__QuickAccessMenu_color-hr: mix(@totara_style-color_neutral_2, @totara_core__QuickAccessMenu_color-bg, 50%); //fake opacity 50%
+@totara_core__QuickAccessMenu_color-border: @totaranav_prim-color_font;
 
 @totara_core__QuickAccessMenu_search_color-text: @totara_style-color_neutral_1;
 @totara_core__QuickAccessMenu_search_color-bg: @totara_style-color_neutral_8;
@@ -68,7 +69,7 @@
 
       //Open/Close animation properties
       box-shadow: @totara_core__QuickAccessMenu__shadow;
-      border-top: 1px solid @totara_core__QuickAccessMenu_search_color-text;
+      border-top: 1px solid @totara_core__QuickAccessMenu_color-border;
 
       transform-origin: top;
 
@@ -300,7 +301,7 @@
     }
 
     > a {
-      color: @totara_core__QuickAccessMenu_search_color-text;
+      color: inherit;
       font-size: @totara_core__QuickAccessMenu_search_font-size;
       float: right;
     }

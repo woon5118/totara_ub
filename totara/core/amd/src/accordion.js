@@ -47,17 +47,14 @@ define(['core/templates'], function(templates) {
     AccordionController.prototype.events = function() {
         var self = this;
 
-        var toggleHeader = function() {
-            var item = this.closest('.totara_core__Accordion__item');
-            self.toggleItem(item);
+        var toggleHeader = function(e) {
+            var item = e.target.closest('.totara_core__Accordion__item');
+            if (item) {
+                self.toggleItem(item);
+            }
         };
 
-        // Toggle accordion when the head is clicked
-        var headers = this.element.querySelectorAll('.totara_core__Accordion__item__header');
-        for (var i = 0; i < headers.length; i++) {
-            var header = headers.item(i);
-            header.addEventListener('click', toggleHeader);
-        }
+        this.element.addEventListener('click', toggleHeader);
 
         // Open the accordion
         this.element.addEventListener('totara_core/accordion:open', function(e) {
@@ -108,7 +105,7 @@ define(['core/templates'], function(templates) {
         }
 
         // Close all other items if we don't allow multiple
-        if (!this.allowMultiple) {
+        if (newState && !this.allowMultiple) {
             this.closeAllItems();
         }
 
@@ -118,9 +115,7 @@ define(['core/templates'], function(templates) {
         var icon = newState ? 'totara_core|accordion-expanded' : 'totara_core|accordion-collapsed';
 
         templates.renderIcon(icon).then(function(html) {
-            if (elem.classList.contains('collapsed') !== newState) {
-                elem.querySelector('.totara_core__Accordion__item__header__icon').innerHTML = html;
-            }
+            elem.querySelector('.totara_core__Accordion__item__header__icon').innerHTML = html;
         });
 
         if (!silent) {
@@ -150,6 +145,16 @@ define(['core/templates'], function(templates) {
             child.classList.toggle('collapsed', true);
             child.querySelector('.totara_core__Accordion__item__header').setAttribute('aria-expanded', false);
         }
+
+        //Run this loop seperately so icon loading doesn't delay collapse
+        templates.renderIcon('totara_core|accordion-collapsed').then(function(html) {
+            for (var i = 0; i < children.length; i++) {
+                var child = children.item(i);
+                if (child.classList.contains('collapsed')) {
+                    child.querySelector('.totara_core__Accordion__item__header__icon').innerHTML = html;
+                }
+            }
+        });
     };
 
     /**

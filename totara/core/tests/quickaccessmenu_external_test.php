@@ -288,10 +288,11 @@ class totara_core_quickaccessmenu_external_testcase extends advanced_testcase {
         $user = $this->basic_setup();
 
         $return = external::add_group('Group 1', $user->id);
-        self::assertTrue($return);
+        self::assertNotEmpty($return);
+        self::assertContains($return['key'], group::get_group_keys($user->id));
 
         $result = external::clean_returnvalue(external::add_group_returns(), $return);
-        self::assertTrue($result);
+        self::assertNotEmpty($result);
     }
 
     public function test_rename_group() {

@@ -47,15 +47,13 @@ final class quickaccesssettings extends \core\output\template {
      * @return quickaccesssettings
      */
     public static function create_from_menu(menu $menu): quickaccesssettings {
-        global $USER, $OUTPUT;
+        global $USER;
 
         $data = [];
         $groups = [];
 
-        $treeWidget = new select_tree(self::get_tree_selector_data());
-
         $allgroups = group::get_groups($USER->id);
-        $tree_selector = $OUTPUT->render($treeWidget);
+        $tree_selector = self::get_tree_selector_data();
         $adminroot = self::get_admin_root();
 
         foreach (self::organise_items_by_group($menu->get_items(), $allgroups) as $group => $items) {
@@ -122,13 +120,11 @@ final class quickaccesssettings extends \core\output\template {
      * @return array
      */
     public static function get_group_data($key): array {
-        global $USER, $OUTPUT;
+        global $USER;
         $menu = helper::get_user_menu();
 
-        $treeWidget = new select_tree(self::get_tree_selector_data());
-
         $allgroups = group::get_groups($USER->id);
-        $tree_selector = $OUTPUT->render($treeWidget);
+        $tree_selector = self::get_tree_selector_data();
         $adminroot = self::get_admin_root();
 
         $groups = [
@@ -198,8 +194,8 @@ final class quickaccesssettings extends \core\output\template {
     private static function convert_admin_tree(\part_of_admin_tree $parentnode) {
         $options = new \stdClass();
 
-        $options->key = $parentnode->name;
-        $options->name = $parentnode->visiblename;
+        $options->key = (string)$parentnode->name;
+        $options->name = (string)$parentnode->visiblename;
         $options->selectable = true;
 
         if ($parentnode instanceof \admin_category) {

@@ -89,11 +89,23 @@
     //Animations to swap up and down
     &-swap-up {
       transition-duration: @totara_core__QuickAccess__transition-time;
-      transform: translateY(-100%);
+
+      //When the menu is open, we don't know how big everything is, so we can't move the menu by any percentage of itself
+      //so instead, we approximate the height of the header by using font-size * line-height + padding-top + padding-bottom
+      transform: translateY(calc( -@font-size-h3 * 1.1 ~"+" 2 * -@totara_core__QuickAccessSettings__spacing));
+      .collapsed& {
+        transform: translateY(-100%);
+      }
     }
     &-swap-down {
       transition-duration: @totara_core__QuickAccess__transition-time;
-      transform: translateY(100%);
+
+      //When the menu is open, we don't know how big everything is, so we can't move the menu by any percentage of itself
+      //so instead, we approximate the height of the header by using font-size * line-height + padding-top + padding-bottom
+      transform: translateY(calc(@font-size-h3 * 1.1 ~"+" 2 * @totara_core__QuickAccessSettings__spacing));
+      .collapsed& {
+        transform: translateY(100%);
+      }
     }
 
     &--name {
