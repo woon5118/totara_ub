@@ -189,7 +189,18 @@ class mod_feedback_responses_table extends table_sql {
         if (preg_match('/^val(\d+)$/', $column, $matches)) {
             $items = $this->feedbackstructure->get_items();
             $itemobj = feedback_get_item_class($items[$matches[1]]->typ);
-            return trim($itemobj->get_printval($items[$matches[1]], (object) ['value' => $row->$column] ));
+
+            // TOTARA: Feedback values from the items are encoded (places where they are not are places
+            // where there would be nothing that needs to be encoded). For csv, excel and ods, we can decode
+            // these. Others we will leave as is for now.
+            $value = trim($itemobj->get_printval($items[$matches[1]], (object) ['value' => $row->$column] ));
+
+            // in_array() must have the strict option because 0 == 'csv'.
+            if (in_array($this->download, array('csv', 'excel', 'ods'), true)) {
+                return htmlspecialchars_decode($value, ENT_QUOTES);
+            } else {
+                return $value;
+            }
         }
         return $row->$column;
     }
