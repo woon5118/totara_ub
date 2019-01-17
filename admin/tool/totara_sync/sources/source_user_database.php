@@ -322,6 +322,9 @@ class totara_sync_source_user_database extends totara_sync_source_user {
             return false;
         }
 
+        // Update temporary table stats once import is done.
+        $DB->update_temp_table_stats();
+
         return true;
     }
 

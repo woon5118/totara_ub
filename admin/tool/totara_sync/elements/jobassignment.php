@@ -168,7 +168,7 @@ class totara_sync_element_jobassignment extends totara_sync_element {
             $DB->delete_records($synctable, array('deleted' => 1));
         }
 
-        // Prior to the sanity check, there's some cases to remove.
+        // Prior to the sanity check, there are some cases to remove.
 
         // Remove any that are missing idnumber or useridnumber
         // as there'll be little else we can do with them.
@@ -481,25 +481,19 @@ class totara_sync_element_jobassignment extends totara_sync_element {
         global $DB;
 
         // Remove those with matching timemodified.
-        $sql = "SELECT s.id
-                  FROM {" . $table . "} s
-                  JOIN {job_assignment} j
-                    ON s.idnumber=j.idnumber
-                 WHERE s.idnumber IS NOT NULL
-                   AND s.idnumber != ''
-                   AND s.timemodified != 0
-                   AND s.timemodified = j.synctimemodified";
-        $latertimemodified = $DB->get_fieldset_sql($sql);
+        $where = "EXISTS (
+                    SELECT 1
+                        FROM {job_assignment} ja
+                    WHERE ja.idnumber = {{$table}}.idnumber
+                        AND ja.synctimemodified = {{$table}}.timemodified
+                )
+                AND idnumber IS NOT NULL
+                AND idnumber != ''
+                AND timemodified != 0";
 
         // No need for logging here. At present, this is simply expected behaviour for
         // when the record should supposedly already match the data in this entry.
-        if (!empty($latertimemodified)) {
-            $idtodelete_sets = array_chunk($latertimemodified, $DB->get_max_in_params());
-            foreach ($idtodelete_sets as $idtodelete_set) {
-                list($deletesql, $deleteparams) = $DB->get_in_or_equal($idtodelete_set);
-                $DB->delete_records_select($table, "id $deletesql", $deleteparams);
-            }
-        }
+        $DB->delete_records_select($table, $where);
     }
 
     /**

@@ -104,6 +104,7 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
     }
 
     function import_data($temptable) {
+        global $DB; // Careful using this in here as we have 2 database connections
 
         // Get database config
         $dbtype = $this->config->{'database_dbtype'};
@@ -251,6 +252,9 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
             $this->addlog(get_string('couldnotimportallrecords', 'tool_totara_sync'), 'error', 'populatesynctabledb');
             return false;
         }
+
+        // Update temporary table stats once import is done.
+        $DB->update_temp_table_stats();
 
         return true;
     }

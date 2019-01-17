@@ -267,6 +267,9 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
 
         $this->close_csv_file($file);
 
+        // Update temporary table stats once import is done.
+        $DB->update_temp_table_stats();
+
         return true;
     }
 

@@ -442,6 +442,9 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
             unlink($storefilepath); // don't store this file in temp
         }
 
+        // Update temporary table stats once import is done.
+        $DB->update_temp_table_stats();
+
         return true;
     }
 

@@ -200,7 +200,7 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
 
         // Add fields.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
-        $table->add_field('idnumber', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL);
+        $table->add_field('idnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
         $table->add_field('useridnumber', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL);
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
 
@@ -223,13 +223,13 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
             $table->add_field('posidnumber', XMLDB_TYPE_CHAR, '100');
         }
         if ($this->is_importing_field('manageridnumber')) {
-            $table->add_field('manageridnumber', XMLDB_TYPE_CHAR, '100');
+            $table->add_field('manageridnumber', XMLDB_TYPE_CHAR, '255');
         }
         if ($this->is_importing_field('managerjobassignmentidnumber')) {
             $table->add_field('managerjobassignmentidnumber', XMLDB_TYPE_CHAR, '100');
         }
         if ($this->is_importing_field('appraiseridnumber')) {
-            $table->add_field('appraiseridnumber', XMLDB_TYPE_CHAR, '100');
+            $table->add_field('appraiseridnumber', XMLDB_TYPE_CHAR, '255');
         }
 
         // Add keys.

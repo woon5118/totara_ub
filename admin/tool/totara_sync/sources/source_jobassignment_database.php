@@ -48,7 +48,7 @@ class totara_sync_source_jobassignment_database extends totara_sync_source_jobas
     }
 
     public function import_data($temptable) {
-        global $CFG;
+        global $DB;
 
         // Get database config.
         $dbtype = $this->config->{'database_dbtype'};
@@ -191,6 +191,9 @@ class totara_sync_source_jobassignment_database extends totara_sync_source_jobas
             $this->addlog(get_string('couldnotimportallrecords', 'tool_totara_sync'), 'error', 'populatesynctabledb');
             return false;
         }
+
+        // Update temporary table stats once import is done.
+        $DB->update_temp_table_stats();
 
         return true;
     }

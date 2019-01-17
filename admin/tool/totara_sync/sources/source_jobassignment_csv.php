@@ -112,6 +112,7 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
         $saveemptyfields = !empty($element->config->csvsaveemptyfields);
         $notnullfields = array('idnumber' => 1, 'useridnumber' => 1, 'timemodified' => 1, 'deleted' => 1);
 
+        $temptable_columns = $DB->get_columns($temptable);
         while ($csvrow = fgetcsv($file, 0, $this->config->delimiter)) {
             $fieldcount->rownum++;
             // Skip empty rows
@@ -184,7 +185,7 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
             $rowcount++;
 
             if ($rowcount >= TOTARA_SYNC_DBROWS) {
-                $this->check_length_limit($datarows, $DB->get_columns($temptable), $fieldmappings, $this->get_element_name());
+                $this->check_length_limit($datarows, $temptable_columns, $fieldmappings, $this->get_element_name());
                 // Bulk insert.
                 try {
                     totara_sync_bulk_insert($temptable, $datarows);
@@ -201,7 +202,7 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
             }
         }  // while
 
-        $this->check_length_limit($datarows, $DB->get_columns($temptable), $fieldmappings, $this->get_element_name());
+        $this->check_length_limit($datarows, $temptable_columns, $fieldmappings, $this->get_element_name());
         // Insert remaining rows.
         try {
             totara_sync_bulk_insert($temptable, $datarows);
@@ -212,6 +213,9 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
         unset($fieldmappings);
 
         $this->close_csv_file($file);
+
+        // Update temporary table stats once import is done.
+        $DB->update_temp_table_stats();
 
         return true;
     }

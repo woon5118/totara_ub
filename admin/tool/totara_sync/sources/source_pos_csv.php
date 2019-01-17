@@ -267,6 +267,9 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
 
         $this->close_csv_file($file);
 
+        // Update temporary table stats once import is done.
+        $DB->update_temp_table_stats();
+
         return true;
     }
 
