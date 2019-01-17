@@ -1649,7 +1649,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             }
 
             // Add specific user role completion information.
-            if ($showactor || !empty($rolecompletion->realusercompleted)) {
+            if (!empty($rolecompletion->usercompleted) && ($showactor || !empty($rolecompletion->realusercompleted))) {
                 $rolecomplete .= $this->get_completion_user_info($rolecompletion->usercompleted, $rolecompletion->realusercompleted);
             }
 
