@@ -42,7 +42,7 @@ $selectedids = totara_prog_removed_selected_ids($programid, $selected, $removed,
 $guest = guest_user();
 $usernamefields = get_all_user_name_fields(true);
 $items = $DB->get_records_select('user', 'deleted = 0 AND suspended = 0 AND id != ?', array($guest->id), '',
-    'id, ' . $usernamefields . ', email');
+    'id, ' . $usernamefields . ', email', 0, TOTARA_DIALOG_MAXITEMS + 1);
 
 // We'll remove users from $selected whose id is not in $selectedids.
 $allselected = $items;
