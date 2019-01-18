@@ -369,7 +369,8 @@ class rb_source_course_completion extends rb_base_source {
                 'course_completion',
                 'passgrade',
                 get_string('passgrade', 'rb_source_course_completion'),
-                '(((criteria.gradepass - grade_items.grademin) / (grade_items.grademax - grade_items.grademin)) * 100)',
+                'CASE WHEN grade_items.grademax = 0 THEN NULL
+                      ELSE (((criteria.gradepass - grade_items.grademin) / (grade_items.grademax - grade_items.grademin)) * 100) END',
                 array(
                     'joins' => ['criteria', 'grade_items'],
                     'displayfunc' => 'percent',

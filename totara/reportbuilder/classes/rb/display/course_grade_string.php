@@ -56,6 +56,11 @@ class course_grade_string extends base {
             $grademax = $extrafields->grademax;
         }
 
+        // We can't have a divisor of zero, and a negative one doesn't make much sense either.
+        if ($grademax - $grademin <= 0) {
+            return '-';
+        }
+
         $usergrade = sprintf('%.1f', ((($usergrade - $grademin) / ($grademax - $grademin)) * 100));
 
         if ($value === null or $value === '') {

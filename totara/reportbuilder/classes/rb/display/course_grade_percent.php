@@ -56,6 +56,11 @@ class course_grade_percent extends base {
                 $mingrade = (float)$extrafields->mingrade;
             }
 
+            // We can't have a divisor of zero, and a negative one doesn't make much sense either.
+            if ($maxgrade - $mingrade <= 0) {
+                return '-';
+            }
+
             // Create a percentage using the max grade.
             $percent = ((($value - $mingrade) / ($maxgrade - $mingrade)) * 100);
 

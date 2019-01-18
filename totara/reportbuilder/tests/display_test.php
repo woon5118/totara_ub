@@ -872,7 +872,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertEquals('0.0%', $display);
 
         $display = \totara_reportbuilder\rb\display\percent::display(null, $format, $row, $column, $report);
-        $this->assertEquals(null, $display);
+        $this->assertEquals('-', $display);
 
         $display = \totara_reportbuilder\rb\display\percent::display('blah', $format, $row, $column, $report);
         $this->assertEquals('0.0%', $display);

@@ -807,6 +807,11 @@ trait base_deprecated_t12_trait {
                 $mingrade = (float)$row->mingrade;
             }
 
+            // We can't have a divisor of zero, and a negative one doesn't make much sense either.
+            if ($maxgrade - $mingrade <= 0) {
+                return '-';
+            }
+
             // Create a percentage using the max grade.
             $percent = ((($item - $mingrade) / ($maxgrade - $mingrade)) * 100);
 
@@ -1545,6 +1550,11 @@ trait base_deprecated_t12_trait {
         }
         if (isset($row->grademax)) {
             $grademax = $row->grademax;
+        }
+
+        // We can't have a divisor of zero, and a negative one doesn't make much sense either.
+        if ($grademax - $grademin <= 0) {
+            return '-';
         }
 
         $usergrade = sprintf('%.1f', ((($usergrade - $grademin) / ($grademax - $grademin)) * 100));
