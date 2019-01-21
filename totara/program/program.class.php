@@ -730,16 +730,16 @@ class program {
         if (!empty($enrolmentmessageids)) {
             list($enrolmentmessageidssql, $enrolmentmessageidsparams) =
                 $DB->get_in_or_equal($enrolmentmessageids, SQL_PARAMS_NAMED);
-            $sql = "DELETE FROM {prog_messagelog} pm
-                     WHERE pm.messageid {$enrolmentmessageidssql}
+            $sql = "DELETE FROM {prog_messagelog}
+                     WHERE messageid {$enrolmentmessageidssql}
                        AND NOT EXISTS (SELECT 1
                                          FROM {prog_user_assignment} pua
                                         WHERE pua.programid = :programid
-                                          AND pua.userid = pm.userid)
+                                          AND pua.userid = {prog_messagelog}.userid)
                        AND NOT EXISTS (SELECT 1
                                          FROM {prog_completion} pc
                                         WHERE pc.programid = :programid2
-                                          AND pc.userid = pm.userid
+                                          AND pc.userid = {prog_messagelog}.userid
                                           AND pc.coursesetid = 0
                                           AND pc.status = :status)";
             $params = array_merge(array('programid' => $this->id, 'programid2' => $this->id, 'status' => STATUS_PROGRAM_COMPLETE),
