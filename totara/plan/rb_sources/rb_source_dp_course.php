@@ -380,9 +380,9 @@ class rb_source_dp_course extends rb_base_source {
                 )
         );
         $columnoptions[] = new rb_column_option(
-                'course_completion',
-                'status',
-                get_string('progressnumeric', 'rb_source_dp_course'),
+                'plan',
+                'courseprogress',
+                get_string('courseprogress', 'rb_source_dp_course'),
                 // use 'live' values except for completed plans
                 "CASE WHEN dp_course.planstatus = " . DP_PLAN_STATUS_COMPLETE . "
                 THEN
@@ -402,7 +402,7 @@ class rb_source_dp_course extends rb_base_source {
                 get_string('progresspercentage', 'rb_source_dp_course'),
                 "course_completion.status",
                 array(
-                    'joins' => array('course_completion', 'dp_course'),
+                    'joins' => array('course_completion'),
                     'displayfunc' => 'plan_course_completion_progress_percentage',
                     'extrafields' => array('userid' => 'base.userid', 'courseid' => 'base.courseid'),
                 )
@@ -514,8 +514,8 @@ class rb_source_dp_course extends rb_base_source {
                 'text'
         );
         $filteroptions[] = new rb_filter_option(
-                'course_completion',
-                'status',
+                'plan',
+                'courseprogress',
                 get_string('completionstatus', 'rb_source_dp_course'),
                 'select',
                 array(
