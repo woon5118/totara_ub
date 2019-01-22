@@ -24,6 +24,7 @@
 namespace totara_catalog;
 
 use totara_catalog\datasearch\datasearch;
+use totara_catalog\hook\exclude_item;
 use totara_catalog\local\config;
 use totara_catalog\local\feature_handler;
 use totara_catalog\local\filter_handler;
@@ -227,6 +228,24 @@ class catalog_retrieval {
                     $skipped++;
                     continue;
                 }
+
+                // A hook here to exclude/include the course/program/certificate based on the
+                // third parties setting.
+                $hook = new exclude_item($record);
+                $hook->execute();
+
+                if ($hook->is_excluded()) {
+                    $skipped++;
+                    continue;
+                }
+
+                // If we want to modify any record of a catalog, probably here is a good place to
+                // have another seperate hook for it.
+
+                // Unfortunately, there should not have a hook to add new record(s) into the list
+                // of the result, because adding new record(s) will break the core functionality of
+                // the catalog's pagination. Furthermore, we should not encourage the third party to
+                // do so, because any record(s) added on the fly will not have any sorting supports
 
                 // Not excluded, so add it to the results;
                 $objects[] = $record;
