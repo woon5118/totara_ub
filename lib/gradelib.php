@@ -1257,7 +1257,7 @@ function grade_regrade_final_grades($courseid, $userid=null, $updated_item=null,
                 if ($updateddependencies === false) {
                     // If no direct descendants are marked as updated, then we don't need to update this grade item. We then mark it
                     // as final.
-
+                    $count++;
                     $finalids[] = $gid;
                     continue;
                 }
