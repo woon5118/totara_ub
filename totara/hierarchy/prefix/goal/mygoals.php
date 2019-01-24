@@ -47,7 +47,7 @@ $data = array(
 
 require_login();
 
-$context = context_user::instance($userid);
+$context = context_system::instance();
 
 $goal = new goal();
 if (!$permissions = $goal->get_permissions(null, $userid)) {
@@ -74,6 +74,25 @@ if (!$report = reportbuilder::create_embedded($shortname, $config)) {
 $report->include_js();
 /* End of defining the report */
 
+if (!isset($USER->editing)) {
+    $USER->editing = 0;
+}
+if ($PAGE->user_allowed_editing()) {
+    $editbutton = $OUTPUT->edit_button($PAGE->url);
+    $PAGE->set_button($editbutton . $PAGE->button);
+
+    if ($edit == 1 && confirm_sesskey()) {
+        $USER->editing = 1;
+        $url = new moodle_url($PAGE->url, array('notifyeditingon' => 1));
+        redirect($url);
+    } else if ($edit == 0 && confirm_sesskey()) {
+        $USER->editing = 0;
+        redirect($PAGE->url);
+    }
+} else {
+    $USER->editing = 0;
+}
+
 if (\totara_job\job_assignment::is_managing($USER->id, $userid)) {
     $username = fullname($DB->get_record('user', array('id' => $userid)));
     $strmygoals = get_string('mygoalsteam', 'totara_hierarchy', $username);
@@ -88,7 +107,7 @@ if (\totara_job\job_assignment::is_managing($USER->id, $userid)) {
 }
 $PAGE->navbar->add($strmygoals);
 $PAGE->set_title($strmygoals);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 $PAGE->set_focuscontrol('');
 $PAGE->set_cacheable(true);
 
@@ -127,14 +146,7 @@ $jsmodule = array(
     'requires' => array('json'));
 $PAGE->requires->js_init_call('M.totara_assignindividual.init', $args, false, $jsmodule);
 
-if ($edit !== -1) {
-    $USER->edit = $edit;
-}
-
 $renderer = $PAGE->get_renderer('totara_hierarchy');
-
-$header = '';
-$header .= $OUTPUT->heading($strmygoals);
 
 $company = '';
 if ($can_view_company) {
@@ -202,16 +214,10 @@ if ($can_view_company) {
     // Set up the company goal data.
     $company .= $renderer->mygoals_company_table($userid, $can_edit[GOAL_ASSIGNMENT_INDIVIDUAL], $display);
     $company .= html_writer::end_tag('div');
-
-
 }
-
-// Spacing.
-$spacing = html_writer::empty_tag('br');
 
 $personal = '';
 if ($can_view_personal) {
-
     if ($can_edit_personal) {
         // Set up the personal goal data.
         $personal_edit_url = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php', array('userid' => $userid));
@@ -260,9 +266,9 @@ $reportrenderer = $PAGE->get_renderer('totara_reportbuilder');
 
 // Output everything.
 echo $OUTPUT->header();
-echo $header;
+echo $OUTPUT->heading($strmygoals);
 echo $company;
-echo $spacing;
+echo html_writer::empty_tag('br');
 echo $personal;
 $reportrenderer->export_select($report, $sid);
 echo $OUTPUT->footer();
