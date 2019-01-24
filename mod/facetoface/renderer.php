@@ -1665,10 +1665,23 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         if (get_config(null, 'facetoface_selectjobassignmentonsignupglobal') &&
             ($facetoface->selectjobassignmentonsignup || $facetoface->forceselectjobassignment)) {
             if (isset($bookedsession->jobassignmentid) && $bookedsession->jobassignmentid) {
-                $jobassignment = \totara_job\job_assignment::get_with_id($bookedsession->jobassignmentid);
+                $jobassignment = \totara_job\job_assignment::get_with_id(
+                    $bookedsession->jobassignmentid,
+                    false
+                );
+
+                if (null == $jobassignment) {
+                    // If the job assignment does not exist, we should let the user know that
+                    // the job assignment might have been deleted by the site admin, and the
+                    // reference is not updated yet
+                    $fullname = get_string("missingjobassignment", "mod_facetoface");
+                } else {
+                    $fullname = $jobassignment->fullname;
+                }
+
                 $output .= html_writer::empty_tag('br');
                 $output .= html_writer::tag('dt', get_string('jobassignment', 'facetoface'));
-                $output .= html_writer::tag('dd', $jobassignment->fullname);
+                $output .= html_writer::tag('dd', $fullname);
                 $output .= html_writer::empty_tag('br');
             }
         }

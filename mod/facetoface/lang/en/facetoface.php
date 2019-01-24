@@ -792,6 +792,7 @@ $string['minbookings'] = 'Minimum bookings';
 $string['minbookings_help'] = 'Sessions with a minimum bookings are highlighted when the number of booked users is less than the minimum bookings. To prevent highlighting, set the minimum bookings to zero.';
 $string['mincapacity'] = 'Minimum bookings';
 $string['mincapacity_help'] = 'If the minimum bookings has not been reached by the cut-off point, then the appropriate users will be automatically notified. Users to be notified is determined by role assignments and the configuration setting under Site administration > Seminars > Global Settings > Notification recipients';
+$string['missingjobassignment'] = 'The job assignment was <strong>deleted</strong>';
 $string['modulename'] = 'Seminar';
 $string['modulenameplural'] = 'Seminars';
 $string['moreinfo'] = 'More info';

@@ -3436,8 +3436,15 @@ function facetoface_get_session_managers($userid, $sessionid, $jobassignmentid =
         $manager = $DB->get_record('user', array('id' => $signup->managerid));
         $managers[] = $manager;
     } else if ($selectjobassignmentonsignupglobal && !empty($jobassignmentid)) {
-        $ja = \totara_job\job_assignment::get_with_id($jobassignmentid);
-        if ($ja->managerid) {
+        // The job assignment could not be found here, because the system admin might had deleted
+        // the job assignment record, but did not update the seminar signup record here.
+
+        // This could mean that, seminar system is not able to notify this user's manager here.
+        // However, when deleting the job assignment of a user, this could indicate that this
+        // user is no longer being managed by the same manager anymore. Unless, deleting job
+        // assignment is an accident.
+        $ja = \totara_job\job_assignment::get_with_id($jobassignmentid, false);
+        if (null != $ja && $ja->managerid) {
             $managers[] = $DB->get_record('user', array('id' => $ja->managerid));
         }
     } else {
