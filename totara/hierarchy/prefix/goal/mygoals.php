@@ -98,12 +98,12 @@ if (\totara_job\job_assignment::is_managing($USER->id, $userid)) {
     $strmygoals = get_string('mygoalsteam', 'totara_hierarchy', $username);
     if (totara_feature_visible('myteam')) {
         $myteamurl = new moodle_url('/my/teammembers.php', array());
-        $PAGE->set_totara_menu_selected('myteam');
+        $PAGE->set_totara_menu_selected('\totara_core\totara\menu\myteam');
         $PAGE->navbar->add(get_string('team', 'totara_core'), $myteamurl);
     }
 } else {
     $strmygoals = get_string('goals', 'totara_hierarchy');
-    $PAGE->set_totara_menu_selected('mygoals');
+    $PAGE->set_totara_menu_selected('\totara_hierarchy\totara\menu\mygoals');
 }
 $PAGE->navbar->add($strmygoals);
 $PAGE->set_title($strmygoals);

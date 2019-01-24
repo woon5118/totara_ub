@@ -39,8 +39,6 @@ $id = required_param('id', PARAM_INT);
 $expandname = required_param('expandname', PARAM_TEXT);
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/totara/reportbuilder/report.php', array('id' => $id));
-$PAGE->set_totara_menu_selected('myreports');
 $PAGE->set_pagelayout('noblocks');
 
 // Create the report object. Includes embedded report capability checks.

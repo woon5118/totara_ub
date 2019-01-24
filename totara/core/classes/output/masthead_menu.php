@@ -29,38 +29,7 @@ class masthead_menu implements \renderable, \templatable {
 
     public $menuitems = array();
 
-    public function __construct($menudata, $parent=null, $selected_items=array()) {
-        global $PAGE, $FULLME;
-
-        // Gets selected items, only done first time.
-        if (!$selected_items && $PAGE->totara_menu_selected) {
-            foreach ($menudata as $item) {
-                if ($PAGE->totara_menu_selected == $item->name) {
-                    $selected_items = array($item->name);
-                }
-            }
-        }
-
-        if (!$selected_items) {
-            $urlcache = [];
-            foreach ($menudata as $item) {
-                $url = new \moodle_url($item->url);
-                $urlcache[$item->name] = $url;
-                if ($PAGE->url->compare($url)) {
-                    $selected_items = array($item->name);
-                    break;
-                }
-            }
-            if (!$selected_items) {
-                foreach ($menudata as $item) {
-                    if ($urlcache[$item->name]->compare(new \moodle_url($FULLME), URL_MATCH_EXACT)) {
-                        $selected_items = array($item->name);
-                        break;
-                    }
-                }
-            }
-            unset($urlcache);
-        }
+    public function __construct($menudata, $parent=null) {
 
         $currentlevel = array();
         foreach ($menudata as $menuitem) {
@@ -77,10 +46,8 @@ class masthead_menu implements \renderable, \templatable {
             foreach ($currentlevel as $menuitem) {
                 $class_isfirst = ($count == 0 ? true : false);
                 $class_islast  = ($count == $numitems - 1 ? true : false);
-                // If the menu item is known to be selected or it if its a direct match to the current pages URL.
-                $class_isselected = (in_array($menuitem->name, $selected_items) ? true : false);
 
-                $children = new self($menudata, $menuitem->name, $selected_items);
+                $children = new self($menudata, $menuitem->name);
                 $haschildren = ($children->has_children() ? true : false);
                 $externallink = ($menuitem->target == '_blank' ? true : false);
                 $url = new \moodle_url($menuitem->url);
@@ -88,7 +55,7 @@ class masthead_menu implements \renderable, \templatable {
                     'class_name' => $menuitem->name,
                     'class_isfirst' => $class_isfirst,
                     'class_islast' => $class_islast,
-                    'class_isselected' => $class_isselected,
+                    'class_isselected' => $menuitem->is_selected,
                     'external_link' => $externallink,
                     'linktext' => $menuitem->linktext,
                     'url' => $url->out(false),

@@ -111,7 +111,7 @@ if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
         }
     }
 }
-$PAGE->set_totara_menu_selected('home');
+$PAGE->set_totara_menu_selected('\totara_core\totara\menu\home');
 
 // Trigger event.
 course_view(context_course::instance(SITEID));

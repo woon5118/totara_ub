@@ -130,7 +130,7 @@ $PAGE->set_heading(format_string($SITE->fullname));
 $ownplan = $USER->id == $userid;
 
 $usertype = ($ownplan) ? 'learner' : 'manager';
-$menuitem = ($ownplan) ? 'recordoflearning' : 'myteam';
+$menuitem = ($ownplan) ? '\totara_plan\totara\menu\recordoflearning' : '\totara_core\totara\menu\myteam';
 $PAGE->set_totara_menu_selected($menuitem);
 dp_display_plans_menu($userid, 0, $usertype, 'courses', 'none');
 

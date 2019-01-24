@@ -36,7 +36,7 @@ $id = required_param('id', PARAM_INT); // Id for report to save.
 
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->set_totara_menu_selected('myreports');
+$PAGE->set_totara_menu_selected('\totara_core\totara\menu\myreports');
 
 $report = reportbuilder::create($id);
 $returnurl = $report->report_url(true);

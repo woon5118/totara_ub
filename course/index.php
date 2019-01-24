@@ -70,7 +70,7 @@ if ($CFG->forcelogin) {
 if ($categoryid && !$category->visible && !has_capability('moodle/category:viewhiddencategories', $PAGE->context)) {
     throw new moodle_exception('unknowncategory');
 }
-$PAGE->set_totara_menu_selected('courses');
+$PAGE->set_totara_menu_selected('\totara_coursecatalog\totara\menu\courses');
 $PAGE->set_heading($site->fullname);
 $content = $courserenderer->course_category($categoryid);
 

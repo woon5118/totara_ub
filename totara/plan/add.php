@@ -43,7 +43,7 @@ $PAGE->set_context($context);
 $PAGE->set_url('/totara/plan/add.php', array('userid' => $userid));
 $PAGE->set_pagelayout('report');
 $ownplan = ($userid == $USER->id);
-$menuitem = ($ownplan) ? 'learningplans' : 'myteam';
+$menuitem = ($ownplan) ? '\totara_plan\totara\menu\learningplans' : '\totara_core\totara\menu\myteam';
 $PAGE->set_totara_menu_selected($menuitem);
 
 ///

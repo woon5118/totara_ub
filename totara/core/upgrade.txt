@@ -23,6 +23,11 @@ information provided here is intended especially for developers.
 * Removed deprecated function check_string()
 * totara_core\quickaccessmenu\external::add_group returns group context object instead of a boolean
 * totara_core/accordion widget changed default setting of "always_open" to true
+* Changed how menu compares menu items to values set by $PAGE->set_totara_menu_selected
+** totara_build_menu_selected_node() now contains logic to find highlighted item
+** $PAGE->set_totara_menu_selected now requires the fully qualified class name (including backslash),
+   e.g 'recordoflearning' => '\totara_plan\totara\menu\recordoflearning'
+** totara_core\masthead constructor no longer uses $selected_items parameter
 
 === 12.0 ===
 

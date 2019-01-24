@@ -87,7 +87,9 @@ if ($categoryid && !$category->visible && !has_capability('moodle/category:viewh
 }
 
 // This 's' is needed so that the correct Totara menu item has the selected css class added.
-$PAGE->set_totara_menu_selected($viewtype . 's');
+$menuitem = $viewtype == 'program' ? '\totara_coursecatalog\totara\menu\programs' : '\totara_coursecatalog\totara\menu\certifications';
+
+$PAGE->set_totara_menu_selected($menuitem);
 $PAGE->set_heading(format_string($site->fullname));
 $content = $programrenderer->program_category($categoryid, $viewtype);
 

@@ -48,7 +48,7 @@ $returnurl = new moodle_url('/totara/reportbuilder/savedsearches.php', array('id
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/totara/reportbuilder/savedsearches.php', array('id' => $id, 'sid' => $sid));
-$PAGE->set_totara_menu_selected('myreports');
+$PAGE->set_totara_menu_selected('\totara_core\totara\menu\myreports');
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 

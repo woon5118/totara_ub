@@ -40,7 +40,7 @@ require_login();
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url('/totara/reportbuilder/report.php', array('id' => $id));
-$PAGE->set_totara_menu_selected('myreports');
+$PAGE->set_totara_menu_selected('\totara_core\totara\menu\myreports');
 $PAGE->set_pagelayout('noblocks');
 
 // We can rely on the report builder record existing here as there is no way to get directly to report.php.

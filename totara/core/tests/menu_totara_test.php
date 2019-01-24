@@ -70,8 +70,11 @@ class totara_core_menu_totara_testcase extends advanced_testcase {
     }
 
     public function test_totara_build_menu() {
-        global $CFG, $USER, $SESSION, $DB;
+        global $CFG, $USER, $SESSION, $DB, $PAGE;
         $this->resetAfterTest();
+
+        //have to set page url so menu comparisons for selected items don't fail
+        $PAGE->set_url(new moodle_url($CFG->wwwroot . '/'));
 
         $unusedcontainerid = helper::get_unused_container_id();
 

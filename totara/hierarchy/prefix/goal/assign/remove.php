@@ -57,7 +57,7 @@ $urlparams = array('goalid' => $goalid,
 $PAGE->set_url(new moodle_url('/totara/hierarchy/prefix/goal/assign/remove.php'), $urlparams);
 $PAGE->set_context($sitecontext);
 $PAGE->set_pagelayout('admin');
-$PAGE->set_totara_menu_selected('mygoals');
+$PAGE->set_totara_menu_selected('\totara_hierarchy\totara\menu\mygoals');
 $PAGE->set_title($strdelgoals);
 $PAGE->set_heading($strdelgoals);
 

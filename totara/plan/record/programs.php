@@ -147,7 +147,7 @@ $PAGE->set_title($strheading);
 $PAGE->set_button($report->edit_button());
 $PAGE->set_heading(format_string($SITE->fullname));
 
-$menuitem = ($ownplan) ? 'recordoflearning' : 'myteam';
+$menuitem = ($ownplan) ? '\totara_plan\totara\menu\recordoflearning' : '\totara_core\totara\menu\myteam';
 $PAGE->set_totara_menu_selected($menuitem);
 dp_display_plans_menu($userid, 0, $usertype, 'programs', $rolstatus);
 

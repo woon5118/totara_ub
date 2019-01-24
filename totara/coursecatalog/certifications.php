@@ -33,7 +33,7 @@ $PAGE->set_context(context_system::instance());
 $catalogtype = get_config('core', 'catalogtype');
 
 if ($catalogtype === 'enhanced') {
-    $PAGE->set_totara_menu_selected('certifications');
+    $PAGE->set_totara_menu_selected('\totara_coursecatalog\totara\menu\certifications');
 }
 
 $PAGE->set_pagelayout('noblocks');

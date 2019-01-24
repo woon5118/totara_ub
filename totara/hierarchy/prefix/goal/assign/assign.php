@@ -103,7 +103,7 @@ $urlparams = array('assignto' => $assignto,
 $PAGE->set_url(new moodle_url('/totara/hierarchy/prefix/goal/assign/assign.php'), $urlparams);
 $PAGE->set_context($sitecontext);
 $PAGE->set_pagelayout('admin');
-$PAGE->set_totara_menu_selected('mygoals');
+$PAGE->set_totara_menu_selected('\totara_hierarchy\totara\menu\mygoals');
 $PAGE->set_title($straddgoals);
 $PAGE->set_heading($straddgoals);
 

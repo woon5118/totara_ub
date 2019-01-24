@@ -33,7 +33,7 @@ $PAGE->set_pagelayout('noblocks');
 $catalogtype = get_config('core', 'catalogtype');
 
 if ($catalogtype === 'enhanced') {
-    $PAGE->set_totara_menu_selected('courses');
+    $PAGE->set_totara_menu_selected('\totara_coursecatalog\totara\menu\courses');
 }
 
 $PAGE->set_url('/totara/coursecatalog/courses.php');

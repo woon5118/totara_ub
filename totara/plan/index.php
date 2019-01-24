@@ -52,9 +52,9 @@ $PAGE->set_context($context);
 $PAGE->set_pagelayout('report');
 
 if ($role == 'manager') {
-    $PAGE->set_totara_menu_selected('myteam');
+    $PAGE->set_totara_menu_selected('\totara_core\totara\menu\myteam');
 } else {
-    $PAGE->set_totara_menu_selected('learningplans');
+    $PAGE->set_totara_menu_selected('\totara_plan\totara\menu\learningplans');
 }
 
 $heading = get_string('learningplans', 'totara_plan');

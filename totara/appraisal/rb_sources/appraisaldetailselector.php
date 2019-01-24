@@ -42,7 +42,7 @@ $fullname = $report->fullname;
 
 // Start page output.
 $PAGE->set_url('/totara/appraisal/rb_source/appraisaldetailselector.php', array('detailreportid' => $detailreportid));
-$PAGE->set_totara_menu_selected('myreports');
+$PAGE->set_totara_menu_selected('\totara_core\totara\menu\myreports');
 $PAGE->set_pagelayout('noblocks');
 $heading = get_string('myappraisals', 'totara_appraisal');
 $PAGE->set_title($heading);

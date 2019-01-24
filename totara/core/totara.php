@@ -1423,6 +1423,8 @@ function totara_build_menu() {
                     $node->url = \totara_core\totara\menu\item::replace_url_parameter_placeholders($node->url);
                     $tree[$k] = $node;
                 }
+
+                totara_build_menu_selected_node($tree);
                 return $tree;
             }
         }
@@ -1447,6 +1449,8 @@ function totara_build_menu() {
         $node->url = \totara_core\totara\menu\item::replace_url_parameter_placeholders($node->url);
         $tree[$k] = $node;
     }
+
+    totara_build_menu_selected_node($tree);
 
     return $tree;
 }
@@ -1519,14 +1523,57 @@ function totara_build_menu_descendants($parentid, $allrecords, $parentdepth = 0)
             'name'     => $node->get_name(),
             'linktext' => $node->get_title(),
             'parent'   => $node->get_parent(),
+            'classname'=> $node->get_classname(),
             'url'      => $url,
-            'target'   => $node->get_targetattr()
+            'target'   => $node->get_targetattr(),
+            'is_selected' => false,
         );
 
         $tree = array_merge($tree, $descendants);
     }
 
     return $tree;
+}
+
+/**
+ * Flags the selected node in the main navigation tree
+ * @param array $tree tree of menu item objects
+ */
+function totara_build_menu_selected_node($tree) {
+    global $PAGE, $FULLME;
+
+    $has_selected = false; //flag to prevent unnecessary loops of nav tree
+    foreach ($tree as $k => $node) {
+        if ($PAGE->totara_menu_selected == $node->classname) {
+            $node->is_selected = true;
+            $has_selected = true;
+        }
+    }
+
+    //If we haven't found a selected node yet, compare URLs to find a matching node
+    if (!$has_selected) {
+        $urlcache = [];
+        foreach ($tree as $k => $node) {
+            $url = new \moodle_url($node->url);
+            $urlcache[$node->name] = $url;
+            if ($PAGE->url && $PAGE->url->compare($url)) {
+                $node->is_selected = true;
+                $has_selected = true;
+                break;
+            }
+        }
+
+        //If we still haven't found a selected node, loop through again, but compare against the raw URL
+        if (!$has_selected) {
+            foreach ($tree as $k => $node) {
+                if ($urlcache[$node->name]->compare(new \moodle_url($FULLME), URL_MATCH_EXACT)) {
+                    $node->is_selected = true;
+                    break;
+                }
+            }
+        }
+        unset($urlcache);
+    }
 }
 
 

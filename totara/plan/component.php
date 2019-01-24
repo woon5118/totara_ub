@@ -50,7 +50,7 @@ $PAGE->set_context($systemcontext);
 $PAGE->set_pagelayout('report');
 $plan = new development_plan($id);
 $ownplan = ($USER->id == $plan->userid);
-$menuitem = ($ownplan) ? 'learningplans' : 'myteam';
+$menuitem = ($ownplan) ? '\totara_plan\totara\menu\learningplans' : '\totara_core\totara\menu\myteam';
 $PAGE->set_totara_menu_selected($menuitem);
 
 // Check if the user can view the component content.

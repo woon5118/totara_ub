@@ -63,12 +63,6 @@ if (!reportbuilder::is_capable($id)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
 
-if (!empty($report->embeddedurl)) {
-    $PAGE->set_url($report->embeddedurl);
-} else {
-    $PAGE->set_url('/totara/reportbuilder/report.php', array('id' => $id));
-}
-$PAGE->set_totara_menu_selected('myreports');
 $PAGE->set_pagelayout('noblocks');
 
 \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
