@@ -39,14 +39,14 @@ Feature: Verify membership options work correctly.
 
     # Add a rule set.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner1"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #1"
 
     # Add another rule set.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner2"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #2"
@@ -87,7 +87,7 @@ Feature: Verify membership options work correctly.
 
     # Add a rule set.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner1"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #1"
@@ -105,7 +105,7 @@ Feature: Verify membership options work correctly.
 
     # Add another rule set but with the 'add' membership option active
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner2"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #2"
@@ -148,14 +148,14 @@ Feature: Verify membership options work correctly.
 
     # Add a rule set.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner1"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #1"
 
     # Add another rule set.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner2"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #2"
@@ -194,7 +194,7 @@ Feature: Verify membership options work correctly.
     And I should see "firstname21 lastname21" in the "#cohort_members" "css_element"
 
   @javascript
-  Scenario: Verify a user is added the audience when they meet the criteria and the 'add' memeber option is active.
+  Scenario: Verify a user is added the audience when they meet the criteria and the 'add' member option is active.
 
     # Navigate to Audiences.
     Given I log in as "admin"
@@ -210,14 +210,14 @@ Feature: Verify membership options work correctly.
 
     # Add a rule set.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner1"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #1"
 
     # Add another rule set.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner2"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #2"
@@ -229,7 +229,7 @@ Feature: Verify membership options work correctly.
       | learner12 | firstname12 | lastname12 |
       | learner22 | firstname22 | lastname22 |
       | learner32 | firstname32 | lastname32 |
-    Then I trigger cron
+    And I run the "\totara_cohort\task\update_cohort_task" task
 
     # Navigate to Audiences and check the new users has been added.
     When I am on homepage
@@ -258,14 +258,14 @@ Feature: Verify membership options work correctly.
 
     # Add a rule set.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner1"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #1"
 
     # Add another rule set.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner2"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #2"
@@ -282,7 +282,7 @@ Feature: Verify membership options work correctly.
       | learner12 | firstname12 | lastname12 |
       | learner22 | firstname22 | lastname22 |
       | learner32 | firstname32 | lastname32 |
-    Then I trigger cron
+    And I run the "\totara_cohort\task\update_cohort_task" task
 
     # Navigate to Audiences and check the new users have been added.
     When I am on homepage
@@ -311,21 +311,21 @@ Feature: Verify membership options work correctly.
 
     # Add a rule set to include users containing 'learner1'.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner1"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #1"
 
     # Add a rule set to include users containing 'learner2'.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner2"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #2"
 
     # Extend one rule set to include anyone who has not logged in within the last week.
     When I set the field "addrulemenu1" to "Last login date"
-    Then I should see "Add a rule based on User's last login date"
+    Then I should see "based on User's last login date"
     When I click on "id_fixedordynamic_2" "radio"
     And I set the field "durationdate" to "7"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
@@ -342,7 +342,7 @@ Feature: Verify membership options work correctly.
     And I log out
     And I log in as "learner11"
     And I log out
-    Then I trigger cron
+    And I run the "\totara_cohort\task\update_cohort_task" task
 
     # Navigate to Audiences and check the new users have been removed.
     When I log in as "admin"
@@ -374,21 +374,21 @@ Feature: Verify membership options work correctly.
     # Add a rule set to include users containing 'learner1'
     When I click on "Remove a user's membership when they no longer meet the rule sets criteria" "checkbox"
     And I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner1"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #1"
 
     # Add a rule set to include users containing 'learner2'.
     When I set the field "addrulesetmenu" to "Username"
-    Then I should see "Add a rule based on User's username"
+    Then I should see "based on User's username"
     When I set the field "listofvalues" to "learner2"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Ruleset #2"
 
     # Extend one rule set to include anyone who has not logged in within the last week.
     When I set the field "addrulemenu1" to "Last login date"
-    Then I should see "Add a rule based on User's last login date"
+    Then I should see "based on User's last login date"
     When I click on "id_fixedordynamic_2" "radio"
     And I set the field "durationdate" to "7"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
@@ -405,7 +405,7 @@ Feature: Verify membership options work correctly.
     And I log out
     And I log in as "learner11"
     And I log out
-    Then I trigger cron
+    And I run the "\totara_cohort\task\update_cohort_task" task
 
     # Navigate to Audiences and check the new users have NOT been removed.
     When I log in as "admin"
