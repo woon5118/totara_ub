@@ -1,4 +1,4 @@
-@totara_contentmarketplace @contentmarketplace_goone @javascript @_switch_window
+@totara @totara_contentmarketplace @contentmarketplace_goone @javascript @_switch_window
 Feature: Create a course from the Go1 content marketplace
   As an admin
   I should be able to navigate the content marketplace and create a course

@@ -1,4 +1,4 @@
-@local @totara_contentmarketplace @contentmarketplace_goone
+@totara @totara_contentmarketplace @contentmarketplace_goone
 Feature: Disabling a content marketplace
 
   Scenario: An enabled marketplace has several actions

@@ -1,4 +1,4 @@
-@local @totara_contentmarketplace @contentmarketplace_goone
+@totara @totara_contentmarketplace @contentmarketplace_goone
 Feature: Establish API connection with GO1
 
   @javascript @_switch_window

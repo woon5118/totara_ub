@@ -1,4 +1,4 @@
-@totara_contentmarketplace
+@totara @totara_contentmarketplace
 Feature: Totara content marketplace filter tests
   In order to test the filter elements
   As an admin

@@ -1,4 +1,4 @@
-@totara_contentmarketplace @contentmarketplace_goone @javascript @_switch_window
+@totara @totara_contentmarketplace @contentmarketplace_goone @javascript @_switch_window
 Feature: Search for content in the Go1 content marketplace
   As an admin
   I should be able to filter the content marketplace
