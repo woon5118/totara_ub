@@ -2731,22 +2731,30 @@ class appraisal_stage {
             );
             $event->trigger();
 
-            // Check if all involved roles are complete for this user and stage.
-            $rolescompletion = $this->get_mandatory_completion($roleassignment->subjectid);
-            $complete = true;
-            foreach ($rolescompletion as $rolecompletion) {
-                if (!isset($rolecompletion->timecompleted)) {
-                    $complete = false;
-                    break;
-                }
-            }
-            if ($complete) {
+            if ($this->is_all_roles_complete($roleassignment->subjectid)) {
                 // Mark this stage as complete for this user.
                 $this->complete_for_user($roleassignment->subjectid);
             }
         }
     }
 
+    /**
+     * Check if all involved roles are complete for this user and stage.
+     *
+     * @param $subjectid
+     * @return bool
+     */
+    public function is_all_roles_complete($subjectid) {
+        $rolescompletion = $this->get_mandatory_completion($subjectid);
+        $complete = true;
+        foreach ($rolescompletion as $rolecompletion) {
+            if (!isset($rolecompletion->timecompleted)) {
+                $complete = false;
+                break;
+            }
+        }
+        return $complete;
+    }
 
     /**
      * Mark this stage as complete for the given user.
@@ -2810,6 +2818,19 @@ class appraisal_stage {
             )
         );
         $event->trigger();
+
+        // Check if this was the last stage for this user.
+        if (!empty($nextstageid)) {
+            // Check if the next stage is complete.
+            $nextstage = new appraisal_stage($nextstageid);
+            if ($nextstage->is_all_roles_complete($subjectid)) {
+                $nextstage->complete_for_user($subjectid);
+            }
+        } else {
+            // Mark the appraisal as complete for the given user.
+            $appraisal = new appraisal($this->appraisalid);
+            $appraisal->complete_for_user($subjectid);
+        }
     }
 
 

@@ -48,6 +48,7 @@ $title = $PAGE->title . ': ' . $appraisal->name;
 $PAGE->set_title($title);
 $PAGE->set_heading($appraisal->name);
 $PAGE->navbar->add($appraisal->name);
+/** @var totara_appraisal_renderer $output */
 $output = $PAGE->get_renderer('totara_appraisal');
 
 $grouptypes = $assign->get_assignable_grouptype_names();
@@ -163,7 +164,11 @@ if (!appraisal::is_closed($appraisalid)) {
 }
 
 if ($canviewusers) {
-    echo $output->display_user_datatable(!appraisal::is_closed($appraisalid));
+    $canunlockstages = has_capability('totara/appraisal:unlockstages', $systemcontext);
+    echo $output->display_user_datatable(
+        !appraisal::is_closed($appraisalid),
+        $canunlockstages && $appraisal->get()->status == $appraisal::STATUS_ACTIVE
+    );
 }
 
 
