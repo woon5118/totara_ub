@@ -315,13 +315,15 @@ class reportbuilder {
         // Handle if report not found in db.
         $embed = null;
         if (!$report) {
-            $embed = reportbuilder_get_embedded_report_object($name, $config->get_embeddata());
-            if ($embed) {
-                // Maybe this is the first time we have run it, so try to create it.
-                if (!$id = reportbuilder_create_embedded_record($name, $embed, $error)) {
-                    print_error('error:creatingembeddedrecord', 'totara_reportbuilder', '', $error);
+            if ($embedclass = self::get_embedded_report_class($name)) {
+                $embed = new $embedclass($config->get_embeddata());
+                if ($embed) {
+                    // Maybe this is the first time we have run it, so try to create it.
+                    if (!$id = reportbuilder_create_embedded_record($name, $embed, $error)) {
+                        print_error('error:creatingembeddedrecord', 'totara_reportbuilder', '', $error);
+                    }
+                    $report = $DB->get_record('report_builder', ['id' => $id]);
                 }
-                $report = $DB->get_record('report_builder', ['id' => $id]);
             }
         }
 
@@ -423,13 +425,15 @@ class reportbuilder {
 
         // If this is an embedded report then load the embedded report object.
         if ($this->embedded) {
-            $embed = reportbuilder_get_embedded_report_object($this->shortname, $config->get_embeddata());
-            if (!$embed) {
-                throw new coding_exception('Embedded report definition not found');
+            if ($embedclass = self::get_embedded_report_class($this->shortname)) {
+                $embed = new $embedclass($config->get_embeddata());
+                if (!$embed) {
+                    throw new coding_exception('Embedded report definition not found');
+                }
+                $this->embedobj = $embed;
+                $this->embeddedurl = $this->embedobj->url;
+                unset($embed);
             }
-            $this->embedobj = $embed;
-            $this->embeddedurl = $this->embedobj->url;
-            unset($embed);
         }
 
         $this->initialise();
@@ -950,18 +954,60 @@ class reportbuilder {
         // NOTE: luckily this is not called often, let's filter out
         //       the ignored embedded reports here to improve the performance.
         foreach ($reports as $i => $report) {
-            $embed = reportbuilder_get_embedded_report_object($report->shortname);
-            if (!$embed or $embed->is_ignored()) {
+            $embedclass = self::get_embedded_report_class($report->shortname);
+            // Deprecated method is used here to ensure backwards compatibility.
+            // This should be replaced with direct call to $embedclass::is_report_ignored() in the future.
+            if (self::is_embedded_class_ignored($embedclass)) {
                 unset($reports[$i]);
             } else {
-                $reports[$i]->embedobj = $embed;
+                $reports[$i]->embedobj = new $embedclass([]);
             }
         }
         return $reports;
     }
 
     /**
-     * @return array()  Of normalised database ojected for all reports.
+     * Generate class name from an embedded report name.
+     *
+     * Given an embedded report name, it finds the class and includes its library.
+     * The class name is returned, or false if something went wrong.
+     *
+     * @param string $embedname Shortname of an embedded report
+     *                          e.g. X from rb_X_embedded.php
+     *
+     * @return string|boolean
+     */
+    public static function get_embedded_report_class(string $embedname) {
+        global $CFG;
+
+        $sourcepaths = reportbuilder::find_source_dirs();
+        $sourcepaths[] = $CFG->dirroot . '/totara/reportbuilder/embedded/';
+
+        foreach ($sourcepaths as $sourcepath) {
+            $classfile = $sourcepath . 'rb_' . $embedname . '_embedded.php';
+            if (is_readable($classfile)) {
+                include_once($classfile);
+                $classname = 'rb_' . $embedname . '_embedded';
+                if (class_exists($classname)) {
+                    if (is_subclass_of($classname, 'rb_base_embedded')) {
+                        return $classname;
+                    } else {
+                        debugging('All embedded report classes should extend rb_base_embedded', DEBUG_DEVELOPER);
+                        return false;
+                    }
+                } else {
+                    debugging('Embedded report class was not found in ' . $classfile, DEBUG_DEVELOPER);
+                    return false;
+                }
+            }
+        }
+
+        // File or class not found.
+        return false;
+    }
+
+    /**
+     * @return array()  Of normalised database objects for all reports.
      */
     protected static function get_normalised_report_records() {
         global $DB;
@@ -984,8 +1030,8 @@ class reportbuilder {
                 // The embedded report did not exist within the database, its new or this is the first time anyone has seen it.
                 // Trigger its creation.
                 $error = null;
-                $embed = reportbuilder_get_embedded_report_object($object->shortname);
-                $id = reportbuilder_create_embedded_record($object->shortname, $embed, $error);
+                $embedclass = self::get_embedded_report_class($object->shortname);
+                $id = reportbuilder_create_embedded_record($object->shortname, new $embedclass([]), $error);
                 // If $id is false then the report could not be generated.
                 // There is no warning for this currently unfortunately.
                 if ($id) {
@@ -1007,24 +1053,17 @@ class reportbuilder {
                 $report->nextreport = $cache[$report->id]->nextreport;
             }
 
-            // Add extra sourcetitle property to the report object to avoid loading later.
             $src = self::get_source_object($report->source, true, false);
 
-            if ($src) {
-                $report->sourcetitle = $src->sourcetitle;
-                $report->sourceobject = $src;
-            } else {
-
-                // If you can't find the reports source, toss it.
-                unset($reports[$report->id]);
-                continue;
-            }
-            if ($src->is_ignored()) {
-                // This source is ignored, do not show it anywhere.
+            // If we can't find the reports source or this source is ignored, do not show it anywhere.
+            // Deprecated method is used here to ensure backwards compatibility.
+            // This should be replaced with a direct call to $src::is_source_ignored() in the future.
+            if (!$src || self::is_source_class_ignored($report->source)) {
                 unset($reports[$report->id]);
                 continue;
             }
             $report->sourcetitle = $src->sourcetitle;
+            $report->sourceobject = $src;
         }
         return $reports;
     }
@@ -1044,15 +1083,24 @@ class reportbuilder {
         foreach (self::find_source_dirs() as $dir) {
             if (is_dir($dir) && $dh = opendir($dir)) {
                 while(($file = readdir($dh)) !== false) {
-                    if (is_dir($file) ||
-                    !preg_match('|^rb_source_(.*)\.php$|', $file, $matches)) {
+                    if (is_dir($file) || !preg_match('|^rb_source_(.*)\.php$|', $file, $matches)) {
                         continue;
                     }
                     $source = $matches[1];
-                    $src = reportbuilder::get_source_object($source);
-                    if ($src->is_ignored()) {
-                        continue;
+                    $file = $dir . 'rb_source_' . $source . '.php';
+                    if (is_readable($file)) {
+                        include_once($file);
+                        // Deprecated method is used here to ensure backwards compatibility.
+                        // This should be replaced with:
+                        //     $classname = 'rb_source_' . $source;
+                        //     if (class_exists($classname) && $classname::is_source_ignored()) {
+                        // in the future.
+                        if (self::is_source_class_ignored($source)) {
+                            continue;
+                        }
                     }
+
+                    $src = self::get_source_object($source);
                     $sourcename = $src->sourcetitle;
 
                     if ($src->selectable || $includenonselectable) {
@@ -1082,16 +1130,24 @@ class reportbuilder {
                 foreach (self::find_source_dirs() as $dir) {
                     if (is_dir($dir) && $dh = opendir($dir)) {
                         while(($file = readdir($dh)) !== false) {
-                            if (is_dir($file) ||
-                                !preg_match('|^rb_source_(.*)\.php$|', $file, $matches)) {
+                            if (is_dir($file) || !preg_match('|^rb_source_(.*)\.php$|', $file, $matches)) {
                                 continue;
                             }
                             $source = $matches[1];
-                            $src = reportbuilder::get_source_object($source);
-                            if ($src->is_ignored()) {
-                                $ignored[] = $source;
+                            $file = $dir . 'rb_source_' . $source . '.php';
+                            if (is_readable($file)) {
+                                include_once($file);
+                                // Deprecated method is used here to ensure backwards compatibility.
+                                // This should be replaced with:
+                                //     $classname = 'rb_source_' . $source;
+                                //     if (class_exists($classname) && $classname::is_source_ignored()) {
+                                // in the future.
+                                if (self::is_source_class_ignored($source)) {
+                                    $ignored[] = $source;
+                                }
                             }
                         }
+                        closedir($dh);
                     }
                 }
                 $cache->set('all', $ignored);
@@ -1125,13 +1181,14 @@ class reportbuilder {
                                 continue;
                             }
                             $embedded = $matches[1];
-
-                            $emb = reportbuilder_get_embedded_report_object($embedded);
-
-                            if ($emb->is_ignored()) {
+                            $embedclass = self::get_embedded_report_class($embedded);
+                            // Deprecated method is used here to ensure backwards compatibility.
+                            // This should be replaced with direct call to $embedclass::is_report_ignored() in the future.
+                            if (self::is_embedded_class_ignored($embedclass)) {
                                 $ignored[] = $embedded;
                             }
                         }
+                        closedir($dh);
                     }
                 }
                 $cache->set('all', $ignored);
@@ -5284,6 +5341,56 @@ class reportbuilder {
         // Get the sql and params and return them.
         return totara_visibility_where($userid, $id, $vis, $audvis, $table, $type, $this->is_cached(), $showhidden);
     }
+
+    /**
+     * Private method to preserve backwards compatibility of is_ignored() in rb_base_source classes.
+     * Calls to this method should be replaced with direct calls to is_source_ignored() once
+     * deprecated is_ignored() is completely removed from the code base.
+     *
+     * @deprecated since Totara 13.0
+     *
+     * @param string $source
+     *
+     * @return bool Whether current report source should be ignored.
+     */
+    private static function is_source_class_ignored(string $source) {
+        $classname = 'rb_source_' . $source;
+        if (!class_exists($classname)) {
+            return true; // Ignore non-existing report source classes.
+        }
+
+        $reflection = new ReflectionClass($classname);
+        $oldmethod = $reflection->getMethod('is_ignored');
+        if ($oldmethod->class != 'rb_base_source') {
+            debugging($oldmethod->class . '::is_ignored() has been deprecated. Please call is_source_ignored() instead.', DEBUG_DEVELOPER);
+            $src = self::get_source_object($source);
+            return $src->is_ignored();
+        }
+        return $classname::is_source_ignored();
+    }
+
+    /**
+     * Private method to preserve backwards compatibility of is_ignored() in rb_base_embedded classes.
+     * Calls to this method should be replaced with direct calls to is_report_ignored() once
+     * deprecated is_ignored() is completely removed from the code base.
+     *
+     * @deprecated since Totara 13.0
+     *
+     * @param string $classname
+     *
+     * @return bool Whether current embedded report should be ignored.
+     */
+    private static function is_embedded_class_ignored(string $classname) {
+        $reflection = new ReflectionClass($classname);
+        $oldmethod = $reflection->getMethod('is_ignored');
+        if ($oldmethod->class != 'rb_base_embedded') {
+            debugging($oldmethod->class . '::is_ignored() has been deprecated. Please call is_report_ignored() instead.', DEBUG_DEVELOPER);
+            $embed = new $classname([]); // Don't need initialise it with any data for is_ignored() check.
+            return $embed->is_ignored();
+        }
+        return $classname::is_report_ignored();
+    }
+
 } // End of reportbuilder class
 
 class ReportBuilderException extends \Exception { }
@@ -5962,7 +6069,8 @@ function reportbuilder_get_report_url($report) {
         return $CFG->wwwroot . '/totara/reportbuilder/report.php?id=' . $report->id;
     } else {
         // use report shortname to find appropriate embedded report object
-        if ($embed = reportbuilder_get_embedded_report_object($report->shortname)) {
+        if ($embedclass = reportbuilder::get_embedded_report_class($report->shortname)) {
+            $embed = new $embedclass([]);
             return $CFG->wwwroot . $embed->url;
         } else {
             return $CFG->wwwroot;
@@ -5979,6 +6087,8 @@ function reportbuilder_get_report_url($report) {
  * calls the class passing in any data provided. The object created
  * by that call is returned, or false if something went wrong.
  *
+ * @deprecated since Totara 13.0
+ *
  * @param string $embedname Shortname of embedded report
  *                          e.g. X from rb_X_embedded.php
  * @param array $data Associative array of data needed by source (optional)
@@ -5986,21 +6096,11 @@ function reportbuilder_get_report_url($report) {
  * @return object Embedded report object
  */
 function reportbuilder_get_embedded_report_object($embedname, $data=array()) {
-    global $CFG;
-
-    $sourcepaths = reportbuilder::find_source_dirs();
-    $sourcepaths[] = $CFG->dirroot . '/totara/reportbuilder/embedded/';
-
-    foreach ($sourcepaths as $sourcepath) {
-        $classfile = $sourcepath . 'rb_' . $embedname . '_embedded.php';
-        if (is_readable($classfile)) {
-            include_once($classfile);
-            $classname = 'rb_' . $embedname . '_embedded';
-            if (class_exists($classname)) {
-                return new $classname($data);
-            }
-        }
+    debugging(__FUNCTION__ . ' has been deprecated. Please update your API.', DEBUG_DEVELOPER);
+    if ($embedclass = reportbuilder::get_embedded_report_class($embedname)) {
+        return new $embedclass($data);
     }
+
     // file or class not found
     return false;
 }
@@ -6059,16 +6159,16 @@ function reportbuilder_get_all_embedded_reports() {
     foreach ($sourcepaths as $sourcepath) {
         if ($dh = opendir($sourcepath)) {
             while(($file = readdir($dh)) !== false) {
-                if (is_dir($file) ||
-                    !preg_match('|^rb_(.*)_embedded\.php$|', $file, $matches)) {
-                        continue;
-                    }
+                if (is_dir($file) || !preg_match('|^rb_(.*)_embedded\.php$|', $file, $matches)) {
+                    continue;
+                }
                 $name = $matches[1];
-                $embed = reportbuilder_get_embedded_report_object($name);
-                if ($embed) {
-                    $embedded[] = $embed;
+                $embedclass = reportbuilder::get_embedded_report_class($name);
+                if ($embedclass) {
+                    $embedded[] = new $embedclass([]);
                 }
             }
+            closedir($dh);
         }
     }
     // sort by fullname before returning
@@ -6156,11 +6256,10 @@ function reportbuilder_get_embedded_id_from_shortname($shortname, $embedded_ids)
     }
     // otherwise, create a new embedded report and return the new ID
     // returns false if creation fails
-    $embed = reportbuilder_get_embedded_report_object($shortname);
+    $embedclass = reportbuilder::get_embedded_report_class($shortname);
     $error = null;
-    return reportbuilder_create_embedded_record($shortname, $embed, $error);
+    return reportbuilder_create_embedded_record($shortname, new $embedclass([]), $error);
 }
-
 
 /**
  * Creates a database entry for an embedded report when it is first viewed

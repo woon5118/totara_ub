@@ -64,7 +64,7 @@ class rb_catalogcertifications_embedded extends rb_base_embedded {
      * Hide this embedded report if feature disabled or hidden.
      * @return bool
      */
-    public function is_ignored() {
+    public static function is_report_ignored() {
         global $CFG;
         return ($CFG->catalogtype !== 'enhanced' || !totara_feature_visible('certifications'));
     }

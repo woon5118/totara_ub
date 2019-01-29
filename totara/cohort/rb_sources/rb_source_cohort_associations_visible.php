@@ -57,7 +57,7 @@ class rb_source_cohort_associations_visible extends rb_base_source {
      * Hide this source if feature disabled or hidden.
      * @return bool
      */
-    public function is_ignored() {
+    public static function is_source_ignored() {
         global $CFG;
         return empty($CFG->audiencevisibility);
     }

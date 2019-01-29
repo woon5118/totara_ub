@@ -53,7 +53,7 @@ class rb_source_opensesame extends rb_base_source {
      * Hide this source if site not registered.
      * @return bool
      */
-    public function is_ignored() {
+    public static function is_source_ignored() {
         $key = get_config('repository_opensesame', 'tenantkey');
         return empty($key);
     }

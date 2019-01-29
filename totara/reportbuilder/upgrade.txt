@@ -3,6 +3,14 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* reportbuilder_get_embedded_report_object() has been deprecated. Please consider calling
+  reportbuilder::get_embedded_report_class() and creating embedded report objects directly instead.
+* rb_base_source::is_ignored() has been deprecated. Please use rb_base_source::is_source_ignored()
+  static method instead.
+* rb_base_embedded::is_ignored() has been deprecated. Please use rb_base_embedded::is_report_ignored()
+  static method instead.
+* unused renderer methods totara_reportbuilder_renderer::user_generated_reports_table() and
+  totara_reportbuilder_renderer::embedded_reports_table() have been deprecated.
 * Deprecated display method rb_display_deleted_status() has been removed
 * Deprecated graph::reset_records() has been removed
 * Deprecated rb_base_source::language_code_to_name instead use totara_core\helper::language_code_to_name

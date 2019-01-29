@@ -205,14 +205,28 @@ abstract class rb_base_source {
      * in all user interfaces. For example when the source
      * requires some subsystem to be enabled.
      *
+     * @deprecated since Totara 13.0
      * @return bool
      */
     public function is_ignored() {
-        // NOTE: override in source if required.
+        // Debugging notice is being thrown from reportbuilder class.
         return false;
     }
 
     /**
+     * Is this report source usable?
+     *
+     * Override and return true if the source should be hidden
+     * in all user interfaces. For example when the source
+     * requires some subsystem to be enabled.
+     *
+     * @return bool
+     */
+    public static function is_source_ignored() {
+        return false;
+    }
+
+        /**
      * Are the global report restrictions implemented in the source?
      *
      * Return values mean:

@@ -53,7 +53,7 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
      * Hide this source if feature disabled or hidden.
      * @return bool
      */
-    public function is_ignored() {
+    public static function is_source_ignored() {
         return !totara_feature_visible('appraisals');
     }
 

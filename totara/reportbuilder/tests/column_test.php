@@ -566,6 +566,11 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
     protected $repository_opensesame_bps_data = array('id' => 1, 'bundleid' => 1, 'packageid' => 1);
 
+    protected $auth_connect_servers_data = array('id' => 1, 'status' => 0, 'serveridnumber' => 'XXX', 'serversecret' => 'YYY',
+        'serverurl' => 'http://example.com/totara', 'servername' => 'Test server', 'clientidnumber' => 'xxx', 'servercomment' => '',
+        'clientsecret' => 'yyyy', 'apiversion' => 1, 'timecreated' => 1416859984, 'timemodified' => 1416859985
+    );
+
     protected $totara_connect_clients_data = array('id' => 1, 'status' => 1, 'clientidnumber' => 'xxx', 'clientsecret' => 'yyyy',
         'clientname' => 'some client', 'clienturl' => 'http://example.com/totara', 'clienttype' => 'totaralms', 'clientcomment' => '',
         'cohortid' => null, 'serversecret' => 'zzzz', 'addnewcohorts' => 0, 'addnewcourses' => 0, 'apiversion' => 1,
@@ -698,6 +703,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $this->repository_opensesame_bdls_data = null;
         $this->repository_opensesame_pkgs_data = null;
         $this->repository_opensesame_bps_data = null;
+        $this->auth_connect_servers_data = null;
         $this->totara_connect_clients_data = null;
         $this->tool_customlang_data = null;
         $this->tool_customlang_components_data = null;
@@ -823,6 +829,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'repository_opensesame_bdls' => array($this->repository_opensesame_bdls_data),
             'repository_opensesame_pkgs' => array($this->repository_opensesame_pkgs_data),
             'repository_opensesame_bps' => array($this->repository_opensesame_bps_data),
+            'auth_connect_servers' => array($this->auth_connect_servers_data),
             'totara_connect_clients' => array($this->totara_connect_clients_data),
             'tool_customlang' => array($this->tool_customlang_data),
             'tool_customlang_components' => array($this->tool_customlang_components_data),

@@ -35,6 +35,8 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
     /**
      * Renders a table containing user-generated reports and options
      *
+     * @deprecated since Totara 11.12
+     *
      * @param array $reports array of report objects
      * @return string HTML table
      */
@@ -130,6 +132,8 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
 
     /**
      * Renders a table containing embedded reports and options
+     *
+     * @deprecated since Totara 11.12
      *
      * @param array $reports array of report objects
      * @return string HTML table

@@ -58,7 +58,7 @@ class rb_source_comp_status_history extends rb_base_source {
         return true;
     }
 
-    public function is_ignored() {
+    public static function is_source_ignored() {
         return !totara_feature_visible('competencies');
     }
 

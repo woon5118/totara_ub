@@ -47,7 +47,7 @@ class rb_source_connect_clients extends rb_base_source {
      * Hide this source if TC not enabled.
      * @return bool
      */
-    public function is_ignored() {
+    public static function is_source_ignored() {
         global $CFG;
         return empty($CFG->enableconnectserver);
     }

@@ -44,7 +44,7 @@ class rb_source_connect_servers extends rb_base_source {
      * Hide this source if TC auth not enabled.
      * @return bool
      */
-    public function is_ignored() {
+    public static function is_source_ignored() {
         return !is_enabled_auth('connect');
     }
 

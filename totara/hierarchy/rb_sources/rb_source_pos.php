@@ -47,7 +47,7 @@ class rb_source_pos extends rb_base_source {
      *
      * @return boolean If the report should be ignored of not.
      */
-    public function is_ignored() {
+    public static function is_source_ignored() {
         return !totara_feature_visible('positions');
     }
 
