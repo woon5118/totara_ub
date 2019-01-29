@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* cohort_rule_sqlhandler_hasreports{} class has been deprecated, please use cohort_rule_sqlhandler_has_direct_reports{}
 * Certifications have been separated from the program related methods in totara_cohort\rb\source\report_trait.
   To add certification tables/columns/filters to the custom report sources please use the following new methods:
   * add_totara_cohort_certification_tables()

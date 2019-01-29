@@ -36,8 +36,9 @@ require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/completion.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/manager.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/userstatus.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/cohortmember.php');
-require_once($CFG->dirroot . '/totara/cohort/rules/option.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/custom_fields/custom_field_sqlhandler.php');
+require_once($CFG->dirroot . '/totara/cohort/rules/option.php');
+require_once($CFG->dirroot . '/totara/cohort/classes/rules/ui/job_assignments.php');
 
 use totara_cohort\rules\ui\text as cohort_rule_ui_text;
 use totara_cohort\rules\ui\menu as cohort_rule_ui_menu;
@@ -58,6 +59,7 @@ use totara_cohort\rules\ui\course_history_allanynotallnone as cohort_rule_ui_pic
 use totara_cohort\rules\ui\program_allanynotallnone as cohort_rule_ui_picker_program_allanynotallnone;
 use totara_cohort\rules\ui\certification_status as cohort_rule_ui_picker_certification_status;
 use totara_cohort\rules\ui\cohort_member as cohort_rule_ui_cohortmember;
+use totara_cohort\rules\ui\has_direct_reports as cohort_rule_ui_has_direct_reports;
 
 /* Constants to identify if the rule comes from a menu or a text input */
 define('COHORT_RULES_TYPE_MENU', 1);
@@ -568,18 +570,13 @@ function cohort_rules_list($reset = false){
             new cohort_rule_ui_reportsto(),
             new cohort_rule_sqlhandler_allstaff()
         );
-        // If the user is a manager in any of their job assignments.
+
+        // If the user is a manager with direct staff in any of their job assignments.
         $rules[] = new cohort_rule_option(
             'alljobassign',
             'hasdirectreports',
-            new cohort_rule_ui_checkbox(
-                get_string('ruledesc-alljobassign-hasdirectreports', 'totara_cohort'),
-                array(
-                    1 => get_string('directreportsyes', 'totara_cohort'),
-                    0 => get_string('directreportsno', 'totara_cohort')
-                )
-            ),
-            new cohort_rule_sqlhandler_hasreports()
+            new cohort_rule_ui_has_direct_reports(),
+            new cohort_rule_sqlhandler_has_direct_reports()
         );
 
         // Learning (i.e. course & program completion)

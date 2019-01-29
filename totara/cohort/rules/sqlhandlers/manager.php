@@ -18,19 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aaron Wells <aaronw@catalyst.net.nz>
- * @package totara
- * @subpackage cohort/rules/sqlhandlers
- */
-/**
- * This file contains sqlhandlers for rules involving managers
+ * @package totara_cohort
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/job_assignments.php');
 
 /**
- * A rule which indicates whether or not a user has anyone who reports directly to them.
+ * Deprecated rule which indicates whether or not a user has anyone who reports directly to them.
+ * @deprecated since Totara 13.0
  */
 class cohort_rule_sqlhandler_hasreports extends cohort_rule_sqlhandler {
 
@@ -39,6 +36,15 @@ class cohort_rule_sqlhandler_hasreports extends cohort_rule_sqlhandler {
         'equal' => 0,
         'listofvalues' => 1
     );
+
+    /**
+     * cohort_rule_sqlhandler_hasreports constructor.
+     * @deprecated since Totara 13.0
+     */
+    public function __construct() {
+        debugging('cohort_rule_sqlhandler_hasreports{} class has been deprecated, please use cohort_rule_sqlhandler_has_direct_reports{}',
+            DEBUG_DEVELOPER);
+    }
 
     public function get_sql_snippet() {
         $sqlhandler = new stdClass();
@@ -52,6 +58,20 @@ class cohort_rule_sqlhandler_hasreports extends cohort_rule_sqlhandler {
             ) ";
         $sqlhandler->params = array();
         return $sqlhandler;
+    }
+}
+
+/**
+ * A rule which indicates whether or not a user has anyone who reports directly to them.
+ */
+class cohort_rule_sqlhandler_has_direct_reports extends cohort_rule_sqlhandler_job_assignments {
+
+    /**
+     * Return job_assignment join column for har direct reports rule.
+     * @return string
+     */
+    public function get_join_column(): string {
+        return 'managerjaid';
     }
 }
 

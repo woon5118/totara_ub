@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Ben Lobo <ben.lobo@kineo.com>
+ * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
  * @package totara_cohort
  */
+
+namespace totara_cohort\rules\ui;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2019020700;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017051509;       // Requires this Moodle version.
-$plugin->component = 'totara_cohort'; // To check on upgrade, that module sits in correct place
+use totara_cohort\rules\ui\none_min_max_exactly as none_min_max_exactly;
+
+class has_direct_reports extends none_min_max_exactly {
+
+    /** @var string select box legend */
+    public $label;
+
+    /**
+     * Number of direct reports
+     */
+    public function __construct() {
+        $this->description = get_string('ruledesc-alljobassign-hasdirectreports', 'totara_cohort');
+        $this->label = get_string('rulelegend-alljobassign-hasdirectreports', 'totara_cohort');
+        parent::__construct();
+    }
+}

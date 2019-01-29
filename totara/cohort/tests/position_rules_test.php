@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Maria Torres <maria.torres@totaralms.com>
- * @package totara
- * @subpackage cohort
+ * @package totara_cohort
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -45,14 +44,14 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
     private $pos4 = null;
     private $pos5 = null;
     private $posfw = null;
-    private $cohort = null;
-    private $ruleset = 0;
+    protected $cohort = null;
+    protected $ruleset = 0;
     private $userspos1 = array();
     private $userspos2 = array();
     private $userspos3 = array();
     private $userspos4 = array();
     /** @var totara_cohort_generator $cohort_generator */
-    private $cohort_generator = null;
+    protected $cohort_generator = null;
     /** @var totara_hierarchy_generator $hierarchy_generator */
     private $hierarchy_generator = null;
     private $dateformat = '';
@@ -317,60 +316,6 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
 
         $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array ($this->cohort->id));
         $this->assertEquals(2, count($members));
-    }
-
-
-    /**
-     * Data provider for the reports to rule.
-     */
-    public function data_reportsto() {
-        $data = array(
-            array(array('equal' => COHORT_RULES_OP_IN_EQUAL),  array(1), 2),
-            array(array('equal' => COHORT_RULES_OP_IN_EQUAL),  array(0), 23),
-        );
-        return $data;
-    }
-    /**
-     * Evaluates if the user is a manager.
-     * Has direct reports = is_manager.
-     *
-     * manager1
-     *    |-------> user1, user3, user5.
-     *
-     * manager2
-     *    |-------> user2, user4.
-     *
-     * @dataProvider data_reportsto
-     */
-    public function test_direct_reports_rule($params, $listofvalues, $usercount) {
-        global $DB;
-        $this->resetAfterTest(true);
-        $this->setAdminUser();
-
-        // Create some manager accounts.
-        $manager1 = $this->getDataGenerator()->create_user(array('username' => 'manager1'));
-        $manager2 = $this->getDataGenerator()->create_user(array('username' => 'manager2'));
-
-        // Assign managers to users.
-        $manager1ja = \totara_job\job_assignment::create_default($manager1->id);
-        $manager2ja = \totara_job\job_assignment::create_default($manager2->id);
-        \totara_job\job_assignment::get_first($this->user1->id)->update(array('managerjaid' => $manager1ja->id));
-        \totara_job\job_assignment::get_first($this->user2->id)->update(array('managerjaid' => $manager2ja->id));
-        \totara_job\job_assignment::get_first($this->user3->id)->update(array('managerjaid' => $manager1ja->id));
-        \totara_job\job_assignment::get_first($this->user4->id)->update(array('managerjaid' => $manager2ja->id));
-        \totara_job\job_assignment::get_first($this->user5->id)->update(array('managerjaid' => $manager1ja->id));
-
-        // Exclude admin user from this cohort.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'user', 'username', array('equal' => COHORT_RULES_OP_IN_NOTEQUALTO), array('admin'));
-
-        // Create a rule.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'hasdirectreports', $params, $listofvalues);
-        cohort_rules_approve_changes($this->cohort);
-
-        // It should match:
-        // 1. data1: 2 (users that are assigned as managers (Has direct reports)).
-        // 2. data2: 23 (users that no are managers (Do not have direct reports)).
-        $this->assertEquals($usercount, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
     }
 
     /**

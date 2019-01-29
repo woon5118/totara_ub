@@ -62,5 +62,11 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017042800, 'totara', 'cohort');
     }
 
+    if ($oldversion < 2019020700) {
+
+        totara_cohort_update_has_direct_reports_rule();
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2019020700, 'totara', 'cohort');
+    }
     return true;
 }

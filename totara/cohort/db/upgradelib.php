@@ -59,3 +59,35 @@ function totara_cohort_migrate_rules($oldtype, $oldname, $newtype, $newname) {
     return true;
 }
 
+/**
+ * This function update the "cohort_rule_params" records where the rule is "Has direct reports" and
+ * param is equal to "Does not have direct reports" to reflect with new conditions
+ */
+function totara_cohort_update_has_direct_reports_rule() {
+    global $DB;
+
+    $rules  = $DB->get_records('cohort_rules', ['name' => 'hasdirectreports'], '', 'id');
+    $ids = [];
+    foreach ($rules as $rule) {
+        $ids[] = $rule->id;
+    }
+    if (!empty($ids)) {
+        list($sqlin, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'rsid');
+        $sql = "SELECT chp.ruleid
+              FROM {cohort_rule_params} chp
+             WHERE chp.name = 'listofvalues'
+               AND chp.value = '0'
+               AND chp.ruleid {$sqlin}";
+        $ruleparams = $DB->get_records_sql($sql, $params);
+        $ids = [];
+        foreach ($ruleparams as $data) {
+            $ids[] = $data->ruleid;
+        }
+        if (!empty($ids)) {
+            list($sqlin, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'rps');
+            $sql = "UPDATE {cohort_rule_params} SET value = '0' WHERE name = 'equal' AND ruleid {$sqlin}";
+            $DB->execute($sql, $params);
+        }
+    }
+    return true;
+}
