@@ -48,3 +48,4 @@ totara_private.pem
 /lib/yuilib/*/*/*-coverage.js
 atlassian-ide-plugin.xml
 /node_modules/
+.graphqlconfig

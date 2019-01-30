@@ -345,6 +345,13 @@ require(['core/autoinitialise'], function(ai) {
                 $contextid = $page->context->id;
             }
 
+            // Totara: we should not guess current language in JS code,
+            //         make sure we set existing language to make this compatible with PARAM_LANG!
+            $currentlanguage = current_language();
+            if (!get_string_manager()->translation_exists($currentlanguage)) {
+                $currentlanguage = 'en';
+            }
+
             $this->M_cfg = array(
                 'wwwroot'             => $CFG->wwwroot,
                 'sesskey'             => sesskey(),
@@ -357,6 +364,7 @@ require(['core/autoinitialise'], function(ai) {
                 'svgicons'            => $page->theme->use_svg_icons(),
                 'usertimezone'        => usertimezone(),
                 'contextid'           => $contextid,
+                'currentlanguage'     => $currentlanguage,
             );
             if ($CFG->debugdeveloper) {
                 $this->M_cfg['developerdebug'] = true;
@@ -1233,6 +1241,14 @@ require(['core/autoinitialise'], function(ai) {
     public function string_for_js($identifier, $component, $a = null) {
         if (!$component) {
             throw new coding_exception('The $component parameter is required for page_requirements_manager::string_for_js().');
+        }
+        // Totara: normalise component.
+        if ($component === 'core') {
+            $component = 'moodle';
+        } else if (strpos($component, 'core_') === 0) {
+            $component = substr($component, 5);
+        } else if (strpos($component, 'mod_') === 0) {
+            $component = substr($component, 4);
         }
         if (isset($this->stringsforjs_as[$component][$identifier]) and $this->stringsforjs_as[$component][$identifier] !== $a) {
             throw new coding_exception("Attempt to re-define already required string '$identifier' " .

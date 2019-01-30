@@ -69,6 +69,7 @@ function report_security_get_issue_list() {
         'report_security_check_xxe_risk',
         'report_security_check_preventexecpath',
         'report_security_check_disableconsistentcleaning',
+        'report_security_check_devgraphql',
     );
 }
 
@@ -1251,6 +1252,33 @@ function report_security_check_disableconsistentcleaning($detailed = false): std
     } else {
         $result->status = REPORT_SECURITY_OK;
         $result->info = get_string('check_disableconsistentcleaning_ok', 'report_security');
+    }
+
+    return $result;
+}
+
+/**
+ * Verifies GraphQL dev mode is disabled.
+ *
+ * @param bool $detailed
+ * @return object result
+ */
+function report_security_check_devgraphql($detailed = false) {
+    $result = new stdClass();
+    $result->issue   = 'report_security_check_devgraphql';
+    $result->name    = get_string('check_devgraphql_name', 'report_security');
+    $result->details = null;
+    $result->link    = null;
+
+    if (defined('GRAPHQL_DEVELOPMENT_MODE') and GRAPHQL_DEVELOPMENT_MODE) {
+        $result->status = REPORT_SECURITY_SERIOUS;
+        $result->info = get_string('check_devgraphql_error', 'report_security');
+        if ($detailed) {
+            $result->details = get_string('check_devgraphql_details', 'report_security');
+        }
+    } else {
+        $result->status = REPORT_SECURITY_OK;
+        $result->info   = get_string('check_devgraphql_ok', 'report_security');
     }
 
     return $result;

@@ -1471,6 +1471,7 @@ class core_plugin_manager {
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
                 'certification', 'completionimport', 'mssql', 'generator', 'connect', 'form',
                 'gap', 'job', 'completioneditor', 'userdata', 'catalog', 'workflow', 'contentmarketplace',
+                'webapi',
             ),
             'tabexport' => array(
                 'csv', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',

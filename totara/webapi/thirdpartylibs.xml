@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>lib/graphql-php</location>
+        <name>graphql-php</name>
+        <license>MIT</license>
+        <version>v0.13.1+ (11d32d456848a554e7615c3e21d18fa0c10152d5)</version>
+        <licenseversion></licenseversion>
+    </library>
+</libraries>

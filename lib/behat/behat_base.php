@@ -845,6 +845,11 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
             throw new behat_log_exception('Behat detected debugging in logs: ' . $matches[1][0]);
         }
 
+        preg_match_all('/^\[[^\]]+\] AJAX API error: (.*)$/m', $logs, $matches);
+        if ($matches[0]) {
+            throw new behat_log_exception('Behat detected AJAX API error in logs: ' . $matches[1][0]);
+        }
+
         // Do not bother looking for fatal errors here, they are not in behat error logs,
         // the behat will not be able to click anywhere to continue because the browser
         // page is most likely empty.
