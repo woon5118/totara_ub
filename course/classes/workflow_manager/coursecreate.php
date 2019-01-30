@@ -46,7 +46,16 @@ class coursecreate extends \totara_workflow\workflow_manager\base {
         }
 
         require_once($CFG->dirroot . '/lib/coursecatlib.php');
-        $cat = \coursecat::get($category);
+        try {
+            $cat = \coursecat::get($category);
+        } catch (\moodle_exception $e) {
+            // If the category is invisible to the user, it will be 'unknown' to coursecat::get().
+            if ($e->errorcode == 'unknowncategory') {
+                return false;
+            } else {
+                throw $e;
+            }
+        }
         return $cat->can_create_course();
     }
 

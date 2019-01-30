@@ -138,12 +138,14 @@ class rb_catalogcourses_embedded extends rb_base_embedded {
             $buttons .= $OUTPUT->render($explorebutton);
         }
 
-        $wm = new \core_course\workflow_manager\coursecreate();
-        $wm->set_params(['category' => $categoryid]);
-        if ($wm->workflows_available()) {
-            $createurl = $wm->get_url();
-            $createbutton = new single_button($createurl, get_string('addcourse', 'totara_coursecatalog'), 'get', true);
-            $buttons .= $OUTPUT->render($createbutton);
+        if ($categoryid !== false) {
+            $wm = new \core_course\workflow_manager\coursecreate();
+            $wm->set_params(['category' => $categoryid]);
+            if ($wm->workflows_available()) {
+                $createurl = $wm->get_url();
+                $createbutton = new single_button($createurl, get_string('addcourse', 'totara_coursecatalog'), 'get', true);
+                $buttons .= $OUTPUT->render($createbutton);
+            }
         }
 
         $buttons .= html_writer::end_div();
