@@ -220,7 +220,10 @@ if (!empty($command)) {
                         $datamodel['[comments]'] = 'cmi.comments';
                         $datarows = explode("\r\n", $aiccdata);
                         reset($datarows);
-                        foreach ($datarows as $datarow) {
+
+                        do {
+                            $datarow = current($datarows);
+                            scorm_debug_log_write("aicc", "~~ row " .$datarow.' '.__LINE__, $scoid);
                             if (($equal = strpos($datarow, '=')) !== false) {
                                 $element = strtolower(trim(substr($datarow, 0, $equal)));
                                 $value = trim(substr($datarow, $equal + 1));
@@ -266,7 +269,7 @@ if (!empty($command)) {
                                             if (empty($value) || isset($exites[$value])) {
                                                 $subelement = 'cmi.core.exit';
                                                 $id = scorm_insert_track($aiccuser->id, $scorm->id, $sco->id,
-                                                                            $attempt, $subelement, $value);
+                                                    $attempt, $subelement, $value);
                                             }
                                             $value = trim(strtolower($values[0]));
                                             $value = $value[0];
@@ -308,16 +311,28 @@ if (!empty($command)) {
                             } else {
                                 if (isset($datamodel[strtolower(trim($datarow))])) {
                                     $element = $datamodel[strtolower(trim($datarow))];
-                                    $value = '';
-                                    while ((($datarow = current($datarows)) !== false) && (substr($datarow, 0, 1) != '[')) {
-                                        $value .= $datarow."\r\n";
-                                        next($datarows);
-                                    }
-                                    $value = rawurlencode($value);
+                                    $values = [];
+
+                                    // OK we need to scan forward until we hit the next group.
+                                    // Everything in between now and then is data.
+                                    // Start by moving forwards one.
+                                    do {
+                                        $next = next($datarows);
+                                        if ($next === false) {
+                                            break;
+                                        } else if (preg_match('#^\s*\[#', $next)) {
+                                            prev($datarows);
+                                            break;
+                                        }
+                                        $values[] = $next;
+                                    } while (true);
+
+                                    $value = rawurlencode(join("\r\n", $values));
                                     $id = scorm_insert_track($aiccuser->id, $scorm->id, $sco->id, $attempt, $element, $value);
                                 }
                             }
-                        }
+                        } while (next($datarows) !== false);
+
                         if (($mode == 'browse') && ($initlessonstatus == 'not attempted')) {
                             $lessonstatus = 'browsed';
                             $id = scorm_insert_track($aiccuser->id, $scorm->id, $sco->id,
