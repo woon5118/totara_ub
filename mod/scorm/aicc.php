@@ -409,6 +409,9 @@ if (!empty($command)) {
             case 'exitau':
                 if ($status == 'Running') {
                     // Totara: do not store results without the savetrack permission!
+                    if (!$cm = get_coursemodule_from_instance('scorm', $scorm->id, $scorm->course)) {
+                        echo "error=1\r\nerror_text=Unknown\r\n"; // No one must see this error message if not hacked.
+                    }
                     $savetrack = has_capability('mod/scorm:savetrack', context_module::instance($cm->id), $aiccuser->id);
 
                     if ($savetrack && isset($scormsession->sessiontime) && ($scormsession->sessiontime != '')) {
