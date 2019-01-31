@@ -207,6 +207,13 @@ final class interest {
     }
 
     /**
+     * Delete {facetoface_interest}.record where id from database
+     */
+    public function delete() {
+        $this->withdraw();
+    }
+
+    /**
      * @return int
      */
     public function get_id() : int {
