@@ -6,6 +6,8 @@ This files describes API changes in /admin/*.
 * Deprecated core_admin_renderer::registration_warning() has been removed
 * Deprecated setting 'uselegacybrowselistofusersreport' has been removed
 * Legacy "Browse list of users" admin page (admin/user_legacy.php) has been removed
+* Added default value to core_admin_renderer::admin_notifications_page for users that have logged in
+    in the last 3 months
 
 === 12.0 ===
 
