@@ -1267,6 +1267,15 @@ class moodle_page {
      * @param string $menuitemname The name of the bottom level selected item
      */
     public function set_totara_menu_selected($menuitemname) {
+
+        // Check to make sure that fully qualified classes are being passed
+        if (!preg_match('/^\\\([a-zA-Z0-9_]+\\\)*[a-zA-Z0-9_]+$/', $menuitemname)) {
+            debugging('Incorrect menuitem class given. Please provide the full classname 
+            including leading backslash, e.g. \totara_core\totara\menu\myreports. Actual value: \''.$menuitemname.'\'', DEBUG_DEVELOPER);
+        } else if (!class_exists($menuitemname)) {
+            debugging('No class '.$menuitemname.' was found. Please check the class is correct.', DEBUG_DEVELOPER);
+        }
+
         $this->_totara_menu_selected = $menuitemname;
     }
 
