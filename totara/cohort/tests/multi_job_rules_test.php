@@ -378,6 +378,36 @@ class totara_cohort_multi_jobs_rules_testcase extends advanced_testcase {
     }
 
     /**
+     * Test the all job id number rule.
+     */
+    public function test_all_job_idnumber_rule() {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Add a rule that matches users who have the first two positions assigned across all of their job assignments.
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'idnumber',
+            array('equal' => COHORT_RULES_OP_IN_STARTSWITH), array('job-'));
+        cohort_rules_approve_changes($this->cohort);
+
+        $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($this->cohort->id));
+        $this->assertEquals(16, count($members));
+
+        // Add a rule that matches users who have all three positions assigned across all of their job assignments.
+        $this->cohort_generator->cohort_clean_ruleset($this->ruleset);
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'idnumber',
+            array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('job-1.3'));
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'idnumber',
+            array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('job-2.2'));
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'idnumber',
+            array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('job-3.1'));
+        cohort_rules_approve_changes($this->cohort);
+
+        $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($this->cohort->id));
+        $this->assertEquals(4, count($members));
+    }
+
+    /**
      * Test the all job start dates rule.
      */
     public function test_all_job_start_dates_rule() {

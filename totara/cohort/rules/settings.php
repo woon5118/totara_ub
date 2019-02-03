@@ -309,6 +309,16 @@ function cohort_rules_list($reset = false){
             ),
             new cohort_rule_sqlhandler_in_alljobassignfield('fullname', true)
         );
+        // User has a job assignments ID number.
+        $rules[] = new cohort_rule_option(
+            'alljobassign',
+            'idnumber',
+            new cohort_rule_ui_text(
+                get_string('ruledesc-alljobassign-idnumber', 'totara_cohort'),
+                get_string('rulehelp-job-idnumber', 'totara_cohort')
+            ),
+            new cohort_rule_sqlhandler_in_alljobassignfield('idnumber', true)
+        );
         // User's job assignment startdate.
         $rules[] = new cohort_rule_option(
             'alljobassign',
