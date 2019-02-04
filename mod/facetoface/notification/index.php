@@ -54,36 +54,6 @@ if ($display !== '' && !in_array($display, array(MDL_F2F_NOTIFICATION_MANUAL, MD
     die();
 }
 
-// Get all notifications.
-$notifications = $DB->get_records('facetoface_notification', array('facetofaceid' => $facetoface->id), 'title,type');
-
-// Count the number of system notifications by type.
-// We want to allow duplicate system notifications to be deleted.
-$autonotifications = array();
-$foundduplicates = false;
-foreach ($notifications as $note) {
-    if (!isset($autonotifications[$note->conditiontype])) {
-        $autonotifications[$note->conditiontype] = 0;
-    }
-    if ($note->type != MDL_F2F_NOTIFICATION_AUTO) {
-        continue;
-    }
-    $autonotifications[$note->conditiontype]++;
-
-    if ($autonotifications[$note->conditiontype] > 1) {
-        $foundduplicates = true;
-    }
-}
-if ($foundduplicates) {
-    totara_set_notification(get_string('notificationduplicatesfound', 'facetoface', $url->out()));
-}
-
-$report_data = array(
-    'display'       => $display,
-    'update'        => $update,
-    'facetofaceid'  => $facetoface->id
-);
-
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('editinga', 'moodle', 'facetoface'));
 $PAGE->set_heading(format_string($SITE->fullname));
@@ -91,20 +61,6 @@ echo $OUTPUT->header();
 
 $heading = get_string('notifications', 'facetoface');
 echo $OUTPUT->heading_with_help($heading, 'notifications', 'facetoface');
-
-// Detect missing default notifications.
-$defaultnotifications = facetoface_get_default_notifications($facetoface->id)[0];
-foreach ($notifications as $note) {
-    unset($defaultnotifications[$note->conditiontype]);
-}
-if (!empty($defaultnotifications)) {
-    $url = new moodle_url('/mod/facetoface/notification/restore.php', array('update' => $cm->id, 'sesskey' => sesskey()));
-    $a['url1'] = $url->out();
-    $url = new moodle_url('/mod/facetoface/notification/template/index.php');
-    $a['url2'] = $url->out();
-    $message = get_string('unavailablenotifications', 'facetoface', (object)$a);
-    echo $OUTPUT->notification($message, \core\output\notification::NOTIFY_WARNING);
-}
 
 $str_edit = get_string('edit', 'moodle');
 $str_copy = get_string('copynotification', 'facetoface');
@@ -128,13 +84,50 @@ $headers[] = get_string('actions', 'facetoface');
 
 $title = 'facetoface_notifications';
 $table = new flexible_table($title);
-$table->define_baseurl($CFG->wwwroot . '/mod/facetoface/notification/index.php');
+$table->define_baseurl($url);
 $table->define_columns($columns);
 $table->define_headers($headers);
 $table->set_attribute('class', 'generalbox mod-facetoface-notification-list');
 $table->sortable(true, 'title');
+$table->no_sorting('recipients');
 $table->no_sorting('actions');
 $table->setup();
+$sort = $table->get_sql_sort();
+
+// Get all notifications.
+$notifications = $DB->get_records('facetoface_notification', array('facetofaceid' => $facetoface->id), $sort);
+// Count the number of system notifications by type.
+// We want to allow duplicate system notifications to be deleted.
+$autonotifications = array();
+$foundduplicates = false;
+foreach ($notifications as $note) {
+    if (!isset($autonotifications[$note->conditiontype])) {
+        $autonotifications[$note->conditiontype] = 0;
+    }
+    if ($note->type != MDL_F2F_NOTIFICATION_AUTO) {
+        continue;
+    }
+    $autonotifications[$note->conditiontype]++;
+    if ($autonotifications[$note->conditiontype] > 1) {
+        $foundduplicates = true;
+    }
+}
+if ($foundduplicates) {
+    totara_set_notification(get_string('notificationduplicatesfound', 'facetoface', $url->out()));
+}
+// Detect missing default notifications.
+$defaultnotifications = facetoface_get_default_notifications($facetoface->id)[0];
+foreach ($notifications as $note) {
+    unset($defaultnotifications[$note->conditiontype]);
+}
+if (!empty($defaultnotifications)) {
+    $url1 = new moodle_url('/mod/facetoface/notification/restore.php', array('update' => $cm->id, 'sesskey' => sesskey()));
+    $a['url1'] = $url1->out();
+    $url2 = new moodle_url('/mod/facetoface/notification/template/index.php');
+    $a['url2'] = $url2->out();
+    $message = get_string('unavailablenotifications', 'facetoface', (object)$a);
+    echo $OUTPUT->notification($message, \core\output\notification::NOTIFY_WARNING);
+}
 
 foreach ($notifications as $note) {
     $row = array();
