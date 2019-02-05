@@ -50,42 +50,15 @@ $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
 
-// Get list of required customfields.
-$requiredcfnames  = array();
-$customfieldnames = array();
-$customfields = customfield_get_fields_definition('facetoface_signup');
-foreach($customfields as $customfield) {
-    if ($customfield->locked || $customfield->hidden) {
-        continue;
-    }
-    if ($customfield->required) {
-        $requiredcfnames[] = $customfield->shortname;
-    }
-    $customfieldnames[] = $customfield->shortname;
-}
-
-$extrafields = [];
-if ($seminar->get_selectjobassignmentonsignup() > 0) {
-    $extrafields[] = 'jobassignmentidnumber';
-}
-
-$mform = new attendees_add_file(null, array(
-    's' => $s,
-    'listid' => $listid,
-    'customfields' => $customfieldnames,
-    'extrafields' => $extrafields,
-    'requiredcustomfields' => $requiredcfnames
-));
+$mform = new attendees_add_file(null, ['s' => $s, 'listid' => $listid, 'seminar' => $seminar]);
 if ($mform->is_cancelled()) {
     $list = new bulk_list($listid, $currenturl, 'addfile');
     $list->clean();
     redirect($returnurl);
 }
-
-// Check if data submitted
+// Check if data submitted.
 if ($formdata = $mform->get_data()) {
-    $formdata->content = $mform->get_file_content('userfile');
-    attendees_list_helper::add_file($formdata, $requiredcfnames);
+    attendees_list_helper::add_file($formdata);
 }
 
 local_js(array(TOTARA_JS_DIALOG));
@@ -95,7 +68,7 @@ $PAGE->set_title(format_string($seminar->get_name()));
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('addattendeestep1', 'facetoface'));
+echo $OUTPUT->heading(get_string('addattendeestep1', 'mod_facetoface'));
 
 /**
  * @var mod_facetoface_renderer $seminarrenderer

@@ -90,7 +90,7 @@ final class attendees_list_helper {
             foreach ($attendeestoadd as $attendeetoadd) {
                 $userdata = $list->get_user_data($attendeetoadd->id);
                 if (empty($userdata['jobassignmentid'])) {
-                    totara_set_notification(get_string('error:nojobassignmentselectedlist', 'facetoface'), $currenturl);
+                    totara_set_notification(get_string('error:nojobassignmentselectedlist', 'mod_facetoface'), $currenturl);
                 }
             }
         }
@@ -103,7 +103,11 @@ final class attendees_list_helper {
                 if (!is_enrolled($context, $attendee)) {
                     $defaultlearnerrole = $DB->get_record('role', array('id' => $CFG->learnerroleid));
                     if (!enrol_try_internal_enrol($seminar->get_course(), $attendee->id, $defaultlearnerrole->id, time())) {
-                        $errors[] = ['idnumber' => $attendee->idnumber, 'name' => fullname($attendee), 'result' => get_string('error:enrolmentfailed', 'facetoface', fullname($attendee))];
+                        $errors[] = [
+                            'idnumber' => $attendee->idnumber,
+                            'name' => fullname($attendee),
+                            'result' => get_string('error:enrolmentfailed', 'mod_facetoface', fullname($attendee))
+                        ];
                         continue;
                     }
                 }
@@ -130,7 +134,11 @@ final class attendees_list_helper {
                 }
                 if (signup_helper::can_signup($signup)) {
                     signup_helper::signup($signup);
-                    $added[] = ['idnumber' => $attendee->idnumber, 'name' => fullname($attendee), 'result' => get_string('addedsuccessfully', 'facetoface')];
+                    $added[] = [
+                        'idnumber' => $attendee->idnumber,
+                        'name' => fullname($attendee),
+                        'result' => get_string('addedsuccessfully', 'mod_facetoface')
+                    ];
 
                     // Store customfields.
                     $signupstatus = facetoface_get_attendee($seminarevent->get_id(), $attendee->id);
@@ -163,15 +171,16 @@ final class attendees_list_helper {
      * @param $formdata users to add to seminar event via file
      *      @var s seminar event id
      *      @var listid list id
+     *      @var requiredcfnames
      *      data via file
-     * @param $requiredcfnames array required customfield names
      */
-    public static function add_file($formdata, $requiredcfnames) {
+    public static function add_file($formdata) {
         global $DB;
 
         $importid = optional_param('importid', '', PARAM_INT);
 
         $listid = $formdata->listid;
+        $requiredcfnames = $formdata->requiredcfnames;
         $seminarevent = new seminar_event($formdata->s);
         $seminar = $seminarevent->get_seminar();
         $currenturl = new \moodle_url('/mod/facetoface/attendees/list/addfile.php', array('s' => $seminarevent->get_id(), 'listid' => $listid));
@@ -203,7 +212,7 @@ final class attendees_list_helper {
 
         $headers = $cir->get_columns();
         if (!$headers) {
-            $errors[] = get_string('error:csvcannotparse', 'facetoface');
+            $errors[] = get_string('error:csvcannotparse', 'mod_facetoface');
         }
 
         $cir->init();
@@ -216,7 +225,7 @@ final class attendees_list_helper {
             foreach ($headers as $header) {
                 if (in_array($header, array('idnumber', 'username', 'email'))) {
                     if ($idfield != '') {
-                        $errors[] = get_string('error:csvtoomanyidfields', 'facetoface');
+                        $errors[] = get_string('error:csvtoomanyidfields', 'mod_facetoface');
                         break;
                     }
                     $idfield = $header;
@@ -231,12 +240,12 @@ final class attendees_list_helper {
                             $erridstr = 'error:usernamenotfound';
                             break;
                         default:
-                            print_error(get_string('error:unknownuserfield', 'facetoface'));
+                            print_error(get_string('error:unknownuserfield', 'mod_facetoface'));
                     }
                 }
             }
             if (empty($idfield)) {
-                $errors[] = get_string('error:csvnoidfields', 'facetoface');
+                $errors[] = get_string('error:csvnoidfields', 'mod_facetoface');
             }
         }
 
@@ -244,7 +253,7 @@ final class attendees_list_helper {
         if (empty($errors)) {
             $notfoundcf = array_diff($requiredcfnames, $headers);
             if (!empty($notfoundcf)) {
-                $errors[] = get_string('error:csvnorequiredcf', 'facetoface', implode('\', \'', $notfoundcf));
+                $errors[] = get_string('error:csvnorequiredcf', 'mod_facetoface', implode('\', \'', $notfoundcf));
             }
         }
 
@@ -306,7 +315,7 @@ final class attendees_list_helper {
                             $a = new \stdClass();
                             $a->user = fullname($user);
                             $a->idnumber = $data['jobassignmentidnumber'];
-                            $errors[] = get_string('error:xinvalidjaidnumber', 'facetoface', $a);
+                            $errors[] = get_string('error:xinvalidjaidnumber', 'mod_facetoface', $a);
                         }
                     }
                 }
@@ -314,15 +323,15 @@ final class attendees_list_helper {
                 $addusers[$user->id] = $data;
             }
             if (!empty($inconsistentlines)) {
-                $errors[] = get_string('error:csvinconsistentrows', 'facetoface', implode(', ', $inconsistentlines));
+                $errors[] = get_string('error:csvinconsistentrows', 'mod_facetoface', implode(', ', $inconsistentlines));
             }
             if (!empty($usersnotexist)) {
-                $errors[] = get_string($erridstr, 'facetoface', implode(', ', $usersnotexist));
+                $errors[] = get_string($erridstr, 'mod_facetoface', implode(', ', $usersnotexist));
             }
             if (!empty($validationerrors)) {
                 $validationerrorcount = count($validationerrors);
-                $validationnotification = get_string('xerrorsencounteredduringimport', 'facetoface', $validationerrorcount);
-                $validationnotification .= ' '. \html_writer::link('#', get_string('viewresults', 'facetoface'), array('id' => 'viewbulkresults', 'class' => 'viewbulkresults'));
+                $validationnotification = get_string('xerrorsencounteredduringimport', 'mod_facetoface', $validationerrorcount);
+                $validationnotification .= ' '. \html_writer::link('#', get_string('viewresults', 'mod_facetoface'), array('id' => 'viewbulkresults', 'class' => 'viewbulkresults'));
                 $list->set_validaton_results($validationerrors);
                 $errors[] = $validationnotification;
             }
@@ -381,40 +390,44 @@ final class attendees_list_helper {
                 $errstr = 'error:usernamenotfound';
                 break;
             default:
-                print_error(get_string('error:unknownuserfield', 'facetoface'));
+                print_error(get_string('error:unknownuserfield', 'mod_facetoface'));
         }
 
         // Validate every user.
+        $added = array();
         $notfound = array();
         $userstoadd = array();
         $validationerrors = array();
-        foreach ($addusers as $value) {
-            $user = $DB->get_record('user', array($field => $value));
-            if (!$user) {
-                $notfound[] = $value;
-                continue;
-            }
-            $userstoadd[] = $user->id;
-            $signup = signup::create($user->id, $seminarevent);
-            $signup->set_ignoreconflicts($data->ignoreconflicts);
-            if (!signup_helper::can_signup($signup)) {
-                $signuperrors = signup_helper::get_failures($signup);
-                if (!empty($signuperrors) && !isset($signuperrors['user_is_enrolable'])) {
-                    $validationerrors[] = ['idnumber' => $user->idnumber, 'name' => fullname($user), 'result' => implode(',', $signuperrors)];
+
+        if (!empty($addusers)) {
+            list($insql, $params) = $DB->get_in_or_equal($addusers, SQL_PARAMS_NAMED);
+            $availableusers = $DB->get_records_sql("SELECT * FROM {user} WHERE {$field} " . $insql, $params);
+            foreach ($availableusers as $id => $user) {
+                $added[] = $user->{$field};
+                $userstoadd[] = $user->id;
+                $signup = signup::create($user->id, $seminarevent);
+                $signup->set_ignoreconflicts($data->ignoreconflicts);
+                if (!signup_helper::can_signup($signup)) {
+                    $signuperrors = signup_helper::get_failures($signup);
+                    if (!empty($signuperrors) && !isset($signuperrors['user_is_enrolable'])) {
+                        $validationerrors[] =
+                            ['idnumber' => $user->idnumber, 'name' => fullname($user), 'result' => implode(',', $signuperrors)];
+                    }
                 }
             }
+            $notfound = array_diff_key($addusers, $added);
         }
 
         // Check for data.
         if (empty($addusers)) {
-            totara_set_notification(get_string('error:nodatasupplied', 'facetoface'), null, array('class' => 'notifyproblem'));
+            totara_set_notification(get_string('error:nodatasupplied', 'mod_facetoface'), null, array('class' => 'notifyproblem'));
         } else if (!empty($notfound)) {
             $notfoundlist = implode(', ', $notfound);
-            totara_set_notification(get_string($errstr, 'facetoface', $notfoundlist), null, array('class' => 'notifyproblem'));
+            totara_set_notification(get_string($errstr, 'mod_facetoface', $notfoundlist), null, array('class' => 'notifyproblem'));
         } else if (!empty($validationerrors)) {
             $validationerrorcount = count($validationerrors);
-            $validationnotification = get_string('xerrorsencounteredduringimport', 'facetoface', $validationerrorcount);
-            $validationnotification .= ' '. \html_writer::link('#', get_string('viewresults', 'facetoface'), array('id' => 'viewbulkresults', 'class' => 'viewbulkresults'));
+            $validationnotification = get_string('xerrorsencounteredduringimport', 'mod_facetoface', $validationerrorcount);
+            $validationnotification .= ' '. \html_writer::link('#', get_string('viewresults', 'mod_facetoface'), array('id' => 'viewbulkresults', 'class' => 'viewbulkresults'));
             $list->set_validaton_results($validationerrors);
             totara_set_notification($validationnotification, null, array('class' => 'notifyproblem'));
         } else {
@@ -494,7 +507,7 @@ final class attendees_list_helper {
                     // Values of multi-select are changed after edit_save_data func.
                     $data = unserialize($clonefromform);
 
-                    $result['result'] = get_string('removedsuccessfully', 'facetoface');
+                    $result['result'] = get_string('removedsuccessfully', 'mod_facetoface');
                     $removed[] = $result;
                 } else {
                     $result['result'] = get_string('error:cannotcancel', 'mod_facetoface');

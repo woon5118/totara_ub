@@ -69,7 +69,7 @@ $PAGE->set_title(format_string($seminar->get_name()));
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('addattendeestep1', 'facetoface'));
+echo $OUTPUT->heading(get_string('addattendeestep1', 'mod_facetoface'));
 
 /**
  * @var mod_facetoface_renderer $seminarrenderer

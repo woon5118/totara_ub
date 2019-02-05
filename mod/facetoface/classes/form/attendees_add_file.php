@@ -28,7 +28,30 @@ defined('MOODLE_INTERNAL') || die();
 
 class attendees_add_file extends \moodleform {
 
+    /** @var array $requiredcfnames */
+    protected $requiredcfnames = [];
+
     protected function definition() {
+
+        // Get list of required customfields.
+        $requiredcustomfields = array();
+        $customfieldnames = array();
+        $customfields = customfield_get_fields_definition('facetoface_signup');
+        foreach ($customfields as $customfield) {
+            if ($customfield->locked || $customfield->hidden) {
+                continue;
+            }
+            if ($customfield->required) {
+                $requiredcustomfields[] = $customfield->shortname;
+            }
+            $customfieldnames[] = $customfield->shortname;
+        }
+
+        $extrafields = [];
+        if ($this->_customdata['seminar']->get_selectjobassignmentonsignup() > 0) {
+            $extrafields[] = 'jobassignmentidnumber';
+        }
+
         $mform = $this->_form;
 
         // $customfieldinfo is used as $a in get_string().
@@ -37,15 +60,13 @@ class attendees_add_file extends \moodleform {
         $customfieldinfo->requiredcustomfields = '';
 
         $dataoptional = get_string('dataoptional', 'mod_facetoface');
-
-        $customfields = $this->_customdata['customfields'];
-        $requiredcustomfields = $this->_customdata['requiredcustomfields'];
-        $optionalfields = array_diff($customfields, $requiredcustomfields);
+        $optionalfields = array_diff($customfieldnames, $requiredcustomfields);
 
         if (!empty($requiredcustomfields)) {
             foreach ($requiredcustomfields as $item) {
                 $customfieldinfo->customfields .= "* '{$item}'\n";
                 $customfieldinfo->requiredcustomfields .= "* '{$item}'\n";
+                $this->requiredcfnames .= "* '{$item}'\n";
             }
         }
 
@@ -55,7 +76,6 @@ class attendees_add_file extends \moodleform {
             }
         }
 
-        $extrafields = $this->_customdata['extrafields'];
         if (!empty($extrafields)) {
             foreach ($extrafields as $item) {
                 $customfieldinfo->customfields .= "* '{$item}' ({$dataoptional})\n";
@@ -89,4 +109,20 @@ class attendees_add_file extends \moodleform {
 
         $this->add_action_buttons(true, get_string('continue'));
     }
+
+    /**
+     * Return submitted data if properly submitted or returns NULL if validation fails or
+     * if there is no submitted data.
+     *
+     * @return object submitted data; NULL if not valid or not submitted or cancelled
+     */
+    public function get_data() {
+        $data = parent::get_data();
+        if ($data) {
+            $data->content = $this->get_file_content('userfile');
+            $data->requiredcfnames = $this->requiredcfnames;
+        }
+        return $data;
+    }
 }
+
