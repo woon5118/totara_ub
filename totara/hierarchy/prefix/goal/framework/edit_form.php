@@ -18,9 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara
- * @subpackage totara_hierarchy
+ * @package totara_hierarchy
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/lib/formslib.php');
 
@@ -61,13 +62,13 @@ class framework_edit_form extends moodleform {
             'maxlength="254" size="50"');
         $mform->addHelpButton('fullname', 'goalframeworkfullname', 'totara_hierarchy');
         $mform->addRule('fullname', get_string('goalmissingnameframework', 'totara_hierarchy'), 'required', null, 'client');
-        $mform->setType('fullname', PARAM_MULTILANG);
+        $mform->setType('fullname', PARAM_TEXT);
 
         if (!empty($CFG->showhierarchyshortnames)) {
             $mform->addElement('text', 'shortname', get_string('shortnameframework', 'totara_hierarchy'),
                 'maxlength="100" size="20"');
             $mform->addHelpButton('shortname', 'goalframeworkshortname', 'totara_hierarchy');
-            $mform->setType('shortname', PARAM_MULTILANG);
+            $mform->setType('shortname', PARAM_TEXT);
         }
 
         $mform->addElement('text', 'idnumber', get_string('goalframeworkidnumber', 'totara_hierarchy'),
