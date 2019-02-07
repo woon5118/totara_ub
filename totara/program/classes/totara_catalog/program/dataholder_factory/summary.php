@@ -54,7 +54,7 @@ class summary extends dataholder_factory {
                         'summary_rich_ctx.id',
                         "'totara_program'",
                         "'summary'",
-                        'NULL'
+                        '0'
                     ),
                 ],
                 [

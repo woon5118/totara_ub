@@ -21,7 +21,7 @@
  * @subpackage totara_catalog
  */
 
-define(['core/templates', 'core/ajax', 'core/notification'], function(templates, ajax, notification) {
+define(['core/templates', 'core/ajax', 'core/notification', 'core/event'], function(templates, ajax, notification, events) {
 
     /**
      * Class constructor for the Catalog.
@@ -381,6 +381,8 @@ define(['core/templates', 'core/ajax', 'core/notification'], function(templates,
                         targetContainer.innerHTML = '';
                         targetContainer.appendChild(childHTML);
                     }
+                    // Update
+                    events.notifyFilterContentUpdated(targetContainer);
                     // Run global scan
                     templates.runTemplateJS('');
 
