@@ -40,9 +40,6 @@ function xmldb_tool_sitepolicy_upgrade($oldversion) {
 
     // Totara 11 branching line.
 
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
-
     if ($oldversion < 2018050800) {
         // Add format fields for policytext and whatsnew.
         $table = new xmldb_table('tool_sitepolicy_localised_policy');
@@ -51,20 +48,15 @@ function xmldb_tool_sitepolicy_upgrade($oldversion) {
         // Conditionally launch add field.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
+            $DB->execute("UPDATE {tool_sitepolicy_localised_policy} SET policytextformat = 2");
         }
 
         $field = new xmldb_field('whatsnewformat', XMLDB_TYPE_INTEGER, '2', null, null, null, '1', 'whatsnew');
         // Conditionally launch add field.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
+            $DB->execute("UPDATE {tool_sitepolicy_localised_policy} SET whatsnewformat = 2");
         }
-
-        $sql =
-            "UPDATE {tool_sitepolicy_localised_policy}
-                SET policytextformat = :policytextformat,
-                    whatsnewformat = :whatsnewformat";
-        $params = ['policytextformat' => FORMAT_PLAIN, 'whatsnewformat' => FORMAT_PLAIN];
-        $DB->execute($sql, $params);
 
         // Connect savepoint reached.
         upgrade_plugin_savepoint(true, 2018050800, 'tool', 'sitepolicy');
