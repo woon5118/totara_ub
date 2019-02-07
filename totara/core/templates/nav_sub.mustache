@@ -32,6 +32,7 @@
     Context variables required for this template:
     * subnav: list of items
     * subnav -> haschildren: Has sub list items
+    * subnav -> class_name: Identifier for this node
     * subnav -> class_isfirst: First node
     * subnav -> class_islast: Last node
     * subnav -> class_isselected: Is current section
@@ -48,7 +49,8 @@
     <div class="container-fluid">
         <ul class="totaraNav_sub--list" role="menubar">
             {{#subnav}}{{!
-          }}<li class="totaraNav_sub--list_item
+          }}<li id="{{class_name}}"
+                class="totaraNav_sub--list_item
                 {{#haschildren}} totaraNav_sub--list_item_hasChildren{{/haschildren}}
                 {{^haschildren}}{{#external_link}} totaraNav_sub--list_item_externalLink{{/external_link}}{{/haschildren}}
                 {{#class_isselected}} totaraNav_sub--list_item_selected{{/class_isselected}}

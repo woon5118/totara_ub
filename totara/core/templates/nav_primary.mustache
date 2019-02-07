@@ -40,6 +40,7 @@
     * [parent] -> masthead_usermenu: Usermenu data
     * menuitems -> list of items
     * menuitems -> haschildren: Has sub list items
+    * menuitems -> class_name: Identifier for this node
     * menuitems -> class_isfirst: First node
     * menuitems -> class_islast: Last node
     * menuitems -> class_isselected: Is current section or parent of current section
@@ -67,7 +68,8 @@
                 </a>
             </li>{{!
           }}{{#menuitems}}{{!
-          }}<li class="totaraNav_prim--list_item
+          }}<li id="{{class_name}}"
+                class="totaraNav_prim--list_item
                 {{#haschildren}} totaraNav_prim--list_item_hasChildren{{/haschildren}}
                 {{^haschildren}}{{#external_link}} totaraNav_prim--list_item_externalLink{{/external_link}}{{/haschildren}}
                 {{#class_isselected}} totaraNav_prim--list_item_selected{{/class_isselected}}"

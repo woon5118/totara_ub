@@ -47,7 +47,8 @@
 
 <ul class="navExpand--list navExpand--listSecond" data-tw-navExpand-list="true">
     {{#children}}
-        <li class="navExpand--list_item
+        <li id="{{class_name}}"
+            class="navExpand--list_item
             {{#haschildren}} navExpand--list_item_hasChildren{{/haschildren}}
             {{#class_isselected}} navExpand--list_item_selected{{/class_isselected}}"
             {{#haschildren}} data-tw-totaraNav-hasChildren="true"{{/haschildren}}
