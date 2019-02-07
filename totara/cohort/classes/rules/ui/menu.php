@@ -97,7 +97,7 @@ class menu extends base_form {
         // todo: The UI mockup shows a fancy ajax thing to add/remove selected items.
         // For now, using a humble multi-select
         $row[1]->setMultiple(true);
-        $mform->addGroup($row, 'row1', ' ', ' ', false);
+        $mform->addGroup($row, 'row1', '', '', false);
 
         // Make sure they selected at least one item from the multi-select. Sadly, formslib's
         // client-side stuff is broken for multi-selects (because it adds "[]" to their name),
