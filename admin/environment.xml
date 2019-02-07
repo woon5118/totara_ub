@@ -159,6 +159,11 @@
       </CUSTOM_CHECK>
       <CUSTOM_CHECK file="lib/upgradelib.php" function="check_mysql_large_prefix" level="required">
       </CUSTOM_CHECK>
+      <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_core_mysql_environment_check" />
+      <CUSTOM_CHECK level="required" file="/totara/core/environmentlib.php" function="totara_core_linear_upgrade_check" />
+      <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_core_xml_external_entities_check" />
+      <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_check" />
+      <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_read_committed_snapshot" />
     </CUSTOM_CHECKS>
   </TOTARA>
   <TOTARA version="11" requires="9.0">
@@ -320,6 +325,11 @@
       </CUSTOM_CHECK>
       <CUSTOM_CHECK file="lib/upgradelib.php" function="check_mysql_large_prefix" level="required">
       </CUSTOM_CHECK>
+      <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_core_mysql_environment_check" />
+      <CUSTOM_CHECK level="required" file="/totara/core/environmentlib.php" function="totara_core_linear_upgrade_check" />
+      <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_core_xml_external_entities_check" />
+      <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_check" />
+      <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_read_committed_snapshot" />
     </CUSTOM_CHECKS>
   </TOTARA>
   <TOTARA version="12" requires="9.0">
@@ -490,6 +500,11 @@
           <ON_CHECK message="ishttpswarning" />
         </FEEDBACK>
       </CUSTOM_CHECK>
+      <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_core_mysql_environment_check" />
+      <CUSTOM_CHECK level="required" file="/totara/core/environmentlib.php" function="totara_core_linear_upgrade_check" />
+      <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_core_xml_external_entities_check" />
+      <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_check" />
+      <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_read_committed_snapshot" />
     </CUSTOM_CHECKS>
   </TOTARA>
 </COMPATIBILITY_MATRIX>
