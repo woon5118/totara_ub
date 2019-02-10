@@ -44,7 +44,9 @@ class fully_attended extends state {
             transition::to(new partially_attended($this->signup))->with_conditions(
                 event_is_not_cancelled::class,
                 event_in_the_past::class
-            )
+            ),
+            // Attendance state can always be reverted back to booked.
+            transition::to(new booked($this->signup))
         ];
     }
 

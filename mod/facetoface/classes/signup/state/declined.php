@@ -28,7 +28,13 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * This class is used in booking class and responsible for exact state
  */
-class declined extends not_set {
+class declined extends state {
+
+    final public function get_map() : array {
+        // User declined has exactly the same steps forward as initial state (at least now).
+        return (new not_set($this->signup))->get_map();
+    }
+
     /**
      * Code of status as it is stored in DB
      * Numeric statuses are backward compatible except not_set which was not meant to be written into DB.

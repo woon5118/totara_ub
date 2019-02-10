@@ -24,6 +24,10 @@
 namespace mod_facetoface;
 
 use mod_facetoface\exception\signup_exception;
+use mod_facetoface\signup\state\fully_attended;
+use mod_facetoface\signup\state\no_show;
+use mod_facetoface\signup\state\not_set;
+use mod_facetoface\signup\state\partially_attended;
 use \stdClass;
 use mod_facetoface\signup\state\state as state;
 use mod_facetoface\signup\state\booked as booked;
@@ -192,8 +196,25 @@ final class signup_helper {
         foreach ($attendance as $signupid => $value) {
             $signup = new signup($signupid);
             $desiredstate = state::from_code($value);
+            $currentstate = $signup->get_state();
 
+            if ($desiredstate == not_set::class) {
+                // If current state is attendance, try fallback to booked, otherwise leave it as is
+                if (
+                    ($currentstate instanceof fully_attended) ||
+                    ($currentstate instanceof partially_attended) ||
+                    ($currentstate instanceof no_show)
+                ){
+                    $desiredstate = booked::class;
+                } else {
+                    $desiredstate = get_class($currentstate);
+                }
+            }
             if (!$signup->can_switch($desiredstate)) {
+                // suppress the error log when switching to the same state
+                if (get_class($currentstate) === $desiredstate) {
+                    continue;
+                }
                 error_log("Seminar: could not switch signup id '$signupid' to '$desiredstate'");
                 continue;
             }

@@ -287,10 +287,8 @@ final class signup {
     public function switch_state(string ...$newstates) {
         global $DB;
         $trans = $DB->start_delegated_transaction();
-
         $oldstate = $this->get_state();
         $newstate = $oldstate->switch_to(...$newstates);
-
         $this->update_status($newstate);
 
         /**

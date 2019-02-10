@@ -84,11 +84,15 @@ Feature: Take attendance for seminar sessions
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
-    And I click on "Take attendance" "link"
+    And I switch to "Take attendance" tab
     And I click on "Fully attended" "option" in the "Sam1 Student1" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
-    And I should see "Sam1 Student1"
+    And I switch to "Attendees" tab
+    And I should see "Fully attended" in the "Sam1 Student1" "table_row"
+    And I should see "Booked" in the "Sam2 Student2" "table_row"
+    And I should see "Booked" in the "Sam3 Student3" "table_row"
+    And I should see "Booked" in the "Sam4 Student4" "table_row"
     When I navigate to "Course completion" node in "Course administration > Reports"
     And I click on "Sam1 Student1" "link"
     Then I should see "Completed" in the "#criteriastatus" "css_element"
@@ -120,4 +124,32 @@ Feature: Take attendance for seminar sessions
     And I navigate to "Course completion" node in "Course administration > Reports"
     And I click on "Sam3 Student3" "link"
     Then I should not see "Completed" in the "#criteriastatus" "css_element"
+    And I log out
+
+  Scenario: Reset attendance for user
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I click on "View all events" "link"
+    And I click on "Attendees" "link"
+    And I switch to "Take attendance" tab
+    And I click on "Fully attended" "option" in the "Sam1 Student1" "table_row"
+    And I press "Save attendance"
+    Then I should see "Successfully updated attendance"
+    And I switch to "Attendees" tab
+    And I should see "Fully attended" in the "Sam1 Student1" "table_row"
+    And I should see "Booked" in the "Sam2 Student2" "table_row"
+    When I switch to "Take attendance" tab
+    And I click on "Partially attended" "option" in the "Sam1 Student1" "table_row"
+    And I press "Save attendance"
+    Then I should see "Successfully updated attendance"
+    And I switch to "Attendees" tab
+    And I should see "Partially attended" in the "Sam1 Student1" "table_row"
+    And I should see "Booked" in the "Sam2 Student2" "table_row"
+    When I switch to "Take attendance" tab
+    And I click on "Not set" "option" in the "Sam1 Student1" "table_row"
+    And I press "Save attendance"
+    Then I should see "Successfully updated attendance"
+    And I switch to "Attendees" tab
+    And I should see "Booked" in the "Sam1 Student1" "table_row"
+    And I should see "Booked" in the "Sam2 Student2" "table_row"
     And I log out
