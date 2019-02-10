@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * @group totara_catalog
  */
-class core_tag__totara_catalog_settings_observer_testcase extends advanced_testcase {
+class core_tag_totara_catalog_settings_observer_testcase extends advanced_testcase {
 
     public function setUp() {
         global $DB;
@@ -43,6 +43,7 @@ class core_tag__totara_catalog_settings_observer_testcase extends advanced_testc
 
         // create a course
         set_config('usetags', 1);
+        $DB->delete_records('task_adhoc');
         $course = $this->getDataGenerator()->create_course();
 
         core_tag_tag::add_item_tag(
@@ -67,7 +68,6 @@ class core_tag__totara_catalog_settings_observer_testcase extends advanced_testc
         $this->assertContains('newtagname', $data->ftsmedium);
 
         // turn off tags
-        $now = time();
         set_config('usetags', 0);
         $event = core\event\admin_settings_changed::create(
             [
@@ -80,7 +80,8 @@ class core_tag__totara_catalog_settings_observer_testcase extends advanced_testc
         );
         $event->trigger();
 
-        $task = \core\task\manager::get_next_adhoc_task($now);
+        $this->assertEquals(1, $DB->count_records('task_adhoc'));
+        $task = \core\task\manager::get_next_adhoc_task(time());
         totara_catalog\cache_handler::reset_all_caches();
         $task->execute();
         \core\task\manager::adhoc_task_complete($task);

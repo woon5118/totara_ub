@@ -141,6 +141,8 @@ class totara_certification_totara_catalog_provider_testcase extends \advanced_te
     public function test_change_status() {
         global $DB;
 
+        $DB->delete_records('task_adhoc');
+
         // check inactive status
         certification_provider::change_status(provider::PROVIDER_STATUS_INACTIVE);
         $count = $DB->count_records('catalog', ['objecttype' => certification_provider::get_object_type()]);
@@ -148,8 +150,8 @@ class totara_certification_totara_catalog_provider_testcase extends \advanced_te
 
         // check active status
         certification_provider::change_status(provider::PROVIDER_STATUS_ACTIVE);
-        $now = time();
-        $task = task_manager::get_next_adhoc_task($now);
+        $this->assertEquals(1, $DB->count_records('task_adhoc'));
+        $task = task_manager::get_next_adhoc_task(time());
         $task->execute();
         task_manager::adhoc_task_complete($task);
 

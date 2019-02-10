@@ -26,9 +26,8 @@ namespace totara_catalog\observer;
 defined('MOODLE_INTERNAL') || die();
 
 use core\event\admin_settings_changed;
-use totara_catalog\provider_handler;
-use totara_catalog\task\provider_active_task;
 use core\task\manager as task_manager;
+use totara_catalog\task\refresh_catalog_adhoc;
 
 class settings_observer {
 
@@ -43,12 +42,9 @@ class settings_observer {
 
         if (static::is_setting_changed($event->get_data())) {
             if ($CFG->catalogtype == 'totara') {
-                foreach (provider_handler::instance()->get_active_providers() as $provider) {
-                    $adhoctask = new provider_active_task();
-                    $adhoctask->set_custom_data(array('objecttype' => $provider->get_object_type()));
-                    $adhoctask->set_component('totara_catalog');
-                    task_manager::queue_adhoc_task($adhoctask);
-                }
+                $adhoctask = new refresh_catalog_adhoc();
+                $adhoctask->set_component('totara_catalog');
+                task_manager::queue_adhoc_task($adhoctask);
             } else {
                 $DB->delete_records('catalog');
             }

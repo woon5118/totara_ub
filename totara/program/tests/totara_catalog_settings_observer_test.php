@@ -77,7 +77,6 @@ class totara_program_totara_catalog_settings_observer_testcase extends advanced_
         $this->assertSame(2, $DB->count_records('catalog'));
 
         // turn on programs
-        $now = time();
         set_config('enableprograms', 1);
         $event = core\event\admin_settings_changed::create(
             [
@@ -90,7 +89,8 @@ class totara_program_totara_catalog_settings_observer_testcase extends advanced_
         );
         $event->trigger();
 
-        $task = \core\task\manager::get_next_adhoc_task($now);
+        $this->assertEquals(1, $DB->count_records('task_adhoc'));
+        $task = \core\task\manager::get_next_adhoc_task(time());
         totara_catalog\cache_handler::reset_all_caches();
         $task->execute();
         \core\task\manager::adhoc_task_complete($task);

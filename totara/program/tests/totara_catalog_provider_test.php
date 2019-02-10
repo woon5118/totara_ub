@@ -139,6 +139,8 @@ class totara_program_totara_catalog_provider_testcase extends \advanced_testcase
     public function test_change_status() {
         global $DB;
 
+        $DB->delete_records('task_adhoc');
+
         // check inactive status
         program_provider::change_status(provider::PROVIDER_STATUS_INACTIVE);
         $count = $DB->count_records('catalog', ['objecttype' => program_provider::get_object_type()]);
@@ -146,8 +148,8 @@ class totara_program_totara_catalog_provider_testcase extends \advanced_testcase
 
         // check active status
         program_provider::change_status(provider::PROVIDER_STATUS_ACTIVE);
-        $now = time();
-        $task = task_manager::get_next_adhoc_task($now);
+        $this->assertEquals(1, $DB->count_records('task_adhoc'));
+        $task = task_manager::get_next_adhoc_task(time());
         $task->execute();
         task_manager::adhoc_task_complete($task);
 
