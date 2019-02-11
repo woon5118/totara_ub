@@ -57,10 +57,6 @@ if ($display !== '' && !in_array($display, array(MDL_F2F_NOTIFICATION_MANUAL, MD
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('editinga', 'moodle', 'facetoface'));
 $PAGE->set_heading(format_string($SITE->fullname));
-echo $OUTPUT->header();
-
-$heading = get_string('notifications', 'facetoface');
-echo $OUTPUT->heading_with_help($heading, 'notifications', 'facetoface');
 
 $str_edit = get_string('edit', 'moodle');
 $str_copy = get_string('copynotification', 'facetoface');
@@ -120,6 +116,11 @@ $defaultnotifications = facetoface_get_default_notifications($facetoface->id)[0]
 foreach ($notifications as $note) {
     unset($defaultnotifications[$note->conditiontype]);
 }
+
+echo $OUTPUT->header();
+$heading = get_string('notifications', 'mod_facetoface');
+echo $OUTPUT->heading_with_help($heading, 'notifications', 'mod_facetoface');
+
 if (!empty($defaultnotifications)) {
     $url1 = new moodle_url('/mod/facetoface/notification/restore.php', array('update' => $cm->id, 'sesskey' => sesskey()));
     $a['url1'] = $url1->out();
