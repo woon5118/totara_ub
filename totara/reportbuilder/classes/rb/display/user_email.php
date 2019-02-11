@@ -49,14 +49,7 @@ class user_email extends base {
             return $value;
         }
 
-        // In reality, format_text() should not be called here since emails do
-        // not need any such processing. However, the call still remains because
-        // it was in the totara_reportbuilder\rb\display\legacy class originally
-        // handling email text and removing the call could break existing sites.
-        $opts = ['filter' => false];
-        $email = format_text($value, FORMAT_HTML, $opts);
-
-        return obfuscate_mailto($email, '', (bool)$extrafields->emailstop);
+        return obfuscate_mailto($value, '', (bool)$extrafields->emailstop);
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {

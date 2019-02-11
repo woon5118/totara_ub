@@ -6,10 +6,11 @@ Feature: Verify functionality of user source report.
 
   Background:
     Given I am on a totara site
+    # 'Learner2' case tests email display with non-standard characters.
     And the following "users" exist:
       | username | firstname | lastname | email                     | maildisplay |
       | learner1 | Bob1      | Learner1 | bob1.learner1@example.com | 1           |
-      | learner2 | Bob2      | Learner2 | bob2.learner2@example.com | 1           |
+      | learner2 | Bob2      | Learner2 | bob2&learner2@example.com | 1           |
       | learner3 | Bob3      | Learner3 | bob3.learner3@example.com | 0           |
       | learner4 | Bob4      | Learner4 | bob4.learner4@example.com | 2           |
 
@@ -165,7 +166,7 @@ Feature: Verify functionality of user source report.
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
-      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active      |
+      | Bob2 Learner2   | learner2 | bob2&learner2@example.com | Active      |
       | Bob3 Learner3   | learner3 | Email is private          | Active      |
       | Bob4 Learner4   | learner4 | Email is private          | Active      |
     And I log out
@@ -176,7 +177,7 @@ Feature: Verify functionality of user source report.
     # Email addresses is 'hidden from everyone' and only visible to course members.
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
-      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active      |
+      | Bob2 Learner2   | learner2 | bob2&learner2@example.com | Active      |
       | Bob3 Learner3   | learner3 | Email is private          | Active      |
       | Bob4 Learner4   | learner4 | Email is private          | Active      |
     And I log out
@@ -187,7 +188,7 @@ Feature: Verify functionality of user source report.
     # Email addresses is 'hidden from everyone' and only visible to course members.
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
-      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active      |
+      | Bob2 Learner2   | learner2 | bob2&learner2@example.com | Active      |
       | Bob3 Learner3   | learner3 | Email is private          | Active      |
       | Bob4 Learner4   | learner4 | Email is private          | Active      |
 
@@ -241,7 +242,7 @@ Feature: Verify functionality of user source report.
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
-      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active      |
+      | Bob2 Learner2   | learner2 | bob2&learner2@example.com | Active      |
       | Bob3 Learner3   | learner3 | Email is private          | Active      |
       | Bob4 Learner4   | learner4 | Email is private          | Active      |
     And I log out
@@ -254,7 +255,7 @@ Feature: Verify functionality of user source report.
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
-      | Bob2 Learner2   | learner2 | bob2.learner2@example.com | Active      |
+      | Bob2 Learner2   | learner2 | bob2&learner2@example.com | Active      |
 
   Scenario: Verify reports extending from the user source class do not support the action column in user source report.
 
