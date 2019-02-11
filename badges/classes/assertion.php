@@ -88,11 +88,39 @@ class core_badges_assertion {
     }
 
     /**
+     * Get the local id for this badge.
+     *
+     * @return int
+     */
+    public function get_badge_id() {
+        $badgeid = 0;
+        if ($this->_data) {
+            $badgeid = $this->_data->id;
+        }
+        return $badgeid;
+    }
+
+    /**
+     * Get the local id for this badge assertion.
+     *
+     * @return string
+     */
+    public function get_assertion_hash() {
+        $hash = '';
+        if ($this->_data) {
+            $hash = $this->_data->uniquehash;
+        }
+        return $hash;
+    }
+
+    /**
      * Get badge assertion.
      *
+     * @param boolean $issued Include the nested badge issued information.
+     * @param boolean $usesalt Hash the identity and include the salt information for the hash.
      * @return array Badge assertion.
      */
-    public function get_badge_assertion() {
+    public function get_badge_assertion($issued = true, $usesalt = true) {
         global $CFG;
         $assertion = array();
         if ($this->_data) {
@@ -109,17 +137,27 @@ class core_badges_assertion {
             // Required.
             $assertion['uid'] = $hash;
             $assertion['recipient'] = array();
-            $assertion['recipient']['identity'] = 'sha256$' . hash('sha256', $email . $CFG->badges_badgesalt);
+            if ($usesalt) {
+                $assertion['recipient']['identity'] = 'sha256$' . hash('sha256', $email . $CFG->badges_badgesalt);
+            } else {
+                $assertion['recipient']['identity'] = $email;
+            }
             $assertion['recipient']['type'] = 'email'; // Currently the only supported type.
             $assertion['recipient']['hashed'] = true; // We are always hashing recipient.
-            $assertion['recipient']['salt'] = $CFG->badges_badgesalt;
-            $assertion['badge'] = $classurl->out(false);
+            if ($usesalt) {
+                $assertion['recipient']['salt'] = $CFG->badges_badgesalt;
+            }
+            if ($issued) {
+                $assertion['badge'] = $classurl->out(false);
+            }
             $assertion['verify'] = array();
             $assertion['verify']['type'] = 'hosted'; // 'Signed' is not implemented yet.
             $assertion['verify']['url'] = $assertionurl->out(false);
             $assertion['issuedOn'] = $this->_data->dateissued;
+            if ($issued) {
+                $assertion['evidence'] = $this->_url->out(false); // Currently issued badge URL.
+            }
             // Optional.
-            $assertion['evidence'] = $this->_url->out(false); // Currently issued badge URL.
             if (!empty($this->_data->dateexpire)) {
                 $assertion['expires'] = $this->_data->dateexpire;
             }
@@ -131,31 +169,46 @@ class core_badges_assertion {
     /**
      * Get badge class information.
      *
+     * @param boolean $issued Include the nested badge issuer information.
      * @return array Badge Class information.
      */
-    public function get_badge_class() {
-        $class = array();
+    public function get_badge_class($issued = true) {
+        $class = [];
         if ($this->_data) {
             if (empty($this->_data->courseid)) {
                 $context = context_system::instance();
             } else {
                 $context = context_course::instance($this->_data->courseid);
             }
-
             // Required.
             $class['name'] = $this->_data->name;
             $class['description'] = $this->_data->description;
-            $class['image'] = moodle_url::make_pluginfile_url($context->id, 'badges', 'badgeimage', $this->_data->id, '/', 'f1')->out(false);
-            $class['criteria'] = $this->_url->out(false); // Currently issued badge URL.
-
-            if ($this->_obversion == OPEN_BADGES_V2) {
-                $badgeid = $this->_data ? $this->_data->id : 0;
-                $issuerurl = new moodle_url('/badges/badge_json.php', array('id' => $badgeid, 'action' => 0));
+            $storage = get_file_storage();
+            $imagefile = $storage->get_file($context->id, 'badges', 'badgeimage', $this->_data->id, '/', 'f3.png');
+            if ($imagefile) {
+                $imagedata = base64_encode($imagefile->get_content());
             } else {
-                $issuerurl = new moodle_url('/badges/assertion.php', array('b' => $this->_data->uniquehash, 'action' => 0));
+                if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+                    // Unit tests the file might not exist yet.
+                    $imagedata = '';
+                } else {
+                    throw new coding_exception('Image file does not exist.');
+                }
             }
-            $class['issuer'] = $issuerurl->out(false);
+            $class['image'] = 'data:image/png;base64,' . $imagedata;
+            $class['criteria'] = $this->_url->out(false); // Currently issued badge URL.
+            if ($issued) {
+                if ($this->_obversion == OPEN_BADGES_V2) {
+                    $issuerurl = new moodle_url('/badges/badge_json.php', array('id' => $this->get_badge_id(), 'action' => 0));
+                } else {
+                    $issuerurl = new moodle_url('/badges/assertion.php', array('b' => $this->_data->uniquehash, 'action' => 0));
+                }
+                $class['issuer'] = $issuerurl->out(false);
+            }
             $this->embed_data_badge_version2($class, OPEN_BADGES_V2_TYPE_BADGE);
+            if (!$issued) {
+                unset($class['issuer']);
+            }
         }
         return $class;
     }
@@ -166,6 +219,7 @@ class core_badges_assertion {
      * @return array Issuer information.
      */
     public function get_issuer() {
+        global $CFG;
         $issuer = array();
         if ($this->_data) {
             // Required.
@@ -174,6 +228,8 @@ class core_badges_assertion {
             // Optional.
             if (!empty($this->_data->issuercontact)) {
                 $issuer['email'] = $this->_data->issuercontact;
+            } else {
+                $issuer['email'] = $CFG->badges_defaultissuercontact;
             }
         }
         $this->embed_data_badge_version2($issuer, OPEN_BADGES_V2_TYPE_ISSUER);
@@ -270,7 +326,6 @@ class core_badges_assertion {
                 }
                 unset($json['uid']);
             }
-
             // For Badge.
             if ($type == OPEN_BADGES_V2_TYPE_BADGE) {
                 $json['@context'] = OPEN_BADGES_V2_CONTEXT;
@@ -291,17 +346,19 @@ class core_badges_assertion {
                         $this->_data->imageauthoremail ||
                         $this->_data->imageauthorurl ||
                         $this->_data->imagecaption) {
-                    $urlimage = moodle_url::make_pluginfile_url($context->id,
-                        'badges', 'badgeimage', $this->_data->id, '/', 'f1')->out(false);
-                    $json['image'] = array();
-                    $json['image']['id'] = $urlimage;
-                    if ($this->_data->imageauthorname || $this->_data->imageauthoremail || $this->_data->imageauthorurl) {
-                        $authorimage = new moodle_url('/badges/image_author_json.php', array('id' => $this->_data->id));
-                        $json['image']['author'] = $authorimage->out(false);
+                    $storage = get_file_storage();
+                    $imagefile = $storage->get_file($context->id, 'badges', 'badgeimage', $this->_data->id, '/', 'f1.png');
+                    if ($imagefile) {
+                        $imagedata = base64_encode($imagefile->get_content());
+                    } else {
+                        // The file might not exist in unit tests.
+                        if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+                            $imagedata = '';
+                        } else {
+                            throw new coding_exception('Image file does not exist.');
+                        }
                     }
-                    if ($this->_data->imagecaption) {
-                        $json['image']['caption'] = $this->_data->imagecaption;
-                    }
+                    $json['image'] = 'data:image/png;base64,' . $imagedata;
                 }
             }
 
