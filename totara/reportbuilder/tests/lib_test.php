@@ -1566,6 +1566,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->add_column($report, 'user', 'username', null, null, '', 0);
 
         // Get report.
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         list($sql, $params, $cache) = $report->build_query(false, false, false);
         $records = $DB->get_recordset_sql($sql, $params);

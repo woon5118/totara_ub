@@ -50,14 +50,17 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
         $CFG->clone_dbname = $CFG->dbname;
         $reportdb = totara_get_clone_db(true);
 
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $report->get_filtered_count();
         $this->assertSame($reads, $reportdb->perf_get_reads());
         $this->assertSame($writes, $reportdb->perf_get_writes());
 
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();
@@ -65,6 +68,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
         $this->assertSame($reads, $reportdb->perf_get_reads());
         $this->assertSame($writes, $reportdb->perf_get_writes());
 
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();
@@ -105,11 +109,13 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();
 
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $report->get_filtered_count();
         $this->assertSame($reads + 1, $reportdb->perf_get_reads());
         $this->assertSame($writes, $reportdb->perf_get_writes());
 
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();
@@ -117,6 +123,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
         $this->assertSame($reads + 1, $reportdb->perf_get_reads());
         $this->assertSame($writes, $reportdb->perf_get_writes());
 
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();
@@ -124,6 +131,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
         $this->assertGreaterThanOrEqual($reads + 1, $reportdb->perf_get_reads());
         $this->assertSame($writes, $reportdb->perf_get_writes());
 
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();
@@ -167,6 +175,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
         $this->assertSame($reads, $reportdb->perf_get_reads());
         $this->assertSame($writes, $reportdb->perf_get_writes());
 
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();
@@ -174,6 +183,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
         $this->assertSame($reads, $reportdb->perf_get_reads());
         $this->assertSame($writes, $reportdb->perf_get_writes());
 
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();
@@ -181,6 +191,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
         $this->assertSame($reads, $reportdb->perf_get_reads());
         $this->assertSame($writes, $reportdb->perf_get_writes());
 
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $reads = $reportdb->perf_get_reads();
         $writes = $reportdb->perf_get_writes();

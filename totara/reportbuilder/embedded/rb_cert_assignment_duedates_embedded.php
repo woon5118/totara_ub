@@ -97,4 +97,13 @@ class rb_cert_assignment_duedates_embedded extends rb_base_embedded {
         }
         return has_capability('totara/program:configureassignments', $context, $reportfor);
     }
+
+    /**
+     * Can searches be saved?
+     *
+     * @return bool
+     */
+    public static function is_search_saving_allowed() : bool {
+        return false;
+    }
 }

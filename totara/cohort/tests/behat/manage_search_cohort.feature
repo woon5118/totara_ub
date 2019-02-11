@@ -40,9 +40,9 @@ Feature: Manage searches in audiences
     And I set the field "name" to "Search by Audience1"
     And I click on "Save changes" "button"
     And I follow "All audiences"
-    And "Manage searches" "button" should exist
+    And "Manage your saved searches" "link" should exist
 
-    When I click on "Manage searches" "button"
+    When I click on "Manage your saved searches" "link"
     Then I should see "Search by Cat" in the "searchlist" "totaradialogue"
     And I should see "Search by Audience1" in the "searchlist" "totaradialogue"
 
@@ -54,7 +54,7 @@ Feature: Manage searches in audiences
     Then I should see "Search by Category"
     And I click on "Close" "button" in the "searchlist" "totaradialogue"
 
-    When I click on "Manage searches" "button"
+    When I click on "Manage your saved searches" "link"
     And I click on "Delete" "link" in the "Search by Category" "table_row"
     Then I should see "Are you sure you want to delete this saved search" in the "searchlist" "totaradialogue"
     And I click on "Continue" "button"
@@ -62,5 +62,5 @@ Feature: Manage searches in audiences
     And I click on "Close" "button" in the "searchlist" "totaradialogue"
 
     When I follow "System audiences"
-    And I click on "Manage searches" "button"
+    And I click on "Manage your saved searches" "link"
     Then I should see "Search by Audience1" in the "searchlist" "totaradialogue"

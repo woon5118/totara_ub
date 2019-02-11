@@ -54,7 +54,7 @@ $data->sid = 0;
 $data->ispublic = 0;
 $data->action = 'edit';
 
-$mform = new report_builder_save_form($PAGE->url, array('report' => $report, 'data' => $data));
+$mform = new report_builder_save_form($PAGE->url, array('data' => $data));
 
 // form results check
 if ($mform->is_cancelled()) {
@@ -68,13 +68,23 @@ if ($fromform = $mform->get_data()) {
     $searchsettings = (isset($SESSION->reportbuilder[$report->get_uniqueid()])) ?
             serialize($SESSION->reportbuilder[$report->get_uniqueid()]) : null;
 
-    // handle form submission
+    // Setting as report default.
+    $mrcapability = has_capability('totara/reportbuilder:managereports', context_system::instance());
+    $isdefault = $mrcapability && $fromform->ispublic && $fromform->isdefault ? true : false;
+
+    // If setting as default, remove any previous default.
+    if ($isdefault) {
+        $DB->set_field('report_builder_saved', 'isdefault', 0, array('reportid' => $id));
+    }
+
+    // Handle form submission.
     $todb = new stdClass();
-    $todb->reportid = $fromform->id;
+    $todb->reportid = $id;
     $todb->userid = $USER->id;
     $todb->search = $searchsettings;
     $todb->name = $fromform->name;
     $todb->ispublic = $fromform->ispublic;
+    $todb->isdefault = $isdefault;
     $todb->timemodified = time();
     $todb->id = $DB->insert_record('report_builder_saved', $todb);
 

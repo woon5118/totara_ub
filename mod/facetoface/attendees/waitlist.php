@@ -143,11 +143,10 @@ if ($show_table) {
     list($reporthtml, $debughtml) = $output->report_html($report, $debug);
     echo $debughtml;
 
+    $report->display_saved_search_options();
     $report->display_search();
     $report->display_sidebar_search();
 
-    // Print saved search buttons if appropriate.
-    echo $report->display_saved_search_options();
     echo $reporthtml;
 
     attendees_helper::report_export_form($report, $sid);

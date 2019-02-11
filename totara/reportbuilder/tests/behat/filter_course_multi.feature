@@ -58,17 +58,16 @@ Feature: Use the multi-item course filter
     And I should not see "CourseTwo" in the ".reportbuilder-table" "css_element"
     And I should see "CourseThree" in the ".reportbuilder-table" "css_element"
     When I press "Save this search"
-    # The order of the courses in the below text can change so just check the first part of it.
-    Then I should see "Course (multi-item) isn't equal to"
-    When I set the field "Search Name" to "Not1or2"
-    And I set the field "Let other users view" to "1"
+    And I set the field "Search Name" to "Not1or2"
+    And I click on "Shared" "radio"
     And I press "Save changes"
-    Then "View a saved search..." "select" should be visible
+    Then I should see "Saved searches"
+    And I should see "View a saved search"
     When I log out
     And I log in as "user1"
     And I click on "Reports" in the totara menu
     And I click on "Courses" "link" in the ".reportmanager" "css_element"
-    And I select "Not1or2" from the "View a saved search..." singleselect
+    And I set the field "sid" to "Not1or2"
     Then I should not see "CourseOne" in the "Course (multi-item)" "fieldset"
     And I should see "CourseTwo" in the "Course (multi-item)" "fieldset"
     And I should not see "CourseOne" in the ".reportbuilder-table" "css_element"

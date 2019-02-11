@@ -104,17 +104,14 @@ echo $debughtml;
 // print report description if set
 echo $output->print_description($report->description, $report->_id);
 
-// print filters
+// Print saved search options and filters.
+$report->display_saved_search_options();
 $report->display_search();
 $report->display_sidebar_search();
-
-// print saved search buttons if appropriate
-echo $report->display_saved_search_options();
 
 // Show results.
 echo $output->showhide_button($report->_id, $report->shortname);
 echo $tablehtml;
-
 
 // Export button.
 $output->export_select($report, $sid);

@@ -548,10 +548,13 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      * Returns a button that when clicked, takes the user to a page where they can
      * save the results of a search for the current report
      *
+     * @deprecated Since Totara 13.0
      * @param reportbuilder $report
      * @return string HTML to display the button
      */
     public function save_button($report) {
+        debugging('totara_reportbuilder_renderer::save_button has been deprecated since Totara 13.0. The save search button is now being handled via totara_reportbuilder_renderer::display_search().', DEBUG_DEVELOPER);
+
         global $SESSION;
 
         $buttonsarray = optional_param_array('submitgroup', null, PARAM_TEXT);
@@ -735,25 +738,52 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      * @return string HTML table
      */
     public function saved_searches_table($searches, $report) {
-        $tableheader = array(get_string('name', 'totara_reportbuilder'),
-                             get_string('publicsearch', 'totara_reportbuilder'),
-                             get_string('options', 'totara_reportbuilder'));
+        global $OUTPUT;
+
+        $tableheader = array(
+            get_string('name', 'totara_reportbuilder'),
+            get_string('availability', 'totara_reportbuilder'),
+            get_string('defaultview', 'totara_reportbuilder'),
+            get_string('options', 'totara_reportbuilder')
+        );
         $data = array();
         $stredit = get_string('edit');
         $strdelete = get_string('delete', 'totara_reportbuilder');
 
         foreach ($searches as $search) {
-            $editurl = new moodle_url('/totara/reportbuilder/savedsearches.php',
-                array('id' => $search->reportid, 'action' => 'edit', 'sid' => $search->id));
-            $deleteurl = new moodle_url('/totara/reportbuilder/savedsearches.php',
-                array('id' => $search->reportid, 'action' => 'delete', 'sid' => $search->id));
 
-            $actions = $this->output->action_icon($editurl, new pix_icon('/t/edit', $stredit, 'moodle')) . ' ';
-            $actions .= $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'));
+            // Default view.
+            if ($search->isdefault) {
+                $default = get_string('default', 'totara_reportbuilder');
+            } else {
+                if ($search->cansetreportdefault) {
+                    $makedefaulturl = new moodle_url('/totara/reportbuilder/savedsearches.php',
+                        array('id' => $search->reportid, 'action' => 'makedefault', 'sid' => $search->id));
+
+                    $default = html_writer::link($makedefaulturl, get_string('makedefault', 'totara_reportbuilder'));
+                } else {
+                    $default = '-';
+                }
+            }
+
+            // Actions.
+            if ($search->canedit) {
+                $editurl = new moodle_url('/totara/reportbuilder/savedsearches.php',
+                    array('id' => $search->reportid, 'action' => 'edit', 'sid' => $search->id));
+                $deleteurl = new moodle_url('/totara/reportbuilder/savedsearches.php',
+                    array('id' => $search->reportid, 'action' => 'delete', 'sid' => $search->id));
+
+                $actions = $this->output->action_icon($editurl, new pix_icon('/t/edit', $stredit, 'moodle')) . ' ';
+                $actions .= $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'));
+            } else {
+                $actions = '-';
+            }
 
             $row = array();
-            $row[] = $search->name;
-            $row[] = ($search->ispublic) ? get_string('yes') : get_string('no');
+            $row[] = format_string($search->name);
+            $row[] = ($search->ispublic) ? get_string('shared', 'totara_reportbuilder') :
+                get_string('private', 'totara_reportbuilder');
+            $row[] = $default;
             $row[] = $actions;
             $data[] = $row;
         }
@@ -764,7 +794,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         $table->attributes['class'] = 'fullwidth generaltable';
         $table->data = $data;
 
-        return html_writer::table($table);
+        return $OUTPUT->render($table);
     }
 
     /**

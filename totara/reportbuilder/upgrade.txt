@@ -16,6 +16,14 @@ information provided here is intended especially for developers.
 * Deprecated rb_base_source::language_code_to_name instead use totara_core\helper::language_code_to_name
 * Deprecated reportbuilder::get_counted_recordset_sql, this method was private and should not have been used outside
   of this class. The methods get_data_for_table() and get_data() replace it.
+* totara_reportbuilder_renderer::save_button() has been deprecated. The save search button is now being handled via
+  totara_reportbuilder_renderer::display_search().
+* reportbuilder::display_saved_search_options() no longer returns the html instead calling moodleform::display for the
+  display of the saved search options.
+* Deprecated reportbuilder::view_saved_menu(). Use reportbuilder::display_saved_search_options()
+* totara_reportbuilder_renderer::saved_searches_table() has been updated to also display the report saved search default.
+* reportbuilder::get_saved_searches() first argument is no longer used. Functionality has not changed.
+* reportbuilder::get_saved_searches() second argument is no longer used. Functionality has not changed.
 
 === 12.0 ===
 

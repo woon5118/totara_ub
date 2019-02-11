@@ -103,6 +103,8 @@ final class saved_search_private extends item {
             $transaction->allow_commit();
         }
 
+        $DB->delete_records('report_builder_saved_user_default', ['userid' => $user->id]);
+
         return self::RESULT_STATUS_SUCCESS;
     }
 

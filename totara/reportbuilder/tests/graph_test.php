@@ -256,6 +256,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);
         $this->add_column($report, 'user', 'timecreated', 'dayyear', null, null, 0);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $column = $report->columns['user-timecreated'];
         $this->assertTrue($column->is_graphable($report));
@@ -282,12 +283,14 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         // Removal of empty series.
 
         $rid = $this->create_report('user', 'Test user report 3');
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'username', null, null, null, 0);
         $this->add_column($report, 'user', 'timecreated', 'dayyear', null, null, 0);
         $this->add_column($report, 'statistics', 'coursescompleted', null, null, null, 0);
         $this->add_column($report, 'statistics', 'coursesstarted', null, null, null, 0);
+        $config = (new rb_config())->set_nocache(true);
         $report = reportbuilder::create($rid, $config);
         $column = $report->columns['user-timecreated'];
         $this->assertTrue($column->is_graphable($report));

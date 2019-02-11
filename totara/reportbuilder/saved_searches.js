@@ -59,8 +59,7 @@ M.totara_reportbuilder_savedsearches = M.totara_reportbuilder_savedsearches || {
                     // Ask for the elements of the select sid. If none. remove the view saved search option.
                     // And the manage button.
                     if ($('select[name=sid] option').length == 1) { // 1 because of the Choose option.
-                        $('#rb-search-menu').remove();
-                        $('#manage-saved-search-button').remove();
+                        $('#totara_reportbuilder_viewsavedsearch').remove();
                     }
                 }
             });
@@ -70,7 +69,7 @@ M.totara_reportbuilder_savedsearches = M.totara_reportbuilder_savedsearches || {
                 var form = this;
                 var action = $(":hidden[name=action]", form).val();
 
-                // Deleting is confirmed, so remove the search from the drop-down list.
+                // Editing is confirmed, so update the search from the drop-down list.
                 if (action == 'edit') {
                     var idsearch = $(":hidden[name=sid]", form).val();
                     var searchname = $("#id_name", form).val();
@@ -79,19 +78,19 @@ M.totara_reportbuilder_savedsearches = M.totara_reportbuilder_savedsearches || {
             });
         }
 
-        var managebutton = $('input[name=rb_manage_search]');
-
-        if (typeof managebutton.attr('id') != 'undefined') {
+        // The manage searches link.
+        $('#totara_reportbuilder_manageseacheslink').on("click", function (e) {
             var path = M.cfg.wwwroot + '/totara/reportbuilder/';
             var handler = new totaraDialog_saved_search_handler();
             var name = 'searchlist';
-            var id = managebutton.attr('id').substr('show-searchlist-dialog-'.length);
+            var id = e.target.getAttribute('data-id');
+
             var buttons = {};
             buttons[M.util.get_string('close', 'form')] = function() { handler._cancel() };
 
             totaraDialogs[name] = new totaraDialog(
                 name,
-                'show-' + name + '-dialog-' + id,
+                'totara_reportbuilder_manageseacheslink',
                 {
                     buttons: buttons,
                     title: '<h2>' + M.util.get_string('managesavedsearches', 'totara_reportbuilder') + '</h2>'
@@ -99,6 +98,44 @@ M.totara_reportbuilder_savedsearches = M.totara_reportbuilder_savedsearches || {
                 path + 'savedsearches.php?id=' + id.toString(),
                 handler
             );
-        }
+        });
+
+        // View a saved search.
+        $('#id_sid').on("change", function() {
+            if (this.value) {
+                var url = $('#totara_reportbuilder_viewsavedsearch').attr("action");
+                var breakchar = (url.match(/\?/)) ? '&' : '?';
+                window.location.href = url + breakchar + 'sid=' + this.value;
+            }
+        });
+
+        // Set saved search as default.
+        var savedsearchdefault = $('#id_sdefault');
+        savedsearchdefault.on("change", function() {
+            require(['core/ajax', 'core/notification'], function(ajax, notification) {
+                var request = {
+                    methodname: 'totara_reportbuilder_set_default_search',
+                    args: {
+                        reportid: args['rb_reportid'],
+                        sid: document.getElementById('id_sid').value,
+                        setdefault: savedsearchdefault.is(':checked')
+                    }
+                };
+
+                ajax.call([request])[0]
+                    .done(function(result) {
+                        if (result['warnings'].length != 0) {
+                            notification.exception(result['warnings'][0]);
+                        } else {
+                            // Update saved search select showing default if set.
+                            var savedsearches = result['savedsearches'];
+                            for (var search in savedsearches) {
+                                $('select[name=sid] option[value=' + savedsearches[search]['sid'] + ']').text(savedsearches[search]['name']);
+                            }
+                        }
+                    })
+                    .fail(notification.exception);
+            });
+        });
     }
 }

@@ -182,4 +182,13 @@ class rb_completionimport_course_embedded extends rb_base_embedded {
         $context = context_system::instance();
         return has_capability('totara/completionimport:import', $context, $reportfor);
     }
+
+    /**
+     * Can searches be saved?
+     *
+     * @return bool
+     */
+    public static function is_search_saving_allowed() : bool {
+        return false;
+    }
 }

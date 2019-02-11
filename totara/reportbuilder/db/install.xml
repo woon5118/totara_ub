@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="totara/reportbuilder/db" VERSION="20170630" COMMENT="XMLDB file for Report Builder Totara module"
+<XMLDB PATH="totara/reportbuilder/db" VERSION="20190205" COMMENT="XMLDB file for Report Builder Totara module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -120,7 +120,8 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User who saved the search"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="A name describing the saved search"/>
         <FIELD NAME="search" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialized data containing the search details"/>
-        <FIELD NAME="ispublic" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If none zero, the saved search is visible to all users, not just the creator"/>
+        <FIELD NAME="ispublic" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If none zero, the saved search is visible to all users, not just the creator"/>
+        <FIELD NAME="isdefault" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If none zero, the saved search is the default for the report"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="udpated when saved changes"/>
       </FIELDS>
       <KEYS>
@@ -131,6 +132,22 @@
       <INDEXES>
         <INDEX NAME="reportid" UNIQUE="false" FIELDS="reportid" COMMENT="Index on reportid field"/>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" COMMENT="Index on the userid field"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="report_builder_saved_user_default" COMMENT="Stores the default search to be used for a user">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="reportid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="savedid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="reportid" UNIQUE="false" FIELDS="reportid"/>
+        <INDEX NAME="userid_reportid" UNIQUE="true" FIELDS="userid, reportid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="report_builder_schedule" COMMENT="Storing details of scheduled reports">

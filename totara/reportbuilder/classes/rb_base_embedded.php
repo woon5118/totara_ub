@@ -85,6 +85,15 @@ class rb_base_embedded {
     }
 
     /**
+     * Can searches be saved?
+     *
+     * @return bool
+     */
+    public static function is_search_saving_allowed() : bool {
+        return true;
+    }
+
+    /**
      * Is this embedded report usable?
      *
      * If true returned the report is not displayed in the list of all embedded reports.

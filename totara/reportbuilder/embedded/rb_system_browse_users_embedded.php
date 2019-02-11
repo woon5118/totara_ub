@@ -117,4 +117,13 @@ class rb_system_browse_users_embedded extends rb_base_embedded {
     public function embedded_global_restrictions_supported() {
         return true;
     }
+
+    /**
+     * Can searches be saved?
+     *
+     * @return bool
+     */
+    public static function is_search_saving_allowed() : bool {
+        return false;
+    }
 }

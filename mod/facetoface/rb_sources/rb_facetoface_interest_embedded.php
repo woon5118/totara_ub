@@ -105,4 +105,13 @@ class rb_facetoface_interest_embedded extends rb_base_embedded {
             return true;
         }
     }
+
+    /**
+     * Can searches be saved?
+     *
+     * @return bool
+     */
+    public static function is_search_saving_allowed() : bool {
+        return false;
+    }
 }

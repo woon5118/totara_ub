@@ -38,7 +38,7 @@ class totara_reportbuilder_userdata_saved_search_public_test extends advanced_te
 
     /**
      * Generate data for purge, export, and count test
-     * It generates: 2 users, 1 report, 2 private searches (1 per user), 2 public searches (1 per user),
+     * It generates: 2 users, 1 report, 2 private searches (1 per user), 2 public searches (1 per user), 2 default searches (1 per user)
      * 4 scheduled reports (1 per search), each scheduled report has 1 audience, 1 sys user, 1 external
      * @return array generated data
      */
@@ -62,11 +62,14 @@ class totara_reportbuilder_userdata_saved_search_public_test extends advanced_te
             'source' => 'user', 'hidden'=>1, 'embedded' => 1];
         $report->id = $DB->insert_record('report_builder', $report);
 
-        // Saved searches (2 private + 2 public).
+        // Saved searches (2 private + 2 public) and set one as default for each user.
         $userpubsearch = $rbgen->create_saved_search($report, $user, ['name'=>'Saved 1.1', 'ispublic' => 1]);
         $userprivsearch = $rbgen->create_saved_search($report, $user, ['name'=>'Saved 1.2', 'ispublic' => 0]);
+        $userdefaultsearch = $rbgen->create_saved_search_user_default($report, $user, $userprivsearch);
+
         $otheruserpubsearch = $rbgen->create_saved_search($report, $otheruser, ['name'=>'Saved 2.1', 'ispublic' => 1]);
         $otheruserprivsearch = $rbgen->create_saved_search($report, $otheruser, ['name'=>'Saved 2.2', 'ispublic' => 0]);
+        $otheruserdefaultsearch = $rbgen->create_saved_search_user_default($report, $otheruser, $otheruserprivsearch);
 
         // Scheduled reports.
         $userpubsched = $rbgen->create_scheduled_report($report, $user, ['savedsearch' => $userpubsearch]);
@@ -86,8 +89,10 @@ class totara_reportbuilder_userdata_saved_search_public_test extends advanced_te
             'report' => $report,
             'userpublicsearch' => $userpubsearch,
             'userprivatesearch' => $userprivsearch,
+            'userdefaultsearch' => $userdefaultsearch,
             'otheruserpublicsearch' => $otheruserpubsearch,
             'otheruserprivatesearch' => $otheruserprivsearch,
+            'otheruserdefaultsearch' => $otheruserdefaultsearch,
             'userpublicsched' => $userpubsched,
             'userprivatesched' => $userprivsched,
             'otheruserpublicsched' => $otheruserpubsched,
@@ -122,11 +127,14 @@ class totara_reportbuilder_userdata_saved_search_public_test extends advanced_te
 
         // Confirm
         $this->assertCount(2, $DB->get_records('report_builder_saved', ['userid' => $seed->otheruser->id]));
+        $this->assertCount(1, $DB->get_records('report_builder_saved_user_default', ['userid' => $seed->otheruser->id]));
 
         $usersaved = $DB->get_record('report_builder_saved', ['userid' => $seed->user->id], '*', MUST_EXIST);
         $this->assertEquals(0, $usersaved->ispublic);
         $this->assertEquals('Saved 1.2', $usersaved->name);
         $this->assertEquals($seed->userprivatesearch, $usersaved);
+
+        $this->assertCount(0, $DB->get_records('report_builder_saved_user_default', ['userid' => $seed->user->id]));
 
         $this->assertCount(2, $DB->get_records('report_builder_schedule', ['userid' => $seed->otheruser->id]));
 

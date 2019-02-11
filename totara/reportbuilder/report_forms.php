@@ -38,7 +38,7 @@ if (!defined('MOODLE_INTERNAL')) {
  */
 class report_builder_new_form extends moodleform {
 
-    function definition() {
+    public function definition() {
 
         $mform =& $this->_form;
 
@@ -1262,23 +1262,35 @@ function validate_unique_filters($data) {
 class report_builder_save_form extends moodleform {
     function definition() {
         $mform = $this->_form;
-        $report = $this->_customdata['report'];
         $data = $this->_customdata['data'];
-
-        $filterparams = $report->get_restriction_descriptions('filter');
-        $params = implode(html_writer::empty_tag('br'), $filterparams);
 
         if ($data->sid) {
             $mform->addElement('header', 'savesearch', get_string('editingsavedsearch', 'totara_reportbuilder'));
         } else {
             $mform->addElement('header', 'savesearch', get_string('createasavedsearch', 'totara_reportbuilder'));
         }
-        $mform->addElement('static', 'description', '', get_string('savedsearchdesc', 'totara_reportbuilder'));
-        $mform->addElement('static', 'params', get_string('currentsearchparams', 'totara_reportbuilder'), $params);
         $mform->addElement('text', 'name', get_string('searchname', 'totara_reportbuilder'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', get_string('missingsearchname', 'totara_reportbuilder'), 'required', null, 'server');
-        $mform->addElement('advcheckbox', 'ispublic', get_string('publicallyavailable', 'totara_reportbuilder'), '', null, array(0, 1));
+
+        // Availability.
+        $radiogroup = array();
+        $radiogroup[] =& $mform->createElement('radio', 'ispublic', '',
+            get_string('private', 'totara_reportbuilder'), '0');
+        $radiogroup[] =& $mform->createElement('radio', 'ispublic', '',
+            get_string('shared', 'totara_reportbuilder'), '1');
+        $mform->addGroup($radiogroup, 'ispublic',
+            get_string('availability', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
+        $mform->setDefault('ispublic', 'private');
+        $mform->addHelpButton('ispublic', 'availability', 'totara_reportbuilder');
+
+        // Include the set as default view option to report managers only.
+        if (has_capability('totara/reportbuilder:managereports', context_system::instance())) {
+            $mform->addElement('advcheckbox', 'isdefault', get_string('defaultview', 'totara_reportbuilder'), '', null, array(0, 1));
+            $mform->addHelpButton('isdefault', 'defaultview', 'totara_reportbuilder');
+            $mform->disabledIf('isdefault', 'ispublic', 'eq', '0');
+        }
+
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'sid');
@@ -1295,6 +1307,7 @@ class report_builder_standard_search_form extends moodleform {
     function definition() {
         $mform =& $this->_form;
         $fields = $this->_customdata['fields'];
+        $cansave = $this->_customdata['cansave'];
 
         $mform->disable_form_change_checker();
 
@@ -1311,6 +1324,14 @@ class report_builder_standard_search_form extends moodleform {
             $submitgroup[] =& $mform->createElement('submit', 'clearstandardfilters',
                     get_string('clearform', 'totara_reportbuilder'));
             $mform->addGroup($submitgroup, 'submitgroupstandard', '&nbsp;', ' &nbsp; ');
+
+            if ($cansave) {
+                // Save search button.
+                $submitgroup = array();
+                $submitgroup[] =& $mform->createElement('submit', 'savesearch',
+                    get_string('savesearch', 'totara_reportbuilder'));
+                $mform->addGroup($submitgroup, 'submitgroupstandard', '&nbsp;', ' &nbsp; ');
+            }
         }
     }
 
@@ -1325,6 +1346,46 @@ class report_builder_standard_search_form extends moodleform {
                 }
             }
         }
+    }
+}
+
+class report_builder_standard_saved_search_form extends moodleform {
+    function definition() {
+        $mform =& $this->_form;
+        $report = $this->_customdata['report'];
+        $savedoptions = $this->_customdata['savedoptions'];
+        $id = $this->_customdata['id'];
+        $sid = $this->_customdata['sid'];
+        $userdefault = $this->_customdata['sdefault'];
+
+        $mform->disable_form_change_checker();
+
+        $mform->addElement('header', 'newfilterstandard', get_string('savedsearches', 'totara_reportbuilder'));
+
+        // Select a saved search.
+        $submitgroup = array();
+        $submitgroup[] =& $mform->createElement('select', 'sid', '', $savedoptions);
+        $submitgroup[] =& $mform->createElement('checkbox', 'sdefault', null,
+            get_string('setasyourdefaultview', 'totara_reportbuilder'));
+        $mform->addGroup($submitgroup, null, get_string('viewsavedsearch', 'totara_reportbuilder'), ' &nbsp; ');
+
+
+        // Set the defaults.
+        if (!empty($sid) || $report->using_default_saved_search()) {
+            $select_default = empty($sid) ? $userdefault : $sid;
+            $mform->setDefault('sid', $select_default);
+
+            $checkbox_default = !empty($select_default) && $select_default == $userdefault ? true : false;
+            $mform->setDefault('sdefault', $checkbox_default);
+        }
+
+        $mform->disabledIf('sdefault', 'sid', 'eq', '');
+
+        // Manage searches link.
+        $html = html_writer::link('#', get_string('manageyoursavedsearches', 'totara_reportbuilder'),
+            array('id' => 'totara_reportbuilder_manageseacheslink', 'data-id' => $id));
+
+        $mform->addElement('static', 'managesearch', null, $html);
     }
 }
 

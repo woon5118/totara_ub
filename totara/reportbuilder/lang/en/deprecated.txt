@@ -35,3 +35,7 @@ reportbuildergrouptag_help,totara_reportbuilder
 reportcount,totara_reportbuilder
 refreshdataforthisgroup,totara_reportbuilder
 resultsfromfeedback,totara_reportbuilder
+currentsearchparams,totara_reportbuilder
+publicallyavailable,totara_reportbuilder
+savedsearchdesc,totara_reportbuilder
+publicsearch,totara_reportbuilder

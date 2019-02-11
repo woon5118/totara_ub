@@ -46,6 +46,9 @@ $action = optional_param('action', 'show', PARAM_ALPHANUMEXT); // Action to be e
 $confirm = optional_param('confirm', false, PARAM_BOOL); // Confirm delete.
 $returnurl = new moodle_url('/totara/reportbuilder/savedsearches.php', array('id' => $id));;
 
+// Manage reports capability.
+$mrcapability = has_capability('totara/reportbuilder:managereports', context_system::instance());
+
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/totara/reportbuilder/savedsearches.php', array('id' => $id, 'sid' => $sid));
 $PAGE->set_totara_menu_selected('\totara_core\totara\menu\myreports');
@@ -57,8 +60,15 @@ $report = reportbuilder::create($id, $config);
 
 // Get info about the saved search we are dealing with.
 if ($sid) {
-    $conditions = array('id' => $sid, 'reportid' => $id, 'userid' => $USER->id);
-    $search = $DB->get_record('report_builder_saved', $conditions, '*');
+    if ($mrcapability) {
+        // With the managereports capability the user can manage their own and all shared searches.
+        $sql = "id = :id AND reportid = :reportid AND (userid = :userid OR ispublic = 1)";
+    } else {
+        // The user can only manage their own searches.
+        $sql = "id = :id AND reportid = :reportid AND userid = :userid";
+    }
+    $params = array('id' => $sid, 'reportid' => $id, 'userid' => $USER->id);
+    $search = $DB->get_record_select('report_builder_saved', $sql, $params);
     if (!$search) {
         print_error('error:invalidsavedsearchid', 'totara_reportbuilder');
     }
@@ -84,6 +94,7 @@ if ($action === 'delete') {
         $DB->delete_records_select('report_builder_schedule_email_external', $select, array($sid));
         $DB->delete_records('report_builder_schedule', array('savedsearchid' => $sid));
         $DB->delete_records('report_builder_saved', array('id' => $sid));
+        $DB->delete_records('report_builder_saved_user_default', array('savedid' => $sid));
         $transaction->allow_commit();
         redirect($returnurl);
     }
@@ -120,13 +131,23 @@ if ($action === 'edit') {
     $data->id = $data->reportid;
     $data->action = 'edit';
 
-    $mform = new report_builder_save_form(null, array('report' => $report, 'data' => $data));
+    $mform = new report_builder_save_form(null, array('data' => $data), 'post', '', array('class' => 'dialog-nobind'));
 
     if ($data = $mform->get_data()) {
+
+        // Setting as report default.
+        $isdefault = $mrcapability && $data->ispublic && $data->isdefault ? true : false;
+
+        // If setting as default, remove any previous default.
+        if ($isdefault && !$search->isdefault) {
+            $DB->set_field('report_builder_saved', 'isdefault', 0, array('reportid' => $search->reportid));
+        }
+
         $todb = new stdClass();
         $todb->id = $data->sid;
         $todb->name = $data->name;
         $todb->ispublic = $data->ispublic;
+        $todb->isdefault = $isdefault;
         $todb->timemodified = time();
         $DB->update_record('report_builder_saved', $todb);
         redirect($returnurl);
@@ -134,14 +155,38 @@ if ($action === 'edit') {
 
     echo $output->heading(get_string('savedsearches', 'totara_reportbuilder'), 1);
     $mform->display();
+    echo $PAGE->requires->get_end_code(false);
     die;
+}
+
+if ($action === 'makedefault') {
+    if (!$sid) {
+        redirect($returnurl);
+    }
+
+    $transaction = $DB->start_delegated_transaction();
+    $DB->set_field('report_builder_saved', 'isdefault', 0, array('reportid' => $id));
+    $DB->set_field('report_builder_saved', 'isdefault', 1, array('id' => $sid));
+
+    $transaction->allow_commit();
 }
 
 // Show users searches.
 echo $output->heading(get_string('savedsearches', 'totara_reportbuilder'), 1);
 
-$searches = $DB->get_records('report_builder_saved', array('userid' => $USER->id, 'reportid' => $id));
+// Get all searches the user has availability to.
+$sql = "reportid = :reportid AND (userid = :userid OR ispublic = 1)";
+$params = array('userid' => $USER->id, 'reportid' => $id);
+$searches = $DB->get_records_select('report_builder_saved', $sql, $params);
+
 if (!empty($searches)) {
+    foreach ($searches as $key => $search) {
+        // Can the user edit/delete the saved search.
+        $searches[$key]->canedit = ($mrcapability || $search->userid == $USER->id);
+        // Can the user set the report default.
+        $searches[$key]->cansetreportdefault = ($mrcapability && $search->ispublic);
+    }
+
     echo $output->saved_searches_table($searches, $report);
 } else {
     echo html_writer::tag('p', get_string('error:nosavedsearches', 'totara_reportbuilder'));

@@ -111,4 +111,13 @@ class rb_catalogprograms_embedded extends rb_base_embedded {
 
         return false;
     }
+
+    /**
+     * Can searches be saved?
+     *
+     * @return bool
+     */
+    public static function is_search_saving_allowed() : bool {
+        return false;
+    }
 }

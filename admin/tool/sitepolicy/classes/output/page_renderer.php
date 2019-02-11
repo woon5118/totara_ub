@@ -230,11 +230,11 @@ class page_renderer extends \plugin_renderer_base {
         $html .= $debughtml;
 
         ob_start();
+        // Print saved search options and filters.
+        $report->display_saved_search_options();
         $report->display_search();
         $report->display_sidebar_search();
         $html .= ob_get_clean();
-
-        $html .= $report->display_saved_search_options();
 
         $html .= $tablehtml;
 

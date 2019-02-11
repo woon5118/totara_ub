@@ -121,11 +121,10 @@ if (empty($report->description)) {
 
 echo $output->print_description($report->description, $report->_id);
 
+// Print saved search options and filters.
+$report->display_saved_search_options();
 $report->display_search();
 $report->display_sidebar_search();
-
-// Print saved search buttons if appropriate.
-echo $report->display_saved_search_options();
 
 $PAGE->requires->string_for_js('reviewitems', 'block_totara_alerts');
 $PAGE->requires->js_init_call('M.totara_message.dismiss_input_toggle');

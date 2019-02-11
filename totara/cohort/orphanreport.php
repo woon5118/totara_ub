@@ -70,11 +70,10 @@ $report->display_restrictions();
 echo $OUTPUT->heading(get_string('orphanedusers', 'totara_cohort'));
 echo $OUTPUT->container(get_string('orphanhelptext', 'totara_cohort'));
 
+// Print saved search options and filters.
+$report->display_saved_search_options();
 $report->display_search();
 $report->display_sidebar_search();
-
-// Print saved search buttons if appropriate.
-echo $report->display_saved_search_options();
 
 echo $reporthtml;
 $output->export_select($report, $sid);

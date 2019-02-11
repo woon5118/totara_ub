@@ -85,9 +85,7 @@ Feature: Verify the User System Role filter.
 
     When I press "Save this search"
     Then I should see "Create a saved search"
-    And I should see "No role selected"
-
-    When I set the field "Search Name" to "No role selected"
+    And I set the field "Search Name" to "No role selected"
     And I press "Save changes"
     Then I should see "My User Report: 7 records shown"
     And I should see "No role selected" in the "sid" "select"
@@ -115,9 +113,7 @@ Feature: Verify the User System Role filter.
 
     When I press "Save this search"
     Then I should see "Create a saved search"
-    And I should see "Assigned any role"
-
-    When I set the field "Search Name" to "Assigned any role"
+    And I set the field "Search Name" to "Assigned any role"
     And I press "Save changes"
     Then I should see "My User Report: 4 records shown"
     And I should see "Assigned any role" in the "sid" "select"
@@ -139,9 +135,7 @@ Feature: Verify the User System Role filter.
 
     When I press "Save this search"
     Then I should see "Create a saved search"
-    And I should see "Not assigned any role"
-
-    When I set the field "Search Name" to "Not assigned any role"
+    And I set the field "Search Name" to "Not assigned any role"
     And I press "Save changes"
     Then I should see "My User Report: 3 records shown"
     And I should see "Not assigned any role" in the "sid" "select"
@@ -202,9 +196,7 @@ Feature: Verify the User System Role filter.
 
     When I press "Save this search"
     Then I should see "Create a saved search"
-    And I should see "Assigned role 'Staff Manager'"
-
-    When I set the field "Search Name" to "Assigned role 'Staff Manager'"
+    And I set the field "Search Name" to "Assigned role 'Staff Manager'"
     And I press "Save changes"
     Then I should see "My User Report: 2 records shown"
     And I should see "Assigned role 'Staff Manager'" in the "sid" "select"
@@ -265,9 +257,7 @@ Feature: Verify the User System Role filter.
 
     When I press "Save this search"
     Then I should see "Create a saved search"
-    And I should see "Not assigned role 'Staff Manager'"
-
-    When I set the field "Search Name" to "Not assigned role 'Staff Manager'"
+    And I set the field "Search Name" to "Not assigned role 'Staff Manager'"
     And I press "Save changes"
     Then I should see "My User Report: 5 records shown"
     And I should see "Not assigned role 'Staff Manager'" in the "sid" "select"

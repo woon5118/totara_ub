@@ -57,6 +57,7 @@ class totara_reportbuilder_ignore_report_testcase extends advanced_testcase {
         $this->setUser($user);
 
         $rid = $this->create_report('user', 'Test user report 2');
+        $config = (new rb_config())->set_nocache(true);
         $report2 = reportbuilder::create($rid, $config);
         $this->add_column($report2, 'user', 'id', null, null, null, 0);
         $this->add_column($report2, 'user', 'username', null, null, null, 0);
@@ -66,6 +67,7 @@ class totara_reportbuilder_ignore_report_testcase extends advanced_testcase {
         $this->assertCount(2, $reports);
 
         $rid = $this->create_report('opensesame', 'Ignored 2');
+        $config = (new rb_config())->set_nocache(true);
         $report3 = reportbuilder::create($rid, $config);
         $this->add_column($report3, 'opensesame', 'title', null, null, null, 0);
         $this->add_column($report3, 'opensesame', 'visible', null, null, null, 0);

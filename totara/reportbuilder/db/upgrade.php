@@ -398,5 +398,60 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019021300, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2019031300) {
+        // Define table report_builder_saved_user_default to be created.
+        $table = new xmldb_table('report_builder_saved_user_default');
+
+        // Adding fields to table report_builder_saved_user_default.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('reportid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('savedid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table report_builder_saved_user_default.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table report_builder_saved_user_default.
+        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+        $table->add_index('reportid', XMLDB_INDEX_NOTUNIQUE, array('reportid'));
+        $table->add_index('userid_reportid', XMLDB_INDEX_UNIQUE, array('userid', 'reportid'));
+
+        // Conditionally launch create table for report_builder_saved_user_default.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2019031300, 'totara', 'reportbuilder');
+    }
+
+    if ($oldversion < 2019031301) {
+        // Define field isdefault to be added to report_builder_saved.
+        $table = new xmldb_table('report_builder_saved');
+        $field = new xmldb_field('isdefault', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'ispublic');
+
+        // Conditionally launch add field isdefault.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2019031301, 'totara', 'reportbuilder');
+    }
+
+    if ($oldversion < 2019031302) {
+        // Define field ispublic to be changed to precision 1.
+        $table = new xmldb_table('report_builder_saved');
+        $field = new xmldb_field('ispublic', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+        // Conditionally launch to change field ispublic.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_precision($table, $field);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2019031302, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

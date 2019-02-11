@@ -71,9 +71,8 @@ Feature: Report builder table block
     # "Search" button ambigous with "Search by" form section
     And I press "id_submitgroupstandard_addfilter"
     And I press "Save this search"
-    And I set the following fields to these values:
-      | Search Name          | LearnerSearch |
-      | Let other users view | 1             |
+    And I set the field "Search Name" to "LearnerSearch"
+    And I click on "Shared" "radio"
     And I press "Save changes"
 
     # Add and configure block with sid
@@ -136,9 +135,8 @@ Feature: Report builder table block
   # "Search" button ambigous with "Search by" form section
     And I press "id_toolbarsearchbutton"
     And I press "Save this search"
-    And I set the following fields to these values:
-      | Search Name          | LearnerFilter |
-      | Let other users view | 1             |
+    And I set the field "Search Name" to "LearnerFilter"
+    And I click on "Shared" "radio"
     And I press "Save changes"
 
   # Add and configure block with sid
@@ -221,9 +219,8 @@ Feature: Report builder table block
     # "Search" button ambigous with "Search by" form section
     And I press "id_submitgroupstandard_addfilter"
     And I press "Save this search"
-    And I set the following fields to these values:
-      | Search Name          | LearnerSearch |
-      | Let other users view | 1             |
+    And I set the field "Search Name" to "LearnerSearch"
+    And I click on "Shared" "radio"
     And I press "Save changes"
     # Create block with it
     And I click on "Dashboard" in the totara menu
@@ -240,10 +237,9 @@ Feature: Report builder table block
     # Make this saved search non-public
     And I click on "Reports" in the totara menu
     And I click on "User report" "link"
-    And I press "Manage searches"
+    And I follow "Manage your saved searches"
     And I click on "Edit" "link" in the "LearnerSearch" "table_row"
-    And I set the following fields to these values:
-      | Let other users view | 0 |
+    And I click on "Private" "radio"
     And I press "Save changes"
     And I press "Close"
     # Confirm that block report is not shown

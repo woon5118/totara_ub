@@ -212,6 +212,27 @@ class totara_reportbuilder_generator extends component_generator_base {
     }
 
     /**
+     * Set a saved search as a user default
+     *
+     * @param stdClass $report
+     * @param stdClass $user
+     * @param stdClass $search
+     * @return stdClass The report_builder_saved_user_default record
+     */
+    public function create_saved_search_user_default(stdClass $report, stdClass $user, stdClass $search) {
+        global $DB;
+
+        $default = new stdClass();
+        $default->userid = $user->id;
+        $default->reportid = $report->id;
+        $default->savedid = $search->id;
+        $default->id = $DB->insert_record('report_builder_saved_user_default', $default);
+        $default = $DB->get_record('report_builder_saved_user_default', array('id' => $default->id));
+
+        return $default;
+    }
+
+    /**
      * Generate scheduled report
      * @param stdClass $report Generated report
      * @param stdClass $user Generated user who scheduled report

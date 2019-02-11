@@ -89,11 +89,11 @@ echo $renderer->print_description($report->description, $report->_id);
 
 $report->include_js();
 
+// Print saved search options and filters.
+$report->display_saved_search_options();
 $report->display_search();
 $report->display_sidebar_search();
 
-// Print saved search buttons if appropriate.
-echo $report->display_saved_search_options();
 echo $renderer->showhide_button($report->_id, $report->shortname);
 echo $reporthtml;
 

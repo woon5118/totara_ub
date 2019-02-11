@@ -60,10 +60,10 @@ $strheading = get_string('reportpending', 'auth_approved');
 $heading = $strheading . ': ' . $output->result_count_info($report);
 echo $output->heading($heading);
 
+// Print saved search options and filters.
+$report->display_saved_search_options();
 $report->display_search();
 $report->display_sidebar_search();
-
-echo $report->display_saved_search_options();
 
 echo $reporthtml;
 

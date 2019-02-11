@@ -53,10 +53,10 @@ echo $debughtml;
 
 echo $output->heading(get_string('sourcetitle', 'rb_source_userdata_deleted_users') . ': ' . $output->result_count_info($report));
 
+// Print saved search options and filters.
+$report->display_saved_search_options();
 $report->display_search();
 $report->display_sidebar_search();
-
-echo $report->display_saved_search_options();
 
 echo $reporthtml;
 

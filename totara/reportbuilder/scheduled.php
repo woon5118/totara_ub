@@ -106,7 +106,7 @@ $allow_sendtoself = in_array('sendtoself', $allowedscheduledrecipients) && $mysc
 // Clean up.
 unset($allowedscheduledrecipients);
 
-$savedsearches = $report->get_saved_searches($schedule->reportid, $USER->id);
+$savedsearches = $report->get_saved_searches();
 if (!isset($report->src->redirecturl)) {
     $savedsearches[0] = get_string('alldata', 'totara_reportbuilder');
 }

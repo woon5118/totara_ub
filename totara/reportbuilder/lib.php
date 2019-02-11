@@ -177,6 +177,9 @@ class reportbuilder {
 
     public $reportfor, $embedded, $embedobj, $toolbarsearch;
 
+    /** @var  int The users default search */
+    public $userdefaultsearch;
+
     public $hidetoolbar = false;
 
     /**
@@ -438,8 +441,8 @@ class reportbuilder {
         $this->cache = $report->cache;
 
         // Use config settings.
-        $this->_sid = $config->get_sid();
         $this->reportfor = $config->get_reportfor();
+        $this->_sid = empty($config->get_sid()) && !$this->has_searched() ? $this->get_user_default_search() : $config->get_sid();
         $this->cacheignore = $config->get_nocache();
         $this->globalrestrictionset = $config->get_global_restriction_set();
 
@@ -718,6 +721,9 @@ class reportbuilder {
         $jsdetails->strings = array(
             'totara_reportbuilder' => array('managesavedsearches'),
             'form' => array('close')
+        );
+        $jsdetails->args = array(
+            array('rb_reportid' => $this->_id)
         );
         $js[] = $jsdetails;
 
@@ -1712,10 +1718,18 @@ class reportbuilder {
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
         $clearfilters = optional_param('clearfilters', 0, PARAM_INT);
         $mformstandard = new report_builder_standard_search_form(null,
-                array('fields' => $this->get_standard_filters()));
+            array('fields' => $this->get_standard_filters(), 'cansave' => $this->can_save_search()));
         $adddatastandard = $mformstandard->get_data(false);
         // Get submitted data as get_data could result in NUll if validation fails.
         $standardsubmitteddata = $mformstandard->get_submitted_data();
+
+        // Save the search.
+        if (isset($standardsubmitteddata->submitgroupstandard['savesearch'])) {
+            $params = $this->get_current_url_params();
+            $params['id'] = $this->_id;
+            redirect(new moodle_url("/totara/reportbuilder/save.php", $params));
+        }
+
         $clearstandardfilters = $clearfilters || isset($standardsubmitteddata->submitgroupstandard['clearstandardfilters']);
         if ($adddatastandard || $clearstandardfilters) {
             foreach ($this->get_standard_filters() as $field) {
@@ -2236,13 +2250,13 @@ class reportbuilder {
         global $CFG;
 
         $standard_filters = $this->get_standard_filters();
-        if (count($standard_filters) === 0) {
+        if (empty($standard_filters)) {
             return;
         }
 
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
         $mformstandard = new report_builder_standard_search_form($this->get_current_url(),
-                array('fields' => $standard_filters), 'post', '', array('class' => 'rb-search'));
+            array('fields' => $standard_filters, 'cansave' => $this->can_save_search()), 'post', '', array('class' => 'rb-search'));
         // Calling get_data to get the form validated before displaying it, so we can see errors present in the form.
         $mformstandard->get_data();
         $mformstandard->display();
@@ -4951,16 +4965,19 @@ class reportbuilder {
     /**
      * Returns a menu that when selected, takes the user to the specified saved search
      *
+     * @deprecated Since totara 13.0
      * @return string HTML to display a pulldown menu with saved search options
      */
     function view_saved_menu() {
+        debugging('reportbuilder::view_saved_menu has been deprecated since Totara 13.0. The menu is now incorporated within the report form class report_builder_standard_saved_search_form.', DEBUG_DEVELOPER);
+
         global $USER, $OUTPUT;
         $id = $this->_id;
         $sid = $this->_sid;
 
         $common = new moodle_url($this->get_current_url());
 
-        $savedoptions = $this->get_saved_searches($id, $USER->id);
+        $savedoptions = $this->get_saved_searches();
         if (count($savedoptions) > 0) {
             $select = new single_select($common, 'sid', $savedoptions, $sid);
             $select->label = get_string('viewsavedsearch', 'totara_reportbuilder');
@@ -4972,65 +4989,175 @@ class reportbuilder {
     }
 
     /**
-     * Returns an array of available saved seraches for this report and user
-     * @param int $reportid look for saved searches for this report
-     * @param int $userid Check for saved searches belonging to this user
+     * Returns an array of available saved searches for this report and user
+     *
+     * @param int $unused This argument is no longer used as of Totara 13.0
+     * @param int $unused2 This argument is no longer used as of Totara 13.0
      * @return array search id => search name
      */
-    function get_saved_searches($reportid, $userid) {
+    public function get_saved_searches($unused = null, $unused2 = null) {
+        if ($unused !== null) {
+            debugging('The reportbuilder::get_saved_searches() first argument is no longer used, please review your code', DEBUG_DEVELOPER);
+        }
+        if ($unused2 !== null) {
+            debugging('The reportbuilder::get_saved_searches() second argument is no longer used, please review your code', DEBUG_DEVELOPER);
+        }
+
         global $DB;
+
+        $default = $this->get_user_default_search();
         $savedoptions = array();
-        // Are there saved searches for this report and user?
-        $saved = $DB->get_records('report_builder_saved', array('reportid' => $reportid, 'userid' => $userid));
+
+        $sql = "SELECT *
+                  FROM {report_builder_saved}
+                 WHERE reportid = :reportid
+                   AND (userid = :userid OR ispublic = 1)";
+        $params = array('userid' => $this->reportfor, 'reportid' => $this->_id);
+
+        $saved = $DB->get_records_sql($sql, $params);
+
         foreach ($saved as $item) {
-            $savedoptions[$item->id] = format_string($item->name);
+            $name = ($item->id != $default) ? format_string($item->name)
+                : format_string($item->name) . ' (' . get_string('defaultview', 'totara_reportbuilder') . ')';
+
+            $savedoptions[$item->id] = $name;
         }
-        // Are there public saved searches for this report?
-        $saved = $DB->get_records('report_builder_saved', array('reportid' => $reportid, 'ispublic' => 1));
-        foreach ($saved as $item) {
-            $savedoptions[$item->id] = format_string($item->name);
-        }
+
         return $savedoptions;
     }
 
     /**
-     * Diplays a table containing the save search button and pulldown
-     * of existing saved searches (if any)
+     * Can a search be saved?
      *
-     * @return string HTML to display the table
+     * @return bool
+     */
+    public function can_save_search() {
+        global $SESSION;
+
+        // Does the report allow saving?
+        $allowsaving = $this->embedobj ? $this->embedobj->is_search_saving_allowed() : true;
+        if (!$allowsaving) {
+            return false;
+        }
+
+        $search = (isset($SESSION->reportbuilder[$this->get_uniqueid()]) &&
+            !empty($SESSION->reportbuilder[$this->get_uniqueid()])) ? true : false;
+        // If a report has required url params then scheduled reports require a saved search.
+        // This is because the user needs to be able to save the search with no filters defined.
+        $hasrequiredurlparams = isset($this->src->redirecturl);
+
+        return $search || $hasrequiredurlparams;
+    }
+
+    /**
+     * Have user filters been applied?
+     *
+     * @return bool
+     */
+    private function has_searched() {
+        global $SESSION;
+        return isset($SESSION->reportbuilder[$this->_id]);
+    }
+
+    /**
+     * Is the current search the default saved search?
+     *
+     * @return bool
+     */
+    public function using_default_saved_search() {
+        global $DB, $SESSION;
+
+        if ($this->has_searched()) {
+            $default = $this->get_user_default_search();
+
+            if (empty($default)) {
+                return false;
+            }
+
+            $saved = $DB->get_field('report_builder_saved', 'search', array('id' => $default));
+            $current = serialize($SESSION->reportbuilder[$this->_id]);
+
+            if ($saved === $current) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the users default saved search
+     *
+     * @return mixed
+     */
+    public function get_user_default_search() {
+        global $DB;
+
+        if ($this->userdefaultsearch) {
+            return $this->userdefaultsearch;
+        }
+
+        $default = $DB->get_field('report_builder_saved_user_default', 'savedid',
+            array('userid' => $this->reportfor, 'reportid' => $this->_id));
+
+        if ($default === false) {
+            // User has no default, lets see if there's a report default.
+            $default = $DB->get_field('report_builder_saved', 'id',
+                array('reportid' => $this->_id, 'isdefault' => 1, 'ispublic' => 1));
+        }
+
+        $this->userdefaultsearch = $default;
+
+        return $default;
+    }
+
+    /**
+     * Set the users default search
+     *
+     * @param int $default
+     */
+    public function set_user_default_search($default) {
+        $this->userdefaultsearch = $default;
+    }
+
+    /**
+     * Displays saved searches available to the user with option to add searches as a default together with
+     * a link to manage searches
+     *
+     * @return void
      */
     public function display_saved_search_options() {
-        global $PAGE;
+        global $CFG;
+
 
         if (!isloggedin() or isguestuser()) {
             // No saving for guests, sorry.
-            return '';
+            return;
         }
 
-        $output = $PAGE->get_renderer('totara_reportbuilder');
+        $savedoptions = $this->get_saved_searches();
 
-        $savedbutton = $output->save_button($this);
-        $savedmenu = $this->view_saved_menu();
-
-        // no need to print anything
-        if (strlen($savedmenu) == 0 && strlen($savedbutton) == 0) {
-            return '';
+        // No need to print anything if there's no saved searches.
+        if (empty($savedoptions)) {
+            return;
         }
 
-        $controls = html_writer::start_tag('div', array('id' => 'rb-search-controls'));
-
-        if (strlen($savedbutton) != 0) {
-            $controls .= $savedbutton;
-        }
-        if (strlen($savedmenu) != 0) {
-            $managesearchbutton = $output->manage_search_button($this);
-            $controls .= html_writer::tag('div', $savedmenu, array('id' => 'rb-search-menu'));
-            $controls .=  html_writer::tag('div', $managesearchbutton, array('id' => 'manage-saved-search-button'));;
+        // Order saved searches.
+        asort($savedoptions);
+        $sortedoptions = array('' => get_string('choosedots'));
+        foreach ($savedoptions as $k => $v) {
+            $sortedoptions[$k] = $v;
         }
 
-        $controls .= html_writer::end_tag('div');
-        return $controls;
+        // Get the users default search.
+        $sdefault = $this->get_user_default_search();
 
+        require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+        $mformstandard = new report_builder_standard_saved_search_form($this->get_current_url(),
+            array('report' => $this, 'savedoptions' => $sortedoptions, 'id' => $this->_id, 'sid' => $this->_sid, 'sdefault' => $sdefault),
+            'post',
+            '',
+            array('id' => 'totara_reportbuilder_viewsavedsearch', 'class' => 'totara_reportbuilder_savedsearches dialog-nobind'));
+        $mformstandard->display();
     }
 
     /**
@@ -6875,6 +7002,7 @@ function reportbuilder_delete_report($id) {
     $DB->delete_records('report_builder_settings', array('reportid' => $id));
     // Delete any saved searches.
     $DB->delete_records('report_builder_saved', array('reportid' => $id));
+    $DB->delete_records('report_builder_saved_user_default', array('reportid' => $id));
 
     // Delete the report.
     $DB->delete_records('report_builder', array('id' => $id));
