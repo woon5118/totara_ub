@@ -58,16 +58,20 @@ final class seminar_event_list implements \Iterator {
 
     /**
      * Get any seminar events that we need to check for waitlist entries.
+     * @param int $now
      * @return seminar_event_list
      */
-    public static function pending_waitlist_clear() {
+    public static function pending_waitlist_clear(int $now = 0) {
         global $DB;
+        if (empty($now) || $now < 0) {
+            $now = time();
+        }
 
         // SQL that gets all events that have started, but still have at least one waitlisted user.
-        $sql = 'SELECT fs.*, ( SELECT MIN(fsd.timestart)
-                                 FROM {facetoface_sessions_dates} fsd
-                                 WHERE fsd.sessionid = fs.id)
-                    AS mintimestart
+        $sql = 'SELECT DISTINCT fs.*, ( SELECT MIN(fsd.timestart)
+                                          FROM {facetoface_sessions_dates} fsd
+                                         WHERE fsd.sessionid = fs.id
+                                      ) AS mintimestart
                   FROM {facetoface_sessions} fs
                   JOIN {facetoface_sessions_dates} fsd
                     ON fsd.sessionid = fs.id
@@ -82,7 +86,6 @@ final class seminar_event_list implements \Iterator {
                                    AND fst.statuscode = :wcode
                        )';
 
-        $now = time();
         $list = new static();
         $seminarevents = $DB->get_records_sql($sql, ['wcode' => \mod_facetoface\signup\state\waitlisted::get_code()]);
         foreach ($seminarevents as $seminarevent) {
