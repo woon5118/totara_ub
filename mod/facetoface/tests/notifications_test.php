@@ -1559,6 +1559,54 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertCount(2, $emails, 'Wrong booking confirmation for Default test Manager copy is enable and suppressccmanager is disabled.');
     }
 
+    /**
+     * $this->test_booking_confirmation_default() checks that both user and manager receive the signup notification.
+     * This function servers to test the other three possibilities:
+     * - notification to user only;
+     * - notification to manager only;
+     * - notification to neither user, or manager.
+     */
+    public function test_booking_confirmation_not_sent() {
+
+
+        $emailsink = $this->redirectMessages();
+
+        // Only send to user.
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        $new_signup = \mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id));
+        $new_signup->set_skipusernotification(false);
+        $new_signup->set_skipmanagernotification();
+        signup_helper::signup($new_signup);
+        $this->execute_adhoc_tasks();
+        $emails = $emailsink->get_messages();
+        $this->assertCount(1, $emails, 'Incorrect number of notification emails generated for signup.');
+        $emailsink->clear();
+        $new_signup = null;
+
+        // Only send to manager.
+        $new_signup = \mod_facetoface\signup::create($student2->id, new \mod_facetoface\seminar_event($session->id));
+        $new_signup->set_skipusernotification();
+        $new_signup->set_skipmanagernotification(false);
+        signup_helper::signup($new_signup);
+        $this->execute_adhoc_tasks();
+        $emails = $emailsink->get_messages();
+        $this->assertCount(1, $emails, 'Incorrect number of notification emails generated for signup.');
+        $emailsink->clear();
+        $new_signup = null;
+
+        // Send to neither user, nor manager.
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        $new_signup = \mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id));
+        $new_signup->set_skipusernotification();
+        $new_signup->set_skipmanagernotification();
+        signup_helper::signup($new_signup);
+        $this->execute_adhoc_tasks();
+        $emails = $emailsink->get_messages();
+        $this->assertCount(0, $emails, 'Incorrect number of notification emails generated for signup.');
+
+        $emailsink->close();
+    }
+
     public function test_booking_confirmation_suppress_ccmanager() {
 
         // Test Manager copy is enable and suppressccmanager is enabled(do not send a copy to manager).

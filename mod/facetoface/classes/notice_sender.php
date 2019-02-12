@@ -327,6 +327,7 @@ class notice_sender {
         if ($signup->get_skipmanagernotification()) {
             $facetoface->ccmanager = 0;
             $skipnotifymanager = true;
+            $session->notifymanager = false;
         }
 
         // When the notify user and manager options are disabled, then it is not sending any notification to anyone at all

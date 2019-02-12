@@ -1386,6 +1386,16 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
         return 'userdoesnotexist';
     }
 
+    // If checkbox option is not present here then it means, perversely, that it was checked on the confirmation form.
+    // This matters when we arrive here via adhoc task running in cron.
+    if (!isset($session->notifyuser)) {
+        $session->notifyuser = true;
+    }
+
+    if (!isset($session->notifymanager)) {
+        $session->notifymanager = true;
+    }
+
     // Make it not fail if more then one notification found. Just use one.
     // Other option is to change data_object, but so far it's facetoface issue that we hope to fix soon and remove workaround
     // code from here.
@@ -1415,10 +1425,6 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
     }
     $notice->set_facetoface($facetoface);
 
-    if (!isset($session->notifyuser)) {
-        $session->notifyuser = true;
-    }
-
     $notice->set_newevent($user, $session->id, null, $fromuser);
     $icaldata = [];
     if ((int)$icalattachmenttype == MDL_F2F_BOTH && $notice->conditiontype != MDL_F2F_CONDITION_DECLINE_CONFIRMATION) {
@@ -1433,7 +1439,9 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
     if ($session->notifyuser) {
         $notice->send_to_user($user, $session->id, null, $icaldata);
     }
-    $notice->send_to_manager($user, $session->id);
+    if ($session->notifymanager) {
+        $notice->send_to_manager($user, $session->id);
+    }
     $notice->send_to_thirdparty($user, $session->id);
     $notice->send_to_roleapprovers_adhoc($user, $session->id);
     $notice->send_to_adminapprovers_adhoc($user, $session->id);
@@ -1466,10 +1474,6 @@ function facetoface_send_oneperday_notice($facetoface, $session, $userid, $param
     $user = $DB->get_record('user', array('id' => $userid));
     if (!$user) {
         return 'userdoesnotexist';
-    }
-
-    if (!isset($session->notifyuser)) {
-        $session->notifyuser = true;
     }
 
     $session = facetoface_notification_session_dates($session);
@@ -1520,8 +1524,10 @@ function facetoface_send_oneperday_notice($facetoface, $session, $userid, $param
             if ($session->notifyuser) {
                 $notice->send_to_user($user, $session->id, $date);
             }
+            if ($session->notifymanager) {
+                $notice->send_to_manager($user, $session->id);
+            }
 
-            $notice->send_to_manager($user, $session->id);
             $notice->send_to_thirdparty($user, $session->id);
             $notice->send_to_roleapprovers_adhoc($user, $session->id);
             $notice->send_to_adminapprovers_adhoc($user, $session->id);

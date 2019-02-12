@@ -218,6 +218,15 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
             'conditiontype' => MDL_F2F_CONDITION_BOOKING_CONFIRMATION
         );
 
+        // Ensure expected attributes are initialised.
+        if (!isset($seed->session->notifyuser)) {
+            $seed->session->notifyuser = true;
+        }
+
+        if (!isset($seed->session->notifymanager)) {
+            $seed->session->notifymanager = true;
+        }
+
         facetoface_send_oneperday_notice($seed->facetoface, $seed->session, $seed->student1->id, $params);
         $messages = $this->fetch_messages(true);
 

@@ -118,6 +118,9 @@ final class attendees_list_helper {
                 if (empty($data->notifyuser)) {
                     $signup->set_skipusernotification();
                 }
+                if (empty($data->notifymanager)) {
+                    $signup->set_skipmanagernotification();
+                }
                 if ($attendee->id != $USER->id) {
                     $signup->set_bookedby($USER->id);
                 }
