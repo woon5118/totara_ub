@@ -518,8 +518,6 @@ function facetoface_delete_session($session) {
                 if (!$sessionover) {
                     notice_sender::event_cancellation($user->userid, $seminarevent);
                 }
-            } else {
-                return false; // Cannot rollback since we notified users already
             }
         }
     }

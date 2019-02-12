@@ -1361,6 +1361,75 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assert_count_customfield_data('cancellation', [$signups[12]->id, $signups[22]->id], 0, 0);
     }
 
+    function test_facetoface_delete_session_with_attendance() {
+        global $DB;
+
+        $this->setAdminUser();
+
+        $student1 = $this->getDataGenerator()->create_user();
+        $student2 = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $this->getDataGenerator()->enrol_user($student1->id, $course->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course->id, $studentrole->id);
+
+        /** @var mod_facetoface_generator $facetofacegenerator */
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetoface = $facetofacegenerator->create_instance(['course' => $course->id]);
+
+        $seminarevent = new seminar_event();
+        $seminarevent->set_facetoface($facetoface->id)
+            ->set_capacity(2)
+            ->save();
+
+        $seminarsession = new \mod_facetoface\seminar_session();
+        $seminarsession->set_sessionid($seminarevent->get_id())
+            ->set_timestart(time() + WEEKSECS)
+            ->set_timefinish(time() + WEEKSECS + 60)
+            ->save();
+
+        $facetoface2= $facetofacegenerator->create_instance(['course' => $course->id]);
+
+        $seminarevent2 = new seminar_event();
+        $seminarevent2->set_facetoface($facetoface2->id)
+            ->set_capacity(2)
+            ->save();
+
+        $seminarsession2 = new \mod_facetoface\seminar_session();
+        $seminarsession2->set_sessionid($seminarevent2->get_id())
+            ->set_timestart(time() + WEEKSECS * 2)
+            ->set_timefinish(time() + WEEKSECS * 2 + 60)
+            ->save();
+
+        // Signup users for first event and date back to take attendance
+        $signup11 = signup_helper::signup(signup::create($student1->id, $seminarevent));
+        $signup12 = signup_helper::signup(signup::create($student2->id, $seminarevent));
+        $seminarsession->set_timestart(time() - 100)
+            ->set_timefinish(time() - 10)
+            ->save();
+        $signup11->switch_state(signup\state\partially_attended::class);
+
+        // Signup users for second event.
+        $signup21 = signup_helper::signup(signup::create($student1->id, $seminarevent2));
+        $signup22 = signup_helper::signup(signup::create($student2->id, $seminarevent2));
+
+        $this->assertTrue(facetoface_delete_session(facetoface_get_session($seminarevent->get_id())));
+        $this->assertFalse($DB->record_exists('facetoface_sessions', array('id' => $seminarevent->get_id())));
+
+        // Reload signups and check that other event is not affected.
+        $signup21 = new signup($signup21->get_id());
+        $signup22 = new signup($signup22->get_id());
+
+        $this->assertInstanceOf(booked::class, $signup21->get_state());
+        $this->assertEquals($student1->id, $signup21->get_userid());
+        $this->assertEquals($seminarevent2->get_id(), $signup21->get_seminar_event()->get_id());
+
+        $this->assertInstanceOf(booked::class, $signup22->get_state());
+        $this->assertEquals($student2->id, $signup22->get_userid());
+        $this->assertEquals($seminarevent2->get_id(), $signup22->get_seminar_event()->get_id());
+    }
+
     function test_facetoface_delete_signups() {
         global $DB;
 
