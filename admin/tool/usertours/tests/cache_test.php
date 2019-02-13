@@ -148,7 +148,7 @@ class tool_usertours_cache_testcase extends advanced_testcase {
             ],
             (object) [
                 'name' => 'my_glob_2',
-                'pathmatch' => '/my/%'
+                'pathmatch' => '/my/profile.php?param1=%&param2=%'
             ],
             (object) [
                 'name' => 'frontpage_only',
@@ -164,12 +164,17 @@ class tool_usertours_cache_testcase extends advanced_testcase {
             'Matches expected glob' => [
                 $tourconfigs,
                 '/my/index.php',
+                ['my_glob_1'],
+            ],
+            'Matches expected glob 1 and 2' => [
+                $tourconfigs,
+                '/my/profile.php?param1=2&param2=text',
                 ['my_glob_1', 'my_glob_2'],
             ],
             'Matches expected glob and exact' => [
                 $tourconfigs,
                 '/my/view.php',
-                ['my_exact_1', 'my_glob_1', 'my_glob_2'],
+                ['my_exact_1', 'my_glob_1'],
             ],
             'Special constant FRONTPAGE must match front page only' => [
                 $tourconfigs,
