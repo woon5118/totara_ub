@@ -26,6 +26,7 @@ namespace mod_facetoface\signup\state;
 use mod_facetoface\event\booking_booked;
 use mod_facetoface\signup\condition\{event_allows_cancellation, event_is_cancelled, event_in_the_future, event_in_the_past,
     event_is_not_cancelled, event_taking_attendance, waitlist_common};
+use mod_facetoface\signup\restriction\actor_can_removeattendees;
 use mod_facetoface\signup\restriction\actor_can_signuppastevents;
 use mod_facetoface\signup\transition;
 use mod_facetoface\event\abstract_signup_event;
@@ -74,10 +75,26 @@ class booked extends state implements interface_event {
                     event_allows_cancellation::class,
                     event_in_the_future::class
                 ),
+                // Users with "signuppastevents" capability can remove users from non cancelled events that allow cancellations.
                 transition::to(new user_cancelled($this->signup))->with_conditions(
                     event_is_not_cancelled::class,
                     event_allows_cancellation::class
                 )->with_restrictions(
+                    actor_can_signuppastevents::class
+                ),
+                // Users with "removeattendees" capability can remove users from non cancelled events in future.
+                transition::to(new user_cancelled($this->signup))->with_conditions(
+                    event_is_not_cancelled::class,
+                    event_in_the_future::class
+                )->with_restrictions(
+                    actor_can_removeattendees::class
+                ),
+                // Users with both "removeattendees" and "signuppastevents" capabilities  can remove users
+                // from non cancelled events.
+                transition::to(new user_cancelled($this->signup))->with_conditions(
+                    event_is_not_cancelled::class
+                )->with_restrictions(
+                    actor_can_removeattendees::class,
                     actor_can_signuppastevents::class
                 ),
                 transition::to(new event_cancelled($this->signup))->with_conditions(
