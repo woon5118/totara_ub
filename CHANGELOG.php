@@ -3,6 +3,265 @@
 
 Totara Learn Changelog
 
+Release Evergreen (14th February 2019):
+=======================================
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-20156       Omitted environment tests have been reintroduced
+
+                   It was discovered that several environment tests within Totara core had not
+                   been running for sites installing or upgrading to Totara 11 or 12. The
+                   following tests have been reintroduced to ensure that during installation
+                   and upgrade the following criteria are met:
+
+                   * Linear upgrades - Enforces linear upgrades; a site must upgrade to a
+                     higher version of Totara that was released on or after the current version
+                     they are running. For instance if you are running Totara 11.11 then you can
+                     only upgrade to Totara 12.2 or higher.
+                   * XML External entities are not present - Checks to make sure that there
+                     are no XML files within libraries that are loading external entities by
+                     default.
+                   * MySQL engine - Checks that if MySQL is being used that either InnoDB or
+                     XtraDB are being used. Other engines are known to cause problems in
+                     Totara.
+                   * MSSQL required permissions - Ensures that during installation and upgrade
+                     on MSSQL the database user has sufficient permissions to complete the
+                     operation.
+                   * MSSQL read committed snapshots - Ensures that the MSSQL setting "Read
+                     committed snapshots" is turned on for the database Totara is using.
+
+    TL-20173       Fixed user cancellation when taking attendance if attendance status is not set
+
+                   When taking seminar attendance, signups for which attendance was not set
+                   would get cancelled. If this happened, attendees needed to be re-added and
+                   attendance taken for them. This fix keeps attendees in their current state
+                   if attendance is not set for them and current state is not attendance
+                   related.
+
+API changes:
+
+    TL-20109       Added a default value for $activeusers3mth when calling core_admin_renderer::admin_notifications_page()
+
+                   TL-18789 introduced an additional parameter to
+                   core_admin_renderer::admin_notifications_page() which was not indicated and
+                   will cause issues with themes that override this function (which
+                   bootstrapbase did in Totara 9). This issue adds a default value for this
+                   function and also fixes the PHP error when using themes derived off
+                   bootstrap base in Totara 9.
+
+Performance improvements:
+
+    TL-19810       Removed unnecessary caching from the URL sanitisation in page redirection code
+
+                   Prior to this fix several functions within Totara, including the redirect
+                   function, were using either clean_text() or purify_html() to clean and
+                   sanitise URL's that were going to be output. Both functions were designed
+                   for larger bodies of text, and as such cached the result after cleaning in
+                   order to improve performance. The uses of these functions were leading to
+                   cache bloat, that on a large site could be have a noticeable impact upon
+                   performance.
+
+                   After this fix, places that were previously using clean_text() or
+                   purify_html() to clean URL's now use purify_uri() instead. This function
+                   does not cache the result, and is optimised specifically for its purpose.
+
+    TL-20026       Removed an unused index on the 'element' column in the 'scorm_scoes_track' table
+    TL-20053       Improved handling of the ignored report sources and ignored embedded reports in Report Builder
+
+                   The Report Builder API has been changed to allow checking whether a report
+                   should be ignored without initialising the report. This change is fully
+                   backwards compatible, but to benefit from the performance improvement it
+                   will require the updating of any custom report sources and embedded reports
+                   that override is_ignored() method.
+
+                   For more technical information, please refer to the Report Builder
+                   upgrade.txt file.
+
+Improvements:
+
+    TL-8314    +   Improved aggregation support for the program report source
+
+                   Previously the program report source contained several required columns in
+                   order to ensure user visibility was correctly applied. These required
+                   columns lead to aggregation within the report not working. Thanks to
+                   improvements made in Totara 12 this could be refactored so that the
+                   required columns are no longer necessary. Visibility is still calculated
+                   accurately and aggregation is now working for this report source.
+
+    TL-8315    +   Improved aggregation support for the course report source
+
+                   Previously the course report source contained several required columns in
+                   order to ensure user visibility was correctly applied. These required
+                   columns lead to aggregation within the report not working. Thanks to
+                   improvements made in Totara 12 this could be refactored so that the
+                   required columns are no longer necessary. Visibility is still calculated
+                   accurately and aggregation is now working for this report source.
+
+                   Please note that the course report source no longer supports caching.
+
+    TL-19824       Added ability to unlock closed appraisal stages
+
+                   It is now possible to let one or more users in a learner's appraisal move
+                   back to an earlier stage, allowing them to make changes to answers on
+                   stages that may have become locked. An 'Edit current stage' button has been
+                   added to the list of assigned learners in the appraisal administration
+                   interface. To see this button, users must be granted the new capability
+                   'totara/appraisal:unlockstages' (given to site managers by default), and
+                   must have permission to view the Assignments tab in appraisal
+                   administration (requires 'totara/appraisal:manageappraisals' and
+                   'totara/appraisal:viewassignedusers').
+
+    TL-19985       Added a hook to the course catalogue to allow modifying the queried result before rendering the courses
+    TL-20051   +   Added new Job Assignment ID number dynamic audience rule
+
+                   This new rule allows you to include or exclude users from an audience based
+                   on the idnumber field in their job assignments.
+
+    TL-20132       Menu type dynamic audience rules now allow horizontal scrolling of long content when required
+
+                   When options for a menu dynamic audience rule are sufficiently long enough,
+                   the dialog containing them will scroll horizontally to display them.
+
+                   This will require CSS to be regenerated for themes that use LESS
+                   inheritance.
+
+    TL-20152       Fixed content width restrictions when selecting badge criteria
+
+                   This will require CSS to be regenerated for themes that use LESS
+                   inheritance.
+
+Bug fixes:
+
+    TL-18892       Fixed problem with redisplayed goal question in appraisals
+
+                   Formerly, a redisplayed goal question would display the goal status as a
+                   drop-down list - whether or not the user had rights to change/answer the
+                   question. However, when the goal was changed, it was ignored. This patch
+                   changes the drop-down into a text string when necessary so that it cannot
+                   be changed.
+
+    TL-19454       Fixed accordion and add group behaviour on admin menu settings page
+    TL-19494       The render_tabobject now respects the linkedwhenselected parameter in the learning plans tab
+
+                   This also links the tab name back to the learning plan component when
+                   viewing an individual item in a learning plan.
+
+    TL-19838       SCORM AICC suspend data is now correctly stored
+
+                   This was a regression introduced in Totara 10.0 and it affected all later
+                   versions. Suspend data on the affected versions was not correctly recorded,
+                   resulting in users returning to an in-progress attempt not being returned
+                   to their last location within the activity. This has now been fixed and
+                   suspend data is correctly stored and returned.
+
+    TL-19895       Added notification message communicating the outcome when performing a seminar approval via task block
+
+                   Previously, when a manager performed a seminar approval via the task block,
+                   there was no feedback to the manager as to whether or not it had been
+                   successful.
+
+                   An example of where this could have been problematic was when a seminar
+                   event required manager approval and the signup period had closed: the task
+                   would be dismissed after the manager had completed the approval process,
+                   but they would not be informed that approval had not in fact taken place
+                   (due to the signup period being closed).
+
+                   With this patch, a message will now be displayed to the user after
+                   attempting to perform an approval, communicating whether the approval was
+                   successful or not.
+
+    TL-19916       MySQL Derived merge has been turned off for all versions 5.7.20 / 8.0.4 and lower
+
+                   The derived merge optimisation for MySQL is now forcibly turned off when
+                   connecting to MySQL, if the version of MySQL that is running is 5.7.20 /
+                   8.0.4 or lower. This was done to work around a known bug  in MySQL which
+                   could lead to the wrong results being returned for queries that were using
+                   a LEFT join to eliminate rows, this issue was fixed in versions 5.7.21 /
+                   8.0.4 of MySQL and above and can be found in their changelogs as issue #26627181:
+                    * https://dev.mysql.com/doc/relnotes/mysql/5.7/en/news-5-7-21.html
+                    * https://dev.mysql.com/doc/relnotes/mysql/8.0/en/news-8-0-4.html
+
+                   In some cases this can affect performance, so we strongly recommend all
+                   sites running MySQL 5.7.20 / 8.0.4 or lower upgrade both Totara, and their
+                   version of MySQL.
+
+    TL-19935       Fixed $PAGE->totara_menu_selected not correctly highlighting menu items
+    TL-19936       Fixed text display for yes/no options in multiple choice questions
+
+                   Originally, when defining a yes/no multiple choice type question, the page
+                   showed 'selected by default' and 'unselect' for each allowed option. This
+                   text now only appears when a default option has been selected.
+
+    TL-19938       Fixed database deadlocking issues in job assignments sync
+
+                   Refactored how HR Import processes unchanged job assignment records. Prior
+                   to this fix if processing a large number of job assignments through HR
+                   Import, the action of removing unchanged records from the process queue
+                   could lead to a deadlock situation in the database.
+
+                   The code in question has now been refactored to avoid this deadlock
+                   situation, and to greatly improve performance when running an import with
+                   hundreds of thousands of job assignments.
+
+    TL-19994       Prevented the featured links title from taking up the full width in IE 11
+
+                   This will require CSS to be regenerated for themes that use LESS
+                   inheritance.
+
+    TL-19996       Updated and renamed the 'Progress' column in the 'Record of Learning: Courses' Report Builder report source
+
+                   The 'Progress' column displays progress for a course within a Learning
+                   Plan. As this column is related to Learning plans, the 'type' of the column
+                   has been moved from 'course_completion' to 'plan' and renamed from
+                   'Progress' to 'Course progress'.
+
+                   Please note that if a Learning plan has multiple courses assigned to it,
+                   multiple rows will be displayed for the Learning Plan within the 'Record of
+                   Learning: Courses' report if there are any 'plan' type columns included.
+
+    TL-19997       Added limit to individual assignment dialog in program assignments
+    TL-20008       Allowed users with page editing permissions to add blocks on 'My goals' page
+
+                   Previously the 'Turn editing on' button was not available on the 'My goals'
+                   page, preventing users from adding blocks to the page. This has now been
+                   fixed.
+
+    TL-20018       Removed exception modal when version tracking script fails to contact community
+    TL-20019       Fixed a bug that prevented cancelling a seminar booking when one of a learner's job assignments was deleted
+    TL-20102       Fixed certificates not rendering text in RTL languages.
+    TL-20113       Fixed the filtering of menu custom fields within report builder reports
+
+                   This is a regression from TL-19739 which was introduced in 11.11, and 12.2
+                   last month.
+
+    TL-20128       Fixed 'missing parameter' error in column sorting for the Seminar notification table
+    TL-20141       Fixed 'Date started' and 'Date assigned' filters in the program completion report
+
+                   Previously the 'Date assigned' filter was mis-labelled and filtered records
+                   based on the 'Date started' column. This filter has now been renamed to
+                   'Date started' to correctly reflect the column name. A new 'Date assigned'
+                   filter has been added to filter based on the 'Date assigned' column.
+
+    TL-20155       Ensured that site policy content format was only ever set once during upgrade
+
+                   Prior to this fix if the site policy editor upgrade was run multiple times
+                   it could lead to site policy text format being incorrectly force to plain
+                   text. Multiple upgrades should not be possible, and this issue lead to the
+                   discovery of TL-20156.
+
+                   Anyone affected by this will need to edit and reformat their site policy.
+
+    TL-20192       Fixed deletion of seminar event after attendance was taken for learners
+
+                   Previously, attempting to delete a seminar event where attendance for at
+                   least one learner had been taken resulted in an error. Now, seminar event
+                   deletion will be successful regardless of whether attendance has been taken
+                   or not.
+
+
 Release Evergreen (24th January 2019):
 ======================================
 
