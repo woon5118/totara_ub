@@ -64,7 +64,7 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
                               'sortorder' => 5, 'advanced' => 0),
                         array('id' => 48, 'reportid' => 6, 'type' => 'course', 'value' => 'language',
                               'sortorder' => 6, 'advanced' => 1),
-                        array('id' => 49, 'reportid' => 6, 'type' => 'cohort', 'value' => 'enrolledcoursecohortids',
+                        array('id' => 49, 'reportid' => 6, 'type' => 'course', 'value' => 'enrolledcoursecohortids',
                               'sortorder' => 7, 'advanced' => 1),
                         array('id' => 50, 'reportid' => 6, 'type' => 'course', 'value' => 'shortname',
                               'sortorder' => 8, 'advanced' => 0),

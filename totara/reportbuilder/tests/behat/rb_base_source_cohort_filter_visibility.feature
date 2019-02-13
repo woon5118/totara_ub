@@ -83,7 +83,7 @@ Feature: Test the capability to see and use audience filter for report builder
     And I press "Save changes"
 
     And I switch to "Filters" tab
-    And I select "Course is enrolled in by audience" from the "newstandardfilter" singleselect
+    And I select "Course with enrolled audience(s)" from the "newstandardfilter" singleselect
     And I press "Add"
 
     And I switch to "Access" tab
@@ -92,7 +92,7 @@ Feature: Test the capability to see and use audience filter for report builder
     And I click on "View This Report" "link"
 
     # Make sure that we are still can see and use Audience filter for admins.
-    And I should see "Course is enrolled in by audience"
+    And I should see "Course with enrolled audience(s)"
     And I click on "Add audience" "link"
     And I click on "Audience TL-2986" "link"
     And I click on "Save" "button" in the "Choose audiences" "totaradialogue"
@@ -106,7 +106,7 @@ Feature: Test the capability to see and use audience filter for report builder
     And I click on "Reports" in the totara menu
     # Test the user with no moodle/cohort:view capability can't see the filter.
     When I follow "Course Report"
-    Then I should not see "Course is enrolled in by audience"
+    Then I should not see "Course with enrolled audience(s)"
     # But still can see the course report.
     And I should see "Course 1"
 
@@ -138,7 +138,7 @@ Feature: Test the capability to see and use audience filter for report builder
     And I press "Save changes"
 
     And I switch to "Filters" tab
-    And I select "Program is enrolled in by audience" from the "newstandardfilter" singleselect
+    And I select "Program with enrolled audience(s)" from the "newstandardfilter" singleselect
     And I press "Add"
 
     And I switch to "Access" tab
@@ -147,7 +147,7 @@ Feature: Test the capability to see and use audience filter for report builder
     And I click on "View This Report" "link"
 
     # Make sure that we are still can see and use Audience filter for admins.
-    And I should see "Program is enrolled in by audience"
+    And I should see "Program with enrolled audience(s)"
     And I click on "Add audience" "link"
     And I click on "Audience TL-2986" "link"
     And I click on "Save" "button" in the "Choose audiences" "totaradialogue"
@@ -161,6 +161,6 @@ Feature: Test the capability to see and use audience filter for report builder
     And I click on "Reports" in the totara menu
     # Test the user with no moodle/cohort:view capability can't see the filter.
     When I follow "Program Report"
-    Then I should not see "Program is enrolled in by audience"
+    Then I should not see "Program with enrolled audience(s)"
     # But still can see the program report.
     And I should see "Program TL2986"

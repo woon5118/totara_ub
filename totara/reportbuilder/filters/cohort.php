@@ -59,18 +59,17 @@ class rb_filter_cohort extends rb_filter_type {
 
         $mform->addElement('hidden', $this->name, '');
         $mform->setType($this->name, PARAM_SEQUENCE);
+        $this->add_help_button($mform, $this->name . '_list', 'reportbuildercohortfilter', 'totara_reportbuilder');
 
         // set default values
         if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
             $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
+            if (isset($defaults['value'])) {
+                $mform->setDefault($this->name, $defaults['value']);
+            }
         } else if (!empty($defaultvalue)) {
             $this->set_data($defaultvalue);
         }
-
-        if (isset($defaults['value'])) {
-            $mform->setDefault($this->name, $defaults['value']);
-        }
-
     }
 
     function definition_after_data(&$mform) {

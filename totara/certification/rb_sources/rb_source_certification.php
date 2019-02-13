@@ -89,8 +89,6 @@ class rb_source_certification extends rb_base_source {
     }
 
     protected function define_joinlist() {
-        global $CFG;
-
         $joinlist = array(
             new rb_join(
                 'ctx',
@@ -102,7 +100,7 @@ class rb_source_certification extends rb_base_source {
         );
 
         $this->add_core_course_category_tables($joinlist, 'base', 'category');
-        $this->add_totara_cohort_program_tables($joinlist, 'base', 'id');
+        $this->add_totara_cohort_certification_tables($joinlist, 'base', 'id');
 
         return $joinlist;
     }
@@ -112,11 +110,10 @@ class rb_source_certification extends rb_base_source {
         // Include some standard columns
         $this->add_totara_certification_columns($columnoptions, 'base');
         $this->add_core_course_category_columns($columnoptions, 'course_category', 'base', 'programcount');
-        $this->add_totara_cohort_program_columns($columnoptions);
+        $this->add_totara_cohort_certification_columns($columnoptions);
 
         return $columnoptions;
     }
-
 
     protected function define_filteroptions() {
         $filteroptions = array();
@@ -124,7 +121,7 @@ class rb_source_certification extends rb_base_source {
         // Include some standard filters
         $this->add_totara_certification_filters($filteroptions);
         $this->add_core_course_category_filters($filteroptions);
-        $this->add_totara_cohort_program_filters($filteroptions, 'totara_certification');
+        $this->add_totara_cohort_certification_filters($filteroptions);
 
         return $filteroptions;
     }

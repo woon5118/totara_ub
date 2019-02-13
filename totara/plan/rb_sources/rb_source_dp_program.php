@@ -482,8 +482,8 @@ class rb_source_dp_program extends rb_base_source {
         );
         $this->add_core_user_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'program_completion', 'userid');
-        $this->add_core_course_category_filters($filteroptions, 'base', 'category');
-        $this->add_totara_cohort_program_filters($filteroptions, 'totara_program');
+        $this->add_core_course_category_filters($filteroptions);
+        $this->add_totara_cohort_program_filters($filteroptions);
 
         return $filteroptions;
     }

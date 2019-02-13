@@ -365,5 +365,38 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018111900, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2019021300) {
+        // Separate certification enrolled cohort columns/filters certification from programs,
+        // and migrate cohort columns/filters into new types.
+        $certif_sources = ['certification', 'certification_completion'];
+        $prog_value = 'enrolledprogramcohortids';
+        $certif_value = 'enrolledcertificationcohortids'; // Certifications also need their value migrated.
+        foreach ($certif_sources as $source) {
+            reportbuilder_rename_data('columns', $source, 'cohort', $prog_value, 'certif', $certif_value);
+            reportbuilder_rename_data('filters', $source, 'cohort', $prog_value, 'certif', $certif_value);
+            totara_reportbuilder_migrate_saved_searches($source, 'cohort', $prog_value, 'certif', $certif_value);
+        }
+
+        $prog_sources = ['program', 'program_completion', 'dp_program'];
+        $value = 'enrolledprogramcohortids';
+        foreach ($prog_sources as $source) {
+            reportbuilder_rename_data('columns', $source, 'cohort', $value, 'prog', $value);
+            reportbuilder_rename_data('filters', $source, 'cohort', $value, 'prog', $value);
+            totara_reportbuilder_migrate_saved_searches($source, 'cohort', $value, 'prog', $value);
+        }
+
+        $course_sources = ['site_logstore', 'facetoface_events', 'facetoface_sessions', 'facetoface_signin', 'scorm',
+                           'dp_course', 'badge_issued', 'courses', 'course_completion', 'site_logs'];
+        $value = 'enrolledcoursecohortids';
+        foreach ($course_sources as $source) {
+            reportbuilder_rename_data('columns', $source, 'cohort', $value, 'course', $value);
+            reportbuilder_rename_data('filters', $source, 'cohort', $value, 'course', $value);
+            totara_reportbuilder_migrate_saved_searches($source, 'cohort', $value, 'course', $value);
+        }
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2019021300, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

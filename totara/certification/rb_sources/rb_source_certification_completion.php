@@ -96,8 +96,6 @@ class rb_source_certification_completion extends rb_base_source {
     }
 
     protected function define_joinlist() {
-        global $CFG;
-
         $joinlist = array();
         $this->add_totara_certification_tables($joinlist, 'base', 'programid');
 
@@ -119,7 +117,7 @@ class rb_source_certification_completion extends rb_base_source {
         $this->add_core_user_tables($joinlist, 'base', 'userid');
         $this->add_totara_job_tables($joinlist, 'base', 'userid');
         $this->add_core_course_category_tables($joinlist, 'certif', 'category');
-        $this->add_totara_cohort_program_tables($joinlist, 'base', 'programid');
+        $this->add_totara_cohort_certification_tables($joinlist, 'base', 'programid');
 
         $joinlist[] = new rb_join(
             'certif_completion',
@@ -288,7 +286,7 @@ class rb_source_certification_completion extends rb_base_source {
         $this->add_core_user_columns($columnoptions);
         $this->add_totara_job_columns($columnoptions);
         $this->add_core_course_category_columns($columnoptions, 'course_category', 'certif');
-        $this->add_totara_cohort_program_columns($columnoptions);
+        $this->add_totara_cohort_certification_columns($columnoptions);
         $this->add_totara_certification_columns($columnoptions, 'certif');
 
         // Add back the columns that were just removed, but suitable for certifications.
@@ -499,8 +497,7 @@ class rb_source_certification_completion extends rb_base_source {
         $this->add_core_user_filters($filteroptions);
         $this->add_core_course_category_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');
-        $this->add_totara_cohort_program_filters($filteroptions, "totara_certification");
-
+        $this->add_totara_cohort_certification_filters($filteroptions);
         $this->add_totara_certification_filters($filteroptions);
 
         // Add back the filters that were just removed, but suitable for certifications.

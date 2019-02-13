@@ -508,7 +508,7 @@ class rb_source_program_completion extends rb_base_source {
         $this->add_core_course_category_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');
         $this->add_totara_program_filters($filteroptions);
-        $this->add_totara_cohort_program_filters($filteroptions, "totara_program");
+        $this->add_totara_cohort_program_filters($filteroptions);
 
         return $filteroptions;
     }

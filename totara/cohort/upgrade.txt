@@ -3,6 +3,14 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Certifications have been separated from the program related methods in totara_cohort\rb\source\report_trait.
+  To add certification tables/columns/filters to the custom report sources please use the following new methods:
+  * add_totara_cohort_certification_tables()
+  * add_totara_cohort_certification_columns()
+  * add_totara_cohort_certification_filters()
+* Column and filter types in totara_cohort\rb\source\report_trait have been changed to better reflect the type of
+  content they belong to. Any reports based on the custom report sources using this trait should be updated.
+
 === 12.0 ===
 
 * Icon helpers are no longer used in the following templates, icon data is passed via context data:

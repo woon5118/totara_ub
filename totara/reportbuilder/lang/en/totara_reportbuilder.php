@@ -194,7 +194,7 @@ $string['coursecategorymultichoice'] = 'Course Category (multichoice)';
 $string['coursecategoryidnumber'] = 'Course Category ID Number';
 $string['coursecompletedon'] = 'Course completed on {$a}';
 $string['coursedatecreated'] = 'Course Date Created';
-$string['courseenrolledincohort'] = 'Course is enrolled in by audience';
+$string['courseenrolledincohort'] = 'Course with enrolled audience(s)';
 $string['courseicon'] = 'Course Icon';
 $string['courseid'] = 'Course ID';
 $string['courseidnumber'] = 'Course ID Number';
@@ -287,6 +287,7 @@ $string['enablereportgraphsinfo'] = 'This option will let you: enable (show) or 
 * If Disable is selected, no report builder graphs features will be visible or accessible.';
 $string['enrol'] = 'Enrol';
 $string['enrolledcoursecohortids'] = 'Enrolled course audience IDs';
+$string['enrolledcertificationcohortids'] = 'Enrolled certification audience IDs';
 $string['enrolledprogramcohortids'] = 'Enrolled program audience IDs';
 $string['enrolusing'] = 'Enrol with - {$a}';
 $string['error:addscheduledreport'] = 'Error adding new Scheduled Report';
@@ -610,7 +611,6 @@ $string['positiontype'] = 'User\'s Position Type';
 $string['positiontypeid'] = 'User\'s Position Type ID';
 $string['posstartdate'] = 'User\'s Job Assignment Start Date';
 $string['processscheduledtask'] = 'Generate scheduled reports';
-$string['programenrolledincohort'] = 'Program is enrolled in by audience';
 $string['publicallyavailable'] = 'Let other users view';
 $string['publicsearch'] = 'Is search public?';
 $string['records'] = 'Records';
@@ -662,6 +662,8 @@ $string['reportbuildercachescheduler_help'] = 'Determines the schedule used to c
 For example, if you have set up your cron to run every 20 minutes at 10, 30 and 50 minutes past the hour and you schedule a report to run at midnight, it will actually run at 10 minutes past midnight.';
 $string['reportbuildercacheservertime'] = 'Current Server Time';
 $string['reportbuildercacheservertime_help'] = 'All reports are being cached based on server time. Cache status shows you current local time which might be different from server time. Make sure to take into account your server time when scheduling cache.';
+$string['reportbuildercohortfilter'] = 'Audience filter';
+$string['reportbuildercohortfilter_help'] = 'Show records where the selected audience(s) have been assigned.';
 $string['reportbuildercolumns'] = 'Columns';
 $string['reportbuildercolumns_help'] = '**Report Columns** allows you to customise the columns that appear on your report. The available columns are determined by the data **Source** of the report. Each report source has a set of default columns set up.
 

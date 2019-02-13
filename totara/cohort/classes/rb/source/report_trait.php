@@ -43,6 +43,7 @@ trait report_trait {
     protected function add_totara_cohort_course_tables(&$joinlist, $join, $field) {
         global $CFG, $DB;
 
+        // Needed for visibility checks and completion constants.
         require_once($CFG->dirroot . '/cohort/lib.php');
 
         $idlist = $DB->sql_group_concat_unique($DB->sql_cast_2char('customint1'), '|');
@@ -62,6 +63,51 @@ trait report_trait {
         return true;
     }
 
+    /**
+     * Adds some common cohort course info to the $columnoptions array
+     *
+     * @param array &$columnoptions Array of current column options
+     *                              Passed by reference and updated by
+     *                              this method
+     * @param string $cohortenrolledids Name of the join that provides the
+     *                          'cohortenrolledcourse' table.
+     *
+     * @return True
+     */
+    protected function add_totara_cohort_course_columns(&$columnoptions, $cohortenrolledids='cohortenrolledcourse') {
+        $columnoptions[] = new \rb_column_option(
+            'course',
+            'enrolledcoursecohortids',
+            get_string('enrolledcoursecohortids', 'totara_reportbuilder'),
+            "$cohortenrolledids.idlist",
+            array('joins' => $cohortenrolledids, 'selectable' => false)
+        );
+
+        return true;
+    }
+
+    /**
+     * Adds some common course cohort filters to the $filteroptions array
+     *
+     * @param array &$filteroptions Array of current filter options
+     *                              Passed by reference and updated by
+     *                              this method
+     * @return True
+     */
+    protected function add_totara_cohort_course_filters(&$filteroptions) {
+        if (!has_capability('moodle/cohort:view', \context_system::instance())) {
+            return true;
+        }
+
+        $filteroptions[] = new \rb_filter_option(
+            'course',
+            'enrolledcoursecohortids',
+            get_string('courseenrolledincohort', 'totara_reportbuilder'),
+            'cohort'
+        );
+
+        return true;
+    }
 
     /**
      * Adds the cohort program tables to the $joinlist array
@@ -97,30 +143,6 @@ trait report_trait {
     }
 
     /**
-     * Adds some common cohort course info to the $columnoptions array
-     *
-     * @param array &$columnoptions Array of current column options
-     *                              Passed by reference and updated by
-     *                              this method
-     * @param string $cohortenrolledids Name of the join that provides the
-     *                          'cohortenrolledcourse' table.
-     *
-     * @return True
-     */
-    protected function add_totara_cohort_course_columns(&$columnoptions, $cohortenrolledids='cohortenrolledcourse') {
-        $columnoptions[] = new \rb_column_option(
-            'cohort',
-            'enrolledcoursecohortids',
-            get_string('enrolledcoursecohortids', 'totara_reportbuilder'),
-            "$cohortenrolledids.idlist",
-            array('joins' => $cohortenrolledids, 'selectable' => false)
-        );
-
-        return true;
-    }
-
-
-    /**
      * Adds some common cohort program info to the $columnoptions array
      *
      * @param array &$columnoptions Array of current column options
@@ -133,7 +155,7 @@ trait report_trait {
      */
     protected function add_totara_cohort_program_columns(&$columnoptions, $cohortenrolledids='cohortenrolledprogram') {
         $columnoptions[] = new \rb_column_option(
-            'cohort',
+            'prog',
             'enrolledprogramcohortids',
             get_string('enrolledprogramcohortids', 'totara_reportbuilder'),
             "$cohortenrolledids.idlist",
@@ -144,50 +166,102 @@ trait report_trait {
     }
 
     /**
-     * Adds some common course cohort filters to the $filteroptions array
+     * Adds some common program cohort filters to the $filteroptions array
      *
-     * @param array &$columnoptions Array of current filter options
+     * @param array &$filteroptions Array of current filter options
      *                              Passed by reference and updated by
      *                              this method
+     *
      * @return True
      */
-    protected function add_totara_cohort_course_filters(&$filteroptions) {
-
+    protected function add_totara_cohort_program_filters(&$filteroptions) {
         if (!has_capability('moodle/cohort:view', \context_system::instance())) {
             return true;
         }
 
         $filteroptions[] = new \rb_filter_option(
-            'cohort',
-            'enrolledcoursecohortids',
-            get_string('courseenrolledincohort', 'totara_reportbuilder'),
+            'prog',
+            'enrolledprogramcohortids',
+            get_string('programenrolledincohort', 'totara_program'),
             'cohort'
         );
 
         return true;
     }
 
+    /**
+     * Adds the cohort certification tables to the $joinlist array
+     *
+     * @param array &$joinlist Array of current join options
+     *                         Passed by reference and updated to
+     *                         include new table joins
+     * @param string $join Name of the join that provides the
+     *                     table containing the certification id
+     * @param string $field Name of certification id field to join on
+     * @return boolean True
+     */
+    protected function add_totara_cohort_certification_tables(&$joinlist, $join, $field) {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/cohort/lib.php');
+
+        $idlist = $DB->sql_group_concat_unique($DB->sql_cast_2char('assignmenttypeid'), '|');
+        $joinlist[] = new \rb_join(
+            'cohortenrolledcertification',
+            'LEFT',
+            // subquery as table name
+            "(SELECT programid AS program, {$idlist} AS idlist
+                FROM {prog_assignment} pa
+               WHERE assignmenttype = " . ASSIGNTYPE_COHORT . "
+            GROUP BY programid)",
+            "cohortenrolledcertification.program = $join.$field",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            $join
+        );
+
+        return true;
+    }
 
     /**
-     * Adds some common program cohort filters to the $filteroptions array
+     * Adds some common cohort certification info to the $columnoptions array
      *
-     * @param array &$columnoptions Array of current filter options
-     *                              Passed by reference and updated by
-     *                              this method
-     * @param string $langfile Source for translation, totara_program or totara_certification
+     * @param array &$columnoptions     Array of current column options
+     *                                  Passed by reference and updated by
+     *                                  this method
+     * @param string $cohortenrolledids Name of the join that provides the
+     *                                  'cohortenrolledcertification' table.
      *
      * @return True
      */
-    protected function add_totara_cohort_program_filters(&$filteroptions, $langfile) {
+    protected function add_totara_cohort_certification_columns(&$columnoptions, $cohortenrolledids='cohortenrolledcertification') {
+        $columnoptions[] = new \rb_column_option(
+            'certif',
+            'enrolledcertificationcohortids',
+            get_string('enrolledcertificationcohortids', 'totara_reportbuilder'),
+            "$cohortenrolledids.idlist",
+            ['joins' => $cohortenrolledids, 'selectable' => false]
+        );
 
+        return true;
+    }
+
+    /**
+     * Adds some common certification cohort filters to the $filteroptions array
+     *
+     * @param array &$filteroptions Array of current filter options
+     *                              Passed by reference and updated by this method
+     *
+     * @return True
+     */
+    protected function add_totara_cohort_certification_filters(&$filteroptions) {
         if (!has_capability('moodle/cohort:view', \context_system::instance())) {
             return true;
         }
 
         $filteroptions[] = new \rb_filter_option(
-            'cohort',
-            'enrolledprogramcohortids',
-            get_string('programenrolledincohort', $langfile),
+            'certif',
+            'enrolledcertificationcohortids',
+            get_string('programenrolledincohort', 'totara_certification'),
             'cohort'
         );
 
