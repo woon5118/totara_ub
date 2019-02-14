@@ -40,7 +40,10 @@ final class quickaccessmenu extends \core\output\template {
         $groups = [];
 
         //Set up data constants
-        $canedit = has_capability('totara/core:editownquickaccessmenu', \context_system::instance());
+        $canedit =
+            has_capability('totara/core:editownquickaccessmenu', \context_system::instance()) &&
+            has_capability('moodle/user:editownprofile', \context_system::instance());
+
         $data['can_edit'] = $canedit;
         $data['can_search'] = has_capability('moodle/site:config', \context_system::instance());
 
