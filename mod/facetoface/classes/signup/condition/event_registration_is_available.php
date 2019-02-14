@@ -26,7 +26,7 @@ namespace mod_facetoface\signup\condition;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class event_not_in_the_past
+ * Class event_registration_is_available
  */
 class event_registration_is_available extends condition {
 
@@ -35,6 +35,13 @@ class event_registration_is_available extends condition {
      * @return bool
      */
     public function pass() : bool {
+
+        // Can user add attendees outside Sign-up registration period.
+        $cansignup = new \mod_facetoface\signup\restriction\actor_can_surpasssignupperiod($this->signup);
+        if ($cansignup->pass()) {
+            return true;
+        }
+
         $now = time();
         $timestart = $this->signup->get_seminar_event()->get_registrationtimestart();
         $timefinish = $this->signup->get_seminar_event()->get_registrationtimefinish();
