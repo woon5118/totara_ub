@@ -1657,9 +1657,12 @@ function purge_all_caches() {
     $DB->reset_caches();
     cache_helper::purge_all();
 
-    // Report Builder
+    // Totara Report Builder cache purge.
     require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
     reportbuilder_purge_all_cache();
+
+    // Totara menu cache purge.
+    totara_menu_reset_all_caches();
 
     // Purge all other caches: rss, simplepie, etc.
     clearstatcache();

@@ -836,6 +836,16 @@ class reportbuilder {
             return self::$sourceobjects[$USER->id][$source];
         }
 
+        // Check if the current source class is already included and cached.
+        // No need to check $usecache here as we are not skipping restriction checks.
+        if (isset(self::$cache_sourceclasses[$source])) {
+            $instance = new self::$cache_sourceclasses[$source](null, $globalrestrictionset);
+            if (!$globalrestrictionset) {
+                self::$sourceobjects[$USER->id][$source] = $instance;
+            }
+            return $instance;
+        }
+
         $sourcepaths = self::find_source_dirs();
         foreach ($sourcepaths as $sourcepath) {
             $classfile = $sourcepath . 'rb_source_' . $source . '.php';
@@ -860,10 +870,52 @@ class reportbuilder {
         return false;
     }
 
+    /**
+     * Searches for and returns a class name from the report source.
+     *
+     * Given a report source name, it finds the class and includes its library.
+     * The class name is cached and returned, or false if something went wrong.
+     *
+     * @param string $source The name of the source class to return
+     *                       (excluding the rb_source prefix)
+     *
+     * @return string|boolean Returns false if the source can't be found
+     */
+    public static function get_source_class(string $source) {
+        if (isset(self::$cache_sourceclasses[$source])) {
+            return self::$cache_sourceclasses[$source];
+        }
+
+        $sourcepaths = self::find_source_dirs();
+        foreach ($sourcepaths as $sourcepath) {
+            $classfile = $sourcepath . 'rb_source_' . $source . '.php';
+            if (is_readable($classfile)) {
+                include_once($classfile);
+                $classname = 'rb_source_' . $source;
+                if (class_exists($classname)) {
+                    if (is_subclass_of($classname, 'rb_base_source')) {
+                        self::$cache_sourceclasses[$source] = $classname;
+                        return $classname;
+                    } else {
+                        debugging('All report source classes should extend rb_base_source', DEBUG_DEVELOPER);
+                        return false;
+                    }
+                } else {
+                    debugging('Report source class was not found in ' . $classfile, DEBUG_DEVELOPER);
+                    return false;
+                }
+            }
+        }
+
+        // File or class not found.
+        return false;
+    }
+
     protected static $reportrecordcache = null;
 
     protected static $cache_userpermittedreports = null;
     protected static $cache_userpermittedreports_userid = null;
+    protected static $cache_sourceclasses = null;
 
     /**
      * Retreives or creates a cached array of data objects for reports,
@@ -905,6 +957,7 @@ class reportbuilder {
         self::$reportrecordcache = null;
         self::$cache_userpermittedreports = null;
         self::$cache_userpermittedreports_userid = null;
+        self::$cache_sourceclasses = null;
     }
 
     /**
@@ -920,22 +973,24 @@ class reportbuilder {
         }
 
         self::$cache_userpermittedreports_userid = $USER->id;
-        $alluserreports = reportbuilder::get_user_generated_reports();
 
-        if (!$alluserreports) {
-            self::$cache_userpermittedreports = array();
-            return self::$cache_userpermittedreports;
-        }
-
+        $visiblesources = [];
         self::$cache_userpermittedreports = reportbuilder::get_permitted_reports($USER->id, false);
-        foreach (self::$cache_userpermittedreports as $id => $unused) {
-            if (!isset($alluserreports[$id])) {
-                unset(self::$cache_userpermittedreports[$id]);
+        foreach (self::$cache_userpermittedreports as $id => $report) {
+            if (in_array($report->source, $visiblesources)) {
+                continue;
             }
+            $sourceclass = self::get_source_class($report->source);
+            // Deprecated method is used here to ensure backwards compatibility.
+            // This should be replaced with a direct call to $sourceclass::is_source_ignored() in the future.
+            if ($report->embedded || !$sourceclass || self::is_source_class_ignored($report->source)) {
+                unset(self::$cache_userpermittedreports[$id]);
+                continue;
+            }
+            $visiblesources[] = $report->source;
         }
 
         return self::$cache_userpermittedreports;
-
     }
 
     /**
@@ -964,6 +1019,31 @@ class reportbuilder {
             }
         }
         return $reports;
+    }
+
+    /**
+     * Function that loops through all the embedded reports and generates the ones that are missing.
+     * This used to be done as a part of get_user_permitted_reports(), but for performance benefit
+     * it should be called from a limited number of places, like the embedded reports page.
+     */
+    public static function generate_embedded_reports() {
+        global $DB;
+
+        $embedrecords = $DB->get_records_menu('report_builder', ['embedded' => 1], '', 'shortname,1');
+        $embedobjects = reportbuilder_get_all_embedded_reports();
+        $error = null;
+
+        foreach ($embedobjects as $embedobject) {
+            // Check if the embedded report already exists or not (to make it safely re-runnable).
+            if (!isset($embedrecords[$embedobject->shortname])) {
+                $error = null;
+                // If the result is false, then the report could not be generated.
+                if (!reportbuilder_create_embedded_record($embedobject->shortname, $embedobject, $error)) {
+                    // This is horrible but it is how the report builder_create_embedded_record was designed.
+                    debugging('Embedded report generation failed with the error: ' . $error, DEBUG_DEVELOPER);
+                }
+            }
+        }
     }
 
     /**
@@ -1030,8 +1110,7 @@ class reportbuilder {
                 // The embedded report did not exist within the database, its new or this is the first time anyone has seen it.
                 // Trigger its creation.
                 $error = null;
-                $embedclass = self::get_embedded_report_class($object->shortname);
-                $id = reportbuilder_create_embedded_record($object->shortname, new $embedclass([]), $error);
+                $id = reportbuilder_create_embedded_record($object->shortname, $object, $error);
                 // If $id is false then the report could not be generated.
                 // There is no warning for this currently unfortunately.
                 if ($id) {
@@ -1053,15 +1132,16 @@ class reportbuilder {
                 $report->nextreport = $cache[$report->id]->nextreport;
             }
 
-            $src = self::get_source_object($report->source, true, false);
-
+            $sourceclass = self::get_source_class($report->source);
             // If we can't find the reports source or this source is ignored, do not show it anywhere.
             // Deprecated method is used here to ensure backwards compatibility.
-            // This should be replaced with a direct call to $src::is_source_ignored() in the future.
-            if (!$src || self::is_source_class_ignored($report->source)) {
+            // This should be replaced with a direct call to $sourceclass::is_source_ignored() in the future.
+            if (!$sourceclass || self::is_source_class_ignored($report->source)) {
                 unset($reports[$report->id]);
                 continue;
             }
+            // Source object will be initialised from the cached $sourceclass.
+            $src = self::get_source_object($report->source, true, false);
             $report->sourcetitle = $src->sourcetitle;
             $report->sourceobject = $src;
         }
@@ -1076,8 +1156,6 @@ class reportbuilder {
      *               to be used in a select element.
      */
     public static function get_source_list($includenonselectable = false) {
-        global $DB;
-
         $output = array();
 
         foreach (self::find_source_dirs() as $dir) {
@@ -1101,10 +1179,8 @@ class reportbuilder {
                     }
 
                     $src = self::get_source_object($source);
-                    $sourcename = $src->sourcetitle;
-
                     if ($src->selectable || $includenonselectable) {
-                        $output[$source] = $sourcename;
+                        $output[$source] = $src->sourcetitle;
                     }
                 }
                 closedir($dh);
@@ -2438,7 +2514,7 @@ class reportbuilder {
      *                            will also be included
      * @return array Array of results from the report_builder table
      */
-    public static function get_permitted_reports($userid=NULL, $showhidden=false) {
+    public static function get_permitted_reports($userid = null, $showhidden = false) {
         global $DB, $USER;
 
         // check access for specified user, or the current user if none set
@@ -2502,6 +2578,77 @@ class reportbuilder {
         return $permitted_reports;
     }
 
+    /**
+     * Check if the user can view at least one report.
+     *
+     * This method is similar to get_permitted_reports(), but instead of collecting all report data
+     * and storing it, we loop through the data until we find a report that the user can access.
+     *
+     * @param int $userid The user to check which reports they have access to
+     *
+     * @return bool
+     */
+    public static function has_reports($userid = null) {
+        global $DB, $USER;
+
+        // Check access for specified user, or the current user if none set.
+        $foruser = isset($userid) ? $userid : $USER->id;
+        // Get array of all reports with enabled plugins and whether they passed or failed each enabled plugin.
+        $enabled_plugins = \reportbuilder::get_reports_plugins_access($foruser);
+        // Get basic reports list.
+        $reports = $DB->get_records('report_builder', ['hidden' => 0], 'fullname ASC');
+
+        if ($reports) {
+            foreach ($reports as $report) {
+                if (!$sourceclass = self::get_source_class($report->source)) {
+                    // No point of going any further if we are't able to find the class for 'ignored' check.
+                    continue;
+                }
+                // Calls to deprecated is_source_class_ignored method are used here to ensure backwards compatibility.
+                // These should be replaced with the direct calls to $sourceclass::is_source_ignored() in the future.
+                if ($report->accessmode == REPORT_BUILDER_ACCESS_MODE_NONE) {
+                    if (!self::is_source_class_ignored($report->source)) {
+                        return true;
+                    }
+                } else if ($report->accessmode == REPORT_BUILDER_ACCESS_MODE_ANY) {
+                    if (!empty($enabled_plugins) && isset($enabled_plugins[$report->id])) {
+                        foreach ($enabled_plugins[$report->id] as $plugin => $value) {
+                            if ($value == 1) {
+                                if (!self::is_source_class_ignored($report->source)) {
+                                    return true;
+                                }
+                            }
+                        }
+                        continue;
+                    } else {
+                        // Bad data - set to "any plugin passing", but no plugins actually have settings to check for this report.
+                        continue;
+                    }
+                } else if ($report->accessmode == REPORT_BUILDER_ACCESS_MODE_ALL) {
+                    if (!empty($enabled_plugins) && isset($enabled_plugins[$report->id])) {
+                        $status = true;
+                        foreach ($enabled_plugins[$report->id] as $plugin => $value) {
+                            if ($value == 0) {
+                                // Failed in some expected plugin, reject.
+                                $status = false;
+                                break;
+                            }
+                        }
+                        if ($status) {
+                            if (!self::is_source_class_ignored($report->source)) {
+                                return true;
+                            }
+                        }
+                    } else {
+                        // Bad data - set to "all plugins passing", but no plugins actually have settings to check for this report.
+                        continue;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Get the value of the specified parameter, or null if not found
@@ -6327,9 +6474,9 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
         $todb->initialdisplay = $embed->initialdisplay;
     }
 
-    try {
-        $transaction = $DB->start_delegated_transaction();
+    $transaction = $DB->start_delegated_transaction();
 
+    try {
         $newid = $DB->insert_record('report_builder', $todb);
         // Add columns.
         $so = 1;
@@ -6379,8 +6526,7 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
             $classname = $option . '_content';
             if (class_exists('rb_' . $classname)) {
                 foreach ($settings as $name => $value) {
-                    if (!reportbuilder::update_setting($newid, $classname, $name,
-                        $value)) {
+                    if (!reportbuilder::update_setting($newid, $classname, $name, $value)) {
                             throw new moodle_exception('Error inserting content restrictions');
                         }
                 }
@@ -6391,8 +6537,7 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
             $classname = $option . '_access';
             if (class_exists($classname)) {
                 foreach ($settings as $name => $value) {
-                    if (!reportbuilder::update_setting($newid, $classname, $name,
-                        $value)) {
+                    if (!reportbuilder::update_setting($newid, $classname, $name, $value)) {
                             throw new moodle_exception('Error inserting access restrictions');
                         }
                 }
@@ -6713,4 +6858,3 @@ function reportbuilder_clone_report(reportbuilder $report, $clonename) {
 
     return $cloneid;
 }
-

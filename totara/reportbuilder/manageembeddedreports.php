@@ -36,10 +36,11 @@ $pageparams = [
     'debug' => $debug,
 ];
 
-$shortname = 'manage_embedded_reports';
+// Generate any missing embedded reports when we load this page.
+reportbuilder::generate_embedded_reports();
 
 $config = (new rb_config())->set_sid($sid)->set_embeddata($pageparams);
-if (!$report = reportbuilder::create_embedded($shortname, $config)) {
+if (!$report = reportbuilder::create_embedded('manage_embedded_reports', $config)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 

@@ -50,9 +50,7 @@ class myreports extends item {
         }
 
         require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
-        $reportbuilder_permittedreports = \reportbuilder::get_user_permitted_reports();
-        $hasreports = (is_array($reportbuilder_permittedreports) && (count($reportbuilder_permittedreports) > 0));
-        if ($hasreports) {
+        if (\reportbuilder::has_reports()) {
             $cache = true;
         } else {
             $cache = false;

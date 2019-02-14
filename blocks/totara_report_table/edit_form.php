@@ -46,6 +46,9 @@ class block_totara_report_table_edit_form extends block_edit_form {
         // Output the form.
         $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
+        // Generate any missing embedded reports when we load this form.
+        reportbuilder::generate_embedded_reports();
+
         // Report selection.
         $reportoptions = array('' => get_string('choosedots', 'core'));
 

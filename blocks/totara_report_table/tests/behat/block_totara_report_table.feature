@@ -289,7 +289,9 @@ Feature: Report builder table block
     And I should see "User report: 13 records shown"
 
   Scenario: Test view full report link for embedded report block navigation
-    Given I am on a totara site
+    # Enable report-based catalogue to be able to select it.
+    And I set the following administration settings values:
+      | Catalogue type | enhanced |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
