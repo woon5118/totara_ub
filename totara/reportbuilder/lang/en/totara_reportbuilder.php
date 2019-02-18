@@ -389,6 +389,16 @@ $string['eventreportviewed'] = 'Report viewed';
 $string['eventscheduledreportcreated'] = 'Scheduled report created';
 $string['eventscheduledreportdeleted'] = 'Scheduled report deleted';
 $string['eventscheduledreportupdated'] = 'Scheduled report updated';
+$string['fetchmethod'] = 'Result fetch method';
+$string['fetchmethod_default'] = 'Default result fetch method';
+$string['fetchmethod_help'] = 'This advanced option allows you to fine tune how results for the report are fetched from the database when displaying a single page of the table.
+By default the recommended approach for your database engine will be used. This is determined by the database engine itself.
+In situations where you are experiencing poor performance for a report changing this setting may result in improved performance.
+Setting this to use a standard recordset will result in report pages executing two distinct queries. The first to get a single page of results, and the second to get the total count of results for the report.
+Setting this to use counted recordset will result in a single query being made against the database that will return both a single page of results, and the total count of results.';
+$string['fetchmethod_use_countedrecordset'] = 'Use a single advanced query to get both results and a count';
+$string['fetchmethod_use_databaserecommendation'] = 'Use the recommended method for your database engine';
+$string['fetchmethod_use_standardrecordset'] = 'Use two simple queries, one to get the results, and a second to get the count';
 $string['filter'] = 'Filter';
 $string['filterby'] = 'Filter by';
 $string['filtercheckboxallyes'] = 'All values "Yes"';

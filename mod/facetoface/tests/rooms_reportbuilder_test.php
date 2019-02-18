@@ -137,25 +137,6 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
     }
 
     /**
-     * Helper method to invoke the private methods
-     * of report builder class
-     *
-     * @param reportbuilder     $reportbuilder
-     * @param int               $max
-     * @return counted_recordset
-     */
-    private function query_records(reportbuilder $reportbuilder, int $max=2): counted_recordset {
-        list($sql, $params, $cache) = $reportbuilder->build_query(false, true);
-
-        $refClass = new ReflectionClass($reportbuilder);
-        $method = $refClass->getMethod("get_counted_recordset_sql");
-        $method->setAccessible(true);
-
-        $results = $method->invokeArgs($reportbuilder, [$sql, $params, 0, $max, true]);
-        return $results;
-    }
-
-    /**
      * Providing the data with the ability to tweak data type
      *
      * @param stdClass  $user   User who created the room
@@ -217,8 +198,7 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
         $data = $this->dummy_data($user);
         $this->create_face2face_rooms($data);
 
-        $records = $this->query_records($reportbuilder);
-        $this->assertEquals(1, $records->get_count_without_limits());
+        $this->assertEquals(1, $reportbuilder->get_filtered_count());
     }
 
     /**
@@ -250,8 +230,7 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
 
         $DB->insert_record("facetoface_sessions_dates", (object) $params);
 
-        $records = $this->query_records($reportbuilder);
-        $this->assertEquals(2, $records->get_count_without_limits());
+        $this->assertEquals(2, $reportbuilder->get_filtered_count());
     }
 
     /**
@@ -277,7 +256,6 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
         $data = $this->dummy_data($user, false);
         $this->create_face2face_rooms($data);
 
-        $records = $this->query_records($reportbuilder);
-        $this->assertEquals(1, $records->get_count_without_limits());
+        $this->assertEquals(1, $reportbuilder->get_filtered_count());
     }
 }

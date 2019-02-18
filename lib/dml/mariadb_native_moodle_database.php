@@ -142,4 +142,18 @@ class mariadb_native_moodle_database extends mysqli_native_moodle_database {
         }
         return true;
     }
+
+    /**
+     * Returns true as MariaDB testing showed that for the queries tested 2 queries was faster than a counted recordset.
+     *
+     * Testing showed that MariaDB 10.2, 10.3, and 10.4 when using counted recordsets performed quicker than two independent queries
+     * on a paginated recordset.
+     * For results on performance testing of paginated results see:
+     * https://tracker.totaralms.com/browse/TL-19933?focusedCommentId=172537&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-172537
+     *
+     * @return bool
+     */
+    public function recommends_counted_recordset(): bool {
+        return true;
+    }
 }

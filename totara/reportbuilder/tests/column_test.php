@@ -1057,9 +1057,9 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
         // Test we can execute the query with all columns and filters.
         $rb = reportbuilder::create($bigreportid);
-        list($sql, $params, $cacheschedule) = $rb->build_query(false, true, false);
-        $rs = $DB->get_counted_recordset_sql($sql, $params);
-        $rs->close();
+        $getdata = new ReflectionMethod(reportbuilder::class, 'get_data');
+        $getdata->setAccessible(true);
+        $getdata->invoke($rb);
 
         if (!$src->cacheable) {
             return;
@@ -1119,9 +1119,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $this->enable_caching($bigreportid);
         $rb = reportbuilder::create($bigreportid);
         if ($rb->cache) {
-            list($sql, $params, $cacheschedule) = $rb->build_query(false, true, true);
-            $rs = $DB->get_counted_recordset_sql($sql, $params);
-            $rs->close();
+            $getdata->invoke($rb);
         }
 
         reportbuilder_purge_cache($bigreportid, false);

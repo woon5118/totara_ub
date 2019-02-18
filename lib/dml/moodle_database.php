@@ -3224,4 +3224,16 @@ abstract class moodle_database {
         $paramcounts[$prefix]++;
         return 'uq_'.$prefix.'_'.$paramcounts[$prefix];
     }
+
+    /**
+     * Returns true if this database engine recommends counted recordsets be used for counting of paginated recordsets.
+     *
+     * For results on performance testing of paginated results see:
+     * https://tracker.totaralms.com/browse/TL-19933?focusedCommentId=172537&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-172537
+     *
+     * @return bool
+     */
+    public function recommends_counted_recordset(): bool {
+        return false;
+    }
 }

@@ -14,6 +14,8 @@ information provided here is intended especially for developers.
 * Deprecated display method rb_display_deleted_status() has been removed
 * Deprecated graph::reset_records() has been removed
 * Deprecated rb_base_source::language_code_to_name instead use totara_core\helper::language_code_to_name
+* Deprecated reportbuilder::get_counted_recordset_sql, this method was private and should not have been used outside
+  of this class. The methods get_data_for_table() and get_data() replace it.
 
 === 12.0 ===
 

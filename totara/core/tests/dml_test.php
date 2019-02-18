@@ -1920,4 +1920,21 @@ ORDER BY tt1.groupid";
         $dbman->drop_table(new xmldb_table($coursetable));
         $dbman->drop_table(new xmldb_table($coursesearchtable));
     }
+
+    /**
+     * Tests recommends_counted_recordset to ensure it returns the result that we expect.
+     *
+     * Expected results are thanks to performance testing completed for each database.
+     * For results on performance testing of paginated results see:
+     * https://tracker.totaralms.com/browse/TL-19933?focusedCommentId=172537&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-172537
+     */
+    public function test_recommends_counted_recordset() {
+        global $DB;
+        $expected = false;
+        $dbfamily = $DB->get_dbvendor(); // Cannot use get_dbfamily() here because MariaDB returns 'mysql'.
+        if ($dbfamily === 'mariadb') {
+            $expected = true;
+        }
+        self::assertSame($expected, $DB->recommends_counted_recordset());
+    }
 }

@@ -121,6 +121,13 @@ class reportbuilder {
     const FILTER = 1;
     const FILTERALL = 2;
 
+    /**
+     * Used to represent the different methods of fetching results and counts for a report.
+     */
+    const FETCHMETHOD_DATABASE_RECOMMENDATION = 0;
+    const FETCHMETHOD_STANDARD_RECORDSET = 1;
+    const FETCHMETHOD_COUNTED_RECORDSET = 2;
+
     /** Disable global restrictions in report */
     const GLOBAL_REPORT_RESTRICTIONS_DISABLED = 0;
     /** Use site-wide global restrictions in report */
@@ -257,6 +264,22 @@ class reportbuilder {
      * @var bool
      */
     public $useclonedb;
+
+    /**
+     * Sets how data and counts are collected for the report.
+     *
+     * Values:
+     *   - FETCHMETHOD_COUNTED_RECORDSET: Counted recordsets will be used, allowing counts to be collected when counting records.
+     *   - FETCHMETHOD_STANDARD_RECORDSET: A standard recordset will be used to get data, and a separate query will be executed to get counts.
+     *   - FETCHMETHOD_DATABASE_RECOMMENDATION: Use the system default, which if not set uses the database recommendation (recommended)
+     *
+     * Don't access this property outside of the Report Builder API.
+     * It should be considered private. It is public only because of the report form requirements.
+     *
+     * @internal
+     * @var int
+     */
+    private $fetchmethod = null;
 
     /**
      * Factory method for creating instance of report (both user and embedded reports ids are allowed).
@@ -455,6 +478,9 @@ class reportbuilder {
         if ($this->is_ready()) {
             throw new coding_exception('This report instance cannot be initialised any more.');
         }
+
+        // Set default fetch method for this report.
+        $this->fetchmethod = self::get_default_fetch_method();
 
         // Load restriction set.
         if (!empty($CFG->enableglobalrestrictions)) {
@@ -3697,6 +3723,57 @@ class reportbuilder {
     }
 
     /**
+     * Returns the fetch method this report should use.
+     *
+     * @return int One of self::FETCHMETHOD_*
+     */
+    private function get_fetch_method() {
+        global $DB;
+
+        $value = $this->fetchmethod;
+
+        if ($value === self::FETCHMETHOD_STANDARD_RECORDSET) {
+            return self::FETCHMETHOD_STANDARD_RECORDSET;
+        }
+        if ($value === self::FETCHMETHOD_COUNTED_RECORDSET) {
+            return self::FETCHMETHOD_COUNTED_RECORDSET;
+        }
+
+        $default = self::get_default_fetch_method();
+        if ($default === self::FETCHMETHOD_STANDARD_RECORDSET) {
+            return self::FETCHMETHOD_STANDARD_RECORDSET;
+        }
+        if ($default === self::FETCHMETHOD_COUNTED_RECORDSET) {
+            return self::FETCHMETHOD_COUNTED_RECORDSET;
+        }
+
+        if ($DB->recommends_counted_recordset()) {
+            return self::FETCHMETHOD_COUNTED_RECORDSET;
+        }
+
+        return self::FETCHMETHOD_STANDARD_RECORDSET;
+    }
+
+    /**
+     * Returns the default fetch method for report builder reports.
+     *
+     * @return int One of self::FETCHMETHOD_*
+     */
+    public static function get_default_fetch_method() {
+        $default = get_config('totara_reportbuidler', 'defaultfetchmethod');
+        if ($default !== false) {
+            $default = (int)$default;
+            if ($default === self::FETCHMETHOD_STANDARD_RECORDSET) {
+                return self::FETCHMETHOD_STANDARD_RECORDSET;
+            }
+            if ($default === self::FETCHMETHOD_COUNTED_RECORDSET) {
+                return self::FETCHMETHOD_COUNTED_RECORDSET;
+            }
+        }
+        return self::FETCHMETHOD_DATABASE_RECOMMENDATION;
+    }
+
+    /**
      * Is report caching enabled and cache is ready and not cache is not ignored
      *
      * @return bool
@@ -4385,7 +4462,7 @@ class reportbuilder {
      * @return string|void No return value but prints the current data table
      */
     public function display_table($return = false) {
-        global $SESSION, $DB, $OUTPUT, $PAGE;
+        global $SESSION, $OUTPUT, $PAGE;
 
         if (!$this->can_access()) {
             throw new moodle_exception('nopermission', 'totara_reportbuilder');
@@ -4544,17 +4621,10 @@ class reportbuilder {
             $table->pagesize($perpage, $this->get_filtered_count());
             $table->set_no_records_message(get_string('initialdisplay_pending', 'totara_reportbuilder'));
         } else {
+            $records = $this->get_data_for_table($table);
+            $count = $this->get_filtered_count();
 
-            // Get the ORDER BY sql snippet and page start, needed for the records and the graph.
-            $order = $this->get_report_sort($table);
-            $pagestart = $table->get_page_start();
-
-            // Get the recordset!
-            list($sql, $params, $cache) = $this->build_query(false, true);
-            // This also sets the filtered count so that when we use it later it doesn't execute the query again!
-            $records = $this->get_counted_recordset_sql($sql . $order, $params, $pagestart, $perpage, true);
-
-            $table->pagesize($perpage, $this->get_filtered_count());
+            $table->pagesize($perpage, $count);
             $table->add_toolbar_pagination('right', 'both');
             if ($this->is_report_filtered()) {
                 $table->set_no_records_message(get_string('norecordswithfilter', 'totara_reportbuilder'));
@@ -4562,7 +4632,8 @@ class reportbuilder {
                 $table->set_no_records_message(get_string('norecordsinreport', 'totara_reportbuilder'));
             }
 
-            $count = $this->get_filtered_count();
+            $require_complete_graph = ($count <= $perpage);
+
             $location = 0;
             foreach ($records as $record) {
                 $record_data = $this->src->process_data_row($record, 'html', $this);
@@ -4578,7 +4649,7 @@ class reportbuilder {
                     $table->add_data($record_data);
                 }
 
-                if ($graph and $pagestart == 0) {
+                if ($graph and !$require_complete_graph) {
                     $graph->add_record($record);
                 }
             }
@@ -4586,14 +4657,17 @@ class reportbuilder {
             // Close the recordset.
             $records->close();
 
-            if ($graph and ($pagestart != 0 or $perpage == $graph->count_records())) {
-                $graph = new \totara_reportbuilder\local\graph($this);
-                if ($records = $DB->get_recordset_sql($sql.$order, $params, 0, $graph->get_max_records())) {
-                    foreach ($records as $record) {
-                        $graph->add_record($record);
-                    }
-                    $records->close();
+            if ($graph and $require_complete_graph) {
+                $records = $this->get_data(
+                    $this->get_report_sort($table),
+                    0,
+                    $graph->get_max_records(),
+                    self::FETCHMETHOD_STANDARD_RECORDSET
+                );
+                foreach ($records as $record) {
+                    $graph->add_record($record);
                 }
+                $records->close();
             }
         }
 
@@ -4657,6 +4731,7 @@ class reportbuilder {
      *
      * Wrapped into a separate function so that we can ensure that all errors given when producing the data are friendly.
      *
+     * @deprecated since Totara 13 as it is no longer needed. See get_data_for_table();
      * @since Totara 2.7.29, 2.9.21, 9.9, 10
      * @throws moodle_exception If the report query fails a moodle_exception with a friendly message is generated instead
      *      of a dml_read_exception.
@@ -4690,6 +4765,65 @@ class reportbuilder {
 
         if ($setfilteredcount) {
             $this->set_filtered_count($recordset->get_count_without_limits());
+        }
+
+        return $recordset;
+    }
+
+    /**
+     * Returns a recordset containing data suitable for use in the given totara_table.
+     *
+     * @param totara_table $table
+     * @return moodle_recordset|counted_recordset
+     */
+    private function get_data_for_table(totara_table $table): moodle_recordset {
+        $orderby = $this->get_report_sort($table);
+        $limitfrom = $table->get_page_start();
+        if ($limitfrom === '') {
+            $limitfrom = 0;
+        }
+
+        $limitnum = $table->get_page_size();
+        if ($limitnum === '') {
+            $limitnum = 0;
+        }
+        return $this->get_data($orderby, (int)$limitfrom, (int)$limitnum);
+    }
+
+    /**
+     * Gets data for this report.
+     *
+     * @param string $orderby
+     * @param int $limitfrom
+     * @param int $limitnum
+     * @param int $method One of self::FETCHMETHOD_USE_*
+     * @return moodle_recordset|counted_recordset
+     */
+    private function get_data(string $orderby = '', int $limitfrom = 0, int $limitnum = 0, int $method = null): moodle_recordset {
+        list($sql, $params, $cache) = $this->build_query(false, true);
+        $sql .= $orderby;
+
+        if ($method === null) {
+            $method = $this->get_fetch_method();
+        }
+
+        try {
+            $reportdb = $this->get_report_db();
+            if ($method === self::FETCHMETHOD_COUNTED_RECORDSET) {
+                // This also sets the filtered count so that when we use it later it doesn't execute the query again!
+                $recordset = $reportdb->get_counted_recordset_sql($sql, $params, $limitfrom, $limitnum, $count);
+                $this->set_filtered_count($count);
+            } else {
+                $recordset = $reportdb->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
+            }
+        } catch (dml_exception $e) {
+            // We are wrapping this exception to provide a more user friendly error message.
+            if ($this->is_cached()) {
+                $message = 'error:problemobtainingcachedreportdata';
+            } else {
+                $message = 'error:problemobtainingreportdata';
+            }
+            throw new moodle_exception($message, 'totara_reportbuilder', '', $e->getMessage(), $e->debuginfo);
         }
 
         return $recordset;

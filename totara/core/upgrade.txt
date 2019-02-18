@@ -32,6 +32,8 @@ information provided here is intended especially for developers.
   they may be targeted by user_tours. This is to replace the the css classes used to identify individual menu items used
   in Totara 11 and below.
 * totara_core\masthead_menu::export_for_template now outputs totara_core|home instead of home (as provided by the basis theme)
+* Added moodle_database::recommends_counted_recordset() which should be overridden for databases where performance
+  testing shows that counted recordsets perform better than two simple queries.
 
 === 12.0 ===
 

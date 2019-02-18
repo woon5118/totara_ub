@@ -111,16 +111,13 @@ class mod_facetoface_seminar_waitlisted_testcase extends advanced_testcase {
 
     /**
      * @param reportbuilder $reportbuilder
-     * @return counted_recordset
+     * @return moodle_recordset
      */
-    private function query_records(reportbuilder $reportbuilder): counted_recordset {
-        list ($sql, $params, $cache) = $reportbuilder->build_query(false, true);
-
+    private function query_records(reportbuilder $reportbuilder): moodle_recordset {
         $refClass = new ReflectionClass($reportbuilder);
-        $method = $refClass->getMethod("get_counted_recordset_sql");
+        $method = $refClass->getMethod("get_data");
         $method->setAccessible(true);
-        $recordset = $method->invokeArgs($reportbuilder, [$sql, $params, 0, 100, true]);
-
+        $recordset = $method->invoke($reportbuilder);
         return $recordset;
     }
 
@@ -137,9 +134,7 @@ class mod_facetoface_seminar_waitlisted_testcase extends advanced_testcase {
         $rid = $this->create_facetoface_session_report();
 
         $reportbuilder = reportbuilder::create($rid);
-
-        $recordset = $this->query_records($reportbuilder);
-        $this->assertEquals(2, $recordset->get_count_without_limits());
+        $this->assertEquals(2, $reportbuilder->get_filtered_count());
     }
 
     /**
