@@ -115,6 +115,26 @@ Feature: Award badges
     And I follow "Profile" in the user menu
     And I click on "Course 1" "link" in the "region-main" "region"
     And I should see "Course Badge"
+    # Student 1 should have both badges also in the Badges navigation section.
+    When I follow "Badges"
+    Then I should see "Course Badge"
+    And I should not see "Manage badges" in the "#region-main" "css_element"
+    And I should not see "Add a new badge"
+    And I log out
+    # Teacher 1 should have access to manage/create badges in the Badges navigation section.
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Badges"
+    Then I should see "Course Badge"
+    And I should see "Manage badges" in the "#region-main" "css_element"
+    And I should see "Add a new badge"
+    # Teacher 1 should NOT have access to manage/create site badges in the Site badges section.
+    When I am on homepage
+    And I click on "Home" in the totara menu
+    And I click on "Site badges" "link" in the "Front page" "block"
+    Then I should see "There are no badges available."
+    And I should not see "Manage badges" in the "#region-main" "css_element"
+    And I should not see "Add a new badge"
 
   @javascript
   Scenario: Award badge on activity completion

@@ -114,3 +114,37 @@ Feature: Add badges to the system
       | Endorsement comment | Test Endorsement comment    |
     And I press "Save changes"
     Then I should see "Changes saved"
+
+  @javascript @_file_upload
+  Scenario: Add a badge from Site badges section
+    Given I click on "Home" in the totara menu
+    And I click on "Site badges" "link" in the "Front page" "block"
+    Then I should see "Manage badges" in the "#region-main" "css_element"
+    And I should see "Add a new badge"
+    # Add a badge.
+    When I follow "Add a new badge"
+    And I set the following fields to these values:
+      | Name          | Test badge with 'apostrophe' and other friends (<>&@#) 2 |
+      | Version       | v1                                                       |
+      | Language      | English                                                  |
+      | Description   | Test badge description                                   |
+      | Image author  | http://author.example.com                                |
+      | Image caption | Test caption image                                       |
+      | issuername    | Test Badge Site                                          |
+      | issuercontact | testuser@example.com                                     |
+    And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
+    And I press "Create badge"
+    Then I should see "Edit details"
+    And I should see "Test badge with 'apostrophe' and other friends (&@#) 2"
+    And I should see "Endorsement"
+    And I should see "Related badges (0)"
+    And I should not see "Create badge"
+    And I follow "Manage badges"
+    And I should see "Number of badges available: 1"
+    And I should not see "There are no badges available."
+    # See buttons from the "Site badges" page.
+    And I am on homepage
+    And I click on "Home" in the totara menu
+    When I click on "Site badges" "link" in the "Front page" "block"
+    Then I should see "Manage badges" in the "#region-main" "css_element"
+    And I should see "Add a new badge"
