@@ -853,7 +853,7 @@ class event extends \moodleform {
             $todb->allowcancellations = $fromform->allowcancellations;
             $todb->cancellationcutoff = $fromform->cancellationcutoff;
         } else {
-            if ($session) {
+            if ((int)$session->id != 0) {
                 $todb->allowcancellations = $session->allowcancellations;
                 $todb->cancellationcutoff = $session->cancellationcutoff;
             } else {
