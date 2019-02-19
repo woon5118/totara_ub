@@ -21,6 +21,8 @@
  * @package core_badges
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/totara/program/lib.php');
@@ -155,6 +157,10 @@ class award_criteria_program extends award_criteria {
         global $DB;
         $overall = false;
 
+        if (!self::is_enabled()) {
+            return false;
+        }
+
         foreach ($this->params as $param) {
             $program = $DB->get_record('prog', array('id' => $param['program']));
 
@@ -223,7 +229,11 @@ class award_criteria_program extends award_criteria {
 
         $join = '';
         $where = '';
-        $params = array ();
+        $params = array();
+
+        if (!self::is_enabled()) {
+            return array($join, $where, $params);
+        }
 
         // Build the joins and where SQL required to retrieve
         // a list of newly qualifying users who have met program
@@ -244,6 +254,15 @@ class award_criteria_program extends award_criteria {
         }
 
         return array($join, $where, $params);
+    }
+
+    /**
+     * Hide this criteria when competencies are disabled.
+     *
+     * @return boolean
+     */
+    public static function is_enabled() {
+        return advanced_feature::is_enabled('programs');
     }
 
 }
