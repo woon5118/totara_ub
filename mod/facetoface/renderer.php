@@ -1781,17 +1781,20 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param \mod_facetoface\seminar $seminar
      */
     public function attendees_export_form(\mod_facetoface\seminar $seminar) {
+        global $OUTPUT;
 
         if (has_capability('mod/facetoface:viewattendees', $this->context)) {
             echo \html_writer::start_tag('form', array('action' => 'export.php', 'method' => 'post'));
             echo \html_writer::start_tag('div') . \html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'f', 'value' => $seminar->get_id()));
-            echo get_string('exportattendance', 'facetoface') . '&nbsp;';
+            echo $OUTPUT->help_icon('exportattendance', 'mod_facetoface', true) . '&nbsp;';
+
             $formats = [
                 '0' => get_string('format', 'mod_facetoface'),
                 'excel' => get_string('excelformat', 'facetoface'),
                 'ods' => get_string('odsformat', 'facetoface')
             ];
             echo \html_writer::select($formats, 'download', '0', '');
+
             echo \html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('exporttofile', 'facetoface')));
             echo \html_writer::end_tag('div') . \html_writer::end_tag('form');
         }

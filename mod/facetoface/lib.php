@@ -1389,7 +1389,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         JOIN {facetoface_sessions} s ON s.facetoface = f.id
         JOIN {facetoface_signups} su ON s.id = su.sessionid
         JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
-        JOIN {user} u ON u.id = su.userid
+        JOIN {user} u ON u.id = su.userid AND u.deleted = 0
         LEFT JOIN (
             SELECT ss.signupid, MAX(ss.timecreated) AS timecreated
             FROM {facetoface_signups_status} ss
@@ -1461,6 +1461,10 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
     $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
 
     foreach ($sessions as $session) {
+        if (null == $session->roomid) {
+            $session->roomid = 0;
+        }
+
         $sessionstartdate = false;
         $sessionenddate = false;
         $starttime   = get_string('wait-listed', 'facetoface');

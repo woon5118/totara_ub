@@ -673,6 +673,7 @@ $string['exportattendancetxt'] = 'Export attendance form (txt)';
 $string['exportattendancexls'] = 'Export attendance form (xls)';
 $string['exporttofile'] = 'Export to file';
 $string['exportattendance'] = 'Export attendance';
+$string['exportattendance_help'] = 'Please note: when exporting attendees report from this page any deleted users will be excluded. To include deleted users you must go to Report Builder and export it there.';
 $string['exportcustomprofilefields'] = 'Export custom profile fields';
 $string['exportcustomprofilefields_desc'] = 'Include these custom user profile fields (short names) in seminar exports, separated by commas.';
 $string['exportuserprofilefields'] = 'Export user profile fields';
