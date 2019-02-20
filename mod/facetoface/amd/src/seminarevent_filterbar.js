@@ -26,7 +26,17 @@ define([], function () {
     var filter = {
         init: function (root) {
             /**
-             * Reset a <select>.value if it is not.
+             * Execute Array.forEach for <select> elements in the root element.
+             * @param {Function} callback A callback function that is passed to the forEach method.
+             */
+            function forEachSelectElement (callback) {
+                Array.prototype.forEach.call(
+                    root.getElementsByTagName('select'),
+                    callback
+                );
+            }
+            /**
+             * Restore the correct <select>.value if it is not.
              * @param {HTMLSelectElement} el <select> element
              */
             function initialSelection (el) {
@@ -37,25 +47,33 @@ define([], function () {
                     }
                 }
             }
-            // restore the initial selection for Safari
             window.addEventListener(
                 'pageshow',
                 function () {
-                    Array.prototype.forEach.call(
-                        root.getElementsByTagName('select'),
-                        initialSelection
+                    forEachSelectElement(
+                        function (el) {
+                            // restore the initial selection for Safari
+                            initialSelection(el);
+                            // enable filter when the page is displayed
+                            el.disabled = false;
+                        }
                     );
                 }
             );
-            Array.prototype.forEach.call(
-                root.getElementsByTagName('select'),
+            forEachSelectElement(
                 function (el) {
                     // restore the initial selection for Chrome
                     initialSelection(el);
-
                     el.addEventListener('change', function (e) {
                         e.target.closest('form').submit();
+                        forEachSelectElement(
+                            function (el) {
+                                el.disabled = true;
+                            }
+                        );
                     });
+                    // enable filter when the page is displayed
+                    el.disabled = false;
                 }
             );
         }

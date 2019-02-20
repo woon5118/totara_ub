@@ -120,7 +120,7 @@
         {{^disabled}}
             <div class="mod_facetoface__filter__item">
                 <label for="mod_facetoface__filter_{{formid}}__{{name}}" class="mod_facetoface__filter__item__label">{{{label}}}</label>
-                <select id="mod_facetoface__filter_{{formid}}__{{name}}" name="{{name}}" class="mod_facetoface__filter__item__{{class}}-select" data-webkit-init-value="{{webkit_init_value}}">
+                <select id="mod_facetoface__filter_{{formid}}__{{name}}" name="{{name}}" disabled class="mod_facetoface__filter__item__{{class}}-select" data-webkit-init-value="{{webkit_init_value}}">
                     {{#options}}
                         <option value="{{value}}"{{#selected}} selected{{/selected}}>{{name}}</option>
                     {{/options}}
