@@ -46,7 +46,7 @@ class totara_reportbuilder_rb_base_source_testcase extends advanced_testcase {
      */
     public function test_get_all_advanced_column_options(rb_base_source $source) {
         $options = $source->get_all_advanced_column_options();
-        self::assertInternalType('array', $options);
+        self::assertIsArray($options);
         self::assertCount(3, $options);
 
         $key_none = get_string('none');
@@ -61,12 +61,12 @@ class totara_reportbuilder_rb_base_source_testcase extends advanced_testcase {
 
         foreach ($options[$key_transforms] as $key => $value) {
             self::assertStringStartsWith('transform_', $key);
-            self::assertInternalType('string', $value);
+            self::assertIsString($value);
         }
 
         foreach ($options[$key_aggregations] as $key => $value) {
             self::assertStringStartsWith('aggregate_', $key);
-            self::assertInternalType('string', $value);
+            self::assertIsString($value);
         }
     }
 
@@ -76,10 +76,10 @@ class totara_reportbuilder_rb_base_source_testcase extends advanced_testcase {
     public function test_get_allowed_advanced_column_options(rb_base_source $source) {
         $options = $source->get_allowed_advanced_column_options();
 
-        self::assertInternalType('array', $options);
+        self::assertIsArray($options);
         foreach ($options as $key => $values) {
             self::assertRegExp('/^[a-z0-9_]+-[a-z0-9_]+$/', $key);
-            self::assertInternalType('array', $values);
+            self::assertIsArray($values);
             self::assertNotEmpty($values, 'There should be at least one option.');
             self::assertEmpty(reset($values), 'The first option should always be empty.');
             self::assertSame(count($values), count(array_unique($values)), 'All options should be unique.');

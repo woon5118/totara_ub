@@ -133,7 +133,7 @@ class totara_program_totara_catalog_provider_testcase extends \advanced_testcase
 
     public function test_get_buttons() {
         set_config('enablecourserequests', 1);
-        $this->assertInternalType('array', $this->provider->get_buttons());
+        $this->assertIsArray($this->provider->get_buttons());
     }
 
     public function test_change_status() {

@@ -831,27 +831,27 @@ class core_completion_progressinfo_testcase extends externallib_advanced_testcas
         }
 
         $result = $progressinfo->search_criteria(1);
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertCount(4, $result);
 
         $result = $progressinfo->search_criteria('1');
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertCount(4, $result);
 
         $result = $progressinfo->search_criteria(true);
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertCount(4, $result);
 
         $result = $progressinfo->search_criteria(2);
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertCount(1, $result);
 
         $result = $progressinfo->search_criteria(4);
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertCount(4, $result);
 
         $result = $progressinfo->search_criteria(5);
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertCount(0, $result);
     }
 

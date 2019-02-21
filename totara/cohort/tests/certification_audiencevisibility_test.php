@@ -400,7 +400,7 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
                     $r = array_shift($search);
                     $this->assertEquals($this->{$certification}->fullname, $r->certif_progexpandlink);
                 } else {
-                    $this->assertInternalType('int', strpos($search, $this->{$certification}->fullname));
+                    $this->assertIsInt(strpos($search, $this->{$certification}->fullname));
                 }
             }
 
@@ -417,7 +417,7 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
                 if ($enhancedcatalog) {
                     $this->assertCount(0, $search);
                 } else {
-                    $this->assertInternalType('int', strpos($search, 'No programs were found'));
+                    $this->assertIsInt(strpos($search, 'No programs were found'));
                 }
             }
 

@@ -51,7 +51,7 @@ class totara_catalog_feature_factory_testcase extends advanced_testcase {
         ];
     }
 
-    
+
     /**
      * Test get_features()
      *
@@ -95,14 +95,14 @@ class totara_catalog_feature_factory_testcase extends advanced_testcase {
      */
     private function assert_feature(feature $feature) {
         $this->assertNotEmpty($feature->key);
-        $this->assertInternalType('string', $feature->key);
+        $this->assertIsString($feature->key);
         $this->assertNotEmpty($feature->title);
-        $this->assertInternalType('string', $feature->title);
+        $this->assertIsString($feature->title);
         $this->assertNotEmpty($feature->datafilter);
         $this->assertInstanceOf(filter::class, $feature->datafilter);
         $this->assertTrue($feature->category instanceof lang_string || is_string($feature->category));
         $options = $feature->get_options();
-        $this->assertInternalType('array', $options);
+        $this->assertIsArray($options);
         foreach ($options as $option) {
             $this->assertInstanceOf(lang_string::class, $option);
         }
@@ -176,7 +176,7 @@ class totara_catalog_feature_factory_testcase extends advanced_testcase {
         $options = $feature->get_options();
         $this->assertGreaterThan(0, count($options));
         foreach ($options as $option) {
-            $this->assertInternalType('string', $option);
+            $this->assertIsString($option);
         }
     }
 

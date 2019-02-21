@@ -78,7 +78,7 @@ class totara_core_totara_lang_testcase extends advanced_testcase {
         }
         $string = array();
         include($file);
-        $this->assertInternalType('array', $string);
+        $this->assertIsArray($string);
         foreach ($string as $k => $v) {
             if (in_array($k, $exceptions)) {
                 continue;

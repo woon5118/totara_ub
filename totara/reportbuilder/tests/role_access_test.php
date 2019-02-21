@@ -34,7 +34,7 @@ class totara_reportbuilder_role_access_testcase extends advanced_testcase {
 
     public function test_get_all_access_plugins() {
         $result = reportbuilder::get_all_access_plugins();
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         foreach ($result as $name => $instance) {
             $this->assertStringEndsWith('_access', $name);
             $this->assertInstanceOf('totara_reportbuilder\rb\access\base', $instance);

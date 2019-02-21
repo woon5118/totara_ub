@@ -79,7 +79,7 @@ class core_phpunit_basic_testcase extends basic_testcase {
         $this->assertNotEquals($a, $b);
         $this->assertNotEquals($a, $d);
         $this->assertEquals($a, $c);
-        $this->assertEquals($a, $b, '', 0, 10, true);
+        $this->assertEqualsCanonicalizing($a, $b);
 
         // Objects.
         $a = new stdClass();

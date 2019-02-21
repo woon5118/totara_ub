@@ -558,7 +558,7 @@ class core_ddl_testcase extends database_driver_testcase {
         $id = $DB->insert_record('test_innodb', $data);
         $expected = (array)$data;
         $expected['id'] = (string)$id;
-        $this->assertEquals($expected, (array)$DB->get_record('test_innodb', array('id' => $id)), '', 0, 10, true);
+        $this->assertEqualsCanonicalizing($expected, (array)$DB->get_record('test_innodb', array('id' => $id)));
 
         $dbman->drop_table($table);
 
@@ -579,7 +579,7 @@ class core_ddl_testcase extends database_driver_testcase {
             $id = $DB->insert_record('test_innodb', $data);
             $expected = (array)$data;
             $expected['id'] = (string)$id;
-            $this->assertEquals($expected, (array)$DB->get_record('test_innodb', array('id' => $id)), '', 0, 10, true);
+            $this->assertEqualsCanonicalizing($expected, (array)$DB->get_record('test_innodb', array('id' => $id)));
         }
 
         $dbman->drop_table($table);
@@ -600,7 +600,7 @@ class core_ddl_testcase extends database_driver_testcase {
         $id = $DB->insert_record('test_innodb', $data);
         $expected = (array)$data;
         $expected['id'] = (string)$id;
-        $this->assertEquals($expected, (array)$DB->get_record('test_innodb', array('id' => $id)), '', 0, 10, true);
+        $this->assertEqualsCanonicalizing($expected, (array)$DB->get_record('test_innodb', array('id' => $id)));
 
         $dbman->drop_table($table);
     }

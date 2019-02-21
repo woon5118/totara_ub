@@ -94,7 +94,7 @@ class totara_core_progressinfo_testcase extends \advanced_testcase {
         $progressinfo = progressinfo::from_data(progressinfo::AGGREGATE_ANY, 1, 0.55, 'customdata');
 
         $cachedata = $progressinfo->prepare_to_cache();
-        $this->assertInternalType('array', $cachedata);
+        $this->assertIsArray($cachedata);
         $this->assertSame(progressinfo::AGGREGATE_ANY, $cachedata['agg_method']);
         $this->assertSame(1, $cachedata['weight']);
         $this->assertSame(0.55, $cachedata['score']);
@@ -118,7 +118,7 @@ class totara_core_progressinfo_testcase extends \advanced_testcase {
         $progressinfo->add_criteria(1, progressinfo::AGGREGATE_ANY, 5, 0.44, '', '');
 
         $cachedata = $progressinfo->prepare_to_cache();
-        $this->assertInternalType('array', $cachedata);
+        $this->assertIsArray($cachedata);
         $this->assertSame(progressinfo::AGGREGATE_ANY, $cachedata['agg_method']);
         $this->assertSame(1, $cachedata['weight']);
         $this->assertSame(0.55, $cachedata['score']);

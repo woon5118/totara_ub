@@ -994,6 +994,6 @@ class mod_data_lib_testcase extends advanced_testcase {
         // Check we received the entries updated.
         $updates = data_check_updates_since($cm, $onehourago);
         $this->assertTrue($updates->entries->updated);
-        $this->assertEquals([$datarecor1did, $datarecor2did], $updates->entries->itemids, '', 0, 10, true);
+        $this->assertEqualsCanonicalizing([$datarecor1did, $datarecor2did], $updates->entries->itemids);
     }
 }

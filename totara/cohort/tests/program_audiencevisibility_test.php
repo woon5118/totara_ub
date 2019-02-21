@@ -385,7 +385,7 @@ class totara_cohort_program_audiencevisibility_testcase extends reportcache_adva
                     $r = array_shift($search);
                     $this->assertEquals($this->{$program}->fullname, $r->prog_progexpandlink);
                 } else {
-                    $this->assertInternalType('int', strpos($search, $this->{$program}->fullname));
+                    $this->assertIsInt(strpos($search, $this->{$program}->fullname));
                 }
             }
 
@@ -402,7 +402,7 @@ class totara_cohort_program_audiencevisibility_testcase extends reportcache_adva
                 if ($enhancedcatalog) {
                     $this->assertCount(0, $search);
                 } else {
-                    $this->assertInternalType('int', strpos($search, 'No programs were found'));
+                    $this->assertIsInt(strpos($search, 'No programs were found'));
                 }
             }
 

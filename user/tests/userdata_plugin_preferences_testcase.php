@@ -176,11 +176,11 @@ abstract class core_user_userdata_plugin_preferences_testcase extends advanced_t
         $preferencecount = count($preferences);
 
         $count = forward_static_call([$class, 'execute_count'], new target_user($usera), $context);
-        self::assertInternalType('integer', $count);
+        self::assertIsInt($count);
         self::assertSame($preferencecount, $count);
 
         $count = forward_static_call([$class, 'execute_count'], new target_user($userb), $context);
-        self::assertInternalType('integer', $count);
+        self::assertIsInt($count);
         self::assertSame($preferencecount, $count);
     }
 
@@ -332,11 +332,11 @@ abstract class core_user_userdata_plugin_preferences_testcase extends advanced_t
         $preferencecount = count($preferences);
 
         $count = forward_static_call([$class, 'execute_count'], new target_user($usera), $context);
-        self::assertInternalType('integer', $count);
+        self::assertIsInt($count);
         self::assertSame($preferencecount, $count);
 
         $count = forward_static_call([$class, 'execute_count'], new target_user($userb), $context);
-        self::assertInternalType('integer', $count);
+        self::assertIsInt($count);
         self::assertSame($preferencecount, $count);
     }
 
@@ -470,11 +470,11 @@ abstract class core_user_userdata_plugin_preferences_testcase extends advanced_t
         $preferencecount = count($preferences);
 
         $count = forward_static_call([$class, 'execute_count'], new target_user($usera), $context);
-        self::assertInternalType('integer', $count);
+        self::assertIsInt($count);
         self::assertSame($preferencecount, $count);
 
         $count = forward_static_call([$class, 'execute_count'], new target_user($userb), $context);
-        self::assertInternalType('integer', $count);
+        self::assertIsInt($count);
         self::assertSame($preferencecount, $count);
     }
 

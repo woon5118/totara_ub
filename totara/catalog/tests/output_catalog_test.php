@@ -150,7 +150,7 @@ class totara_catalog_output_catalog_testcase extends output_test_base {
         // For grid_template_data only assert that it's there. Grid template itself is tested elsewhere.
         $this->assertTrue($actual['grid_template_data']['tiles_exist']);
         $this->assertSame('totara_catalog/item_narrow', $actual['grid_template_data']['tiles'][0]->template_name);
-        $this->assertInternalType('array', $actual['grid_template_data']['tiles'][0]->template_data);
+        $this->assertIsArray($actual['grid_template_data']['tiles'][0]->template_data);
     }
 
     /**

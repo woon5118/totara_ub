@@ -96,15 +96,15 @@ class totara_catalog_dataholder_testcase extends advanced_testcase {
      */
     private function assert_dataholder(dataholder $dataholder) {
         $this->assertNotEmpty($dataholder->key);
-        $this->assertInternalType('string', $dataholder->key);
-        $this->assertInternalType('string', $dataholder->name);
+        $this->assertIsString($dataholder->key);
+        $this->assertIsString($dataholder->name);
         $this->assertNotEmpty($dataholder->formatters);
-        $this->assertInternalType('array', $dataholder->formatters);
+        $this->assertIsArray($dataholder->formatters);
         foreach ($dataholder->formatters as $formatter) {
             $this->assertInstanceOf(formatter::class, $formatter);
         }
-        $this->assertInternalType('array', $dataholder->datajoins);
-        $this->assertInternalType('array', $dataholder->dataparams);
+        $this->assertIsArray($dataholder->datajoins);
+        $this->assertIsArray($dataholder->dataparams);
         $this->assertTrue($dataholder->category instanceof lang_string || is_string($dataholder->category));
     }
 

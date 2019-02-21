@@ -1277,7 +1277,7 @@ class mod_wiki_external_testcase extends externallib_advanced_testcase {
         // Test on existing subwiki.
         $result = mod_wiki_external::new_page($pagetitle, $pagecontent, 'html', $this->fpsepg1indstu->subwikiid);
         $result = external_api::clean_returnvalue(mod_wiki_external::new_page_returns(), $result);
-        $this->assertInternalType('int', $result['pageid']);
+        $this->assertIsInt($result['pageid']);
 
         $version = wiki_get_current_version($result['pageid']);
         $this->assertEquals($pagecontent, $version->content);
@@ -1299,7 +1299,7 @@ class mod_wiki_external_testcase extends externallib_advanced_testcase {
         $result = mod_wiki_external::new_page($pagetitle, $pagecontent, 'html', null, $this->wikisepind->id, $this->student->id,
             $this->group2->id);
         $result = external_api::clean_returnvalue(mod_wiki_external::new_page_returns(), $result);
-        $this->assertInternalType('int', $result['pageid']);
+        $this->assertIsInt($result['pageid']);
 
         $version = wiki_get_current_version($result['pageid']);
         $this->assertEquals($pagecontent, $version->content);
@@ -1352,7 +1352,7 @@ class mod_wiki_external_testcase extends externallib_advanced_testcase {
 
         $result = mod_wiki_external::edit_page($newpage->id, $newpagecontent);
         $result = external_api::clean_returnvalue(mod_wiki_external::edit_page_returns(), $result);
-        $this->assertInternalType('int', $result['pageid']);
+        $this->assertIsInt($result['pageid']);
 
         $version = wiki_get_current_version($result['pageid']);
         $this->assertEquals($newpagecontent, $version->content);
@@ -1363,7 +1363,7 @@ class mod_wiki_external_testcase extends externallib_advanced_testcase {
 
         $result = mod_wiki_external::edit_page($newpage->id, $newsectioncontent, $section);
         $result = external_api::clean_returnvalue(mod_wiki_external::edit_page_returns(), $result);
-        $this->assertInternalType('int', $result['pageid']);
+        $this->assertIsInt($result['pageid']);
 
         $expected = $sectioncontent . $newsectioncontent;
 

@@ -852,7 +852,7 @@ class totara_core_menu_helper_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         $rev = helper::get_cache_revision();
-        $this->assertInternalType('integer', $rev);
+        $this->assertIsInt($rev);
         $this->assertGreaterThan(1, $rev);
         $this->assertSame($rev, helper::get_cache_revision());
 
@@ -860,7 +860,7 @@ class totara_core_menu_helper_testcase extends advanced_testcase {
         $now = time();
         unset($CFG->totaramenurev);
         $rev = helper::get_cache_revision();
-        $this->assertInternalType('integer', $rev);
+        $this->assertIsInt($rev);
         $this->assertGreaterThanOrEqual($now, $rev);
     }
 
@@ -871,14 +871,14 @@ class totara_core_menu_helper_testcase extends advanced_testcase {
         $oldrev = helper::get_cache_revision();
 
         $rev = helper::bump_cache_revision();
-        $this->assertInternalType('integer', $rev);
+        $this->assertIsInt($rev);
         $this->assertGreaterThan($oldrev, $rev);
         $this->assertSame($rev, helper::get_cache_revision());
 
         $now = time();
         unset($CFG->totaramenurev);
         $rev = helper::bump_cache_revision();
-        $this->assertInternalType('integer', $rev);
+        $this->assertIsInt($rev);
         $this->assertGreaterThanOrEqual($now, $rev);
     }
 }

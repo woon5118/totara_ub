@@ -131,7 +131,7 @@ class core_course_totara_catalog_course_provider_testcase extends \advanced_test
 
     public function test_get_buttons() {
         set_config('enablecourserequests', 1);
-        $this->assertInternalType('array', $this->provider->get_buttons());
+        $this->assertIsArray($this->provider->get_buttons());
     }
 
     public function test_change_status() {

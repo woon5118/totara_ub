@@ -43,7 +43,7 @@ class totara_core_requirejs_testcase extends advanced_testcase {
         $this->assertSame('https://www.example.com/moodle/lib/javascript.php/-1/lib/requirejs/jquery-private', $config['paths']['jqueryprivate']);
         $this->assertSame('jqueryprivate', $config['map']['*']['jquery']);
         $this->assertSame('jquery', $config['map']['jqueryprivate']['jquery']);
-        $this->assertInternalType('array', $config['bundles']['core/bundle']);
+        $this->assertIsArray($config['bundles']['core/bundle']);
         foreach($config['bundles']['core/bundle'] as $amd) {
             $this->assertRegExp('/^[a-z0-9_]+\/[a-z0-9_-]+$/', $amd, 'Invalid AMD module name: ' . $amd);
             $this->assertNotContains('-lazy', $amd);
@@ -56,7 +56,7 @@ class totara_core_requirejs_testcase extends advanced_testcase {
         $this->assertSame('https://www.example.com/moodle/lib/javascript.php/55/lib/requirejs/jquery-private', $config['paths']['jqueryprivate']);
         $this->assertSame('jqueryprivate', $config['map']['*']['jquery']);
         $this->assertSame('jquery', $config['map']['jqueryprivate']['jquery']);
-        $this->assertInternalType('array', $config['bundles']['core/bundle']);
+        $this->assertIsArray($config['bundles']['core/bundle']);
         foreach($config['bundles']['core/bundle'] as $amd) {
             $this->assertRegExp('/^[a-z0-9_]+\/[a-z0-9_-]+$/', $amd, 'Invalid AMD module name: ' . $amd);
             $this->assertNotContains('-lazy', $amd);
@@ -69,7 +69,7 @@ class totara_core_requirejs_testcase extends advanced_testcase {
         $content = preg_replace('/^var require =/', '', $content);
 
         $config = json_decode($content, JSON_OBJECT_AS_ARRAY);
-        $this->assertInternalType('array', $config);
+        $this->assertIsArray($config);
         $this->assertSame('https://www.example.com/moodle/lib/requirejs.php/55/', $config['baseUrl']);
     }
 }

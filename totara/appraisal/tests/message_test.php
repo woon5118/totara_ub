@@ -502,11 +502,11 @@ class appraisal_message_test extends appraisal_testcase {
         foreach ($emails as $email) {
             if ($email->subject == 'Appraisal activation immediate') {
                 $location = array_search($email->to, $expectedactivation);
-                $this->assertInternalType('int', $location);
+                $this->assertIsInt($location);
                 unset($expectedactivation[$location]);
             } else if ($email->subject == 'Stage due before') {
                 $location = array_search($email->to, $expectedduedatemsg);
-                $this->assertInternalType('int', $location);
+                $this->assertIsInt($location);
                 unset($expectedduedatemsg[$location]);
             } else {
                 $this->assertTrue(false, 'Unexpected Email Type');
@@ -572,7 +572,7 @@ class appraisal_message_test extends appraisal_testcase {
             array('Stage due immediate', 'username3@example.com'));
         foreach ($emails as $email) {
             $location = array_search(array($email->subject, $email->to), $expectedemails);
-            $this->assertInternalType('int', $location);
+            $this->assertIsInt($location);
             unset($expectedemails[$location]);
         }
         $sink->close();
@@ -611,7 +611,7 @@ class appraisal_message_test extends appraisal_testcase {
             array('Stage completion immediate', 'username1@example.com'));
         foreach ($emails as $email) {
             $location = array_search(array($email->subject, $email->to), $expectedemails);
-            $this->assertInternalType('int', $location);
+            $this->assertIsInt($location);
             unset($expectedemails[$location]);
         }
         $sink->close();
@@ -656,7 +656,7 @@ class appraisal_message_test extends appraisal_testcase {
             array('Stage due after incomplete', 'username3@example.com'));
         foreach ($emails as $email) {
             $location = array_search(array($email->subject, $email->to), $expectedemails);
-            $this->assertInternalType('int', $location);
+            $this->assertIsInt($location);
             unset($expectedemails[$location]);
         }
         $sink->close();

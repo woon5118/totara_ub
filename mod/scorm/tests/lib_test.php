@@ -258,10 +258,10 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
         ));
 
         scorm_print_overview(array($this->course->id => $this->course), $details);
-        $this->assertInternalType('array', $details);
+        $this->assertIsArray($details);
         $this->assertCount(1, $details);
         $scormdetails = reset($details);
-        $this->assertInternalType('array', $scormdetails);
+        $this->assertIsArray($scormdetails);
         $this->assertCount(1, $scormdetails);
         $this->assertArrayHasKey('scorm', $scormdetails);
         $this->assertContains('SCORM package:', $scormdetails['scorm']);

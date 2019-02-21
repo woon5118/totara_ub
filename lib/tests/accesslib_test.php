@@ -653,13 +653,13 @@ class core_accesslib_testcase extends advanced_testcase {
         assign_capability('moodle/backup:backupcourse', CAP_PREVENT, $teacher->id, $frontcontext->id);
 
         $roles = get_roles_with_capability('moodle/backup:backupcourse');
-        $this->assertEquals(array($teacher->id, $manager->id), array_keys($roles), '', 0, 10, true);
+        $this->assertEqualsCanonicalizing(array($teacher->id, $manager->id), array_keys($roles));
 
         $roles = get_roles_with_capability('moodle/backup:backupcourse', CAP_ALLOW);
-        $this->assertEquals(array($manager->id), array_keys($roles), '', 0, 10, true);
+        $this->assertEqualsCanonicalizing(array($manager->id), array_keys($roles));
 
         $roles = get_roles_with_capability('moodle/backup:backupcourse', null, $syscontext);
-        $this->assertEquals(array($manager->id), array_keys($roles), '', 0, 10, true);
+        $this->assertEqualsCanonicalizing(array($manager->id), array_keys($roles));
     }
 
     /**
@@ -728,13 +728,13 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         $allroles = get_all_roles();
-        $this->assertInternalType('array', $allroles);
+        $this->assertIsArray($allroles);
         $this->assertCount(9, $allroles); // there are 9 roles in standard totara install
 
         $role = reset($allroles);
         $role = (array)$role;
 
-        $this->assertEquals(array('id', 'name', 'shortname', 'description', 'sortorder', 'archetype'), array_keys($role), '', 0, 10, true);
+        $this->assertEqualsCanonicalizing(array('id', 'name', 'shortname', 'description', 'sortorder', 'archetype'), array_keys($role));
 
         foreach ($allroles as $roleid => $role) {
             $this->assertEquals($role->id, $roleid);
@@ -751,12 +751,12 @@ class core_accesslib_testcase extends advanced_testcase {
         $renames = $DB->get_records_menu('role_names', array('contextid'=>$coursecontext->id), '', 'roleid, name');
 
         $allroles = get_all_roles($coursecontext);
-        $this->assertInternalType('array', $allroles);
+        $this->assertIsArray($allroles);
         $this->assertCount(10, $allroles);
         $role = reset($allroles);
         $role = (array)$role;
 
-        $this->assertEquals(array('id', 'name', 'shortname', 'description', 'sortorder', 'archetype', 'coursealias'), array_keys($role), '', 0, 10, true);
+        $this->assertEqualsCanonicalizing(array('id', 'name', 'shortname', 'description', 'sortorder', 'archetype', 'coursealias'), array_keys($role));
 
         foreach ($allroles as $roleid => $role) {
             $this->assertEquals($role->id, $roleid);
@@ -916,13 +916,13 @@ class core_accesslib_testcase extends advanced_testcase {
         foreach ($archetypes as $archetype) {
 
             $result = get_default_role_archetype_allows('assign', $archetype);
-            $this->assertInternalType('array', $result);
+            $this->assertIsArray($result);
 
             $result = get_default_role_archetype_allows('override', $archetype);
-            $this->assertInternalType('array', $result);
+            $this->assertIsArray($result);
 
             $result = get_default_role_archetype_allows('switch', $archetype);
-            $this->assertInternalType('array', $result);
+            $this->assertIsArray($result);
         }
 
         $result = get_default_role_archetype_allows('assign', '');
@@ -1300,7 +1300,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $alllevels = context_helper::get_all_levels();
         foreach ($archetypes as $archetype) {
             $defaults = get_default_contextlevels($archetype);
-            $this->assertInternalType('array', $defaults);
+            $this->assertIsArray($defaults);
             foreach ($defaults as $level) {
                 $this->assertTrue(isset($alllevels[$level]));
             }

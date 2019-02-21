@@ -1044,7 +1044,7 @@ ORDER BY tt1.groupid";
         $dbman->create_table($table);
 
         $indices = $DB->get_indexes($tablename);
-        $this->assertInternalType('array', $indices);
+        $this->assertIsArray($indices);
         $this->assertCount(4, $indices);
 
         // Ignore the index names here.
@@ -1226,8 +1226,8 @@ ORDER BY tt1.groupid";
 
         // One column only.
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['fullname' => 1], 'php');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1239,8 +1239,8 @@ ORDER BY tt1.groupid";
 
         // Three columns ranked.
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['shortname' => 100, 'fullname' => 10, 'summary' => 1], 'php');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1252,8 +1252,8 @@ ORDER BY tt1.groupid";
 
         // Three columns ranked with null values
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['shortname' => 100, 'fullname' => 10, 'summary' => 1], 'null data');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1266,8 +1266,8 @@ ORDER BY tt1.groupid";
         $this->assertDebuggingNotCalled();
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['shortname' => 100, 'fullname' => 10, 'summary' => 1], ' ');
         $this->assertDebuggingCalled('Full text search text is empty, developers should make sure user entered something.');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1279,8 +1279,8 @@ ORDER BY tt1.groupid";
 
         // Search too short.
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['shortname' => 100, 'fullname' => 10, 'summary' => 1], 'x');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1290,8 +1290,8 @@ ORDER BY tt1.groupid";
         $result = $DB->get_records_sql($sql, $params);
         $this->assertCount(0, $result);
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['shortname' => 100, 'fullname' => 10, 'summary' => 1], 'xx');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1304,8 +1304,8 @@ ORDER BY tt1.groupid";
         // Search for an incomplete word should not match anything,
         // this proves full text search is not good for autocompletion!
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['shortname' => 100, 'fullname' => 10, 'summary' => 1], 'Java');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1317,8 +1317,8 @@ ORDER BY tt1.groupid";
 
         // Search one phrase.
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['fullname' => 1], '"PHP development"');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1335,8 +1335,8 @@ ORDER BY tt1.groupid";
 
         // Other languages: Czech.
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['summary' => 1], 'žluťoučký koníček');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1349,8 +1349,8 @@ ORDER BY tt1.groupid";
 
         // Other languages: Russian.
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['fullname' => 1], 'достижений народного');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1363,8 +1363,8 @@ ORDER BY tt1.groupid";
 
         // RTL languages: Hebrew
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['summary' => 1], 'שיעורי ספורט');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1559,8 +1559,8 @@ ORDER BY tt1.groupid";
         $this->wait_for_mssql_fts_indexing($coursesearchtable);
 
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['summary' => 1], '犬');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1573,8 +1573,8 @@ ORDER BY tt1.groupid";
 
         // Not sure if it is correct, but MS SQL Server does not search for these two without space.
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['summary' => 1], '犬 木');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1725,8 +1725,8 @@ ORDER BY tt1.groupid";
         $this->wait_for_mssql_fts_indexing($coursesearchtable);
 
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['summary' => 1], '狗');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1739,8 +1739,8 @@ ORDER BY tt1.groupid";
 
         // Not sure if it is correct, but MS SQL Server does not search for these two without space.
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['summary' => 1], '狗 樹');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1891,8 +1891,8 @@ ORDER BY tt1.groupid";
         $this->wait_for_mssql_fts_indexing($coursesearchtable);
 
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['summary' => 1], '狗');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id
@@ -1905,8 +1905,8 @@ ORDER BY tt1.groupid";
 
         // Not sure if it is correct, but MS SQL Server does not search for these two without space.
         list($ftssql, $params) = $DB->get_fts_subquery($coursesearchtable, ['summary' => 1], '狗 树');
-        $this->assertInternalType('string', $ftssql);
-        $this->assertInternalType('array', $params);
+        $this->assertIsString($ftssql);
+        $this->assertIsArray($params);
         $sql = "SELECT c.*, fts.score
                   FROM {{$coursesearchtable}} cs
                   JOIN {$ftssql} fts ON fts.id = cs.id

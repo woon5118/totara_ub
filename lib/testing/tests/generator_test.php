@@ -145,7 +145,7 @@ class core_test_generator_testcase extends advanced_testcase {
         $record = $generator->create_user(array('username' => 'bloodyhack666'), array('noinsert' => true));
         $postcount = $DB->count_records('user');
         $this->assertSame($prevcount, $postcount);
-        $this->assertInternalType('array', $record);
+        $this->assertIsArray($record);
         $this->assertFalse(isset($record['id']));
         $this->assertSame('bloodyhack666', $record['username']);
 

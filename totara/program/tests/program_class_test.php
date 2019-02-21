@@ -2136,8 +2136,8 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $options_limited = program_utilities::get_standard_time_allowance_options();
         $options_all = program_utilities::get_standard_time_allowance_options(true);
 
-        $this->assertInternalType('array', $options_limited);
-        $this->assertInternalType('array', $options_all);
+        $this->assertIsArray($options_limited);
+        $this->assertIsArray($options_all);
 
         $this->assertCount(4, $options_limited);
         $this->assertCount(5, $options_all);
@@ -2162,7 +2162,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
     public function test_print_duration_selector() {
 
         $html = program_utilities::print_duration_selector('t_', 'name_test', TIME_SELECTOR_WEEKS, 'number_test', 7);
-        $this->assertInternalType('string', $html);
+        $this->assertIsString($html);
         $this->assertSame(1, preg_match('/name=([\'"])t_name_test\1/', $html));
         $this->assertSame(1, preg_match('/name=([\'"])t_number_test\1/', $html));
         $this->assertSame(1, preg_match('/value=([\'"])7\1/', $html));

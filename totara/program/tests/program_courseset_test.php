@@ -486,7 +486,7 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         $content = $program->get_content();
         $this->assertInstanceOf('prog_content', $content);
         $coursesets = $content->get_course_sets();
-        $this->assertInternalType('array', $coursesets);
+        $this->assertIsArray($coursesets);
         $this->assertCount(3, $coursesets);
         $content->fix_set_sortorder();
 

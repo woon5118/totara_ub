@@ -410,7 +410,7 @@ class totara_core_access_testcase extends advanced_testcase {
 
             include($file);
 
-            $this->assertInternalType('array', $capabilities);
+            $this->assertIsArray($capabilities);
             $this->assertNull(${$plugin.'_capabilities'});
 
             foreach ($capabilities as $capname => $data) {

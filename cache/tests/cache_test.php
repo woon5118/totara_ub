@@ -123,7 +123,7 @@ class core_cache_cache_testcase extends advanced_testcase {
         $this->assertCount(3, $stores);
         foreach ($stores as $name => $store) {
             // Check its an array.
-            $this->assertInternalType('array', $store);
+            $this->assertIsArray($store);
             // Check the name is the key.
             $this->assertEquals($name, $store['name']);
             // Check that it has been declared default.
@@ -371,11 +371,11 @@ class core_cache_cache_testcase extends advanced_testcase {
             'key1' => array(1, 2, 3),
             'key2' => array(3, 2, 1),
         ));
-        $this->assertInternalType('array', $cache->get('key1'));
-        $this->assertInternalType('array', $cache->get('key2'));
+        $this->assertIsArray($cache->get('key1'));
+        $this->assertIsArray($cache->get('key2'));
         $this->assertCount(3, $cache->get('key1'));
         $this->assertCount(3, $cache->get('key2'));
-        $this->assertInternalType('array', $cache->get_many(array('key1', 'key2')));
+        $this->assertIsArray($cache->get_many(array('key1', 'key2')));
         $this->assertCount(2, $cache->get_many(array('key1', 'key2')));
         $this->assertEquals(2, $cache->delete_many(array('key1', 'key2')));
 
@@ -545,7 +545,7 @@ class core_cache_cache_testcase extends advanced_testcase {
         $this->assertTrue($cache->purge());
         $this->assertTrue($cache->set('b', 'B'));
         $result = $cache->get_many(array('a', 'b', 'c'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('b', $result);
@@ -681,7 +681,7 @@ class core_cache_cache_testcase extends advanced_testcase {
         // Test with multiple keys.
         $this->assertEquals(3, $cache->set_many(array('a' => 'A', 'b' => 'B', 'c' => 'C')));
         $result = $cache->get_many(array('a', 'b', 'c'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('b', $result);
@@ -692,7 +692,7 @@ class core_cache_cache_testcase extends advanced_testcase {
 
         // Test with multiple keys including missing ones.
         $result = $cache->get_many(array('a', 'c', 'e'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('c', $result);
@@ -730,7 +730,7 @@ class core_cache_cache_testcase extends advanced_testcase {
         // Test with multiple keys.
         $this->assertEquals(3, $cache->set_many(array('a' => 'A', 'b' => 'B', 'c' => 'C')));
         $result = $cache->get_many(array('a', 'b', 'c'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('b', $result);
@@ -741,7 +741,7 @@ class core_cache_cache_testcase extends advanced_testcase {
 
         // Test with multiple keys including missing ones.
         $result = $cache->get_many(array('a', 'c', 'e'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('c', $result);
@@ -779,7 +779,7 @@ class core_cache_cache_testcase extends advanced_testcase {
         // Test with multiple keys.
         $this->assertEquals(3, $cache->set_many(array('a' => 'A', 'b' => 'B', 'c' => 'C')));
         $result = $cache->get_many(array('a', 'b', 'c'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('b', $result);
@@ -790,7 +790,7 @@ class core_cache_cache_testcase extends advanced_testcase {
 
         // Test with multiple keys including missing ones.
         $result = $cache->get_many(array('a', 'c', 'e'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('c', $result);
@@ -1413,7 +1413,7 @@ class core_cache_cache_testcase extends advanced_testcase {
         // Test the many commands.
         $this->assertEquals(3, $cache->set_many(array('a' => 'A', 'b' => 'B', 'c' => 'C')));
         $result = $cache->get_many(array('a', 'b', 'c'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('b', $result);
@@ -1424,7 +1424,7 @@ class core_cache_cache_testcase extends advanced_testcase {
         $this->assertEquals($result, $cache->get_many(array('a', 'b', 'c')));
         $this->assertEquals(2, $cache->delete_many(array('a', 'c')));
         $result = $cache->get_many(array('a', 'b', 'c'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('b', $result);
@@ -1482,7 +1482,7 @@ class core_cache_cache_testcase extends advanced_testcase {
         // Test the many commands.
         $this->assertEquals(3, $cache->set_many(array('a' => 'A', 'b' => 'B', 'c' => 'C')));
         $result = $cache->get_many(array('a', 'b', 'c'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('b', $result);
@@ -1493,7 +1493,7 @@ class core_cache_cache_testcase extends advanced_testcase {
         $this->assertEquals($result, $cache->get_many(array('a', 'b', 'c')));
         $this->assertEquals(2, $cache->delete_many(array('a', 'c')));
         $result = $cache->get_many(array('a', 'b', 'c'));
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('a', $result);
         $this->assertArrayHasKey('b', $result);

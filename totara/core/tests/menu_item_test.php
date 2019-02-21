@@ -345,7 +345,7 @@ class totara_core_menu_item_testcase extends advanced_testcase {
         $records = $DB->get_records('totara_navigation', array());
         foreach ($records as $record) {
             $instance = item::create_instance($record);
-            $this->assertInternalType('bool', $instance->get_default_visibility(), 'item::get_default_visibility() is now supposed to return bools');
+            $this->assertIsBool($instance->get_default_visibility(), 'item::get_default_visibility() is now supposed to return bools');
         }
     }
 
@@ -355,7 +355,7 @@ class totara_core_menu_item_testcase extends advanced_testcase {
         $records = $DB->get_records('totara_navigation', array());
         foreach ($records as $record) {
             $instance = item::create_instance($record);
-            $this->assertInternalType('bool', $instance->is_disabled(), 'item::is_disabled() is supposed to return bools');
+            $this->assertIsBool($instance->is_disabled(), 'item::is_disabled() is supposed to return bools');
         }
     }
 

@@ -284,7 +284,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
                     $r = array_shift($search);
                     $this->assertEquals($this->{$course}->fullname, $r->course_courseexpandlink);
                 } else {
-                    $this->assertInternalType('int', strpos($search, $this->{$course}->fullname));
+                    $this->assertIsInt(strpos($search, $this->{$course}->fullname));
                 }
             }
 
@@ -298,7 +298,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
                 if ($enhancedcatalog) {
                     $this->assertCount(0, $search);
                 } else {
-                    $this->assertInternalType('int', strpos($search, 'No courses were found'));
+                    $this->assertIsInt(strpos($search, 'No courses were found'));
                 }
             }
 
@@ -316,7 +316,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
                     $r = array_shift($search);
                     $this->assertEquals($this->{$course}->fullname, $r->course_courseexpandlink);
                 } else {
-                    $this->assertInternalType('int', strpos($search, $this->{$course}->fullname));
+                    $this->assertIsInt(strpos($search, $this->{$course}->fullname));
                 }
             }
 
@@ -330,7 +330,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
                 if ($enhancedcatalog) {
                     $this->assertCount(0, $search);
                 } else {
-                    $this->assertInternalType('int', strpos($search, 'No courses were found'));
+                    $this->assertIsInt(strpos($search, 'No courses were found'));
                 }
             }
         }
