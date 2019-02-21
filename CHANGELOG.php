@@ -3,6 +3,43 @@
 
 Totara Learn Changelog
 
+Release Evergreen (21st February 2019):
+=======================================
+
+Key:           + Evergreen only
+
+
+New features:
+
+    TL-12692   +   Added the ability to track attendance at the session level of seminars
+
+                   Previously it was only possible to track attendance at the event level of
+                   a seminar. With this improvement, attendance can be tracked for each
+                   individual session within an event. This includes:
+
+                   * A new seminar setting, 'Session attendance tracking', which allows trainers
+                     to record attendance for each session of a seminar event. The recorded
+                     session attendance is summarised on the event attendance form, allowing
+                     trainers to use it as the basis for setting an overall attendance status
+                     for each attendee.
+
+                   * A new seminar setting, 'Mark attendance at', which determines when trainers
+                     are allowed to begin taking attendance for an event or session.
+
+                   * A new attendance status, 'Unable to attend', which provides an option for
+                     trainers to mark an attendee as not having attended a session or event, but
+                     without marking them as a 'no show'. The 'Restrict subsequent sign-ups to'
+                     setting now includes 'Unable to attend' as one of its options.
+
+                   * The seminar events dashboard has been consolidated into a single list of
+                     sessions and events, with a filter allowing participants to see all events,
+                     or only those that are upcoming, in progress, or in the past. 
+
+                   * If 'Session attendance tracking' is enabled, a per-session 'Attendance tracking'
+                     column appears on the events dashboard, allowing trainers to see at a glance
+                     which sessions are marked or are ready to be marked.
+
+
 Release Evergreen (14th February 2019):
 =======================================
 
