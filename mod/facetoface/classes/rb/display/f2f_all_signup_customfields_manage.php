@@ -61,7 +61,9 @@ class f2f_all_signup_customfields_manage extends base {
         }
         $context = \context_module::instance($cm->id);
 
-        if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
+        // When 'Reserve spaces for team' is used and no learners are added yet,
+        // we still display attendees records with 'Reserved' status for other managers the number of reservations/bookings is used.
+        if ((int)$extrafields->userid != 0 && has_capability('mod/facetoface:manageattendeesnote', $context)) {
             $url = new \moodle_url('/mod/facetoface/attendees/ajax/signup_notes.php', array(
                 's' => $extrafields->sessionid,
                 'userid' => $extrafields->userid,
