@@ -2315,13 +2315,13 @@ function block_add_block_ui($page, $output, $region=null) {
     foreach ($page->blocks->get_addable_blocks() as $block) {
         // At least 1 block (current learning) returns its title as a lang_string
         // object, not as a normal string. Hence the typecast.
-        $blocks[] = ["blockname" => $block->name, "blocktitle" => (string)$block->title];
+        $blocks[] = ["blockname" => fix_utf8($block->name), "blocktitle" => fix_utf8((string)$block->title)];
     }
 
     // Any query parameters that were in the original url need to be replicated
     // as hidden fields in the add block form. Otherwise, things will break.
     $actionurl = new moodle_url($page->url);
-    $region =  $region ?? $this->get_default_region();
+    $region =  $region ?? $page->blocks->get_default_region();
     $hidden = [
         ["name" => "sesskey", "value" => sesskey()],
         ["name" => "bui_addblockregion", "value" => $region]

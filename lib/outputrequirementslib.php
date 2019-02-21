@@ -1061,7 +1061,11 @@ require(['core/autoinitialise'], function(ai) {
 
         $jsonparams = array();
         foreach ($params as $param) {
-            $jsonparams[] = json_encode($param);
+            $jsonvalue = json_encode($param);
+            if ($jsonvalue === false) {
+                $jsonvalue = "null";
+            }
+            $jsonparams[] = $jsonvalue;
         }
         $strparams = implode(', ', $jsonparams);
 

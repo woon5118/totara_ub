@@ -772,6 +772,61 @@ return;
         $this->assertEquals('8', $mybr[5]->instance->weight);
         $PAGE = $storedpage;
     }
+
+    /**
+     * Test that invlid values in block names are handled correctly
+     */
+    public function test_block_add_block_ui_names_handling() {
+        global $OUTPUT, $USER;
+        $this->resetAfterTest(true);
+
+        $this->setAdminUser();
+        $USER->editing = true;
+        $syscontext = context_system::instance();
+        [$page, $blockmanager] = $this->get_a_page_and_block_manager(['side-pre'], $syscontext, 'page-type');
+
+        // Mock blocks.
+        $blocks = new core_blocklib_test_blocks_mock();
+        $reflection = new ReflectionClass($page);
+        $property = $reflection->getProperty("_blocks");
+        $property->setAccessible(true);
+        $property->setValue($page, $blocks);
+
+        block_add_block_ui($page, $OUTPUT);
+        /**
+         * @var page_requirements_manager $requirements
+         */
+        $requirements = $page->requires;
+
+        $code = implode(';', $requirements->get_raw_amd_js_code());
+
+        // Current UTF-8 fixer will recover invalid UTF-8 sequence with "1".
+        $this->assertContains('{"blockname":"name1","blocktitle":"title1"}', $code);
+        $this->assertContains('{"blockname":"invalid21","blocktitle":"title2"}', $code);
+        $this->assertContains('{"blockname":"title3","blocktitle":"invalid31"}', $code);
+        $this->assertContains('{"blockname":"name4","blocktitle":"title4"}', $code);
+
+        // Confirm that default region works correctly.
+        $this->assertContains('"default-region"', $code);
+    }
+}
+
+/**
+ * Class for mocking moodle_page::_blocks property which implements methods requrie to call test_block_add_block_ui_names_handling
+ */
+class core_blocklib_test_blocks_mock {
+    public function get_addable_blocks() {
+        return [
+            (object)['name' => 'name1', 'title' => 'title1'],
+            (object)['name' => 'invalid2' . "\xB1\x31", 'title' => 'title2'],
+            (object)['name' => 'title3', 'title' => 'invalid3'. "\xB1\x31"],
+            (object)['name' => 'name4', 'title' => 'title4']
+        ];
+    }
+
+    public function get_default_region() {
+        return 'default-region';
+    }
 }
 
 /**
