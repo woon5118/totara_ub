@@ -1354,6 +1354,26 @@ class pgsql_native_moodle_database extends moodle_database {
     }
 
     /**
+     * Returns the driver specific syntax for the beginning of a word boundary.
+     *
+     * @since Totara 13.0
+     * @return string or empty if not supported
+     */
+    public function sql_regex_word_boundary_start(): string {
+        return '[[:<:]]';
+    }
+
+    /**
+     * Returns the driver specific syntax for the end of a word boundary.
+     *
+     * @since Totara 13.0
+     * @return string or empty if not supported
+     */
+    public function sql_regex_word_boundary_end(): string {
+        return '[[:>:]]';
+    }
+
+    /**
      * Does this driver support tool_replace?
      *
      * @since Moodle 2.6.1
