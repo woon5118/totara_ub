@@ -28,15 +28,19 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once('builder/seminarevent_filterbar_builder.php');
 
-class seminarevent_filterbar extends \core\output\template {
+use core\output\template;
+use mod_facetoface\output\builder\seminarevent_filterbar_builder;
+
+class seminarevent_filterbar extends template {
     /**
      * Create a new builder object.
      *
-     * @param string $id part of form id
+     * @param string $id     part of form id
      * @param string $method get or post
-     * @return \mod_facetoface\output\builder\seminarevent_filterbar_builder
+     *
+     * @return seminarevent_filterbar_builder
      */
-    public static function builder(string $id, string $method = 'get') : builder\seminarevent_filterbar_builder {
-        return new builder\seminarevent_filterbar_builder($id, $method);
+    public static function builder(string $id, string $method = 'get'): seminarevent_filterbar_builder {
+        return new seminarevent_filterbar_builder($id, $method);
     }
 }

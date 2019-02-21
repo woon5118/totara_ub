@@ -22,6 +22,7 @@
  */
 
 namespace mod_facetoface\attendance;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -52,6 +53,7 @@ final class attendance_helper {
 
     /**
      * attendance_helper constructor.
+     *
      * @param int[] $statuses
      */
     public function __construct(array $statuses = []) {
@@ -74,6 +76,7 @@ final class attendance_helper {
      * @param string $beforeid  This will be used to determine whether the sql needs to have any
      *                          other id in front of the current user's id or not. It helps to avoid
      *                          the possibility of duplicated user's id.
+     *
      * @return string
      */
     private function get_base_sql(string $beforeid = ""): string {
@@ -91,12 +94,12 @@ final class attendance_helper {
             {%extra_select%}
             f.id AS facetofaceid,
             f.course AS course
-            FROM {facetoface} AS f
-            INNER JOIN {facetoface_sessions} AS s
+            FROM {facetoface} f
+            INNER JOIN {facetoface_sessions} s
             ON s.facetoface = f.id
             INNER JOIN {facetoface_signups} su
             ON su.sessionid = s.id
-            INNER JOIN {user} AS u
+            INNER JOIN {user} u
             ON u.id = su.userid
             {%extra_join%} 
         ";
@@ -119,6 +122,7 @@ final class attendance_helper {
      * + [usernamefields] : string
      *
      * @param int $seminareventid
+     *
      * @return stdClass[]
      */
     public function get_event_attendees(int $seminareventid): array {
@@ -129,7 +133,7 @@ final class attendance_helper {
             ['{%extra_select%}', '{%extra_join%}'],
             [
                 " ss.statuscode, ",
-                " INNER JOIN {facetoface_signups_status} AS ss ON ss.signupid = su.id "
+                " INNER JOIN {facetoface_signups_status} ss ON ss.signupid = su.id "
             ],
             $sql
         );
@@ -170,6 +174,7 @@ final class attendance_helper {
      *
      * @param int $seminareventid
      * @param int $sessionid
+     *
      * @return stdClass[]
      */
     public function get_session_attendees(int $seminareventid, int $sessionid): array {
@@ -185,13 +190,13 @@ final class attendance_helper {
             ['{%extra_select%}', '{%extra_join%}'],
             [
                 ' sds.attendancecode as statuscode, ',
-                " INNER JOIN {facetoface_sessions_dates} AS sd ON sd.sessionid = s.id
+                " INNER JOIN {facetoface_sessions_dates} sd ON sd.sessionid = s.id
                   
-                  LEFT JOIN {facetoface_signups_dates_status} AS sds ON sds.signupid = su.id
+                  LEFT JOIN {facetoface_signups_dates_status} sds ON sds.signupid = su.id
                     AND sds.sessiondateid = sd.id
                     AND sds.superceded <> 1
                     
-                  LEFT JOIN {facetoface_signups_status} AS ss ON ss.signupid = su.id
+                  LEFT JOIN {facetoface_signups_status} ss ON ss.signupid = su.id
                     AND ss.superceded <> 1
                     
                 "
@@ -207,7 +212,7 @@ final class attendance_helper {
         ";
 
         $params['seminareventid'] = $seminareventid;
-        $params['sessiondateid'] = $sessionid;
+        $params['sessiondateid']  = $sessionid;
 
         return $DB->get_records_sql($sql, $params);
     }
@@ -220,6 +225,7 @@ final class attendance_helper {
      *
      * @param int $seminareventid
      * @param int $sessiondateid
+     *
      * @return stdClass[]
      */
     public function get_attendees(int $seminareventid, int $sessiondateid = 0): array {
@@ -240,6 +246,7 @@ final class attendance_helper {
      * + userid: int        -> The user id of that state
      *
      * @param int $seminareventid
+     *
      * @return moodle_recordset
      */
     public function load_session_attendance_status(int $seminareventid): moodle_recordset {
@@ -285,6 +292,7 @@ final class attendance_helper {
         ];
 
         $params = array_merge($params, $additional);
+
         return $DB->get_recordset_sql($sql, $params);
     }
 
@@ -294,6 +302,7 @@ final class attendance_helper {
      *
      * Returning an array that will look something similar like this:
      * userid: int -> [ statuscode: int -> total (attendances): int ]
+     *
      * @example
      * [
      *      15 => [
@@ -306,6 +315,7 @@ final class attendance_helper {
      * ]
      *
      * @param int $seminareventid
+     *
      * @return array
      */
     public function get_calculated_session_attendance_status(int $seminareventid): array {
@@ -336,6 +346,7 @@ final class attendance_helper {
      * @param array $attendance     Array<submissionid, statuscode> Where submission-id represents for signup.id
      *                              within table {facetoface_signups}.
      * @param int   $sessiondateid
+     *
      * @return bool
      */
     public static function process_session_attendance(array $attendance, int $sessiondateid): bool {

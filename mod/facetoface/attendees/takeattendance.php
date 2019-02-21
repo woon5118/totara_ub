@@ -31,6 +31,7 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 use mod_facetoface\{signup_helper, attendees_list_helper, seminar_event, seminar};
 use mod_facetoface\attendance\{attendance_helper, factory};
+use core\output\notification;
 
 /**
  * Load and validate base data
@@ -154,10 +155,11 @@ if ($formdata = data_submitted()) {
 
                 $event->trigger();
 
-                totara_set_notification(
-                    get_string('updateattendeessuccessful', 'facetoface'),
+                redirect(
                     $baseurl,
-                    ['class' => 'notifysuccess']
+                    get_string('updateattendeessuccessful', 'mod_facetoface'),
+                    null,
+                    notification::NOTIFY_SUCCESS
                 );
             }
         } else {
@@ -165,19 +167,21 @@ if ($formdata = data_submitted()) {
             $result = attendance_helper::process_session_attendance($items, $sd);
 
             if ($result) {
-                totara_set_notification(
-                    get_string('updateattendeessuccessful', 'mod_facetoface'),
+                redirect(
                     $baseurl,
-                    ['class' => 'notifysuccess']
+                    get_string('updateattendeessuccessful', 'mod_facetoface'),
+                    null,
+                    notification::NOTIFY_SUCCESS
                 );
             }
         }
 
         if (!$result) {
-            totara_set_notification(
-                get_string('error:takeattendance', 'facetoface'),
+            redirect(
                 $baseurl,
-                ['class' => 'notifyproblem']
+                get_string('error:takeattendance', 'facetoface'),
+                null,
+                notification::NOTIFY_ERROR
             );
         }
     }
@@ -187,7 +191,7 @@ if ($formdata = data_submitted()) {
  * Print page header
  */
 if (!$onlycontent) {
-    attendees_list_helper::process_js($action, $seminar, $seminarevent, $sd);
+    attendees_list_helper::process_js($action, $seminar, $seminarevent);
     \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
     $PAGE->set_cm($cm);
     $PAGE->set_heading($course->fullname);

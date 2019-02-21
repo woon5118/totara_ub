@@ -130,9 +130,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         $signups_dates_status = new backup_nested_element('signups_dates_status');
         $signup_date_status = new backup_nested_element(
-            'signup_date_status', array('id'), array(
-                'signupid', 'attendancecode', 'superceded', 'grade', 'createdby', 'timecreated'
-            )
+            'signup_date_status', array('id'), array('signupid', 'attendancecode', 'superceded', 'createdby', 'timecreated')
         );
 
         $room = new backup_nested_element('room', array('id'), array(

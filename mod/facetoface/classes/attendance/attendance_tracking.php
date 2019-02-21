@@ -25,7 +25,12 @@ namespace mod_facetoface\attendance;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * The interface is for generating the content, and obviously it is for quite a few different contents, it could be a downloadable
+ * content, interactive contents or just read only content. If the attendance tracking needs a new type of contents, this interface
+ * should be used to extend the functionality.
+ *
  * Interface attendance_tracking
+ *
  * @package mod_facetoface\attendance
  */
 interface attendance_tracking {

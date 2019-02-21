@@ -24,8 +24,14 @@
 namespace mod_facetoface\signup\state;
 
 use mod_facetoface\event\booking_booked;
-use mod_facetoface\signup\condition\{event_allows_cancellation, event_is_cancelled, event_in_the_future, event_in_the_past,
-    event_is_not_cancelled, event_taking_attendance, waitlist_common};
+use mod_facetoface\signup\condition\{
+    event_allows_cancellation,
+    event_is_cancelled,
+    event_in_the_future,
+    event_is_not_cancelled,
+    event_taking_attendance,
+    waitlist_common
+};
 use mod_facetoface\signup\restriction\actor_can_removeattendees;
 use mod_facetoface\signup\restriction\actor_can_signuppastevents;
 use mod_facetoface\signup\transition;
@@ -40,7 +46,7 @@ class booked extends state implements interface_event {
     /**
      * @return transition[]
      */
-    final private function get_transitions_to_attendance_states() : array {
+    private function get_transitions_to_attendance_states() : array {
         $transitions = [];
         $stateclasses = attendance_state::get_all_attendance_states();
 

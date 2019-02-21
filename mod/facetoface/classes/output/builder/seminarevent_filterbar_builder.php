@@ -26,15 +26,31 @@ namespace mod_facetoface\output\builder;
 
 defined('MOODLE_INTERNAL') || die();
 
+use mod_facetoface\output\seminarevent_filterbar;
 
 class seminarevent_filterbar_builder {
+    /**
+     * @var string
+     */
     private $id;
+
+    /**
+     * @var string
+     */
     private $method;
+
+    /**
+     * @var array
+     */
     private $params = [];
+
+    /**
+     * @var array
+     */
     private $filters = [];
 
     /**
-     * @param string $id part of form id
+     * @param string $id     part of form id
      * @param string $method get or post
      */
     public function __construct(string $id, string $method = 'get') {
@@ -45,11 +61,12 @@ class seminarevent_filterbar_builder {
     /**
      * Add a query parameter.
      *
-     * @param string $name
+     * @param string         $name
      * @param string|integer $value
-     * @return \mod_facetoface\output\builder\seminarevent_filterbar_builder
+     *
+     * @return seminarevent_filterbar_builder
      */
-    public function add_param(string $name, $value) : seminarevent_filterbar_builder {
+    public function add_param(string $name, $value): seminarevent_filterbar_builder {
         $this->params[$name] = $value;
         return $this;
     }
@@ -57,19 +74,21 @@ class seminarevent_filterbar_builder {
     /**
      * Add a select menu.
      *
-     * @param string $name the name attribute of an element
-     * @param array $options key/value array of options
-     * @param string $class part of css class
-     * @param string $label label
+     * @param string  $name     the name attribute of an element
+     * @param array   $options  key/value array of options
+     * @param string  $class    part of css class
+     * @param string  $label    label
      * @param boolean $disabled true to disable/hide an element
-     * @return \mod_facetoface\output\builder\seminarevent_filterbar_builder
+     *
+     * @return seminarevent_filterbar_builder
      */
-    public function add_filter(string $name, array $options, $class = '', $label = '', $disabled = false) : seminarevent_filterbar_builder {
+    public function add_filter(string $name, array $options, $class = '',
+                               $label = '', $disabled = false): seminarevent_filterbar_builder {
         $this->filters[$name] = [
             'options' => $options,
             'class' => $class,
             'label' => $label,
-            'disabled' => $disabled
+            'disabled' => $disabled,
         ];
         return $this;
     }
@@ -77,9 +96,9 @@ class seminarevent_filterbar_builder {
     /**
      * Create a seminarevent_filterbar object.
      *
-     * @return \mod_facetoface\output\seminarevent_filterbar
+     * @return seminarevent_filterbar
      */
-    public function build() : \mod_facetoface\output\seminarevent_filterbar {
+    public function build(): seminarevent_filterbar {
         $params = [];
         foreach ($this->params as $name => $value) {
             if (array_key_exists($name, $this->filters)) {
@@ -87,7 +106,7 @@ class seminarevent_filterbar_builder {
             }
             $params[] = [
                 'name' => $name,
-                'value' => $value
+                'value' => $value,
             ];
         }
 
@@ -99,7 +118,7 @@ class seminarevent_filterbar_builder {
                 $options[] = [
                     'name' => $optname,
                     'value' => $optvalue,
-                    'selected' => $optvalue === $selectedvalue
+                    'selected' => $optvalue === $selectedvalue,
                 ];
             }
             $filters[] = [
@@ -109,16 +128,16 @@ class seminarevent_filterbar_builder {
                 'label' => $opts['label'],
                 'disabled' => $opts['disabled'],
                 'webkit_init_value' => $selectedvalue,
-                'options' => $options
+                'options' => $options,
             ];
         }
 
-        return new \mod_facetoface\output\seminarevent_filterbar(
+        return new seminarevent_filterbar(
             [
                 'formid' => $this->id,
                 'method' => $this->method,
                 'params' => $params,
-                'filters' => $filters
+                'filters' => $filters,
             ]
         );
     }

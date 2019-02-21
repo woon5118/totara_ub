@@ -44,7 +44,7 @@ abstract class attendance_state extends state {
      *
      * @return transition[]
      */
-    final public function get_map() : array {
+    final public function get_map(): array {
         $transitions = [];
         foreach (self::get_all_attendance_states() as $stateclass) {
             // do not include itself
@@ -62,6 +62,7 @@ abstract class attendance_state extends state {
         $transitions[] = transition::to(new event_cancelled($this->signup))->with_conditions(
             event_is_cancelled::class
         );
+
         return $transitions;
     }
 
@@ -70,7 +71,7 @@ abstract class attendance_state extends state {
      *
      * @return string[]
      */
-    final public static function get_all_attendance_states() : array {
+    final public static function get_all_attendance_states(): array {
         $classes = \core_component::get_namespace_classes(
             'signup\state',
             self::class,
@@ -84,7 +85,7 @@ abstract class attendance_state extends state {
      *
      * @return int[]
      */
-    final public static function get_all_attendance_code() : array {
+    final public static function get_all_attendance_code(): array {
         return self::get_all_attendance_code_with([]);
     }
 
@@ -92,15 +93,17 @@ abstract class attendance_state extends state {
      * Get the code of all attendance state classes alongside additional states
      *
      * @param string[] $additional_states
+     *
      * @return int[]
      */
-    final public static function get_all_attendance_code_with(array $additional_states) : array {
+    final public static function get_all_attendance_code_with(array $additional_states): array {
         $states = array_merge(self::get_all_attendance_states(), $additional_states);
         return array_map(
             function ($state) {
                 if (!is_subclass_of($state, state::class)) {
-                    throw new \InvalidArgumentException($state . ' is not a subclass of state.');
+                    throw new \coding_exception($state.' is not a subclass of state.');
                 }
+
                 return $state::get_code();
             },
             $states

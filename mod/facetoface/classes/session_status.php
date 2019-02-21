@@ -336,9 +336,10 @@ final class session_status {
         $this->validate_before_save();
 
         $trans = $DB->start_delegated_transaction();
-        $DB->execute(
-            "UPDATE {facetoface_signups_dates_status} SET superceded = 1 
-            WHERE signupid = :signupid AND sessiondateid = :sessiondateid",
+        $DB->set_field(
+            'facetoface_signups_dates_status',
+            'superceded',
+            1,
             [
                 'signupid' => $this->signupid,
                 'sessiondateid' => $this->sessiondateid

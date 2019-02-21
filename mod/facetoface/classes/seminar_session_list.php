@@ -85,9 +85,9 @@ final class seminar_session_list implements \Iterator {
         global $DB;
         $list = new seminar_session_list();
         $sessionrecords = $DB->get_records('facetoface_sessions_dates', ['sessionid' => $seminarevent->get_id()], 'timestart DESC');
-        foreach ($sessionrecords as $sessionrecords) {
+        foreach ($sessionrecords as $sessionrecord) {
             $session = new seminar_session();
-            $list->add($session->from_record($sessionrecords));
+            $list->add($session->from_record($sessionrecord));
         }
         return $list;
     }

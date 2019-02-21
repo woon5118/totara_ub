@@ -22,6 +22,7 @@
  */
 
 namespace mod_facetoface\attendance;
+
 defined('MOODLE_INTERNAL') || die();
 
 use mod_facetoface\{seminar_event, seminar_session_list, attendees_list_helper};
@@ -40,6 +41,7 @@ use mod_facetoface\output\take_attendance_status_picker;
  * downloadable content.
  *
  * Class content_generator
+ *
  * @package mod_facetoface\attendance
  */
 abstract class content_generator {
@@ -69,12 +71,16 @@ abstract class content_generator {
 
     /**
      * content_generator constructor.
-     * @param seminar_event         $seminarevent
-     * @param string                $action
-     * @param seminar_session_list  $sessions
+     *
+     * @param seminar_event        $seminarevent
+     * @param string               $action
+     * @param seminar_session_list $sessions
      */
-    final public function __construct(seminar_event $seminarevent,
-                                      string $action, ?seminar_session_list $sessions = null) {
+    final public function __construct(
+        seminar_event $seminarevent,
+        string $action,
+        seminar_session_list $sessions = null
+    ) {
         $this->seminarevent = $seminarevent;
         $this->action = $action;
         $this->sessions = $sessions;
@@ -87,6 +93,7 @@ abstract class content_generator {
     /**
      * @param stdClass[] $data
      * @param moodle_url $url
+     *
      * @return totara_table
      */
     abstract public function generate_allowed_action_content(array $data, moodle_url $url): totara_table;
@@ -97,12 +104,14 @@ abstract class content_generator {
      * + headers: string[]
      *
      * @param stdClass[] $data
+     *
      * @return array    Array<string, array>
      */
     abstract public function generate_downloadable_content(array $data): array;
 
     /**
      * Lazy loading the seminar_session_list here, as if it is not set, we should set it.
+     *
      * @return seminar_session_list
      */
     final protected function get_sessions(): seminar_session_list {
@@ -118,10 +127,12 @@ abstract class content_generator {
      * should only be called in generating the content that allow action on.
      *
      * @param stdClass $attendee
+     *
      * @return string
      */
     protected function create_checkbox(stdClass $attendee): string {
         $checkoptionid = 'check_submissionid_' . $attendee->submissionid;
+
         return html_writer::checkbox(
             $checkoptionid,
             $attendee->statuscode,
@@ -129,18 +140,21 @@ abstract class content_generator {
             '',
             [
                 'class' => 'selectedcheckboxes',
-                'data-selectid' => 'menusubmissionid_' . $attendee->submissionid
+                'data-selectid' => 'menusubmissionid_' . $attendee->submissionid,
             ]
         );
     }
 
     /**
      * Returning a HTML string for a selection box of the attendance state, for the user to pick.
+     *
      * @param stdClass $attendee
+     *
      * @return string
      */
     protected function create_attendance_status(stdClass $attendee): string {
         global $OUTPUT;
+
         return $OUTPUT->render(
             take_attendance_status_picker::create($attendee, $this->statusoptions, false)
         );
@@ -150,6 +164,7 @@ abstract class content_generator {
      * If the statuscode is booked, which means it should be not_set in taking attendance
      *
      * @param stdClass $attendee
+     *
      * @return void
      */
     protected function reset_attendee_statuscode(stdClass &$attendee): void {

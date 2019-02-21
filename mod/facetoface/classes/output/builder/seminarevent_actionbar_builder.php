@@ -26,10 +26,25 @@ namespace mod_facetoface\output\builder;
 
 defined('MOODLE_INTERNAL') || die();
 
+use mod_facetoface\output\seminarevent_actionbar;
+
 
 class seminarevent_actionbar_builder {
+    /**
+     * @var string
+     */
     private $id;
+
+    /**
+     * @var string
+     */
     private $align = '';
+
+    /**
+     * Array<string, mixed>
+     *
+     * @var array
+     */
     private $commandlinks = [];
 
     /**
@@ -42,13 +57,14 @@ class seminarevent_actionbar_builder {
     /**
      * Add a button.
      *
-     * @param string $name
+     * @param string             $name
      * @param string|\moodle_url $url
-     * @param string $text label text
-     * @param bool $primary true to accent the element
-     * @return \mod_facetoface\output\builder\seminarevent_actionbar_builder
+     * @param string             $text      label text
+     * @param bool               $primary   true to accent the element
+     *
+     * @return seminarevent_actionbar_builder
      */
-    public function add_commandlink(string $name, $url, string $text, $primary = false) : seminarevent_actionbar_builder {
+    public function add_commandlink(string $name, $url, string $text, $primary = false): seminarevent_actionbar_builder {
         if ($url instanceof \moodle_url) {
             $url = $url->out();
         }
@@ -56,7 +72,7 @@ class seminarevent_actionbar_builder {
             'name' => $name,
             'href' => $url,
             'text' => $text,
-            'primary' => $primary
+            'primary' => $primary,
         ];
         return $this;
     }
@@ -65,9 +81,10 @@ class seminarevent_actionbar_builder {
      * Set the alignment of buttons.
      *
      * @param string $align one of far, near or center
-     * @return \mod_facetoface\output\builder\seminarevent_actionbar_builder
+     *
+     * @return seminarevent_actionbar_builder
      */
-    public function set_align(string $align) : seminarevent_actionbar_builder {
+    public function set_align(string $align): seminarevent_actionbar_builder {
         $this->align = $align;
         return $this;
     }
@@ -75,14 +92,14 @@ class seminarevent_actionbar_builder {
     /**
      * Create a seminarevent_actionbar object.
      *
-     * @return \mod_facetoface\output\seminarevent_actionbar
+     * @return seminarevent_actionbar
      */
-    public function build() : \mod_facetoface\output\seminarevent_actionbar {
-        return new \mod_facetoface\output\seminarevent_actionbar(
+    public function build(): seminarevent_actionbar {
+        return new seminarevent_actionbar(
             [
                 'id' => $this->id,
                 'align' => $this->align ?: 'near',
-                'commandlinks' => array_values($this->commandlinks)
+                'commandlinks' => array_values($this->commandlinks),
             ]
         );
     }

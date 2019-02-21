@@ -254,10 +254,15 @@ final class seminar_session {
     /**
      * Returning the time description of seminar's session.
      *
+     * @param string $fullformatstring  full date time format string, an identifier string that has been defined in the
+     *                                  langconfig.php file
+     *
+     * @param string $timeformatstring  time format string, an identifier string that has been defined in langconfig.php file
+     *
      * @return sting
      */
     public function get_time_description($fullformatstring = 'strftimerecentfull', $timeformatstring = 'strftimetime'): string {
-        if (!isset($this->timestart) || !isset($this->timefinish)) {
+        if (empty($this->timestart) || empty($this->timefinish)) {
             return '';
         }
 

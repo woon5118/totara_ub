@@ -39,7 +39,7 @@ class unable_to_attend extends attendance_state {
      *
      * @return int
      */
-    public static function get_code() : int {
+    public static function get_code(): int {
         return 85;
     }
 
@@ -66,7 +66,7 @@ class unable_to_attend extends attendance_state {
      *
      * @return int
      */
-    public static function get_grade() : int {
+    public static function get_grade(): int {
         return 0;
     }
 
@@ -75,7 +75,7 @@ class unable_to_attend extends attendance_state {
      *
      * @return string
      */
-    public static function get_string() : string {
+    public static function get_string(): string {
         return get_string('status_unable_to_attend', 'mod_facetoface');
     }
 }

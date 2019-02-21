@@ -24,14 +24,16 @@
 namespace mod_facetoface;
 
 use mod_facetoface\exception\signup_exception;
-use mod_facetoface\signup\state\not_set;
 use \stdClass;
-use mod_facetoface\signup\state\state as state;
-use mod_facetoface\signup\state\booked as booked;
-use mod_facetoface\signup\state\requested as requested;
-use mod_facetoface\signup\state\waitlisted as waitlisted;
-use mod_facetoface\signup\state\user_cancelled as user_cancelled;
-use mod_facetoface\signup\state\attendance_state as attendance_state;
+use mod_facetoface\signup\state\{
+    state,
+    not_set,
+    booked,
+    requested,
+    waitlisted,
+    user_cancelled,
+    attendance_state
+};
 
 defined('MOODLE_INTERNAL') || die();
 

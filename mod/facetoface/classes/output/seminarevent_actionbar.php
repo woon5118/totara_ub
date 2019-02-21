@@ -28,14 +28,17 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once('builder/seminarevent_actionbar_builder.php');
 
+use mod_facetoface\output\builder\seminarevent_actionbar_builder;
+
 class seminarevent_actionbar extends \core\output\template {
     /**
      * Create a new builder object.
      *
      * @param string $id part of element id
-     * @return \mod_facetoface\output\builder\seminarevent_actionbar_builder
+     *
+     * @return seminarevent_actionbar_builder
      */
-    public static function builder(string $id) : builder\seminarevent_actionbar_builder {
-        return new builder\seminarevent_actionbar_builder($id);
+    public static function builder(string $id): seminarevent_actionbar_builder {
+        return new seminarevent_actionbar_builder($id);
     }
 }
