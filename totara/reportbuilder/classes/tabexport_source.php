@@ -125,7 +125,8 @@ class tabexport_source extends \totara_core\tabexport_source {
     public function get_svg_graph($w, $h) {
         global $DB;
 
-        $graph = new \totara_reportbuilder\local\graph($this->report);
+        // Force svg graph type when exporting, since it has better compatibility
+        $graph = new \totara_reportbuilder\graph\svggraph($this->report);
         if (!$graph->is_valid()) {
             return null;
         }
@@ -144,7 +145,7 @@ class tabexport_source extends \totara_core\tabexport_source {
         }
         $rs->close();
 
-        $svgdata = $graph->fetch_export_svg($w, $h);
+        $svgdata = $graph->render($w, $h);
         if (!$svgdata) {
             return null;
         }

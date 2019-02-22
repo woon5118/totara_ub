@@ -54,7 +54,8 @@ if (!reportbuilder::is_capable($id)) {
 // and we want to mess with session data and improve perf.
 \core\session\manager::write_close();
 
-$graph = new \totara_reportbuilder\local\graph($report);
+// Ignore graph settings and use svggraph for pdfs
+$graph = new \totara_reportbuilder\graph\svggraph($report);
 if (!$graph->is_valid()) {
     // This should not happen.
     die;
@@ -68,7 +69,7 @@ foreach ($records as $record) {
     $graph->add_record($record);
 }
 
-$svgdata = $graph->fetch_svg();
+$svgdata = $graph->render(1000,400);
 
 require_once $CFG->libdir . '/pdflib.php';
 $pdf = new \PDF('L', 'mm', 'A3', true, 'UTF-8');

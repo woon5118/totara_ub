@@ -42,11 +42,5 @@ class block_totara_report_graph_block_testcase extends advanced_testcase {
         $this->assertInstanceOf('stdClass', $content);
         $this->assertNotEmpty($content->text);
         $this->assertNotEmpty($content->footer);
-        $this->assertContains('max-width:777px;', $content->text);
-        $this->assertContains('max-height:327px;', $content->text);
-        $this->assertContains('width="100%"', $content->text);
-        $this->assertContains('height="100%"', $content->text);
-        $this->assertContains('type="image/svg+xml"', $content->text);
-        $this->assertContains('blocks/totara_report_graph/ajax_graph.php?blockid='.$blockinstance->instance->id, $content->text);
     }
 }

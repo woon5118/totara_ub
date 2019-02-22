@@ -19,6 +19,8 @@
  *
  * @author Petr Skoda <petr.skoda@totaralms.com>
  * @package block_totara_report_graph
+ *
+ * @deprecated since Totara 13
  */
 
 // Disable debug messages and any errors in output,

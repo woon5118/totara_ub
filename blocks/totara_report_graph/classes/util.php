@@ -35,8 +35,12 @@ class util {
      * Get the svg
      * @param \reportbuilder $report
      * @return null
+     *
+     * @deprecated since Totara 13
      */
     protected static function get_svg(\reportbuilder $report) {
+        debugging('util::get_svg() was deprecated in 13.0. Use util::get_graph() instead', DEBUG_DEVELOPER);
+
         $graph = new \totara_reportbuilder\local\graph($report);
         if (!$graph->is_valid()) {
             return null;
@@ -55,14 +59,28 @@ class util {
     }
 
     /**
+     * Get the graph
+     * @param \reportbuilder $report
+     * @return string HTML for graph
+     */
+    public static function get_graph(\reportbuilder $report) {
+        $graph = \totara_reportbuilder\graph\base::create_graph($report);
+        return $graph->render(400,400);
+    }
+
+    /**
      * Cache key helper.
      *
      * @param int $reportorsavedid
      * @param int $reportfor
      * @return string key
+     *
+     * @deprecated since Totara 13
      */
     public static function get_cache_key($reportorsavedid, $reportfor) {
         global $USER;
+
+        debugging('util::get_cache_key was deprecated in 13.0', DEBUG_DEVELOPER);
 
         if (empty($reportfor)) {
             // Value 0 means current user.
@@ -114,9 +132,13 @@ class util {
      * @param int $blockid
      * @param \stdClass $config
      * @return string svg data, dies on error
+     *
+     * @deprecated since Totara 13
      */
     public static function get_svg_data($blockid, $config) {
         global $SESSION;
+
+        debugging('util::get_svg_data was deprecated in 13.0. Use util::get_graph instead', DEBUG_DEVELOPER);
 
         if (!isset($config->reportfor) or empty($config->reportorsavedid)) {
             error_log($blockid . ': not configured');
@@ -199,8 +221,13 @@ class util {
      * Send SVG file and die.
      * @param string $svgdata
      * @void does not return
+     *
+     * @deprecated since Totara 13
      */
     public static function send_svg($svgdata) {
+
+        debugging('util::send_svg was deprecated in 13.0. Use util::get_graph instead', DEBUG_DEVELOPER);
+
         // Try to fix RTL header as the last step because we cache the data.
         $svgdata = \totara_reportbuilder\local\graph::fix_svg_rtl($svgdata, null, null);
 
@@ -215,9 +242,13 @@ class util {
      * Send PDF data and die.
      * @param string $svgdata
      * @void does not return
+     *
+     * @deprecated since Totara 13
      */
     public static function send_pdf($svgdata) {
         global $CFG;
+
+        debugging('util::send_pdf was deprecated in 13.0. Use util::get_graph instead', DEBUG_DEVELOPER);
 
         // Try to fix RTL header as the last step because we cache the data.
         $svgdata = \totara_reportbuilder\local\graph::fix_svg_rtl($svgdata, null, false);

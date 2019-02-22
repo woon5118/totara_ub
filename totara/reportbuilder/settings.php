@@ -134,6 +134,24 @@ if ($ADMIN->fulltree) {
             ]
         )
     );
+
+    $classes = \core_component::get_namespace_classes('graph', '\totara_reportbuilder\graph\base');
+    $options = array();
+
+    foreach($classes as $class) {
+        $options[] = $class::get_name();
+    }
+
+    $rb->add(
+        new admin_setting_configselect(
+            'totara_reportbuilder/graphlib',
+            new lang_string('graphlibsetting', 'totara_reportbuilder'),
+            new lang_string('graphlibsetting_desc', 'totara_reportbuilder'),
+            null,
+            $options
+        )
+    );
+
 }
 
 

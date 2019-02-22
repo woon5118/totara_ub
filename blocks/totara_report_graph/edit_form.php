@@ -170,18 +170,6 @@ class block_totara_report_graph_edit_form extends block_edit_form {
         }
         $reportfor = $data['config_reportfor'];
 
-        // Purge caches for this block before and after the change.
-
-        $cache = cache::make('block_totara_report_graph', 'graph');
-        if (!empty($this->block->config->reportorsavedid) and isset($this->block->config->reportfor)) {
-            $key = \block_totara_report_graph\util::get_cache_key($this->block->config->reportorsavedid, $this->block->config->reportfor);
-            $cache->delete($key);
-        }
-        if (!empty($data['config_reportorsavedid'])) {
-            $key = \block_totara_report_graph\util::get_cache_key($data['config_reportorsavedid'], $data['config_reportfor']);
-            $cache->delete($key);
-        }
-
         // Validate the data.
 
         if ($data['config_reportorsavedid'] > 0) {

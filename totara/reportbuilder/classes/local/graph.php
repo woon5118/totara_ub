@@ -19,12 +19,16 @@
  *
  * @author Petr Skoda <petr.skoda@totaralms.com>
  * @package totara_reportbuilder
+ *
+ * @deprecated since Totara 13
  */
 
 namespace totara_reportbuilder\local;
 
 /**
  * Class describing report graphs.
+ *
+ * @deprecated since Totara 13
  */
 class graph {
     /** @var \stdClass record from report_builder_graph table */
@@ -52,6 +56,8 @@ class graph {
 
     public function __construct(\reportbuilder $report) {
 
+        debugging("totara_reportbuilder/local/graph is deprecated as of Totara 13. Use totara_reportbuilder/graph/base and subclasses instead");
+
         $this->load($report);
 
         if (!empty($this->graphrecord->type)) {
@@ -62,6 +68,8 @@ class graph {
 
     /**
      * Object initialisation.
+     *
+     * @deprecated since Totara 13
      */
     private function init() {
 
@@ -156,6 +164,7 @@ class graph {
      * Load graph record.
 
      * @param \reportbuilder $report eportbuilder the relevant reportbuilder instance
+     * @deprecated since Totara 13
      */
     private function load($report) {
         global $DB;
@@ -167,6 +176,9 @@ class graph {
         }
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function add_record($record) {
         $recorddata = $this->report->src->process_data_row($record, 'graph', $this->report);
 
@@ -209,6 +221,8 @@ class graph {
      *
      * @param mixed $val
      * @return int|float|string
+     *
+     * @deprecated since Totara 13
      */
     public static function normalize_numeric_value($val) {
         // Strip the percentage sign, the SVGGraph is not compatible with it.
@@ -241,14 +255,23 @@ class graph {
         return $val;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function count_records() {
         return $this->processedcount;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function get_max_records() {
         return $this->graphrecord->maxrecords;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     protected function init_svggraph() {
         global $CFG;
         require_once($CFG->dirroot.'/totara/core/lib/SVGGraph/SVGGraph.php');
@@ -419,6 +442,8 @@ class graph {
      *
      * @param array $settings the parsed settings
      * @return array settings with removed 'colours' option
+     *
+     * @deprecated since Totara 13
      */
     protected function apply_custom_colours($settings) {
         if (!empty($settings['colours'])) {
@@ -434,6 +459,9 @@ class graph {
         return $settings;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     protected function get_final_settings() {
         $settings = $this->svggraphsettings;
 
@@ -460,6 +488,8 @@ class graph {
      * @param null|bool $rtl apply RTL hacks, NULL means detect RTL from current language
      * @param null|bool $msrtlhack true means hack text anchors, NULL means true if IE/Edge detected
      * @return string SVG markup
+     *
+     * @deprecated since Totara 13
      */
     public static function fix_svg_rtl($data, $rtl = null, $msrtlhack = null) {
         if ($rtl === null) {
@@ -493,6 +523,8 @@ class graph {
      * @param array $values
      * @param array $settings
      * @return array modified $values
+     *
+     * @deprecated since Totara 13
      */
     protected function shorten_labels(array $values, array $settings) {
         $labelshorten = (int)$settings['label_shorten'];
@@ -521,6 +553,8 @@ class graph {
      *
      * @param array $settings
      * @return array modified $settings
+     *
+     * @deprecated since Totara 13
      */
     protected function shorten_legend(array $settings) {
         if (empty($settings['legend_entries'])) {
@@ -572,6 +606,8 @@ class graph {
      * @param int $height
      * @param array $settings
      * @return string SVG markup
+     *
+     * @deprecated since Totara 13
      */
     protected function get_svggraph_data($width, $height, array $settings) {
         $svggraph = new \SVGGraph($width, $height, $settings);
@@ -602,6 +638,8 @@ class graph {
      * Get SVG image markup suitable for embedding in report page.
      *
      * @return string SVG markup
+     *
+     * @deprecated since Totara 13
      */
     public function fetch_svg() {
         $this->init_svggraph();
@@ -621,6 +659,8 @@ class graph {
      * NOTE: the RTL fixes are not applied because we need to cache the results.
      *
      * @return string SVG markup without RTL hacks
+     *
+     * @deprecated since Totara 13
      */
     public function fetch_block_svg() {
         $this->init_svggraph();
@@ -651,6 +691,8 @@ class graph {
      * @param int $w width of the SVG
      * @param int $h height of SVG
      * @return string SVG markup
+     *
+     * @deprecated since Totara 13
      */
     public function fetch_export_svg($w, $h) {
         $this->init_svggraph();
@@ -664,6 +706,9 @@ class graph {
         return $data;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function is_valid() {
 
         if (empty($this->graphrecord->type)) {
@@ -677,6 +722,8 @@ class graph {
      * Set all fonts used in svg graph to the specified font
      *
      * @param string $font Name of the font to use
+     *
+     * @deprecated since Totara 13
      */
     public function set_font($font) {
         // this place require set all font settings for pdf svg graph, see svggraph.ini file

@@ -22,13 +22,3 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
-$definitions = array(
-    'graph' => array( // NOTE: this cache is mostly safe for local cluster stores.
-        'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
-        'simpledata' => false,
-        'staticacceleration' => false,
-        'ttl' => 60*60*24, // This should correspond with maximum lifetime in block configuration.
-    ),
-);

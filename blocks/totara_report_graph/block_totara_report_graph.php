@@ -149,39 +149,8 @@ class block_totara_report_graph extends block_base {
             $this->content->footer = '<a href="'.$url.'">'.get_string('report', 'totara_reportbuilder').'</a>';
         }
 
-        if (core_useragent::check_browser_version('MSIE', '6.0') and !core_useragent::check_browser_version('MSIE', '9.0')) {
-            // See http://partners.adobe.com/public/developer/en/acrobat/PDFOpenParameters.pdf
-            $svgurl = new moodle_url('/blocks/totara_report_graph/ajax_graph.php', array('blockid' => $this->instance->id, 'type' => 'pdf'));
-            $svgurl = $svgurl . '#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&viewrect=20,20,180,170';
-            $nopdf = get_string('error:nopdf', 'totara_reportbuilder');
-            $this->content->text = "<div class=\"rb-block-pdfgraph\"><object type=\"application/pdf\" data=\"$svgurl\" width=\"100%\" height=\"250\">$nopdf</object>";
-
-        } else {
-            // NOTE: unfortunately the inline SVGs are not self-contained and there are problems,
-            //       when multiple graphs present on on page - this is the reasons for object embedding.
-            $svgurl = new moodle_url('/blocks/totara_report_graph/ajax_graph.php', array('blockid' => $this->instance->id, 'type' => 'svg'));
-            $nosvg = get_string('error:nosvg', 'totara_reportbuilder');
-
-            $objectattrs = [
-                'type' => 'image/svg+xml',
-                'data' => $svgurl,
-                'width' => '100%',
-                'height' => '100%',
-                'style' => []
-            ];
-            if (!empty($this->graphimage_maxwidth)) {
-                $objectattrs['style'][] = 'max-width:' . $this->graphimage_maxwidth;
-            }
-            if (!empty($this->graphimage_maxheight)) {
-                $objectattrs['style'][] = 'max-height:' . $this->graphimage_maxheight;
-            }
-            if (empty($objectattrs['style'])) {
-                unset($objectattrs['style']);
-            } else {
-                $objectattrs['style'] = join(';', $objectattrs['style']).';';
-            }
-            $this->content->text = '<div class="block_totara_report_graph_svggraph">' . html_writer::tag('object', $nosvg, $objectattrs) . '</div>';
-        }
+        $chart = \totara_reportbuilder\graph\base::create_graph(reportbuilder::create($this->rawreport->id));
+        $this->content->text = $chart->render(400,400);
 
         return $this->content;
     }
