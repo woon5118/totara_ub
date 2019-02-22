@@ -378,7 +378,7 @@ The start date of the earliest event must be at least this far in the future.';
 $string['created'] = 'Created';
 $string['createnewasset'] = 'Create new asset';
 $string['createnewroom'] = 'Create new room';
-$string['csvtextfile'] = 'CSV file';
+$string['csvtextfile'] = 'CSV text file';
 $string['csvtextfile_help'] = 'Preparing a file for upload: Use .CSV text file with a heading row and one or more data rows.
 
 All rows must have the following columns:
@@ -478,6 +478,7 @@ $string['embedded:seminarassets'] = 'Seminars: Manage assets';
 $string['embedded:seminarassetsupcoming'] = 'Seminars: Upcoming events using asset';
 $string['embedded:seminareventattendance'] = 'Seminars: Event attendees';
 $string['embedded:seminarevents'] = 'Seminars: View and manage events';
+$string['embedded:seminareventwaitlist'] = 'Seminars: Event wait-list attendees';
 $string['embedded:seminarinterest'] = 'Seminars: Declared interest';
 $string['embedded:seminarrooms'] = 'Seminars: Manage rooms';
 $string['embedded:seminarroomsupcoming'] = 'Seminars: Upcoming events using room';

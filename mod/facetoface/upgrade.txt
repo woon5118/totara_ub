@@ -3,6 +3,13 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* attendees_list_helper::get_status() function has been deprecated, please use attendees_helper::get_status()
+* attendees_list_helper::process_no_sessionid() function has been deprecated, please use attendees_helper::process_no_sessionid()
+* attendees_list_helper::process_js() function has been deprecated, please use attendees_helper::process_js()
+* attendees_list_helper::get_allowed_available_actions() function has been deprecated, please use attendees_helper::get_allowed_available_actions()
+* facetoface_confirm_attendees() function has been deprecated, please use signup_helper::confirm_waitlist()
+* facetoface_waitlist_randomly_confirm_users() function has been deprecated, please use signup_helper::confirm_waitlist_randomly()
+* facetoface_cancel_attendees() function has been deprecated, please use signup_helper::cancel_waitlist()
 * facetoface_sync_assets() function has been deprecated, please use asset_helper::sync()
 * facetoface_withdraw_interest() function has been deprecated, please use signup_helper::withdraw_interest()
 * facetoface_download_ods() function has been deprecated, please use export_helper::download_ods()

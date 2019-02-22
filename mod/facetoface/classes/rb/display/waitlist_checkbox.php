@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Player <simon.player@totaralearning.com>
+ * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
  * @package mod_facetoface
  */
 
@@ -25,17 +25,11 @@ namespace mod_facetoface\rb\display;
 use totara_reportbuilder\rb\display\base;
 
 /**
- * Display customfield with edit action icon
- * This module requires JS already to be included
- *
- * @author Simon Player <simon.player@totaralearning.com>
- * @package mod_facetoface
+ * Display class intended for the wait-list actions
  */
-class f2f_all_signup_customfields_manage extends base {
+class waitlist_checkbox extends base {
 
     /**
-     * Handles the display
-     *
      * @param string $value
      * @param string $format
      * @param \stdClass $row
@@ -44,23 +38,14 @@ class f2f_all_signup_customfields_manage extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $OUTPUT;
 
-        $extrafields = self::get_extrafields_row($row, $column);
-        // When 'Reserve spaces for team' is used and no learners are added yet,
-        // we still display attendees records with 'Reserved' status for other managers the number of reservations/bookings is used.
-        if ((int)$extrafields->userid != 0) {
-            $url = new \moodle_url('/mod/facetoface/attendees/ajax/signup_notes.php', array(
-                's' => $extrafields->sessionid,
-                'userid'  => $extrafields->userid,
-                'sesskey' => sesskey(),
-                'return'  => $report->src->get_return_page()
-            ));
-            $pix = new \pix_icon('t/edit', get_string('edit'));
-            $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'js-hide action-icon attendee-add-note pull-right'));
-            return $icon;
-        }
-        return '';
+//        if ($report->src->has_capability('addremoveattendees')) {
+            $extrafields = self::get_extrafields_row($row, $column);
+            return \html_writer::empty_tag(
+                'input', array('type' => 'checkbox', 'value' => $extrafields->userid, 'name' => 'userid')
+            );
+//        }
+//        return '';
     }
 
     /**

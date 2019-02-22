@@ -290,7 +290,7 @@ class facetoface_notification extends data_object {
         if ($this->booked) {
             switch ((int) $this->booked) {
                 case MDL_F2F_RECIPIENTS_ALLBOOKED:
-                    $status = array_keys(\mod_facetoface\attendees_list_helper::get_status(true));
+                    $status = array_keys(\mod_facetoface\attendees_helper::get_status(true));
                     break;
 
                 case MDL_F2F_RECIPIENTS_ATTENDED:

@@ -4051,3 +4051,93 @@ function facetoface_get_facetoface_menu() {
         return '';
     }
 }
+
+/**
+ * Confirms waitlisted users from an array as booked on a session
+ * @param int    $sessionid  ID of the session to use
+ * @param array  $userids    Array of user ids to confirm
+ * @return string[] failures or empty array
+ * @deprecated since Totara 13.0
+ */
+function facetoface_confirm_attendees($sessionid, $userids) {
+    global $DB;
+
+    debugging('facetoface_confirm_attendees() function has been deprecated, please use signup_helper::confirm_waitlist()',
+        DEBUG_DEVELOPER);
+
+    $errors = [];
+    $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+    foreach ($userids as $userid) {
+        $signup = \mod_facetoface\signup::create($userid, $seminarevent);
+        if ($signup->get_state() instanceof \mod_facetoface\signup\state\not_set) {
+            continue;
+        }
+
+        if ($signup->can_switch(\mod_facetoface\signup\state\booked::class)) {
+            $signup->switch_state(\mod_facetoface\signup\state\booked::class);
+            $conditions = array('sessionid' => $sessionid, 'userid' => $userid);
+            $existingsignup = $DB->get_record('facetoface_signups', $conditions, '*', MUST_EXIST);
+            notice_sender::confirm_booking(new signup($existingsignup->id), $existingsignup->notificationtype);
+        } else {
+            $failures = $signup->get_failures(\mod_facetoface\signup\state\booked::class);
+            if (!empty($failures)) {
+                $errors[$signup->get_userid()] = current($failures);
+            }
+        }
+    }
+    return $errors;
+}
+
+/**
+ * Randomly books waitlisted users on to a session
+ * @param int $sessionid  ID of the session to use
+ * @deprecated since Totara 13.0
+ */
+function facetoface_waitlist_randomly_confirm_users($sessionid, $userids) {
+
+    debugging('facetoface_waitlist_randomly_confirm_users() function has been deprecated, please use signup_helper::confirm_waitlist_randomly()',
+        DEBUG_DEVELOPER);
+
+    $session = facetoface_get_session($sessionid);
+    $signupcount = facetoface_get_num_attendees($sessionid);
+
+    $numtoconfirm = $session->capacity - $signupcount;
+
+    if (count($userids) <= $session->capacity) {
+        $winners = $userids;
+    } else {
+        $winners = array_rand(array_flip($userids), $numtoconfirm);
+
+        if ($numtoconfirm == 1) {
+            $winners = array($winners);
+        }
+    }
+
+    facetoface_confirm_attendees($sessionid, $winners);
+
+    return $winners;
+}
+
+/**
+ * Cancels waitlisted users from an array on a session
+ * @param int    $sessionid  ID of the session to use
+ * @param array  $userids    Array of user ids to cancel
+ * @deprecated since Totara 13.0
+ */
+function facetoface_cancel_attendees($sessionid, $userids) {
+
+    debugging('facetoface_cancel_attendees() function has been deprecated, please use signup_helper::cancel_waitlist()',
+        DEBUG_DEVELOPER);
+
+    $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+    foreach ($userids as $userid) {
+        $signup = \mod_facetoface\signup::create($userid, $seminarevent);
+        if ($signup->get_state() instanceof \mod_facetoface\signup\state\not_set) {
+            continue;
+        }
+        if ($signup->can_switch(\mod_facetoface\signup\state\user_cancelled::class)) {
+            $signup->switch_state(\mod_facetoface\signup\state\user_cancelled::class);
+        }
+    }
+}
+

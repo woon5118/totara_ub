@@ -18,8 +18,7 @@
  *
  * @author Alastair Munro <alastair.munro@totaralms.com>
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
- * @package totara
- * @subpackage facetoface
+ * @package mod_facetoface
  */
 
 M.totara_f2f_attendees = M.totara_f2f_attendees || {
@@ -48,10 +47,11 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             throw new Error('M.totara_f2f_attendees.init()-> jQuery dependency required for this module to function.');
         }
 
+        // TODO: double check if other tabs use it, not for waitlist anymore.
         $('.selectall').click(function(){
             $('[name="userid"]').prop("checked", true);
         });
-
+        // TODO: double check if other tabs use it, not for waitlist anymore.
         $('.selectnone').click(function(){
             $('[name="userid"]').prop("checked", false);
         });
@@ -151,17 +151,25 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
          * @param string Optional HTML content of the result
          */
         function print_notice(success, content) {
-            var notice = M.util.get_string('updateattendeessuccessful','facetoface');
-            var classname = 'notifysuccess';
+            var notice = M.util.get_string('updateattendeessuccessful', 'facetoface');
             if (!success) {
-                notice = M.util.get_string('updateattendeesunsuccessful','facetoface');
-                classname = 'notifyproblem';
+                notice = M.util.get_string('updateattendeesunsuccessful', 'facetoface');
             }
             if (content) {
-                $('div#noticeupdate').removeClass('hide').html(notice + content);
-                return;
+                require(["core/notification"], function(notification) {
+                    notification.addNotification({
+                        message: notice + content,
+                        type: "error"
+                    });
+                });
+            } else {
+                require(["core/notification"], function(notification) {
+                    notification.addNotification({
+                        message: notice,
+                        type: "success"
+                    });
+                });
             }
-            $('div#noticeupdate').removeClass('hide').addClass(classname).text(notice);
         }
 
         function options_validated(selectbulk) {
@@ -355,6 +363,27 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             dialogue.show();
         }
 
+        // Handle wait-list select attendees "All" or "None" drop down.
+        $(document).on('change', 'select#menuf2f-select', function() {
+            // Get current value.
+            var current = $(this).val();
+            // If its the empty or if its the same as the last action.
+            if (current === '') {
+                // No need to do anything here we're returning to the default value.
+                return;
+            }
+            // Reset to default.
+            // This triggers the change event for a second time but we catch it with the above check.
+            $(this).val('');
+
+            if (current == "all") {
+                $('[name="userid"]').prop("checked", true);
+            }
+            if (current == "none") {
+                $('[name="userid"]').prop("checked", false);
+            }
+        });
+
         // Handle actions drop down.
         $(document).on('change', 'select#menuf2f-actions', function() {
             var select = $(this);
@@ -391,16 +420,17 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     break;
             }
 
-            // Process confirm/cancel attendees.
+            // Process confirm/cancel(remove) waitlist attendees.
             if (current == "confirmattendees" || current == "cancelattendees" || current == "playlottery") {
 
-                var users = Y.all('table.mod-facetoface-attendees.waitlist tr');
+                var users = Y.all('table.reportbuilder-table tr');
                 var updateusers = [];
                 var i = 0;
                 users.each(function(node) {
-                    if (checkbox = node.one('input[type=checkbox]')) {
+                    var checkbox = node.one('input[type=checkbox]');
+                    if (checkbox) {
                         if (checkbox._node.checked) {
-                            userid = checkbox.get('value');
+                            var userid = checkbox.get('value');
                             updateusers[i] = userid;
                             i++;
                         }
@@ -415,8 +445,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                             draggable: true,
                             modal: true
                         };
-                        dialog = new M.core.dialogue(config);
 
+                        var dialog = new M.core.dialogue(config);
                         dialog.addButton({
                             label: M.util.get_string('close', 'facetoface'),
                             section: Y.WidgetStdMod.FOOTER,
@@ -532,7 +562,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                         draggable: true,
                         modal: true,
                     };
-                    dialogue = new M.core.dialogue(config);
+                    var dialogue = new M.core.dialogue(config);
                     dialogue.addButton({
                         label: M.util.get_string('ok', 'moodle'),
                         section: Y.WidgetStdMod.FOOTER,

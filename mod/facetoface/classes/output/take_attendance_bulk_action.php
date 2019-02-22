@@ -62,7 +62,7 @@ class take_attendance_bulk_action extends template {
      * @return array
      */
     protected static function create_bulkaction(bool $disabled = false): array {
-        $statusoptions = attendees_list_helper::get_status();
+        $statusoptions = \mod_facetoface\attendees_helper::get_status();
 
         // Cleaning not set here for the admin, and change it with the custom label here.
         unset($statusoptions[not_set::get_code()]);

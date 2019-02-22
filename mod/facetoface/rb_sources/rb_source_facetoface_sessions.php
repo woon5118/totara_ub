@@ -39,6 +39,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     use \mod_facetoface\rb\traits\post_config;
     use \totara_cohort\rb\source\report_trait;
 
+    /** @var string $returnpage name */
+    private $returnpage = 'view';
+
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
@@ -226,7 +229,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     }
 
     protected function define_columnoptions() {
-        global $DB;
+        global $DB, $PAGE;
 
         $usernamefieldscreator = totara_get_all_user_name_fields_join('creator');
         $usernamefieldsbooked  = totara_get_all_user_name_fields_join('bookedby');
@@ -236,14 +239,22 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'capacity',                 // Value.
                 get_string('sesscapacity', 'rb_source_facetoface_sessions'),    // Name.
                 'sessions.capacity',        // Field.
-                array('joins' => 'sessions', 'dbdatatype' => 'integer', 'displayfunc' => 'integer')         // Options array.
+                array(
+                    'joins' => 'sessions',
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
+                )
             ),
             new rb_column_option(
                 'session',
                 'numattendees',
                 get_string('numattendees', 'rb_source_facetoface_sessions'),
                 'attendees.number',
-                array('joins' => 'attendees', 'dbdatatype' => 'integer', 'displayfunc' => 'integer')
+                array(
+                    'joins' => 'attendees',
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer'
+                )
             ),
             new rb_column_option(
                 'session',
@@ -304,7 +315,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     'displayfunc' => 'event_date',
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'outputformat' => 'text'
-)            ),
+                )
+            ),
             new rb_column_option(
                 'status',
                 'statuscode',
@@ -321,9 +333,10 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('ftfname', 'rb_source_facetoface_sessions'),
                 'facetoface.name',
                 array('joins' => 'facetoface',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text',
-                      'displayfunc' => 'format_string')
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
+                )
             ),
             new rb_column_option(
                 'facetoface',
@@ -584,6 +597,21 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 );
             }
         }
+        if (has_any_capability(array('mod/facetoface:addattendees', 'mod/facetoface:removeattendees'), $PAGE->context)) {
+            $columnoptions[] = new rb_column_option(
+                'session',
+                'waitlist_checkbox',
+                get_string('selectwithdot', 'mod_facetoface'),
+                'NULL',
+                array(
+                    'displayfunc' => 'waitlist_checkbox',
+                    'extrafields' => array('userid' => 'base.userid'),
+                    'customheading' => true,
+                    'nosort' => true,
+                    'noexport' => true
+                )
+            );
+        }
 
         // include some standard columns
         $this->add_core_user_columns($columnoptions);
@@ -591,11 +619,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_core_course_category_columns($columnoptions);
         $this->add_totara_job_columns($columnoptions);
         $this->add_core_tag_columns('core', 'course', $columnoptions);
-
         $this->add_facetoface_session_roles_to_columns($columnoptions);
         $this->add_assets_fields_to_columns($columnoptions);
         $this->add_rooms_fields_to_columns($columnoptions);
-
         $this->add_totara_cohort_course_columns($columnoptions);
 
         return $columnoptions;
@@ -927,6 +953,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
      * @return array of rb_column
      */
     public function rb_cols_generator_allcustomfieldssignupmanage(rb_column_option $columnoption, $hidden) {
+        global $PAGE;
+
         $results = $this->rb_cols_generator_allcustomfields($columnoption, $hidden);
 
         if (empty($results)) {
@@ -935,28 +963,28 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         }
 
         $extrafields = [
-            'courseid' => 'facetoface.course',
             'sessionid' => 'sessions.id',
-            'facetofaceid' => 'facetoface.id',
             'userid' => 'base.userid',
         ];
 
-
-        $results[] = new rb_column(
-            'facetoface_signup_manage',
-            'custom_field_edit_all',
-            get_string('actions', 'facetoface'),
-            'NULL',
-            [
-                'displayfunc' => 'f2f_all_signup_customfields_manage',
-                'noexport' => true,
-                'dbdatatype' => 'text',
-                'outputformat' => 'text',
-                'style' => null,
-                'class' => null,
-                'extrafields' => $extrafields,
-            ]
-        );
+        if (has_capability('mod/facetoface:manageattendeesnote', $PAGE->context)) {
+            $results[] = new rb_column(
+                'facetoface_signup_manage',
+                'custom_field_edit_all',
+                get_string('actions', 'facetoface'),
+                'NULL',
+                [
+                    'displayfunc' => 'f2f_all_signup_customfields_manage',
+                    'noexport' => true,
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
+                    'style' => null,
+                    'class' => null,
+                    'extrafields' => $extrafields,
+                    'nosort' => true
+                ]
+            );
+        }
 
         return $results;
     }
@@ -1174,5 +1202,25 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_audiencevisibility_config($report);
     }
 
+    /**
+     * Set extra params: customfield, add and/or remove attendees capabilities.
+     *
+     * @param reportbuilder $report
+     */
+    public function post_params(reportbuilder $report) {
+
+        if (isset($report->embedobj->returnpage)) {
+            $this->returnpage = $report->embedobj->returnpage;
+        }
+    }
+
+    /**
+     * Where to return when user customfield note is updated.
+     *
+     * @return string
+     */
+    public function get_return_page(): string {
+        return $this->returnpage;
+    }
 } // end of rb_source_facetoface_sessions class
 

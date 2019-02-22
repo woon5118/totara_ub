@@ -101,7 +101,7 @@ Feature: Allocate spaces in full events
     And I should see "Sam2 Student2"
 
     # Confirm to overbook
-    And I click on "All" "link"
+    And I click on "All" "option" in the "#menuf2f-select" "css_element"
     When I select "Confirm" from the "Attendee actions" singleselect
     And I press "Yes"
     Then I should not see "Sam2 Student2"

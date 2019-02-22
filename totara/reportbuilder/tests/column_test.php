@@ -1129,6 +1129,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
     public function test_embedded_reports() {
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $embeddedobjects = reportbuilder_get_all_embedded_reports();
         foreach ($embeddedobjects as $embeddedobject) {

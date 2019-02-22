@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/completion/completion_completion.php');
 /**
  * @group totara_reportbuilder
  */
-class course_grade_percent_test extends advanced_testcase {
+class totara_reportbuilder_course_grade_percent_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
     /**

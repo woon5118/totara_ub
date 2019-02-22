@@ -29,6 +29,7 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 $userid    = required_param('userid', PARAM_INT); // Facetoface signup user ID.
 $sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
+$return = optional_param('return', 'view', PARAM_ALPHA);
 
 require_sesskey();
 
@@ -66,10 +67,16 @@ if (!empty($customfields)) {
     $output .= get_string('none');
 }
 $output .= html_writer::empty_tag('hr');
+$params = [
+    's' => $sessionid,
+    'userid'  => $userid,
+    'return'  => $return,
+    'sesskey' => sesskey()
+];
 $output .= $renderer->single_button(
-    new moodle_url('/mod/facetoface/attendees/edit_signup_notes.php', array('userid' => $userid, 's' => $sessionid, 'sesskey' => sesskey())),
+    new moodle_url('/mod/facetoface/attendees/edit_signup_notes.php', $params),
     get_string('edit'),
-    'get'
+    'post'
 );
 
 header('Content-type: text/html; charset=utf-8');

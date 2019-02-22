@@ -214,7 +214,7 @@ Feature: Add - Remove seminar attendees
 
     When I click on "Attendees" "link"
     And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
-    And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV file" filemanager
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
     And I press "Continue"
     And I press "Confirm"
     And I should see "Sam1 Student1"
@@ -301,7 +301,7 @@ Feature: Add - Remove seminar attendees
     Then I should see "Add users (step 2 of 2)"
     When I press "Confirm"
     Then I should see "Bulk add attendees success - Successfully added/edited 1 attendees."
-    When I click on "(View results)" "link"
+    When I click on "View results" "link"
     Then I should see "Added successfully" in the "Bulk add attendees results" "totaradialogue"
     When I press "Cancel"
     Then I should see "Sam1 Student1"
@@ -333,7 +333,7 @@ Feature: Add - Remove seminar attendees
 
     When I click on "Attendees" "link"
     And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
-    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_invalid_columns.csv" file to "CSV file" filemanager
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_invalid_columns.csv" file to "CSV text file" filemanager
     And I press "Continue"
     And I should see "Invalid CSV file format - number of columns is not constant!"
 
@@ -394,7 +394,7 @@ Feature: Add - Remove seminar attendees
 
     And I click on "Attendees" "link"
     And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
-    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_with_ja.csv" file to "CSV file" filemanager
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_with_ja.csv" file to "CSV text file" filemanager
     And I press "Continue"
     When I press "Confirm"
     Then I should see "job1" in the "Sam1 Student1" "table_row"

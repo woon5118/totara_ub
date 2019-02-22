@@ -2039,7 +2039,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $seminarevent3 = new seminar_event($session3id);
 
         signup_helper::signup(\mod_facetoface\signup::create($user1->id, new \mod_facetoface\seminar_event($session1id)));
-        facetoface_cancel_attendees($session1id, array($user1->id));
+        \mod_facetoface\signup_helper::cancel_waitlist($seminarevent1, array($user1->id));
 
         $signup2 = \mod_facetoface\signup::create($user2->id, new \mod_facetoface\seminar_event($session1id));
         signup_helper::signup($signup2);

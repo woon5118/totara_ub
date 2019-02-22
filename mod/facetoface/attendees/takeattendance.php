@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 use mod_facetoface\{signup_helper, attendees_list_helper, seminar_event, seminar};
 use mod_facetoface\attendance\{attendance_helper, factory};
-use core\output\notification;
 
 /**
  * Load and validate base data
@@ -60,7 +59,7 @@ $download = optional_param('download', '', PARAM_ALPHA);
 
 // If there's no sessionid specified.
 if (!$s) {
-    attendees_list_helper::process_no_sessionid('takeattendance');
+    \mod_facetoface\attendees_helper::process_no_sessionid('takeattendance');
     exit;
 }
 
@@ -88,7 +87,8 @@ $PAGE->set_url($baseurl);
     $cancellations,
     $requests,
     $attendees
-] = attendees_list_helper::get_allowed_available_actions($seminar, $seminarevent, $context, $session);
+] = \mod_facetoface\attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context, $session);
+$includeattendeesnote = (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context));
 
 $can_view_session = !empty($allowed_actions);
 if (!$can_view_session) {
@@ -155,11 +155,10 @@ if ($formdata = data_submitted()) {
 
                 $event->trigger();
 
-                redirect(
+                totara_set_notification(
+                    get_string('updateattendeessuccessful', 'facetoface'),
                     $baseurl,
-                    get_string('updateattendeessuccessful', 'mod_facetoface'),
-                    null,
-                    notification::NOTIFY_SUCCESS
+                    ['class' => 'notifysuccess']
                 );
             }
         } else {
@@ -167,21 +166,19 @@ if ($formdata = data_submitted()) {
             $result = attendance_helper::process_session_attendance($items, $sd);
 
             if ($result) {
-                redirect(
-                    $baseurl,
+                totara_set_notification(
                     get_string('updateattendeessuccessful', 'mod_facetoface'),
-                    null,
-                    notification::NOTIFY_SUCCESS
+                    $baseurl,
+                    ['class' => 'notifysuccess']
                 );
             }
         }
 
         if (!$result) {
-            redirect(
-                $baseurl,
+            totara_set_notification(
                 get_string('error:takeattendance', 'facetoface'),
-                null,
-                notification::NOTIFY_ERROR
+                $baseurl,
+                ['class' => 'notifyproblem']
             );
         }
     }
@@ -191,7 +188,7 @@ if ($formdata = data_submitted()) {
  * Print page header
  */
 if (!$onlycontent) {
-    attendees_list_helper::process_js($action, $seminar, $seminarevent);
+    \mod_facetoface\attendees_helper::process_js($action, $seminar, $seminarevent);
     \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
     $PAGE->set_cm($cm);
     $PAGE->set_heading($course->fullname);

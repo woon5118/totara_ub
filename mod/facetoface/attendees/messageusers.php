@@ -42,7 +42,7 @@ $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
 // If there's no sessionid specified.
 if (!$s) {
-    \mod_facetoface\attendees_list_helper::process_no_sessionid('messageusers');
+    \mod_facetoface\attendees_helper::process_no_sessionid('messageusers');
     exit;
 }
 
@@ -59,7 +59,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
 
 list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
-    = \mod_facetoface\attendees_list_helper::get_allowed_available_actions($seminar, $seminarevent, $context, $session);
+    = \mod_facetoface\attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context, $session);
 $includeattendeesnote = (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context));
 
 $can_view_session = !empty($allowed_actions);

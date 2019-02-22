@@ -2011,7 +2011,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     public function display_bulk_actions_picker() {
         global $OUTPUT;
 
-        $status_options = \mod_facetoface\attendees_list_helper::get_status();
+        $status_options = \mod_facetoface\attendees_helper::get_status();
         unset($status_options[\mod_facetoface\signup\state\not_set::get_code()]);
         $out = $OUTPUT->container_start('facetoface-bulk-actions-picker');
         $select = html_writer::select($status_options, 'bulkattendanceop', '',

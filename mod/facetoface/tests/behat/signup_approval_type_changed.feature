@@ -101,6 +101,18 @@ Feature: Seminar Manager signup approval changes
     And I click on "Update requests" "button"
     And I log out
 
+    And I log in as "admin"
+    And I am on "Classroom Connect Course" course homepage
+    And I follow "Test seminar name"
+    And I follow "Attendees"
+    And I follow "Wait-list"
+    And I press "Edit this report"
+    And I switch to "Columns" tab
+    And I set the field "newcolumns" to "Approver name"
+    And I press "Add"
+    And I press "Save changes"
+    And I log out
+
     When I log in as "teacher"
     And I am on "Classroom Connect Course" course homepage
     And I follow "Test seminar name"

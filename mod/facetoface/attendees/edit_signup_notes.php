@@ -27,9 +27,10 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 $userid    = required_param('userid', PARAM_INT); // Facetoface signup user ID.
 $sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
+$return = optional_param('return', 'view', PARAM_ALPHA);
 
 $url = new moodle_url('/mod/facetoface/attendees/edit_signup_notes.php', array('userid' => $userid, 'sessionid' => $sessionid));
-$returnurl = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $sessionid, 'backtoallsessions' => 1));
+$returnurl = new moodle_url("/mod/facetoface/attendees/{$return}.php", array('s' => $sessionid, 'backtoallsessions' => 1));
 
 require_sesskey();
 
@@ -44,8 +45,13 @@ $attendeenote->userid = $attendeenote->id;
 $attendeenote->id = $attendeenote->submissionid;
 $attendeenote->sessionid = $sessionid;
 customfield_load_data($attendeenote, 'facetofacesignup', 'facetoface_signup');
-
-$mform = new \mod_facetoface\form\attendee_note(null, array('s' => $sessionid, 'userid' => $userid, 'attendeenote' => $attendeenote));
+$params = [
+    's' => $sessionid,
+    'userid' => $userid,
+    'return' => $return,
+    'attendeenote' => $attendeenote
+];
+$mform = new \mod_facetoface\form\attendee_note(null, $params);
 $mform->set_data($attendeenote);
 
 if ($mform->is_cancelled()) {

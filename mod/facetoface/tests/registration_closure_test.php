@@ -116,7 +116,8 @@ class mod_facetoface_registration_closure_testcase extends advanced_testcase {
 
         $signup4 = \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user4->id, new \mod_facetoface\seminar_event($session->id)));
         $signup4->switch_state(\mod_facetoface\signup\state\booked::class);
-        facetoface_cancel_attendees($session->id, array($user4->id));
+        $seminarevent = new \mod_facetoface\seminar_event($session->id);
+        \mod_facetoface\signup_helper::cancel_waitlist($seminarevent, array($user4->id));
 
         // Clear any events/messages caused by the signups.
         $this->execute_adhoc_tasks();

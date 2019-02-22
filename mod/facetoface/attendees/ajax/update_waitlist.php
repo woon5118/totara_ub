@@ -41,35 +41,21 @@ require_capability('mod/facetoface:takeattendance', $context);
 require_sesskey();
 
 $result = array('result' => 'failure', 'content' => '');
+$seminarevent = new \mod_facetoface\seminar_event($sessionid);
 switch($action) {
     case 'confirmattendees':
-        $errors = facetoface_confirm_attendees($sessionid, $data);
-        if (empty($errors)) {
-            $result['result'] = 'success';
-        } else {
-            $result['result'] = 'failure';
-            $errormsgs = [];
-            foreach ($errors as $userid => $error) {
-                $user = $DB->get_record('user', ['id' => $userid]);
-                $errormsgs[] = get_string('error:cannotchangestateuser', 'mod_facetoface',
-                    (object)['user'=> fullname($user), 'error' => $error]);
-            }
-            $result['content'] = html_writer::alist($errormsgs);
-        }
+        $result = \mod_facetoface\signup_helper::confirm_waitlist($seminarevent, $data);
         break;
     case 'cancelattendees':
-        facetoface_cancel_attendees($sessionid, $data);
+        \mod_facetoface\signup_helper::cancel_waitlist($seminarevent, $data);
         $result['result'] = 'success';
         break;
     case 'playlottery':
-        facetoface_waitlist_randomly_confirm_users($sessionid, $data);
-        $result['result'] = 'success';
+        $result = \mod_facetoface\signup_helper::confirm_waitlist_randomly($seminarevent, $data);
         break;
     case 'checkcapacity':
-        $seminar_event = new \mod_facetoface\seminar_event($sessionid);
-        $signupcount = facetoface_get_num_attendees($seminar_event->get_id());
-
-        if (($signupcount + count($data)) > $seminar_event->get_capacity()) {
+        $signupcount = facetoface_get_num_attendees($seminarevent->get_id());
+        if (($signupcount + count($data)) > $seminarevent->get_capacity()) {
             $result['result'] = 'overcapacity';
         } else {
             $result['result'] = 'undercapacity';

@@ -118,12 +118,12 @@ Feature: Seminar Approval required
     And I should not see "Sam6 Student6" in the "#facetoface_sessions" "css_element"
 
     When I follow "Wait-list"
-    Then I should not see "Sam1 Student1" in the "table.waitlist" "css_element"
-    And I should not see "Sam2 Student2" in the "table.waitlist" "css_element"
-    And I should not see "Sam3 Student3" in the "table.waitlist" "css_element"
-    And I should not see "Sam4 Student4" in the "table.waitlist" "css_element"
-    And I should see "Sam5 Student5" in the "table.waitlist" "css_element"
-    And I should see "Sam6 Student6" in the "table.waitlist" "css_element"
+    Then I should not see "Sam1 Student1" in the "#facetoface_waitlist" "css_element"
+    And I should not see "Sam2 Student2" in the "#facetoface_waitlist" "css_element"
+    And I should not see "Sam3 Student3" in the "#facetoface_waitlist" "css_element"
+    And I should not see "Sam4 Student4" in the "#facetoface_waitlist" "css_element"
+    And I should see "Sam5 Student5" in the "#facetoface_waitlist" "css_element"
+    And I should see "Sam6 Student6" in the "#facetoface_waitlist" "css_element"
 
   @javascript
   Scenario: Update user's status code with override enabled when seminar approval required is removed
@@ -195,5 +195,5 @@ Feature: Seminar Approval required
     And I should see "Sam3 Student3" in the "#facetoface_sessions" "css_element"
     And I should see "Sam4 Student4" in the "#facetoface_sessions" "css_element"
     And I switch to "Wait-list" tab
-    And I should see "Sam5 Student5" in the ".mod-facetoface-attendees.waitlist" "css_element"
-    And I should see "Sam6 Student6" in the ".mod-facetoface-attendees.waitlist" "css_element"
+    And I should see "Sam5 Student5" in the "#facetoface_waitlist" "css_element"
+    And I should see "Sam6 Student6" in the "#facetoface_waitlist" "css_element"

@@ -86,7 +86,7 @@ abstract class content_generator {
         $this->sessions = $sessions;
 
         // Loading status options and reorder it here.
-        $this->statusoptions = attendees_list_helper::get_status();
+        $this->statusoptions = \mod_facetoface\attendees_helper::get_status();
         krsort($this->statusoptions, SORT_NUMERIC);
     }
 

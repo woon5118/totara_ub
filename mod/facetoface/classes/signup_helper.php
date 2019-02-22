@@ -313,4 +313,94 @@ final class signup_helper {
         $interest = interest::from_seminar($signup->get_seminar_event()->get_seminar(), $signup->get_userid());
         $interest->withdraw();
     }
+
+    /**
+     * Confirms waitlisted users from an array as booked on a session.
+     *
+     * @param seminar_event $seminarevent
+     * @param array  $userids    Array of user ids to confirm
+     * @return array $result success|failures
+     */
+    public static function confirm_waitlist(\mod_facetoface\seminar_event $seminarevent, $userids) {
+        global $DB;
+
+        $errors = [];
+        foreach ($userids as $userid) {
+            $signup = signup::create($userid, $seminarevent);
+            if ($signup->get_state() instanceof \mod_facetoface\signup\state\not_set) {
+                continue;
+            }
+
+            if ($signup->can_switch(\mod_facetoface\signup\state\booked::class)) {
+                $signup->switch_state(\mod_facetoface\signup\state\booked::class);
+                $conditions = array('sessionid' => $seminarevent->get_id(), 'userid' => $userid);
+                $existingsignup = $DB->get_record('facetoface_signups', $conditions, '*', MUST_EXIST);
+                notice_sender::confirm_booking(new signup($existingsignup->id), $existingsignup->notificationtype);
+            } else {
+                $failures = $signup->get_failures(\mod_facetoface\signup\state\booked::class);
+                if (!empty($failures)) {
+                    $errors[$signup->get_userid()] = current($failures);
+                }
+            }
+        }
+        $result = [];
+        if (empty($errors)) {
+            $result['result'] = 'success';
+        } else {
+            $result['result'] = 'failure';
+            $errormsgs = [];
+            list($sqlin, $inparams) = $DB->get_in_or_equal(array_keys($errors));
+            $users = $DB->get_records_sql('SELECT * FROM {user} WHERE id '.$sqlin, $inparams);
+            foreach ($users as $user) {
+                $errormsgs[] = get_string(
+                    'error:cannotchangestateuser',
+                    'mod_facetoface',
+                    (object)['user' => fullname($user), 'error' => $errors[$user->id]]
+                );
+            }
+            $result['content'] = html_writer::alist($errormsgs);
+        }
+        return $result;
+    }
+
+    /**
+     * Randomly books waitlisted users on to a session.
+     *
+     * @param seminar_event $seminarevent
+     * @param array $userids a list of user ids
+     * @return array $result success|failure
+     */
+    public static function confirm_waitlist_randomly(\mod_facetoface\seminar_event $seminarevent, $userids) {
+
+        $signupcount  = facetoface_get_num_attendees($seminarevent->get_id());
+        $numtoconfirm = $seminarevent->get_capacity() - $signupcount;
+
+        if (count($userids) <= $seminarevent->get_capacity()) {
+            $winners = $userids;
+        } else {
+            $winners = array_rand(array_flip($userids), $numtoconfirm);
+            if ($numtoconfirm == 1) {
+                $winners = array($winners);
+            }
+        }
+        return self::confirm_waitlist($seminarevent, $winners);
+    }
+
+    /**
+     * Cancels waitlisted users from an array on a session
+     * @param seminar_event $seminarevent
+     * @param array  $userids    Array of user ids to cancel
+     */
+    public static function cancel_waitlist(\mod_facetoface\seminar_event $seminarevent, $userids) {
+
+        foreach ($userids as $userid) {
+            $signup = signup::create($userid, $seminarevent);
+            if ($signup->get_state() instanceof \mod_facetoface\signup\state\not_set) {
+                continue;
+            }
+            if ($signup->can_switch(\mod_facetoface\signup\state\user_cancelled::class)) {
+                $signup->switch_state(\mod_facetoface\signup\state\user_cancelled::class);
+            }
+        }
+    }
 }

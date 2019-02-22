@@ -50,7 +50,7 @@ $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
 // If there's no sessionid specified.
 if (!$s) {
-    \mod_facetoface\attendees_list_helper::process_no_sessionid('cancellations');
+    \mod_facetoface\attendees_helper::process_no_sessionid('cancellations');
     exit;
 }
 
@@ -67,7 +67,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
 
 list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
-    = \mod_facetoface\attendees_list_helper::get_allowed_available_actions($seminar, $seminarevent, $context, $session);
+    = \mod_facetoface\attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context, $session);
 
 $can_view_session = !empty($allowed_actions);
 if (!$can_view_session) {
@@ -115,7 +115,7 @@ if ($actionallowed) {
  * Print page header
  */
 if (!$onlycontent) {
-    \mod_facetoface\attendees_list_helper::process_js($action, $seminar, $seminarevent);
+    \mod_facetoface\attendees_helper::process_js($action, $seminar, $seminarevent);
     \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
     $PAGE->set_cm($cm);
     $PAGE->set_heading($course->fullname);
