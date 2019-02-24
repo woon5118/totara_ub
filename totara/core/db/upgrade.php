@@ -535,5 +535,20 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018120701, 'totara', 'core');
     }
 
+    if ($oldversion < 2019022201) {
+        $duration = get_config('moodlecourse', 'courseduration');
+        if ($duration !== false) {
+            // adjust the default course duration.
+            if ($duration <= 0) {
+                // if it is 0, set it back to 365 days, the internal default duration.
+                $duration = YEARSECS;
+            } else if ($duration < HOURSECS) {
+                // if it is less than an hour, set it to an hour.
+                $duration = HOURSECS;
+            }
+            set_config('courseduration', $duration, 'moodlecourse');
+        }
+    }
+
     return true;
 }

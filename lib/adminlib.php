@@ -3635,6 +3635,9 @@ class admin_setting_configduration extends admin_setting {
     /** @var int default duration unit */
     protected $defaultunit;
 
+    /** @var callback|null custom validator */
+    protected $validator;
+
     /**
      * Constructor
      * @param string $name unique ascii name, either 'mysetting' for settings that in config,
@@ -3655,6 +3658,20 @@ class admin_setting_configduration extends admin_setting {
             $this->defaultunit = 86400;
         }
         parent::__construct($name, $visiblename, $description, $defaultsetting);
+    }
+
+    /**
+     * Sets a new custom validator.
+     * @param callback|null $validator - custom validator function that takes a parameter
+     * @return admin_setting_configduration
+     * @since Totara 11.13, 12.4, 13.0
+     */
+    public function set_validator($validator) {
+        if (!is_null($validator) && !is_callable($validator)) {
+            throw new coding_exception('A custom validator must be callable.');
+        }
+        $this->validator = $validator;
+        return $this;
     }
 
     /**
@@ -3737,9 +3754,27 @@ class admin_setting_configduration extends admin_setting {
             return '';
         }
 
+        if (!is_numeric($data['v'])) {
+            return get_string('errornonnumeric', 'admin');
+        }
+
         $seconds = (int)($data['v']*$data['u']);
         if ($seconds < 0) {
             return get_string('errorsetting', 'admin');
+        }
+
+        // Totara: custom validator function
+        if ($this->validator) {
+            $error = call_user_func($this->validator, $seconds);
+            if (is_null($error)) {
+                // null means ok.
+            } else if (is_string($error) && strlen($error) > 0) {
+                // non-empty string means validation error.
+                return $error;
+            } else {
+                // any other return value is not acceptable.
+                throw coding_exception('A custom validator must return a non-empty string or null.');
+            }
         }
 
         $result = $this->config_write($this->name, $seconds);

@@ -115,8 +115,20 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $temp->add(new admin_setting_configselect('moodlecourse/coursedisplay', new lang_string('coursedisplay'),
         new lang_string('coursedisplay_help'), COURSE_DISPLAY_SINGLEPAGE, $choices));
 
-    $temp->add(new admin_setting_configduration('moodlecourse/courseduration', get_string('courseduration'),
-        get_string('courseduration_desc'), YEARSECS));
+    // Totara: Changes made to treat less than an hour as invalid duration.
+    $duration = new admin_setting_configduration(
+        'moodlecourse/courseduration', get_string('courseduration'),
+        get_string('courseduration_desc'), YEARSECS);
+    $temp->add(
+        $duration->set_validator(
+            function ($seconds) {
+                if ($seconds < HOURSECS) {
+                    return get_string('errordurationminonehour', 'admin');
+                }
+                return null;
+            }
+        )
+    );
 
     // Appearance.
     $temp->add(new admin_setting_heading('appearancehdr', new lang_string('appearance'), ''));
