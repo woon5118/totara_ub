@@ -31,14 +31,14 @@ defined('MOODLE_INTERNAL') || die();
  */
 trait crud_mapper {
 
-    protected function crud_load() : self {
+    protected function crud_load(int $strictness = MUST_EXIST) : self {
         global $DB;
 
         if (!$this->id) {
             return $this;
         }
 
-        $record = $DB->get_record(self::DBTABLE, ['id' => $this->id], '*', MUST_EXIST);
+        $record = $DB->get_record(self::DBTABLE, ['id' => $this->id], '*', $strictness);
         if (!$record) {
             $this->id = 0;
             return $this;

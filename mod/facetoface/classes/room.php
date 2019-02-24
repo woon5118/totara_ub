@@ -145,6 +145,20 @@ final class room {
     }
 
     /**
+     * Load record from $id, if it is the invalid $id, that does not exist within the database, then we should probably not throw
+     * any exceptions, rather than just return an object without default empty data set here.
+     *
+     * @param int $id
+     *
+     * @return room
+     */
+    public static function find(int $id): room {
+        $o = new static();
+        $o->id = $id;
+        return $o->crud_load(IGNORE_MISSING);
+    }
+
+    /**
      * Loads a seminar room.
      *
      * @return room

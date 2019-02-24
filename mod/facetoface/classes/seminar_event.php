@@ -198,15 +198,6 @@ final class seminar_event {
         $this->set_cancelledstatus(1);
         $this->save();
 
-        // Unlink rooms, orphaned custom rooms are deleted from cleanup task.
-        $DB->set_field('facetoface_sessions_dates', 'roomid', 0, array('sessionid' => $this->get_id()));
-
-        // Unlink assets, orphaned custom assets are deleted from cleanup task.
-        $dateids = $DB->get_fieldset_select('facetoface_sessions_dates', 'id', "sessionid = :sessionid", array('sessionid' => $this->get_id()));
-        foreach ($dateids as $dateid) {
-            $DB->delete_records('facetoface_asset_dates', array('sessionsdateid' => $dateid));
-        }
-
         // Remove entries from the calendars.
         \mod_facetoface\calendar::remove_all_entries($this);
 
@@ -254,6 +245,21 @@ final class seminar_event {
 
         // Notify managers who had reservations.
         \mod_facetoface\notice_sender::reservation_cancelled($this);
+
+        // Start cleaning up the custom rooms, custom assets here at the very end of this cancellation task, because we would want
+        // the information of custom rooms and custom assets to be included in the email sending to users which should have happened
+        // before this stage.
+        $sessions = $this->get_sessions();
+
+        /** @var seminar_session $session */
+        foreach ($sessions as $session) {
+            // Unlink rooms, orphaned custom rooms are deleted from cleanup task.
+            $session->set_roomid(0);
+            $session->save();
+
+            // Unlink assets, orphaned custom assets are deleted from cleanup task.
+            $DB->delete_records('facetoface_asset_dates', ['sessionsdateid' => $session->get_id()]);
+        }
 
         return true;
     }

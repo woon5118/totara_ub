@@ -1968,6 +1968,25 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
 
     $roomcf = array();
     $roomlist = \mod_facetoface\room_list::get_event_rooms($data->id);
+    if ($roomlist->is_empty()) {
+        // If the roomlist is empty, then we start checking roomid within session dates of an event/session, because the custom
+        // room would have been removed from session date in the database at this point, whenever an event is cancelled.
+        if (isset($data->sessiondates) && is_array($data->sessiondates)) {
+            foreach ($data->sessiondates as $sessiondate) {
+                if (empty($sessiondate->roomid)) {
+                    continue;
+                }
+
+                $room = \mod_facetoface\room::find($sessiondate->roomid);
+                if (!$room->exists()) {
+                    continue;
+                }
+
+                $roomlist->add($room);
+            }
+        }
+    }
+
     foreach ($roomlist as $room) {
         $roomcf[$room->get_id()] = customfield_get_data($room->to_record(), 'facetoface_room', 'facetofaceroom', false);
     }
