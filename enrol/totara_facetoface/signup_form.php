@@ -237,7 +237,8 @@ class enrol_totara_facetoface_signup_form extends moodleform {
 
             // Room.
             if (isset($session->room)) {
-                $roomhtml = facetoface_room_html($session->room, $PAGE->url);
+                $renderer = $PAGE->get_renderer('mod_facetoface');
+                $roomhtml = $renderer->get_room_details_html($session->room, $PAGE->url);
             } else {
                 $roomhtml = '';
             }
