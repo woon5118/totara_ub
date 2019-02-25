@@ -29,29 +29,32 @@ $pixonlyimages = array(
 );
 
 $icons = array(
-    'home' => array(
+    'theme_basis|notification-info' => array(
         'data' => array(
-            'classes' => 'fa-home ft-size-200'
+            'classes' => 'fa-info-circle',
         ),
     ),
-    'notification-info' => array(
+    'theme_basis|notification-success' => array(
         'data' => array(
-            'classes' => 'fa-info-circle ft-size-200',
+            'classes' => 'fa-check ft-flip-rtl',
         ),
     ),
-    'notification-success' => array(
+    'theme_basis|notification-warning' => array(
         'data' => array(
-            'classes' => 'fa-check ft-size-200 ft-flip-rtl',
+            'classes' => 'fa-exclamation-triangle',
         ),
     ),
-    'notification-warning' => array(
+    'theme_basis|notification-error' => array(
         'data' => array(
-            'classes' => 'fa-exclamation-triangle ft-size-200',
-        ),
-    ),
-    'notification-error' => array(
-        'data' => array(
-            'classes' => 'fa-bolt ft-size-200 ft-flip-rtl',
+            'classes' => 'fa-bolt ft-flip-rtl',
         ),
     ),
 );
+
+$deprecated = [
+    'home' => 'totara_core|home',
+    'notification-info' => 'theme_basis|notification-info',
+    'notification-success' => 'theme_basis|notification-success',
+    'notification-warning' => 'theme_basis|notification-warning',
+    'notification-error' => 'theme_basis|notification-error',
+];

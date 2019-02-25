@@ -162,7 +162,7 @@ class masthead_menu implements \renderable, \templatable {
         if (!empty($menudata->menuitems)) {
             $firstitem = $menudata->menuitems[0];
             if ($firstitem['class_name'] === 'home') {
-                $icon = $output->flex_icon('home', array('alt' => $firstitem['linktext']));
+                $icon = $output->flex_icon('totara_core|home', array('alt' => $firstitem['linktext']));
                 $menudata->menuitems[0]['homeicon'] = $icon;
             }
 

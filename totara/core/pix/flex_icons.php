@@ -38,7 +38,14 @@ $icons = array(
                     'classes' => 'fa-chevron-right ft-flip-rtl',
                 ),
         ),
-    );
+    'totara_core|home' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-home',
+                ),
+        ),
+);
 
 $aliases = array(
     'totara_core|bookings' => 'calendar',

@@ -31,6 +31,7 @@ information provided here is intended especially for developers.
 * Added an id attribute to main navigation items in nav_primary.mustache, nav_expand.mustache and nav_sub.mustache so
   they may be targeted by user_tours. This is to replace the the css classes used to identify individual menu items used
   in Totara 11 and below.
+* totara_core\masthead_menu::export_for_template now outputs totara_core|home instead of home (as provided by the basis theme)
 
 === 12.0 ===
 

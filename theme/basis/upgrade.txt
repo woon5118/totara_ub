@@ -2,6 +2,18 @@ This file describes API changes for 'theme_basis'.
 
 === 13.0 ===
 
+* Deprecated the following icons:
+** notification-info - use theme_basis|notification-info instead
+** notification-succes - use theme_basis|notification-success instead
+** notification-warning - use theme_basis|notification-warning instead
+** notification-error - use theme_basis|notification-error instead
+** home - use totara_core|home instead
+* Modified the following templates, extracting out the ft-size-200 class that was previously applied to the flex icon declaration:
+** core/notification_error
+** core/notification_info
+** core/notification_success
+** core/notification_warning
+
 === 12.0 ===
 
 * Altered theme/basis/layout/partials/footer.php, removing reference to page_footer_nav
