@@ -109,10 +109,20 @@ if (!empty($seminar->get_intro())) {
 $f2f_renderer->selfapproval_notice($seminar->get_id());
 
 $f2f_renderer->print_action_bar($seminar);
-$f2f_renderer->print_filter_bar($seminar, $roomid, $eventtime);
+
+$hassessions = $seminar->get_events()->count() > 0;
+
+// only print the filter bar if this seminar has events
+if ($hassessions) {
+    $f2f_renderer->print_filter_bar($seminar, $roomid, $eventtime);
+}
+
 echo $f2f_renderer->print_session_list($seminar, $roomid, $eventtime);
 
-$f2f_renderer->attendees_export_form($seminar);
+// only print the export form if this seminar has events
+if ($hassessions) {
+    $f2f_renderer->attendees_export_form($seminar);
+}
 
 echo $OUTPUT->box_end();
 
