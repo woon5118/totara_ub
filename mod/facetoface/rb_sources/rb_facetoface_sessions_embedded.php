@@ -27,11 +27,19 @@ class rb_facetoface_sessions_embedded extends rb_base_embedded {
     public $returnpage = 'view';
 
     public function __construct($data) {
+        global $PAGE;
+
         if (!empty($data['sessionid'])) {
             $this->embeddedparams['sessionid'] = $data['sessionid'];
         }
         if (!empty($data['status'])) {
             $this->embeddedparams['status'] = $data['status'];
+        }
+
+        if (!has_capability('totara/core:seedeletedusers', $PAGE->context)) {
+            // If the current user does not has the ability to view the deleted users, then we should not include the deleted user
+            // in the embedded report.
+            $this->embeddedparams['userdeleted'] = 0;
         }
 
         $this->url = '/mod/facetoface/attendees/view.php';

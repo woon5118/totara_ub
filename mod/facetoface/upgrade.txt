@@ -67,6 +67,11 @@ information provided here is intended especially for developers.
 * facetoface_get_trainer_roles() function has been deprecated, please use \mod_facetoface\trainer_helper::get_trainer_roles() instead
 * facetoface_get_trainers() function has been deprecated, please use \mod_facetoface\trainer_helper::get_trainers() instead
 * facetoface_get_session_managers() function has been deprecated, please use \mod_facetoface\signup_helper::find_managers_from_signup() instead
+* mod_facetoface_renderer::print_session_list_table has been changed to check the capability of current session user to decide whether it should include the deleted users or not in the number of booking users.
+* facetoface_get_num_attendees() function takes another parameter to flag that the query should include the deleted users or not
+* facetoface_get_users_by_status() function takes another parameter to flag that the query should include the deleted users or not
+* facetoface_get_cancellations() function takes another parameter to flag that the query should include the deleted users or not
+* facetoface_get_attendees() function takes another parameter to flag that the query should include the deleted users or not
 
 === 12.0 ===
 

@@ -52,14 +52,15 @@ class attendees_message extends \moodleform {
         $json_users = array();
         $attendees = array();
         foreach ($statuses as $status) {
-            // Get count of users with this status
-            $count = facetoface_get_num_attendees($this->_customdata['s'], $status, '=');
+            // Get count of users with this status. We cannot send any messages to deleted user anyway, so no point
+            // to include them here.
+            $count = facetoface_get_num_attendees($this->_customdata['s'], $status, '=', false);
 
             if (!$count) {
                 continue;
             }
 
-            $users = facetoface_get_users_by_status($this->_customdata['s'], $status);
+            $users = facetoface_get_users_by_status($this->_customdata['s'], $status, '', false, false);
             $json_users[$status] = $users;
             $attendees = array_merge($attendees, $users);
 

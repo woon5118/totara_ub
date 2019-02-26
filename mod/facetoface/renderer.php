@@ -142,6 +142,13 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $table->head = $tableheader;
         $table->data = array();
 
+        $context = $this->context;
+        if (null == $context) {
+            // Probably context is not being set here yet, therefore, we should use the one provided by $PAGE
+            $context = $this->page->context;
+        }
+        $includedeleted = has_capability('totara/core:seedeletedusers', $context);
+
         foreach ($sessions as $session) {
             $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
             $sessionstarted = facetoface_has_session_started($session, time());
@@ -156,7 +163,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $status = \mod_facetoface\signup\state\waitlisted::get_code();
                 $comp = '=';
             }
-            $signupcount = facetoface_get_num_attendees($session->id, $status, $comp);
+            $signupcount = facetoface_get_num_attendees($session->id, $status, $comp, $includedeleted);
             $sessionfull = ($signupcount >= $session->capacity);
 
             $rooms = \mod_facetoface\room_list::get_event_rooms($session->id);
@@ -419,6 +426,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @throws coding_exception
      */
     private function session_capacity_table_cell($session, $viewattendees, $signupcount, $datescount = 0) {
+        $context = $this->context;
+        if (null == $context) {
+            // Using $PAGE->context if the internal $context had not been set.
+            $context = $this->page->context;
+        }
+
+        $includedeleted = has_capability('totara/core:seedeletedusers', $context);
+
         if ($viewattendees) {
             if (!empty($session->sessiondates)) {
                 $a = array('current' => $signupcount, 'maximum' => $session->capacity);
@@ -426,16 +441,24 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 if ($signupcount > $session->capacity) {
                     $stats .= get_string('capacityoverbooked', 'facetoface');
                 }
-                $waitlisted = facetoface_get_num_attendees($session->id, \mod_facetoface\signup\state\waitlisted::get_code()) - $signupcount;
+
+                $waitlisted = facetoface_get_num_attendees(
+                    $session->id,
+                    \mod_facetoface\signup\state\waitlisted::get_code(),
+                    '>=',
+                    $includedeleted
+                );
+
+                $waitlisted -= $signupcount;
+
                 if ($waitlisted > 0) {
                     $stats .= " (" . $waitlisted . " " . get_string('status_waitlisted', 'facetoface') . ")";
                 }
             } else {
-
                 // Since within the event that has no sesison date, and user that are in wait-list could be moved to
                 // attendees, and it caused the number of wait-listed user being calculated and rendered wrong.
                 // If there is any user that confirm as booked, then it should display the number of booked user within current
-                $currentbookeduser = (int) facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_BOOKED, "=");
+                $currentbookeduser = (int) facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_BOOKED, "=", $includedeleted);
                 $a = array('current' => $currentbookeduser, 'maximum' => $session->capacity);
                 $stats = get_string('capacitycurrentofmaximum', 'facetoface', $a);
                 if ($currentbookeduser > $session->capacity) {

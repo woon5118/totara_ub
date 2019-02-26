@@ -123,10 +123,12 @@ final class attendance_helper {
      * + [usernamefields] : string
      *
      * @param int $seminareventid
+     * @param bool $includedeleted  Set this true, to include the deleted user in the query, otherwise, leave it as FALSE, if we
+     *                              would not expect deleted users to appear in the list.
      *
      * @return stdClass[]
      */
-    public function get_event_attendees(int $seminareventid): array {
+    public function get_event_attendees(int $seminareventid, bool $includedeleted = false): array {
         global $DB;
 
         $sql = $this->get_base_sql();
@@ -145,8 +147,13 @@ final class attendance_helper {
             WHERE s.id = ?
             AND ss.statuscode {$statussql}
             AND ss.superceded <> 1
-            ORDER BY u.firstname, u.lastname ASC
         ";
+
+        if (!$includedeleted) {
+            $sql .= " AND u.deleted <> 1 ";
+        }
+
+        $sql .= " ORDER BY u.firstname, u.lastname ASC";
 
         array_unshift($params, $seminareventid);
         return $DB->get_records_sql($sql, $params);
@@ -173,12 +180,13 @@ final class attendance_helper {
      * + statuscode: int
      * + [usernamefields] : string
      *
-     * @param int $seminareventid
-     * @param int $sessionid
+     * @param int   $seminareventid
+     * @param int   $sessionid
+     * @param bool  $includedeleted     Flag this to true, if we would want the query to include the deleted users.
      *
      * @return stdClass[]
      */
-    public function get_session_attendees(int $seminareventid, int $sessionid): array {
+    public function get_session_attendees(int $seminareventid, int $sessionid, bool $includedeleted = false): array {
         global $DB;
 
         [$statussql, $params] = $DB->get_in_or_equal($this->statuses, SQL_PARAMS_NAMED, 'ssparam');
@@ -206,8 +214,13 @@ final class attendance_helper {
             WHERE s.id = :seminareventid
             AND sd.id = :sessiondateid
             AND ss.statuscode {$statussql}
-            ORDER BY u.firstname, u.lastname ASC
         ";
+
+        if (!$includedeleted) {
+            $sql .= " AND u.deleted <> 1 ";
+        }
+
+        $sql .= " ORDER BY u.firstname, u.lastname ASC";
 
         $params['seminareventid'] = $seminareventid;
         $params['sessiondateid']  = $sessionid;
@@ -221,16 +234,22 @@ final class attendance_helper {
      * means that the caller want to retrieve the session attendees base on the session date id.
      * Otherwise, it will return the event's attendees by default.
      *
+     * The list of attendees will include the deleted users if the viewer/actor does have the ability
+     * to view deleted users.
+     *
      * @param int $seminareventid
      * @param int $sessiondateid
      *
      * @return event_attendee[]
      */
     public function get_attendees(int $seminareventid, int $sessiondateid = 0): array {
+        global $PAGE;
+        $includedeleted = has_capability('totara/core:seedeletedusers', $PAGE->context);
+
         if ($sessiondateid > 0) {
-            $array = $this->get_session_attendees($seminareventid, $sessiondateid);
+            $array = $this->get_session_attendees($seminareventid, $sessiondateid, $includedeleted);
         } else {
-            $array = $this->get_event_attendees($seminareventid);
+            $array = $this->get_event_attendees($seminareventid, $includedeleted);
         }
 
         return array_map(
@@ -250,12 +269,15 @@ final class attendance_helper {
      *                          is sum base on the status code.
      * + userid: int        -> The user id of that state
      *
+     * The recordset will only include the deleted user's record(s) if the viewer/actor does have the ability
+     * to view deleted user
+     *
      * @param int $seminareventid
      *
      * @return moodle_recordset
      */
     public function load_session_attendance_status(int $seminareventid): moodle_recordset {
-        global $DB;
+        global $DB, $PAGE;
         [$statussql, $params] = $DB->get_in_or_equal($this->statuses, SQL_PARAMS_NAMED);
 
         $code = not_set::get_code();
@@ -269,6 +291,7 @@ final class attendance_helper {
             COUNT(sds.id) AS total
             FROM {facetoface_signups_dates_status} sds
             INNER JOIN {facetoface_signups} su ON su.id = sds.signupid
+            %extra_join%
             INNER JOIN {facetoface_sessions_dates} sd ON sd.id = sds.sessiondateid
             INNER JOIN {facetoface_sessions} s ON s.id = sd.sessionid
             AND su.sessionid = s.id
@@ -284,6 +307,7 @@ final class attendance_helper {
             FROM {facetoface_sessions_dates} sd
             INNER JOIN {facetoface_sessions} s ON s.id = sd.sessionid
             INNER JOIN {facetoface_signups} su ON su.sessionid = s.id
+            %extra_join%
             LEFT JOIN {facetoface_signups_dates_status} sds ON sds.signupid = su.id
             AND sds.sessiondateid = sd.id
             WHERE sds.id IS NULL
@@ -291,6 +315,14 @@ final class attendance_helper {
             GROUP BY su.userid
             ORDER BY statuscode";
 
+        $replacement = "";
+        if (!has_capability('totara/core:seedeletedusers', $PAGE->context)) {
+            // If the user does not have the ability to view the deleted users, we should removed the deleted
+            // users out of the query.
+            $replacement = " INNER JOIN {user} u ON u.id = su.userid AND u.deleted <> 1";
+        }
+
+        $sql = str_replace('%extra_join%', $replacement,  $sql);
         $additional = [
             'sessionid1' => $seminareventid,
             'sessionid2' => $seminareventid,

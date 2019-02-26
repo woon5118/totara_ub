@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
- * @package 
+ * @package mod_facetoface
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -107,6 +107,7 @@ class mod_facetoface_retrieve_attendance_testcase extends advanced_testcase {
             foreach ($signups as $signup) {
                 $sessionstatus = session_status::from_signup($signup, $session->get_id());
                 $sessionstatus->set_attendance_status(fully_attended::class);
+                $sessionstatus->save();
             }
         }
 

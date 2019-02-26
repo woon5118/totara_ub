@@ -574,6 +574,11 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'hasbooked',
                 'CASE WHEN status.statuscode >= 70 THEN 1 ELSE 0 END',
                 'status'
+            ),
+            new rb_param_option(
+                'userdeleted',
+                'auser.deleted',
+                'auser'
             )
         );
 

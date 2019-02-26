@@ -711,9 +711,11 @@ function facetoface_get_grade($userid, $courseid, $facetofaceid) {
  * @param array $status Array of statuses to include
  * @param bool $includereserved optional - if true, then include 'reserved' spaces (note this will change the array index
  *                                to signupid instead of the user id, to prevent duplicates)
+ *
+ * @param bool $includedeleted  optional - if false, then deleted userw ill not be included in the list.
  * @return array
  */
-function facetoface_get_attendees($sessionid, $status = [], $includereserved = false) {
+function facetoface_get_attendees($sessionid, $status = [], $includereserved = false, $includedeleted = true) {
     global $DB;
 
     if (empty($status)) {
@@ -730,6 +732,11 @@ function facetoface_get_attendees($sessionid, $status = [], $includereserved = f
         $reservedfields = 'su.id AS signupid, '.$bookedbyusernamefields.', bb.id AS bookedby, ';
         $userjoin = 'LEFT JOIN {user} bb ON bb.id = su.bookedby
                      LEFT JOIN';
+    }
+
+    $extrajoincondition = '';
+    if (!$includedeleted) {
+        $extrajoincondition = ' AND u.deleted <> 1 ';
     }
 
     // Get all name fields, and user identity fields.
@@ -777,6 +784,7 @@ function facetoface_get_attendees($sessionid, $status = [], $includereserved = f
        {$userjoin}
             {user} u
          ON u.id = su.userid
+          {$extrajoincondition}
         WHERE
             s.id = ?
         AND ss.statuscode {$statussql}
@@ -1597,13 +1605,13 @@ function facetoface_grade_item_update($facetoface, $grades=NULL) {
 /**
  * Return number of attendees signed up to a facetoface session
  *
- * @param integer $session_id
- * @param integer $status (optional), default is '70' (booked)
- * @param string $comp SQL comparison operator.
- *
+ * @param integer   $session_id
+ * @param integer   $status             (optional), default is '70' (booked)
+ * @param string    $comp               SQL comparison operator.
+ * @param bool      $includedeleted     Set this to false, if we do not want to include the deleted user in the count.
  * @return integer
  */
-function facetoface_get_num_attendees($session_id, $status = null, $comp = '>=') {
+function facetoface_get_num_attendees($session_id, $status = null, $comp = '>=', $includedeleted = true) {
     global $DB;
 
     if (is_null($status)) {
@@ -1613,9 +1621,19 @@ function facetoface_get_num_attendees($session_id, $status = null, $comp = '>=')
     $sql = 'SELECT COUNT(ss.id)
               FROM {facetoface_signups} su
               JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+              %extra_join%
              WHERE sessionid = ?
                AND ss.superceded = 0
                AND ss.statuscode ' . $comp . ' ?';
+
+    $replacement = "";
+    if (!$includedeleted) {
+        // Only inner join the table user if it is needed, and filter out the deleted users. Otherwise, leave it be to assure that
+        // it can perform as the way it is.
+        $replacement = " JOIN {user} u ON u.id = su.userid AND u.deleted = 0 ";
+    }
+
+    $sql = str_replace('%extra_join%', $replacement, $sql);
 
     // For the session, pick signups that haven't been superceded.
     return (int)$DB->count_records_sql($sql, array($session_id, $status));
@@ -1912,9 +1930,10 @@ function facetoface_get_customfielddata($sessionid) {
  *
  * @access  public
  * @param   integer $sessionid
+ * @param   bool    $includedeleted
  * @return  array
  */
-function facetoface_get_cancellations($sessionid) {
+function facetoface_get_cancellations($sessionid, $includedeleted = true) {
     global $CFG, $DB;
 
     $usernamefields = get_all_user_name_fields(true, 'u');
@@ -1929,6 +1948,12 @@ function facetoface_get_cancellations($sessionid) {
         \mod_facetoface\signup\state\requestedrole::get_code()
     );
     list($insql, $inparams) = $DB->get_in_or_equal($instatus);
+
+    $extrawhere = '';
+    if (!$includedeleted) {
+        $extrawhere = " AND u.deleted = 0";
+    }
+
     // Nasty SQL follows:
     // Load currently cancelled users,
     // include most recent booked/waitlisted time also
@@ -1945,7 +1970,7 @@ function facetoface_get_cancellations($sessionid) {
             JOIN {user} u ON u.id = su.userid
             JOIN {facetoface_signups_status} c ON su.id = c.signupid AND c.statuscode $cancelledinsql AND c.superceded = 0
             LEFT JOIN {facetoface_signups_status} ss ON su.id = ss.signupid AND ss.statuscode $insql AND ss.superceded = 1
-            WHERE su.sessionid = ? AND u.deleted = 0 AND u.suspended = 0
+            WHERE su.sessionid = ? AND u.suspended = 0 {$extrawhere}
             GROUP BY
                 su.id,
                 u.id,
@@ -1958,6 +1983,7 @@ function facetoface_get_cancellations($sessionid) {
                 {$usernamefields},
                 c.timecreated
     ";
+
     $params = array_merge($cancelledinparams, $inparams);
     $params[] = $sessionid;
     return $DB->get_records_sql($sql, $params);
@@ -2009,9 +2035,11 @@ function facetoface_get_adminrequests($sessionid) {
  * @param   string  $select     SELECT clause
  * @param   bool    $includereserved   optional - include 'reserved' users (note this will change the array index
  *                              to be the signupid, to avoid duplicate id problems).
+ *
+ * @param   bool    $includedeleted    Set this to false, if we do not want to include the deleted user in the list
  * @return  array|false
  */
-function facetoface_get_users_by_status($sessionid, $status, $select = '', $includereserved = false) {
+function facetoface_get_users_by_status($sessionid, $status, $select = '', $includereserved = false, $includedeleted = true) {
     global $DB;
 
     // If no select SQL supplied, use default
@@ -2036,6 +2064,11 @@ function facetoface_get_users_by_status($sessionid, $status, $select = '', $incl
         $params = array('status' => $status);
     }
 
+    $extra = '';
+    if (!$includedeleted) {
+        $extra = " AND u.deleted <> 1 ";
+    }
+
     $sql = "
         SELECT {$select}
           FROM {facetoface_signups} su
@@ -2044,7 +2077,8 @@ function facetoface_get_users_by_status($sessionid, $status, $select = '', $incl
          WHERE su.sessionid = :sid
            AND ss.superceded != 1
            AND {$statussql}
-      ORDER BY {$usernamefields}, ss.timecreated
+           {$extra}
+         ORDER BY {$usernamefields}, ss.timecreated
     ";
     $params['sid'] = $sessionid;
 

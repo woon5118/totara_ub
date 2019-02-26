@@ -197,6 +197,7 @@ final class attendees_helper {
 
         // Actions the user can perform
         $has_attendees = facetoface_get_num_attendees($seminarevent->get_id());
+        $includedeleted = has_capability('totara/core:seedeletedusers', $context);
 
         if (has_capability('mod/facetoface:viewattendees', $context)) {
             $allowed_actions[] = 'attendees';
@@ -221,8 +222,12 @@ final class attendees_helper {
                     declined::get_code(),
                     user_cancelled::get_code(),
                     event_cancelled::get_code()
-                ]
+                ],
+                '',
+                false,
+                $includedeleted
             );
+
             if (!empty($seminarevent->get_cancelledstatus()) || $users_by_status) {
                 $available_actions[] = 'cancellations';
             }

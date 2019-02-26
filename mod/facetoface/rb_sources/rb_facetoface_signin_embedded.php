@@ -28,6 +28,8 @@ class rb_facetoface_signin_embedded extends rb_base_embedded {
     public $hidden, $accessmode, $accesssettings, $shortname;
 
     public function __construct($data) {
+        global $PAGE;
+
         $this->url = '/mod/facetoface/reports/signinsheet.php';
         $this->source = 'facetoface_signin';
         $this->shortname = 'facetoface_signin';
@@ -62,6 +64,10 @@ class rb_facetoface_signin_embedded extends rb_base_embedded {
         $this->embeddedparams['sessionid'] = isset($data['sessionid']) ? $data['sessionid'] : 0;
         $this->embeddedparams['facetofaceid'] = isset($data['facetofaceid']) ? $data['facetofaceid'] : 0;
         $this->embeddedparams['hasbooked'] = 1;
+
+        if (!has_capability('totara/core:seedeletedusers', $PAGE->context)) {
+            $this->embeddedparams['userdeleted'] = 0;
+        }
 
         parent::__construct();
     }

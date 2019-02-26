@@ -843,6 +843,11 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'sessionid',
                 'base.sessionid'
             ),
+            new rb_param_option(
+                'userdeleted',
+                'auser.deleted',
+                'auser'
+            )
         );
 
         return $paramoptions;

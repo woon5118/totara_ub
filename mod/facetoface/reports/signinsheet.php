@@ -49,6 +49,7 @@ $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface),
 $course = $DB->get_record('course', array('id' => $facetoface->course), '*', MUST_EXIST);
 $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id, false, MUST_EXIST);
 $context = context_module::instance($cm->id);
+$PAGE->set_context($context);
 
 require_login($course, false, $cm);
 require_capability('mod/facetoface:exportsessionsigninsheet', $context);

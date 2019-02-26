@@ -27,12 +27,21 @@ class rb_facetoface_cancellations_embedded extends rb_base_embedded {
     public $returnpage = 'cancellations';
 
     public function __construct($data) {
+        global $PAGE;
 
         if (!empty($data['sessionid'])) {
             $this->embeddedparams['sessionid'] = $data['sessionid'];
         }
         if (!empty($data['status'])) {
             $this->embeddedparams['status'] = $data['status'];
+        }
+
+        if (!has_capability('totara/core:seedeletedusers', $PAGE->context)) {
+            // If the current user does not have the capability, then for embedded report, it should not display
+            // deleted user record for current user (viewer) at all.
+            // This embedded is being used within facetoface_cancellations, therefore, it is using key userdeleted
+            // for
+            $this->embeddedparams['userdeleted'] = 0;
         }
 
         $this->url    = '/mod/facetoface/attendees/cancellations.php';

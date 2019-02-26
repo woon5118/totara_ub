@@ -150,6 +150,75 @@ class mod_facetoface_attendance_helper_testcase extends advanced_testcase {
     }
 
     /**
+     * @return void
+     */
+    public function test_get_calculated_status_without_deleted_users(): void {
+        global $PAGE;
+        $PAGE->set_url('/');
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $e = $this->get_seminar_event();
+        $times = [
+            [
+                'start' => time() - (3600 * 4),
+                'finish' => time() - (3600 * 3)
+            ],
+            [
+                'start' => time() - (3600 * 2),
+                'finish' => time() - (3600 * 1)
+            ]
+        ];
+
+        foreach ($times as $time) {
+            $s = new seminar_session();
+            $s->set_sessionid($e->get_id());
+            $s->set_timestart($time['start']);
+            $s->set_timefinish($time['finish']);
+            $s->save();
+        }
+
+        $gen = $this->getDataGenerator();
+        // A user to be deleted.
+        $current = null;
+
+        for ($i = 0; $i < 5; $i++) {
+            $user = $gen->create_user();
+            $gen->enrol_user($user->id, $e->get_seminar()->get_course());
+
+            $signup = signup::create($user->id, $e);
+            $signup->save();
+            $signup->switch_state(booked::class);
+
+            if (null == $current) {
+                $current = $user;
+            }
+
+            $sessionstatus = session_status::from_signup($signup, $e->get_sessions()->get_first()->get_id());
+            $sessionstatus->set_attendance_status(fully_attended::class);
+            $sessionstatus->save();
+        }
+
+        $cm = get_coursemodule_from_instance('facetoface', $e->get_facetoface(), $e->get_seminar()->get_course());
+        $context = context_module::instance($cm->id);
+        $PAGE->set_context($context);
+
+        $trainer = $gen->create_user();
+        $gen->enrol_user($trainer->id, $e->get_seminar()->get_course(), 'editingteacher');
+        $this->setUser($trainer);
+
+        delete_user($current);
+        $helper = new attendance_helper();
+        $records = $helper->get_calculated_session_attendance_status($e->get_id());
+
+        // We had 5 users in signup and 5 session statuses had been set for all of 5 users, however, one of the users had been
+        // deleted before this retrieving process. Therefore, we should only expecting 4 records here, because the current actor
+        // does not have the ability to view the deleted records.
+        $this->assertCount(4, $records);
+    }
+
+    /**
      * Test suite of checking whether the field `createdby` and `timecreated` are populated corectly for table
      * `facetoface_signups_dates_status`. And also it does check the functionality of processing attendance state should
      * skip those records that does not change at all, when saving to storage.
@@ -213,5 +282,122 @@ class mod_facetoface_attendance_helper_testcase extends advanced_testcase {
         // Expecting $x number of records that has been superseded.
         $records = $DB->get_records('facetoface_signups_dates_status', ['superceded' => 1]);
         $this->assertCount($x, $records);
+    }
+
+    /**
+     * This is the test suite assure that we are retrieving the attendance record(s) of users, but not the deleted users.
+     * @return void
+     */
+    public function test_retrieve_attendance_records_without_deleted_users(): void {
+        global $PAGE;
+        $PAGE->set_url('/');
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $e = $this->get_seminar_event();
+
+        $s = new seminar_session();
+        $s->set_sessionid($e->get_id());
+        $s->set_timestart(time() - 7200);
+        $s->set_timefinish(time() - 3600);
+        $s->save();
+
+        $users = $this->create_users();
+        $gen = $this->getDataGenerator();
+
+        foreach ($users as $user) {
+            $gen->enrol_user($user->id, $e->get_seminar()->get_course());
+            $signup = signup::create($user->id, $e);
+            $signup->save();
+
+            $signup->switch_state(booked::class);
+        }
+
+        delete_user($users[0]);
+
+        $cm = get_coursemodule_from_instance('facetoface', $e->get_seminar()->get_id(), $e->get_seminar()->get_course());
+        $ctxt = context_module::instance($cm->id);
+        $PAGE->set_context($ctxt);
+
+        $trainer = $gen->create_user();
+        $this->setUser($trainer);
+
+        $helper = new attendance_helper();
+        $records = $helper->get_attendees($e->get_id());
+
+        // There is 1 deleted user, therefore the attendance helper should not retrieve the deleted users, in its return records.
+        // This is for the event level.
+        $this->assertCount(4, $records);
+
+        // This is for session level
+        $records = $helper->get_attendees($e->get_id(), $s->get_id());
+        $this->assertCount(4, $records);
+    }
+
+    /**
+     * A test suite assures that we are retrieving the attendance record(s) of users, but the role user with the permission
+     * should be able to see it.
+     *
+     * @return void
+     */
+    public function test_retrieve_attendance_records_with_deleted_users(): void {
+        global $PAGE, $DB, $USER;
+        $PAGE->set_url('/');
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $e = $this->get_seminar_event();
+        $s = new seminar_session();
+        $s->set_sessionid($e->get_id());
+        $s->set_timestart(time() - 7200);
+        $s->set_timefinish(time() - 3600);
+        $s->save();
+
+        $gen = $this->getDataGenerator();
+        $current = null;
+
+        for ($i = 0; $i < 5; $i++) {
+            $user = $gen->create_user();
+            $gen->enrol_user($user->id, $e->get_seminar()->get_course());
+
+            $signup = signup::create($user->id, $e);
+            $signup->save();
+            $signup->switch_state(booked::class);
+
+            if (null == $current) {
+                // Just set which users we should deleted here
+                $current = $user;
+            }
+        }
+
+        $cm = get_coursemodule_from_instance('facetoface', $e->get_facetoface(), $e->get_seminar()->get_course());
+        $role = $DB->get_record('role', ['shortname' => 'editingteacher']);
+
+        $context = context_module::instance($cm->id);
+        $PAGE->set_context($context);
+
+        $cap = new stdClass();
+        $cap->contextid = $context->id;
+        $cap->roleid = $role->id;
+        $cap->capability = 'totara/core:seedeletedusers';
+        $cap->permission = 1;
+        $cap->timemodified = time();
+        $cap->modifierid = $USER->id;
+
+        $DB->insert_record('role_capabilities', $cap);
+
+        $trainer = $gen->create_user();
+        $gen->enrol_user($trainer->id, $e->get_seminar()->get_course(), 'editingteacher');
+        $this->setUser($trainer);
+
+        delete_user($current);
+        $helper = new attendance_helper();
+
+        // Because the current user is able to view the deleted user, therefore attendance_helper should be able to provide these
+        // deleted user in the result set for this actor.
+        $records = $helper->get_attendees($e->get_id());
+        $this->assertCount(5, $records);
     }
 }
