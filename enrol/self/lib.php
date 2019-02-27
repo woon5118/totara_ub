@@ -780,11 +780,8 @@ class enrol_self_plugin extends enrol_plugin {
     public function edit_instance_form($instance, MoodleQuickForm $mform, $context) {
         global $CFG;
 
-        // Merge these two settings to one value for the single selection element.
-        if ($instance->notifyall and $instance->expirynotify) {
-            $instance->expirynotify = 2;
-        }
-        unset($instance->notifyall);
+        // Totara: convert database fields to a form field
+        self::fixup_expirynotify_from_database($instance);
 
         $nameattribs = array('size' => '20', 'maxlength' => '255');
         $mform->addElement('text', 'name', get_string('custominstancename', 'enrol'), $nameattribs);
@@ -1000,15 +997,8 @@ class enrol_self_plugin extends enrol_plugin {
      * @return int id of new instance, null if can not be created
      */
     public function add_instance($course, array $fields = null) {
-        // In the form we are representing 2 db columns with one field.
-        if (!empty($fields) && !empty($fields['expirynotify'])) {
-            if ($fields['expirynotify'] == 2) {
-                $fields['expirynotify'] = 1;
-                $fields['notifyall'] = 1;
-            } else {
-                $fields['notifyall'] = 0;
-            }
-        }
+        // Totara: convert a form field to database fields
+        self::fixup_expirynotify_to_database($fields);
 
         return parent::add_instance($course, $fields);
     }
@@ -1020,13 +1010,9 @@ class enrol_self_plugin extends enrol_plugin {
      * @return boolean
      */
     public function update_instance($instance, $data) {
-        // In the form we are representing 2 db columns with one field.
-        if ($data->expirynotify == 2) {
-            $data->expirynotify = 1;
-            $data->notifyall = 1;
-        } else {
-            $data->notifyall = 0;
-        }
+        // Totara: convert a form field to database fields
+        self::fixup_expirynotify_to_database($data);
+
         // Keep previous/default value of disabled expirythreshold option.
         if (!$data->expirynotify) {
             $data->expirythreshold = $instance->expirythreshold;

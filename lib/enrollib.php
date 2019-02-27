@@ -3095,4 +3095,51 @@ abstract class enrol_plugin {
         }
         return $errors;
     }
+
+    /**
+     * Translate the expirynotify/notifyall database fields into the expirynotify form field.
+     * @since Totara 11.13, 12.4, 13.0
+     *
+     * @param stdClass $fields
+     */
+    final protected static function fixup_expirynotify_from_database(&$fields) {
+        // Merge these two settings to one value for the single selection element.
+        if ($fields instanceof \stdClass) {
+            if ($fields->notifyall && $fields->expirynotify) {
+                $fields->expirynotify = 2;
+            }
+            unset($fields->notifyall);
+        } else {
+            throw new coding_exception('Invalid parameter type');
+        }
+    }
+
+    /**
+     * Translate the expirynotify form field into the expirynotify/notifyall database fields
+     * @since Totara 11.13, 12.4, 13.0
+     *
+     * @param array|stdClass $fields
+     */
+    final protected static function fixup_expirynotify_to_database(&$fields) {
+        // In the form we are representing 2 db columns with one field.
+        if ($fields instanceof \stdClass) {
+            if ($fields->expirynotify == 2) {
+                $fields->expirynotify = 1;
+                $fields->notifyall = 1;
+            } else {
+                $fields->notifyall = 0;
+            }
+        } else if (is_array($fields)) {
+            if (!empty($fields) && !empty($fields['expirynotify'])) {
+                if ($fields['expirynotify'] == 2) {
+                    $fields['expirynotify'] = 1;
+                    $fields['notifyall'] = 1;
+                } else {
+                    $fields['notifyall'] = 0;
+                }
+            }
+        } else {
+            throw new coding_exception('Invalid parameter type');
+        }
+    }
 }
