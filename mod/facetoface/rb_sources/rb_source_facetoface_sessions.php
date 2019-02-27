@@ -507,12 +507,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     FROM {facetoface_signups_status}
                     WHERE signupid = base.id AND statuscode IN ('.\mod_facetoface\signup\state\booked::get_code().', '.\mod_facetoface\signup\state\waitlisted::get_code().'))',
                 array(
-                    'joins' => 'sessiondate',
                     'displayfunc' => 'event_date',
                     'dbdatatype' => 'timestamp',
-                    'extrafields' => array(
-                        'timezone' => 'sessiondate.sessiontimezone'
-                    ),
                 )
             ),
             new rb_column_option(
