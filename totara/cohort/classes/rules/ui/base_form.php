@@ -54,6 +54,9 @@ abstract class base_form extends base {
      */
     public $form = null;
 
+    /** @var string heading description */
+    public $description = '';
+
     /**
      * @return bool
      */

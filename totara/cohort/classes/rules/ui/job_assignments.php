@@ -27,10 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 
 use totara_cohort\rules\ui\none_min_max_exactly as none_min_max_exactly;
 
+/**
+ * UI for dynamic audience based on the fact if the person has direct reports.
+ */
 class has_direct_reports extends none_min_max_exactly {
-
-    /** @var string select box legend */
-    public $label;
 
     /**
      * Number of direct reports
@@ -38,6 +38,21 @@ class has_direct_reports extends none_min_max_exactly {
     public function __construct() {
         $this->description = get_string('ruledesc-alljobassign-hasdirectreports', 'totara_cohort');
         $this->label = get_string('rulelegend-alljobassign-hasdirectreports', 'totara_cohort');
+        parent::__construct();
+    }
+}
+
+/**
+ * UI for dynamic audience based on the fact if the person has temporary reports.
+ */
+class has_temporary_reports extends none_min_max_exactly {
+
+    /**
+     * Number of temporary reports
+     */
+    public function __construct() {
+        $this->description = get_string('ruledesc-alljobassign-hastemporaryreports', 'totara_cohort');
+        $this->label = get_string('rulelegend-alljobassign-hastemporaryreports', 'totara_cohort');
         parent::__construct();
     }
 }

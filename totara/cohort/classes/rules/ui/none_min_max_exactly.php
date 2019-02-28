@@ -25,7 +25,6 @@ namespace totara_cohort\rules\ui;
 
 defined('MOODLE_INTERNAL') || die();
 
-use totara_catalog\optional_param;
 use totara_cohort\rules\ui\base_form as base_form;
 
 class none_min_max_exactly extends base_form {
@@ -41,6 +40,9 @@ class none_min_max_exactly extends base_form {
         'equal' => 0,
         'listofvalues' => 1
     ];
+
+    /** @var string select box legend */
+    public $label;
 
     /** @var array $operators */
     private static $operators = [];
@@ -145,8 +147,10 @@ class none_min_max_exactly extends base_form {
     public function handleDialogUpdate($sqlhandler) {
         $equal = required_param('equal', PARAM_INT);
         $listofvalues = optional_param('listofvalues', 0, PARAM_INT);
+
         $this->equal = $sqlhandler->equal = $equal;
         $this->listofvalues = $sqlhandler->listofvalues = $listofvalues;
+
         $sqlhandler->write();
     }
 

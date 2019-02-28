@@ -76,6 +76,20 @@ class cohort_rule_sqlhandler_has_direct_reports extends cohort_rule_sqlhandler_j
 }
 
 /**
+ * A rule which indicates whether or not a user has anyone who reports temporary to them.
+ */
+class cohort_rule_sqlhandler_has_temporary_reports extends cohort_rule_sqlhandler_job_assignments {
+
+    /**
+     * Return job_assignment join column for har temporary reports rule.
+     * @return string
+     */
+    public function get_join_column(): string {
+        return 'tempmanagerjaid';
+    }
+}
+
+/**
  * A rule for determining whether or not a user reports to another user in any of their respective job assignments.
  */
 class cohort_rule_sqlhandler_allstaff extends cohort_rule_sqlhandler {

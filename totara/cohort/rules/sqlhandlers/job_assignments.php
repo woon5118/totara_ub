@@ -60,7 +60,7 @@ abstract class cohort_rule_sqlhandler_job_assignments extends cohort_rule_sqlhan
                     $comparison = '=';
                     break;
             }
-            $sql = "SELECT ja.managerjaid, staff.userid
+            $sql = "SELECT {$column}, staff.userid
                       FROM {job_assignment} ja
                       JOIN {job_assignment} staff
                         ON {$column} = staff.id

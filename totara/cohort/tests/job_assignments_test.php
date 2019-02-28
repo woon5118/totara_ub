@@ -109,4 +109,72 @@ class totara_cohort_job_assignments_testcase extends totara_cohort_position_rule
         // 5. data5: 0 users that are assigned as managers and have "equal to" 2 learner/s
         $this->assertEquals($usercount, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
     }
+
+    /**
+     * Evaluates if the user is a tempmanager.
+     * Has temporary reports = is_manager.
+     *
+     * tempmanager1
+     *    |-------> user1, user3, user5.
+     *
+     * tempmanager2
+     *    |-------> user2, user4.
+     *
+     * @dataProvider data_reportsto
+     */
+    public function test_has_temporary_reports($params, $listofvalues, $usercount) {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Create some manager accounts.
+        $manager1 = $this->getDataGenerator()->create_user(array('username' => 'manager1'));
+        $manager2 = $this->getDataGenerator()->create_user(array('username' => 'manager2'));
+
+        // Assign managers to users.
+        $expirydate = time() + WEEKSECS;
+        $manager1ja = \totara_job\job_assignment::create_default($manager1->id);
+        $manager2ja = \totara_job\job_assignment::create_default($manager2->id);
+        \totara_job\job_assignment::create([
+            'userid' => $this->user1->id,
+            'fullname' => 'user1',
+            'shortname' => 'user1',
+            'idnumber' => 'id1',
+            'tempmanagerjaid' => $manager1ja->id,
+            'tempmanagerexpirydate' => $expirydate
+        ]);
+        \totara_job\job_assignment::create([
+            'userid' => $this->user1->id,
+            'fullname' => 'user1',
+            'shortname' => 'user1',
+            'idnumber' => 'id2',
+            'tempmanagerjaid' => $manager2ja->id,
+            'tempmanagerexpirydate' => $expirydate
+        ]);
+        \totara_job\job_assignment::get_first($this->user2->id)->update(array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $expirydate));
+        \totara_job\job_assignment::get_first($this->user3->id)->update(array('tempmanagerjaid' => $manager1ja->id, 'tempmanagerexpirydate' => $expirydate));
+        \totara_job\job_assignment::get_first($this->user4->id)->update(array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $expirydate));
+        \totara_job\job_assignment::get_first($this->user5->id)->update(array('tempmanagerjaid' => $manager1ja->id, 'tempmanagerexpirydate' => $expirydate));
+        \totara_job\job_assignment::create([
+            'userid' => $this->user6->id,
+            'fullname' => 'user6',
+            'shortname' => 'user6',
+            'idnumber' => 'id6',
+        ]);
+
+        // Exclude admin user from this cohort.
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'user', 'username', array('equal' => COHORT_RULES_OP_IN_NOTEQUALTO), array('admin'));
+
+        // Create a rule.
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'hastemporaryreports', $params, $listofvalues);
+        cohort_rules_approve_changes($this->cohort);
+
+        // It should match:
+        // 1. data2: 23 users that no are temporary managers.
+        // 2. data1: 2 users that are assigned as managers and have "greater than or equal to" 1 learner/s
+        // 3. data3: 2 users that are assigned as managers and have "less than or equal to" 4 learner/s
+        // 4. data4: 2 users that are assigned as managers and have "equal to" 3 learner/s
+        // 5. data5: 0 users that are assigned as managers and have "equal to" 2 learner/s
+        $this->assertEquals($usercount, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+    }
 }

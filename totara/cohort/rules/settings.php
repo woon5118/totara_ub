@@ -60,6 +60,7 @@ use totara_cohort\rules\ui\program_allanynotallnone as cohort_rule_ui_picker_pro
 use totara_cohort\rules\ui\certification_status as cohort_rule_ui_picker_certification_status;
 use totara_cohort\rules\ui\cohort_member as cohort_rule_ui_cohortmember;
 use totara_cohort\rules\ui\has_direct_reports as cohort_rule_ui_has_direct_reports;
+use totara_cohort\rules\ui\has_temporary_reports as cohort_rule_ui_has_temporary_reports;
 
 /* Constants to identify if the rule comes from a menu or a text input */
 define('COHORT_RULES_TYPE_MENU', 1);
@@ -577,6 +578,14 @@ function cohort_rules_list($reset = false){
             'hasdirectreports',
             new cohort_rule_ui_has_direct_reports(),
             new cohort_rule_sqlhandler_has_direct_reports()
+        );
+
+        // If the user is a manager with temporary staff in any of their job assignments.
+        $rules[] = new cohort_rule_option(
+            'alljobassign',
+            'hastemporaryreports',
+            new cohort_rule_ui_has_temporary_reports(),
+            new cohort_rule_sqlhandler_has_temporary_reports()
         );
 
         // Learning (i.e. course & program completion)

@@ -30,14 +30,25 @@ $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 
 require_login();
 
-$cohort = $DB->get_record('cohort', array('id'=>$id), '*', MUST_EXIST);
+$cohort = $DB->get_record('cohort', array('id' => $id), '*');
+if (!$cohort) {
+    $url = new moodle_url('/cohort/index.php');
+    redirect($url, get_string('error:badcohortid','totara_cohort'), null, \core\notification::ERROR);
+}
+
 $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
+$PAGE->set_context($context);
+$baseurl = new moodle_url('/cohort/assign.php', ['id' => $id, 'contextid' => $context->id]);
+if ($context->contextlevel == CONTEXT_SYSTEM) {
+    admin_externalpage_setup('cohorts', '', [], $baseurl);
+} else {
+    $PAGE->set_url($baseurl);
+    $PAGE->set_heading($COURSE->fullname);
+    $PAGE->set_pagelayout('admin');
+}
+$PAGE->set_title(get_string('assigncohorts', 'cohort'));
 
 require_capability('moodle/cohort:assign', $context);
-
-$PAGE->set_context($context);
-$PAGE->set_url('/cohort/assign.php', array('id'=>$id));
-$PAGE->set_pagelayout('admin');
 
 if ($returnurl) {
     $returnurl = new moodle_url($returnurl);
@@ -55,15 +66,11 @@ if (optional_param('cancel', false, PARAM_BOOL)) {
 }
 
 if ($context->contextlevel == CONTEXT_COURSECAT) {
-    $category = $DB->get_record('course_categories', array('id'=>$context->instanceid), '*', MUST_EXIST);
-    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array('contextid'=>$cohort->contextid)));
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array('contextid' => $context->id)));
 } else {
-    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php'));
 }
 totara_cohort_navlinks($cohort->id, format_string($cohort->name), get_string('assign', 'cohort'));
-
-$PAGE->set_title(get_string('assigncohorts', 'cohort'));
-$PAGE->set_heading($COURSE->fullname);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('assignto', 'cohort', format_string($cohort->name)));

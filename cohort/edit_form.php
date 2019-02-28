@@ -32,13 +32,11 @@ class cohort_edit_form extends moodleform {
      * Define the cohort edit form
      */
     public function definition() {
-        global $CFG, $DB, $COHORT_ALERT;
+        global $CFG, $COHORT_ALERT;
 
         $mform = $this->_form;
         $editoroptions = $this->_customdata['editoroptions'];
         $cohort = $this->_customdata['data'];
-        $placeholder = get_string('datepickerlongyearplaceholder', 'totara_core');
-        $hint = get_string('dateformatlongyearhint', 'totara_cohort', $placeholder);
 
         $mform->addElement('text', 'name', get_string('name', 'cohort'), 'maxlength="254" size="50"');
         $mform->addRule('name', get_string('required'), 'required', null, 'client');
@@ -100,11 +98,6 @@ class cohort_edit_form extends moodleform {
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
-
-        if (isset($this->_customdata['returnurl'])) {
-            $mform->addElement('hidden', 'returnurl', $this->_customdata['returnurl']->out_as_local_url());
-            $mform->setType('returnurl', PARAM_LOCALURL);
-        }
 
         // Display offical Cohort Tags
         if (!empty($CFG->usetags)) {

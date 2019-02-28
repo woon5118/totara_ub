@@ -45,9 +45,13 @@ require_capability('moodle/cohort:manage', $context);
 
 $PAGE->set_context($context);
 $baseurl = new moodle_url('/cohort/upload.php', array('contextid' => $context->id));
-$PAGE->set_url($baseurl);
-$PAGE->set_heading($COURSE->fullname);
-$PAGE->set_pagelayout('admin');
+if ($context->contextlevel == CONTEXT_SYSTEM) {
+    admin_externalpage_setup('cohorts', '', [], $baseurl);
+} else {
+    $PAGE->set_url($baseurl);
+    $PAGE->set_heading($COURSE->fullname);
+    $PAGE->set_pagelayout('admin');
+}
 
 if ($context->contextlevel == CONTEXT_COURSECAT) {
     $PAGE->set_category_by_id($context->instanceid);
@@ -55,6 +59,8 @@ if ($context->contextlevel == CONTEXT_COURSECAT) {
 } else {
     navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
 }
+$strheading = get_string('uploadcohorts', 'cohort');
+totara_cohort_navlinks(false, false, $strheading);
 
 $uploadform = new cohort_upload_form(null, array('contextid' => $context->id, 'returnurl' => $returnurl));
 
@@ -67,9 +73,6 @@ if ($returnurl) {
 if ($uploadform->is_cancelled()) {
     redirect($returnurl);
 }
-
-$strheading = get_string('uploadcohorts', 'cohort');
-$PAGE->navbar->add($strheading);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading_with_help($strheading, 'uploadcohorts', 'cohort');

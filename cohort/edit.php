@@ -36,21 +36,18 @@ if ($usetags) {
 
 $id        = optional_param('id', 0, PARAM_INT);
 $contextid = optional_param('contextid', 0, PARAM_INT);
-$delete    = optional_param('delete', 0, PARAM_BOOL);
-$show      = optional_param('show', 0, PARAM_BOOL);
-$hide      = optional_param('hide', 0, PARAM_BOOL);
-$confirm   = optional_param('confirm', 0, PARAM_BOOL);
-$returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 
 require_login();
 
-$category = null;
 if ($id) {
-    $cohort = $DB->get_record('cohort', array('id'=>$id), '*', MUST_EXIST);
+    $cohort = $DB->get_record('cohort', array('id' => $id), '*');
+    if (!$cohort) {
+        $url = new moodle_url('/cohort/index.php');
+        redirect($url, get_string('error:badcohortid','totara_cohort'), null, \core\notification::ERROR);
+    }
     if ($usetags) {
         $cohort->tags = core_tag_tag::get_item_tags_array('core', 'cohort', $cohort->id);
     }
-
     $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
 } else {
     $context = context::instance_by_id($contextid, MUST_EXIST);
@@ -68,11 +65,7 @@ if ($id) {
 
 require_capability('moodle/cohort:manage', $context);
 
-if ($returnurl) {
-    $returnurl = new moodle_url($returnurl);
-} else {
-    $returnurl = new moodle_url('/cohort/index.php', array('contextid'=>$context->id));
-}
+$returnurl = new moodle_url('/cohort/index.php', array('contextid' => $context->id));
 
 if (!empty($cohort->component)) {
     // We can not manually edit cohorts that were created by external systems, sorry.
@@ -81,84 +74,36 @@ if (!empty($cohort->component)) {
 
 $PAGE->set_context($context);
 $baseurl = new moodle_url('/cohort/edit.php', array('contextid' => $context->id, 'id' => $cohort->id));
-$PAGE->set_url($baseurl);
-$PAGE->set_context($context);
-$PAGE->set_pagelayout('admin');
-$PAGE->set_heading($COURSE->fullname);
-
-if ($context->contextlevel == CONTEXT_COURSECAT) {
-    $category = $DB->get_record('course_categories', array('id'=>$context->instanceid), '*', MUST_EXIST);
-    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array('contextid'=>$cohort->contextid)));
-
+if ($context->contextlevel == CONTEXT_SYSTEM) {
+    admin_externalpage_setup('cohorts', '', [], $baseurl);
 } else {
-    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
-}
-if ($id && $cohort->name) {
-    $PAGE->navbar->add(format_string($cohort->name), $CFG->wwwroot.'/cohort/view.php?id='.$id);
-}
-
-if ($delete and $cohort->id) {
-    $PAGE->url->param('delete', 1);
-    if ($confirm and confirm_sesskey()) {
-        cohort_delete_cohort($cohort);
-        redirect($returnurl);
-    }
-    $strheading = get_string('delcohort', 'cohort');
-    $PAGE->navbar->add($strheading);
-    $PAGE->set_title($strheading);
+    $PAGE->set_url($baseurl);
+    $PAGE->set_pagelayout('admin');
     $PAGE->set_heading($COURSE->fullname);
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading($strheading);
-    $yesurl = new moodle_url('/cohort/edit.php', array('id' => $cohort->id, 'delete' => 1,
-        'confirm' => 1, 'sesskey' => sesskey(), 'returnurl' => $returnurl->out_as_local_url()));
-    $message = get_string('delconfirm', 'cohort', format_string($cohort->name));
-    echo $OUTPUT->confirm($message, $yesurl, $returnurl);
-    echo $OUTPUT->footer();
-    die;
 }
-
-if ($show && $cohort->id && confirm_sesskey()) {
-    if (!$cohort->visible) {
-        $record = (object)array('id' => $cohort->id, 'visible' => 1, 'contextid' => $cohort->contextid);
-        // Totora: ignore Moodle visibility hacks TL-7124.
-        //cohort_update_cohort($record);
-    }
-    redirect($returnurl);
-}
-
-if ($hide && $cohort->id && confirm_sesskey()) {
-    if ($cohort->visible) {
-        $record = (object)array('id' => $cohort->id, 'visible' => 0, 'contextid' => $cohort->contextid);
-        // Totora: ignore Moodle visibility hacks TL-7124.
-        //cohort_update_cohort($record);
-    }
-    redirect($returnurl);
-}
-
-$editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES,
-    'maxbytes' => $SITE->maxbytes, 'context' => $context);
 if ($cohort->id) {
     // Edit existing.
-    $cohort = file_prepare_standard_editor($cohort, 'description', $editoroptions,
-            $context, 'cohort', 'description', $cohort->id);
-    $strheading = get_string('editcohort', 'cohort');
-
+    $strheading = get_string('editcohort', 'totara_cohort');
+    $PAGE->set_title($cohort->name . ' : ' . $strheading);
 } else {
     // Add new.
-    $cohort = file_prepare_standard_editor($cohort, 'description', $editoroptions,
-            $context, 'cohort', 'description', null);
-    $strheading = get_string('addcohort', 'cohort');
+    $strheading = get_string('addcohort', 'totara_cohort');
+    $PAGE->set_title($strheading);
 }
 
-$PAGE->set_title($cohort->name . ' : ' . $strheading);
-$PAGE->set_heading($COURSE->fullname);
-$PAGE->navbar->add($strheading);
+if ($context->contextlevel == CONTEXT_COURSECAT) {
+    navigation_node::override_active_url($returnurl);
+} else {
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php'));
+}
+totara_cohort_navlinks($cohort->id, format_string($cohort->name), $strheading);
 
-$editform = new cohort_edit_form(null, array('editoroptions'=>$editoroptions, 'data'=>$cohort, 'returnurl'=>$returnurl));
-
+$editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $SITE->maxbytes, 'context' => $context);
+$cohort = file_prepare_standard_editor($cohort, 'description', $editoroptions, $context, 'cohort', 'description',
+    ($cohort->id ?: null));
+$editform = new cohort_edit_form(null, array('editoroptions' => $editoroptions, 'data' => $cohort));
 if ($editform->is_cancelled()) {
     redirect($returnurl);
-
 } else if ($data = $editform->get_data()) {
     $oldcontextid = $context->id;
     $editoroptions['context'] = $context = context::instance_by_id($data->contextid);
@@ -172,19 +117,12 @@ if ($editform->is_cancelled()) {
         $data = file_postupdate_standard_editor($data, 'description', $editoroptions,
                 $context, 'cohort', 'description', $data->id);
         cohort_update_cohort($data);
-        // Totara: handle tags and go to view page after update.
-        if ($usetags) {
-            if (isset($data->tags)) {
-                core_tag_tag::set_item_tags('core', 'cohort', $cohort->id, $context, $data->tags);
-            }
-        }
-        $url = new moodle_url('/cohort/view.php', array('id' => $data->id));
-        totara_set_notification(get_string('successfullyupdated','totara_cohort'), $url, array('class' => 'notifysuccess'));
+        $data->cohorttype = $cohort->cohorttype;
+        $message = get_string('successfullyupdated', 'totara_cohort');
     } else {
         $data->descriptionformat = $data->description_editor['format'];
         $data->description = $description = $data->description_editor['text'];
         $data->id = cohort_add_cohort($data);
-        $editoroptions['context'] = $context = context::instance_by_id($data->contextid);
         $data = file_postupdate_standard_editor($data, 'description', $editoroptions,
                 $context, 'cohort', 'description', $data->id);
         if ($description != $data->description) {
@@ -192,43 +130,28 @@ if ($editform->is_cancelled()) {
                 'description' => $data->description, 'contextid' => $context->id);
             cohort_update_cohort($updatedata);
         }
-        // Totara: handle tags and go to relevant page after insert.
-        if ($usetags) {
-            if (isset($data->tags)) {
-                core_tag_tag::set_item_tags('core', 'cohort', $data->id, $context, $data->tags);
-            }
-        }
-        if ($data->cohorttype == cohort::TYPE_STATIC && has_capability('moodle/cohort:assign', $context)) {
-            $url = new moodle_url('/cohort/assign.php', array('id' => $data->id));
-        } else if (has_capability('totara/cohort:managerules', $context)) {
-            $url = new moodle_url('/totara/cohort/rules.php', array('id' => $data->id));
-        } else {
-            $url = new moodle_url('/cohort/view.php', array('id' => $data->id));
-        }
-        redirect($url);
+        $message = get_string('successfullyaddedcohort', 'totara_cohort');
     }
+    // Totara: handle tags and go to relevant page after insert.
     if ($usetags) {
         if (isset($data->tags)) {
-            core_tag_tag::set_item_tags('core', 'cohort', $cohort->id, $context, $data->tags);
+            core_tag_tag::set_item_tags('core', 'cohort', $data->id, $context, $data->tags);
         }
     }
-
-    if ($returnurl->get_param('showall') || $returnurl->get_param('contextid') == $data->contextid) {
-        // Redirect to where we were before.
-        redirect($returnurl);
+    if ($data->cohorttype == cohort::TYPE_STATIC && has_capability('moodle/cohort:assign', $context)) {
+        $url = new moodle_url('/cohort/assign.php', array('id' => $data->id));
+    } else if (has_capability('totara/cohort:managerules', $context)) {
+        $url = new moodle_url('/totara/cohort/rules.php', array('id' => $data->id));
     } else {
-        // Use new context id, it has been changed.
-        redirect(new moodle_url('/cohort/index.php', array('contextid' => $data->contextid)));
+        $url = new moodle_url('/cohort/view.php', array('id' => $data->id));
     }
+    redirect($url, $message, null, \core\notification::SUCCESS);
 }
 
 echo $OUTPUT->header();
-if ($cohort->id != false) {
-    echo $OUTPUT->heading($strheading);
+echo $OUTPUT->heading($strheading);
+if ((int)$cohort->id != 0) {
     echo cohort_print_tabs('edit', $cohort->id, $cohort->cohorttype, $cohort);
-}
-else {
-    echo $OUTPUT->heading($strheading);
 }
 
 if (!$id && ($editcontrols = cohort_edit_controls($context, $baseurl))) {
