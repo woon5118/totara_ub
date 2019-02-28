@@ -48,15 +48,16 @@ class booking_requests_rejected extends \core\event\base {
      *
      * @param array $requestdata
      * @param \context_module $context
-     * @return attendance_requests_approved
+     * @return booking_requests_rejected
      */
     public static function create_from_data(array $requestdata, \context_module $context) {
         $data = array(
             'context' => $context,
-            'other' => $requestdata
+            'other' => $requestdata // WARNING: Don't ever copy this pattern! Always provide explicit mapping.
         );
 
         self::$preventcreatecall = false;
+        /** @var booking_requests_rejected $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
 

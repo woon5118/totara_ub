@@ -50,7 +50,7 @@ final class role_list implements \Iterator {
 
     /**
      * Add session_role to item list
-     * @param session_role $item
+     * @param role $item
      */
     public function add(role $item) {
         $this->items[$item->get_id()] = $item;

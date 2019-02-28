@@ -56,15 +56,24 @@ class user_is_enrolable extends condition {
         }
 
         // Can enrol?
+        /** @var \enrol_totara_facetoface_plugin $enrol */
         $enrol = enrol_get_plugin('totara_facetoface');
         $events = $enrol->get_enrolable_sessions($seminar->get_course());
         return in_array($seminarevent->get_id(), array_keys($events));
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_userisnotenrolable_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array of strings
+     */
     public function get_failure() : array {
         return ['user_is_enrolable' => get_string('state_userisenrolable_fail', 'mod_facetoface')];
     }

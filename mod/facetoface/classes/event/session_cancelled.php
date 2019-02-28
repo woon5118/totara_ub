@@ -26,6 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event triggered when a session is cancelled.
  *
+ * @property-read array $other {
+ * Extra information about the event.
+ *
+ * - facetoface The facetoface ID of the cancelled session
+ *
+ * }
+ *
  * @package mod_facetoface
  */
 class session_cancelled extends \core\event\base {
@@ -49,9 +56,11 @@ class session_cancelled extends \core\event\base {
         $data = array(
             'context' => $context,
             'objectid' => $session->id,
+            'other' => array('facetoface' => $session->facetoface),
         );
 
         self::$preventcreatecall = false;
+        /** @var session_cancelled $event */
         $event = self::create($data);
         $event->add_record_snapshot('facetoface_sessions', $session);
         self::$preventcreatecall = true;

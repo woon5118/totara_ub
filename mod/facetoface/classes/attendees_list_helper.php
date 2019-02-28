@@ -35,7 +35,7 @@ final class attendees_list_helper {
     /**
      * Add attendees to seminar event via html form.
      *
-     * @param $data submitted users to add to seminar event:
+     * @param \stdClass $data submitted users to add to seminar event:
      *      @var s seminar event id
      *      @var listid list id
      *      @var isapprovalrequired
@@ -168,7 +168,7 @@ final class attendees_list_helper {
     /**
      * Add attendees to seminar event via file.
      *
-     * @param $formdata users to add to seminar event via file
+     * @param \stdClass $formdata users to add to seminar event via file
      *      @var s seminar event id
      *      @var listid list id
      *      @var requiredcfnames
@@ -311,7 +311,7 @@ final class attendees_list_helper {
                         try {
                             $jobassignment = \totara_job\job_assignment::get_with_idnumber($user->id, $data['jobassignmentidnumber'], true);
                             $data['jobassignmentid'] = $jobassignment->id;
-                        } catch (dml_missing_record_exception $e) {
+                        } catch(\dml_missing_record_exception $e) {
                             $a = new \stdClass();
                             $a->user = fullname($user);
                             $a->idnumber = $data['jobassignmentidnumber'];
@@ -351,7 +351,7 @@ final class attendees_list_helper {
     /**
      * Add attendees to seminar event via textarea input.
      *
-     * @param $data submitted users to add to seminar event via textarea input
+     * @param \stdClass $data submitted users to add to seminar event via textarea input
      *      @var s seminar event id
      *      @var listid list id
      *      @var csvinput textarea input
@@ -440,7 +440,7 @@ final class attendees_list_helper {
     /**
      * Remove attendees from seminar event.
      *
-     * @param $data submitted remove users confirmation form data
+     * @param \stdClass $data submitted remove users confirmation form data
      *      @var s seminar event id
      *      @var listid list id
      *      @var notifyuser

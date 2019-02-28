@@ -44,6 +44,10 @@ class approval_admin_required extends condition {
         return $this->signup->get_seminar_event()->get_seminar()->get_approvaltype() == seminar::APPROVAL_ADMIN;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_approvaladminrequired_desc', 'mod_facetoface');
     }

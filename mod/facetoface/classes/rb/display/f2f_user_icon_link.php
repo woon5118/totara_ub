@@ -46,7 +46,7 @@ class f2f_user_icon_link extends base {
         $extrafields = self::get_extrafields_row($row, $column);
 
         if (!empty($extrafields->id)) {
-            return \totara_reportbuilder\rb\display\link_user_icon::display($value, $format, $row, $column, $report);
+            return \totara_reportbuilder\rb\display\user_icon_link::display($value, $format, $row, $column, $report);
         }
         return get_string('reserved', 'rb_source_facetoface_sessions');
     }

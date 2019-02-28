@@ -32,7 +32,10 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @property-read array $other {
  * Extra information about the event.
+ *
+ * - signupid The signup id
  * - sessionid Seminar Event ID.
+ *
  * }
  */
 abstract class abstract_signup_event extends \core\event\base {
@@ -50,7 +53,7 @@ abstract class abstract_signup_event extends \core\event\base {
      *
      * @param signup $signup
      * @param \context_module $context
-     * @return booking_booked
+     * @return abstract_signup_event
      */
     public static function create_from_signup(signup $signup, \context_module $context) {
         $data = [
@@ -62,6 +65,7 @@ abstract class abstract_signup_event extends \core\event\base {
         ];
 
         static::$preventcreatecall = false;
+        /** @var abstract_signup_event $event */
         $event = static::create($data);
         static::$preventcreatecall = true;
         $event->signup = $signup;
@@ -75,6 +79,11 @@ abstract class abstract_signup_event extends \core\event\base {
      */
     public function get_signup(): signup {
         if (!($this->signup instanceof signup)) {
+            if (!isset($this->data['other']['signupid'])) {
+                // If you get here we're very sorry. This abstract class was overused, and signup was not marked
+                // as required data.
+                throw new \coding_exception('No signup id was provided for this event.');
+            }
             $this->signup = new signup($this->data['other']['signupid']);
         }
         return $this->signup;

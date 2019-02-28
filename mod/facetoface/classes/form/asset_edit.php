@@ -39,7 +39,9 @@ class asset_edit extends \moodleform {
          * @var \mod_facetoface\asset $asset
          */
         $asset = $this->_customdata['asset'];
+        /** @var \mod_facetoface\seminar $seminar */
         $seminar = empty($this->_customdata['seminar']) ? null : $this->_customdata['seminar'];
+        /** @var \mod_facetoface\seminar_event $event */
         $event = empty($this->_customdata['event']) ? null : $this->_customdata['event'];
         $editoroptions = $this->_customdata['editoroptions'];
 

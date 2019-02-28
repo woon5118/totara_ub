@@ -40,6 +40,7 @@ class event_handler {
      * when there is limited capacity.
      *
      * @param \core\event\user_deleted $event
+     * @return bool True if successful, exception if not.
      */
     public static function user_deleted(\core\event\user_deleted $event) {
         global $DB;
@@ -67,6 +68,7 @@ class event_handler {
      * when there is limited capacity.
      *
      * @param \totara_core\event\user_suspended $event
+     * @return bool True if successful, exception if not.
      */
     public static function user_suspended(\totara_core\event\user_suspended $event) {
         global $DB;
@@ -145,7 +147,6 @@ class event_handler {
      * Add calendar entry when user is booked
      *
      * @param \mod_facetoface\event\booking_booked $event
-     * @return true if no errors were encountered
      */
     public static function add_calendar_booked_entry(\mod_facetoface\event\abstract_signup_event $event) {
 
@@ -159,7 +160,6 @@ class event_handler {
      * Send notifications when user cancelled their booking
      *
      * @param \mod_facetoface\event\booking_cancelled $event
-     * @return true if no errors were encountered
      */
     public static function remove_calendar_booked_entry(\mod_facetoface\event\booking_cancelled $event) {
         $signup = $event->get_signup();
@@ -171,7 +171,6 @@ class event_handler {
      * Send notifications when user is booked
      *
      * @param \mod_facetoface\event\booking_booked $event
-     * @return true if no errors were encountered
      */
     public static function send_notification_booked(\mod_facetoface\event\booking_booked $event) {
         $signup = $event->get_signup();
@@ -188,7 +187,6 @@ class event_handler {
      * Send notifications when user is waitlisted
      *
      * @param \mod_facetoface\event\booking_waitlisted $event
-     * @return true if no errors were encountered
      */
     public static function send_notification_waitlisted(\mod_facetoface\event\booking_waitlisted $event) {
         $signup = $event->get_signup();
@@ -199,7 +197,6 @@ class event_handler {
      *  Send notifications when user requested booking approval
      *
      * @param \mod_facetoface\event\booking_requested $event
-     * @return true if no errors were encountered
      */
     public static function send_notification_requested(\mod_facetoface\event\booking_requested $event) {
         $signup = $event->get_signup();
@@ -220,7 +217,6 @@ class event_handler {
     /**
      * Mark course completion to being in progress
      * @param event\abstract_signup_event $event
-     * @throws \coding_exception
      */
     public static function mark_completion_in_progress(\mod_facetoface\event\abstract_signup_event $event) {
         global $DB;

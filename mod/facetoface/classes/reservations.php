@@ -24,8 +24,9 @@
 namespace mod_facetoface;
 
 use \context_course;
+use \mod_facetoface\exception\signup_exception;
 use \moodle_exception;
-use mod_facetoface\exception\signup_exception;
+
 
 final class reservations {
 
@@ -211,7 +212,7 @@ final class reservations {
      *
      * @param seminar $seminar
      * @param object[] $sessions
-     * @param context $context
+     * @param \context $context
      * @param int $managerid optional defaults to current user
      * @throws moodle_exception
      * @return array with values 'allocate' - array how many spare allocations there are, per sesion + 'all'

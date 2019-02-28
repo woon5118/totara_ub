@@ -23,8 +23,6 @@
 
 namespace mod_facetoface\signup\condition;
 
-use mod_facetoface\signup;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -58,10 +56,18 @@ class user_has_no_conflicts extends condition {
         return empty($conflicts);
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_userhasnoconflicts_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array of strings
+     */
     public function get_failure() : array {
         return ['user_has_no_conflicts' => get_string('state_userhasnoconflicts_fail', 'mod_facetoface')];
     }

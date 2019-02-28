@@ -36,6 +36,7 @@ final class room_helper {
      *      @var string {facetoface_room}.description
      *      @var int {facetoface_room}.custom
      *      @var int {facetoface_room}.hidden
+     * @return room
      */
     public static function save($data) {
         global $TEXTAREA_OPTIONS;

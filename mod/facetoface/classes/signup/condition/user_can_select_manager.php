@@ -42,10 +42,18 @@ class user_can_select_manager extends condition {
         return false;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_userhasmanager_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array of strings
+     */
     public function get_failure() : array {
         return ['user_can_select_manager' => get_string('error:missingrequiredmanager', 'mod_facetoface')];
     }

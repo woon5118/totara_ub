@@ -22,8 +22,8 @@
  */
 namespace mod_facetoface;
 
-use mod_facetoface\signup\state\booked;
-use mod_facetoface\signup\state\waitlisted;
+use \mod_facetoface\signup\state\waitlisted;
+use \mod_facetoface\signup\state\booked;
 use \stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -99,7 +99,7 @@ class notice_sender {
      * @param signup $signup Signup
      * @param int $notificationtype Type of notifications to be sent @see {{MDL_F2F_INVITE}}
      * @param stdClass $fromuser User object describing who the email is from.
-     * @returns string Error message (or empty string if successful)
+     * @return string Error message (or empty string if successful)
      */
     public static function confirm_booking(signup $signup, int $notificationtype, stdClass $fromuser = null) : string {
         global $DB;
@@ -123,7 +123,7 @@ class notice_sender {
      * @param signup $signup Signup
      * @param int $notificationtype Type of notifications to be sent @see {{MDL_F2F_INVITE}}
      * @param stdClass $fromuser User object describing who the email is from.
-     * @returns string Error message (or empty string if successful)
+     * @return string Error message (or empty string if successful)
      */
     public static function confirm_waitlist(signup $signup, int $notificationtype, stdClass $fromuser = null) : string {
         global $DB;
@@ -147,7 +147,7 @@ class notice_sender {
      * cancellation
      *
      * @param signup $signup Signup
-     * @returns string Error message (or empty string if successful)
+     * @return string Error message (or empty string if successful)
      */
     public static function decline(signup $signup) {
         global $CFG;
@@ -167,7 +167,7 @@ class notice_sender {
      * @param integer $recipientid ID of the recipient of the email
      * @param seminar_event $seminarevent
      * @param array $olddates array of previous dates
-     * @returns string Error message (or empty string if successful)
+     * @return string Error message (or empty string if successful)
      */
     public static function event_datetime_changed(int $recipientid, seminar_event $seminarevent, array $olddates) : string {
         $params = [
@@ -200,7 +200,7 @@ class notice_sender {
      * Send a message to a user who has just had their waitlisted signup cancelled due to the event starting
      * and the automatic waitlist cleaner cancelling all waitlisted records.
      *
-     * @param \signup        $signup
+     * @param signup $signup
      * @return string
      */
     public static function signup_waitlist_autoclean(signup $signup) : string {
@@ -217,7 +217,7 @@ class notice_sender {
      *
      * @param integer $recipientid ID of the recipient of the email
      * @param seminar_event $seminarevent
-     * @returns string Error message (or empty string if successful)
+     * @return string Error message (or empty string if successful)
      */
     public static function trainer_confirmation(int $recipientid, seminar_event $seminarevent) {
         $params = [
@@ -233,7 +233,7 @@ class notice_sender {
      *
      * @param integer $recipientid ID of the recipient of the email
      * @param seminar_event $seminarevent
-     * @returns string Error message (or empty string if successful)
+     * @return string Error message (or empty string if successful)
      */
     public static function event_trainer_cancellation(int $recipientid, seminar_event $seminarevent) {
         $params = [
@@ -248,7 +248,7 @@ class notice_sender {
      *
      * @param integer $recipientid ID of the recipient of the email
      * @param seminar_event $seminarevent
-     * @returns string Error message (or empty string if successful)
+     * @return string Error message (or empty string if successful)
      */
     public static function event_trainer_unassigned(int $recipientid, seminar_event $seminarevent) {
         $params = [
@@ -265,7 +265,7 @@ class notice_sender {
      *
      * @param signup $signup Signup
      * @param bool $attachical Should cancellation ical be attached
-     * @returns string Error message (or empty string if successful)
+     * @return string Error message (or empty string if successful)
      */
     public static function signup_cancellation(signup $signup, $attachical = true) {
         global $CFG;
@@ -285,7 +285,7 @@ class notice_sender {
      * @param integer $recipientid ID of the recipient of the email
      * @param seminar_event $seminarevent
      * @param bool $attachical Should cancellation ical be attached
-     * @returns string Error message (or empty string if successful)
+     * @return string Error message (or empty string if successful)
      */
     public static function event_cancellation(int $recipientid, seminar_event $seminarevent, bool $attachical = true) {
         global $CFG;

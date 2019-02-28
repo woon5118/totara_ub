@@ -60,7 +60,7 @@ class event_date extends \moodleform {
         $mform->setType('sessiontimezone', PARAM_TIMEZONE);
 
         if (empty($defaultstart)) {
-            list($defaultstart, $defaultfinish) = self::get_default_dates();
+            throw new \coding_exception('Start and finish dates must be provided and cannot be empty.');
         }
         // NOTE: Do not set type for date elements because it borks timezones!
         $mform->addElement('date_time_selector', 'timestart', get_string('timestart', 'facetoface'), array('defaulttime' => $defaultstart, 'showtimezone' => true));

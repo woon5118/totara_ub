@@ -43,10 +43,18 @@ class event_in_the_future extends condition {
         return false;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventinthefuture_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array
+     */
     function get_failure() : array {
         return ['event_in_the_future' => get_string('state_eventinthefuture_fail', 'mod_facetoface')];
     }

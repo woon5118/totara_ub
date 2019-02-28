@@ -66,6 +66,7 @@ class session_signup extends \core\event\base {
         ];
 
         self::$preventcreatecall = false;
+        /** @var session_signup $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
         $event->usersignup = $signup;
@@ -95,6 +96,7 @@ class session_signup extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var session_signup $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
         $event->usersignup = $usersignup;

@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class seminar represents Seminar Activity
  */
-final class seminar {
+final class seminar implements seminar_iterator_item {
 
     use traits\crud_mapper;
 
@@ -238,12 +238,15 @@ final class seminar {
      *
      * @return seminar this
      */
-    public function load() : seminar {
+    public function load(): seminar {
 
         return $this->crud_load();
     }
 
-    public function save() {
+    /**
+     * Save seminar to database
+     */
+    public function save(): void {
 
         $this->timemodified = time();
 
@@ -254,7 +257,10 @@ final class seminar {
         $this->crud_save();
     }
 
-    public function delete() {
+    /**
+     * Delete seminar and related items from database
+     */
+    public function delete(): void {
         global $DB;
 
         $seminarinterests = new interest_list(['facetoface' => $this->get_id()]);
@@ -283,7 +289,7 @@ final class seminar {
      * Get seminar events
      * @return seminar_event_list
      */
-    public function get_events() : seminar_event_list {
+    public function get_events(): seminar_event_list {
         return seminar_event_list::form_seminar($this);
     }
 
@@ -291,9 +297,8 @@ final class seminar {
      * Delete grade item for given facetoface
      *
      * @param object $facetoface object
-     * @return object facetoface
      */
-    private function grade_item_delete() {
+    private function grade_item_delete(): void {
         grade_update('mod/facetoface', $this->course, 'mod', 'facetoface', $this->id, 0, NULL, ['deleted' => 1]);
     }
 
@@ -312,7 +317,7 @@ final class seminar {
      * Check if current seminar approval settings require manager or admin approval.
      * @return bool
      */
-    public function is_manager_required() : bool {
+    public function is_manager_required(): bool {
         return $this->approvaltype == static::APPROVAL_MANAGER || $this->approvaltype == static::APPROVAL_ADMIN;
     }
 
@@ -320,7 +325,7 @@ final class seminar {
      * Check if current seminar approval settings require role approval.
      * @return bool
      */
-    public function is_role_required() : bool {
+    public function is_role_required(): bool {
         return $this->approvaltype == static::APPROVAL_ROLE;
     }
 
@@ -330,7 +335,7 @@ final class seminar {
      * @param \stdClass $object
      * @return seminar instance
      */
-    public function map_instance(\stdClass $object) : seminar {
+    public function map_instance(\stdClass $object): seminar {
 
         return $this->map_object($object);
     }
@@ -340,7 +345,7 @@ final class seminar {
      *
      * @return \stdClass
      */
-    public function get_properties() : \stdClass {
+    public function get_properties(): \stdClass {
 
         return $this->unmap_object();
     }
@@ -351,7 +356,7 @@ final class seminar {
      *
      * @return bool - true if the asset has an $id, false if it hasn't
      */
-    public function exists() : bool {
+    public function exists(): bool {
         return !empty($this->id);
     }
 
@@ -365,7 +370,7 @@ final class seminar {
      * @param int $userid
      * @return bool
      */
-    public function has_unarchived_signups(int $userid = 0) : bool {
+    public function has_unarchived_signups(int $userid = 0): bool {
         global $DB, $USER;
 
         $userid = $userid == 0 ? $USER->id : $userid;
@@ -396,7 +401,7 @@ final class seminar {
      * Get list of approval admins for current seminar
      * @return array
      */
-    public function get_approvaladmins_list() : array {
+    public function get_approvaladmins_list(): array {
         return explode(',', $this->get_approvaladmins());
     }
 
@@ -404,7 +409,7 @@ final class seminar {
      * Return the approval type of a facetoface as a human readable string
      * @return string
      */
-    public function get_approvaltype_string() : string {
+    public function get_approvaltype_string(): string {
         switch ($this->approvaltype) {
             case self::APPROVAL_NONE:
                 return get_string('approval_none', 'mod_facetoface');
@@ -427,7 +432,7 @@ final class seminar {
      *
      * @return \stdClass
      */
-    public function get_coursemodule() : \stdClass {
+    public function get_coursemodule(): \stdClass {
         return get_coursemodule_from_instance('facetoface', $this->id, $this->course, false, MUST_EXIST);
     }
 
@@ -436,14 +441,14 @@ final class seminar {
      * @param int $cmid course module id
      * @return \context_module
      */
-    public function get_contextmodule(int $cmid) : \context_module {
+    public function get_contextmodule(int $cmid): \context_module {
         return \context_module::instance($cmid);
     }
 
     /**
      * @return int
      */
-    public function get_id() : int {
+    public function get_id(): int {
         return (int)$this->id;
     }
 
@@ -460,7 +465,7 @@ final class seminar {
      * There is no course class, so use id
      * @param int $course
      */
-    public function set_course(int $course) : seminar {
+    public function set_course(int $course): seminar {
         $this->course = $course;
         return $this;
     }
@@ -473,7 +478,7 @@ final class seminar {
     /**
      * @param string $name
      */
-    public function set_name(string $name) : seminar {
+    public function set_name(string $name): seminar {
         $this->name = $name;
         return $this;
     }
@@ -487,7 +492,7 @@ final class seminar {
     /**
      * @param string $intro
      */
-    public function set_intro(string $intro) : seminar {
+    public function set_intro(string $intro): seminar {
         $this->intro = $intro;
         return $this;
     }
@@ -501,7 +506,7 @@ final class seminar {
     /**
      * @param int $introformat
      */
-    public function set_introformat(int $introformat) : seminar {
+    public function set_introformat(int $introformat): seminar {
         $this->introformat = $introformat;
         return $this;
     }
@@ -515,7 +520,7 @@ final class seminar {
     /**
      * @param string $thirdparty
      */
-    public function set_thirdparty(string $thirdparty) : seminar {
+    public function set_thirdparty(string $thirdparty): seminar {
         $this->thirdparty = $thirdparty;
         return $this;
     }
@@ -529,7 +534,7 @@ final class seminar {
     /**
      * @param string $thirdpartywaitlist
      */
-    public function set_thirdpartywaitlist(string $thirdpartywaitlist) : seminar {
+    public function set_thirdpartywaitlist(string $thirdpartywaitlist): seminar {
         $this->thirdpartywaitlist = $thirdpartywaitlist;
         return $this;
     }
@@ -543,7 +548,7 @@ final class seminar {
     /**
      * @param bool $waitlistautoclean
      */
-    public function set_waitlistautoclean(bool $waitlistautoclean) : seminar {
+    public function set_waitlistautoclean(bool $waitlistautoclean): seminar {
         $this->waitlistautoclean = (int) $waitlistautoclean;
         return $this;
     }
@@ -557,7 +562,7 @@ final class seminar {
     /**
      * @param int $display
      */
-    public function set_display(int $display) : seminar {
+    public function set_display(int $display): seminar {
         $this->display = $display;
         return $this;
     }
@@ -571,7 +576,7 @@ final class seminar {
     /**
      * @param int $timecreated
      */
-    public function set_timecreated(int $timecreated) : seminar {
+    public function set_timecreated(int $timecreated): seminar {
         $this->timecreated = $timecreated;
         return $this;
     }
@@ -585,7 +590,7 @@ final class seminar {
     /**
      * @param int $timemodified
      */
-    public function set_timemodified(int $timemodified) : seminar {
+    public function set_timemodified(int $timemodified): seminar {
         $this->timemodified = $timemodified;
         return $this;
     }
@@ -599,7 +604,7 @@ final class seminar {
     /**
      * @param string $shortname
      */
-    public function set_shortname(string $shortname) : seminar {
+    public function set_shortname(string $shortname): seminar {
         $this->shortname = $shortname;
         return $this;
     }
@@ -613,7 +618,7 @@ final class seminar {
     /**
      * @param int $showoncalendar
      */
-    public function set_showoncalendar(int $showoncalendar) : seminar {
+    public function set_showoncalendar(int $showoncalendar): seminar {
         $this->showoncalendar = $showoncalendar;
         return $this;
     }
@@ -627,7 +632,7 @@ final class seminar {
     /**
      * @param int $usercalentry
      */
-    public function set_usercalentry(int $usercalentry) : seminar {
+    public function set_usercalentry(int $usercalentry): seminar {
         $this->usercalentry = $usercalentry;
         return $this;
     }
@@ -643,18 +648,18 @@ final class seminar {
     /**
      * Note: saved in the database as multiplesessions,
      *       referred to elsewhere as multiplesignups.
-     * @param int $multiplesessions
+     * @param int $multiplesignups
      */
-    public function set_multiplesessions(int $multiplesignups) : seminar {
+    public function set_multiplesessions(int $multiplesignups): seminar {
         $this->multiplesessions = $multiplesignups;
         return $this;
     }
 
     /**
      * Group all the state restrictions settings into one array
-     * @return []
+     * @return string[] An array of attendance classes. Key is code, value is class.
      */
-    public function get_multisignup_states() : array {
+    public function get_multisignup_states(): array {
         $states = [];
 
         if (!empty($this->multisignupfully)) {
@@ -676,33 +681,38 @@ final class seminar {
         return $states;
     }
 
-    public function get_multisignup_maximum() : int {
+    /**
+     * Get multiple signup maximum number
+     *
+     * @return int
+     */
+    public function get_multisignup_maximum(): int {
         return $this->multisignupmaximum;
     }
 
     /**
      * @param int $multisignupfully
-     * @return this
+     * @return seminar
      */
-    public function set_multisignupfully(bool $multisignupfully) : seminar {
+    public function set_multisignupfully(bool $multisignupfully): seminar {
         $this->multisignupfully = (int)$multisignupfully;
         return $this;
     }
 
     /**
      * @param int $multisignuppartly
-     * @return this
+     * @return seminar
      */
-    public function set_multisignuppartly(bool $multisignuppartly) : seminar {
+    public function set_multisignuppartly(bool $multisignuppartly): seminar {
         $this->multisignuppartly = (int)$multisignuppartly;
         return $this;
     }
 
     /**
      * @param int $multisignupnoshow
-     * @return this
+     * @return seminar
      */
-    public function set_multisignupnoshow(bool $multisignupnoshow) : seminar {
+    public function set_multisignupnoshow(bool $multisignupnoshow): seminar {
         $this->multisignupnoshow = (int)$multisignupnoshow;
         return $this;
     }
@@ -711,16 +721,16 @@ final class seminar {
      * @param int $multisignupunableto
      * @return this
      */
-    public function set_multisignupunableto(bool $multisignupunableto) : seminar {
+    public function set_multisignupunableto(bool $multisignupunableto): seminar {
         $this->multisignupunableto = (int)$multisignupunableto;
         return $this;
     }
 
     /**
      * @param int $multisignupmaximum
-     * @return this
+     * @return seminar
      */
-    public function set_multisignupmaximum(int $multisignupmaximum) : seminar {
+    public function set_multisignupmaximum(int $multisignupmaximum): seminar {
         $this->multisignupmaximum = $multisignupmaximum;
         return $this;
     }
@@ -733,8 +743,9 @@ final class seminar {
     }
     /**
      * @param string $completionstatusrequired
+     * @return seminar
      */
-    public function set_completionstatusrequired(string $completionstatusrequired) : seminar {
+    public function set_completionstatusrequired(string $completionstatusrequired): seminar {
         $this->completionstatusrequired = $completionstatusrequired;
         return $this;
     }
@@ -747,8 +758,9 @@ final class seminar {
     }
     /**
      * @param int $managerreserve
+     * @return seminar
      */
-    public function set_managerreserve(int $managerreserve) : seminar {
+    public function set_managerreserve(int $managerreserve): seminar {
         $this->managerreserve = $managerreserve;
         return $this;
     }
@@ -761,8 +773,9 @@ final class seminar {
     }
     /**
      * @param int $maxmanagerreserves
+     * @return seminar
      */
-    public function set_maxmanagerreserves(int $maxmanagerreserves) : seminar {
+    public function set_maxmanagerreserves(int $maxmanagerreserves): seminar {
         $this->maxmanagerreserves = $maxmanagerreserves;
         return $this;
     }
@@ -775,8 +788,9 @@ final class seminar {
     }
     /**
      * @param int $reservecanceldays
+     * @return seminar
      */
-    public function set_reservecanceldays(int $reservecanceldays) : seminar {
+    public function set_reservecanceldays(int $reservecanceldays): seminar {
         $this->reservecanceldays = $reservecanceldays;
         return $this;
     }
@@ -789,8 +803,9 @@ final class seminar {
     }
     /**
      * @param int $reservedays
+     * @return seminar
      */
-    public function set_reservedays(int $reservedays) : seminar {
+    public function set_reservedays(int $reservedays): seminar {
         $this->reservedays = $reservedays;
         return $this;
     }
@@ -803,8 +818,9 @@ final class seminar {
     }
     /**
      * @param int $declareinterest
+     * @return seminar
      */
-    public function set_declareinterest(int $declareinterest) : seminar {
+    public function set_declareinterest(int $declareinterest): seminar {
         $this->declareinterest = $declareinterest;
         return $this;
     }
@@ -817,8 +833,9 @@ final class seminar {
     }
     /**
      * @param int $interestonlyiffull
+     * @return seminar
      */
-    public function set_interestonlyiffull(int $interestonlyiffull) : seminar {
+    public function set_interestonlyiffull(int $interestonlyiffull): seminar {
         $this->interestonlyiffull = $interestonlyiffull;
         return $this;
     }
@@ -831,8 +848,9 @@ final class seminar {
     }
     /**
      * @param int $allowcancellationsdefault
+     * @return seminar
      */
-    public function set_allowcancellationsdefault(int $allowcancellationsdefault) : seminar {
+    public function set_allowcancellationsdefault(int $allowcancellationsdefault): seminar {
         $this->allowcancellationsdefault = $allowcancellationsdefault;
         return $this;
     }
@@ -845,8 +863,9 @@ final class seminar {
     }
     /**
      * @param int $cancellationscutoffdefault
+     * @return seminar
      */
-    public function set_cancellationscutoffdefault(int $cancellationscutoffdefault) : seminar {
+    public function set_cancellationscutoffdefault(int $cancellationscutoffdefault): seminar {
         $this->cancellationscutoffdefault = $cancellationscutoffdefault;
         return $this;
     }
@@ -859,8 +878,9 @@ final class seminar {
     }
     /**
      * @param int $selectjobassignmentonsignup
+     * @return seminar
      */
-    public function set_selectjobassignmentonsignup(int $selectjobassignmentonsignup) : seminar {
+    public function set_selectjobassignmentonsignup(int $selectjobassignmentonsignup): seminar {
         $this->selectjobassignmentonsignup = $selectjobassignmentonsignup;
         return $this;
     }
@@ -873,8 +893,9 @@ final class seminar {
     }
     /**
      * @param int $forceselectjobassignment
+     * @return seminar
      */
-    public function set_forceselectjobassignment(int $forceselectjobassignment) : seminar {
+    public function set_forceselectjobassignment(int $forceselectjobassignment): seminar {
         $this->forceselectjobassignment = $forceselectjobassignment;
         return $this;
     }
@@ -887,8 +908,9 @@ final class seminar {
     }
     /**
      * @param int $approvaltype
+     * @return seminar
      */
-    public function set_approvaltype(int $approvaltype) : seminar {
+    public function set_approvaltype(int $approvaltype): seminar {
         $this->approvaltype = $approvaltype;
         return $this;
     }
@@ -901,8 +923,9 @@ final class seminar {
     }
     /**
      * @param int $approvalrole
+     * @return seminar
      */
-    public function set_approvalrole(int $approvalrole) : seminar {
+    public function set_approvalrole(int $approvalrole): seminar {
         $this->approvalrole = $approvalrole;
         return $this;
     }
@@ -915,8 +938,9 @@ final class seminar {
     }
     /**
      * @param string $approvalterms
+     * @return seminar
      */
-    public function set_approvalterms(string $approvalterms) : seminar {
+    public function set_approvalterms(string $approvalterms): seminar {
         $this->approvalterms = $approvalterms;
         return $this;
     }
@@ -929,8 +953,9 @@ final class seminar {
     }
     /**
      * @param string $approvaladmins
+     * @return seminar
      */
-    public function set_approvaladmins(string $approvaladmins) : seminar {
+    public function set_approvaladmins(string $approvaladmins): seminar {
         $this->approvaladmins = $approvaladmins;
         return $this;
     }
@@ -944,7 +969,7 @@ final class seminar {
     /**
      * @param int $sessionattendance
      */
-    public function set_sessionattendance(int $sessionattendance) : seminar {
+    public function set_sessionattendance(int $sessionattendance): seminar {
         $this->sessionattendance = $sessionattendance;
         return $this;
     }
@@ -958,7 +983,7 @@ final class seminar {
     /**
      * @param int $attendancetime
      */
-    public function set_attendancetime(int $attendancetime) : seminar {
+    public function set_attendancetime(int $attendancetime): seminar {
         $this->attendancetime = $attendancetime;
         return $this;
     }
@@ -997,7 +1022,7 @@ final class seminar {
      * @param int $completionstate
      * @return bool
      */
-    public function set_completion(int $userid, int $completionstate) : bool {
+    public function set_completion(int $userid, int $completionstate): bool {
         global $CFG;
         require_once($CFG->libdir . '/completionlib.php');
 

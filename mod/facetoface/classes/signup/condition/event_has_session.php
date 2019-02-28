@@ -38,10 +38,18 @@ class event_has_session extends condition {
         return $this->signup->get_seminar_event()->is_sessions();
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventhassession_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array
+     */
     public function get_failure() : array {
         return ['event_has_session' => get_string('state_eventhassession_fail', 'mod_facetoface')];
     }

@@ -36,6 +36,7 @@ use \context_module;
  *
  * - userid User ID which status has been updated
  * - sessionid Session ID where the action occurs
+ * - statuscode The current signup status code
  *
  * }
  *
@@ -62,6 +63,7 @@ class signup_status_updated extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var signup_status_updated $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
         $event->signupstatus = $signupstatus;
@@ -92,6 +94,7 @@ class signup_status_updated extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var signup_status_updated $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
         $event->signupstatus = $signupstatus;

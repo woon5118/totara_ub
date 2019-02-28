@@ -31,11 +31,12 @@ defined('MOODLE_INTERNAL') || die();
 final class approver {
 
     /**
-     * Dismiss mamager
+     * Dismiss manager
      *
-     * @param seminar $seminarid
+     * @param seminar $seminar
      */
     public static function dismiss(seminar $seminar) {
+        /** @var seminar_event[] $seminarevents */
         $seminarevents = seminar_event_list::form_seminar($seminar);
 
         foreach ($seminarevents as $seminarevent) {
@@ -145,12 +146,12 @@ final class approver {
     /**
      * Get the right approver & approval time we will need to get the approved status record.
      *
-     * @param \seminar $seminar
+     * @param seminar $seminar
      * @param $attendee
      * @return array
      * @throws \dml_exception
      */
-    public static function get_required(\seminar $seminar, $attendee) {
+    public static function get_required(seminar $seminar, $attendee) {
         global $DB;
 
         $approver = '';

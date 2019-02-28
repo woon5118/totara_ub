@@ -23,16 +23,23 @@
 
 namespace mod_facetoface\traits;
 
+use mod_facetoface\seminar_iterator_item;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class seminar_iterator, Interface for seminar iterators or objects that can be iterated themselves internally.
+ *
+ * WARNING: This class requires the items to have a couple of methods.
+ * All items should implement seminar_iterator_item in order to ensure that they have the correct methods.
+ * It is up to the utilising class to ensure this is adhered to.
+ *
  * @package mod_facetoface
  */
 trait seminar_iterator {
 
     /**
-     * @var array seminar items
+     * @var seminar_iterator_item[] seminar items, implementors choose the type.
      */
     protected $items = [];
 
@@ -45,9 +52,9 @@ trait seminar_iterator {
     }
 
     /**
-     * Delete seminar item from item list.
+     * Delete seminar item from item list, and from the system!
      *
-     * @return mixed
+     * WARNING: This deletes the item from the system as well.
      */
     public function delete() {
         foreach ($this->items as $item) {
@@ -64,7 +71,7 @@ trait seminar_iterator {
      * Return the current element
      *
      * @link http://php.net/manual/en/iterator.current.php
-     * @return event
+     * @return seminar_iterator_item
      */
     public function current() {
         return current($this->items);
@@ -104,7 +111,7 @@ trait seminar_iterator {
      * Rewind the Iterator to the first element
      *
      * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
+     * @return void
      */
     public function rewind() {
         reset($this->items);
@@ -128,19 +135,24 @@ trait seminar_iterator {
 
     /**
      * Check if the items list is empty
-     * @return int
+     * @return bool
      */
     public function is_empty() : bool {
         return empty($this->items);
     }
 
     /**
-     * @param int $ttemid
-     * @return \item - An instance of the specified object matching the given id
+     * Returns an instance of the specified seminar_iterator_item matching the given id.
+     *
+     * If no item matches then null is returned.
+     *
+     * @param int $itemid
+     * @return seminar_iterator_item|null
      */
     public function get(int $itemid) {
         if ($this->contains($itemid)) {
             return $this->items[$itemid];
         }
+        return null;
     }
 }

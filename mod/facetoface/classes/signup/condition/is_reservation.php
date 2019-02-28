@@ -29,10 +29,18 @@ defined('MOODLE_INTERNAL') || die();
  * Class is_reservation
  */
 class is_reservation extends condition {
+    /**
+     * Is condition passing
+     * @return bool
+     */
     public function pass() : bool {
         return empty($this->signup->get_userid()) && !empty($this->signup->get_bookedby());
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_isreservation_desc', 'mod_facetoface');
     }

@@ -52,7 +52,7 @@ final class calendar {
             $description .= \html_writer::tag('p', clean_param($seminar->get_intro(), PARAM_CLEANHTML));
         }
         /**
-         * @var mod_facetoface_renderer $seminarrenderer
+         * @var \mod_facetoface_renderer $seminarrenderer
          */
         $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
         $description .= $seminarrenderer->render_seminar_event($seminarevent, false, true);
@@ -170,6 +170,7 @@ final class calendar {
      *
      * @param seminar_event $seminarevent Record from the facetoface_sessions table
      * @param string $eventtype Type of the event (booking or session)
+     * @return array An array of user events
      */
     public static function delete_user_events(\mod_facetoface\seminar_event $seminarevent, $eventtype) {
         global $DB;
@@ -210,8 +211,9 @@ final class calendar {
      * Remove all entries in the course calendar which relate to this seminar event.
      *
      * @param seminar_event $seminarevent Record from the facetoface_sessions table
-     * @param integer $courseid ID of the course (courseid, SITEID, 0)
-     * @param integer $userid   ID of the user
+     * @param int $courseid ID of the course (courseid, SITEID, 0)
+     * @param int $userid   ID of the user
+     * @return bool
      */
     public static function remove_seminar_event(\mod_facetoface\seminar_event $seminarevent, $courseid = 0, $userid = 0) {
         global $DB;

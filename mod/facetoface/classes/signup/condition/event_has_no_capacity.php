@@ -56,6 +56,10 @@ class event_has_no_capacity extends condition {
         return $seminarevent->get_capacity() <= $numattendees;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventhasnocapacity_desc', 'mod_facetoface');
     }

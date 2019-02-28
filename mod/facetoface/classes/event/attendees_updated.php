@@ -59,6 +59,7 @@ class attendees_updated extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var attendees_updated $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
 
@@ -79,6 +80,7 @@ class attendees_updated extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var attendees_updated $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
 

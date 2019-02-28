@@ -44,14 +44,20 @@ class event_has_role_approver extends condition {
                  WHERE fsr.roleid = :approvalrole
                    AND fsr.sessionid = :sid';
         return $DB->record_exists_sql($sql, ['approvalrole' => $seminar->get_approvalrole(), 'sid' => $this->signup->get_sessionid()]);
-
-        return false;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventhasroleapprover_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array
+     */
     public function get_failure() : array {
         return ['event_has_role_approver' => get_string('state_eventhasroleapprover_fail', 'mod_facetoface')];
     }

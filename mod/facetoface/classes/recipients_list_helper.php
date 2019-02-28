@@ -31,23 +31,22 @@ defined('MOODLE_INTERNAL') || die();
 final class recipients_list_helper {
 
     /**
-     * @var mod_facetoface_recipients $recipients
+     * @var string[] $recipients
      */
     private $recipients = [];
 
     /**
-     * @var array
+     * @var \stdClass[]
      */
     private $existingrecipients = [];
 
     /**
-     * @var array
+     * @var \stdClass[]
      */
     private $potentialrecipients = [];
 
     /**
      * Set recipients submitted by $_POST request.
-     * @throws \coding_exception
      */
     public function set_recipients() {
         $recipients = optional_param('recipients', [], PARAM_SEQUENCE);
@@ -61,7 +60,7 @@ final class recipients_list_helper {
 
     /**
      * Get recipients.
-     * @return array recipients
+     * @return string[] recipients
      */
     public function get_recipients(): array {
         return $this->recipients;
@@ -69,7 +68,7 @@ final class recipients_list_helper {
 
     /**
      * Add recipients
-     * @param object $data submitted by $_POST request
+     * @param \stdClass $data submitted by $_POST request
      */
     public function add_recipients($data) {
         if (!empty($data->addselect) && confirm_sesskey()) {
@@ -101,8 +100,6 @@ final class recipients_list_helper {
     /**
      * Set the list of current recipients
      * @return recipients_list_helper
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     public function set_existing_recipients(): recipients_list_helper {
         global $DB;
@@ -119,7 +116,7 @@ final class recipients_list_helper {
 
     /**
      * Get the list of current recipients
-     * @return array existing recipients
+     * @return \stdClass[] existing recipients
      */
     public function get_existing_recipients(): array {
         return $this->existingrecipients;
@@ -129,7 +126,6 @@ final class recipients_list_helper {
      * Set all available attendees
      * @param seminar_event $seminarevent
      * @return recipients_list_helper
-     * @throws \dml_exception
      */
     public function set_potential_recipients(\mod_facetoface\seminar_event $seminarevent): recipients_list_helper {
         global $DB;
@@ -151,7 +147,7 @@ final class recipients_list_helper {
 
     /**
      * Get all available attendees
-     * @return array potential recipients
+     * @return \stdClass[] potential recipients
      */
     public function get_potential_recipients(): array {
         return $this->potentialrecipients;
@@ -159,7 +155,7 @@ final class recipients_list_helper {
 
     /**
      * Local location for the all name fields to keep consistency with get_selected_users() and get_available_users() methods.
-     * @return array|string All name fields.
+     * @return string All name fields as an SQL fragment
      */
     private static function get_all_user_name_fields() {
         static $fields = null;

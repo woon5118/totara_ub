@@ -40,7 +40,7 @@ class bulk_list {
     /**
      * Prepare list or get list data
      * @param string $listid List identifier
-     * @param moodle_url $returnurl only for first step of list needed for navigation
+     * @param \moodle_url $returnurl only for first step of list needed for navigation
      * @param string $srctype specifies type of action that this list is being used for, e.g. 'add', 'addfile' etc
      */
     public function __construct($listid, \moodle_url $returnurl = null, $srctype = '') {
@@ -146,13 +146,16 @@ class bulk_list {
     }
 
     /**
-     * Get previously stored user list form data. Used to repopulate the form when user decides to change selected users
-     * @return \stdClass
+     * Get previously stored user list form data.
+     *
+     * Used to repopulate the form when user decides to change selected users.
+     *
+     * @return array
      */
     public function get_form_data() {
         global $SESSION;
         if (isset($SESSION->mod_facetoface_attendeeslist[$this->listid]['formdata'])) {
-            return  $SESSION->mod_facetoface_attendeeslist[$this->listid]['formdata'];
+            return (array) $SESSION->mod_facetoface_attendeeslist[$this->listid]['formdata'];
         }
         return array();
     }
@@ -165,11 +168,21 @@ class bulk_list {
         unset($SESSION->mod_facetoface_attendeeslist[$this->listid]);
     }
 
+    /**
+     * Save validation results to session.
+     *
+     * @param array $results
+     */
     public function set_validaton_results($results) {
         global $SESSION;
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['validation'] = $results;
     }
 
+    /**
+     * Load validation results from session.
+     *
+     * @return array
+     */
     public function get_validation_results() {
         global $SESSION;
         if (isset($SESSION->mod_facetoface_attendeeslist[$this->listid]['validation'])) {

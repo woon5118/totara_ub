@@ -56,6 +56,7 @@ class attendance_updated extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var attendance_updated $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
 

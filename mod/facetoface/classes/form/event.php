@@ -27,40 +27,34 @@
 namespace mod_facetoface\form;
 
 global $CFG;
-
-use core\command\exception;
-use mod_facetoface\seminar_event;
-use mod_facetoface\signup_helper;
-use stdClass;
-
 require_once("{$CFG->libdir}/formslib.php");
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 
 class event extends \moodleform {
 
-    /** @var context_module */
+    /** @var \stdClass A record from the facetoface_sessions table */
     protected $session;
 
-    /** @var context_module */
+    /** @var \stdClass A record from the facetoface table */
     protected $facetoface;
 
-    /** @var context_module */
+    /** @var \context_module */
     protected $context;
 
-    /** @var context_module */
+    /** @var array */
     protected $editoroptions;
 
-    /** @var context_module */
+    /** @var \stdClass Data for a form sumbission*/
     protected $fromform;
 
-    /** @var context_module */
+    /** @var \moodle_url */
     protected $returnurl;
 
     /**
      * This is an array that holding the confliting users, including the event role and the
      * attendees of an event.
      *
-     * @var stdClass[]
+     * @var \stdClass[]
      */
     protected $users_roles_in_conflict;
 
@@ -68,8 +62,6 @@ class event extends \moodleform {
     Protected $has_date_changed;
 
     function definition() {
-        global $CFG;
-
         $mform =& $this->_form;
         $this->session = (isset($this->_customdata['session'])) ? $this->_customdata['session'] : false;
         $this->facetoface = $this->_customdata['facetoface'];
@@ -264,10 +256,10 @@ class event extends \moodleform {
 
     /**
      * Adds html hidden fields and html rendered table to display in session date form
-     * @param moodleform $form Form where to add fields and set values
+     * @param \moodleform $form Form where to add fields and set values
      * @param string $defaulttimezone
      * @param int $sessionid
-     * @param stdClass $sessiondata
+     * @param \stdClass $sessiondata
      */
     public static function add_date_render_fields($form, $defaulttimezone, $sessionid, $sessiondata) {
         $mform = $form->_form;
@@ -303,9 +295,9 @@ class event extends \moodleform {
     /**
      * Returns fields and html code required for one date (or new date if no session data provided)
      * Used also to dynamically inject new or cloned session date (event)
-     * @param $mform
+     * @param \MoodleQuickForm $mform
      * @param int $offset
-     * @param stdClass $sessiondata
+     * @param \stdClass $sessiondata
      * @param string $defaulttimezone Default timezone if date not set
      * @return
      */
@@ -676,7 +668,7 @@ class event extends \moodleform {
             }
             $users[] = fullname($user);
         }
-        $details = new stdClass();
+        $details = new \stdClass();
         $details->users = implode('; ', $users);
         $details->userscount = count($this->users_roles_in_conflict);
 
@@ -936,7 +928,7 @@ class event extends \moodleform {
             $seminarevent->from_record($todb);
             $seminarevent->save();
             facetoface_save_dates($seminarevent->to_record(), $sessiondates);
-        } catch (exception $e) {
+        } catch (\moodle_exception $e) {
             print_error('error:couldnotsaveevent', 'facetoface', $this->returnurl);
         }
 
@@ -947,7 +939,7 @@ class event extends \moodleform {
 
         if ($update) {
             // Now that we have updated the session record fetch the rest of the data we need.
-            signup_helper::update_attendees($seminarevent);
+            \mod_facetoface\signup_helper::update_attendees($seminarevent);
         }
 
         // Retrieve record that was just inserted/updated.

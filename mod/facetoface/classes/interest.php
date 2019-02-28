@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class seminar represents Seminar Interest
  */
-final class interest {
+final class interest implements seminar_iterator_item {
 
     use traits\crud_mapper;
 
@@ -197,6 +197,8 @@ final class interest {
 
     /**
      * Delete {facetoface_interest}.record where id from database
+     *
+     * TODO: this should be deprecated in the future, and delete called instead.
      */
     public function withdraw() {
         global $DB;
@@ -207,7 +209,7 @@ final class interest {
     }
 
     /**
-     * Delete {facetoface_interest}.record where id from database
+     * Delete {facetoface_interest}.record (withdraw)
      */
     public function delete() {
         $this->withdraw();
@@ -228,6 +230,7 @@ final class interest {
     }
     /**
      * @param int $seminarid
+     * @return interest
      */
     public function set_facetoface(int $seminarid) : interest {
         $this->facetoface = $seminarid;
@@ -242,6 +245,7 @@ final class interest {
     }
     /**
      * @param int $userid
+     * @return interest
      */
     public function set_userid(int $userid) : interest {
         $this->userid = $userid;
@@ -255,7 +259,8 @@ final class interest {
         return (int)$this->timedeclared;
     }
     /**
-     * @param int $timedesclared
+     * @param int $timedeclared
+     * @return interest
      */
     public function set_timedeclared(int $timedeclared) : interest {
         $this->timedeclared = $timedeclared;
@@ -270,6 +275,7 @@ final class interest {
     }
     /**
      * @param int $reason
+     * @return interest
      */
     public function set_reason(string $reason) : interest {
         $this->reason = $reason;

@@ -38,6 +38,10 @@ class event_has_no_session extends condition {
         return !$this->signup->get_seminar_event()->is_sessions();
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventhasnosession_desc', 'mod_facetoface');
     }

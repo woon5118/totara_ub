@@ -32,6 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * - sessionid Session's ID.
  * - section Refers to the section(tab) viewed in the attendees page.
+ *
  * }
  *
  * @author Alastair Munro <alastair.munro@totaralms.com>
@@ -60,6 +61,7 @@ class attendees_viewed extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var attendees_viewed $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
 

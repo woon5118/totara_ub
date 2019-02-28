@@ -51,10 +51,18 @@ class event_registration_is_available extends condition {
         return $start && $finish;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventregistrationisavailable_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array
+     */
     public function get_failure() : array {
         $now = time();
         $timestart = $this->signup->get_seminar_event()->get_registrationtimestart();

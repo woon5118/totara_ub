@@ -32,7 +32,9 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @property-read array $other {
  * Extra information about the event.
+ *
  * - sessionid Seminar Event ID.
+ *
  * }
  */
 class booking_waitlisted extends abstract_signup_event {

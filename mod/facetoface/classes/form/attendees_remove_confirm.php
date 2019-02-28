@@ -24,9 +24,6 @@
 
 namespace mod_facetoface\form;
 
-use gradereport_singleview\local\ui\empty_element;
-use mod_facetoface\seminar_event;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**

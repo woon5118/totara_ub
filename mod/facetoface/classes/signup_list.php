@@ -37,6 +37,7 @@ final class signup_list implements \Iterator {
      *
      * @param array $conditions optional array $fieldname => requestedvalue with AND in between
      * @param string $sort an order to sort the results in.
+     * @return signup_list
      */
     public static function from_conditions(array $conditions = null, string $sort = '') {
         global $DB;
@@ -56,7 +57,7 @@ final class signup_list implements \Iterator {
      *
      * @param int $userid
      * @param int $seminarid
-     * @return \signup_list
+     * @return signup_list
      */
     public static function user_active_signups_within_seminar($userid, $seminarid) : signup_list {
         global $DB;
@@ -97,7 +98,7 @@ final class signup_list implements \Iterator {
      * Create a list of user signups that are waitlisted for a specified event.
      *
      * @param int $eventid
-     * @return \signup_list
+     * @return signup_list
      */
     public static function signups_for_event($eventid) {
         global $DB;
@@ -116,7 +117,7 @@ final class signup_list implements \Iterator {
      *
      * @param int $eventid
      * @param int $statuscode
-     * @return \signup_list
+     * @return signup_list
      */
     public static function signups_by_statuscode_for_event($eventid, $statuscode) {
         global $DB;

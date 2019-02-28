@@ -26,7 +26,6 @@ namespace mod_facetoface\signup;
 use mod_facetoface\signup\state\state;
 use mod_facetoface\signup\condition\condition;
 use mod_facetoface\signup\restriction\restriction;
-use \stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -70,8 +69,11 @@ final class transition {
 
     /**
      * Add conditions that requred to be met for state transition
+     *
      * Conditions are lazy-initialised when they needed, because most of them will not be needed
-     * @param $conditions string[] condition classes
+     *
+     * @param string[] $conditions condition classes
+     * @return transition
      */
     public function with_conditions(string ...$conditions) : transition {
         $this->conditions = array_merge($this->conditions, $conditions);
@@ -80,8 +82,11 @@ final class transition {
 
     /**
      * Add restrictions on the users that can perform the transition
+     *
      * Restrictions are lazy-initialised when they needed, because most of them will not be needed
-     * @param $restrictions all restrictions
+     *
+     * @param string[] $restrictions all restrictions
+     * @return transition
      */
     public function with_restrictions(string ...$restrictions) : transition {
         $this->restrictions = array_merge($this->restrictions, $restrictions);
@@ -127,15 +132,16 @@ final class transition {
         $results = ['conditions' => [], 'restrictions' => []];
 
         foreach ($this->conditions as $conditionclass) {
+            /** @var condition $condition */
             $condition = new $conditionclass($this->to->get_signup());
             if (isset($results['conditions'][$conditionclass])) {
                 $results['conditions'][] = "Duplicate of $conditionclass in one transition";
             }
-            if ($condition->pass($this->to->get_signup())) {
+            if ($condition->pass()) {
                 $results['conditions'][$conditionclass] = 'PASS';
 
             } else {
-                $failure = $condition->get_failure($this->to->get_signup());
+                $failure = $condition->get_failure();
                 if (empty($failure)) {
                     $failure = 'FAIL';
                 }
@@ -144,18 +150,16 @@ final class transition {
         }
 
         foreach ($this->restrictions as $restrictionclass) {
-            /**
-             * @var restriction $restriction
-             */
+            /** @var restriction $restriction */
             $restriction = new $restrictionclass($this->to->get_signup());
             if (isset($results['restrictions'][$restrictionclass])) {
                 $results['restrictions'][] = "Duplicate of $restrictionclass in one transition";
             }
-            if ($restriction->pass($this->to->get_signup())) {
+            if ($restriction->pass()) {
                 $results['restrictions'][$restrictionclass] = 'PASS';
 
             } else {
-                $failure = $restriction->get_failure($this->to->get_signup());
+                $failure = $restriction->get_failure();
                 if (empty($failure)) {
                     $failure = 'FAIL';
                 }
@@ -173,12 +177,10 @@ final class transition {
     public function get_failures() : array {
         $failures = [];
         foreach ($this->conditions as $conditionclass) {
-            /**
-             * @var condition $condition
-             */
+            /** @var condition $condition */
             $condition = new $conditionclass($this->to->get_signup());
-            if (!$condition->pass($this->to->get_signup())) {
-                $failures = array_merge($failures, $condition->get_failure($this->to->get_signup()));
+            if (!$condition->pass()) {
+                $failures = array_merge($failures, $condition->get_failure());
             }
         }
 
@@ -187,8 +189,8 @@ final class transition {
              * @var restriction $restriction
              */
             $restriction = new $restrictionclass($this->to->get_signup());
-            if (!$restriction->pass($this->to->get_signup())) {
-                $failures = array_merge($failures, $restriction->get_failure($this->to->get_signup()));
+            if (!$restriction->pass()) {
+                $failures = array_merge($failures, $restriction->get_failure());
             }
         }
 

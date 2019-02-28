@@ -56,6 +56,7 @@ class booking_cancelled extends abstract_signup_event {
         );
 
         self::$preventcreatecall = false;
+        /** @var booking_cancelled $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
 

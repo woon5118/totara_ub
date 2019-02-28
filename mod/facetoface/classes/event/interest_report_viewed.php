@@ -58,6 +58,7 @@ class interest_report_viewed extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var interest_report_viewed $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
 

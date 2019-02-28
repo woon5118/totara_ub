@@ -51,7 +51,7 @@ class attendee_note_updated extends \core\event\base {
      *
      * @param \stdClass $attendee
      * @param \context_module $context
-     * @return attendee_note_update
+     * @return attendee_note_updated
      */
     public static function create_from_instance(\stdClass $attendee, \context_module $context) {
         $data = array(
@@ -64,6 +64,7 @@ class attendee_note_updated extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var attendee_note_updated $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
         $event->instance = $attendee;

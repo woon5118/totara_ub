@@ -56,10 +56,18 @@ class has_signup_capability extends condition {
         return has_capability('mod/facetoface:signup', $context, $this->signup->get_userid());
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_hassignupcapability_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array of strings
+     */
     public function get_failure() : array {
         return ['has_signup_capability' => get_string('error:nopermissiontosignup', 'mod_facetoface')];
     }

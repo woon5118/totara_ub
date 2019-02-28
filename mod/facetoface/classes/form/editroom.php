@@ -25,7 +25,8 @@ namespace mod_facetoface\form;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once("{$CFG->dirroot}/lib/formslib.php");
+global $CFG;
+require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 
 class editroom extends \moodleform {
@@ -37,11 +38,11 @@ class editroom extends \moodleform {
         global $DB;
 
         $mform = $this->_form;
-        /**
-         * @var \mod_facetoface\room $room
-         */
+        /** @var \mod_facetoface\room $room */
         $room = $this->_customdata['room'];
+        /** @var \mod_facetoface\seminar $seminar */
         $seminar = empty($this->_customdata['seminar']) ? null : $this->_customdata['seminar'];
+        /** @var \mod_facetoface\seminar_event $event */
         $event = empty($this->_customdata['event']) ? null : $this->_customdata['event'];
         $editoroptions = $this->_customdata['editoroptions'];
 
@@ -153,6 +154,7 @@ class editroom extends \moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
+        /** @var \mod_facetoface\room $room */
         $room = $this->_customdata['room'];
 
         if ((int)$data['roomcapacity'] <= 0) {

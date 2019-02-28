@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
 * Class role represents Seminar event roles
 */
-final class role {
+final class role implements seminar_iterator_item {
 
     use traits\crud_mapper;
 
@@ -66,7 +66,7 @@ final class role {
     /**
      * Load session roles data from DB.
      * 
-     * @return session_role this
+     * @return role this
      */
     public function load() : role {
 
@@ -85,6 +85,7 @@ final class role {
      * Map data object to class instance.
      *
      * @param \stdClass $object
+     * @return role
      */
     public function from_record(\stdClass $object) {
 
@@ -117,6 +118,7 @@ final class role {
     }
     /**
      * @param int $sessionid
+     * @return role
      */
     public function set_sessionid(int $sessionid) : role {
         $this->sessionid = $sessionid;
@@ -131,6 +133,7 @@ final class role {
     }
     /**
      * @param int $roleid
+     * @return role
      */
     public function set_roleid(int $roleid) : role {
         $this->roleid = $roleid;
@@ -145,6 +148,7 @@ final class role {
     }
     /**
      * @param int $userid
+     * @return role
      */
     public function set_userid(int $userid) : role {
         $this->userid = $userid;

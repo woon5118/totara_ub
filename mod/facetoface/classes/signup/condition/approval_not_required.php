@@ -42,6 +42,10 @@ class approval_not_required extends condition {
         return !($this->signup->get_seminar_event()->get_seminar()->is_approval_required());
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_approvalnotrequired_desc', 'mod_facetoface');
     }

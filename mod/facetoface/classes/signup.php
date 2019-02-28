@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  * This class must not know anything about specific states (e.g. difference between booked, waitlisted, or cancelled).
  * If specific state class needs to be considered use signup_helper instead.
  */
-final class signup {
+final class signup implements seminar_iterator_item {
 
     use \mod_facetoface\traits\crud_mapper;
 
@@ -106,12 +106,12 @@ final class signup {
      * A function to create a signup from userid and seminar eventid
      * Will return an existing signup, or create a new one if none exists.
      *
-     * @param int userid
+     * @param int $userid
      * @param seminar_event $seminarevent
-     * @param int notificationtype - Default 3 = MDL_F2F_BOTH
+     * @param int $notificationtype - Default 3 = MDL_F2F_BOTH
      * @return signup
      */
-    public static function create($userid, seminar_event $seminarevent, int $notificationtype = 3) : signup {
+    public static function create(int $userid, seminar_event $seminarevent, int $notificationtype = 3): signup {
         global $DB;
 
         if (empty($seminarevent->get_id())) {
@@ -138,7 +138,7 @@ final class signup {
      * @param bool $skip
      * @return signup
      */
-    public function set_skipapproval($skip = true) {
+    public function set_skipapproval(bool $skip = true): signup {
         $this->settings['skipapproval'] = $skip;
         return $this;
     }
@@ -147,7 +147,7 @@ final class signup {
      * Get signup instance skipapproval setting
      * @return bool
      */
-    public function get_skipapproval() : bool {
+    public function get_skipapproval(): bool {
         return empty($this->settings['skipapproval']) ? false : $this->settings['skipapproval'];
     }
 
@@ -156,7 +156,7 @@ final class signup {
      * @param bool $ignore
      * @return signup
      */
-    public function set_ignoreconflicts($ignore = true) {
+    public function set_ignoreconflicts(bool $ignore = true): signup {
         $this->settings['ignoreconflicts'] = $ignore;
         return $this;
     }
@@ -165,7 +165,7 @@ final class signup {
      * Get signup instance ignoreconflicts setting
      * @return bool
      */
-    public function get_ignoreconflicts() : bool {
+    public function get_ignoreconflicts(): bool {
         return empty($this->settings['ignoreconflicts']) ? false : $this->settings['ignoreconflicts'];
     }
 
@@ -174,7 +174,7 @@ final class signup {
      * @param bool $skip
      * @return signup
      */
-    public function set_skipusernotification($skip = true) {
+    public function set_skipusernotification(bool $skip = true): signup {
         $this->settings['skipusernotification'] = $skip;
         return $this;
     }
@@ -183,7 +183,7 @@ final class signup {
      * Get signup instance skipusernotification setting
      * @return bool
      */
-    public function get_skipusernotification() : bool {
+    public function get_skipusernotification(): bool {
         return empty($this->settings['skipusernotification']) ? false : $this->settings['skipusernotification'];
     }
 
@@ -192,7 +192,7 @@ final class signup {
      * @param bool $skip
      * @return signup
      */
-    public function set_skipmanagernotification($skip = true) {
+    public function set_skipmanagernotification(bool $skip = true): signup {
         $this->settings['skipmanagernotification'] = $skip;
         return $this;
     }
@@ -201,24 +201,24 @@ final class signup {
      * Get signup instance skipmanagernotification setting
      * @return bool
      */
-    public function get_skipmanagernotification() : bool {
+    public function get_skipmanagernotification(): bool {
         return empty($this->settings['skipmanagernotification']) ? false : $this->settings['skipmanagernotification'];
     }
 
     /**
      * Set signup notification sender user instance
-     * @param stdClass $user
+     * @param \stdClass $user
      * @return signup
      */
-    public function set_fromuser(stdClass $user) {
+    public function set_fromuser(\stdClass $user): signup {
         $this->settings['fromuser'] = $user;
         return $this;
     }
     /**
      * Get signup notification sender user instance
-     * @return stdClass or null
+     * @return \stdClass or null
      */
-    public function get_fromuser() {
+    public function get_fromuser(): ?\stdClass {
         return empty($this->settings['fromuser']) ? null : $this->settings['fromuser'];
     }
 
@@ -227,7 +227,7 @@ final class signup {
      *
      * @return signup this
      */
-    public function load() : signup {
+    public function load(): signup {
 
         return $this->crud_load();
     }
@@ -236,7 +236,7 @@ final class signup {
      * Create/update {facetoface_sessions_dates}.record
      * @return signup
      */
-    public function save() {
+    public function save(): signup {
         $this->crud_save();
         return $this;
     }
@@ -246,7 +246,7 @@ final class signup {
      *
      * @param \stdClass $object
      */
-    public function map_instance(\stdClass $object) : signup {
+    public function map_instance(\stdClass $object): signup {
 
         return $this->map_object($object);
     }
@@ -254,7 +254,7 @@ final class signup {
     /**
      * Delete {facetoface_signups}.record where id
      */
-    public function delete() : signup {
+    public function delete(): signup {
         global $DB;
 
         $this->delete_customfields();
@@ -278,7 +278,7 @@ final class signup {
      * @param string ...$newstates class names
      * @return boolean
      */
-    public function can_switch(string ...$newstates) : bool {
+    public function can_switch(string ...$newstates): bool {
         return $this->get_state()->can_switch(...$newstates);
     }
 
@@ -286,9 +286,9 @@ final class signup {
      * Switch signup state.
      * This function must be used for any state changes
      * @param string ...$newstates class names
-     * @return \signup
+     * @return signup
      */
-    public function switch_state(string ...$newstates) {
+    public function switch_state(string ...$newstates): signup {
         global $DB;
         $trans = $DB->start_delegated_transaction();
         $oldstate = $this->get_state();
@@ -316,7 +316,7 @@ final class signup {
      * @param string ...$newstates class names
      * @return \signup
      */
-    public function switch_state_with_grade($grade, $reserved, string ...$newstates) {
+    public function switch_state_with_grade(?float $grade, ?string $reserved, string ...$newstates): signup {
         global $DB;
         if ($reserved !== null) {
             throw \coding_exception('the argument `$reserved` must be null at this moment.');
@@ -345,7 +345,7 @@ final class signup {
      * @param bool $return return debug instead of outputting it (like in print_r)
      * @return array
      */
-    public function debug_state_transitions(bool $return=false) : array {
+    public function debug_state_transitions(bool $return=false): array {
         $results = [];
         $currentstate = $this->get_state();
         /**
@@ -368,7 +368,7 @@ final class signup {
      * @param string ...$newstates class names
      * @return array
      */
-    public function get_failures(string ...$newstates) : array {
+    public function get_failures(string ...$newstates): array {
         $results = [];
         $currentstate = $this->get_state();
 
@@ -399,7 +399,7 @@ final class signup {
     /**
      * Delete records from facetoface_signup_info_data/facetoface_cancellation_info_data
      */
-    protected function delete_customfields() : signup {
+    protected function delete_customfields(): signup {
         global $DB;
 
         // Get all associated signup customfield data to delete.
@@ -434,13 +434,13 @@ final class signup {
     /**
      * Add new current signup status with a new state.
      * To change state of signup use signup::switch_state()
-     * @param status        $status
+     * @param state         $state
      * @param int           $timecreated
      * @param int           $userbyid
      * @param float|null    $grade
      * @param null          $reserved        must be null
      */
-    protected function update_status(state $state, int $timecreated = 0, int $userbyid = 0, $grade = null, $reserved = null) : signup_status {
+    protected function update_status(state $state, int $timecreated = 0, int $userbyid = 0, ?float $grade = null, ?string $reserved = null): signup_status {
         global $USER, $CFG;
 
         // We need the completionlib for \completion_info and the COMPLETION_UNKNOWN constant.
@@ -461,7 +461,7 @@ final class signup {
 
         // Check for completions.
         // Note: This code block was taken from facetoface_set_completion();
-        $course = new stdClass();
+        $course = new \stdClass();
         $course->id = $seminar->get_course();
         $completion = new \completion_info($course);
         if ($completion->is_enabled() && !empty($cm) && $completion->is_enabled($cm)) {
@@ -478,7 +478,7 @@ final class signup {
     /**
      * @return int
      */
-    public function get_id() : int {
+    public function get_id(): int {
         return (int)$this->id;
     }
 
@@ -486,7 +486,7 @@ final class signup {
      * Get current signup state. If no current status, then not_set will be returned
      * @return state
      */
-    public function get_state() : state {
+    public function get_state(): state {
         if (signup_status::has_current($this)) {
             $stateclass = signup_status::from_current($this)->get_state_class();
             return new $stateclass($this);
@@ -498,13 +498,13 @@ final class signup {
     /**
      * @return int
      */
-    public function get_sessionid() : int {
+    public function get_sessionid(): int {
         return (int)$this->sessionid;
     }
     /**
      * @param int $sessionid
      */
-    public function set_sessionid(int $sessionid) : signup {
+    public function set_sessionid(int $sessionid): signup {
         $this->sessionid = $sessionid;
         return $this;
     }
@@ -512,13 +512,13 @@ final class signup {
     /**
      * @return int
      */
-    public function get_userid() : int {
+    public function get_userid(): int {
         return (int)$this->userid;
     }
     /**
      * @param int $userid
      */
-    public function set_userid(int $userid) : signup {
+    public function set_userid(int $userid): signup {
         $this->userid = $userid;
         return $this;
     }
@@ -526,13 +526,13 @@ final class signup {
     /**
      * @return string
      */
-    public function get_discountcode() : string {
+    public function get_discountcode(): string {
         return $this->discountcode;
     }
     /**
      * @param string $discountcode
      */
-    public function set_discountcode(string $discountcode) : signup {
+    public function set_discountcode(string $discountcode): signup {
         $this->discountcode = $discountcode;
         return $this;
     }
@@ -541,7 +541,7 @@ final class signup {
      * Get cost associated with signup.
      * @return string
      */
-    public function get_cost() : string {
+    public function get_cost(): string {
         if (!empty($this->discountcode)) {
             return format_string($this->seminarevent->get_discountcost());
         } else {
@@ -552,13 +552,13 @@ final class signup {
     /**
      * @return int
      */
-    public function get_notificationtype() : int {
+    public function get_notificationtype(): int {
         return (int)$this->notificationtype;
     }
     /**
      * @param int $notificationtype
      */
-    public function set_notificationtype(int $notificationtype) : signup {
+    public function set_notificationtype(int $notificationtype): signup {
         $this->notificationtype = $notificationtype;
         return $this;
     }
@@ -566,7 +566,7 @@ final class signup {
     /**
      * @return int
      */
-    public function get_archived() : int {
+    public function get_archived(): int {
         return (int)$this->archived;
     }
     /**
@@ -624,7 +624,7 @@ final class signup {
      * Get linked seminar event
      * @return seminar_event
      */
-    public function get_seminar_event() {
+    public function get_seminar_event(): seminar_event {
         if (is_null($this->seminarevent) || $this->seminarevent->get_id() != $this->sessionid) {
             $this->seminarevent = new seminar_event((int)$this->sessionid);
         }

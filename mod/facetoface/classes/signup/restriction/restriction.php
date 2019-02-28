@@ -28,7 +28,9 @@ use mod_facetoface\signup;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Interface condition. All conditions in booking states must implement it
+ * Abstract restriction class
+ *
+ * Restrictions limit the actors that can perform an action.
  */
 abstract class restriction {
     /**
@@ -37,29 +39,27 @@ abstract class restriction {
     protected $signup = null;
 
     /**
-     * Condition constructor.
-     * @param \stdClass $actor User that performs the action (actor)
+     * Constructor.
+     *
      * @param signup $signup
      */
     public function __construct(signup $signup) {
         $this->signup = $signup;
     }
     /**
-     * Is condition passing
+     * Is restriction met?
      * @return bool
      */
     abstract public function pass() : bool;
 
     /**
-     * Get English description of condition
-     * Used for debug purpose only
+     * Description of this restriction
      * @return string
      */
     abstract public static function get_description() : string;
 
     /**
-     * Return explanation why condition has not passed
-     * Used for debug purposes only
+     * Return explanation why restriction was not met
      * @return array
      */
     abstract public function get_failure() : array;

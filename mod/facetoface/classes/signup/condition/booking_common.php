@@ -53,9 +53,8 @@ class booking_common extends condition {
     }
 
     /**
-     * Get English description of condition
-     * Used for debug purpose only
-     * @return mixed
+     * Get description of condition
+     * @return string
      */
     public static function get_description() : string {
         return get_string('state_bookingcommon_desc', 'mod_facetoface');
@@ -63,7 +62,6 @@ class booking_common extends condition {
 
     /**
      * Return explanation why condition has not passed
-     * Used for debug purposes only
      * @return array of strings
      */
     public function get_failure() : array {

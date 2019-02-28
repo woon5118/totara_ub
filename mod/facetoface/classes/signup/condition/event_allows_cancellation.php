@@ -55,6 +55,10 @@ class event_allows_cancellation extends condition {
         return false;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventhascapacity_desc', 'mod_facetoface');
     }

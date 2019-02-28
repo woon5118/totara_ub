@@ -47,10 +47,18 @@ class has_required_job_assignment extends condition {
         return true;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_hasrequiredjobassignment_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array
+     */
     public function get_failure() : array {
         return ['has_required_job_assignment' => get_string('error:nojobassignmentselectedactivity', 'mod_facetoface')];
     }

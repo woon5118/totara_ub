@@ -17,35 +17,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author  Valerii Kuznetsov <valerii.kuznetsov@totaralearning.com>
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
  * @package mod_facetoface
  */
 
-namespace mod_facetoface\signup\condition;
+namespace mod_facetoface;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class approval_role_required
+ * Interface seminar_iterator_item
+ *
+ * This needs to be implemented by all items that can be handled by a Seminar Iterator class.
+ * These methods are used internally by Seminar Iterators to manage their lists.
  */
-class approval_role_required extends condition {
+interface seminar_iterator_item {
     /**
-     * Is condition passing
-     * @return bool
+     * Returns the ID for the item.
+     * @return int
      */
-    public function pass() : bool {
-        if ($this->signup->get_skipapproval()) {
-            return true;
-        }
-
-        return $this->signup->get_seminar_event()->get_seminar()->is_role_required();
-    }
+    public function get_id(): int;
 
     /**
-     * Get description of condition
-     * @return string
+     * Deletes the item.
+     *
+     * This should remove any database records belonging to the item.
+     *
+     * @return mixed
      */
-    public static function get_description() : string {
-        return get_string('state_approvalrequired_desc', 'mod_facetoface');
-    }
+    public function delete();
 }

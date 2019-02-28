@@ -72,7 +72,6 @@ class cleanup_task extends \core\task\scheduled_task {
         );
 
         $rs = $DB->get_recordset_sql($sql, $params);
-        $timenow = time();
 
         foreach ($rs as $user) {
             $seminarevent = new seminar_event($user->sessionid);

@@ -33,8 +33,8 @@ final class asset_list implements \Iterator {
     use traits\seminar_iterator;
 
     /**
-     * Add signup to item list
-     * @param signup $item
+     * Add asset to item list
+     * @param asset $item
      */
     public function add(asset $item) {
         $this->items[$item->get_id()] = $item;
@@ -51,9 +51,8 @@ final class asset_list implements \Iterator {
      *
      * @param int $timestart start of requested slot
      * @param int $timefinish end of requested slot
-     * @param int $sessionid current session id, 0 if session is being created, all current session assets are always included
-     * @param int $facetofaceid facetofaceid custom assets can be used in all dates of one seminar activity
-     * @return asset[] assets
+     * @param seminar_event $seminarevent
+     * @return asset_list|asset[] assets
      *
      */
     public static function get_available($timestart, $timefinish, seminar_event $seminarevent) {

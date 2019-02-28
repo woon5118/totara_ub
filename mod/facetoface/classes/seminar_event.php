@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class seminar_event represents Seminar event
  */
-final class seminar_event {
+final class seminar_event implements seminar_iterator_item {
 
     use traits\crud_mapper;
 
@@ -151,7 +151,7 @@ final class seminar_event {
      *
      * @return seminar_event this
      */
-    private function load() : seminar_event {
+    private function load(): seminar_event {
 
         return $this->crud_load();
     }
@@ -159,7 +159,7 @@ final class seminar_event {
     /**
      * Create/update {facetoface_sessions}.record
      */
-    public function save() {
+    public function save(): void {
         global $USER;
 
         $this->timemodified = time();
@@ -178,7 +178,7 @@ final class seminar_event {
      *
      * @return bool
      */
-    public function cancel() : bool {
+    public function cancel(): bool {
         global $USER, $DB;
 
         if ($this->is_started()) {
@@ -201,13 +201,14 @@ final class seminar_event {
         $this->save();
 
         // Remove entries from the calendars.
-        calendar::remove_all_entries($this);
+        \mod_facetoface\calendar::remove_all_entries($this);
 
         // Change all user sign-up statuses, the only exceptions are previously cancelled users and declined users.
+        /** @var signup[] $signups */
         $signups = signup_list::from_conditions(['sessionid' => $this->get_id()]);
         foreach ($signups as $signup) {
-            if ($signup->can_switch(event_cancelled::class)) {
-                $signup->switch_state(event_cancelled::class);
+            if ($signup->can_switch(\mod_facetoface\signup\state\event_cancelled::class)) {
+                $signup->switch_state(\mod_facetoface\signup\state\event_cancelled::class);
 
                 // Add them to the affected learners list for later notifications.
                 $notifylearners[$signup->get_userid()] = $signup;
@@ -219,7 +220,7 @@ final class seminar_event {
 
         $cm = get_coursemodule_from_instance('facetoface', $this->get_facetoface());
         $context = context_module::instance($cm->id);
-        session_cancelled::create_from_session($this->to_record(), $context)->trigger();
+        \mod_facetoface\event\session_cancelled::create_from_session($this->to_record(), $context)->trigger();
 
         // Notify trainers assigned to the session too.
         $sql = "SELECT DISTINCT sr.userid
@@ -246,7 +247,7 @@ final class seminar_event {
         }
 
         // Notify managers who had reservations.
-        notice_sender::reservation_cancelled($this);
+        \mod_facetoface\notice_sender::reservation_cancelled($this);
 
         // Start cleaning up the custom rooms, custom assets here at the very end of this cancellation task, because we would want
         // the information of custom rooms and custom assets to be included in the email sending to users which should have happened
@@ -271,7 +272,7 @@ final class seminar_event {
      *
      * @return void
      */
-    public function delete() {
+    public function delete(): void {
         global $DB;
 
         // Before deleting the whole event, start cancelling the event first, does not matter whether the event is able
@@ -298,11 +299,11 @@ final class seminar_event {
     }
 
     /**
-     * Primarily being called in delete functionality.
+     * Delete event custom field records belonging to this seminar event
      *
      * @return seminar_event
      */
-    protected function delete_customfields() : seminar_event {
+    protected function delete_customfields(): seminar_event {
         global $DB;
 
         // Get session data to delete.
@@ -338,7 +339,7 @@ final class seminar_event {
      *
      * @return seminar_event $this
      */
-    protected function delete_files() : seminar_event {
+    protected function delete_files(): seminar_event {
 
         $seminar = new seminar($this->get_facetoface());
         $cm = get_coursemodule_from_instance('facetoface', $seminar->get_id(), $seminar->get_course(), false, MUST_EXIST);
@@ -354,8 +355,9 @@ final class seminar_event {
      * Map object to class instance.
      *
      * @param \stdClass $object
+     * @return seminar_event
      */
-    public function from_record(\stdClass $object) {
+    public function from_record(\stdClass $object): seminar_event {
         return $this->map_object($object);
     }
 
@@ -364,14 +366,16 @@ final class seminar_event {
      *
      * @return \stdClass
      */
-    public function to_record() : \stdClass {
+    public function to_record(): \stdClass {
         return $this->unmap_object();
     }
 
     /**
      * Prepare the user data to go into the database.
+     *
+     * @return seminar_event
      */
-    protected function cleanup_capacity() : seminar_event {
+    protected function cleanup_capacity(): seminar_event {
         // Only numbers allowed here
         $capacity = preg_replace('/[^\d]/', '', $this->capacity);
         $MAX_CAPACITY = 100000;
@@ -392,7 +396,7 @@ final class seminar_event {
      *
      * @return bool - true if the asset has an $id, false if it hasn't
      */
-    public function exists() : bool {
+    public function exists(): bool {
         return !empty($this->id);
     }
 
@@ -400,7 +404,7 @@ final class seminar_event {
      * Dismiss approver from seminar event.
      *
      */
-    public function dismiss_approver() {
+    public function dismiss_approver(): void {
         global $DB;
 
         $this->set_selfapproval(0);
@@ -414,7 +418,7 @@ final class seminar_event {
     public function get_seminar(): seminar {
         $this->seminar = null;
         if (empty($this->facetoface)) {
-            throw new coding_exception("Cannot get seminar from unassociated event");
+            throw new \coding_exception("Cannot get seminar from unassociated event");
         }
         if (empty($this->seminar) || $this->seminar->get_id() != $this->get_facetoface()) {
             $this->seminar = new seminar($this->get_facetoface());
@@ -460,8 +464,9 @@ final class seminar_event {
      * Get the earliest start time from associated sessions.
      * @return int
      */
-    public function get_mintimestart() {
+    public function get_mintimestart(): int {
         $mintimestart = 0;
+        /** @var seminar_session[] $sessions */
         $sessions = $this->get_sessions();
         foreach ($sessions as $session) {
             // Check for minimum time start.
@@ -480,7 +485,7 @@ final class seminar_event {
      * @param int $time
      * @return bool
      */
-    public function is_progress(int $time = 0) : bool {
+    public function is_progress(int $time = 0): bool {
         if (0 != $this->cancelledstatus) {
             // Cancelled event
             return false;
@@ -503,7 +508,7 @@ final class seminar_event {
      * Does this event have session(s)
      * @return bool
      */
-    public function is_sessions() : bool {
+    public function is_sessions(): bool {
         return $this->get_sessions()->count() > 0;
     }
 
@@ -521,6 +526,7 @@ final class seminar_event {
      */
     public function get_maxtimefinish(): int {
         $maxtimefinish = 0;
+        /** @var seminar_session[] $sessions */
         $sessions = $this->get_sessions();
         foreach ($sessions as $session) {
             // Check for max time finish.
@@ -535,7 +541,7 @@ final class seminar_event {
      * Id of seminar event
      * @return int
      */
-    public function get_id() : int {
+    public function get_id(): int {
         return (int)$this->id;
     }
 
@@ -543,15 +549,16 @@ final class seminar_event {
      * Get facetoface id
      * @return int
      */
-    public function get_facetoface() : int {
+    public function get_facetoface(): int {
         return (int)$this->facetoface;
     }
 
     /**
      * Set facetoface id
      * @param int $facetoface
+     * @return seminar_event
      */
-    public function set_facetoface(int $facetoface) : seminar_event {
+    public function set_facetoface(int $facetoface): seminar_event {
         $this->facetoface = $facetoface;
         return $this;
     }
@@ -560,7 +567,7 @@ final class seminar_event {
      * Get capacity of event (total number of places to book)
      * @return int
      */
-    public function get_capacity() : int {
+    public function get_capacity(): int {
         return (int)$this->capacity;
     }
 
@@ -568,7 +575,7 @@ final class seminar_event {
      * Get amount of free capacity
      * @return int
      */
-    public function get_free_capacity() {
+    public function get_free_capacity(): int {
         global $DB;
         $attendeesql = 'SELECT COUNT(ss.id)
                            FROM {facetoface_signups} su
@@ -599,9 +606,10 @@ final class seminar_event {
 
     /**
      * Set capacity of event
-     * @param int
+     * @param int $capacity
+     * @return seminar_event
      */
-    public function set_capacity(int $capacity) : seminar_event {
+    public function set_capacity(int $capacity): seminar_event {
         $this->capacity = $capacity;
         return $this;
     }
@@ -610,14 +618,15 @@ final class seminar_event {
      * Get event allowoverbook
      * @return int
      */
-    public function get_allowoverbook() : int {
+    public function get_allowoverbook(): int {
         return (int)$this->allowoverbook;
     }
     /**
      * Set allowoverbook of event
-     * @param int
+     * @param int $allowoverbook
+     * @return seminar_event
      */
-    public function set_allowoverbook(int $allowoverbook) : seminar_event {
+    public function set_allowoverbook(int $allowoverbook): seminar_event {
         $this->allowoverbook = $allowoverbook;
         return $this;
     }
@@ -626,7 +635,7 @@ final class seminar_event {
      * Get event waitlisteveryone
      * @return int
      */
-    public function get_waitlisteveryone() : int {
+    public function get_waitlisteveryone(): int {
         return (int)$this->waitlisteveryone;
     }
 
@@ -634,15 +643,16 @@ final class seminar_event {
      * Check if waitlist everyone is enabled globally and for the event.
      * @return bool
      */
-    public function is_waitlisteveryone() : bool {
+    public function is_waitlisteveryone(): bool {
         return get_config(null, 'facetoface_allowwaitlisteveryone') && $this->waitlisteveryone;
     }
 
     /**
      * Set waitlisteveryone of event
-     * @param int
+     * @param int $waitlisteveryone
+     * @return seminar_event
      */
-    public function set_waitlisteveryone(int $waitlisteveryone) : seminar_event {
+    public function set_waitlisteveryone(int $waitlisteveryone): seminar_event {
         $this->waitlisteveryone = $waitlisteveryone;
         return $this;
     }
@@ -651,14 +661,15 @@ final class seminar_event {
      * Get event details
      * @return string
      */
-    public function get_details() : string {
+    public function get_details(): string {
         return (string)$this->details;
     }
     /**
      * Set event details
-     * @param string
+     * @param string $details
+     * @return seminar_event
      */
-    public function set_details(string $details) : seminar_event {
+    public function set_details(string $details): seminar_event {
         $this->details = $details;
         return $this;
     }
@@ -667,14 +678,15 @@ final class seminar_event {
      * Get event normalcost
      * @return string
      */
-    public function get_normalcost() : string {
+    public function get_normalcost(): string {
         return (string)$this->normalcost;
     }
     /**
      * Set event normalcost
-     * @param string
+     * @param string $normalcost
+     * @return seminar_event
      */
-    public function set_normalcost(string $normalcost) : seminar_event {
+    public function set_normalcost(string $normalcost): seminar_event {
         $this->normalcost = $normalcost;
         return $this;
     }
@@ -683,14 +695,15 @@ final class seminar_event {
      * Get event discountcost
      * @return string
      */
-    public function get_discountcost() : string {
+    public function get_discountcost(): string {
         return (string)$this->discountcost;
     }
     /**
      * Set event discountcost
-     * @param string
+     * @param string $discountcost
+     * @return seminar_event
      */
-    public function set_discountcost(string $discountcost) : seminar_event {
+    public function set_discountcost(string $discountcost): seminar_event {
         $this->discountcost = $discountcost;
         return $this;
     }
@@ -699,7 +712,7 @@ final class seminar_event {
      * Should discount cost be displayed taking into account global settings
      * @return bool
      */
-    public function is_discountcost() : bool {
+    public function is_discountcost(): bool {
         return !get_config(null, 'facetoface_hidecost')
             && !get_config(null, 'facetoface_hidediscount')
             && $this->get_discountcost() > 0;
@@ -710,14 +723,15 @@ final class seminar_event {
      * Get event allowcancellations
      * @return int
      */
-    public function get_allowcancellations() : int {
+    public function get_allowcancellations(): int {
         return (int)$this->allowcancellations;
     }
     /**
      * Set event allowcancellations
-     * @param int
+     * @param int $allowcancellations
+     * @return seminar_event
      */
-    public function set_allowcancellations(int $allowcancellations) : seminar_event {
+    public function set_allowcancellations(int $allowcancellations): seminar_event {
         $this->allowcancellations = $allowcancellations;
         return $this;
     }
@@ -726,14 +740,15 @@ final class seminar_event {
      * Get event cancellationcutoff
      * @return int
      */
-    public function get_cancellationcutoff() : int {
+    public function get_cancellationcutoff(): int {
         return (int)$this->cancellationcutoff;
     }
     /**
      * Set event cancellationcutoff
-     * @param int
+     * @param int $cancellationcutoff
+     * @return seminar_event
      */
-    public function set_cancellationcutoff(int $cancellationcutoff) : seminar_event {
+    public function set_cancellationcutoff(int $cancellationcutoff): seminar_event {
         $this->cancellationcutoff = $cancellationcutoff;
         return $this;
     }
@@ -742,14 +757,15 @@ final class seminar_event {
      * Get event timecreated
      * @return int
      */
-    public function get_timecreated() : int {
+    public function get_timecreated(): int {
         return (int)$this->timecreated;
     }
     /**
      * Set event timecreated
-     * @param int
+     * @param int $timecreated
+     * @return seminar_event
      */
-    public function set_timecreated(int $timecreated) : seminar_event {
+    public function set_timecreated(int $timecreated): seminar_event {
         $this->timecreated = $timecreated;
         return $this;
     }
@@ -758,14 +774,15 @@ final class seminar_event {
      * Get event timemodified
      * @return int
      */
-    public function get_timemodified() : int {
+    public function get_timemodified(): int {
         return (int)$this->timemodified;
     }
     /**
      * Set event timemodified
-     * @param int
+     * @param int $timemodified
+     * @return seminar_event
      */
-    public function set_timemodified(int $timemodified) : seminar_event {
+    public function set_timemodified(int $timemodified): seminar_event {
         $this->timemodified = $timemodified;
         return $this;
     }
@@ -774,14 +791,15 @@ final class seminar_event {
      * Get event usermodified
      * @return int
      */
-    public function get_usermodified() : int {
+    public function get_usermodified(): int {
         return (int)$this->usermodified;
     }
     /**
      * Set event usermodified
-     * @param int
+     * @param int $usermodified
+     * @return seminar_event
      */
-    public function set_usermodified(int $usermodified) : seminar_event {
+    public function set_usermodified(int $usermodified): seminar_event {
         $this->usermodified = $usermodified;
         return $this;
     }
@@ -790,14 +808,15 @@ final class seminar_event {
      * Get event selfapproval
      * @return int
      */
-    public function get_selfapproval() : int {
+    public function get_selfapproval(): int {
         return (int)$this->selfapproval;
     }
     /**
      * Set event selfapproval
-     * @param int
+     * @param int $selfapproval
+     * @return seminar_event
      */
-    public function set_selfapproval(int $selfapproval) : seminar_event {
+    public function set_selfapproval(int $selfapproval): seminar_event {
         $this->selfapproval = $selfapproval;
         return $this;
     }
@@ -806,14 +825,15 @@ final class seminar_event {
      * Get event mincapacity
      * @return int
      */
-    public function get_mincapacity() : int {
+    public function get_mincapacity(): int {
         return (int)$this->mincapacity;
     }
     /**
      * Set event mincapacity
-     * @param int
+     * @param int $mincapacity
+     * @return seminar_event
      */
-    public function set_mincapacity(int $mincapacity) : seminar_event {
+    public function set_mincapacity(int $mincapacity): seminar_event {
         $this->mincapacity = $mincapacity;
         return $this;
     }
@@ -822,7 +842,7 @@ final class seminar_event {
      * Get event cutoff
      * @return int
      */
-    public function get_cutoff() : int {
+    public function get_cutoff(): int {
         return (int)$this->cutoff;
     }
 
@@ -836,9 +856,10 @@ final class seminar_event {
 
     /**
      * Set event cutoff
-     * @param int
+     * @param int $cutoff
+     * @return seminar_event
      */
-    public function set_cutoff(int $cutoff) : seminar_event {
+    public function set_cutoff(int $cutoff): seminar_event {
         $this->cutoff = $cutoff;
         return $this;
     }
@@ -847,14 +868,15 @@ final class seminar_event {
      * Get event sendcapacityemail
      * @return int
      */
-    public function get_sendcapacityemail() : int {
+    public function get_sendcapacityemail(): int {
         return (int)$this->sendcapacityemail;
     }
     /**
      * Set event sendcapacityemail
-     * @param int
+     * @param int $sendcapacityemail
+     * @return seminar_event
      */
-    public function set_sendcapacityemail(int $sendcapacityemail) : seminar_event {
+    public function set_sendcapacityemail(int $sendcapacityemail): seminar_event {
         $this->sendcapacityemail = $sendcapacityemail;
         return $this;
     }
@@ -863,14 +885,15 @@ final class seminar_event {
      * Get event registrationtimestart
      * @return int
      */
-    public function get_registrationtimestart() : int {
+    public function get_registrationtimestart(): int {
         return (int)$this->registrationtimestart;
     }
     /**
      * Set event registrationtimestart
-     * @param int
+     * @param int $registrationtimestart
+     * @return seminar_event
      */
-    public function set_registrationtimestart(int $registrationtimestart) : seminar_event {
+    public function set_registrationtimestart(int $registrationtimestart): seminar_event {
         $this->registrationtimestart = $registrationtimestart;
         return $this;
     }
@@ -879,15 +902,16 @@ final class seminar_event {
      * Get event registrationtimefinish
      * @return int
      */
-    public function get_registrationtimefinish() : int {
+    public function get_registrationtimefinish(): int {
         return (int)$this->registrationtimefinish;
     }
 
     /**
      * Set event registrationtimefinish
-     * @param int
+     * @param int $registrationtimefinish
+     * @return seminar_event
      */
-    public function set_registrationtimefinish(int $registrationtimefinish) : seminar_event {
+    public function set_registrationtimefinish(int $registrationtimefinish): seminar_event {
         $this->registrationtimefinish = $registrationtimefinish;
         return $this;
     }
@@ -896,15 +920,16 @@ final class seminar_event {
      * Get event cancelledstatus
      * @return int
      */
-    public function get_cancelledstatus() : int {
+    public function get_cancelledstatus(): int {
         return (int)$this->cancelledstatus;
     }
 
     /**
      * Set event cancelledstatus
-     * @param int
+     * @param int $cancelledstatus
+     * @return seminar_event
      */
-    public function set_cancelledstatus(int $cancelledstatus) : seminar_event {
+    public function set_cancelledstatus(int $cancelledstatus): seminar_event {
         $this->cancelledstatus = $cancelledstatus;
         return $this;
     }

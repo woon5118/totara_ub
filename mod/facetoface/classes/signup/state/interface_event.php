@@ -27,6 +27,11 @@ use mod_facetoface\event\abstract_signup_event;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Interface for states that trigger an event.
+ *
+ * Should be implemented by all states that trigger an event.
+ */
 interface interface_event {
     /**
      * Get event to fire when entering state

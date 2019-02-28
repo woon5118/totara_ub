@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class Asset represents Seminar Asset
  */
-final class asset {
+final class asset implements seminar_iterator_item {
 
     use traits\crud_mapper;
 
@@ -186,7 +186,7 @@ final class asset {
         // Delete all custom fields related to asset.
         $assetfields = $DB->get_records('facetoface_asset_info_field');
         foreach ($assetfields as $assetfield) {
-            /** @var customfield_base $customfieldentry */
+            /** @var \customfield_base $customfieldentry */
             $customfieldentry = customfield_get_field_instance($this->unmap_object(), $assetfield->id, 'facetoface_asset', 'facetofaceasset');
             if (!empty($customfieldentry)) {
                 $customfieldentry->delete();
@@ -371,6 +371,7 @@ final class asset {
     /**
      * Get name for asset
      * @param string $name Name to give the asset
+     * @return asset
      */
     public function set_name(string $name) : asset {
         $this->name = $name;

@@ -35,6 +35,7 @@ final class asset_helper {
      *      @var string {facetoface_asset}.description
      *      @var int {facetoface_asset}.custom
      *      @var int {facetoface_asset}.hidden
+     * @return asset
      */
     public static function save($data) {
         global $TEXTAREA_OPTIONS;

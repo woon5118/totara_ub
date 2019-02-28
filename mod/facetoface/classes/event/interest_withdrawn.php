@@ -48,7 +48,7 @@ class interest_withdrawn extends \core\event\base {
     /**
      * Create instance of event.
      *
-     * @param \interest $interest
+     * @param \mod_facetoface\interest $interest
      * @param \context_module $context
      * @return interest_withdrawn
      */
@@ -62,6 +62,7 @@ class interest_withdrawn extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var interest_withdrawn $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
         $event->add_record_snapshot('facetoface_interest', $interest->get_properties());

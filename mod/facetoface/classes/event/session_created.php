@@ -27,12 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event triggered when a session is created.
  *
- * @property-read array $other {
- * Extra information about the event.
- *
- *
- * }
- *
  * @author Alastair Munro <alastair.munro@totaralms.com>
  * @package mod_facetoface
  */
@@ -58,6 +52,7 @@ class session_created extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var session_created $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
         $event->session = $session;

@@ -29,7 +29,8 @@ class import_helper {
 
     /**
      * If user's choice is 'automatic' delimiter lets try to find out
-     * @param $formdata users to add to seminar event via file
+     *
+     * @param \stdClass $formdata Fields and file submitted by html form
      *      @var s seminar event id
      *      @var listid list id
      *      @var content file content

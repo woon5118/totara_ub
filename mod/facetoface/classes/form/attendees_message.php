@@ -63,6 +63,7 @@ class attendees_message extends \moodleform {
             $json_users[$status] = $users;
             $attendees = array_merge($attendees, $users);
 
+            /** @var string|\mod_facetoface\signup\state\state $state */
             $state = \mod_facetoface\signup\state\state::from_code($status);
             $mform->addElement('checkbox', 'recipient_group['.$status.']', $state::get_string() . ' - ' . get_string('xusers', 'facetoface', $count), null, array('id' => 'id_recipient_group_'.$status));
         }

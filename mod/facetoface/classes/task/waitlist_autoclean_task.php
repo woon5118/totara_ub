@@ -52,9 +52,11 @@ class waitlist_autoclean_task extends \core\task\scheduled_task {
      */
     public function execute() {
 
+        /** @var seminar_event[] $seminarevents */
         $seminarevents = seminar_event_list::pending_waitlist_clear();
         foreach ($seminarevents as $seminarevent) {
 
+            /** @var signup[] $signups */
             $signups = signup_list::signups_by_statuscode_for_event($seminarevent->get_id(), waitlisted::get_code());
             foreach ($signups as $signup) {
                 // First cancel the users waitlisted signup for the event.

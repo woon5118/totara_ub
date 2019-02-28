@@ -58,6 +58,7 @@ class session_updated extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var session_updated $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
         $event->session = $session;

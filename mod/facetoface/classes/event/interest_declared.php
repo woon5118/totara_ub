@@ -48,7 +48,7 @@ class interest_declared extends \core\event\base {
     /**
      * Create from instance.
      *
-     * @param \interest $interest
+     * @param \mod_facetoface\interest $interest
      * @param \context_module $context
      * @return interest_declared
      */
@@ -62,6 +62,7 @@ class interest_declared extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var interest_declared $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
         $event->instance = $interest;

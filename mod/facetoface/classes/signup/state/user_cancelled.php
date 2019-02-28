@@ -48,12 +48,12 @@ class user_cancelled extends state {
 
     /**
      * Get event to fire when entering state
-     * @return abstract_signup_event
+     * @return \mod_facetoface\event\abstract_signup_event
      */
-    public function get_event() : abstract_signup_event {
+    public function get_event() : \mod_facetoface\event\abstract_signup_event {
         $cm = $this->signup->get_seminar_event()->get_seminar()->get_coursemodule();
         $context = \context_module::instance($cm->id);
-        return booking_cancelled::create_from_signup($this->signup, $context);
+        return \mod_facetoface\event\booking_cancelled::create_from_signup($this->signup, $context);
     }
 
     /**

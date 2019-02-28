@@ -38,10 +38,18 @@ class event_is_not_cancelled extends condition {
         return empty($this->signup->get_seminar_event()->get_cancelledstatus());
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventisnotcancelled_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array
+     */
     public function get_failure() : array {
         return ['event_is_not_cancelled' => get_string('error:cannotsignupforacancelledevent', 'mod_facetoface')];
     }

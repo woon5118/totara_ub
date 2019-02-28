@@ -72,7 +72,7 @@ final class room_list implements \Iterator {
      * Get the relevant session rooms for a seminar activity
      *
      * @param int $seminarid
-     * @return \room_list $this
+     * @return room_list $this
      */
     public static function get_seminar_rooms(int $seminarid) : room_list {
         $sql = "SELECT DISTINCT fr.*
@@ -91,7 +91,7 @@ final class room_list implements \Iterator {
      * Get the room record for the specified session
      *
      * @param int $eventid
-     * @return \room_list
+     * @return room_list
      */
     public static function get_event_rooms(int $eventid) : room_list {
         $sql = "SELECT DISTINCT fr.*
@@ -114,7 +114,7 @@ final class room_list implements \Iterator {
      * @param string $fields db fields for which data should be retrieved, with mandatory 'fr.' prefix
      * @param int $sessionid current session id, 0 if session is being created, all current session rooms are always included
      * @param int $facetofaceid facetofaceid custom rooms can be used in all dates of one seminar activity
-     * @return \room_list
+     * @return room_list
      */
     public static function get_available_rooms($timestart, $timefinish, seminar_event $event) : room_list {
         global $DB, $USER;

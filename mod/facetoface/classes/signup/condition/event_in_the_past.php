@@ -47,10 +47,18 @@ class event_in_the_past extends condition {
         return $timefinish < $now;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventinthepast_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array
+     */
     public function get_failure() : array {
         return ['event_in_the_past' => get_string('state_eventinthepast_fail', 'mod_facetoface')];
     }

@@ -46,10 +46,18 @@ class no_other_signups extends condition {
         return !$seminar->has_unarchived_signups($this->signup->get_userid());
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_noothersignups_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array of strings
+     */
     public function get_failure() : array {
         return ['no_other_signups' => get_string('error:signedupinothersession', 'mod_facetoface')];
     }

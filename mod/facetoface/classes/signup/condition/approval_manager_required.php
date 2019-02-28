@@ -46,6 +46,10 @@ class approval_manager_required extends condition {
         return false;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_approvalrequired_desc', 'mod_facetoface');
     }

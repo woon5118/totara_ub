@@ -204,7 +204,7 @@ class signup extends \moodleform {
 
     /**
      * Add form element for job assignment seleciton
-     * @param $mform
+     * @param \MoodleQuickForm $mform
      * @param seminar $seminar
      */
     public static function add_jobassignment_selector ($mform, seminar $seminar) {
@@ -237,9 +237,11 @@ class signup extends \moodleform {
 
     /**
      * (deprecated) Add form element for job assignment seleciton
-     * @param $mform
-     * @param $f2fid
-     * @param $session
+     *
+     * @depreacted since Totara 12
+     * @param \MoodleQuickForm $mform
+     * @param int $f2fid
+     * @param mixed $session
      * @throws \coding_exception
      * @throws \dml_exception
      * @deprecated since Totara 12.0

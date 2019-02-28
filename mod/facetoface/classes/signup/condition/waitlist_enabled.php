@@ -38,6 +38,10 @@ class waitlist_enabled extends condition {
         return !empty($this->signup->get_seminar_event()->get_allowoverbook());
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_waitlistenabled_desc', 'mod_facetoface');
     }

@@ -28,9 +28,9 @@ use stdClass;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class seminar_session represents Seminar event session dates
+ * Class seminar_session represents Seminar event session dates (aka event sessions)
  */
-final class seminar_session {
+final class seminar_session implements seminar_iterator_item {
 
     use traits\crud_mapper;
 
@@ -79,11 +79,11 @@ final class seminar_session {
     }
 
     /**
-     * Load seminar event dates data from DB
+     * Load seminar event session dates data from DB
      *
      * @return seminar session this
      */
-    public function load() : seminar_session {
+    public function load(): seminar_session {
 
         return $this->crud_load();
     }
@@ -91,7 +91,7 @@ final class seminar_session {
     /**
      * Create/update {facetoface_sessions_dates}.record
      */
-    public function save() {
+    public function save(): void {
 
         $this->crud_save();
     }
@@ -100,16 +100,17 @@ final class seminar_session {
      * Map data object to class instance.
      *
      * @param \stdClass $object
+     * @return seminar_session
      */
-    public function from_record(\stdClass $object) {
+    public function from_record(\stdClass $object): seminar_session {
 
         return $this->map_object($object);
     }
 
     /**
-     * Remove event dates from database
+     * Remove seminar event session dates from database
      */
-    public function delete() {
+    public function delete(): void {
         global $DB;
 
         $DB->delete_records(self::DBTABLE, ['id' => $this->id]);
@@ -119,83 +120,105 @@ final class seminar_session {
     }
 
     /**
+     * Get session date id
+     *
      * @return int
      */
-    public function get_id() : int {
+    public function get_id(): int {
         return (int)$this->id;
     }
 
     /**
+     * Get seminar event id (known as sessionid)
+     *
      * @return int
      */
-    public function get_sessionid() : int {
+    public function get_sessionid(): int {
         return (int)$this->sessionid;
     }
     /**
+     * Set seminar event id (known as sessionid)
+     *
      * @param int $sessionid
      */
-    public function set_sessionid(int $sessionid) : seminar_session {
+    public function set_sessionid(int $sessionid): seminar_session {
         $this->sessionid = $sessionid;
         return $this;
     }
 
     /**
+     * Get timezone for this session date
      * @return int
      */
-    public function get_sessiontimezone() : string {
+    public function get_sessiontimezone(): string {
         return (string)$this->sessiontimezone;
     }
     /**
+     * Set timezone for this session date
      * @param int $sessiontimezone
      */
-    public function set_sessiontimezone(string $sessiontimezone) : seminar_session {
+    public function set_sessiontimezone(string $sessiontimezone): seminar_session {
         $this->sessiontimezone = $sessiontimezone;
         return $this;
     }
 
     /**
+     * Get room id for this session date
+     *
      * @return int
      */
-    public function get_roomid() : int {
+    public function get_roomid(): int {
         return (int)$this->roomid;
     }
     /**
+     * Set room id for this session date
+     *
      * @param int $roomid
      */
-    public function set_roomid(int $roomid) : seminar_session {
+    public function set_roomid(int $roomid): seminar_session {
         $this->roomid = $roomid;
         return $this;
     }
 
     /**
+     * Get start time for this session date
+     *
      * @return int
      */
-    public function get_timestart() : int {
+    public function get_timestart(): int {
         return (int)$this->timestart;
     }
     /**
+     * Set start time for this session date
+     *
      * @param int $timestart
      */
-    public function set_timestart(int $timestart) : seminar_session {
+    public function set_timestart(int $timestart): seminar_session {
         $this->timestart = $timestart;
         return $this;
     }
 
     /**
+     * Get end time for this session date
+     *
      * @return int
      */
-    public function get_timefinish() : int {
+    public function get_timefinish(): int {
         return (int)$this->timefinish;
     }
     /**
-     * @param int $timestart
+     * Set end time for this session date
+     *
+     * @param int $timefinish
      */
-    public function set_timefinish(int $timefinish) : seminar_session {
+    public function set_timefinish(int $timefinish): seminar_session {
         $this->timefinish = $timefinish;
         return $this;
     }
 
     /**
+     * Is session date over, in the past?
+     *
      * @param int $time
      * @return bool
      */
@@ -214,6 +237,8 @@ final class seminar_session {
     }
 
     /**
+     * Is session date upcoming, in the future?
+     *
      * @param int $time
      * @return bool
      */
@@ -254,14 +279,11 @@ final class seminar_session {
     /**
      * Returning the time description of seminar's session.
      *
-     * @param string $fullformatstring  full date time format string, an identifier string that has been defined in the
-     *                                  langconfig.php file
-     *
-     * @param string $timeformatstring  time format string, an identifier string that has been defined in langconfig.php file
-     *
-     * @return sting
+     * @param string $fullformatstring name of string to use for date and time
+     * @param string $timeformatstring name of string to use for just time
+     * @return string
      */
-    public function get_time_description($fullformatstring = 'strftimerecentfull', $timeformatstring = 'strftimetime'): string {
+    public function get_time_description(string $fullformatstring = 'strftimerecentfull', string $timeformatstring = 'strftimetime'): string {
         if (empty($this->timestart) || empty($this->timefinish)) {
             return '';
         }
@@ -285,6 +307,8 @@ final class seminar_session {
     }
 
     /**
+     * Get the seminar event that this session date belongs to
+     *
      * @return seminar_event
      */
     public function get_seminar_event(): seminar_event {

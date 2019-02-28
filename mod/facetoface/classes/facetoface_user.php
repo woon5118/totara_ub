@@ -25,20 +25,22 @@
 namespace mod_facetoface;
 defined('MOODLE_INTERNAL') || die();
 
-// Extending the user class for external and facetoface users.
+/**
+ * Extending the user class for external and facetoface users.
+ */
 class facetoface_user extends \core_user {
 
     // Facetoface messages default userid.
     const FACETOFACE_USER = -35;
 
-    // @var stdClass keep record of facetoface user.
+    /** @var \stdClass keep record of facetoface user. */
     public static $facetofaceuser = false;
 
     public static function get_user($userid, $fields = '*', $strictness = IGNORE_MISSING) {
 
         switch ($userid) {
             case self::FACETOFACE_USER:
-                return self::get_facetoface_user($strictness);
+                return self::get_facetoface_user();
                 break;
             default:
                 return parent::get_user($userid, $fields, $strictness);
@@ -49,7 +51,7 @@ class facetoface_user extends \core_user {
     /**
      * Helper function to return dummy facetoface user record.
      *
-     * @return stdClass     The dummy user object
+     * @return \stdClass The dummy user object
      */
     public static function get_facetoface_user() {
 

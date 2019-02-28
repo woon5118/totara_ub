@@ -30,6 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * @property-read array $other {
  * Extra information about the event.
  *
+ * - facetoface Facetoface's ID where session was deleted.
  *
  * }
  *
@@ -61,6 +62,7 @@ class session_deleted extends \core\event\base {
         );
 
         self::$preventcreatecall = false;
+        /** @var session_deleted $event */
         $event = self::create($data);
         $event->add_record_snapshot('facetoface_sessions', $session);
         self::$preventcreatecall = true;
@@ -125,6 +127,10 @@ class session_deleted extends \core\event\base {
     protected function validate_data() {
         if (self::$preventcreatecall) {
             throw new \coding_exception('cannot call create() directly, use create_from_session() instead.');
+        }
+
+        if (!isset($this->other['facetoface'])) {
+            throw new \coding_exception('facetoface must be set in $other');
         }
 
         parent::validate_data();

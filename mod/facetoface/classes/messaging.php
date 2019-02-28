@@ -26,6 +26,7 @@
 
 namespace mod_facetoface;
 
+global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 final class messaging {
@@ -239,7 +240,6 @@ final class messaging {
      * Generates a timestamp for Ical
      * 
      * @param int $timestamp
-     * @return timestamp
      * @return string|false a formatted date string. If a non-numeric value is used for timestamp, false is returned
      */
     public static function ical_generate_timestamp($timestamp) {

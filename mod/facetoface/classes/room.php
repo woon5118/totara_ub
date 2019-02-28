@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class Room represents Seminar Room
  */
-final class room {
+final class room implements seminar_iterator_item {
 
     use traits\crud_mapper;
 

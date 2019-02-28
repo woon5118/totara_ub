@@ -3802,7 +3802,7 @@ function facetoface_session_has_capacity($session, $context = false, $status = n
 function facetoface_get_user_current_status($sessionid, $userid) {
     global $DB;
 
-    debugging('facetoface_get_user_current_status() function has been deprecated, please use signup_status::get_state()',
+    debugging('facetoface_get_user_current_status() function has been deprecated, please use signup::get_state() instead.',
         DEBUG_DEVELOPER);
 
     $sql = "

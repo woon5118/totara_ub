@@ -27,8 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot.'/mod/facetoface/notification/lib.php');
 
-use \stdClass;
-use \context_course;
 use \mod_facetoface\messaging;
 
 class send_user_message_adhoc_task extends \core\task\adhoc_task {
@@ -42,7 +40,6 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
         if (!defined('PHPUNIT_TEST')) {
             $trace->output('Send seminar adhoc notification to user id: ' . $data->event->userto->id);
         }
-
         $recipient = $data->event->userto;
         cron_setup_user($recipient);
 
@@ -51,7 +48,6 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
             $this->regenerate_ical($message, $data);
         }
         message_send($message);
-
         if ($data->addhistory) {
             $this->add_history();
         }
@@ -65,9 +61,9 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
      * Prepare data for send_message to recipient
      * Performs filtering and substitution and replaces fields to match recipient user's preferences
      *
-     * @return stdClass Object for send_message
+     * @return \stdClass Object for send_message
      */
-    protected function prepare_message(): stdClass {
+    protected function prepare_message() {
         $data = unserialize($this->get_custom_data());
         $signupuser = $data->signupuser;
         $sessionid = $data->sessionid;
@@ -80,7 +76,7 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
         $managerprefix = $data->managerprefix;
         $addmanagerprefix = empty($data->event->addmanagerprefix) ? false : true;
 
-        $options = array('context' => context_course::instance($facetoface->course));
+        $options = array('context' => \context_course::instance($facetoface->course));
         $coursename = format_string($facetoface->coursename, true, $options);
 
         $recipientformatoptions = null;
@@ -115,14 +111,6 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
         $messagedata->fullmessagehtml   = $body;
         $messagedata->smallmessage      = $plaintext;
 
-        // Fix totara_task data.
-        if (!empty($event->onaccept->data) && !is_array(!empty($event->onaccept->data))) {
-            $event->onaccept->data = $event->onaccept->data;
-        }
-        if (!empty($event->onreject->data) && !is_array(!empty($event->onreject->data))) {
-            $event->onreject->data = $event->onreject->data;
-        }
-
         if ($addmanagerprefix) {
 
             $managerprefix = facetoface_message_substitutions(
@@ -140,17 +128,16 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
             $messagedata->fullmessagehtml = $managerprefix . $messagedata->fullmessagehtml;
             $messagedata->smallmessage = $plaintext . $messagedata->smallmessage;
         }
-
         return $messagedata;
     }
 
     /**
      * Regenerates ical attachment file
      * Rest of the fields (attachname, ical_uids, ical_method) are not lost, so not regenerated.
-     * @param stdClass $message
-     * @param stdClass $data
+     * @param \stdClass $message
+     * @param \stdClass $data
      */
-    protected function regenerate_ical(stdClass $message, stdClass $data) {
+    protected function regenerate_ical(\stdClass $message, \stdClass $data) {
         global $CFG;
         require_once($CFG->dirroot . '/mod/facetoface/notification/lib.php');
 
@@ -187,7 +174,7 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
         }
         if (!empty($sessiondate)) {
             $uid = empty($icaluids) ? '' : array_shift($icaluids);
-            $hist = new stdClass();
+            $hist = new \stdClass();
             $hist->notificationid = $notificationid;
             $hist->sessionid = $sessionid;
             $hist->userid = $signupuser->id;
@@ -200,7 +187,7 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
             $dates = $sessions[$sessionid]->sessiondates;
             foreach ($dates as $sessiondate) {
                 $uid = empty($icaluids) ? '' : array_shift($icaluids);
-                $hist = new stdClass();
+                $hist = new \stdClass();
                 $hist->notificationid = $notificationid;
                 $hist->sessionid = $sessionid;
                 $hist->userid = $signupuser->id;
@@ -213,7 +200,7 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
         }
 
         // Mark notification as sent for user.
-        $sent = new stdClass();
+        $sent = new \stdClass();
         $sent->sessionid = $sessionid;
         $sent->notificationid = $notificationid;
         $sent->userid = $signupuser->id;
@@ -224,7 +211,7 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
      * Remove generated ical file
      * @param mixed \stdClass|\stored_file $message
      */
-    protected function cleanup($message) {
+    protected function cleanup(\stdClass $message) {
         if (!empty($message->attachment) && $message->attachment instanceof \stored_file) {
             $message->attachment->delete();
         }

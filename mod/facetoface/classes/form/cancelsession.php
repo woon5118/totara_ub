@@ -23,8 +23,6 @@
 
 namespace mod_facetoface\form;
 
-use mod_facetoface\seminar_event;
-
 defined('MOODLE_INTERNAL') || die();
 
 class cancelsession extends \moodleform {
@@ -32,9 +30,7 @@ class cancelsession extends \moodleform {
     protected function definition() {
         $mform = $this->_form;
 
-        /**
-         * @var seminar_event $seminarevent
-         */
+        /** @var \mod_facetoface\seminar_event $seminarevent */
         $seminarevent = $this->_customdata['seminarevent'];
 
         $mform->addElement('hidden', 's', $seminarevent->get_id());

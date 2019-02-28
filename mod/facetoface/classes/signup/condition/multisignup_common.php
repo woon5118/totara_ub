@@ -65,6 +65,7 @@ class multisignup_common extends condition {
 
             $allowedstates = $seminar->get_multisignup_states();
             if (!empty($allowedstates)) {
+                /** @var signup $previous */
                 foreach ($signups as $previous) {
                     $oldstate = $previous->get_state();
 
@@ -87,9 +88,8 @@ class multisignup_common extends condition {
     }
 
     /**
-     * Get English description of condition
-     * Used for debug purpose only
-     * @return mixed
+     * Get description of condition
+     * @return string
      */
     public static function get_description() : string {
         return get_string('state_multisignup_enabled_desc', 'mod_facetoface');
@@ -97,7 +97,6 @@ class multisignup_common extends condition {
 
     /**
      * Return explanation why condition has not passed
-     * Used for debug purposes only
      * @return array of strings
      */
     public function get_failure() : array {
@@ -116,6 +115,7 @@ class multisignup_common extends condition {
         } else {
             $allowedstates = $seminar->get_multisignup_states();
             if (!empty($allowedstates)) {
+                /** @var signup $previous */
                 foreach ($signups as $previous) {
                     $oldstate = $previous->get_state();
 

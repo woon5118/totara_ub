@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class signup_status represents Session signups status
  */
-final class signup_status {
+final class signup_status implements seminar_iterator_item {
 
     use traits\crud_mapper;
 
@@ -116,12 +116,16 @@ final class signup_status {
      * @return state
      */
     public function get_state() : state {
+        debugging(
+            'signup_status::get_state() has been deprecated, please use signup::get_state() instead.',
+            DEBUG_DEVELOPER
+        );
         if (signup_status::has_current($this)) {
             $stateclass = signup_status::from_current($this)->get_state_class();
             return new $stateclass($this);
         }
 
-        return new not_set($this);
+        return new \mod_facetoface\signup\state\not_set($this);
     }
 
     /**

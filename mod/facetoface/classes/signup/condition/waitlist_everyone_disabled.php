@@ -43,6 +43,10 @@ class waitlist_everyone_disabled extends condition {
         return empty($this->signup->get_seminar_event()->get_waitlisteveryone());
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_waitlisteveryonedisabled_desc', 'mod_facetoface');
     }

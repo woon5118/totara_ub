@@ -44,9 +44,16 @@ class seminar_calendar_dynamic_content {
     public static function signup(calendar_dynamic_content $hook) {
         global $USER, $PAGE;
 
+        //
+        // TODO: HOLD THE PHONE!
+        //    uuid comes from the event table, and there is no validation
+        //    that these events are even calendar events.
+        //    this is literally processing random id's at present.
+        //
+
         try {
             $seminarevent = new seminar_event($hook->event->uuid);
-        } catch (dml_exception $e) {
+        } catch (\dml_exception $e) {
             return;
         }
         $content = '';

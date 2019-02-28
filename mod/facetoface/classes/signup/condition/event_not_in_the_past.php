@@ -41,13 +41,21 @@ class event_not_in_the_past extends condition {
             return true;
         }
         $cansignuppast = new \mod_facetoface\signup\restriction\actor_can_signuppastevents($this->signup);
-        return $cansignuppast->pass($this->signup);
+        return $cansignuppast->pass();
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventnotinthepast_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array
+     */
     function get_failure() : array {
         $seminarevent = $this->signup->get_seminar_event();
         if ($seminarevent->is_progress()) {

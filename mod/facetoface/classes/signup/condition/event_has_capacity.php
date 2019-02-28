@@ -49,10 +49,18 @@ class event_has_capacity extends condition {
         return false;
     }
 
+    /**
+     * Get description of condition
+     * @return string
+     */
     public static function get_description() : string {
         return get_string('state_eventhascapacity_desc', 'mod_facetoface');
     }
 
+    /**
+     * Return explanation why condition has not passed
+     * @return array
+     */
     public function get_failure() : array {
         return ['event_has_capacity' => get_string('sessionisfull', 'mod_facetoface')];
     }
