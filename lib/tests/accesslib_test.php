@@ -1708,6 +1708,101 @@ class core_accesslib_testcase extends advanced_testcase {
     }
 
     /**
+     * Test that assigning a fake cap does not return.
+     */
+    public function test_fake_capability() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'), '*', MUST_EXIST);
+        $teacher = $this->getDataGenerator()->create_user();
+
+        $fakecapname = 'moodle/fake:capability';
+
+        role_assign($teacherrole->id, $teacher->id, $coursecontext);
+        $admin = $DB->get_record('user', array('username' => 'admin'));
+
+        // Test a capability which does not exist.
+        // Note: Do not use assign_capability because it will not allow fake caps.
+        $DB->insert_record('role_capabilities', (object) [
+            'contextid' => $coursecontext->id,
+            'roleid' => $teacherrole->id,
+            'capability' => $fakecapname,
+            'permission' => CAP_ALLOW,
+            'timemodified' => time(),
+            'modifierid' => 0,
+        ]);
+
+        // Check `has_capability`.
+        $this->assertFalse(has_capability($fakecapname, $coursecontext, $teacher));
+        $this->assertDebuggingCalled("Capability \"{$fakecapname}\" was not found! This has to be fixed in code.");
+        $this->assertFalse(has_capability($fakecapname, $coursecontext, $admin));
+        $this->assertDebuggingCalled("Capability \"{$fakecapname}\" was not found! This has to be fixed in code.");
+
+        // Check `get_with_capability_sql` (with uses `get_with_capability_join`).
+        list($sql, $params) = get_with_capability_sql($coursecontext, $fakecapname);
+        $users = $DB->get_records_sql($sql, $params);
+
+        $this->assertFalse(array_key_exists($teacher->id, $users));
+        $this->assertFalse(array_key_exists($admin->id, $users));
+
+        // Check `get_users_by_capability`.
+        $users = get_users_by_capability($coursecontext, $fakecapname);
+
+        $this->assertFalse(array_key_exists($teacher->id, $users));
+        $this->assertFalse(array_key_exists($admin->id, $users));
+    }
+
+    /**
+     * Test that assigning a fake cap does not return.
+     */
+    public function test_fake_capability_assign() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'), '*', MUST_EXIST);
+        $teacher = $this->getDataGenerator()->create_user();
+
+        $capability = 'moodle/fake:capability';
+
+        role_assign($teacherrole->id, $teacher->id, $coursecontext);
+        $admin = $DB->get_record('user', array('username' => 'admin'));
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage("Capability '{$capability}' was not found! This has to be fixed in code.");
+        assign_capability($capability, CAP_ALLOW, $teacherrole->id, $coursecontext);
+    }
+
+    /**
+     * Test that assigning a fake cap does not return.
+     */
+    public function test_fake_capability_unassign() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'), '*', MUST_EXIST);
+        $teacher = $this->getDataGenerator()->create_user();
+
+        $capability = 'moodle/fake:capability';
+
+        role_assign($teacherrole->id, $teacher->id, $coursecontext);
+        $admin = $DB->get_record('user', array('username' => 'admin'));
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage("Capability '{$capability}' was not found! This has to be fixed in code.");
+        unassign_capability($capability, $teacherrole->id, $coursecontext);
+    }
+
+    /**
      * Test if course creator future capability lookup works.
      */
     public function test_guess_if_creator_will_have_course_capability() {
@@ -2494,10 +2589,10 @@ class core_accesslib_testcase extends advanced_testcase {
         $rc = $DB->get_record('role_capabilities', array('contextid'=>$frontpagecontext->id, 'roleid'=>$allroles['teacher'], 'capability'=>'moodle/site:accessallgroups'));
         $this->assertFalse($rc);
         assign_capability('moodle/site:accessallgroups', CAP_ALLOW, $allroles['teacher'], $frontpagecontext);
-        unassign_capability('moodle/site:accessallgroups', $allroles['teacher'], $frontpagecontext, true);
+        unassign_capability('moodle/site:accessallgroups', $allroles['teacher'], $frontpagecontext->id);
         $rc = $DB->get_record('role_capabilities', array('contextid'=>$frontpagecontext->id, 'roleid'=>$allroles['teacher'], 'capability'=>'moodle/site:accessallgroups'));
         $this->assertFalse($rc);
-        unassign_capability('moodle/site:accessallgroups', $allroles['teacher'], $frontpagecontext->id, true);
+        unassign_capability('moodle/site:accessallgroups', $allroles['teacher'], $frontpagecontext->id);
         unset($rc);
 
         accesslib_clear_all_caches_for_unit_testing(); // Must be done after assign_capability().
@@ -2569,7 +2664,7 @@ class core_accesslib_testcase extends advanced_testcase {
         assign_capability('moodle/site:accessallgroups', CAP_ALLOW, $CFG->defaultfrontpageroleid, $frontpagepagecontext, true);
         assign_capability('mod/page:view', CAP_PREVENT, $allroles['guest'], $frontpagepagecontext, true);
         assign_capability('mod/page:view', CAP_ALLOW, $allroles['user'], $frontpagepagecontext, true);
-        assign_capability('moodle/page:view', CAP_ALLOW, $allroles['student'], $frontpagepagecontext, true);
+        assign_capability('mod/page:view', CAP_ALLOW, $allroles['student'], $frontpagepagecontext, true);
 
         assign_capability('moodle/site:accessallgroups', CAP_ALLOW, $CFG->defaultuserroleid, $frontpagecontext, true);
         assign_capability('moodle/site:accessallgroups', CAP_ALLOW, $CFG->defaultfrontpageroleid, $frontpagecontext, true);
@@ -3045,6 +3140,8 @@ class core_accesslib_testcase extends advanced_testcase {
         // Fake state before upgrade.
         $DB->set_field('capabilities', 'name', 'moodle/site:restore', array('name'=>'moodle/restore:restorecourse'));
         $DB->set_field('role_capabilities', 'capability', 'moodle/site:restore', array('capability'=>'moodle/restore:restorecourse'));
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage("Capability 'moodle/site:restore' was not found! This has to be fixed in code.");
         assign_capability('moodle/site:restore', CAP_PROHIBIT, $teacher->id, $froncontext->id, true);
         $perms1 = array_values($DB->get_records('role_capabilities', array('capability'=>'moodle/site:restore', 'roleid'=>$teacher->id), 'contextid, permission', 'contextid, permission'));
 
@@ -3387,10 +3484,10 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertFalse(array_key_exists($guest->id, $users));
 
         // Test role override.
-        assign_capability('moodle/site:backupcourse', CAP_PROHIBIT, $teacherrole->id, $coursecontext, true);
-        assign_capability('moodle/site:backupcourse', CAP_ALLOW, $studentrole->id, $coursecontext, true);
+        assign_capability('moodle/backup:backupcourse', CAP_PROHIBIT, $teacherrole->id, $coursecontext, true);
+        assign_capability('moodle/backup:backupcourse', CAP_ALLOW, $studentrole->id, $coursecontext, true);
 
-        list($sql, $params) = get_with_capability_sql($coursecontext, 'moodle/site:backupcourse');
+        list($sql, $params) = get_with_capability_sql($coursecontext, 'moodle/backup:backupcourse');
         $users = $DB->get_records_sql($sql, $params);
 
         $this->assertFalse(array_key_exists($teacher->id, $users));
