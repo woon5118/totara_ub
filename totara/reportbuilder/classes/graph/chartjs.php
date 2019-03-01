@@ -35,12 +35,17 @@ final class chartjs extends base {
     protected function init() : void {
         parent::init();
 
+        // We turn off most of the responsive settings in progress charts so that
+        // we can more easily control the graph layouts with css
         $this->chartsettings = array(
             'responsive' => true,
             'maintainAspectRatio' => false,
+            'legend' => array(
+                'display' => $this->record->type !== 'progress',
+            )
         );
 
-        if ($this->record->type !== 'pie') {
+        if (!$this->isPieChart()) {
             $this->chartsettings['scales'] = array(
                 'xAxes' => array(
                     array(
@@ -65,6 +70,8 @@ final class chartjs extends base {
                     )
                 )
             );
+        } else {
+            $this->chartsettings['cutoutPercentage'] = chartjs::convert_type($this->record->type) === 'doughnut' ? 60 : 0;
         }
 
         $this->labels = array();
@@ -93,7 +100,7 @@ final class chartjs extends base {
             );
         }
 
-        if ($this->record->type !== 'pie') {
+        if (!$this->isPieChart()) {
             foreach ($this->values as $k => $val) {
                 $this->values[$k]['backgroundColor'] = $this->colors[$k % count($this->colors)];
             }
@@ -116,14 +123,17 @@ final class chartjs extends base {
         }
 
         foreach ($values as $k => $val) {
+            $this->values[$k]['total'] = isset($this->values[$k]['total']) ? $this->values[$k]['total'] + $val : $val;
+
             if ($this->record->type === 'scatter') {
                 $this->values[$k]['data'][] = array('x' => $label, 'y' => $val);
             } else {
                 $this->values[$k]['data'][] = $val;
             }
 
-            if ($this->record->type === 'pie') {
+            if ($this->isPieChart()) {
                 $this->values[$k]['backgroundColor'][] = $this->colors[$this->processedcount % count($this->colors)];
+                $this->values[$k]['borderColor'][] = $this->colors[$this->processedcount % count($this->colors)];
             }
 
             $this->values[$k]['stack'] = $k;
@@ -135,23 +145,86 @@ final class chartjs extends base {
     public function render(int $width = null, int $height = null): string {
         global $OUTPUT;
 
-        // Since we're using the ChartJS responsive setting, we ignore $width so it will grow correctly
-        $context = array(
-            'height' => $height,
-            'options' => json_encode(array(
-                'type' => $this->convert_type($this->record->type),
-                'data' => array(
-                    'labels' => $this->labels,
-                    'datasets' => $this->values,
-                ),
-                'options' => $this->chartsettings,
-            ))
-        );
+        //Progress charts need to draw multiple charts, so they have to be handled seperately
+        if ($this->record->type === 'progress') {
+            $context = $this->getProgressChartData($width, $height);
+        } else {
+            // Since we're using the ChartJS responsive setting, we ignore $width so it will grow correctly
+            $context = array(
+                'height' => $height,
+                'chart' => array(
+                    'settings' => json_encode(array(
+                        'type' => chartjs::convert_type($this->record->type),
+                        'data' => array(
+                            'labels' => $this->labels,
+                            'datasets' => $this->values,
+                        ),
+                        'options' => $this->chartsettings,
+                    ))
+                )
+            );
+        }
 
         return $OUTPUT->render_from_template('totara_reportbuilder/chartjs', $context);
     }
 
-    protected function convert_type($type) {
+    /**
+     * Generate the context data for the progress donut chart type.
+     *
+     * @param int|null $width
+     * @param int|null $height
+     * @return array context data for a progress donut chart
+     */
+    private function getProgressChartData(int $width = null, int $height = null): array {
+
+        $charts = array();
+
+        // For progress charts, we have to reprocess them because we need to know the total of the entire dataset
+        // before we can split these out into their own charts
+        foreach ($this->values as $i => $dataset) {
+            $data = $dataset['data'];
+
+            foreach($data as $k => $val){
+                $chart = $dataset; // clone default settings
+
+                $chart['data'] = array($val, $dataset['total'] - $val);
+                $chart['backgroundColor'] = array($this->colors[0], '#8C8C8C');
+                $chart['borderColor'] = array($this->colors[0], '#8C8C8C');
+
+                $settings = $this->chartsettings;
+                $settings['title'] = array(
+                    'display' => true,
+                    'text' => $this->labels[$k],
+                );
+
+                $charts[] = array(
+                    'settings' => json_encode(array(
+                        'aspectRatio' => 1,
+                        'type' => chartjs::convert_type($this->record->type),
+                        'data' => array(
+                            'labels' => array($this->labels[$k], ''),
+                            'datasets' => array($chart),
+                        ),
+                        'options' => $settings,
+                        )),
+                    'progressLabel' => array(
+                        'title' => round($val / $chart['total'] * 100, 0) . '%',
+                        'subtitle' => ''.$chart['total'],
+                    )
+                );
+            }
+        }
+
+        $context = array(
+            'type' => $this->record->type,
+            'height' => $height,
+            'chart' => $charts,
+        );
+
+        return $context;
+    }
+
+    protected static function convert_type($type) {
         switch($type) {
             case 'column':
                 return 'bar';
@@ -159,9 +232,21 @@ final class chartjs extends base {
                 return 'horizontalBar';
             case 'area':
                 return 'line';
+            case 'progress':
+                return 'doughnut';
             default:
                 return $type;
         }
+    }
+
+    /**
+     * Returns whether this is one of the pie chart variants
+     * @return bool
+     */
+    private function isPieChart() {
+        return $this->record->type === 'pie'
+            || $this->record->type === 'doughnut'
+            || $this->record->type === 'progress';
     }
 
     public static function get_name() : string {

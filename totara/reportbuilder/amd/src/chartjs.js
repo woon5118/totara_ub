@@ -25,7 +25,7 @@ define(['core/chartjs'], function(Chart) {
         var ctx = element.getContext('2d');
 
         var options = JSON.parse(element.dataset.reportOptions);
-        var myChart = new Chart(ctx, options);
+        this.chart = new Chart(ctx, options);
     }
 
     /**
@@ -36,7 +36,6 @@ define(['core/chartjs'], function(Chart) {
     function init(element) {
         return new Promise(function(resolve) {
             var controller = new ChartJSController(element);
-            // controller.setupEvents();
             resolve(controller);
         });
     }

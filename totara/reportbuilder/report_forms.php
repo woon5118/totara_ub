@@ -869,6 +869,8 @@ class report_builder_edit_graph_form extends moodleform {
             'pie' => get_string('graphtypepie', 'totara_reportbuilder'),
             'scatter' => get_string('graphtypescatter', 'totara_reportbuilder'),
             'area' => get_string('graphtypearea', 'totara_reportbuilder'),
+            'doughnut' => get_string('graphtypedonut', 'totara_reportbuilder'),
+            'progress' => get_string('graphtypeprogressdonut', 'totara_reportbuilder'),
         );
         $mform->addElement('select', 'type', get_string('graphtype', 'totara_reportbuilder'), $types);
         $mform->addHelpButton('type', 'graphtype', 'totara_reportbuilder');
