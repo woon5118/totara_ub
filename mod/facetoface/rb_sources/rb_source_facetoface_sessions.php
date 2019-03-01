@@ -556,6 +556,20 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     'dbdatatype' => 'integer'
                 )
             ),
+            new rb_column_option(
+                'session',
+                'approvallink',
+                get_string('approvalrequest', 'rb_source_facetoface_sessions'),
+                'sessions.id',
+                array(
+                    'joins' => 'sessions',
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'manage_approval_link',
+                    'defaultheading' => get_string('approvalrequest', 'rb_source_facetoface_sessions'),
+                    'noexport' => true,
+                    'nosort' => true
+                )
+            ),
         );
 
         if (!get_config(null, 'facetoface_hidecost')) {
@@ -849,6 +863,10 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'type' => 'date',
                 'value' => 'sessiondate',
             ),
+            array(
+                'type' => 'session',
+                'value' => 'approvallink'
+            )
         );
 
         return $defaultcolumns;
