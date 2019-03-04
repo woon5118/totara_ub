@@ -4,18 +4,18 @@
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
- * This certification is free software; you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * This certification is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this certification.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author David Curry <david.curry@totaralearning.com>
  * @package totara_certification
@@ -166,6 +166,8 @@ class totara_certification_webapi_resolver_query_certification_testcase extends 
         list($users, $certifications) = $this->create_faux_certifications();
 
         $this->setUser($users[0]);
+        list($certcompletion, $progcompletion) = certif_load_completion($certifications[0]->id, $users[0]->id);
+
         $result = $this->execute_graphql_operation('totara_certification_certification', ['certificationid' => $certifications[0]->id]);
         $data = $result->toArray()['data'];
 
@@ -182,7 +184,10 @@ class totara_certification_webapi_resolver_query_certification_testcase extends 
                 "fullname" => $certifications[0]->fullname,
                 "shortname" => $certifications[0]->shortname,
                 "summary" => "",
-                "summaryformat" => 1,
+                "summaryformat" => "HTML",
+                "endnote" => '',
+                "duedate" => null,
+                "duedate_state" => '',
                 "coursesets" => [
                     0 => [
                         "id" => "{$coursesets[0]->id}",
@@ -200,6 +205,15 @@ class totara_certification_webapi_resolver_query_certification_testcase extends 
                         "id" => "{$coursesets[3]->id}",
                         "label" => "Course Set 2"
                     ]
+                ],
+                'completion' => [
+                    'id' => $certcompletion->id,
+                    'status' => 1,
+                    'statuskey' => 'assigned',
+                    'renewalstatus' => 0,
+                    'renewalstatuskey' => 'notdue',
+                    'timecompleted' => null,
+                    'progress' => 0.0
                 ],
                 "availablefrom" => null,
                 "availableuntil" => null,

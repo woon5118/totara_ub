@@ -76,7 +76,7 @@
 <div class="tf_element totara_form_element_filemanager">
     <input type="hidden" id="{{id}}" {{#frozen}}data-{{/frozen}}name="{{name}}" value="{{value}}" data-fmoptions="{{fmoptions}}" />
     <div class="tf_element_title"><span class="legend">{{label}}{{#required}}{{> totara_form/required_suffix}}{{/required}}</span>{{> totara_form/help_button}}</div>
-    <div class="tf_element_input">
+    <div class="tf_element_input" data-fieldtype="filemanager">
         <div id="filemanager-{{client_id}}" class="filemanager fm-loading" data-frozen="{{frozen}}">
             <div class="fp-restrictions">
                 {{{restrictions}}}

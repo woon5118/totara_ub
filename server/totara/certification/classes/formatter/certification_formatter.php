@@ -37,6 +37,8 @@ class certification_formatter extends formatter {
             'fullname' => string_field_formatter::class,
             'shortname' => string_field_formatter::class,
             'idnumber' => null,
+            'duedate' => date_field_formatter::class,
+            'duedate_state' => null,
             'summary' => function ($value, text_field_formatter $formatter) {
                 $component = 'totara_program';
                 $filearea = 'summary';
@@ -47,10 +49,21 @@ class certification_formatter extends formatter {
                     ->format($value);
             },
             'summaryformat' => null,
+            'endnote' => function ($value, text_field_formatter $formatter) {
+                $component = 'totara_program';
+                $filearea = 'endnote';
+                $itemid = $this->object->id;
+
+                return $formatter
+                    ->set_pluginfile_url_options($this->context, $component, $filearea, $itemid)
+                    ->format($value);
+            },
             'availablefrom' => date_field_formatter::class,
             'availableuntil' => date_field_formatter::class,
+            'activeperiod' => null, // Currently string from the database as "1 Month" this won't be translatable though.
             'category' => null, // Default - core\category_formatter::class
             'coursesets' => null, // Default - program\courseset_formatter::class
+            'completion' => null, // Default - certification\completion_formatter::class
         ];
     }
 }

@@ -30,12 +30,14 @@ use core\webapi\formatter\formatter;
 
 class program_formatter extends formatter {
 
-    protected function get_map(): array {
+    public function get_map(): array {
         return [
             'id' => null,
             'fullname' => string_field_formatter::class,
             'shortname' => string_field_formatter::class,
             'idnumber' => null,
+            'duedate' => date_field_formatter::class,
+            'duedate_state' => null,
             'summary' => function ($value, text_field_formatter $formatter) {
                 $component = 'totara_program';
                 $filearea = 'summary';
@@ -46,10 +48,20 @@ class program_formatter extends formatter {
                     ->format($value);
             },
             'summaryformat' => null,
+            'endnote' => function ($value, text_field_formatter $formatter) {
+                $component = 'totara_program';
+                $filearea = 'endnote';
+                $itemid = $this->object->id;
+
+                return $formatter
+                    ->set_pluginfile_url_options($this->context, $component, $filearea, $itemid)
+                    ->format($value);
+            },
             'availablefrom' => date_field_formatter::class,
             'availableuntil' => date_field_formatter::class,
             'category' => null, // Default - core\category_formatter::class
             'coursesets' => null, // Default - program\courseset_formatter::class
+            'completion' => null, // Default - program\completion_formatter::class
         ];
     }
 }

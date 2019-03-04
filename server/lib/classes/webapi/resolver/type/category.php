@@ -60,6 +60,29 @@ class category implements type_resolver {
             }
         }
 
+        // Transform the format field from the constants to a core_format string.
+        if ($field == 'descriptionformat') {
+            switch ($category->descriptionformat) {
+                case FORMAT_MOODLE:
+                case FORMAT_HTML:
+                    return 'HTML';
+                    break;
+                case FORMAT_PLAIN:
+                    return 'PLAIN';
+                    break;
+                case FORMAT_RAW:
+                    return 'RAW';
+                    break;
+                case FORMAT_MARKDOWN:
+                    return 'MARKDOWN';
+                    break;
+                default:
+                    // Note: There is also FORMAT_WIKI but it has been deprecated since 2005.
+                    throw new \coding_exception("Unrecognised description format '{$category->descriptionformat}'" );
+                    break;
+            }
+        }
+
         if ($field == 'children') {
             $cat = coursecat::get($category->id);
             return $cat->get_children();

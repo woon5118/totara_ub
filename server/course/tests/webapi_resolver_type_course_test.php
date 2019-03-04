@@ -27,7 +27,7 @@ use core\format;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * Tests the totara core learning item type resolver.
+ * Tests the core course type resolver.
  */
 class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase {
 
@@ -60,7 +60,7 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
     }
 
     /**
-     * Check that this only works for learning items.
+     * Check that this only works for courses.
      */
     public function test_resolve_courses_only() {
         list($users, $courses) = $this->create_faux_courses();
@@ -112,7 +112,7 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
             );
         }
 
-        // Check that each core instance of learning item gets resolved.
+        // Check that each core instance of course gets resolved.
         try {
             $value = $this->resolve('id', $courses[0]);
             $this->assertEquals($courses[0]->id, $value);
@@ -136,35 +136,35 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
     }
 
     /**
-     * Test the learning item type resolver for the id field
+     * Test the course type resolver for the id field
      */
     public function test_resolve_id() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
         $course = get_course($courses[0]->id);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('id', $course);
         $this->assertEquals($course->id, $value);
         $this->assertTrue(is_string($value));
     }
 
     /**
-     * Test the learning item type resolver for the idnumber field
+     * Test the course type resolver for the idnumber field
      */
     public function test_resolve_idnumber() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
         $course = get_course($courses[0]->id);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('idnumber', $course);
         $this->assertEquals($course->idnumber, $value);
         $this->assertTrue(is_string($value));
     }
 
     /**
-     * Test the learning item type resolver for the shortname field
+     * Test the course type resolver for the shortname field
      */
     public function test_resolve_shortname() {
         list($users, $courses) = $this->create_faux_courses();
@@ -198,7 +198,7 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
     }
 
     /**
-     * Test the learning item type resolver for the fullname field
+     * Test the course type resolver for the fullname field
      */
     public function test_resolve_fullname() {
         list($users, $courses) = $this->create_faux_courses();
@@ -232,7 +232,7 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
     }
 
     /**
-     * Test the learning item type resolver for the summary field
+     * Test the course type resolver for the summary field
      */
     public function test_resolve_summary() {
         list($users, $courses) = $this->create_faux_courses();
@@ -256,7 +256,7 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
                 $this->assertEquals($courses[0]->summary, $value);
             }
             if ($format == format::FORMAT_HTML) {
-                $this->assertEquals('<div class="text_to_html">'.$courses[0]->summary.'</div>', $value);
+                $this->assertEquals($courses[0]->summary, $value);
             }
             $this->assertTrue(is_string($value));
         }
@@ -271,65 +271,65 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
     }
 
     /**
-     * Test the learning item type resolver for the summaryformat field
+     * Test the course type resolver for the summaryformat field
      */
     public function test_resolve_summaryformat() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('summaryformat', $courses[0]);
-        $this->assertEquals($courses[0]->summaryformat, $value);
+        $this->assertEquals('HTML', $value);
         $this->assertTrue(is_string($value));
     }
 
     /**
-     * Test the learning item type resolver for the timecreated field
+     * Test the course type resolver for the timecreated field
      */
     public function test_resolve_timecreated() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('timecreated', $courses[0], ['format' => \core\date_format::FORMAT_TIMESTAMP]);
         $this->assertEquals($courses[0]->timecreated, $value);
         $this->assertTrue(is_string($value));
     }
 
     /**
-     * Test the learning item type resolver for the timemodified field
+     * Test the course type resolver for the timemodified field
      */
     public function test_resolve_timemodified() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('timemodified', $courses[0], ['format' => \core\date_format::FORMAT_TIMESTAMP]);
         $this->assertEquals($courses[0]->timemodified, $value);
         $this->assertTrue(is_string($value));
     }
 
     /**
-     * Test the learning item type resolver for the timemodified field
+     * Test the course type resolver for the timemodified field
      */
     public function test_resolve_startdate() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('startdate', $courses[0], ['format' => \core\date_format::FORMAT_TIMESTAMP]);
         $this->assertEquals($courses[0]->startdate, $value);
         $this->assertTrue(is_string($value));
     }
 
     /**
-     * Test the learning item type resolver for the timemodified field
+     * Test the course type resolver for the timemodified field
      */
     public function test_resolve_enddate() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('enddate', $courses[0], ['format' => \core\date_format::FORMAT_TIMESTAMP]);
         $this->assertSame(null, $value);
 
@@ -340,70 +340,70 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
     }
 
     /**
-     * Test the learning item type resolver for the theme field
+     * Test the course type resolver for the theme field
      */
     public function test_resolve_theme() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
         $course = get_course($courses[0]->id);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('theme', $course);
         $this->assertEquals($course->theme, $value);
         $this->assertTrue(is_string($value));
     }
 
     /**
-     * Test the learning item type resolver for the lang field
+     * Test the course type resolver for the lang field
      */
     public function test_resolve_lang() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
         $course = get_course($courses[0]->id);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('lang', $course);
         $this->assertEquals($course->lang, $value);
         $this->assertTrue(is_string($value));
     }
 
     /**
-     * Test the learning item type resolver for the format field
+     * Test the course type resolver for the format field
      */
     public function test_resolve_format() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
         $course = get_course($courses[0]->id);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('format', $course);
         $this->assertEquals($course->format, $value);
         $this->assertTrue(is_string($value));
     }
 
     /**
-     * Test the learning item type resolver for the coursetype field
+     * Test the course type resolver for the coursetype field
      */
     public function test_resolve_coursetype() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
         $course = get_course($courses[0]->id);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('coursetype', $course);
         $this->assertEquals($course->coursetype, $value);
         $this->assertTrue(is_string($value));
     }
 
     /**
-     * Test the learning item type resolver for the icon field
+     * Test the course type resolver for the icon field
      */
     public function test_resolve_icon() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
         $course = get_course($courses[0]->id);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $this->assertSame(null, $course->icon);
         $value = $this->resolve('icon', $course);
         $this->assertEquals('default', $value);
@@ -416,7 +416,7 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
     }
 
     /**
-     * Test the learning item type resolver for the image (url) field
+     * Test the course type resolver for the image (url) and mobile_image fields
      */
     public function test_resolve_image() {
         list($users, $courses) = $this->create_faux_courses();
@@ -424,9 +424,53 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
         $course = get_course($courses[0]->id);
         $course->image = course_get_image($course);
 
-        // Check that each core instance of learning item gets resolved correctly.
+        // Check that each core instance of course gets resolved correctly.
         $value = $this->resolve('image', $course);
         $this->assertEquals('https://www.example.com/moodle/theme/image.php/_s/ventura/core/1/course_defaultimage', $value);
         $this->assertTrue(is_string($value));
+    }
+
+    /**
+     * Test the course type resolver for the completionenabled field.
+     */
+    public function test_resolve_completionenabled() {
+        $c1 = $this->getDataGenerator()->create_course([
+            'shortname' => 'c1',
+            'fullname' => 'course1',
+            'summary' => 'first course',
+            'enablecompletion' => 1
+        ]);
+        $c2 = $this->getDataGenerator()->create_course([
+            'shortname' => 'c2',
+            'fullname' => 'course2',
+            'summary' => 'second course',
+            'enablecompletion' => 0
+        ]);
+
+        $this->setAdminUser();
+        $this->assertTrue($this->resolve('completionenabled', $c1));
+        $this->assertfalse($this->resolve('completionenabled', $c2));
+    }
+
+    /**
+     * Test the course type resolver for the showgrades field.
+     */
+    public function test_resolve_showgrades() {
+        $c1 = $this->getDataGenerator()->create_course([
+            'shortname' => 'c1',
+            'fullname' => 'course1',
+            'summary' => 'first course',
+            'showgrades' => 1
+        ]);
+        $c2 = $this->getDataGenerator()->create_course([
+            'shortname' => 'c2',
+            'fullname' => 'course2',
+            'summary' => 'second course',
+            'showgrades' => 0
+        ]);
+
+        $this->setAdminUser();
+        $this->assertTrue($this->resolve('showgrades', $c1));
+        $this->assertfalse($this->resolve('showgrades', $c2));
     }
 }

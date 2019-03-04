@@ -33,7 +33,7 @@ type totara_core_learning_item {
   """
   The format of the learning item description
   """
-  description_format: Int
+  description_format: core_format
   """
   Learning item progress, a percentage of how far
   through the item the user viewing it is.
@@ -48,6 +48,15 @@ type totara_core_learning_item {
   is due for the viewing user.
   """
   duedate(format: core_date_format = TIMESTAMP): core_date
+  """
+  Learning item duedate status, as computed by server. One of
+  "info", "warning", "danger", or "overdue".
+  """
+  duedate_state: String
+  """
+  Learning item image URL
+  """
+  image_src: String
 }
 
 """

@@ -359,6 +359,11 @@ class behat_totara_data_generators extends behat_base {
             'responses' => array(
                 'age_data' => 'age_quiz_responses'
             )
+        ),
+        'totara_mobile' => array(
+            'devices' => array(
+                'age_data' => 'age_mobile_devices'
+            )
         )
 
     );

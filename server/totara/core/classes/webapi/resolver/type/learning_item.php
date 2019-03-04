@@ -44,6 +44,8 @@ class learning_item implements type_resolver {
      * @return mixed
      */
     public static function resolve(string $field, $item, array $args, execution_context $ec) {
+        global $CFG;
+
         if (!$item instanceof item) {
              throw new \coding_exception('Only learning_item objects are accepted: ' . gettype($item));
         }
@@ -59,6 +61,29 @@ class learning_item implements type_resolver {
         $authfield = ($field == 'description') ? 'summary' : $field;
         if (!$classpath::authorize($authfield, $format, $context)) {
             return null;
+        }
+
+        // Transform the format field from the constants to a core_format string.
+        if ($field == 'description_format') {
+            switch ($item->description_format) {
+                case FORMAT_MOODLE:
+                case FORMAT_HTML:
+                    return 'HTML';
+                    break;
+                case FORMAT_PLAIN:
+                    return 'PLAIN';
+                    break;
+                case FORMAT_RAW:
+                    return 'RAW';
+                    break;
+                case FORMAT_MARKDOWN:
+                    return 'MARKDOWN';
+                    break;
+                default:
+                    // Note: There is also FORMAT_WIKI but it has been deprecated since 2005.
+                    throw new \coding_exception("Unrecognised description format '{$item->description_format}'" );
+                    break;
+            }
         }
 
         if ($field == 'duedate') {
@@ -83,12 +108,31 @@ class learning_item implements type_resolver {
             }
         }
 
+        if ($field == 'duedate_state') {
+            if (empty($item->duedate) || $item->duedate == -1) {
+                $item->duedate_state = null; // For consistency.
+            }
+        }
+
         if ($field == 'url_view') {
             return $item->url_view->out();
         }
 
+        if ($field == 'image_src') {
+            if (empty($item->image_src)) {
+                $item->image_src = null; // For consistency.
+            }
+        }
+
         $formatter = new learning_item_formatter($item, $context);
-        return $formatter->format($field, $format);
+        $formatted = $formatter->format($field, $format);
+
+        // For mobile execution context, rewrite pluginfile urls in description and image_src fields.
+        // This is clearly a hack, please suggest something more elegant.
+        if (is_a($ec, 'totara_mobile\webapi\execution_context') && in_array($field, ['description', 'image_src'])) {
+            $formatted = str_replace($CFG->wwwroot . '/pluginfile.php', $CFG->wwwroot . '/totara/mobile/pluginfile.php', $formatted);
+        }
+        return $formatted;
     }
 
     /**

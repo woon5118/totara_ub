@@ -4935,6 +4935,11 @@ function complete_user_login($user) {
         return $USER;
     }
 
+    if (!empty($SESSION->totara_mobile_device_registration)) {
+        // Totara: do not interfere with device registration.
+        return $USER;
+    }
+
     // Select password change url.
     $userauth = get_auth_plugin($USER->auth);
 

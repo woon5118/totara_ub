@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @author David Curry <david.curry@totaralearning.com>
  * @package core
  */
 
@@ -32,7 +33,7 @@ use coursecat;
 
 class course implements type_resolver {
     public static function resolve(string $field, $course, array $args, execution_context $ec) {
-        global $USER;
+        global $DB, $USER, $CFG, $OUTPUT;
 
         // Note: There's no good way of checking course object since it returns a db object.
         if (!$course instanceof \stdClass) {
@@ -72,21 +73,154 @@ class course implements type_resolver {
             }
         }
 
-        if ($field == 'image') {
-            if ($course->image instanceof \moodle_url) {
-                return $course->image = $course->image->out();
-            } else {
-                return $course->image;
+        // Transform the format field from the constants to a core_format string.
+        if ($field == 'summaryformat') {
+            switch ($course->summaryformat) {
+                case FORMAT_MOODLE:
+                case FORMAT_HTML:
+                    return 'HTML';
+                    break;
+                case FORMAT_PLAIN:
+                    return 'PLAIN';
+                    break;
+                case FORMAT_RAW:
+                    return 'RAW';
+                    break;
+                case FORMAT_MARKDOWN:
+                    return 'MARKDOWN';
+                    break;
+                default:
+                    // Note: There is also FORMAT_WIKI but it has been deprecated since 2005.
+                    throw new \coding_exception("Unrecognised summary format: {$course->summaryformat}" );
+                    break;
             }
         }
 
-        if ($field == 'sections') {
-            // Note: Most of this cminfo stuff is cached for speed.
-            return \course_modinfo::instance($course->id, $USER->id)->get_section_info_all();
+        if ($field == 'image') {
+            if ($course->image instanceof \moodle_url) {
+                $course->image = $course->image->out();
+            }
+        }
+
+        if ($field == 'showgrades') {
+            return !empty($course->showgrades);
+        }
+
+        if ($field == 'completionenabled') {
+            return !empty($course->enablecompletion);
+        }
+
+        if ($field == 'completion') {
+            $params = ['userid' => $USER->id, 'course' => $course->id];
+            return new \completion_completion($params);
+        }
+
+        if ($field == 'criteria') {
+            // Organise activity completions according to the course display order.
+            // Obtain the display order of activity modules.
+            $sections = $DB->get_records('course_sections', array('course' => $course->id), 'section ASC', 'id, sequence');
+            $moduleorder = array();
+            foreach ($sections as $section) {
+                if (!empty($section->sequence)) {
+                    $moduleorder = array_merge(array_values($moduleorder), array_values(explode(',', $section->sequence)));
+                }
+            }
+
+            $info = new \completion_info($course);
+            $completions = $info->get_completions($USER->id);
+            $modulecriteria = [];
+            $nonactivitycompletions = [];
+            foreach ($completions as $completion) {
+                $criteria = $completion->get_criteria();
+                $completion->typeaggregation = $info->get_aggregation_method($criteria->criteriatype);
+                if ($criteria->criteriatype == COMPLETION_CRITERIA_TYPE_ACTIVITY) {
+                    if (!empty($criteria->moduleinstance)) {
+                        $modulecriteria[$criteria->moduleinstance] = $completion;
+                    }
+                } else {
+                    $nonactivitycompletions[] = $completion;
+                }
+            }
+
+            // Compare to the course module order to put the activities in the same order as on the course view.
+            $activitycompletions = [];
+            foreach ($moduleorder as $module) {
+                // Some modules may not have completion criteria and can be ignored.
+                if (isset($modulecriteria[$module])) {
+                    $activitycompletions[] = $modulecriteria[$module];
+                }
+            }
+
+            $orderedcompletions = [];
+
+            // Put the activity completions at the top.
+            foreach ($activitycompletions as $completion) {
+                $orderedcompletions[] = $completion;
+            }
+
+            foreach ($nonactivitycompletions as $completion) {
+                $orderedcompletions[] = $completion;
+            }
+
+            return $orderedcompletions;
+        }
+
+        /**
+         * Constants defined in lib completionlib
+         * define('COMPLETION_AGGREGATION_ALL', 1);
+         * define('COMPLETION_AGGREGATION_ANY', 2);
+         */
+        if ($field == 'criteriaaggregation') {
+            $info = new \completion_info($course);
+            $aggregationtypes = $info::get_aggregation_methods();
+            return $aggregationtypes[$info->get_aggregation_method()];
+        }
+
+        if (in_array($field, ['sections', 'modcount'])) {
+            $modinfo = \course_modinfo::instance($course->id, $USER->id);
+
+            // Does a quick visibility check and counts visible modules.
+            if ($field == 'modcount') {
+                $count = 0;
+                foreach ($modinfo->get_cms() as $cm) {
+                    if ($cm->__get('uservisible')) {
+                        $count++;
+                    }
+                }
+                return $count;
+            }
+
+            // Return the raw course section information, let the type handle the rest.
+            if ($field == 'sections') {
+                $rawsections = $modinfo->get_section_info_all();
+
+                // The user can see everything, just return everything.
+                if (has_capability('moodle/course:viewhiddensections', $course_context, $USER->id)) {
+                    return $rawsections;
+                }
+
+                $sections = [];
+                // Quickly loop through all the sections, and remove non-visible ones.
+                foreach ($rawsections as $key => $section) {
+                    if ($section->__get('visible')) {
+                        $sections[$key] = $section;
+                    }
+                }
+
+                return $sections;
+            }
         }
 
         $formatter = new course_formatter($course, $course_context);
-        return $formatter->format($field, $format);
+        $formatted = $formatter->format($field, $format);
+
+        // For mobile execution context, rewrite pluginfile urls in description and image_src fields.
+        // This is clearly a hack, please suggest something more elegant.
+        if (is_a($ec, 'totara_mobile\webapi\execution_context') && in_array($field, ['summary', 'description', 'image', 'mobile_image'])) {
+            $formatted = str_replace($CFG->wwwroot . '/pluginfile.php', $CFG->wwwroot . '/totara/mobile/pluginfile.php', $formatted);
+        }
+
+        return $formatted;
     }
 
     public static function authorize(string $field, ?string $format, context_course $context) {

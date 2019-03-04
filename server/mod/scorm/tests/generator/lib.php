@@ -66,6 +66,7 @@ class mod_scorm_generator extends testing_module_generator {
             'whatgrade' => $cfgscorm->whatgrade,
             'forcenewattempt' => $cfgscorm->forcenewattempt,
             'lastattemptlock' => $cfgscorm->lastattemptlock,
+            'allowmobileoffline' => $cfgscorm->allowmobileoffline,
             'forcecompleted' => $cfgscorm->forcecompleted,
             'masteryoverride' => $cfgscorm->masteryoverride,
             'auto' => $cfgscorm->auto,

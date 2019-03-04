@@ -10,5 +10,7 @@ query totara_core_my_current_learning {
     progress
     url_view
     duedate
+    duedate_state
+    image_src
   }
 }

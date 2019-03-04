@@ -4,7 +4,7 @@ query core_course_course($courseid: core_id!) {
     idnumber
     fullname
     shortname
-    summary
+    summary(format: HTML)
     summaryformat
     category {
       id

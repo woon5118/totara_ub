@@ -201,6 +201,11 @@ $THEME->layouts = array(
         'regions' => array(),
         'options' => array('noblocks' => true, 'langmenu' => true),
     ),
+    // Totara: special layout for mobile app WebView.
+    'webview' => array(
+        'file' => 'webview.php',
+        'regions' => array(),
+    ),
     'legacynolayout' => array(
         'file' => 'default.php',
         'regions' => array(),

@@ -132,6 +132,7 @@ information provided here is intended especially for developers.
   been generated. Allowing plugins to introduce shims and other common constructs if required.
 * Function delete_course has been deprecated and will be removed in the future, please use \container_course\course::delete instead
 * Deprecated $THEME->yuicssmodules. This setting is ignored when a theme inherits from legacy or ventura, and will be removed in a future version. It is recommended to set this to an empty array if you are not inheriting from legacy or ventura.
+* core_renderer::standard_footer_html() now includes a once-per-session link to the mobile app (if enabled) on homepage, dashboard, or catalog if user is using a mobile device
 
 
 === 12.0 ===

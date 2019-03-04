@@ -47,6 +47,7 @@ trait message_popup_test_helper {
         $record->notification = 1;
         $record->subject = 'No subject';
         $record->fullmessage = $message;
+        $record->fullmessagehtml = $message;
         $record->smallmessage = $message;
         $record->timecreated = $timecreated ? $timecreated : time();
 
@@ -85,6 +86,7 @@ trait message_popup_test_helper {
         $record->notification = 1;
         $record->subject = 'No subject';
         $record->fullmessage = $message;
+        $record->fullmessagehtml = $message;
         $record->smallmessage = $message;
         $record->timecreated = $timecreated ? $timecreated : time();
         $record->timeread = $timeread ? $timeread : time();

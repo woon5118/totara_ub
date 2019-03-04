@@ -1,23 +1,22 @@
 <?php
-
 /**
  * This file is part of Totara Learn
- * 
+ *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * @package totara_program
  * @author Simon Coggins <simon.coggins@totaralearning.com>
  */
@@ -53,8 +52,8 @@ class courseset implements type_resolver {
 
         require_once($CFG->dirroot . '/totara/program/lib.php');
 
-        if (!$courseset instanceof stdClass) {
-            throw new coding_exception('Only courseset records from the database are accepted ' . gettype($courseset));
+        if (!is_object($courseset)) {
+            throw new coding_exception('Only program courseset objects are accepted: ' . gettype($courseset));
         }
 
         $format = $args['format'] ?? null;

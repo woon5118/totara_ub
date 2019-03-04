@@ -24,6 +24,7 @@
 
 namespace totara_core\webapi\resolver\query;
 
+use block_current_learning\helper as current_learning_helper;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
@@ -57,12 +58,48 @@ class my_current_learning implements query_resolver, has_middleware {
         // Filter the content to exclude duplications, completed courses and other block specific criteria.
         $items = learning_item_helper::filter_collective_learning_items($USER->id, $items);
 
-        $learning_items = array_filter($items, function ($item) {
-            // We don't need the plan itself, just the contents.
-            return !$item instanceof plan_item;
-        });
+        $learningitems = [];
+        // Loop through to add component, any other transformations/pre-formatting can happen here.
+        foreach ($items as $item) {
+            if ($item instanceof \totara_plan\user_learning\item) {
+                // We don't need the plan itself, just the contents.
+                continue;
+            }
 
-        return $learning_items;
+            // Note: Persistant queries are <component>_<type> i.e. core_course_course(id);
+            $item->itemtype = $item->get_type(); // certification, program, course.
+            $item->itemcomponent = $item->get_component(); // totara_certification, totara_program, core_course
+
+            // Make sure we have the due date, this is for programs and certifications, also courses inside learning plans.
+            if ($item->item_has_duedate()) {
+                $item->ensure_duedate_loaded();
+                // Mimic the block_current_learning configuration.
+                $config = new \stdClass();
+                $config->alertperiod = WEEKSECS; // Show danger.
+                $config->warningperiod = (30 * DAYSECS); // Show warning.
+                $duedate_state = current_learning_helper::get_duedate_state($item->duedate, $config);
+                $item->duedate_state = substr($duedate_state['state'], strlen('label-'));
+                if ($item->duedate_state == 'danger' && $duedate_state['alert'] == true) {
+                    $item->duedate_state = 'overdue';
+                }
+            } else {
+                $item->duedate_state = null;
+            }
+
+            // Make sure we have the percentage in the progress.
+            if (method_exists($item, 'get_progress_percentage')) {
+                $item->progress = $item->get_progress_percentage();
+            }
+
+            // Find the image.
+            if (method_exists($item, 'get_image')) {
+                $item->image_src = $item->get_image();
+            }
+
+            $learningitems[] = $item;
+        }
+
+        return $learningitems;
     }
 
     public static function get_middleware(): array {

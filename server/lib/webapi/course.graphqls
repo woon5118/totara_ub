@@ -22,7 +22,7 @@ type core_course {
   """
   The format of the courses summary
   """
-  summaryformat: Int
+  summaryformat: core_format
   """
   The date/time the course was created
   """
@@ -71,6 +71,34 @@ type core_course {
   A URL for the course image
   """
   image: String
+  """
+  Course sections/topics/weeks
+  """
+  sections: [core_course_section!]!
+  """
+  The number of modules in the course accessible to the user.
+  """
+  modcount: Int
+  """
+  The showgrades (show gradebook to learners) flag for the course
+  """
+  showgrades: Boolean!
+  """
+  The enablecompletion (enable completion tracking) flag for the course
+  """
+  completionenabled: Boolean!
+  """
+  The completion information relating to the course and current user
+  """
+  completion: core_course_completion
+  """
+  The completion criteria for the course, and associated completion info for the current user
+  """
+  criteria: [core_course_criteria]!
+  """
+  The aggregation method for the overall course criteria
+  """
+  criteriaaggregation: String
 }
 
 type core_category {
@@ -93,7 +121,7 @@ type core_category {
   """
   The format of the categories description
   """
-  descriptionformat: Int
+  descriptionformat: core_format
   """
   Parent category this category is inside, or null for top level categories.
   """
@@ -120,6 +148,172 @@ type core_category {
   Force theme used in category, or null if not overridden in category.
   """
   theme: String
+}
+
+type core_course_section {
+  """
+  Course section id
+  """
+  id: core_id!
+  """
+  Title of the course section
+  """
+  title(format: core_format = HTML): String
+  """
+  The course modules in the section
+  """
+  modules: [core_course_module]
+  """
+  Whether the course section is available to the viewing user
+  """
+  available: Boolean!
+  """
+  The reason why the course section is not available to the viewing user, empty if available
+  """
+  availablereason(format: core_format = HTML): [String]
+  """
+  The summary of the course section
+  """
+  summary(format: core_format = HTML): String
+  summaryformat: core_format
+}
+
+type core_course_module {
+  """
+  The id of the course module
+  """
+  id: core_id!
+  """
+  The idnumber of the course module
+  """
+  idnumber(format: core_format = PLAIN): String
+  """
+  The id in the instance, e.g. the id of the scorm in the scorm table
+  """
+  instanceid: core_id!
+  """
+  The type of the module (assignment, quiz, etc)
+  """
+  modtype(format: core_format = PLAIN): String!
+  """
+  The name of the course module
+  """
+  name(format: core_format = HTML): String!
+  """
+  The view url of the course module
+  """
+  viewurl(format: core_format = PLAIN): String
+  """
+  The completion settings of the course module
+  """
+  completion: String
+  """
+  The completion status of the current user in the course module
+  """
+  completionstatus: String
+  """
+  Whether the course module is available for the current user
+  """
+  available: Boolean!
+  """
+  The reason for the course module not being available to the current user
+  """
+  availablereason(format: core_format = HTML): [String]!
+  """
+  Whether the course module displays the description or not
+  """
+  showdescription: Boolean
+  """
+  The description of the course module
+  """
+  description(format: core_format = HTML): String
+  """
+  The format of the description field.
+  """
+  descriptionformat: core_format
+  """
+  The users grade in the course as an absolute value
+  """
+  gradefinal: Float
+  """
+  The maximum achievable grade for the course
+  """
+  grademax: Float
+  """
+  The users grade in the course as a percentage of grademax
+  """
+  gradepercentage: Float
+}
+
+type core_course_criteria {
+  """
+  The id of the course module
+  """
+  id: core_id!
+  """
+  The type of the criteria
+  """
+  type: String
+  """
+  The aggregation used for this criteria type grouping
+  """
+  typeaggregation(format: core_format = HTML): String
+  """
+  The name or descriptor of the criteria
+  """
+  criteria(format: core_format = PLAIN): String
+  """
+  What needs to be done to complete the criteria
+  """
+  requirement(format: core_format = HTML): String
+  """
+  How far the user is through the requirement
+  """
+  status(format: core_format = HTML): String
+  """
+  Whether the current user has completed the criteria
+  """
+  complete: Boolean
+  """
+  The date the current user completed the criteria
+  """
+  completiondate(format: core_date_format = TIMESTAMP): core_date
+}
+
+type core_course_completion {
+  """
+  The id of the completion record, however this can be null if not started or not enrolled.
+  """
+  id: Int
+  # Note: this id can't use core_id like the others because the default 0 would be replaced with NULL
+  """
+  A string representing the current learners completion state in a course
+  """
+  status: String
+  """
+  A string used as a get_string key for a longer completion status description
+  """
+  statuskey(format: core_format = PLAIN): String
+  """
+  A percentage describing how far the user has progressed through this course
+  """
+  progress: Float
+  """
+  The time the user completed this course
+  """
+  timecompleted(format: core_date_format = TIMESTAMP): core_date
+  """
+  The users grade in the course as an absolute value
+  """
+  gradefinal: Float
+  """
+  The maximum achievable grade for the course
+  """
+  grademax: Float
+  """
+  The users grade in the course as a percentage of grademax
+  """
+  gradepercentage: Float
 }
 
 extend type Query {
@@ -153,7 +347,7 @@ extend type Query {
   core_category(categoryid: core_id!): core_category!
 
   """
-   Return all categories in the specified category visible to the current user. Excludes non-direct decendants
+  Return all categories in the specified category visible to the current user. Excludes non-direct decendants
   (sub-sub-categories).
   """
   core_categories_by_parent_category(

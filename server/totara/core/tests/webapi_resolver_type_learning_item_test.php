@@ -479,7 +479,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
                 $this->assertEquals('first course', $value);
             }
             if ($format == format::FORMAT_HTML) {
-                $this->assertEquals('<div class="text_to_html">first course</div>', $value);
+                $this->assertEquals('first course', $value);
             }
             $this->assertTrue(is_string($value));
         }
@@ -533,17 +533,17 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         // Check that each core instance of learning item gets resolved correctly.
         $item = array_pop($items);
         $value = $this->resolve('description_format', $item);
-        $this->assertEquals(1, $value);
+        $this->assertEquals('HTML', $value);
         $this->assertTrue(is_string($value));
 
         $item = array_pop($items);
         $value = $this->resolve('description_format', $item);
-        $this->assertEquals(0, $value);
+        $this->assertEquals('HTML', $value);
         $this->assertTrue(is_string($value));
 
         $item = array_pop($items);
         $value = $this->resolve('description_format', $item);
-        $this->assertEquals(1, $value);
+        $this->assertEquals('HTML', $value);
         $this->assertTrue(is_string($value));
     }
 

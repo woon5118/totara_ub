@@ -244,6 +244,12 @@ class mod_scorm_mod_form extends moodleform_mod {
         $mform->addHelpButton('lastattemptlock', 'lastattemptlock', 'scorm');
         $mform->setDefault('lastattemptlock', $cfgscorm->lastattemptlock);
 
+        if (get_config('totara_mobile', 'enable')) {
+            $mform->addElement('selectyesno', 'allowmobileoffline', get_string('allowmobileoffline', 'scorm'));
+            $mform->addHelpButton('allowmobileoffline', 'allowmobileoffline', 'scorm');
+            $mform->setDefault('allowmobileoffline', $cfgscorm->allowmobileoffline);
+        }
+
         // Compatibility settings.
         $mform->addElement('header', 'compatibilitysettingshdr', get_string('compatibilitysettings', 'scorm'));
 

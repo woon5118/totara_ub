@@ -67,6 +67,20 @@ require_login($course, false, $cm);
 require_capability('mod/scorm:view', context_module::instance($cm->id));
 require_capability('mod/scorm:launch', context_module::instance($cm->id));
 
+$iswebview = $PAGE->pagelayout == 'webview';
+
+// Override some settings for webview
+if ($iswebview) {
+    $displaymode = ''; // Current window
+    $scorm->hidetoc = SCORM_TOC_DISABLED;
+    $scorm->nav = '0';
+    $scorm->popup = 0;
+
+    // Remove any size settings
+    $scorm->width = 0;
+    $scorm->height = 0;
+}
+
 // If new attempt is being triggered set normal mode and increment attempt number.
 $attempt = scorm_get_last_attempt($scorm->id, $USER->id);
 
@@ -184,7 +198,7 @@ $PAGE->requires->data_for_js('scormplayerdata', Array('launch' => false,
 $PAGE->requires->js('/mod/scorm/request.js', true);
 $PAGE->requires->js('/lib/cookies.js', true);
 
-if (get_config('scorm', 'sessionkeepalive')) {
+if (!$iswebview && get_config('scorm', 'sessionkeepalive')) {
     // Totara: try to prevent session timeouts in idle open windows.
     core\session\manager::keepalive('networkdropped', 'mod_scorm', $CFG->sessiontimeout / 10);
 }
@@ -196,7 +210,7 @@ if (file_exists($CFG->dirroot.'/mod/scorm/datamodels/'.$scorm->version.'.js')) {
 }
 
 echo $OUTPUT->header();
-if (!empty($scorm->displayactivityname)) {
+if (!$iswebview && !empty($scorm->displayactivityname)) {
     echo $OUTPUT->heading(format_string($scorm->name));
 }
 
@@ -272,7 +286,7 @@ if ($scorm->popup != 1 || $displaymode == 'popup') {
         'fullpath' => '/mod/scorm/module.js',
         'requires' => array('json'),
     );
-    $scorm->nav = intval($scorm->nav);
+    $scorm->nav = $iswebview ? 0 : intval($scorm->nav);
     $PAGE->requires->js_init_call('M.mod_scorm.init', array($scorm->nav, $scorm->navpositionleft, $scorm->navpositiontop,
                             $scorm->hidetoc, $collapsetocwinsize, $result->toctitle, $name, $sco->id, $adlnav), false, $jsmodule);
 }

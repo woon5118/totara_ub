@@ -82,4 +82,11 @@ function xmldb_scorm_totara_postupgrade($version) {
               GROUP BY f.contenthash';
         $DB->execute($sql);
     }
+
+    // Totara mobile support
+    $table = new xmldb_table('scorm');
+    $field = new xmldb_field('allowmobileoffline', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'autocommit');
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+    }
 }

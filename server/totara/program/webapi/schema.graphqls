@@ -25,7 +25,19 @@ type totara_program_program {
   """
   The format of the program summary
   """
-  summaryformat: Int
+  summaryformat: core_format
+  """
+  Program endnnote to be displayed on completion
+  """
+  endnote(format: core_format = HTML): String
+  """
+  The date the current user is due in the program
+  """
+  duedate(format: core_date_format = TIMESTAMP): core_date
+  """
+  The state of the duedate
+  """
+  duedate_state(format: core_format = PLAIN): core_notification_state
   """
   The date/time the program is available from
   """
@@ -42,6 +54,10 @@ type totara_program_program {
   Program content coursesets
   """
   coursesets: [totara_program_program_courseset!]!
+  """
+  Current users completion information within the program
+  """
+  completion: totara_program_completion
 }
 
 type totara_program_program_courseset {
@@ -57,6 +73,31 @@ type totara_program_program_courseset {
   Courseset courses
   """
   courses: [core_course]!
+}
+
+type totara_program_completion {
+  """
+  The id of the completion record for the current user within the program
+  """
+  id: core_id!
+  """
+  The integer status of the current user within the program
+  possible values: 0, 1
+  """
+  status: Int
+  """
+  The string status of the current user within the program
+  possible values: incomplete, complete
+  """
+  statuskey: String
+  """
+  The time the user completed the program
+  """
+  timecompleted(format: core_date_format = TIMESTAMP): core_date
+  """
+  The progress (as a percentage) that the user has made in the program
+  """
+  progress: Float
 }
 
 extend type Query {

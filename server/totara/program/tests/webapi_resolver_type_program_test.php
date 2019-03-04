@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author David Curry <david.curry@totaralearning.com>
- * @package totara_core
+ * @package totara_program
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -50,7 +50,13 @@ class totara_program_webapi_resolver_type_program_testcase extends advanced_test
         $c2 = $this->getDataGenerator()->create_course();
         $c3 = $this->getDataGenerator()->create_course();
 
-        $program = $prog_gen->create_program(['shortname' => 'prg1', 'fullname' => 'program1', 'summary' => 'first program']);
+        $program = $prog_gen->create_program([
+            'shortname' => 'prg1',
+            'fullname' => 'program1',
+            'summary' => 'first program',
+            'endnote' => 'Congratulations on completing the program'
+        ]);
+
         $prog_gen->add_courses_and_courseset_to_program($program, [[$c1, $c2], [$c3]], CERTIFPATH_STD);
         $prog_gen->assign_program($program->id, [$user->id]);
 
@@ -224,8 +230,41 @@ class totara_program_webapi_resolver_type_program_testcase extends advanced_test
 
         // Check that each core instance of learning item gets resolved correctly.
         $value = $this->resolve('summaryformat', $program);
-        $this->assertEquals(FORMAT_HTML, $value);
+        $this->assertEquals('HTML', $value);
         $this->assertTrue(is_string($value));
+    }
+
+    /**
+     * Test the program type resolver for the endnote field
+     */
+    public function test_resolve_endnote() {
+        list($user, $program) = $this->create_faux_programs();
+        $this->setUser($user);
+        $formats = [format::FORMAT_HTML, format::FORMAT_PLAIN];
+
+        try {
+            $value = $this->resolve('endnote', $program);
+            $this->fail('Expected failure on null $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                'Coding error detected, it must be fixed by a programmer: Invalid format given',
+                $ex->getMessage()
+            );
+        }
+
+        foreach ($formats as $format) {
+            $value = $this->resolve('endnote', $program, ['format' => $format]);
+            $this->assertEquals('Congratulations on completing the program', $value);
+            $this->assertTrue(is_string($value));
+        }
+
+        // Check the permissions required for format::FORMAT_RAW
+        $value = $this->resolve('endnote', $program, ['format' => format::FORMAT_RAW]);
+        $this->assertNull($value);
+
+        $this->setAdminUser();
+        $value = $this->resolve('endnote', $program, ['format' => format::FORMAT_RAW]);
+        $this->assertEquals('Congratulations on completing the program', $value);
     }
 
     /**

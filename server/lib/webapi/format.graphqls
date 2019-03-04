@@ -2,7 +2,7 @@
 List of supported output formats for core_date scalar.
 
 The actual format used for userdate() is:
- get_string('strftime' . strtolower($arg['format']), 'langconfig')
+get_string('strftime' . strtolower($arg['format']), 'langconfig')
 """
 enum core_date_format {
   """
@@ -32,4 +32,16 @@ enum core_format {
   RAW
   HTML
   PLAIN
+  MARKDOWN
+}
+
+"""
+Acceptable notification states, as defined in lib/classes/output/notification.php
+note: message, problem and redirect are deprecated.
+"""
+enum core_notification_state {
+  success
+  info
+  warning
+  error
 }

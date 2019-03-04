@@ -224,6 +224,30 @@ final class user_field_resolver {
             throw new \coding_exception("Unknown user field '{$field_name}', perhaps check for custom field");
         }
 
+        if ('descriptionformat' === $field_name && $this->access_controller->can_view_field('email')) {
+            // Transform the format field from the constants to a core_format string.
+            $descriptionformat = $this->do_get_value('descriptionformat');
+            switch ($descriptionformat) {
+                case FORMAT_MOODLE:
+                case FORMAT_HTML:
+                    return 'HTML';
+                    break;
+                case FORMAT_PLAIN:
+                    return 'PLAIN';
+                    break;
+                case FORMAT_RAW:
+                    return 'RAW';
+                    break;
+                case FORMAT_MARKDOWN:
+                    return 'MARKDOWN';
+                    break;
+                default:
+                    // Note: There is also FORMAT_WIKI but it has been deprecated since 2005.
+                    throw new \coding_exception("Unrecognised description format '{$descriptionformat}'");
+                    break;
+            }
+        }
+
         if ('profileurl' === $field_name && $this->access_controller->can_view_profile()) {
             // Special custom computed field 'profileurl'
             return $this->do_get_value('profileurl');

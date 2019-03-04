@@ -55,6 +55,10 @@ $layouts = array(
         'name' => 'No Blocks',
         'description' => 'This is a custom Totara layout used on pages where the full page width is needed. No other block regions are displayed.',
     ),
+    'webview' => array(
+        'name' => 'WebView',
+        'description' => 'This is a custom Totara layout used in mobile app WebViews',
+    ),
     'popup' => array(
         'name' => 'Popup',
         'description' => 'This layout is used within pages displayed as a popup window. Avoid navigation, blocks or header to a minimum to leave space for the content of the window.',

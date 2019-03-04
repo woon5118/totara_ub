@@ -4,18 +4,18 @@
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
- * This certification is free software; you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * This certification is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this certification.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author David Curry <david.curry@totaralearning.com>
  * @package totara_core
@@ -229,7 +229,7 @@ class totara_certification_webapi_resolver_type_certification_testcase extends a
 
         // Check that each core instance of learning item gets resolved correctly.
         $value = $this->resolve('summaryformat', $certification);
-        $this->assertEquals(FORMAT_HTML, $value);
+        $this->assertEquals('HTML', $value);
         $this->assertTrue(is_string($value));
     }
 

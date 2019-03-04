@@ -25,12 +25,13 @@
 namespace core_course\user_learning;
 
 use totara_core\user_learning\item_base;
+use totara_core\user_learning\item_has_image;
 use \totara_core\user_learning\item_has_progress;
 use \totara_core\user_learning\designation_primary;
 
 require_once($CFG->libdir . '/completionlib.php');
 
-class item extends item_base implements item_has_progress {
+class item extends item_base implements item_has_progress, item_has_image {
 
     use designation_primary;
 
@@ -279,6 +280,16 @@ class item extends item_base implements item_has_progress {
 
     public function item_has_duedate() {
         return false;
+    }
+
+    /**
+     * Returns the image url of this program.
+     *
+     * @return string
+     */
+    public function get_image() {
+        $course = get_course($this->id);
+        return course_get_image($course)->out();
     }
 
     /**

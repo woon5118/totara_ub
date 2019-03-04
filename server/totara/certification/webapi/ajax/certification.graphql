@@ -6,9 +6,21 @@ query totara_certification_certification($certificationid: core_id!) {
     shortname
     summary
     summaryformat
+    endnote
+    duedate(format: TIMESTAMP)
+    duedate_state(format: PLAIN)
     coursesets {
       id
       label(format: RAW)
+    }
+    completion {
+      id
+      status
+      statuskey
+      renewalstatus
+      renewalstatuskey
+      timecompleted
+      progress
     }
     availablefrom
     availableuntil

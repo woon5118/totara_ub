@@ -28,12 +28,13 @@ defined('MOODLE_INTERNAL') || die();
 
 use totara_core\advanced_feature;
 use \totara_core\user_learning\item_base;
+use totara_core\user_learning\item_has_image;
 use \totara_core\user_learning\item_has_progress;
 use \totara_core\user_learning\item_has_dueinfo;
 use \totara_core\user_learning\designation_primary;
 use \totara_program\user_learning\program_common;
 
-class item extends item_base implements item_has_progress, item_has_dueinfo {
+class item extends item_base implements item_has_progress, item_has_dueinfo, item_has_image {
 
     use designation_primary;
     use program_common;
@@ -331,6 +332,16 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
         $this->ensure_program_loaded();
 
         return $this->program->is_single_course($this->user->id);
+    }
+
+    /**
+     * Returns the image url of this program.
+     *
+     * @return string
+     */
+    public function get_image() {
+        $this->ensure_program_loaded();
+        return $this->program->get_image();
     }
 
     /**

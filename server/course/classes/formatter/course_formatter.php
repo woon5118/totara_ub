@@ -43,7 +43,6 @@ class course_formatter extends formatter {
                 $itemid = $this->object->id;
 
                 return $formatter
-                    ->set_text_format($this->object->summaryformat)
                     ->set_pluginfile_url_options($this->context, $component, $filearea, $itemid)
                     ->format($value);
             },
@@ -60,6 +59,13 @@ class course_formatter extends formatter {
             'coursetype' => null,
             'icon' => null,
             'image' => null,
+            'mobile_image' => null,
+            'sections' => null,
+            'showgrades' => null, // Default - boolean.
+            'completionenabled' => null, // Default - boolean.
+            'completion' => null,
+            'criteriaaggregation' => string_field_formatter::class,
+            'criteria' => null, // Default - course_criteria_formatter
         ];
     }
 }

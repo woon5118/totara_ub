@@ -502,6 +502,11 @@ class core_renderer extends renderer_base {
               <li><a href="http://www.contentquality.com/mynewtester/cynthia.exe?rptmode=0&amp;warnp2n3e=1&amp;url1=' . urlencode(qualified_me()) . '">WCAG 1 (2,3) Check</a></li>
             </ul></div>';
         }
+
+        // Totara: hook to allow modification of standard html footer.
+        $hook = new core\hook\renderer_standard_footer_html_complete($output, $this, $this->page);
+        $hook->execute();
+
         return $output;
     }
 

@@ -38,6 +38,10 @@ if (!isset($CFG->additionalhtmlhead)) {
 }
 $CFG->additionalhtmlhead .= '<meta name="robots" content="noindex" />';
 
+// Totara: Hook to modify setup of login page.
+$hook = new core\hook\login_page_start();
+$hook->execute();
+
 redirect_if_major_upgrade_required();
 
 $testsession = optional_param('testsession', 0, PARAM_INT); // test session works properly
@@ -218,6 +222,10 @@ if (!$errorcode && $frm and isset($frm->username)) {                            
 
         /// Let's get them all set up.
         complete_user_login($user);
+
+        // Totara: Hook to do something after login.
+        $hook = new core\hook\login_page_login_complete();
+        $hook->execute();
 
         \core\session\manager::apply_concurrent_login_limit($user->id, session_id());
 

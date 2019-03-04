@@ -36,6 +36,17 @@ final class graphql {
     public const TYPE_MOBILE = 'mobile';
 
     /**
+     * Returns the schema instance
+     *
+     * @return \GraphQL\Type\Schema
+     */
+    public static function get_schema(): \GraphQL\Type\Schema {
+        $schema_file_loader = new schema_file_loader();
+        $schema_builder = new schema_builder($schema_file_loader);
+        return $schema_builder->build();
+    }
+
+    /**
      * Returns list of required capabilities in system context for each operation.
      *
      * NOTE: this is not enforced automatically,

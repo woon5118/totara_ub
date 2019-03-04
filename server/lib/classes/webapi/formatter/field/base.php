@@ -82,7 +82,22 @@ abstract class base implements field_formatter_interface {
         if (!is_null($this->format)) {
             $format_function = 'format_' . strtolower($this->format);
             if (method_exists($this, $format_function)) {
-                return $this->$format_function($value);
+                // Allow for array of values to be formatted and returned.
+                if (is_array($value)) {
+                    $formatted = [];
+                    foreach ($value as $record) {
+                        // Note: This can be changed to is_scalar to allow other types of arrays, but should never
+                        // accept objects or nested arrays. Limited to strings for now due to test coverage.
+                        if (is_string($record)) {
+                            $formatted[] = $this->$format_function($record);
+                        } else {
+                            throw new coding_exception('Invalid array values, only scalar values can be formatted');
+                        }
+                    }
+                    return $formatted;
+                } else {
+                    return $this->$format_function($value);
+                }
             }
         }
 

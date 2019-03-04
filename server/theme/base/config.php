@@ -50,6 +50,11 @@ $THEME->layouts = array(
         'file' => 'general.php',
         'regions' => array(),
     ),
+    // Totara: special layout for mobile app WebView.
+    'webview' => array(
+        'file' => 'general.php',
+        'regions' => array(),
+    ),
     // Main course page.
     'course' => array(
         'file' => 'general.php',

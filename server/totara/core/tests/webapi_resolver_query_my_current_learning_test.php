@@ -338,10 +338,12 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
                     'shortname' => $items['certifications'][0]->shortname,
                     'fullname' => $items['certifications'][0]->fullname,
                     'description' => $items['certifications'][0]->summary,
-                    'description_format' => 1,
+                    'description_format' => 'HTML',
                     'progress' => 0.0,
                     'url_view' => "https://www.example.com/moodle/totara/program/view.php?id={$items['certifications'][0]->id}",
                     'duedate' => null,
+                    'duedate_state' => null,
+                    'image_src' => 'https://www.example.com/moodle/theme/image.php/_s/ventura/totara_certification/1/defaultimage'
                 ],
                 1 => [
                     'id' => "{$items['courses'][0]->id}",
@@ -349,12 +351,13 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
                     'itemcomponent' => "core_course",
                     'shortname' => $items['courses'][0]->shortname,
                     'fullname' => $items['courses'][0]->fullname,
-                    // summaryformat is FORMAT_MOODLE, means text_to_html
-                    'description' => '<div class="text_to_html">'.$items['courses'][0]->summary.'</div>',
-                    'description_format' => 0,
+                    'description' => $items['courses'][0]->summary,
+                    'description_format' => 'HTML',
                     'progress' => null,
                     'url_view' => "https://www.example.com/moodle/course/view.php?id={$items['courses'][0]->id}",
-                    'duedate' => null
+                    'duedate' => null,
+                    'duedate_state' => null,
+                    'image_src' => 'https://www.example.com/moodle/theme/image.php/_s/ventura/core/1/course_defaultimage'
                 ],
                 2 => [
                     'id' => "{$items['programs'][0]->id}",
@@ -363,10 +366,12 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
                     'shortname' => $items['programs'][0]->shortname,
                     'fullname' => $items['programs'][0]->fullname,
                     'description' => $items['programs'][0]->summary,
-                    'description_format' => 1,
+                    'description_format' => 'HTML',
                     'progress' => 0.0,
                     'url_view' => "https://www.example.com/moodle/totara/program/view.php?id={$items['programs'][0]->id}",
-                    'duedate' => null
+                    'duedate' => null,
+                    'duedate_state' => null,
+                    'image_src' => 'https://www.example.com/moodle/theme/image.php/_s/ventura/totara_program/1/defaultimage'
                 ]
             ]
         ];
@@ -388,10 +393,12 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
                     'shortname' => 'c1',
                     'fullname' => 'cert1',
                     'description' => 'first cert',
-                    'description_format' => 1,
+                    'description_format' => 'HTML',
                     'progress' => 0.0,
                     'url_view' => "https://www.example.com/moodle/totara/program/view.php?id={$items['certifications'][0]->id}",
                     'duedate' => null,
+                    'duedate_state' => null,
+                    'image_src' => 'https://www.example.com/moodle/theme/image.php/_s/ventura/totara_certification/1/defaultimage'
                 ],
                 1 => [
                     'id' => "{$items['certifications'][1]->id}",
@@ -400,10 +407,12 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
                     'shortname' => 'c2',
                     'fullname' => 'cert2',
                     'description' => 'second cert',
-                    'description_format' => 1,
+                    'description_format' => 'HTML',
                     'progress' => 0.0,
                     'url_view' => "https://www.example.com/moodle/totara/program/view.php?id={$items['certifications'][1]->id}",
                     'duedate' => null,
+                    'duedate_state' => null,
+                    'image_src' => 'https://www.example.com/moodle/theme/image.php/_s/ventura/totara_certification/1/defaultimage'
                 ],
                 2 => [
                     'id' => "{$items['courses'][0]->id}",
@@ -411,11 +420,13 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
                     'itemcomponent' => "core_course",
                     'shortname' => "c1",
                     'fullname' => "course1",
-                    'description' => "<div class=\"text_to_html\">first course</div>",
-                    'description_format' => 0,
+                    'description' => "first course",
+                    'description_format' => 'HTML',
                     'progress' => null,
                     'url_view' => "https://www.example.com/moodle/course/view.php?id={$items['courses'][0]->id}",
-                    'duedate' => null
+                    'duedate' => null,
+                    'duedate_state' => null,
+                    'image_src' => 'https://www.example.com/moodle/theme/image.php/_s/ventura/core/1/course_defaultimage'
                 ],
                 3 => [
                     'id' => "{$items['courses'][1]->id}",
@@ -423,11 +434,13 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
                     'itemcomponent' => "core_course",
                     'shortname' => "c2",
                     'fullname' => "course2",
-                    'description' => "<div class=\"text_to_html\">second course</div>",
-                    'description_format' => 0,
+                    'description' => "second course",
+                    'description_format' => 'HTML',
                     'progress' => null,
                     'url_view' => "https://www.example.com/moodle/course/view.php?id={$items['courses'][1]->id}",
-                    'duedate' => null
+                    'duedate' => null,
+                    'duedate_state' => null,
+                    'image_src' => 'https://www.example.com/moodle/theme/image.php/_s/ventura/core/1/course_defaultimage'
                 ],
                 4 => [
                     'id' => "{$items['programs'][0]->id}",
@@ -436,10 +449,12 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
                     'shortname' => "p1",
                     'fullname' => "prog1",
                     'description' => "first prog",
-                    'description_format' => 1,
+                    'description_format' => 'HTML',
                     'progress' => 0.0,
                     'url_view' => "https://www.example.com/moodle/totara/program/view.php?id={$items['programs'][0]->id}",
-                    'duedate' => null
+                    'duedate' => null,
+                    'duedate_state' => null,
+                    'image_src' => 'https://www.example.com/moodle/theme/image.php/_s/ventura/totara_program/1/defaultimage'
                 ],
                 5 => [
                     'id' => "{$items['programs'][1]->id}",
@@ -448,10 +463,12 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
                     'shortname' => "p2",
                     'fullname' => "prog2",
                     'description' => "second prog",
-                    'description_format' => 1,
+                    'description_format' => 'HTML',
                     'progress' => 0.0,
                     'url_view' => "https://www.example.com/moodle/totara/program/view.php?id={$items['programs'][1]->id}",
-                    'duedate' => null
+                    'duedate' => null,
+                    'duedate_state' => null,
+                    'image_src' => 'https://www.example.com/moodle/theme/image.php/_s/ventura/totara_program/1/defaultimage'
                 ]
             ]
         ];
@@ -468,6 +485,29 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
             'totara_core_my_current_learning' => []
         ];
         $this->assertSame($expected, $data);
+    }
+
+    /**
+     * Test presence of duedate state
+     */
+    public function test_duedate_state() {
+        $user1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+
+        $prog_gen = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $program1 = $prog_gen->create_program(['shortname' => 'p1', 'fullname' => 'prog1', 'summary' => 'first prog']);
+        $prog_gen->add_courses_and_courseset_to_program($program1, [[$course1]], CERTIFPATH_STD);
+        $prog_gen->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $user1->id,
+            array('completiontime' => date('d/m/Y', strtotime('+5 days'))), true);
+
+        $this->setUser($user1);
+        $result = \totara_webapi\graphql::execute_operation(
+            \core\webapi\execution_context::create('ajax', 'totara_core_my_current_learning'), []
+        );
+        $data = $result->toArray()['data'];
+        $record = $data['totara_core_my_current_learning'][0];
+        $this->assertEquals(strtotime(date('Y-m-d', strtotime('+5 days'))), $record['duedate']);
+        $this->assertEquals('danger', $record['duedate_state']);
     }
 
 }

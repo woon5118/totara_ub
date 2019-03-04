@@ -1,0 +1,11 @@
+query totara_mobile_messages {
+  message_popup_messages {
+    id
+    subject
+    fullmessage: fullmessagehtml(format: PLAIN)
+    fullmessageformat
+    timecreated
+    isread
+    __typename
+  }
+}

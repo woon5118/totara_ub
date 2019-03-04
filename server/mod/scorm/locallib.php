@@ -453,6 +453,11 @@ function scorm_get_scoes($id, $organisation=false) {
 function scorm_insert_track($userid, $scormid, $scoid, $attempt, $element, $value, $forcecompleted=false, $trackdata = null) {
     global $DB, $CFG;
 
+    if ($element === 'x.offline.attempt') {
+        // Totara: Do not allow overriding of internal offline attempt marker.
+        return null;
+    }
+
     $id = null;
 
     if ($forcecompleted) {

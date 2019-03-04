@@ -149,6 +149,8 @@ class totara_program_webapi_resolver_query_program_testcase extends advanced_tes
         $result = $this->execute_graphql_operation('totara_program_program', ['programid' => $programs[0]->id]);
         $data = $result->toArray()['data'];
 
+        $completion = prog_load_completion($programs[0]->id, $users[0]->id);
+
         $coursesets = $programs[0]->get_content()->get_course_sets();
         $expected = [
             "totara_program_program" => [
@@ -157,7 +159,10 @@ class totara_program_webapi_resolver_query_program_testcase extends advanced_tes
                 "fullname" => "prog1",
                 "shortname" => "p1",
                 "summary" => "",
-                "summaryformat" => 1,
+                "summaryformat" => 'HTML',
+                "endnote" => "",
+                "duedate" => null,
+                "duedate_state" => null,
                 "coursesets" => [
                     0 => [
                         "id" => "{$coursesets[0]->id}",
@@ -167,6 +172,13 @@ class totara_program_webapi_resolver_query_program_testcase extends advanced_tes
                         "id" => "{$coursesets[1]->id}",
                         "label" => "Course Set 2"
                     ]
+                ],
+                'completion' => [
+                    'id' => $completion->id,
+                    'status' => 0,
+                    'statuskey' => 'incomplete',
+                    'timecompleted' => null,
+                    'progress' => 0.0
                 ],
                 "availablefrom" => null,
                 "availableuntil" => null,

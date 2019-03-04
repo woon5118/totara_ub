@@ -120,6 +120,9 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect('scorm/lastattemptlock',
         get_string('lastattemptlock', 'scorm'), get_string('lastattemptlockdesc', 'scorm'), 0, $yesno));
 
+    $settings->add(new admin_setting_configselect('scorm/allowmobileoffline',
+        get_string('allowmobileoffline', 'scorm'), get_string('allowmobileoffline_desc', 'scorm'), 1, $yesno));
+
     $settings->add(new admin_setting_configselect('scorm/auto',
         get_string('autocontinue', 'scorm'), get_string('autocontinuedesc', 'scorm'), 0, $yesno));
 

@@ -245,7 +245,7 @@ function scorm_update_instance($scorm, $mform=null) {
             // Totara: Record package as trusted, it must have passed form validation or validation in whatever called this function.
             if (!$oldfile || $oldfile->get_contenthash() !== $file->get_contenthash()) {
                 if (strtolower($filename) !== 'imsmanifest.xml' && !$file->get_referencefileid()) {
-                    if ($file->get_contenthash() !== $scorm->sha1hash && has_capability('mod/scorm:addnewpackage', $context)) {
+                    if ((empty($scorm->sha1hash) || $file->get_contenthash() !== $scorm->sha1hash) && has_capability('mod/scorm:addnewpackage', $context)) {
                         scorm_add_trusted_package_contenthash($file->get_contenthash());
                     }
                 }
@@ -1061,10 +1061,26 @@ function scorm_pluginfile($course, $cm, $context, $filearea, $args, $forcedownlo
         // TODO: add any other access restrictions here if needed!
 
     } else if ($filearea === 'package') {
-        // Check if the global setting for disabling package downloads is enabled.
-        $protectpackagedownloads = get_config('scorm', 'protectpackagedownloads');
-        if ($protectpackagedownloads and !$canmanageactivity) {
-            return false;
+        if (defined('TOTARA_MOBILE_ACCESS') && TOTARA_MOBILE_ACCESS) {
+            if (!get_config('totara_mobile', 'enable')) {
+                return false;
+            }
+            $scorm = $DB->get_record('scorm', array('id' => $cm->instance), '*', MUST_EXIST);
+            if (!$scorm->allowmobileoffline) {
+                return false;
+            }
+            if (!scorm_version_check($scorm->version, SCORM_12)) {
+                return false;
+            }
+            if ($scorm->scormtype !== SCORM_TYPE_LOCAL && $scorm->scormtype !== SCORM_TYPE_LOCALSYNC) {
+                return false;
+            }
+        } else {
+            // Check if the global setting for disabling package downloads is enabled.
+            $protectpackagedownloads = get_config('scorm', 'protectpackagedownloads');
+            if ($protectpackagedownloads and !$canmanageactivity) {
+                return false;
+            }
         }
         $revision = (int)array_shift($args); // Prevents caching problems - ignored here.
         $relativepath = implode('/', $args);

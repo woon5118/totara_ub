@@ -43,7 +43,7 @@ class user implements \core\webapi\type_resolver {
      * @throws \coding_exception If the requested field does not exist, or the current user cannot see the given user.
      */
     public static function resolve(string $field, $user, array $args, execution_context $ec) {
-        global $USER;
+        global $CFG, $USER;
 
         if ($field === 'password' or $field === 'secret') {
             // Extra safety - these must never ever be exposed.
@@ -153,6 +153,13 @@ class user implements \core\webapi\type_resolver {
                     $user->{$missing_field} = $missing_value;
                 }
             }
+        }
+
+        // For mobile execution context, rewrite pluginfile urls in description and image_src fields.
+        // This is clearly a hack, please suggest something more elegant.
+        $urlfields = ['description', 'profileimageurl', 'profileimageurlsmall', 'url'];
+        if (is_a($ec, 'totara_mobile\webapi\execution_context') && in_array($field, $urlfields)) {
+            $formatted = str_replace($CFG->wwwroot . '/pluginfile.php', $CFG->wwwroot . '/totara/mobile/pluginfile.php', $formatted);
         }
 
         return $value;

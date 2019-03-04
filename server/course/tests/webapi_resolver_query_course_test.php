@@ -1,21 +1,21 @@
 <?php
-/*
- * This file is part of Totara LMS
+/**
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
- * This course is free software; you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * This course is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this course.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author David Curry <david.curry@totaralearning.com>
  * @package core_course
@@ -84,6 +84,8 @@ class totara_core_webapi_resolver_query_course_testcase extends advanced_testcas
      * Test the results of the query when the current user is the site administrator.
      */
     public function test_resolve_admin_user() {
+        global $PAGE;
+
         list($users, $courses) = $this->create_faux_courses();
         $this->setAdminUser();
 
@@ -92,6 +94,15 @@ class totara_core_webapi_resolver_query_course_testcase extends advanced_testcas
         $this->assertEquals($courses[0]->id, $result->id);
         $this->assertEquals($courses[0]->fullname, $result->fullname);
         $this->assertEquals($courses[0]->shortname, $result->shortname);
+
+        // There is an issue with require_login_course being called multiple times from within the same test.
+        $PAGE->reset_theme_and_output();
+
+        // They should also be able to see hidden courses.
+        $result = $this->resolve_graphql_query('core_course', ['courseid' => $courses[2]->id]);
+        $this->assertEquals($courses[2]->id, $result->id);
+        $this->assertEquals($courses[2]->fullname, $result->fullname);
+        $this->assertEquals($courses[2]->shortname, $result->shortname);
     }
 
     /**
@@ -164,9 +175,8 @@ class totara_core_webapi_resolver_query_course_testcase extends advanced_testcas
                 'idnumber' => "{$courses[0]->idnumber}",
                 'fullname' => "{$courses[0]->fullname}",
                 'shortname' => "{$courses[0]->shortname}",
-                // summaryformat is FORMAT_MOODLE, means text_to_html
-                'summary' => '<div class="text_to_html">'.$courses[0]->summary.'</div>',
-                'summaryformat' => (int) $courses[0]->summaryformat,
+                'summary' => $courses[0]->summary,
+                'summaryformat' => 'HTML',
                 'category' => [
                     'id' => $category->id,
                     'name' => $category->name
