@@ -668,6 +668,8 @@ M.core_filepicker.init = function(Y, options) {
                 params['newfilename'] = data.newfile.filename;
                 params['newfilepath'] = data.newfile.filepath;
                 this.hide_header();
+                // Pause the behat.
+                window.M.util.js_pending('filepicker_process_existing_file_overwrite');
                 this.request({
                     'params': params,
                     'scope': this,
@@ -687,6 +689,8 @@ M.core_filepicker.init = function(Y, options) {
                                 'file':data.existingfile.filename};
                         var formcallback_scope = scope.options.magicscope ? scope.options.magicscope : scope;
                         scope.options.formcallback.apply(formcallback_scope, [fileinfo]);
+                        // Release the behat.
+                        window.M.util.js_complete('filepicker_process_existing_file_overwrite');
                     }
                 }, true);
             }
