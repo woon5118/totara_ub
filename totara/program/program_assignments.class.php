@@ -581,7 +581,7 @@ abstract class prog_assignment_category {
      * @param array $userids Array of user IDs that we want to remove
      * @return bool $success True if the delete statement was successfully executed.
      */
-    function remove_outdated_assignments($programid, $assignmenttypeid, $userids) {
+    public function remove_outdated_assignments($programid, $assignmenttypeid, $userids) {
         global $DB;
 
         // Do nothing if it's not a group assignment or the id of the assignment type is not given or no users are passed.
@@ -608,10 +608,11 @@ abstract class prog_assignment_category {
             $sql = "DELETE FROM {prog_user_assignment}
                      WHERE userid {$sql}
                        AND programid = :programid
-                       AND assignmentid IN (SELECT id
-                                              FROM {prog_assignment}
-                                             WHERE assignmenttype = :assigntype
-                                               AND assignmenttypeid = :assigntypeid)";
+                       AND EXISTS (SELECT 1
+                         FROM {prog_assignment} pa
+                         WHERE pa.assignmenttype = :assigntype
+                           AND pa.assignmenttypeid = :assigntypeid
+                           AND pa.id = {prog_user_assignment}.assignmentid)";
             $result &= $DB->execute($sql, $params);
         }
 
