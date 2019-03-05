@@ -9,6 +9,7 @@ information provided here is intended especially for developers.
   * build_nojs_frameworkpicker()
   * build_nojs_jobassignmentpicker()
 * Removed deprecated totara/hierarchy/prefix/competency/template/lib.php file
+* Function goal::create_user_assignments has been deprecated. Use update_user_assignments instead.
 
 === 12.0 ===
 

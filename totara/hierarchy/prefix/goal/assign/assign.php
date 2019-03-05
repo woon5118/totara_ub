@@ -172,7 +172,7 @@ if ($add) {
         } else {
             // Make the assignment, then create all the current user assignments.
             $relationship->id = $DB->insert_record($type->table, $relationship);
-            $goal->create_user_assignments($assigntype, $relationship, $relationship->includechildren);
+            $goal->update_user_assignments($item, $assigntype, $relationship);
             $eventclass = "\\hierarchy_goal\\event\\assignment_{$type->fullname}_created";
         }
 

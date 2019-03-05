@@ -612,7 +612,10 @@ class hierarchy {
     }
 
     /**
-     * Get descendants of an item
+     * Get descendants of an item.
+     *
+     * NOTE: Includes the given item as well!
+     *
      * @param int $id
      * @return array
      */

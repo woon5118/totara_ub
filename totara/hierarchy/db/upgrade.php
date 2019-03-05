@@ -23,6 +23,8 @@
  * @subpackage totara_core
  */
 
+require_once($CFG->dirroot.'/totara/hierarchy/db/upgradelib.php');
+
 /**
  * Database upgrade script
  *
@@ -42,7 +44,6 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         // The function isn't particularly well performing, however we don't expect to encounter sites
         // with thousands of custom fields per type, as such we will raise memory as a caution as proceed.
         raise_memory_limit(MEMORY_HUGE);
-        require_once($CFG->dirroot.'/totara/hierarchy/db/upgradelib.php');
 
         totara_hierarchy_upgrade_fix_customfield_sortorder('comp_type'); // Competencies.
         totara_hierarchy_upgrade_fix_customfield_sortorder('goal_type'); // Company goals.
@@ -217,6 +218,13 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
 
         // Hierarchy savepoint reached.
         upgrade_plugin_savepoint(true, 2018090300, 'totara', 'hierarchy');
+    }
+
+    if ($oldversion < 2019030700) {
+        totara_hierarchy_upgrade_user_assignment_extrainfo();
+
+        // Hierarchy savepoint reached.
+        upgrade_plugin_savepoint(true, 2019030700, 'totara', 'hierarchy');
     }
 
     return true;

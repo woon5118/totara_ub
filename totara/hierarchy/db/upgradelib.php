@@ -68,3 +68,90 @@ function totara_hierarchy_upgrade_fix_customfield_sortorder($tableprefix) {
         unset($fieldsbytype[$typeid]);
     }
 }
+
+/*
+ * TL-20233 Convert old "extrainfo" into the new format.
+ *
+ * There are three possible states:
+ * - NULL - if there is no extrainfo then the assignment is current and reason is in the assignment
+ * - OLD:x,y - x is the assigntype, y is the rule instance id (rule may not be reason, but we don't know)
+ * - PAR:x,z - x is the assigntype, z is the assignmentid - audience cannot have PAR
+ *
+ * We upgrade NULL to the new format.
+ * We don't touch OLD, because we don't know the real reason. Instead, these are handled separately when displayed.
+ * We change PAR to OLD because this will happen anyway, but in upgrade it is controlled, and real code can stay clean.
+ */
+function totara_hierarchy_upgrade_user_assignment_extrainfo() {
+    global $CFG, $DB, $USER;
+
+    require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
+
+    // Upgrade NULL to "ITEM:x,y,z" where x is the assigntype, y is the assignmentid and z is the reason instance id.
+    $itemid = "(SELECT grp.posid FROM {goal_grp_pos} grp WHERE grp.id = gua.assignmentid)";
+    $sql = "UPDATE {goal_user_assignment} gua
+               SET extrainfo = " . $DB->sql_concat("'ITEM:'", 'assigntype', "','", 'assignmentid', "','", $itemid) . "
+             WHERE assigntype = :assigntype
+               AND extrainfo IS NULL
+    ";
+    $params = ['assigntype' => GOAL_ASSIGNMENT_POSITION];
+    $DB->execute($sql, $params);
+
+    $itemid = "(SELECT grp.orgid FROM {goal_grp_org} grp WHERE grp.id = gua.assignmentid)";
+    $sql = "UPDATE {goal_user_assignment} gua
+               SET extrainfo = " . $DB->sql_concat("'ITEM:'", 'assigntype', "','", 'assignmentid', "','", $itemid) . "
+             WHERE assigntype = :assigntype
+               AND extrainfo IS NULL
+    ";
+    $params = ['assigntype' => GOAL_ASSIGNMENT_ORGANISATION];
+    $DB->execute($sql, $params);
+
+    $itemid = "(SELECT grp.cohortid FROM {goal_grp_cohort} grp WHERE grp.id = gua.assignmentid)";
+    $sql = "UPDATE {goal_user_assignment} gua
+               SET extrainfo = " . $DB->sql_concat("'ITEM:'", 'assigntype', "','", 'assignmentid', "','", $itemid) . "
+             WHERE assigntype = :assigntype
+               AND extrainfo IS NULL
+    ";
+    $params = ['assigntype' => GOAL_ASSIGNMENT_AUDIENCE];
+    $DB->execute($sql, $params);
+
+    // Mark PAR records as OLD, because they would anyway next time cron runs (both before or after this upgrade).
+    $itemid = "(SELECT grp.posid FROM {goal_grp_pos} grp WHERE grp.id = gua.assignmentid)";
+    $sql = "UPDATE {goal_user_assignment} gua
+               SET extrainfo = " . $DB->sql_concat("'OLD:'", 'assigntype', "','", $itemid) . ",
+                   assigntype = :individualtype,
+                   assignmentid = 0,
+                   timemodified = :timemodified,
+                   usermodified = :usermodified
+             WHERE assigntype = :assigntype
+               AND " . $DB->sql_like('extrainfo', ':par');
+    $params = [
+        'individualtype' => GOAL_ASSIGNMENT_INDIVIDUAL,
+        'timemodified' => time(),
+        'usermodified' => $USER->id,
+        'assigntype' => GOAL_ASSIGNMENT_POSITION,
+        'par' => "PAR%",
+    ];
+    $DB->execute($sql, $params);
+
+    $itemid = "(SELECT grp.orgid FROM {goal_grp_org} grp WHERE grp.id = gua.assignmentid)";
+    $sql = "UPDATE {goal_user_assignment} gua
+               SET extrainfo = " . $DB->sql_concat("'OLD:'", 'assigntype', "','", $itemid) . ",
+                   assigntype = :individualtype,
+                   assignmentid = 0,
+                   timemodified = :timemodified,
+                   usermodified = :usermodified
+             WHERE assigntype = :assigntype
+               AND " . $DB->sql_like('extrainfo', ':par');
+    $params = [
+        'individualtype' => GOAL_ASSIGNMENT_INDIVIDUAL,
+        'timemodified' => time(),
+        'usermodified' => $USER->id,
+        'assigntype' => GOAL_ASSIGNMENT_ORGANISATION,
+        'par' => "PAR%",
+    ];
+    $DB->execute($sql, $params);
+
+    // There are no audience PAR records (audiences don't have hierarchies).
+
+    // After upgrade, we only have OLD:x,z (which we can't match to an original assignment) and ITEM:x,y,z records.
+}

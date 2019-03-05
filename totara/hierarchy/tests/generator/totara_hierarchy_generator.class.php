@@ -1038,7 +1038,7 @@ class totara_hierarchy_generator extends component_generator_base {
             // Get the base goal item.
             $item = $DB->get_record('goal', array('id' => $hierarchyid));
             $baseclassname = "totara_assign_goal";
-            $baseclass = new $baseclassname('goal', $item);
+            $baseclass = new totara_assign_goal('goal', $item);
             // Assign random pos, org or cohort groups to this goal.
             $grouptypes = array('pos', 'org', 'cohort');
             $groupstoassign = mt_rand(1,3);
