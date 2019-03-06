@@ -655,8 +655,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emails = $emailsink->get_messages();
         $emailsink->clear();
 
-        $this->assertContains("The session you are booked on (or on the waitlist) has changed:", $emails[0]->fullmessagehtml);
-        $this->assertContains("BOOKING CANCELLED", $emails[1]->fullmessagehtml);
+        usort($emails, function($email1, $email2) {
+           return strcmp($email1->subject, $email2->subject);
+        });
+        $this->assertContains("BOOKING CANCELLED", $emails[0]->fullmessagehtml);
+        $this->assertContains("The session you are booked on (or on the waitlist) has changed:", $emails[1]->fullmessagehtml);
 
         // Now test cancelling the session.
         $result = $seminarevent->cancel();
