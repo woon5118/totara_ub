@@ -52,6 +52,14 @@ final class seminar {
     const ATTENDANCE_TIME_ANY = 2;
 
     /**
+     * Event grading method field values
+     */
+    const GRADING_METHOD_GRADEHIGHEST = 0;
+    const GRADING_METHOD_GRADELOWEST = 1;
+    const GRADING_METHOD_EVENTFIRST = 2;
+    const GRADING_METHOD_EVENTLAST = 3;
+
+    /**
      * @var int {facetoface}.id
      */
     private $id = 0;
@@ -201,6 +209,14 @@ final class seminar {
      * @var int {facetoface}.attendancetime
      */
     private $attendancetime = self::ATTENDANCE_TIME_END;
+    /**
+     * @var int {facetoface}.eventgradingmanual
+     */
+    private $eventgradingmanual = 0;
+    /**
+     * @var int {facetoface}.eventgradingmethod
+     */
+    private $eventgradingmethod = self::GRADING_METHOD_GRADEHIGHEST;
     /**
      * @var string facetoface table name
      */
@@ -949,6 +965,34 @@ final class seminar {
      */
     public function set_attendancetime(int $attendancetime) : seminar {
         $this->attendancetime = $attendancetime;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_eventgradingmanual(): int {
+        return (int)$this->eventgradingmanual;
+    }
+    /**
+     * @param int $eventgradingmanual
+     */
+    public function set_eventgradingmanual(int $eventgradingmanual) : seminar {
+        $this->eventgradingmanual = $eventgradingmanual;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_eventgradingmethod(): int {
+        return (int)$this->eventgradingmethod;
+    }
+    /**
+     * @param int $eventgradingmethod
+     */
+    public function set_eventgradingmethod(int $eventgradingmethod) : seminar {
+        $this->eventgradingmethod = $eventgradingmethod;
         return $this;
     }
 

@@ -309,6 +309,38 @@ final class signup {
     }
 
     /**
+     * Switch signup state and set grade.
+     * This function must be used for any state changes
+     * @param mixed $grade grade
+     * @param null $reserved must be null
+     * @param string ...$newstates class names
+     * @return \signup
+     */
+    public function switch_state_with_grade($grade, $reserved, string ...$newstates) {
+        global $DB;
+        if ($reserved !== null) {
+            throw \coding_exception('the argument `$reserved` must be null at this moment.');
+        }
+
+        $trans = $DB->start_delegated_transaction();
+        $oldstate = $this->get_state();
+        $newstate = $oldstate->switch_to(...$newstates);
+        $this->update_status($newstate, 0, 0, $grade, $reserved);
+
+        /**
+         * @var state $newstate
+         */
+        if ($newstate instanceof interface_event) {
+            $newstate->get_event()->trigger();
+        }
+        $newstate->on_enter();
+
+        $trans->allow_commit();
+
+        return $this;
+    }
+
+    /**
      * Print debug information for all states transitions
      * @param bool $return return debug instead of outputting it (like in print_r)
      * @return array
@@ -402,15 +434,19 @@ final class signup {
     /**
      * Add new current signup status with a new state.
      * To change state of signup use signup::switch_state()
-     * @param status $status
+     * @param status        $status
+     * @param int           $timecreated
+     * @param int           $userbyid
+     * @param float|null    $grade
+     * @param null          $reserved        must be null
      */
-    protected function update_status(state $state, int $timecreated = 0, int $userbyid = 0) : signup_status {
+    protected function update_status(state $state, int $timecreated = 0, int $userbyid = 0, $grade = null, $reserved = null) : signup_status {
         global $USER, $CFG;
 
         // We need the completionlib for \completion_info and the COMPLETION_UNKNOWN constant.
         require_once($CFG->libdir . '/completionlib.php');
 
-        $status = signup_status::create($this, $state, $timecreated);
+        $status = signup_status::create($this, $state, $timecreated, $grade, $reserved);
 
         if (empty($userbyid)) {
             $userbyid = (int)$USER->id;

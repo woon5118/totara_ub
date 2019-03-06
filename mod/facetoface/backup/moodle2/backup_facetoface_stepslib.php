@@ -78,7 +78,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
                 'allowcancellationsdefault', 'cancellationscutoffdefault', 'selectjobassignmentonsignup',
                 'forceselectjobassignment', 'approvaltype', 'approvalrole', 'approvalterms', 'approvaladmins',
                 'multisignupfully', 'multisignuppartly', 'multisignupnoshow', 'multisignupunableto', 'multisignupmaximum',
-                'waitlistautoclean', 'sessionattendance', 'attendancetime'
+                'waitlistautoclean', 'sessionattendance', 'attendancetime', 'eventgradingmanual', 'eventgradingmethod'
             )
         );
 

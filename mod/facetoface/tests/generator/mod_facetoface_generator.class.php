@@ -107,6 +107,8 @@ class mod_facetoface_generator extends testing_module_generator {
         $defaults['reservedays'] = 2;
         $defaults['sessionattendance'] = 1;
         $defaults['attendancetime'] = \mod_facetoface\seminar::ATTENDANCE_TIME_END;
+        $defaults['eventgradingmanual'] = 0;
+        $defaults['eventgradingmethod'] = \mod_facetoface\seminar::GRADING_METHOD_GRADEHIGHEST;
         foreach ($defaults as $field => $value) {
             if (!isset($record->$field)) {
                 $record->$field = $value;

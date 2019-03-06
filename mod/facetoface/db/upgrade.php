@@ -494,5 +494,20 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019011100, 'facetoface');
     }
 
+    // Add support for event manual grading
+    if ($oldversion < 2019030100) {
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('eventgradingmanual', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'attendancetime');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('eventgradingmethod', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'eventgradingmanual');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2019030100, 'facetoface');
+    }
+
     return true;
 }

@@ -344,3 +344,19 @@ div.mod-facetoface__export-options {
 a.mod_facetoface__action_goback {
     margin: 0 0 3px 5px;
 }
+
+.mod_facetoface__grade.input-group {
+    display: flex;
+
+    input.form-control {
+        width: 6em;
+
+        &:focus::placeholder {
+            opacity: 0;
+        }
+        // Workaround for Edge, which does not see the :focus::placeholder.
+        &:focus::-ms-input-placeholder {
+            opacity: 0;
+        }
+    }
+}

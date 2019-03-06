@@ -103,6 +103,22 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->addHelpButton('attendancetime', 'attendancetime', 'facetoface');
         $mform->setDefault('attendancetime', get_config('facetoface', 'attendancetime'));
 
+        $mform->addElement('header', 'gradesheader', get_string('gradesheader', 'facetoface'));
+
+        $mform->addElement('checkbox', 'eventgradingmanual', get_string('eventgradingmanual', 'facetoface'));
+        $mform->addHelpButton('eventgradingmanual', 'eventgradingmanual', 'facetoface');
+        $mform->setType('eventgradingmanual', PARAM_BOOL);
+        $mform->setDefault('eventgradingmanual', get_config('facetoface', 'eventgradingmanual'));
+
+        $options = [];
+        $options[\mod_facetoface\seminar::GRADING_METHOD_GRADEHIGHEST] = new lang_string('eventgradingmethod:highest', 'facetoface');
+        $options[\mod_facetoface\seminar::GRADING_METHOD_GRADELOWEST] = new lang_string('eventgradingmethod:lowest', 'facetoface');
+        $options[\mod_facetoface\seminar::GRADING_METHOD_EVENTFIRST] = new lang_string('eventgradingmethod:first', 'facetoface');
+        $options[\mod_facetoface\seminar::GRADING_METHOD_EVENTLAST] = new lang_string('eventgradingmethod:last', 'facetoface');
+        $mform->addElement('select', 'eventgradingmethod', get_string('eventgradingmethod', 'facetoface'), $options);
+        $mform->addHelpButton('eventgradingmethod', 'eventgradingmethod', 'facetoface');
+        $mform->setDefault('eventgradingmethod', get_config('facetoface', 'eventgradingmethod'));
+
         $mform->addElement('header', 'approvaloptionsheader', get_string('signupworkflowheader', 'facetoface'));
 
         $options = array();
@@ -493,6 +509,9 @@ class mod_facetoface_mod_form extends moodleform_mod {
         }
         if (empty($data->sessionattendance)) {
             $data->sessionattendance = 0;
+        }
+        if (empty($data->eventgradingmanual)) {
+            $data->eventgradingmanual = 0;
         }
         if (!empty($data->shortname)) {
             // This needs to match the actual database field size in mod/facetoface/db/install.xml file.

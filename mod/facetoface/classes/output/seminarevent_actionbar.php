@@ -30,6 +30,9 @@ require_once('builder/seminarevent_actionbar_builder.php');
 
 use mod_facetoface\output\builder\seminarevent_actionbar_builder;
 
+/**
+ * An action bar that comprises a set of buttons (a.k.a. command links)
+ */
 class seminarevent_actionbar extends \core\output\template {
     /**
      * Create a new builder object.

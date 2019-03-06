@@ -26,6 +26,9 @@ namespace mod_facetoface\output;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * A table cell that represents attendance tracking on seminar event list
+ */
 class attendance_tracking_table_cell extends \html_table_cell {
     const CSS_CLASS = 'mod_facetoface__sessionlist__attendance';
 

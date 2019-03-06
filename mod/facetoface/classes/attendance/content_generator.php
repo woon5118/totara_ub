@@ -91,7 +91,7 @@ abstract class content_generator {
     }
 
     /**
-     * @param stdClass[] $data
+     * @param event_attendee[] $data
      * @param moodle_url $url
      *
      * @return totara_table
@@ -100,10 +100,10 @@ abstract class content_generator {
 
     /**
      * The keys of returning array should be specified as below:
-     * + rows: array|stdClass[]
+     * + rows: event_attendee[]
      * + headers: string[]
      *
-     * @param stdClass[] $data
+     * @param event_attendee[] $data
      *
      * @return array    Array<string, array>
      */
@@ -126,11 +126,11 @@ abstract class content_generator {
      * Returning a HTML block for the checkbox to manipulate the attendance's status record. This
      * should only be called in generating the content that allow action on.
      *
-     * @param stdClass $attendee
+     * @param event_attendee $attendee
      *
      * @return string
      */
-    protected function create_checkbox(stdClass $attendee): string {
+    protected function create_checkbox(event_attendee $attendee): string {
         $checkoptionid = 'check_submissionid_' . $attendee->submissionid;
 
         return html_writer::checkbox(
@@ -148,11 +148,11 @@ abstract class content_generator {
     /**
      * Returning a HTML string for a selection box of the attendance state, for the user to pick.
      *
-     * @param stdClass $attendee
+     * @param event_attendee $attendee
      *
      * @return string
      */
-    protected function create_attendance_status(stdClass $attendee): string {
+    protected function create_attendance_status(event_attendee $attendee): string {
         global $OUTPUT;
 
         return $OUTPUT->render(
@@ -161,13 +161,24 @@ abstract class content_generator {
     }
 
     /**
+     * Returning a HTML string for a text box of the event grade.
+     *
+     * @param event_attendee $attendee
+     *
+     * @return string
+     */
+    protected function event_grade_status(event_attendee $attendee): string {
+        return '';
+    }
+
+    /**
      * If the statuscode is booked, which means it should be not_set in taking attendance
      *
-     * @param stdClass $attendee
+     * @param event_attendee $attendee
      *
      * @return void
      */
-    protected function reset_attendee_statuscode(stdClass &$attendee): void {
+    protected function reset_attendee_statuscode(event_attendee &$attendee): void {
         if ($attendee->statuscode == booked::get_code() || $attendee->statuscode == null) {
             $attendee->statuscode = not_set::get_code();
         }

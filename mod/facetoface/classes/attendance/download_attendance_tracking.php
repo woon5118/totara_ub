@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 use mod_facetoface\seminar_event;
 use coding_exception;
 use moodle_exception;
+use mod_facetoface\export_helper;
 
 /**
  * Class download_attendance_tracking
@@ -111,13 +112,13 @@ final class download_attendance_tracking implements attendance_tracking {
 
         switch ($this->download) {
             case 'ods':
-                facetoface_download_ods($headers, $rows, $exportfilename);
+                export_helper::download_ods($headers, $rows, $exportfilename);
                 break;
             case 'xls':
-                facetoface_download_xls($headers, $rows, $exportfilename);
+                export_helper::download_xls($headers, $rows, $exportfilename);
                 break;
             case 'csv':
-                facetoface_download_csv($headers, $rows, $exportfilename);
+                export_helper::download_csv($headers, $rows, $exportfilename);
                 break;
             default:
                 throw new moodle_exception('nodownloadfiletype', 'mod_facetoface');

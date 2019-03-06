@@ -76,11 +76,12 @@ final class take_attendance_tracking implements attendance_tracking {
      * + email: string
      * + facetofaceid: int      -> {facetoface}.id
      * + course: int            -> {course}.id
-     * + statuscode: int        -> {facetoface_signups_status|facetofaec_signup_date_status}.statuscode
+     * + statuscode: int        -> {facetoface_signups_status|facetoface_signup_date_status}.statuscode
+     * + grade: float|null      -> {facetoface_signups_status}.grade|null
      * + deleted: int           -> {user}.deleted
      * + suspended: int         -> {user}.suspended
      *
-     * @var stdClass[]
+     * @var event_attendee[]
      */
     protected $rows;
 

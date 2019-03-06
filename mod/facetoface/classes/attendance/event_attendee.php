@@ -1,0 +1,185 @@
+<?php
+
+/*
+ * This file is part of Totara LMS
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
+ * @package mod_facetoface
+ */
+
+namespace mod_facetoface\attendance;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Provide a convenient way to handle the result of \mod_facetoface\attendance\attendance_helper::get_attendees()
+ */
+final class event_attendee extends \stdClass {
+
+    /** @var int {user}.id */
+    public $id = 0;
+    /** @var string {user}.idnumber */
+    public $idnumber = '';
+    /** @var string {user}.email */
+    public $email = '';
+    /** @var int {user}.deleted */
+    public $deleted = 0;
+    /** @var int {user}.suspended */
+    public $suspended = 0;
+
+    /** @var int {facetoface_signups}.id */
+    public $submissionid = 0;
+    /** @var int {facetoface}.id */
+    public $facetofaceid = 0;
+    /** @var int {course}.id */
+    public $course = 0;
+    /** @var int {facetoface_signups_status}.statuscode / {facetoface_signup_date_status}.attendancecode */
+    public $statuscode = 0;
+    /** @var float|null {facetoface_signups_status}.grade / null */
+    public $grade = null;
+
+    /** @var string {user}.firstname */
+    public $firstname = '';
+    /** @var string {user}.lastname */
+    public $lastname = '';
+    /** @var string {user}.alternatename */
+    public $alternatename = '';
+    /** @var string {user}.middlename */
+    public $middlename = '';
+    /** @var string {user}.firstnamephonetic */
+    public $firstnamephonetic = '';
+    /** @var string {user}.lastnamephonetic */
+    public $lastnamephonetic = '';
+
+    /**
+     * Map data object to class instance.
+     *
+     * @param \stdClass $object an element of an array returned by \mod_facetoface\attendance\attendance_helper::get_attendees()
+     */
+    public function from_record(\stdClass $object): event_attendee {
+        return $this->map_object($object);
+    }
+
+    /**
+     * Map data object to class instance.
+     *
+     * @param \stdClass $object an element of an array returned by \mod_facetoface\attendance\attendance_helper::get_attendees()
+     * @return event_attendee new class instance or null if $object is not a valid entry.
+     */
+    public static function map_from_record(\stdClass $object): event_attendee {
+        $self = new static();
+        $self->map_object($object);
+        return $self->is_valid() ? $self : null;
+    }
+
+    /**
+     * @see \mod_facetoface\traits\crud_mapper::map_object
+     *
+     * @param \stdClass $object
+     * @return event_attendee
+     */
+    protected function map_object(\stdClass $object) {
+        foreach ((array)$object as $property => $value) {
+            if (property_exists($this, $property)) {
+                $this->{$property} = $value;
+            } else {
+                debugging("Provided object does not have {$property} field", DEBUG_DEVELOPER);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Return true if the entry is valid.
+     *
+     * @return boolean
+     */
+    public function is_valid(): bool {
+        return !empty($this->id);
+    }
+
+    /**
+     * @return int
+     */
+    public function get_id(): int {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_idnumber(): string {
+        return $this->idnumber;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_email(): string {
+        return $this->email;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function is_deleted(): bool {
+        return !empty($this->deleted);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function is_suspended(): bool {
+        return !empty($this->suspended);
+    }
+
+    /**
+     * @return integer
+     */
+    public function get_signupid(): int {
+        return $this->submissionid;
+    }
+
+    /**
+     * @return integer
+     */
+    public function get_facetofaceid(): int {
+        return $this->facetofaceid;
+    }
+
+    /**
+     * @return integer
+     */
+    public function get_courseid(): int {
+        return $this->course;
+    }
+
+    /**
+     * @return integer
+     */
+    public function get_statuscode(): int {
+        return $this->statuscode;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function get_grade(): ?float {
+        return $this->grade;
+    }
+}

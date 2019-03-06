@@ -165,6 +165,30 @@ if ($ADMIN->fulltree) {
         )
     );
 
+    $settings->add(
+        new admin_setting_configcheckbox(
+            'facetoface/eventgradingmanual',
+            new lang_string('eventgradingmanual', 'facetoface'),
+            new lang_string('eventgradingmanual_help', 'facetoface'),
+            0
+        )
+    );
+
+    $options = [];
+    $options[\mod_facetoface\seminar::GRADING_METHOD_GRADEHIGHEST] = new lang_string('eventgradingmethod:highest', 'facetoface');
+    $options[\mod_facetoface\seminar::GRADING_METHOD_GRADELOWEST] = new lang_string('eventgradingmethod:lowest', 'facetoface');
+    $options[\mod_facetoface\seminar::GRADING_METHOD_EVENTFIRST] = new lang_string('eventgradingmethod:first', 'facetoface');
+    $options[\mod_facetoface\seminar::GRADING_METHOD_EVENTLAST] = new lang_string('eventgradingmethod:last', 'facetoface');
+    $settings->add(
+        new admin_setting_configselect(
+            'facetoface/eventgradingmethod',
+            new lang_string('eventgradingmethod', 'facetoface'),
+            new lang_string('eventgradingmethod_help', 'facetoface'),
+            \mod_facetoface\seminar::GRADING_METHOD_GRADEHIGHEST,
+            $options
+        )
+    );
+
     $settings->add(new admin_setting_heading('facetoface_signupworkflow_header', new lang_string('signupworkflowheader', 'facetoface'), ''));
 
     $amounts = [];

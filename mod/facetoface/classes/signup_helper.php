@@ -23,8 +23,9 @@
 
 namespace mod_facetoface;
 
-use mod_facetoface\exception\signup_exception;
 use \stdClass;
+use mod_facetoface\signup_status;
+use mod_facetoface\exception\signup_exception;
 use mod_facetoface\signup\state\{
     state,
     not_set,
@@ -187,57 +188,196 @@ final class signup_helper {
      * Process the attendance records for a seminar event. This is for event taking attendance.
      *
      * @param seminar_event $seminarevent
-     * @param array         $attendance
+     * @param array         $attendance     an array containing [ signup::id => state::get_code() ]
+     * @param array         $grades         an array containing [ signup::id => grade or null ]
+     *                                      only valid for seminars with manual event grading
      * @return bool
      */
-    public static function process_attendance(seminar_event $seminarevent, array $attendance) : bool {
+    public static function process_attendance(seminar_event $seminarevent, array $attendance, array $grades = null) : bool {
+        if ($grades === null) {
+            $grades = [];
+        }
+        $eventgradingmanual = $seminarevent->get_seminar()->get_eventgradingmanual() != 0;
+
+        foreach ($attendance as $signupid => $statuscode) {
+            $grade = $grades[$signupid] ?? null;
+            $signup = new signup($signupid);
+            $desiredstate = state::from_code($statuscode);
+
+            if (!self::switch_state_and_grade($seminarevent, $signup, $desiredstate, $eventgradingmanual, $grade)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Switch state and grade.
+     *
+     * @param seminar_event $seminarevent
+     * @param signup        $signup
+     * @param string        $desiredstate       the class name of a new state
+     * @param bool          $eventgradingmanual true to use $grade value, false to use default value instead of $grade value
+     * @param float         $grade              new grade or null to use default by $desiredstate::get_grade()
+     * @return bool
+     */
+    private static function switch_state_and_grade(seminar_event $seminarevent, signup $signup, string $desiredstate, bool $eventgradingmanual, float $grade = null) : bool {
+        $currentstate = $signup->get_state();
+
+        if ($desiredstate == not_set::class) {
+            // If current state is attendance, try fallback to booked, otherwise leave it as is
+            if ($currentstate instanceof attendance_state) {
+                $desiredstate = booked::class;
+            } else {
+                $desiredstate = get_class($currentstate);
+            }
+        }
+
+        if (!$eventgradingmanual) {
+            $grade = $desiredstate::get_grade();
+        }
+
+        if ($signup->can_switch($desiredstate)) {
+            $signup->switch_state_with_grade($grade, null, $desiredstate);
+        } else {
+            $same_state = get_class($currentstate) === $desiredstate;
+            if ($same_state) {
+                $signupstatus = signup_status::from_current($signup);
+                // same states but different grade
+                error_log(json_encode([$signupstatus->get_grade(), $grade]));
+                if ($signupstatus->get_grade() !== $grade) {
+                    $signupstatus = signup_status::create($signup, $currentstate, 0, $grade, null);
+                    $signupstatus->save();
+                }
+            }
+
+            // do not error_log() when attempting to switch to the same state
+            if (!$same_state) {
+                error_log(
+                    sprintf(
+                        "Seminar: could not switch signup #%d from '%s' to '%s'",
+                        $signup->get_id(), get_class($currentstate), $desiredstate
+                    )
+                );
+                return false;
+            }
+        }
+
+        return self::grade_signup($seminarevent, $signup, $grade);
+    }
+
+    /**
+     * Calculate a final grade for given sign-up based on a grading method.
+     *
+     * @param seminar $seminar
+     * @param signup $signup
+     * @return float|null               a grade value or null if nothing applicable
+     */
+    private static function compute_final_grade(seminar $seminar, signup $signup) : ?float {
+        global $DB;
+
+        if (!$seminar->get_eventgradingmanual()) {
+            throw \coding_exception("compute_final_grade() cannot be called when seminar::eventgradingmanual is off");
+        }
+
+        switch ($seminar->get_eventgradingmethod()) {
+            case seminar::GRADING_METHOD_GRADEHIGHEST:
+                $select_grade = 'MAX(sus.grade) AS grade';
+                $order_by = '';
+                break;
+            case seminar::GRADING_METHOD_GRADELOWEST:
+                $select_grade = 'MIN(sus.grade) AS grade';
+                $order_by = '';
+                break;
+            case seminar::GRADING_METHOD_EVENTFIRST:
+                $select_grade = 'sus.grade';
+                $order_by = 'ORDER BY m.mintimestart';
+                break;
+            case seminar::GRADING_METHOD_EVENTLAST:
+                $select_grade = 'sus.grade';
+                $order_by = 'ORDER BY m.maxtimefinish DESC';
+                break;
+
+            default:
+                throw new \coding_exception(
+                    sprintf(
+                        "Bogus grading method: %d at signup #%d of seminar #%d",
+                        $grading_method,
+                        $signup->get_id(),
+                        $signup->get_seminar_event()->get_facetoface()
+                    )
+                );
+        }
+
+        $sql = '
+            SELECT ' . $select_grade . '
+            FROM {facetoface_signups_status} sus
+            JOIN {facetoface_signups} su ON su.id = sus.signupid
+            JOIN {facetoface_sessions} s ON s.id = su.sessionid
+            LEFT JOIN (
+                SELECT
+                    fsd.sessionid,
+                    MIN(fsd.timestart) AS mintimestart,
+                    MAX(fsd.timefinish) AS maxtimefinish
+                FROM {facetoface_sessions_dates} fsd
+                WHERE (1=1)
+                GROUP BY fsd.sessionid
+            ) m ON m.sessionid = s.id
+            JOIN {user} u ON u.id = su.userid
+            WHERE u.id = :uid AND s.facetoface = :f2f AND sus.superceded = 0 AND sus.grade IS NOT NULL
+            ' . $order_by;
+
+        $set = $DB->get_recordset_sql($sql, ['uid' => $signup->get_userid(), 'f2f' => $seminar->get_id()], 0, 1);
+        try {
+            if ($set->valid()) {
+                return $set->current()->grade;
+            }
+            return null;
+        } finally {
+            $set->close();
+        }
+    }
+
+    /**
+     * Create grade item for given sign-up.
+     *
+     * @param seminar_event $seminarevent
+     * @param signup        $signup
+     * @param float|null    $defaultgrade   the default grade value used only if manual grading is off
+     * @return bool
+     */
+    private static function grade_signup(seminar_event $seminarevent, signup $signup, float $defaultgrade = null) : bool {
         global $CFG, $USER;
 
         // Necessary for facetoface_grade_item_update()
         require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-        foreach ($attendance as $signupid => $value) {
-            $signup = new signup($signupid);
-            $desiredstate = state::from_code($value);
-            $currentstate = $signup->get_state();
+        $seminar = $seminarevent->get_seminar();
 
-            if ($desiredstate == not_set::class) {
-                // If current state is attendance, try fallback to booked, otherwise leave it as is
-                if ($currentstate instanceof attendance_state) {
-                    $desiredstate = booked::class;
-                } else {
-                    $desiredstate = get_class($currentstate);
-                }
-            }
-            if (!$signup->can_switch($desiredstate)) {
-                // suppress the error log when switching to the same state
-                if (get_class($currentstate) === $desiredstate) {
-                    continue;
-                }
-                error_log("Seminar: could not switch signup id '$signupid' to '$desiredstate'");
-                continue;
-            }
+        if ($seminar->get_eventgradingmanual()) {
+            $finalgrade = self::compute_final_grade($seminar, $signup);
+        } else {
+            $finalgrade = $defaultgrade;
+        }
 
-            $signup->switch_state($desiredstate);
+        $timenow = time();
 
-            $timenow = time();
-            $seminar = $seminarevent->get_seminar();
-            $facetoface = $seminar->get_properties();
+        $grade = new \stdclass();
+        $grade->userid = $signup->get_userid();
+        $grade->rawgrade = $finalgrade;
+        // TODO: support scale, pass, min, max
+        $grade->rawgrademin = 0;
+        $grade->rawgrademax = 100;
+        $grade->timecreated = $timenow;
+        $grade->timemodified = $timenow;
+        $grade->usermodified = $USER->id;
 
-            $grade = new \stdclass();
-            $grade->userid = $signup->get_userid();
-            $grade->rawgrade = $desiredstate::get_grade();
-            $grade->rawgrademin = 0;
-            $grade->rawgrademax = 100;
-            $grade->timecreated = $timenow;
-            $grade->timemodified = $timenow;
-            $grade->usermodified = $USER->id;
+        $facetoface = $seminar->get_properties();
 
-            // Grade functions stay in lib file.
-            if (!facetoface_grade_item_update($facetoface, $grade)) {
-                    error_log("F2F: could grade signup '$signupid' as '$grade'");
-                    continue;
-            }
+        // Grade functions stay in lib file.
+        if (!facetoface_grade_item_update($facetoface, $grade)) {
+            error_log("F2F: could not grade signup '{$signup->get_id()}' as '$grade'");
+            return false;
         }
         return true;
     }

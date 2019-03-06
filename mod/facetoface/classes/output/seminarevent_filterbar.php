@@ -31,6 +31,9 @@ require_once('builder/seminarevent_filterbar_builder.php');
 use core\output\template;
 use mod_facetoface\output\builder\seminarevent_filterbar_builder;
 
+/**
+ * A filter bar that comprises a set of filters for seminar event list
+ */
 class seminarevent_filterbar extends template {
     /**
      * Create a new builder object.

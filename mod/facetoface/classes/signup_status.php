@@ -145,6 +145,29 @@ final class signup_status {
     }
 
     /**
+     * Load the current signup_status instance from signup.
+     *
+     * @param int|signup $signup    signup instance or signup id
+     * @return signup_status        class instance or null if nothing found
+     */
+    public static function find_current($signup) : signup_status {
+        global $DB;
+        if (is_int($signup)) {
+            $rec = $DB->get_record('facetoface_signups_status', ['signupid' => $signup, 'superceded' => 0], '*', IGNORE_MISSING);
+            if (!empty($rec)) {
+                $self = new signup_status();
+                return $self->from_record($rec);
+            }
+        } else {
+            $id = (int)$DB->get_field('facetoface_signups_status', 'id', ['signupid' => $signup->get_id(), 'superceded' => 0], IGNORE_MISSING);
+            if ($id !== 0) {
+                return new signup_status($id);
+            }
+        }
+        return null;
+    }
+
+    /**
      * Map data object to class instance.
      *
      * @param \stdClass $object
@@ -171,12 +194,17 @@ final class signup_status {
 
     /**
      * Create new signup status from state
-     * @param signup $signup
-     * @param state $state
-     * @param int $timecreated
+     * @param signup        $signup
+     * @param state         $state
+     * @param int           $timecreated
+     * @param float|null    $grade
+     * @param null          $reserved       must be null
      * @return signup_status
      */
-    public static function create(signup $signup, state $state, int $timecreated = 0) : signup_status {
+    public static function create(signup $signup, state $state, int $timecreated = 0, float $grade = null, $reserved = null) : signup_status {
+        if ($reserved !== null) {
+            throw \coding_exception('the argument `$reserved` must be null at this moment.');
+        }
         if (empty($timecreated)) {
             $timecreated = time();
         }
@@ -184,6 +212,7 @@ final class signup_status {
         $status->statuscode = $state->get_code();
         $status->signupid = $signup->get_id();
         $status->timecreated = $timecreated;
+        $status->grade = $grade;
 
         return $status;
     }
@@ -237,21 +266,19 @@ final class signup_status {
         return $this;
     }
 
-
     /**
-     * @return float
+     * @return float|null
      */
-    public function get_grade() : float {
-        return (float)$this->grade;
+    public function get_grade() : ?float {
+        return $this->grade;
     }
     /**
-     * @param float $grade
+     * @param float|null $grade
      */
-    public function set_grade(float $grade) : signup_status {
+    public function set_grade(?float $grade) : signup_status {
         $this->grade = $grade;
         return $this;
     }
-
 
     /**
      * @return int

@@ -25,10 +25,11 @@ namespace mod_facetoface\attendance;
 defined('MOODLE_INTERNAL') || die();
 
 use mod_facetoface\output\take_attendance_status_picker;
+use mod_facetoface\output\event_grade_input;
 use mod_facetoface\signup\state\{not_set, booked};
+use mod_facetoface\signup_status;
 use moodle_url;
 use totara_table;
-use stdClass;
 use html_writer;
 
 /**
@@ -69,10 +70,11 @@ final class event_content extends content_generator {
         $headers = ['', get_string('learner')];
         $columns = ['checkbox', 'name'];
 
-        if ($this->seminarevent->get_seminar()->get_sessionattendance()) {
+        $seminar = $this->seminarevent->get_seminar();
+        if ($seminar->get_sessionattendance()) {
             foreach ($this->statusoptions as $key => $label) {
                 $identifier = "status-code-{$key}";
-                $o = new stdClass();
+                $o = new \stdClass();
                 $o->statuslabel = $label;
 
                 $headers[] = get_string('sessionstatus', 'mod_facetoface', $o);
@@ -83,6 +85,11 @@ final class event_content extends content_generator {
         // Adding the other columns here after those status columns
         $headers = array_merge($headers, [get_string('eventattendanceheader', 'mod_facetoface')]);
         $columns = array_merge($columns, ['attendance']);
+
+        if ($seminar->get_eventgradingmanual()) {
+            $headers = array_merge($headers, [get_string('eventgradeheader', 'mod_facetoface')]);
+            $columns = array_merge($columns, ['grade']);
+        }
 
         if (!$iseditable) {
             // Because this is not an edit able content, therefore, we should not allow these boxes
@@ -102,7 +109,7 @@ final class event_content extends content_generator {
      * the editor to be able to edit the content. Therefore, it is quite different from downloadable
      * content or readonly table. As there should have no checkbox or selection box included.
      *
-     * @param array $rows
+     * @param event_attendee[] $rows
      * @param moodle_url $url
      * @return totara_table
      */
@@ -116,13 +123,12 @@ final class event_content extends content_generator {
         $helper = new attendance_helper();
         $stats = $helper->get_calculated_session_attendance_status($this->seminarevent->get_id());
 
-        foreach ($rows as $row) {
-            $data = [];
-
-            $attendee = clone $row;
-            if (!$attendee->id) {
+        foreach ($rows as $attendee) {
+            if ($attendee === null) {
                 continue;
             }
+
+            $data = [];
 
             $this->reset_attendee_statuscode($attendee);
             $data[] = $this->create_checkbox($attendee);
@@ -149,6 +155,10 @@ final class event_content extends content_generator {
 
             $data[] = $this->create_attendance_status($attendee);
 
+            if ($seminar->get_eventgradingmanual()) {
+                $data[] = $this->event_grade_status($attendee);
+            }
+
             // If grade is needed, please add it here
             $table->add_data($data);
         }
@@ -159,7 +169,7 @@ final class event_content extends content_generator {
 
     /**
      * @inheritdoc
-     * @param array $rows
+     * @param event_attendee[] $rows
      * @return array Array<string, array>
      */
     public function generate_downloadable_content(array $rows): array {
@@ -173,6 +183,7 @@ final class event_content extends content_generator {
         }
 
         $headers[] = get_string('eventattendanceheader', 'mod_facetoface');
+        $headers[] = get_string('eventgradeheader', 'mod_facetoface');
         $definition = [
             'headers' => $headers,
             'rows' => []
@@ -210,6 +221,7 @@ final class event_content extends content_generator {
             }
 
             $data[] = $attendancestatus;
+            $data[] = $attendee->get_grade() !== null ? (string)$attendee->get_grade() : '';
             $exportrows[] = $data;
         }
 
@@ -219,16 +231,33 @@ final class event_content extends content_generator {
 
     /**
      * @inheritdoc
-     * @param stdClass $attendee
+     * @param event_attendee $attendee
      * @return string
      */
-    protected function create_attendance_status(stdClass $attendee): string {
+    protected function create_attendance_status(event_attendee $attendee): string {
         global $OUTPUT;
 
         // Disabled will happen if the seminar_event is not open for attendance.
         $disabled = !$this->seminarevent->is_attendance_open();
         return $OUTPUT->render(
             take_attendance_status_picker::create($attendee, $this->statusoptions, $disabled)
+        );
+    }
+
+    /**
+     * @inheritdoc
+     * @param event_attendee $attendee
+     * @return string
+     */
+    protected function event_grade_status(event_attendee $attendee): string {
+        global $OUTPUT;
+
+        $status = signup_status::find_current($attendee->get_signupid());
+
+        // Disabled will happen if the seminar_event is not open for attendance.
+        $disabled = !$this->seminarevent->is_attendance_open();
+        return $OUTPUT->render(
+            event_grade_input::create($attendee, $status, $disabled)
         );
     }
 }

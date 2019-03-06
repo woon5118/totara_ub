@@ -125,8 +125,9 @@ if ($formdata = data_submitted()) {
         }
 
         // Pre-process form data.
-        $check = [];
-        $items = [];
+        $error = [];
+        $states = [];
+        $grades = [];
         foreach ($formdata as $key => $item) {
             $keyparts = explode('_', $key);
             /**
@@ -139,31 +140,44 @@ if ($formdata = data_submitted()) {
                     continue; // Attendance value not set.
                 }
 
-                $items[$keyparts[1]] = (int)$item;
+                $states[$keyparts[1]] = (int)$item;
+            } else if ($keyparts[0] == 'submissiongradeid') {
+                if ($item === '') {
+                    $grades[$keyparts[1]] = null;
+                } else {
+                    $val = (float)$item;
+                    if (!is_number($item) || $val < 0 || $val > 100) {
+                        $error[] = get_string('eventgradingoutofrange', 'facetoface', ['min' => 0, 'max' => 100, 'val' => $item]);
+                        continue;
+                    }
+                    $grades[$keyparts[1]] = (float)$item;
+                }
             }
         }
 
-        $result = false;
-        if ($sd == 0) {
-            $result = signup_helper::process_attendance($seminarevent, $items);
-            if ($result) {
-                // Trigger take attendance update event.
-                $event = \mod_facetoface\event\attendance_updated::create_from_session(
-                    $session,
-                    $context
-                );
-
-                $event->trigger();
-
-                totara_set_notification(
-                    get_string('updateattendeessuccessful', 'facetoface'),
-                    $baseurl,
-                    ['class' => 'notifysuccess']
-                );
-            }
+        if (count($error)) {
+            totara_set_notification(
+                implode('<br>', $error),
+                $baseurl,
+                ['class' => 'notifynotice alert alert-warning']
+            );
         } else {
-            $baseurl->param('sd', $sd);
-            $result = attendance_helper::process_session_attendance($items, $sd);
+            $result = false;
+            if ($sd == 0) {
+                $result = signup_helper::process_attendance($seminarevent, $states, $grades);
+                if ($result) {
+                    // Trigger take attendance update event.
+                    $event = \mod_facetoface\event\attendance_updated::create_from_session(
+                        $session,
+                        $context
+                    );
+
+                    $event->trigger();
+                }
+            } else {
+                $baseurl->param('sd', $sd);
+                $result = attendance_helper::process_session_attendance($states, $sd);
+            }
 
             if ($result) {
                 totara_set_notification(
@@ -171,15 +185,13 @@ if ($formdata = data_submitted()) {
                     $baseurl,
                     ['class' => 'notifysuccess']
                 );
+            } else {
+                totara_set_notification(
+                    get_string('error:takeattendance', 'facetoface'),
+                    $baseurl,
+                    ['class' => 'notifyproblem']
+                );
             }
-        }
-
-        if (!$result) {
-            totara_set_notification(
-                get_string('error:takeattendance', 'facetoface'),
-                $baseurl,
-                ['class' => 'notifyproblem']
-            );
         }
     }
 }

@@ -87,8 +87,8 @@ final class session_content extends content_generator {
     /**
      * Generating the sessions table that is allowed to be edit on browser for user user.
      *
-     * @param array         $rows
-     * @param moodle_url    $url
+     * @param event_attendee[] $rows
+     * @param moodle_url       $url
      * @return totara_table
      */
     public function generate_allowed_action_content(array $rows, moodle_url $url): totara_table {
@@ -129,7 +129,7 @@ final class session_content extends content_generator {
     }
 
     /**
-     * @param array $rows
+     * @param event_attendee[] $rows
      * @return array Array<string, array>
      *
      * @inheritdoc

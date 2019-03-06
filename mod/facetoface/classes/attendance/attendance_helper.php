@@ -101,7 +101,7 @@ final class attendance_helper {
             ON su.sessionid = s.id
             INNER JOIN {user} u
             ON u.id = su.userid
-            {%extra_join%} 
+            {%extra_join%}
         ";
     }
 
@@ -119,6 +119,7 @@ final class attendance_helper {
      * + facetofaceid: int
      * + course: int
      * + statuscode: int
+     * + grade: float|null
      * + [usernamefields] : string
      *
      * @param int $seminareventid
@@ -132,7 +133,7 @@ final class attendance_helper {
         $sql = str_replace(
             ['{%extra_select%}', '{%extra_join%}'],
             [
-                " ss.statuscode, ",
+                " ss.statuscode, ss.grade, ",
                 " INNER JOIN {facetoface_signups_status} ss ON ss.signupid = su.id "
             ],
             $sql
@@ -140,7 +141,7 @@ final class attendance_helper {
 
         [$statussql, $params] = $DB->get_in_or_equal($this->statuses);
 
-        $sql .= " 
+        $sql .= "
             WHERE s.id = ?
             AND ss.statuscode {$statussql}
             AND ss.superceded <> 1
@@ -191,14 +192,11 @@ final class attendance_helper {
             [
                 ' sds.attendancecode as statuscode, ',
                 " INNER JOIN {facetoface_sessions_dates} sd ON sd.sessionid = s.id
-                  
                   LEFT JOIN {facetoface_signups_dates_status} sds ON sds.signupid = su.id
                     AND sds.sessiondateid = sd.id
                     AND sds.superceded <> 1
-                    
                   LEFT JOIN {facetoface_signups_status} ss ON ss.signupid = su.id
                     AND ss.superceded <> 1
-                    
                 "
             ],
             $sql
@@ -226,14 +224,21 @@ final class attendance_helper {
      * @param int $seminareventid
      * @param int $sessiondateid
      *
-     * @return stdClass[]
+     * @return event_attendee[]
      */
     public function get_attendees(int $seminareventid, int $sessiondateid = 0): array {
         if ($sessiondateid > 0) {
-            return $this->get_session_attendees($seminareventid, $sessiondateid);
+            $array = $this->get_session_attendees($seminareventid, $sessiondateid);
+        } else {
+            $array = $this->get_event_attendees($seminareventid);
         }
 
-        return $this->get_event_attendees($seminareventid);
+        return array_map(
+            function ($e) {
+                return event_attendee::map_from_record($e);
+            }
+            , $array
+        );
     }
 
     /**
@@ -258,11 +263,11 @@ final class attendance_helper {
         // The first query is about attendances of those session date, that the attendee has
         // data populated. Whereas the second query is about those session date, that the attendee
         // does not has populated yet. Which it should be counted as missing.
-        $sql = "SELECT 
+        $sql = "SELECT
             sds.attendancecode AS statuscode,
             su.userid AS userid,
             COUNT(sds.id) AS total
-            FROM {facetoface_signups_dates_status} sds 
+            FROM {facetoface_signups_dates_status} sds
             INNER JOIN {facetoface_signups} su ON su.id = sds.signupid
             INNER JOIN {facetoface_sessions_dates} sd ON sd.id = sds.sessiondateid
             INNER JOIN {facetoface_sessions} s ON s.id = sd.sessionid
