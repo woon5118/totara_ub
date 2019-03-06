@@ -4583,6 +4583,8 @@ class appraisal_exception extends Exception {
 
 /**
  * Appraisal event notification
+ *
+ * @property $id
  */
 class appraisal_message {
     /**
@@ -5792,6 +5794,8 @@ function totara_appraisal_install_example_appraisal() {
 
 /**
  * Role assignment to appraisal
+ *
+ * @property-read $id
  */
 class appraisal_role_assignment {
     /**
@@ -5973,6 +5977,8 @@ class appraisal_role_assignment {
 
 /**
  * User (Learner) assignment to appraisal
+ *
+ * @property-read $id
  */
 class appraisal_user_assignment {
     /**

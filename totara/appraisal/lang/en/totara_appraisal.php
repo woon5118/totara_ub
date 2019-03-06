@@ -37,6 +37,7 @@ $string['aggregateselectordisplay'] = '{$a->stagename} - {$a->pagename} : {$a->q
 $string['ahead'] = 'Ahead';
 $string['allappraisals'] = 'All Appraisals';
 $string['allappraisalsfor'] = 'All Appraisals for {$a}';
+$string['allroles'] = 'All roles';
 $string['answer'] = 'Answer';
 $string['appraisal:manageappraisals'] = 'Manage appraisals';
 $string['appraisal:cloneappraisal'] = 'Clone appraisals';
