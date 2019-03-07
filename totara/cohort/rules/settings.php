@@ -39,6 +39,7 @@ require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/cohortmember.php'
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/custom_fields/custom_field_sqlhandler.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/option.php');
 require_once($CFG->dirroot . '/totara/cohort/classes/rules/ui/job_assignments.php');
+require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/enrolment.php');
 
 use totara_cohort\rules\ui\text as cohort_rule_ui_text;
 use totara_cohort\rules\ui\menu as cohort_rule_ui_menu;
@@ -61,6 +62,8 @@ use totara_cohort\rules\ui\certification_status as cohort_rule_ui_picker_certifi
 use totara_cohort\rules\ui\cohort_member as cohort_rule_ui_cohortmember;
 use totara_cohort\rules\ui\has_direct_reports as cohort_rule_ui_has_direct_reports;
 use totara_cohort\rules\ui\has_temporary_reports as cohort_rule_ui_has_temporary_reports;
+use totara_cohort\rules\ui\course_enrolment_allanynotallnone as  cohort_rule_ui_course_enrolment_allanynotallnone;
+use totara_cohort\rules\ui\program_enrolment_allanynotallnone as cohort_rule_ui_program_enrolment_allanynotallnone;
 
 /* Constants to identify if the rule comes from a menu or a text input */
 define('COHORT_RULES_TYPE_MENU', 1);
@@ -619,6 +622,16 @@ function cohort_rules_list($reset = false){
             ),
             new cohort_rule_sqlhandler_completion_duration_course()
         );
+        // Enrolment in all/any/none/not-all courses in a list
+        $rules[] = new cohort_rule_option(
+            'learning',
+            'courseenrolmentlist',
+            new cohort_rule_ui_course_enrolment_allanynotallnone(
+                get_string('ruledesc-learning-courseenrolmentlist', 'totara_cohort'),
+                COHORT_PICKER_COURSE_ENROLMENT
+            ),
+            new cohort_rule_sqlhandler_enrolment_list_course()
+        );
         // Historic Completion of all/any/none/not-all courses in a list
         $rules[] = new cohort_rule_option(
             'learning',
@@ -639,7 +652,18 @@ function cohort_rules_list($reset = false){
             ),
             new cohort_rule_sqlhandler_course_completion_history_date()
         );
+
         if (totara_feature_visible('programs')) {
+            // Assignemnt to all/any/not all/none programs in a list
+            $rules[] = new cohort_rule_option(
+                'learning',
+                'programenrolmentlist',
+                new cohort_rule_ui_program_enrolment_allanynotallnone(
+                    get_string('ruledesc-learning-programenrolmentlist', 'totara_cohort'),
+                    COHORT_PICKER_PROGRAM_ENROLMENT
+                ),
+                new cohort_rule_sqlhandler_enrolment_list_program()
+            );
             // Completion of all/any/not-all/none of programs in a list
             $rules[] = new cohort_rule_option(
                 'learning',

@@ -52,10 +52,12 @@ class cohort_broken_rules_check {
             'coursecompletionlist'              => 'course',
             'coursecompletiondate'              => 'course',
             'coursecompletionduration'          => 'course',
+            'courseenrolmentlist'               => 'course',
             'programcompletionlist'             => 'prog',
             'programcompletiondate'             => 'prog',
             'programcompletiondurationassigned' => 'prog',
             'programcompletiondurationstarted'  => 'prog',
+            'programenrolmentlist'              => 'prog',
             'positions'                         => 'pos',
             'organisations'                     => 'org'
         );
