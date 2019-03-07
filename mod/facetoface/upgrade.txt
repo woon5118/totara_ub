@@ -59,6 +59,9 @@ information provided here is intended especially for developers.
 * facetoface_send_notice() function has been deprecated, please use \mod_facetoface\notice_sender::send_notice()
 * facetoface_send_oneperday_notice() function has been deprecated, please use \mod_facetoface\notice_sender::send_notice_oneperday()
 * facetoface_send_registration_closure_notice() function has been deprecated, please use \mod_facetoface\notice_sender::registration_closure()
+* facetoface_notify_under_capacity() function has been deprecated, please use mod_facetoface\notification\notification_helper::notify_under_capacity instead
+* facetoface_notify_registration_ended() function has been deprecated, please use mod_facetoface\notification\notification_helper::notify_registration_ended instead
+* facetoface_cancel_pending_requests() function has been deprecated
 
 === 12.0 ===
 

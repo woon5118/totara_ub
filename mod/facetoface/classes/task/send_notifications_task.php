@@ -23,10 +23,13 @@
 
 namespace mod_facetoface\task;
 
+use mod_facetoface\notification\notification_helper;
+use core\task\scheduled_task;
+
 /**
  * Send facetoface notifications
  */
-class send_notifications_task extends \core\task\scheduled_task {
+class send_notifications_task extends scheduled_task {
     // Test mode.
     public $testing = false;
 
@@ -92,11 +95,14 @@ class send_notifications_task extends \core\task\scheduled_task {
             unset($sched);
         }
 
+        $helper = new notification_helper();
+
         // Find finish Sign-Up dates that expired to send notifications to.
         if (!$this->testing) {
             mtrace('Checking for expired Face-to-face sign-up period dates');
         }
-        facetoface_notify_registration_ended();
+
+        $helper->notify_registration_ended();
 
         // Find any reservations that are too close to the start of the session and delete them.
         \mod_facetoface\reservations::remove_after_deadline($this->testing);
@@ -105,8 +111,8 @@ class send_notifications_task extends \core\task\scheduled_task {
         if (!$this->testing) {
             mtrace("Checking for sessions below minimum bookings");
         }
-        facetoface_notify_under_capacity();
 
+        $helper->notify_under_capacity();
         return true;
     }
 }

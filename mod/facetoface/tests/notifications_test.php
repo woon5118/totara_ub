@@ -2372,9 +2372,8 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $emailsink = $this->redirectMessages();
 
-        ob_start();
-        facetoface_notify_under_capacity();
-        ob_end_clean();
+        $helper = new \mod_facetoface\notification\notification_helper();
+        $helper->notify_under_capacity();
 
         $messages = $emailsink->get_messages();
         $emailsink->close();

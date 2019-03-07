@@ -3000,7 +3000,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $facetofacegenerator->add_session($sessiondata);
 
         $sink = $this->redirectMessages();
-        facetoface_notify_under_capacity();
+        $helper = new \mod_facetoface\notification\notification_helper();
+        $helper->notify_under_capacity();
         $messages = $sink->get_messages();
 
         // Only the teacher should get a message.
@@ -3051,7 +3052,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $facetofacegenerator->add_session($sessiondata);
 
         $sink = $this->redirectMessages();
-        facetoface_notify_under_capacity();
+        $helper = new \mod_facetoface\notification\notification_helper();
+        $helper->notify_under_capacity();
         $messages = $sink->get_messages();
 
         // There should be no messages received.
@@ -3108,7 +3110,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $DB->execute($sql, array('sessionid' => $sessionid));
 
         $sink = $this->redirectMessages();
-        facetoface_notify_under_capacity();
+        $helper = new \mod_facetoface\notification\notification_helper();
+        $helper->notify_under_capacity();
         $messages = $sink->get_messages();
 
         // There should be one messages received.

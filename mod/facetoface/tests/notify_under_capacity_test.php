@@ -137,9 +137,9 @@ class mod_facetoface_notify_under_capacity_testcase extends advanced_testcase {
         $this->create_facetoface_with_session();
 
         $sink = $this->redirectMessages();
-        ob_start();
-        facetoface_notify_under_capacity();
-        ob_end_clean();
+
+        $helper = new \mod_facetoface\notification\notification_helper();
+        $helper->notify_under_capacity();
 
         $messages = $sink->get_messages();
         $this->assertCount(2, $messages, "The test suite was expecting only 2 messages sent out in the environment setup");

@@ -23,6 +23,9 @@
 
 namespace mod_facetoface\task;
 
+use mod_facetoface\{notice_sender, seminar_event, signup};
+use mod_facetoface\signup\state\{requested, requestedadmin, declined};
+
 /**
  * Check for sessions where the registration period has recently ended,
  * cancel any pending requests for the session and send the users a
@@ -52,8 +55,6 @@ class close_registrations_task extends \core\task\scheduled_task {
             mtrace('Checking for Face-to-face sessions with expired registration periods...');
         }
 
-        $conditions = array('component' => 'mod_facetoface', 'classname' => '\mod_facetoface\task\close_registrations_task');
-        $lastcron = $DB->get_field('task_scheduled', 'lastruntime', $conditions);
         $time = time();
 
         $sql = "SELECT s.*
@@ -71,16 +72,64 @@ class close_registrations_task extends \core\task\scheduled_task {
               ORDER BY s.facetoface, s.id";
         $params = array(
             'now'      => $time,
-            'req' => \mod_facetoface\signup\state\requested::get_code(),
-            'adreq' => \mod_facetoface\signup\state\requestedadmin::get_code(),
+            'req' => requested::get_code(),
+            'adreq' => requestedadmin::get_code(),
         );
 
         $sessions = $DB->get_records_sql($sql, $params);
 
         foreach ($sessions as $session) {
-            facetoface_cancel_pending_requests($session);
+            $seminarevent = new seminar_event();
+            $seminarevent->from_record($session);
+
+            $this->cancel_pending_requests($seminarevent);
         }
 
         return true;
+    }
+
+    /**
+     * Cancel all pending requests for a given session.
+     *
+     * @param seminar_event $seminarevent
+     * @return void
+     */
+    private function cancel_pending_requests(seminar_event $seminarevent): void {
+        global $DB;
+
+        // Find any pending requests for the given session.
+        $sql = "SELECT fss.*, fs.userid as recipient
+                     FROM {facetoface_signups} fs
+               INNER JOIN {facetoface_signups_status} fss
+                       ON fss.signupid = fs.id AND fss.superceded = 0
+                    WHERE fs.sessionid = :sess
+                      AND (statuscode = :req OR statuscode = :adreq)";
+
+        $params = [
+            'req' => requested::get_code(),
+            'adreq' => requestedadmin::get_code(),
+            'sess' => $seminarevent->get_id(),
+        ];
+
+        $records = $DB->get_records_sql($sql, $params);
+        if (empty($records)) {
+            return;
+        }
+
+        // Loop through all the pending requests, cancel them, and send a notification to the user.
+        foreach ($records as $record) {
+            // Mark the request as declined so they can no longer be approved.
+            $signup = new signup($record->signupid);
+
+            if ($signup->can_switch(declined::class)) {
+                $signup->switch_state(declined::class);
+            } else {
+                $failures = $signup->get_failures(declined::class);
+                debugging(implode("\n", $failures), DEBUG_DEVELOPER);
+            }
+
+            // Send a registration expiration message to the user (and their manager).
+            notice_sender::registration_closure($seminarevent, $record->recipient);
+        }
     }
 }

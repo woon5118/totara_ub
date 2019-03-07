@@ -810,6 +810,15 @@ final class seminar_event {
     public function get_cutoff() : int {
         return (int)$this->cutoff;
     }
+
+    /**
+     * Checking whether the seminar_event has the cutoff time or not. By default, it is zero in database/table.
+     * @return bool
+     */
+    public function has_cutoff(): bool {
+        return !empty($this->cutoff);
+    }
+
     /**
      * Set event cutoff
      * @param int

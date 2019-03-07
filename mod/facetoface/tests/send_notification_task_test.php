@@ -174,7 +174,8 @@ class mod_facetoface_send_notification_task_testcase extends mod_facetoface_face
         $DB->update_record('facetoface_notification', $notificationrec);
 
         $sink = $this->redirectEmails();
-        facetoface_notify_registration_ended();
+        $helper = new \mod_facetoface\notification\notification_helper();
+        $helper->notify_registration_ended();
         $this->execute_adhoc_tasks();
         $messages = $sink->get_messages();
         $sink->clear();
@@ -184,7 +185,7 @@ class mod_facetoface_send_notification_task_testcase extends mod_facetoface_face
         $this->assertEquals('test@example.com', $message->to);
 
         // Confirm that messages not sent again
-        facetoface_notify_registration_ended();
+        $helper->notify_registration_ended();
         $this->execute_adhoc_tasks();
         $this->assertEmpty($sink->get_messages());
         $sink->close();
