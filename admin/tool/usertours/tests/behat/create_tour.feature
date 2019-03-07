@@ -58,7 +58,7 @@ Feature: Add a new user tour
       | Tour is enabled     | 1 |
     And I add steps to the "First tour" tour:
       | targettype                  | targetvalue_selector | Title             | Content |
-      | Selector                    | "#totaramenuitem8"] | Going Home     | This is the home button. It will return you to your homepage. |
+      | Selector                    | #totaramenuitem8 | Going Home     | This is the home button. It will return you to your homepage. |
     When I click on "Dashboard" in the totara menu
     Then I should see "This is the home button. It will return you to your homepage."
 
