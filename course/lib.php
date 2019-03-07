@@ -4138,13 +4138,34 @@ function course_get_image(int $courseid) {
     $files = array_values(array_filter($files, function($file) {
         return !$file->is_directory();
     }));
-    if (empty($files)) {
-        if (get_config('course', 'defaultimage') != '') {
-            return get_config('course', 'defaultimage');
-        } else {
-            return $CFG->wwwroot . '/course/defaultimage.svg';
-        }
+
+    $cfgvalue = get_config('course', 'defaultimage');
+    if (empty($files) && $cfgvalue != '') {
+        // TOTARA: try to find the default image file here for course if there is any, otherwise, there should be another layer
+        // to make sure the course default image is always exist in the system.
+        $context = context_system::instance();
+        $files = $fs->get_area_files($context->id, 'course', 'defaultimage');
+
+        $files = array_values(
+            array_filter(
+                $files,
+                function ($file) use ($cfgvalue) {
+                    /** @var stored_file $file */
+                    if ($file->is_directory()) {
+                        return false;
+                    }
+
+                    return $file->get_filepath().$file->get_filename() == $cfgvalue;
+                }
+            )
+        );
     }
+
+    if (empty($files)) {
+        // TOTARA: another defense layer to make sure that we do have default image in the system.
+        return $CFG->wwwroot . '/course/defaultimage.svg';
+    }
+
     assert(count($files) <= 1, 'There should only be one image for the course but there was ' . count($files));
     $file = moodle_url::make_pluginfile_url(
         $files[0]->get_contextid(),

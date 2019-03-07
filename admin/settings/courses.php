@@ -65,12 +65,13 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     // TOTARA changes.
     // These settings are called images so it saves the file to the images filearea.
     $temp->add(
-        new admin_setting_configfilepicker(
+        new admin_setting_configstoredfile(
             'course/defaultimage',
             new lang_string('courseimagedefault'),
-            get_string('coursedefaultimage_help'),
-            '',
-            'web_image'
+            new lang_string('coursedefaultimage_help'),
+            'defaultimage',
+            0,
+            ['accepted_types' => 'web_image']
         )
     );
     // End TOTARA changes.

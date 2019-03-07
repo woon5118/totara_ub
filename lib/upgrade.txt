@@ -25,6 +25,7 @@ information provided here is intended especially for developers.
   The dbunit package won't receive any updates anymore and composer issues a warning that the "Package phpunit/dbunit is abandoned".
 * Deprecated properties flex_icon::pix, flex_icon::component, flex_icon::attributes have been removed
 * Updated render_tabobject to correctly support tabobject::linkedwhenselected
+* The class admin_setting_configfilepicker has been deprecated, please use admin_setting_configstoredfile instead
 
 === 12.0 ===
 

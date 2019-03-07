@@ -3763,11 +3763,6 @@ class core_course_courselib_testcase extends advanced_testcase {
         // Return false if there is not image anywhere.
         $this->assertEquals($CFG->wwwroot . '/course/defaultimage.svg', course_get_image($course->id));
 
-        $defaultimageurl = 'foo';
-        set_config('defaultimage', $defaultimageurl, 'course');
-        // If the config variable is set then return that instead.
-        $this->assertEquals($defaultimageurl, course_get_image($course->id));
-
         $this->setAdminUser();
         $context = context_course::instance($course->id);
         $usercontext = context_user::instance($USER->id);

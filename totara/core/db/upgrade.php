@@ -559,5 +559,10 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019030800, 'totara', 'core');
     }
 
+    if ($oldversion < 2019031200) {
+        totara_core_upgrade_course_defaultimage_config();
+        upgrade_plugin_savepoint(true, 2019031200, 'totara', 'core');
+    }
+
     return true;
 }

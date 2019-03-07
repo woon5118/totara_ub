@@ -10118,6 +10118,9 @@ class admin_setting_configmultiselect_modules extends admin_setting_configmultis
  * an enhancement on admin_setting_configfile that lets you use a filepicker
  * to select and upload a file using the moodle file manager.
  *
+ * This class has been deprecated, please use admin_setting_configstoredfile instead
+ *
+ * @deprecated Since totara 13
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_setting_configfilepicker extends admin_setting {
@@ -10153,6 +10156,11 @@ class admin_setting_configfilepicker extends admin_setting {
         }
         $this->component = $bits[0];
         $this->filearea = $bits[1];
+
+        debugging(
+            "This class has been deprecated, please use " . admin_setting_configstoredfile::class . " instead",
+            DEBUG_DEVELOPER
+        );
     }
 
     /**

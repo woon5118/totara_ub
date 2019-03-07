@@ -745,3 +745,105 @@ function totara_core_add_course_navigation() {
         $page->blocks->add_blocks(['side-pre' => ['course_navigation']], '*', null, true, -10);
     }
 }
+
+function totara_core_upgrade_course_defaultimage_config() {
+    global $CFG;
+    require_once("{$CFG->libdir}/adminlib.php");
+
+    $cfgvalue = get_config('course', 'defaultimage');
+    if (empty($cfgvalue)) {
+        return;
+    }
+
+    if (false === stripos($cfgvalue, $CFG->wwwroot)) {
+        // Weird, the defaultimage does not contain $CFG->wwwroot, there could be a posibility that the value is containing a
+        // different www path. We should do nothing here, let the system admin update it by themselves manually
+        if (false !== stripos($cfgvalue, "https://") || false !== stripos($cfgvalue, "http://")) {
+            return;
+        }
+    }
+
+    // First we need to strip out the default domain name here, so it is easier to perform the upgrade.
+    // For example: http://localhost/pluginfile.php/1/course/defaultimage/{itemid}/{filename}
+    $cfgvalue = str_replace($CFG->wwwroot, "", $cfgvalue);
+    $parts = explode("/", $cfgvalue);
+
+    // Filename is always at the end of the url, pretty much. Then we need to replace %20 with spaces, otherwise it couldn't find
+    // the file in mdl_files. The filename will be looking something like this: 'Smaky%20100%20IMG%204149.jpg'
+    $filename = array_pop($parts);
+    $filename = rawurldecode($filename);
+
+    $itemid = array_pop($parts);
+
+    if (!is_string($filename) || !is_numeric($itemid)) {
+        debugging(
+            "Either filename or itemid is invalid",
+            DEBUG_DEVELOPER
+        );
+        // Something is weird with the URI? We shouldn't do anything here. Just let the system admin to update the db by themselves.
+        return;
+    }
+
+    $fs = get_file_storage();
+    $context = context_system::instance();
+
+    $files = $fs->get_area_files(
+        $context->id,
+        'course',
+        'defaultimage',
+        $itemid
+    );
+
+    $files = array_values(
+        array_filter(
+            $files,
+            function ($file) {
+                /** @var stored_file $file */
+                return !$file->is_directory();
+            }
+        )
+    );
+
+    if (count($files) !== 1) {
+        // Better to not update anything, if there are more than one file found for default image.
+        debugging(
+            'There are more than one files found for the default image',
+            DEBUG_DEVELOPER
+        );
+
+        return;
+    } else if ($files[0]->get_filename() !== $filename) {
+        debugging(
+            'The file to be upgraded for default image is not the same with the previous config',
+            DEBUG_DEVELOPER
+        );
+
+        return;
+    }
+
+    /** @var stored_file $file */
+    $file = $files[0];
+    // Need to prepare the draft file here for default file, before any updates are happening. This needs to be happened, because
+    // the setting object will try to save the file out of the draft file.
+    $data = $file->get_itemid();
+    if (!$fs->file_exists($context->id, 'course', 'draft', $file->get_itemid(), $file->get_filepath(), $file->get_filename())) {
+        // Draft file does not exist in the current system, we should prepare one.
+        $draftid = null;
+        file_prepare_draft_area($draftid, $context->id, 'course', 'defaultimage', $file->get_itemid());
+        $data = $draftid;
+    }
+
+    // Start writing the new setting for default image file here, using the admin_setting_configstoredfile because we would want
+    // this setting to perform saving with several of pre-actions such as prepare draft file and storing file out of draft file.
+    // So that, after the upgrade, user is still able to find the default image at the setting page.
+    $setting = new admin_setting_configstoredfile(
+        'course/defaultimage',
+        new lang_string('courseimagedefault'),
+        new lang_string('coursedefaultimage_help'),
+        'defaultimage',
+        0,
+        ['accepted_types' => 'web_image']
+    );
+
+    $setting->write_setting($data);
+}
