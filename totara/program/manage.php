@@ -331,7 +331,6 @@ if ($perpage) {
 $urlparams += $searchcriteria;
 $urlparams['viewtype'] = $viewtype;
 
-$PAGE->set_pagelayout('coursecategory');
 $programrenderer = $PAGE->get_renderer('totara_program');
 
 if (can_edit_in_category()) {
@@ -351,6 +350,7 @@ if (can_edit_in_category()) {
     }
 } else {
     $site = get_site();
+    $PAGE->set_pagelayout('admin');
     $PAGE->set_title("$site->shortname: $coursecat->name");
     $PAGE->set_heading($site->fullname);
     $PAGE->set_button($programrenderer->program_search_form($viewtype, '', 'navbar'));
