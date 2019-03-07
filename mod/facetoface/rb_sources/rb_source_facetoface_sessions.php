@@ -982,6 +982,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         ];
 
         if (has_capability('mod/facetoface:manageattendeesnote', $PAGE->context)) {
+            // Only include the column manage attendee's note, if the current $user in session does have the permission
+            // to perform the action. Otherwise, the report will be ending up with an empty columns.
             $results[] = new rb_column(
                 'facetoface_signup_manage',
                 'custom_field_edit_all',
