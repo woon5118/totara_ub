@@ -87,8 +87,8 @@ function totara_hierarchy_upgrade_user_assignment_extrainfo() {
     require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
     // Upgrade NULL to "ITEM:x,y,z" where x is the assigntype, y is the assignmentid and z is the reason instance id.
-    $itemid = "(SELECT grp.posid FROM {goal_grp_pos} grp WHERE grp.id = gua.assignmentid)";
-    $sql = "UPDATE {goal_user_assignment} gua
+    $itemid = "(SELECT grp.posid FROM {goal_grp_pos} grp WHERE grp.id = {goal_user_assignment}.assignmentid)";
+    $sql = "UPDATE {goal_user_assignment}
                SET extrainfo = " . $DB->sql_concat("'ITEM:'", 'assigntype', "','", 'assignmentid', "','", $itemid) . "
              WHERE assigntype = :assigntype
                AND extrainfo IS NULL
@@ -96,8 +96,8 @@ function totara_hierarchy_upgrade_user_assignment_extrainfo() {
     $params = ['assigntype' => GOAL_ASSIGNMENT_POSITION];
     $DB->execute($sql, $params);
 
-    $itemid = "(SELECT grp.orgid FROM {goal_grp_org} grp WHERE grp.id = gua.assignmentid)";
-    $sql = "UPDATE {goal_user_assignment} gua
+    $itemid = "(SELECT grp.orgid FROM {goal_grp_org} grp WHERE grp.id = {goal_user_assignment}.assignmentid)";
+    $sql = "UPDATE {goal_user_assignment}
                SET extrainfo = " . $DB->sql_concat("'ITEM:'", 'assigntype', "','", 'assignmentid', "','", $itemid) . "
              WHERE assigntype = :assigntype
                AND extrainfo IS NULL
@@ -105,8 +105,8 @@ function totara_hierarchy_upgrade_user_assignment_extrainfo() {
     $params = ['assigntype' => GOAL_ASSIGNMENT_ORGANISATION];
     $DB->execute($sql, $params);
 
-    $itemid = "(SELECT grp.cohortid FROM {goal_grp_cohort} grp WHERE grp.id = gua.assignmentid)";
-    $sql = "UPDATE {goal_user_assignment} gua
+    $itemid = "(SELECT grp.cohortid FROM {goal_grp_cohort} grp WHERE grp.id = {goal_user_assignment}.assignmentid)";
+    $sql = "UPDATE {goal_user_assignment}
                SET extrainfo = " . $DB->sql_concat("'ITEM:'", 'assigntype', "','", 'assignmentid', "','", $itemid) . "
              WHERE assigntype = :assigntype
                AND extrainfo IS NULL
@@ -115,8 +115,8 @@ function totara_hierarchy_upgrade_user_assignment_extrainfo() {
     $DB->execute($sql, $params);
 
     // Mark PAR records as OLD, because they would anyway next time cron runs (both before or after this upgrade).
-    $itemid = "(SELECT grp.posid FROM {goal_grp_pos} grp WHERE grp.id = gua.assignmentid)";
-    $sql = "UPDATE {goal_user_assignment} gua
+    $itemid = "(SELECT grp.posid FROM {goal_grp_pos} grp WHERE grp.id = {goal_user_assignment}.assignmentid)";
+    $sql = "UPDATE {goal_user_assignment}
                SET extrainfo = " . $DB->sql_concat("'OLD:'", 'assigntype', "','", $itemid) . ",
                    assigntype = :individualtype,
                    assignmentid = 0,
@@ -133,8 +133,8 @@ function totara_hierarchy_upgrade_user_assignment_extrainfo() {
     ];
     $DB->execute($sql, $params);
 
-    $itemid = "(SELECT grp.orgid FROM {goal_grp_org} grp WHERE grp.id = gua.assignmentid)";
-    $sql = "UPDATE {goal_user_assignment} gua
+    $itemid = "(SELECT grp.orgid FROM {goal_grp_org} grp WHERE grp.id = {goal_user_assignment}.assignmentid)";
+    $sql = "UPDATE {goal_user_assignment}
                SET extrainfo = " . $DB->sql_concat("'OLD:'", 'assigntype', "','", $itemid) . ",
                    assigntype = :individualtype,
                    assignmentid = 0,
