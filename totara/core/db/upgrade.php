@@ -550,5 +550,14 @@ function xmldb_totara_core_upgrade($oldversion) {
         }
     }
 
+    if ($oldversion < 2019030800) {
+        if (get_config('moodlecourse', 'courseenddateenabled') === false) {
+            set_config('courseenddateenabled', 1, 'moodlecourse');
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2019030800, 'totara', 'core');
+    }
+
     return true;
 }

@@ -33,3 +33,19 @@ Feature: Test course duration in the course default settings
     When I press "Save changes"
     Then I should see "Some settings were not changed due to an error."
     Then I should see "The value has to be a number." in the "#admin-courseduration" "css_element"
+
+  Scenario: Enable/disable course end date
+    Given I set the field "Course end date enabled by default" to "0"
+    When I press "Save changes"
+    Then the field "Course end date enabled by default" matches value "0"
+    And I navigate to "Courses and categories" node in "Site administration >  Courses"
+    When I follow "Create new course"
+    Then the field with xpath "//input[@name='enddate[enabled]']" matches value "0"
+
+    And I navigate to "Course default settings" node in "Site administration >  Courses"
+    Given I set the field "Course end date enabled by default" to "1"
+    When I press "Save changes"
+    Then the field "Course end date enabled by default" matches value "1"
+    And I navigate to "Courses and categories" node in "Site administration >  Courses"
+    When I follow "Create new course"
+    Then the field with xpath "//input[@name='enddate[enabled]']" matches value "1"
