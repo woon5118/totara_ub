@@ -69,7 +69,7 @@ class cohort_rule_sqlhandler_hasreports extends cohort_rule_sqlhandler {
 class cohort_rule_sqlhandler_has_direct_reports extends cohort_rule_sqlhandler_job_assignments {
 
     /**
-     * Return job_assignment join column for har direct reports rule.
+     * Return job_assignment join column for has direct reports rule.
      * @return string
      */
     public function get_join_column(): string {
@@ -83,7 +83,7 @@ class cohort_rule_sqlhandler_has_direct_reports extends cohort_rule_sqlhandler_j
 class cohort_rule_sqlhandler_has_temporary_reports extends cohort_rule_sqlhandler_job_assignments {
 
     /**
-     * Return job_assignment join column for har temporary reports rule.
+     * Return job_assignment join column for has temporary reports rule.
      * @return string
      */
     public function get_join_column(): string {
@@ -92,13 +92,83 @@ class cohort_rule_sqlhandler_has_temporary_reports extends cohort_rule_sqlhandle
 }
 
 /**
+ * A rule which indicates whether or not a user has anyone who reports appraisal to them.
+ */
+class cohort_rule_sqlhandler_has_appraisees extends cohort_rule_sqlhandler_job_assignments {
+
+    /**
+     * Return job_assignment join column for has appraisees rule.
+     * @return string
+     */
+    public function get_join_column(): string {
+        return 'appraiserid';
+    }
+
+    public function get_sql_snippet() {
+        global $DB;
+
+        $column = 'ja.' . $this->get_join_column();
+        $sqlhandler = new stdClass();
+        $sqlhandler->sql = '';
+        $sqlhandler->params = [];
+        switch ($this->equal) {
+            case ui::COHORT_RULES_OP_NONE:
+                $sqlhandler->sql = "
+                    NOT EXISTS (
+                        SELECT 1
+                          FROM {job_assignment} ja
+                         WHERE {$column} IS NOT NULL
+                           AND ja.userid = u.id
+                        )
+                ";
+                break;
+            case ui::COHORT_RULES_OP_MIN:
+                $comparison = '>=';
+                break;
+            case ui::COHORT_RULES_OP_MAX:
+                $comparison = '<=';
+                break;
+            case ui::COHORT_RULES_OP_EXACT:
+                $comparison = '=';
+                break;
+        }
+        if (empty($sqlhandler->sql)) {
+            $sql = "SELECT {$column}
+                      FROM {job_assignment} ja
+                  GROUP BY {$column}
+                    HAVING COUNT(*) {$comparison} ?";
+            if ($staff = $DB->get_records_sql($sql, $this->listofvalues)) {
+                $userids = [];
+                foreach ($staff as $person) {
+                    $userids[] = $person->appraiserid;
+                }
+                list($sqlin, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'iu'.$this->ruleid);
+                $sqlhandler->sql = "u.id {$sqlin}";
+                $sqlhandler->params = $params;
+            } else {
+                $sqlhandler->sql = '0 = 1';
+            }
+        }
+        return $sqlhandler;
+    }
+}
+
+/**
  * A rule for determining whether or not a user reports to another user in any of their respective job assignments.
  */
 class cohort_rule_sqlhandler_allstaff extends cohort_rule_sqlhandler {
+
+    /** @var array $params */
     public $params = array(
         'isdirectreport' => 0,
         'managerid' => 1
     );
+
+    /** @var int $isdirectreport */
+    public $isdirectreport = 0;
+
+    /** @var int $managerid */
+    public $managerid = 1;
 
     public function get_sql_snippet() {
         global $DB;

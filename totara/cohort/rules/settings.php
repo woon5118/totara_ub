@@ -66,6 +66,7 @@ use totara_cohort\rules\ui\has_temporary_reports as cohort_rule_ui_has_temporary
 use totara_cohort\rules\ui\course_enrolment_allanynotallnone as  cohort_rule_ui_course_enrolment_allanynotallnone;
 use totara_cohort\rules\ui\program_enrolment_allanynotallnone as cohort_rule_ui_program_enrolment_allanynotallnone;
 use totara_cohort\rules\ui\has_indirect_reports as cohort_rule_ui_has_indirect_reports;
+use totara_cohort\rules\ui\has_appraisees as cohort_rule_ui_has_appraisees;
 
 /* Constants to identify if the rule comes from a menu or a text input */
 define('COHORT_RULES_TYPE_MENU', 1);
@@ -631,6 +632,14 @@ function cohort_rules_list($reset = false){
             'hastemporaryreports',
             new cohort_rule_ui_has_temporary_reports(),
             new cohort_rule_sqlhandler_has_temporary_reports()
+        );
+
+        // If the user is a manager with appraisal staff in any of their job assignments.
+        $rules[] = new cohort_rule_option(
+            'alljobassign',
+            'hasappraisees',
+            new cohort_rule_ui_has_appraisees(),
+            new cohort_rule_sqlhandler_has_appraisees()
         );
 
         // Learning (i.e. course & program completion)

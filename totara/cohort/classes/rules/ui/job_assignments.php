@@ -71,3 +71,18 @@ class has_indirect_reports extends none_min_max_exactly {
         parent::__construct();
     }
 }
+
+/**
+ * UI for dynamic audience based on the fact if the person has appraisal reports.
+ */
+class has_appraisees extends none_min_max_exactly {
+
+    /**
+     * Number of appraisers
+     */
+    public function __construct() {
+        $this->description = get_string('ruledesc-alljobassign-hasappraisees', 'totara_cohort');
+        $this->label = get_string('rulelegend-alljobassign-hasappraisees', 'totara_cohort');
+        parent::__construct();
+    }
+}

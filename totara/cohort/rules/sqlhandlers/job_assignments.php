@@ -29,10 +29,17 @@ use \totara_cohort\rules\ui\none_min_max_exactly as ui;
  */
 abstract class cohort_rule_sqlhandler_job_assignments extends cohort_rule_sqlhandler {
 
+    /** @var array $params */
     public $params = array(
         'equal' => 0,
         'listofvalues' => 1
     );
+
+    /** @var int $equal */
+    public $equal = 0;
+
+    /** @var int $listofvalues */
+    public $listofvalues = 1;
 
     public function get_sql_snippet() {
         global $DB;
@@ -67,6 +74,7 @@ abstract class cohort_rule_sqlhandler_job_assignments extends cohort_rule_sqlhan
                   GROUP BY {$column}, staff.userid
                     HAVING COUNT(*) {$comparison} ?";
             if ($staff = $DB->get_records_sql($sql, $this->listofvalues)) {
+                $userids = [];
                 foreach ($staff as $person) {
                     $userids[] = $person->userid;
                 }
