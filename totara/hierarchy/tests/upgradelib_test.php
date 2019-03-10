@@ -466,7 +466,7 @@ class totara_hierarchy_upgradelib_testcase extends advanced_testcase {
                     break;
                 default:
                     // Should not be changed.
-                    continue;
+                    continue 2;
             }
             if (is_null($expected_user_assignment->extrainfo)) {
                 // We expect all current records to be updated to new ITEM records.
