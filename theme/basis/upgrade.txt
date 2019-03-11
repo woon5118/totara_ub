@@ -13,6 +13,7 @@ This file describes API changes for 'theme_basis'.
 ** core/notification_info
 ** core/notification_success
 ** core/notification_warning
+* Added theme setting for primary button color
 
 === 12.0 ===
 

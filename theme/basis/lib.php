@@ -53,10 +53,11 @@ function theme_basis_process_css($css, $theme) {
     // These defaults will also be used to generate and replace
     // variant colours (e.g. linkcolor-dark, linkcolor-darker).
     $variantdefaults = array(
-        'linkcolor'        => css_processor::$DEFAULT_LINKCOLOR,
-        'linkvisitedcolor' => css_processor::$DEFAULT_LINKVISITEDCOLOR,
-        'headerbgc'        => css_processor::$DEFAULT_HEADERBGC,
-        'buttoncolor'      => css_processor::$DEFAULT_BUTTONCOLOR,
+        'linkcolor'          => css_processor::$DEFAULT_LINKCOLOR,
+        'linkvisitedcolor'   => css_processor::$DEFAULT_LINKVISITEDCOLOR,
+        'headerbgc'          => css_processor::$DEFAULT_HEADERBGC,
+        'buttoncolor'        => css_processor::$DEFAULT_BUTTONCOLOR,
+        'primarybuttoncolor' => css_processor::$DEFAULT_PRIMARYBUTTONCOLOR,
     );
 
     // These default values do not have programmatic variants.

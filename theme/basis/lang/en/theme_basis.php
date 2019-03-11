@@ -24,7 +24,9 @@
  */
 
 $string['buttoncolor'] = 'Button colour';
-$string['buttoncolordesc'] = 'This sets the colour for the background of buttons.';
+$string['buttoncolordesc'] = 'This sets the colour for the background of most buttons.';
+$string['primarybuttoncolor'] = 'Primary button colour';
+$string['primarybuttoncolordesc'] = 'This sets the colour for the background of save buttons.';
 $string['bodybackground'] = 'Background colour';
 $string['bodybackground_desc'] = 'The main colour to use for the background.';
 $string['choosereadme'] = 'Basis default theme for Totara.';
