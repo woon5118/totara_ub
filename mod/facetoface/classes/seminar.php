@@ -257,11 +257,6 @@ final class seminar {
     public function delete() {
         global $DB;
 
-        $sessions = facetoface_get_sessions($this->id);
-        foreach ($sessions as $session) {
-            facetoface_delete_session($session);
-        }
-
         $seminarinterests = new interest_list(['facetoface' => $this->get_id()]);
         $seminarinterests->delete();
 
@@ -271,7 +266,7 @@ final class seminar {
             $notification->delete();
         }
 
-        $seminarevents = seminar_event_list::form_seminar($this);
+        $seminarevents = $this->get_events();
         $seminarevents->delete();
 
         $DB->delete_records('event', array('modulename' => 'facetoface', 'instance' => $this->get_id()));
@@ -390,7 +385,7 @@ final class seminar {
             'facetofaceid' => $this->id,
             'userid' => $userid,
             'statusdeclined' => declined::get_code(),
-            'statusnotset' => not_set::get_code()
+            'statusnotset' => not_set::get_code(),
         ];
 
         // Check if user is already signed up to a session in the facetoface and it has not been archived.

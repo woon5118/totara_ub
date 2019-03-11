@@ -1240,7 +1240,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         // Call facetoface_delete_session function for session1.
         $sink = $this->redirectMessages();
-        $this->assertTrue((bool)facetoface_delete_session($session1));
+        $event1 = new seminar_event($session1->id);
+        $event1->delete();
         $this->execute_adhoc_tasks();
         $sink->close();
 
@@ -1409,7 +1410,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $signup21 = signup_helper::signup(signup::create($student1->id, $seminarevent2));
         $signup22 = signup_helper::signup(signup::create($student2->id, $seminarevent2));
 
-        $this->assertTrue(facetoface_delete_session(facetoface_get_session($seminarevent->get_id())));
+        $seminarevent->delete();
         $this->assertFalse($DB->record_exists('facetoface_sessions', array('id' => $seminarevent->get_id())));
 
         // Reload signups and check that other event is not affected.

@@ -4827,3 +4827,177 @@ function facetoface_cancel_pending_requests($session) {
         }
     }
 }
+
+
+/**
+ * Delete entry from the facetoface_sessions table along with all
+ * related details in other tables
+ *
+ * This function has been deprecated, please call to \mod_facetoface\seminar_event::delete() instead
+ *
+ * @param object $session Record from facetoface_sessions
+ * @deprecated since Totara 13
+ */
+function facetoface_delete_session($session) {
+    global $DB;
+
+    debugging(
+        "The function facetoface_delete_session() has been deprecated, please use \\mod_facetoface\\seminar_event::delete() instead",
+        DEBUG_DEVELOPER
+    );
+
+    $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false, MUST_EXIST);
+    $context = context_module::instance($cm->id);
+
+    // Get session status and if it is over, do not send any cancellation notifications, see below.
+    $sessionover = $session->mintimestart && facetoface_has_session_started($session, time());
+
+    // Cancel user signups (and notify users)
+    $signedupusers = $DB->get_records_sql(
+        "
+            SELECT DISTINCT
+                userid
+            FROM
+                {facetoface_signups} s
+            LEFT JOIN
+                {facetoface_signups_status} ss
+             ON ss.signupid = s.id
+            WHERE
+                s.sessionid = ?
+            AND ss.superceded = 0
+            AND ss.statuscode >= ?
+        ", array($session->id, \mod_facetoface\signup\state\requested::get_code()));
+
+    $seminarevent = new \mod_facetoface\seminar_event($session->id);
+
+    if ($signedupusers and count($signedupusers) > 0) {
+        foreach ($signedupusers as $user) {
+            $signup = \mod_facetoface\signup::create($user->userid, $seminarevent);
+            if (\mod_facetoface\signup_helper::can_user_cancel($signup)) {
+                \mod_facetoface\signup_helper::user_cancel($signup);
+                if (!$sessionover) {
+                    \mod_facetoface\notice_sender::event_cancellation($user->userid, $seminarevent);
+                }
+            }
+        }
+    }
+
+    // Send cancellations for trainers assigned to the session.
+    $trainers = $DB->get_records("facetoface_session_roles", array("sessionid" => $session->id));
+    if ($trainers and count($trainers) > 0) {
+        foreach ($trainers as $trainer) {
+            if (!$sessionover) {
+                \mod_facetoface\notice_sender::event_cancellation($trainer->userid, $seminarevent);
+            }
+        }
+    }
+
+    // Notify managers who had reservations.
+    if (!$sessionover) {
+        \mod_facetoface\notice_sender::reservation_cancelled($seminarevent);
+    }
+
+    $transaction = $DB->start_delegated_transaction();
+
+    // Remove entries from the teacher calendars.
+    // Deleting records before refactoring attendees/view.php page
+    $select = $DB->sql_like('description', ':attendess');
+    $select .= " AND modulename = 'facetoface' AND eventtype = 'facetofacesession' AND instance = :facetofaceid";
+    $params = array('attendess' => "%attendees.php?s={$session->id}%", 'facetofaceid' => $facetoface->id);
+    $DB->delete_records_select('event', $select, $params);
+    // Remove entries from the teacher calendars.
+    // Deleting records after refactoring attendees/view.php page
+    $select = $DB->sql_like('description', ':attendess');
+    $select .= " AND modulename = 'facetoface' AND eventtype = 'facetofacesession' AND instance = :facetofaceid";
+    $params = array('attendess' => "%view.php?s={$session->id}%", 'facetofaceid' => $facetoface->id);
+    $DB->delete_records_select('event', $select, $params);
+
+    $seminarevent = new \mod_facetoface\seminar_event($session->id);
+    if ($facetoface->showoncalendar == F2F_CAL_COURSE) {
+        // Remove entry from course calendar
+        \mod_facetoface\calendar::remove_seminar_event($seminarevent, $facetoface->course);
+    } else if ($facetoface->showoncalendar == F2F_CAL_SITE) {
+        // Remove entry from site-wide calendar
+        \mod_facetoface\calendar::remove_seminar_event($seminarevent, SITEID);
+    }
+
+    // Delete links to assets and delete freshly orphaned custom assets because there is little chance they would be reused.
+    $dateids = $DB->get_fieldset_select('facetoface_sessions_dates', 'id', "sessionid = :sessionid", array('sessionid' => $session->id));
+    foreach ($dateids as $dateid) {
+        $sql = "SELECT fa.id
+                  FROM {facetoface_asset} fa
+                  JOIN {facetoface_asset_dates} fad ON (fad.assetid = fa.id)
+                 WHERE fa.custom = 1 AND sessionsdateid = :sessionsdateid";
+        $customassetids = $DB->get_fieldset_sql($sql, array('sessionsdateid' => $dateid));
+        $DB->delete_records('facetoface_asset_dates', array('sessionsdateid' => $dateid));
+        foreach ($customassetids as $assetid) {
+            if (!$DB->record_exists('facetoface_asset_dates', array('assetid' => $assetid))) {
+                $asset = new \mod_facetoface\asset($assetid);
+                $asset->delete();
+            }
+        }
+    }
+
+    // Delete links to rooms and delete freshly orphaned custom rooms because there is little chance they would be reused.
+    $sql = "SELECT fr.id
+              FROM {facetoface_room} fr
+              JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = fr.id)
+             WHERE fr.custom = 1 AND sessionid = :sessionid";
+    $customroomids = $DB->get_fieldset_sql($sql, array('sessionid' => $session->id));
+    $DB->set_field('facetoface_sessions_dates', 'roomid', 0, array('sessionid' => $session->id));
+    foreach ($customroomids as $roomid) {
+        if (!$DB->record_exists('facetoface_sessions_dates', array('roomid' => $roomid))) {
+            $room = new \mod_facetoface\room($roomid);
+            $room->delete();
+        }
+    }
+
+    // Delete session details
+    $DB->delete_records('facetoface_sessions_dates', array('sessionid' => $session->id));
+    $DB->delete_records('facetoface_session_roles', array('sessionid' => $session->id));
+
+    // Get session data to delete.
+    $sessiondataids = $DB->get_fieldset_select(
+        'facetoface_session_info_data',
+        'id',
+        "facetofacesessionid = :facetofacesessionid",
+        array('facetofacesessionid' => $session->id));
+
+    if (!empty($sessiondataids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($sessiondataids);
+        $DB->delete_records_select('facetoface_session_info_data_param', "dataid {$sqlin}", $inparams);
+        $DB->delete_records_select('facetoface_session_info_data', "id {$sqlin}", $inparams);
+    }
+
+    $sessioncancelparams = array('sessionid' => $session->id);
+    $sessioncancelids = $DB->get_fieldset_select(
+        'facetoface_sessioncancel_info_data',
+        'id',
+        "facetofacesessioncancelid = :sessionid",
+        $sessioncancelparams
+    );
+    if (!empty($sessioncancelids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($sessioncancelids);
+        $DB->delete_records_select('facetoface_sessioncancel_info_data_param', "dataid $sqlin", $inparams);
+        $DB->delete_records_select('facetoface_sessioncancel_info_data', "id {$sqlin}", $inparams);
+    }
+
+    // Delete signups and related data.
+    $signups = \mod_facetoface\signup_list::from_conditions(['sessionid' => (int)$session->id]);
+    $signups->delete();
+
+    // Notifications.
+    $DB->delete_records('facetoface_notification_sent', array('sessionid' => $session->id));
+    $DB->delete_records('facetoface_notification_hist', array('sessionid' => $session->id));
+
+    // Delete files embedded in details text.
+    $fs = get_file_storage();
+    $fs->delete_area_files($context->id, 'mod_facetoface', 'session', $session->id);
+
+    $DB->delete_records('facetoface_sessions', array('id' => $session->id));
+
+    $transaction->allow_commit();
+
+    return true;
+}

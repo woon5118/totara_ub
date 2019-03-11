@@ -25,6 +25,8 @@ namespace mod_facetoface;
 
 use context_module;
 use mod_facetoface\signup\condition\event_taking_attendance;
+use mod_facetoface\event\session_cancelled;
+use mod_facetoface\signup\state\event_cancelled;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -199,13 +201,13 @@ final class seminar_event {
         $this->save();
 
         // Remove entries from the calendars.
-        \mod_facetoface\calendar::remove_all_entries($this);
+        calendar::remove_all_entries($this);
 
         // Change all user sign-up statuses, the only exceptions are previously cancelled users and declined users.
         $signups = signup_list::from_conditions(['sessionid' => $this->get_id()]);
         foreach ($signups as $signup) {
-            if ($signup->can_switch(\mod_facetoface\signup\state\event_cancelled::class)) {
-                $signup->switch_state(\mod_facetoface\signup\state\event_cancelled::class);
+            if ($signup->can_switch(event_cancelled::class)) {
+                $signup->switch_state(event_cancelled::class);
 
                 // Add them to the affected learners list for later notifications.
                 $notifylearners[$signup->get_userid()] = $signup;
@@ -217,7 +219,7 @@ final class seminar_event {
 
         $cm = get_coursemodule_from_instance('facetoface', $this->get_facetoface());
         $context = context_module::instance($cm->id);
-        \mod_facetoface\event\session_cancelled::create_from_session($this->to_record(), $context)->trigger();
+        session_cancelled::create_from_session($this->to_record(), $context)->trigger();
 
         // Notify trainers assigned to the session too.
         $sql = "SELECT DISTINCT sr.userid
@@ -244,7 +246,7 @@ final class seminar_event {
         }
 
         // Notify managers who had reservations.
-        \mod_facetoface\notice_sender::reservation_cancelled($this);
+        notice_sender::reservation_cancelled($this);
 
         // Start cleaning up the custom rooms, custom assets here at the very end of this cancellation task, because we would want
         // the information of custom rooms and custom assets to be included in the email sending to users which should have happened
@@ -266,11 +268,17 @@ final class seminar_event {
 
     /**
      * Delete {facetoface_sessions}.record where id from database
+     *
+     * @return void
      */
     public function delete() {
         global $DB;
 
-        $sessiondates = new seminar_session_list(['sessionid' => $this->get_id()]);
+        // Before deleting the whole event, start cancelling the event first, does not matter whether the event is able
+        // to cancel or not. In the end, records are going to be hard deleted anyway.
+        $this->cancel();
+
+        $sessiondates = $this->get_sessions();
         $sessiondates->delete();
 
         $seminarsignups = signup_list::from_conditions(['sessionid' => $this->get_id()]);
@@ -281,12 +289,19 @@ final class seminar_event {
 
         $this->delete_files();
         $this->delete_customfields();
+        $this->delete_notifications();
 
         $DB->delete_records(self::DBTABLE, ['id' => $this->id]);
+
         // Re-load instance with default values.
         $this->map_object((object)get_object_vars(new self()));
     }
 
+    /**
+     * Primarily being called in delete functionality.
+     *
+     * @return seminar_event
+     */
     protected function delete_customfields() : seminar_event {
         global $DB;
 
@@ -961,5 +976,26 @@ final class seminar_event {
         } else {
             return $this->is_attendance_open($time);
         }
+    }
+
+    /**
+     * Deleting notifications for facetoface, if there are any. It is deleting records in both table {facetoface_notification_sent}
+     * and {facetoface_notification_hist} that are related to this event.
+     *
+     * Primarily being used in delete function.
+     *
+     * @return bool
+     */
+    private function delete_notifications(): bool {
+        global $DB;
+
+        if (empty($this->id)) {
+            return false;
+        }
+
+        $params = ['sessionid' => $this->id];
+        $DB->delete_records('facetoface_notification_sent', $params);
+        $DB->delete_records('facetoface_notification_hist', $params);
+        return true;
     }
 }

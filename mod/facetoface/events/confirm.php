@@ -44,8 +44,12 @@ if ($backtoallsessions) {
     $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
 }
 
-if (facetoface_delete_session($session)) {
+try {
+    $event = new \mod_facetoface\seminar_event($session->id);
+    $event->delete();
+
     \mod_facetoface\event\session_deleted::create_from_session($session, $context)->trigger();
     redirect($returnurl);
+} catch (Exception $e) {
+    print_error('error:couldnotdeletesession', 'facetoface', $returnurl);
 }
-print_error('error:couldnotdeletesession', 'facetoface', $returnurl);

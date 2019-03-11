@@ -62,6 +62,7 @@ information provided here is intended especially for developers.
 * facetoface_notify_under_capacity() function has been deprecated, please use mod_facetoface\notification\notification_helper::notify_under_capacity instead
 * facetoface_notify_registration_ended() function has been deprecated, please use mod_facetoface\notification\notification_helper::notify_registration_ended instead
 * facetoface_cancel_pending_requests() function has been deprecated
+* facetoface_delete_session() function has been deprecated, please use \mod_facetoface\seminar_event::delete() instead
 
 === 12.0 ===
 
