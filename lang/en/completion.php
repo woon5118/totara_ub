@@ -76,6 +76,7 @@ $string['completiondisabled'] = 'Disabled, not shown in activity settings';
 $string['completionenabled'] = 'Enabled, control via completion and activity settings';
 $string['completionexpected'] = 'Expect completed on';
 $string['completionexpected_help'] = 'This setting specifies the date when the activity is expected to be completed. The date is not shown to learners and is only displayed in the activity completion report.';
+$string['completionexpectedfor'] = 'Expected completion for \'{$a->modulename}\' activity \'{$a->instancename}\'';
 $string['completionicons'] = 'Completion tick boxes';
 $string['completionicons_help'] = 'A tick next to activity name indicates completion. This helps track your progress through courses accurately.
 
