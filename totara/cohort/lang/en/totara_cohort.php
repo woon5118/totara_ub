@@ -146,7 +146,7 @@ rules and verify they are correct.';
 $string['cohortdateactive'] = 'Active';
 $string['cohortdatealreadyended'] = 'Already ended';
 $string['cohortdatenotyetstarted'] = 'Not yet started';
-$string['cohortdeletionwarning'] = 'Note: Audience deletion may take minutes to process, depending on its size. 
+$string['cohortdeletionwarning'] = 'Note: Audience deletion may take minutes to process, depending on its size.
 Once completed, the audience association will be removed from this course.';
 $string['cohortenrolledlearningselect'] = 'To view enrolled learning, first <a href="{$a}">select an audience</a> then click the "Enrolled Learning" tab.';
 $string['cohortenrolledreportname'] = 'Audience: Enrolled Learning';
@@ -205,7 +205,7 @@ $string['copy'] = 'Copy';
 $string['courseadditionwarning'] = 'Note: When adding courses, enrolment changes are performed in the background and take a few minutes to appear.';
 $string['coursecohortsenrolled'] = 'Course audiences (enrolled)';
 $string['coursecohortsvisible'] = 'Course audiences (visible)';
-$string['coursedeletionwarning'] = 'Note: Course deletion may take minutes to process, depending on audience size. 
+$string['coursedeletionwarning'] = 'Note: Course deletion may take minutes to process, depending on audience size.
 Once completed, the course association will be removed from this audience.';
 $string['createdynamiccohort'] = 'Create dynamic audience';
 $string['createforexistingautoplan'] = 'have an existing, automatically created plan based on this template';
@@ -440,6 +440,7 @@ $string['rulecheckboxdialogdesc'] = 'Add a rule based on whether {$a} is checked
 $string['ruledesc-alljobassign-enddates'] = 'The end date of any of the user\'s job assignments';
 $string['ruledesc-alljobassign-hasdirectreports'] = 'User is a manager with direct staff in any of their job assignments.';
 $string['ruledesc-alljobassign-hastemporaryreports'] = 'User is a manager with temporary staff in any of their job assignments.';
+$string['ruledesc-alljobassign-hasindirectreports'] = 'User is a manager with indirect staff in any of their job assignments.';
 $string['ruledesc-alljobassign-idnumber'] = 'User has a job assignment ID number';
 $string['ruledesc-alljobassign-orgid'] = 'User\'s organisation in any of their job assignments';
 $string['ruledesc-alljobassign-orgidnumbers'] = 'User\'s organisation idnumber in any of their job assignments';
@@ -523,6 +524,7 @@ $string['rulelabel-relativedate'] = 'Relative date';
 $string['rulelabel-withinorbeforeprevious'] = 'Within or before previous';
 $string['rulelegend-alljobassign-hasdirectreports'] = 'Total number of direct reports:';
 $string['rulelegend-alljobassign-hastemporaryreports'] = 'Total number of temporary reports:';
+$string['rulelegend-alljobassign-hasindirectreports'] = 'Total number of indirect reports:';
 $string['rulelegend-alljobassign-persons'] = 'person(s)';
 $string['rulelegend-certificationstatus'] = 'User\'s certification status' ;
 $string['rulelegend-certificationassignmentstatus'] = 'User\'s certification assignment status';
@@ -532,6 +534,7 @@ $string['rulelistdateformat'] = '%d %b, %Y';
 $string['rulename-alljobassign-enddates'] = 'End Dates';
 $string['rulename-alljobassign-hasdirectreports'] = 'Has direct reports';
 $string['rulename-alljobassign-hastemporaryreports'] = 'Has temporary reports';
+$string['rulename-alljobassign-hasindirectreports'] = 'Has indirect reports';
 $string['rulename-alljobassign-idnumber'] = 'ID number';
 $string['rulename-alljobassign-jobtitles'] = 'Titles';
 $string['rulename-alljobassign-managers'] = 'Managers';

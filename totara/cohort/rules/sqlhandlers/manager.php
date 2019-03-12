@@ -24,6 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/job_assignments.php');
+require_once($CFG->dirroot . '/totara/cohort/classes/rules/ui/none_min_max_exactly.php');
+use \totara_cohort\rules\ui\none_min_max_exactly as ui;
 
 /**
  * Deprecated rule which indicates whether or not a user has anyone who reports directly to them.
@@ -140,5 +142,69 @@ class cohort_rule_sqlhandler_allstaff extends cohort_rule_sqlhandler {
         $sqlhandler->sql .= ')';
         $sqlhandler->params = $params;
         return $sqlhandler;
+    }
+}
+
+/**
+ * A rule which indicates whether or not a user has anyone who indirectly reports to them.
+ */
+class cohort_rule_sqlhandler_has_indirect_reports extends cohort_rule_sqlhandler_job_assignments {
+    public $params = [
+        'equal' => 0,
+        'listofvalues' => 1
+    ];
+
+    public function get_sql_snippet() {
+        global $DB;
+
+        $sqlhandler = new stdClass();
+        $sqlhandler->params = [];
+        $column = 'ja.' . $this->get_join_column();
+
+        $sql = '';
+        $comparison = '';
+        switch ($this->equal) {
+            case ui::COHORT_RULES_OP_MIN:
+                $comparison = '>=';
+                break;
+            case ui::COHORT_RULES_OP_MAX:
+                $comparison = '<=';
+                break;
+            case ui::COHORT_RULES_OP_EXACT:
+                $comparison = '=';
+                break;
+            case ui::COHORT_RULES_OP_NONE:
+                $sql = "SELECT DISTINCT ja.userid
+                          FROM {job_assignment} ja
+                          WHERE NOT EXISTS
+                          (
+                            SELECT ja.userid FROM {job_assignment} staff
+                            WHERE {$column} = staff.managerjaid
+                )";
+                break;
+        }
+
+        // Are we looking for some kind of reports count?
+        if ($sql == '') {
+           $sql = "SELECT DISTINCT ja.userid FROM {job_assignment} ja
+                    JOIN {job_assignment} staff
+                      ON {$column} != staff.managerjaid
+                      AND staff.managerjapath LIKE (" . $DB->sql_concat('ja.managerjapath', "'/%'") . ")
+                    GROUP BY ja.userid
+                    HAVING COUNT(*) {$comparison} " . (string) $this->listofvalues[0];
+        }
+
+        $sqlhandler->sql = "u.id IN ({$sql})";
+        $sqlhandler->params = [];
+        return $sqlhandler;
+    }
+
+
+    /**
+     * Return job_assignment join column for har direct reports rule.
+     * @return string
+     */
+    public function get_join_column(): string {
+        return 'id';
     }
 }

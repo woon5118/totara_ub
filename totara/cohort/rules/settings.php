@@ -64,6 +64,7 @@ use totara_cohort\rules\ui\has_direct_reports as cohort_rule_ui_has_direct_repor
 use totara_cohort\rules\ui\has_temporary_reports as cohort_rule_ui_has_temporary_reports;
 use totara_cohort\rules\ui\course_enrolment_allanynotallnone as  cohort_rule_ui_course_enrolment_allanynotallnone;
 use totara_cohort\rules\ui\program_enrolment_allanynotallnone as cohort_rule_ui_program_enrolment_allanynotallnone;
+use totara_cohort\rules\ui\has_indirect_reports as cohort_rule_ui_has_indirect_reports;
 
 /* Constants to identify if the rule comes from a menu or a text input */
 define('COHORT_RULES_TYPE_MENU', 1);
@@ -581,6 +582,14 @@ function cohort_rules_list($reset = false){
             'hasdirectreports',
             new cohort_rule_ui_has_direct_reports(),
             new cohort_rule_sqlhandler_has_direct_reports()
+        );
+
+        // If the user is a manager with indirect staff in any of their job assignments.
+        $rules[] = new cohort_rule_option(
+            'alljobassign',
+            'hasindirectreports',
+            new cohort_rule_ui_has_indirect_reports(),
+            new cohort_rule_sqlhandler_has_indirect_reports()
         );
 
         // If the user is a manager with temporary staff in any of their job assignments.

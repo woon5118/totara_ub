@@ -56,3 +56,18 @@ class has_temporary_reports extends none_min_max_exactly {
         parent::__construct();
     }
 }
+
+/**
+ * Number of indirect reports
+ */
+class has_indirect_reports extends none_min_max_exactly {
+
+    /** @var string select box legend */
+    public $label;
+
+    public function __construct() {
+        $this->description = get_string('ruledesc-alljobassign-hasindirectreports', 'totara_cohort');
+        $this->label = get_string('rulelegend-alljobassign-hasindirectreports', 'totara_cohort');
+        parent::__construct();
+    }
+}
