@@ -126,6 +126,7 @@ $string['nolearnergoals'] = '{$a} doesn\'t have any goals to review';
 $string['nolearnerobjfromplan'] = '{$a}\'s learning plan(s) don\'t contain any objectives to review';
 $string['nolearnerprogfromplan'] = '{$a}\'s learning plan(s) don\'t contain any programs to review';
 $string['nolearnerrequiredlearning'] = '{$a}\ doesn\'t have any required learning to review';
+$string['noresponse'] = 'No response';
 $string['noselfcompfromplan'] = 'Your learning plan(s) don\'t contain any competencies to review';
 $string['noselfcoursefromplan'] = 'Your learning plan(s) don\'t contain any courses to review';
 $string['noselfevidencefromplan'] = 'Your learning plan(s) don\'t contain any evidence to review';

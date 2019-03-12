@@ -140,4 +140,4 @@ Feature: Admin page that lists missing roles for one appraisal
     And I should see "Manager answer2"
     And I should see "Manager answer4"
     And I should see "Manager's answer"
-    And I should see "Not yet answered"
+    And I should see "No response"
