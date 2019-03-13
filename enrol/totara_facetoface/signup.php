@@ -26,9 +26,7 @@
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-use mod_facetoface\signup_helper;
-use mod_facetoface\signup;
-use mod_facetoface\seminar;
+use mod_facetoface\{signup_helper, signup, seminar, trainer_helper};
 
 $s = required_param('s', PARAM_INT); // {facetoface_sessions}.id
 
@@ -63,10 +61,12 @@ $returnurl = new moodle_url('/enrol/index.php', ['id' => $course->id]);
 
 // This is not strictly required for signup (more correctly it is checked in actor_has_role), but leaving it for early
 // indication of the issue.
-$trainerroles = facetoface_get_trainer_roles(context_course::instance($course->id));
-$trainers     = facetoface_get_trainers($seminarevent->get_id());
+$trainerhelper = new trainer_helper($seminarevent);
+
+$trainerroles = trainer_helper::get_trainer_roles(context_course::instance($course->id));
+$trainers     = $trainerhelper->get_trainers();
 if ($seminar->get_approvaltype() == seminar::APPROVAL_ROLE) {
-    if (!$trainerroles || !$trainers) {
+    if (empty($trainerroles) || empty($trainers)) {
         totara_set_notification(get_string('error:missingrequiredrole', 'mod_facetoface'), $returnurl);
     }
 }

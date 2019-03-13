@@ -5001,3 +5001,284 @@ function facetoface_delete_session($session) {
 
     return true;
 }
+
+
+/**
+ * This function has been deprecated, please use \mod_facetoface\trainer_helper class instead.
+ *
+ * @param $facetoface
+ * @param $session
+ * @param $form
+ *
+ * @return bool
+ * @deprecated since Totara 13.0
+ */
+function facetoface_update_trainers($facetoface, $session, $form) {
+    global $DB;
+
+    debugging(
+            "The function facetoface_update_trainers has been deprecated, please call to " .
+            \mod_facetoface\trainer_helper::class . " instead",
+            DEBUG_DEVELOPER
+    );
+
+    // If we recieved bad data
+    if (!is_array($form)) {
+        return false;
+    }
+
+    // Load current trainers
+    $current_trainers = facetoface_get_trainers($session->id);
+    // To collect trainers
+    $new_trainers = array();
+    $old_trainers = array();
+
+    $transaction = $DB->start_delegated_transaction();
+
+    // Loop through form data and add any new trainers
+    foreach ($form as $roleid => $trainers) {
+
+        // Loop through trainers in this role
+        foreach ($trainers as $trainer) {
+
+            if (!$trainer) {
+                continue;
+            }
+
+            // If the trainer doesn't exist already, create it
+            if (!isset($current_trainers[$roleid][$trainer])) {
+
+                $newtrainer = new stdClass();
+                $newtrainer->userid = $trainer;
+                $newtrainer->roleid = $roleid;
+                $newtrainer->sessionid = $session->id;
+                $new_trainers[] = $newtrainer;
+
+                if (!$DB->insert_record('facetoface_session_roles', $newtrainer)) {
+                    print_error('error:couldnotaddtrainer', 'facetoface');
+                    $transaction->force_transaction_rollback();
+                    return false;
+                }
+            } else {
+                unset($current_trainers[$roleid][$trainer]);
+            }
+        }
+    }
+
+    // Loop through what is left of old trainers, and remove
+    // (as they have been deselected)
+    if ($current_trainers) {
+        foreach ($current_trainers as $roleid => $trainers) {
+            // If no trainers left
+            if (empty($trainers)) {
+                continue;
+            }
+
+            // Delete any remaining trainers
+            foreach ($trainers as $trainer) {
+                $old_trainers[] = $trainer;
+                if (!$DB->delete_records('facetoface_session_roles', array('sessionid' => $session->id, 'roleid' => $roleid, 'userid' => $trainer->id))) {
+                    print_error('error:couldnotdeletetrainer', 'facetoface');
+                    $transaction->force_transaction_rollback();
+                    return false;
+                }
+            }
+        }
+    }
+
+    $transaction->allow_commit();
+
+    $seminarevent = new \mod_facetoface\seminar_event($session->id);
+
+    // Send a confirmation notice to new trainer
+    foreach ($new_trainers as $i => $trainer) {
+        \mod_facetoface\notice_sender::trainer_confirmation($trainer->userid, $seminarevent);
+    }
+
+    // Send an unassignment notice to old trainer
+    foreach ($old_trainers as $i => $trainer) {
+        \mod_facetoface\notice_sender::trainer_confirmation($trainer->id, $seminarevent);
+    }
+
+    return true;
+}
+
+
+/**
+ * This function has been deprecated, please use \mod_facetoface\trainer_helper::get_trainer_roles() instead.
+ *
+ * Return array of trainer roles configured for face-to-face
+ * @param $context context of the facetoface activity
+ * @return  array
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_trainer_roles($context) {
+    global $CFG, $DB;
+
+    debugging(
+            "The function facetoface_get_trainer_roles has been deprecated, please call to " .
+            "\\mod_facetoface\\trainer_helper::get_trainer_roles() instead",
+            DEBUG_DEVELOPER
+    );
+
+    // Check that roles have been selected
+    if (empty($CFG->facetoface_session_roles)) {
+        return false;
+    }
+
+    // Parse roles
+    $cleanroles = clean_param($CFG->facetoface_session_roles, PARAM_SEQUENCE);
+    list($rolesql, $params) = $DB->get_in_or_equal(explode(',', $cleanroles));
+
+    // Load role names
+    $rolenames = $DB->get_records_sql("
+        SELECT
+            r.id,
+            r.name
+        FROM
+            {role} r
+        WHERE
+            r.id {$rolesql}
+        AND r.id <> 0
+    ", $params);
+
+    // Return roles and names
+    if (!$rolenames) {
+        return array();
+    }
+
+    $rolenames = role_fix_names($rolenames, $context);
+
+    return $rolenames;
+}
+
+
+/**
+ * This function has been deprecated, please use \mod_facetoface\trainer_helper::get_trainers() instead.
+ *
+ * Get all trainers associated with a session, optionally
+ * restricted to a certain roleid
+ *
+ * If a roleid is not specified, will return a multi-dimensional
+ * array keyed by roleids, with an array of the chosen roles
+ * for each role
+ *
+ * @param   integer     $sessionid
+ * @param   integer     $roleid (optional)
+ * @return  array
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_trainers($sessionid, $roleid = null) {
+    global $CFG, $DB;
+
+    debugging(
+            "The function facetoface_get_trainers has been deprecated, " .
+            "please use \\mod_facetoface\\trainer_helper::get_trainers() instead",
+            DEBUG_DEVELOPER
+    );
+
+    $usernamefields = get_all_user_name_fields(true, 'u');
+    $sql = "
+        SELECT
+            u.id,
+            {$usernamefields},
+            r.roleid
+        FROM
+            {facetoface_session_roles} r
+        LEFT JOIN
+            {user} u
+         ON u.id = r.userid
+        WHERE
+            r.sessionid = ?
+        ";
+    $params = array($sessionid);
+
+    if ($roleid) {
+        $sql .= "AND r.roleid = ?";
+        $params[] = $roleid;
+    }
+
+    $rs = $DB->get_recordset_sql($sql , $params);
+    $return = array();
+    foreach ($rs as $record) {
+        // Create new array for this role
+        if (!isset($return[$record->roleid])) {
+            $return[$record->roleid] = array();
+        }
+        $return[$record->roleid][$record->id] = $record;
+    }
+    $rs->close();
+
+    // If we are only after one roleid
+    if ($roleid) {
+        if (empty($return[$roleid])) {
+            return false;
+        }
+        return $return[$roleid];
+    }
+
+    // If we are after all roles
+    if (empty($return)) {
+        return false;
+    }
+
+    return $return;
+}
+
+
+/**
+ * This function has been deprecated, please use \mod_facetoface\signup::get_managers() instead.
+ *
+ * @param int   $userid     The user whose manager we are looking for
+ * @param int   $sessionid  The session where the manager is assigned
+ * @param int   $jobassignmentid The job when users are allowed to select their secondary jobs !!! "Seconardy" jobs ???
+ * @return array of object   The user object (including fullname) of the user assigned as the learners managers
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_session_managers($userid, $sessionid, $jobassignmentid = null) {
+    global $DB;
+
+    debugging(
+            "The function facetoface_get_session_managers has been deprecated, " .
+            " please use \\mod_facetoface\\signup::get_managers()"
+    );
+
+    $managerselect = get_config(null, 'facetoface_managerselect');
+    $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
+    $signup = $DB->get_record('facetoface_signups', array('userid' => $userid, 'sessionid' => $sessionid));
+
+    $managers = array();
+
+    if ($managerselect && !empty($signup->managerid)) {
+        // Check if they selected a manager for their signup.
+        $manager = $DB->get_record('user', array('id' => $signup->managerid));
+        $managers[] = $manager;
+    } else if ($selectjobassignmentonsignupglobal && !empty($jobassignmentid)) {
+        // The job assignment could not be found here, because the system admin might had deleted
+        // the job assignment record, but did not update the seminar signup record here.
+
+        // This could mean that, seminar system is not able to notify this user's manager here.
+        // However, when deleting the job assignment of a user, this could indicate that this
+        // user is no longer being managed by the same manager anymore. Unless, deleting job
+        // assignment is an accident.
+        $ja = \totara_job\job_assignment::get_with_id($jobassignmentid, false);
+        if (null != $ja && $ja->managerid) {
+            $managers[] = $DB->get_record('user', array('id' => $ja->managerid));
+        }
+    } else {
+        $managerids = \totara_job\job_assignment::get_all_manager_userids($userid);
+        if (!empty($managerids)) {
+            list($mansql, $manparams) = $DB->get_in_or_equal($managerids, SQL_PARAMS_NAMED);
+            $managers = $DB->get_records_select('user', "id $mansql", $manparams);
+        }
+    }
+
+    foreach ($managers as &$manager) {
+        $manager->fullname = fullname($manager);
+    }
+
+    return $managers;
+}

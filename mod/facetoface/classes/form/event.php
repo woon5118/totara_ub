@@ -173,11 +173,13 @@ class event extends \moodleform {
         $mform->addHelpButton('details_editor', 'details', 'facetoface');
 
         // Choose users for trainer roles
-        $roles = facetoface_get_trainer_roles($this->context);
+        $roles = \mod_facetoface\trainer_helper::get_trainer_roles($this->context);
 
         if ($roles) {
+            $trainerhelper = new \mod_facetoface\trainer_helper(new \mod_facetoface\seminar_event($this->_customdata['s']));
+
             // Get current trainers
-            $current_trainers = facetoface_get_trainers($this->_customdata['s']);
+            $current_trainers = $trainerhelper->get_trainers();
             // Get course context and roles
             $rolenames = role_get_names($this->context);
             // Loop through all selected roles
@@ -952,9 +954,17 @@ class event extends \moodleform {
         $session->details = $data->details;
         $DB->set_field('facetoface_sessions', 'details', $data->details, array('id' => $seminarevent->get_id()));
 
+        $excludetrainers = [];
+        $trainerhelper = new \mod_facetoface\trainer_helper($seminarevent);
         // Save trainer roles.
         if (isset($fromform->trainerrole)) {
-            facetoface_update_trainers($facetoface, $session, $fromform->trainerrole);
+            $trainerrole = $fromform->trainerrole;
+            foreach ($trainerrole as $roleid => $trainers) {
+                $added = $trainerhelper->add_trainers($roleid, $trainers);
+                $excludetrainers = array_merge($excludetrainers, $added);
+            }
+
+            $trainerhelper->remove_trainers($excludetrainers);
         }
 
         \mod_facetoface\calendar::update_entries($seminarevent);
@@ -967,7 +977,8 @@ class event extends \moodleform {
                     $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
                     \mod_facetoface\notice_sender::signup_datetime_changed($signup, $olddates);
                 }
-                $sessiontrainers = facetoface_get_trainers($session->id);
+
+                $sessiontrainers = $trainerhelper->get_trainers();
                 if (!empty($sessiontrainers)) {
                     foreach ($sessiontrainers as $roleid => $trainers) {
                         foreach ($trainers as $trainer) {

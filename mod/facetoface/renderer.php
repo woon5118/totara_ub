@@ -22,10 +22,9 @@
  */
 
 use mod_facetoface\room;
-use \mod_facetoface\{ seminar, seminar_event };
+use \mod_facetoface\{seminar, trainer_helper, event_time};
 use \mod_facetoface\signup\state\booked;
 use \mod_facetoface\signup\condition\event_taking_attendance;
-use \mod_facetoface\event_time;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -1948,8 +1947,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             }
         }
         // Display trainers.
-        $trainerroles = facetoface_get_trainer_roles(context_course::instance($seminar->get_course()));
-        $trainers = facetoface_get_trainers($seminarevent->get_id());
+        $trainerhelper = new trainer_helper($seminarevent);
+        $trainerroles = trainer_helper::get_trainer_roles(context_course::instance($seminar->get_course()));
+        $trainers = $trainerhelper->get_trainers();
         foreach ((array)$trainerroles as $role => $rolename) {
             if (empty($trainers[$role])) {
                 continue;

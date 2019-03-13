@@ -27,12 +27,8 @@
  * Unit tests for mod/facetoface/lib.php
  */
 
-use \mod_facetoface\seminar;
-use \mod_facetoface\signup;
-use \mod_facetoface\signup_helper;
-use \mod_facetoface\signup\state\{not_set, waitlisted, booked, requested, user_cancelled, fully_attended};
-use \mod_facetoface\seminar_event;
-use \mod_facetoface\event_time;
+use \mod_facetoface\{seminar_event, seminar, event_time, signup, signup_helper, trainer_helper};
+use \mod_facetoface\signup\state\{waitlisted, booked, requested, user_cancelled, fully_attended};
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
@@ -2880,12 +2876,12 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $context = context_course::instance(123074);
 
         // No session roles.
-        $this->assertFalse((bool)facetoface_get_trainer_roles($context), $this->msgfalse);
+        $this->assertEmpty(trainer_helper::get_trainer_roles($context));
 
         // Add some roles.
         set_config('facetoface_session_roles', "4");
 
-        $result = facetoface_get_trainer_roles($context);
+        $result = trainer_helper::get_trainer_roles($context);
         $this->assertEquals($result[4]->localname, 'Trainer');
     }
 
@@ -2896,10 +2892,11 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sessionid1 = 1;
         $roleid1 = 1;
 
-        // Test for valid case.
-        $this->assertTrue((bool)facetoface_get_trainers($sessionid1, $roleid1), $this->msgtrue);
+        $trainerhelper = new trainer_helper(new seminar_event($sessionid1));
 
-        $this->assertTrue((bool)facetoface_get_trainers($sessionid1), $this->msgtrue);
+        // Test for valid case.
+        $this->assertNotEmpty($trainerhelper->get_trainers_for_role($roleid1));
+        $this->assertNotEmpty($trainerhelper->get_trainers());
     }
 
     function test_facetoface_supports() {

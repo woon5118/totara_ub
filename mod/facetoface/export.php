@@ -79,7 +79,7 @@ $worksheet->write_string(0, $pos++, get_string('timefinish', 'facetoface'));
 $worksheet->write_string(0, $pos++, get_string('duration', 'facetoface'));
 $worksheet->write_string(0, $pos++, get_string('status', 'facetoface'));
 
-if ($trainerroles = facetoface_get_trainer_roles($context)) {
+if ($trainerroles = \mod_facetoface\trainer_helper::get_trainer_roles($context)) {
     foreach ($trainerroles as $role) {
         $worksheet->write_string(0, $pos++, get_string('role').': '.$role->localname);
     }

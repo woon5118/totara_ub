@@ -30,6 +30,7 @@ require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 use \mod_facetoface\signup;
+use mod_facetoface\signup_helper;
 use \mod_facetoface\signup\state\{booked, waitlisted, requestedadmin, declined};
 
 /**
@@ -539,8 +540,11 @@ foreach ($requests as $attendee) {
     }
 
     // Additional approval columns for the approval tab.
-    if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_MANAGER || $seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ADMIN) {
-        $managers = facetoface_get_session_managers($attendee->id, $seminarevent->get_id());
+    if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_MANAGER ||
+        $seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ADMIN) {
+        $signup = signup::create($attendee->id, $seminarevent);
+        $managers = signup_helper::find_managers_from_signup($signup);
+
         $managernames = array();
         $state = '';
         $time = '';

@@ -861,16 +861,17 @@ class facetoface_notification extends data_object {
      * @return  void
      */
     public function send_to_manager($user, $sessionid) {
-        global $CFG, $DB;
+        global $CFG;
 
         // Check that the notification is enabled and that all facetoface notifications are not disabled.
         if (!$this->status || !empty($CFG->facetoface_notificationdisable)) {
             return;
         }
 
-        $params = array('userid'=>$user->id, 'sessionid'=>$sessionid);
-        $jobassignmentid = $DB->get_field('facetoface_signups', 'jobassignmentid', $params);
-        $managers = facetoface_get_session_managers($user->id, $sessionid, $jobassignmentid);
+        $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+
+        $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
+        $managers = \mod_facetoface\signup_helper::find_managers_from_signup($signup);
 
         if ($this->ccmanager && !empty($managers)) {
             foreach ($managers as $manager) {
@@ -994,13 +995,14 @@ class facetoface_notification extends data_object {
         $event->name = 'task';
 
         // Send the booking request to all users with the approvalrole set in the session.
-        $sessionroles = facetoface_get_trainers($sessionid, $this->_facetoface->approvalrole);
+        $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+        $trainerhelper = new \mod_facetoface\trainer_helper($seminarevent);
+        $sessionroles = $trainerhelper->get_trainers_for_role($this->_facetoface->approvalrole);
+
         if (!empty($sessionroles)) {
             foreach ($sessionroles as $recipient) {
-                if (!empty($recipient)) {
-                    $event->userto = core_user::get_user($recipient->id);
-                    $this->send_adhoc_manager_message($event, $user, $sessionid);
-                }
+                $event->userto = core_user::get_user($recipient->id);
+                $this->send_adhoc_manager_message($event, $user, $sessionid);
             }
         }
 

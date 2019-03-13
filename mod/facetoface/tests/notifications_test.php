@@ -38,9 +38,7 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/field/datetime/define.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/datetime/field.class.php');
 
-use mod_facetoface\signup;
-use mod_facetoface\signup_helper;
-use mod_facetoface\seminar_event;
+use mod_facetoface\{signup_helper, seminar_event, trainer_helper};
 
 class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_testcase {
     /**
@@ -2417,8 +2415,15 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $teachers[] = $teacher1->id;
         $form[$role->id] = $teachers;
         $sink = $this->redirectEmails();
-        facetoface_update_trainers($f2f, $seminarevent->to_record(), $form);
-        unset($form, $teachers);
+
+        $helper = new \mod_facetoface\trainer_helper($seminarevent);
+        foreach ($form as $roleid => $trainers) {
+            $helper->add_trainers($roleid, $trainers);
+        }
+
+        $form = [];
+        $teachers = [];
+
         $count = $DB->count_records('facetoface_session_roles', ['roleid' => $role->id, 'userid' => $teacher1->id]);
         $this->assertEquals(1, (int)$count);
 
@@ -2437,7 +2442,15 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $teachers[] = $teacher2->id;
         $form[$role->id] = $teachers;
         $sink = $this->redirectEmails();
-        facetoface_update_trainers($f2f, $seminarevent->to_record(), $form);
+
+        $excludedusers = [];
+        foreach ($form as $roleid => $trainers) {
+            $added = $helper->add_trainers($roleid, $trainers);
+            $excludedusers = array_merge($excludedusers, $added);
+        }
+
+        $helper->remove_trainers($excludedusers);
+
         unset($form, $teachers);
         $count = $DB->count_records('facetoface_session_roles', ['roleid' => $role->id, 'userid' => $teacher2->id]);
         $this->assertEquals(1, (int)$count);

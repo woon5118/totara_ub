@@ -23,11 +23,10 @@
 
 namespace mod_facetoface;
 use mod_facetoface\exception\signup_exception;
-use mod_facetoface\signup\state\state;
-use mod_facetoface\signup\state\not_set;
-use mod_facetoface\signup\state\interface_event;
+use mod_facetoface\signup\state\{state, not_set, interface_event};
 use mod_facetoface\signup\transition;
 use \stdClass;
+use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -131,6 +130,14 @@ final class signup implements seminar_iterator_item {
         }
 
         return $signup;
+    }
+
+    /**
+     * Returning true if this object has associated id existing in the table.
+     * @return bool
+     */
+    public function exists(): bool {
+        return !empty($this->id);
     }
 
     /**
@@ -598,6 +605,15 @@ final class signup implements seminar_iterator_item {
     public function get_managerid() : int {
         return (int)$this->managerid;
     }
+
+    /**
+     * Checking whether this signup has associated managerid or not.
+     * @return bool
+     */
+    public function has_manager(): bool {
+        return !empty($this->managerid);
+    }
+
     /**
      * @param int $managerid
      */
@@ -618,6 +634,14 @@ final class signup implements seminar_iterator_item {
     public function set_jobassignmentid(int $jobassignmentid) : signup {
         $this->jobassignmentid = $jobassignmentid;
         return $this;
+    }
+
+    /**
+     * Checking whether the user has chosen the job assignment for their signup or not
+     * @return bool
+     */
+    public function has_jobassignment(): bool {
+        return !empty($this->jobassignmentid);
     }
 
     /**

@@ -36,6 +36,7 @@ use mod_facetoface\signup\state\{
     user_cancelled,
     attendance_state
 };
+use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -533,5 +534,57 @@ final class signup_helper {
                 $signup->switch_state(\mod_facetoface\signup\state\user_cancelled::class);
             }
         }
+    }
+
+    /**
+     * @param signup $signup
+     * @return stdClass[]
+     */
+    public static function find_managers_from_signup(signup $signup): array {
+        global $DB;
+
+        if (!$signup->exists()) {
+            // Prevent the path that throws exception with empty signup id. Just don't bother to find the managers of
+            // a user within signup, if the signup does not exists in the system though.
+            return [];
+        }
+
+        $managerselect = get_config(null, 'facetoface_managerselect');
+        $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
+
+        $managers = [];
+
+        if ($managerselect && $signup->has_manager()) {
+            // Check if they selected a manager for their signup.
+            $managerid = $signup->get_managerid();
+            $managers[] = $DB->get_record('user', ['id' => $managerid]);
+        } else if ($selectjobassignmentonsignupglobal && $signup->has_jobassignment()) {
+            // The job assignment could not be found here, because the system admin might had deleted
+            // the job assignment record, but did not update the seminar signup record here.
+
+            // This could mean that, seminar system is not able to notify this user's manager here.
+            // However, when deleting the job assignment of a user, this could indicate that this
+            // user is no longer being managed by the same manager anymore. Unless, deleting job
+            $jobasssignmentid = $signup->get_jobassignmentid();
+            $ja = job_assignment::get_with_id($jobasssignmentid, false);
+
+            if (null !== $ja && $ja->managerid) {
+                $managers[] = $DB->get_record('user', ['id' => $ja->managerid]);
+            }
+        } else {
+            $userid = $signup->get_userid();
+            $managerids = job_assignment::get_all_manager_userids($userid);
+
+            if (!empty($managerids)) {
+                [$psql, $params] = $DB->get_in_or_equal($managerids, SQL_PARAMS_NAMED);
+                $managers = $DB->get_records_select('user', "id {$psql}", $params);
+            }
+        }
+
+        array_walk($managers, function (stdClass &$manager) {
+            $manager->fullname = fullname($manager);
+        });
+
+        return $managers;
     }
 }

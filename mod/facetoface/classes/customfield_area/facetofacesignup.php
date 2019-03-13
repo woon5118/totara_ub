@@ -25,6 +25,8 @@
 
 namespace mod_facetoface\customfield_area;
 
+use mod_facetoface\{seminar_event, trainer_helper};
+
 /**
  * Seminar Signup custom field management class.
  *
@@ -145,13 +147,11 @@ class facetofacesignup implements \totara_customfield\area {
 
         // 5. The current user is a facetoface trainer.
         if ($record->approvaltype == \mod_facetoface\seminar::APPROVAL_ROLE) {
-            $sessionroles = facetoface_get_trainers($record->sessionid, $record->approvalrole);
-            if (!empty($sessionroles)) {
-                foreach ($sessionroles as $user) {
-                    if ($user->id == $USER->id) {
-                        return true;
-                    }
-                }
+            $trainerhelper = new trainer_helper(new seminar_event($record->sessionid));
+            $sessionroles = $trainerhelper->get_trainers_for_role($record->approvalrole);
+
+            if (!empty($sessionroles) && isset($sessionroles[$USER->id])) {
+                return true;
             }
         }
 

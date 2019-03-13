@@ -25,6 +25,7 @@ namespace mod_facetoface;
 use \mod_facetoface\signup\state\waitlisted;
 use \mod_facetoface\signup\state\booked;
 use \stdClass;
+use mod_facetoface\signup_helper;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -43,7 +44,7 @@ class notice_sender {
      * @return string
      */
     public static function request_manager(signup $signup) {
-        $managers = facetoface_get_session_managers($signup->get_userid(), $signup->get_sessionid(), $signup->get_jobassignmentid());
+        $managers = signup_helper::find_managers_from_signup($signup);
 
         $hasemail = false;
         foreach ($managers as $manager) {

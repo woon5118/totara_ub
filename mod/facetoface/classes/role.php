@@ -48,6 +48,7 @@ final class role implements seminar_iterator_item {
      * @var int {facetoface_session_roles}.userid
      */
     private $userid = 0;
+
     /**
      * @var string facetoface_session_roles table name
      */
@@ -153,5 +154,48 @@ final class role implements seminar_iterator_item {
     public function set_userid(int $userid) : role {
         $this->userid = $userid;
         return $this;
+    }
+
+    /**
+     * Returning true if the record does have associated id with it.
+     * @return bool
+     */
+    public function exists(): bool {
+        return !empty($this->id);
+    }
+
+    /**
+     * If the record was not found in the db, then it is okay to return the object without the associated id. However, it will still
+     * set the property for the record obj.
+     *
+     * @param int $userid
+     * @param int $sessionid
+     * @param int $roleid
+     *
+     * @return role
+     */
+    public static function find_from(int $userid, int $sessionid, int $roleid): role {
+        global $DB;
+
+        $params = [
+            'userid' => $userid,
+            'sessionid' => $sessionid,
+            'roleid' => $roleid
+        ];
+
+        $record = $DB->get_record(static::DBTABLE, $params);
+        $self = new static();
+
+        if (!$record) {
+            // Just setting a few properties related first, but do not set the associated id. So that the external usage can check
+            // that the record does not exist in the system yet base on associated id.
+            $self->userid = $userid;
+            $self->sessionid = $sessionid;
+            $self->roleid = $roleid;
+        } else {
+            $self->map_object($record);
+        }
+
+        return $self;
     }
 }
