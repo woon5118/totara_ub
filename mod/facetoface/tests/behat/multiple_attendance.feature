@@ -129,15 +129,10 @@ Feature: Take attendance for a seminar with multiple sessions
 
     # Assign the user to the cert.
     And I switch to "Assignments" tab
-    And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "first1 last1 (user1@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
     And I wait until the page is ready
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
-    Then I should see "1 learner(s) assigned: 1 active, 0 exception(s)."
 
   Scenario: Complete older session, archive cert, complete newer session, see newer completion date on cert
     # Complete older session.

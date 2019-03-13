@@ -56,13 +56,9 @@ Feature: Enrolment plugin cron tasks
     And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Organisations" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add organisations to program"
+    And I set the field "Add a new" to "Organisations"
     And I click on "Organisation1" "link" in the "Add organisations to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add organisations to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Organisation1"
 
     # Ensure Audience syn External unenrol action is set to "Disable course enrolment and remove roles"

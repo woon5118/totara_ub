@@ -235,5 +235,14 @@ function xmldb_totara_program_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019042600, 'totara', 'program');
     }
 
+    if ($oldversion < 2019052101) {
+        // Enable legacy program assignments by default on upgrade
+        if (get_config(null, 'enablelegacyprogramassignments') === false) {
+            set_config('enablelegacyprogramassignments', 1);
+        }
+
+        upgrade_plugin_savepoint(true, 2019052101, 'totara', 'program');
+    }
+
     return true;
 }

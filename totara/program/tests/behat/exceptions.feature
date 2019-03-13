@@ -44,27 +44,23 @@ Feature: Generation of program assignment exceptions
     And I click on "Save all changes" "button"
 
     When I click on "Assignments" "link"
-    And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "fn_002 ln_002 (user002@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
-    And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
+    And I wait "2" seconds
+    And I click on "Set due date" "link" in the "fn_001 ln_001" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
         | timeamount | 1 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
-    And I click on "Set due date" "link" in the ".completionlink_4" "css_element"
+    And I click on "Set due date" "link" in the "fn_002 ln_002" "table_row"
     And I click on "Day(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
         | timeamount | 15 |
     And I click on "Set time relative to event" "button"
-    And I click on "Save changes" "button"
     Then I should see "2 learner(s) assigned: 1 active, 1 exception(s)"
     And I wait "1" seconds
     And I run the scheduled task "\totara_program\task\send_messages_task"
@@ -102,17 +98,15 @@ Feature: Generation of program assignment exceptions
     And I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
 
     When I click on "Assignments" "link"
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "fn_003 ln_003 (user003@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
-    And I click on "Set due date" "link" in the ".completionlink_5" "css_element"
+    And I click on "Set due date" "link" in the "fn_003 ln_003" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype.eventtype" "css_element"
     And I set the following fields to these values:
         | timeamount | 3 |
     And I click on "Set time relative to event" "button"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     Then I should see "3 learner(s) assigned: 3 active, 0 exception(s)"
     And I wait "1" seconds
     And I run the scheduled task "\totara_program\task\send_messages_task"
@@ -149,14 +143,10 @@ Feature: Generation of program assignment exceptions
     And I click on "Edit program details" "button"
 
     When I click on "Assignments" "link"
-    And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "fn_002 ln_002 (user002@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     Then I should see "2 learner(s) assigned: 1 active, 1 exception(s)"
     And I wait "1" seconds
     And I run the scheduled task "\totara_program\task\send_messages_task"
@@ -193,11 +183,9 @@ Feature: Generation of program assignment exceptions
     And I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
 
     When I click on "Assignments" "link"
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "fn_003 ln_003 (user003@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     Then I should see "3 learner(s) assigned: 3 active, 0 exception(s)"
     And I wait "1" seconds
     And I run the scheduled task "\totara_program\task\send_messages_task"
@@ -224,14 +212,12 @@ Feature: Generation of program assignment exceptions
     And I click on "Edit program details" "button"
 
     When I click on "Assignments" "link"
-    And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "fn_002 ln_002 (user002@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
     And I wait "2" seconds
-    And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
+    And I click on "Set due date" "link" in the "fn_001 ln_001" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Profile field date" "option" in the "#eventtype" "css_element"
     And I click on "Date & Time" "link" in the "completion-event-dialog" "totaradialogue"
@@ -240,8 +226,6 @@ Feature: Generation of program assignment exceptions
     And I set the following fields to these values:
         | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     Then I should see "2 learner(s) assigned: 1 active, 1 exception(s)"
 
     When I log out
@@ -274,12 +258,10 @@ Feature: Generation of program assignment exceptions
     And I should see "2 learner(s) assigned: 1 active, 0 exception(s)"
 
     When I click on "Assignments" "link"
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "fn_003 ln_003 (user003@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
     And I wait "2" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     Then I should see "3 learner(s) assigned: 2 active, 0 exception(s)"
 
     When I log out
@@ -307,9 +289,7 @@ Feature: Generation of program assignment exceptions
     And I click on "Save all changes" "button"
 
     When I click on "Assignments" "link"
-    And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "fn_002 ln_002 (user002@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "fn_003 ln_003 (user003@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
@@ -317,30 +297,27 @@ Feature: Generation of program assignment exceptions
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
 
     Then I wait until the page is ready
-    And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
+    And I click on "Set due date" "link" in the "fn_001 ln_001" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
       | timeamount | 1 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
 
-    And I click on "Set due date" "link" in the ".completionlink_4" "css_element"
+    And I click on "Set due date" "link" in the "fn_002 ln_002" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
       | timeamount | 1 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
 
-    And I click on "Set due date" "link" in the ".completionlink_5" "css_element"
+    And I click on "Set due date" "link" in the "fn_003 ln_003" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
       | timeamount | 1 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
-
-    And I wait until the page is ready
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I wait "1" seconds
     Then I should see "4 learner(s) assigned: 1 active, 3 exception(s)"
 
     When I click on "Exception Report (3)" "link"
@@ -371,12 +348,11 @@ Feature: Generation of program assignment exceptions
 
     When I click on "Assignments" "link"
     And I wait until the page is ready
-    And I click on "Save changes" "button"
     Then I should see "4 learner(s) assigned: 3 active, 0 exception(s)"
 
     And I should not see "No due date" in the "fn_001" "table_row"
     And I should not see "Not yet known" in the "fn_001" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
+    And I click on "Set due date" "link" in the "fn_001 ln_001" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -384,7 +360,7 @@ Feature: Generation of program assignment exceptions
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
     And I should not see "No due date" in the "fn_002" "table_row"
     And I should not see "Not yet known" in the "fn_002" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_4" "css_element"
+    And I click on "Set due date" "link" in the "fn_002 ln_002" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -392,7 +368,7 @@ Feature: Generation of program assignment exceptions
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
     And I should not see "No due date" in the "fn_003" "table_row"
     And I should not see "Not yet known" in the "fn_003" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_5" "css_element"
+    And I click on "Set due date" "link" in the "fn_003 ln_003" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -400,7 +376,6 @@ Feature: Generation of program assignment exceptions
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
 
     And I wait until the page is ready
-    And I click on "Save changes" "button"
     Then I should see "4 learner(s) assigned: 3 active, 1 exception(s)"
 
     When I click on "Exception Report (1)" "link"
@@ -412,7 +387,7 @@ Feature: Generation of program assignment exceptions
     Then I should see "4 learner(s) assigned: 3 active, 0 exception(s)"
 
     Then I click on "Assignments" "link"
-    And I click on "Set due date" "link" in the ".completionlink_6" "css_element"
+    And I click on "Set due date" "link" in the "fn_004 ln_004" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -420,13 +395,12 @@ Feature: Generation of program assignment exceptions
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
 
     And I wait until the page is ready
-    And I click on "Save changes" "button"
     Then I should see "4 learner(s) assigned: 2 active, 1 exception(s)"
 
     Then I click on "Assignments" "link"
     And I should not see "No due date" in the "fn_001" "table_row"
     And I should not see "Not yet known" in the "fn_001" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
+    And I click on "Set due date" "link" in the "fn_001 ln_001" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -435,7 +409,7 @@ Feature: Generation of program assignment exceptions
 
     And I should not see "No due date" in the "fn_002" "table_row"
     And I should not see "Not yet known" in the "fn_002" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_4" "css_element"
+    And I click on "Set due date" "link" in the "fn_002 ln_002" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -444,7 +418,7 @@ Feature: Generation of program assignment exceptions
 
     And I should not see "No due date" in the "fn_003" "table_row"
     And I should not see "Not yet known" in the "fn_003" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_5" "css_element"
+    And I click on "Set due date" "link" in the "fn_003 ln_003" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -453,7 +427,7 @@ Feature: Generation of program assignment exceptions
 
     And I should not see "No due date" in the "fn_004" "table_row"
     And I should not see "Not yet known" in the "fn_004" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_6" "css_element"
+    And I click on "Set due date" "link" in the "fn_004 ln_004" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -461,12 +435,11 @@ Feature: Generation of program assignment exceptions
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
 
     And I wait until the page is ready
-    And I click on "Save changes" "button"
     Then I should see "4 learner(s) assigned: 3 active, 1 exception(s)"
 
     And I should not see "No due date" in the "fn_004" "table_row"
     And I should not see "Not yet known" in the "fn_004" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_6" "css_element"
+    And I click on "Set due date" "link" in the "fn_004 ln_004" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -474,7 +447,6 @@ Feature: Generation of program assignment exceptions
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
 
     And I wait until the page is ready
-    And I click on "Save changes" "button"
     Then I should see "4 learner(s) assigned: 4 active, 0 exception(s)"
 
   @javascript
@@ -495,31 +467,26 @@ Feature: Generation of program assignment exceptions
     And I click on "Save all changes" "button"
 
     When I click on "Assignments" "link"
-    And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "fn_002 ln_002 (user002@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
 
     Then I wait until the page is ready
-    And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
+    And I click on "Set due date" "link" in the "fn_001 ln_001" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
       | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
-
-    And I click on "Set due date" "link" in the ".completionlink_4" "css_element"
+    And I click on "Set due date" "link" in the "fn_002 ln_002" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
       | timeamount | 5 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
+    And I wait "1" seconds
 
-    And I wait until the page is ready
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     Then I should see "2 learner(s) assigned: 1 active, 1 exception(s)"
 
     When I click on "Exception Report (1)" "link"
@@ -534,7 +501,7 @@ Feature: Generation of program assignment exceptions
     Then I click on "Assignments" "link"
     And I should not see "No due date" in the "fn_001" "table_row"
     And I should not see "Not yet known" in the "fn_001" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
+    And I click on "Set due date" "link" in the "fn_002 ln_002" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -542,12 +509,11 @@ Feature: Generation of program assignment exceptions
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
 
     And I wait until the page is ready
-    And I click on "Save changes" "button"
     Then I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
 
     Then I should not see "No due date" in the "fn_001" "table_row"
     And I should not see "Not yet known" in the "fn_001" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
+    And I click on "Set due date" "link" in the "fn_002 ln_002" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -556,7 +522,7 @@ Feature: Generation of program assignment exceptions
 
     Then I should not see "No due date" in the "fn_002" "table_row"
     And I should not see "Not yet known" in the "fn_002" "table_row"
-    And I click on "Set due date" "link" in the ".completionlink_4" "css_element"
+    And I click on "Set due date" "link" in the "fn_002 ln_002" "table_row"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
@@ -564,5 +530,4 @@ Feature: Generation of program assignment exceptions
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
 
     And I wait until the page is ready
-    And I click on "Save changes" "button"
     Then I should see "2 learner(s) assigned: 2 active, 0 exception(s)"

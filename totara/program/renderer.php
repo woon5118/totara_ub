@@ -94,8 +94,9 @@ class totara_program_renderer extends plugin_renderer_base {
     * @return str HTML fragment
     */
     public function render_current_status($data) {
+        global $CFG;
 
-        $programstatusclass = $data->statusclass;
+        $programstatusclass = $data->notification_state;
         $programstatusstring = get_string($data->statusstr, 'totara_program');
 
         if (($data->statusstr === 'notduetostartuntil') or ($data->statusstr === 'nolongeravailabletolearners')) {
@@ -115,6 +116,10 @@ class totara_program_renderer extends plugin_renderer_base {
             $coursevisibilityinfo .= html_writer::end_tag('span');
 
             $notification = $programstatusstring . $learnerinfo . $coursevisibilityinfo;
+        }
+
+        if (!empty($data->expired) && !$CFG->enablelegacyprogramassignments) {
+            $notification .= '<br/>' . get_string('ifreactivatinglearnerupdate', 'totara_program');
         }
 
         $out = $this->output->notification($notification, $programstatusclass);
@@ -464,9 +469,12 @@ class totara_program_renderer extends plugin_renderer_base {
     /**
     * Generates the HTML to display the set_completion page
     *
+    * @param object $data object containing data to set default values in due date dialog
+    * @param int $programid
+    *
     * @return string HTML Fragment
     */
-    public function display_set_completion($programid = null) {
+    public function display_set_completion($programid = null, $data = null) {
         $out = '';
         $out .= html_writer::start_tag('fieldset');
         $out .= html_writer::start_tag('span', array('class' => 'legend')) . get_string('completeby', 'totara_program') . html_writer::end_tag('span');
@@ -481,26 +489,34 @@ class totara_program_renderer extends plugin_renderer_base {
             $minutes[$i] = sprintf("%02d", $i);
         }
 
+        $selectedhour = isset($data->hour) ? $data->hour : '';
+        $selectedmin = isset($data->minute) ? $data->minute : '';
+        $selecteddate = isset($data->date) ? $data->date : '';
+
+        $periodvalue = isset($data->period) ? $data->period : 0;
+        $numbervalue = isset($data->num) ? $data->num : 1;
+        $instanceid = isset($data->instance) ? $data->instance : '';
+
         $out .= html_writer::start_tag('span', array('class' => 'datepicker-wrapper'));
         $out .= html_writer::label(get_string('date', 'moodle'), 'completiontime', false, array('class' => 'accesshide'));
-        $out .= html_writer::empty_tag('input', array('class' => 'completiontime', 'type' => 'text', 'name' => "completiontime", 'placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core')));
+        $out .= html_writer::empty_tag('input', array('class' => 'completiontime', 'type' => 'text', 'name' => "completiontime", 'placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core'), 'value' => $selecteddate));
         $out .= html_writer::end_tag('span');
 
         // Matching display of time in RTL to what is done in lib/form/datetimeselector.php.
         if (right_to_left()) {
             $out .= ' '.get_string('datepickerattime', 'totara_core'). ' ';
             $out .= html_writer::label(get_string('minute', 'moodle'), 'completiontimeminute', false, array('class' => 'accesshide'));
-            $out .= html_writer::select($minutes, 'completiontimeminute', array(0 => '00'), false, array('name' => 'completiontimeminute', 'class' => 'completiontimeminute'));
+            $out .= html_writer::select($minutes, 'completiontimeminute', $selectedmin, false, array('name' => 'completiontimeminute', 'class' => 'completiontimeminute'));
             $out .= ':';
             $out .= html_writer::label(get_string('hour', 'moodle'), 'completiontimehour', false, array('class' => 'accesshide'));
-            $out .= html_writer::select($hours, 'completiontimehour', array(0 => '00'), false, array('name' => 'completiontimehour', 'class' => 'completiontimehour'));
+            $out .= html_writer::select($hours, 'completiontimehour', $selectedhour, false, array('name' => 'completiontimehour', 'class' => 'completiontimehour'));
         } else {
             $out .= ' '.get_string('datepickerattime', 'totara_core'). ' ';
             $out .= html_writer::label(get_string('hour', 'moodle'), 'completiontimehour', false, array('class' => 'accesshide'));
-            $out .= html_writer::select($hours, 'completiontimehour', array(0 => '00'), false, array('name' => 'completiontimehour', 'class' => 'completiontimehour'));
+            $out .= html_writer::select($hours, 'completiontimehour', $selectedhour, false, array('name' => 'completiontimehour', 'class' => 'completiontimehour'));
             $out .= ':';
             $out .= html_writer::label(get_string('minute', 'moodle'), 'completiontimeminute', false, array('class' => 'accesshide'));
-            $out .= html_writer::select($minutes, 'completiontimeminute', array(0 => '00'), false, array('name' => 'completiontimeminute', 'class' => 'completiontimeminute'));
+            $out .= html_writer::select($minutes, 'completiontimeminute', $selectedmin, false, array('name' => 'completiontimeminute', 'class' => 'completiontimeminute'));
         }
 
         $out .= ' ' . html_writer::start_tag('button', array('class' => 'fixeddate')) .
@@ -514,10 +530,10 @@ class totara_program_renderer extends plugin_renderer_base {
 
         $out .= html_writer::start_tag('div', array('id' => 'prog-completion-relative-date'));
         $out .= html_writer::tag('span', get_string('completewithin', 'totara_program'));
-        $out .= \totara_program\utils::print_duration_selector($prefix = '', $periodelementname = 'timeperiod', $periodvalue = '', $numberelementname = 'timeamount', $numbervalue = '1', $includehours = false);
+        $out .= \totara_program\utils::print_duration_selector($prefix = '', $periodelementname = 'timeperiod', $periodvalue, $numberelementname = 'timeamount', $numbervalue, $includehours = false);
         $out .= ' ' . get_string('of', 'totara_program') . ' ';
         $out .= $this->completion_events_dropdown("eventtype", $programid);
-        $out .= html_writer::empty_tag('input', array('id' => 'instance', 'type' => 'hidden', 'name' => "instance", 'value' => ''));
+        $out .= html_writer::empty_tag('input', array('id' => 'instance', 'type' => 'hidden', 'name' => "instance", 'value' => $instanceid));
         $out .= html_writer::link('#', '', array('id' => 'instancetitle', 'onclick' => 'handle_completion_selection()'));
         $out .= html_writer::start_tag('button', array('class' => 'relativeeventtime')) . get_string('settimerelativetoevent', 'totara_program') . html_writer::end_tag('button');
         $out .= html_writer::end_tag('div');

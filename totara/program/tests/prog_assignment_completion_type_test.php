@@ -233,9 +233,11 @@ class totara_program_prog_assignment_completion_type_testcase extends reportcach
 
         $completionobject = new prog_assigment_completion_position_assigned_date();
 
-        $assignment = $DB->get_record('prog_assignment', array('programid' => $this->programs[0]->id,
+        $assignment = $DB->get_record('prog_assignment', array(
+            'programid' => $this->programs[0]->id,
             'assignmenttype' => ASSIGNTYPE_INDIVIDUAL,
-            'assignmenttypeid' => $this->users[3]->id));
+            'assignmenttypeid' => $this->users[3]->id
+        ));
         $assignment->completioninstance = $this->positions[2]->id;
         $timestamp = $completionobject->get_timestamp($this->users[3]->id, $assignment);
         $this->assertGreaterThan($this->beforesetuptime, $timestamp);

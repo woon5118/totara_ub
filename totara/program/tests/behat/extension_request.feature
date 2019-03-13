@@ -42,7 +42,6 @@ Feature: Request extensions in programs
       | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
     And I wait "1" seconds
-    And I press "Save changes"
     And I log out
 
   Scenario: Program extension request enable (site and program level), manager assigned and program about to expire

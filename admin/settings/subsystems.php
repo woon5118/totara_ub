@@ -129,6 +129,10 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('enableprogramextensionrequests', 'totara_core'),
         new lang_string('enableprogramextensionrequests_help', 'totara_core'), 1));
 
+    $optionalsubsystems->add(new admin_setting_configcheckbox('enablelegacyprogramassignments',
+        new lang_string('enablelegacyprogramassignments', 'totara_program'),
+        new lang_string('enablelegacyprogramassignments_help', 'totara_program'), 0));
+
     // If adding or removing the settings below, be sure to update the array in
     // totara_advanced_features_list() in totara/core/totara.php.
 

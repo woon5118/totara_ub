@@ -39,12 +39,9 @@ Feature: Deferred assignments task for programs
     And I am on "Program One" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Positions" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add position to program"
-    And I click on "Position One" "link" in the "Add position to program" "totaradialogue"
-    And I click on "Ok" "button" in the "Add position to program" "totaradialogue"
-    And I press "Save changes"
+    And I set the field "Add a new" to "Positions"
+    And I click on "Position One" "link" in the "Add positions to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add positions to program" "totaradialogue"
     # Run the task now to clear any flags that might have been set already
     And I run the scheduled task "\totara_program\task\assignments_deferred_task"
     And I navigate to "Manage users" node in "Site administration > Users"
@@ -68,12 +65,9 @@ Feature: Deferred assignments task for programs
     And I am on "Program One" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Organisations" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add organisations to program"
+    And I set the field "Add a new" to "Organisations"
     And I click on "Organisation One" "link" in the "Add organisations to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add organisations to program" "totaradialogue"
-    And I press "Save changes"
     # Run the task now to clear any flags that might have been set already
     And I run the scheduled task "\totara_program\task\assignments_deferred_task"
     And I navigate to "Manage users" node in "Site administration > Users"

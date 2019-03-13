@@ -96,6 +96,22 @@ Feature: Users completion of programs and coursesets
     And I click on "Completion Program Tests" "link"
     Then I should see "100%" program progress
 
+    # Test assignments interface due date cannot be changed
+    Given I log out
+    And I log in as "admin"
+    And I navigate to "Manage programs" node in "Site administration > Programs"
+    And I click on "Miscellaneous" "link"
+    And I click on "Enrolled users" "link" in the "Completion Program Tests" "table_row"
+    And I should see "Cannot change - user complete" in the "fn_001 ln_001" "table_row"
+    And I should not see "Set due date" in the "fn_001 ln_001" "table_row"
+    And I should not see "Remove due date" in the "fn_001 ln_001" "table_row"
+    And I should not see "Cannot change - user complete" in the "fn_002 ln_002" "table_row"
+    And I should see "Set due date" in the "fn_002 ln_002" "table_row"
+    And I should not see "Remove due date" in the "fn_002 ln_002" "table_row"
+    And I should not see "Cannot change - user complete" in the "fn_003 ln_003" "table_row"
+    And I should see "Set due date" in the "fn_003 ln_003" "table_row"
+    And I should not see "Remove due date" in the "fn_003 ln_003" "table_row"
+
   # Completion of a program with content like so:
   # Course set 1 [ Course 1 Or Course 2]
   # Or

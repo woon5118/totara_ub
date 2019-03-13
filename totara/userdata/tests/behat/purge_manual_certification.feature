@@ -37,13 +37,9 @@ Feature: Yet another manual user data purging
 
     And I switch to "Assignments" tab
     And I set the field "Add a new" to "Individuals"
-    And I click on "Add" "button"
-    And I click on "Add individuals to program" "button"
     And I click on "One Uno" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
 
     And I am on "Akoranga" course homepage
     And I navigate to "Completion editor" node in "Course administration"

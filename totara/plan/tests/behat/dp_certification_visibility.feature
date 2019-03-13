@@ -347,10 +347,8 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     Then I should see "Not certified" in the "fn_002 ln_002" "table_row"
 
     When I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "fn_002 ln_002" "table_row"
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+    And I click on "Remove program assignment" "link" in the "fn_002 ln_002" "table_row"
+    And I click on "Remove" "button"
 
     # RoL: Certs tab should be visible but not contain the certification for learner.
     When I log out
@@ -418,10 +416,8 @@ Feature: See that certification visibility affects Record of Learning: Certifica
 
     When I follow "Return to certification"
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "fn_002 ln_002" "table_row"
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+    And I click on "Remove program assignment" "link" in the "fn_002 ln_002" "table_row"
+    And I click on "Remove" "button"
 
     # RoL: Certs tab should be visible but not contain the certification for learner.
     When I log out
@@ -489,10 +485,9 @@ Feature: See that certification visibility affects Record of Learning: Certifica
 
     When I follow "Return to certification"
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "fn_002 ln_002" "table_row"
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+    And I click on "Remove program assignment" "link" in the "fn_002 ln_002" "table_row"
+    And I click on "Remove" "button"
+    Then I should see "'fn_002 ln_002' has been removed from the program"
 
     # RoL: Certs tab should be visible but not contain the certification for learner.
     When I log out
@@ -545,10 +540,8 @@ Feature: See that certification visibility affects Record of Learning: Certifica
 
     When I follow "Return to certification"
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "fn_002 ln_002" "table_row"
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+    And I click on "Remove program assignment" "link" in the "fn_002 ln_002" "table_row"
+    And I click on "Remove" "button"
 
   # RoL: Certs tab should be visible but not contain the certification for learner.
     When I log out

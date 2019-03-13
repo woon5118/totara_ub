@@ -36,9 +36,7 @@ Feature: Specific permissions allow users to manage programs
     And I am on "Program One" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Authenticated User (authuser@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "John Smith (john@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
@@ -53,9 +51,7 @@ Feature: Specific permissions allow users to manage programs
     And I wait "1" seconds
     And I click on "Set time relative to event" "button" in the "Completion criteria" "totaradialogue"
     And I wait "1" seconds
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+    Then I should see "Assignment 'Authenticated User' updated"
     And "Exception Report (1)" "link" should be visible
     And I log out
 
@@ -145,13 +141,11 @@ Feature: Specific permissions allow users to manage programs
     And "Exception Report (1)" "link" should not exist
     And "Completion" "link" should not exist
     When I press "Edit program assignments"
-    And I press "Add individuals to program"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Mary Jones" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+    Then I should see "'Mary Jones' has been added to the program"
     And I should see "Mary Jones"
 
   Scenario: totara/program:configureassignments allows a user to set completion time based on course completion
@@ -171,8 +165,7 @@ Feature: Specific permissions allow users to manage programs
     And I wait "1" seconds
     And I click on "Set time relative to event" "button" in the "Completion criteria" "totaradialogue"
     And I wait "1" seconds
-    And I press "Save changes"
-    Then I should see "Program assignments saved successfully"
+    Then I should see "Assignment 'John Smith' updated"
     And I should see "Complete within 1 Day(s) of completion of course 'Course One'" in the "John Smith" "table_row"
 
   Scenario: totara/program:handleexceptions allows a user to manage exceptions

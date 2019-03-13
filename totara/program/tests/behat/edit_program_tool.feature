@@ -20,14 +20,10 @@ Feature: Program editing tool
     And I click on "Settings" "link" in the "Prog 1" "table_row"
     And I switch to "Assignments" tab
     And I set the field "Add a new" to "Individuals"
-    And I click on "Add" "button"
-    And I click on "Add individuals to program" "button"
     And I click on "fn_001 ln_001" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "fn_002 ln_002" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     And I switch to "Completion" tab
 
   Scenario: Confirm that you can not save an invalid state

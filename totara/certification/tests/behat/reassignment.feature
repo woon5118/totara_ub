@@ -41,20 +41,15 @@ Feature: User reassignment to a certification
     And I click on "Save all changes" "button"
     And I switch to "Assignments" tab
     And I set the field "Add a new" to "Individuals"
-    And I click on "Add" "button"
-    And I click on "Add individuals to program" "button"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Timmy Tim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
 
   Scenario: Reassign someone with no history records
     # And I unassign jimmy.
-    And I click on "Delete" "link" in the "Jimmy Jim" "table_row"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I click on "Remove program assignment" "link" in the "Jimmy Jim" "table_row"
+    And I click on "Remove" "button"
 
     # Confirm unassignment.
     And I log out
@@ -69,12 +64,10 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
 
     # And I check jimmy is assigned.
     And I switch to "Completion" tab
@@ -144,9 +137,8 @@ Feature: User reassignment to a certification
 
     # And I unassign jimmy.
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "Jimmy Jim" "table_row"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I click on "Remove program assignment" "link" in the "Jimmy Jim" "table_row"
+    And I click on "Remove" "button"
 
     # Confirm unassignment.
     And I log out
@@ -161,12 +153,10 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
 
     # And I check jimmy is assigned.
     And I switch to "Completion" tab
@@ -218,9 +208,8 @@ Feature: User reassignment to a certification
     # And I unassign jimmy.
     When I follow "Return to certification"
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "Jimmy Jim" "table_row"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I click on "Remove program assignment" "link" in the "Jimmy Jim" "table_row"
+    And I click on "Remove" "button"
 
     And I switch to "Completion" tab
     And I click on "Edit completion records" "link" in the "Jimmy Jim" "table_row"
@@ -284,12 +273,10 @@ Feature: User reassignment to a certification
     # And I reassign jimmy.
     When I follow "Return to certification"
     And I switch to "Assignments" tab
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
 
     # And I check jimmy is assigned.
     And I switch to "Completion" tab
@@ -322,9 +309,8 @@ Feature: User reassignment to a certification
 
     # And I unassign jimmy.
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "Jimmy Jim" "table_row"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I click on "Remove program assignment" "link" in the "Jimmy Jim" "table_row"
+    And I click on "Remove" "button"
 
     # Confirm unassignment.
     And I log out
@@ -339,12 +325,10 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
 
     # And I check jimmy is assigned.
     And I switch to "Completion" tab
@@ -392,9 +376,8 @@ Feature: User reassignment to a certification
 
     # And I unassign jimmy.
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "Jimmy Jim" "table_row"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I click on "Remove program assignment" "link" in the "Jimmy Jim" "table_row"
+    And I click on "Remove" "button"
 
     # Confirm unassignment.
     And I log out
@@ -410,12 +393,10 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
 
     # And I check jimmy is assigned.
     And I switch to "Completion" tab
@@ -464,9 +445,8 @@ Feature: User reassignment to a certification
 
     # And I unassign jimmy.
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "Jimmy Jim" "table_row"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I click on "Remove program assignment" "link" in the "Jimmy Jim" "table_row"
+    And I click on "Remove" "button"
 
     # Confirm unassignment.
     And I log out
@@ -482,12 +462,10 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
 
     # And I check they are assigned.
     And I switch to "Completion" tab
@@ -517,9 +495,8 @@ Feature: User reassignment to a certification
 
     # And I unassign jimmy.
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "Jimmy Jim" "table_row"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I click on "Remove program assignment" "link" in the "Jimmy Jim" "table_row"
+    And I click on "Remove" "button"
 
     # Confirm unassignment.
     And I log out
@@ -535,12 +512,10 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
 
     # And I check jimmy is assigned.
     And I switch to "Completion" tab
@@ -598,9 +573,8 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "Jimmy Jim" "table_row"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I click on "Remove program assignment" "link" in the "Jimmy Jim" "table_row"
+    And I click on "Remove" "button"
 
     # Confirm unassignment.
     And I log out
@@ -619,12 +593,10 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     And I run the "\totara_certification\task\update_certification_task" task
 
     # Check window opening.
@@ -641,9 +613,8 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "Jimmy Jim" "table_row"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I click on "Remove program assignment" "link" in the "Jimmy Jim" "table_row"
+    And I click on "Remove" "button"
 
     # Confirm unassignment.
     And I log out
@@ -662,12 +633,10 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     And I run the "\totara_certification\task\update_certification_task" task
 
     # Check certification expiration
@@ -679,9 +648,8 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "Jimmy Jim" "table_row"
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
+    And I click on "Remove program assignment" "link" in the "Jimmy Jim" "table_row"
+    And I click on "Remove" "button"
 
     # Confirm unassignment.
     And I log out
@@ -708,12 +676,10 @@ Feature: User reassignment to a certification
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Reassign Tests" "table_row"
     And I switch to "Assignments" tab
-    And I click on "Add individuals to program" "button"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Jimmy Jim" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     And I run the "\totara_program\task\completions_task" task
     And I run the "\totara_certification\task\update_certification_task" task
 

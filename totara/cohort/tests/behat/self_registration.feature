@@ -440,15 +440,11 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I click on "Program 1" "link"
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
-    And I click on "Audiences" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add audiences to program" "button"
-    And I click on "Username - manual" "link" in the "add-assignment-dialog-3" "totaradialogue"
-    And I click on "Ok" "button" in the "add-assignment-dialog-3" "totaradialogue"
+    And I set the field "Add a new" to "Audiences"
+    And I click on "Username - manual" "link" in the "Add audiences to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add audiences to program" "totaradialogue"
     And I wait "1" seconds
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+    Then I should see "'Username - manual' has been added to the program"
     And I should see "4 learner(s) assigned: 4 active, 0 exception(s)"
 
     When I navigate to "Manage programs" node in "Site administration > Programs"
@@ -456,14 +452,11 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I click on "Program 2" "link"
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
-    And I click on "Audiences" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add audiences to program" "button"
-    And I click on "Username - selfie" "link" in the "add-assignment-dialog-3" "totaradialogue"
-    And I click on "Ok" "button" in the "add-assignment-dialog-3" "totaradialogue"
+    And I set the field "Add a new" to "Audiences"
+    And I click on "Username - selfie" "link" in the "Add audiences to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add audiences to program" "totaradialogue"
     And I wait "1" seconds
-    And I press "Save changes"
-    Then I should see "Program assignments saved successfully"
+    Then I should see "'Username - selfie' has been added to the program"
     And I should see "0 learner(s) assigned: 0 active, 0 exception(s)"
 
     And I navigate to "Manage programs" node in "Site administration > Programs"
@@ -471,27 +464,20 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I click on "Program 3" "link"
     And I click on "Edit program details" "button"
     And I click on "Assignments" "link"
-    And I click on "Organisations" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Positions" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Management hierarchy" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add organisations to program" "button"
-    And I click on "Organisation Two" "link" in the "add-assignment-dialog-1" "totaradialogue"
-    And I click on "Ok" "button" in the "add-assignment-dialog-1" "totaradialogue"
+    And I set the field "Add a new" to "Organisations"
+    And I click on "Organisation Two" "link" in the "Add organisations to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add organisations to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Add position to program" "button"
-    And I click on "Position Two" "link" in the "add-assignment-dialog-2" "totaradialogue"
-    And I click on "Ok" "button" in the "add-assignment-dialog-2" "totaradialogue"
+    And I set the field "Add a new" to "Positions"
+    And I click on "Position Two" "link" in the "Add positions to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add positions to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Add managers to program" "button"
-    And I click on "fnameman lnameman (manager@example.com) - General Manager" "link" in the "add-assignment-dialog-6" "totaradialogue"
-    And I click on "Ok" "button" in the "add-assignment-dialog-6" "totaradialogue"
+    And I set the field "Add a new" to "Management hierarchy"
+    And I click on "fnameman lnameman (manager@example.com) - General Manager" "link" in the "Add managers to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add managers to program" "totaradialogue"
     And I wait "1" seconds
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+
+    Then I should see "'fnameman lnameman - General Manager' has been added to the program"
     And I should see "3 learner(s) assigned: 3 active, 0 exception(s)"
     # Create the self auth user for positive testing.
     When I log out
@@ -568,7 +554,6 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should see "Program 2" in the "plan_programs" "table"
     And I should see "Program 3" in the "plan_programs" "table"
 
-  @removeme
   Scenario: Verify self registered users are added to certifications instantly when confirmed
     # Create audience/pos/org/manager assignments for programs
     When I log in as "admin"
@@ -579,15 +564,11 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I click on "Certification 1" "link"
     And I click on "Edit certification details" "button"
     And I click on "Assignments" "link"
-    And I click on "Audiences" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add audiences to program" "button"
+    And I set the field "Add a new" to "Audiences"
     And I click on "Username - manual" "link" in the "add-assignment-dialog-3" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-3" "totaradialogue"
     And I wait "1" seconds
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+    Then I should see "'Username - manual' has been added to the program"
     And I should see "4 learner(s) assigned: 4 active, 0 exception(s)"
 
     When I navigate to "Manage certifications" node in "Site administration > Certifications"
@@ -595,14 +576,11 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I click on "Certification 2" "link"
     And I click on "Edit certification details" "button"
     And I click on "Assignments" "link"
-    And I click on "Audiences" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add audiences to program" "button"
+    And I set the field "Add a new" to "Audiences"
     And I click on "Username - selfie" "link" in the "add-assignment-dialog-3" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-3" "totaradialogue"
     And I wait "1" seconds
-    And I press "Save changes"
-    Then I should see "Program assignments saved successfully"
+    Then I should see "'Username - selfie' has been added to the program"
     And I should see "0 learner(s) assigned: 0 active, 0 exception(s)"
 
     And I navigate to "Manage certifications" node in "Site administration > Certifications"
@@ -610,27 +588,21 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I click on "Certification 3" "link"
     And I click on "Edit certification details" "button"
     And I click on "Assignments" "link"
-    And I click on "Organisations" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Positions" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Management hierarchy" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add organisations to program" "button"
-    And I click on "Organisation Two" "link" in the "add-assignment-dialog-1" "totaradialogue"
-    And I click on "Ok" "button" in the "add-assignment-dialog-1" "totaradialogue"
+    And I set the field "Add a new" to "Organisations"
+    And I click on "Organisation Two" "link" in the "Add organisations to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add organisations to program" "totaradialogue"
+
+    And I set the field "Add a new" to "Positions"
+    And I click on "Position Two" "link" in the "Add positions to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add positions to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Add position to program" "button"
-    And I click on "Position Two" "link" in the "add-assignment-dialog-2" "totaradialogue"
-    And I click on "Ok" "button" in the "add-assignment-dialog-2" "totaradialogue"
+
+    And I set the field "Add a new" to "Management hierarchy"
+    And I click on "fnameman lnameman (manager@example.com) - General Manager" "link" in the "Add managers to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add managers to program" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Add managers to program" "button"
-    And I click on "fnameman lnameman (manager@example.com) - General Manager" "link" in the "add-assignment-dialog-6" "totaradialogue"
-    And I click on "Ok" "button" in the "add-assignment-dialog-6" "totaradialogue"
-    And I wait "1" seconds
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+
+    Then I should see "'fnameman lnameman - General Manager' has been added to the program"
     And I should see "3 learner(s) assigned: 3 active, 0 exception(s)"
     # Create the self auth user for positive testing.
     When I log out

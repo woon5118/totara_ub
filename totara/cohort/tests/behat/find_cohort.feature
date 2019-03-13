@@ -41,9 +41,7 @@ Feature: Find cohort through totara dialog window
     And I follow "Program 9074"
     And I click on "Edit program details" "button"
     And I follow "Assignments"
-    And I click on "Audiences" "option" in the "#menucategory_select_dropdown" "css_element"
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I click on "Add audiences to program" "button"
+    And I set the field "Add a new" to "Audiences"
     And I click on "Search" "link" in the "add-assignment-dialog-3" "totaradialogue"
 
     When I search for "9074A" in the "add-assignment-dialog-3" totara dialogue
@@ -67,4 +65,3 @@ Feature: Find cohort through totara dialog window
     And I should see "Audience TL-9074B (AUD9074B)"
 
     And I click on "Cancel" "button" in the "add-assignment-dialog-3" "totaradialogue"
-    And I click on "Clear unsaved changes" "link"

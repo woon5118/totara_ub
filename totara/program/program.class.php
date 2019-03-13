@@ -1945,7 +1945,23 @@ class program {
      * @return string
      */
     public function display_current_status() {
-        global $PAGE, $CFG, $DB;
+        global $PAGE;
+
+        $data = $this->get_current_status();
+
+        $renderer = $PAGE->get_renderer('totara_program');
+        return $renderer->render_current_status($data);
+    }
+
+    /**
+     * Creates data object needed to display current status of a
+     * program
+     *
+     * @return stdClass
+     */
+    public function get_current_status() {
+        global $DB, $CFG;
+
         require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
         $data = new stdClass();
@@ -1953,7 +1969,7 @@ class program {
         $data->exceptions = $this->assignments->count_user_assignment_exceptions();
         $data->total = $this->assignments->count_total_user_assignments();
         $data->audiencevisibilitywarning = false;
-        $data->assignmentsdeferred = $this->assignmentsdeferred;
+        $data->assignmentsdeferred = (int)$this->assignmentsdeferred;
 
         if (!empty($CFG->audiencevisibility)) {
             $coursesnovisible = $this->content->get_visibility_coursesets(TOTARA_SEARCH_OP_NOT_EQUAL, COHORT_VISIBLE_ALL);
@@ -1973,20 +1989,20 @@ class program {
                 $data->assignments > 0 ||
                 $this->audiencevisible == COHORT_VISIBLE_AUDIENCE && $DB->record_exists_sql($audiencesql, $audienceparams)) {
                 $data->statusstr = 'programlive';
-                $data->statusclass = 'notifynotice';
+                $data->notification_state = core\output\notification::NOTIFY_WARNING;
             } else {
                 $data->statusstr = 'programnotlive';
-                $data->statusclass = 'notifymessage';
+                $data->notification_state = core\output\notification::NOTIFY_INFO;
             }
 
         } else {
             if ($this->visible ||
                 $data->assignments > 0) {
                 $data->statusstr = 'programlive';
-                $data->statusclass = 'notifynotice';
+                $data->notification_state = core\output\notification::NOTIFY_WARNING;
             } else {
                 $data->statusstr = 'programnotlive';
-                $data->statusclass = 'notifymessage';
+                $data->notification_state = core\output\notification::NOTIFY_INFO;
             }
         }
 
@@ -2003,8 +2019,9 @@ class program {
             $data->statusstr = 'nolongeravailabletolearners';
         }
 
-        $renderer = $PAGE->get_renderer('totara_program');
-        return $renderer->render_current_status($data);
+        $data->expired = $this->has_expired();
+
+        return $data;
     }
 
     /**

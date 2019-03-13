@@ -10,6 +10,10 @@ information provided here is intended especially for developers.
 * TIME_SELECTOR_* globals have been deprecated. Please use \totara_program\utils::TIME_SELECTOR_* constants.
 * $TIMEALLOWANCESTRINGS global variable has been deprecated. Please use \totara_program\utils::$timeallowancestrings.
 
+=== 12.8 ===
+
+* Added new parameter $data to totara_program_renderer::display_set_completion(), this contains data to set the values of the set completion dialog.
+
 === 12.0 ===
 
 * Removed deprecated file assignment/remove_item.php

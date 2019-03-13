@@ -86,7 +86,6 @@ Feature: The Certification Completion report displays correctly for a learner.
     And I set the following fields to these values:
       | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
-    And I click on "Save changes" "button"
     And I log out
     And I log in as "user001"
     And I click on "Reports" in the totara menu
@@ -145,7 +144,6 @@ Feature: The Certification Completion report displays correctly for a learner.
     And I set the following fields to these values:
       | completiontime       | 15/04/2017 |
     And I click on "Set fixed completion date" "button" in the "Completion criteria" "totaradialogue"
-    And I press "Save changes"
     Then I should see "15 Apr 2017 at 00:00" in the "fn_002 ln_002" "table_row"
 
     When I log out

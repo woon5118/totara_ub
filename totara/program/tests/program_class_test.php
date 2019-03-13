@@ -2364,4 +2364,43 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
         $this->assertCount(0, $exceptions);
     }
+
+    public function test_get_current_status() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        list($program1, $program2) = $this->get_program_objects('program');
+
+        $result = $program1->get_current_status();
+        $expected = new \stdClass();
+        $expected->assignments = 0;
+        $expected->exceptions = 0;
+        $expected->total = 0;
+        $expected->assignmentsdeferred = 0;
+        $expected->statusstr = 'programlive';
+        $expected->notification_state = 'warning';
+        $expected->audiencevisibilitywarning = false;
+        $expected->expired = false;
+
+        $this->assertEquals($expected, $result);
+
+        // Add some assignments
+        $assignmentdata = $this->get_assignment_data();
+        $this->assign_users_to_program($program1, $assignmentdata);
+
+        // Get status
+        $result = $program1->get_current_status();
+
+        $expected2 = new \stdClass();
+        $expected2->assignments = 22;
+        $expected2->exceptions = 0;
+        $expected2->total = 22;
+        $expected2->assignmentsdeferred = 0;
+        $expected2->statusstr = 'programlive';
+        $expected2->notification_state = 'warning';
+        $expected2->audiencevisibilitywarning = false;
+        $expected2->expired = false;
+
+        $this->assertEquals($expected2, $result);
+    }
 }

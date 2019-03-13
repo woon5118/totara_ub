@@ -31,8 +31,6 @@ Feature: Test the cohort associations report source.
     And I click on "Settings" "link" in the "Program #1" "table_row"
     And I switch to "Assignments" tab
     And I set the field "Add a new" to "Audiences"
-    And I click on "Add" "button"
-    And I click on "Add audiences to program" "button"
     And I click on "Audience #1" "link" in the "Add audiences to program" "totaradialogue"
     And I click on "Audience #2" "link" in the "Add audiences to program" "totaradialogue"
     And I click on "Audience #3" "link" in the "Add audiences to program" "totaradialogue"
@@ -51,15 +49,12 @@ Feature: Test the cohort associations report source.
       | completiontimehour   | 14         |
       | completiontimeminute | 30         |
     And I click on "Set fixed completion date" "button" in the "Completion criteria" "totaradialogue"
-    And I click on "Save changes" "button"
 
     Given I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Cert #1" "table_row"
     And I switch to "Assignments" tab
     And I set the field "Add a new" to "Audiences"
-    And I click on "Add" "button"
-    And I click on "Add audiences to program" "button"
     And I click on "Audience #1" "link" in the "Add audiences to program" "totaradialogue"
     And I click on "Audience #2" "link" in the "Add audiences to program" "totaradialogue"
     And I click on "Audience #4" "link" in the "Add audiences to program" "totaradialogue"
@@ -78,8 +73,6 @@ Feature: Test the cohort associations report source.
       | completiontimehour   | 17         |
       | completiontimeminute | 30         |
     And I click on "Set fixed completion date" "button" in the "Completion criteria" "totaradialogue"
-    And I click on "Save changes" "button"
-
 
   # -------------------------------
   Scenario: cohort_associations_rs_00: custom report contents

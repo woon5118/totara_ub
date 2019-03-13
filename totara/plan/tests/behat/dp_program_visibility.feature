@@ -347,10 +347,8 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     Then I should see "Not complete" in the "fn_002 ln_002" "table_row"
 
     When I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "fn_002 ln_002" "table_row"
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+    And I click on "Remove program assignment" "link" in the "fn_002 ln_002" "table_row"
+    And I click on "Remove" "button"
 
   # RoL: Progs tab should be visible but not contain the program for learner.
     When I log out
@@ -402,10 +400,8 @@ Feature: See that program visibility affects Record of Learning: Programs conten
 
     When I follow "Return to program"
     And I switch to "Assignments" tab
-    And I click on "Delete" "link" in the "fn_002 ln_002" "table_row"
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Program assignments saved successfully"
+    And I click on "Remove program assignment" "link" in the "fn_002 ln_002" "table_row"
+    And I click on "Remove" "button"
 
     # RoL: Progs tab should be visible but not contain the program for learner.
     When I log out

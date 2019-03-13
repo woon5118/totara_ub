@@ -88,13 +88,9 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Organisations" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add organisations to program"
+    And I set the field "Add a new" to "Organisations"
     And I click on "Organisation1" "link" in the "Add organisations to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add organisations to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Organisation1"
     And I log out
 
@@ -159,13 +155,9 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Organisations" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add organisations to program"
+    And I set the field "Add a new" to "Organisations"
     And I click on "Organisation1" "link" in the "Add organisations to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add organisations to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Organisation1"
     And I log out
 
@@ -181,12 +173,11 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Enrolled users" "link" in the "Test Program 1" "table_row"
-    And I click on "Delete" "link" in the "Organisation1" "table_row"
-    And I press "Add organisations to program"
+    And I click on "Remove program assignment" "link" in the "Organisation1" "table_row"
+    And I click on "Remove" "button"
+    And I set the field "Add a new" to "Organisations"
     And I click on "Organisation2" "link" in the "Add organisations to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add organisations to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Organisation2"
     And I log out
 
@@ -215,11 +206,9 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Enrolled users" "link" in the "Test Program 1" "table_row"
-    And I press "Add organisations to program"
+    And I set the field "Add a new" to "Organisations"
     And I click on "Organisation1" "link" in the "Add organisations to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add organisations to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Organisation1"
     And I should see "Organisation2"
     And I log out
@@ -239,13 +228,9 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Positions" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add position to program"
-    And I click on "Learner" "link" in the "Add position to program" "totaradialogue"
-    And I click on "Ok" "button" in the "Add position to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
+    And I set the field "Add a new" to "Positions"
+    And I click on "Learner" "link" in the "Add positions to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add positions to program" "totaradialogue"
     Then I should see "Learner"
     And I log out
 
@@ -310,13 +295,9 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Positions" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add position to program"
-    And I click on "Learner" "link" in the "Add position to program" "totaradialogue"
-    And I click on "Ok" "button" in the "Add position to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
+    And I set the field "Add a new" to "Positions"
+    And I click on "Learner" "link" in the "Add positions to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add positions to program" "totaradialogue"
     Then I should see "Learner"
     And I log out
 
@@ -332,12 +313,11 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Enrolled users" "link" in the "Test Program 1" "table_row"
-    And I click on "Delete" "link" in the "Learner" "table_row"
-    And I press "Add position to program"
-    And I click on "Manager" "link" in the "Add position to program" "totaradialogue"
-    And I click on "Ok" "button" in the "Add position to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
+    And I click on "Remove program assignment" "link" in the "Learner" "table_row"
+    And I click on "Remove" "button"
+    And I set the field "Add a new" to "Positions"
+    And I click on "Manager" "link" in the "Add positions to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add positions to program" "totaradialogue"
     Then I should see "Manager"
     And I log out
 
@@ -366,11 +346,9 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Enrolled users" "link" in the "Test Program 1" "table_row"
-    And I press "Add position to program"
-    And I click on "Learner" "link" in the "Add position to program" "totaradialogue"
-    And I click on "Ok" "button" in the "Add position to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
+    And I set the field "Add a new" to "Positions"
+    And I click on "Learner" "link" in the "Add positions to program" "totaradialogue"
+    And I click on "Ok" "button" in the "Add positions to program" "totaradialogue"
     Then I should see "Learner"
     And I should see "Manager"
     And I log out
@@ -390,13 +368,9 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Management hierarchy" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add managers to program"
+    And I set the field "Add a new" to "Management hierarchy"
     And I click on "Manager One (manager1@example.com) - fullm1" "link" in the "Add managers to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add managers to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Manager One - fullm1"
     And I log out
 
@@ -462,13 +436,9 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Management hierarchy" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add managers to program"
+    And I set the field "Add a new" to "Management hierarchy"
     And I click on "Manager One (manager1@example.com) - fullm1" "link" in the "Add managers to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add managers to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Manager One - fullm1"
     And I log out
 
@@ -484,12 +454,11 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Enrolled users" "link" in the "Test Program 1" "table_row"
-    And I click on "Delete" "link" in the "Manager One - fullm1" "table_row"
-    And I press "Add managers to program"
+    And I click on "Remove program assignment" "link" in the "Manager One - fullm1" "table_row"
+    And I click on "Remove" "button"
+    And I set the field "Add a new" to "Management hierarchy"
     And I click on "Teacher First (teacher1@example.com) - fullt1" "link" in the "Add managers to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add managers to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Teacher First - fullt1"
     And I log out
 
@@ -517,11 +486,9 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Enrolled users" "link" in the "Test Program 1" "table_row"
-    And I press "Add managers to program"
+    And I set the field "Add a new" to "Management hierarchy"
     And I click on "Manager One (manager1@example.com) - fullm1" "link" in the "Add managers to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add managers to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Manager One - fullm1"
     And I should see "Teacher First - fullt1"
     And I log out
@@ -541,16 +508,14 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Individuals" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add individuals to program"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Learner One (learner1@example.com)" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Learner Two (learner2@example.com)" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should see "Learner One"
-    And I should see "Learner Two"
+    Then I should see "Learner One" in the ".totara_program__assignments__results__table" "css_element"
+    And I should see "'Learner One' has been added to the program"
+    And I should see "Learner Two" in the ".totara_program__assignments__results__table" "css_element"
+    And I should see "'Learner Two' has been added to the program"
     And I log out
 
     # Enrol learner1 in the course via the program
@@ -565,10 +530,10 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Enrolled users" "link" in the "Test Program 1" "table_row"
-    And I click on "Delete" "link" in the "Learner One" "table_row"
-    And I press "Save changes"
-    And I press "Save all changes"
-    Then I should not see "Learner One"
+    And I click on "Remove program assignment" "link" in the "Learner One" "table_row"
+    And I click on "Remove" "button"
+    Then I should not see "Learner One" in the ".totara_program__assignments__results__table" "css_element"
+    And I should see "'Learner One' has been removed from the program"
     And I log out
 
     # Now run the cron task and test user access to the course
@@ -595,11 +560,9 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I follow "Miscellaneous"
     And I click on "Enrolled users" "link" in the "Test Program 1" "table_row"
-    And I press "Add individuals to program"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Learner One (learner1@example.com)" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Learner One"
     And I should see "Learner Two"
     And I log out
@@ -619,14 +582,10 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab
-    And I select "Individuals" from the "Add a new" singleselect
-    And I click on "Add" "button" in the "#category_select" "css_element"
-    And I press "Add individuals to program"
+    And I set the field "Add a new" to "Individuals"
     And I click on "Learner One (learner1@example.com)" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Learner Two (learner2@example.com)" "link" in the "Add individuals to program" "totaradialogue"
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
-    And I press "Save changes"
-    And I press "Save all changes"
     Then I should see "Learner One"
     And I should see "Learner Two"
     And I log out

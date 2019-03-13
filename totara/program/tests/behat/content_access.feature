@@ -109,7 +109,6 @@ Feature: Access programs content as a learner
     And I set the following fields to these values:
       | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
-    And I click on "Save changes" "button"
     And I log out
 
     Given I log in as "user001"
@@ -192,7 +191,6 @@ Feature: Access programs content as a learner
     And I set the following fields to these values:
       | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
-    And I click on "Save changes" "button"
     And I log out
 
     Given I log in as "user001"
