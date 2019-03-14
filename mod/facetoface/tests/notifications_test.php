@@ -2399,4 +2399,81 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             [1]
         ];
     }
+
+    public function test_trainer_confirmation_trainer_unassigned(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        // Prepare data.
+        $f2f = $this->create_facetoface();
+        $role = $DB->get_record('role', array('shortname' => 'teacher'));
+        $DB->set_field('facetoface', 'approvalrole', $role->id, ['id' => $f2f->get_id()]);
+        $seminarevent = $f2f->get_events()->current();
+
+        // Assign teacher1 to seminar event.
+        $teacher1 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher1->id, $f2f->get_course(), $role->id);
+        $teachers[] = $teacher1->id;
+        $form[$role->id] = $teachers;
+        $sink = $this->redirectEmails();
+        facetoface_update_trainers($f2f, $seminarevent->to_record(), $form);
+        unset($form, $teachers);
+        $count = $DB->count_records('facetoface_session_roles', ['roleid' => $role->id, 'userid' => $teacher1->id]);
+        $this->assertEquals(1, (int)$count);
+
+        $this->execute_adhoc_tasks();
+        $messages = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $messages);
+
+        $message = $messages[0];
+        $this->assertSame($teacher1->email, $message->to);
+        $this->assertStringStartsWith('Seminar trainer confirmation:', $message->subject);
+
+        // Assign teacher2 to seminar event and unassign teacher1 from, check emails.
+        $teacher2 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher2->id, $f2f->get_course(), $role->id);
+        $teachers[] = $teacher2->id;
+        $form[$role->id] = $teachers;
+        $sink = $this->redirectEmails();
+        facetoface_update_trainers($f2f, $seminarevent->to_record(), $form);
+        unset($form, $teachers);
+        $count = $DB->count_records('facetoface_session_roles', ['roleid' => $role->id, 'userid' => $teacher2->id]);
+        $this->assertEquals(1, (int)$count);
+
+        $this->execute_adhoc_tasks();
+        $messages = $sink->get_messages();
+        $sink->close();
+        usort($messages, function($email1, $email2) {
+            return strcmp($email1->to, $email2->to);
+        });
+        $this->assertCount(2, $messages);
+
+        $message2 = $messages[1];
+        $this->assertSame($teacher2->email, $message2->to);
+        $this->assertStringStartsWith('Seminar trainer confirmation:', $message2->subject);
+
+        $message1 = $messages[0];
+        $this->assertSame($teacher1->email, $message1->to);
+        $this->assertStringStartsWith('Seminar event trainer unassigned', $message1->subject);
+        $this->assertEquals(1, 1);
+    }
+
+    private function create_facetoface() {
+
+        $course = $this->createCourse(null, ['createsections' => true]);
+        $f2f = $this->createSeminar($course, 'Approval', ['approvaltype' => \mod_facetoface\seminar::APPROVAL_ROLE]);
+
+        $seminarevent = new \mod_facetoface\seminar_event();
+        $seminarevent->set_facetoface($f2f->id)->save();
+
+        $time = time() + 3600;
+        $seminarsession = new \mod_facetoface\seminar_session();
+        $seminarsession->set_sessionid($seminarevent->get_id())
+            ->set_timestart($time)
+            ->set_timefinish($time + 7200)
+            ->save();
+
+        return new \mod_facetoface\seminar($f2f->id);
+    }
 }

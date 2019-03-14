@@ -2321,7 +2321,7 @@ function facetoface_update_trainers($facetoface, $session, $form) {
 
     // Send an unassignment notice to old trainer
     foreach ($old_trainers as $i => $trainer) {
-        \mod_facetoface\notice_sender::trainer_confirmation($trainer->id, $seminarevent);
+        \mod_facetoface\notice_sender::event_trainer_unassigned($trainer->id, $seminarevent);
     }
 
     return true;
