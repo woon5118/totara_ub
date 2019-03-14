@@ -166,8 +166,6 @@ Program 2 - Course 1 and Course 2
         );
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
-        $this->ruleset = null;
-        $this->cohort = null;
 
         // C1 OR C2 - should match 3 users.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
@@ -183,7 +181,6 @@ Program 2 - Course 1 and Course 2
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(3, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
 
-        // <TEST_PLAN_PAUSE>
         // Test the effects of changing a users enrolment status - should now be 2 in cohort, then 3 again when we change status back.
         $this->update_status('user_enrolments', 'status', 'userid = ' . $this->users[1]->id, 1);
         cohort_rules_approve_changes($this->cohort);
@@ -209,9 +206,6 @@ Program 2 - Course 1 and Course 2
         $this->update_status('user_enrolments', 'timeend', 'userid = ' . $this->users[1]->id, time() + 100);
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(3, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
-        // </TEST_PLAN_PAUSE>
-        $this->ruleset = null;
-        $this->cohort = null;
 
         // P1 AND P2 - should match 1 user.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
@@ -226,8 +220,6 @@ Program 2 - Course 1 and Course 2
         );
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(1, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
-        $this->ruleset = null;
-        $this->cohort = null;
 
         // P1 OR P2 - should match 2 users.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
@@ -242,8 +234,6 @@ Program 2 - Course 1 and Course 2
         );
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(2, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
-        $this->ruleset = null;
-        $this->cohort = null;
 
         // C2 AND P2 - should match 0 users.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
@@ -273,8 +263,6 @@ Program 2 - Course 1 and Course 2
         $this->assertTrue($result);
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(3, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
-        $this->ruleset = null;
-        $this->cohort = null;
 
         // P1 AND C1 - should match 1 users.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
