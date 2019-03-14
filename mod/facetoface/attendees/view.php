@@ -107,6 +107,8 @@ if ($actionallowed) {
  */
 if ($pagecontent) {
     attendees_helper::process_js($action, $seminar, $seminarevent);
+    // restore page url as attendees_helper::process_js() overwrites it with the rouge one
+    $PAGE->set_url($baseurl);
     \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
     $PAGE->set_cm($cm);
     $PAGE->set_heading($course->fullname);
