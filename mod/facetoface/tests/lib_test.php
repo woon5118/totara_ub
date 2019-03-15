@@ -27,8 +27,11 @@
  * Unit tests for mod/facetoface/lib.php
  */
 
-use \mod_facetoface\{seminar_event, seminar, event_time, signup, signup_helper, trainer_helper};
+use \mod_facetoface\{seminar_event, seminar, event_time, signup, signup_helper, trainer_helper, seminar_session, seminar_event_list};
 use \mod_facetoface\signup\state\{waitlisted, booked, requested, user_cancelled, fully_attended};
+use mod_facetoface\query\event\filter\{room_filter, event_time_filter};
+use mod_facetoface\query\event\sortorder\{default_sortorder, future_sortorder};
+use mod_facetoface\query\event\query;
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
@@ -1400,6 +1403,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $seminarsession->set_timestart(time() - 100)
             ->set_timefinish(time() - 10)
             ->save();
+
+        $signup11->get_seminar_event()->clear_sessions();
         $signup11->switch_state(signup\state\partially_attended::class);
 
         // Signup users for second event.
@@ -1590,73 +1595,122 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sessiondates1_1[] = $this->prepare_date($now + (DAYSECS * 5), $now + (DAYSECS * 6), $sitewideroom1->id);
         $sessiondates1_1[] = $this->prepare_date($now + (DAYSECS * 2), $now + (DAYSECS * 3), $sitewideroom1->id);
         $sessiondates1_1[] = $this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $sitewideroom2->id);
-        $sessionid1_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates1_1));
+
+        $seminarevent = new seminar_event();
+        $seminarevent->set_facetoface($facetoface1->id);
+        $seminarevent->save();
+
+        $sessionid1_1 = $seminarevent->get_id();
+        foreach ($sessiondates1_1 as $i => $sessiondate) {
+            $session = new seminar_session();
+            $session->from_record($sessiondate);
+            $session->set_sessionid($sessionid1_1);
+            $session->save();
+
+            $sessiondates1_1[$i]->id = $session->get_id();
+        }
 
         $sessiondates1_2 = array();
         $sessiondates1_2[] = $this->prepare_date($now + (DAYSECS * 1), $now + (DAYSECS * 2), $sitewideroom1->id);
         $sessiondates1_2[] = $this->prepare_date($now + (DAYSECS * 2), $now + (DAYSECS * 3), 0);
-        $sessionid1_2 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates1_2));
+
+        $seminarevent = new seminar_event();
+        $seminarevent->set_facetoface($facetoface1->id);
+        $seminarevent->save();
+
+        $sessionid1_2 = $seminarevent->get_id();
+        foreach ($sessiondates1_2 as $i => $sessiondate) {
+            $session = new seminar_session();
+            $session->from_record($sessiondate);
+            $session->set_sessionid($sessionid1_2);
+            $session->save();
+
+            $sessiondates1_2[$i]->id = $session->get_id();
+        }
 
         $sessiondates2_1 = array();
         $sessiondates2_1[] = $this->prepare_date($now + (DAYSECS * 5), $now + (DAYSECS * 6), 0);
-        $sessionid2_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates2_1));
+        $seminarevent = new seminar_event();
+        $seminarevent->set_facetoface($facetoface2->id);
+        $seminarevent->save();
 
-        $sessions = facetoface_get_sessions($facetoface1->id);
-        $this->assertCount(2, $sessions);
-        $this->assertSame(array($sessionid1_2, $sessionid1_1), array_keys($sessions));
-        $this->assertCount(3, $sessions[$sessionid1_1]->sessiondates);
-        $this->assertCount(2, $sessions[$sessionid1_2]->sessiondates);
-        $this->assertSame($sessiondates1_1[1]->roomid, $sessions[$sessionid1_1]->sessiondates[0]->roomid);
-        $this->assertSame($sessiondates1_1[1]->timestart, $sessions[$sessionid1_1]->sessiondates[0]->timestart);
-        $this->assertSame($sessiondates1_1[2]->roomid, $sessions[$sessionid1_1]->sessiondates[1]->roomid);
-        $this->assertSame($sessiondates1_1[2]->timestart, $sessions[$sessionid1_1]->sessiondates[1]->timestart);
-        $this->assertSame($sessiondates1_1[0]->roomid, $sessions[$sessionid1_1]->sessiondates[2]->roomid);
-        $this->assertSame($sessiondates1_1[0]->timestart, $sessions[$sessionid1_1]->sessiondates[2]->timestart);
-        $this->assertSame($sessiondates1_2[0]->roomid, $sessions[$sessionid1_2]->sessiondates[0]->roomid);
-        $this->assertSame($sessiondates1_2[0]->timestart, $sessions[$sessionid1_2]->sessiondates[0]->timestart);
-        $this->assertSame($sessiondates1_2[1]->roomid, $sessions[$sessionid1_2]->sessiondates[1]->roomid);
-        $this->assertSame($sessiondates1_2[1]->timestart, $sessions[$sessionid1_2]->sessiondates[1]->timestart);
+        $sessionid2_1 = $seminarevent->get_id();
+        foreach ($sessiondates2_1 as $i => $sessiondate) {
+            $session = new seminar_session();
+            $session->from_record($sessiondate);
+            $session->set_sessionid($sessionid2_1);
+            $session->save();
 
-        $sessions = facetoface_get_sessions($facetoface2->id);
-        $this->assertCount(1, $sessions);
-        $this->assertCount(1, $sessions[$sessionid2_1]->sessiondates);
-        $this->assertSame($sessiondates2_1[0]->roomid, $sessions[$sessionid2_1]->sessiondates[0]->roomid);
-        $this->assertSame($sessiondates2_1[0]->timestart, $sessions[$sessionid2_1]->sessiondates[0]->timestart);
+            $sessiondates2_1[$i]->id = $session->get_id();
+        }
+
+        $seminarevents = (new seminar($facetoface1->id))->get_events();
+        $this->assertCount(2, $seminarevents);
+        $this->assertCount(3, $seminarevents->get($sessionid1_1)->get_sessions());
+        $this->assertCount(2, $seminarevents->get($sessionid1_2)->get_sessions());
+
+        $data = [
+            $sessionid1_1 => $sessiondates1_1,
+            $sessionid1_2 => $sessiondates1_2,
+        ];
+
+        foreach ($data as $sessionid => $sessiondates) {
+            $seminarevent = $seminarevents->get($sessionid);
+
+            foreach ($sessiondates as $sessiondate) {
+                $sessions = $seminarevent->get_sessions();
+
+                $this->assertEquals(
+                    $sessiondate->roomid,
+                    $sessions->get($sessiondate->id)->get_roomid()
+                );
+
+                $this->assertEquals(
+                    $sessiondate->timestart,
+                    $sessions->get($sessiondate->id)->get_timestart()
+                );
+            }
+        }
+
+        $seminarevents = (new seminar($facetoface2->id))->get_events();
+        $this->assertCount(1, $seminarevents);
+        $this->assertCount(1, $seminarevents->get($sessionid2_1)->get_sessions());
+        $this->assertEquals(
+            $sessiondates2_1[0]->roomid,
+            $seminarevents->get($sessionid2_1)->get_sessions()->get_first()->get_roomid()
+        );
+
+        $this->assertEquals(
+            $sessiondates2_1[0]->timestart,
+            $seminarevents->get($sessionid2_1)->get_sessions()->get_first()->get_timestart());
 
         // Test room filtering.
+        $filter = new room_filter($sitewideroom1->id);
+        $query = new query(new seminar($facetoface1->id));
+        $query->with_filter($filter);
 
-        $sessions = facetoface_get_sessions($facetoface1->id, null, $sitewideroom1->id);
-        $this->assertCount(2, $sessions);
-        $this->assertSame(array($sessionid1_2, $sessionid1_1), array_keys($sessions));
-        $this->assertCount(3, $sessions[$sessionid1_1]->sessiondates);
-        $this->assertCount(2, $sessions[$sessionid1_2]->sessiondates);
-        $this->assertSame($sessiondates1_1[1]->roomid, $sessions[$sessionid1_1]->sessiondates[0]->roomid);
-        $this->assertSame($sessiondates1_1[1]->timestart, $sessions[$sessionid1_1]->sessiondates[0]->timestart);
-        $this->assertSame($sessiondates1_1[2]->roomid, $sessions[$sessionid1_1]->sessiondates[1]->roomid);
-        $this->assertSame($sessiondates1_1[2]->timestart, $sessions[$sessionid1_1]->sessiondates[1]->timestart);
-        $this->assertSame($sessiondates1_1[0]->roomid, $sessions[$sessionid1_1]->sessiondates[2]->roomid);
-        $this->assertSame($sessiondates1_1[0]->timestart, $sessions[$sessionid1_1]->sessiondates[2]->timestart);
-        $this->assertSame($sessiondates1_2[0]->roomid, $sessions[$sessionid1_2]->sessiondates[0]->roomid);
-        $this->assertSame($sessiondates1_2[0]->timestart, $sessions[$sessionid1_2]->sessiondates[0]->timestart);
-        $this->assertSame($sessiondates1_2[1]->roomid, $sessions[$sessionid1_2]->sessiondates[1]->roomid);
-        $this->assertSame($sessiondates1_2[1]->timestart, $sessions[$sessionid1_2]->sessiondates[1]->timestart);
+        $seminarevents = seminar_event_list::from_query($query);
+        $this->assertCount(2, $seminarevents);
+        $this->assertTrue($seminarevents->contains($sessionid1_1));
+        $this->assertTrue($seminarevents->contains($sessionid1_2));
 
-        $sessions = facetoface_get_sessions($facetoface1->id, null, $sitewideroom2->id);
-        $this->assertCount(1, $sessions);
-        $this->assertSame(array($sessionid1_1), array_keys($sessions));
-        $this->assertCount(3, $sessions[$sessionid1_1]->sessiondates);
-        $this->assertSame($sessiondates1_1[1]->roomid, $sessions[$sessionid1_1]->sessiondates[0]->roomid);
-        $this->assertSame($sessiondates1_1[1]->timestart, $sessions[$sessionid1_1]->sessiondates[0]->timestart);
-        $this->assertSame($sessiondates1_1[2]->roomid, $sessions[$sessionid1_1]->sessiondates[1]->roomid);
-        $this->assertSame($sessiondates1_1[2]->timestart, $sessions[$sessionid1_1]->sessiondates[1]->timestart);
-        $this->assertSame($sessiondates1_1[0]->roomid, $sessions[$sessionid1_1]->sessiondates[2]->roomid);
-        $this->assertSame($sessiondates1_1[0]->timestart, $sessions[$sessionid1_1]->sessiondates[2]->timestart);
+        $filter->set_roomid($sitewideroom2->id);
+        $query->with_filter($filter);
 
-        $sessions = facetoface_get_sessions($facetoface2->id, null, $sitewideroom1->id);
-        $this->assertCount(0, $sessions);
+        $seminarevents = seminar_event_list::from_query($query);
+        $this->assertCount(1, $seminarevents);
+        $this->assertCount(3, $seminarevents->get($sessionid1_1)->get_sessions());
 
-        $sessions = facetoface_get_sessions($facetoface2->id, null, -1);
-        $this->assertCount(0, $sessions);
+        $filter->set_roomid($sitewideroom1->id);
+        $query = new query(new seminar($facetoface2->id));
+        $query->with_filter($filter);
+        $seminarevents = seminar_event_list::from_query($query);
+        $this->assertCount(0, $seminarevents);
+
+        $filter->set_roomid(-1);
+        $query->with_filter($filter);
+        $seminarevents = seminar_event_list::from_query($query);
+        $this->assertCount(0, $seminarevents);
     }
 
     private function make_session($f2f, $room, $dates, $cancelrightnow = false) : int {
@@ -1672,15 +1726,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             $evt->cancel();
         }
         return $id;
-    }
-
-    private static function select_timestart_from($session) {
-        return array_map(
-            function ($e) {
-                return $e->timestart;
-            },
-            $session->sessiondates
-        );
     }
 
     public function test_facetoface_get_sessions_eventtime() {
@@ -1707,41 +1752,68 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $can_wait   = $this->make_session($f2f, $room, [], true);
         $can_future = $this->make_session($f2f, $room, [$date_furtherfuture], true);
 
-        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::ALL, false);
+        $default = new default_sortorder();
+        $future = new future_sortorder();
+
+        $filter = new event_time_filter(event_time::ALL);
+
+        $seminar = new seminar($f2f->id);
+        $query = new query($seminar);
+
+        $query->with_sortorder($default);
+        $query->with_filter($filter);
+
+        $sessions = seminar_event_list::from_query($query);
         $this->assertCount(7, $sessions);
-        $this->assertEquals([$can_future, $can_wait, $sess_inp1, $sess_over, $sess_inp2, $sess_up, $sess_wait], array_keys($sessions));
-        $this->assertEquals([$date_farpast, $date_farfuture], self::select_timestart_from($sessions[$sess_inp1]));
+        $this->assertEquals(
+            [$can_future, $can_wait, $sess_inp1, $sess_over, $sess_inp2, $sess_up, $sess_wait],
+            array_keys($sessions->to_records())
+        );
 
-        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::ALL, true);
+        $query->with_sortorder($future);
+        $sessions = seminar_event_list::from_query($query);
+
         $this->assertCount(7, $sessions);
-        $this->assertEquals([$sess_wait, $sess_inp1, $sess_up, $sess_inp2, $sess_over, $can_wait, $can_future], array_keys($sessions));
-        $this->assertEquals([$date_farfuture, $date_farpast], self::select_timestart_from($sessions[$sess_inp1]));
+        $this->assertEquals(
+            [$sess_wait, $sess_inp1, $sess_up, $sess_inp2, $sess_over, $can_wait, $can_future],
+            array_keys($sessions->to_records())
+        );
 
-        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::UPCOMING, false);
+        $filter->set_eventtime(event_time::UPCOMING);
+        $query->with_sortorder($default);
+        $query->with_filter($filter);
+        $sessions = seminar_event_list::from_query($query);
         $this->assertCount(2, $sessions);
-        $this->assertEquals([$sess_up, $sess_wait], array_keys($sessions));
+        $this->assertEquals([$sess_up, $sess_wait], array_keys($sessions->to_records()));
 
-        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::UPCOMING, true);
+        $query->with_sortorder($future);
+        $sessions = seminar_event_list::from_query($query);
         $this->assertCount(2, $sessions);
-        $this->assertEquals([$sess_wait, $sess_up], array_keys($sessions));
+        $this->assertEquals([$sess_wait, $sess_up], array_keys($sessions->to_records()));
 
-        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::INPROGRESS, false);
+        $filter->set_eventtime(event_time::INPROGRESS);
+        $query->with_filter($filter);
+        $query->with_sortorder($default);
+        $sessions = seminar_event_list::from_query($query);
         $this->assertCount(2, $sessions);
-        $this->assertEquals([$sess_inp1, $sess_inp2], array_keys($sessions));
-        $this->assertEquals([$date_farpast, $date_farfuture], self::select_timestart_from($sessions[$sess_inp1]));
+        $this->assertEquals([$sess_inp1, $sess_inp2], array_keys($sessions->to_records()));
 
-        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::INPROGRESS, true);
+        $query->with_sortorder($future);
+        $sessions = seminar_event_list::from_query($query);
         $this->assertCount(2, $sessions);
-        $this->assertEquals([$sess_inp1, $sess_inp2], array_keys($sessions));
-        $this->assertEquals([$date_farfuture, $date_farpast], self::select_timestart_from($sessions[$sess_inp1]));
+        $this->assertEquals([$sess_inp1, $sess_inp2], array_keys($sessions->to_records()));
 
-        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::OVER, false);
+        $filter->set_eventtime(event_time::OVER);
+        $query->with_filter($filter);
+        $query->with_sortorder($default);
+        $sessions = seminar_event_list::from_query($query);
         $this->assertCount(3, $sessions);
-        $this->assertEquals([$can_future, $can_wait, $sess_over], array_keys($sessions));
+        $this->assertEquals([$can_future, $can_wait, $sess_over], array_keys($sessions->to_records()));
 
-        $sessions = facetoface_get_sessions($f2f->id, null, 0, event_time::OVER, true);
+        $query->with_sortorder($future);
+        $sessions = seminar_event_list::from_query($query);
         $this->assertCount(3, $sessions);
-        $this->assertEquals([$sess_over, $can_wait, $can_future], array_keys($sessions));
+        $this->assertEquals([$sess_over, $can_wait, $can_future], array_keys($sessions->to_records()));
     }
 
     function test_facetoface_get_attendees() {
@@ -4421,121 +4493,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         ));
 
         $this->resetAfterTest(true);
-    }
-
-    public function test_facetoface_get_sessions_within() {
-        /*
-         * What are we testing:
-         *  1. Returns false when no dates supplied.
-         *  2. Gets session(s) within given dates correctly.
-         *  3. Ignores session(s) if they had been cancelled.
-         *  4. Works correctly when user id is supplied.
-         *  5. Works correctly with custom sql supplied.
-         */
-
-        $this->init_sample_data();
-
-        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
-        $user = $this->getDataGenerator()->create_user();
-
-        // A function to quickly create a new session.
-        $whip_up_session = function($start = null, $duration = null, $users = array()) use ($facetofacegenerator) {
-            // Normalizing input.
-            $start = $start ?: time() + (YEARSECS * 69);
-            $duration = $duration ?: 3600;
-            $finish = $start + $duration;
-
-            $facetoface = $facetofacegenerator->create_instance(array('course' => $this->course1->id));
-
-            $sessiondate = (object) array(
-                'timestart' => $start,
-                'timefinish' => $finish,
-                'sessiontimezone' => 'Pacific/Auckland',
-            );
-            $sessiondata = array(
-                'facetoface' => $facetoface->id,
-                'capacity' => 10,
-                'allowoverbook' => 0,
-                'sessiondates' => array($sessiondate),
-            );
-
-            $session = facetoface_get_session($facetofacegenerator->add_session($sessiondata));
-
-            // We have some users to sign up for the session.
-            if ($users) {
-                array_map(function($user) use ($facetoface, $session) {
-                    $this->getDataGenerator()->enrol_user($user->id, $this->course1->id);
-                    $signup21 = signup::create($user->id, new seminar_event($session->id));
-                    $this->assertTrue(signup_helper::can_signup($signup21));
-                    signup_helper::signup($signup21);
-                }, $users);
-            }
-
-            return $session;
-        };
-
-        $dates = array();
-
-        // 1. Returns false when no dates supplied.
-        $this->assertEmpty(facetoface_get_sessions_within(array()));
-
-        // 2. Gets session(s) within given dates correctly.
-        $dates[] = (object) array(
-            'timestart' => time() + (YEARSECS * 69),
-            'timefinish' => time() + (YEARSECS * 69 + 3600),
-        );
-        $date = end($dates);
-        $session = $whip_up_session($date->timestart, 3600);
-        $result = facetoface_get_sessions_within(array($date));
-        $this->assertAttributeEquals($session->sessiondates[0]->id, 'id', $result);
-
-        // Sanity check - nothing gets returned if there is no sessions for given dates.
-        $this->assertEmpty(facetoface_get_sessions_within(array(
-                (object) array(
-                    'timestart' => $date->timestart + YEARSECS,
-                    'timefinish' => $date->timefinish + YEARSECS,
-                ))
-        ));
-
-        // 3. Ignores cancelled session.
-        $dates[] = (object) array(
-            'timestart' => time() + (YEARSECS * 71),
-            'timefinish' => time() + (YEARSECS * 71 + 3600),
-        );
-        $date = end($dates);
-        $session = $whip_up_session($date->timestart, 3600);
-        $seminarevent = new \mod_facetoface\seminar_event($session->id);
-        $seminarevent->cancel();
-        $result = facetoface_get_sessions_within(array($date));
-        $this->assertEmpty($result);
-
-        // 4. Works correctly when user id is supplied.
-        $dates[] = (object) array(
-            'timestart' => time() + (YEARSECS * 73),
-            'timefinish' => time() + (YEARSECS * 73 + 3600),
-        );
-        $date = end($dates);
-        $nodate = reset($dates);
-        $session = $whip_up_session($date->timestart, 3600, array($user));
-        $firstsid = $session->id;
-
-        $emptyresult =  facetoface_get_sessions_within(array($nodate), $user->id);
-        $result = facetoface_get_sessions_within(array($date), $user->id);
-
-        $this->assertAttributeEquals($session->sessiondates[0]->id, 'id', $result);
-        $this->assertEmpty($emptyresult);
-
-        // 5. Works correctly when custom SQL is supplied.
-        // Reusing previously created session to change details.
-        $session = $whip_up_session($date->timestart, 3600);
-
-        $firstresult = facetoface_get_sessions_within(array($date), false, ' and s.id = ?', array($firstsid));
-        $result = facetoface_get_sessions_within(array($date), false, ' and s.id = ?', array($session->id));
-
-        $this->assertAttributeEquals($firstsid, 'sessionid', $firstresult);
-        $this->assertAttributeEquals($session->id, 'sessionid', $result);
-
-        $this->resetAfterTest();
     }
 
     public function test_save_session_dates() {

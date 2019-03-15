@@ -23,12 +23,14 @@
 
 namespace mod_facetoface;
 
+use mod_facetoface\query\event\event_query;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class seminar_event_list represents all events in one activity
  */
-final class seminar_event_list implements \Iterator {
+final class seminar_event_list implements \Iterator, \Countable {
 
     use traits\seminar_iterator;
 
@@ -113,5 +115,45 @@ final class seminar_event_list implements \Iterator {
             $list->add($item->from_record($seminarevent));
         }
         return $list;
+    }
+
+    /**
+     * Retrieving the list of seminar_evnet base on query builder object, as this query will give us the sql built from filters
+     * and sortorder that are injected into the object before this stage.
+     *
+     * @param event_query $query
+     *
+     * @return seminar_event_list
+     */
+    public static function from_query(event_query $query): seminar_event_list {
+        global $DB;
+
+        $statement = $query->get_statement();
+        $records = $DB->get_records_sql($statement->get_sql(), $statement->get_parameters());
+
+        $list = new static();
+        foreach ($records as $record) {
+            $seminarevent = new seminar_event();
+            $seminarevent->from_record($record);
+            $list->add($seminarevent);
+        }
+
+        return $list;
+    }
+
+    /**
+     * Returning an array of dummy class that hold data of a session. With a event's id associated as the array key.
+     *
+     * @return \stdClass[]
+     */
+    public function to_records(): array {
+        $data = [];
+
+        /** @var seminar_event $item */
+        foreach ($this->items as $item) {
+            $data[$item->get_id()] = $item->to_record();
+        }
+
+        return $data;
     }
 }

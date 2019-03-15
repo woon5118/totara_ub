@@ -21,6 +21,8 @@
  * @subpackage facetoface
  */
 
+use mod_facetoface\{seminar_event, seminar};
+
 require_once '../../config.php';
 require_once 'lib.php';
 
@@ -110,14 +112,31 @@ foreach ($facetofaces as $facetoface) {
     }
 
     $totalsignupcount = 0;
-    if ($sessions = facetoface_get_sessions($facetoface->id)) {
-        foreach ($sessions as $session) {
-            if (!facetoface_has_session_started($session, $timenow)) {
-                $signupcount = facetoface_get_num_attendees($session->id);
-                $totalsignupcount += $signupcount;
-            }
+
+    // Cloning the record here, and start removing those unnecessary fields as the mapping_instance will complaining about it.
+    $rc = clone $facetoface;
+    unset($rc->coursemodule);
+    unset($rc->section);
+    unset($rc->visible);
+    unset($rc->groupmode);
+    unset($rc->groupingid);
+
+    $seminar = new seminar();
+    $seminar->map_instance($rc);
+
+    $seminarevents = $seminar->get_events();
+
+    /** @var seminar_event $seminarevent */
+    foreach ($seminarevents as $seminarevent) {
+        if ($seminarevent->is_started()) {
+            // Skipping those events that had already started.
+            continue;
         }
+
+        $signupcount = facetoface_get_num_attendees($seminarevent->get_id());
+        $totalsignupcount += $signupcount;
     }
+
     $url = new moodle_url('/course/view.php', array('id' => $course->id));
     $courselink = html_writer::link($url, $course->shortname, array('title' => $course->shortname));
     if ($course->format == 'weeks' or $course->format == 'topics') {
@@ -135,5 +154,5 @@ foreach ($facetofaces as $facetoface) {
 
 echo html_writer::empty_tag('br');
 
-echo html_writer::table($table);
+echo $OUTPUT->render($table);
 echo $OUTPUT->footer($course);

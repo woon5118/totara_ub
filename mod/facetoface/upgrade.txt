@@ -72,6 +72,10 @@ information provided here is intended especially for developers.
 * facetoface_get_users_by_status() function takes another parameter to flag that the query should include the deleted users or not
 * facetoface_get_cancellations() function takes another parameter to flag that the query should include the deleted users or not
 * facetoface_get_attendees() function takes another parameter to flag that the query should include the deleted users or not
+* facetoface_get_booking_conflicts() function has been deprecated, please use \mod_facetoface\seminar_session_list::is_conflicting() instead
+* facetoface_get_sessions() function has been deprecated, please use \mod_facetoface\seminar::get_events() or \mod_facetoface\seminar_event_list::from_seminar() instead
+* facetoface_get_session_involvement() function has been deprecated, there is no replacement
+* facetoface_get_sessions_within() function has been deprecated, please use \mod_facetoface\seminar_session_list::load_sessiondates_foruser() instead
 
 === 12.0 ===
 

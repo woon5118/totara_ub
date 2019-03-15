@@ -395,17 +395,16 @@ class event extends \moodleform {
     }
 
     function validation($data, $files) {
-        global $DB;
-
         $errors = parent::validation($data, $files);
         $facetofaceid = $this->_customdata['f'];
         $session = $this->session;
-        $dates = array();
-        $dateids = isset($data['sessiondateid']) ? $data['sessiondateid'] : array();
+        $dates = [];
+        $dateids = isset($data['sessiondateid']) ? $data['sessiondateid'] : [];
         $datecount = count($dateids);
         $deletecount = 0;
-        $errdates = array();
-        $users_in_conflict = array();
+        $errdates = [];
+        $users_in_conflict = [];
+
         for ($i=0; $i < $datecount; $i++) {
             if (!empty($data['datedelete'][$i])) {
                 // Ignore dates marked for deletion.
@@ -417,7 +416,8 @@ class event extends \moodleform {
             $endtime = $data["timefinish"][$i];
             $roomid = $data["roomid"][$i];
             $assetids = $data["assetids"][$i];
-            $assetlist = array();
+            $assetlist = [];
+
             if (!empty($assetids)) {
                 $assetlist = explode(',', $assetids);
             }
@@ -515,19 +515,35 @@ class event extends \moodleform {
             }
         }
 
+        $seminarevent = null;
+        if (!empty($session)) {
+            // Just clone the record here, and clean up a few attributes first before pass it to seminar_event,
+            // so that the mapper wouldn't complain much. Note that maxtimefinish and mintimestart will be removed once
+            // the deprecated environment patch is merged.
+            $record = clone $session;
+            unset($record->cntdates);
+            unset($record->sessiondates);
+            unset($record->maxtimefinish);
+            unset($record->mintimestart);
+
+            if (!isset($record->facetoface)) {
+                // Sometimes the form is to add new record, therefore, facetofaceid might not be existing in this record object yet.
+                // It needs to be added for record obj.
+                $record->facetoface = $facetofaceid;
+            }
+
+            $seminarevent = new \mod_facetoface\seminar_event();
+            $seminarevent->from_record($record);
+        }
+
         // Check approval by role.
         $trainerdata = !empty($data['trainerrole']) ? $data['trainerrole'] : array();
         if ($dates && is_array($trainerdata)) {
             // Seminar approval by role is set, required at least one role selected.
             $selectedroleids = array();
-            // Query to load users with roles the seminar context.
-            $wheresql = '';
-            $whereparams = array();
+
             $usernamefields = get_all_user_name_fields(true, 'u');
-            if (!empty($session)) {
-                $wheresql = ' AND s.id != ?';
-                $whereparams[] = $session->id;
-            }
+            // Query to load users with roles the seminar context.
             // Loop through roles.
             foreach ($trainerdata as $roleid => $trainers) {
                 // Attempt to load users with this role in this context.
@@ -548,17 +564,24 @@ class event extends \moodleform {
                     $selectedroleids[] = $roleid;
 
                     // Check their availability.
-                    $availability = facetoface_get_sessions_within($dates, $trainer, $wheresql, $whereparams);
-                    if (!empty($availability)) {
+                    $sessiondates = \mod_facetoface\seminar_session_list::from_user_conflicts_with_dates($trainer, $dates, $seminarevent);
+                    if (!$sessiondates->is_empty()) {
                         $users_in_conflict[] = $trainerlist[$trainer];
                     }
                 }
             }
-            $facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid));
+
+            $seminar = $seminarevent->get_seminar();
+
             // Check if default role approval is selected.
-            if ($facetoface->approvaltype == \mod_facetoface\seminar::APPROVAL_ROLE && !in_array($facetoface->approvalrole, $selectedroleids)) {
+            if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ROLE &&
+                !in_array($seminar->get_approvalrole(), $selectedroleids)) {
                 $rolenames = role_get_names($this->context);
-                $errors['roleapprovalerror'] = get_string('error:rolerequired', 'facetoface', $rolenames[$facetoface->approvalrole]->localname);
+                $errors['roleapprovalerror'] = get_string(
+                    'error:rolerequired',
+                    'facetoface',
+                    $rolenames[$seminar->get_approvalrole()]->localname
+                );
             }
         }
 
@@ -603,15 +626,13 @@ class event extends \moodleform {
 
         // Check that there is not booking conflicts for current attendees.
         if ($dates) {
-            $wheresql = '';
-            $whereparams = array();
-            if (!empty($this->_customdata['s'])) {
-                $wheresql = ' AND s.id != ?';
-                $whereparams[] = $this->_customdata['s'];
-            }
             $currentattendees = facetoface_get_attendees($sessid);
-            $conflictsdetails = facetoface_get_booking_conflicts($dates, $currentattendees, $wheresql, $whereparams, true);
-            $users_in_conflict = array_merge($users_in_conflict, $conflictsdetails);
+            foreach ($currentattendees as $attendee) {
+                $sessiondates = \mod_facetoface\seminar_session_list::from_user_conflicts_with_dates($attendee->id, $dates, $seminarevent);
+                if (!$sessiondates->is_empty()) {
+                    $users_in_conflict[$attendee->id] = $attendee;
+                }
+            }
         }
 
         // Process the data for a custom field and validate it.
@@ -636,16 +657,16 @@ class event extends \moodleform {
     function get_users_in_conflict() {
         if (!($data = $this->get_data())) {
             // Only check the conflicts if the form is already submitted
-            return array();
+            return [];
         }
 
         if ($this->session != false && $this->has_date_changed == false) {
             // Check for conflicts only if it's a new session or there was a change in dates or
             // user with roles were added.
-            return array();
+            return [];
         } else if ($this->_customdata['savewithconflicts']) {
             // If save with conflict passed then we don't need to return the users with conflicts.
-            return array() ;
+            return [];
         }
 
         return $this->users_roles_in_conflict;

@@ -24,14 +24,15 @@
 
 namespace mod_facetoface;
 
+use mod_facetoface\signup\state\{attendance_state, booked, waitlisted};
+
 defined('MOODLE_INTERNAL') || die();
 
-use stdClass;
 
 /**
  * Class seminar_session_list represents Seminar event sessions date list
  */
-final class seminar_session_list implements \Iterator {
+final class seminar_session_list implements \Iterator, \Countable {
 
     use traits\seminar_iterator;
 
@@ -193,7 +194,7 @@ final class seminar_session_list implements \Iterator {
         }
 
         $time = time();
-        $a = new stdClass();
+        $a = new \stdClass();
 
         $a->total = count($this->items);
         $a->upcoming = $this->count_upcoming($time);
@@ -225,6 +226,21 @@ final class seminar_session_list implements \Iterator {
         return $o;
     }
 
+    /**
+     * Returning an array of dummy class holding data of seminar_session. And the session's id associated as array key.
+     *
+     * @return \stdClass[]
+     */
+    public function to_records(): array {
+        $data = [];
+
+        /** @var seminar_session $item */
+        foreach ($this->items as $item) {
+            $data[$item->get_id()] = $item->to_record();
+        }
+
+        return $data;
+    }
 
     /**
      * Sort the list of items based on finish time.
@@ -234,8 +250,127 @@ final class seminar_session_list implements \Iterator {
      * @param seminar_session[] $items
      */
     private static function sort(array &$items): void {
-        usort($items, function ($a, $b) {
-            return $a->get_timefinish() > $b->get_timefinish();
-        });
+        usort(
+            $items,
+            function (seminar_session $a, seminar_session $b) {
+                $result = $a->get_timefinish() > $b->get_timefinish();
+                return $result ? 1 : -1;
+            }
+        );
+    }
+
+    /**
+     * Given an array of date object (where it is must include $timestart and $timefinish), then it this factory method will be able to retrieve the list of session dates that
+     * the passed in $userid is having and conflicting with the $dates. Each date object in $dates must have the keys specified as bellow
+     * + timestart: int => time start of a new session, or old session
+     * + timefinish: int => time finish of new session, or old session
+     *
+     * @param \stdClass[]        $dates
+     * @param int                $userid
+     * @param seminar_event|null $excludeseminarevent
+     * @param string[]           $additionalstatuses
+     *
+     * @return seminar_session_list
+     */
+    public static function from_user_conflicts_with_dates(int $userid, array $dates, seminar_event $excludeseminarevent = null,
+                                                         array $additionalstatuses = []): seminar_session_list {
+        global $DB;
+        $list = new static();
+
+        if (empty($dates)) {
+            // No times were given, so we can't supply sessions within any times. Just return empty list.
+            return $list;
+        }
+
+        $sql = "
+            SELECT d.*
+            FROM {facetoface_sessions_dates} d
+            INNER JOIN {facetoface_sessions} s 
+            ON s.id = d.sessionid
+
+            LEFT JOIN {facetoface_signups} su 
+            ON su.sessionid = s.id AND su.userid = :userid1
+
+            LEFT JOIN {facetoface_signups_status} ss 
+            ON ss.signupid = su.id AND ss.superceded <> 1
+
+            LEFT JOIN {facetoface_session_roles} sr
+            ON sr.sessionid = s.id AND sr.userid = :userid2
+
+            WHERE s.cancelledstatus = 0
+        ";
+
+        $params = [
+            'userid1' => $userid,
+            'userid2' => $userid
+        ];
+
+        // Building status sql for the signup/users.
+        $additional = array_merge([booked::class, waitlisted::class], $additionalstatuses);
+        $statuses = attendance_state::get_all_attendance_code_with($additional);
+
+        [$asql, $aparams] = $DB->get_in_or_equal($statuses, SQL_PARAMS_NAMED);
+
+        $sql .= " AND ((ss.id IS NOT NULL AND ss.statuscode {$asql}) OR sr.id IS NOT NULL)";
+        $params = array_merge($params, $aparams);
+
+        // Building times conflicting sql.
+        $timesqls = [];
+        $i = 0;
+
+        foreach ($dates as $date) {
+            $timesqls[] = "(d.timefinish > :timestart{$i} AND d.timestart < :timefinish{$i})";
+            $params["timestart{$i}"] = $date->timestart;
+            $params["timefinish{$i}"] = $date->timefinish;
+            $i++;
+        }
+
+        $sql .= " AND (" . implode(" OR ", $timesqls) . ")";
+
+        // Finally, building the excluded seminar_event sql pharse here.
+        if (null !== $excludeseminarevent) {
+            $sql .= " AND s.id <> :sessionid";
+            $params['sessionid'] = $excludeseminarevent->get_id();
+        }
+
+        $records = $DB->get_records_sql($sql, $params);
+        if (!$records) {
+            return $list;
+        }
+
+        foreach ($records as $record) {
+            $session = new seminar_session();
+            $session->from_record($record);
+            $list->add($session);
+        }
+
+        return $list;
+    }
+
+    /**
+     * Given the list of sessions, this factory will try to pre-build the data for $dates, then invoke ::from_user_conflicts with_date
+     *
+     * @param int                  $userid
+     * @param seminar_session_list $sessions
+     * @param seminar_event|null   $excludeseminarevent
+     * @param array                $additionalstatuses
+     *
+     * @return seminar_session_list
+     */
+    public static function from_user_conflicts_with_sessions(int $userid, seminar_session_list $sessions,
+                                                             seminar_event $excludeseminarevent = null,
+                                                             array $additionalstatuses = []): seminar_session_list {
+        $dates = [];
+
+        /** @var seminar_session $session */
+        foreach ($sessions as $session) {
+            $date = new \stdClass();
+            $date->timestart = $session->get_timestart();
+            $date->timefinish = $session->get_timefinish();
+
+            $dates[] = $date;
+        }
+
+        return self::from_user_conflicts_with_dates($userid, $dates, $excludeseminarevent, $additionalstatuses);
     }
 }

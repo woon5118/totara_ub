@@ -23,6 +23,8 @@
 
 namespace mod_facetoface\signup\condition;
 
+use mod_facetoface\seminar_session_list;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -35,8 +37,6 @@ class user_has_no_conflicts extends condition {
      * @return bool
      */
     public function pass() : bool {
-        global $DB;
-
         // Don't bother checking if we are ignoring conflicts.
         if ($this->signup->get_ignoreconflicts()) {
             return true;
@@ -47,13 +47,14 @@ class user_has_no_conflicts extends condition {
 
         $seminarevent = $this->signup->get_seminar_event();
         $userid = $this->signup->get_userid();
-        $user = $DB->get_record('user', ['id' => $userid]);
 
-        // Check if the user has any date conflicts with existing signups.
-        $dates = facetoface_get_session_dates($seminarevent->get_id());
-        $conflicts = facetoface_get_booking_conflicts($dates, [$user], '', []);
+        // If the list of conflict sessions is not empty, then this condition should be failed.
+        $conflictsessions = seminar_session_list::from_user_conflicts_with_sessions(
+            $userid,
+            $seminarevent->get_sessions()
+        );
 
-        return empty($conflicts);
+        return $conflictsessions->is_empty();
     }
 
     /**

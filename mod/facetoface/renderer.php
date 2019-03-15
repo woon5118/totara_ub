@@ -21,8 +21,10 @@
  * @subpackage facetoface
  */
 
-use mod_facetoface\room;
-use \mod_facetoface\{seminar, trainer_helper, event_time};
+use mod_facetoface\query\event\filter\{room_filter, event_time_filter};
+use mod_facetoface\query\event\sortorder\future_sortorder;
+use mod_facetoface\query\event\query;
+use \mod_facetoface\{seminar, trainer_helper, event_time, room, seminar_event_list};
 use \mod_facetoface\signup\state\booked;
 use \mod_facetoface\signup\condition\event_taking_attendance;
 
@@ -89,7 +91,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         if (empty($sessions)) {
             // If there's no sessions, just return an empty string.
-            return '';
+            return $output;
         }
 
         if ($this->context === null || !has_capability('mod/facetoface:takeattendance', $this->context)) {
@@ -314,17 +316,21 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     /**
      * Print the list of a sessions
      *
-     * @param \mod_facetoface\seminar $seminar
+     * @param seminar $seminar
      * @param int $roomid room id
-     * @param int $eventtime one of \mod_facetoface\event_time::xxx
+     * @param int $eventtime one of constants defined in '\mod_facetoface\event_time'
      * @return string
      */
-    public function print_session_list(\mod_facetoface\seminar $seminar, int $roomid, int $eventtime = event_time::ALL) {
-        global $USER, $OUTPUT, $PAGE;
+    public function print_session_list(seminar $seminar, int $roomid, int $eventtime = event_time::ALL) {
+        global $USER, $PAGE;
 
-        $timenow = time();
         $output = '';
-        $sessions = facetoface_get_sessions($seminar->get_id(), null, $roomid, $eventtime, true);
+
+        $query = new query($seminar);
+        $query->with_filters(new room_filter($roomid), new event_time_filter($eventtime));
+        $query->with_sortorder(new future_sortorder());
+
+        $seminarevents = seminar_event_list::from_query($query);
 
         $viewattendees = has_capability('mod/facetoface:viewattendees', $this->context);
         $editevents = has_capability('mod/facetoface:editevents', $this->context);
@@ -337,19 +343,27 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         }
 
         $sessionarray = [];
+        if (!$seminarevents->is_empty()) {
+            /** @var seminar_event $seminarevent */
+            foreach ($seminarevents as $seminarevent) {
+                $sessiondata = $seminarevent->to_record();
+                $sessiondata->mintimestart = $seminarevent->get_mintimestart();
+                $sessiondata->maxtimefinish = $seminarevent->get_maxtimefinish();
+                $sessiondata->sessiondates = $seminarevent->get_sessions()->to_records();
+                $sessiondata->cntdates = count($sessiondata->sessiondates);
 
-        if ($sessions) {
-            foreach ($sessions as $session) {
-                $sessiondata = $session;
                 if ($seminar->get_multiplesessions()) {
                     $submission = facetoface_get_user_submissions(
-                        $seminar->get_id(), $USER->id,
+                        $seminar->get_id(),
+                        $USER->id,
                         \mod_facetoface\signup\state\requested::get_code(),
                         \mod_facetoface\signup\state\fully_attended::get_code(),
-                        $session->id
+                        $seminarevent->get_id()
                     );
+
                     $bookedsession = array_shift($submission);
                 }
+
                 $sessiondata->bookedsession = $bookedsession;
                 $sessionarray[] = $sessiondata;
             }
@@ -360,17 +374,26 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         if (empty($sessionarray)) {
             $output .= html_writer::div(get_string('nosessions', 'facetoface'), 'mod_facetoface__sessionlist--empty');
         } else {
-            $reserveinfo = array();
+            $reserveinfo = [];
             if (!empty($seminar->get_managerreserve())) {
                 // Include information about reservations when drawing the list of sessions.
-                $reserveinfo = \mod_facetoface\reservations::can_reserve_or_allocate($seminar, $sessions, $this->context);
+                $reserveinfo = \mod_facetoface\reservations::can_reserve_or_allocate($seminar, $sessionarray, $this->context);
                 $output .= html_writer::tag('p', get_string('lastreservation', 'mod_facetoface', $seminar->get_properties()));
             }
 
             $sessionlist = $this->print_session_list_table(
-                $sessionarray, $viewattendees, $editevents, $displaytimezones, $reserveinfo, $PAGE->url,
-                false, true, $seminar->get_sessionattendance(), $seminar->get_attendancetime()
+                $sessionarray,
+                $viewattendees,
+                $editevents,
+                $displaytimezones,
+                $reserveinfo,
+                $PAGE->url,
+                false,
+                true,
+                $seminar->get_sessionattendance(),
+                $seminar->get_attendancetime()
             );
+
             $output .= html_writer::div($sessionlist, 'mod_facetoface__sessionlist');
         }
 

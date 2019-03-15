@@ -563,20 +563,46 @@ class facetoface_notification extends data_object {
         );
 
         $facetoface = $DB->get_record('facetoface', array('id' => $notif->facetoface));
+        $seminar = new \mod_facetoface\seminar();
+        $seminar->map_instance($facetoface);
+
+        // Workaround to build the seminar_event record, that has mintimestart, maxtimefinish and
+        // sessiondates properties
+        $sessions = [];
+        $seminarevents = $seminar->get_events();
+
+        /** @var \mod_facetoface\seminar_event $seminarevent */
+        foreach ($seminarevents as $seminarevent) {
+            $session = $seminarevent->to_record();
+            $session->mintimestart = $seminarevent->get_mintimestart();
+            $session->maxtimefinish = $seminarevent->get_maxtimefinish();
+            $session->sessiondates = array_values($seminarevent->get_sessions()->to_records());
+            $session->cntdates = count($session->sessiondates);
+
+            $sessions[$session->id] = $session;
+        }
 
         foreach ($users as $user) {
 
             $notice = new facetoface_notification($notificationparams);
 
             // Check notification hasn't already need sent.
-            $notificationhistory = $DB->get_record('facetoface_notification_sent', array('notificationid' => $notice->id, 'sessionid' => $notif->id, 'userid' => $user->id));
+            $notificationhistory = $DB->get_record(
+                'facetoface_notification_sent',
+                [
+                    'notificationid' => $notice->id,
+                    'sessionid' => $notif->id,
+                    'userid' => $user->id
+                ]
+            );
+
             if ($notificationhistory != null) {
                 // Notification has already  been sent.
                 return;
             }
 
             $notice->set_facetoface($facetoface);
-            $notice->_sessions = facetoface_get_sessions($facetoface->id);
+            $notice->_sessions = $sessions;
             $notice->set_newevent($user, $notif->id);
             $notice->send_to_user($user, $notif->id);
         }

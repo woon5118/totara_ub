@@ -23,7 +23,6 @@
 
 namespace mod_facetoface;
 use mod_facetoface\signup\condition\event_taking_attendance;
-use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -94,6 +93,12 @@ final class seminar_session implements seminar_iterator_item {
     public function save(): void {
 
         $this->crud_save();
+
+        if (null !== $this->seminarevent) {
+            // We need to clear the sessions stored in seminarevent here, because the sessions had been updated,
+            // therefore, no point to keep the invalid data.
+            $this->seminarevent->clear_sessions();
+        }
     }
 
     /**
@@ -105,6 +110,14 @@ final class seminar_session implements seminar_iterator_item {
     public function from_record(\stdClass $object): seminar_session {
 
         return $this->map_object($object);
+    }
+
+    /**
+     * Return a dummy data object, that whole data associated with the table's column name in db.
+     * @return \stdClass
+     */
+    public function to_record(): \stdClass {
+        return $this->unmap_object();
     }
 
     /**
@@ -288,7 +301,7 @@ final class seminar_session implements seminar_iterator_item {
             return '';
         }
 
-        $a = new stdClass();
+        $a = new \stdClass();
         $fullformat = get_string($fullformatstring, 'langconfig');
         $a->start = userdate($this->timestart, $fullformat);
 

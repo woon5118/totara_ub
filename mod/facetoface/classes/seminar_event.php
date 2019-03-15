@@ -136,6 +136,11 @@ final class seminar_event implements seminar_iterator_item {
     const DBTABLE = 'facetoface_sessions';
 
     /**
+     * @var seminar_session_list
+     */
+    private $sessions = null;
+
+    /**
      * Seminar event constructor.
      *
      * @param int $id {facetoface_session}.id If 0 - new Seminar Event will be created
@@ -517,7 +522,22 @@ final class seminar_event implements seminar_iterator_item {
      * @return seminar_session_list
      */
     public function get_sessions(): seminar_session_list {
-        return seminar_session_list::from_seminar_event($this);
+        if (null == $this->sessions) {
+            $this->sessions = seminar_session_list::from_seminar_event($this);
+        }
+
+        return $this->sessions;
+    }
+
+    /**
+     * With the purpose to reload the inner sessions here, and it should be used mostly for the testing purpose, as sometimes data
+     * needed to be reload after update.
+     *
+     * @return seminar_event
+     */
+    public function clear_sessions(): seminar_event {
+        $this->sessions = null;
+        return $this;
     }
 
     /**

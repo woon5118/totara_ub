@@ -28,7 +28,9 @@ use mod_facetoface\room;
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar, signup, signup_helper, seminar_event, notice_sender, event_time, trainer_helper};
+use mod_facetoface\{seminar, signup, signup_helper, seminar_event, notice_sender, event_time, trainer_helper, seminar_event_list, reservations};
+use mod_facetoface\query\event\query;
+use mod_facetoface\query\event\sortorder\future_sortorder;
 
 require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->dirroot.'/grade/lib.php');
@@ -600,83 +602,6 @@ function facetoface_get_session($sessionid) {
     }
 
     return $session;
-}
-
-/**
- * Get all records from facetoface_sessions for a given facetoface activity, location and event time in the specific order
- *
- * @param integer $facetofaceid ID of the activity
- * @param string $unsed previously location filter (optional). @deprecated 9.0 No longer used by internal code.
- * @param integer $roomid Room id filter (optional).
- * @param integer $eventtime One of event_time::xxx
- * @param boolean $reverseorder true to sort the list by future first
- */
-function facetoface_get_sessions($facetofaceid, $unused = null, $roomid = 0, int $eventtime = event_time::ALL, bool $reverseorder = false) : array {
-    global $DB;
-
-    $sqlparams = array('facetoface' => $facetofaceid);
-    $roomwhere = '';
-    $eventtimewhere = '';
-
-    if (!empty($roomid)) {
-        $roomwhere = "AND s.id IN (
-             SELECT sd.sessionid
-               FROM {facetoface_sessions_dates} sd
-              WHERE sd.roomid = :roomid)";
-        $sqlparams['roomid'] = $roomid;
-    }
-
-    if ($eventtime !== event_time::ALL) {
-        $sqlparams['timenow'] = time();
-        if ($eventtime === event_time::UPCOMING) {
-            // (wait-listed OR first session_date not started) AND (not cancelled)
-            $eventtimewhere = 'AND (m.cntdates IS NULL OR :timenow < m.mintimestart) AND s.cancelledstatus = 0';
-        } else if ($eventtime === event_time::INPROGRESS) {
-            // (first session_date started AND last session_date not finished) AND (not cancelled)
-            $eventtimewhere = 'AND (m.mintimestart <= :timenow AND :timenow2 < m.maxtimefinish) AND s.cancelledstatus = 0';
-            $sqlparams['timenow2'] = time();
-        } else if ($eventtime === event_time::OVER) {
-            // (last session_date finished) OR (cancelled)
-            $eventtimewhere = 'AND (m.maxtimefinish <= :timenow OR s.cancelledstatus = 1)';
-        }
-    }
-
-    // PostgreSQL and MySQL sort NULL in a different order.
-    // We need wait-listed events to be the furthest future events, meaning NULL needs to act as a positive maximum value.
-    // So we use 999999999999999999 as the timestart/timefinish for events that are waitlisted (whose actual timestart/finish is NULL)
-    $max = str_repeat('9', 18);
-    if ($reverseorder) {
-        $orderby = "ORDER BY s.cancelledstatus, coalesce(m.maxtimefinish,{$max}) DESC, coalesce(m.mintimestart,{$max}) DESC, s.id DESC";
-    } else {
-        $orderby = "ORDER BY s.cancelledstatus DESC, coalesce(m.mintimestart,{$max}), coalesce(m.maxtimefinish,{$max}), s.id";
-    }
-
-    $sessions = $DB->get_records_sql(
-        "SELECT s.*, m.mintimestart, m.maxtimefinish, m.cntdates
-            FROM {facetoface_sessions} s
-            LEFT JOIN (
-                SELECT
-                    fsd.sessionid,
-                    COUNT(fsd.id) AS cntdates,
-                    MIN(fsd.timestart) AS mintimestart,
-                    MAX(fsd.timefinish) AS maxtimefinish
-                FROM {facetoface_sessions_dates} fsd
-                WHERE (1=1)
-                GROUP BY fsd.sessionid
-            ) m ON m.sessionid = s.id
-            WHERE s.facetoface = :facetoface
-            $roomwhere
-            $eventtimewhere
-            $orderby",
-        $sqlparams
-    );
-
-    if ($sessions) {
-        foreach ($sessions as $key => $value) {
-            $sessions[$key]->sessiondates = facetoface_get_session_dates($value->id, $reverseorder);
-        }
-    }
-    return $sessions;
 }
 
 /**
@@ -1369,8 +1294,8 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     if (!($facetoface = $DB->get_record('facetoface', array('id' => $coursemodule->instance)))) {
         return null;
     }
-    $seminar = new \mod_facetoface\seminar($coursemodule->instance);
-
+    $seminar = new seminar();
+    $seminar->map_instance($facetoface);
     $coursemodule->set_name($facetoface->name);
 
     $contextmodule = context_module::instance($coursemodule->id);
@@ -1401,25 +1326,31 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     $declareinterest_url = new moodle_url('/mod/facetoface/interest.php', array('f' => $facetoface->id));
     $declareinterest_link = html_writer::link($declareinterest_url, $declareinterest_label, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $declareinterest_label));
 
-    // User has signedup for the instance.
     if ($seminar->has_unarchived_signups()) {
+        // User has signedup for the instance.
         $submissions = facetoface_get_user_submissions($facetoface->id, $USER->id);
         if (!$facetoface->multiplesessions) {
             // First submission only.
             $submissions = array(array_shift($submissions));
         }
 
-        $sessions = array();
+        $sessions = [];
         foreach ($submissions as $submission) {
-            if ($session = facetoface_get_session($submission->sessionid)) {
-
-                if (facetoface_is_session_over($session, $timenow) || !empty($session->cancelledstatus)) {
-                    continue;
-                }
-
-                $session->bookedsession = $submission;
-                $sessions[$session->id] = $session;
+            $seminarevent = new seminar_event($submission->sessionid);
+            if ($seminarevent->is_over($timenow) || $seminarevent->get_cancelledstatus()) {
+                // We do not want to display those events that are either cancelled or over here at course page.
+                continue;
             }
+
+            $session = $seminarevent->to_record();
+
+            $session->mintimestart = $seminarevent->get_mintimestart();
+            $session->maxtimefinish = $seminarevent->get_maxtimefinish();
+            $session->sessiondates = $seminarevent->get_sessions()->to_records();
+            $session->cntdates = count($session->sessiondates);
+            $session->bookedsession = $submission;
+
+            $sessions[$session->id] = $session;
         }
 
         // If the user can sign up for multiple events, we should show all upcoming events in this seminar.
@@ -1445,15 +1376,21 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 
             $maximum = $seminar->get_multisignup_maximum();
             if ($checkremaining && (empty($maximum) || count($submissions) < $maximum)) {
-                $allsessions = facetoface_get_sessions($facetoface->id, null, 0, event_time::ALL, true);
+                $query = new query($seminar);
+                $query->with_sortorder(new future_sortorder());
+                $seminarevents = seminar_event_list::from_query($query);
+
                 $numberofeventstodisplay = isset($facetoface->display) ? (int)$facetoface->display : 0;
                 $index = 0;
-                foreach ($allsessions as $id => $session) {
+
+                /** @var seminar_event $seminarevent */
+                foreach ($seminarevents as $seminarevent) {
+                    $id = $seminarevent->get_id();
                     if (array_key_exists($id, $sessions)) {
                         continue;
                     }
-                    // Don't show events that are over.
-                    if (facetoface_is_session_over($session, $timenow) || !empty($session->cancelledstatus)) {
+
+                    if ($seminarevent->is_over($timenow) || $seminarevent->get_cancelledstatus()) {
                         continue;
                     }
 
@@ -1462,7 +1399,14 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     if ($index == $numberofeventstodisplay) {
                         break;
                     }
-                    $sessions[$session->id] = $session;
+
+                    $session = $seminarevent->to_record();
+                    $session->mintimestart = $seminarevent->get_mintimestart();
+                    $session->maxtimefinish = $seminarevent->get_maxtimefinish();
+                    $session->sessiondates = $seminarevent->get_sessions()->to_records();
+                    $session->cntdates = count($session->sessiondates);
+
+                    $sessions[$id] = $session;
                     $index++;
                 }
             }
@@ -1470,14 +1414,22 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 
         if (!empty($facetoface->managerreserve)) {
             // Include information about reservations when drawing the list of sessions.
-            $reserveinfo = \mod_facetoface\reservations::can_reserve_or_allocate($seminar, $sessions, $contextmodule);
+            $reserveinfo = reservations::can_reserve_or_allocate($seminar, $sessions, $contextmodule);
         }
 
-        /** @var mod_facetoface_renderer $f2frenderer */
+        /** @var \mod_facetoface_renderer $f2frenderer */
         $f2frenderer = $PAGE->get_renderer('mod_facetoface');
         $f2frenderer->setcontext($contextmodule);
-        $output .= $f2frenderer->print_session_list_table($sessions, $viewattendees, $editevents,
-            $displaytimezones, $reserveinfo, $PAGE->url, true, false);
+        $output .= $f2frenderer->print_session_list_table(
+            $sessions,
+            $viewattendees,
+            $editevents,
+            $displaytimezones,
+            $reserveinfo,
+            $PAGE->url,
+            true,
+            false
+        );
 
         // Add "view all sessions" row to table.
         $output .= $htmlviewallsessions;
@@ -1485,50 +1437,77 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         if ($declareinterest_enable) {
             $output .= $declareinterest_link;
         }
-    } else if ($sessions = facetoface_get_sessions($facetoface->id, null, 0, event_time::ALL, true)) {
-        if ($facetoface->display > 0) {
-            foreach($sessions as $id => $session) {
-                if (facetoface_is_session_over($session, $timenow) || !empty($session->cancelledstatus)) {
-                    // We only want upcoming sessions (or those with no date set).
-                    // For now, we've cut down the sessions to loop through to just those displayed.
-                    unset($sessions[$id]);
+    } else {
+        // If user does not have signed-up, then start querying the list of seminar_events, and displaying it on screen.
+        $query = new query($seminar);
+        $query->with_sortorder(new future_sortorder());
+        $seminarevents = seminar_event_list::from_query($query);
+
+        if (!$seminarevents->is_empty()) {
+            $sessions = [];
+
+            if ($facetoface->display > 0) {
+                /** @var seminar_event $seminarevent */
+                foreach ($seminarevents as $seminarevent) {
+                    if ($seminarevent->is_over() || $seminarevent->get_cancelledstatus()) {
+                        // We only want upcoming sessions (or those with no date set).
+                        // For now, we've cut down the sessions to loop through to just those displayed.
+                        continue;
+                    }
+
+                    $id = $seminarevent->get_id();
+
+                    $session = $seminarevent->to_record();
+                    $session->mintimestart = $seminarevent->get_mintimestart();
+                    $session->maxtimefinish = $seminarevent->get_maxtimefinish();
+                    $session->sessiondates = $seminarevent->get_sessions()->to_records();
+                    $session->cntdates = count($session->sessiondates);
+                    $sessions[$id] = $session;
                 }
+
+                // Limit number of sessions display. $sessions is in order of start time.
+                $displaysessions = array_slice($sessions, 0, $facetoface->display, true);
+
+                if (!empty($facetoface->managerreserve)) {
+                    // Include information about reservations when drawing the list of sessions.
+                    $reserveinfo = reservations::can_reserve_or_allocate($seminar, $displaysessions, $contextmodule);
+                }
+
+                /** @var mod_facetoface_renderer $f2frenderer */
+                $f2frenderer = $PAGE->get_renderer('mod_facetoface');
+                $f2frenderer->setcontext($contextmodule);
+                $output .= $f2frenderer->print_session_list_table(
+                    $displaysessions,
+                    $viewattendees,
+                    $editevents,
+                    $displaytimezones,
+                    $reserveinfo,
+                    $PAGE->url,
+                    true,
+                    false
+                );
+
+                $output .= ($iseditor || ($coursemodule->visible && $coursemodule->available)) ? $htmlviewallsessions : $strviewallsessions;
+                if (($iseditor || ($coursemodule->visible && $coursemodule->available)) && $declareinterest_enable) {
+                    $output .= $declareinterest_link;
+                }
+            } else {
+                // Show only name if session display is set to zero.
+                $content = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
+                $coursemodule->set_content($content);
+                return;
             }
-
-            // Limit number of sessions display. $sessions is in order of start time.
-            $displaysessions = array_slice($sessions, 0, $facetoface->display, true);
-
-            if (!empty($facetoface->managerreserve)) {
-                // Include information about reservations when drawing the list of sessions.
-                $reserveinfo = \mod_facetoface\reservations::can_reserve_or_allocate($seminar, $displaysessions, $contextmodule);
-            }
-
-            /** @var mod_facetoface_renderer $f2frenderer */
-            $f2frenderer = $PAGE->get_renderer('mod_facetoface');
-            $f2frenderer->setcontext($contextmodule);
-            $output .= $f2frenderer->print_session_list_table($displaysessions, $viewattendees, $editevents,
-                $displaytimezones, $reserveinfo, $PAGE->url, true, false);
-
-            $output .= ($iseditor || ($coursemodule->visible && $coursemodule->available)) ? $htmlviewallsessions : $strviewallsessions;
-
-            if (($iseditor || ($coursemodule->visible && $coursemodule->available)) && $declareinterest_enable) {
-                $output .= $declareinterest_link;
-            }
-        } else {
-            // Show only name if session display is set to zero.
+        } else if (has_capability('mod/facetoface:viewemptyactivities', $contextmodule)) {
             $content = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
             $coursemodule->set_content($content);
             return;
+        } else {
+            // Nothing to display to this user.
+            $coursemodule->set_content('');
+            return;
         }
-    } else if (has_capability('mod/facetoface:viewemptyactivities', $contextmodule)) {
-        $content = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
-        $coursemodule->set_content($content);
-        return;
-    } else {
-        // Nothing to display to this user.
-        $coursemodule->set_content('');
-        return;
     }
+
     $coursemodule->set_content($output);
 }
 
@@ -2113,154 +2092,6 @@ function facetoface_supports($feature) {
 }
 
 /**
- * Get first session that occurs at least partly during time periods
- *
- * @access  public
- * @param   array   $times          Array of dates defining time periods
- * @param   integer $userid         Limit sessions to those affecting a user (optional)
- * @param   string  $extrawhere     Custom WHERE additions (optional)
- * @return  array|stdClass
- *
- */
-function facetoface_get_sessions_within($times, $userid = null, $extrawhere = '', $extraparams = array()) {
-    global $DB;
-
-    $params = array();
-    $select = "
-             SELECT d.id,
-                    c.id AS courseid,
-                    c.fullname AS coursename,
-                    f.name,
-                    f.id AS f2fid,
-                    s.id AS sessionid,
-                    d.sessiontimezone,
-                    d.timestart,
-                    d.timefinish
-    ";
-
-    $source = "
-              FROM {facetoface_sessions_dates} d
-        INNER JOIN {facetoface_sessions} s ON s.id = d.sessionid
-        INNER JOIN {facetoface} f ON f.id = s.facetoface
-        INNER JOIN {course} c ON f.course = c.id
-    ";
-
-    $twhere = array();
-    foreach ($times as $time) {
-        $twhere[] = 'd.timefinish > ? AND d.timestart < ?';
-        $params = array_merge($params, array($time->timestart, $time->timefinish));
-    }
-
-    if ($times) {
-        $where = 'WHERE ((' . implode(') OR (', $twhere) . '))';
-    } else {
-        // No times were given, so we can't supply sessions within any times. Return an empty array.
-        return array();
-    }
-
-    // If userid supplied, only return sessions they are waitlisted, booked or attendees, or
-    // have been assigned a role in
-    if ($userid) {
-        $select .= ", ss.statuscode, sr.roleid";
-
-        $source .= "
-            LEFT JOIN {facetoface_signups} su
-                   ON su.sessionid = s.id AND su.userid = {$userid}
-            LEFT JOIN {facetoface_signups_status} ss
-                   ON su.id = ss.signupid AND ss.superceded != 1
-            LEFT JOIN {facetoface_session_roles} sr
-                   ON sr.sessionid = s.id AND sr.userid = {$userid}
-        ";
-
-        $where .= ' AND ((ss.id IS NOT NULL AND ss.statuscode >= ?) OR sr.id IS NOT NULL)';
-        $params[]  = \mod_facetoface\signup\state\waitlisted::get_code();
-    }
-
-    // Ignoring cancelled sessions.
-    $where .= ' AND s.cancelledstatus = ?';
-    $params[]  = 0;
-
-    $params = array_merge($params, $extraparams);
-    $sessions = $DB->get_record_sql($select.$source.$where.$extrawhere, $params, IGNORE_MULTIPLE);
-
-    return $sessions;
-}
-
-
-/**
- * Takes result of get_sessions_within and produces message about existing attendance.
- *
- * This function returns the strings:
- * - error:userassignedsessionconflictsameday
- * - error:userassignedsessionconflictsamedayselfsignup
- * - error:userbookedsessionconflictsameday
- * - error:userbookedsessionconflictsamedayselfsignup
- * - error:userassignedsessionconflictmultiday
- * - error:userassignedsessionconflictmultidayselfsignup
- * - error:userbookedsessionconflictmultiday
- * - error:userbookedsessionconflictmultidayselfsignup
- *
- * @access  public
- * @param   object  $user     User this $info relates to
- * @param   object  $info     Single result from facetoface_get_sessions_within()
- * @return  string
- */
-function facetoface_get_session_involvement($user, $info) {
-    global $USER;
-
-    // Data to pass to lang string
-    $data = new stdClass();
-
-    // Session time data
-    $data->timestart = userdate($info->timestart, get_string('strftimetime'), $info->sessiontimezone);
-    $data->timefinish = userdate($info->timefinish, get_string('strftimetime'), $info->sessiontimezone);
-    $data->datestart = userdate($info->timestart, get_string('strftimedate'), $info->sessiontimezone);
-    $data->datefinish = userdate($info->timefinish, get_string('strftimedate'), $info->sessiontimezone);
-    $data->datetimestart = userdate($info->timestart, get_string('strftimedatetime'), $info->sessiontimezone);
-    $data->datetimefinish = userdate($info->timefinish, get_string('strftimedatetime'), $info->sessiontimezone);
-
-    // Session name/link
-    $data->session = html_writer::link(new moodle_url('/mod/facetoface/view.php', array('f' => $info->f2fid)), format_string($info->name));
-
-    // User's participation
-    if (!empty($info->roleid)) {
-        // Load roles (and cache)
-        static $roles;
-        if (!isset($roles)) {
-            $context = context_course::instance($info->courseid);
-            $roles = role_get_names($context);
-        }
-
-        // Check if role exists
-        if (!isset($roles[$info->roleid])) {
-            print_error('error:rolenotfound');
-        }
-
-        $data->participation = format_string($roles[$info->roleid]->localname);
-        $strkey = "error:userassigned";
-    } else {
-        $strkey = "error:userbooked";
-    }
-
-    // Check if start/finish on the same day
-    $strkey .= "sessionconflict";
-
-    if ($data->datestart == $data->datefinish) {
-        $strkey .= "sameday";
-    } else {
-        $strkey .= "multiday";
-    }
-
-    if ($user->id == $USER->id) {
-        $strkey .= "selfsignup";
-    }
-
-    $data->fullname = fullname($user);
-
-    return get_string($strkey, 'facetoface', $data);
-}
-
-/**
  * Adds module specific settings to the settings block
  *
  * @param settings_navigation $settings The settings navigation object
@@ -2538,35 +2369,4 @@ function facetoface_get_env_session($sessionid) {
     $context = context_module::instance($cm->id);
 
     return array($session, $facetoface, $course, $cm, $context);
-}
-
-/**
- * Returns detailed information about booking conflicts for the passed users
- *
- * @param array $dates Array of dates defining time periods
- * @param array $users Array of user objects that will be checked for booking conflicts
- * @param string $extrawhere SQL fragment to be added to the where clause in facetoface_get_sessions_within
- * @param array $extraparams Paramaters used by the $extrawhere To be used in facetoface_get_sessions_within
- * @param bool $objreturn Pass this as true if u want an object to be returned
- * @return array The booking conflicts.
- */
-function facetoface_get_booking_conflicts(array $dates, array $users, string $extrawhere,
-                                          array $extraparams, bool $objreturn = false) {
-    $bookingconflicts = array();
-    foreach ($users as $user) {
-        if ($availability = facetoface_get_sessions_within($dates, $user->id, $extrawhere, $extraparams)) {
-            $data = array(
-                'idnumber' => $user->idnumber,
-                'name' => fullname($user),
-                'result' => facetoface_get_session_involvement($user, $availability),
-            );
-
-            if ($objreturn) {
-                $data = (object) $data;
-            }
-
-            $bookingconflicts[] = $data;
-        }
-    }
-    return $bookingconflicts;
 }

@@ -5282,3 +5282,284 @@ function facetoface_get_session_managers($userid, $sessionid, $jobassignmentid =
 
     return $managers;
 }
+
+
+/**
+ * Returns detailed information about booking conflicts for the passed users
+ *
+ * @param array $dates Array of dates defining time periods
+ * @param array $users Array of user objects that will be checked for booking conflicts
+ * @param string $extrawhere SQL fragment to be added to the where clause in facetoface_get_sessions_within
+ * @param array $extraparams Paramaters used by the $extrawhere To be used in facetoface_get_sessions_within
+ * @param bool $objreturn Pass this as true if u want an object to be returned
+ * @return array The booking conflicts.
+ *
+ * @deprecated since Totara 13
+ */
+function facetoface_get_booking_conflicts(array $dates, array $users, string $extrawhere,
+                                          array $extraparams, bool $objreturn = false) {
+    debugging(
+        "The function facetoface_get_booking_conflicts() has been deprecated, please call to " .
+        "\\mod_facetoface\\seminar_session_list::is_conflicting() instead",
+        DEBUG_DEVELOPER
+    );
+    $bookingconflicts = array();
+    foreach ($users as $user) {
+        if ($availability = facetoface_get_sessions_within($dates, $user->id, $extrawhere, $extraparams)) {
+            $data = array(
+                'idnumber' => $user->idnumber,
+                'name' => fullname($user),
+                'result' => facetoface_get_session_involvement($user, $availability),
+            );
+
+            if ($objreturn) {
+                $data = (object) $data;
+            }
+
+            $bookingconflicts[] = $data;
+        }
+    }
+    return $bookingconflicts;
+}
+
+/**
+ * Get all records from facetoface_sessions for a given facetoface activity, location and event time in the specific order
+ *
+ * @param integer $facetofaceid ID of the activity
+ * @param string $unsed previously location filter (optional). @deprecated 9.0 No longer used by internal code.
+ * @param integer $roomid Room id filter (optional).
+ * @param integer $eventtime One of event_time::xxx
+ * @param boolean $reverseorder true to sort the list by future first
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_sessions($facetofaceid, $unused = null, $roomid = 0, int $eventtime = \mod_facetoface\event_time::ALL, bool $reverseorder = false) : array {
+    global $DB;
+
+    debugging(
+        "The function facetoface_get_sessions() has been deprecated, please use \\mod_facetoface\\seminar::get_events() instead",
+        DEBUG_DEVELOPER
+    );
+
+    $sqlparams = array('facetoface' => $facetofaceid);
+    $roomwhere = '';
+    $eventtimewhere = '';
+
+    if (!empty($roomid)) {
+        $roomwhere = "AND s.id IN (
+             SELECT sd.sessionid
+               FROM {facetoface_sessions_dates} sd
+              WHERE sd.roomid = :roomid)";
+        $sqlparams['roomid'] = $roomid;
+    }
+
+    if ($eventtime !== \mod_facetoface\event_time::ALL) {
+        $sqlparams['timenow'] = time();
+        if ($eventtime === \mod_facetoface\event_time::UPCOMING) {
+            // (wait-listed OR first session_date not started) AND (not cancelled)
+            $eventtimewhere = 'AND (m.cntdates IS NULL OR :timenow < m.mintimestart) AND s.cancelledstatus = 0';
+        } else if ($eventtime === \mod_facetoface\event_time::INPROGRESS) {
+            // (first session_date started AND last session_date not finished) AND (not cancelled)
+            $eventtimewhere = 'AND (m.mintimestart <= :timenow AND :timenow2 < m.maxtimefinish) AND s.cancelledstatus = 0';
+            $sqlparams['timenow2'] = time();
+        } else if ($eventtime === \mod_facetoface\event_time::OVER) {
+            // (last session_date finished) OR (cancelled)
+            $eventtimewhere = 'AND (m.maxtimefinish <= :timenow OR s.cancelledstatus = 1)';
+        }
+    }
+
+    // PostgreSQL and MySQL sort NULL in a different order.
+    // We need wait-listed events to be the furthest future events, meaning NULL needs to act as a positive maximum value.
+    // So we use 999999999999999999 as the timestart/timefinish for events that are waitlisted (whose actual timestart/finish is NULL)
+    $max = str_repeat('9', 18);
+    if ($reverseorder) {
+        $orderby = "ORDER BY s.cancelledstatus, coalesce(m.maxtimefinish,{$max}) DESC, coalesce(m.mintimestart,{$max}) DESC, s.id DESC";
+    } else {
+        $orderby = "ORDER BY s.cancelledstatus DESC, coalesce(m.mintimestart,{$max}), coalesce(m.maxtimefinish,{$max}), s.id";
+    }
+
+    $sessions = $DB->get_records_sql(
+        "SELECT s.*, m.mintimestart, m.maxtimefinish, m.cntdates
+            FROM {facetoface_sessions} s
+            LEFT JOIN (
+                SELECT
+                    fsd.sessionid,
+                    COUNT(fsd.id) AS cntdates,
+                    MIN(fsd.timestart) AS mintimestart,
+                    MAX(fsd.timefinish) AS maxtimefinish
+                FROM {facetoface_sessions_dates} fsd
+                WHERE (1=1)
+                GROUP BY fsd.sessionid
+            ) m ON m.sessionid = s.id
+            WHERE s.facetoface = :facetoface
+            $roomwhere
+            $eventtimewhere
+            $orderby",
+        $sqlparams
+    );
+
+    if ($sessions) {
+        foreach ($sessions as $key => $value) {
+            $sessions[$key]->sessiondates = facetoface_get_session_dates($value->id, $reverseorder);
+        }
+    }
+    return $sessions;
+}
+
+/**
+ * Takes result of get_sessions_within and produces message about existing attendance.
+ *
+ * This function returns the strings:
+ * - error:userassignedsessionconflictsameday
+ * - error:userassignedsessionconflictsamedayselfsignup
+ * - error:userbookedsessionconflictsameday
+ * - error:userbookedsessionconflictsamedayselfsignup
+ * - error:userassignedsessionconflictmultiday
+ * - error:userassignedsessionconflictmultidayselfsignup
+ * - error:userbookedsessionconflictmultiday
+ * - error:userbookedsessionconflictmultidayselfsignup
+ *
+ * @access  public
+ * @param   object  $user     User this $info relates to
+ * @param   object  $info     Single result from facetoface_get_sessions_within()
+ * @return  string
+ *
+ * @deprecated since Totara 13
+ */
+function facetoface_get_session_involvement($user, $info) {
+    global $USER;
+
+    debugging("The function facetoface_get_session_involment() has been deprecated", DEBUG_DEVELOPER);
+    // Data to pass to lang string
+    $data = new stdClass();
+
+    // Session time data
+    $data->timestart = userdate($info->timestart, get_string('strftimetime'), $info->sessiontimezone);
+    $data->timefinish = userdate($info->timefinish, get_string('strftimetime'), $info->sessiontimezone);
+    $data->datestart = userdate($info->timestart, get_string('strftimedate'), $info->sessiontimezone);
+    $data->datefinish = userdate($info->timefinish, get_string('strftimedate'), $info->sessiontimezone);
+    $data->datetimestart = userdate($info->timestart, get_string('strftimedatetime'), $info->sessiontimezone);
+    $data->datetimefinish = userdate($info->timefinish, get_string('strftimedatetime'), $info->sessiontimezone);
+
+    // Session name/link
+    $data->session = html_writer::link(new moodle_url('/mod/facetoface/view.php', array('f' => $info->f2fid)), format_string($info->name));
+
+    // User's participation
+    if (!empty($info->roleid)) {
+        // Load roles (and cache)
+        static $roles;
+        if (!isset($roles)) {
+            $context = context_course::instance($info->courseid);
+            $roles = role_get_names($context);
+        }
+
+        // Check if role exists
+        if (!isset($roles[$info->roleid])) {
+            print_error('error:rolenotfound');
+        }
+
+        $data->participation = format_string($roles[$info->roleid]->localname);
+        $strkey = "error:userassigned";
+    } else {
+        $strkey = "error:userbooked";
+    }
+
+    // Check if start/finish on the same day
+    $strkey .= "sessionconflict";
+
+    if ($data->datestart == $data->datefinish) {
+        $strkey .= "sameday";
+    } else {
+        $strkey .= "multiday";
+    }
+
+    if ($user->id == $USER->id) {
+        $strkey .= "selfsignup";
+    }
+
+    $data->fullname = fullname($user);
+
+    return get_string($strkey, 'facetoface', $data);
+}
+
+
+/**
+ * Get first session that occurs at least partly during time periods
+ *
+ * @access  public
+ * @param   array   $times          Array of dates defining time periods
+ * @param   integer $userid         Limit sessions to those affecting a user (optional)
+ * @param   string  $extrawhere     Custom WHERE additions (optional)
+ * @return  array|stdClass
+ *
+ * @deprecated since Totara 13
+ */
+function facetoface_get_sessions_within($times, $userid = null, $extrawhere = '', $extraparams = array()) {
+    global $DB;
+
+    debugging(
+        "The function facetoface_get_sessions_within() has been deprecated, " .
+        "please \\mod_facetoface\\seminar_session_list::load_sessiondates_foruser() instead",
+        DEBUG_DEVELOPER
+    );
+
+    $params = array();
+    $select = "
+             SELECT d.id,
+                    c.id AS courseid,
+                    c.fullname AS coursename,
+                    f.name,
+                    f.id AS f2fid,
+                    s.id AS sessionid,
+                    d.sessiontimezone,
+                    d.timestart,
+                    d.timefinish
+    ";
+
+    $source = "
+              FROM {facetoface_sessions_dates} d
+        INNER JOIN {facetoface_sessions} s ON s.id = d.sessionid
+        INNER JOIN {facetoface} f ON f.id = s.facetoface
+        INNER JOIN {course} c ON f.course = c.id
+    ";
+
+    $twhere = array();
+    foreach ($times as $time) {
+        $twhere[] = 'd.timefinish > ? AND d.timestart < ?';
+        $params = array_merge($params, array($time->timestart, $time->timefinish));
+    }
+
+    if ($times) {
+        $where = 'WHERE ((' . implode(') OR (', $twhere) . '))';
+    } else {
+        // No times were given, so we can't supply sessions within any times. Return an empty array.
+        return array();
+    }
+
+    // If userid supplied, only return sessions they are waitlisted, booked or attendees, or
+    // have been assigned a role in
+    if ($userid) {
+        $select .= ", ss.statuscode, sr.roleid";
+
+        $source .= "
+            LEFT JOIN {facetoface_signups} su
+                   ON su.sessionid = s.id AND su.userid = {$userid}
+            LEFT JOIN {facetoface_signups_status} ss
+                   ON su.id = ss.signupid AND ss.superceded != 1
+            LEFT JOIN {facetoface_session_roles} sr
+                   ON sr.sessionid = s.id AND sr.userid = {$userid}
+        ";
+
+        $where .= ' AND ((ss.id IS NOT NULL AND ss.statuscode >= ?) OR sr.id IS NOT NULL)';
+        $params[]  = \mod_facetoface\signup\state\waitlisted::get_code();
+    }
+
+    // Ignoring cancelled sessions.
+    $where .= ' AND s.cancelledstatus = ?';
+    $params[]  = 0;
+
+    $params = array_merge($params, $extraparams);
+    $sessions = $DB->get_record_sql($select.$source.$where.$extrawhere, $params, IGNORE_MULTIPLE);
+
+    return $sessions;
+}

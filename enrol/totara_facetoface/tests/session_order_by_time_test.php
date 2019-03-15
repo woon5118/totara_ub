@@ -23,6 +23,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use mod_facetoface\{seminar, seminar_event};
+
 class enrol_totara_facetoface_session_order_by_time_testcase extends advanced_testcase {
 
     public function test_session_order_by_time() {
@@ -78,16 +80,14 @@ class enrol_totara_facetoface_session_order_by_time_testcase extends advanced_te
         $session->sessiondates = array($sessiondate);
         $sid = $facetofacegenerator->add_session($session);
 
-        $sessions = facetoface_get_sessions($facetoface->id);
+        $seminarevents = (new seminar($facetoface->id))->get_events();
         $enrolablesessions = $totara_facetoface->get_enrolable_sessions($course->id, null, $facetoface->id);
 
-        foreach ($sessions as $session) {
-            // Enrolable sessions don't need info about assets, just add it to compare all other values.
-            if (count($enrolablesessions[$session->id]->sessiondates)) {
-                $enrolablesessions[$session->id]->sessiondates[0]->assetids = null;
-            }
-
-            $this->assertEquals($session->sessiondates, $enrolablesessions[$session->id]->sessiondates);
+        /** @var seminar_event $seminarevent */
+        foreach ($seminarevents as $seminarevent) {
+            $seminareventid = $seminarevent->get_id();
+            $sessions = $seminarevent->get_sessions();
+            $this->assertEquals(array_values($sessions->to_records()), $enrolablesessions[$seminareventid]->sessiondates);
         }
     }
 

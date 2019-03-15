@@ -74,6 +74,7 @@ class mod_facetoface_booking_cancellation_testcase extends advanced_testcase {
 
         // Confirm that learner cannot cancel.
         $this->setUser($learner1);
+        $signup1->get_seminar_event()->clear_sessions();
         $this->assertFalse($signup1->can_switch(user_cancelled::class));
 
         // Create trainer and assign capability.

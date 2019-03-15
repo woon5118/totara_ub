@@ -177,12 +177,16 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
         $date11->timestart = $now - DAYSECS;
         $date11->timefinish = $now - DAYSECS + HOURSECS;
         $DB->update_record('facetoface_sessions_dates', $date11);
+
+        $seminarevent11->clear_sessions();
         $this->assertTrue($seminarevent11->is_started());
 
         $date21 = $DB->get_record('facetoface_sessions_dates', ['sessionid' => $seminarevent21->get_id()]);
         $date21->timestart = $now - DAYSECS;
         $date21->timefinish = $now - DAYSECS + HOURSECS;
         $DB->update_record('facetoface_sessions_dates', $date21);
+
+        $seminarevent21->clear_sessions();
         $this->assertTrue($seminarevent21->is_started());
 
         // Do some pre-task checks.
@@ -321,6 +325,9 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
         $eventsession->timestart = $now - DAYSECS;
         $eventsession->timefinish = $now - DAYSECS + HOURSECS;
         $DB->update_record('facetoface_sessions_dates', $eventsession);
+
+        // Reloading, before assertion.
+        $seminarevent->clear_sessions();
         $this->assertTrue($seminarevent->is_started());
 
         $fully = [];
