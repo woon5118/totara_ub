@@ -99,6 +99,14 @@ class rb_source_certification_completion extends rb_base_source {
         $joinlist = array();
         $this->add_totara_certification_tables($joinlist, 'base', 'programid');
 
+        // Join 'prog_user_assignment' is needed for applying assignmentid parameter.
+        $joinlist[] = new rb_join(
+            'prog_user_assignment',
+            'LEFT',
+            '{prog_user_assignment}',
+            'prog_user_assignment.programid = base.programid AND prog_user_assignment.userid = base.userid',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE
+        );
         $joinlist[] = new rb_join(
             'completion_organisation',
             'LEFT',
@@ -597,6 +605,11 @@ class rb_source_certification_completion extends rb_base_source {
             new rb_param_option(
                 'userid',
                 'base.userid'
+            ),
+            new rb_param_option(
+                'assignmentid',
+                'prog_user_assignment.assignmentid',
+                'prog_user_assignment'
             ),
         );
         return $paramoptions;

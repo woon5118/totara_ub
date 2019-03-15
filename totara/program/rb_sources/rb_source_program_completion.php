@@ -94,8 +94,6 @@ class rb_source_program_completion extends rb_base_source {
     }
 
     protected function define_joinlist() {
-        global $CFG;
-
         $joinlist = array(
             new rb_join(
                 'program',
@@ -104,6 +102,14 @@ class rb_source_program_completion extends rb_base_source {
                 "program.id = base.programid",
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'base'
+            ),
+            // Join 'prog_user_assignment' is needed for applying assignmentid parameter.
+            new rb_join(
+                'prog_user_assignment',
+                'LEFT',
+                '{prog_user_assignment}',
+                'prog_user_assignment.programid = base.programid AND prog_user_assignment.userid = base.userid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
                 'completion_organisation',
@@ -544,6 +550,11 @@ class rb_source_program_completion extends rb_base_source {
             new rb_param_option(
                 'userid',
                 'base.userid'
+            ),
+            new rb_param_option(
+                'assignmentid',
+                'prog_user_assignment.assignmentid',
+                'prog_user_assignment'
             ),
         );
         return $paramoptions;
