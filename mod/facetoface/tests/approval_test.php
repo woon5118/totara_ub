@@ -98,7 +98,7 @@ class mod_facetoface_approval_testcase extends advanced_testcase {
             'instance' => $cm->instance,
             'coursemodule' => $cm->id,
             'cmidnumber' => $cm->idnumber,
-            'availabilityconditionsjson' => '{}',
+            'availabilityconditionsjson' => '',
         );
         // Many errors.
         $mockdata['selectedapprovers'] = "$user1,$user2,$inactive,$user2,$admin,$guest,$deleted";
