@@ -69,13 +69,13 @@ $seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
 
 // Allow managers to be able to approve staff without being enrolled in the course.
 require_login();
-
+/**
+ * Print page header
+ */
 // Setup urls
 $baseurl = new moodle_url('/mod/facetoface/attendees/approvalrequired.php', array('s' => $seminarevent->get_id()));
-
 $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
-$PAGE->set_cm($cm);
 
 list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
     = \mod_facetoface\attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context, $session);
@@ -166,23 +166,23 @@ if ($form = data_submitted()) {
     }
 }
 
-/**
- * Print page header
- */
 if (!$onlycontent) {
+    $pagetitle = format_string($seminar->get_name());
+    $PAGE->set_cm($cm);
+    $PAGE->set_pagelayout('standard');
+    $PAGE->set_title($pagetitle);
+    $PAGE->set_heading($course->fullname);
     \mod_facetoface\attendees_helper::process_js($action, $seminar, $seminarevent);
     \mod_facetoface\event\attendees_viewed::create_from_session($seminarevent->to_record(), $context, $action)->trigger();
-    $PAGE->set_heading($course->fullname);
-    echo $OUTPUT->header();
 }
 
 /**
  * Print page content
  */
 if (!$onlycontent && !$download) {
+    echo $OUTPUT->header();
     echo $OUTPUT->box_start();
-
-    echo $OUTPUT->heading(format_string($seminar->get_name()));
+    echo $OUTPUT->heading($pagetitle);
     if ($can_view_session) {
         /**
          * @var mod_facetoface_renderer $seminarrenderer

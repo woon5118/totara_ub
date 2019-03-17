@@ -25,11 +25,14 @@ namespace mod_facetoface\rb\display;
 use totara_reportbuilder\rb\display\base;
 
 /**
- * Display class intended for the wait-list actions
+ * Display cancellation customfield with edit action icon
+ * This module requires JS already to be included
  */
-class waitlist_checkbox extends base {
+class user_cancellation_customfields_manage extends base {
 
     /**
+     * Handles the display
+     *
      * @param string $value
      * @param string $format
      * @param \stdClass $row
@@ -38,11 +41,18 @@ class waitlist_checkbox extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        global $OUTPUT;
 
         $extrafields = self::get_extrafields_row($row, $column);
-        return \html_writer::empty_tag(
-            'input', array('type' => 'checkbox', 'value' => $extrafields->userid, 'name' => 'userid')
-        );
+        $url = new \moodle_url('/mod/facetoface/attendees/ajax/usercancellation_notes.php', [
+            's' => $extrafields->sessionid,
+            'userid'  => $extrafields->userid,
+            'sesskey' => sesskey(),
+            'return'  => $report->src->get_return_page()
+        ]);
+        $pix = new \pix_icon('t/edit', get_string('showcancelreason', 'mod_facetoface'));
+        $icon = $OUTPUT->action_icon($url, $pix, null, ['class' => 'action-icon attendee-cancellation-note pull-right']);
+        return $icon;
     }
 
     /**

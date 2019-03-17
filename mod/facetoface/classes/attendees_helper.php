@@ -27,12 +27,14 @@ use mod_facetoface\signup\state\not_set;
 use mod_facetoface\signup\state\state;
 use mod_facetoface\signup\state\booked;
 use mod_facetoface\signup\state\waitlisted;
+use mod_facetoface\signup\state\declined;
+use mod_facetoface\signup\state\event_cancelled;
+use mod_facetoface\signup\state\user_cancelled;
 use mod_facetoface\signup\state\no_show;
 use mod_facetoface\signup\state\partially_attended;
 use mod_facetoface\signup\state\fully_attended;
 use mod_facetoface\signup\state\requested;
 use mod_facetoface\signup\state\requestedadmin;
-use mod_facetoface\signup\state\user_cancelled;
 use mod_facetoface\seminar_event;
 use mod_facetoface\seminar;
 use \context_module;
@@ -100,8 +102,6 @@ final class attendees_helper {
     public static function process_js($action, seminar $seminar, seminar_event $seminar_event) {
         global $PAGE;
 
-        $pagetitle = format_string($seminar->get_name());
-
         local_js(
             array(
                 TOTARA_JS_DIALOG,
@@ -143,9 +143,6 @@ final class attendees_helper {
         );
 
         $PAGE->requires->js_init_call('M.totara_f2f_attendees.init', $args, false, $jsmodule);
-        $PAGE->set_url("/mod/facetoface/attendees/{$action}.php", array('s' => $seminar_event->get_id()));
-        $PAGE->set_pagelayout('standard');
-        $PAGE->set_title($pagetitle);
     }
 
     /**
@@ -218,8 +215,15 @@ final class attendees_helper {
         if (has_capability('mod/facetoface:viewcancellations', $context)) {
             $allowed_actions[] = 'cancellations';
 
-            if (!empty($seminarevent->get_cancelledstatus()) ||
-                facetoface_get_users_by_status($seminarevent->get_id(), \mod_facetoface\signup\state\user_cancelled::get_code())) {
+            $users_by_status = facetoface_get_users_by_status(
+                $seminarevent->get_id(),
+                [
+                    declined::get_code(),
+                    user_cancelled::get_code(),
+                    event_cancelled::get_code()
+                ]
+            );
+            if (!empty($seminarevent->get_cancelledstatus()) || $users_by_status) {
                 $available_actions[] = 'cancellations';
             }
         }

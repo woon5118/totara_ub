@@ -25,6 +25,7 @@ $string['sourcetitle'] = 'Seminar Sign-ups';
 
 // columns
 $string['address'] = 'Address';
+$string['allcancellationcustomfields'] = 'All cancellation custom fields';
 $string['allsignupcustomfields'] = 'All sign up custom fields';
 $string['approvalrequest'] = 'Link to approval requests';
 $string['approvaltype'] = 'Approval Type';

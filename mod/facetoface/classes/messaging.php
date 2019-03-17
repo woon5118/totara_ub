@@ -290,8 +290,6 @@ final class messaging {
     public static function process_js($action, \mod_facetoface\seminar $seminar, \mod_facetoface\seminar_event $seminar_event) {
         global $PAGE;
 
-        $pagetitle = format_string($seminar->get_name());
-
         local_js(
             array(
                 TOTARA_JS_DIALOG,
@@ -329,8 +327,5 @@ final class messaging {
         );
 
         $PAGE->requires->js_init_call('M.totara_f2f_attendees_messaging.init', $args, false, $jsmodule);
-        $PAGE->set_url("/mod/facetoface/attendees/{$action}.php", array('s' => $seminar_event->get_id()));
-        $PAGE->set_pagelayout('standard');
-        $PAGE->set_title($pagetitle);
     }
 }

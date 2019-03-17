@@ -148,8 +148,8 @@ Feature: Seminar event cancellation status
     And I should not see "Learner Two" in the "#facetoface_sessions" "css_element"
     And I should not see "Learner Five" in the "#facetoface_sessions" "css_element"
     When I follow "Cancellations"
-    Then I should see "Learner Five" in the ".cancellations" "css_element"
-    And I should not see "Learner Two" in the ".cancellations" "css_element"
+    Then I should see "Learner Five" in the "User Cancelled" "table_row"
+    And I should not see "Learner Two" in the "User Cancelled" "table_row"
     And I run all adhoc tasks
     And I log out
 
@@ -200,11 +200,11 @@ Feature: Seminar event cancellation status
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
     When I click on "Attendees" "link" in the "3 / 10" "table_row"
     And I click on "Cancellations" "link"
-    Then I should see "Event cancellation" in the "Learner One" "table_row"
-    And I should see "Event cancellation" in the "Learner Three" "table_row"
-    And I should see "Event cancellation" in the "Learner Four" "table_row"
-    And I should see "User cancellation" in the "Learner Five" "table_row"
-    And I should not see "Learner Two"
+    Then I should see "Event Cancelled" in the "Learner One" "table_row"
+    And I should see "Event Cancelled" in the "Learner Three" "table_row"
+    And I should see "Event Cancelled" in the "Learner Four" "table_row"
+    And I should see "User Cancelled" in the "Learner Five" "table_row"
+    And I should see "Declined" in the "Learner Two" "table_row"
 
   # -------------------------------------------------------------------------------------
   Scenario: Event cancellation in a Seminar with users that have cancelled their session.
@@ -253,8 +253,8 @@ Feature: Seminar event cancellation status
     And I should not see "Learner Four" in the "#facetoface_sessions" "css_element"
     And I should not see "Learner Five" in the "#facetoface_sessions" "css_element"
     When I follow "Cancellations"
-    Then I should see "Learner Five" in the ".cancellations" "css_element"
-    And I should not see "Learner Two" in the ".cancellations" "css_element"
+    Then I should see "Learner Five" in the "User Cancelled" "table_row"
+    And I should not see "Learner Two" in the "User Cancelled" "table_row"
     And I log out
 
     When I log in as "admin"
@@ -267,7 +267,7 @@ Feature: Seminar event cancellation status
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
     When I click on "Attendees" "link"
     And I click on "Cancellations" "link"
-    Then I should see "Event cancellation" in the "Learner One" "table_row"
-    And I should see "Event cancellation" in the "Learner Three" "table_row"
-    And I should see "User cancellation" in the "Learner Five" "table_row"
+    Then I should see "Event Cancelled" in the "Learner One" "table_row"
+    And I should see "Event Cancelled" in the "Learner Three" "table_row"
+    And I should see "User Cancelled" in the "Learner Five" "table_row"
     And I should not see "Learner Two"

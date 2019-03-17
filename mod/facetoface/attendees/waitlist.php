@@ -54,10 +54,11 @@ $seminarevent = new \mod_facetoface\seminar_event($s);
 $seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
 
 require_login($course, false, $cm);
-
+/**
+ * Print page header
+ */
 // Setup urls
 $baseurl = new moodle_url('/mod/facetoface/attendees/waitlist.php', array('s' => $seminarevent->get_id()));
-
 $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
 
@@ -71,15 +72,19 @@ if (!$can_view_session) {
     redirect($return);
     die();
 }
+
+$pagetitle = format_string($seminar->get_name());
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title($pagetitle);
+$PAGE->set_cm($cm);
+$PAGE->set_heading($course->fullname);
+
 // $allowed_actions is already set, so we can now know if the current action is allowed.
 $actionallowed = in_array($action, $allowed_actions);
-
-/**
- * Handle actions
- */
 $show_table = false;
 $addremoveattendees = has_any_capability(array('mod/facetoface:addattendees', 'mod/facetoface:removeattendees'), $context);
 if ($actionallowed) {
+    attendees_helper::process_js($action, $seminar, $seminarevent);
     // Verify global restrictions and process report early before any output is done (required for export).
     $shortname = 'facetoface_waitlist';
     $attendancestatuses = array(waitlisted::get_code());
@@ -87,19 +92,13 @@ if ($actionallowed) {
     // We will show embedded report.
     $show_table = true;
 }
-/**
- * Print page header
- */
-attendees_helper::process_js($action, $seminar, $seminarevent);
-\mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
-$PAGE->set_cm($cm);
-$PAGE->set_heading($course->fullname);
-echo $OUTPUT->header();
+
 /**
  * Print page content
  */
+echo $OUTPUT->header();
 echo $OUTPUT->box_start();
-echo $OUTPUT->heading(format_string($seminar->get_name()));
+echo $OUTPUT->heading($pagetitle);
 if ($can_view_session) {
     attendees_helper::show_customfields($seminarevent);
 }
@@ -161,3 +160,5 @@ echo html_writer::link($url, get_string('goback', 'mod_facetoface')) . html_writ
 echo $OUTPUT->container_end();
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer($course);
+
+\mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();

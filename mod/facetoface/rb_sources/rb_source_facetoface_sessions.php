@@ -22,8 +22,11 @@
  * @package mod_facetoface
  */
 
-use \mod_facetoface\signup\state\waitlisted;
 use \mod_facetoface\signup\state\booked;
+use \mod_facetoface\signup\state\declined;
+use \mod_facetoface\signup\state\waitlisted;
+use \mod_facetoface\signup\state\user_cancelled;
+use \mod_facetoface\signup\state\event_cancelled;
 global $CFG;
 
 defined('MOODLE_INTERNAL') || die();
@@ -136,7 +139,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 '{facetoface_signups_status}',
                 '(cancellationstatus.signupid = base.id AND
                     cancellationstatus.superceded = 0 AND
-                    cancellationstatus.statuscode = '.\mod_facetoface\signup\state\user_cancelled::get_code().')',
+                cancellationstatus.statuscode IN (' .user_cancelled::get_code(). ', ' .event_cancelled::get_code(). ', ' .declined::get_code(). '))',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
@@ -461,7 +464,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('cancellationdate', 'rb_source_facetoface_sessions'),
                 'cancellationstatus.timecreated',
                 array(
-                    'joins' => 'cancellationstatus',
+                    'joins' => array('cancellationstatus', 'sessions','sessiondate'),
                     'displayfunc' => 'event_date',
                     'dbdatatype' => 'timestamp',
                     'extrafields' => array(
@@ -505,7 +508,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('timeofsignup', 'rb_source_facetoface_sessions'),
                 '(SELECT MAX(timecreated)
                     FROM {facetoface_signups_status}
-                    WHERE signupid = base.id AND statuscode IN ('.\mod_facetoface\signup\state\booked::get_code().', '.\mod_facetoface\signup\state\waitlisted::get_code().'))',
+                    WHERE signupid = base.id AND statuscode IN ('.booked::get_code().', '.waitlisted::get_code().'))',
                 array(
                     'displayfunc' => 'event_date',
                     'dbdatatype' => 'timestamp',
@@ -908,7 +911,15 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             'facetofacesignupid',
             array(
                 'columngenerator' => 'allcustomfieldssignupmanage',
-                'displayfunc' => 'f2f_all_signup_customfields_manage'
+            )
+        );
+        $this->columnoptions[] = new rb_column_option(
+            'facetoface_cancellation',
+            'allcancellationcustomfields',
+            get_string('allcancellationcustomfields', 'rb_source_facetoface_sessions'),
+            'facetofacecancellationid',
+            array(
+                'columngenerator' => 'allcancellationcustomfieldsmanage'
             )
         );
         $this->add_totara_customfield_component('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
@@ -962,11 +973,45 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
 
     /**
      * Add control to manage signup customfields when user have rights to do so.
+     *
      * @param rb_column_option $columnoption should have public string property "type" which value is the type of customfields to show
      * @param bool $hidden should all these columns be hidden
      * @return array of rb_column
      */
-    public function rb_cols_generator_allcustomfieldssignupmanage(rb_column_option $columnoption, $hidden) {
+    public function rb_cols_generator_allcustomfieldssignupmanage(rb_column_option $columnoption, $hidden): array {
+
+        $columnargs = [
+            'type' => 'facetoface_signup_manage',
+            'displayfunc' => 'f2f_all_signup_customfields_manage'
+        ];
+        return $this->rb_cols_generator_allcustomfieldsmanage($columnoption, $hidden, $columnargs);
+    }
+
+    /**
+     * Add control to manage user cancellation customfields when user have rights to do so.
+     *
+     * @param rb_column_option $columnoption should have public string property "type" which value is the type of customfields to show
+     * @param bool $hidden should all these columns be hidden
+     * @return array of rb_column
+     */
+    public function rb_cols_generator_allcancellationcustomfieldsmanage(rb_column_option $columnoption, $hidden): array {
+
+        $columnargs = [
+            'type' => 'facetoface_cancellation_manage',
+            'displayfunc' => 'user_cancellation_customfields_manage'
+        ];
+        return $this->rb_cols_generator_allcustomfieldsmanage($columnoption, $hidden, $columnargs);
+    }
+
+    /**
+     * Add control to manage signup/user cancellation/etc customfields when user have rights to do so.
+     *
+     * @param rb_column_option $columnoption should have public string property "type" which value is the type of customfields to show
+     * @param bool $hidden should all these columns be hidden
+     * @param array $columnargs
+     * @return array of rb_column
+     */
+    private function rb_cols_generator_allcustomfieldsmanage(rb_column_option $columnoption, $hidden, array $columnargs): array {
         global $PAGE;
 
         $results = $this->rb_cols_generator_allcustomfields($columnoption, $hidden);
@@ -985,23 +1030,22 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             // Only include the column manage attendee's note, if the current $user in session does have the permission
             // to perform the action. Otherwise, the report will be ending up with an empty columns.
             $results[] = new rb_column(
-                'facetoface_signup_manage',
+                $columnargs['type'],
                 'custom_field_edit_all',
-                get_string('actions', 'facetoface'),
+                get_string('actions', 'mod_facetoface'),
                 'NULL',
                 [
-                    'displayfunc' => 'f2f_all_signup_customfields_manage',
+                    'displayfunc' => $columnargs['displayfunc'],
                     'noexport' => true,
                     'dbdatatype' => 'text',
                     'outputformat' => 'text',
                     'style' => null,
                     'class' => null,
                     'extrafields' => $extrafields,
-                    'nosort' => true
+                    'nosort' => true,
                 ]
             );
         }
-
         return $results;
     }
 

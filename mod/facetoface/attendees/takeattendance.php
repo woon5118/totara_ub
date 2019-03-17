@@ -68,13 +68,14 @@ $seminarevent = new seminar_event($s);
 $seminar = new seminar($seminarevent->get_facetoface());
 
 require_login($course, false, $cm);
-
+/**
+ * Print page header
+ */
 // Setup urls
 $baseurl = new moodle_url(
     '/mod/facetoface/attendees/takeattendance.php',
     ['s' => $seminarevent->get_id()]
 );
-
 $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
 
@@ -196,23 +197,23 @@ if ($formdata = data_submitted()) {
     }
 }
 
-/**
- * Print page header
- */
 if (!$onlycontent) {
-    \mod_facetoface\attendees_helper::process_js($action, $seminar, $seminarevent);
-    \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
+    $pagetitle = format_string($seminar->get_name());
+    $PAGE->set_pagelayout('standard');
+    $PAGE->set_title($pagetitle);
     $PAGE->set_cm($cm);
     $PAGE->set_heading($course->fullname);
-    echo $OUTPUT->header();
+    \mod_facetoface\attendees_helper::process_js($action, $seminar, $seminarevent);
+    \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
 }
 
 /**
  * Print page content
  */
 if (!$onlycontent && !$download) {
+    echo $OUTPUT->header();
     echo $OUTPUT->box_start();
-    echo $OUTPUT->heading(format_string($seminar->get_name()));
+    echo $OUTPUT->heading($pagetitle);
     if ($can_view_session) {
         /**
          * @var mod_facetoface_renderer $seminarrenderer

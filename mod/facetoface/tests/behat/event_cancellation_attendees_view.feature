@@ -89,9 +89,9 @@ Feature: Seminar event cancellation attendees view
     And I should see the "Wait-list" tab is disabled
     And I should see the "Take attendance" tab is disabled
     And I click on "Cancellations" "link"
-    And I should see "User cancellation" in the "Learner One" "table_row"
-    And I should see "Event cancellation" in the "Learner Two" "table_row"
-    And I should see "Event cancellation" in the "Learner Three" "table_row"
+    And I should see "User Cancelled" in the "Learner One" "table_row"
+    And I should see "Event Cancelled" in the "Learner Two" "table_row"
+    And I should see "Event Cancelled" in the "Learner Three" "table_row"
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_401: attendees "message users" tab view.
@@ -99,9 +99,9 @@ Feature: Seminar event cancellation attendees view
     And I click on "Message users" "link"
     And I press "Discard message"
     And I click on "Cancellations" "link"
-    Then I should see "User cancellation" in the "Learner One" "table_row"
-    And I should see "Event cancellation" in the "Learner Two" "table_row"
-    And I should see "Event cancellation" in the "Learner Three" "table_row"
+    Then I should see "User Cancelled" in the "Learner One" "table_row"
+    And I should see "Event Cancelled" in the "Learner Two" "table_row"
+    And I should see "Event Cancelled" in the "Learner Three" "table_row"
 
     When I click on "Message users" "link"
     And I set the following fields to these values:
@@ -123,6 +123,8 @@ Feature: Seminar event cancellation attendees view
     # --------------------------------------------------------------------------
     When I click on "Attendees" "link"
     And I click on "Cancellations" "link"
-    Then I should see "Export in Excel format"
-    And I should see "Export in ODS format"
-    And I should see "Export in CSV format"
+    Then I should see "Excel"
+    And I should see "ODS"
+    And I should see "CSV"
+    And I should see "PDF landscape"
+    And I should see "PDF portrait"

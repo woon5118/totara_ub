@@ -111,7 +111,7 @@ Feature: Add - Remove seminar attendees
     Then I should not see "Sam1 Student1"
     And I should see "There are no records in this report"
     And I switch to "Cancellations" tab
-    And I should see "Sam1 Student1" in the "User cancellation" "table_row"
+    And I should see "Sam1 Student1" in the "User Cancelled" "table_row"
 
 
   Scenario: Add and remove users to a Seminar session without dates (waitlist)

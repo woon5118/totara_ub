@@ -65,10 +65,11 @@ $seminarevent = new \mod_facetoface\seminar_event($s);
 $seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
 
 require_login($course, false, $cm);
-
+/**
+ * Print page header
+ */
 // Setup urls
 $baseurl = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id()));
-
 $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
 
@@ -82,14 +83,18 @@ if (!$can_view_session) {
     redirect($return);
     die();
 }
+
+$pagetitle = format_string($seminar->get_name());
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title($pagetitle);
+$PAGE->set_cm($cm);
+$PAGE->set_heading($course->fullname);
+
 // $allowed_actions is already set, so we can now know if the current action is allowed.
 $actionallowed = in_array($action, $allowed_actions);
-$pagecontent = !$onlycontent && !$download;
-/**
- * Handle actions
- */
 $show_table = false;
 if ($actionallowed) {
+    attendees_helper::process_js($action, $seminar, $seminarevent);
     // Verify global restrictions and process report early before any output is done (required for export).
     $shortname = 'facetoface_sessions';
     $attendancestatuses = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
@@ -102,40 +107,27 @@ if ($actionallowed) {
     // We will show embedded report.
     $show_table = true;
 }
-/**
- * Print page header
- */
-if ($pagecontent) {
-    attendees_helper::process_js($action, $seminar, $seminarevent);
-    // restore page url as attendees_helper::process_js() overwrites it with the rouge one
-    $PAGE->set_url($baseurl);
-    \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
-    $PAGE->set_cm($cm);
-    $PAGE->set_heading($course->fullname);
-    echo $OUTPUT->header();
-}
+
 /**
  * Print page content
  */
-if ($pagecontent) {
-    echo $OUTPUT->box_start();
-    echo $OUTPUT->heading(format_string($seminar->get_name()));
-    if ($can_view_session) {
-        attendees_helper::show_customfields($seminarevent);
-    }
-    require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
-    echo $OUTPUT->container_start('f2f-attendees-table');
+echo $OUTPUT->header();
+echo $OUTPUT->box_start();
+echo $OUTPUT->heading($pagetitle);
+if ($can_view_session) {
+    attendees_helper::show_customfields($seminarevent);
 }
+require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
+echo $OUTPUT->container_start('f2f-attendees-table');
+
 /**
  * Print attendees (if user able to view)
  */
 if ($show_table) {
     // Get list of attendees
-    if ($pagecontent) {
-        attendees_helper::is_overbooked($seminarevent);
-        // Output the section heading.
-        echo $OUTPUT->heading(get_string('attendees', 'mod_facetoface'));
-    }
+    attendees_helper::is_overbooked($seminarevent);
+    // Output the section heading.
+    echo $OUTPUT->heading(get_string('attendees', 'mod_facetoface'));
 
     $report->set_baseurl($baseurl);
     $report->display_restrictions();
@@ -196,8 +188,8 @@ echo html_writer::link($url, get_string('goback', 'facetoface')) . html_writer::
 /**
  * Print page footer
  */
-if ($pagecontent) {
-    echo $OUTPUT->container_end();
-    echo $OUTPUT->box_end();
-    echo $OUTPUT->footer($course);
-}
+echo $OUTPUT->container_end();
+echo $OUTPUT->box_end();
+echo $OUTPUT->footer($course);
+
+\mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();

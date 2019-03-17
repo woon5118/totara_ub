@@ -477,6 +477,7 @@ $string['email:subject'] = 'Subject';
 $string['embedded:seminarassets'] = 'Seminars: Manage assets';
 $string['embedded:seminarassetsupcoming'] = 'Seminars: Upcoming events using asset';
 $string['embedded:seminareventattendance'] = 'Seminars: Event attendees';
+$string['embedded:seminareventcancellations'] = 'Seminars: Event cancellations attendees';
 $string['embedded:seminarevents'] = 'Seminars: View and manage events';
 $string['embedded:seminareventwaitlist'] = 'Seminars: Event wait-list attendees';
 $string['embedded:seminarinterest'] = 'Seminars: Declared interest';

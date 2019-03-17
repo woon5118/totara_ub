@@ -103,9 +103,9 @@ Feature: Seminar event cancellation reporting
     When I click on "Attendees" "link" in the "Test Seminar" "table_row"
 
     And I click on "Cancellations" "link"
-    And I should see "User cancellation" in the "Learner One" "table_row"
-    And I should see "Event cancellation" in the "Learner Two" "table_row"
-    And I should see "Event cancellation" in the "Learner Three" "table_row"
+    And I should see "User Cancelled" in the "Learner One" "table_row"
+    And I should see "Event Cancelled" in the "Learner Two" "table_row"
+    And I should see "Event Cancelled" in the "Learner Three" "table_row"
 
 
   # ----------------------------------------------------------------------------
