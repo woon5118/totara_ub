@@ -25,23 +25,34 @@ use totara_core\quickaccessmenu\helper;
 use totara_core\output\quickaccesssettings;
 
 require_once(__DIR__ . '/../config.php');
-require_once($CFG->dirroot . '/user/editlib.php');
 
 $reset = optional_param('reset', 0, PARAM_INT);
 $confirm  = optional_param('confirm',  0, PARAM_BOOL);
 
 $url = new moodle_url('/user/quickaccessmenu.php');
-$PAGE->set_url($url, array('id' => $USER->id));
+$PAGE->set_url($url, ['id' => $USER->id]);
+
+if (!isloggedin()) {
+    if (empty($SESSION->wantsurl)) {
+        $SESSION->wantsurl = $CFG->wwwroot . '/user/preferences.php';
+    }
+    redirect(get_login_url());
+} else if (isguestuser()) {
+    // Guests can not edit menu.
+    redirect($CFG->wwwroot);
+}
+
+$PAGE->set_pagelayout('admin');
+$PAGE->set_context(context_user::instance($USER->id));
 $PAGE->navbar->includesettingsbase = true;
 
-list($user, $course) = useredit_setup_preference_page($USER->id, SITEID);
 $systemcontext = context_system::instance();
 require_capability('totara/core:editownquickaccessmenu', $systemcontext);
 
 // Display page header.
 $settingsheading = get_string('quickaccessmenu:settingsheading', 'totara_core');
-$userfullname = fullname($user, true);
-$PAGE->set_title("$course->shortname: $settingsheading");
+$userfullname = fullname($USER, true);
+$PAGE->set_title("{$SITE->shortname}: {$settingsheading}");
 $PAGE->set_heading($userfullname);
 
 if (!empty($reset)) {

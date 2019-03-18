@@ -9,23 +9,31 @@ Feature: Totara settings for admin main menu
 
   Scenario: Ensure only users with the correct capability can configure their own menu
     Given the following "users" exist:
-      | username | firstname | lastname | email                  |
-      | manager1 | manager1  | one      | managerone@example.com |
-      | manager2 | manager2  | two      | managertwo@example.com |
+      | username | firstname | lastname | email                    |
+      | manager1 | manager1  | one      | managerone@example.com   |
+      | manager2 | manager2  | two      | managertwo@example.com   |
+      | manager3 | manager3  | three    | managerthree@example.com |
     And the following "roles" exist:
-      | name         | shortname |
-      | User manager | userman1  |
-      | User manager | userman2  |
+      | name           | shortname |
+      | User manager 1 | userman1  |
+      | User manager 2 | userman2  |
+      | User manager 3 | userman3  |
     And the following "role assigns" exist:
       | user     | role     | contextlevel | reference |
       | manager1 | userman1 | System       |           |
       | manager2 | userman2 | System       |           |
+      | manager3 | userman3 | System       |           |
     And the following "permission overrides" exist:
       | capability                         | permission | role     | contextlevel | reference |
       | totara/plan:configureplans         | Allow      | userman1 | System       |           |
       | totara/plan:configureplans         | Allow      | userman2 | System       |           |
+      | totara/plan:configureplans         | Allow      | userman3 | System       |           |
       | totara/core:editownquickaccessmenu | Allow      | userman1 | System       |           |
       | totara/core:editownquickaccessmenu | Prohibit   | userman2 | System       |           |
+      | totara/core:editownquickaccessmenu | Allow      | userman3 | System       |           |
+      | moodle/user:editownprofile         | Allow      | userman1 | System       |           |
+      | moodle/user:editownprofile         | Allow      | userman2 | System       |           |
+      | moodle/user:editownprofile         | Prohibit   | userman3 | System       |           |
 
     When I log in as "admin"
     And I click on "[aria-label='Show admin menu window']" "css_element"
@@ -42,6 +50,11 @@ Feature: Totara settings for admin main menu
     When I log in as "manager2"
     And I click on "[aria-label='Show admin menu window']" "css_element"
     Then I should not see "Menu settings"
+    And I log out
+
+    When I log in as "manager3"
+    And I click on "[aria-label='Show admin menu window']" "css_element"
+    Then I should see "Menu settings"
 
   Scenario: As a user I can add a new admin menu group
     Given I log in as "admin"
