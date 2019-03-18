@@ -91,7 +91,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $seed = $this->seed_data();
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS);
 
-        facetoface_send_registration_closure_notice($seed->facetoface, $seed->session, $seed->student1->id);
+        \mod_facetoface\notice_sender::registration_closure(new \mod_facetoface\seminar_event($seed->session->id), $seed->student1->id);
         $messages = $this->fetch_messages();
 
         $this->assertCount(3, $messages);
@@ -218,16 +218,8 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
             'conditiontype' => MDL_F2F_CONDITION_BOOKING_CONFIRMATION
         );
 
-        // Ensure expected attributes are initialised.
-        if (!isset($seed->session->notifyuser)) {
-            $seed->session->notifyuser = true;
-        }
-
-        if (!isset($seed->session->notifymanager)) {
-            $seed->session->notifymanager = true;
-        }
-
-        facetoface_send_oneperday_notice($seed->facetoface, $seed->session, $seed->student1->id, $params);
+        set_config('facetoface_oneemailperday', '1');
+        \mod_facetoface\notice_sender::send_notice(new \mod_facetoface\seminar_event($seed->session->id), $seed->student1->id, $params);
         $messages = $this->fetch_messages(true);
 
         $this->assertCount(3, $messages);

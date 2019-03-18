@@ -307,7 +307,7 @@ class notice_sender {
     public static function reservation_cancelled(seminar_event $seminarevent) {
         global $CFG, $DB;
 
-        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(booked::get_code()), true);
+        $attendees = facetoface_get_attendees($seminarevent->get_id(), [booked::get_code()], true);
         $reservedids = array();
         foreach ($attendees as $attendee) {
             if ($attendee->bookedby) {
@@ -332,11 +332,130 @@ class notice_sender {
             'conditiontype' => MDL_F2F_CONDITION_RESERVATION_CANCELLED
         );
 
-        $session = facetoface_get_session($seminarevent->get_id());
         $includeical = empty($CFG->facetoface_disableicalcancel);
         foreach ($reservedids as $reservedid) {
-            facetoface_send_notice($facetoface, $session, $reservedid, $params, $includeical ? MDL_F2F_BOTH : MDL_F2F_TEXT, MDL_F2F_CANCEL);
+            static::send_notice($seminarevent, $reservedid, $params, $includeical ? MDL_F2F_BOTH : MDL_F2F_TEXT, MDL_F2F_CANCEL);
         }
+    }
+
+    /**
+     * Send a notice (all session dates in one message).
+     *
+     * @param seminar_event $seminarevent
+     * @param integer $userid ID of the recipient of the email
+     * @param array $params The parameters for the notification
+     * @param int $icalattachmenttype The ical attachment type, or MDL_F2F_TEXT to disable ical attachments
+     * @param int $icalattachmentmethod The ical method type: MDL_F2F_INVITE or MDL_F2F_CANCEL
+     * @param object $fromuser User object describing who the email is from.
+     * @param array $olddates array of previous dates
+     * @param bool $notifyuser Send user notification
+     * @param bool $notifymanager Send manager notification
+     * @return string Error message (or empty string if successful)
+     */
+    public static function send_notice(seminar_event $seminarevent, $userid, $params, $icalattachmenttype = MDL_F2F_TEXT,
+                                       $icalattachmentmethod = MDL_F2F_INVITE, $fromuser = null, array $olddates = array(),
+                                       $notifyuser = true, $notifymanager = true) {
+        global $DB;
+
+        $notificationdisable = get_config(null, 'facetoface_notificationdisable');
+        if (!empty($notificationdisable)) {
+            return false;
+        }
+
+        $user = $DB->get_record('user', ['id' => $userid]);
+        if (!$user) {
+            return 'userdoesnotexist';
+        }
+
+        // Make it not fail if more then one notification found. Just use one.
+        // Other option is to change data_object, but so far it's facetoface issue that we hope to fix soon and remove workaround
+        // code from here.
+        $checkrows = $DB->get_records('facetoface_notification', $params);
+        if (count($checkrows) > 1) {
+            $params['id'] = reset($checkrows)->id;
+            debugging("Duplicate notifications found for (excluding id): " . json_encode($params), DEBUG_DEVELOPER);
+        }
+
+        // By definition, the send one email per day feature works on sessions with
+        // dates. However, the current system allows sessions to be created without
+        // dates and it allows people to sign up to those sessions. In this cases,
+        // the sign ups still need to get email notifications; hence the checking of
+        // the existence of dates before allowing the send one email per day part.
+        // Note, that's not always the case, if all dates have been deleted from a
+        // seminar event we still need to send the emails to cancel the dates,
+        // thus need to check whether old dates have been supplied.
+        if (get_config(null, 'facetoface_oneemailperday')
+            && ($seminarevent->is_sessions() || !empty($olddates))) {
+            return static::send_notice_oneperday($seminarevent, $userid, $params, $icalattachmenttype, $icalattachmentmethod,
+                $olddates, $notifyuser, $notifymanager);
+        }
+
+        $seminareventid = $seminarevent->get_id();
+
+        $notice = new \facetoface_notification($params);
+        $notice->facetofaceid = $seminarevent->get_facetoface();
+        $notice->set_newevent($user, $seminareventid, null, $fromuser);
+
+        if ($notifyuser) {
+            $icaldata = [];
+            if ((int)$icalattachmenttype == MDL_F2F_BOTH && $notice->conditiontype != MDL_F2F_CONDITION_DECLINE_CONFIRMATION) {
+                // add_ical_attachment needs session dates on the session stdClass object
+                // this is a work around until facetoface_get_session_dates gets replaced
+                $session = $seminarevent->to_record();
+                $session->sessiondates = facetoface_get_session_dates($seminarevent->get_id());
+                $notice->add_ical_attachment($user, $session, $icalattachmentmethod, null, $olddates);
+                $icaldata = [
+                    'dates' => $session->sessiondates,
+                    'olddates' => $olddates,
+                    'method' => $icalattachmentmethod
+                ];
+            }
+            $notice->send_to_user($user, $seminareventid, null, $icaldata);
+        }
+        if ($notifymanager) {
+            $notice->send_to_manager($user, $seminareventid);
+        }
+        $notice->send_to_thirdparty($user, $seminareventid);
+        $notice->send_to_roleapprovers_adhoc($user, $seminareventid);
+        $notice->send_to_adminapprovers_adhoc($user, $seminareventid);
+        $notice->delete_ical_attachment();
+
+        return '';
+    }
+
+    /**
+     * Send registration closure notice to user, manager, all session admins.
+     *
+     * @param object $facetoface    Facetoface instance
+     * @param object $session       Session instance
+     * @param int    $recipientid   The id of the user requesting a booking
+     */
+    public static function registration_closure(seminar_event $seminarevent, $recipientid) {
+        global $DB, $USER;
+
+        $notificationdisable = get_config(null, 'facetoface_notificationdisable');
+        if (!empty($notificationdisable)) {
+            return false;
+        }
+
+        $recipient = $DB->get_record('user', ['id' => $recipientid]);
+        if (!$recipient) {
+            return 'userdoesnotexist';
+        }
+
+        $params = array(
+            'facetofaceid'  => $seminarevent->get_facetoface(),
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS
+        );
+
+        $seminareventid = $seminarevent->get_id();
+        $notice = new \facetoface_notification($params);
+        $notice->set_newevent($recipient, $seminareventid, null, $USER);
+        $notice->send_to_user($recipient, $seminareventid);
+        $notice->send_to_manager($recipient, $seminareventid);
+
+        return '';
     }
 
     /**
@@ -350,33 +469,26 @@ class notice_sender {
      * @return string
      */
     protected static function send(signup $signup, array $params, int $icalattachmenttype = MDL_F2F_TEXT, int $icalattachmentmethod = MDL_F2F_INVITE, stdClass $fromuser = null, array $olddates = []) : string {
-        global $DB;
         $recipientid = $signup->get_userid();
         $seminarevent = $signup->get_seminar_event();
-        $params['facetofaceid']  = $signup->get_seminar_event()->get_facetoface();
+        $params['facetofaceid']  = $seminarevent->get_facetoface();
 
-        $session = facetoface_get_session($seminarevent->get_id());
-        $skipnotifyuser = false;
-        $skipnotifymanager = false;
+        $notifyuser = true;
+        $notifymanager = true;
         if ($signup->get_skipusernotification()) {
-            $session->notifyuser = false;
-            $skipnotifyuser = true;
+            $notifyuser = false;
         }
 
-        $facetoface = $DB->get_record('facetoface', ['id' => $seminarevent->get_facetoface()]);
         if ($signup->get_skipmanagernotification()) {
-            $facetoface->ccmanager = 0;
-            $skipnotifymanager = true;
-            $session->notifymanager = false;
+            $notifymanager = false;
         }
 
-        // When the notify user and manager options are disabled, then it is not sending any notification to anyone at all
-        if ($skipnotifymanager && $skipnotifyuser && !$seminarevent->is_started()) {
-            // Returning empty string here, to make it compatible from what the function facetoface_send_notice returns
-            return '';
+        if ($notifymanager || $notifyuser || $seminarevent->is_started()) {
+            return static::send_notice($seminarevent, $recipientid, $params, $icalattachmenttype, $icalattachmentmethod,
+                $fromuser, $olddates, $notifyuser, $notifymanager);
         }
 
-        return facetoface_send_notice($facetoface, $session, $recipientid, $params,$icalattachmenttype, $icalattachmentmethod, $fromuser, $olddates);
+        return '';
     }
 
     /**
@@ -390,13 +502,116 @@ class notice_sender {
      * @param array $olddates
      * @return string
      */
-    protected static function send_event(int $recipientid, seminar_event $seminarevent, array $params, int $icalattachmenttype = MDL_F2F_TEXT, int $icalattachmentmethod = MDL_F2F_INVITE, stdClass $fromuser = null, array $olddates = []) : string {
+    protected static function send_event(int $recipientid, seminar_event $seminarevent, array $params, int $icalattachmenttype = MDL_F2F_TEXT,
+                                         int $icalattachmentmethod = MDL_F2F_INVITE, stdClass $fromuser = null, array $olddates = []) : string {
         global $DB;
         $params['facetofaceid']  = $seminarevent->get_facetoface();
 
-        $session = facetoface_get_session($seminarevent->get_id());
-        $facetoface = $DB->get_record('facetoface', ['id' => $seminarevent->get_facetoface()]);
+        return static::send_notice($seminarevent, $recipientid, $params, $icalattachmenttype, $icalattachmentmethod, $fromuser, $olddates);
+    }
 
-        return facetoface_send_notice($facetoface, $session, $recipientid, $params,$icalattachmenttype, $icalattachmentmethod, $fromuser, $olddates);
+    /**
+     * Send a notice (one message per session date).
+     *
+     * @param seminar_event $seminarevent
+     * @param integer $userid ID of the recipient of the email
+     * @param array $params The parameters for the notification
+     * @param int $icalattachmenttype The ical attachment type, or MDL_F2F_TEXT to disable ical attachments
+     * @param int $icalattachmentmethod The ical method type: MDL_F2F_INVITE or MDL_F2F_CANCEL
+     * @param array $olddates array of previous dates
+     * @param bool $notifyuser Send user notification
+     * @param bool $notifymanager Send manager notification
+     * @return string Error message (or empty string if successful)
+     */
+    private static function send_notice_oneperday(seminar_event $seminarevent, $userid, $params, $icalattachmenttype = MDL_F2F_TEXT,
+                                                  $icalattachmentmethod = MDL_F2F_INVITE, array $olddates = [],
+                                                  $notifyuser = true, $notifymanager = true) {
+        global $DB, $CFG;
+
+        $notificationdisable = get_config(null, 'facetoface_notificationdisable');
+        if (!empty($notificationdisable)) {
+            return false;
+        }
+
+        $user = $DB->get_record('user', ['id' => $userid]);
+        if (!$user) {
+            return 'userdoesnotexist';
+        }
+
+        // Get sessions and convert to an array of stdClass objects
+        // to fit in with the rest of the code down the line.
+        $eventsessions = $seminarevent->get_sessions();
+        $session = $seminarevent->to_record();
+        $session->sessiondates = [];
+        foreach ($eventsessions as $eventsession) {
+            array_push($session->sessiondates, (object) [
+                'id' => $eventsession->get_id(),
+                'sessionid' => $eventsession->get_sessionid(),
+                'sessiontimezone' => $eventsession->get_sessiontimezone(),
+                'timestart' => $eventsession->get_timestart(),
+                'timefinish' => $eventsession->get_timefinish(),
+                'roomid' => $eventsession->get_roomid()
+            ]);
+        }
+
+        // Filtering dates.
+        // "Key by" date id.
+        $get_id = function ($item) {
+            return $item->id;
+        };
+        $olds = array_combine(array_map($get_id, $olddates), $olddates);
+
+        $dates = array_filter($session->sessiondates, function ($date) use (&$olds) {
+            if (isset($olds[$date->id])) {
+                $old = $olds[$date->id];
+                unset($olds[$date->id]);
+                if ($old->sessiontimezone == $date->sessiontimezone &&
+                    $old->timestart == $date->timestart &&
+                    $old->timefinish == $date->timefinish &&
+                    $old->roomid == $date->roomid) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        $send = function ($dates, $cancel = false, $notifyuser = true, $notifymanager = true) use ($seminarevent, $session,
+            $icalattachmenttype, $icalattachmentmethod, $user, $params, $DB, $CFG
+        ) {
+            $seminareventid = $seminarevent->get_id();
+            foreach ($dates as $date) {
+                if ($cancel) {
+                    $params['conditiontype'] = MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION;
+                }
+                $sendical =  (int)$icalattachmenttype == MDL_F2F_BOTH &&
+                    (!$cancel || ($cancel && empty($CFG->facetoface_disableicalcancel)));
+
+                $notice = new \facetoface_notification($params);
+                $notice->facetofaceid = $seminarevent->get_facetoface();
+                // Send original notice for this date.
+                $notice->set_newevent($user, $seminareventid, $date);
+                if ($sendical) {
+                    $notice->add_ical_attachment($user, $session, $icalattachmentmethod, !$cancel ? $date : [], $cancel ? $date : []);
+                }
+                if ($notifyuser) {
+                    $notice->send_to_user($user, $seminareventid, $date);
+                }
+                if ($notifymanager) {
+                    $notice->send_to_manager($user, $seminareventid);
+                }
+
+                $notice->send_to_thirdparty($user, $seminareventid);
+                $notice->send_to_roleapprovers_adhoc($user, $seminareventid);
+                $notice->send_to_adminapprovers_adhoc($user, $seminareventid);
+
+                $notice->delete_ical_attachment();
+            }
+        };
+
+        $send($dates, false, $notifyuser, $notifymanager);
+        $send($olds, true, $notifyuser, $notifymanager);
+
+        return '';
     }
 }

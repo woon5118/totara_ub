@@ -763,17 +763,11 @@ function facetoface_cancel_pending_requests($session) {
                       AND (statuscode = :req OR statuscode = :adreq)";
     $requestparams = array('req' => \mod_facetoface\signup\state\requested::get_code(), 'adreq' => \mod_facetoface\signup\state\requestedadmin::get_code());
 
-    $f2fs = array();
-
     $requestparams['sess'] = $session->id;
     $pendingrequests = $DB->get_records_sql($requestsql, $requestparams);
 
     // Loop through all the pending requests, cancel them, and send a notification to the user.
     if (!empty($pendingrequests)) {
-        if (!isset($f2fs[$session->facetoface])) {
-            $f2fs[$session->facetoface] = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
-        }
-
         $errors = [];
         foreach ($pendingrequests as $pending) {
             // Mark the request as declined so they can no longer be approved.
@@ -785,7 +779,7 @@ function facetoface_cancel_pending_requests($session) {
                 $errors[$pending->recipient] = current($failures);
             }
             // Send a registration expiration message to the user (and their manager).
-            facetoface_send_registration_closure_notice($f2fs[$session->facetoface], $session, $pending->recipient);
+            \mod_facetoface\notice_sender::registration_closure($signup->get_seminar_event(), $pending->recipient);
         }
     }
 }

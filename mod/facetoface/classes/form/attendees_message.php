@@ -189,7 +189,7 @@ class attendees_message extends \moodleform {
 
         if ($emailerrors) {
             $message = get_string('xmessagesfailed', 'facetoface', $emailerrors);
-            $baseurl = new moodle_url('/mod/facetoface/attendees/messageusers.php', array('s' => $s));
+            $baseurl = new \moodle_url('/mod/facetoface/attendees/messageusers.php', array('s' => $s));
             totara_set_notification($message, $baseurl);
         }
     }

@@ -589,9 +589,9 @@ final class reservations {
                     $seminar = new seminar($facetofaceid);
                     $notifyparams['facetofaceid'] = $seminar->get_id();
                     foreach ($sessions as $sessionid => $managers) {
-                        $session = facetoface_get_session($sessionid);
+                        $seminarevent = new seminar_event($sessionid);
                         foreach ($managers as $managerid) {
-                            facetoface_send_notice($seminar->get_properties(), $session, $managerid, $notifyparams);
+                            notice_sender::send_notice($seminarevent, $managerid, $notifyparams);
                         }
                     }
                 }
