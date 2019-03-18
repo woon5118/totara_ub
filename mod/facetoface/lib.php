@@ -249,7 +249,11 @@ function facetoface_update_instance($facetoface, $mform = null) {
 
         // If manager changed from approval required to not
         if ($facetoface->approvaltype != $previousapproval) {
-            $status = [signup\state\requested::get_code(), signup\state\requestedadmin::get_code()];
+            $status = [
+                signup\state\requested::get_code(),
+                signup\state\requestedrole::get_code(),
+                signup\state\requestedadmin::get_code()
+            ];
             $pending = facetoface_get_attendees($seminarevent->get_id(), $status);
             core_collator::asort_objects_by_property($pending, 'timecreated', core_collator::SORT_NUMERIC);
 
@@ -2265,7 +2269,12 @@ function facetoface_get_cancellations($sessionid) {
     $cancelledstatus = array(\mod_facetoface\signup\state\user_cancelled::get_code(), \mod_facetoface\signup\state\event_cancelled::get_code());
     list($cancelledinsql, $cancelledinparams) = $DB->get_in_or_equal($cancelledstatus);
 
-    $instatus = array(\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\waitlisted::get_code(), \mod_facetoface\signup\state\requested::get_code());
+    $instatus = array(
+        \mod_facetoface\signup\state\booked::get_code(),
+        \mod_facetoface\signup\state\waitlisted::get_code(),
+        \mod_facetoface\signup\state\requested::get_code(),
+        \mod_facetoface\signup\state\requestedrole::get_code()
+    );
     list($insql, $inparams) = $DB->get_in_or_equal($instatus);
     // Nasty SQL follows:
     // Load currently cancelled users,
@@ -2315,7 +2324,8 @@ function facetoface_get_requests($sessionid) {
     $select = "u.id, su.id AS signupid, {$usernamefields}, u.email,
         ss.statuscode, ss.timecreated AS timerequested";
 
-    return facetoface_get_users_by_status($sessionid, \mod_facetoface\signup\state\requested::get_code(), $select);
+    $status = array(\mod_facetoface\signup\state\requested::get_code(), \mod_facetoface\signup\state\requestedrole::get_code());
+    return facetoface_get_users_by_status($sessionid, $status, $select);
 }
 
 /**
@@ -2333,7 +2343,7 @@ function facetoface_get_adminrequests($sessionid) {
     $select = "u.id, su.id AS signupid, {$usernamefields}, u.email,
         ss.statuscode, ss.timecreated AS timerequested";
 
-    $status = array(\mod_facetoface\signup\state\requested::get_code(), \mod_facetoface\signup\state\requestedadmin::get_code());
+    $status = array(\mod_facetoface\signup\state\requested::get_code(), \mod_facetoface\signup\state\requestedrole::get_code(), \mod_facetoface\signup\state\requestedadmin::get_code());
     return facetoface_get_users_by_status($sessionid, $status, $select);
 }
 

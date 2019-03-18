@@ -313,6 +313,7 @@ class facetoface_notification extends data_object {
 
         if ($this->requested) {
             $status[] = \mod_facetoface\signup\state\requested::get_code();
+            $status[] = \mod_facetoface\signup\state\requestedrole::get_code();
             $status[] = \mod_facetoface\signup\state\requestedadmin::get_code();
         }
 

@@ -65,6 +65,7 @@ $string['userstatus:user_cancelled'] = 'Cancelled';
 $string['userstatus:event_cancelled'] = 'Event cancelled';
 $string['userstatus:declined'] = 'Declined';
 $string['userstatus:requested'] = 'Requested';
+$string['userstatus:requestedrole'] = 'Requested';
 $string['userstatus:requestedadmin'] = 'Requested';
 $string['userstatus:approved'] = 'Approved';
 $string['userstatus:waitlisted'] = 'Waitlisted';

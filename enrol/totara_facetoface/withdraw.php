@@ -49,13 +49,14 @@ if ($confirm) {
     JOIN {facetoface_signups_status} sst ON (sst.signupid = snp.id)
     WHERE f2f.course = :courseid
     AND sst.superceded = :superceded
-    AND sst.statuscode = :statuscode
+    AND (sst.statuscode = :req OR sst.statuscode = :roreq)
     ";
     $params = array(
         'userid' => $USER->id,
         'courseid' => $course->id,
         'superceded' => 0,
-        'statuscode' => \mod_facetoface\signup\state\requested::get_code(),
+        'req' => \mod_facetoface\signup\state\requested::get_code(),
+        'roreq' => \mod_facetoface\signup\state\requestedrole::get_code(),
     );
     $requests = $DB->get_records_sql($sql, $params);
     foreach ($requests as $request) {

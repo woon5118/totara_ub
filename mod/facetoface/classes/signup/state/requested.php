@@ -23,7 +23,8 @@
 
 namespace mod_facetoface\signup\state;
 
-use mod_facetoface\signup\condition\{approval_admin_not_required,
+use mod_facetoface\signup\condition\{
+    approval_admin_not_required,
     approval_admin_required,
     approval_manager_required,
     approval_not_required,
@@ -31,9 +32,14 @@ use mod_facetoface\signup\condition\{approval_admin_not_required,
     booking_common,
     event_is_cancelled,
     event_is_not_cancelled,
-    waitlist_common,
-    waitlist_everyone_disabled};
-use mod_facetoface\signup\restriction\{actor_has_role, actor_is_admin, actor_is_manager_or_admin};
+    event_has_role_approver,
+    waitlist_common
+};
+use mod_facetoface\signup\restriction\{
+    actor_is_admin,
+    actor_is_manager_or_admin,
+    actor_has_role
+};
 use mod_facetoface\signup\transition;
 use mod_facetoface\event\booking_requested;
 use mod_facetoface\event\abstract_signup_event;
@@ -91,24 +97,11 @@ class requested extends state implements interface_event {
                 actor_is_manager_or_admin::class
             ),
 
-            // A user with the specified role approves or declines the request.
-            transition::to(new waitlisted($this->signup))->with_conditions(
-                waitlist_common::class,
-                approval_role_required::class,
-                approval_admin_not_required::class
-            )->with_restrictions(
-                actor_has_role::class
-            ),
-            transition::to(new booked($this->signup))->with_conditions(
+            // The manager approval is not longer required but role approval is now required
+            transition::to(new requestedrole($this->signup))->with_conditions(
                 booking_common::class,
                 approval_role_required::class,
-                approval_admin_not_required::class
-            )->with_restrictions(
-                actor_has_role::class
-            ),
-            transition::to(new declined($this->signup))->with_conditions(
-                approval_role_required::class,
-                event_is_not_cancelled::class
+                event_has_role_approver::class
             )->with_restrictions(
                 actor_has_role::class
             ),
@@ -143,7 +136,7 @@ class requested extends state implements interface_event {
             transition::to(new event_cancelled($this->signup))->with_conditions(
                 event_is_cancelled::class
             ),
-            // The seminar event is cancelled.
+            // The user has cancelled.
             transition::to(new user_cancelled($this->signup)),
         ];
     }

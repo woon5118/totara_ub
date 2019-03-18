@@ -132,3 +132,34 @@ function facetoface_upgradelib_calendar_events_for_sessiondates() {
         }
     }
 }
+
+/**
+ * Move requested state to requestedrole state for role approval.
+ */
+function facetoface_upgradelib_requestedrole_state_for_role_approval() {
+    global $DB;
+
+    // magic numbers
+    /** @var int @see \mod_facetoface\seminar::APPROVAL_ROLE */
+    $seminar_approval_role = 2;
+    /** @var int @see \mod_facetoface\signup\state\requested::get_code() */
+    $requested_statuscode = 40;
+    /** @var int @see \mod_facetoface\signup\state\requestedrole::get_code() */
+    $requestedrole_statuscode = 44;
+
+    $trans = $DB->start_delegated_transaction();
+    $statuses = $DB->get_records_sql(
+        'SELECT sus.*
+         FROM {facetoface_signups_status} sus
+         JOIN {facetoface_signups} su ON su.id = sus.signupid
+         JOIN {facetoface_sessions} s ON s.id = su.sessionid
+         JOIN {facetoface} f ON f.id = s.facetoface
+         WHERE f.approvaltype = :at AND sus.statuscode = :cd AND sus.superceded = 0',
+        [ 'at' => $seminar_approval_role, 'cd' => $requested_statuscode ]
+    );
+    foreach ($statuses as $status) {
+        $status->statuscode = $requestedrole_statuscode;
+        $DB->update_record('facetoface_signups_status', $status);
+    }
+    $trans->allow_commit();
+}

@@ -75,7 +75,7 @@ Feature: Seminar Signup Role Approval
     And I follow "Request approval"
     And I should see "Editing Trainer"
     And I press "Request approval"
-    Then I should see "Your request was sent to your manager for approval."
+    Then I should see "Your request was sent for approval to the following user(s): Freddy Fred"
 
   Scenario: Student gets approved through role approval
     When I log in as "jimmy"
@@ -86,7 +86,7 @@ Feature: Seminar Signup Role Approval
     And I should see "Freddy Fred"
 
     When I press "Request approval"
-    Then I should see "Your request was sent to your manager for approval."
+    Then I should see "Your request was sent for approval to the following user(s): Freddy Fred"
     And I run all adhoc tasks
 
     And I log out

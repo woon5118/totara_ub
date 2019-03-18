@@ -509,5 +509,12 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019030100, 'facetoface');
     }
 
+    // evacuate users that will be stuck in the requested state
+    if ($oldversion < 2019030101) {
+        facetoface_upgradelib_requestedrole_state_for_role_approval();
+
+        upgrade_mod_savepoint(true, 2019030101, 'facetoface');
+    }
+
     return true;
 }

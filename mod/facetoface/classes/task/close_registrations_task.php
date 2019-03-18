@@ -24,7 +24,7 @@
 namespace mod_facetoface\task;
 
 use mod_facetoface\{notice_sender, seminar_event, signup};
-use mod_facetoface\signup\state\{requested, requestedadmin, declined};
+use mod_facetoface\signup\state\{requested, requestedrole, requestedadmin, declined};
 
 /**
  * Check for sessions where the registration period has recently ended,
@@ -66,13 +66,14 @@ class close_registrations_task extends \core\task\scheduled_task {
                          FROM {facetoface_signups} fs
                          JOIN {facetoface_signups_status} fss
                            ON fss.signupid = fs.id
-                        WHERE (fss.statuscode = :req OR fss.statuscode = :adreq)
+                        WHERE (fss.statuscode = :req OR fss.statuscode = :roreq OR fss.statuscode = :adreq)
                           AND fs.sessionid = s.id
                        )
               ORDER BY s.facetoface, s.id";
         $params = array(
             'now'      => $time,
             'req' => requested::get_code(),
+            'roreq' => requestedrole::get_code(),
             'adreq' => requestedadmin::get_code(),
         );
 

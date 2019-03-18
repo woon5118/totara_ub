@@ -31,6 +31,7 @@ use mod_facetoface\signup\state\{
     not_set,
     booked,
     requested,
+    requestedrole,
     waitlisted,
     user_cancelled,
     attendance_state
@@ -61,7 +62,7 @@ final class signup_helper {
         $signup->save();
 
 
-        $signup->switch_state(booked::class, waitlisted::class, requested::class);
+        $signup->switch_state(booked::class, waitlisted::class, requested::class, requestedrole::class);
 
         static::trigger_event($signup);
         static::set_default_job_assignment($signup);
@@ -87,7 +88,7 @@ final class signup_helper {
             || $signup->get_state() instanceof waitlisted) {
             return false;
         }
-        return $signup->can_switch(booked::class, waitlisted::class, requested::class);
+        return $signup->can_switch(booked::class, waitlisted::class, requested::class, requestedrole::class);
     }
 
     /**
@@ -98,8 +99,8 @@ final class signup_helper {
      */
     public static function expected_signup_state(signup $signup) : state {
         $oldstate = $signup->get_state();
-        if ($oldstate->can_switch(booked::class, waitlisted::class, requested::class)) {
-            return $oldstate->switch_to(booked::class, waitlisted::class, requested::class);
+        if ($oldstate->can_switch(booked::class, waitlisted::class, requested::class, requestedrole::class)) {
+            return $oldstate->switch_to(booked::class, waitlisted::class, requested::class, requestedrole::class);
         }
         return $oldstate;
     }
@@ -114,7 +115,7 @@ final class signup_helper {
             || $signup->get_state() instanceof waitlisted) {
             return ['addalreadysignedupattendee' => get_string('error:addalreadysignedupattendee', 'mod_facetoface')];
         }
-        return $signup->get_failures( booked::class, waitlisted::class, requested::class);
+        return $signup->get_failures(booked::class, waitlisted::class, requested::class, requestedrole::class);
     }
 
     /**

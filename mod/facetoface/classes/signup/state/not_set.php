@@ -78,7 +78,7 @@ class not_set extends state {
                 user_is_enrolable::class
             ),
             // Request approval: role
-            transition::to(new requested($this->signup))->with_conditions(
+            transition::to(new requestedrole($this->signup))->with_conditions(
                 multisignup_common::class,
                 has_signup_capability::class,
                 has_required_job_assignment::class,
