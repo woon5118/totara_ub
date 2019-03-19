@@ -516,5 +516,18 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019030101, 'facetoface');
     }
 
+    if ($oldversion < 2019032000) {
+        // Update all job assignments to NULL where were deleted from user job assignments.
+        $sql = "UPDATE {facetoface_signups}
+                   SET jobassignmentid = NULL
+                 WHERE jobassignmentid NOT IN (
+                       SELECT id
+                         FROM {job_assignment}
+                 )";
+        $DB->execute($sql);
+
+        upgrade_mod_savepoint(true, 2019032000, 'facetoface');
+    }
+
     return true;
 }

@@ -358,4 +358,62 @@ class mod_facetoface_events_testcase extends advanced_testcase {
 
         $this->assertSame('r', $data['crud']);
     }
+
+    public function test_job_assignment_deleted() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        set_config('facetoface_selectjobassignmentonsignupglobal', true);
+
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, $studentrole->id);
+
+        $data = array(
+            'userid' => $user->id,
+            'fullname' => 'ja1',
+            'shortname' => 'ja1',
+            'idnumber' => 'ja1',
+        );
+        $jobassignment = \totara_job\job_assignment::create($data);
+
+        // Set up a face to face session that requires you to get manager approval and select a position.
+        $facetofacedata = array(
+            'course' => $course->id,
+            'selectjobassignmentonsignup' => 1,
+        );
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        // Create session with capacity and date in 2 years.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + (DAYSECS * 365 * 2);
+        $sessiondate->timefinish = time() + (DAYSECS * 365 * 2 + 60);
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'sessiondates' => array($sessiondate),
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+
+        $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
+        $signup->set_jobassignmentid((int)$jobassignment->id);
+        signup_helper::signup($signup);
+        // Reload signup.
+        $signup = new \mod_facetoface\signup($signup->get_id());
+        $this->assertNotNull($signup->get_jobassignmentid());
+        $this->assertNotEquals(0, $signup->get_jobassignmentid());
+
+        // Delete JA which must trigger event of deleting.
+        \totara_job\job_assignment::delete($jobassignment);
+
+        // Reload signup.
+        $signup = new \mod_facetoface\signup($signup->get_id());
+        $this->assertEquals(0, $signup->get_jobassignmentid());
+    }
 }

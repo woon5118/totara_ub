@@ -236,4 +236,20 @@ class event_handler {
             $cc->mark_inprogress();
         }
     }
+
+    /**
+     * Triggered via job_assignment_deleted event.
+     * - Removes facetoface signup jobassignmentid data
+     *
+     * @param \totara_job\event\job_assignment_deleted $event
+     * @return bool true on success
+     */
+    public static function job_assignment_deleted(\totara_job\event\job_assignment_deleted $event) {
+        global $DB;
+
+        $sql = "UPDATE {facetoface_signups} SET jobassignmentid = NULL WHERE jobassignmentid = :jobassignmentid";
+        $DB->execute($sql, ['jobassignmentid' => $event->objectid]);
+
+        return true;
+    }
 }

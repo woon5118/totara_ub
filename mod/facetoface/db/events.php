@@ -81,4 +81,8 @@ $observers = [
         'eventname' => \mod_facetoface\event\booking_requested::class,
         'callback' => '\mod_facetoface\event_handler::send_notification_requested'
     ],
+    [
+        'eventname' => \totara_job\event\job_assignment_deleted::class,
+        'callback'  => '\mod_facetoface\event_handler::job_assignment_deleted',
+    ],
 ];
