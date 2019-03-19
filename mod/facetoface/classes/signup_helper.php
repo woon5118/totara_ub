@@ -244,7 +244,6 @@ final class signup_helper {
             if ($same_state) {
                 $signupstatus = signup_status::from_current($signup);
                 // same states but different grade
-                error_log(json_encode([$signupstatus->get_grade(), $grade]));
                 if ($signupstatus->get_grade() !== $grade) {
                     $signupstatus = signup_status::create($signup, $currentstate, 0, $grade, null);
                     $signupstatus->save();
