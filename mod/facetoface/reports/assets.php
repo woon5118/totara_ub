@@ -29,6 +29,7 @@ use \mod_facetoface\asset;
 
 $assetid = optional_param('assetid', 0, PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
+$sid = optional_param('sid', '0', PARAM_INT);
 
 require_login(0, false);
 
@@ -54,7 +55,7 @@ if (rb_facetoface_summary_asset_embedded::is_capable_static($USER->id)) {
     $shortname = 'facetoface_summary_asset';
     $reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
     $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
-    $config = (new rb_config())->set_global_restriction_set($globalrestrictionset);
+    $config = (new rb_config())->set_global_restriction_set($globalrestrictionset)->set_sid($sid);
     $report = reportbuilder::create_embedded($shortname, $config);
     if (!$report) {
         print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');

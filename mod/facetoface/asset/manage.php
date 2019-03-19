@@ -31,13 +31,16 @@ $id = optional_param('id', 0, PARAM_INT);
 $action = optional_param('action', '', PARAM_ALPHA);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
 $debug = optional_param('debug', 0, PARAM_INT);
+$sid = optional_param('sid', '0', PARAM_INT);
 
 // Check permissions.
 admin_externalpage_setup('modfacetofaceassets');
 
 $returnurl = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));
 
-$report = reportbuilder::create_embedded('facetoface_assets');
+$config = new rb_config();
+$config->set_sid($sid);
+$report = reportbuilder::create_embedded('facetoface_assets', $config);
 $redirectto = new moodle_url('/mod/facetoface/asset/manage.php', $report->get_current_url_params());
 
 // Handle actions.
