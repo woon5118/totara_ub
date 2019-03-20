@@ -3,6 +3,301 @@
 
 Totara Learn Changelog
 
+Release Evergreen (22nd March 2019):
+====================================
+
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-20400   +   Changed default seminar grading method, and added manual grading option to seminar events
+
+                   There is a new 'Grading method' setting for seminars, which determines
+                   which grade to use for the overall activity grade when a learner attends
+                   multiple seminar events. Choices are 'Highest event grade,' 'Lowest event
+                   grade', 'First event grade', and 'Last event grade'.
+
+                   The default seminar grading method has been changed to 'Highest event
+                   grade'. Prior to this change, a seminar attendee's grade was based on the
+                   last attendance taken. The old behaviour can be replicated in practice by
+                   setting the grading method to 'Last event grade'.
+
+                   Trainers now also have the ability to assign arbitrary grades to seminar
+                   attendees. When 'Event manual grading' is enabled, a 'Grade' column is
+                   added to the event 'Take attendance' form. For each learner, trainers can
+                   set attendance, a grade, or both.
+
+Security issues:
+
+    TL-20498       MDL-64651: Prevented links in comments from including the referring URL when followed
+    TL-20518       Changed the Secure page layout to use layout/secure.php
+
+                   Previously the secure page layout was using the standard layout PHP file in
+                   both Roots and Basis themes and unless otherwise specified, in child
+                   themes.
+
+API changes:
+
+    TL-16600   +   Deprecated the rest of facetoface_send_* functions
+    TL-19859       Added experimental support for paratest to run PHPUnit tests in parallel
+    TL-20331   +   Updated Basis notification icon definitions
+
+                   Previously the notification icon definitions provided by Basis did not
+                   include the component. This has now been corrected.
+
+Performance improvements:
+
+    TL-19933       Improved Report Builder counting performance
+
+                   Each database engine now provides a recommendation on whether counted
+                   recordsets should be used.
+
+                   A new plugin setting 'Default result fetch method' has been added for those
+                   wanting to control the choice manually rather than rely on the database
+                   recommendation.
+
+    TL-20212       Improved the performance of Report Builder access checks
+
+Improvements:
+
+    TL-6693    +   Added audience rules for position and organisation multi-select custom fields
+
+                   Previously you could create audience rules based on other position and
+                   organisation custom fields (menu of choices, checkboxes etc), but not based
+                   on multi-select custom fields. This patch adds a new rule type for
+                   multi-select custom fields which has 4 operators
+                    * in all of the selected options
+                    * in any of the selected options
+                    * not in all of the selected options
+                    * not in any of the selected options
+
+                   It is worth noting that the in any/all operators will include users that
+                   have at least one job assignment that have all/any of the selections,
+                   similarly the not in any/all operators will include users that have at
+                   least one job assignment that does not have all/any of the selections. None
+                   of the operators will include users with no job assignments.
+
+    TL-6695    +   Added new course or program assignment dynamic audience rule
+
+                   This new rule allows you to include or exclude users from an audience based
+                   on their enrolment in specified courses or programs.
+
+    TL-8754    +   Added 'Has temporary reports' dynamic audience rule
+    TL-17469   +   Added dynamic audience rule for 'Has Indirect Reports'
+
+                   Created a dynamic audience rule based on whether the person has indirect
+                   reports.
+
+    TL-19259   +   Added 'Has appraisees' dynamic audience rule
+    TL-17209   +   Converted seminar wait-list tab to an embedded report
+    TL-20041   +   Added enable/disable course end date to course defaults
+
+                   Added a new setting in the course defaults page to enable/disable the
+                   course end date by default when creating a new course.
+
+    TL-20106       Improved the handling of invalid UTF-8 strings in block names
+
+                   Fixed javascript failure when one or more block names are translated using
+                   invalid UTF-8 sequences.
+
+    TL-20248   +   Made filters invisible on the Seminar events page when there is nothing to filter
+    TL-20305   +   Prevented filters from being changed on the seminar events dashboard while events are loading
+    TL-20306       Added a 'Link to approval requests' column to the Seminar Sign-ups report source
+    TL-20358       Added the ability to unlock all roles in an appraisal at once
+
+                   Before this change, when an appraisal was unlocked for a specific role in a
+                   user's appraisal, all roles could make changes to their answers at the
+                   given stage (within the normal appraisal rules), but only the unlocked role
+                   was required to mark each stage complete again. With this change, a new
+                   option 'All roles' is available, and when selected every role will be
+                   required to mark each unlocked stage complete again.
+
+    TL-20390       Improved the clean up of records from the 'prog_user_assignment' table
+    TL-20410       MDL-57878: Added expected completion date function
+    TL-20428       Updated dompdf to version 0.8.3
+
+Bug fixes:
+
+    TL-19369       Fixed the display of images and videos in the summary of course catalogue items
+    TL-19840       Fixed divide by zero errors in report builder grade columns
+
+                   If you uploaded or manually set grades for users, but didn't set up the
+                   grades for the associated course, the grade percentage columns in report
+                   builder would attempt to divide by zero. The report builder now displays a
+                   '-' instead.
+
+    TL-19934       Removed duplicate records from the attendees list for seminar events with multiple sessions
+
+                   Prior to this patch, when a seminar event had more than one session date,
+                   then the attendees list of the event would duplicate the attendee records
+                   based on the number of session dates of an event.
+
+                   With this patch, the attendees list of seminar event with multiple session
+                   dates will not duplicate the attendees record based on the number of
+                   session dates, unless the admin adds columns that are related to sessions
+                   specifically.
+
+    TL-19962       Made the Auto-fill form element always show the result of the most recent search term
+
+                   Previously there was a chance that the result of a previous search term
+                   would override the results of a newer search term when using a Moodle form
+                   auto-fill element. This change ensures that more recent results are shown.
+
+    TL-19963       Stopped seminar booking confirmation notifications being sent to managers when unchecked.
+
+                   Seminar session signup notification emails were incorrectly being sent to
+                   manager when "Send booking confirmation to new attendees managers" was not
+                   selected on the seminar session sign-up confirmation page. The behaviour
+                   has been corrected to not send the manager copy of confirmation unless
+                   specifically requested to do so.
+
+    TL-19966       Added sanity checks to the course duration setting
+
+                   Previously setting the default course duration to 0 did not disable the
+                   course end date, but instead the system had an undocumented implementation
+                   where '0' was treated as '365 days'. This change has added validation to
+                   the field to prevent zero to prevent the issue, as a result the minimum
+                   acceptable default course duration is now at least 1 hour.
+
+    TL-20033       Fixed the SQL pattern for word matching regular expressions in MySQL 8
+    TL-20045       Improved the wording of the cohort-type filters in course/program/certification reports
+
+                   * Certifications have been separated from the program-related methods in
+                   totara_cohort\rb\source\report_trait.
+                   * Column and filter types in totara_cohort\rb\source\report_trait have been
+                   changed to better reflect the type of content they belong to. Any reports
+                   based on the custom report sources using this trait should be updated.
+
+    TL-20052       Fixed misleading 'not answered' text for appraisal questions
+
+                   With the 'view answer' permission, a manager is able to see a learner's
+                   appraisal answers even if he does not need to fill in the appraisal
+                   himself.
+
+                   Previously however, not only would he see the learner's answers. he would
+                   also see "Not yet answered" for each question he didn't answer. This is
+                   misleading because it implied the manager needed to answer questions even
+                   though this was not the case.
+
+                   This patch removes that "Not yet answered" text.
+
+    TL-20108       Fixed the removal of users who "declared interest" in a seminar event when the event gets deleted
+    TL-20118       Fixed the prevention of Site Manager from managing Site Policies
+    TL-20127       Changed the grpconcat_date Report Builder filter to use 'AND' operator when both a before and after date has been set
+
+                   Before this patch an 'OR' operator was being used that gave inconsistent
+                   results
+
+    TL-20131       Fixed an error when hierarchy frameworks had more than one user entering data concurrently
+    TL-20139       Added unique identifiers to each navigation item so they can be targeted by user tours
+    TL-20151       Fixed the display of email addresses with non-standard characters in reports
+    TL-20153       Fixed Javascript error when a block has no heading
+    TL-20159       Browser local storage is now cleared after upgrade/cache purge
+    TL-20210       The seminar 'allow cancellations' setting no longer takes precedence over the remove attendees capability
+
+                   This change restores previous behaviour whereby a user with the
+                   'mod/facetoface:removeattendees' capability is able to cancel a users'
+                   seminar booking, regardless of what the "Allow cancellations" setting is
+                   set to.
+
+    TL-20211       Added a new capability to allow the addition of attendees to a seminar event outside of the sign-up registration period
+
+                   The new capability 'mod/facetoface:surpasssignupperiod' is enabled by
+                   default for the editingtrainer and manager roles, on upgrade it will be
+                   enabled for any role that currently has the 'mod/facetoface:editevents'
+                   capability to maintain current functionality.
+
+    TL-20214       Fixed icons in quiz results page overlaying text
+    TL-20222       Fixed duplicate 'ID' SQL failure, when a seminar's event has more than one session date
+    TL-20233       Fixed problems with complex company goal assignments
+
+                   Before this patch, there were several problems relating to company goal
+                   assignments. These included the 'Include children' hierarchy option not
+                   working, and problems relating to users who might be assigned due to
+                   several reasons, such as meeting multiple goal assignment criteria, or
+                   having multiple job assignments.
+
+                   With this patch, each separate reason that a user is assigned to a company
+                   goal is correctly recorded in the database, including those caused by the
+                   use of 'Include children'. When a user no longer meets the criteria for
+                   assignment, the related assignment record is marked 'old'. When a user
+                   again meets the criteria, the old record is changed back into an 'active'
+                   record.
+
+    TL-20234       Fixed display of Totara logo in IE11 on Windows 7 & 8
+    TL-20245       Ensured program and certification messages are displayed correctly when adding and editing
+
+                   The subject and message content were displaying special characters as HTML
+                   entities in the add edit form. These now display correctly.
+
+    TL-20256       Fixed user tours based on URLs with multiple parameters
+    TL-20272       Fixed missing permissions check on Menu settings link in quickaccess menu
+
+                   Prior to this patch, the link to edit the quick access menu would be shown
+                   to users who didn't have the editownprofile capability. The link is now
+                   only displayed if the user has this permission.
+
+    TL-20302       Fixed 'Allow cancellations' form setting for users without 'Configure cancellation' capability when adding an event
+    TL-20303       Fixed a bug that prevented attendance export from the seminar events dashboard when a deleted user was in the attendees list
+    TL-20318       Fixed the 'edit attendee note' action for seminar events which enable reservations
+
+                   Previously when 'Reserve spaces for team' was enabled but no attendees had
+                   been added yet, the attendees list page was still displaying a record with
+                   the 'Reserve' status to inform other managers about the number of
+                   reservations/bookings used. This allowed the update of the Attendee Note
+                   without an associated user, causing an error. This patch hides the update
+                   attendee note action until a learner is added.
+
+    TL-20324       Included custom room information in notification emails about cancelled seminar events
+
+                   Prior to this patch, when a seminar event had a custom room assigned to one
+                   or more sessions and an admin/editor/trainer cancelled the event, the room
+                   information would not be included in the notification emails sent to
+                   attendees.
+
+                   With this patch, a custom room's information will be included in emails
+                   sent to attendees when an event is cancelled.
+
+    TL-20339       Fixed deletion of multiple goals when a single goal was unassigned from a user
+
+                   When a user is assigned to the same organisation via several job
+                   assignments and then simultaneously unassigned from the organisation, the
+                   goals assigned to this user via an organisation are converted to individual
+                   duplicated goal assignments. Previously, when a single goal was deleted,
+                   the duplicate records were deleted as well. After the patch, the individual
+                   goal assignments are removed separately.
+
+    TL-20355       Fixed course’s default image display problems by improved handling of stored image source
+
+                   Prior to this patch, when an admin uploaded the default image for course,
+                   then the URL (including the domain name of a hosting system) would be
+                   stored in the config table. This meant the image could no longer be
+                   displayed if the domain name changed.
+
+                   With this patch, the path and filename of the default course image will be
+                   stored. The function 'course_get_image' is also changed to cope with the
+                   new stored value of the default course image and has another defense layer
+                   to make sure that the course default image is always existing in the
+                   system.
+
+    TL-20424       Fixed drag-and-drop accessible text showing block contents instead of title
+    TL-20426       Fixed incorrect page layout set on the program management page
+    TL-20442       MDL-58015: Set organisation identifier correctly for SCORM package displayed in a popup mode
+    TL-20453   +   Fixed broken 'Turn editing off' link on the seminar attendees page
+    TL-20460       Fixed incorrect notification being sent to trainers who are unassigned from seminar events
+
+                   Previously trainers who were removed from seminar events, received a
+                   notification saying that they had been assigned to the event. They will now
+                   receive the correct 'unassignment' notification.
+
+Contributions:
+
+    * Learning Pool - TL-20212
+    * Michael Trio, Kineo USA - TL-19933
+    * Think Learning - TL-20108
+
+
 Release Evergreen (21st February 2019):
 =======================================
 
