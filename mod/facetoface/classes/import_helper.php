@@ -38,7 +38,7 @@ class import_helper {
      *      data via file
      * @return string
      */
-    public static function csv_detect_delimiter($formdata): ?string {
+    public static function csv_detect_delimiter($formdata): string {
         // User's choice is auto detect delimiter, lets try it, if failed, return false.
         $detectdelimiter = function($delimiters, $content) {
             foreach($delimiters as $name => $delimiter) {
@@ -53,7 +53,7 @@ class import_helper {
         $thedelimiter = $formdata->delimiter == 'auto' ?
             $detectdelimiter(csv::get_delimiter_list(), $formdata->content) :
             $formdata->delimiter;
-        return $thedelimiter;
+        return $thedelimiter ?: 'comma';
     }
 
     /**

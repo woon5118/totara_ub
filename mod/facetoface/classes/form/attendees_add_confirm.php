@@ -77,8 +77,17 @@ class attendees_add_confirm extends \moodleform {
     }
 
     public function validation($data, $files) {
-        $data['id'] = 0;
-        return customfield_validation((object)$data, 'facetofacesignup', 'facetoface_signup');
+        $errors = parent::validation($data, $files);
+        // Custom fields.
+        // Skip validation if it is uploaded data from csv file, we do validate it in other place.
+        if ($this->_customdata['enablecustomfields']) {
+            $data['id'] = 0;
+            $err = customfield_validation((object)$data, 'facetofacesignup', 'facetoface_signup');
+            if (!empty($err)) {
+                $errors['signupfieldslimitation'] = $err;
+            }
+        }
+        return $errors;
     }
 
     public static function get_user_list($userlist, $offset = 0, $limit = 0) {

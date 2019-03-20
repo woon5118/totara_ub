@@ -34,15 +34,14 @@ class attendees_add_file extends \moodleform {
     protected function definition() {
 
         // Get list of required customfields.
-        $requiredcustomfields = array();
-        $customfieldnames = array();
+        $customfieldnames = [];
         $customfields = customfield_get_fields_definition('facetoface_signup');
         foreach ($customfields as $customfield) {
             if ($customfield->locked || $customfield->hidden) {
                 continue;
             }
             if ($customfield->required) {
-                $requiredcustomfields[] = $customfield->shortname;
+                $this->requiredcfnames[] = $customfield->shortname;
             }
             $customfieldnames[] = $customfield->shortname;
         }
@@ -55,30 +54,27 @@ class attendees_add_file extends \moodleform {
         $mform = $this->_form;
 
         // $customfieldinfo is used as $a in get_string().
-        $customfieldinfo = new \stdClass();
-        $customfieldinfo->customfields = '';
-        $customfieldinfo->requiredcustomfields = '';
+        $a = new \stdClass();
+        $a->customfields = '';
+        $a->requiredcustomfields = '';
 
-        $dataoptional = get_string('dataoptional', 'mod_facetoface');
-        $optionalfields = array_diff($customfieldnames, $requiredcustomfields);
-
-        if (!empty($requiredcustomfields)) {
-            foreach ($requiredcustomfields as $item) {
-                $customfieldinfo->customfields .= "* '{$item}'\n";
-                $customfieldinfo->requiredcustomfields .= "* '{$item}'\n";
-                $this->requiredcfnames .= "* '{$item}'\n";
+        if (!empty($this->requiredcfnames)) {
+            foreach ($this->requiredcfnames as $item) {
+                $a->requiredcustomfields .= "* '{$item}'\n";
             }
         }
 
+        $dataoptional = get_string('dataoptional', 'mod_facetoface');
+        $optionalfields = array_diff($customfieldnames, $this->requiredcfnames);
         if (!empty($optionalfields)) {
             foreach ($optionalfields as $item) {
-                $customfieldinfo->customfields .= "* '{$item}' ({$dataoptional})\n";
+                $a->customfields .= "* '{$item}' ({$dataoptional})\n";
             }
         }
 
         if (!empty($extrafields)) {
             foreach ($extrafields as $item) {
-                $customfieldinfo->customfields .= "* '{$item}' ({$dataoptional})\n";
+                $a->customfields .= "* '{$item}' ({$dataoptional})\n";
             }
         }
 
@@ -105,7 +101,11 @@ class attendees_add_file extends \moodleform {
         $mform->addElement('advcheckbox', 'ignoreconflicts', get_string('allowscheduleconflicts', 'mod_facetoface'));
         $mform->setType('ignoreconflicts', PARAM_BOOL);
 
-        $mform->addelement('html', format_text(get_string('csvtextfile_help', 'mod_facetoface', $customfieldinfo), FORMAT_MARKDOWN));
+        $help = get_string('csvtextfile_help', 'mod_facetoface', $a);
+        if (!empty($a->customfields)) {
+            $help .= get_string('csvtextfileoptionalcolumns_help', 'mod_facetoface', $a);
+        }
+        $mform->addelement('html', format_text($help, FORMAT_MARKDOWN));
 
         $this->add_action_buttons(true, get_string('continue'));
     }

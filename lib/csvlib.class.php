@@ -126,7 +126,7 @@ class csv_import_reader {
         $columns = array();
         // str_getcsv doesn't iterate through the csv data properly. It has
         // problems with line returns.
-        while ($fgetdata = fgetcsv($fp, 0, $csv_delimiter, $enclosure)) {
+        while ($fgetdata = @fgetcsv($fp, 0, $csv_delimiter, $enclosure)) {
             // Check to see if we have an empty line.
             if (count($fgetdata) == 1) {
                 if ($fgetdata[0] !== null) {

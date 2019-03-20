@@ -382,9 +382,14 @@ $string['createnewroom'] = 'Create new room';
 $string['csvtextfile'] = 'CSV text file';
 $string['csvtextfile_help'] = 'Preparing a file for upload: Use .CSV text file with a heading row and one or more data rows.
 
-All rows must have the following columns:
+Mandatory columns
 
 * \'username\' **OR** \'idnumber\' **OR** \'email\' (use only one)
+{$a->requiredcustomfields}';
+$string['csvtextfileoptionalcolumns_help'] = '
+
+Optional columns
+
 {$a->customfields}';
 $string['csvtextinput'] = 'CSV text input';
 $string['currentallocations'] = 'Current allocations ({$a->allocated} / {$a->max})';

@@ -80,5 +80,35 @@ Feature: Add seminar attendees in bulk via csv file
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_pipe.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     When I press "Continue"
-    Then I should see "Supported CSV file delimiter is not found."
-    And I should see "Cannot parse submitted CSV file."
+    Then I should see "The column called 'username', 'email', or 'idnumber' was not detected."
+
+  Scenario: Upload csv file using 'Automatic' delimiter option with email address and no required custom fields
+    Given I click on "Attendees" "link"
+    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_email_no_customfields.csv" file to "CSV text file" filemanager
+    And I set the field "delimiter" to "Automatic"
+    And I press "Continue"
+    When I press "Confirm"
+    Then I should see "Booked" in the "John1 Smith1" "table_row"
+    And I should see "Booked" in the "John2 Smith2" "table_row"
+
+  Scenario: Upload csv file using 'Automatic' delimiter option with username and no required custom fields
+    Given I click on "Attendees" "link"
+    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_username_no_customfields.csv" file to "CSV text file" filemanager
+    And I set the field "delimiter" to "Automatic"
+    And I press "Continue"
+    When I press "Confirm"
+    Then I should see "Booked" in the "John1 Smith1" "table_row"
+    And I should see "Booked" in the "John2 Smith2" "table_row"
+
+  Scenario: Upload csv file using 'Automatic' delimiter option with idnumber and no required custom fields
+    Given I click on "Attendees" "link"
+    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_idnumber_no_customfields.csv" file to "CSV text file" filemanager
+    And I set the field "delimiter" to "Automatic"
+    And I press "Continue"
+    When I press "Confirm"
+    Then I should see "Booked" in the "John1 Smith1" "table_row"
+    And I should see "Booked" in the "John2 Smith2" "table_row"
+    And I should see "Booked" in the "John3 Smith3" "table_row"

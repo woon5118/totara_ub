@@ -282,10 +282,13 @@ final class attendees_list_helper {
 
                 // Custom fields validate.
                 $data['id'] = 0;
-                list($cferrors, $data) = customfield_validation_filedata((object)$data, 'facetofacesignup', 'facetoface_signup');
-                if (!empty($cferrors)) {
-                    $errors = array_merge($errors, $cferrors);
-                    continue;
+                if (count($headers) > 1) { // Custom field(s) exists.
+                    list($cferrors, $data) =
+                        customfield_validation_filedata((object)$data, 'facetofacesignup', 'facetoface_signup');
+                    if (!empty($cferrors)) {
+                        $errors = array_merge($errors, $cferrors);
+                        continue;
+                    }
                 }
 
                 // Check that user exists.

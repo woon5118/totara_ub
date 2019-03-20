@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara @javascript @totara_customfield
-Feature: Add seminar attendess from csv file with custom fields
+Feature: Add seminar attendees from csv file with custom fields
   In order to test the bulk add attendees from file
   As a site manager
   I need to create an event, create sign-up custom fields and upload csv file with custom fields using bulk add attendees from file.
@@ -23,24 +23,23 @@ Feature: Add seminar attendess from csv file with custom fields
 
     And I click on "Checkbox" "option"
     And I set the following fields to these values:
-      | Full name                   | Event checkbox |
-      | Short name (must be unique) | checkbox       |
+      | Full name                   | Signup checkbox |
+      | Short name (must be unique) | checkbox        |
     And I press "Save changes"
 
     And I click on "Date/time" "option"
     And I set the following fields to these values:
-      | Full name                   | Event date/time |
-      | Short name (must be unique) | datetime        |
+      | Full name                   | Signup date/time |
+      | Short name (must be unique) | datetime         |
     And I press "Save changes"
-
 
   @_file_upload
   Scenario: Login as manager, upload csv file with custom fields using bulk add attendees from file and check the result.
 
     And I click on "Menu of choices" "option"
     And I set the following fields to these values:
-      | Full name                   | Event menu of choices |
-      | Short name (must be unique) | menuofchoices         |
+      | Full name                   | Signup menu of choices |
+      | Short name (must be unique) | menuofchoices          |
     And I set the field "Menu options (one per line)" to multiline:
       """
       Apple
@@ -51,29 +50,29 @@ Feature: Add seminar attendess from csv file with custom fields
 
     And I click on "Multi-select" "option"
     And I set the following fields to these values:
-      | Full name                   | Event multi select |
-      | Short name (must be unique) | multiselect        |
-      | multiselectitem[0][option]  | Tui                |
-      | multiselectitem[1][option]  | Moa                |
-      | multiselectitem[2][option]  | Tuatara            |
+      | Full name                   | Signup multi select |
+      | Short name (must be unique) | multiselect         |
+      | multiselectitem[0][option]  | Tui                 |
+      | multiselectitem[1][option]  | Moa                 |
+      | multiselectitem[2][option]  | Tuatara             |
     And I press "Save changes"
 
     And I click on "Text area" "option"
     And I set the following fields to these values:
-      | Full name                   | Event text area |
-      | Short name (must be unique) | textarea        |
+      | Full name                   | Signup text area |
+      | Short name (must be unique) | textarea         |
     And I press "Save changes"
 
     And I click on "Text input" "option"
     And I set the following fields to these values:
-      | Full name                   | Event text input |
-      | Short name (must be unique) | textinput        |
+      | Full name                   | Signup text input |
+      | Short name (must be unique) | textinput         |
     And I press "Save changes"
 
     And I click on "URL" "option"
     And I set the following fields to these values:
-      | Full name                   | Event address |
-      | Short name (must be unique) | url           |
+      | Full name                   | Signup address |
+      | Short name (must be unique) | url            |
     And I press "Save changes"
 
     And I am on "Course 1" course homepage
@@ -114,7 +113,7 @@ Feature: Add seminar attendess from csv file with custom fields
     And I should see "/mod/facetoface/view.php?id=1" in the "John3 Smith3" "table_row"
 
   @_file_upload
-  Scenario: Invalid CSV format, where header and colums are missed
+  Scenario: Valid CSV format, but where header and columns are missed
 
     And I am on "Course 1" course homepage
     And I follow "View all events"
@@ -123,9 +122,12 @@ Feature: Add seminar attendess from csv file with custom fields
 
     And I click on "Attendees" "link"
     And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
-    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_invalid_columns.csv" file to "CSV text file" filemanager
-    When I press "Continue"
-    Then I should see "Invalid CSV file format - \"checkbox\" custom field does not exist"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_columns.csv" file to "CSV text file" filemanager
+    And I press "Continue"
+    When I press "Confirm"
+    Then I should see "Booked" in the "John1 Smith1" "table_row"
+    And I should see "Booked" in the "John2 Smith2" "table_row"
+    And I should see "Booked" in the "John3 Smith3" "table_row"
 
   @_file_upload
   Scenario: Invalid CSV format, one of the custom field values is missed
@@ -141,3 +143,29 @@ Feature: Add seminar attendess from csv file with custom fields
     When I press "Continue"
     Then I should see "Invalid CSV file format - number of columns is not constant!"
 
+  @_file_upload
+  Scenario: Login as manager, upload csv file with required multi-select custom field using bulk add attendees from file and check the result.
+
+    And I click on "Multi-select" "option"
+    And I set the following fields to these values:
+      | Full name                   | Beer        |
+      | Short name (must be unique) | multiselect |
+      | This field is required      | Yes         |
+      | multiselectitem[0][option]  | Tui         |
+      | multiselectitem[1][option]  | Moa         |
+      | multiselectitem[2][option]  | Tuatara     |
+    And I press "Save changes"
+
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I follow "Add event"
+    And I press "Save changes"
+
+    And I click on "Attendees" "link"
+    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_required_customfields.csv" file to "CSV text file" filemanager
+    And I press "Continue"
+    When I press "Confirm"
+    Then I should see "Tui, Moa" in the "John1 Smith1" "table_row"
+    And I should see "Moa, Tuatara" in the "John2 Smith2" "table_row"
+    And I should see "Tuatara" in the "John3 Smith3" "table_row"

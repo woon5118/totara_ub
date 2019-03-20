@@ -581,15 +581,22 @@ function customfield_validation($itemnew, $prefix, $tableprefix) {
  */
 function customfield_validation_filedata($itemnew, $prefix, $tableprefix) {
 
-    $err    = array();
-    $fields = customfield_get_fields_definition($tableprefix);
-    foreach ($fields as $field) {
+    // Load fields (and cache)
+    static $fields = [];
+    $err = array();
+
+    if (!isset($fields[$prefix])) {
+        $fields[$prefix] = customfield_get_fields_definition($tableprefix);
+    }
+    foreach ($fields[$prefix] as $field) {
         if (isset($itemnew->{$field->shortname})) {
             $formfield = customfield_get_field_instance($itemnew, $field, $tableprefix, $prefix);
             $itemnew = $formfield->sync_filedata_preprocess($itemnew);
             $err += $formfield->edit_validate_field($itemnew, $prefix, $tableprefix);
         } else {
-            $err += (array)get_string('error:novalue', 'totara_customfield', $field->shortname);
+            if ((bool)(int)$field->required) {
+                $err += (array)get_string('error:novalue', 'totara_customfield', $field->shortname);
+            }
         }
     }
     return array($err, (array)$itemnew);

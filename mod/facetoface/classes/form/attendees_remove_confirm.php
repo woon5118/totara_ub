@@ -64,8 +64,16 @@ class attendees_remove_confirm extends \moodleform {
     }
 
     public function validation($data, $files) {
-        $data['id'] = 0;
-        return customfield_validation((object)$data, 'facetofacecancellation', 'facetoface_cancellation');
+        $errors = parent::validation($data, $files);
+        // Custom fields.
+        if ($this->_customdata['enablecustomfields']) {
+            $data['id'] = 0;
+            $err = customfield_validation((object)$data, 'facetofacecancellation', 'facetoface_cancellation');
+            if (!empty($err)) {
+                $errors['cancellationfieldslimitation'] = $err;
+            }
+        }
+        return $errors;
     }
 
     public function get_user_list($userlist, $offset = 0, $limit = 0) {
