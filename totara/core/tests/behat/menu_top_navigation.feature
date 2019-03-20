@@ -109,3 +109,5 @@ Feature: Totara Main menu navigation
     And I start watching to see if a new page loads
     And I click on "3rd Level item" "link" in the ".totaraNav_sub--list" "css_element"
     Then a new page should have loaded since I started watching
+    # Check regression from TL-20194 where second level navigation wasn't showing when visiting third level pages
+    And I should see "Extra courses" in the ".totaraNav_sub--list" "css_element"

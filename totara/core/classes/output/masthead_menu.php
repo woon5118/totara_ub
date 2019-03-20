@@ -97,40 +97,42 @@ class masthead_menu implements \renderable, \templatable {
      * @return array
      */
     protected function totara_menu_current_selected_item(&$contextdata) {
+        return $this->totara_menu_node_selected($contextdata->menuitems);
+    }
+
+    /**
+     * Recursively search an array for the current navigation item
+     *
+     * @param $menuitems array list of navigation items to search
+     * @param $node array|null parent navigation node whose children are being searched
+     * @return array|null current navigation item, or null if none is found
+     */
+    private function totara_menu_node_selected(&$menuitems, &$node = null) {
 
         $currentitem = null;
-        $itemindex = -1;
-        $childselected = false;
 
-        foreach ($contextdata->menuitems as $i => $navitem) {
+        foreach ($menuitems as $i => &$navitem) {
 
-            if ($currentitem !== null) {
+            if ($navitem['class_isselected']) {
+                $currentitem = $navitem;
                 break;
             }
 
-            if ($navitem['class_isselected']) {
-                if (empty($navitem['children'])) {
-                    $currentitem = $navitem;
-                    $itemindex = $i;
-                }
-            }
-
-            foreach ($navitem['children'] as $childitem) {
-                if ($childitem['class_isselected']) {
-                    $currentitem = $navitem;
-                    $itemindex = $i;
-                    $childselected = true;
+            if (!empty($navitem['children'])) {
+                $currentitem = $this->totara_menu_node_selected($navitem['children'], $navitem);
+                if ($currentitem !== null) {
+                    break;
                 }
             }
         }
 
-        if ($currentitem !== null) {
+        if ($currentitem !== null && $node !== null) {
             // The .selected class is not consistently added so normalize TL-10596.
-            $contextdata->menuitems[$itemindex]['class_isselected'] = true;
+            $node['class_isselected'] = true;
             // Add a class so we know it is the child item which is active.
-            if ($childselected) {
-                $contextdata->menuitems[$itemindex]['class_child_isselected'] = true;
-            }
+            $node['class_child_isselected'] = true;
+
+            return $node;
         }
 
         return $currentitem;
