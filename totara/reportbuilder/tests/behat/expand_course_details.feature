@@ -14,6 +14,13 @@ Feature: Test expand course details in Reportbuilder
       | Course 1 | C1        | 0        |
       | Course 2 | C2        | 0        |
       | Course 3 | C3        | 0        |
+      | Course 4 | C4        | 0        |
+    And the following "course enrolments" exist:
+      | user     | course | role           |
+      | student1 | C4     | student        |
+    And the following courses are completed:
+      | user     | course | timecompleted  |
+      | student1 | C4     | yesterday      |
 
     And I log in as "admin"
     And I set the following administration settings values:
@@ -64,6 +71,17 @@ Feature: Test expand course details in Reportbuilder
       | Name                | Page 1 |
       | Description         | Test   |
       | Page content        | Test   |
+
+    And I am on "Course 4" course homepage
+    And I navigate to "Edit settings" node in "Course administration"
+    And I set the following fields to these values:
+      | Show gradebook to learners | No |
+    And I press "Save and display"
+    And I navigate to "Grades" node in "Course administration"
+    And I follow "Grader report"
+    And I turn editing mode on
+    And I give the grade "90" to the user "Sam1 Student1" for the grade item "Course total"
+    And I press "Save changes"
     And I log out
 
   Scenario: Expand course detail in coursecatalog with filters
@@ -75,16 +93,18 @@ Feature: Test expand course details in Reportbuilder
     And I should not see "Sign-up"
     And I should not see "Manual enrolments, Program"
 
-    When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 1')]" "xpath_element"
-    And I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 2')]" "xpath_element"
+    When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 2')]" "xpath_element"
     Then I should see "Seminar direct enrolment"
     And I should not see "Cannot enrol (no seminar events in this course)"
     And I should see "Sign-up"
     And I should not see "Manual enrolments, Program"
 
-    When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 1')]" "xpath_element"
-    And I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 3')]" "xpath_element"
+    When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 3')]" "xpath_element"
     And I should see "Manual enrolments, Program"
+
+    When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 4')]" "xpath_element"
+    Then I should see "You have completed this course"
+    And I should not see "Grade"
     And I log out
 
   @_alert
@@ -107,14 +127,12 @@ Feature: Test expand course details in Reportbuilder
     And I should not see "Sign-up"
     And I should not see "Manual enrolments, Program"
 
-    When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 1')]" "xpath_element"
-    And I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 2')]" "xpath_element"
+    When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 2')]" "xpath_element"
     Then I should see "Seminar direct enrolment"
     And I should not see "Cannot enrol (no seminar events in this course)"
     And I should see "Sign-up"
     And I should not see "Manual enrolments, Program"
 
-    When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 1')]" "xpath_element"
-    And I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 3')]" "xpath_element"
+    When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 3')]" "xpath_element"
     And I should see "Manual enrolments, Program"
     And I log out

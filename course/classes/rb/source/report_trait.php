@@ -541,6 +541,7 @@ trait report_trait {
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
         require_once($CFG->dirroot . '/course/renderer.php');
         require_once($CFG->dirroot . '/lib/coursecatlib.php');
+        require_once($CFG->dirroot . '/totara/plan/lib.php');
 
         $courseid = required_param('expandcourseid', PARAM_INT);
         $userid = $USER->id;
@@ -571,30 +572,34 @@ trait report_trait {
         );
 
         $coursecontext = context_course::instance($course->id, MUST_EXIST);
-        $enrolled = is_enrolled($coursecontext);
+        $enrolled = is_enrolled($coursecontext, $userid);
 
         $inlineenrolments = array();
         if ($enrolled) {
             $ccompl = new completion_completion(array('userid' => $userid, 'course' => $courseid));
             $complete = $ccompl->is_complete();
             if ($complete) {
-                $sql = 'SELECT gg.*
-                          FROM {grade_grades} gg
-                          JOIN {grade_items} gi
-                            ON gg.itemid = gi.id
-                         WHERE gg.userid = ?
-                           AND gi.courseid = ?';
-                $grade = $DB->get_record_sql($sql, array($userid, $courseid));
                 $coursecompletion = $DB->get_record('course_completions', array('userid' => $userid, 'course' => $courseid));
                 $coursecompletedon = userdate($coursecompletion->timecompleted, get_string('strfdateshortmonth', 'langconfig'));
 
                 $formdata['status'] = get_string('coursestatuscomplete', 'totara_reportbuilder');
                 $formdata['progress'] = get_string('coursecompletedon', 'totara_reportbuilder', $coursecompletedon);
-                if ($grade) {
-                    if (!isset($grade->finalgrade)) {
-                        $formdata['grade'] = '-';
-                    } else {
-                        $formdata['grade'] = get_string('xpercent', 'totara_core', $grade->finalgrade);
+
+                if ($course->showgrades && has_capability('moodle/grade:view', $coursecontext, $userid)) {
+                    $sql = "SELECT gg.*
+                          FROM {grade_grades} gg
+                          JOIN {grade_items} gi
+                            ON gg.itemid = gi.id
+                          WHERE gg.userid = ?
+                            AND gi.courseid = ?
+                            AND gi.itemtype = 'course'";
+                    $grade = $DB->get_record_sql($sql, array($userid, $courseid));
+                    if ($grade) {
+                        if (!isset($grade->finalgrade)) {
+                            $formdata['grade'] = '-';
+                        } else {
+                            $formdata['grade'] = get_string('xpercent', 'totara_core', $grade->finalgrade);
+                        }
                     }
                 }
             } else {
@@ -605,9 +610,8 @@ trait report_trait {
                 $progress = totara_display_course_progress_bar($userid, $courseid,
                     $statusdp->course_completion_statusandapproval);
                 // Highlight if the item has not yet been approved.
-                if ($statusdp->approved == DP_APPROVAL_UNAPPROVED
-                    || $statusdp->approved == DP_APPROVAL_REQUESTED) {
-                    $progress .= $this->rb_display_plan_item_status($statusdp->approved);
+                if ($statusdp->approved == DP_APPROVAL_UNAPPROVED || $statusdp->approved == DP_APPROVAL_REQUESTED) {
+                    $progress .= dp_get_approval_status_from_code($statusdp->approved);
                 }
                 $formdata['progress'] = $progress;
 
