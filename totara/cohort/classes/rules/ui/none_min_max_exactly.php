@@ -156,10 +156,14 @@ class none_min_max_exactly extends base_form {
 
     /**
      * Generate java sctipt to validate listofvalues input.
+     *
+     * Do not copy this implementation, nor this inline JavaScript pattern, to new UI classes.
+     *
      * @return string
      */
     protected static function add_js(): string {
-        $msg = self::$error;
+        // Convert entities, even/especially single quotes, utf-8, but do not double encode.
+        $hmsg = htmlspecialchars(self::$error, ENT_QUOTES, 'UTF-8', false);
         $none = self::COHORT_RULES_OP_NONE;
         // Allow empty value as long as the rule is "none".
         $js = <<<JS
@@ -168,7 +172,7 @@ function validate_emptyruleuiform() {
     var sucess = true;
     if ($('#id_listofvalues').val() === '' && $('#id_equal').val() !== '$none') {
         if ($('#id_error_listofvalues').length == 0 ) {
-            $('div#fgroup_id_row1 > fieldset').prepend('<span id="id_error_listofvalues" class="error">{$msg}</span><br>');
+            $('div#fgroup_id_row1 > fieldset').prepend('<span id="id_error_listofvalues" class="error">{$hmsg}</span><br>');
         }
         sucess = false;
     }
