@@ -44,7 +44,7 @@ class like extends filter {
 
     protected function validate_current_data($data) {
         if (is_null($data) || is_int($data) || is_string($data) || is_bool($data)) {
-            return $data;
+            return $this->filter_json_encode($data);
         }
 
         throw new \coding_exception('like filter only accepts null, int, string or bool data');

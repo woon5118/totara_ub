@@ -51,13 +51,15 @@ class like_or extends filter {
             throw new \coding_exception('like or search filter only accepts null or array data');
         }
 
+        $encoded = [];
         foreach ($data as $datum) {
             if (!(is_int($datum) || is_string($datum) || is_bool($datum))) {
                 throw new \coding_exception('like or search filter only accepts null, int, string or bool data in an array');
             }
+            $encoded[] = $this->filter_json_encode($datum);
         }
 
-        return $data;
+        return $encoded;
     }
 
     /**

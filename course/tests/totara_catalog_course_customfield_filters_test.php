@@ -125,7 +125,7 @@ class core_course_totara_catalog_course_customfield_filters_testcase extends \ad
      */
     private function generate_menu(
         int $course_count = 25,
-        array $options = ['aaa', 'bbb', 'ccc', 'ddd', 'eee']
+        array $options = ['aaa', 'bbb', 'ccc', 'ddd', 'eee', 'Matěj Dvořák', 'Vésêlá Černý', 'fff', 'ě']
     ): array {
         $cf_type = 'menu';
         $cf_id = $this->generate_customfield(
@@ -292,7 +292,7 @@ class core_course_totara_catalog_course_customfield_filters_testcase extends \ad
      */
     private function generate_multi(
         int $course_count = 25,
-        array $options = ['aaa', 'bbb', 'ccc', 'ddd', 'eee']
+        array $options = ['aaa', 'bbb', 'ccc', 'ddd', 'eee', 'Matěj Dvořák', 'Vésêlá Černý', 'fff', 'ě']
     ): array {
         $multi_options = [];
         foreach ($options as $i => $option) {

@@ -358,4 +358,22 @@ abstract class filter {
      * @return array(string where, array params)
      */
     abstract protected function make_compare(\stdClass $source): array;
+
+    /**
+     * We need to json encode string filter criteria in order to locate unicode characters (e.g. Matěj Dvořák) in db.
+     *
+     * @param $data
+     * @return null|bool|string
+     */
+    protected function filter_json_encode($data) {
+        if (is_string($data)) {
+            $encode = substr(json_encode($data), 1, -1);
+            if (strpos($encode, "\\") !== false) {
+                $encode = addslashes($encode);
+            }
+        } else {
+            $encode = $data;
+        }
+        return $encode;
+    }
 }
