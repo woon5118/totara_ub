@@ -748,6 +748,10 @@ class dp_course_component extends dp_base_component {
         $outdata->icon = html_writer::empty_tag('img', array('src' => totara_get_icon($item->courseid, TOTARA_ICON_TYPE_COURSE),
             'class' => 'course_icon', 'alt' => ''));
 
+        $outdata->backlink  = '&laquo; ' . html_writer::link(
+            new moodle_url('/totara/plan/component.php', array('id' => $this->plan->id, 'c' => 'course')),
+            get_string('backtoallcourses', 'totara_plan'));
+
         $outdata->extras = array();
         if ($priorityenabled && !empty($item->priority)) {
             $outdata->extras[] = get_string('priority', 'totara_plan') . ': ' . $this->display_priority_as_text($item->priority, $item->priorityname, $priorityvalues);

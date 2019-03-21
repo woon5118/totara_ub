@@ -846,6 +846,10 @@ class dp_competency_component extends dp_base_component {
         $outdata->icon = $OUTPUT->pix_icon("/msgicons/" . $icon, '', 'totara_core', array('class' => "competency_state_icon"));
         $outdata->extras = array();
 
+        $outdata->backlink  = '&laquo; ' . html_writer::link(
+            new moodle_url('/totara/plan/component.php', array('id' => $this->plan->id, 'c' => 'competency')),
+            get_string('backtoallcompetencies', 'totara_plan'));
+
         if ($priorityenabled && !empty($item->priority)) {
             $outdata->extras[] = get_string('priority', 'totara_plan') . ': ' . $this->display_priority_as_text($item->priority, $item->priorityname, $priorityvalues);
         }

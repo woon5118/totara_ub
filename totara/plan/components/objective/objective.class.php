@@ -1274,6 +1274,10 @@ class dp_objective_component extends dp_base_component {
         $icon = $this->determine_item_icon($item);
         $outdata->icon = $OUTPUT->pix_icon("/msgicons/" . $icon, '', 'totara_core', array('class' => 'objective_state_icon'));
 
+        $outdata->backlink  = '&laquo; ' . html_writer::link(
+            new moodle_url('/totara/plan/component.php', array('id' => $this->plan->id, 'c' => 'objective')),
+            get_string('backtoallobjectives', 'totara_plan'));
+
         $plancompleted = $this->plan->status == DP_PLAN_STATUS_COMPLETE;
 
         if (!$plancompleted && $canupdate) {

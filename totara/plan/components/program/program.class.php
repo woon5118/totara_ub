@@ -823,7 +823,11 @@ class dp_program_component extends dp_base_component {
         }
 
         $out = '';
-        $itemicon = (!empty($item->icon)) ? $item->icon : 'default';
+
+        $out .= '&laquo; ' . html_writer::link(
+            new moodle_url('/totara/plan/component.php', array('id' => $this->plan->id, 'c' => 'program')),
+            get_string('backtoallprograms', 'totara_plan'));
+
         $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($item->id, TOTARA_ICON_TYPE_PROGRAM),
             'class' => 'course_icon', 'alt' => ''));
         $out .= $OUTPUT->heading($icon . format_string($item->fullname), 3);
