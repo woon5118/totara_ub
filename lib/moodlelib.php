@@ -6075,8 +6075,10 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     }
 
     if (defined('BEHAT_SITE_RUNNING')) {
-        // Fake email sending in behat.
-        return true;
+        require_once($CFG->libdir.'/behat/classes/util.php');
+        return \behat_util::record_email(
+            $from->email, $user->email, $subject, $messagetext
+        );
     }
 
     if (!empty($CFG->noemailever)) {

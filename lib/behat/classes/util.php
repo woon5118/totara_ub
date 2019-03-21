@@ -449,5 +449,180 @@ class behat_util extends testing_util {
         theme_reset_all_caches();
 
         \totara_catalog\cache_handler::reset_all_caches();
+
+        self::close_email_sink();
+    }
+
+    /**
+     * Indicates whether email recording is enabled.
+     *
+     * @return bool true if it is enabled.
+     */
+    public static function email_sink_enabled(): bool {
+        return file_exists(self::email_sink_file());
+    }
+
+    /**
+     * Sets up an email sink for the current behat process. This clears existing
+     * email data.
+     *
+     * @return bool true if the operation was successful.
+     */
+    public static function reset_email_sink(): bool {
+        self::enable_mail_processor(true);
+
+        return self::with_email_sink(
+            function ($unused): bool {
+                // Nothing to do; just opening the sink clears it and makes it
+                // available.
+                return true;
+            },
+            'wb'
+        );
+    }
+
+    /**
+     * Removes the email sink for the current behat process.
+     *
+     * @return bool true if the operation was successful.
+     */
+    public static function close_email_sink(): bool {
+        self::enable_mail_processor(false);
+
+        $sink = self::email_sink_file();
+        return file_exists($sink) ? unlink($sink) : true;
+    }
+
+    /**
+     * Enable/disables the email processor.
+     *
+     * @param bool $enabled whether to enable the mail processor or not.
+     */
+    private static function enable_mail_processor(
+        bool $enabled
+    ): void {
+        global $DB;
+
+        $DB->set_field(
+            'message_processors',
+            'enabled',
+            $enabled ? 1 : 0,
+            ['name' => 'email']
+        );
+    }
+
+    /**
+     * Records the given email data provided the sink has been setup previously
+     * via reset_email_sink().
+     *
+     * @param string $from from email address.
+     * @param string $to to email address.
+     * @param string $subject email subject.
+     * @param string $body email body.
+     *
+     * @return bool true if the operation was successful.
+     */
+    public static function record_email(
+        string $from,
+        string $to,
+        string $subject,
+        string $messagetext
+    ): bool {
+        if (!self::email_sink_enabled()) {
+            return true;
+        }
+
+        $serialized = json_encode([
+            'from' => $from,
+            'to' => $to,
+            'subject' => $subject,
+            'body' => $messagetext
+        ]);
+
+        return self::with_email_sink(
+            function ($file) use ($serialized): bool {
+                return fwrite($file, "$serialized\n");
+            },
+            'ab'
+        );
+    }
+
+    /**
+     * Returns the emails captured up to now. If the email sink was not enabled,
+     * this returns an empty array.
+     *
+     * @return array a list of (from, to, subject, body) tuples.
+     */
+    public static function get_emails(): array {
+        if (!self::email_sink_enabled()) {
+            return [];
+        }
+
+        return self::with_email_sink(
+            function ($file): array {
+                $emails = [];
+
+                $line = trim(fgets($file));
+                while ($line) {
+                    $email = json_decode($line);
+                    $emails[] = [
+                        $email->from, $email->to, $email->subject, $email->body
+                    ];
+
+                    $line = trim(fgets($file));
+                }
+
+                return $emails;
+            },
+            'rb'
+        );
+    }
+
+    /**
+     * Returns the name of file containing intercepted emails for this behat
+     * run.
+     *
+     * @return string the file name.
+     */
+    private static function email_sink_file(): string {
+        global $CFG;
+
+        $proc_id = behat_get_run_process();
+        return sprintf(
+            "%s/behat_emails%s.log",
+            $CFG->behat_dataroot,
+            $proc_id ? "_$proc_id" : ''
+        );
+    }
+
+    /**
+     * Opens the email sink file and executes the given function on the file.
+     *
+     * @param callable $fn ($file)=>boolean function to receive an opened file
+     *        handle and do something with it.
+     * @param string $mode file open mode.
+     *
+     * @return mixed the processing result.
+     */
+    private static function with_email_sink(
+        callable $fn,
+        string $mode
+    ) {
+        $sink = self::email_sink_file();
+
+        $file = fopen($sink, $mode);
+        if (!$file) {
+            if (CLI_SCRIPT) {
+                mtrace("Could not open '$sink' for behat email test");
+            }
+
+            return false;
+        }
+
+        $result = $fn($file);
+        fflush($file);
+        fclose($file);
+
+        return $result;
     }
 }

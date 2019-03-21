@@ -532,6 +532,8 @@ class behat_hooks extends behat_base {
                 behat_hooks::error_log('Browser could not be stopped after problematic scenario: [' . get_class($ex) . '] - ' . $ex->getMessage());
             }
         }
+
+        behat_util::close_email_sink();
     }
 
     /**
