@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use mod_facetoface\{seminar_event, seminar, seminar_session, signup, signup_helper, signup_status};
-use mod_facetoface\signup\state\{booked, fully_attended, partially_attended, unable_to_attend};
+use mod_facetoface\signup\state\{booked, fully_attended, partially_attended, unable_to_attend, no_show};
 
 class mod_facetoface_event_taking_attendance_testcase extends advanced_testcase {
     /**
@@ -130,39 +130,47 @@ class mod_facetoface_event_taking_attendance_testcase extends advanced_testcase 
     }
 
     /**
-     * Data provider - [ grading_method, expected_grade ]
+     * Data provider - [ grading_method, states, expected_state, grades, expected_grade ]
      *
      * @return array
      */
     public function data_provider_grading_method() {
         /** @var float[] */
         $grades = [ 4., 2., 8., 5., 7. ];
+        /** @var string[] */
+        $states = [ partially_attended::class, fully_attended::class, no_show::class, partially_attended::class, unable_to_attend::class ];
         $data = [];
-        $data[] = [ seminar::GRADING_METHOD_GRADEHIGHEST, $grades, $grades[2] ];
-        $data[] = [ seminar::GRADING_METHOD_GRADELOWEST, $grades, $grades[1] ];
-        $data[] = [ seminar::GRADING_METHOD_EVENTFIRST, $grades, $grades[0] ];
-        $data[] = [ seminar::GRADING_METHOD_EVENTLAST, $grades, $grades[4] ];
+        $data[] = [ seminar::GRADING_METHOD_GRADEHIGHEST, $states, $states[1], $grades, $grades[2] ];
+        $data[] = [ seminar::GRADING_METHOD_GRADELOWEST, $states, $states[2], $grades, $grades[1] ];
+        $data[] = [ seminar::GRADING_METHOD_EVENTFIRST, $states, $states[0], $grades, $grades[0] ];
+        $data[] = [ seminar::GRADING_METHOD_EVENTLAST, $states, $states[4], $grades, $grades[4] ];
         // fully null
-        $data[] = [ seminar::GRADING_METHOD_GRADEHIGHEST, [ null, null, null ], null ];
-        $data[] = [ seminar::GRADING_METHOD_GRADELOWEST, [ null, null, null ], null ];
-        $data[] = [ seminar::GRADING_METHOD_EVENTFIRST, [ null, null, null ], null ];
-        $data[] = [ seminar::GRADING_METHOD_EVENTLAST, [ null, null, null ], null ];
+        $data[] = [ seminar::GRADING_METHOD_GRADEHIGHEST, null, null, [ null, null, null ], null ];
+        $data[] = [ seminar::GRADING_METHOD_GRADELOWEST, null, null, [ null, null, null ], null ];
+        $data[] = [ seminar::GRADING_METHOD_EVENTFIRST, null, null, [ null, null, null ], null ];
+        $data[] = [ seminar::GRADING_METHOD_EVENTLAST, null, null, [ null, null, null ], null ];
         // partially null
-        $data[] = [ seminar::GRADING_METHOD_GRADEHIGHEST, [ null, 50., 0., 100., null ], 100. ];
-        $data[] = [ seminar::GRADING_METHOD_GRADELOWEST, [ null, 50., 0., 100., null ], 0. ];
-        $data[] = [ seminar::GRADING_METHOD_EVENTFIRST, [ null, 50., 0., 100., null ], 50. ];
-        $data[] = [ seminar::GRADING_METHOD_EVENTLAST, [ null, 50., 0., 100., null ], 100. ];
+        $data[] = [ seminar::GRADING_METHOD_GRADEHIGHEST, null, null, [ null, 50., 0., 100., null ], 100. ];
+        $data[] = [ seminar::GRADING_METHOD_GRADELOWEST, null, null, [ null, 50., 0., 100., null ], 0. ];
+        $data[] = [ seminar::GRADING_METHOD_EVENTFIRST, null, null, [ null, 50., 0., 100., null ], 50. ];
+        $data[] = [ seminar::GRADING_METHOD_EVENTLAST, null, null, [ null, 50., 0., 100., null ], 100. ];
         return $data;
     }
 
     /**
      * @param int $grading_method
+     * @param string[]|null $states
+     * @param string|null $expected_state
      * @param (float|null)[] $grades
      * @param float|null $expected_grade
      * @dataProvider data_provider_grading_method
      */
-    public function test_process_attendance_with_grading_method($grading_method, $grades, $expected_grade) {
+    public function test_process_attendance_with_grading_method($grading_method, $states, $expected_state, $grades, $expected_grade) {
         $this->resetAfterTest();
+
+        if ($states !== null) {
+            $this->assertCount(count($states), $grades);
+        }
 
         $gen = $this->getDataGenerator();
         $course = $gen->create_course();
@@ -174,8 +182,12 @@ class mod_facetoface_event_taking_attendance_testcase extends advanced_testcase 
         $seminar
             ->set_sessionattendance(0)
             ->set_multisignupfully(true)
+            ->set_multisignuppartly(true)
+            ->set_multisignupnoshow(true)
+            ->set_multisignupunableto(true)
             ->set_multiplesessions(1)
             ->set_multisignupmaximum(count($grades))
+            ->set_eventgradingmethod($grading_method)
             ->save();
 
         $user = $gen->create_user(['firstname' => 'John', 'lastname' => 'Doe']);
@@ -209,11 +221,6 @@ class mod_facetoface_event_taking_attendance_testcase extends advanced_testcase 
                 ->set_timefinish($time - YEARSECS + HOURSECS)
                 ->save();
 
-            // turn off manual grading
-            $seminar
-                ->set_eventgradingmanual(0)
-                ->save();
-
             // TEST 1. When manual grading is off, use default grade based on attendance status
             $result = signup_helper::process_attendance($event, [ $signup->get_id() => partially_attended::get_code() ]);
             $this->assertTrue($result);
@@ -226,50 +233,65 @@ class mod_facetoface_event_taking_attendance_testcase extends advanced_testcase 
             $status = signup_status::find_current($signup->get_id());
             $this->assertSame((float)unable_to_attend::get_grade(), $status->get_grade());
 
-            // turn on manual grading
-            $seminar
-                ->set_eventgradingmanual(1)
-                ->set_eventgradingmethod($grading_method)
-                ->save();
+            if ($states !== null) {
+                // TEST 3. Set final state
+                $result = signup_helper::process_attendance($event, [ $signup->get_id() => $states[$i]::get_code() ]);
+                $this->assertTrue($result);
+                $status = signup_status::find_current($signup->get_id());
+                $this->assertSame((float)$states[$i]::get_grade(), $status->get_grade());
+            }
 
-            // TEST 3a. When manual grading is on, signup_helper::process_attendance() takes the argument $grades
+            unset($event, $session, $signup, $result, $status);
+        }
+
+        if ($states !== null) {
+            // TEST 4. Make sure that the final grade is calculated based on the given grading method
+            $grade_grades = grade_get_grades($course->id, 'mod', 'facetoface', $seminar->get_id(), $user->id);
+            $this->assertCount(1, $grade_grades->items);
+            $this->assertArrayHasKey($user->id, $grade_grades->items[0]->grades);
+            $user_grade = $grade_grades->items[0]->grades[$user->id];
+            $this->assertSame((float)$expected_state::get_grade(), self::fixup_grade($user_grade->grade));
+        }
+
+        // turn on manual grading
+        $seminar->set_eventgradingmanual(1)->save();
+
+        for ($i = 0; $i < count($signups); $i++) {
+            $event = $events[$i];
+            $signup = $signups[$i];
+
+            // TEST 5a. When manual grading is on, signup_helper::process_attendance() takes the argument $grades
             // make sure that the event grade becomes null if $grades is not passed
             $result = signup_helper::process_attendance($event, [ $signup->get_id() => partially_attended::get_code() ]);
             $this->assertTrue($result);
             $status = signup_status::find_current($signup->get_id());
             $this->assertSame(null, $status->get_grade());
 
-            // TEST 3b. When manual grading is on, signup_helper::process_attendance() takes the argument $grades
+            // TEST 5b. When manual grading is on, signup_helper::process_attendance() takes the argument $grades
             // make sure that the event grade becomes null if null is passed as grade
             $result = signup_helper::process_attendance($event, [ $signup->get_id() => partially_attended::get_code() ], [ $signup->get_id() => null ]);
             $this->assertTrue($result);
             $status = signup_status::find_current($signup->get_id());
             $this->assertSame(null, $status->get_grade());
 
-            // TEST 4. When manual grading is on, signup_helper::process_attendance() takes the argument $grades
+            // TEST 6. When manual grading is on, signup_helper::process_attendance() takes the argument $grades
             // make sure that the event grade becomes the given grade
             $result = signup_helper::process_attendance($event, [ $signup->get_id() => fully_attended::get_code() ], [ $signup->get_id() => $grades[$i] ]);
             $this->assertTrue($result);
             $status = signup_status::find_current($signup->get_id());
             $this->assertSame($grades[$i], $status->get_grade());
 
-            unset($event, $session, $signup, $result, $status);
+            unset($event, $signup, $result, $status);
         }
 
-        // TEST 5. Make sure that the final grade is calculated based on the given grading method
+        // TEST 7. Make sure that the final grade is calculated based on the given grading method
         $grade_grades = grade_get_grades($course->id, 'mod', 'facetoface', $seminar->get_id(), $user->id);
         $this->assertCount(1, $grade_grades->items);
         $this->assertArrayHasKey($user->id, $grade_grades->items[0]->grades);
         $user_grade = $grade_grades->items[0]->grades[$user->id];
         $this->assertSame($expected_grade, self::fixup_grade($user_grade->grade));
 
-        // turn on manual grading for sure
-        $seminar
-            ->set_eventgradingmanual(1)
-            ->set_eventgradingmethod($grading_method)
-            ->save();
-
-        // TEST 6. Set event grade to 0 and make sure 0 is the new event grade
+        // TEST 8. Set event grade to 0 and make sure 0 is the new event grade
         for ($i = 0; $i < count($signups); $i++) {
             $result = signup_helper::process_attendance($events[$i], [ $signups[$i]->get_id() => fully_attended::get_code() ], [ $signups[$i]->get_id() => 0 ]);
             $this->assertTrue($result);
@@ -279,14 +301,14 @@ class mod_facetoface_event_taking_attendance_testcase extends advanced_testcase 
             unset($result, $status);
         }
 
-        // TEST 7. Make sure that the final grade becomes 0
+        // TEST 9. Make sure that the final grade becomes 0
         $grade_grades = grade_get_grades($course->id, 'mod', 'facetoface', $seminar->get_id(), $user->id);
         $this->assertCount(1, $grade_grades->items);
         $this->assertArrayHasKey($user->id, $grade_grades->items[0]->grades);
         $user_grade = $grade_grades->items[0]->grades[$user->id];
         $this->assertSame(0., self::fixup_grade($user_grade->grade));
 
-        // TEST 8. Nullify event grade and make sure null is the new event grade
+        // TEST 10. Nullify event grade and make sure null is the new event grade
         for ($i = 0; $i < count($signups); $i++) {
             $result = signup_helper::process_attendance($events[$i], [ $signups[$i]->get_id() => fully_attended::get_code() ]);
             $this->assertTrue($result);
@@ -296,7 +318,7 @@ class mod_facetoface_event_taking_attendance_testcase extends advanced_testcase 
             unset($result, $status);
         }
 
-        // TEST 9. Make sure that the final grade becomes null
+        // TEST 11. Make sure that the final grade becomes null
         $grade_grades = grade_get_grades($course->id, 'mod', 'facetoface', $seminar->get_id(), $user->id);
         $this->assertCount(1, $grade_grades->items);
         $this->assertArrayHasKey($user->id, $grade_grades->items[0]->grades);

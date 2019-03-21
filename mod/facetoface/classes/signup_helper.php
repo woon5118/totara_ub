@@ -262,7 +262,7 @@ final class signup_helper {
             }
         }
 
-        return self::grade_signup($seminarevent, $signup, $grade);
+        return self::grade_signup($seminarevent, $signup);
     }
 
     /**
@@ -274,10 +274,6 @@ final class signup_helper {
      */
     private static function compute_final_grade(seminar $seminar, signup $signup) : ?float {
         global $DB;
-
-        if (!$seminar->get_eventgradingmanual()) {
-            throw \coding_exception("compute_final_grade() cannot be called when seminar::eventgradingmanual is off");
-        }
 
         switch ($seminar->get_eventgradingmethod()) {
             case seminar::GRADING_METHOD_GRADEHIGHEST:
@@ -342,10 +338,9 @@ final class signup_helper {
      *
      * @param seminar_event $seminarevent
      * @param signup        $signup
-     * @param float|null    $defaultgrade   the default grade value used only if manual grading is off
      * @return bool
      */
-    private static function grade_signup(seminar_event $seminarevent, signup $signup, float $defaultgrade = null) : bool {
+    private static function grade_signup(seminar_event $seminarevent, signup $signup) : bool {
         global $CFG, $USER;
 
         // Necessary for facetoface_grade_item_update()
@@ -353,11 +348,7 @@ final class signup_helper {
 
         $seminar = $seminarevent->get_seminar();
 
-        if ($seminar->get_eventgradingmanual()) {
-            $finalgrade = self::compute_final_grade($seminar, $signup);
-        } else {
-            $finalgrade = $defaultgrade;
-        }
+        $finalgrade = self::compute_final_grade($seminar, $signup);
 
         $timenow = time();
 
