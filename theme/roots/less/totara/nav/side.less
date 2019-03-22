@@ -45,6 +45,11 @@
         margin: auto @totaranav-spacing_x_small;
         position: initial;
 
+        .ie11 & {
+            //TL-20522: IE11 doesn't support the initial value, so we have to explicitly set it to the (usual) default
+            position: static;
+        }
+
         .flex-icon {
             vertical-align: inherit;
         }

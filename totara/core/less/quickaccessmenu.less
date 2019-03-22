@@ -164,6 +164,12 @@
         > .input-group {
           float: right;
           width: 25ch;
+
+          .ie11 & {
+            // TL-20522: IE11 calculates ch units differently to other browsers (it doesn't account for the space between letters)
+            // so we have to use a higher number for the same effect
+            width: 1.33 * 25ch;
+          }
         }
       }
 
@@ -252,6 +258,12 @@
       overflow: hidden;
       text-overflow: ellipsis;
       line-height: normal;
+
+      .ie11 & {
+        // TL-20522: IE11 calculates ch units differently to other browsers (it doesn't account for the space between letters)
+        // so we have to use a higher number for the same effect
+        max-width: 1.33 * @totara_core__QuickAccessMenu_section_title-max-width;
+      }
     }
 
     &-list {
@@ -262,6 +274,12 @@
 
         @media (min-width: @quickaccess_desktop_breakpoint) {
           width: 20ch;
+
+          .ie11 & {
+            // TL-20522: IE11 calculates ch units differently to other browsers (it doesn't account for the space between letters)
+            // so we have to use a higher number for the same effect
+            width: 1.33 * 20ch;
+          }
         }
 
         @media (max-width: @quickaccess_mobile_breakpoint) {

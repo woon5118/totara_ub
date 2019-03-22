@@ -39,7 +39,7 @@ define(['core/str'], function(str) {
         // Find the input to swap with, or create one if none exists
         var input = this.element.querySelector('[data-inline-edit-input]');
         if (!input) {
-            var classes = this.target.getAttribute('class');
+            var classes = this.target.getAttribute('class') || '';
             this.target.insertAdjacentHTML('afterend', '<input class="' + classes + '" data-inline-edit-input type="text">');
             input = this.element.querySelector('[data-inline-edit-input]'); // Fetch the new element
         }
@@ -92,6 +92,7 @@ define(['core/str'], function(str) {
                 case "Enter":
                     self.save();
                     break;
+                case "Esc": // TL-20522: IE11 puts interprets escape at "Esc"
                 case "Escape":
                     self.cancel();
                     break;
@@ -136,8 +137,9 @@ define(['core/str'], function(str) {
         this.input.value = this.target.textContent.trim();
 
         this.target.style.display = 'none';
-        this.input.style.display = null;
-        this.tooltip.style.display = null;
+        // TL-20522: IE11 needs an empty string to clear style attributes instead of null
+        this.input.style.display = '';
+        this.tooltip.style.display = '';
 
         // Send focus to the input element
         this.input.focus();
@@ -175,11 +177,12 @@ define(['core/str'], function(str) {
 
         this.target.textContent = text;
 
-        this.target.style.display = null;
+        // TL-20522: IE11 needs an empty string to clear style attributes instead of null
+        this.target.style.display = '';
         this.input.style.display = 'none';
         this.tooltip.style.display = 'none';
 
-        this.controller.style.display = null;
+        this.controller.style.display = '';
         this.editing = false;
 
         this.element.dispatchEvent(new CustomEvent('totara_core/inline-edit:save', {
@@ -203,11 +206,11 @@ define(['core/str'], function(str) {
 
         this.input.value = '';
 
-        this.target.style.display = null;
+        this.target.style.display = '';
         this.input.style.display = 'none';
         this.tooltip.style.display = 'none';
 
-        this.controller.style.display = null;
+        this.controller.style.display = '';
         this.editing = false;
     };
 

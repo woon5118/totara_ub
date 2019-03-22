@@ -12,6 +12,12 @@
 .totara_core__QuickAccessSettings {
   max-width: 100ch;
 
+  .ie11 & {
+    // TL-20522: IE11 calculates ch units differently to other browsers (it doesn't account for the space between letters)
+    // so we're going to magic-number a conversion from chrome
+    max-width: 88rem;
+  }
+
   .totara_core__Accordion__item {
     border: 1px solid @totara_core__QuickAccessSettings__accordion-border-color;
   }
@@ -126,7 +132,7 @@
     }
 
     &--controls {
-      flex: 0 1 4ch;
+      flex: 0 1 auto;
       text-align: right;
       margin-left: @totara_core__QuickAccessSettings__spacing;
       white-space: nowrap;

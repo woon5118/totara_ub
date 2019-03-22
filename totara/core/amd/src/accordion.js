@@ -109,7 +109,13 @@ define(['core/templates'], function(templates) {
             this.closeAllItems();
         }
 
-        elem.classList.toggle('collapsed', !newState);
+        // TL-20522: IE11 ignores the second parameter of classList.toggle, so we have to do this explicitly
+        if (newState) {
+            elem.classList.remove('collapsed');
+        } else {
+            elem.classList.add('collapsed');
+        }
+
         elem.querySelector('.totara_core__Accordion__item__header').setAttribute('aria-expanded', newState);
 
         var icon = newState ? 'totara_core|accordion-expanded' : 'totara_core|accordion-collapsed';
@@ -142,7 +148,7 @@ define(['core/templates'], function(templates) {
         for (var i = 0; i < children.length; i++) {
             var child = children.item(i);
 
-            child.classList.toggle('collapsed', true);
+            child.classList.add('collapsed');
             child.querySelector('.totara_core__Accordion__item__header').setAttribute('aria-expanded', false);
         }
 
