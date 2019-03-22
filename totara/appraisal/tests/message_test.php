@@ -740,4 +740,49 @@ class appraisal_message_test extends appraisal_testcase {
 
         $sink->close();
     }
+
+    public function test_appraisal_close() {
+        $this->resetAfterTest();
+        $sink = $this->redirectEmails();
+        $this->setAdminUser();
+        /** @var appraisal $appraisal */
+        list($appraisal, $users) = $this->prepare_appraisal_with_users();
+        $this->assertCount(2, $users);
+        $appraisal->validate();
+        $appraisal->activate();
+
+        $formdata = new stdClass();
+        $formdata->sendalert = true;
+        $formdata->id = $appraisal->id;
+        $formdata->alerttitle = 'Test alert title';
+        $formdata->alertbody_editor['text'] = 'Test alert body text';
+
+        $appraisal->close($formdata);
+        appraisal::send_scheduled();
+
+        $emails = $sink->get_messages();
+        $this->assertCount(2, $emails);
+        $this->assertSame('Test alert title', $emails[0]->subject);
+        $this->assertSame('Test alert title', $emails[1]->subject);
+
+        // Check that both emails have the same content.
+        // Remove multipart boundary because that's the only expected difference between the two messages.
+        preg_match('|\R--(.{0,69})\R|', $emails[0]->body, $matches);
+        $boundary = $matches[1];
+        $body_0 = str_replace($boundary, '', $emails[0]->body);
+
+        preg_match('|\R--(.{0,69})\R|', $emails[1]->body, $matches);
+        $boundary = $matches[1];
+        $body_1 = str_replace($boundary, '', $emails[1]->body);
+
+        $this->assertContains('Test alert body text', $body_0);
+
+        // A bug (TL-20258) used to append a contexturl string for each appraisal closure message.
+        // Make sure the bug is not re-introduced by checking both bodies are the same and don't contain this text.
+        $this->assertSame($body_0, $body_1);
+        $this->assertNotContains('More details can be found at', $body_1);
+
+        $sink->clear();
+        $sink->close();
+    }
 }
