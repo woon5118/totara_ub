@@ -775,13 +775,16 @@ abstract class moodle_database {
      * TOTARA - For retrieving the maximum number of items that should be used in an SQL IN clause.
      * This value can be used for chunking queries into batches, and should be used in combination
      * with get_in_or_equal.
-     * NOTE: This value is only meant as a guide. The limit should work for integer parameters, but
-     *       using strings or multiple IN clauses in a single query could cause other problems such
-     *       as query maximum string lengths, depending on database, platform, configuration etc.
+     *
+     * NOTE: The default value is only meant as a guide. The limit should work for integer parameters,
+     *       but using strings or multiple IN clauses in a single query could cause other problems
+     *       such as query maximum string lengths, depending on database, platform, configuration etc.
+     *       The default value can be overridden in config.php by setting $CFG->dboptions['maxinparams'].
+     *
      * @return int The maximum number of items that should be used in an SQL IN statement.
      */
     public function get_max_in_params() {
-        return 30000;
+        return !empty($this->dboptions['maxinparams']) ? $this->dboptions['maxinparams'] : 30000;
     }
 
     /**
@@ -813,6 +816,10 @@ abstract class moodle_database {
 
         // Totara: counting arrays is expensive, do it only once.
         $itemscount = is_array($items) ? count($items) : 1;
+
+        if ($itemscount > $this->get_max_in_params()) {
+            debugging("The number of parameters passed ({$itemscount}) exceeds maximum number allowed ({$this->get_max_in_params()})", DEBUG_DEVELOPER);
+        }
 
         if ($itemscount > 10) {
             // Totara: large number of parameters may cause performance problems or fatal errors.

@@ -1936,4 +1936,38 @@ ORDER BY tt1.groupid";
         }
         self::assertSame($expected, $DB->recommends_counted_recordset());
     }
+
+    public function test_get_max_in_params() {
+        global $CFG;
+
+        $DB = $this->tdb;
+
+        // Basic check for default value.
+        if (empty($CFG->dboptions['maxinparams'])) {
+            self::assertEquals(30000, $DB->get_max_in_params());
+        } else {
+            self::assertEquals($CFG->dboptions['maxinparams'], $DB->get_max_in_params());
+        }
+
+        // Override 'maxinparams' in dboptions for this test.
+        $property = (new ReflectionClass($DB))->getProperty('dboptions');
+        $property->setAccessible(true);
+        $dboptions = $property->getValue($DB);
+        $dboptions['maxinparams'] = 100;
+        $property->setValue($DB, $dboptions);
+        $property->setAccessible(false);
+
+        // Check we have a new value now.
+        self::assertEquals(100, $DB->get_max_in_params());
+
+        // Check get_in_or_equal() warns about exceeding maximum number allowed.
+        $params = range(1, 1000);
+        $DB->get_in_or_equal($params);
+        self::assertDebuggingCalled("The number of parameters passed (1000) exceeds maximum number allowed (100)", DEBUG_DEVELOPER);
+
+        // Check get_in_or_equal() passes with the maximum number allowed.
+        $params = range(1, 100);
+        $DB->get_in_or_equal($params);
+        self::assertDebuggingNotCalled();
+    }
 }
