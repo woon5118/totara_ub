@@ -682,7 +682,7 @@ function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = tru
             case 'multiselect':
                 $datavalue = json_decode($field->data, true);
                 $values = array();
-                $dataparams = $DB->get_records("{$tableprefix}_info_data_param", array('dataid' => $field->dataid));
+                $dataparams = $DB->get_records("{$tableprefix}_info_data_param", array('dataid' => $field->dataid), 'id ASC');
                 foreach ($dataparams as $dataparam) {
                     if (isset($datavalue[$dataparam->value])) {
                         $option = $datavalue[$dataparam->value];

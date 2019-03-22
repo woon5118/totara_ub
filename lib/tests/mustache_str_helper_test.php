@@ -24,6 +24,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+use totara_core\path_whitelist; // Totara: path_whitelist
 
 class mustache_string_helper_testcase extends advanced_testcase {
 
@@ -356,17 +357,17 @@ class mustache_string_helper_testcase extends advanced_testcase {
         // There should be none, but if there are valid cases that are found to be false positive then we
         // can list them here and know that they have been manually validated as safe.
         // If you are adding to this list you need approval from the security experts.
-        $whitelist = [
+        $whitelist = new path_whitelist([
             $CFG->dirroot . '/lib/templates/test.mustache', // A mustache test file. Must not contain anything exploitable.
             $CFG->dirroot . '/totara/core/templates/progressbar.mustache', // Deprecated since Totara 12.
-        ];
+        ]); // Totara: path_whitelist
 
         $recursivehelpers = [];
         foreach ($iterator as $file) {
             /** @var SplFileInfo $file */
             if ($file->isFile() && $file->getExtension() === 'mustache') {
                 $path = $file->getPathname();
-                $whitelistkey = array_search($path, $whitelist);
+                $whitelistkey = $whitelist->search($path); // Totara: path_whitelist
                 if (!is_readable($path)) {
                     $this->fail('Mustache template is not readable by unit test suite "'.$path.'"');
                 }
@@ -376,7 +377,7 @@ class mustache_string_helper_testcase extends advanced_testcase {
                 if ($result) {
                     if ($whitelistkey !== false) {
                         // It's OK, its on the whitelist.
-                        unset($whitelist[$whitelistkey]);
+                        $whitelist->remove($whitelistkey); // Totara: path_whitelist
                         continue;
                     }
                     $recursivehelpers[] = str_replace($CFG->dirroot, '', $path).' :: '.$result;
@@ -385,7 +386,7 @@ class mustache_string_helper_testcase extends advanced_testcase {
                 if ($result) {
                     if ($whitelistkey !== false) {
                         // It's OK, its on the whitelist.
-                        unset($whitelist[$whitelistkey]);
+                        $whitelist->remove($whitelistkey); // Totara: path_whitelist
                         continue;
                     }
                     $variablesinhelpers[] = str_replace($CFG->dirroot, '', $path).' :: '.$result;
@@ -399,8 +400,8 @@ class mustache_string_helper_testcase extends advanced_testcase {
         if (!empty($variablesinhelpers)) {
             $this->fail('Templates containing variables in string helpers.'."\n * ".join("\n * ", $variablesinhelpers));
         }
-        if (!empty($whitelist)) {
-            $this->fail('Items on the whitelist were not found to contain vulnerabilities.'."\n".join("\n", $whitelist));
+        if (!$whitelist->is_empty()) { // Totara: path_whitelist
+            $this->fail('Items on the whitelist were not found to contain vulnerabilities.'."\n".$whitelist->join("\n"));
         }
     }
 

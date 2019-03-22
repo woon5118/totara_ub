@@ -487,7 +487,8 @@ class backup_course_structure_step extends backup_structure_step {
                                         FROM {course_info_field} f
                                         JOIN {course_info_data} d ON d.fieldid = f.id
                                    LEFT JOIN {course_info_data_param} dp ON dp.dataid = d.id
-                                       WHERE d.courseid = ?', array(backup::VAR_PARENTID));
+                                       WHERE d.courseid = ?
+                                    ORDER BY dp.id ASC', array(backup::VAR_PARENTID));
 
         $customrolename->set_source_sql('SELECT r.shortname AS role_name, rn.name AS custom_name
                                         FROM {role_names} rn

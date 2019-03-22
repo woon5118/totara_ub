@@ -63,7 +63,7 @@ class core_phpunit_basic_testcase extends basic_testcase {
         $this->assertEquals('https://www.example.com/moodle', $CFG->wwwroot);
         // Totara: test instance separation
         $this->assertSame($CFG->prefix, $CFG->phpunit_prefix . PHPUNIT_INSTANCE);
-        $this->assertSame($CFG->dataroot, $CFG->phpunit_dataroot . '/' . PHPUNIT_INSTANCE);
+        $this->assertSame($CFG->dataroot, $CFG->phpunit_dataroot . DIRECTORY_SEPARATOR . PHPUNIT_INSTANCE);
     }
 
     /**
