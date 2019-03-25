@@ -9,47 +9,27 @@ Feature: Take attendance tracking general
       | kianbomba | kian      | bomba    | k@example.com | bomba    |
       | bolobala  | bolo      | bala     | b@example.com | bolo     |
       | kian      | loc       | nguyen   | l@example.com | loc      |
+    And the following "course enrolments" exist:
+      | user      | course  | role    |
+      | kianbomba | course1 | student |
+      | bolobala  | course1 | student |
+      | kian      | course1 | student |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name      | course  | sessionattendance |
+      | seminar 1 | course1 | 1                 |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface | details |
+      | seminar 1  | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                   | finish                  |
+      | event 1      | now -2 days -30 minutes | now -2 days +30 minutes |
+      | event 1      | now +2 days             | now +2 days +60 minutes |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user      | eventdetails |
+      | kianbomba | event 1      |
+      | bolobala  | event 1      |
+      | kian      | event 1      |
     And I log in as "admin"
-    And I am on "course1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                        | seminar 1 |
-      | Session attendance tracking | 1         |
-    And I turn editing mode off
-    And I follow "seminar 1"
-    And I follow "Add event"
-    And I click on "Add a new session" "button"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | timestart[day]     | -2  |
-      | timestart[hour]    | -30 |
-      | timefinish[minute] | +30 |
-      | timefinish[day]    | -2  |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-
-    # There is something wrong with the totara dialog box within behat tests here, as the button
-    # was not found for second dialog box when pop up. Therefore, we reload the page here
-    And I click on "Save changes" "button"
-    And I click on "Edit event" "link"
-
-    # Second date selector here, as clicking on the link in row {number} does not work well
-    And I click on "#show-selectdate1-dialog" "css_element"
-    And I fill seminar session with relative date in form data:
-      | timestart[day]     | +2               |
-      | timefinish[minute] | +60              |
-      | timefinish[day]    | +2               |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-
-    And I click on "Save changes" "button"
-    And I follow "Attendees"
-    And I set the field "Attendee actions" to "add"
-    And I set the field "potential users" to "bolo bala, b@example.com"
-    And I click on "Add" "button"
-    And I set the field "potential users" to "kian bomba, k@example.com"
-    And I click on "Add" "button"
-    And I set the field "potential users" to "loc nguyen, l@example.com"
-    And I click on "Add" "button"
-    And I click on "Continue" "button"
-    And I click on "Confirm" "button"
 
   # Expect to not able to take attendance here, because all the sessions are not finished yet,
   # and the mark attendance time is set to end time

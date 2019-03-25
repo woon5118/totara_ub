@@ -33,6 +33,8 @@ use mod_facetoface\signup_helper;
 use mod_facetoface\seminar_event;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once("{$CFG->dirroot}/mod/facetoface/tests/generator/mod_facetoface_generator_util.php");
 
 class mod_facetoface_generator extends testing_module_generator {
 
@@ -608,5 +610,73 @@ class mod_facetoface_generator extends testing_module_generator {
         );
         $id = $DB->insert_record('facetoface_signups_dates_status', (object)$sessionstatus);
         return $DB->get_record('facetoface_signups_dates_status', ['id' => $id]);
+    }
+
+    /**
+     * The identifier 'course' could either be a cousre shortname or course idnumber. As long as it is being found
+     * within the storage, then we are able to create an instance within the system.
+     *
+     * @param array $record
+     * @return int
+     */
+    public function create_instance_for_behat(array $record) {
+        global $DB;
+
+        if (!isset($record['course'])) {
+            throw new coding_exception("No property 'course' defined in \$record");
+        }
+
+        $course = $record['course'];
+        $copy = $record;
+
+        if (!is_numeric($course)) {
+            // Must be course shortname or idnumber, therefore it needs to find the courseid base on this shortname
+            $courseid = $DB->get_field('course', 'id', ['shortname' => $course]);
+
+            if (!$courseid) {
+                // If the course is not found by shortname, then idnumber is our next try.
+                $courseid = $DB->get_field('course', 'id', ['idnumber' => $course]);
+                if (!$courseid) {
+                    throw new coding_exception("The property 'course' must be a shortname of course");
+                }
+            }
+
+            $copy['course'] = $courseid;
+        }
+
+        $options = [];
+        if (isset($record['idnumber'])) {
+            $options['idnumber'] = $record['idnumber'];
+        }
+
+        $instance = $this->create_instance($copy, $options);
+        return $instance->id;
+    }
+
+    /**
+     * @param array $record
+     * @return int|bool
+     */
+    public function create_sessions_for_behat(array $record) {
+        return mod_facetoface_generator_util::create_session_for_behat($record);
+    }
+
+    /**
+     * For start/finish time, we use the format that php is supporting. Therefore, please provided it if
+     * @see https://www.php.net/manual/en/datetime.formats.relative.php
+     * @param array $record
+     * @return int
+     */
+    public function create_sessiondates_for_behat(array $record) {
+        return mod_facetoface_generator_util::create_sessiondates_for_behat($record);
+    }
+
+    /**
+     * @param array $record
+     *
+     * @return int
+     */
+    public function create_signups_for_behat(array $record) {
+        return mod_facetoface_generator_util::create_signups_for_behat($record);
     }
 }
