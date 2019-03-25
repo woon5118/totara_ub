@@ -453,6 +453,10 @@ final class signup implements seminar_iterator_item {
         // We need the completionlib for \completion_info and the COMPLETION_UNKNOWN constant.
         require_once($CFG->libdir . '/completionlib.php');
 
+        if ($state instanceof not_set) {
+            throw new signup_exception("New booking status cannot be 'not set'");
+        }
+
         $status = signup_status::create($this, $state, $timecreated, $grade, $reserved);
 
         if (empty($userbyid)) {

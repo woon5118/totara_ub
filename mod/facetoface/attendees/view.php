@@ -25,11 +25,6 @@
  */
 
 use \mod_facetoface\attendees_helper;
-use \mod_facetoface\signup\state\booked;
-use \mod_facetoface\signup\state\fully_attended;
-use \mod_facetoface\signup\state\not_set;
-use \mod_facetoface\signup\state\no_show;
-use \mod_facetoface\signup\state\partially_attended;
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');

@@ -23,6 +23,7 @@
 
 namespace mod_facetoface;
 use mod_facetoface\exception\signup_exception;
+use mod_facetoface\signup\state\not_set;
 use mod_facetoface\signup\state\state;
 
 defined('MOODLE_INTERNAL') || die();
@@ -96,7 +97,7 @@ final class signup_status implements seminar_iterator_item {
         if ($this->id || $this->superceded) {
             throw new signup_exception('Cannot update status that was already saved or superceded');
         }
-        if (empty($this->statuscode)) {
+        if (empty($this->statuscode) || $this->statuscode == not_set::get_code()) {
             throw new signup_exception('Cannot update status without state set');
         }
         if (empty($this->signupid)) {

@@ -23,7 +23,7 @@
 
 namespace mod_facetoface;
 
-use mod_facetoface\signup\state\{not_set, state, booked, waitlisted};
+use mod_facetoface\signup\state\{booked, waitlisted};
 use mod_facetoface\form\attendees_add_confirm;
 use mod_facetoface\event\attendees_updated;
 use \context_module;
