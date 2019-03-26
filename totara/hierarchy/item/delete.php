@@ -69,12 +69,7 @@ if (!$delete) {
     $PAGE->navbar->add(get_string('delete'.$prefix, 'totara_hierarchy'));
 
     echo $OUTPUT->header();
-
-    $strdelete = $hierarchy->get_delete_message($item->id);
-
-    echo $OUTPUT->confirm($strdelete, new moodle_url("/totara/hierarchy/item/delete.php", array('prefix' => $prefix, 'id' => $item->id, 'delete' => md5($item->timemodified), 'sesskey' => $USER->sesskey, 'page' => $page)),
-                                      new moodle_url("/totara/hierarchy/index.php", array('prefix' => $prefix, 'frameworkid' => $item->frameworkid)));
-
+    echo $hierarchy->delete_item_confirmation_modal($item, ['sesskey' => $USER->sesskey, 'page' => $page], $OUTPUT);
     echo $OUTPUT->footer();
     exit;
 }

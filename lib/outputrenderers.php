@@ -1485,9 +1485,10 @@ class core_renderer extends renderer_base {
     * @param string $message The question to ask the user
     * @param single_button|moodle_url|string $continue The single_button component representing the Continue answer. Can also be a moodle_url or string URL
     * @param single_button|moodle_url|string $cancel The single_button component representing the Cancel answer. Can also be a moodle_url or string URL
+    * @param string|null $title Override modal confirmation title // TOTARA only since v13
     * @return string HTML fragment
     */
-    public function confirm($message, $continue, $cancel) {
+    public function confirm($message, $continue, $cancel, $title = null) {
         if ($continue instanceof single_button) {
             // ok
             $continue->primary = true;
@@ -1512,7 +1513,7 @@ class core_renderer extends renderer_base {
         $output = $this->box_start('generalbox modal modal-dialog modal-in-page show', 'notice');
         $output .= $this->box_start('modal-content', 'modal-content');
         $output .= $this->box_start('modal-header', 'modal-header');
-        $output .= html_writer::tag('h4', get_string('confirm'));
+        $output .= html_writer::tag('h4', !empty($title) ? $title : get_string('confirm'));
         $output .= $this->box_end();
         $output .= $this->box_start('modal-body', 'modal-body');
         $output .= html_writer::tag('p', $message);
@@ -4541,9 +4542,10 @@ class core_renderer_maintenance extends core_renderer {
      * @param string $message The question to ask the user
      * @param single_button|moodle_url|string $continue The single_button component representing the Continue answer.
      * @param single_button|moodle_url|string $cancel The single_button component representing the Cancel answer.
+     * @param string $title Modal title // TOTARA only since v13
      * @return string HTML fragment
      */
-    public function confirm($message, $continue, $cancel) {
+    public function confirm($message, $continue, $cancel, $title = null) {
         // We need plain styling of confirm boxes on upgrade because we don't know which stylesheet we have (it could be
         // from any previous version of Moodle).
         if ($continue instanceof single_button) {
@@ -4569,7 +4571,7 @@ class core_renderer_maintenance extends core_renderer {
         }
 
         $output = $this->box_start('generalbox', 'notice');
-        $output .= html_writer::tag('h4', get_string('confirm'));
+        $output .= html_writer::tag('h4', !empty($title) ? $title : get_string('confirm'));
         $output .= html_writer::tag('p', $message);
         $output .= html_writer::tag('div', $this->render($continue) . $this->render($cancel), array('class' => 'buttons'));
         $output .= $this->box_end();

@@ -10,7 +10,12 @@ information provided here is intended especially for developers.
   * build_nojs_jobassignmentpicker()
 * Removed deprecated totara/hierarchy/prefix/competency/template/lib.php file
 * Function goal::create_user_assignments has been deprecated. Use update_user_assignments instead.
-
+* The following functions related to displaying delete confirmations messages have been deprecated:
+  * hierarchy::get_item_stats() and overrides
+  * hierarchy::get_delete_message()
+  * hierarchy::output_delete_message() and overrides
+  Please use hierarchy::delete_item_confirmation_modal(), hierarchy::delete_bulk_confirmation_modal()
+  or hierarchy::get_all_related_data() instead of hierarchy::get_item_stats().
 === 12.0 ===
 
 * Removed deprecated methods:

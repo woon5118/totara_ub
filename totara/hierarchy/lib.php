@@ -2937,10 +2937,13 @@ class hierarchy {
      *
      * Overridden in child classes to add more specific info
      *
+     * @deprecated since Totara 13
      * @param integer $id ID of the item to get stats for
      * @return array Associative array containing stats
      */
     public function get_item_stats($id) {
+        debugging('This method has been deprecated since Totara 13, please use get_related_data() instead.');
+
         global $DB;
 
         // should always include at least one item (itself)
@@ -2965,16 +2968,260 @@ class hierarchy {
         return $data;
     }
 
+    /**
+     * Returns various stats about an item, used for listed what will be deleted
+     *
+     * @param int $id ID of the item to get stats for
+     * @return array|bool
+     */
+    public function get_framework_related_data($id) {
+        global $DB;
+
+        $children = $DB->get_records($this->shortprefix, ['frameworkid' => $id]);
+
+        $ids = array_keys($children);
+
+        // number of custom field data records
+        $sql = sql_sequence($this->prefix.'id', $ids);
+
+        return [
+            'children' => count($children),
+            'custom_fields' => $DB->count_records_select("{$this->shortprefix}_type_info_data", ...$sql),
+        ];
+    }
+
+    /**
+     * Get data related to this hierarchy item.
+     *
+     * @param int $id Hierarchy item id
+     * @return array|bool
+     */
+    public function get_related_data($id) {
+        global $DB;
+
+        // should always include at least one item (itself)
+        if (!$children = $this->get_item_descendants($id)) {
+            return false;
+        }
+
+        // Count number of CF data records
+        // There would be at least one child.
+        $sql = sql_sequence($this->prefix.'id', array_keys($children));
+
+        return [
+            'name' => $children[$id]->fullname,
+            'children' => count($children) - 1,
+            'custom_fields' => $DB->count_records_select("{$this->shortprefix}_type_info_data", ...$sql),
+        ];
+    }
+
+    /**
+     * Return html for deleting hierarchy confirmation `modal`
+     *
+     * @param \stdClass $item Hierarchy item fetched from the DB
+     * @param array $attributes Extra attributes
+     * @param renderer_base $renderer $OUTPUT renderer
+     * @return string
+     */
+    public function delete_item_confirmation_modal($item, array $attributes, renderer_base $renderer) {
+        $str = "delete_{$this->prefix}_item_confirmation";
+        $title = get_string_manager()->string_exists($str, 'totara_hierarchy') ?
+            get_string($str, 'totara_hierarchy') :
+            get_string('delete_hierarchy_item_confirmation', 'totara_hierarchy');
+
+        $str_title = "delete_{$this->prefix}_item_title";
+        $confirm = get_string_manager()->string_exists($str_title, 'totara_hierarchy') ?
+            get_string($str_title, 'totara_hierarchy', $item) :
+            get_string('delete_hierarchy_item_title', 'totara_hierarchy', $item);
+
+        $str_proceed = "delete_{$this->prefix}_item_proceed";
+        $proceed = get_string_manager()->string_exists($str_proceed, 'totara_hierarchy') ?
+            get_string($str_proceed, 'totara_hierarchy', $item) :
+            get_string('delete_hierarchy_item_proceed', 'totara_hierarchy', $item);
+
+        $message = "{$confirm}<ul><li>" . implode('</li><li>', $this->prepare_delete_message($item->id)) . "</li></ul>{$proceed}";
+
+        $sesskey = $attributes['sesskey'] ?? null;
+        $page = $attributes['page'] ?? 0;
+
+        $confirm_button = new single_button(new moodle_url("/totara/hierarchy/item/delete.php", [
+            'prefix' => $this->prefix,
+            'id' => $item->id,
+            'delete' => md5($item->timemodified),
+            'sesskey' => $sesskey,
+            'page' => $page
+        ]), get_string('yes'), 'post');
+
+        $cancel_button = new single_button(new moodle_url('/totara/hierarchy/framework/index.php', [
+            'prefix' => $this->prefix,
+            'frameworkid' => $item->frameworkid,
+        ]), get_string('no'), 'get');
+
+        return $renderer->confirm($message, $confirm_button, $cancel_button, $title);
+    }
+
+    /**
+     * Return html for deleting hierarchy confirmation `modal`
+     *
+     * @param \stdClass $framework Hierarchy framework fetched from the DB
+     * @param array $attributes Extra attributes
+     * @param renderer_base $renderer $OUTPUT renderer
+     * @return string
+     */
+    public function delete_framework_confirmation_modal($framework, array $attributes, renderer_base $renderer) {
+        $str = "delete_{$this->prefix}_framework_confirmation";
+        $title = get_string_manager()->string_exists($str, 'totara_hierarchy') ?
+            get_string($str, 'totara_hierarchy') :
+            get_string('delete_hierarchy_framework_confirmation', 'totara_hierarchy');
+
+
+        $str_title = "delete_{$this->prefix}_framework_title";
+        $confirm = get_string_manager()->string_exists($str_title, 'totara_hierarchy') ?
+            get_string($str_title, 'totara_hierarchy', $framework) :
+            get_string('delete_hierarchy_framework_title', 'totara_hierarchy', $framework);
+
+        $str_proceed = "delete_{$this->prefix}_framework_proceed";
+        $proceed = get_string_manager()->string_exists($str_proceed, 'totara_hierarchy') ?
+            get_string($str_proceed, 'totara_hierarchy', $framework) :
+            get_string('delete_hierarchy_framework_proceed', 'totara_hierarchy', $framework);
+
+        $message = "{$confirm}<ul><li>" . implode('</li><li>', $this->prepare_framework_delete_message($framework)) . "</li></ul>{$proceed}";
+
+        $sesskey = $attributes['sesskey'] ?? null;
+
+        $confirm_button = new single_button(new moodle_url("/totara/hierarchy/framework/delete.php", [
+            'prefix' => $this->prefix,
+            'id' => $framework->id,
+            'delete' => md5($framework->timemodified),
+            'sesskey' => $sesskey,
+        ]), get_string('yes'), 'post');
+
+        $cancel_button = new single_button(new moodle_url('/totara/hierarchy/framework/index.php', [
+            'prefix' => $this->prefix
+        ]), get_string('no'), 'get');
+
+        return $renderer->confirm($message, $confirm_button, $cancel_button, $title);
+    }
+
+    /**
+     * Return html for deleting hierarchy confirmation `modal`
+     *
+     * @param int[] $ids unique IDs of a given hierarchy item
+     * @param \moodle_url $form_url URL of the form
+     * @param string $sesskey Session key
+     * @param renderer_base $renderer $OUTPUT renderer
+     * @return string
+     */
+    public function delete_bulk_confirmation_modal($ids, \moodle_url $form_url, string $sesskey, renderer_base $renderer) {
+        $str = "delete_{$this->prefix}_bulk_confirmation";
+        $title = get_string_manager()->string_exists($str, 'totara_hierarchy') ?
+            get_string($str, 'totara_hierarchy') :
+            get_string('delete_hierarchy_bulk_confirmation', 'totara_hierarchy');
+
+
+        $str_title = "delete_{$this->prefix}_bulk_title";
+        $confirm = get_string_manager()->string_exists($str_title, 'totara_hierarchy') ?
+            get_string($str_title, 'totara_hierarchy', count($ids)) :
+            get_string('delete_hierarchy_bulk_title', 'totara_hierarchy', count($ids));
+
+        $str_proceed = "delete_{$this->prefix}_bulk_proceed";
+        $proceed = get_string_manager()->string_exists($str_proceed, 'totara_hierarchy') ?
+            get_string($str_proceed, 'totara_hierarchy', count($ids)) :
+            get_string('delete_hierarchy_bulk_proceed', 'totara_hierarchy', count($ids));
+
+        $message = "{$confirm}<ul><li>" . implode('</li><li>', $this->prepare_delete_message($ids)) . "</li></ul>{$proceed}";
+
+        $confirm_button = new single_button(new moodle_url('bulkactions.php', array_merge($form_url->params(), [
+            'confirmdelete' => 1,
+            'sesskey' => $sesskey,
+        ])), get_string('yes'), 'post');
+
+        $cancel_button = new single_button($form_url, get_string('no'), 'get');
+
+        return $renderer->confirm($message, $confirm_button, $cancel_button, $title);
+    }
+
+    /**
+     * Prepare a list of related data information to be deleted for hierarchy items
+     * It's expected to be called from overridden methods as ALL hierarchy items may have children or custom fields.
+     *
+     * @param int|int[] $id Id(s) of hierarchy items to delete
+     * @return array
+     */
+    public function prepare_delete_message($id) {
+        $data = $this->get_all_related_data($id);
+        $str_children = get_string_manager()->string_exists($str = "delete_{$this->prefix}_children", 'totara_hierarchy') ?
+            $str : 'delete_hierarchy_item_children';
+
+        return [
+            'children' => get_string($str_children, 'totara_hierarchy', $data['children'] ?? 0),
+            'custom_fields' => get_string('delete_hierarchy_item_custom_field_records', 'totara_hierarchy', $data['custom_fields'] ?? 0),
+        ];
+    }
+
+    /**
+     * Get data related to multiple hiearchy items.
+     *
+     * @param int|int[] $ids Hierarchy item id
+     * @return array|bool
+     */
+    public function get_all_related_data($ids) {
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
+
+        $stats = [];
+
+        foreach ($ids as $id) {
+            $stat = $this->get_related_data($id);
+
+            if (!$stat) {
+                continue;
+            }
+
+            foreach ($stat as $attr => $value) {
+                if (!isset($stats[$attr])) {
+                    $stats[$attr] = 0;
+                }
+                if (is_numeric($value)) {
+                    $stats[$attr] += $value;
+                } else {
+                    $stats[$attr] = $value;
+                }
+            }
+        }
+
+        return $stats;
+    }
+
+    /**
+     * Prepare framework delete message points
+     *
+     * @param \stdClass $framework Framework object
+     * @return array
+     */
+    public function prepare_framework_delete_message($framework) {
+        $data = $this->get_framework_related_data($framework->id);
+        $str_children = get_string_manager()->string_exists($str = "delete_{$this->prefix}_in_framework", 'totara_hierarchy') ?
+            $str : 'delete_hierarchy_items_in_framework';
+
+        return [
+            'children' => get_string($str_children, 'totara_hierarchy', $data['children'] ?? 0),
+            'custom_fields' => get_string('delete_hierarchy_item_custom_field_records', 'totara_hierarchy', $data['custom_fields'] ?? 0),
+        ];
+    }
 
     /**
      * Given some stats about an item, return a formatted delete message
      *
      * Overridden in child classes to add more specific info
      *
+     * @deprecated since Totara 13
      * @param array $stats Associative array of item stats
      * @return string Formatted delete message
      */
     public function output_delete_message($stats) {
+        debugging('This function has been deprecated since Totara 13, please use get_related_data() instead.');
         $message = '';
 
         $a = new stdClass();
@@ -3004,11 +3251,12 @@ class hierarchy {
     /**
      * Returns a delete message to prompt the user when deleting one or more items
      *
+     * @deprecated since Totara 13
      * @param integer|array ID or array of IDs to be deleted
-     *
      * @return string Human-readable delete prompt text for the items given
      */
     public function get_delete_message($ids) {
+        debugging('This function has been deprecated since Totara 13. Please use delete_item_confirmation_modal() or delete_bulk_confirmation_modal() instead');
         if (is_array($ids)) {
             // aggregate stats for multiple items
             $itemstats = array();

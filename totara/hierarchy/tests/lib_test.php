@@ -809,6 +809,47 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
         $this->assertEquals('F2 Competency 1', $info['itemname']);
         $this->assertEquals(0, $info['children']);
 
+        $this->assertDebuggingCalledCount(4);
+
+        $this->resetAfterTest(true);
+    }
+
+    public function test_get_related_data() {
+        $info = $this->competency->get_related_data($this->comp1->id);
+        $this->assertEquals('Competency 1', $info['name']);
+        $this->assertEquals(2, $info['children']);
+
+        $info = $this->competency->get_related_data($this->comp3->id);
+        $this->assertEquals('F2 Competency 1', $info['name']);
+        $this->assertEquals(0, $info['children']);
+
+        $this->resetAfterTest(true);
+    }
+
+    public function test_get_all_related_data() {
+        $info = $this->competency->get_all_related_data([
+            $this->comp1->id,
+            $this->comp2->id,
+        ]);
+
+        $this->assertEquals('Competency 2', $info['name']);
+        $this->assertEquals(2, $info['children']);
+        $this->assertEquals(3, $info['custom_fields']);
+
+        $this->resetAfterTest(true);
+    }
+
+    public function test_get_framework_related_data() {
+        $info = $this->competency->get_framework_related_data($this->comp1->frameworkid);
+
+        $this->assertEquals(4, $info['children']);
+        $this->assertEquals(2, $info['custom_fields']);
+
+        $info = $this->competency->get_framework_related_data($this->comp3->frameworkid);
+
+        $this->assertEquals(1, $info['children']);
+        $this->assertEquals(0, $info['custom_fields']);
+
         $this->resetAfterTest(true);
     }
 

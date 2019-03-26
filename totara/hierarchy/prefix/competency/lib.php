@@ -850,10 +850,13 @@ class competency extends hierarchy {
     /**
      * Returns various stats about an item, used for listed what will be deleted
      *
+     * @deprecated since Totara 13
      * @param integer $id ID of the item to get stats for
      * @return array Associative array containing stats
      */
     public function get_item_stats($id) {
+        debugging('This method has been deprecated since Totara 13, please use get_related_data() instead.');
+
         global $DB;
         if (!$data = parent::get_item_stats($id)) {
             return false;
@@ -883,12 +886,108 @@ class competency extends hierarchy {
     }
 
     /**
+     * Returns various stats about an item, used for listed what will be deleted
+     *
+     * @param int $id ID of the item to get stats for
+     * @return array|bool
+     */
+    public function get_framework_related_data($id) {
+        global $DB;
+
+        $data = parent::get_framework_related_data($id);
+
+        // should always include at least one item (itself)
+        $children = $DB->get_records('comp', ['frameworkid' => $id]);
+
+        if (!empty($children)) {
+            $ids = array_keys($children);
+
+            [$idssql, $idsparams] = sql_sequence('competencyid', $ids);
+            // number of comp_record records
+            $data['user_achievement'] = $DB->count_records_select('comp_record', $idssql, $idsparams);
+
+            // number of comp_criteria records
+            $data['evidence'] = $DB->count_records_select('comp_criteria', $idssql, $idsparams);
+
+            // number of comp_relations records
+            [$ids1sql, $ids1params] = sql_sequence('id1', $ids);
+            [$ids2sql, $ids2params] = sql_sequence('id2', $ids);
+            $sql = "{$ids1sql} OR {$ids2sql}";
+            $params = array_merge($ids1params, $ids2params);
+            $data['related'] = $DB->count_records_select('comp_relations', $sql, $params);
+        } else {
+            $data['user_achievement'] = 0;
+            $data['evidence'] = 0;
+            $data['assignments'] = 0;
+            $data['related'] = 0;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get data related to this hierarchy item.
+     *
+     * @param int $id Hierarchy item id
+     * @return array|bool
+     */
+    public function get_related_data($id) {
+        global $DB;
+
+        if (!$data = parent::get_related_data($id)) {
+            return false;
+        }
+
+        // Should always include at least one item (itself).
+        if (!$children = $this->get_item_descendants($id)) {
+            return false;
+        }
+
+        $ids = array_keys($children);
+
+        [$ids_sql, $ids_params] = sql_sequence('competencyid', $ids);
+
+        // It's not really called user achievement anywhere.
+        $data['user_achievement'] = $DB->count_records_select('comp_record', $ids_sql, $ids_params);
+
+        // Number of comp_criteria records.
+        $data['evidence'] = $DB->count_records_select('comp_criteria', $ids_sql, $ids_params);
+
+        // Number of comp_relations records.
+        [$ids1sql, $ids1params] = sql_sequence('id1', $ids);
+        [$ids2sql, $ids2params] = sql_sequence('id2', $ids);
+        $data['related'] = $DB->count_records_select('comp_relations', "{$ids1sql} OR {$ids2sql}", array_merge($ids1params, $ids2params));
+
+        return $data;
+    }
+
+    /**
+     * Prepare a list of related data information to be deleted for hierarchy items
+     * It's expected to be called from overridden methods as ALL hierarchy items may have children or custom fields.
+     *
+     * @param int|int[] $id Id(s) of hierarchy items to delete
+     * @return array
+     */
+    public function prepare_delete_message($id) {
+        $messages = parent::prepare_delete_message($id);
+        $data = $this->get_all_related_data($id);
+
+        return array_merge($messages, [
+            'user_achievement' => get_string('delete_competency_user_achievements', 'totara_hierarchy', $data['user_achievement']),
+            'evidence' => get_string('delete_competency_evidence_items', 'totara_hierarchy', $data['evidence']),
+            'related' => get_string('delete_competency_related_links', 'totara_hierarchy', $data['related']),
+        ]);
+    }
+
+    /**
      * Given some stats about an item, return a formatted delete message
      *
+     * @deprecated since Totara 13
      * @param array $stats Associative array of item stats
      * @return string Formatted delete message
      */
     public function output_delete_message($stats) {
+        debugging('This function has been deprecated since Totara 13, please use get_related_data() instead.');
         $message = parent::output_delete_message($stats);
 
         if ($stats['user_achievement'] > 0) {
@@ -904,6 +1003,22 @@ class competency extends hierarchy {
         }
 
         return $message;
+    }
+
+    /**
+     * Prepare framework delete message points
+     *
+     * @param \stdClass $framework Framework object
+     * @return array
+     */
+    public function prepare_framework_delete_message($framework) {
+        $data = $this->get_framework_related_data($framework->id);
+
+        return array_merge(parent::prepare_framework_delete_message($framework), [
+            'user_achievement' => get_string('delete_competency_user_achievements', 'totara_hierarchy', $data['user_achievement']),
+            'evidence' => get_string('delete_competency_evidence_items', 'totara_hierarchy', $data['evidence']),
+            'related' => get_string('delete_competency_related_links', 'totara_hierarchy', $data['related']),
+        ]);
     }
 
     /**

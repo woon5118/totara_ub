@@ -402,10 +402,13 @@ class goal extends hierarchy {
     /**
      * Returns various stats about an item, used for listed what will be deleted
      *
+     * @deprecated since Totara 13
      * @param integer $id ID of the item to get stats for
      * @return array Associative array containing stats
      */
     public function get_item_stats($id) {
+        debugging('This method has been deprecated since Totara 13, please use get_related_data() instead.');
+
         global $DB;
 
         if (!$data = parent::get_item_stats($id)) {
@@ -427,12 +430,100 @@ class goal extends hierarchy {
     }
 
     /**
+     * Get data related to this hierarchy item.
+     *
+     * @param int $id Hierarchy item id
+     * @return array|bool
+     */
+    public function get_related_data($id) {
+        global $DB;
+
+        if (!$data = parent::get_related_data($id)) {
+            return false;
+        }
+
+        // Should always include at least one item (itself).
+        if (!$children = $this->get_item_descendants($id)) {
+            return false;
+        }
+
+        $ids = array_keys($children);
+
+        [$ids_sql, $ids_params] = sql_sequence('goalid', $ids);
+
+        // Get user assignments for this goal
+        $data['user_assignments'] = $DB->count_records_select('goal_user_assignment', $ids_sql, $ids_params);
+
+        return $data;
+    }
+
+    /**
+     * Returns various stats about an item, used for listed what will be deleted
+     *
+     * @param int $id ID of the item to get stats for
+     * @return array|bool
+     */
+    public function get_framework_related_data($id) {
+        global $DB;
+
+        $data = parent::get_framework_related_data($id);
+
+        // should always include at least one item (itself)
+        $children = $DB->get_records('goal', ['frameworkid' => $id]);
+
+        if (!empty($children)) {
+            $ids = array_keys($children);
+
+            [$ids_sql, $ids_params] = sql_sequence('goalid', $ids);
+
+            // Get user assignments for this goal
+            $data['user_assignments'] = $DB->count_records_select('goal_user_assignment', $ids_sql, $ids_params);
+        } else {
+            $data['user_assignments'] = 0;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Prepare a list of related data information to be deleted for hierarchy items
+     * It's expected to be called from overridden methods as ALL hierarchy items may have children or custom fields.
+     *
+     * @param int|int[] $id Id(s) of hierarchy items to delete
+     * @return array
+     */
+    public function prepare_delete_message($id) {
+        $messages = parent::prepare_delete_message($id);
+        $data = $this->get_all_related_data($id);
+
+        return array_merge($messages, [
+            'user_assignments' => get_string('delete_goal_user_assignments', 'totara_hierarchy', $data['user_assignments']),
+        ]);
+    }
+
+    /**
+     * Prepare framework delete message points
+     *
+     * @param \stdClass $framework Framework object
+     * @return array
+     */
+    public function prepare_framework_delete_message($framework) {
+        $data = $this->get_framework_related_data($framework->id);
+
+        return array_merge(parent::prepare_framework_delete_message($framework), [
+            'user_assignments' => get_string('delete_goal_user_assignments', 'totara_hierarchy', $data['user_assignments']),
+        ]);
+    }
+
+    /**
      * Given some stats about an item, return a formatted delete message
      *
+     * @deprecated since Totara 13
      * @param array $stats Associative array of item stats
      * @return string Formatted delete message
      */
     public function output_delete_message($stats) {
+        debugging('This function has been deprecated since Totara 13, please use get_related_data() instead.');
         $message = parent::output_delete_message($stats);
 
         if ($stats['user_assignments'] > 0) {

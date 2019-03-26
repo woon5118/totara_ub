@@ -337,10 +337,7 @@ if ($mform->is_cancelled()) {
 
         if ((count($unique_ids) > 0)) {
             echo $OUTPUT->header();
-            $strdelete = $hierarchy->get_delete_message($unique_ids);
-            $formparams['confirmdelete'] = 1;
-            $formparams['sesskey'] = $USER->sesskey;
-            echo $OUTPUT->confirm($strdelete, new moodle_url('bulkactions.php', $formparams), $formurl);
+            echo $hierarchy->delete_bulk_confirmation_modal($unique_ids, $formurl, $USER->sesskey, $OUTPUT);
         } else {
             totara_set_notification(get_string('error:noitemsselected', 'totara_hierarchy'), $formurl);
         }

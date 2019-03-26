@@ -394,10 +394,13 @@ class position extends hierarchy {
     /**
      * Returns various stats about an item, used for listed what will be deleted
      *
+     * @deprecated since Totara 13
      * @param integer $id ID of the item to get stats for
      * @return array Associative array containing stats
      */
     public function get_item_stats($id) {
+        debugging('This method has been deprecated since Totara 13, please use get_related_data() instead.');
+
         global $DB;
 
         if (!$data = parent::get_item_stats($id)) {
@@ -425,10 +428,12 @@ class position extends hierarchy {
     /**
      * Given some stats about an item, return a formatted delete message
      *
+     * @deprecated since Totara 13
      * @param array $stats Associative array of item stats
      * @return string Formatted delete message
      */
     public function output_delete_message($stats) {
+        debugging('This function has been deprecated since Totara 13, please use get_related_data() instead.');
         $message = parent::output_delete_message($stats);
 
         if ($stats['job_assignment'] > 0) {
@@ -442,6 +447,111 @@ class position extends hierarchy {
         }
 
         return $message;
+    }
+
+    /**
+     * Get data related to this hierarchy item.
+     *
+     * @param int $id Hierarchy item id
+     * @return array|bool
+     */
+    public function get_related_data($id) {
+        global $DB;
+
+        if (!$data = parent::get_related_data($id)) {
+            return false;
+        }
+
+        // Should always include at least one item (itself).
+        if (!$children = $this->get_item_descendants($id)) {
+            return false;
+        }
+
+        $ids = array_keys($children);
+
+        [$ids_sql, $ids_params] = sql_sequence('positionid', $ids);
+
+        // Number of job assignment records with matching organisation.
+        $data['job_assignment'] = $DB->count_records_select('job_assignment', $ids_sql, $ids_params);
+
+        // Number of assigned competencies.
+        $data['assigned_comps'] = $DB->count_records_select('pos_competencies', $ids_sql, $ids_params);
+
+        // Number of related goals.
+        $data['related_goals'] = $DB->count_records_select('goal_grp_pos', ...sql_sequence('posid', $ids));
+
+        return $data;
+    }
+
+    /**
+     * Returns various stats about an item, used for listed what will be deleted
+     *
+     * @param int $id ID of the item to get stats for
+     * @return array|bool
+     */
+    public function get_framework_related_data($id) {
+        global $DB;
+
+        $data = parent::get_framework_related_data($id);
+
+        // should always include at least one item (itself)
+        $children = $DB->get_records('pos', ['frameworkid' => $id]);
+
+        if (!empty($children)) {
+            $ids = array_keys($children);
+
+            [$ids_sql, $ids_params] = sql_sequence('positionid', $ids);
+
+            // Number of job assignment records with matching organisation.
+            $data['job_assignment'] = $DB->count_records_select('job_assignment', $ids_sql, $ids_params);
+
+            // Number of assigned competencies.
+            $data['assigned_comps'] = $DB->count_records_select('pos_competencies', $ids_sql, $ids_params);
+
+            // Number of related goals.
+            $data['related_goals'] = $DB->count_records_select('goal_grp_pos', ...sql_sequence('posid', $ids));
+        } else {
+            $data['job_assignment'] = 0;
+            $data['assigned_comps'] = 0;
+            $data['related_goals'] = 0;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Prepare a list of related data information to be deleted for hierarchy items
+     * It's expected to be called from overridden methods as ALL hierarchy items may have children or custom fields.
+     *
+     * @param int|int[] $id Id(s) of hierarchy items to delete
+     * @return array
+     */
+    public function prepare_delete_message($id) {
+        $messages = parent::prepare_delete_message($id);
+        $data = $this->get_all_related_data($id);
+
+        return array_merge($messages, [
+            'job_assignment' => get_string('delete_position_related_job_assignments', 'totara_hierarchy', $data['job_assignment']),
+            'assigned_comps' => get_string('delete_position_linked_competencies', 'totara_hierarchy', $data['assigned_comps']),
+            'related_goals' => get_string('delete_position_linked_goals', 'totara_hierarchy', $data['related_goals']),
+        ]);
+    }
+
+    /**
+     * Prepare a list of related data information to be deleted for hierarchy items
+     * It's expected to be called from overridden methods as ALL hierarchy items may have children or custom fields.
+     *
+     * @param \stdClass $framework Hierarchy framework to delete
+     * @return array
+     */
+    public function prepare_framework_delete_message($framework) {
+        $data = $this->get_framework_related_data($framework->id);
+
+        return array_merge(parent::prepare_framework_delete_message($framework), [
+            'job_assignment' => get_string('delete_position_related_job_assignments', 'totara_hierarchy', $data['job_assignment']),
+            'assigned_comps' => get_string('delete_position_linked_competencies', 'totara_hierarchy', $data['assigned_comps']),
+            'related_goals' => get_string('delete_position_linked_goals', 'totara_hierarchy', $data['related_goals']),
+        ]);
     }
 
     /**

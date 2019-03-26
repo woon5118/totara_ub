@@ -182,21 +182,8 @@ $string['competencyassigndeletecheck'] = 'Are you sure you would like to remove 
 $string['competencybacktoallframeworks'] = 'Back to all competency frameworks';
 $string['competencycreatetype'] = 'The competency type "{$a}" has been created';
 $string['competencycustomfields'] = 'Custom fields';
-$string['competencydeletecheck'] = 'Are you absolutely sure you want to completely delete this competency, all its children and the data they contain?';
-$string['competencydeletecheck11'] = 'Are you sure you want to delete the competency "{$a}"?
-<br /><br />
-This will remove the following data:<br />
-- The "{$a}" competency';
-$string['competencydeletecheckwithchildren'] = 'Are you sure you want to delete the competency "{$a->itemname}" and its {$a->children_string}?
-<br /><br />
-This will remove the following data: <br />
-- The "{$a->itemname}" competency and its {$a->childcount} {$a->children_string}';
 $string['competencydeletedframework'] = 'The competency framework "{$a}" and its data have been completely deleted.';
 $string['competencydeletedtype'] = 'The competency type "{$a}" has been completely deleted.';
-$string['competencydeletemulticheckwithchildren'] = 'Are you sure you want to delete {$a->num} competency/competencies and {$a->childcount} {$a->children_string}?
-<br /><br />
-This will remove the following data: <br />
-- The {$a->num} competency/competencies and {$a->childcount} {$a->children_string}';
 $string['competencydepthcustomfields'] = 'Competency depth custom fields';
 $string['competencydepthlevelview'] = 'Competency depth level view';
 $string['competencydescription'] = 'Description';
@@ -360,7 +347,6 @@ $string['currenttype'] = 'Current type';
 $string['customfields'] = 'Custom fields';
 $string['datainx'] = 'Data in {$a}:';
 $string['deletecheckdepth'] = 'Are you absolutely sure you want to completely delete this depth level?';
-$string['deletecheckframework'] = 'Are you sure you want to delete the framework "{$a}"?';
 $string['deletecheckscale'] = 'Are you absolutely sure you want to completely delete this scale?';
 $string['deletecheckscalevalue'] = 'Are you absolutely sure you want to delete this scale value?';
 $string['deletechecktemplate'] = 'Are you absolutely sure you want to delete this competency template?';
@@ -384,20 +370,72 @@ $string['deletedpersonalgoal'] = 'Successfully deleted personal goal {$a}';
 $string['deletedposition'] = 'The position {$a} and its children have been completely deleted';
 $string['deletedtemplate'] = 'The competency template {$a} and its data have been completely deleted.';
 $string['deletedtype'] = 'The type "{$a}" has been deleted.';
-$string['deleteframework'] = 'Delete {$a}';
+$string['deleteframework'] = 'Delete "{$a}"';
 $string['deletegoal'] = 'Delete goal';
-$string['deleteincludexcustomfields'] = '- {$a} custom field record(s)';
-$string['deleteincludexevidence'] = '- {$a} item(s) of evidence';
-$string['deleteincludexrelatedcompetencies'] = '- {$a} link(s) to related competencies';
-$string['deleteincludexrelatedgoals'] = '- {$a} link(s) to related goals';
-$string['deleteincludexuserassignments'] = '- {$a} user assignment(s)';
-$string['deleteincludexuserstatusrecords'] = '- {$a} user status record(s)';
 $string['deleteorganisation'] = 'Delete organisation';
 $string['deleteposition'] = 'Delete position';
 $string['deleteselectedx'] = 'Delete selected {$a}';
 $string['deletethisdata'] = 'Delete this data';
 $string['deletetype'] = 'Delete type "{$a}"';
 $string['deletetypenosuchtype'] = 'Bad type id. Please try again.';
+$string['delete_competency_bulk_confirmation'] = 'Confirm bulk competency deletion';
+$string['delete_competency_bulk_title'] = 'This will permanently delete <strong>{$a}</strong> competencies and the following data:';
+$string['delete_competency_bulk_proceed'] = 'Do you want to proceed with the bulk competency deletion?';
+$string['delete_competency_children'] = 'Competency descendants: <strong>{$a}</strong>';
+$string['delete_competency_evidence_items'] = 'Related evidence: <strong>{$a}</strong>';
+$string['delete_competency_framework_confirmation'] = 'Confirm competency framework deletion';
+$string['delete_competency_in_framework'] = 'All competencies in framework: <strong>{$a}</strong>';
+$string['delete_competency_item_confirmation'] = 'Confirm competency deletion';
+$string['delete_competency_item_proceed'] = 'Do you want to proceed with deleting this competency?';
+$string['delete_competency_item_title'] = 'This will permanently delete the <strong>"{$a->fullname}"</strong> competency and the following associated data:';
+$string['delete_competency_related_links'] = 'Links to related competencies: <strong>{$a}</strong>';
+$string['delete_competency_user_achievements'] = 'User status records: <strong>{$a}</strong>';
+$string['delete_goal_bulk_confirmation'] = 'Confirm bulk goal deletion';
+$string['delete_goal_bulk_title'] = 'This will permanently delete <strong>{$a}</strong> goals and the following data:';
+$string['delete_goal_bulk_proceed'] = 'Do you want to proceed with the bulk goal deletion?';
+$string['delete_goal_children'] = 'Goal descendants: <strong>{$a}</strong>';
+$string['delete_goal_framework_confirmation'] = 'Confirm goal framework deletion';
+$string['delete_goal_in_framework'] = 'All goals in framework: <strong>{$a}</strong>';
+$string['delete_goal_item_confirmation'] = 'Confirm goal deletion';
+$string['delete_goal_item_title'] = 'This will permanently delete the <strong>"{$a->fullname}"</strong> goal and the following associated data:';
+$string['delete_goal_item_proceed'] = 'Do you want to proceed with deleting this goal?';
+$string['delete_goal_user_assignments'] = 'User assignments: <strong>{$a}</strong>';
+$string['delete_hierarchy_bulk_confirmation'] = 'Confirm bulk hierarchy item deletion';
+$string['delete_hierarchy_bulk_proceed'] = 'Do you want to proceed with the bulk deletion?';
+$string['delete_hierarchy_bulk_title'] = 'This will permanently delete <strong>{$a}</strong> hierarchy items and the following data:';
+$string['delete_hierarchy_framework_confirmation'] = 'Confirm framework deletion';
+$string['delete_hierarchy_framework_proceed'] = 'Do you want to proceed with deleting the framework?';
+$string['delete_hierarchy_framework_title'] = 'This will permanently delete the <strong>"{$a->fullname}"</strong> framework and the following associated data:';
+$string['delete_hierarchy_item_children'] = 'Item descendants: <strong>{$a}</strong>';
+$string['delete_hierarchy_item_confirmation'] = 'Confirm hierarchy item deletion';
+$string['delete_hierarchy_item_custom_field_records'] = 'Custom field records: <strong>{$a}</strong>';
+$string['delete_hierarchy_item_proceed'] = 'Do you want to proceed with deleting this hierarchy item?';
+$string['delete_hierarchy_item_title'] = 'This will permanently delete the <strong>"{$a->fullname}"</strong> item and the following associated data:';
+$string['delete_hierarchy_items_in_framework'] = 'All items in framework <strong>{$a}</strong>';
+$string['delete_organisation_bulk_confirmation'] = 'Confirm bulk organisation deletion';
+$string['delete_organisation_bulk_title'] = 'This will permanently delete <strong>{$a}</strong> organisations and the following associated data:';
+$string['delete_organisation_bulk_proceed'] = 'Do you want to proceed with the bulk organisation deletion?';
+$string['delete_organisation_children'] = 'Organisation descendants: <strong>{$a}</strong>';
+$string['delete_organisation_framework_confirmation'] = 'Confirm organisation framework deletion';
+$string['delete_organisation_in_framework'] = 'All organisations in framework: <strong>{$a}</strong>';
+$string['delete_organisation_item_confirmation'] = 'Confirm organisation deletion';
+$string['delete_organisation_item_title'] = 'This will permanently delete the <strong>"{$a->fullname}"</strong> organisation and the following associated data:';
+$string['delete_organisation_item_proceed'] = 'Do you want to proceed with deleting this organisation?';
+$string['delete_organisation_linked_competencies'] = 'Links to competencies: <strong>{$a}</strong>';
+$string['delete_organisation_linked_goals'] = 'Links to goals: <strong>{$a}</strong>';
+$string['delete_organisation_related_job_assignments'] = 'User assignments: <strong>{$a}</strong>';
+$string['delete_position_bulk_confirmation'] = 'Confirm bulk position deletion';
+$string['delete_position_bulk_title'] = 'This will permanently delete <strong>{$a}</strong> positions and the following associated data:';
+$string['delete_position_bulk_proceed'] = 'Do you want to proceed with the bulk position deletion?';
+$string['delete_position_children'] = 'Position descendants: <strong>{$a}</strong>';
+$string['delete_position_framework_confirmation'] = 'Confirm position framework deletion';
+$string['delete_position_in_framework'] = 'All positions in framework: <strong>{$a}</strong>';
+$string['delete_position_item_confirmation'] = 'Confirm position deletion';
+$string['delete_position_item_title'] = 'This will permanently delete the <strong>"{$a->fullname}"</strong> position and the following associated data:';
+$string['delete_position_item_proceed'] = 'Do you want to proceed with deleting this position?';
+$string['delete_position_linked_competencies'] = 'Links to competencies: <strong>{$a}</strong>';
+$string['delete_position_linked_goals'] = 'Links to goals: <strong>{$a}</strong>';
+$string['delete_position_related_job_assignments'] = 'User assignments: <strong>{$a}</strong>';
 $string['depth'] = 'Depth {$a}';
 $string['depthlevel'] = 'Depth level';
 $string['depthlevels'] = 'Depth levels';
@@ -575,22 +613,9 @@ $string['goalbacktoallframeworks'] = 'Back to all goal frameworks';
 $string['goalcount'] = 'Number of goals';
 $string['goalcreatetype'] = 'The goal type "{$a}" has been created';
 $string['goalcustomfields'] = 'Custom fields';
-$string['goaldeletecheck'] = 'Are you absolutely sure you want to completely delete this goal, all its children and the data they contain?';
-$string['goaldeletecheck11'] = 'Are you sure you want to delete the goal "{$a}"?
-<br /><br />
-This will remove the following data:<br />
-- The "{$a}" goal';
-$string['goaldeletecheckwithchildren'] = 'Are you sure you want to delete the goal "{$a->itemname}" and its {$a->children_string}?
-<br /><br />
-This will remove the following data: <br />
-- The "{$a->itemname}" goal and its {$a->childcount} {$a->children_string}';
 $string['goaldeletedassignment'] = 'Successfuly deleted goal assignment';
 $string['goaldeletedframework'] = 'The goal framework "{$a}" and its data have been completely deleted.';
 $string['goaldeletedtype'] = 'The goal type "{$a}" has been completely deleted.';
-$string['goaldeletemulticheckwithchildren'] = 'Are you sure you want to delete {$a->num} goal(s) and {$a->childcount} {$a->children_string}?
-<br /><br />
-This will remove the following data: <br />
-- The {$a->num} goal/goals and {$a->childcount} {$a->children_string}';
 $string['goaldepthcustomfields'] = 'Goal depth custom fields';
 $string['goaldepthlevelview'] = 'Goal depth level view';
 $string['goaldescription'] = 'Description';
@@ -982,26 +1007,12 @@ $string['organisationaddnewframework'] = 'Add new organisation framework';
 $string['organisationbacktoallframeworks'] = 'Back to all organisation frameworks';
 $string['organisationcreatetype'] = 'The organisation type "{$a}" has been created';
 $string['organisationcustomfields'] = 'Custom fields';
-$string['organisationdeletecheck'] = 'Are you sure you want to delete this organisation, all its children and the data they contain?';
-$string['organisationdeletecheck11'] = 'Are you sure you want to delete the organisation "{$a}"?
-<br /><br />
-This will remove the following data:<br />
-- The "{$a}" organisation';
-$string['organisationdeletecheckwithchildren'] = 'Are you sure you want to delete the organisation "{$a->itemname}" and its {$a->children_string}?
-<br /><br />
-This will remove the following data: <br />
-- The "{$a->itemname}" organisation and its {$a->childcount} {$a->children_string}';
 $string['organisationdeletedassignedcompetency'] = 'Competency successfully unassigned from this organisation';
 $string['organisationdeletedassignedgoal'] = 'Goal successfully unassigned from this organisation';
 $string['organisationdeletedframework'] = 'The organisation framework "{$a}" and its data have been completely deleted';
 $string['organisationdeletedtype'] = 'The organisation type "{$a}" has been completely deleted';
-$string['organisationdeleteincludexjobassignments'] = '- {$a} assignment(s) to this organisation (users assigned to this organisation will be unassigned)';
 $string['organisationdeleteincludexlinkedcompetencies'] = '- {$a} link(s) to competencies';
 $string['organisationdeleteincludexlinkedgoals'] = '- {$a} link(s) to goals';
-$string['organisationdeletemulticheckwithchildren'] = 'Are you sure you want to delete {$a->num} organisation(s) and {$a->childcount} {$a->children_string}?
-<br /><br />
-This will remove the following data: <br />
-- The {$a->num} organisation(s) and {$a->childcount} {$a->children_string}';
 $string['organisationdepthcustomfields'] = 'Organisation depth custom fields';
 $string['organisationdescription'] = 'Description';
 $string['organisationdescription_help'] = 'A free-text field for providing more details about this organisation. This data is displayed when viewing the hieararchy listing, and the individual organisation page.';
@@ -1086,26 +1097,10 @@ $string['positionbacktoallframeworks'] = 'Back to all position frameworks';
 $string['positionbulkaction'] = 'Bulk actions';
 $string['positioncreatetype'] = 'The position type "{$a}" has been created';
 $string['positioncustomfields'] = 'Custom fields';
-$string['positiondeletecheck'] = 'Are you sure you want to delete this position, all its children and the data they contain?';
-$string['positiondeletecheck11'] = 'Are you sure you want to delete the position "{$a}"?
-<br /><br />
-This will remove the following data:<br />
-- The "{$a}" position';
-$string['positiondeletecheckwithchildren'] = 'Are you sure you want to delete the position "{$a->itemname}" and its {$a->children_string}?
-<br /><br />
-This will remove the following data: <br />
-- The "{$a->itemname}" position and its {$a->childcount} {$a->children_string}';
 $string['positiondeletedassignedcompetency'] = 'Competency unassigned successfully from this position';
 $string['positiondeletedassignedgoal'] = 'Goal unassigned successfully from this position';
 $string['positiondeletedframework'] = 'The position framework "{$a}" and its data have been completely deleted';
 $string['positiondeletedtype'] = 'The position type "{$a}" has been completely deleted';
-$string['positiondeleteincludexjobassignments'] = '- {$a} assignment(s) to this position (users assigned to this position will be unassigned)';
-$string['positiondeleteincludexlinkedcompetencies'] = '- {$a} links to competencies';
-$string['positiondeleteincludexlinkedgoals'] = '- {$a} links to goals';
-$string['positiondeletemulticheckwithchildren'] = 'Are you sure you want to delete {$a->num} position(s) and {$a->childcount} {$a->children_string}?
-<br /><br />
-This will remove the following data: <br />
-- The {$a->num} position(s) and {$a->childcount} {$a->children_string}';
 $string['positiondepthcustomfields'] = 'Position depth custom fields';
 $string['positiondescription'] = 'Description';
 $string['positiondescription_help'] = 'A free-text field for providing more details about this position. This data is displayed when viewing the hieararchy listing, and the individual position page.';
@@ -1284,3 +1279,69 @@ $string['xandychild'] = '{$a->item} (and {$a->num} child)';
 $string['xandychildren'] = '{$a->item} (and {$a->num} children)';
 $string['xitemsdeleted'] = '{$a->num} {$a->items} and all children have been deleted';
 $string['xitemsmoved'] = '{$a->num} {$a->items} and all children have been moved';
+
+// Deprecated in 13
+$string['confirmframeworkdeletion'] = 'Confirm framework deletion';
+$string['deleteincludexcustomfields'] = '- {$a} custom field record(s)';
+$string['deleteincludexuserstatusrecords'] = '- {$a} user status record(s)';
+$string['organisationdeleteincludexjobassignments'] = '- {$a} assignment(s) to this organisation (users assigned to this organisation will be unassigned)';
+$string['competencydeletemulticheckwithchildren'] = 'Are you sure you want to delete {$a->num} competency/competencies and {$a->childcount} {$a->children_string}?
+<br /><br />
+This will remove the following data: <br />
+- The {$a->num} competency/competencies and {$a->childcount} {$a->children_string}';
+$string['goaldeletemulticheckwithchildren'] = 'Are you sure you want to delete {$a->num} goal(s) and {$a->childcount} {$a->children_string}?
+<br /><br />
+This will remove the following data: <br />
+- The {$a->num} goal/goals and {$a->childcount} {$a->children_string}';
+$string['organisationdeletemulticheckwithchildren'] = 'Are you sure you want to delete {$a->num} organisation(s) and {$a->childcount} {$a->children_string}?
+<br /><br />
+This will remove the following data: <br />
+- The {$a->num} organisation(s) and {$a->childcount} {$a->children_string}';
+$string['positiondeletemulticheckwithchildren'] = 'Are you sure you want to delete {$a->num} position(s) and {$a->childcount} {$a->children_string}?
+<br /><br />
+This will remove the following data: <br />
+- The {$a->num} position(s) and {$a->childcount} {$a->children_string}';
+$string['competencydeletecheckwithchildren'] = 'Are you sure you want to delete the competency "{$a->itemname}" and its {$a->children_string}?
+<br /><br />
+This will remove the following data: <br />
+- The "{$a->itemname}" competency and its {$a->childcount} {$a->children_string}';
+$string['goaldeletecheckwithchildren'] = 'Are you sure you want to delete the goal "{$a->itemname}" and its {$a->children_string}?
+<br /><br />
+This will remove the following data: <br />
+- The "{$a->itemname}" goal and its {$a->childcount} {$a->children_string}';
+$string['organisationdeletecheckwithchildren'] = 'Are you sure you want to delete the organisation "{$a->itemname}" and its {$a->children_string}?
+<br /><br />
+This will remove the following data: <br />
+- The "{$a->itemname}" organisation and its {$a->childcount} {$a->children_string}';
+$string['positiondeletecheckwithchildren'] = 'Are you sure you want to delete the position "{$a->itemname}" and its {$a->children_string}?
+<br /><br />
+This will remove the following data: <br />
+- The "{$a->itemname}" position and its {$a->childcount} {$a->children_string}';
+$string['competencydeletecheck11'] = 'Are you sure you want to delete the competency "{$a}"?
+<br /><br />
+This will remove the following data:<br />
+- The "{$a}" competency';
+$string['goaldeletecheck11'] = 'Are you sure you want to delete the goal "{$a}"?
+<br /><br />
+This will remove the following data:<br />
+- The "{$a}" goal';
+$string['organisationdeletecheck11'] = 'Are you sure you want to delete the organisation "{$a}"?
+<br /><br />
+This will remove the following data:<br />
+- The "{$a}" organisation';
+$string['positiondeletecheck11'] = 'Are you sure you want to delete the position "{$a}"?
+<br /><br />
+This will remove the following data:<br />
+- The "{$a}" position';
+$string['positiondeleteincludexjobassignments'] = '- {$a} assignment(s) to this position (users assigned to this position will be unassigned)';
+$string['positiondeleteincludexlinkedcompetencies'] = '- {$a} links to competencies';
+$string['positiondeleteincludexlinkedgoals'] = '- {$a} links to goals';
+$string['deletecheckframework'] = 'Are you sure you want to delete the framework "{$a}"?';
+$string['deleteincludexevidence'] = '- {$a} item(s) of evidence';
+$string['deleteincludexrelatedcompetencies'] = '- {$a} link(s) to related competencies';
+$string['deleteincludexrelatedgoals'] = '- {$a} link(s) to related goals';
+$string['deleteincludexuserassignments'] = '- {$a} user assignment(s)';
+$string['competencydeletecheck'] = 'Are you absolutely sure you want to completely delete this competency, all its children and the data they contain?';
+$string['goaldeletecheck'] = 'Are you absolutely sure you want to completely delete this goal, all its children and the data they contain?';
+$string['organisationdeletecheck'] = 'Are you sure you want to delete this organisation, all its children and the data they contain?';
+$string['positiondeletecheck'] = 'Are you sure you want to delete this position, all its children and the data they contain?';

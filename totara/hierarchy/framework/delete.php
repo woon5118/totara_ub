@@ -60,12 +60,8 @@ $PAGE->navbar->add(get_string('deleteframework', 'totara_hierarchy', format_stri
 
 if (!$delete) {
     echo $OUTPUT->header();
-    $strdelete = get_string('deletecheckframework', 'totara_hierarchy', format_string($framework->fullname));
-
-    echo $OUTPUT->heading(get_string('deleteframework', 'totara_hierarchy', format_string($framework->fullname)), 1);
-
-    echo $OUTPUT->confirm("$strdelete" . html_writer::empty_tag('br') . html_writer::empty_tag('br'), "{$CFG->wwwroot}/totara/hierarchy/framework/delete.php?prefix=$prefix&id={$framework->id}&amp;delete=".md5($framework->timemodified)."&amp;sesskey={$USER->sesskey}", "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=$prefix");
-
+    echo $OUTPUT->heading(get_string('deleteframework', 'totara_hierarchy', format_string($framework->fullname)), 2);
+    echo $hierarchy->delete_framework_confirmation_modal($framework, ['sesskey' => $USER->sesskey], $OUTPUT);
     echo $OUTPUT->footer();
     exit;
 }
