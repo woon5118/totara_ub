@@ -4998,6 +4998,12 @@ class core_dml_testcase extends database_driver_testcase {
         $result = $DB->get_records($tablename, array(), 'id ASC');
         $expected[$id5]->intro = $long.'llll';
         $this->assertEquals($expected, $result);
+
+        // Test that replacement will not happen when replace is bigger than column size.
+        $toolong = '123456789012345678912';
+        $DB->replace_all_text($tablename, $columns['name'], 'xxyy', $toolong);
+        $result = $DB->get_records($tablename, array(), 'id ASC');
+        $this->assertEquals($expected, $result);
     }
 
     public function test_onelevel_commit() {

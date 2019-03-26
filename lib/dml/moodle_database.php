@@ -2923,21 +2923,24 @@ abstract class moodle_database {
 
         // Enclose the column name by the proper quotes if it's a reserved word.
         $columnname = $this->get_manager()->generator->getEncQuoted($column->name);
+        $likesql = $this->sql_like($columnname, '?');
         $sql = "UPDATE {".$table."}
                        SET $columnname = REPLACE($columnname, ?, ?)
-                     WHERE $columnname IS NOT NULL";
+                     WHERE $columnname IS NOT NULL AND $likesql";
 
         if ($column->meta_type === 'X') {
-            $this->execute($sql, array($search, $replace));
+            $this->execute($sql, array($search, $replace, '%' . $search .'%'));
 
         } else if ($column->meta_type === 'C') {
-            if (core_text::strlen($search) < core_text::strlen($replace)) {
-                $colsize = $column->max_length;
-                $sql = "UPDATE {".$table."}
-                       SET $columnname = " . $this->sql_substr("REPLACE(" . $columnname . ", ?, ?)", 1, $colsize) . "
-                     WHERE $columnname IS NOT NULL";
+            if ($column->max_length >= core_text::strlen($replace)) {
+                if (core_text::strlen($search) < core_text::strlen($replace)) {
+                    $colsize = $column->max_length;
+                    $sql = "UPDATE {" . $table . "}
+                        SET $columnname = " . $this->sql_substr("REPLACE(" . $columnname . ", ?, ?)", 1, $colsize) . "
+                        WHERE $columnname IS NOT NULL AND $likesql";
+                }
+                $this->execute($sql, array($search, $replace, '%' . $search . '%'));
             }
-            $this->execute($sql, array($search, $replace));
         }
     }
 
