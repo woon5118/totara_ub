@@ -3228,8 +3228,21 @@ abstract class moodle_database {
     /**
      * Returns true if this database engine recommends counted recordsets be used for counting of paginated recordsets.
      *
-     * For results on performance testing of paginated results see:
-     * https://tracker.totaralms.com/browse/TL-19933?focusedCommentId=172537&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-172537
+     * The results of performance testing:
+     * | Database        | 2 queries vs counted rs | Page 1 perf | Page 4891 perf |
+     * ----------------------------------------------------------------------------
+     * | PostgreSQL 11.1 | 2 queries were          | 80x faster  | 1.6x faster    |
+     * | PostgreSQL 10.6 | 2 queries were          | 25x faster  | 1.2x faster    |
+     * | PostgreSQL 9.6  | 2 queries were          | 10x faster  | Same speed     |
+     * | MySQL 8.0       | 2 queries were          | 11x faster  | 12% slower     |
+     * | MySQL 5.7       | 2 queries were          | 6x faster   | 15% slower     |
+     * | MariaDB 10.4    | Counted rs were         | 1.3x faster | 1.3x faster    |
+     * | MariaDB 10.3    | Counted rs were         | 2.5x faster | 2x faster      |
+     * | MariaDB 10.2    | Counted rs were         | 2.5x faster | 1.5x faster    |
+     * | MSSQL 2017      | 2 queries were          | 1.8x faster | 2x faster      |
+     *
+     * A "Jobs" report source report was used for testing, that includes user and manager detail,
+     * on a dataset of 280K users and 190K job assignments, with a deep hierarchy and multiple jobs.
      *
      * @return bool
      */

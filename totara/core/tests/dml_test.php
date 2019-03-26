@@ -1925,8 +1925,7 @@ ORDER BY tt1.groupid";
      * Tests recommends_counted_recordset to ensure it returns the result that we expect.
      *
      * Expected results are thanks to performance testing completed for each database.
-     * For results on performance testing of paginated results see:
-     * https://tracker.totaralms.com/browse/TL-19933?focusedCommentId=172537&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-172537
+     * For results on performance testing of paginated results see moodle_database class.
      */
     public function test_recommends_counted_recordset() {
         global $DB;
