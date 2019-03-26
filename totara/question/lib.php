@@ -1141,6 +1141,15 @@ class MoodleQuickForm_staticcallback extends MoodleQuickForm_static {
      * @return string
      */
     public function setText($text) {
+        if ($this->callback instanceof question_base) {
+            // Same problem as in constructor; this time happens when questions
+            // with different permissions for different roles occur.
+            if (empty(trim($this->callback->label))) {
+                parent::setText('');
+                return;
+            }
+        }
+
         // Return a "no response" value when an appraisal is completed but with
         // unanswered questions.
         //
