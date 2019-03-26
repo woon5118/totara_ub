@@ -759,7 +759,7 @@ function enrol_user_sees_own_courses($user = null) {
 }
 
 /**
- * Returns list of courses user is enrolled into without any capability checks
+ * Returns list of courses user is enrolled into with capability checks
  * - $fields is an array of fieldnames to ADD
  *   so name the fields you really need, which will
  *   be added and uniq'd
@@ -837,8 +837,8 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
     $visibilitysql = '';
     $visibilityparams = array();
     if ($onlyactive) {
-    // Take into account the visibility of the courses.
-    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid, 'c.id', 'c.visible', 'c.audiencevisible');
+        // Take into account the visibility of the courses.
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($userid, 'c.id', 'c.visible', 'c.audiencevisible');
         $visibilitysql = "AND {$visibilitysql}";
     }
 
