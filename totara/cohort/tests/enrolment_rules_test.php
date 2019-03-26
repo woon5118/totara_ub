@@ -218,6 +218,8 @@ Program 2 - Course 1 and Course 2
             array($this->program1->id, $this->program2->id),
             'listofids'
         );
+        // Refresh rule list cache.
+        cohort_rules_list(true);
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(1, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
 
