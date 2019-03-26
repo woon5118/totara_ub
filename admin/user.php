@@ -62,7 +62,7 @@ list($reporthtml, $debughtml) = $renderer->report_html($report, $debug);
 echo $debughtml;
 
 $a = $renderer->result_count_info($report);
-echo $OUTPUT->heading(get_string('userreportheading', 'totara_reportbuilder', $a));
+echo $OUTPUT->heading(get_string('manageuserreportheading', 'totara_reportbuilder', $a));
 
 $report->display_restrictions();
 
@@ -73,12 +73,12 @@ $report->display_sidebar_search();
 
 if (has_capability('moodle/user:create', context_system::instance())) {
     $url = new moodle_url('/user/editadvanced.php', array('id' => -1, 'returnto' => 'allusers'));
-    echo $OUTPUT->single_button($url, get_string('addnewuser'), 'get');
+    echo $OUTPUT->single_button($url, get_string('createuser'), 'get');
 
     echo $reporthtml;
 
     $url = new moodle_url('/user/editadvanced.php', array('id' => -1, 'returnto' => 'allusers'));
-    echo $OUTPUT->single_button($url, get_string('addnewuser'), 'get');
+    echo $OUTPUT->single_button($url, get_string('createuser'), 'get');
 } else {
     echo $reporthtml;
 }

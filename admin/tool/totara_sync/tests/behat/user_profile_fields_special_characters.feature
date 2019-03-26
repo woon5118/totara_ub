@@ -53,12 +53,12 @@ Feature: User menu profile fields handle special characters via HR Import.
     And I should not see "However, there have been some problems"
 
     # Confirm the custom field data is saved against the user.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 1"
     Then I should see "Health & Safety"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 2"
     Then I should see "> 10"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 3"
     Then I should see "< 10"

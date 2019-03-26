@@ -120,7 +120,7 @@ Feature: User profile fields set as unique can be used via HR Import.
     And I should not see "However, there have been some problems"
 
     # Confirm the custom field data is saved against the user.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 1"
     And I should see "Unique checkbox test"
     And the "Unique checkbox test" "checkbox" should be disabled
@@ -146,7 +146,7 @@ Feature: User profile fields set as unique can be used via HR Import.
     And I should not see "However, there have been some problems"
 
     # Confirm the custom field empty data is saved against the user.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 1"
     And I should not see "Unique checkbox test"
 

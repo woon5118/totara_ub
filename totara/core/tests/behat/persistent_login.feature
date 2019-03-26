@@ -103,7 +103,7 @@ Feature: Test persistent login feature
     And I set the field "Remember my login" to "1"
     And I press "Log in"
     And I should see "Admin User"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "user one"
     And I follow "Log in as"
     And I should see "You are logged in as user one"
@@ -168,7 +168,7 @@ Feature: Test persistent login feature
     And I should see "Prvni Uzivatel"
     And I use magic for persistent login to purge cookies
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Prvni Uzivatel"
     And I follow "Edit profile"
     And I set the field "New password" to "Userpass-1"

@@ -50,7 +50,7 @@ Feature: Suspended user data purging
     And I click on "Select all" "link"
     And I press "Add"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User data" "link" in the "Bob1 Learner" "table_row"
     And I click on "Edit" "link" in the "Automatic purging once user is suspended" "definition_exact"
     And I set the "Automatic purging once user is suspended" Totara form field to "Minimal suspended user purging"
@@ -59,14 +59,14 @@ Feature: Suspended user data purging
     And I press "Save changes"
     And I should see "Minimal suspended user purging" in the "Automatic purging once user is suspended" "definition_exact"
     And I should see "None" in the "All data purges" "definition_exact"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Suspend Bob1 Learner" "link" in the "Bob1 Learner" "table_row"
     And I set the following fields to these values:
       | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"
     And I click on "User data" "link" in the "Bob3 Learner" "table_row"
     And I should see "None" in the "All data purges" "definition_exact"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I set the following fields to these values:
       | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"
@@ -96,7 +96,7 @@ Feature: Suspended user data purging
     And I set the "Reapply purging" Totara form field to "1"
     And I should see "This purge type will be reapplied to 1 users."
     And I press "Update"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I set the following fields to these values:
       | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"
@@ -105,7 +105,7 @@ Feature: Suspended user data purging
     And I run the scheduled task "totara_userdata\task\purge_suspended"
     Then I should see "3" in the "All data purges" "definition_exact"
     And I should see "purged" in the "Automatic purging once user is suspended" "definition_exact"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I set the following fields to these values:
       | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"
@@ -124,7 +124,7 @@ Feature: Suspended user data purging
     When I navigate to "Settings" node in "Site administration > User data management"
     And I set the field "Default purging type for suspended users" to "Minimal suspended user purging"
     And I press "Save changes"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Suspend Bob2 Learner" "link" in the "Bob2 Learner" "table_row"
     And I click on "Suspend Bob5 Learner" "link" in the "Bob5 Learner" "table_row"
     And I set the following fields to these values:
@@ -142,7 +142,7 @@ Feature: Suspended user data purging
     Then I should see "1" in the "All data purges" "definition_exact"
     And I should see "purged" in the "Automatic purging once user is suspended" "definition_exact"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I set the following fields to these values:
       | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"
@@ -168,6 +168,6 @@ Feature: Suspended user data purging
     When I press "Save changes"
     Then I should see "None" in the "Automatic purging once user is suspended" "definition_exact"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User data" "link" in the "Paul Manager" "table_row"
     Then I should see "None (Site default: Minimal suspended user purging)" in the "Automatic purging once user is suspended" "definition_exact"

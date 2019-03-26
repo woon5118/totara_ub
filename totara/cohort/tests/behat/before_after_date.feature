@@ -103,7 +103,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
     And I press "Approve changes"
 
     # User on the same date as "before and on" should be included (In T10 this should be changed).
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Sam Student1"
     And I follow "Edit profile"
     And I expand all fieldsets
@@ -114,7 +114,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
       | profile_field_joindate[year]    | 2016     |
     And I press "Update profile"
 
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Sal Student2"
     And I follow "Edit profile"
     And I expand all fieldsets
@@ -125,7 +125,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
       | profile_field_joindate[year]    | 2016     |
     And I press "Update profile"
 
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Sad Student3"
     And I follow "Edit profile"
     And I expand all fieldsets
@@ -155,7 +155,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
     And I log out
     And I log in as "siteman1"
 
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Sam Student1"
     And I follow "Edit profile"
     And I expand all fieldsets
@@ -164,7 +164,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
       | profile_field_joindate[minute] | 05 |
     And I press "Update profile"
 
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Sad Student3"
     And I follow "Edit profile"
     And I expand all fieldsets

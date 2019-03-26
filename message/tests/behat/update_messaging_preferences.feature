@@ -22,7 +22,7 @@ Feature: Messaging preferences
     Given the following "users" exist:
       | username | firstname | lastname | email            |
       | user1    | User      | 1        | user1@example.com    |
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User 1" "link"
     And I click on "Preferences" "link" in the ".profile_tree" "css_element"
     And I click on "Message preferences" "link" in the "region-main" "region"

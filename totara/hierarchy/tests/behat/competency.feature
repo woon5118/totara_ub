@@ -39,7 +39,7 @@ Feature: Test competencies achieved is updated
     And I click on "Choice - Help to Gandalf the Grey" "checkbox"
     And I press "Save changes"
     And I click on "Home" in the totara menu
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Bilbo Baggins" "link"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:

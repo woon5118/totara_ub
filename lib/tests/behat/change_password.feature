@@ -11,7 +11,7 @@ Feature: User can change their password
       | username | firstname | lastname | email |
       | learner | learner | 1 | learner@example.com |
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "learner 1" "link"
     And I click on "Edit profile" "link"
     And I set the following fields to these values:
@@ -63,7 +63,7 @@ Feature: User can change their password
       | learner | learner | 1 | learner@example.com | monkey |
 
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "learner 1" "link"
     And I click on "Edit profile" "link"
     And I set the following fields to these values:

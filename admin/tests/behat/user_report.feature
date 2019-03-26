@@ -8,10 +8,10 @@ Feature: Verify functionality of user report.
       | learner1 | Bob1      | Learner1 | bob1.learner1@example.com | 0           |
 
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
 
   Scenario: Verify expected users are in user report
-    Then I should see "Browse list of users: 3 records shown"
+    Then I should see "Manage users: 3 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status | Last Login                   |
       | Guest user      | guest    | root@localhost            | Active      |                              |
@@ -23,7 +23,7 @@ Feature: Verify functionality of user report.
     When I set the field "user-fullname" to "Bob"
     # Press Search button.
     And I click on "#id_submitgroupstandard_addfilter" "css_element"
-    Then I should see "Browse list of users: 1 record shown"
+    Then I should see "Manage users: 1 record shown"
     And "Save this search" "button" should not exist
 
   Scenario: Verify column sorting in user report.
@@ -59,8 +59,8 @@ Feature: Verify functionality of user report.
 
   Scenario: Verify adding a new user from user report.
 
-    Given I press "Add a new user"
-    Then I should see "Add a new user"
+    Given I press "Create user"
+    Then I should see "Create user"
 
     When I set the following fields to these values:
       | Username      | learner2                  |
@@ -68,8 +68,8 @@ Feature: Verify functionality of user report.
       | First name    | Bob2                      |
       | Surname       | Learner4                  |
       | Email address | bob2.learner2@example.com |
-    And I press "Create user"
-    Then I should see "Browse list of users: 4 records shown"
+    And I press "Save and go back"
+    Then I should see "Manage users: 4 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              |
       | Bob2 Learner4   | learner2 | bob2.learner2@example.com |
@@ -78,7 +78,7 @@ Feature: Verify functionality of user report.
 
     Given I follow "Edit Bob1 Learner1"
     When I set the field "First name" to "Sir Bob1"
-    And I press "Update profile"
+    And I press "Save and go back"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname   | Username | User's Email              |
       | Sir Bob1 Learner1 | learner1 | bob1.learner1@example.com |
@@ -105,7 +105,7 @@ Feature: Verify functionality of user report.
     Then I should see "Delete user"
 
     When I press "Delete"
-    Then I should see "Browse list of users: 2 records shown"
+    Then I should see "Manage users: 2 records shown"
     And I set the field "user-deleted" to "any value"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should not see "Bob1 Learner1"
@@ -133,7 +133,7 @@ Feature: Verify functionality of user report.
     Then I should see "An email should have been sent to your address at bob2.learner2@example.com"
 
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I set the field "user-deleted" to "any value"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then the "reportbuilder-table" table should contain the following:
@@ -173,7 +173,7 @@ Feature: Verify functionality of user report.
     Then I should see "Invalid login, please try again"
 
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
@@ -215,9 +215,9 @@ Feature: Verify functionality of user report.
     Then I should see "Bob1 Learner1 (bob1.learner1@example.com)" in the "#removeselect" "css_element"
     And I should see "Bob3 Learner3 (bob3.learner3@example.com)" in the "#removeselect" "css_element"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I press "Edit this report"
-    Then I should see "Edit Report 'Browse list of users'"
+    Then I should see "Edit Report 'Manage users'"
 
     When I switch to "Content" tab
     And I set the field "Global report restrictions" to "1"
@@ -253,8 +253,8 @@ Feature: Verify functionality of user report.
 
     # Learner1 should not have any restrictions on what data it can see.
     When I log in as "learner1"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
-    Then I should see "Browse list of users: 6 records shown"
+    When I navigate to "Manage users" node in "Site administration > Users"
+    Then I should see "Manage users: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
@@ -265,8 +265,8 @@ Feature: Verify functionality of user report.
 
     # Learner3 should be restricted to a report containing only learner1 and 2.
     When I log in as "learner3"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
-    Then I should see "Browse list of users: 2 records shown"
+    And I navigate to "Manage users" node in "Site administration > Users"
+    Then I should see "Manage users: 2 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |

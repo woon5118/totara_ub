@@ -13,7 +13,7 @@ Feature: User remove the value of profile custom field that had already been use
     And I am on a totara site
     And I log in as "admin"
 
-    And I navigate to "Users > Browse list of users" in site administration
+    And I navigate to "Users > Manage users" in site administration
     And I follow "kian bomba"
     And I follow "Edit profile"
     And I follow "Other fields"
@@ -32,7 +32,7 @@ Feature: User remove the value of profile custom field that had already been use
   Scenario: User delete the value of custom field in a profile page
     then expecting the audience rules page to have a message about deleted value
 
-    Given I navigate to "Users > Browse list of users" in site administration
+    Given I navigate to "Users > Manage users" in site administration
     And I follow "kian bomba"
     And I follow "Edit profile"
     And I follow "Other fields"

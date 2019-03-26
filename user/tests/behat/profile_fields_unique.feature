@@ -81,8 +81,8 @@ Feature: User profile fields handle the unique values correctly.
     Then I should see "User profile fields"
     Then I should see "Text 1"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
-    And I press "Add a new user"
+    When I navigate to "Manage users" node in "Site administration > Users"
+    And I press "Create user"
     And I expand all fieldsets
     And I set the following fields to these values:
       | Username                         | learner1             |
@@ -103,12 +103,12 @@ Feature: User profile fields handle the unique values correctly.
       | Textarea 1                       | Textarea Content     |
       | Text 1                           | Text Content         |
 
-    And I press "Create user"
+    And I press "Save and go back"
 
   Scenario: Verify unique user profile fields when creating a user with non-unique values fail uniqueness check in manual user creation.
 
-    Given I navigate to "Browse list of users" node in "Site administration > Users"
-    When I press "Add a new user"
+    Given I navigate to "Manage users" node in "Site administration > Users"
+    When I press "Create user"
     And I expand all fieldsets
     And I set the following fields to these values:
       | Username                         | learner2             |
@@ -117,7 +117,7 @@ Feature: User profile fields handle the unique values correctly.
       | Surname                          | Learner2             |
       | Email address                    | learner2@example.com |
       | Checkbox 1                       | 1                    |
-    And I press "Create user"
+    And I press "Save and go back"
     Then I should see the form validation error "This value has already been used." for the "checkbox1" user profile field
 
     When I set the following fields to these values:
@@ -126,7 +126,7 @@ Feature: User profile fields handle the unique values correctly.
       | profile_field_date1[year]        | 2049                 |
       | profile_field_date1[month]       | 7                    |
       | profile_field_date1[day]         | 20                   |
-    And I press "Create user"
+    And I press "Save and go back"
     Then I should not see the form validation error "This value has already been used." for the "checkbox1" user profile field
     And I should see the form validation error "This value has already been used." for the "date1" user profile field
 
@@ -139,7 +139,7 @@ Feature: User profile fields handle the unique values correctly.
       | profile_field_datetime1[year]    | 2049                 |
       | profile_field_datetime1[month]   | 8                    |
       | profile_field_datetime1[day]     | 21                   |
-    And I press "Create user"
+    And I press "Save and go back"
     Then I should not see the form validation error "This value has already been used." for the "date1" user profile field
     And I should see the form validation error "This value has already been used." for the "datetime1" user profile field
 
@@ -149,28 +149,28 @@ Feature: User profile fields handle the unique values correctly.
       | profile_field_datetime1[month]   | 8                    |
       | profile_field_datetime1[day]     | 22                   |
       | Menu 1                           | Option 1             |
-    And I press "Create user"
+    And I press "Save and go back"
     Then I should not see the form validation error "This value has already been used." for the "datetime1" user profile field
     And I should see the form validation error "This value has already been used." for the "menu1" user profile field
 
     When I set the following fields to these values:
       | Menu 1                           | Option 2             |
       | Textarea 1                       | Textarea Content     |
-    And I press "Create user"
+    And I press "Save and go back"
     Then I should not see the form validation error "This value has already been used." for the "menu1" user profile field
     And I should see the form validation error "This value has already been used." for the "textarea1" user profile field
 
     When I set the following fields to these values:
       | Textarea 1                       | Textarea Content 2   |
       | Text 1                           | Text Content         |
-    And I press "Create user"
+    And I press "Save and go back"
     Then I should not see the form validation error "This value has already been used." for the "textarea1" user profile field
     And I should see the form validation error "This value has already been used." for the "text1" user profile field
 
     When I set the following fields to these values:
       | Text 1                           | Text Content 2       |
-    And I press "Create user"
-    Then I should see "Browse list of users: 4 records shown"
+    And I press "Save and go back"
+    Then I should see "Manage users: 4 records shown"
     And the following should exist in the "users" table:
       | username |
       | guest    |
@@ -180,8 +180,8 @@ Feature: User profile fields handle the unique values correctly.
 
   Scenario: Verify unique user profile fields when updating a user with non-unique values fail uniqueness check in manual user creation.
 
-    Given I navigate to "Browse list of users" node in "Site administration > Users"
-    When I press "Add a new user"
+    Given I navigate to "Manage users" node in "Site administration > Users"
+    When I press "Create user"
     And I expand all fieldsets
     And I set the following fields to these values:
       | Username                         | learner2             |
@@ -201,8 +201,8 @@ Feature: User profile fields handle the unique values correctly.
       | Menu 1                           | Option 2             |
       | Textarea 1                       | Textarea Content 2   |
       | Text 1                           | Text Content 2       |
-    And I press "Create user"
-    Then I should see "Browse list of users: 4 records shown"
+    And I press "Save and go back"
+    Then I should see "Manage users: 4 records shown"
     And the following should exist in the "users" table:
       | username |
       | learner2 |
@@ -211,7 +211,7 @@ Feature: User profile fields handle the unique values correctly.
     And I expand all fieldsets
     When I set the following fields to these values:
       | Checkbox 1                       | 1                    |
-    And I press "Update profile"
+    And I press "Save and go back"
     Then I should see the form validation error "This value has already been used." for the "checkbox1" user profile field
 
     When I set the following fields to these values:
@@ -220,7 +220,7 @@ Feature: User profile fields handle the unique values correctly.
       | profile_field_date1[year]        | 2049                 |
       | profile_field_date1[month]       | 7                    |
       | profile_field_date1[day]         | 20                   |
-    And I press "Update profile"
+    And I press "Save and go back"
     Then I should not see the form validation error "This value has already been used." for the "checkbox1" user profile field
     And I should see the form validation error "This value has already been used." for the "date1" user profile field
 
@@ -233,7 +233,7 @@ Feature: User profile fields handle the unique values correctly.
       | profile_field_datetime1[year]    | 2049                 |
       | profile_field_datetime1[month]   | 8                    |
       | profile_field_datetime1[day]     | 21                   |
-    And I press "Update profile"
+    And I press "Save and go back"
     Then I should not see the form validation error "This value has already been used." for the "date1" user profile field
     And I should see the form validation error "This value has already been used." for the "datetime1" user profile field
 
@@ -243,28 +243,28 @@ Feature: User profile fields handle the unique values correctly.
       | profile_field_datetime1[month]   | 8                    |
       | profile_field_datetime1[day]     | 23                   |
       | Menu 1                           | Option 1             |
-    And I press "Update profile"
+    And I press "Save and go back"
     Then I should not see the form validation error "This value has already been used." for the "datetime1" user profile field
     And I should see the form validation error "This value has already been used." for the "menu1" user profile field
 
     When I set the following fields to these values:
       | Menu 1                           | Option 3             |
       | Textarea 1                       | Textarea Content     |
-    And I press "Update profile"
+    And I press "Save and go back"
     Then I should not see the form validation error "This value has already been used." for the "menu1" user profile field
     And I should see the form validation error "This value has already been used." for the "textarea1" user profile field
 
     When I set the following fields to these values:
       | Textarea 1                       | Textarea Content 3   |
       | Text 1                           | Text Content         |
-    And I press "Update profile"
+    And I press "Save and go back"
     Then I should not see the form validation error "This value has already been used." for the "textarea1" user profile field
     And I should see the form validation error "This value has already been used." for the "text1" user profile field
 
     When I set the following fields to these values:
       | Text 1                           | Text Content 3       |
-    And I press "Update profile"
-    Then I should see "Browse list of users: 4 records shown"
+    And I press "Save and go back"
+    Then I should see "Manage users: 4 records shown"
     And the following should exist in the "users" table:
       | username |
       | guest	 |

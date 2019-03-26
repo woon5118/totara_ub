@@ -13,17 +13,17 @@ Feature: Deleted user accounts feature
     When I log in as "admin"
     And I navigate to "Deleted user accounts" node in "Site administration > User data management"
     Then I should see "Deleted user accounts: 0 records shown"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
-    And I should see "Browse list of users: 6 records shown"
+    And I navigate to "Manage users" node in "Site administration > Users"
+    And I should see "Manage users: 6 records shown"
 
   Scenario: Verify proper full user delete works
     Given I log in as "admin"
     And I set the following administration settings values:
       | authdeleteusers | fullproper |
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Delete Bob1 Learner" "link"
     When I press "Delete"
-    And I should see "Browse list of users: 5 records shown"
+    And I should see "Manage users: 5 records shown"
     And I navigate to "Deleted user accounts" node in "Site administration > User data management"
     Then I should see "Bob1 Learner"
     And I should not see "username1"
@@ -36,10 +36,10 @@ Feature: Deleted user accounts feature
     Given I log in as "admin"
     And I set the following administration settings values:
       | authdeleteusers | full |
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Delete Bob1 Learner" "link"
     When I press "Delete"
-    And I should see "Browse list of users: 5 records shown"
+    And I should see "Manage users: 5 records shown"
     And I navigate to "Deleted user accounts" node in "Site administration > User data management"
     Then I should see "Bob1 Learner"
     And I should not see "username1"
@@ -52,10 +52,10 @@ Feature: Deleted user accounts feature
     Given I log in as "admin"
     And I set the following administration settings values:
       | authdeleteusers | partial |
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Delete Bob1 Learner" "link"
     When I press "Delete"
-    And I should see "Browse list of users: 5 records shown"
+    And I should see "Manage users: 5 records shown"
     And I navigate to "Deleted user accounts" node in "Site administration > User data management"
     Then I should see "Bob1 Learner"
     And I should see "username1"
@@ -67,8 +67,8 @@ Feature: Deleted user accounts feature
     Then I should see "Undeleted Bob1 Learner"
     And I should see "Bob1 Learner"
     And I should see "Job assignments"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
-    And I should see "Browse list of users: 6 records shown"
+    And I navigate to "Manage users" node in "Site administration > Users"
+    And I should see "Manage users: 6 records shown"
     And I should see "Bob1 Learner"
     And I should see "username1"
     And I should see "bob1.learner@example.com"

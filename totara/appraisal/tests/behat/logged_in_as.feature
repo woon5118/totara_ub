@@ -53,7 +53,7 @@ Feature: Make sure the real user is recorded in appraisals when using login-as
     # Admin logs in as the manager
     And I log out
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "manager lastname" "link"
     And I click on "Log in as" "link"
     Then I should see "You are logged in as manager lastname"

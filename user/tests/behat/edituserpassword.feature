@@ -10,8 +10,8 @@ Feature: Enable/disable password field based on authentication selected.
   Scenario: Verify the password field is enabled/disabled based on authentication selected when creating a new user.
 
     Given I log in as "admin"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
-    And I press "Add a new user"
+    When I navigate to "Manage users" node in "Site administration > Users"
+    And I press "Create user"
     Then the "New password" "field" should be enabled
     And "Language" "field" should exist
     And I set the field "auth" to "Web services authentication"
@@ -19,7 +19,7 @@ Feature: Enable/disable password field based on authentication selected.
     And I set the field "auth" to "Email-based self-registration"
     And the "New password" "field" should be enabled
     # We need to cancel/submit a form that has been modified.
-    And I press "Create user"
+    And I press "Save and go back"
 
   Scenario: Verify the password field is enabled/disabled based on authentication selected when editing an existing user.
 
@@ -27,7 +27,7 @@ Feature: Enable/disable password field based on authentication selected.
       | username | firstname | lastname | email                |
       | learner1 | Leonard   | Learner1 | learner1@example.com |
     And I log in as "admin"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Edit" "link" in the "Leonard Learner1" "table_row"
     Then "Language" "field" should not exist
     And the "New password" "field" should be enabled
@@ -36,4 +36,4 @@ Feature: Enable/disable password field based on authentication selected.
     And I set the field "auth" to "Email-based self-registration"
     And the "newpassword" "field" should be enabled
     # We need to cancel/submit a form that has been modified.
-    And I press "Update profile"
+    And I press "Save and go back"

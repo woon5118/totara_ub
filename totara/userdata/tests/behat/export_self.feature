@@ -76,7 +76,7 @@ Feature: Own user data exporting
     And I log out
 
     When I log in as "manager"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User data" "link" in the "Bob1 Learner" "table_row"
     Then I should see "2" in the "Data export requests" "definition_exact"
 

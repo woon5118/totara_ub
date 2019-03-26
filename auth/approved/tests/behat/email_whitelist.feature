@@ -121,7 +121,7 @@ Feature: auth_approved: email whitelist
     And "Account request email was confirmed" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) confirmed email address"
     And "Account request was approved" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) approved for system access"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "James Bond"
     Then I should see "This user has no job assignments"
 
@@ -206,7 +206,7 @@ Feature: auth_approved: email whitelist
     And "Account request email was confirmed" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) confirmed email address"
     And "Account request was approved" row "Description" column of "reportlog" table should contain "jb007 (bond@example.org) approved for system access"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "James Bond"
     And I follow "Unnamed job assignment"
     Then I should see "Sales Engr"

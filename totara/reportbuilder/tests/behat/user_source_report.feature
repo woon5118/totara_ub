@@ -2,7 +2,7 @@
 Feature: Verify functionality of user source report.
 
   # See admin/tests/behat/user_report.feature for more tests that are relevant
-  # to the user source report but specific to the Browse List of Users report.
+  # to the user source report but specific to the Manage users report.
 
   Background:
     Given I am on a totara site
@@ -45,7 +45,7 @@ Feature: Verify functionality of user source report.
 
     Given I follow "Edit Bob1 Learner1"
     When I set the field "First name" to "Sir Bob1"
-    And I press "Update profile"
+    And I press "Save and go back"
     Then I should see "User Report: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname   | Username | User's Email              | User Status |

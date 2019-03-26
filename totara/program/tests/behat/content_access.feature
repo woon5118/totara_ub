@@ -161,7 +161,7 @@ Feature: Access programs content as a learner
 
   Scenario: Access a new course added to a completed program via learning plans
     Given I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "fn_002 ln_002" "link"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I press "Create new learning plan"

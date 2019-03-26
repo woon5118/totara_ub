@@ -113,7 +113,7 @@ Feature: Link appraisal with an appraisee job assignment.
 
     Given I log out
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "James Bond" "link"
     And I click on "Unnamed job assignment (ID: 1)" "link"
     And I set the following fields to these values:
@@ -161,7 +161,7 @@ Feature: Link appraisal with an appraisee job assignment.
 
     Given I log out
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "James Bond" "link"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -215,7 +215,7 @@ Feature: Link appraisal with an appraisee job assignment.
 
     Given I log out
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "James Bond" "link"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:

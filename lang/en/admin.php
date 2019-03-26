@@ -713,6 +713,7 @@ $string['manageqbehaviours'] = 'Manage question behaviours';
 $string['manageqtypes'] = 'Manage question types';
 $string['managerroleid'] = 'Role for manager';
 $string['managerroleid_help'] = 'The role is used for staff managers.';
+$string['manageusers'] = 'Manage users';
 $string['maturity50'] = 'Alpha';
 $string['maturity100'] = 'Beta';
 $string['maturity150'] = 'Release candidate';

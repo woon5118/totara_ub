@@ -72,11 +72,11 @@ Feature: availability_profile
     And I click on "Save changes" "button"
 
     # Set field value for user.
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Edit" "link" in the "s@example.com" "table_row"
     And I expand all fieldsets
     And I set the field "Super field" to "Bananaman"
-    And I click on "Update profile" "button"
+    And I click on "Save and go back" "button"
 
     # Set Page activity which has requirement on this field.
     And I am on "Course 1" course homepage with editing mode on

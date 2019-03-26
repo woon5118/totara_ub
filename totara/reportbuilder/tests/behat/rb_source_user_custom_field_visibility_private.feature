@@ -113,7 +113,7 @@ Feature: Per user visibility of user report source custom field values
       | Default value                | TestTextField default value |
     And I press "Save changes"
 
-    Given I navigate to "Browse list of users" node in "Site administration > Users"
+    Given I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Maxwell Smart"
     And I follow "Edit profile"
     And I expand all fieldsets
@@ -138,7 +138,7 @@ Feature: Per user visibility of user report source custom field values
       | TestTextField                      | agent86 text value             |
     And I press "Update profile"
 
-    Given I navigate to "Browse list of users" node in "Site administration > Users"
+    Given I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Agent 99"
     And I follow "Edit profile"
     And I expand all fieldsets
@@ -163,7 +163,7 @@ Feature: Per user visibility of user report source custom field values
       | TestTextField                      | agent99 text value             |
     And I press "Update profile"
 
-    Given I navigate to "Browse list of users" node in "Site administration > Users"
+    Given I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Kaos Inc"
     And I follow "Edit profile"
     And I expand all fieldsets

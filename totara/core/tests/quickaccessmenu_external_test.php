@@ -241,7 +241,7 @@ class totara_core_quickaccessmenu_external_testcase extends advanced_testcase {
         $expected = [
             [
                 'key'   => 'editusers',
-                'label' => 'Browse list of users',
+                'label' => 'Manage users',
             ],
             [
                 'key'   => 'userbulk',

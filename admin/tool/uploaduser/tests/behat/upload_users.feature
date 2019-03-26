@@ -29,7 +29,7 @@ Feature: Upload users
     And I should see "Section 1"
     And I press "Upload users"
     And I press "Continue"
-    And I navigate to "Users > Browse list of users" in site administration
+    And I navigate to "Users > Manage users" in site administration
     And I should see "Tom Jones"
     And I should see "Trent Reznor"
     And I should see "reznor@example.com"
@@ -56,7 +56,7 @@ Feature: Upload users
       | Department | Purchasing |
     And I press "Upload users"
     And I press "Continue"
-    And I navigate to "Users > Browse list of users" in site administration
+    And I navigate to "Users > Manage users" in site administration
     And I should see "Tom Jones"
     And I follow "Tom Jones"
     And I follow "Edit profile"
@@ -90,7 +90,7 @@ Feature: Upload users
     And I press "Upload users"
     And I press "Upload users"
     # Check that users were created and the superfield is filled.
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Tom Jones"
     And I should see "Super field"
     And I should see "The big guy"

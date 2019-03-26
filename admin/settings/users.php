@@ -15,7 +15,7 @@ if ($hassiteconfig
 
 
     // Totara: stuff under the "Users" subcategory
-    $ADMIN->add('users', new admin_externalpage('editusers', new lang_string('userlist','admin'), "$CFG->wwwroot/$CFG->admin/user.php", array('moodle/user:update', 'moodle/user:delete')));
+    $ADMIN->add('users', new admin_externalpage('editusers', new lang_string('manageusers','admin'), "$CFG->wwwroot/$CFG->admin/user.php", array('moodle/user:update', 'moodle/user:delete')));
     $ADMIN->add('users', new admin_externalpage('userbulk', new lang_string('userbulk','admin'), "$CFG->wwwroot/$CFG->admin/user/user_bulk.php", array('moodle/user:update', 'moodle/user:delete')));
 
     // "User default preferences" settingpage.

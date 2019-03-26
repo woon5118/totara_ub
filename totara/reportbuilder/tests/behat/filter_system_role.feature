@@ -270,16 +270,16 @@ Feature: Verify the User System Role filter.
     And I switch to "Filters" tab
     Then I should not see "User System Role" in the "newstandardfilter" "select"
 
-    # Add the filter to the Browse List of Users embedded report.
+    # Add the filter to the Manage users embedded report.
     When I follow "All embedded reports"
-    And I click on "Settings" "link" in the "Browse list of users" "table_row"
+    And I click on "Settings" "link" in the "Manage users" "table_row"
     And I switch to "Filters" tab
     And I set the field "newstandardfilter" to "User System Role"
     And I press "Save changes"
     Then I should see "Filters updated"
 
     # Check the system roles are present in the filter menu.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     Then I should see "Site Manager" in the "user-roleid" "select"
     And I should see "Course creator" in the "user-roleid" "select"
     And I should see "Staff Manager" in the "user-roleid" "select"
@@ -288,7 +288,7 @@ Feature: Verify the User System Role filter.
     When I click on "Assigned" "radio"
     And I set the field "user-roleid" to "Any role"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "Browse list of users: 4 records shown"
+    Then I should see "Manage users: 4 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Bob1 Learner1   | learner1 |

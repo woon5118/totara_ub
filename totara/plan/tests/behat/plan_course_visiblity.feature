@@ -42,7 +42,7 @@ Feature: See that audience based visibility doesn't effect a course showing in a
     And I set the following fields to these values:
       | Visibility | Enrolled users and members of the selected audiences |
     And I press "Save and display"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Learner One" "link"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I click on "Learning Plan 1" "link"

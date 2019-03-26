@@ -118,7 +118,7 @@ Feature: Request extensions in programs
 
   Scenario: Program extension request enable in site and program level, no manager assigned and program about to expire
     Given I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Sam Student"
     And I click on "jobassignment1" "link"
     And I click on "Delete" "link" in the "#managertitle" "css_element"

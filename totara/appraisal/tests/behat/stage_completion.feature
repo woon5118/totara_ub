@@ -178,7 +178,7 @@ Feature: Test appraisal stage completion with missing roles
 
     # Now assign a manager to learner2
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "learner2 lastname"
     And I follow "Learner2 Job"
     And I press "Choose manager"
@@ -251,7 +251,7 @@ Feature: Test appraisal stage completion with missing roles
 
     # Now remove the manager
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "learner1 lastname"
     And I follow "Learner1 Job"
     And I click on "Delete" "link" in the "#managertitle" "css_element"
@@ -340,7 +340,7 @@ Feature: Test appraisal stage completion with missing roles
 
     # Now remove the manager
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "learner1 lastname"
     And I follow "Learner1 Job"
     And I click on "Delete" "link" in the "#managertitle" "css_element"

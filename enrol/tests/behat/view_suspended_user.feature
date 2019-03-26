@@ -30,7 +30,7 @@ Feature: View an enrolled user list with suspended users in the course enrolment
     And I log out
     # Suspend user.
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Suspend James Second" "link" in the "James Second" "table_row"
     And I log out
     # Check if the teacher can see the suspended users.

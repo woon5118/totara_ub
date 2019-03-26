@@ -121,7 +121,7 @@ Feature: User profile fields can be used via HR Import.
     And I should not see "However, there have been some problems"
 
     # Confirm the custom field data is saved against the user.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 1"
     Then I should see "Checkbox 1"
     And the "Checkbox 1" "checkbox" should be disabled
@@ -148,7 +148,7 @@ Feature: User profile fields can be used via HR Import.
     And I should not see "However, there have been some problems"
 
     # Confirm the user has been created as expected.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 2"
     Then I should see "Checkbox 1"
     And the "Checkbox 1" "checkbox" should be disabled
@@ -187,7 +187,7 @@ Feature: User profile fields can be used via HR Import.
     When I navigate to "HR Import Log" node in "Site administration > HR Import"
     Then I should see "The value '1' for customfield_checkbox1 is a duplicate of existing data and must be unique. Skipped user"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     Then I should not see "Upload User 3"
 
   Scenario: Verify unique user profile fields with non-unique date values fail uniqueness check in HR Import.
@@ -214,7 +214,7 @@ Feature: User profile fields can be used via HR Import.
     When I navigate to "HR Import Log" node in "Site administration > HR Import"
     Then I should see "The date of 20/07/2034 (2036966400) for customfield_date1 is a duplicate of existing data and must be unique. Skipped user 3"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     Then I should not see "Upload User 3"
 
   Scenario: Verify unique user profile fields with non-unique datetime values fail uniqueness check in HR Import.
@@ -241,7 +241,7 @@ Feature: User profile fields can be used via HR Import.
     When I navigate to "HR Import Log" node in "Site administration > HR Import"
     Then I should see "The date of 21/08/2035 (2037052800) for customfield_datetime1 is a duplicate of existing data and must be unique. Skipped user 3"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     Then I should not see "Upload User 3"
 
   Scenario: Verify unique user profile fields with non-unique menu values fail uniqueness check in HR Import.
@@ -268,7 +268,7 @@ Feature: User profile fields can be used via HR Import.
     When I navigate to "HR Import Log" node in "Site administration > HR Import"
     Then I should see "The value 'Option 2' for customfield_menu1 is a duplicate of existing data and must be unique. Skipped user 3"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     Then I should not see "Upload User 3"
 
   Scenario: Verify unique user profile fields with non-unique textarea values fail uniqueness check in HR Import.
@@ -295,7 +295,7 @@ Feature: User profile fields can be used via HR Import.
     When I navigate to "HR Import Log" node in "Site administration > HR Import"
     Then I should see "The value 'textarea data 2' for customfield_textarea1 is a duplicate of existing data and must be unique. Skipped user 3"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     Then I should not see "Upload User 3"
 
   Scenario: Verify unique user profile fields with non-unique text values fail uniqueness check in HR Import.
@@ -322,7 +322,7 @@ Feature: User profile fields can be used via HR Import.
     When I navigate to "HR Import Log" node in "Site administration > HR Import"
     Then I should see "The value 'text data 2' for customfield_text1 is a duplicate of existing data and must be unique. Skipped user 3"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     Then I should not see "Upload User 3"
 
   Scenario: Verify unique user profile fields with empty values are not included in uniqueness check in HR Import.
@@ -338,7 +338,7 @@ Feature: User profile fields can be used via HR Import.
     And I should not see "However, there have been some problems"
 
     # Confirm the custom field data is saved against the user.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 1"
     Then I should see "Checkbox 1"
     And the "Checkbox 1" "checkbox" should be disabled
@@ -364,7 +364,7 @@ Feature: User profile fields can be used via HR Import.
     And I should not see "However, there have been some problems"
 
     # Confirm the custom field empty data is saved against the user.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 1"
     And I should not see "Checkbox 1"
 
@@ -393,5 +393,5 @@ Feature: User profile fields can be used via HR Import.
     And I should not see "However, there have been some problems"
 
     # Confirm the new user is added.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     Then I should see "Upload User 2"

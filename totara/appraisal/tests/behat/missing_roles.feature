@@ -125,7 +125,7 @@ Feature: Admin page that lists missing roles for one appraisal
 
     And I log out
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Delete" "link" in the "manager1" "table_row"
     And I click on "Delete" "button"
 

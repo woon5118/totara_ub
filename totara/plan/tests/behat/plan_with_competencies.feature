@@ -173,7 +173,7 @@ Feature: Learner creates learning plan with competencies.
       | Unclassified | Competency 3 |
 
     # Create a learning plan, Competency 1 should be added to the learning plan.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I press "Create new learning plan"
@@ -193,7 +193,7 @@ Feature: Learner creates learning plan with competencies.
     And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I follow "Competency Framework 1"
     And I click on "Hide" "link" in the "Competency 1" "table_row"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I follow "Learning Plan 2"
@@ -210,7 +210,7 @@ Feature: Learner creates learning plan with competencies.
     When I am on homepage
     And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Hide" "link" in the "Competency Framework 1" "table_row"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I press "Create new learning plan"

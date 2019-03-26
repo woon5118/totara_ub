@@ -19,7 +19,7 @@ Feature: Certification history can be imported as long as records are considered
     Then I should see "CSV import completed"
     And I should see "2 Records successfully imported as certifications"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
     And I switch to "Certifications" tab
@@ -62,7 +62,7 @@ Feature: Certification history can be imported as long as records are considered
     And I click on "Save changes" "button"
     And I click on "Save changes" "button"
     And I run the scheduled task "\totara_certification\task\update_certification_task"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
     And I switch to "Certifications" tab
@@ -89,7 +89,7 @@ Feature: Certification history can be imported as long as records are considered
     And I click on "Upload" "button" in the "#mform2" "css_element"
     Then I should see "CSV import completed"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
     And I switch to "Certifications" tab

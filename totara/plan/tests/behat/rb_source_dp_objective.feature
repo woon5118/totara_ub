@@ -38,7 +38,7 @@ Feature: Verify the columns of the Record of Learning objectives report source.
 
   Scenario: Verify the objective date updated column is present and correct.
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I follow "Objectives (1)"

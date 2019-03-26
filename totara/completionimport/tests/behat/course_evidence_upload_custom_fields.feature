@@ -86,7 +86,7 @@ Feature: Verify course completion data with custom fields can be successfully up
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
     And I follow "Completed course : thisisevidence"
@@ -145,7 +145,7 @@ Feature: Verify course completion data with custom fields can be successfully up
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
     And I follow "Completed course : thisisevidence"

@@ -178,10 +178,10 @@ Feature: Learning plans can be created for members of an audience.
 
     # Update another user so they are added to the audience
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Edit" "link" in the "learner2 learner2" "table_row"
     And I set the field "City/town" to "Brighton"
-    And I press "Update profile"
+    And I press "Save and go back"
 
     # Check the new plan has been created.
     And I navigate to "Audiences" node in "Site administration > Audiences"
@@ -338,7 +338,7 @@ Feature: Learning plans can be created for members of an audience.
       | learner1 | Learning plan template 1 |
     And I log in as "admin"
     # Complete the plan.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "learner1 learner1"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I follow "Learning plan template 1"

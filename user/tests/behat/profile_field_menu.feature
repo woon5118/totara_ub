@@ -25,7 +25,7 @@ text < term
     And I press "Save changes"
     Then I should see "menu profile"
 
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Student 1"
     And I follow "Edit profile"
     And I expand all fieldsets
@@ -37,7 +37,7 @@ text < term
     And I press "Update profile"
     And I should see "A & B"
 
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Student 2"
     And I follow "Edit profile"
     And I expand all fieldsets

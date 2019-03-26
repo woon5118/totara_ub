@@ -33,7 +33,7 @@ Feature: An admin can import different CSV enconding through HR import
     And I should see "Running HR Import cron...Done!"
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
     And I should not see "Error" in the "#totarasynclog" "css_element"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     Then I should see "bob marley"
     Then I should see "Žlutý Koníček"
 
@@ -48,6 +48,6 @@ Feature: An admin can import different CSV enconding through HR import
     And I navigate to "Run HR Import" node in "Site administration > HR Import"
     And I press "Run HR Import"
     And I should see "Running HR Import cron...Done!"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     Then I should see "alice smith"
     Then I should see "Žlutý Koníček"

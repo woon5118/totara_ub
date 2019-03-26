@@ -251,7 +251,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should not see "Selfie ZeroZeroTwo" in the "#region-main" "css_element"
 
     # Check audience membership post-confirmation.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I set the field "User Status" to "any value"
     And I press "id_submitgroupstandard_addfilter"
     And I click on "Confirm" "link" in the "Selfie ZeroZeroOne" "table_row"
@@ -390,7 +390,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I should not see "Selfie ZeroZeroTwo" in the "userenrolment" "table"
 
     # Confirm user 1 but not user 2.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I set the field "User Status" to "any value"
     And I press "id_submitgroupstandard_addfilter"
     And I click on "Confirm" "link" in the "Selfie ZeroZeroOne" "table_row"
@@ -546,7 +546,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I click on "Completion" "link"
     Then I should not see "Selfie"
     # Confirm user 1 but not user 2.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I set the field "User Status" to "any value"
     And I press "id_submitgroupstandard_addfilter"
     And I click on "Confirm" "link" in the "Selfie ZeroZeroOne" "table_row"
@@ -685,7 +685,7 @@ Feature: Verify self registration updates audience membership and enrolled learn
     And I click on "Completion" "link"
     Then I should not see "Selfie"
     # Confirm user 1 but not user 2.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I set the field "User Status" to "any value"
     And I press "id_submitgroupstandard_addfilter"
     And I click on "Confirm" "link" in the "Selfie ZeroZeroOne" "table_row"

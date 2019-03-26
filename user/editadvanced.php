@@ -312,6 +312,10 @@ if ($usernew = $userform->get_data()) {
         }
     }
 
+    if (optional_param('viewprofile', '', PARAM_TEXT)) {
+        $customreturn = null;
+        $returnto = 'profile';
+    }
     if ($user->id == $USER->id) {
         // Override old $USER session variable.
         foreach ((array)$usernew as $variable => $value) {
@@ -350,7 +354,7 @@ if ($usernew = $userform->get_data()) {
 if ($user->id == -1 or ($user->id != $USER->id)) {
     if ($user->id == -1) {
         echo $OUTPUT->header();
-        echo $OUTPUT->heading(get_string('addnewuser'));
+        echo $OUTPUT->heading(get_string('createuser'));
     } else {
         $streditmyprofile = get_string('editmyprofile');
         $userfullname = fullname($user, true);

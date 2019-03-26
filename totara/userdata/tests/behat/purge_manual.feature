@@ -88,7 +88,7 @@ Feature: Manual user data purging
     And I click on "1" "link" in the "All data purges" "definition_exact"
     And I should see "Success" in the "Deleted user purging" "table_row"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User data" "link" in the "Bob1 Learner" "table_row"
     And I press "Select purge type"
     And I set the "Purge type" Totara form field to "Additional names purging"
@@ -116,7 +116,7 @@ Feature: Manual user data purging
     And I should see "Success" in the "Additional names purging" "table_row"
     And I should see "Success" in the "Picture purging" "table_row"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I set the following fields to these values:
     | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"

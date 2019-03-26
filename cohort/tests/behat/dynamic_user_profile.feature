@@ -21,19 +21,19 @@ Feature: Limit an audience based on user profile fields
       | user1    | User      | One      | user1@example.com | 1    |
       | user2    | User      | Two      | user2@example.com | 2    |
       | user3    | User      | Three    | user3@example.com | 3    |
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Edit" "link" in the "User One" "table_row"
     And I expand all fieldsets
     And I set the field "test" to "1"
-    And I press "Update profile"
+    And I press "Save and go back"
     And I click on "Edit" "link" in the "User Two" "table_row"
     And I expand all fieldsets
     And I set the field "test" to "2"
-    And I press "Update profile"
+    And I press "Save and go back"
     And I click on "Edit" "link" in the "User Three" "table_row"
     And I expand all fieldsets
     And I set the field "test" to "3"
-    And I press "Update profile"
+    And I press "Save and go back"
     And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Add new audience"
     And I set the following fields to these values:

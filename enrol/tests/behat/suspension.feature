@@ -193,7 +193,7 @@ Feature: Suspend enrolled course users
 
     # Remove learner1 from the audience
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "Edit profile"
     And I set the following fields to these values:

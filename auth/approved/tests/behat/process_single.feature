@@ -168,7 +168,7 @@ Feature: auth_approved: single signup ops
     And I press "Get these logs"
     Then "jb007 (bond@example.gov) approved for system access" row "Event name" column of "reportlog" table should contain "Account request was approved"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "James Bond"
     And I follow "Unnamed job assignment"
     Then I should see "Sales Engr"
@@ -261,7 +261,7 @@ Feature: auth_approved: single signup ops
     And I press "Get these logs"
     Then "jb007 (bond@example.gov) approved for system access" row "Event name" column of "reportlog" table should contain "Account request was approved"
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "James Bond"
     Then I should see "This user has no job assignments"
 

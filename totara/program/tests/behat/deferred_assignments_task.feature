@@ -47,7 +47,7 @@ Feature: Deferred assignments task for programs
     And I press "Save changes"
     # Run the task now to clear any flags that might have been set already
     And I run the scheduled task "\totara_program\task\assignments_deferred_task"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "fn_001 ln_001" "link"
     And I click on "Job2" "link"
     And I press "Choose position"
@@ -76,7 +76,7 @@ Feature: Deferred assignments task for programs
     And I press "Save changes"
     # Run the task now to clear any flags that might have been set already
     And I run the scheduled task "\totara_program\task\assignments_deferred_task"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "fn_001 ln_001" "link"
     And I click on "Job2" "link"
     And I press "Choose organisation"

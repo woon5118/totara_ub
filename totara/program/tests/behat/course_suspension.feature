@@ -82,7 +82,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
     # Change learner1's organisation
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Delete" "link" in the "#organisationtitle" "css_element"
@@ -109,7 +109,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
     # Change learner1's organisation again to re-assign him to the program
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Choose organisation" "button"
@@ -233,7 +233,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
     # Change learner1's position
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Delete" "link" in the "#positiontitle" "css_element"
@@ -260,7 +260,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
     # Change learner1's position again to re-enrol him in the program
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Choose position" "button"
@@ -384,7 +384,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
     # Change learner1's profile
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Delete" "link" in the "#managertitle" "css_element"
@@ -411,7 +411,7 @@ Feature: Suspend and re-enrol users enrolled in courses via programs
 
     # Change learner1's profile again to re-enrol him
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Choose manager" "button"

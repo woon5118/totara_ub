@@ -44,7 +44,7 @@ Feature: Test the user csv auth field import.
     And I press "Continue"
 
     # Check there are no errors in user profiles.
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I should see "Upload User 1"
     And I should not see "Upload User 2"
     And I should not see "Upload User 3"
@@ -54,7 +54,7 @@ Feature: Test the user csv auth field import.
     And I follow "Edit profile"
     Then I should see "Upload User 1"
     And I should see "Manual accounts"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 4"
     And I follow "Edit profile"
     Then I should see "Upload User 4"
@@ -77,7 +77,7 @@ Feature: Test the user csv auth field import.
     And I should see "invalid authentication plugin DOES-NOT-EXIST for user 6"
 
     # Check there are no errors in user profiles.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I should see "Upload User 1"
     And I should not see "Upload User 2"
     And I should not see "Upload User 3"
@@ -87,7 +87,7 @@ Feature: Test the user csv auth field import.
     And I follow "Edit profile"
     Then I should see "Upload User 1"
     And I should see "Manual accounts"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 4"
     And I follow "Edit profile"
     Then I should see "Upload User 4"
@@ -118,11 +118,11 @@ Feature: Test the user csv auth field import.
     And I press "Continue"
 
     # Check there are no errors in user profiles.
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 1"
     And I follow "Edit profile"
     Then I should see "Upload User 1"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 2"
     And I follow "Edit profile"
     Then I should see "Upload User 2"
@@ -141,11 +141,11 @@ Feature: Test the user csv auth field import.
     And I should see "updated user 2"
 
     # Check there are no errors in user profiles.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 1"
     And I follow "Edit profile"
     Then I should see "Upload User 1"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Upload User 2"
     And I follow "Edit profile"
     Then I should see "Upload User 2"

@@ -50,7 +50,7 @@ Feature: Totara admin main menu
     Given I log in as "admin"
     When I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on "Users" "link" in the "#quickaccess-popover-content" "css_element"
-    Then I should see "Browse list of users"
+    Then I should see "Manage users"
     When I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on "Courses and categories" "link" in the "#quickaccess-popover-content" "css_element"
     Then I should see "Course and category management"

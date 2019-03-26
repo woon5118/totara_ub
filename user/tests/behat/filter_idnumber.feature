@@ -12,7 +12,7 @@ Feature: Filter users by idnumber
       | student2 | Student2 | 1 | student2@example.com | 2000000 |
       | student3 | Student3 | 1 | student3@example.com | 3000000 |
     And I log in as "admin"
-    And I navigate to "Users > Browse list of users" in site administration
+    And I navigate to "Users > Manage users" in site administration
     And I press "Edit this report"
     And I switch to "Filters" tab
     And I select "User ID Number" from the "newstandardfilter" singleselect

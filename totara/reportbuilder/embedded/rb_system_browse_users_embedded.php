@@ -28,7 +28,7 @@ class rb_system_browse_users_embedded extends rb_base_embedded {
         $this->url = '/admin/user.php';
         $this->source = 'user';
         $this->shortname = 'system_browse_users'; // This must be unique, lets try make it really unique.
-        $this->fullname = get_string('userlist', 'admin');
+        $this->fullname = get_string('manageusers', 'admin');
         $this->columns = array(
             array(
                 'type' => 'user',

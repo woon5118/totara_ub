@@ -198,7 +198,7 @@ Feature: Verify competencies are automatically added to plan according to job as
       | Learning Plan |	Admin User | Draft       | 1                        |
 
     # Check that learner3 has a single competency assigned in their learning plan.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob3 Learner3"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I follow "Competencies (1)"
@@ -274,7 +274,7 @@ Feature: Verify competencies are automatically added to plan according to job as
       | Learning Plan |	Admin User | Draft       | 1                        |
 
     # Check that learner3 has a single competency assigned in their learning plan.
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob3 Learner3"
     And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
     And I follow "Competencies (1)"

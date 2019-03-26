@@ -103,7 +103,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager Two"
 
     # Remove users from the dynamic audience
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner Two"
     And I click the delete icon for the "Job 1" job assignment
     And I click on "Yes, delete" "button"
@@ -422,7 +422,7 @@ Feature: Test reported learners in appraisal assignments
     And "Manager Two" row "Status" column of "appraisal_detail" table should contain "On Target"
 
     # Remove user from audience who hasn't completed the appraisal
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner Three"
     And I click the delete icon for the "Job 1" job assignment
     And I click on "Yes, delete" "button"
@@ -560,7 +560,7 @@ Feature: Test reported learners in appraisal assignments
     And "Manager Two" row "Status" column of "appraisal_detail" table should contain "On Target"
 
     # Remove user from audience who completed the appraisal
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I click the delete icon for the "Job 1" job assignment
     And I click on "Yes, delete" "button"
@@ -740,7 +740,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Learner Five"
 
     # Remove original user from audience who hasn't completed the appraisal
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner Three"
     And I click the delete icon for the "Job 1" job assignment
     And I click on "Yes, delete" "button"
@@ -788,7 +788,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Learner Five"
 
     # Remove user from audience who completed the appraisal
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I click the delete icon for the "Job 1" job assignment
     And I click on "Yes, delete" "button"
@@ -865,7 +865,7 @@ Feature: Test reported learners in appraisal assignments
     # Change the audience before closure to get some "Assignment Cancelled" users
     # Remove user from audience who hasn't completed the appraisal
     When I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner Three"
     And I click the delete icon for the "Job 1" job assignment
     And I click on "Yes, delete" "button"
@@ -910,7 +910,7 @@ Feature: Test reported learners in appraisal assignments
     And "Manager Two" row "Status" column of "appraisal_detail" table should contain "On Target"
 
     # Remove user from audience who completed the appraisal
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I click the delete icon for the "Job 1" job assignment
     And I click on "Yes, delete" "button"
@@ -1099,7 +1099,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Learner Five"
 
     # Remove user from audience who completed the appraisal
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner Two"
     And I click the delete icon for the "Job 1" job assignment
     And I click on "Yes, delete" "button"

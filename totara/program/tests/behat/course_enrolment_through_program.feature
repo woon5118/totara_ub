@@ -124,7 +124,7 @@ Feature: Course enrolment through programs
     And I press "Save changes"
 
     # Remove learner1's position
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Delete" "link" in the "#positiontitle" "css_element"
@@ -171,7 +171,7 @@ Feature: Course enrolment through programs
     And I press "Save changes"
 
     # Remove learner1's position
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Delete" "link" in the "#positiontitle" "css_element"
@@ -218,7 +218,7 @@ Feature: Course enrolment through programs
     And I press "Save changes"
 
     # Remove learner1's position
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
     And I follow "full1"
     And I click on "Delete" "link" in the "#positiontitle" "css_element"
@@ -276,7 +276,7 @@ Feature: Course enrolment through programs
     # Now add teacher to both programs
     Given I log in as "admin"
 
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Teacher First"
     And I follow "fullt1"
     And I press "Choose position"

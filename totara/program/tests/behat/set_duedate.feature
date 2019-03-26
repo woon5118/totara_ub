@@ -45,10 +45,10 @@ Feature: Set due date for program assignments
     And I click on "Edit" "link" in the "Required Learning" "table_row"
     And I set the field "Parent item" to "Top"
     And I press "Save changes"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Edit" "link" in the "Admin User" "table_row"
     And I select "Europe/Rome" from the "Timezone" singleselect
-    And I press "Update profile"
+    And I press "Save and go back"
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Set Due Date Tests" "link"

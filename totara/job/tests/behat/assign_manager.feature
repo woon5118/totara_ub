@@ -35,7 +35,7 @@ Feature: Assigning a manager to a user via the job assignment page
   Scenario: A user who is allowed to alter their own job assignment details can select another user as their manager
     Given I set the following system permissions of "Authenticated user" role:
      | totara/hierarchy:assignselfposition | Allow      |
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Manager One" "link" in the "Manager One" "table_row"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -43,7 +43,7 @@ Feature: Assigning a manager to a user via the job assignment page
      | ID Number | 1                   |
     And I click on "Add job assignment" "button"
     Then I should see "Development Manager"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Manager Two" "link" in the "Manager Two" "table_row"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -94,7 +94,7 @@ Feature: Assigning a manager to a user via the job assignment page
   Scenario: A user with the permissions to alter any job assignment can select managers for any user
     Given I log out
     Given I log in as "jobadmin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User One" "link" in the "User One" "table_row"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -107,7 +107,7 @@ Feature: Assigning a manager to a user via the job assignment page
     Then I should see "Manager One - create empty job assignment"
     When I click on "Add job assignment" "button"
     Then I should see "Developer"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Manager One" "link" in the "Manager One" "table_row"
     Then I should see "Unnamed job assignment (ID: 1)"
     When I click on "Unnamed job assignment (ID: 1)" "link"
@@ -116,7 +116,7 @@ Feature: Assigning a manager to a user via the job assignment page
       | ID Number | 1                   |
     And I click on "Update job assignment" "button"
     Then I should see "Development Manager"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User Two" "link" in the "User Two" "table_row"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -136,14 +136,14 @@ Feature: Assigning a manager to a user via the job assignment page
     And I click on "Tester" "link"
     Then I should see "Manager One - Unnamed job assignment (ID: 2)"
     When I click on "Cancel" "button"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Manager One" "link" in the "Manager One" "table_row"
     And I click on "Unnamed job assignment (ID: 2)" "link"
     And I set the following fields to these values:
      | Full name | Testing Manager |
     And I click on "Update job assignment" "button"
     Then I should see "Testing Manager"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User Two" "link" in the "User Two" "table_row"
     And I click on "Tester" "link"
     Then I should see "Manager One - Testing Manager"
@@ -151,7 +151,7 @@ Feature: Assigning a manager to a user via the job assignment page
   Scenario: A user who is allowed to alter their own job assignment details has same options available when using search to assign manager
     Given I set the following system permissions of "Authenticated user" role:
       | totara/hierarchy:assignselfposition | Allow      |
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Manager One" "link" in the "Manager One" "table_row"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -159,7 +159,7 @@ Feature: Assigning a manager to a user via the job assignment page
       | ID Number | 1                   |
     And I click on "Add job assignment" "button"
     Then I should see "Development Manager"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Manager Two" "link" in the "Manager Two" "table_row"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -209,7 +209,7 @@ Feature: Assigning a manager to a user via the job assignment page
   Scenario: A user with permissions to alter any job assignment has the same dialog options available in Search as in Browse tabs
     Given I log out
     Given I log in as "jobadmin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User One" "link" in the "User One" "table_row"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -226,7 +226,7 @@ Feature: Assigning a manager to a user via the job assignment page
     Then I should see "Manager One - create empty job assignment"
     When I click on "Add job assignment" "button"
     Then I should see "Developer"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Manager One" "link" in the "Manager One" "table_row"
     Then I should see "Unnamed job assignment (ID: 1)"
     When I click on "Unnamed job assignment (ID: 1)" "link"
@@ -235,7 +235,7 @@ Feature: Assigning a manager to a user via the job assignment page
       | ID Number | 1                   |
     And I click on "Update job assignment" "button"
     Then I should see "Development Manager"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User Two" "link" in the "User Two" "table_row"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -255,14 +255,14 @@ Feature: Assigning a manager to a user via the job assignment page
     And I click on "Tester" "link"
     Then I should see "Manager One - Unnamed job assignment (ID: 2)"
     When I click on "Cancel" "button"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Manager One" "link" in the "Manager One" "table_row"
     And I click on "Unnamed job assignment (ID: 2)" "link"
     And I set the following fields to these values:
       | Full name | Testing Manager |
     And I click on "Update job assignment" "button"
     Then I should see "Testing Manager"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User Two" "link" in the "User Two" "table_row"
     And I click on "Tester" "link"
     Then I should see "Manager One - Testing Manager"
@@ -271,7 +271,7 @@ Feature: Assigning a manager to a user via the job assignment page
     And I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Allow multiple job assignments" to "Disable"
     And I press "Save changes"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User One" "link" in the "User One" "table_row"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:
@@ -284,7 +284,7 @@ Feature: Assigning a manager to a user via the job assignment page
     And I click on "OK" "button" in the "Choose manager" "totaradialogue"
     And I click on "Add job assignment" "button"
     Then I should see "Job assignment saved"
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User One" "link" in the "User One" "table_row"
     And I click on "Add job assignment" "link"
     And I set the following fields to these values:

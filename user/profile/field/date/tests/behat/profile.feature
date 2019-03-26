@@ -41,7 +41,7 @@ Feature: Test date user profile field
     And I click on "Edit profile" "link"
     And I set the field "Timezone" to "America/Mexico_City"
     And I press "Update profile"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Student 1" "link"
     Then I should see "Day of birth" in the ".profile_tree" "css_element"
     And I should see "13 January 1975" in the ".profile_tree" "css_element"

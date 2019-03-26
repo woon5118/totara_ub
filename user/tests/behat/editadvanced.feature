@@ -1,4 +1,4 @@
-@core @core_user
+@core @core_user @javascript
 Feature: Advanced editing of users
   In order to let admin manage users
   As an admin
@@ -6,23 +6,23 @@ Feature: Advanced editing of users
 
   Scenario: Add a new user from admin tree
     Given I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
-    And I press "Add a new user"
+    And I navigate to "Manage users" node in "Site administration > Users"
+    And I press "Create user"
     When I set the following fields to these values:
       | Username                        | user1             |
       | New password                    | A.New.Pw.123      |
       | First name                      | User              |
       | Surname                         | One               |
       | Email address                   | u1@example.com    |
-    And I press "Create user"
+    And I press "Update profile"
     And I follow "User One"
     Then I should see "User details"
     And I should see "u1@example.com"
 
   Scenario: Cancel adding of a new user from admin tree
     Given I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
-    And I press "Add a new user"
+    And I navigate to "Manage users" node in "Site administration > Users"
+    And I press "Create user"
     When I set the following fields to these values:
       | Username                        | user1             |
       | New password                    | A.New.Pw.123      |
@@ -37,15 +37,15 @@ Feature: Advanced editing of users
 
   Scenario: Add a new user from all users
     Given I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
-    And I press "Add a new user"
+    And I navigate to "Manage users" node in "Site administration > Users"
+    And I press "Create user"
     When I set the following fields to these values:
       | Username                        | user1             |
       | New password                    | A.New.Pw.123      |
       | First name                      | User              |
       | Surname                         | One               |
       | Email address                   | u1@example.com    |
-    And I press "Create user"
+    And I press "Update profile"
     Then the following should exist in the "system_browse_users" table:
       | Username | User's Email       |
       | admin    | moodle@example.com |
@@ -53,8 +53,8 @@ Feature: Advanced editing of users
 
   Scenario: Cancel adding of a new user from all users
     Given I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
-    And I press "Add a new user"
+    And I navigate to "Manage users" node in "Site administration > Users"
+    And I press "Create user"
     When I set the following fields to these values:
       | Username                        | user1             |
       | New password                    | A.New.Pw.123      |
@@ -72,7 +72,7 @@ Feature: Advanced editing of users
       | username | firstname | lastname | email                |
       | user1    | User      | One      | user1@example.com |
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Edit" "link" in the "User One" "table_row"
     When I set the following fields to these values:
       | Username      | u1             |
@@ -88,7 +88,7 @@ Feature: Advanced editing of users
       | username | firstname | lastname | email             |
       | user1    | User      | One      | user1@example.com |
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Edit" "link" in the "User One" "table_row"
     When I set the following fields to these values:
       | Username      | u1             |
@@ -104,7 +104,7 @@ Feature: Advanced editing of users
       | username | firstname | lastname | email             |
       | user1    | User      | One      | user1@example.com |
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User One" "link" in the "User One" "table_row"
     And I follow "Edit profile"
     When I set the following fields to these values:
@@ -119,7 +119,7 @@ Feature: Advanced editing of users
       | username | firstname | lastname | email             |
       | user1    | User      | One      | user1@example.com |
     And I log in as "admin"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User One" "link" in the "User One" "table_row"
     And I follow "Edit profile"
     When I set the following fields to these values:

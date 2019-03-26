@@ -153,13 +153,30 @@ class user_editadvanced_form extends moodleform {
         // Next the customisable profile fields.
         profile_definition($mform, $userid);
 
-        if ($userid == -1) {
-            $btnstring = get_string('createuser');
+        $addbuttons = function ($cancel) use ($userid) {
+            if ($userid == -1) {
+                $btnstring = get_string('createuser');
+            } else {
+                $btnstring = get_string('updatemyprofile');
+            }
+            $this->add_action_buttons($cancel, $btnstring);
+        };
+        // Installation process
+        if (!empty($USER->newadminuser)) {
+            $addbuttons(empty($USER->newadminuser)); // Totara: do not allow cancelling in the install process.
         } else {
-            $btnstring = get_string('updatemyprofile');
+            $returnto = optional_param('returnto', null, PARAM_ALPHANUMEXT);
+            if ($returnto == 'profile') {
+                $addbuttons(true);
+            } else {
+                $buttonarray = array();
+                $buttonarray[] = &$mform->createElement('submit', 'viewprofile', get_string('saveandview'), ['id' => 'id_submitbutton']);
+                $buttonarray[] = &$mform->createElement('submit', 'goback', get_string('saveandgoback'), ['id' => 'id_submitbutton2']);
+                $buttonarray[] = &$mform->createElement('cancel');
+                $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+                $mform->closeHeaderBefore('buttonar');
+            }
         }
-
-        $this->add_action_buttons(empty($USER->newadminuser), $btnstring); // Totara: do not allow cancelling in the install process.
 
         // Called at the end of the definition, prior to data being set.
         $hook = new core_user\hook\editadvanced_form_definition_complete($this, $this->_customdata);

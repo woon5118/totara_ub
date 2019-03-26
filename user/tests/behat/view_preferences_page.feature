@@ -69,7 +69,7 @@ Feature: Access to preferences page
     | moodle/user:viewuseractivitiesreport | 1 |
     | moodle/user:viewdetails | 1 |
     And I click on "Create this role" "button"
-    And I navigate to "Browse list of users" node in "Site administration > Users"
+    And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Student 1"
     And I click on "Preferences" "link" in the ".profile_tree" "css_element"
     And I follow "Assign roles relative to this user"
