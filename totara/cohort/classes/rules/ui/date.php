@@ -150,6 +150,7 @@ class date extends base_form {
         $mform->disabledIf('beforeafterdatetime[hour]','fixedordynamic','neq',1);
         $mform->disabledIf('beforeafterdatetime[minute]','fixedordynamic','neq',1);
         $mform->disabledIf('beforeafterdatetime[calendar]','fixedordynamic','neq',1);
+        $mform->disabledIf('beforeafterdatetime[timezone]','fixedordynamic','neq',1);
         $mform->disabledIf('durationmenu','fixedordynamic','neq',2);
         $mform->disabledIf('durationdate','fixedordynamic','neq',2);
     }

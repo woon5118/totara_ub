@@ -314,7 +314,6 @@ Feature: Test dynamic audience with user profile custom text fields.
   @javascript
   Scenario: cohort_userprofile_text_17: "empty" custom text field value
     When I set the field "equal" to "is empty"
-    And I set the field "listofvalues" to "aaa"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
     Then I should see "Audience rules changed"
 

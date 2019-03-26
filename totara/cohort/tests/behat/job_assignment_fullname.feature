@@ -278,8 +278,8 @@ Feature: Test dynamic audience with job assignment fullnames.
   @javascript
   Scenario: cohort_job_assignment_fullname_15: "empty" value
     When I set the field "equal" to "is empty"
-    And I set the field "listofvalues" to "aaa"
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
+    And I wait "1" seconds
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"

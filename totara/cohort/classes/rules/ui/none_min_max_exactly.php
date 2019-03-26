@@ -94,26 +94,11 @@ class none_min_max_exactly extends base_form {
             '',
             self::$operators
         );
-        $row[1] = $mform->createElement('text', 'listofvalues', '');
+        $row[1] = $mform->createElement('text', 'listofvalues', '', ['data-error-message' => self::$error, 'data-validate-number' => 'true']);
         $row[2] = $mform->createElement('static', 'persons', '', self::$formsuffix);
         $mform->setType('listofvalues', PARAM_INT);
         $mform->disabledIf('listofvalues', 'equal', 'eq', self::COHORT_RULES_OP_NONE);
         $mform->addGroup($row, 'row1', ' ', ' ', false);
-        // Make sure they filled in the text field
-        $mform->addGroupRule(
-            'row1',
-            [1 =>
-                [
-                    [
-                        0 => self::$error,
-                        1 => 'callback',
-                        2 => 'validate_emptyruleuiform',
-                        3 => 'client'
-                    ]
-                ]
-            ]
-        );
-        $mform->addElement('html', self::add_js());
     }
 
     /**
@@ -152,34 +137,5 @@ class none_min_max_exactly extends base_form {
         $this->listofvalues = $sqlhandler->listofvalues = $listofvalues;
 
         $sqlhandler->write();
-    }
-
-    /**
-     * Generate java sctipt to validate listofvalues input.
-     *
-     * Do not copy this implementation, nor this inline JavaScript pattern, to new UI classes.
-     *
-     * @return string
-     */
-    protected static function add_js(): string {
-        // Convert entities, even/especially single quotes, utf-8, but do not double encode.
-        $hmsg = htmlspecialchars(self::$error, ENT_QUOTES, 'UTF-8', false);
-        $none = self::COHORT_RULES_OP_NONE;
-        // Allow empty value as long as the rule is "none".
-        $js = <<<JS
-<script type="text/javascript">
-function validate_emptyruleuiform() {
-    var sucess = true;
-    if ($('#id_listofvalues').val() === '' && $('#id_equal').val() !== '$none') {
-        if ($('#id_error_listofvalues').length == 0 ) {
-            $('div#fgroup_id_row1 > fieldset').prepend('<span id="id_error_listofvalues" class="error">{$hmsg}</span><br>');
-        }
-        sucess = false;
-    }
-    return sucess;
-}
-</script>
-JS;
-        return $js;
     }
 }

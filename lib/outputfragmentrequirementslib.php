@@ -52,7 +52,7 @@ class fragment_requirements_manager extends page_requirements_manager {
      *
      * @return string
      */
-    protected function get_amd_footercode() {
+    protected function get_amd_footercode($initialiseamd = false) {
         // Totara: no need to use 'core/first' any more, we use bundle configuration instead now.
         return html_writer::script(implode(";\n", $this->amdjscode));
     }

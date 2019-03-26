@@ -26,6 +26,8 @@
  * This file defines the Totara dialog for creating/editing a single rule for a dynamic cohort.
  */
 
+/* globals $, totaraDialog */
+
 M.totara_cohortrules = M.totara_cohortrules || {
 
     Y: null,
@@ -308,8 +310,71 @@ M.totara_cohortrules = M.totara_cohortrules || {
             dialog.saveurl = dialog.default_url + '&update=1&sesskey=' + M.cfg.sesskey;
             dialog.open();
         });
+    },
+
+    /**
+     * Validates a text rule
+     *
+     * @returns {boolean} whether the text rule is valid or not
+     */
+    validateList: function() {
+        var listelement = document.getElementById('id_listofvalues');
+        var errorMsg = document.getElementById('id_error_listofvalues');
+        if (!listelement.hasAttribute('disabled') && listelement.value.length === 0) {
+            if (!errorMsg) {
+                $('div#fgroup_id_row1 > fieldset').prepend('<span id="id_error_listofvalues" class="error">' + listelement.getAttribute('data-error-message') + '</span><br>');
+                errorMsg = document.getElementById('id_error_listofvalues');
+            }
+            errorMsg.style.display = '';
+            return false;
+        } else {
+            if (errorMsg) {
+                errorMsg.style.display = 'none';
+            }
+            return true;
+        }
+    },
+
+    /**
+     * Validates a date rule
+     *
+     * @returns {boolean} whether the date rule is valid or not
+     */
+    validateDate: function() {
+        var valueElement = document.getElementById('id_durationdate');
+        var errorMsg = document.getElementById('id_error_durationdate');
+        if (!valueElement.hasAttribute('disabled') && valueElement.value.length === 0) {
+            if (!errorMsg) {
+                $('div#fgroup_id_durationrow > fieldset').prepend('<span id="id_error_durationdate" class="error">' + M.util.get_string('error:badduration', 'totara_cohort') + '</span><br>');
+                errorMsg = document.getElementById('id_error_durationdate');
+            }
+            errorMsg.style.display = '';
+            return false;
+        } else {
+            if (errorMsg) {
+                errorMsg.style.display = 'none';
+            }
+            return true;
+        }
+    },
+
+    validateNumber: function(element) {
+        var errorMsg = document.getElementById('id_error_listofvalues');
+        if (!element.hasAttribute('disabled') && isNaN(parseInt(element.value, 10))) {
+            if (!errorMsg) {
+                $('div#fgroup_id_row1 > fieldset').prepend('<span id="id_error_listofvalues" class="error">' + element.getAttribute('data-error-message') + '</span><br>');
+                errorMsg = document.getElementById('id_error_listofvalues');
+            }
+            errorMsg.style.display = '';
+            return false;
+        } else {
+            if (errorMsg) {
+                errorMsg.style.display = 'none';
+            }
+            return true;
+        }
     }
-}
+};
 
 
 // Function to validate completion date field.
@@ -427,12 +492,18 @@ function initial_validation() {
 
     // Validate radio button options.
     if ($('#fixedordynamic1').is(':checked')) {
+        $('#menudurationmenu').prop('disabled', true);
+        $('#menubeforeaftermenu').prop('disabled', false);
+        $('#completiondate').prop('disabled', false);
         $('#completiondurationdate').prop('disabled', true);
         $('#completiondate').get(0).cohort_validation_func = funccompletiondate;
     }
 
     if ($('#fixedordynamic2').is(':checked')) {
+        $('#menudurationmenu').prop('disabled', false);
+        $('#menubeforeaftermenu').prop('disabled', true);
         $('#completiondate').prop('disabled', true);
+        $('#completiondurationdate').prop('disabled', false);
         $('#completiondurationdate').get(0).cohort_validation_func = funccompletionduration;
     }
 }
@@ -459,18 +530,20 @@ $(document).on('change', '#certifassignmentstatus', function() {
 
 // Validate when radio buttons selected.
 $(document).on('click', 'input[name="fixeddynamic"]', function(event) {
+    $('input[name="fixeddynamic"]').removeClass('cohorttreeviewsubmitfield');
+    $(this).addClass('cohorttreeviewsubmitfield');
     if ($(this).val() == 1) { // Fixed date.
-        $('#fixedordynamic1').addClass('cohorttreeviewsubmitfield');
-        $('#fixedordynamic2').removeClass('cohorttreeviewsubmitfield');
+        $('#menudurationmenu').prop('disabled', true);
+        $('#menubeforeaftermenu').prop('disabled', false);
         $('#completiondate').prop('disabled', false);
         $('#completiondurationdate').prop('disabled', true);
         $('#completiondate').get(0).cohort_validation_func = funccompletiondate;
         $('#completiondurationdate').get(0).cohort_validation_func = null;
     } else { // Relative date.
-        $('#fixedordynamic2').addClass('cohorttreeviewsubmitfield');
-        $('#fixedordynamic1').removeClass('cohorttreeviewsubmitfield');
-        $('#completiondurationdate').prop('disabled', false);
+        $('#menudurationmenu').prop('disabled', false);
+        $('#menubeforeaftermenu').prop('disabled', true);
         $('#completiondate').prop('disabled', true);
+        $('#completiondurationdate').prop('disabled', false);
         $('#completiondurationdate').get(0).cohort_validation_func = funccompletionduration;
         $('#completiondate').get(0).cohort_validation_func = null;
     }
@@ -537,11 +610,54 @@ totaraDialog_handler_cohortruleform.prototype.every_load = function() {
     // Get the original onsubmit (most likely from mforms)
     var orighandler = forms.get(0).onsubmit;
 
+    /**
+     * Triggers validation for text and none/min/max rules
+     *
+     * @param {Event} event UI event (either a change or focusout event)
+     */
+    var validateFunc = function(event) {
+        switch (event.target.id) {
+            case 'id_equal':
+                M.totara_cohortrules.validateList();
+                break;
+
+            case 'id_durationdate':
+                M.totara_cohortrules.validateDate();
+                break;
+
+            case 'id_listofvalues':
+                if (event.target.hasAttribute('data-validate-number') && event.target.getAttribute('data-validate-number') === 'true') {
+                    M.totara_cohortrules.validateNumber(event.target);
+                }
+                break;
+        }
+    };
+
+    this._container[0].addEventListener('change', validateFunc);
+    this._container[0].addEventListener('focusout', validateFunc);
+
+
     forms.get(0).onsubmit = null;
     forms.off('submit');
 
     forms.on('submit', function(e) {
         e.preventDefault();
+        var numberElement = handler._container[0].querySelector('[data-validate-number]');
+        var valid = true;
+        if (document.getElementById('id_equal')) {
+            valid = M.totara_cohortrules.validateList();
+        } else if (document.getElementById('id_durationdate')) {
+            valid = M.totara_cohortrules.validateDate();
+        }
+
+        if (numberElement && valid) {
+            valid = M.totara_cohortrules.validateNumber(numberElement);
+        }
+
+        if (!valid) {
+            // Form is invalid - return
+            return;
+        }
 
         // Check whether the original onsubmit worked
         if (!(typeof(orighandler) == 'function') || orighandler(forms.get(0)) ) {
@@ -551,7 +667,6 @@ totaraDialog_handler_cohortruleform.prototype.every_load = function() {
             var url = $(this).attr('action');
             var method = $(this).attr('method');
             var data = $(this).serialize();
-
             handler._dialog._request(
                 url,
                 {

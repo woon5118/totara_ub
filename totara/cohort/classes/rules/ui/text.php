@@ -83,42 +83,12 @@ class text extends base_form {
             '',
             $COHORT_RULES_OP_IN_LIST
         );
-        $row[1] = $mform->createElement('text', 'listofvalues', '');
+        $row[1] = $mform->createElement('text', 'listofvalues', '', ['data-error-message' => get_string('error:mustpickonevalue', 'totara_cohort')]);
         $mform->addGroup($row, 'row1', ' ', ' ', false);
         if (isset($this->example)) {
             $mform->addElement('static', 'exampletext', '', $this->example);
         }
-
-        // Make sure they filled in the text field
-        $mform->addGroupRule(
-            'row1',
-            array(
-                1 => array(
-                    array(0 => get_string('error:mustpickonevalue', 'totara_cohort'), 1 => 'callback', 2 => 'validate_emptyruleuiform', 3 => 'client')
-                )
-            )
-        );
-
-        $error = get_string('error:mustpickonevalue', 'totara_cohort');
-        $isemptyopt = COHORT_RULES_OP_IN_ISEMPTY;
-
-        // Allow empty value for ​​listofvalues as long as the rule is "is empty"
-        $js = <<<JS
-<script type="text/javascript">
-function validate_emptyruleuiform() {
-    var sucess = true;
-
-    if ($('#id_listofvalues').val() === '' && $('#id_equal').val() !== '$isemptyopt') {
-        if ($('#id_error_listofvalues').length == 0 ) {
-            $('div#fgroup_id_row1 > fieldset').prepend('<span id="id_error_listofvalues" class="error">{$error}</span><br>');
-        }
-        sucess = false;
-    }
-    return sucess;
-}
-</script>
-JS;
-        $mform->addElement('html', $js);
+        $mform->disabledIf('listofvalues', 'equal', 'eq', COHORT_RULES_OP_IN_ISEMPTY);
     }
 
     /**
@@ -152,7 +122,7 @@ JS;
      */
     public function handleDialogUpdate($sqlhandler) {
         $equal = required_param('equal', PARAM_INT);
-        $listofvalues = required_param('listofvalues', PARAM_RAW);
+        $listofvalues = optional_param('listofvalues', '', PARAM_RAW);
         $listofvalues = explode(',', $listofvalues);
         array_walk(
             $listofvalues,

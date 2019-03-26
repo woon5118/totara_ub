@@ -92,34 +92,12 @@ class menu extends base_form {
             'listofvalues',
             '',
             $options,
-            array('size' => 10)
+            array('size' => 10, 'data-error-message' => get_string('rule_selector_failure', 'totara_cohort'))
         );
         // todo: The UI mockup shows a fancy ajax thing to add/remove selected items.
         // For now, using a humble multi-select
         $row[1]->setMultiple(true);
         $mform->addGroup($row, 'row1', '', '', false);
-
-        // Make sure they selected at least one item from the multi-select. Sadly, formslib's
-        // client-side stuff is broken for multi-selects (because it adds "[]" to their name),
-        // so we'll need to do this as a custom callback rule. And because it only executes
-        // custom callback rules if the field actually contains a value, we'll key it to the
-        // equal/notequal menu, which will always have a value.
-        $mform->addGroupRule(
-            'row1',
-            array(
-                0=>array(
-                    array(0=>get_string('error:mustpickonevalue', 'totara_cohort'), 1=>'callback',2=>'validate_menu', 3=>'client')
-                )
-            )
-        );
-        $js = <<<JS
-<script type="text/javascript">
-function validate_menu(value) {
-    return $('#id_listofvalues option:selected').length;
-}
-</script>
-JS;
-        $mform->addElement('html', $js);
     }
 
 

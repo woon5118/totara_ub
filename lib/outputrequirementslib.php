@@ -1363,33 +1363,37 @@ require(['core/autoinitialise'], function(ai) {
      * that contain require() calls using RequireJS.
      * @return string
      */
-    protected function get_amd_footercode() {
+    protected function get_amd_footercode($initialiseamd = true) {
         global $CFG;
         $output = '';
         $jsrev = $this->get_jsrev();
 
-        // Totara: no need to use 'core/first' here, we define bundle in requirejs configuration instead.
 
-        $configurl = "{$CFG->wwwroot}/lib/requirejs/config.php/{$jsrev}/config.js";
-        $output .= html_writer::script('', $configurl);
+        $amdjscode = $this->amdjscode;
 
-        if ($CFG->debugdeveloper) {
-            $output .= html_writer::script('', $this->js_fix_url('/lib/requirejs/require.js'));
-        } else {
-            $output .= html_writer::script('', $this->js_fix_url('/lib/requirejs/require.min.js'));
-        }
+        if ($initialiseamd) {
+            // Totara: no need to use 'core/first' here, we define bundle in requirejs configuration instead.
+            $configurl = "{$CFG->wwwroot}/lib/requirejs/config.php/{$jsrev}/config.js";
+            $output .= html_writer::script('', $configurl);
 
-        // Totara: add ajax activity tracking for behat, this must be done once per page only,
-        //         we do not want it in dialogs or fragments. This was in 'core/first' module before.
-        $ajaxpending = "require(['jquery'], function($) {
+            if ($CFG->debugdeveloper) {
+                $output .= html_writer::script('', $this->js_fix_url('/lib/requirejs/require.js'));
+            } else {
+                $output .= html_writer::script('', $this->js_fix_url('/lib/requirejs/require.min.js'));
+            }
+
+            // Totara: add ajax activity tracking for behat, this must be done once per page only,
+            //         we do not want it in dialogs or fragments. This was in 'core/first' module before.
+            $ajaxpending = "require(['jquery'], function($) {
     $(document).on('ajaxStart', function() {
         M.util.js_pending('jq');
     }).on('ajaxStop', function() {
         M.util.js_complete('jq');
     });
 })";
-        $amdjscode = $this->amdjscode;
-        array_unshift($amdjscode, $ajaxpending);
+
+            array_unshift($amdjscode, $ajaxpending);
+        }
 
         $output .= html_writer::script(implode(";\n", $amdjscode));
         return $output;
@@ -1657,8 +1661,8 @@ require(['core/autoinitialise'], function(ai) {
         if ($initialiseamd) {
             // Totara: ajaxy form fetching does not like AMD.
             $this->js_call_amd('core/log', 'setConfig', array($logconfig));
-            $output .= $this->get_amd_footercode();
         }
+        $output .= $this->get_amd_footercode($initialiseamd);
 
         // Add other requested modules.
         $output .= $this->get_extra_modules_code();

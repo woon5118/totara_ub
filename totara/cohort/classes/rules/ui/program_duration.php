@@ -58,36 +58,6 @@ class program_duration extends base_selector {
         $html .= '" /> day(s)';
         $html .= '</fieldset>';
         $html .= '</div>';
-        $badduration = get_string('error:badduration', 'totara_cohort');
-        $html .= <<<JS
-
-<script type="text/javascript">
-$(function() {
-    var valfunc = function(element){
-        element = $(element);
-        var parent = element.parent();
-        if (!element.val().match(/[1-9]+[0-9]*/)){
-            parent.addClass('error');
-            if ( $('#id_error_completionduration').length == 0 ) {
-                parent.prepend('<span id="id_error_completionduration" class="error">{$badduration}</span>');
-            }
-            return false;
-        } else {
-            $('#id_error_completionduration').remove();
-            parent.removeClass('error');
-            return true;
-        }
-    };
-    $('#completionduration').get(0).cohort_validation_func = valfunc;
-    $('#completionduration').change(
-        function(){
-            valfunc(this);
-        }
-    );
-});
-</script>
-
-JS;
         return $html;
     }
 
