@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use \mod_facetoface\signup;
 use \mod_facetoface\signup_status;
+use mod_facetoface\exception\signup_exception;
 use \context_module;
 
 /**
@@ -136,7 +137,20 @@ class signup_status_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $status = \mod_facetoface\signup\state\state::from_code($this->other['statuscode'])::get_string();
+        try {
+            $status = \mod_facetoface\signup\state\state::from_code($this->other['statuscode'])::get_string();
+        } catch (signup_exception $e) {
+            // Note: The statuscode 50 was previously used as the approved state,
+            //       this was removed when we moved to the statemachine. However
+            //       there may still be sitelogs with this statuscode, this allows
+            //       those logs to display correctly.
+            if ($this->other['statuscode'] == 50) {
+                $status = get_string('approved', 'mod_facetoface');
+            } else {
+                $status = 'unknown status';
+            }
+        }
+
         $description  = "A '{$status}' status was set for ";
         $description .= "User with id {$this->other['userid']} in Session id {$this->other['sessionid']}.";
         return $description;
