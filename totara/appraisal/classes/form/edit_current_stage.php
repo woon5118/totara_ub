@@ -128,7 +128,7 @@ class edit_current_stage extends form {
         );
 
         // Buttons.
-        $this->model->add_action_buttons();
+        $this->model->add_action_buttons(true, get_string('savestagechanges', 'totara_appraisal'));
     }
 
     protected function validation(array $data, array $files) {

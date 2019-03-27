@@ -81,7 +81,7 @@ Feature: Test unlocking an appraisal stage for a role
     And I switch to "Assignments" tab
     And I click on "Edit" "link" in the "learner lastname" "table_row"
     And I set the field "Role / user to change" to "All roles"
-    And I press "Save changes"
+    And I press "Apply"
     Then I should see "Editing current stage was completed"
     And I log out
 
@@ -124,7 +124,7 @@ Feature: Test unlocking an appraisal stage for a role
     And I switch to "Assignments" tab
     And I click on "Edit" "link" in the "learner lastname" "table_row"
     And I set the field "Role / user to change" to "Learner - learner lastname"
-    And I press "Save changes"
+    And I press "Apply"
     Then I should see "Editing current stage was completed"
     And I log out
 
