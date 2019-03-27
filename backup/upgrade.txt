@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13 ===
 
+* Fixed missing closing <div> tag in core_backup_renderer::course_selector_new(),
+  core_backup_renderer::course_selector_current(), and core_backup_renderer::course_selector_existing.
 * Deprecated restore_ui::cleanup() has been removed
 * Constant backup::MODE_HUB has been deprecated
 
