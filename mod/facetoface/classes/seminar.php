@@ -273,7 +273,11 @@ final class seminar implements seminar_iterator_item {
         }
 
         $seminarevents = $this->get_events();
-        $seminarevents->delete();
+        foreach ($seminarevents as $seminarevent) {
+            // We are going to full scale deleting seminar event here, so that the event custom rooms/assets
+            // are going to be gone.
+            seminar_event_helper::delete_seminarevent($seminarevent);
+        }
 
         $DB->delete_records('event', array('modulename' => 'facetoface', 'instance' => $this->get_id()));
 

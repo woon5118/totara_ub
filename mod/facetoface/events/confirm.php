@@ -51,8 +51,8 @@ try {
     $session->mintimestart = $seminarevent->get_mintimestart();
     $session->sessiondates = facetoface_get_session_dates($seminarevent->get_id());
 
-    $event = new \mod_facetoface\seminar_event($session->id);
-    $event->delete();
+    // Start deleting now.
+    \mod_facetoface\seminar_event_helper::delete_seminarevent($seminarevent);
 
     \mod_facetoface\event\session_deleted::create_from_session($session, $context)->trigger();
     redirect($returnurl);

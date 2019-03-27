@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar_event, signup, seminar_session, role};
+use mod_facetoface\{seminar_event, signup, seminar_session, role, seminar_event_helper, room, asset, asset_helper};
 use mod_facetoface\signup\state\booked;
 
 class mod_facetoface_delete_event_testcase extends advanced_testcase {
@@ -98,7 +98,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
             $role->save();
         }
 
-        $event->delete();
+        seminar_event_helper::delete_seminarevent($event);
         $this->execute_adhoc_tasks();
 
         $messages = $sink->get_messages();
@@ -160,12 +160,102 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
             $role->save();
         }
 
-        $event->delete();
+        seminar_event_helper::delete_seminarevent($event);
         $this->execute_adhoc_tasks();
 
         $messages = $sink->get_messages();
         $this->assertEmpty($messages);
 
         $this->assertFalse($DB->record_exists('facetoface_sessions', ['id' => $eventid]));
+    }
+
+    /**
+     * @return void
+     */
+    public function test_delete_event_with_custom_room(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $room = room::create_custom_room();
+        $room->save();
+        $roomid = $room->get_id();
+
+        $seminarevent = $this->create_seminar_event();
+        $s = new seminar_session();
+        $s->set_timestart(time() + 3600);
+        $s->set_timefinish(time() + 7200);
+        $s->set_sessionid($seminarevent->get_id());
+        $s->set_roomid($roomid);
+        $s->save();
+
+        // Add this custom room to be used at different seminar event, so that we can check whether the room is being
+        // deleted after the first event cancelled or not.
+        $seminarevent2 = $this->create_seminar_event();
+        $s2 = new seminar_session();
+        $s2->set_timestart(time() + 7200);
+        $s2->set_timefinish(time() + 7200 + 3600);
+        $s2->set_sessionid($seminarevent2->get_id());
+        $s2->set_roomid($roomid);
+        $s2->save();
+
+        $seminareventid = $seminarevent->get_id();
+        seminar_event_helper::delete_seminarevent($seminarevent);
+        $this->assertFalse($DB->record_exists('facetoface_sessions', ['id' => $seminareventid]));
+        $this->assertTrue($DB->record_exists('facetoface_room', ['id' => $roomid]));
+
+        $seminarevent2id = $seminarevent2->get_id();
+        seminar_event_helper::delete_seminarevent($seminarevent2);
+        $this->assertFalse($DB->record_exists('facetoface_sessions', ['id' => $seminarevent2id]));
+        $this->assertFalse($DB->record_exists('facetoface_room', ['id' => $roomid]));
+    }
+
+    /**
+     * @return void
+     */
+    public function test_delete_event_with_custom_assets(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $asset1 = asset::create_custom_asset();
+        $asset1->save();
+        $asset1id = $asset1->get_id();
+
+        $asset2 = asset::create_custom_asset();
+        $asset2->save();
+        $asset2id = $asset2->get_id();
+
+        $seminarevent1 = $this->create_seminar_event();
+        $seminarevent2 = $this->create_seminar_event();
+
+        $time = time();
+
+        /** @var seminar_event $seminarevent */
+        foreach ([$seminarevent1, $seminarevent2] as $seminarevent) {
+            for ($i = 0; $i < 2; $i++) {
+                $time += 7200;
+
+                $s = new seminar_session();
+                $s->set_timestart($time);
+                $s->set_timefinish($time + 2900);
+                $s->set_sessionid($seminarevent->get_id());
+                $s->save();
+
+                asset_helper::sync($s->get_id(), [$asset1id, $asset2id]);
+            }
+        }
+
+        // Deleting the first seminar event does not clear the custom assets at all, because custom asset is also
+        // being linked with different seminar_event.
+        seminar_event_helper::delete_seminarevent($seminarevent1);
+        $this->assertTrue($DB->record_exists('facetoface_asset', ['id' => $asset1id]));
+        $this->assertTrue($DB->record_exists('facetoface_asset', ['id' => $asset2id]));
+
+        seminar_event_helper::delete_seminarevent($seminarevent2);
+        $this->assertFalse($DB->record_exists('facetoface_asset', ['id' => $asset2id]));
+        $this->assertFalse($DB->record_exists('facetoface_asset', ['id' => $asset1id]));
     }
 }

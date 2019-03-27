@@ -62,7 +62,7 @@ information provided here is intended especially for developers.
 * facetoface_notify_under_capacity() function has been deprecated, please use mod_facetoface\notification\notification_helper::notify_under_capacity instead
 * facetoface_notify_registration_ended() function has been deprecated, please use mod_facetoface\notification\notification_helper::notify_registration_ended instead
 * facetoface_cancel_pending_requests() function has been deprecated
-* facetoface_delete_session() function has been deprecated, please use \mod_facetoface\seminar_event::delete() instead
+* facetoface_delete_session() function has been deprecated, please use \mod_facetoface\seminar_event_helper::delete_seminarevent() instead
 * facetoface_update_trainers() function has been deprecated, please use \mod_facetoface\trainer_helper class instead
 * facetoface_get_trainer_roles() function has been deprecated, please use \mod_facetoface\trainer_helper::get_trainer_roles() instead
 * facetoface_get_trainers() function has been deprecated, please use \mod_facetoface\trainer_helper::get_trainers() instead

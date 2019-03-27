@@ -230,7 +230,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // Call facetoface_delete_session function for session1.
         $emailsink = $this->redirectMessages();
         $e = new seminar_event($session->id);
-        $e->delete();
+        \mod_facetoface\seminar_event_helper::delete_seminarevent($e);
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -245,7 +245,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // Call facetoface_delete_session function for session1.
         $emailsink = $this->redirectMessages();
         $e = new seminar_event($session->id);
-        $e->delete();
+        \mod_facetoface\seminar_event_helper::delete_seminarevent($e);
         $emailsink->close();
 
         $emails = $emailsink->get_messages();

@@ -144,4 +144,37 @@ final class asset_list implements \Iterator {
         }
         return $list;
     }
+
+    /**
+     * Just load most of the custom assets that are being used by the seminar event.
+     *
+     * @param int   $seminareventid
+     * @return asset_list
+     */
+    public static function get_custom_assets_from_seminarevent(int $seminareventid): asset_list {
+        global $DB;
+
+        // Using distinct here, because there could be a possibility that different session dates are using the same
+        // asset. And would cause an unexpecing debugging message where duplicated Id is appearing in the list.
+        $sql = "
+            SELECT DISTINCT a.*
+            FROM {facetoface_asset} a
+            INNER JOIN {facetoface_asset_dates} fad ON fad.assetid = a.id
+            INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
+            WHERE a.custom = 1
+            AND fsd.sessionid = :sessionid
+        ";
+
+        $records = $DB->get_records_sql($sql, ['sessionid' => $seminareventid]);
+        $list = new static();
+
+        foreach ($records as $record) {
+            $asset = new asset();
+            $asset->from_record($record);
+
+            $list->add($asset);
+        }
+
+        return $list;
+    }
 }

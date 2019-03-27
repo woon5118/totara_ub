@@ -205,4 +205,23 @@ final class room_list implements \Iterator {
 
         return $list;
     }
+
+    /**
+     * Getting all the custom rooms given by the eventid.
+     *
+     * @param int $seminareventid
+     * @return room_list
+     */
+    public static function get_custom_rooms_from_seminarevent(int $seminareventid): room_list {
+        $sql = "
+            SELECT r.*
+            FROM {facetoface_room} r
+            INNER JOIN {facetoface_sessions_dates} AS fsd
+            ON fsd.roomid = r.id
+            WHERE r.custom = 1
+            AND fsd.sessionid = :eventid
+        ";
+
+        return new room_list($sql, ['eventid' => $seminareventid]);
+    }
 }

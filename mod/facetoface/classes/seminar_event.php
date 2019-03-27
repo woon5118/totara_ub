@@ -273,16 +273,19 @@ final class seminar_event implements seminar_iterator_item {
     }
 
     /**
-     * Delete {facetoface_sessions}.record where id from database
+     * Delete {facetoface_sessions}.record where id from database. This will only delete session date, signup, file,
+     * custom field and notification records that are related to the seminar_event. It does not actually delete orphan
+     * rooms nor orphan assets that had unlinked from the seminar events. Furthermore it does not cancel itself at all,
+     * and it shouldn't.
+     *
+     * If external usage wants to perform a full scale on deleting seminar event (include trying to delete orphan rooms
+     * and assets, plus cancelling event) then \mod_facetoface\seminar_event_helper::delete_seminarevent is the
+     * way to go.
      *
      * @return void
      */
     public function delete(): void {
         global $DB;
-
-        // Before deleting the whole event, start cancelling the event first, does not matter whether the event is able
-        // to cancel or not. In the end, records are going to be hard deleted anyway.
-        $this->cancel();
 
         $sessiondates = $this->get_sessions();
         $sessiondates->delete();
