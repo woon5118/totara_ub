@@ -594,6 +594,17 @@ class item {
     }
 
     /**
+     * Preset rules not compatible with the current menu item. For example, setting a rule that to be able
+     * to view reports page one should be able to view report page leads to an infinite loop and should not
+     * be an option users can select from.
+     *
+     * @return string[] A list of rules to exclude when configuring a menu item
+     */
+    public function get_incompatible_preset_rules(): array {
+        return [];
+    }
+
+    /**
      * Checks the preset rules for this menu item.
      *
      * To add another rule, just add to the switch statement, and {@link item::get_visibility_preset_rule_choices()}.

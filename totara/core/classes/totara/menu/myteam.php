@@ -68,4 +68,8 @@ class myteam extends item {
     public function is_disabled() {
         return totara_feature_disabled('myteam');
     }
+
+    public function get_incompatible_preset_rules(): array {
+        return ['can_view_my_team'];
+    }
 }

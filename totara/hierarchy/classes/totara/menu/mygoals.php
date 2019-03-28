@@ -74,4 +74,8 @@ class mygoals extends \totara_core\totara\menu\item {
     protected function get_default_parent() {
         return '\totara_appraisal\totara\menu\appraisal';
     }
+
+    public function get_incompatible_preset_rules(): array {
+        return ['can_view_my_goals'];
+    }
 }

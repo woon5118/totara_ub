@@ -74,4 +74,8 @@ class latestappraisal extends \totara_core\totara\menu\item {
     public function is_disabled() {
         return totara_feature_disabled('appraisals');
     }
+
+    public function get_incompatible_preset_rules(): array {
+        return ['can_view_latestappraisal'];
+    }
 }

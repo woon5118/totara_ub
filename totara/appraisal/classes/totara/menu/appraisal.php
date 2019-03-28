@@ -35,4 +35,8 @@ class appraisal extends \totara_core\totara\menu\container {
     public function get_default_sortorder() {
         return 40000;
     }
+
+    public function get_incompatible_preset_rules(): array {
+        return ['can_view_appraisal'];
+    }
 }

@@ -57,4 +57,8 @@ class myreports extends item {
         }
         return $cache;
     }
+
+    public function get_incompatible_preset_rules(): array {
+        return ['can_view_my_reports'];
+    }
 }

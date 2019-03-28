@@ -55,4 +55,8 @@ class programs extends \totara_core\totara\menu\item {
     protected function get_default_parent() {
         return '\totara_coursecatalog\totara\menu\findlearning';
     }
+
+    public function get_incompatible_preset_rules(): array {
+        return ['can_view_programs'];
+    }
 }

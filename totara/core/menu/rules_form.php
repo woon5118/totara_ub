@@ -160,6 +160,7 @@ class rules_form extends moodleform {
         $enable = $item->get_setting('preset_access', 'enable');
         $activepresets = explode(',', $item->get_setting('preset_access', 'active_presets'));
         $availablepresets = item::get_visibility_preset_rule_choices();
+        $incompatiblepresets = $item->get_incompatible_preset_rules();
 
         if ($enable) {
             $mform->setExpanded('accessbypreset');
@@ -179,6 +180,9 @@ class rules_form extends moodleform {
 
         $presetgroup = array();
         foreach ($availablepresets as $name => $description) {
+            if (in_array($name, $incompatiblepresets)) {
+                continue;
+            }
             $presetgroup[] =& $mform->createElement('advcheckbox', "preset_active_presets[{$name}]", '',
                 $description, null, array(0, 1));
             if (in_array($name, $activepresets)) {
