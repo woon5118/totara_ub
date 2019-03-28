@@ -262,6 +262,7 @@ $string['eventreminderupdated'] = "Reminder was updated";
 $string['eventundeleted'] = 'User undeleted';
 $string['eventuserconfirmed'] = 'User confirmed';
 $string['eventusersuspended'] = 'User suspended';
+$string['eventupdateadmin'] = 'Admin user group updated';
 $string['exportformat'] = 'Export format';
 $string['facetoface'] = 'Seminar';
 $string['findcourses'] = 'Find Courses';
