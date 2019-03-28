@@ -460,13 +460,38 @@ class mod_facetoface_events_testcase extends advanced_testcase {
 
         $this->assertSame($event::LEVEL_TEACHING, $event->edulevel);
         $this->assertSame('u', $data['crud']);
-        $this->assertEventContextNotUsed($event);
         $this->assertEventLegacyLogData(
             [
                 $this->course->id,
                 'facetoface',
                 'message sent',
                 "attendees/messageusers.php?s={$this->session->id}",
+                $this->session->id,
+                $this->facetoface->cmid
+            ],
+            $event
+        );
+    }
+
+    public function test_approval_required_viewed_event() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $event = \mod_facetoface\event\approval_required_viewed::create_from_session(
+            $this->session,
+            $this->context,
+            'approvalrequired'
+        );
+        $event->trigger();
+
+        $this->assertSame('r', $event->crud);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEventLegacyLogData(
+            [
+                $this->course->id,
+                'facetoface',
+                'approval required view',
+                "attendees/approvalrequired.php?s={$this->session->id}",
                 $this->session->id,
                 $this->facetoface->cmid
             ],

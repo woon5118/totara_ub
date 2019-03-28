@@ -867,4 +867,59 @@ final class attendees_helper {
             echo $OUTPUT->container_end();
         }
     }
+
+    /**
+     * Approve or decline attendee.
+     *
+     * @param \stdClass $form
+     * @param seminar_event $seminarevent
+     * @return \moodle_url
+     */
+    public static function approve_decline_user(\stdClass $form, seminar_event $seminarevent): \moodle_url {
+
+        $baseurl = new \moodle_url('/mod/facetoface/attendees/approvalrequired.php', ['s' => $seminarevent->get_id()]);
+        if (!confirm_sesskey()) {
+            redirect($baseurl, get_string('confirmsesskeybad', 'error'), null, \core\notification::ERROR);
+        }
+
+        $errors = [];
+        foreach ($form->requests as $uid => $value) {
+            $signup = signup::create($uid, $seminarevent);
+
+            switch ($value) {
+                case 1: // Decline.
+                    if ($signup->can_switch(declined::class)) {
+                        $signup->switch_state(declined::class);
+                        notice_sender::decline($signup);
+                    } else {
+                        $failures = $signup->get_failures(declined::class);
+                        $errors[$uid] = current($failures);
+                    }
+                    break;
+                case 2: // Approve.
+                    if ($signup->can_switch(booked::class, waitlisted::class, requestedadmin::class)) {
+                        $signup->switch_state(booked::class, waitlisted::class, requestedadmin::class);
+                    } else {
+                        $failures = $signup->get_failures(booked::class, waitlisted::class, requestedadmin::class);
+                        $errors[$uid] = current($failures);
+                    }
+                    break;
+                case 0:
+                default:
+                    continue 2;
+            }
+        }
+
+        if (empty($errors)) {
+            $baseurl->params(array('approved' => '1'));
+        } else {
+            $output = html_writer::start_tag('ul');
+            foreach ($errors as $attendeeid => $errmsg) {
+                $output .= html_writer::tag('li', $errmsg);
+            }
+            $output .= html_writer::end_tag('ul');
+            totara_set_notification($output);
+        }
+        return $baseurl;
+    }
 }

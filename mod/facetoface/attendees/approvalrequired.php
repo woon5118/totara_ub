@@ -29,41 +29,32 @@ require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-use mod_facetoface\{signup, signup_helper};
-use mod_facetoface\signup\state\{booked, waitlisted, requestedadmin, declined};
+use \mod_facetoface\attendees_helper;
+use \mod_facetoface\signup;
+use \mod_facetoface\signup_helper;
+use \mod_facetoface\signup\state\{requested, requestedadmin, declined};
+use \mod_facetoface\seminar;
+use \mod_facetoface\seminar_event;
 
 /**
  * Load and validate base data
  */
 // Face-to-face session ID
 $s = optional_param('s', 0, PARAM_INT);
-
-// Cancel request
-$cancelform = optional_param('cancelform', false, PARAM_BOOL);
-
-// Action being performed, a proper default will be set shortly.
-// Require for attendees.js
+// Action being performed, a proper default will be set shortly, require for attendees.js
 $action = optional_param('action', 'approvalrequired', PARAM_ALPHA);
-
-// Only return content
-$onlycontent = optional_param('onlycontent', false, PARAM_BOOL);
-
-// Export download.
-$download = optional_param('download', '', PARAM_ALPHA);
-
 // If approval requests have been updated, show a success message.
 $approved = optional_param('approved', 0, PARAM_INT);
-
 // Back to all sessions.
 $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
 // If there's no sessionid specified.
 if (!$s) {
-    \mod_facetoface\attendees_helper::process_no_sessionid('approvalrequired');
+    attendees_helper::process_no_sessionid('approvalrequired');
     exit;
 }
 
-$seminarevent = new \mod_facetoface\seminar_event($s);
+$seminarevent = new seminar_event($s);
 $seminar = $seminarevent->get_seminar();
 $course = $DB->get_record('course', array('id' => $seminar->get_course()));
 $cm = $seminar->get_coursemodule();
@@ -83,25 +74,13 @@ $PAGE->set_url($baseurl);
 
 list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
     = \mod_facetoface\attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context);
-$includeattendeesnote = (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context));
 
-$goback = true;
-$can_view_session = !empty($allowed_actions);
-if (!$can_view_session) {
-    // If no allowed actions so far, check if this was user/manager who has just approved staff requests (approved == 1).
-    if ($approved == 1) {
-        // If so, do not redirect, just display notify message.
-        // Hide "Go back" link for case if a user does not have any capabilities to see facetoface/course.
-        $goback = false;
-    }
-}
 // $allowed_actions is already set, so we can now know if the current action is allowed.
 $actionallowed = in_array($action, $allowed_actions);
 
-/***************************************************************************
+/**
  * Handle actions
  */
-$show_table = false;
 $heading_message = '';
 $params = array('sessionid' => $s);
 $cols = array();
@@ -111,15 +90,7 @@ $exports = array();
 /**
  * Handle submitted data
  */
-if ($form = data_submitted()) {
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
-
-    if ($cancelform) {
-        redirect($baseurl);
-    }
-
+if (($form = data_submitted())) {
     // Approve requests
     if (!empty($form->requests) && $actionallowed) {
         // Site admin is allowing to approve user request.
@@ -127,338 +98,31 @@ if ($form = data_submitted()) {
             // Leave the users which are required to approve and remove the rest.
             $form->requests = array_intersect_key($form->requests, array_flip($staff));
         }
-
-        $errors = [];
-        foreach ($form->requests as $uid => $value) {
-            $signup = signup::create($uid, $seminarevent);
-
-            switch ($value) {
-                case 1: // Decline.
-                    if ($signup->can_switch(declined::class)) {
-                        $signup->switch_state(declined::class);
-                        \mod_facetoface\notice_sender::decline($signup);
-                    } else {
-                        $failures = $signup->get_failures(declined::class);
-                        $errors[$uid] = current($failures);
-                    }
-                    break;
-                case 2: // Approve.
-                    if ($signup->can_switch(booked::class, waitlisted::class, requestedadmin::class)) {
-                        $signup->switch_state(booked::class, waitlisted::class, requestedadmin::class);
-                    } else {
-                        $failures = $signup->get_failures(booked::class, waitlisted::class, requestedadmin::class);
-                        $errors[$uid] = current($failures);
-                    }
-                    break;
-                case 0:
-                default:
-                    continue 2;
-            }
-        }
-
-        if (empty($errors)) {
-            $baseurl->params(array('approved' => '1'));
-        } else {
-            $output = html_writer::start_tag('ul');
-            foreach ($errors as $attendeeid => $errmsg) {
-                $output .= html_writer::tag('li', $errmsg);
-            }
-            $output .= html_writer::end_tag('ul');
-            totara_set_notification($output);
-        }
+        $baseurl = attendees_helper::approve_decline_user($form, $seminarevent);
         redirect($baseurl);
     }
 }
 
-if (!$onlycontent) {
-    $pagetitle = format_string($seminar->get_name());
-    $PAGE->set_cm($cm);
-    $PAGE->set_pagelayout('standard');
-    $PAGE->set_title($pagetitle);
-    $PAGE->set_heading($course->fullname);
-    \mod_facetoface\attendees_helper::process_js($action, $seminar, $seminarevent);
-    \mod_facetoface\event\attendees_viewed::create_from_session($seminarevent->to_record(), $context, $action)->trigger();
-}
+$pagetitle = format_string($seminar->get_name());
+$PAGE->set_cm($cm);
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title($pagetitle);
+$PAGE->set_heading($course->fullname);
+attendees_helper::process_js($action, $seminar, $seminarevent);
 
 /**
  * Print page content
  */
-if (!$onlycontent && !$download) {
-    echo $OUTPUT->header();
-    echo $OUTPUT->box_start();
-    echo $OUTPUT->heading($pagetitle);
-    if ($can_view_session) {
-        /**
-         * @var mod_facetoface_renderer $seminarrenderer
-         */
-        $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-        echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
+echo $OUTPUT->header();
+echo $OUTPUT->box_start();
+echo $OUTPUT->heading($pagetitle);
 
-        // Print customfields.
-        $customfields = customfield_get_data($seminarevent->to_record(), 'facetoface_sessioncancel', 'facetofacesessioncancel');
-        if (!empty($customfields)) {
-            $output = html_writer::start_tag('dl', array('class' => 'f2f'));
-            foreach ($customfields as $cftitle => $cfvalue) {
-                $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', $cftitle));
-                $output .= html_writer::tag('dd', $cfvalue);
-            }
-            $output .= html_writer::end_tag('dl');
-            echo $output;
-        }
-    }
-    require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
-    echo $OUTPUT->container_start('f2f-attendees-table');
-}
+/** @var mod_facetoface_renderer $seminarrenderer */
+$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
+echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
 
-/**
- * Print attendees (if user able to view)
- */
-$pix = new pix_icon('t/edit', get_string('edit'));
-if ($show_table) {
-    if (!$download) {
-        $numattendees = $helper->count_attendees();
-        $overbooked = ($numattendees > $seminarevent->get_capacity());
-        //output the section heading
-        echo $OUTPUT->heading($heading);
-    }
-
-    // Actions menu.
-    if (has_any_capability(array('mod/facetoface:addattendees', 'mod/facetoface:removeattendees'), $context)) {
-        if ($actions) {
-            echo $OUTPUT->container_start('actions last');
-            // Action selector
-            echo html_writer::label(get_string('attendeeactions', 'mod_facetoface'), 'menuf2f-actions', true, array('class' => 'sr-only'));
-            echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('actions')));
-            echo $OUTPUT->container_end();
-        }
-    }
-
-    if (empty($rows)) {
-        if ($seminar->is_approval_required()) {
-            if (count($requests) == 1) {
-                echo $OUTPUT->notification(get_string('nosignedupusersonerequest', 'facetoface'));
-            } else {
-                echo $OUTPUT->notification(get_string('nosignedupusersnumrequests', 'facetoface', count($requests)));
-            }
-        } else {
-            echo $OUTPUT->notification(get_string('nosignedupusers', 'facetoface'));
-        }
-    } else {
-        if (!$download) {
-            echo html_writer::tag('div', '', array('class' => 'hide', 'id' => 'noticeupdate'));
-        }
-
-        $table = new totara_table('facetoface-attendees');
-        $actionurl = clone($baseurl);
-        $actionurl->params(['sesskey' => sesskey(), 'onlycontent' => true, 'action' => $action]);
-        $table->define_baseurl($actionurl);
-        $table->set_attribute('class', 'generalbox mod-facetoface-attendees '.$action);
-
-        $exportfilename = isset($action) ? $action : 'attendees';
-
-        $headers = array();
-        $columns = array();
-        $export_rows = array();
-
-        $headers[] = get_string('name');
-        $columns[] = 'name';
-        $headers[] = get_string('timesignedup', 'facetoface');
-        $columns[] = 'timesignedup';
-
-        $hidecost = get_config(null, 'facetoface_hidecost');
-        $hidediscount = get_config(NULL, 'facetoface_hidediscount');
-        $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
-
-        $showjobassignments = (!empty($selectjobassignmentonsignupglobal) && $seminar->get_selectjobassignmentonsignup() != 0);
-
-        if ($showjobassignments) {
-            $headers[] = get_string('selectedjobassignment', 'mod_facetoface');
-            $columns[] = 'jobassignment';
-        }
-
-        // Additional approval columns for the attendees tab.
-        if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ROLE) {
-            $rolenames = role_fix_names(get_all_roles());
-            $headers[] = get_string('approverrolename', 'mod_facetoface');
-            $columns[] = 'approverrolename';
-        }
-
-        if ($seminar->get_approvaltype() > \mod_facetoface\seminar::APPROVAL_SELF) {
-            // Display approval columns for anything except none and self approval.
-            $headers[] = get_string('approvername', 'mod_facetoface');
-            $columns[] = 'approvername';
-            $headers[] = get_string('approvaltime', 'mod_facetoface');
-            $columns[] = 'approvaltime';
-        }
-
-        if (!$hidecost) {
-            $headers[] = get_string('cost', 'facetoface');
-            $columns[] = 'cost';
-            if (!$hidediscount) {
-                $headers[] = get_string('discountcode', 'facetoface');
-                $columns[] = 'discountcode';
-            }
-        }
-
-        $headers[] = get_string('attendance', 'facetoface');
-        $columns[] = 'attendance';
-
-        if ($includeattendeesnote) {
-            $headers[] = get_string('attendeenote', 'facetoface');
-            $columns[] = 'usernote';
-        }
-
-        if (!$download) {
-            $table->define_columns($columns);
-            $table->define_headers($headers);
-            $table->setup();
-        }
-        $cancancelreservations = has_capability('mod/facetoface:reserveother', $context);
-        $canchangesignedupjobassignment = has_capability('mod/facetoface:changesignedupjobassignment', $context);
-
-        foreach ($rows as $attendee) {
-            $data = array();
-            // Add the name of the manager who made the booking after the user's name.
-            $managername = null;
-            if (!empty($attendee->bookedby)) {
-                $managerurl = new moodle_url('/user/view.php', array('id' => $attendee->bookedby));
-                $manager = (object)array('firstname' => $attendee->bookedbyfirstname, 'lastname' => $attendee->bookedbylastname);
-                $managername = fullname($manager);
-                if (!$download) {
-                    $managername = html_writer::link($managerurl, $managername);
-                }
-            }
-            if ($attendee->id) {
-                $attendeename = fullname($attendee);
-                if (!$download) {
-                    $attendeeurl = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $course->id));
-                    $attendeename = html_writer::link($attendeeurl, $attendeename);
-                }
-                if ($managername) {
-                    $strinfo = (object)array('attendeename' => $attendeename, 'managername' => $managername);
-                    $attendeename = get_string('namewithmanager', 'mod_facetoface', $strinfo);
-                }
-                $data[] = $attendeename;
-            } else {
-                // Reserved space - display 'Reserved' + the name of the person who booked it.
-                $cancelicon = '';
-                if (!$download && $attendee->bookedby) {
-                    if ($cancancelreservations) {
-                        $params = array(
-                            's' => $seminarevent->get_id(),
-                            'managerid' => $attendee->bookedby,
-                            'backtosession' => $action,
-                            'cancelreservation' => 1,
-                            'sesskey' => sesskey(),
-                        );
-                        $cancelurl = new moodle_url('/mod/facetoface/reservations/reserve.php', $params);
-                        $cancelicon = $OUTPUT->pix_icon('t/delete', get_string('cancelreservation', 'mod_facetoface'));
-                        $cancelicon = ' '.html_writer::link($cancelurl, $cancelicon);
-                    }
-                }
-                if ($managername) {
-                    $reserved = get_string('reservedby', 'mod_facetoface', $managername);
-                } else {
-                    $reserved = get_string('reserved', 'mod_facetoface');
-                }
-                $data[] = $reserved.$cancelicon;
-            }
-
-            $data[] = userdate($attendee->timesignedup, get_string('strftimedatetime'));
-
-            if ($showjobassignments) {
-                if (!empty($attendee->jobassignmentid)) {
-                    $jobassignment = \totara_job\job_assignment::get_with_id($attendee->jobassignmentid);
-                    $label = position::job_position_label($jobassignment);
-                } else {
-                    $label = '';
-                }
-
-                $url = new moodle_url('/mod/facetoface/attendees/ajax/job_assignment.php', array('s' => $seminarevent->get_id(), 'id' => $attendee->id));
-                $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-job-assignment pull-right'));
-                $jobassign = html_writer::span($label, 'jobassign'.$attendee->id, array('id' => 'jobassign'.$attendee->id));
-
-                if ($canchangesignedupjobassignment) {
-                    $data[] = $icon . $jobassign;
-                } else {
-                    $data[] = $jobassign;
-                }
-            }
-
-            // Additional approval columns for the attendees tab.
-            if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ROLE) {
-                $data[] = $rolenames[$seminar->get_approvalrole()]->localname;
-            }
-
-            if ($seminar->get_approvaltype() > \mod_facetoface\seminar::APPROVAL_SELF) {
-                list($approver, $approval_time) = \mod_facetoface\approver::get_required($seminar, $attendee);
-                $data[] = $approver;
-                $data[] = $approval_time;
-            }
-
-            if (!$hidecost) {
-                $this_signup = mod_facetoface\signup::create($attendee->id, $seminarevent);
-                $data[] = $this_signup->get_cost();
-                if (!$hidediscount) {
-                    $data[] = $attendee->discountcode;
-                }
-            }
-
-            $state = \mod_facetoface\signup\state\state::from_code($attendee->statuscode);
-            $data[] = str_replace(' ', '&nbsp;', $state::get_string());
-            $icon = '';
-            if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
-                $url = new moodle_url('/mod/facetoface/attendees/ajax/signup_notes.php', array('s' => $seminarevent->get_id(), 'userid' => $attendee->id, 'sesskey' => sesskey()));
-                $showpix = new pix_icon('/t/preview', get_string('showattendeesnote', 'facetoface'));
-                $icon = $OUTPUT->action_icon($url, $showpix, null, array('class' => 'action-icon attendee-add-note pull-right'));
-            }
-            if ($includeattendeesnote) {
-                // Get signup note.
-                $signupstatus = new stdClass();
-                $signupstatus->id = $attendee->submissionid;
-                $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
-                // Currently it is possible to delete signupnote custom field easly so we must check if cf is exists.
-                $signupnotetext = isset($signupnote['signupnote']) ? $signupnote['signupnote'] : '';
-                if (!$download) {
-                    $data[] = $icon . html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
-                } else {
-                    $data[] = $signupnotetext;
-                }
-            }
-
-            if (!$download) {
-                $table->add_data($data);
-            } else {
-                $export_rows[] = $data;
-            }
-        }
-        if (!$download) {
-            $table->finish_html();
-        } else {
-            switch ($download) {
-                case 'ods':
-                    \mod_facetoface\export_helper::download_ods($headers, $export_rows, $exportfilename);
-                    break;
-                case 'xls':
-                    \mod_facetoface\export_helper::download_xls($headers, $export_rows, $exportfilename);
-                    break;
-                case 'csv':
-                    \mod_facetoface\export_helper::download_csv($headers, $export_rows, $exportfilename);
-                    break;
-            }
-        }
-    }
-
-    if (has_any_capability(array('mod/facetoface:addattendees', 'mod/facetoface:removeattendees', 'mod/facetoface:takeattendance'), $context)) {
-        if ($exports) {
-            echo $OUTPUT->container_start('actions last');
-            // Action selector.
-            echo html_writer::label(get_string('attendeeactions', 'mod_facetoface'), 'menuf2f-actions', true, array('class' => 'sr-only'));
-            echo html_writer::select($exports, 'f2f-actions', '', array('' => get_string('export', 'totara_reportbuilder')));
-            echo $OUTPUT->container_end();
-        }
-    }
-}
+require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
+echo $OUTPUT->container_start('f2f-attendees-table');
 
 /**
  * Print unapproved requests (if user able to view)
@@ -479,7 +143,11 @@ $canoverbook = has_capability('mod/facetoface:signupwaitlist', $context);
 if (!$canoverbook && ($numwaiting > $availablespaces)) {
     $stringmodifier = ($availablespaces > 0) ? 'over' : 'no';
     $stringidentifier = ($allowoverbook) ? "approval{$stringmodifier}capacitywaitlist" : "approval{$stringmodifier}capacity";
-    $overcapacitymessage = get_string($stringidentifier, 'facetoface', array('waiting' => $numwaiting, 'available' => $availablespaces));
+    $overcapacitymessage = get_string(
+        $stringidentifier,
+        'mod_facetoface',
+        array('waiting' => $numwaiting, 'available' => $availablespaces)
+    );
     echo $OUTPUT->notification($overcapacitymessage, 'notifynotice');
 }
 // If they cannot overbook and no spaces are available, disable the ability to approve more requests.
@@ -496,15 +164,18 @@ echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'action
 $headings = array();
 $headings[] = get_string('name');
 $headings[] = get_string('timerequested', 'facetoface');
-if ($includeattendeesnote) {
+$viewattendeesnote = has_capability('mod/facetoface:viewattendeesnote', $context);
+$manageattendeesnote = has_capability('mod/facetoface:manageattendeesnote', $context);
+if ($viewattendeesnote) {
     // The user has to hold specific permissions to view this.
     $headings[] = get_string('attendeenote', 'facetoface');
 }
 
 // Additional approval columns for the approval tab.
-if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_MANAGER || $seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ADMIN) {
+if ($seminar->get_approvaltype() == seminar::APPROVAL_MANAGER ||
+    $seminar->get_approvaltype() == seminar::APPROVAL_ADMIN) {
     $headings[] = get_string('header:managername', 'facetoface');
-    if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ADMIN) {
+    if ($seminar->get_approvaltype() == seminar::APPROVAL_ADMIN) {
         $headings[] = get_string('header:approvalstate', 'facetoface');
         $headings[] = get_string('header:approvaltime', 'facetoface');
     }
@@ -518,33 +189,37 @@ $table = new html_table();
 $table->summary = get_string('requeststablesummary', 'facetoface');
 $table->head = $headings;
 $table->align = array('left', 'center', 'center', 'center', 'center', 'center');
-
+$pix = new pix_icon('t/edit', get_string('edit'));
+$params = ['s' => $seminarevent->get_id(), 'sesskey' => sesskey(), 'return' => $action];
 foreach ($requests as $attendee) {
+    $attendeefullname = format_string(fullname($attendee));
     $data = array();
     $attendee_link = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $course->id));
-    $data[] = html_writer::link($attendee_link, format_string(fullname($attendee)));
+    $data[] = html_writer::link($attendee_link, $attendeefullname);
     $data[] = userdate($attendee->timecreated, get_string('strftimedatetime'));
 
-    $icon = '';
-    if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
-        $url = new moodle_url('/mod/facetoface/attendees/ajax/signup_notes.php', array('s' => $seminarevent->get_id(), 'userid' => $attendee->id));
+    // Get signup note.
+    $icon = $note = '';
+    $signupstatus = new stdClass();
+    $signupstatus->id = $attendee->submissionid;
+    $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
+    if ($manageattendeesnote && !empty($signupnote)) {
+        $params['userid'] = $attendee->id;
+        $url = new moodle_url('/mod/facetoface/attendees/ajax/signup_notes.php', $params);
         $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
     }
-    if ($includeattendeesnote) {
-        // Get signup note.
-        $signupstatus = new stdClass();
-        $signupstatus->id = $attendee->submissionid;
-        $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
-        // Currently it is possible to delete signupnote custom field easly so we must check if cf is exists.
-        $signupnotetext = isset($signupnote['signupnote']) ? $signupnote['signupnote'] : '';
-
-        $note = html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
+    if ($viewattendeesnote) {
+        if (!empty($signupnote)) {
+            // Currently it is possible to delete signupnote custom field easly so we must check if cf is exists.
+            $signupnotetext = isset($signupnote['signupnote']) ? $signupnote['signupnote'] : '';
+            $note = html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
+        }
         $data[] = $icon . $note;
     }
 
     // Additional approval columns for the approval tab.
-    if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_MANAGER ||
-        $seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ADMIN) {
+    if ($seminar->get_approvaltype() == seminar::APPROVAL_MANAGER ||
+        $seminar->get_approvaltype() == seminar::APPROVAL_ADMIN) {
         $signup = signup::create($attendee->id, $seminarevent);
         $managers = signup_helper::find_managers_from_signup($signup);
 
@@ -554,13 +229,13 @@ foreach ($requests as $attendee) {
         foreach ($managers as $manager) {
             $managernames[] =  $manager->fullname;
         }
-        if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ADMIN) {
+        if ($seminar->get_approvaltype() == seminar::APPROVAL_ADMIN) {
             switch ($attendee->statuscode) {
-                case \mod_facetoface\signup\state\requested::get_code():
+                case requested::get_code():
                     $state = get_string('none', 'mod_facetoface');
                     $time = '';
                     break;
-                case \mod_facetoface\signup\state\requestedadmin::get_code():
+                case requestedadmin::get_code():
                     $state = get_string('approved', 'mod_facetoface');
                     $time = userdate($attendee->timecreated);
                     break;
@@ -571,32 +246,58 @@ foreach ($requests as $attendee) {
         }
         $managernamestr = implode(', ', $managernames);
         $data[] = html_writer::span($managernamestr, 'managername' . $attendee->id, array('id' => 'managername' . $attendee->id));
-        if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ADMIN) {
+        if ($seminar->get_approvaltype() == seminar::APPROVAL_ADMIN) {
             $data[] = html_writer::span($state, 'approvalstate' . $attendee->id, array('id' => 'approvalstate' . $attendee->id));
             $data[] = html_writer::span($time, 'approvaltime' . $attendee->id, array('id' => 'approvaltime' . $attendee->id));
         }
+    } else {
+
     }
 
     $id = 'requests_' . $attendee->id . '_noaction';
-    $label = html_writer::label(get_string('decideuserlater', 'mod_facetoface', format_string(fullname($attendee))), $id, '', array('class' => 'sr-only'));
-    $radio = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked', 'id' => $id)));
+    $label = html_writer::label(get_string('decideuserlater', 'mod_facetoface', $attendeefullname), $id, '', ['class' => 'sr-only']);
+    $radio = html_writer::empty_tag(
+        'input',
+        array_merge(
+            $approvaldisabled,
+            array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked', 'id' => $id)
+        )
+    );
     $data[] = $label . $radio;
 
     $id = 'requests_' . $attendee->id . '_decline';
-    $label = html_writer::label(get_string('declineuserevent', 'mod_facetoface', format_string(fullname($attendee))), $id, '', array('class' => 'sr-only'));
-    $radio = html_writer::empty_tag('input',array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1', 'id' => $id)));
+    $label = html_writer::label(get_string('declineuserevent', 'mod_facetoface', $attendeefullname), $id, '', ['class' => 'sr-only']);
+    $radio = html_writer::empty_tag(
+        'input',
+        array_merge(
+            $approvaldisabled,
+            array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1', 'id' => $id)
+        )
+    );
     $data[] = $label . $radio;
 
     $id = 'requests_' . $attendee->id . '_approve';
-    $label = html_writer::label(get_string('approveuserevent', 'mod_facetoface', format_string(fullname($attendee))), $id, '', array('class' => 'sr-only'));
-    $radio = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '2', 'id' => $id)));
+    $label = html_writer::label(get_string('approveuserevent', 'mod_facetoface', $attendeefullname), $id, '',['class' => 'sr-only']);
+    $radio = html_writer::empty_tag(
+        'input',
+        array_merge(
+            $approvaldisabled,
+            array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '2', 'id' => $id)
+        )
+    );
     $data[] = $label . $radio;
     $table->data[] = $data;
 }
 
 if (!empty($table->data)) {
     echo html_writer::table($table);
-    echo html_writer::tag('p', html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('updaterequests', 'facetoface'))));
+    echo html_writer::tag(
+        'p',
+        html_writer::empty_tag(
+            'input',
+            array('type' => 'submit', 'value' => get_string('updaterequests', 'facetoface'))
+        )
+    );
 } else {
     echo html_writer::start_span();
     echo html_writer::tag('p', get_string('nopendingapprovals', 'facetoface'));
@@ -605,7 +306,10 @@ if (!empty($table->data)) {
 
 echo html_writer::end_tag('form');
 
+// If no allowed actions so far, check if this was user/manager who has just approved staff requests (approved == 1).
+// If so, do not redirect, just display notify message.
 // Hide "Go back" link for case if a user does not have any capabilities to see facetoface/course.
+$goback = !($approved == 1);
 if ($goback) {
     // Go back.
     if ($backtoallsessions) {
@@ -619,8 +323,8 @@ if ($goback) {
 /**
  * Print page footer
  */
-if (!$onlycontent) {
-    echo $OUTPUT->container_end();
-    echo $OUTPUT->box_end();
-    echo $OUTPUT->footer($course);
-}
+echo $OUTPUT->container_end();
+echo $OUTPUT->box_end();
+echo $OUTPUT->footer($course);
+
+\mod_facetoface\event\approval_required_viewed::create_from_session($seminarevent->to_record(), $context, $action)->trigger();
