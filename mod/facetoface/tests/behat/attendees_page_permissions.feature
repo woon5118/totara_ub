@@ -144,18 +144,15 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I press "Continue"
     And I press "Confirm"
     And I log out
-    When I log in as "trainer1"
+    And I log in as "trainer1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link"
+    When I click on "Attendees" "link"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
     And I should see "Wait-list" in the "div.tabtree" "css_element"
     And I should see "Take attendance" in the "div.tabtree" "css_element"
     And I should see "Message users" in the "div.tabtree" "css_element"
     And I should not see "Cancellations" in the "div.tabtree" "css_element"
-    When I visit the attendees page for session "1" with action "cancellations"
-    Then I should not see "Sam1 Student1"
-    And I should not see "Cancellations" in the "div.f2f-attendees-table" "css_element"
 
   Scenario: Check trainer actions on attendees page after removing view attendees capability
     Given the following "permission overrides" exist:

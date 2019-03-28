@@ -2,7 +2,8 @@ This files describes API changes in /mod/facetoface/*,
 information provided here is intended especially for developers.
 
 === 13.0 ===
-* signup_status::get_state() has been deprecated, please use signup::get_state()
+* attendees_helper::show_customfields() function has been deprecated, please use mod_facetoface_renderer::render_seminar_event()
+* signup_status::get_state() function has been deprecated, please use signup::get_state()
 * attendees_list_helper::get_status() function has been deprecated, please use attendees_helper::get_status()
 * attendees_list_helper::process_no_sessionid() function has been deprecated, please use attendees_helper::process_no_sessionid()
 * attendees_list_helper::process_js() function has been deprecated, please use attendees_helper::process_js()

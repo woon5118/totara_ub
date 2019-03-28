@@ -490,7 +490,7 @@ final class signup_helper {
                     (object)['user' => fullname($user), 'error' => $errors[$user->id]]
                 );
             }
-            $result['content'] = html_writer::alist($errormsgs);
+            $result['content'] = \html_writer::alist($errormsgs);
         }
         return $result;
     }

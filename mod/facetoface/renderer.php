@@ -1869,7 +1869,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $bookedsession = current($bookedsessions);
 
         // Print customfields.
-        $customfields = customfield_get_data($seminarevent->to_record(), 'facetoface_session', 'facetofacesession', true, array('extended' => true));
+        $tblprefix = (bool)$seminarevent->get_cancelledstatus() ? 'facetoface_sessioncancel' : 'facetoface_session';
+        $prefix    = (bool)$seminarevent->get_cancelledstatus() ? 'facetofacesessioncancel'  : 'facetofacesession';
+        $customfields = customfield_get_data($seminarevent->to_record(), $tblprefix, $prefix, true, array('extended' => true));
         if (!empty($customfields)) {
             foreach ($customfields as $cftitle => $cfvalue) {
                 $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', $cftitle));

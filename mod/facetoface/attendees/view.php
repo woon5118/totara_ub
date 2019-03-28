@@ -28,7 +28,6 @@ use \mod_facetoface\attendees_helper;
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
-require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 /**
@@ -78,12 +77,11 @@ $PAGE->set_url($baseurl);
 list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
     = attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context);
 
-$can_view_session = !empty($allowed_actions);
-if (!$can_view_session) {
+// $allowed_actions is already set, so we can now know if the current action is allowed.
+if (!in_array($action, $allowed_actions)) {
     // If no allowed actions so far.
     $return = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
     redirect($return);
-    die();
 }
 
 $pagetitle = format_string($seminar->get_name());
@@ -92,23 +90,16 @@ $PAGE->set_title($pagetitle);
 $PAGE->set_cm($cm);
 $PAGE->set_heading($course->fullname);
 
-// $allowed_actions is already set, so we can now know if the current action is allowed.
-$actionallowed = in_array($action, $allowed_actions);
-$show_table = false;
-if ($actionallowed) {
-    attendees_helper::process_js($action, $seminar, $seminarevent);
-    // Verify global restrictions and process report early before any output is done (required for export).
-    $shortname = 'facetoface_sessions';
-    $attendancestatuses = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
-        [
-            \mod_facetoface\signup\state\booked::class,
-            \mod_facetoface\signup\state\not_set::class
-        ]
-    );
-    $report = attendees_helper::load_report($shortname, $attendancestatuses);
-    // We will show embedded report.
-    $show_table = true;
-}
+attendees_helper::process_js($action, $seminar, $seminarevent);
+// Verify global restrictions and process report early before any output is done (required for export).
+$shortname = 'facetoface_sessions';
+$attendancestatuses = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
+    [
+        \mod_facetoface\signup\state\booked::class,
+        \mod_facetoface\signup\state\not_set::class
+    ]
+);
+$report = attendees_helper::load_report($shortname, $attendancestatuses);
 
 /**
  * Print page content
@@ -116,70 +107,73 @@ if ($actionallowed) {
 echo $OUTPUT->header();
 echo $OUTPUT->box_start();
 echo $OUTPUT->heading($pagetitle);
-if ($can_view_session) {
-    attendees_helper::show_customfields($seminarevent);
-}
+
+/** @var mod_facetoface_renderer $seminarrenderer */
+$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
+echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
+
 require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
 echo $OUTPUT->container_start('f2f-attendees-table');
 
 /**
  * Print attendees (if user able to view)
  */
-if ($show_table) {
-    // Get list of attendees
-    attendees_helper::is_overbooked($seminarevent);
-    // Output the section heading.
-    echo $OUTPUT->heading(get_string('attendees', 'mod_facetoface'));
+// Get list of attendees
+attendees_helper::is_overbooked($seminarevent);
+// Output the section heading.
+echo $OUTPUT->heading(get_string('attendees', 'mod_facetoface'));
 
-    $report->set_baseurl($baseurl);
-    $report->display_restrictions();
+$report->set_baseurl($baseurl);
+$report->display_restrictions();
 
-    // Actions menu.
-    $capability = has_any_capability(array('mod/facetoface:addattendees', 'mod/facetoface:removeattendees'), $context);
-    if ($capability && $actionallowed && ($seminarevent->get_cancelledstatus() == 0)) {
-        // Get list of actions
-        if (in_array('addattendees', $allowed_actions)) {
-            $actions['add'] = get_string('addattendees', 'facetoface');
-            $actions['bulkaddfile'] = get_string('addattendeesviafileupload', 'facetoface');
-            $actions['bulkaddinput'] = get_string('addattendeesviaidlist', 'facetoface');
-            if (has_capability('mod/facetoface:removeattendees', $context)) {
-                $actions['remove'] = get_string('removeattendees', 'facetoface');
-            }
-            echo $OUTPUT->container_start('actions last');
-            // Action selector
-            echo html_writer::label(get_string('attendeeactions', 'mod_facetoface'), 'menuf2f-actions', true, ['class' => 'sr-only']);
-            echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('actions')));
-            echo $OUTPUT->container_end();
-        }
+// Actions menu.
+if ($seminarevent->get_cancelledstatus() == 0) {
+    // Get list of actions
+    $actions = [];
+    if (has_capability('mod/facetoface:addattendees', $context)) {
+        $actions['add']          = get_string('addattendees', 'mod_facetoface');
+        $actions['bulkaddfile']  = get_string('addattendeesviafileupload', 'mod_facetoface');
+        $actions['bulkaddinput'] = get_string('addattendeesviaidlist', 'mod_facetoface');
     }
-    /** @var totara_reportbuilder_renderer $output */
-    $output = $PAGE->get_renderer('totara_reportbuilder');
-    // This must be done after the header and before any other use of the report.
-    list($reporthtml, $debughtml) = $output->report_html($report, $debug);
-    echo $debughtml;
-
-    // Print saved search options and filters.
-    $report->display_saved_search_options();
-    $report->display_search();
-    $report->display_sidebar_search();
-
-    echo $reporthtml;
-
-    // Session downloadable sign in sheet.
-    if ($seminarevent->is_sessions() && has_capability('mod/facetoface:exportsessionsigninsheet', $context)) {
-        $downloadsheetattendees = facetoface_get_attendees($seminarevent->get_id(), $attendancestatuses);
-        if (!empty($downloadsheetattendees)) {
-            // We need the dates, and we only want to show this option if there are one or more dates.
-            $formurl = new moodle_url('/mod/facetoface/reports/signinsheet.php');
-            $signinform = new \mod_facetoface\form\signin($formurl, $session);
-            echo html_writer::start_div('f2fdownloadsigninsheet');
-            $signinform->display();
-            echo html_writer::end_div();
-        }
+    if (has_capability('mod/facetoface:removeattendees', $context)) {
+        $actions['remove'] = get_string('removeattendees', 'mod_facetoface');
     }
-
-    attendees_helper::report_export_form($report, $sid);
+    if (!empty($actions)) {
+        echo $OUTPUT->container_start('actions last');
+        // Action selector
+        echo html_writer::label(get_string('attendeeactions', 'mod_facetoface'), 'menuf2f-actions', true,
+            ['class' => 'sr-only']);
+        echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('actions')));
+        echo $OUTPUT->container_end();
+    }
 }
+/** @var totara_reportbuilder_renderer $output */
+$output = $PAGE->get_renderer('totara_reportbuilder');
+// This must be done after the header and before any other use of the report.
+list($reporthtml, $debughtml) = $output->report_html($report, $debug);
+echo $debughtml;
+
+// Print saved search buttons if appropriate.
+$report->display_saved_search_options();
+$report->display_search();
+$report->display_sidebar_search();
+echo $reporthtml;
+
+// Session downloadable sign in sheet.
+if ($seminarevent->is_sessions() && has_capability('mod/facetoface:exportsessionsigninsheet', $context)) {
+    $downloadsheetattendees = facetoface_get_attendees($seminarevent->get_id(), $attendancestatuses);
+    if (!empty($downloadsheetattendees)) {
+        // We need the dates, and we only want to show this option if there are one or more dates.
+        $formurl = new moodle_url('/mod/facetoface/reports/signinsheet.php');
+        $signinform = new \mod_facetoface\form\signin($formurl, $session);
+        echo html_writer::start_div('f2fdownloadsigninsheet');
+        $signinform->display();
+        echo html_writer::end_div();
+    }
+}
+
+attendees_helper::report_export_form($report, $sid);
+
 // Go back.
 if ($backtoallsessions) {
     $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));

@@ -63,8 +63,8 @@ $PAGE->set_url($baseurl);
 list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
     = attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context);
 
-$can_view_session = !empty($allowed_actions);
-if (!$can_view_session) {
+// $allowed_actions is already set, so we can now know if the current action is allowed.
+if (!in_array($action, $allowed_actions)) {
     // If no allowed actions so far.
     $return = new moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]);
     redirect($return);
@@ -76,22 +76,15 @@ $PAGE->set_title($pagetitle);
 $PAGE->set_cm($cm);
 $PAGE->set_heading($course->fullname);
 
-// $allowed_actions is already set, so we can now know if the current action is allowed.
-$actionallowed = in_array($action, $allowed_actions);
-$show_table = false;
-if ($actionallowed) {
-    attendees_helper::process_js($action, $seminar, $seminarevent);
-    // Verify global restrictions and process report early before any output is done (required for export).
-    $shortname = 'facetoface_cancellations';
-    $attendancestatuses = [
-        user_cancelled::get_code(),
-        event_cancelled::get_code(),
-        declined::get_code()
-    ];
-    $report = attendees_helper::load_report($shortname, $attendancestatuses);
-    // We will show embedded report.
-    $show_table = true;
-}
+attendees_helper::process_js($action, $seminar, $seminarevent);
+// Verify global restrictions and process report early before any output is done (required for export).
+$shortname = 'facetoface_cancellations';
+$attendancestatuses = [
+    user_cancelled::get_code(),
+    event_cancelled::get_code(),
+    declined::get_code()
+];
+$report = attendees_helper::load_report($shortname, $attendancestatuses);
 
 /**
  * Print page content
@@ -99,37 +92,36 @@ if ($actionallowed) {
 echo $OUTPUT->header();
 echo $OUTPUT->box_start();
 echo $OUTPUT->heading($pagetitle);
-if ($can_view_session) {
-    attendees_helper::show_customfields($seminarevent);
-}
+
+/** @var mod_facetoface_renderer $seminarrenderer */
+$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
+echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
+
 require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
 echo $OUTPUT->container_start('f2f-attendees-table');
 
 /**
  * Print attendees (if user able to view)
  */
-if ($show_table) {
-    // Output the section heading.
-    echo $OUTPUT->heading(get_string('cancellations', 'mod_facetoface'));
+// Output the section heading.
+echo $OUTPUT->heading(get_string('cancellations', 'mod_facetoface'));
 
-    $report->set_baseurl($baseurl);
-    $report->display_restrictions();
-    // Actions menu.
-    //if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
+$report->set_baseurl($baseurl);
+$report->display_restrictions();
 
-    $output = $PAGE->get_renderer('totara_reportbuilder');
-    // This must be done after the header and before any other use of the report.
-    list($reporthtml, $debughtml) = $output->report_html($report, $debug);
-    echo $debughtml;
+$output = $PAGE->get_renderer('totara_reportbuilder');
+// This must be done after the header and before any other use of the report.
+list($reporthtml, $debughtml) = $output->report_html($report, $debug);
+echo $debughtml;
 
-    $report->display_saved_search_options();
-    $report->display_search();
-    $report->display_sidebar_search();
+// Print saved search buttons if appropriate.
+$report->display_saved_search_options();
+$report->display_search();
+$report->display_sidebar_search();
+echo $reporthtml;
 
-    echo $reporthtml;
+attendees_helper::report_export_form($report, $sid);
 
-    attendees_helper::report_export_form($report, $sid);
-}
 // Go back.
 if ($backtoallsessions) {
     $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));

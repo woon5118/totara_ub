@@ -26,7 +26,6 @@ use \mod_facetoface\attendees_helper;
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
-require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 /**
@@ -70,12 +69,11 @@ $PAGE->set_url($baseurl);
 list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
     = attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context);
 
-$can_view_session = !empty($allowed_actions);
-if (!$can_view_session) {
+// $allowed_actions is already set, so we can now know if the current action is allowed.
+if (!in_array($action, $allowed_actions)) {
     // If no allowed actions so far.
     $return = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
     redirect($return);
-    die();
 }
 
 $pagetitle = format_string($seminar->get_name());
@@ -84,19 +82,11 @@ $PAGE->set_title($pagetitle);
 $PAGE->set_cm($cm);
 $PAGE->set_heading($course->fullname);
 
-// $allowed_actions is already set, so we can now know if the current action is allowed.
-$actionallowed = in_array($action, $allowed_actions);
-$show_table = false;
-$addremoveattendees = has_any_capability(array('mod/facetoface:addattendees', 'mod/facetoface:removeattendees'), $context);
-if ($actionallowed) {
-    attendees_helper::process_js($action, $seminar, $seminarevent);
-    // Verify global restrictions and process report early before any output is done (required for export).
-    $shortname = 'facetoface_waitlist';
-    $attendancestatuses = array(waitlisted::get_code());
-    $report = attendees_helper::load_report($shortname, $attendancestatuses);
-    // We will show embedded report.
-    $show_table = true;
-}
+attendees_helper::process_js($action, $seminar, $seminarevent);
+// Verify global restrictions and process report early before any output is done (required for export).
+$shortname = 'facetoface_waitlist';
+$attendancestatuses = array(waitlisted::get_code());
+$report = attendees_helper::load_report($shortname, $attendancestatuses);
 
 /**
  * Print page content
@@ -104,53 +94,59 @@ if ($actionallowed) {
 echo $OUTPUT->header();
 echo $OUTPUT->box_start();
 echo $OUTPUT->heading($pagetitle);
-if ($can_view_session) {
-    attendees_helper::show_customfields($seminarevent);
-}
+
+/** @var mod_facetoface_renderer $seminarrenderer */
+$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
+echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
+
 require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
 echo $OUTPUT->container_start('f2f-attendees-table');
+
 /**
  * Print attendees (if user able to view)
  */
-if ($show_table) {
-    attendees_helper::is_overbooked($seminarevent);
-    // Output the section heading.
-    echo $OUTPUT->heading(get_string('wait-list', 'mod_facetoface'));
+attendees_helper::is_overbooked($seminarevent);
+// Output the section heading.
+echo $OUTPUT->heading(get_string('wait-list', 'mod_facetoface'));
 
-    $report->set_baseurl($baseurl);
-    $report->display_restrictions();
-    // Actions menu.
-    if ($addremoveattendees && $actionallowed) {
-        $actions = [
-            'confirmattendees' => get_string('confirmattendees', 'mod_facetoface'),
-            'cancelattendees'  => get_string('cancelattendees',  'mod_facetoface')
-        ];
-        if (get_config(null, 'facetoface_lotteryenabled')) {
-            $actions['playlottery'] = get_string('playlottery', 'mod_facetoface');
-        }
-        $options = ['all' => get_string('all'), 'none' => get_string('none')];
-        echo $OUTPUT->container_start('actions last');
-        // Action selector
-        echo html_writer::label(get_string('attendeeactions', 'mod_facetoface'), 'menuf2f-actions', true, array('class' => 'sr-only'));
-        echo html_writer::select($options, 'f2f-select', '', ['' => get_string('selectwithdot', 'mod_facetoface')]);
-        echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('actions')));
-        echo $OUTPUT->help_icon('f2f-waitlist-actions', 'mod_facetoface');
-        echo $OUTPUT->container_end();
-    }
-
-    $output = $PAGE->get_renderer('totara_reportbuilder');
-    // This must be done after the header and before any other use of the report.
-    list($reporthtml, $debughtml) = $output->report_html($report, $debug);
-    echo $debughtml;
-
-    $report->display_saved_search_options();
-    $report->display_search();
-    $report->display_sidebar_search();
-
-    echo $reporthtml;
-
-    attendees_helper::report_export_form($report, $sid);
+$report->set_baseurl($baseurl);
+$report->display_restrictions();
+// Actions menu.
+$actions = [];
+if (has_capability('mod/facetoface:addattendees', $context)) {
+    $actions['confirmattendees'] = get_string('confirmattendees', 'mod_facetoface');
 }
+if (has_capability('mod/facetoface:removeattendees', $context)) {
+    $actions['cancelattendees']  = get_string('cancelattendees',  'mod_facetoface');
+}
+if (has_capability('mod/facetoface:addattendees', $context) && get_config(null, 'facetoface_lotteryenabled')) {
+    $actions['playlottery'] = get_string('playlottery', 'mod_facetoface');
+}
+if (!empty($actions)) {
+    $options = ['all' => get_string('all'), 'none' => get_string('none')];
+    echo $OUTPUT->container_start('actions last');
+    // Action selector
+    echo html_writer::label(get_string('attendeeactions', 'mod_facetoface'), 'menuf2f-actions', true,
+        array('class' => 'sr-only'));
+    echo html_writer::select($options, 'f2f-select', '', ['' => get_string('selectwithdot', 'mod_facetoface')]);
+    echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('actions')));
+    echo $OUTPUT->help_icon('f2f-waitlist-actions', 'mod_facetoface');
+    echo $OUTPUT->container_end();
+}
+
+$output = $PAGE->get_renderer('totara_reportbuilder');
+// This must be done after the header and before any other use of the report.
+list($reporthtml, $debughtml) = $output->report_html($report, $debug);
+echo $debughtml;
+
+// Print saved search buttons if appropriate.
+$report->display_saved_search_options();
+$report->display_search();
+$report->display_sidebar_search();
+echo $reporthtml;
+
+attendees_helper::report_export_form($report, $sid);
+
 // Go back.
 if ($backtoallsessions) {
     $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));

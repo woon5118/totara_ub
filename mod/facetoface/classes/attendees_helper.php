@@ -202,7 +202,6 @@ final class attendees_helper {
         if (has_capability('mod/facetoface:viewattendees', $context)) {
             $allowed_actions[] = 'attendees';
             $allowed_actions[] = 'waitlist';
-            $allowed_actions[] = 'addattendees';
 
             if (empty($seminarevent->get_cancelledstatus())) {
                 $available_actions[] = 'attendees';
@@ -455,27 +454,19 @@ final class attendees_helper {
 
     /**
      * Print seminar customfields.
-     *
      * @param seminar_event $seminarevent
+     *
+     * @deprecated since Totara 13
      */
     public static function show_customfields(seminar_event $seminarevent) {
         global $PAGE;
 
+        debugging('attendees_helper::show_customfields() function has been deprecated, please use mod_facetoface_renderer::render_seminar_event()',
+            DEBUG_DEVELOPER);
+
         /** @var mod_facetoface_renderer $seminarrenderer */
         $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
         echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
-        // Print customfields.
-        $session['id'] = $seminarevent->get_id();
-        $customfields = customfield_get_data((object)$session, 'facetoface_sessioncancel', 'facetofacesessioncancel');
-        if (!empty($customfields)) {
-            $output = \html_writer::start_tag('dl', array('class' => 'f2f'));
-            foreach ($customfields as $cftitle => $cfvalue) {
-                $output .= \html_writer::tag('dt', str_replace(' ', '&nbsp;', $cftitle));
-                $output .= \html_writer::tag('dd', $cfvalue);
-            }
-            $output .= \html_writer::end_tag('dl');
-            echo $output;
-        }
     }
 
     /**
