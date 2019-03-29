@@ -453,5 +453,133 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019031302, 'totara', 'reportbuilder');
     }
 
+    // Note: upgrade based on totara_reportbuilder_migrate_saved_searches().
+    if ($oldversion < 2019040100) {
+
+        // First switch over any columns/filters.
+        totara_reportbuilder_migrate_column_names(['enrolltype' => 'enrolmenttype'], 'course_completion');
+        totara_reportbuilder_migrate_filter_names(['enrolltype' => 'enrolmenttype'], 'course_completion');
+
+        // Then get all the saved searches for the course completion report source.
+        $sql = "SELECT rbs.*
+                  FROM {report_builder_saved} rbs
+                  JOIN {report_builder} rb
+                    ON rb.id = rbs.reportid
+                 WHERE rb.source = 'course_completion'";
+        $savedsearches = $DB->get_records_sql($sql);
+
+        // Get all available enrolment options, then add on any existing ones to be safe.
+        $options = explode(',', $CFG->enrol_plugins_enabled);
+        foreach ($DB->get_records_sql('SELECT DISTINCT enrol FROM {enrol}') as $opt) {
+            if (!in_array($opt->enrol, $options)) {
+                $options[] = $opt->enrol;
+            }
+        }
+
+        // Loop through them all and json_decode course_completion-enrolltype
+        foreach ($savedsearches as $saved) {
+            if (empty($saved->search)) {
+                continue;
+            }
+
+            $search = unserialize($saved->search);
+
+            if (!is_array($search)) {
+                continue;
+            }
+
+            // Check for any filters that will need to be updated.
+            $update = false;
+            $newkey = 'course_completion-enrolmenttype';
+            foreach ($search as $key => $info) {
+                list($type, $value) = explode('-', $key);
+
+                /**
+                 * Constants for filter types.
+                 *    const RB_FILTER_CONTAINS = 0;
+                 *    const RB_FILTER_DOESNOTCONTAIN = 1;
+                 *    const RB_FILTER_ISEQUALTO = 2;
+                 *    const RB_FILTER_STARTSWITH = 3;
+                 *    const RB_FILTER_ENDSWITH = 4;
+                 *    const RB_FILTER_ISEMPTY = 5;
+                 *    const RB_FILTER_ISNOTEMPTY = 6;
+                 */
+                if ($type == 'course_completion' && $value == 'enrolltype') {
+                    if (!isset($info['operator']) || !isset($info['value'])) {
+                        continue;
+                    }
+
+                    $update = true;
+                    $filter = $info['value'];
+
+                    $newopts = [];
+                    $newinfo = [];
+                    switch ($info['operator']) {
+                        case 0: // contains
+                            $newinfo['operator'] = 1; // Any.
+                            foreach ($options as $option) {
+                                $newopts[$option] = preg_match("/{$filter}/", $option);
+                            }
+                            break;
+                        case 1: // does not contain
+                            $newinfo['operator'] = 3; // Not any.
+                            foreach ($options as $option) {
+                                $newopts[$option] = preg_match("/{$filter}/", $option);
+                            }
+                            break;
+                        case 2: // is equal to
+                            $newinfo['operator'] = 1; // Any.
+                            foreach ($options as $option) {
+                                $newopts[$option] = $info['value'] == $option;
+                            }
+                            break;
+                        case 3: // startswith
+                            $newinfo['operator'] = 1; // Any.
+                            foreach ($options as $option) {
+                                $newopts[$option] = preg_match("/^{$filter}/", $option);
+                            }
+                            break;
+                        case 4: // ends with
+                            $newinfo['operator'] = 1; // Any.
+                            foreach ($options as $option) {
+                                $newopts[$option] = preg_match("/{$filter}$/", $option);
+                            }
+                            break;
+                        case 5: // is empty
+                            $newinfo['operator'] = 3; // Not Any.
+                            foreach ($options as $option) {
+                                $newopts[$option] = true;
+                                // This is actually impossible... it would always have returned no one, probably safe to ignore?
+                            }
+                            break;
+                        case 6: // is not empty
+                            $newinfo['operator'] = 1; // Any.
+                            foreach ($options as $option) {
+                                $newopts[$option] = true;
+                            }
+                            break;
+                    }
+
+                    $newinfo['value'] = $newopts;
+                    $search[$newkey] = $newinfo;
+                }
+            }
+
+            if ($update) {
+                // Remove the out-dated search before updating.
+                unset($search['course_completion-enrolltype']);
+
+                // Re-encode and update the database.
+                $todb = new \stdClass;
+                $todb->id = $saved->id;
+                $todb->search = serialize($search);
+                $DB->update_record('report_builder_saved', $todb);
+            }
+        }
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2019040100, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

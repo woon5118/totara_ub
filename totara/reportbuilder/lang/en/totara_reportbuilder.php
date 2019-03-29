@@ -419,10 +419,21 @@ $string['filter_assetavailable_help'] = 'This filter allows you to find assets t
 $string['filter_roomavailable'] = 'Available between';
 $string['filter_roomavailable_help'] = 'This filter allows you to find rooms that are available for a session by specifying the session start and end date.';
 $string['filtercontains'] = 'Any of the selected';
-$string['filtercontainsnot'] = 'None of the selected';
+$string['filtercontainsnot'] = 'Not any of the selected';
 $string['filterdisabledwarning'] = 'This report has changed due to the removal of one or more filters. Contact your site administrator for more details.';
 $string['filterequals'] = 'All of the selected';
 $string['filterequalsnot'] = 'Not all of the selected';
+$string['filtermultiselect'] = 'Multi-Select Filter';
+$string['filtermultiselect_help'] = 'This filter allows you to filter information based on a set of checkboxes.
+
+The filter has the following options:
+
+* **Any value**: This option disables the filter (i.e. all information is accepted by this filter).
+* **Any of the selected**: This option includes records if they match any of the checked options.
+* **All of the selected**: This option includes records if they  match all of the checked options.
+* **Not any of the selected**: This option includes records if they don\'t match any of the checked options.
+* **Not all of the selected**: This option includes records if they don\'t match all of the checked options.';
+$string['filternotset'] = 'Any value';
 $string['financialyear'] = 'Financial year start';
 $string['financialyeardaystart'] = 'Financial year day start';
 $string['financialyearmonthstart'] = 'Financial year month start';

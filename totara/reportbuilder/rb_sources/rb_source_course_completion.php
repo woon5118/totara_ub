@@ -252,9 +252,9 @@ class rb_source_course_completion extends rb_base_source {
             ),
             new rb_column_option(
                 'course_completion',
-                'enrolltype',
+                'enrolmenttype',
                 get_string('courseenroltypes', 'totara_reportbuilder'),
-                "(SELECT " . $DB->sql_group_concat('e.enrol', ', ', 'e.enrol ASC') . "
+                "(SELECT " . $DB->sql_group_concat('e.enrol', '|', 'e.enrol ASC') . "
                     FROM {enrol} e
                     JOIN {user_enrolments} ue ON ue.enrolid = e.id
                    WHERE ue.userid = base.userid AND e.courseid = base.course)",
@@ -611,11 +611,16 @@ class rb_source_course_completion extends rb_base_source {
             ),
             new rb_filter_option(
                 'course_completion',
-                'enrolltype',
+                'enrolmenttype',
                 get_string('courseenroltypes', 'totara_reportbuilder'),
-                'text',
+                'multicheck',
                 array(
                     'cachingcompatible' => false, // Current filter code is not compatible with aggregated columns.
+                    'concat' => true,
+                    'selectfunc' => 'enrolment_types_list',
+                    'attributes' => rb_filter_option::select_width_limiter(),
+                    'simplemode' => false,
+                    'showcounts' => false
                 )
             ),
         );
@@ -857,5 +862,29 @@ class rb_source_course_completion extends rb_base_source {
         }
         return $statuslist;
     }
+
+    /**
+     * Get all the enabled enrolment types for the filter
+     *
+     * @return array
+     */
+    function rb_filter_enrolment_types_list() : array {
+        global $CFG;
+        require_once($CFG->libdir . '/enrollib.php');
+
+        $types = [];
+        $plugins = enrol_get_plugins(true);
+
+        foreach ($plugins as $key => $plugin) {
+            if ($key == 'guest') {
+                continue;
+            }
+
+            $types[$key] = $plugin->get_instance_name(null);
+        }
+
+        return $types;
+    }
+
 } // end of rb_source_course_completion class
 

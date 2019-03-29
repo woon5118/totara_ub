@@ -136,7 +136,7 @@ class totara_reportbuilder_rb_filters_default_value_testcase extends advanced_te
         $this->assertEquals('status', $filter->value);
         $this->assertEquals('1', $filter->advanced);
         $this->assertEquals(['operator' => 1, 'value' => ["1", "1", "1", "0", "0"]], $filter->defaultvalue);
-        $this->assertEquals('Badge status matches any selected "Not available to users", "Available to users", "Locked - Not available to users"',
+        $this->assertEquals('Badge status Any of the selected "Not available to users", "Available to users", "Locked - Not available to users"',
             $filter->get_label($filter->defaultvalue));
 
         $filter = array_shift($filters);
