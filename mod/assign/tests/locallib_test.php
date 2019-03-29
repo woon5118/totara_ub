@@ -2612,8 +2612,8 @@ Anchor link 2:<a title=\"bananas\" href=\"../logo-240x60.gif\">Link text</a>
         $this->assertFalse(in_array($this->extrastudents[1]->id, $groupmembers[0]));
 
         // Lists of group members for students and extrastudents should be the same.
-        $this->assertEquals($groupmembers[0], $assign->get_shared_group_members($cm, $this->extrastudents[0]->id));
-        $this->assertEquals($groupmembers[1], $assign->get_shared_group_members($cm, $this->extrastudents[1]->id));
+        $this->assertEqualsCanonicalizing($groupmembers[0], $assign->get_shared_group_members($cm, $this->extrastudents[0]->id));
+        $this->assertEqualsCanonicalizing($groupmembers[1], $assign->get_shared_group_members($cm, $this->extrastudents[1]->id));
 
         // Get all group members for extrastudent 3 wich can access all groups.
         $allgroupmembers = $assign->get_shared_group_members($cm, $this->extrastudents[3]->id);
