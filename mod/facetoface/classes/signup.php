@@ -23,7 +23,17 @@
 
 namespace mod_facetoface;
 use mod_facetoface\exception\signup_exception;
-use mod_facetoface\signup\state\{state, not_set, interface_event};
+use mod_facetoface\signup\state\{
+    attendance_state,
+    booked,
+    requested,
+    requestedadmin,
+    requestedrole,
+    state,
+    not_set,
+    interface_event,
+    waitlisted
+};
 use mod_facetoface\signup\transition;
 use \stdClass;
 use totara_job\job_assignment;
@@ -691,5 +701,49 @@ final class signup implements seminar_iterator_item {
             return $USER;
         }
         return $DB->get_record("user", ['id' => $actorid]);
+    }
+
+    /**
+     * Return the object that has all of properties that are mapped with the database's table.
+     * @return stdClass
+     */
+    public function to_record(): \stdClass {
+        return $this->unmap_object();
+    }
+
+    /**
+     * Returning the signup status of this signup. If it is existing in the system.
+     * @return signup_status|null
+     */
+    public function get_signup_status(): ?signup_status {
+        if (signup_status::has_current($this)) {
+            return signup_status::from_current($this);
+        }
+
+        return null;
+    }
+
+    /**
+     * Returning true if the signup is within certain stastes that are not cancelled or not set. By cancelled state,
+     * this is including any cancelled state or declined state.
+     *
+     * @return bool
+     */
+    public function is_active(): bool {
+        if (!$this->exists()) {
+            // Not really an active signup if the signup itself is not even existed.
+            return false;
+        }
+
+        $state = $this->get_state();
+        $statuscodes = attendance_state::get_all_attendance_code_with([
+            requested::class,
+            requestedrole::class,
+            requestedadmin::class,
+            waitlisted::class,
+            booked::class
+        ]);
+
+        return in_array($state::get_code(), $statuscodes);
     }
 }

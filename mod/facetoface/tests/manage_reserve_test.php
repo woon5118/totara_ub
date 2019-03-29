@@ -161,12 +161,16 @@ class mod_facetoface_manage_reserve_testcase extends \advanced_testcase {
         \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user1->id, new \mod_facetoface\seminar_event($session1->get_id()))->set_skipmanagernotification());
         $sink->close();
 
-        $records = facetoface_get_users_by_status($session1->get_id(), \mod_facetoface\signup\state\booked::get_code(), '', true);
+        $helper = new \mod_facetoface\attendees_helper($session1);
+        $records = $helper->get_reservations();
         $this->assertCount(3, $records);
+
         $signupcnt = 0;
         foreach ($records as $record) {
-            if (empty($record->email)) {
+            if (!$record->has_email()) {
                 $signupcnt++;
+            } else {
+                $this->assertEquals(\mod_facetoface\signup\state\booked::get_code(), $record->get_statuscode());
             }
         }
         $this->assertEquals(2, $signupcnt);

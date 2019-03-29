@@ -23,12 +23,17 @@
 
 namespace mod_facetoface;
 
+use mod_facetoface\signup\state\{
+    not_set,
+    state
+};
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class signup_list represents signups in seminar event
  */
-final class signup_list implements \Iterator {
+final class signup_list implements \Iterator, \Countable {
 
     use traits\seminar_iterator;
 
@@ -76,7 +81,8 @@ final class signup_list implements \Iterator {
                    AND s.archived = 0
                    AND st.statuscode != :decl
                    AND st.statuscode != :ucan
-                   AND st.statuscode != :ecan';
+                   AND st.statuscode != :ecan
+            ORDER BY e.timecreated';
         $params = [
             'uid' => $userid,
             'sid' => $seminarid,
@@ -92,6 +98,80 @@ final class signup_list implements \Iterator {
             $list->add($signup->map_instance($data));
         }
         return $list;
+    }
+
+    /**
+     * @param int   $userid
+     * @param int   $seminarid
+     * @param array $statuscodes
+     *
+     * @return signup_list
+     */
+    public static function user_signups_within_seminar_with_codes(int $userid, int $seminarid,
+                                                                  array $statuscodes): signup_list {
+        global $DB;
+
+        [$asql, $params] = $DB->get_in_or_equal($statuscodes, SQL_PARAMS_NAMED);
+        $sql = "
+            SELECT su.*
+            FROM {facetoface_signups} su
+            INNER JOIN {facetoface_signups_status} ss
+            ON ss.signupid = su.id AND ss.superceded = 0
+            INNER JOIN {facetoface_sessions} s
+            ON s.id = su.sessionid
+            INNER JOIN {facetoface} f
+            ON f.id = s.facetoface
+            WHERE su.archived = 0
+            AND f.id = :facetoface
+            AND su.userid = :userid
+            AND ss.statuscode {$asql}
+        ";
+
+        $params['facetoface'] = $seminarid;
+        $params['userid'] = $userid;
+
+        $records = $DB->get_records_sql($sql , $params);
+        $list = new static();
+
+        foreach ($records as $record) {
+            $signup = new signup();
+            $signup->map_instance($record);
+
+            $list->add($signup);
+        }
+
+        return $list;
+    }
+
+    /**
+     * Create a list itself that is including every signups within a seminar, and that signup should not be archived
+     * at all. This means that, the list is including all the possible states, from any cancelled to fully attended.
+     *
+     * @param int $userid
+     * @param int $seminarid
+     *
+     * @return signup_list
+     */
+    public static function user_signups_within_seminar(int $userid, int $seminarid): signup_list {
+        $states = array_values(state::get_all_states());
+        $statuscodes = [];
+
+        foreach ($states as $state) {
+            if (!method_exists($state, 'get_code')) {
+                debugging("No method get_code for state: '{$state}'");
+                continue;
+            }
+
+            $code = $state::get_code();
+            if ($code == not_set::get_code()) {
+                // Do not accept not_set.
+                continue;
+            }
+
+            $statuscodes[] = $code;
+        }
+
+        return self::user_signups_within_seminar_with_codes($userid, $seminarid, $statuscodes);
     }
 
     /**
@@ -148,5 +228,26 @@ final class signup_list implements \Iterator {
      */
     public function add(signup $item) {
         $this->items[$item->get_id()] = $item;
+    }
+
+    /**
+     * @return signup|null
+     */
+    public function get_first(): ?signup {
+        if (empty($this->items)) {
+            return null;
+        }
+
+        $item = reset($this->items);
+        return $item;
+    }
+
+    /**
+     * Returning an array of signups within this list.
+     *
+     * @return signup[]
+     */
+    public function to_array(): array {
+        return $this->items;
     }
 }

@@ -5281,7 +5281,6 @@ function facetoface_get_session_managers($userid, $sessionid, $jobassignmentid =
     return $managers;
 }
 
-
 /**
  * Returns detailed information about booking conflicts for the passed users
  *
@@ -5561,7 +5560,6 @@ function facetoface_get_sessions_within($times, $userid = null, $extrawhere = ''
 
     return $sessions;
 }
-
 
 /**
  * Get a record from the facetoface_sessions table
@@ -6311,7 +6309,6 @@ function facetoface_get_session_dates($sessionid, $reverseorder = false) {
     return $ret;
 }
 
-
 /**
  * Used in many places to obtain properly-formatted session date and time info
  *
@@ -6556,4 +6553,471 @@ function facetoface_get_customfield_value(&$object, $field, $otherid, $table) {
             }
         }
     }
+}
+
+/**
+ * Get a single attendee of a session
+ *
+ * @access public
+ * @param integer Session ID
+ * @param integer User ID
+ * @return false|object
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_attendee($sessionid, $userid) {
+    global $DB;
+
+    debugging(
+        'Function facetoface_get_attendee() has been deprecated, please use \\mod_facetoface\\signup::create() instead',
+        DEBUG_DEVELOPER
+    );
+
+    $usernamefields = get_all_user_name_fields(true, 'u');
+    $record = $DB->get_record_sql("
+        SELECT
+            u.id,
+            su.id AS submissionid,
+            {$usernamefields},
+            u.email,
+            s.discountcost,
+            su.discountcode,
+            su.notificationtype,
+            f.id AS facetofaceid,
+            f.course,
+            ss.grade,
+            ss.statuscode
+        FROM
+            {facetoface} f
+        JOIN
+            {facetoface_sessions} s
+         ON s.facetoface = f.id
+        JOIN
+            {facetoface_signups} su
+         ON s.id = su.sessionid
+        JOIN
+            {facetoface_signups_status} ss
+         ON su.id = ss.signupid
+        JOIN
+            {user} u
+         ON u.id = su.userid
+        WHERE
+            s.id = ?
+        AND ss.superceded != 1
+        AND u.id = ?
+    ", array($sessionid, $userid));
+
+    if (!$record) {
+        return false;
+    }
+
+    return $record;
+}
+
+/**
+ * Get session unapproved requests
+ *
+ * @access  public
+ * @param   integer $sessionid
+ * @return  array|false
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_requests($sessionid) {
+    debugging(
+        "Function facetoface_get_requests has been deprecated, please use " .
+        "\\mod_facetoface\\attendees_helper::get_attendees_in_requested() instead",
+        DEBUG_DEVELOPER
+    );
+
+    $usernamefields = get_all_user_name_fields(true, 'u');
+
+    $select = "u.id, su.id AS signupid, {$usernamefields}, u.email,
+        ss.statuscode, ss.timecreated AS timerequested";
+
+    $status = array(\mod_facetoface\signup\state\requested::get_code(), \mod_facetoface\signup\state\requestedrole::get_code());
+    return facetoface_get_users_by_status($sessionid, $status, $select);
+}
+
+/**
+ * Similar to facetoface_get_requests except this returns 2stage requests in:
+ * Stage One - pending manager approval
+ * Stage Two - pending admin approval
+ *
+ * @access  public
+ * @param   integer $sessionid
+ * @return  array|false
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_adminrequests($sessionid) {
+    debugging(
+        "Function facetoface_get_adminrequests has been deprecated, please use " .
+        "\\mod_facetoface\\attendees_helper::get_attendees_in_admin_requested() instead",
+        DEBUG_DEVELOPER
+    );
+    $usernamefields = get_all_user_name_fields(true, 'u');
+
+    $select = "u.id, su.id AS signupid, {$usernamefields}, u.email,
+        ss.statuscode, ss.timecreated AS timerequested";
+
+    $status = array(\mod_facetoface\signup\state\requested::get_code(), \mod_facetoface\signup\state\requestedrole::get_code(), \mod_facetoface\signup\state\requestedadmin::get_code());
+    return facetoface_get_users_by_status($sessionid, $status, $select);
+}
+
+/**
+ * Get session attendees by status
+ *
+ * @access  public
+ * @param   integer $sessionid
+ * @param   mixed   $status     Integer or array of integers
+ * @param   string  $select     SELECT clause
+ * @param   bool    $includereserved   optional - include 'reserved' users (note this will change the array index
+ *                              to be the signupid, to avoid duplicate id problems).
+ *
+ * @param   bool    $includedeleted    Set this to false, if we do not want to include the deleted user in the list
+ * @return  array|false
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_users_by_status($sessionid, $status, $select = '', $includereserved = false, $includedeleted = true) {
+    global $DB;
+
+    debugging(
+        "Function facetoface_get_users_by_status has been deprecated, please use " .
+        "\\mod_facetoface\\attendees_helper::get_attendees_with_codes() instead",
+        DEBUG_DEVELOPER
+    );
+
+    // If no select SQL supplied, use default
+    $usernamefields = get_all_user_name_fields(true, 'u');
+    if (!$select) {
+        $select = "u.id, su.id AS signupid, {$usernamefields}, ss.timecreated, u.email";
+        if ($includereserved) {
+            $select = "su.id, {$usernamefields}, ss.timecreated, u.email";
+        }
+    }
+    $userjoin = 'JOIN';
+    if ($includereserved) {
+        $userjoin = 'LEFT JOIN';
+    }
+
+    // Make string from array of statuses
+    if (is_array($status)) {
+        list($insql, $params) = $DB->get_in_or_equal($status, SQL_PARAMS_NAMED);
+        $statussql = "ss.statuscode {$insql}";
+    } else {
+        $statussql = 'ss.statuscode = :status';
+        $params = array('status' => $status);
+    }
+
+    $extra = '';
+    if (!$includedeleted) {
+        $extra = " AND u.deleted <> 1 ";
+    }
+
+    $sql = "
+        SELECT {$select}
+          FROM {facetoface_signups} su
+          JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+     $userjoin {user} u ON u.id = su.userid
+         WHERE su.sessionid = :sid
+           AND ss.superceded != 1
+           AND {$statussql}
+           {$extra}
+         ORDER BY {$usernamefields}, ss.timecreated
+    ";
+    $params['sid'] = $sessionid;
+
+    return $DB->get_records_sql($sql, $params);
+}
+
+/**
+ * Get session cancellations
+ *
+ * @access  public
+ * @param   integer $sessionid
+ * @param   bool    $includedeleted
+ * @return  array
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_cancellations($sessionid, $includedeleted = true) {
+    global $CFG, $DB;
+
+    debugging(
+        "Function facetoface_get_cancellations() has been deprecated, please use " .
+        "\\mod_facetoface\\attendees_helper::get_attendees_in_cancellation() instead",
+        DEBUG_DEVELOPER
+    );
+
+    $usernamefields = get_all_user_name_fields(true, 'u');
+
+    $cancelledstatus = array(\mod_facetoface\signup\state\user_cancelled::get_code(), \mod_facetoface\signup\state\event_cancelled::get_code());
+    list($cancelledinsql, $cancelledinparams) = $DB->get_in_or_equal($cancelledstatus);
+
+    $instatus = array(
+        \mod_facetoface\signup\state\booked::get_code(),
+        \mod_facetoface\signup\state\waitlisted::get_code(),
+        \mod_facetoface\signup\state\requested::get_code(),
+        \mod_facetoface\signup\state\requestedrole::get_code()
+    );
+    list($insql, $inparams) = $DB->get_in_or_equal($instatus);
+
+    $extrawhere = '';
+    if (!$includedeleted) {
+        $extrawhere = " AND u.deleted = 0";
+    }
+
+    // Nasty SQL follows:
+    // Load currently cancelled users,
+    // include most recent booked/waitlisted time also
+    $sql = "
+            SELECT
+                u.id,
+                su.id AS submissionid,
+                {$usernamefields},
+                su.jobassignmentid,
+                MAX(ss.timecreated) AS timesignedup,
+                c.timecreated AS timecancelled,
+                c.statuscode
+            FROM {facetoface_signups} su
+            JOIN {user} u ON u.id = su.userid
+            JOIN {facetoface_signups_status} c ON su.id = c.signupid AND c.statuscode $cancelledinsql AND c.superceded = 0
+            LEFT JOIN {facetoface_signups_status} ss ON su.id = ss.signupid AND ss.statuscode $insql AND ss.superceded = 1
+            WHERE su.sessionid = ? AND u.suspended = 0 {$extrawhere}
+            GROUP BY
+                su.id,
+                u.id,
+                {$usernamefields},
+                c.timecreated,
+                su.jobassignmentid,
+                c.statuscode,
+                c.id
+            ORDER BY
+                {$usernamefields},
+                c.timecreated
+    ";
+
+    $params = array_merge($cancelledinparams, $inparams);
+    $params[] = $sessionid;
+    return $DB->get_records_sql($sql, $params);
+}
+
+/**
+ * Return number of attendees signed up to a facetoface session
+ *
+ * @param integer   $session_id
+ * @param integer   $status             (optional), default is '70' (booked)
+ * @param string    $comp               SQL comparison operator.
+ * @param bool      $includedeleted     Set this to false, if we do not want to include the deleted user in the count.
+ * @return integer
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_num_attendees($session_id, $status = null, $comp = '>=', $includedeleted = true) {
+    global $DB;
+
+    debugging(
+        "Function facetoface_get_num_attendees has been deprecated, please use " .
+        "\\mod_facetoface\\attendees_helper::count_attendees_with_codes() instead",
+        DEBUG_DEVELOPER
+    );
+
+    if (is_null($status)) {
+        $status = \mod_facetoface\signup\state\booked::get_code();
+    }
+
+    $sql = 'SELECT COUNT(ss.id)
+              FROM {facetoface_signups} su
+              JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+              %extra_join%
+             WHERE sessionid = ?
+               AND ss.superceded = 0
+               AND ss.statuscode ' . $comp . ' ?';
+
+    $replacement = "";
+    if (!$includedeleted) {
+        // Only inner join the table user if it is needed, and filter out the deleted users. Otherwise, leave it be to assure that
+        // it can perform as the way it is.
+        $replacement = " JOIN {user} u ON u.id = su.userid AND u.deleted = 0 ";
+    }
+
+    $sql = str_replace('%extra_join%', $replacement, $sql);
+
+    // For the session, pick signups that haven't been superceded.
+    return (int)$DB->count_records_sql($sql, array($session_id, $status));
+}
+
+/**
+ * Return all of a users' submissions to a facetoface
+ *
+ * @param integer $facetofaceid
+ * @param integer $userid
+ * @param boolean $includecancellations
+ * @param integer $minimumstatus Minimum status level to return, default is '40' (requested)
+ * @param integer $maximumstatus Maximum status level to return, default is '100' (fully_attended)
+ * @param integer $sessionid Session id
+ * @return array submissions | false No submissions
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_user_submissions($facetofaceid, $userid, $minimumstatus = null, $maximumstatus = null, $sessionid = null) {
+    global $DB;
+
+    debugging(
+        "Function facetoface_get_user_submissions has been deprecated, please use ".
+        "\\mod_facetoface\\signup_list class instead",
+        DEBUG_DEVELOPER
+    );
+
+    if (is_null($minimumstatus)) {
+        $minimumstatus = \mod_facetoface\signup\state\requested::get_code();
+    }
+    if (is_null($maximumstatus)) {
+        $maximumstatus = \mod_facetoface\signup\state\fully_attended::get_code();
+    }
+
+    $whereclause = "s.facetoface = ? AND su.userid = ? AND ss.superceded != 1
+            AND ss.statuscode >= ? AND ss.statuscode <= ? AND s.cancelledstatus != 1";
+    $whereparams = array($facetofaceid, $userid, $minimumstatus, $maximumstatus);
+
+    if (!empty($sessionid)) {
+        $whereclause .= " AND s.id = ? ";
+        $whereparams[] = $sessionid;
+    }
+
+    return $DB->get_records_sql("
+        SELECT
+            su.id,
+            su.userid,
+            su.notificationtype,
+            su.discountcode,
+            su.managerid,
+            su.jobassignmentid,
+            s.facetoface,
+            s.id as sessionid,
+            s.cancelledstatus,
+            s.timemodified,
+            ss.timecreated,
+            ss.timecreated as timegraded,
+            ss.statuscode,
+            0 as timecancelled,
+            0 as mailedconfirmation
+        FROM
+            {facetoface_sessions} s
+        JOIN
+            {facetoface_signups} su
+         ON su.sessionid = s.id
+        JOIN
+            {facetoface_signups_status} ss
+         ON su.id = ss.signupid
+        WHERE
+            {$whereclause}
+        ORDER BY
+            s.timecreated
+    ", $whereparams);
+}
+
+/**
+ * Get list of users attending a given session
+ *
+ * @access public
+ * @param integer Session ID
+ * @param array $status Array of statuses to include
+ * @param bool $includereserved optional - if true, then include 'reserved' spaces (note this will change the array index
+ *                                to signupid instead of the user id, to prevent duplicates)
+ *
+ * @param bool $includedeleted  optional - if false, then deleted userw ill not be included in the list.
+ * @return array
+ *
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_attendees($sessionid, $status = [], $includereserved = false, $includedeleted = true) {
+    global $DB;
+
+    debugging(
+        "Function facetoface_get_attendees() has been deprecated, please use " .
+        "\\mod_facetoface\\attendees_helper::get_attendees_with_codes() instead",
+        DEBUG_DEVELOPER
+    );
+
+    if (empty($status)) {
+        $status = [\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\waitlisted::get_code()];
+    }
+
+    list($statussql, $statusparams) = $DB->get_in_or_equal($status);
+
+    // Find the reservation details (and LEFT JOIN with the {user}, as that will be 0 for reservations).
+    $reservedfields = '';
+    $userjoin = 'JOIN';
+    if ($includereserved) {
+        $bookedbyusernamefields = get_all_user_name_fields(true, 'bb', null, 'bookedby');
+        $reservedfields = 'su.id AS signupid, '.$bookedbyusernamefields.', bb.id AS bookedby, ';
+        $userjoin = 'LEFT JOIN {user} bb ON bb.id = su.bookedby
+                     LEFT JOIN';
+    }
+
+    $extrajoincondition = '';
+    if (!$includedeleted) {
+        $extrajoincondition = ' AND u.deleted <> 1 ';
+    }
+
+    // Get all name fields, and user identity fields.
+    $usernamefields = get_all_user_name_fields(true, 'u').get_extra_user_fields_sql(true, 'u', '', get_all_user_name_fields());
+
+    $sql = "
+        SELECT
+            {$reservedfields}
+            u.id,
+            u.idnumber,
+            su.id AS submissionid,
+            {$usernamefields},
+            u.email,
+            s.discountcost,
+            su.discountcode,
+            su.notificationtype,
+            f.id AS facetofaceid,
+            f.course,
+            ss.grade,
+            ss.statuscode,
+            u.deleted,
+            u.suspended,
+            (
+                SELECT MAX(timecreated)
+                FROM {facetoface_signups_status} ss2
+                WHERE ss2.signupid = ss.signupid AND ss2.statuscode IN (?, ?)
+            ) as timesignedup,
+            ss.timecreated,
+            ja.id AS jobassignmentid,
+            ja.fullname AS jobassignmentname
+        FROM
+            {facetoface} f
+        JOIN
+            {facetoface_sessions} s
+         ON s.facetoface = f.id
+        JOIN
+            {facetoface_signups} su
+         ON s.id = su.sessionid
+        JOIN
+            {facetoface_signups_status} ss
+         ON su.id = ss.signupid
+   LEFT JOIN
+            {job_assignment} ja
+         ON ja.id = su.jobassignmentid
+       {$userjoin}
+            {user} u
+         ON u.id = su.userid
+          {$extrajoincondition}
+        WHERE
+            s.id = ?
+        AND ss.statuscode {$statussql}
+        AND ss.superceded != 1
+        ORDER BY u.firstname, u.lastname ASC";
+
+    $params = array_merge(array(\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\waitlisted::get_code(), $sessionid), $statusparams);
+
+    $records = $DB->get_records_sql($sql, $params);
+
+    return $records;
 }

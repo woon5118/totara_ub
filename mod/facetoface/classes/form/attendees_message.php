@@ -26,6 +26,8 @@
 
 namespace mod_facetoface\form;
 
+use mod_facetoface\{attendees_helper, seminar_event};
+
 defined('MOODLE_INTERNAL') || die();
 
 class attendees_message extends \moodleform {
@@ -49,18 +51,21 @@ class attendees_message extends \moodleform {
             ]
         );
 
+        $seminarevent = new seminar_event($this->_customdata['s']);
+        $helper = new attendees_helper($seminarevent);
+
         $json_users = array();
         $attendees = array();
         foreach ($statuses as $status) {
             // Get count of users with this status. We cannot send any messages to deleted user anyway, so no point
             // to include them here.
-            $count = facetoface_get_num_attendees($this->_customdata['s'], $status, '=', false);
+            $count = $helper->count_attendees_with_codes([$status], false);
 
             if (!$count) {
                 continue;
             }
 
-            $users = facetoface_get_users_by_status($this->_customdata['s'], $status, '', false, false);
+            $users = $helper->get_attendees_with_codes([$status], false);
             $json_users[$status] = $users;
             $attendees = array_merge($attendees, $users);
 
@@ -111,7 +116,8 @@ class attendees_message extends \moodleform {
 
         $s = $this->_customdata['s'];
         $context = $this->_customdata['context'];
-        $seminarevent = $this->_customdata['seminarevent'];
+        $seminarevent = new seminar_event($s);
+        $helper = new attendees_helper($seminarevent);
         $data = $this->get_submitted_data();
 
         // Get recipients list
@@ -121,7 +127,10 @@ class attendees_message extends \moodleform {
                 if (!$value) {
                     continue;
                 }
-                $recipients = $recipients + facetoface_get_users_by_status($s, $key, 'u.id, u.*, su.jobassignmentid');
+
+                // Do not include the deleted users here.
+                $innerrecipients = $helper->get_attendees_with_codes([$key], false);
+                $recipients = array_merge($recipients, $innerrecipients);
             }
         }
 

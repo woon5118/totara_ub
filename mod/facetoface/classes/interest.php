@@ -105,10 +105,10 @@ final class interest implements seminar_iterator_item {
 
         // If "only when full" is turned on, allow only when all sessions are fully booked.
         if ($this->seminar->get_interestonlyiffull()) {
-            // If user signed - no declare interest.
-            $submission = facetoface_get_user_submissions($this->facetoface, $this->userid, \mod_facetoface\signup\state\requested::get_code(),
-                \mod_facetoface\signup\state\fully_attended::get_code());
-            if (!empty($submission)) {
+            $signups = signup_list::user_active_signups_within_seminar($this->userid, $this->seminar->get_id());
+
+            // If user is already signed up for one of the events within this seminar. Then no declare interest.
+            if (0 < count($signups)) {
                 return false;
             }
 

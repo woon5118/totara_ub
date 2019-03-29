@@ -26,10 +26,9 @@ namespace mod_facetoface\notification;
 defined('MOODLE_INTERNAL') || die();
 
 
-use mod_facetoface\seminar_event;
-use mod_facetoface\signup\state\waitlisted;
+use mod_facetoface\{attendees_helper, seminar_event, facetoface_user};
+use mod_facetoface\signup\state\{attendance_state, booked, waitlisted};
 use mod_facetoface\task\send_notifications_task;
-use mod_facetoface\facetoface_user;
 
 
 /**
@@ -102,8 +101,9 @@ class notification_helper {
               AND (dt.minstart - s.cutoff) >= :lastcron
               AND s.cancelledstatus = 0";
 
-
         $records = $DB->get_records_sql($sql, $params);
+        $statuscodes = attendance_state::get_all_attendance_code_with([waitlisted::class, booked::class]);
+
         foreach ($records as $record) {
             // Clone the object without minstart here, so that crud_mapper would not complain about properties that are not defined
             // in the child class.
@@ -113,7 +113,9 @@ class notification_helper {
             $seminarevent = new seminar_event();
             $seminarevent->from_record($rc);
 
-            $booked = facetoface_get_num_attendees($seminarevent->get_id(), waitlisted::get_code());
+            $helper = new attendees_helper($seminarevent);
+            $booked = $helper->count_attendees_with_codes($statuscodes);
+
             if ($booked >= $seminarevent->get_mincapacity()) {
                 continue;
             }

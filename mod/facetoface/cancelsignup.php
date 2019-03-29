@@ -24,11 +24,8 @@
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-use \mod_facetoface\signup as signup;
-use \mod_facetoface\signup_helper as signup_helper;
-use \mod_facetoface\signup\state\booked;
-use \mod_facetoface\signup\state\waitlisted;
-use \mod_facetoface\signup\state\user_cancelled;
+use mod_facetoface\{signup, signup_helper};
+use mod_facetoface\signup\state\{waitlisted, user_cancelled};
 
 $s  = required_param('s', PARAM_INT); // facetoface session ID
 $confirm           = optional_param('confirm', false, PARAM_BOOL);
@@ -42,8 +39,11 @@ if (!$course = $DB->get_record('course', ['id' => $seminar->get_course()])) {
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
-if (!$signup = signup::create($USER->id, $seminarevent)) {
-    throw new coding_exception("No user with ID: {$USER->id} has signed-up for the Seminar event ID: {$seminarevent->get_id()}.");
+$signup = signup::create($USER->id, $seminarevent);
+if (!$signup->exists()) {
+    throw new coding_exception(
+        "No user with ID: {$USER->id} has signed-up for the Seminar event ID: {$seminarevent->get_id()}."
+    );
 }
 
 if (!$seminarevent->get_allowcancellations()) {
@@ -72,8 +72,8 @@ if ($backtoallsessions) {
     $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
 }
 
-$cancellation_note = facetoface_get_attendee($s, $USER->id);
-$cancellation_note->id = $cancellation_note->submissionid;
+$cancellation_note = new stdClass();
+$cancellation_note->id = $signup->get_id();
 customfield_load_data($cancellation_note, 'facetofacecancellation', 'facetoface_cancellation');
 
 $mform = new \mod_facetoface\form\cancelsignup(null, compact('s', 'backtoallsessions', 'cancellation_note', 'userisinwaitlist'));

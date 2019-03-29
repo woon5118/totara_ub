@@ -1704,15 +1704,13 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
-        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\booked::get_code()));
-
         $emailsink = $this->redirectMessages();
-        foreach ($attendees as $attendee) {
-            if (signup_helper::can_user_cancel($signup)) {
-                signup_helper::user_cancel($signup);
-                \mod_facetoface\notice_sender::signup_cancellation($signup);
-            }
+
+        if (signup_helper::can_user_cancel($signup)) {
+            signup_helper::user_cancel($signup);
+            \mod_facetoface\notice_sender::signup_cancellation($signup);
         }
+
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -1726,24 +1724,22 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $suppressccmanager = true;
-
         $emailsink = $this->redirectMessages();
+
         $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
+
         $emailsink->close();
-
-        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\booked::get_code()));
-
         $emailsink = $this->redirectMessages();
-        foreach ($attendees as $attendee) {
-            if (signup_helper::can_user_cancel($signup)) {
-               signup_helper::user_cancel($signup);
-                if ($suppressccmanager) {
-                    $signup->set_skipmanagernotification();
-                }
-                \mod_facetoface\notice_sender::signup_cancellation($signup);
+
+        if (signup_helper::can_user_cancel($signup)) {
+           signup_helper::user_cancel($signup);
+            if ($suppressccmanager) {
+                $signup->set_skipmanagernotification();
             }
+            \mod_facetoface\notice_sender::signup_cancellation($signup);
         }
+
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -1761,23 +1757,21 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
-        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\booked::get_code()));
-
         $params = array(
             'facetofaceid'  => $facetoface->id,
             'type'          => MDL_F2F_NOTIFICATION_AUTO,
             'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
         );
-        $this->update_f2f_notification($params, 1);
 
+        $this->update_f2f_notification($params, 1);
         $emailsink = $this->redirectMessages();
-        foreach ($attendees as $attendee) {
-            if (signup_helper::can_user_cancel($signup)) {
+
+        if (signup_helper::can_user_cancel($signup)) {
             signup_helper::user_cancel($signup);
-                $signup->set_skipusernotification();
-                \mod_facetoface\notice_sender::signup_cancellation($signup);
-            }
+            $signup->set_skipusernotification();
+            \mod_facetoface\notice_sender::signup_cancellation($signup);
         }
+
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -1798,22 +1792,20 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
-        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\booked::get_code()));
-
         $params = array(
             'facetofaceid'  => $facetoface->id,
             'type'          => MDL_F2F_NOTIFICATION_AUTO,
             'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
         );
+
         $this->update_f2f_notification($params, 0);
 
         $emailsink = $this->redirectMessages();
-        foreach ($attendees as $attendee) {
-            if (signup_helper::can_user_cancel($signup)) {
-                signup_helper::user_cancel($signup);
-                \mod_facetoface\notice_sender::signup_cancellation($signup);
-            }
+        if (signup_helper::can_user_cancel($signup)) {
+            signup_helper::user_cancel($signup);
+            \mod_facetoface\notice_sender::signup_cancellation($signup);
         }
+
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -1827,13 +1819,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $suppressccmanager = true;
-
         $emailsink = $this->redirectMessages();
+
         $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
         $emailsink->close();
-
-        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\booked::get_code()));
 
         $params = array(
             'facetofaceid'  => $facetoface->id,
@@ -1843,15 +1833,15 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->update_f2f_notification($params, 0);
 
         $emailsink = $this->redirectMessages();
-        foreach ($attendees as $attendee) {
-            if (signup_helper::can_user_cancel($signup)) {
-                signup_helper::user_cancel($signup);
-                if ($suppressccmanager) {
-                    $signup->set_skipmanagernotification();
-                }
-                \mod_facetoface\notice_sender::signup_cancellation($signup);
+
+        if (signup_helper::can_user_cancel($signup)) {
+            signup_helper::user_cancel($signup);
+            if ($suppressccmanager) {
+                $signup->set_skipmanagernotification();
             }
+            \mod_facetoface\notice_sender::signup_cancellation($signup);
         }
+
         $this->execute_adhoc_tasks();
         $emailsink->close();
 

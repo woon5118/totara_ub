@@ -123,7 +123,6 @@ class mod_facetoface_send_decline_testcase extends advanced_testcase {
 
         list($facetoface, $session, $user) = $this->create_facetoface_with_session_signup();
 
-		$attendee = facetoface_get_attendee($session->id, $user->id);
 		$signup = \mod_facetoface\signup::create($user->id, new \mod_facetoface\seminar_event($session->id));
 		$signup->switch_state(\mod_facetoface\signup\state\declined::class);
 

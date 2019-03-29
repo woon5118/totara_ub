@@ -21,7 +21,7 @@
  * @subpackage facetoface
  */
 
-use mod_facetoface\{seminar_event, seminar};
+use mod_facetoface\{seminar_event, seminar, attendees_helper};
 
 require_once '../../config.php';
 require_once 'lib.php';
@@ -133,7 +133,8 @@ foreach ($facetofaces as $facetoface) {
             continue;
         }
 
-        $signupcount = facetoface_get_num_attendees($seminarevent->get_id());
+        $helper = new attendees_helper($seminarevent);
+        $signupcount = $helper->count_attendees();
         $totalsignupcount += $signupcount;
     }
 

@@ -46,10 +46,20 @@ $renderer = $PAGE->get_renderer('mod_facetoface');
 $renderer->setcontext($context);
 
 // Get custom field values of the cancellation.
-$cancellationnote = facetoface_get_attendee($sessionid, $userid);
-$cancellationnote->userid = $cancellationnote->id;
-$cancellationnote->id = $cancellationnote->submissionid;
+$seminarevent = new \mod_facetoface\seminar_event($sessionid);
+
+$signup = \mod_facetoface\signup::create($userid, $seminarevent);
+if (!$signup->exists()) {
+    throw new coding_exception(
+        "No user with ID: {$USER->id} has signed-up for the Seminar event ID: {$seminarevent->get_id()}."
+    );
+}
+
+$cancellationnote = new stdClass();
+$cancellationnote->userid = $userid;
 $cancellationnote->sessionid = $sessionid;
+$cancellationnote->id = $signup->get_id();
+
 $customfields = customfield_get_data($cancellationnote, 'facetoface_cancellation', 'facetofacecancellation');
 
 // Prepare output.

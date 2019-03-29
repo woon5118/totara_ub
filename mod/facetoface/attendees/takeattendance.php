@@ -29,7 +29,7 @@ require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-use mod_facetoface\{signup_helper, attendees_list_helper, seminar_event, seminar};
+use mod_facetoface\signup_helper;
 use mod_facetoface\attendance\{attendance_helper, factory};
 
 /**
@@ -230,7 +230,8 @@ if (!$onlycontent && !$download) {
 
 //Print list attendees in taking attendance (if user able to view)
 if ($actionallowed) {
-    $numattendees = facetoface_get_num_attendees($seminarevent->get_id());
+    $helper = new \mod_facetoface\attendees_helper($seminarevent);
+    $numattendees = $helper->count_attendees();
     $overbooked = ($numattendees > $seminarevent->get_capacity());
 
     if ($numattendees == 0) {

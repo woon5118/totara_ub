@@ -111,6 +111,7 @@ class event_handler {
 
         // Get all the facetofaces associated with the course.
         $f2fs = $DB->get_fieldset_select('facetoface', 'id', 'course = :cid', array('cid' => $cid));
+        $user = $DB->get_record('user', ['id' => $uid]);
 
         if (!empty($f2fs)) {
             // Get all the sessions for the facetofaces.
@@ -122,16 +123,16 @@ class event_handler {
 
             foreach ($sessids as $sessid) {
                 $seminarevent = new seminar_event($sessid);
+                $signup = signup::create($uid, $seminarevent);
 
-                // Check if user is enrolled on any sessions in the future.
-                if ($user = facetoface_get_attendee($sessid, $uid)) {
+                // Check if user is enrolled on any sessions in the future. And cancel them.
+                if ($signup->exists()) {
                     if (empty($strvar->username)) {
                         $strvar->username = fullname($user);
                     }
 
-                    // And cancel them.
-                    $signup = signup::create($uid, $seminarevent);
-                    // We want to cancel only signup that learner can cancel themselves. E.g. we don't want to cancel past signups.
+                    // We want to cancel only signup that learner can cancel themselves.
+                    // E.g. we don't want to cancel past signups.
                     $signup->set_actorid($signup->get_userid());
                     if (signup_helper::can_user_cancel($signup)) {
                         signup_helper::user_cancel($signup);

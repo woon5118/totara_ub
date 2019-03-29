@@ -26,10 +26,18 @@ require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 require_once($CFG->dirroot.'/totara/core/searchlib.php');
 require_once($CFG->dirroot.'/totara/core/utils.php');
 
-use \mod_facetoface\signup;
-use \mod_facetoface\signup_helper;
-use \mod_facetoface\seminar_event;
-use \mod_facetoface\signup\state\booked;
+use \mod_facetoface\{
+    signup,
+    signup_helper,
+    seminar_event,
+    attendees_helper
+};
+
+use \mod_facetoface\signup\state\{
+    booked,
+    waitlisted,
+    attendance_state
+};
 
 define('MAX_USERS_PER_PAGE', 1000);
 
@@ -64,6 +72,7 @@ $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
 
 $list = new \mod_facetoface\bulk_list($listid, $currenturl, $action);
+$helper = new attendees_helper($seminarevent);
 
 if ($frm = data_submitted()) {
     require_sesskey();
@@ -131,32 +140,19 @@ $waitlist = 0;
 // session is known and there are attendees with the waitlist status.
 $hassessions = $seminarevent->is_sessions();
 if ($hassessions) {
-    $waitlistcount = count(facetoface_get_attendees($seminareventid, [\mod_facetoface\signup\state\waitlisted::get_code()]));
+    $waitlistcount = $helper->count_attendees_with_codes([waitlisted::get_code()]);
     if ($waitlistcount > 0) {
         $waitlist = 1;
     }
 }
 
 // Setup attendees array
+$statuscodes = attendance_state::get_all_attendance_code_with([booked::class]);
 if ($hassessions) {
-    $attendees = facetoface_get_attendees(
-        $seminareventid,
-        \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
-            [
-                \mod_facetoface\signup\state\booked::class
-            ]
-        )
-    );
+    $attendees = $helper->get_attendees_with_codes($statuscodes);
 } else {
-    $attendees = facetoface_get_attendees(
-        $seminareventid,
-        \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
-            [
-                \mod_facetoface\signup\state\waitlisted::class,
-                \mod_facetoface\signup\state\booked::class
-            ]
-        )
-    );
+    $statuscodes[] = waitlisted::get_code();
+    $attendees = $helper->get_attendees_with_codes($statuscodes);
 }
 
 // Add selected users to attendees list.
@@ -177,7 +173,7 @@ if (!empty($userlist)) {
 }
 
 // Get users waiting approval to add to the "already attending" list as we do not want to add them again
-$waitingapproval = facetoface_get_requests($seminareventid);
+$waitingapproval = $helper->get_attendees_in_requested();
 
 // Add the waiting-approval users - we don't want to add them again
 foreach ($waitingapproval as $waiting) {

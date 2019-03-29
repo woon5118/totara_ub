@@ -29,7 +29,8 @@
  * Allocate or reserve spaces for your team.
  */
 
-use mod_facetoface\reservations;
+use mod_facetoface\{reservations, attendees_helper};
+use mod_facetoface\signup\state\{attendance_state, booked, waitlisted};
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
@@ -46,6 +47,8 @@ $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
 $url = new moodle_url('/mod/facetoface/reservations/allocate.php', array('s' => $seminarevent->get_id(), 'backtoallsessions' => $backtoallsessions));
+$helper = new attendees_helper($seminarevent);
+
 if ($backtosession) {
     $url->param('backtosession', $backtosession);
 }
@@ -76,11 +79,14 @@ if ($reserveinfo['allocate'] === false) { // Current user does not have permissi
     print_error('nopermissionreserve', 'mod_facetoface'); // Not allowed to reserve/allocate spaces.
 }
 
+$statuscodes = attendance_state::get_all_attendance_code_with([booked::class]);
 if ($seminarevent->is_sessions()) {
-    $signupcount = facetoface_get_num_attendees($seminarevent->get_id(), \mod_facetoface\signup\state\booked::get_code());
+    $signupcount = $helper->count_attendees_with_codes($statuscodes);
 } else {
-    $signupcount = facetoface_get_num_attendees($seminarevent->get_id(), \mod_facetoface\signup\state\waitlisted::get_code());
+    $statuscodes[] = waitlisted::get_code();
+    $signupcount = $helper->count_attendees_with_codes($statuscodes);
 }
+
 $capacityleft = max(0, $seminarevent->get_capacity() - $signupcount);
 if (!$seminarevent->get_allowoverbook()) {
     $reserveinfo = reservations::limit_info_to_capacity_left($seminarevent, $reserveinfo, $capacityleft);

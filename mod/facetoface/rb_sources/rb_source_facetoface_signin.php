@@ -845,6 +845,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             return null;
         }
 
+        $helper = new \mod_facetoface\attendees_helper($seminarevent);
         $facetoface = $DB->get_record('facetoface', array('id' => $seminarevent->get_facetoface()));
 
         $dates = \mod_facetoface\output\session_time::format(
@@ -859,6 +860,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $session = $seminarevent->to_record();
         $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
         $sessioncustomfields = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
+
         foreach ($sessioncustomfields as $name => $customdata) {
             $data[] = array($name, $customdata);
         }
@@ -866,7 +868,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $data[] = array(get_string('sessionstartdate', 'mod_facetoface'), get_string('sessionstartdatewithtime', 'facetoface', $dates));
         $data[] = array(get_string('sessionenddate', 'mod_facetoface'), get_string('sessionenddatewithtime', 'facetoface', $dates));
         $data[] = array(get_string('maxbookings', 'mod_facetoface'), $seminarevent->get_capacity());
-        $data[] = array(get_string('numberofattendees', 'mod_facetoface'), facetoface_get_num_attendees($seminarevent->get_id()));
+        $data[] = array(get_string('numberofattendees', 'mod_facetoface'), $helper->count_attendees());
         $room = new \mod_facetoface\room($sessiondate->roomid);
         if ($room->exists()) {
             $info = customfield_get_data($room->to_record(), 'facetoface_room', 'facetofaceroom');

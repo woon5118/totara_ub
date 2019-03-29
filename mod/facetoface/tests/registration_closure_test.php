@@ -130,7 +130,8 @@ class mod_facetoface_registration_closure_testcase extends advanced_testcase {
         $cron->execute();
 
         // Check that users 1 & 2 are no longer pending but are declined.
-        $closures = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\declined::get_code()));
+        $helper = new \mod_facetoface\attendees_helper($seminarevent);
+        $closures = $helper->get_attendees_with_codes([\mod_facetoface\signup\state\declined::get_code()]);
         $this->assertEquals(2, count($closures));
         foreach ($closures as $closure) {
             $expected = false;
@@ -144,7 +145,11 @@ class mod_facetoface_registration_closure_testcase extends advanced_testcase {
         }
 
         // And just double check there are no pending requests.
-        $requests = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\requested::get_code(), \mod_facetoface\signup\state\requestedadmin::get_code()));
+        $requests = $helper->get_attendees_with_codes([
+            \mod_facetoface\signup\state\requested::get_code(),
+            \mod_facetoface\signup\state\requestedadmin::get_code()
+        ]);
+
         $this->assertEquals(0, count($requests));
 
         // There should be 2 status changed events.

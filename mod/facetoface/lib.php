@@ -24,11 +24,18 @@
  * @package mod_facetoface
  */
 
-use mod_facetoface\room;
-
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar, signup, signup_helper, seminar_event, notice_sender, event_time, trainer_helper, seminar_event_list, reservations};
+use mod_facetoface\{
+    seminar,
+    signup,
+    seminar_event,
+    notice_sender,
+    signup_list,
+    seminar_event_list,
+    reservations
+};
+
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\sortorder\future_sortorder;
 
@@ -243,6 +250,7 @@ function facetoface_update_instance($facetoface, $mform = null) {
          * @var seminar_event $seminarevent
          */
         \mod_facetoface\calendar::update_entries($seminarevent);
+        $helper = new \mod_facetoface\attendees_helper($seminarevent);
 
         // If manager changed from approval required to not
         if ($facetoface->approvaltype != $previousapproval) {
@@ -251,7 +259,7 @@ function facetoface_update_instance($facetoface, $mform = null) {
                 signup\state\requestedrole::get_code(),
                 signup\state\requestedadmin::get_code()
             ];
-            $pending = facetoface_get_attendees($seminarevent->get_id(), $status);
+            $pending = $helper->get_attendees_with_codes($status);
             core_collator::asort_objects_by_property($pending, 'timecreated', core_collator::SORT_NUMERIC);
 
             foreach ($pending as $attendee) {
@@ -321,153 +329,6 @@ function facetoface_get_grade($userid, $courseid, $facetofaceid) {
 }
 
 /**
- * Get list of users attending a given session
- *
- * @access public
- * @param integer Session ID
- * @param array $status Array of statuses to include
- * @param bool $includereserved optional - if true, then include 'reserved' spaces (note this will change the array index
- *                                to signupid instead of the user id, to prevent duplicates)
- *
- * @param bool $includedeleted  optional - if false, then deleted userw ill not be included in the list.
- * @return array
- */
-function facetoface_get_attendees($sessionid, $status = [], $includereserved = false, $includedeleted = true) {
-    global $DB;
-
-    if (empty($status)) {
-        $status = [\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\waitlisted::get_code()];
-    }
-
-    list($statussql, $statusparams) = $DB->get_in_or_equal($status);
-
-    // Find the reservation details (and LEFT JOIN with the {user}, as that will be 0 for reservations).
-    $reservedfields = '';
-    $userjoin = 'JOIN';
-    if ($includereserved) {
-        $bookedbyusernamefields = get_all_user_name_fields(true, 'bb', null, 'bookedby');
-        $reservedfields = 'su.id AS signupid, '.$bookedbyusernamefields.', bb.id AS bookedby, ';
-        $userjoin = 'LEFT JOIN {user} bb ON bb.id = su.bookedby
-                     LEFT JOIN';
-    }
-
-    $extrajoincondition = '';
-    if (!$includedeleted) {
-        $extrajoincondition = ' AND u.deleted <> 1 ';
-    }
-
-    // Get all name fields, and user identity fields.
-    $usernamefields = get_all_user_name_fields(true, 'u').get_extra_user_fields_sql(true, 'u', '', get_all_user_name_fields());
-
-    $sql = "
-        SELECT
-            {$reservedfields}
-            u.id,
-            u.idnumber,
-            su.id AS submissionid,
-            {$usernamefields},
-            u.email,
-            s.discountcost,
-            su.discountcode,
-            su.notificationtype,
-            f.id AS facetofaceid,
-            f.course,
-            ss.grade,
-            ss.statuscode,
-            u.deleted,
-            u.suspended,
-            (
-                SELECT MAX(timecreated)
-                FROM {facetoface_signups_status} ss2
-                WHERE ss2.signupid = ss.signupid AND ss2.statuscode IN (?, ?)
-            ) as timesignedup,
-            ss.timecreated,
-            ja.id AS jobassignmentid,
-            ja.fullname AS jobassignmentname
-        FROM
-            {facetoface} f
-        JOIN
-            {facetoface_sessions} s
-         ON s.facetoface = f.id
-        JOIN
-            {facetoface_signups} su
-         ON s.id = su.sessionid
-        JOIN
-            {facetoface_signups_status} ss
-         ON su.id = ss.signupid
-   LEFT JOIN
-            {job_assignment} ja
-         ON ja.id = su.jobassignmentid
-       {$userjoin}
-            {user} u
-         ON u.id = su.userid
-          {$extrajoincondition}
-        WHERE
-            s.id = ?
-        AND ss.statuscode {$statussql}
-        AND ss.superceded != 1
-        ORDER BY u.firstname, u.lastname ASC";
-
-    $params = array_merge(array(\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\waitlisted::get_code(), $sessionid), $statusparams);
-
-    $records = $DB->get_records_sql($sql, $params);
-
-    return $records;
-}
-
-/**
- * Get a single attendee of a session
- *
- * @access public
- * @param integer Session ID
- * @param integer User ID
- * @return false|object
- */
-function facetoface_get_attendee($sessionid, $userid) {
-    global $DB;
-
-    $usernamefields = get_all_user_name_fields(true, 'u');
-    $record = $DB->get_record_sql("
-        SELECT
-            u.id,
-            su.id AS submissionid,
-            {$usernamefields},
-            u.email,
-            s.discountcost,
-            su.discountcode,
-            su.notificationtype,
-            f.id AS facetofaceid,
-            f.course,
-            ss.grade,
-            ss.statuscode
-        FROM
-            {facetoface} f
-        JOIN
-            {facetoface_sessions} s
-         ON s.facetoface = f.id
-        JOIN
-            {facetoface_signups} su
-         ON s.id = su.sessionid
-        JOIN
-            {facetoface_signups_status} ss
-         ON su.id = ss.signupid
-        JOIN
-            {user} u
-         ON u.id = su.userid
-        WHERE
-            s.id = ?
-        AND ss.superceded != 1
-        AND u.id = ?
-    ", array($sessionid, $userid));
-
-    if (!$record) {
-        return false;
-    }
-
-    return $record;
-}
-
-/**
  * Return all user fields to include in exports
  *
  * @param bool $reset If true the user fields static cache is reset
@@ -533,7 +394,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     }
     $seminar = new seminar();
     $seminar->map_instance($facetoface);
-    $coursemodule->set_name($facetoface->name);
+    $coursemodule->set_name($seminar->get_name());
 
     $contextmodule = context_module::instance($coursemodule->id);
     if (!has_capability('mod/facetoface:view', $contextmodule)) {
@@ -564,20 +425,46 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     $declareinterest_link = html_writer::link($declareinterest_url, $declareinterest_label, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $declareinterest_label));
 
     if ($seminar->has_unarchived_signups()) {
-        // User has signedup for the instance.
-        $submissions = facetoface_get_user_submissions($facetoface->id, $USER->id);
-        if (!$facetoface->multiplesessions) {
-            // First submission only.
-            $submissions = array(array_shift($submissions));
+        // Get user signed up for the instance.
+        $signups = signup_list::user_active_signups_within_seminar($USER->id, $seminar->get_id())->to_array();
+
+        if (!$seminar->get_multiplesessions()) {
+            // First signup only.
+            $signups = [array_shift($signups)];
         }
 
         $sessions = [];
-        foreach ($submissions as $submission) {
-            $seminarevent = new seminar_event($submission->sessionid);
+        foreach ($signups as $signup) {
+            $seminarevent = $signup->get_seminar_event();
             if ($seminarevent->is_over($timenow) || $seminarevent->get_cancelledstatus()) {
                 // We do not want to display those events that are either cancelled or over here at course page.
                 continue;
             }
+
+            $signupstatus = $signup->get_signup_status();
+            if (null === $signupstatus) {
+                // At this point, if signup status does not exist, we know that the database storage is being messed up.
+                debugging(
+                    "No signup status found for specific signup {$signup->get_id()}",
+                    DEBUG_DEVELOPER
+                );
+
+                continue;
+            }
+
+            $state = $signup->get_state();
+
+            // Workaround to build a dummy data of signup/submission.
+            $submission = $signup->to_record();
+
+            $submission->facetoface = $seminarevent->get_facetoface();
+            $submission->cancelledstatus = $seminarevent->get_cancelledstatus();
+            $submission->timemodified = $seminarevent->get_timemodified();
+            $submission->timecreated = $signupstatus->get_timecreated();
+            $submission->timegraded = $submission->timecreated;
+            $submission->statuscode = $state::get_code();
+            $submission->timecancelled = 0;
+            $submission->mailedconfirmation = 0;
 
             $session = $seminarevent->to_record();
 
@@ -592,14 +479,12 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 
         // If the user can sign up for multiple events, we should show all upcoming events in this seminar.
         // Otherwise it doesn't make sense to do so because the user has already signedup for the instance.
-        if ($facetoface->multiplesessions) {
-
+        if ($seminar->get_multiplesessions()) {
             // If state restrictions are enabled and not met, only display the current signup.
             $checkremaining = true;
             $restrictions = $seminar->get_multisignup_states();
             if (!empty($restrictions)) {
-                foreach ($submissions as $signupdata) {
-                    $signup = new signup($signupdata->id);
+                foreach ($signups as $signup) {
                     $state = $signup->get_state();
                     $code = $state::get_code();
                     if (empty($restrictions[$code])) {
@@ -612,7 +497,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
             }
 
             $maximum = $seminar->get_multisignup_maximum();
-            if ($checkremaining && (empty($maximum) || count($submissions) < $maximum)) {
+            if ($checkremaining && (empty($maximum) || count($signups) < $maximum)) {
                 $query = new query($seminar);
                 $query->with_sortorder(new future_sortorder());
                 $seminarevents = seminar_event_list::from_query($query);
@@ -819,105 +704,6 @@ function facetoface_grade_item_update($facetoface, $grades=NULL) {
 }
 
 /**
- * Return number of attendees signed up to a facetoface session
- *
- * @param integer   $session_id
- * @param integer   $status             (optional), default is '70' (booked)
- * @param string    $comp               SQL comparison operator.
- * @param bool      $includedeleted     Set this to false, if we do not want to include the deleted user in the count.
- * @return integer
- */
-function facetoface_get_num_attendees($session_id, $status = null, $comp = '>=', $includedeleted = true) {
-    global $DB;
-
-    if (is_null($status)) {
-        $status = \mod_facetoface\signup\state\booked::get_code();
-    }
-
-    $sql = 'SELECT COUNT(ss.id)
-              FROM {facetoface_signups} su
-              JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
-              %extra_join%
-             WHERE sessionid = ?
-               AND ss.superceded = 0
-               AND ss.statuscode ' . $comp . ' ?';
-
-    $replacement = "";
-    if (!$includedeleted) {
-        // Only inner join the table user if it is needed, and filter out the deleted users. Otherwise, leave it be to assure that
-        // it can perform as the way it is.
-        $replacement = " JOIN {user} u ON u.id = su.userid AND u.deleted = 0 ";
-    }
-
-    $sql = str_replace('%extra_join%', $replacement, $sql);
-
-    // For the session, pick signups that haven't been superceded.
-    return (int)$DB->count_records_sql($sql, array($session_id, $status));
-}
-
-/**
- * Return all of a users' submissions to a facetoface
- *
- * @param integer $facetofaceid
- * @param integer $userid
- * @param boolean $includecancellations
- * @param integer $minimumstatus Minimum status level to return, default is '40' (requested)
- * @param integer $maximumstatus Maximum status level to return, default is '100' (fully_attended)
- * @param integer $sessionid Session id
- * @return array submissions | false No submissions
- */
-function facetoface_get_user_submissions($facetofaceid, $userid, $minimumstatus = null, $maximumstatus = null, $sessionid = null) {
-    global $DB;
-
-    if (is_null($minimumstatus)) {
-        $minimumstatus = \mod_facetoface\signup\state\requested::get_code();
-    }
-    if (is_null($maximumstatus)) {
-        $maximumstatus = \mod_facetoface\signup\state\fully_attended::get_code();
-    }
-
-    $whereclause = "s.facetoface = ? AND su.userid = ? AND ss.superceded != 1
-            AND ss.statuscode >= ? AND ss.statuscode <= ? AND s.cancelledstatus != 1";
-    $whereparams = array($facetofaceid, $userid, $minimumstatus, $maximumstatus);
-
-    if (!empty($sessionid)) {
-        $whereclause .= " AND s.id = ? ";
-        $whereparams[] = $sessionid;
-    }
-
-    return $DB->get_records_sql("
-        SELECT
-            su.id,
-            su.userid,
-            su.notificationtype,
-            su.discountcode,
-            su.managerid,
-            su.jobassignmentid,
-            s.facetoface,
-            s.id as sessionid,
-            s.cancelledstatus,
-            s.timemodified,
-            ss.timecreated,
-            ss.timecreated as timegraded,
-            ss.statuscode,
-            0 as timecancelled,
-            0 as mailedconfirmation
-        FROM
-            {facetoface_sessions} s
-        JOIN
-            {facetoface_signups} su
-         ON su.sessionid = s.id
-        JOIN
-            {facetoface_signups_status} ss
-         ON su.id = ss.signupid
-        WHERE
-            {$whereclause}
-        ORDER BY
-            s.timecreated
-    ", $whereparams);
-}
-
-/**
  * A list of actions in the logs that indicate view activity for participants
  */
 function facetoface_get_view_actions() {
@@ -938,33 +724,65 @@ function facetoface_get_post_actions() {
  *
  * $return->time = the time they did it
  * $return->info = a short text description
+ *
+ * Core component callback
+ *
+ * @param stdClass $course     DB record of course
+ * @param stdClass $user       DB record of user who is being viewed.
+ * @param cm_info  $mod        DB record of course module
+ * @param stdClass $facetoface DB record of mod_facetoface
+ *
+ * @return stdClass
  */
 function facetoface_user_outline($course, $user, $mod, $facetoface) {
+    $seminar = new seminar();
+    $seminar->map_instance($facetoface);
 
     $result = new stdClass;
 
-    $grade = facetoface_get_grade($user->id, $course->id, $facetoface->id);
+    $grade = facetoface_get_grade($user->id, $course->id, $seminar->get_id());
+
     if ($grade->grade > 0) {
-        $result = new stdClass;
         $result->info = get_string('grade') . ': ' . $grade->grade;
         $result->time = $grade->dategraded;
-    }
-    elseif ($submissions = facetoface_get_user_submissions($facetoface->id, $user->id)) {
-        if ($facetoface->multiplesessions && (count($submissions) > 1) ) {
-            $result->info = get_string('usersignedupmultiple', 'facetoface', count($submissions));
-            $result->time = 0;
-            foreach ($submissions as $submission) {
-                if ($submission->timecreated > $result->time) {
-                    $result->time = $submission->timecreated;
+    } else {
+        $signups = signup_list::user_active_signups_within_seminar($user->id, $seminar->get_id());
+
+        if (!$signups->is_empty()) {
+            if ($seminar->get_multiplesessions() && count($signups) > 1) {
+                $result->info = get_string('usersignedupmultiple', 'mod_facetoface', count($signups));
+                $result->time = 0;
+
+                /** @var signup $signup */
+                foreach ($signups as $signup) {
+                    $signupstatus = $signup->get_signup_status();
+                    if (null === $signupstatus) {
+                        // Database is messed up. Just debugging it.
+                        debugging("No signup status found for signup: '{$signup->get_id()}'", DEBUG_DEVELOPER);
+                        continue;
+                    }
+
+                    if ($signupstatus->get_timecreated() > $result->time) {
+                        $result->time = $signupstatus->get_timecreated();
+                    }
+                }
+            } else {
+                $result->info = get_string('usersignedup', 'mod_facetoface');
+
+                // Only display the first signup.
+                $signup = $signups->get_first();
+                $signupstatus = $signup->get_signup_status();
+
+                if (null === $signupstatus) {
+                    // Database is messed up. Just debugging it.
+                    debugging("No signup status found for signup: '{$signup->get_id()}'", DEBUG_DEVELOPER);
+                } else {
+                    $result->time = $signupstatus->get_timecreated();
                 }
             }
         } else {
-            $result->info = get_string('usersignedup', 'facetoface');
-            $result->time = reset($submissions)->timecreated;
+            $result->info = get_string('usernotsignedup', 'facetoface');
         }
-    }
-    else {
-        $result->info = get_string('usernotsignedup', 'facetoface');
     }
 
     return $result;
@@ -974,27 +792,45 @@ function facetoface_user_outline($course, $user, $mod, $facetoface) {
  * Print a detailed representation of what a user has done with a
  * given particular instance of this module (for user activity
  * reports).
+ *
+ * Core component callback
+ *
+ * @param stdClass $course
+ * @param stdClass $user
+ * @param cm_info  $mod
+ * @param stdClass $facetoface
+ *
+ * @return bool
  */
 function facetoface_user_complete($course, $user, $mod, $facetoface) {
-
     $grade = facetoface_get_grade($user->id, $course->id, $facetoface->id);
+    
+    $signups = signup_list::user_signups_within_seminar($user->id, $facetoface->id);
+    if (!$signups->is_empty()) {
+        echo get_string('grade').': '.$grade->grade.html_writer::empty_tag('br');
 
-    if ($submissions = facetoface_get_user_submissions($facetoface->id, $user->id, \mod_facetoface\signup\state\user_cancelled::get_code(), \mod_facetoface\signup\state\fully_attended::get_code())) {
-        echo get_string('grade').': '.$grade->grade . html_writer::empty_tag('br');
         if ($grade->dategraded > 0) {
             $timegraded = trim(userdate($grade->dategraded, get_string('strftimedatetime')));
-            echo '('.format_string($timegraded).')'. html_writer::empty_tag('br');
+            echo '('.format_string($timegraded).')'.html_writer::empty_tag('br');
         }
+
         echo html_writer::empty_tag('br');
 
-        foreach ($submissions as $submission) {
-            $timesignedup = trim(userdate($submission->timecreated, get_string('strftimedatetime')));
-            echo get_string('usersignedupon', 'facetoface', format_string($timesignedup)) . html_writer::empty_tag('br');
-
-            if ($submission->timecancelled > 0) {
-                $timecancelled = userdate($submission->timecancelled, get_string('strftimedatetime'));
-                echo get_string('usercancelledon', 'facetoface', format_string($timecancelled)) . html_writer::empty_tag('br');
+        /** @var signup $signup */
+        foreach ($signups as $signup) {
+            $signupstatus = $signup->get_signup_status();
+            if (null === $signupstatus) {
+                // Database is messed up. Just debugging it.
+                debugging("There is no signup status found for signup: {$signup->get_id()}", DEBUG_DEVELOPER);
+                continue;
             }
+
+            $timesignedup = trim(userdate($signupstatus->get_timecreated(), get_string('strftimedatetime')));
+            echo get_string(
+                'usersignedupon',
+                'mod_facetoface',
+                format_string($timesignedup) . html_writer::empty_tag('br')
+            );
         }
     } else {
         echo get_string('usernotsignedup', 'facetoface');
@@ -1036,174 +872,12 @@ function facetoface_get_customfielddata($sessionid) {
 }
 
 /**
- * Get session cancellations
- *
- * @access  public
- * @param   integer $sessionid
- * @param   bool    $includedeleted
- * @return  array
- */
-function facetoface_get_cancellations($sessionid, $includedeleted = true) {
-    global $CFG, $DB;
-
-    $usernamefields = get_all_user_name_fields(true, 'u');
-
-    $cancelledstatus = array(\mod_facetoface\signup\state\user_cancelled::get_code(), \mod_facetoface\signup\state\event_cancelled::get_code());
-    list($cancelledinsql, $cancelledinparams) = $DB->get_in_or_equal($cancelledstatus);
-
-    $instatus = array(
-        \mod_facetoface\signup\state\booked::get_code(),
-        \mod_facetoface\signup\state\waitlisted::get_code(),
-        \mod_facetoface\signup\state\requested::get_code(),
-        \mod_facetoface\signup\state\requestedrole::get_code()
-    );
-    list($insql, $inparams) = $DB->get_in_or_equal($instatus);
-
-    $extrawhere = '';
-    if (!$includedeleted) {
-        $extrawhere = " AND u.deleted = 0";
-    }
-
-    // Nasty SQL follows:
-    // Load currently cancelled users,
-    // include most recent booked/waitlisted time also
-    $sql = "
-            SELECT
-                u.id,
-                su.id AS submissionid,
-                {$usernamefields},
-                su.jobassignmentid,
-                MAX(ss.timecreated) AS timesignedup,
-                c.timecreated AS timecancelled,
-                c.statuscode
-            FROM {facetoface_signups} su
-            JOIN {user} u ON u.id = su.userid
-            JOIN {facetoface_signups_status} c ON su.id = c.signupid AND c.statuscode $cancelledinsql AND c.superceded = 0
-            LEFT JOIN {facetoface_signups_status} ss ON su.id = ss.signupid AND ss.statuscode $insql AND ss.superceded = 1
-            WHERE su.sessionid = ? AND u.suspended = 0 {$extrawhere}
-            GROUP BY
-                su.id,
-                u.id,
-                {$usernamefields},
-                c.timecreated,
-                su.jobassignmentid,
-                c.statuscode,
-                c.id
-            ORDER BY
-                {$usernamefields},
-                c.timecreated
-    ";
-
-    $params = array_merge($cancelledinparams, $inparams);
-    $params[] = $sessionid;
-    return $DB->get_records_sql($sql, $params);
-}
-
-
-/**
- * Get session unapproved requests
- *
- * @access  public
- * @param   integer $sessionid
- * @return  array|false
- */
-function facetoface_get_requests($sessionid) {
-    $usernamefields = get_all_user_name_fields(true, 'u');
-
-    $select = "u.id, su.id AS signupid, {$usernamefields}, u.email,
-        ss.statuscode, ss.timecreated AS timerequested";
-
-    $status = array(\mod_facetoface\signup\state\requested::get_code(), \mod_facetoface\signup\state\requestedrole::get_code());
-    return facetoface_get_users_by_status($sessionid, $status, $select);
-}
-
-/**
- * Similar to facetoface_get_requests except this returns 2stage requests in:
- * Stage One - pending manager approval
- * Stage Two - pending admin approval
- *
- * @access  public
- * @param   integer $sessionid
- * @return  array|false
- */
-function facetoface_get_adminrequests($sessionid) {
-    $usernamefields = get_all_user_name_fields(true, 'u');
-
-    $select = "u.id, su.id AS signupid, {$usernamefields}, u.email,
-        ss.statuscode, ss.timecreated AS timerequested";
-
-    $status = array(\mod_facetoface\signup\state\requested::get_code(), \mod_facetoface\signup\state\requestedrole::get_code(), \mod_facetoface\signup\state\requestedadmin::get_code());
-    return facetoface_get_users_by_status($sessionid, $status, $select);
-}
-
-/**
- * Get session attendees by status
- *
- * @access  public
- * @param   integer $sessionid
- * @param   mixed   $status     Integer or array of integers
- * @param   string  $select     SELECT clause
- * @param   bool    $includereserved   optional - include 'reserved' users (note this will change the array index
- *                              to be the signupid, to avoid duplicate id problems).
- *
- * @param   bool    $includedeleted    Set this to false, if we do not want to include the deleted user in the list
- * @return  array|false
- */
-function facetoface_get_users_by_status($sessionid, $status, $select = '', $includereserved = false, $includedeleted = true) {
-    global $DB;
-
-    // If no select SQL supplied, use default
-    $usernamefields = get_all_user_name_fields(true, 'u');
-    if (!$select) {
-        $select = "u.id, su.id AS signupid, {$usernamefields}, ss.timecreated, u.email";
-        if ($includereserved) {
-            $select = "su.id, {$usernamefields}, ss.timecreated, u.email";
-        }
-    }
-    $userjoin = 'JOIN';
-    if ($includereserved) {
-        $userjoin = 'LEFT JOIN';
-    }
-
-    // Make string from array of statuses
-    if (is_array($status)) {
-        list($insql, $params) = $DB->get_in_or_equal($status, SQL_PARAMS_NAMED);
-        $statussql = "ss.statuscode {$insql}";
-    } else {
-        $statussql = 'ss.statuscode = :status';
-        $params = array('status' => $status);
-    }
-
-    $extra = '';
-    if (!$includedeleted) {
-        $extra = " AND u.deleted <> 1 ";
-    }
-
-    $sql = "
-        SELECT {$select}
-          FROM {facetoface_signups} su
-          JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
-     $userjoin {user} u ON u.id = su.userid
-         WHERE su.sessionid = :sid
-           AND ss.superceded != 1
-           AND {$statussql}
-           {$extra}
-         ORDER BY {$usernamefields}, ss.timecreated
-    ";
-    $params['sid'] = $sessionid;
-
-    return $DB->get_records_sql($sql, $params);
-}
-
-
-/**
  * Returns all other caps used in module
  * @return array
  */
 function facetoface_get_extra_capabilities() {
     return array('moodle/site:viewfullnames');
 }
-
 
 /**
  * @param string $feature FEATURE_xx constant for requested feature

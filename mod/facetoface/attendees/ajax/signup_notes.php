@@ -45,13 +45,22 @@ if (!has_capability('mod/facetoface:manageattendeesnote', $context)) {
 /* @var mod_facetoface_renderer|core_renderer $renderer */
 $renderer = $PAGE->get_renderer('mod_facetoface');
 $renderer->setcontext($context);
+$seminarevent = new \mod_facetoface\seminar_event($sessionid);
 
 // Get custom field values of the sign-up.
-$attendee_note = facetoface_get_attendee($sessionid, $userid);
-$attendee_note->userid = $attendee_note->id;
-$attendee_note->id = $attendee_note->submissionid;
-$attendee_note->sessionid = $sessionid;
-$customfields = customfield_get_data($attendee_note, 'facetoface_signup', 'facetofacesignup');
+$signup = \mod_facetoface\signup::create($userid, $seminarevent);
+if (!$signup->exists()) {
+    throw new coding_exception(
+        "No user with ID: {$USER->id} has signed-up for the Seminar event ID: {$seminarevent->get_id()}."
+    );
+}
+
+$attendeenote = new \stdClass();
+$attendeenote->userid = $userid;
+$attendeenote->id = $signup->get_id();
+$attendeenote->sessionid = $sessionid;
+
+$customfields = customfield_get_data($attendeenote, 'facetoface_signup', 'facetofacesignup');
 
 // Prepare output.
 $usernamefields = get_all_user_name_fields(true);

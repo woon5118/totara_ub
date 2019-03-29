@@ -27,6 +27,10 @@
 namespace mod_facetoface\form;
 
 global $CFG;
+
+use mod_facetoface\attendees_helper;
+use mod_facetoface\signup\state\{booked, waitlisted};
+
 require_once("{$CFG->libdir}/formslib.php");
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 
@@ -609,8 +613,13 @@ class event extends \moodleform {
         }
 
         // Check that there is not booking conflicts for current attendees.
-        if ($dates) {
-            $currentattendees = facetoface_get_attendees($sessid);
+        if ($dates && null !== $seminarevent && $seminarevent->exists()) {
+            // No point to check the confliction of event attendees, if the seminar event is not defined yet nor
+            // seminar event is not existing in the database storage yet.
+            $helper = new attendees_helper($seminarevent);
+            $statuscodes = [booked::get_code(), waitlisted::get_code()];
+            $currentattendees = $helper->get_attendees_with_codes($statuscodes);
+
             foreach ($currentattendees as $attendee) {
                 $sessiondates = \mod_facetoface\seminar_session_list::from_user_conflicts_with_dates($attendee->id, $dates, $seminarevent);
                 if (!$sessiondates->is_empty()) {
@@ -973,7 +982,10 @@ class event extends \moodleform {
         if ($update) {
             // Send any necessary datetime change notifications but only if date/time is known.
             if (!empty($sessiondates) && \mod_facetoface\seminar_session_list::dates_check($olddates, $sessiondates)) {
-                $attendees = facetoface_get_attendees($session->id);
+                $helper = new attendees_helper($seminarevent);
+                $statuscodes = [booked::get_code(), waitlisted::get_code()];
+                $attendees = $helper->get_attendees_with_codes($statuscodes);
+
                 foreach ($attendees as $user) {
                     $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
                     \mod_facetoface\notice_sender::signup_datetime_changed($signup, $olddates);

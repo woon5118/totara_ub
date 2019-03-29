@@ -158,18 +158,18 @@ $report->display_search();
 $report->display_sidebar_search();
 echo $reporthtml;
 
-// Session downloadable sign in sheet.
-if ($seminarevent->is_sessions() && has_capability('mod/facetoface:exportsessionsigninsheet', $context)) {
-    $downloadsheetattendees = facetoface_get_attendees($seminarevent->get_id(), $attendancestatuses);
-    if (!empty($downloadsheetattendees)) {
-        // We need the dates, and we only want to show this option if there are one or more dates.
-        $formurl = new moodle_url('/mod/facetoface/reports/signinsheet.php');
-        $signinform = new \mod_facetoface\form\signin($formurl, $session);
-        echo html_writer::start_div('f2fdownloadsigninsheet');
-        $signinform->display();
-        echo html_writer::end_div();
+    // Session downloadable sign in sheet.
+    if ($seminarevent->is_sessions() && has_capability('mod/facetoface:exportsessionsigninsheet', $context)) {
+        $helper = new \mod_facetoface\attendees_helper($seminarevent);
+        if (0 < $helper->count_attendees_with_codes($attendancestatuses)) {
+            // We need the dates, and we only want to show this option if there are one or more dates.
+            $formurl = new moodle_url('/mod/facetoface/reports/signinsheet.php');
+            $signinform = new \mod_facetoface\form\signin($formurl, $session);
+            echo html_writer::start_div('f2fdownloadsigninsheet');
+            $signinform->display();
+            echo html_writer::end_div();
+        }
     }
-}
 
 attendees_helper::report_export_form($report, $sid);
 

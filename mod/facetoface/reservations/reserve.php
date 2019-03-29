@@ -80,10 +80,19 @@ if ($reserveinfo['reserve'] === false) { // Current user does not have permissio
         print_error('nopermissionreserve', 'mod_facetoface'); // Not allowed to reserve/allocate spaces.
     }
 }
+
+$helper = new \mod_facetoface\attendees_helper($seminarevent);
+$statuscodes = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with(
+    [
+        \mod_facetoface\signup\state\booked::class
+    ]
+);
+
 if ($seminarevent->is_sessions()) {
-    $signupcount = facetoface_get_num_attendees($seminarevent->get_id(), \mod_facetoface\signup\state\booked::get_code());
+    $signupcount = $helper->count_attendees_with_codes($statuscodes);
 } else {
-    $signupcount = facetoface_get_num_attendees($seminarevent->get_id(), \mod_facetoface\signup\state\waitlisted::get_code());
+    $statuscodes[] = \mod_facetoface\signup\state\waitlisted::get_code();
+    $signupcount = $helper->count_attendees_with_codes($statuscodes);
 }
 $capacityleft = max(0, $seminarevent->get_capacity() - $signupcount);
 if (!$seminarevent->get_allowoverbook()) {

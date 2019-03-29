@@ -27,7 +27,12 @@ namespace mod_facetoface\attendance;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Provide a convenient way to handle the result of \mod_facetoface\attendance\attendance_helper::get_attendees()
+ * Provide a convenient way to handle the result of \mod_facetoface\attendance\attendance_helper::get_attendees().
+ * Futhermore, this event_attendee class is also being constructed via \mod_facetoface\event_attendee_helper class as
+ * it is a class to load attendees within an event.
+ *
+ * We using casting in getter method, because those properties of this class/object can be null at some point, therefore
+ * casting will allow us to return the specific type of that kind of declared type.
  */
 final class event_attendee extends \stdClass {
 
@@ -44,14 +49,25 @@ final class event_attendee extends \stdClass {
 
     /** @var int {facetoface_signups}.id */
     public $submissionid = 0;
+    /** @var int {facetoface_signups}.bookedby */
+    public $bookedby;
     /** @var int {facetoface}.id */
     public $facetofaceid = 0;
+    /** @var int {faceotface_signups}.jobassignmentid */
+    public $jobassignmentid = 0;
+    /** @var int {facetoface_sessions}.id */
+    public $sessionid = 0;
     /** @var int {course}.id */
     public $course = 0;
-    /** @var int {facetoface_signups_status}.statuscode / {facetoface_signup_date_status}.attendancecode */
+    /** @var int {facetoface_signups_status}.statuscode / {facetoface_signups_dates_status}.attendancecode */
     public $statuscode = 0;
     /** @var float|null {facetoface_signups_status}.grade / null */
     public $grade = null;
+    /** @var int {facetoface_signups_status}.timecreated / {facetoface_signups_dates_status}.timecreated */
+    public $timecreated = 0;
+
+    /** @var int MAX({facetoface_signups_status}.timecreated) with code booked/waitlisted */
+    public $timesignedup = 0;
 
     /** @var string {user}.firstname */
     public $firstname = '';
@@ -81,7 +97,7 @@ final class event_attendee extends \stdClass {
      * @param \stdClass $object an element of an array returned by \mod_facetoface\attendance\attendance_helper::get_attendees()
      * @return event_attendee new class instance or null if $object is not a valid entry.
      */
-    public static function map_from_record(\stdClass $object): event_attendee {
+    public static function map_from_record(\stdClass $object): ?event_attendee {
         $self = new static();
         $self->map_object($object);
         return $self->is_valid() ? $self : null;
@@ -117,21 +133,28 @@ final class event_attendee extends \stdClass {
      * @return int
      */
     public function get_id(): int {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
      * @return string
      */
     public function get_idnumber(): string {
-        return $this->idnumber;
+        return (string) $this->idnumber;
     }
 
     /**
      * @return string
      */
     public function get_email(): string {
-        return $this->email;
+        return (string) $this->email;
+    }
+
+    /**
+     * @return bool
+     */
+    public function has_email(): bool {
+        return !empty($this->email);
     }
 
     /**
@@ -152,28 +175,28 @@ final class event_attendee extends \stdClass {
      * @return integer
      */
     public function get_signupid(): int {
-        return $this->submissionid;
+        return (int) $this->submissionid;
     }
 
     /**
      * @return integer
      */
     public function get_facetofaceid(): int {
-        return $this->facetofaceid;
+        return (int) $this->facetofaceid;
     }
 
     /**
      * @return integer
      */
     public function get_courseid(): int {
-        return $this->course;
+        return (int) $this->course;
     }
 
     /**
      * @return integer
      */
     public function get_statuscode(): int {
-        return $this->statuscode;
+        return (int) $this->statuscode;
     }
 
     /**
@@ -181,5 +204,47 @@ final class event_attendee extends \stdClass {
      */
     public function get_grade(): ?float {
         return $this->grade;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_seminar_id(): int {
+        return (int) $this->facetofaceid;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_seminar_event_id(): int {
+        return (int) $this->sessionid;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_job_assignment_id(): int {
+        return (int) $this->jobassignmentid;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_timecreated(): int {
+        return (int) $this->timecreated;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_bookedby(): int {
+        return (int) $this->bookedby;
+    }
+
+    /**
+     * @return bool
+     */
+    public function has_bookedby(): bool {
+        return !empty($this->bookedby);
     }
 }

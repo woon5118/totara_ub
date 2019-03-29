@@ -183,6 +183,14 @@ final class seminar_session implements seminar_iterator_item {
     public function get_roomid(): int {
         return (int)$this->roomid;
     }
+
+    /**
+     * @return bool
+     */
+    public function has_room(): bool {
+        return !empty($this->roomid);
+    }
+
     /**
      * Set room id for this session date
      *

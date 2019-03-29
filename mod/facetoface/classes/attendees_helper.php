@@ -23,25 +23,344 @@
 
 namespace mod_facetoface;
 
-use mod_facetoface\signup\state\not_set;
-use mod_facetoface\signup\state\state;
-use mod_facetoface\signup\state\booked;
-use mod_facetoface\signup\state\waitlisted;
-use mod_facetoface\signup\state\declined;
-use mod_facetoface\signup\state\event_cancelled;
-use mod_facetoface\signup\state\user_cancelled;
-use mod_facetoface\signup\state\no_show;
-use mod_facetoface\signup\state\partially_attended;
-use mod_facetoface\signup\state\fully_attended;
-use mod_facetoface\signup\state\requested;
-use mod_facetoface\signup\state\requestedadmin;
-use mod_facetoface\seminar_event;
-use mod_facetoface\seminar;
-use \context_module;
+use mod_facetoface\signup\state\{
+    not_set,
+    requestedrole,
+    state,
+    booked,
+    waitlisted,
+    declined,
+    event_cancelled,
+    user_cancelled,
+    requestedadmin,
+    requested,
+    attendance_state
+};
+
+use mod_facetoface\attendance\event_attendee;
 
 defined('MOODLE_INTERNAL') || die();
 
+
+/**
+ * The only difference that this class and the class \mod_facetoface\attendance\attendance_helper is that
+ * attendance_helper class is meant to be retrieving the attendees of an event with specific set of attendance states.
+ * Furthermore, attendance_helper will only produce a event_attendee with a bit fewer properties than this class.
+ *
+ * They are both producing event_attendee object, however, attendance_helper is able to load the session attendance as
+ * well. Whereas this class is being introduced to replace facetoface_get_attendees() which the old function is being
+ * used to get a full list of attendees (even including the free reservation spaces).
+ *
+ * All the code and states within signup are defined as bellow:
+ *
+ * @example
+ *         Array(
+ *              [0] => \mod_facetoface\signup\state\not_set
+ *              [10] => \mod_facetoface\signup\state\user_cancelled
+ *              [20] => \mod_facetoface\signup\state\event_cancelled
+ *              [30] => \mod_facetoface\signup\state\declined
+ *              [40] => \mod_facetoface\signup\state\requested
+ *              [44] => \mod_facetoface\signup\state\requestedrole
+ *              [45] => \mod_facetoface\signup\state\requestedadmin
+ *              [60] => \mod_facetoface\signup\state\waitlisted
+ *              [70] => \mod_facetoface\signup\state\booked
+ *              [80] => \mod_facetoface\signup\state\no_show
+ *              [85] => \mod_facetoface\signup\state\unable_to_attend
+ *              [90] => \mod_facetoface\signup\state\partially_attended
+ *              [100] => \mod_facetoface\signup\state\fully_attended
+ *         )
+ */
 final class attendees_helper {
+    /**
+     * @var seminar_event
+     */
+    private $seminarevent;
+
+    /**
+     * event_attendee_helper constructor.
+     * @param seminar_event $seminarevent
+     */
+    public function __construct(seminar_event $seminarevent) {
+        $this->seminarevent = $seminarevent;
+    }
+
+    /**
+     * Given the array of statuscodes, then this function will count the number of attendees that have those status
+     * codes associated with. This functionality will not include any reservations, as that would be not a good idea
+     * to be in same place here. However, we have another API for it, and developers should be using it.
+     *
+     * @param array $statuscodes
+     * @param bool $includedeleted
+     *
+     * @return int
+     */
+    public function count_attendees_with_codes(array $statuscodes, bool $includedeleted = true): int {
+        global $DB;
+
+        if (0 === $this->seminarevent->get_id()) {
+            debugging("Cannot count the number of attendees for invalid seminar event", DEBUG_DEVELOPER);
+            return 0;
+        }
+
+        [$asql, $params] = $DB->get_in_or_equal($statuscodes, SQL_PARAMS_NAMED);
+        $sql = "
+            SELECT COUNT(su.id)
+            FROM {facetoface_signups} su
+            INNER JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+            INNER JOIN {user} u ON u.id = su.userid
+            WHERE su.sessionid = :sessionid
+            AND ss.superceded = 0
+            AND ss.statuscode {$asql}
+        ";
+
+        if (!$includedeleted) {
+            $sql .= " AND u.deleted = 0";
+        }
+
+        $params['sessionid'] = $this->seminarevent->get_id();
+        return (int) $DB->count_records_sql($sql, $params);
+    }
+
+    /**
+     * Counting the number of reservations within an event. This will return the number of spaces that are reserved
+     * but available for user to be put it.
+     *
+     * @return int
+     */
+    public function count_reserved_spaces(): int {
+        global $DB;
+
+        if (0 === $this->seminarevent->get_id()) {
+            debugging('Cannot count the number of reservations for invalid seminar event', DEBUG_DEVELOPER);
+            return 0;
+        }
+
+        // For reservation, there will be no userid in the rows, so we just specified userid to be zero.
+        $sql = "
+            SELECT COUNT(su.id)
+            FROM {facetoface_signups} su
+            INNER JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+            WHERE su.sessionid = :sessionid
+            AND su.userid = 0
+            AND ss.superceded = 0
+            AND su.archived = 0;
+        ";
+
+        $params = ['sessionid' => $this->seminarevent->get_id()];
+        return (int) $DB->count_records_sql($sql, $params);
+    }
+
+    /**
+     * Given the list of status codes, this method will try to get the list of all attendees that had the status code
+     * associated with.
+     *
+     * Returning an array of event_attendee object, with the user's id associated as key.
+     *
+     * @param int[] $statuscodes
+     * @param bool  $includedeleted
+     *
+     * @return event_attendee[] | \stdClass[]
+     */
+    public function get_attendees_with_codes(array $statuscodes, bool $includedeleted = true): array {
+        global $DB;
+
+        if (0 === $this->seminarevent->get_id()) {
+            debugging("Cannot get list of attendees for invalid seminar event", DEBUG_DEVELOPER);
+            return [];
+        }
+
+        [$asql, $params] = $DB->get_in_or_equal($statuscodes, SQL_PARAMS_NAMED);
+        $usernamefields = get_all_user_name_fields(true, 'u');
+
+        $sql = "
+            SELECT u.id,
+            u.idnumber,
+            {$usernamefields},
+            u.email,
+            u.deleted,
+            u.suspended,
+            su.jobassignmentid,
+            su.bookedby,
+            su.id AS submissionid,
+            s.id AS sessionid,
+            f.id AS facetofaceid,
+            f.course AS course,
+            ss.statuscode,
+            ss.grade,
+            ss.timecreated,
+            (
+                SELECT MAX(ss2.timecreated)
+                FROM {facetoface_signups_status} ss2
+                WHERE ss2.signupid = ss.signupid AND ss2.statuscode IN (:status1, :status2)
+            ) AS timesignedup
+            FROM {facetoface} f
+            INNER JOIN {facetoface_sessions} s
+            ON s.facetoface = f.id
+            INNER JOIN {facetoface_signups} su
+            ON su.sessionid = s.id
+            INNER JOIN {user} u
+            ON u.id = su.userid
+            INNER JOIN {facetoface_signups_status} ss
+            ON ss.signupid = su.id
+            WHERE ss.superceded = 0
+            AND s.id = :sessionid
+            AND ss.statuscode {$asql}
+        ";
+
+        if (!$includedeleted) {
+            // If it is not including the deleted user, then we should exclude them out of the query here.
+            $sql .= " AND u.deleted <> 1";
+        }
+
+        $params['sessionid'] = $this->seminarevent->get_id();
+
+        // By default, the time of signed up is only count when user has these two of specific state within an event.
+        $params['status1'] = booked::get_code();
+        $params['status2'] = waitlisted::get_code();
+
+        $records = $DB->get_records_sql($sql, $params);
+        $attendees = [];
+
+        foreach ($records as $record) {
+            $eventattendee = new event_attendee();
+            $eventattendee->from_record($record);
+
+            $attendees[$eventattendee->id] = $eventattendee;
+        }
+
+        return $attendees;
+    }
+
+    /**
+     * Returning a list of attendee or not set attendee which had been reserved by their manager or admin. This function
+     * is also returning those reserved space that had been taken with a proper attendee.
+     *
+     * @return event_attendee[] | \stdClass[]
+     */
+    public function get_reservations(): array {
+        global $DB;
+
+        if (0 === $this->seminarevent->get_id()) {
+            debugging("Cannot get list of reservations for invalid seminar event", DEBUG_DEVELOPER);
+            return [];
+        }
+
+        $usernamefields = get_all_user_name_fields(true, 'u');
+        $sql = "
+            SELECT u.id,
+            u.idnumber,
+            {$usernamefields},
+            u.email,
+            u.deleted,
+            u.suspended,
+            su.jobassignmentid,
+            su.bookedby,
+            su.id AS submissionid,
+            s.id AS sessionid,
+            f.id AS facetofaceid,
+            f.course AS course,
+            ss.statuscode,
+            ss.grade,
+            ss.timecreated,
+            (
+                SELECT MAX(ss2.timecreated)
+                FROM {facetoface_signups_status} ss2
+                WHERE ss2.signupid = ss.signupid AND ss2.statuscode IN (:status1, :status2)
+            ) AS timesignedup
+            FROM {facetoface} f
+            INNER JOIN {facetoface_sessions} s
+            ON s.facetoface = f.id
+            INNER JOIN {facetoface_signups} su
+            ON su.sessionid = s.id
+            LEFT JOIN {user} u
+            ON u.id = su.userid
+            LEFT JOIN {facetoface_signups_status} ss
+            ON ss.signupid = su.id AND ss.superceded = 0
+            WHERE s.id = :sessionid
+        ";
+
+        $params = [
+            'status1' => booked::get_code(),
+            'status2' => waitlisted::get_code(),
+            'sessionid' => $this->seminarevent->get_id()
+        ];
+
+        $records = $DB->get_recordset_sql($sql, $params);
+
+        $attendees = [];
+        foreach ($records as $record) {
+            $attendee = new event_attendee();
+            $attendee->from_record($record);
+            $attendees[] = $attendee;
+        }
+
+        $records->close();
+        return $attendees;
+    }
+
+    /**
+     * Getting the list of attendees that are waiting for approval.
+     *
+     * Users that are in requested state should not be deleted at all. Because, once the user is deleted, their state
+     * should be moved to cancelled. However, for the past event, user might not be able to switch to different state.
+     * Therefore, by default, we should leave it to exclude the deleted users.
+     *
+     * @param bool $includedeleted
+     * @return event_attendee[] | \stdClass[]
+     */
+    public function get_attendees_in_requested(bool $includedeleted = false): array {
+        $statuscodes = [
+            requested::get_code(),
+            requestedrole::get_code()
+        ];
+
+        return $this->get_attendees_with_codes($statuscodes, $includedeleted);
+    }
+
+    /**
+     * Similar with get_attendees_in_requested(), except that this one is for 2 stage requested in:
+     * + stage one: pending manager approval
+     * + stage two: pending admin approval
+     *
+     * @param bool $includedeleted
+     * @return event_attendee[] | \stdClass[]
+     */
+    public function get_attendees_in_admin_requested(bool $includedeleted = false): array {
+        $statuscodes = [
+            requested::get_code(),
+            requestedrole::get_code(),
+            requestedadmin::get_code()
+        ];
+
+        return $this->get_attendees_with_codes($statuscodes, $includedeleted);
+    }
+
+    /**
+     * Returning the list of attendees that are in any kind of cancellation status.
+     *
+     * @param bool $includedeleted
+     * @return event_attendee[] | \stdClass[]
+     */
+    public function get_attendees_in_cancellation(bool $includedeleted = true): array {
+        $statuscodes = [
+            user_cancelled::get_code(),
+            event_cancelled::get_code()
+        ];
+
+        return $this->get_attendees_with_codes($statuscodes, $includedeleted);
+    }
+
+    /**
+     * Only counting the user that has booked to the specific event. Furthermore, by default this will include the
+     * list of status codes of attendance_state.
+     *
+     * @param bool $includedeleted
+     * @return int
+     */
+    public function count_attendees(bool $includedeleted = true): int {
+        $statuscodes = attendance_state::get_all_attendance_code_with([booked::class]);
+        return $this->count_attendees_with_codes($statuscodes, $includedeleted);
+    }
 
     /**
      * Get a list of status codes depending from booked state.
@@ -195,8 +514,10 @@ final class attendees_helper {
         $allowed_actions = [];
         $available_actions = [];
 
+        $helper = new static($seminarevent);
+
         // Actions the user can perform
-        $has_attendees = facetoface_get_num_attendees($seminarevent->get_id());
+        $has_attendees = $helper->count_attendees();
         $sendmessagecapability = has_all_capabilities(
             [
                 'moodle/site:sendmessage',
@@ -215,7 +536,8 @@ final class attendees_helper {
                 $available_actions[] = 'attendees';
             }
 
-            if (facetoface_get_users_by_status($seminarevent->get_id(), \mod_facetoface\signup\state\waitlisted::get_code())) {
+            $users = $helper->get_attendees_with_codes([waitlisted::get_code()]);
+            if (!empty($users)) {
                 $available_actions[] = 'waitlist';
             }
         }
@@ -223,19 +545,16 @@ final class attendees_helper {
         if (has_capability('mod/facetoface:viewcancellations', $context)) {
             $allowed_actions[] = 'cancellations';
 
-            $users_by_status = facetoface_get_users_by_status(
-                $seminarevent->get_id(),
+            $users = $helper->get_attendees_with_codes(
                 [
                     declined::get_code(),
                     user_cancelled::get_code(),
                     event_cancelled::get_code()
                 ],
-                '',
-                false,
                 $includedeleted
             );
 
-            if (!empty($seminarevent->get_cancelledstatus()) || $users_by_status) {
+            if (!empty($seminarevent->get_cancelledstatus()) || !empty($users)) {
                 $available_actions[] = 'cancellations';
             }
         }
@@ -319,7 +638,9 @@ final class attendees_helper {
                 $available_actions[] = 'approvalrequired';
 
                 // Set everyone as their staff.
-                $staff = array_keys(facetoface_get_requests($seminarevent->get_id()));
+                $staff = array_keys(
+                    $helper->get_attendees_with_codes([requested::get_code(), requestedrole::get_code()])
+                );
             }
         }
 
@@ -351,11 +672,13 @@ final class attendees_helper {
 
         $canapproveanyrequest = has_capability('mod/facetoface:approveanyrequest', $context);
         if ($canapproveanyrequest || !empty($staff)) {
-            // Check if any staff have requests awaiting approval.
-            $get_requests = $seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ADMIN ?
-                facetoface_get_adminrequests($seminarevent->get_id()) :
-                facetoface_get_requests($seminarevent->get_id());
+            $statuscodes = [requested::get_code(), requestedrole::get_code()];
+            if ($seminar->get_approvaltype() == seminar::APPROVAL_ADMIN) {
+                $statuscodes[] = requestedadmin::get_code();
+            }
 
+            // Check if any staff have requests awaiting approval.
+            $get_requests = $helper->get_attendees_with_codes($statuscodes);
             if ($get_requests || !empty($admin_requests)) {
                 // Calculate which requesting users are relevant to the viewer.
                 $requests = ($canapproveanyrequest ? $get_requests : array_intersect_key($get_requests, array_flip($staff)));
@@ -370,16 +693,12 @@ final class attendees_helper {
         // If this is true then we need to show attendees but limit it to just those attendees that are also staff.
         if (!in_array('attendees', $allowed_actions) && !empty($staff)) {
             // Check if any staff are attending.
+            $statuscodes = attendance_state::get_all_attendance_code_with([booked::class]);
             if ($seminarevent->get_mintimestart()) {
-                $get_attendees = facetoface_get_attendees(
-                    $seminarevent->get_id(),
-                    \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with([ booked::class ])
-                );
+                $get_attendees = $helper->get_attendees_with_codes($statuscodes);
             } else {
-                $get_attendees = facetoface_get_attendees(
-                    $seminarevent->get_id(),
-                    \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with([ waitlisted::class, booked::class ])
-                );
+                $statuscodes[] = waitlisted::get_code();
+                $get_attendees = $helper->get_attendees_with_codes($statuscodes);
             }
             if ($get_attendees) {
                 // Calculate which attendees are relevant to the viewer.
@@ -396,7 +715,7 @@ final class attendees_helper {
         // If this is true then we still need to show cancellations but limit it to just those cancellations that are also staff.
         if (!in_array('cancellations', $allowed_actions) && !empty($staff)) {
             // Check if any staff have cancelled.
-            $get_cancellations = facetoface_get_cancellations($seminarevent->get_id());
+            $get_cancellations = $helper->get_attendees_in_cancellation();
             if ($get_cancellations) {
                 // Calculate which cancelled users are relevant to the viewer.
                 $cancellations = array_intersect_key($get_cancellations, array_flip($staff));
@@ -483,14 +802,32 @@ final class attendees_helper {
      * Show message if event is overbooked.
      *
      * @param seminar_event $seminarevent
-     * @param integer $status (optional), default is '70' (booked)
-     * @param string $comp SQL comparison operator.
+     * @param integer       $status         deprecated
+     * @param string        $comp           deprecated
      */
-    public static function is_overbooked(seminar_event $seminarevent, $status = null, $comp = '>=') {
+    public static function is_overbooked(seminar_event $seminarevent, $status = null, $comp = '') {
         global $OUTPUT;
 
+        $items = [
+            'status' => $status,
+            'comp' => $comp
+        ];
+
+        // Deprecating the parameters $status, and $comp because the way we count attendees are no longer working with
+        // operator like '>='. Furthermore, using operator for status code is SUPER WRONG, DO NOT ABUSE IT !!!
+        foreach ($items as $item) {
+            if (!empty($item)) {
+                debugging(
+                    "The parameter \${$item} has been deprecated, please do not use this paramater",
+                    DEBUG_DEVELOPER
+                );
+            }
+        }
+
+        $helper = new static($seminarevent);
+
         // Output overbooked notifications.
-        $numattendees = facetoface_get_num_attendees($seminarevent->get_id(), $status, $comp);
+        $numattendees = $helper->count_attendees();
         $overbooked = ($numattendees > $seminarevent->get_capacity());
         if ($overbooked) {
             $overbookedmessage = get_string(

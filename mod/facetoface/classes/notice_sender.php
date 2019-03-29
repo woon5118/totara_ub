@@ -308,14 +308,16 @@ class notice_sender {
     public static function reservation_cancelled(seminar_event $seminarevent) {
         global $CFG, $DB;
 
-        $attendees = facetoface_get_attendees($seminarevent->get_id(), [booked::get_code()], true);
+        $helper = new attendees_helper($seminarevent);
+        $attendees = $helper->get_reservations();
+
         $reservedids = array();
         foreach ($attendees as $attendee) {
-            if ($attendee->bookedby) {
-                if (!$attendee->id) {
-                    // Managers can already get booking cancellation notices - just adding reserve cancellation notices.
-                    $reservedids[] = $attendee->bookedby;
-                }
+            if ($attendee->has_bookedby() && !$attendee->is_valid()) {
+                // If the attendee is booked by a manager, and the reservation is not a valid record, because it has
+                // no user to fill up this reservation yet. Then we add the manager id here.
+                // Managers can already get booking cancellation notices - just adding reserve cancellation notices.
+                $reservedids[] = $attendee->get_bookedby();
             }
         }
         if (!$reservedids) {

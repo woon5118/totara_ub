@@ -27,8 +27,25 @@
  * Unit tests for mod/facetoface/lib.php
  */
 
-use \mod_facetoface\{seminar_event, seminar, event_time, signup, signup_helper, trainer_helper, seminar_session, seminar_event_list};
-use \mod_facetoface\signup\state\{waitlisted, booked, requested, user_cancelled, fully_attended};
+use \mod_facetoface\{
+    seminar_event,
+    seminar,
+    event_time,
+    signup,
+    signup_helper,
+    trainer_helper,
+    seminar_session,
+    seminar_event_list,
+    attendees_helper,
+    signup_list
+};
+use \mod_facetoface\signup\state\{
+    waitlisted,
+    booked,
+    requested,
+    user_cancelled,
+    fully_attended
+};
 use mod_facetoface\query\event\filter\{room_filter, event_time_filter};
 use mod_facetoface\query\event\sortorder\{default_sortorder, future_sortorder};
 use mod_facetoface\query\event\query;
@@ -1832,36 +1849,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertEquals([$sess_over, $can_wait, $can_future], array_keys($sessions->to_records()));
     }
 
-    function test_facetoface_get_attendees() {
-        $this->init_sample_data();
-
-        // Test variables.
-        $sessionid1 = 1;
-        $sessionid2 = 42;
-
-        // Test - for valid sessionid.
-        $this->assertTrue((bool)count(facetoface_get_attendees($sessionid1)));
-
-        // Test - for invalid sessionid.
-        $this->assertEquals(facetoface_get_attendees($sessionid2), array());
-    }
-
-    function test_facetoface_get_attendee() {
-        $this->init_sample_data();
-
-        // Test variables.
-        $sessionid1 = 1;
-        $sessionid2 = 42;
-        $userid1 = 1;
-        $userid2 = 14;
-
-        // Test for valid case.
-        $this->assertTrue((bool)is_object(facetoface_get_attendee($sessionid1, $userid1)), $this->msgtrue);
-
-        // Test for invalid case.
-        $this->assertFalse((bool)facetoface_get_attendee($sessionid2, $userid2), $this->msgfalse);
-    }
-
     function test_facetoface_get_userfields() {
         $this->init_sample_data();
 
@@ -2868,37 +2855,25 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertTrue((bool)facetoface_grade_item_update($f2f), $this->msgtrue);
     }
 
-    function test_facetoface_get_num_attendees() {
-        $this->init_sample_data();
-
-        // Test variables.
-        $sessionid1 = 2;
-        $sessionid2 = 42;
-
-        // Test for valid case.
-        $this->assertEquals(facetoface_get_num_attendees($sessionid1), 3);
-
-        // Test for invalid case.
-        $this->assertEquals(facetoface_get_num_attendees($sessionid2), 0);
-    }
-
     function test_facetoface_get_user_submissions() {
         $this->init_sample_data();
 
         // Test variables.
         $facetofaceid1 = 1;
         $userid1 = 1;
-        $includecancellations1 = TRUE;
 
         $facetofaceid2 = 11;
         $userid2 = 11;
-        $includecancellations2 = TRUE;
+
+        $statuscodes = [booked::get_code(), user_cancelled::get_code()];
+        $list1 = signup_list::user_signups_within_seminar_with_codes($userid1, $facetofaceid1, $statuscodes);
+        $list2 = signup_list::user_signups_within_seminar_with_codes($userid2, $facetofaceid2, $statuscodes);
 
         // Test for valid case.
-        $this->assertTrue((bool)facetoface_get_user_submissions($facetofaceid1, $userid1, $includecancellations1), $this->msgtrue);
+        $this->assertFalse($list1->is_empty());
 
         // Test for invalid case.
-        $this->assertFalse((bool)facetoface_get_user_submissions($facetofaceid2, $userid2, $includecancellations2), $this->msgfalse);
+        $this->assertTrue($list2->is_empty());
     }
 
     function test_facetoface_get_view_actions() {
@@ -3217,6 +3192,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $seminarevent = new seminar_event($sessionid);
+        $helper = new attendees_helper($seminarevent);
 
         // Sign the user up.
         $signup11 = signup::create($learner->id, $seminarevent);
@@ -3224,12 +3200,12 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         signup_helper::signup($signup11);
 
         // Make sure learner is booked.
-        $booked = facetoface_get_attendees($seminarevent->get_id(), \mod_facetoface\signup\state\booked::get_code(), true);
+        $booked = $helper->get_attendees_with_codes([booked::get_code()]);
         $this->assertCount(1, $booked);
         $booked = reset($booked);
         $this->assertEquals($learner->id, $booked->id);
 
-        $signup = new signup($booked->signupid);
+        $signup = new signup($booked->get_signupid());
 
         $this->assertFalse(signup_helper::is_cancelled($signup));
         signup_helper::user_cancel($signup);
@@ -3265,7 +3241,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $seminarevent = new seminar_event($sessionid);
-        $seminareventid = $seminarevent->get_id();
+        $helper = new attendees_helper($seminarevent);
 
         $sink = $this->redirectMessages();
         // Sign the first user up.
@@ -3303,8 +3279,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sink->clear();
 
         // User 1 should be booked, user 2 waitlisted.
-        $booked = facetoface_get_attendees($seminareventid, \mod_facetoface\signup\state\booked::get_code());
-        $waitlisted = facetoface_get_attendees($seminareventid, \mod_facetoface\signup\state\waitlisted::get_code());
+        $booked = $helper->get_attendees_with_codes([booked::get_code()]);
+        $waitlisted = $helper->get_attendees_with_codes([waitlisted::get_code()]);
         $this->assertCount(1, $booked);
         $this->assertCount(1, $waitlisted);
         $booked = reset($booked);
@@ -3318,9 +3294,9 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertTrue($signup11->can_switch(user_cancelled::class));
         signup_helper::user_cancel($signup11);
 
-        $cancelled = facetoface_get_attendees($seminareventid, \mod_facetoface\signup\state\user_cancelled::get_code());
-        $booked = facetoface_get_attendees($seminareventid, \mod_facetoface\signup\state\booked::get_code());
-        $waitlisted = facetoface_get_attendees($seminareventid, \mod_facetoface\signup\state\waitlisted::get_code());
+        $cancelled = $helper->get_attendees_with_codes([user_cancelled::get_code()]);
+        $booked = $helper->get_attendees_with_codes([booked::get_code()]);
+        $waitlisted = $helper->get_attendees_with_codes([waitlisted::get_code()]);
 
         // User 1 should be cancelled, user 2 should be booked.
         $this->assertCount(1, $cancelled);

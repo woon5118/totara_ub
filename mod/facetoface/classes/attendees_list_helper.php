@@ -23,7 +23,13 @@
 
 namespace mod_facetoface;
 
-use mod_facetoface\signup\state\{booked, waitlisted};
+use mod_facetoface\signup\state\{
+    attendance_state,
+    not_set,
+    state,
+    booked,
+    waitlisted
+};
 use mod_facetoface\form\attendees_add_confirm;
 use mod_facetoface\event\attendees_updated;
 use \context_module;
@@ -52,6 +58,7 @@ final class attendees_list_helper {
 
         $seminarevent = new seminar_event($data->s);
         $seminar = $seminarevent->get_seminar();
+        $helper = new attendees_helper($seminarevent);
         $list = new bulk_list($data->listid);
 
         if (empty($_SESSION['f2f-bulk-results'])) {
@@ -65,10 +72,11 @@ final class attendees_list_helper {
         if (empty($seminarevent->get_sessions())) {
             $signedupstates[] = waitlisted::get_code();
         }
-        $original = facetoface_get_attendees($seminarevent->get_id(), $signedupstates);
+
+        $original = $helper->get_attendees_with_codes($signedupstates);
 
         // Get users waiting approval to add to the "already attending" list as we do not want to add them again.
-        $waitingapproval = facetoface_get_requests($seminarevent->get_id());
+        $waitingapproval = $helper->get_attendees_in_requested();
         // Add those awaiting approval.
         foreach ($waitingapproval as $waiting) {
             if (!isset($original[$waiting->id])) {
@@ -141,15 +149,18 @@ final class attendees_list_helper {
                     ];
 
                     // Store customfields.
-                    $signupstatus = facetoface_get_attendee($seminarevent->get_id(), $attendee->id);
                     $customdata = $list->has_user_data() ? (object)$list->get_user_data($attendee->id) : $data;
-                    $customdata->id = $signupstatus->submissionid;
+                    $customdata->id = $signup->get_id();
                     customfield_save_data($customdata, 'facetofacesignup', 'facetoface_signup');
                     // Values of multi-select are changing after edit_save_data func.
                     $data = unserialize($clonefromform);
                 } else {
                     $failures = signup_helper::get_failures($signup);
-                    $errors[] = ['idnumber' => $attendee->idnumber, 'name' => fullname($attendee), 'result' => current($failures)];
+                    $errors[] = [
+                        'idnumber' => $attendee->idnumber,
+                        'name' => fullname($attendee),
+                        'result' => current($failures)
+                    ];
                 }
             }
         }
@@ -454,6 +465,7 @@ final class attendees_list_helper {
 
         $listid = $data->listid;
         $seminarevent = new seminar_event($data->s);
+        $helper = new attendees_helper($seminarevent);
         $list = new bulk_list($listid);
 
         if (empty($_SESSION['f2f-bulk-results'])) {
@@ -462,17 +474,18 @@ final class attendees_list_helper {
 
         $removed  = array();
         $errors = array();
+
+        $statuscodes = attendance_state::get_all_attendance_code_with([booked::class]);
         // Original booked attendees plus those awaiting approval
         if ($seminarevent->is_sessions()) {
-            $original = facetoface_get_attendees($seminarevent->get_id(), array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
-                MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
+            $original = $helper->get_attendees_with_codes($statuscodes);
         } else {
-            $original = facetoface_get_attendees($seminarevent->get_id(), array(MDL_F2F_STATUS_WAITLISTED, MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
-                MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
+            $statuscodes[] = waitlisted::get_code();
+            $original = $helper->get_attendees_with_codes($statuscodes);
         }
 
         // Get users waiting approval to add to the "already attending" list as we might want to remove them as well.
-        $waitingapproval = facetoface_get_requests($seminarevent->get_id());
+        $waitingapproval = $helper->get_attendees_in_requested();
         // Add those awaiting approval
         foreach ($waitingapproval as $waiting) {
             if (!isset($original[$waiting->id])) {
@@ -503,9 +516,8 @@ final class attendees_list_helper {
                     notice_sender::signup_cancellation($signup);
 
                     // Store customfields.
-                    $signupstatus = facetoface_get_attendee($seminarevent->get_id(), $attendee->id);
                     $customdata = $list->has_user_data() ? (object)$list->get_user_data($attendee->id) : $data;
-                    $customdata->id = $signupstatus->submissionid;
+                    $customdata->id = $signup->get_id();
                     customfield_save_data($customdata, 'facetofacecancellation', 'facetoface_cancellation');
                     // Values of multi-select are changed after edit_save_data func.
                     $data = unserialize($clonefromform);

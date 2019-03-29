@@ -23,6 +23,11 @@
 
 namespace mod_facetoface;
 
+use mod_facetoface\signup\state\{
+    booked,
+    waitlisted
+};
+
 final class calendar {
 
     /**
@@ -130,7 +135,8 @@ final class calendar {
             return true;
         }
 
-        $seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
+        $seminar = $seminarevent->get_seminar();
+        $helper = new attendees_helper($seminarevent);
 
         // Remove from all calendars.
         self::delete_user_events($seminarevent, 'booking');
@@ -145,8 +151,10 @@ final class calendar {
         // Add to NEW calendartype.
         if ($seminar->get_usercalentry() > 0) {
             // Get ALL enrolled/booked users.
-            $users  = facetoface_get_attendees($seminarevent->get_id());
-            if (!in_array($USER->id, $users)) {
+            $statuscodes = [booked::get_code(), waitlisted::get_code()];
+            $users = $helper->get_attendees_with_codes($statuscodes);
+
+            if (!in_array($USER->id, array_keys($users))) {
                 self::add_seminar_event($seminarevent, 'user', $USER->id, 'session');
             }
 

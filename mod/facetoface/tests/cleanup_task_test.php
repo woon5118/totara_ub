@@ -93,7 +93,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
             ]
         ]);
         $seminarevent1 = new \mod_facetoface\seminar_event($session1id);
-        $seminarevent1id = $seminarevent1->get_id();
+        $helper1 = new \mod_facetoface\attendees_helper($seminarevent1);
 
         $session2id = $facetofacegenerator->add_session([
             'facetoface' => $facetoface->id,
@@ -107,7 +107,8 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
             ]
         ]);
         $seminarevent2 = new \mod_facetoface\seminar_event($session2id);
-        $seminarevent2id = $seminarevent2->get_id();
+        $helper2 = new \mod_facetoface\attendees_helper($seminarevent2);
+
 
         // Sign the users up to the first session.
         $sink = $this->redirectMessages();
@@ -128,12 +129,12 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         $sink->clear();
 
         // Confirm the signups for session 1.
-        $this->assertCount(3, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(0, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(3, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(0, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         // Confirm the signups for session 2.
-        $this->assertCount(3, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(0, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(3, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(0, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         // Suspend user 3.
         $user3 = $DB->get_record('user', array('id'=>$user3->id, 'deleted'=>0), '*', MUST_EXIST);
@@ -152,20 +153,20 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         $this->assertArrayHasKey($room4->id, $rooms);
 
         // The deleted user will be automatically updated but the suspended user won't.
-        $this->assertCount(2, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(1, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\user_cancelled::get_code()));
-        $this->assertCount(2, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(1, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(2, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(1, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
+        $this->assertCount(2, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(1, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         // Now cancel the second session.
         $seminarevent2->cancel();
 
         // This should have lead to all users in session 2 being marked as cancelled by session cancellation.
-        $this->assertCount(2, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(1, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\user_cancelled::get_code()));
-        $this->assertCount(0, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(1, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\user_cancelled::get_code()));
-        $this->assertCount(2, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\event_cancelled::get_code()));
+        $this->assertCount(2, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(1, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
+        $this->assertCount(0, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(1, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
+        $this->assertCount(2, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\event_cancelled::get_code()]));
 
         // Run the cleanup task.
         $task = new \mod_facetoface\task\cleanup_task();
@@ -174,12 +175,12 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         $this->assertDebuggingNotCalled('Cleanup task is zealously cancelling users. Fix it!');
 
         // We should now have updated statuses for session 1.
-        $this->assertCount(1, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(2, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(1, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(2, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
         // And nothing about session 2 should have changed.
-        $this->assertCount(0, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(1, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\user_cancelled::get_code()));
-        $this->assertCount(2, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\event_cancelled::get_code()));
+        $this->assertCount(0, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(1, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
+        $this->assertCount(2, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\event_cancelled::get_code()]));
 
         // Check that room1 has been deleted.
         $rooms = $DB->get_records('facetoface_room');
@@ -242,7 +243,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
             ]
         ]);
         $seminarevent1 = new \mod_facetoface\seminar_event($session1id);
-        $seminarevent1id = $seminarevent1->get_id();
+        $helper1 = new \mod_facetoface\attendees_helper($seminarevent1);
 
         // Session 2 will be in past
         $session2id = $facetofacegenerator->add_session([
@@ -256,7 +257,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
             ]
         ]);
         $seminarevent2 = new \mod_facetoface\seminar_event($session2id);
-        $seminarevent2id = $seminarevent2->get_id();
+        $helper2 = new \mod_facetoface\attendees_helper($seminarevent2);
 
         // Session 3 will be in progress
         $session3id = $facetofacegenerator->add_session([
@@ -270,7 +271,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
             ]
         ]);
         $seminarevent3 = new \mod_facetoface\seminar_event($session3id);
-        $seminarevent3id = $seminarevent3->get_id();
+        $helper3 = new \mod_facetoface\attendees_helper($seminarevent3);
 
         // Session is waitlisted
         $session4id = $facetofacegenerator->add_session([
@@ -279,54 +280,54 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
             ]
         ]);
         $seminarevent4 = new \mod_facetoface\seminar_event($session4id);
-        $seminarevent4id = $seminarevent4->get_id();
+        $helper4 = new \mod_facetoface\attendees_helper($seminarevent4);
 
         // Sign the users up to the session 1.
         $sink = $this->redirectMessages();
-        signup_helper::signup(\mod_facetoface\signup::create($user1->id, new \mod_facetoface\seminar_event($seminarevent1id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user2->id, new \mod_facetoface\seminar_event($seminarevent1id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user3->id, new \mod_facetoface\seminar_event($seminarevent1id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user4->id, new \mod_facetoface\seminar_event($seminarevent1id))->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user1->id, $seminarevent1)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent1)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user3->id, $seminarevent1)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user4->id, $seminarevent1)->set_skipusernotification());
         $this->execute_adhoc_tasks();
         $sink->clear();
         // Confirm the signups for session 1.
-        $this->assertCount(4, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(0, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(4, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(0, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         // Sign the users up to the session 2.
         $sink = $this->redirectMessages();
-        signup_helper::signup(\mod_facetoface\signup::create($user1->id, new \mod_facetoface\seminar_event($seminarevent2id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user2->id, new \mod_facetoface\seminar_event($seminarevent2id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user3->id, new \mod_facetoface\seminar_event($seminarevent2id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user4->id, new \mod_facetoface\seminar_event($seminarevent2id))->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user1->id, $seminarevent2)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent2)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user3->id, $seminarevent2)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user4->id, $seminarevent2)->set_skipusernotification());
         $this->execute_adhoc_tasks();
         $sink->clear();
         // Confirm the signups for session 2.
-        $this->assertCount(4, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(0, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(4, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(0, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         // Sign the users up to the session 3.
         $sink = $this->redirectMessages();
-        signup_helper::signup(\mod_facetoface\signup::create($user1->id, new \mod_facetoface\seminar_event($seminarevent3id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user2->id, new \mod_facetoface\seminar_event($seminarevent3id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user3->id, new \mod_facetoface\seminar_event($seminarevent3id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user4->id, new \mod_facetoface\seminar_event($seminarevent3id))->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user1->id, $seminarevent3)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent3)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user3->id, $seminarevent3)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user4->id, $seminarevent3)->set_skipusernotification());
         $this->execute_adhoc_tasks();
         $sink->clear();
         // Confirm the signups for session 3.
-        $this->assertCount(4, facetoface_get_users_by_status($seminarevent3id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(0, facetoface_get_users_by_status($seminarevent3id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(4, $helper3->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(0, $helper3->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         // Sign the users up to the session 4.
         $sink = $this->redirectMessages();
-        signup_helper::signup(\mod_facetoface\signup::create($user1->id, new \mod_facetoface\seminar_event($seminarevent4id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user2->id, new \mod_facetoface\seminar_event($seminarevent4id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user3->id, new \mod_facetoface\seminar_event($seminarevent4id))->set_skipusernotification());
-        signup_helper::signup(\mod_facetoface\signup::create($user4->id, new \mod_facetoface\seminar_event($seminarevent4id))->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user1->id, $seminarevent4)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent4)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user3->id, $seminarevent4)->set_skipusernotification());
+        signup_helper::signup(\mod_facetoface\signup::create($user4->id, $seminarevent4)->set_skipusernotification());
         $sink->clear();
         // Confirm the signups for session 4.
-        $this->assertCount(4, facetoface_get_users_by_status($seminarevent4id, \mod_facetoface\signup\state\waitlisted::get_code()));
-        $this->assertCount(0, facetoface_get_users_by_status($seminarevent4id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(4, $helper4->get_attendees_with_codes([\mod_facetoface\signup\state\waitlisted::get_code()]));
+        $this->assertCount(0, $helper4->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         // Move dates back.
         $seminarevent = new \mod_facetoface\seminar_event($session2id);
@@ -356,22 +357,21 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         $task->execute();
 
         // Session 1 is open for booking, we should now have updated statuses for session 1.
-        $this->assertCount(3, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(1, facetoface_get_users_by_status($seminarevent1id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(3, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(1, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         // Session 2 is over, we should not have updated statuses for session 2.
-        $this->assertCount(4, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(0, facetoface_get_users_by_status($seminarevent2id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(4, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(0, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         // Session 3 in progress, we should not have updated statuses for session 3.
-        $this->assertCount(4, facetoface_get_users_by_status($seminarevent3id, \mod_facetoface\signup\state\booked::get_code()));
-        $this->assertCount(0, facetoface_get_users_by_status($seminarevent3id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(4, $helper3->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
+        $this->assertCount(0, $helper3->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         // Session 4 is waitlisted, we should now have updated statuses for session 4.
-        $this->assertCount(3, facetoface_get_users_by_status($seminarevent4id, \mod_facetoface\signup\state\waitlisted::get_code()));
-        $this->assertCount(1, facetoface_get_users_by_status($seminarevent4id, \mod_facetoface\signup\state\user_cancelled::get_code()));
+        $this->assertCount(3, $helper4->get_attendees_with_codes([\mod_facetoface\signup\state\waitlisted::get_code()]));
+        $this->assertCount(1, $helper4->get_attendees_with_codes([\mod_facetoface\signup\state\user_cancelled::get_code()]));
 
         $sink->close();
-
     }
 }

@@ -29,9 +29,8 @@ require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-use \mod_facetoface\signup;
-use mod_facetoface\signup_helper;
-use \mod_facetoface\signup\state\{booked, waitlisted, requestedadmin, declined};
+use mod_facetoface\{signup, signup_helper};
+use mod_facetoface\signup\state\{booked, waitlisted, requestedadmin, declined};
 
 /**
  * Load and validate base data
@@ -69,6 +68,8 @@ $seminar = $seminarevent->get_seminar();
 $course = $DB->get_record('course', array('id' => $seminar->get_course()));
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
+
+$helper = new \mod_facetoface\attendees_helper($seminarevent);
 
 // Allow managers to be able to approve staff without being enrolled in the course.
 require_login();
@@ -215,7 +216,7 @@ if (!$onlycontent && !$download) {
 $pix = new pix_icon('t/edit', get_string('edit'));
 if ($show_table) {
     if (!$download) {
-        $numattendees = facetoface_get_num_attendees($seminarevent->get_id());
+        $numattendees = $helper->count_attendees();
         $overbooked = ($numattendees > $seminarevent->get_capacity());
         //output the section heading
         echo $OUTPUT->heading($heading);
@@ -467,7 +468,7 @@ if ($approved == 1) {
 }
 
 echo html_writer::empty_tag('br', array('id' => 'unapproved'));
-$numattendees = facetoface_get_num_attendees($seminarevent->get_id());
+$numattendees = $helper->count_attendees();
 $numwaiting = count($requests);
 $availablespaces = $seminarevent->get_capacity() - $numattendees;
 $allowoverbook = $seminarevent->get_allowoverbook();
@@ -522,7 +523,7 @@ foreach ($requests as $attendee) {
     $data = array();
     $attendee_link = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $course->id));
     $data[] = html_writer::link($attendee_link, format_string(fullname($attendee)));
-    $data[] = userdate($attendee->timerequested, get_string('strftimedatetime'));
+    $data[] = userdate($attendee->timecreated, get_string('strftimedatetime'));
 
     $icon = '';
     if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
@@ -532,7 +533,7 @@ foreach ($requests as $attendee) {
     if ($includeattendeesnote) {
         // Get signup note.
         $signupstatus = new stdClass();
-        $signupstatus->id = $attendee->signupid;
+        $signupstatus->id = $attendee->submissionid;
         $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
         // Currently it is possible to delete signupnote custom field easly so we must check if cf is exists.
         $signupnotetext = isset($signupnote['signupnote']) ? $signupnote['signupnote'] : '';
@@ -561,7 +562,7 @@ foreach ($requests as $attendee) {
                     break;
                 case \mod_facetoface\signup\state\requestedadmin::get_code():
                     $state = get_string('approved', 'mod_facetoface');
-                    $time = userdate($attendee->timerequested);
+                    $time = userdate($attendee->timecreated);
                     break;
                 default:
                     print_error('error:invalidstatus', 'mod_facetoface');

@@ -45,6 +45,8 @@ require_capability('mod/facetoface:takeattendance', $context);
 require_sesskey();
 
 $result = array('result' => 'failure', 'content' => '');
+$helper = new \mod_facetoface\attendees_helper($seminarevent);
+
 switch($action) {
     case 'confirmattendees':
         $result = \mod_facetoface\signup_helper::confirm_waitlist($seminarevent, $data);
@@ -57,7 +59,8 @@ switch($action) {
         $result = \mod_facetoface\signup_helper::confirm_waitlist_randomly($seminarevent, $data);
         break;
     case 'checkcapacity':
-        $signupcount = facetoface_get_num_attendees($seminarevent->get_id());
+        $signupcount = $helper->count_attendees();
+
         if (($signupcount + count($data)) > $seminarevent->get_capacity()) {
             $result['result'] = 'overcapacity';
         } else {
@@ -67,6 +70,13 @@ switch($action) {
         die();
         break;
 }
-$attendees = facetoface_get_attendees($sessionid, $status = array(\mod_facetoface\signup\state\booked::get_code(), \mod_facetoface\signup\state\user_cancelled::get_code()));
+
+$attendees = $helper->get_attendees_with_codes(
+    [
+        \mod_facetoface\signup\state\booked::get_code(),
+        \mod_facetoface\signup\state\user_cancelled::get_code()
+    ]
+);
+
 $result['attendees'] = array_keys($attendees);
 echo json_encode($result);

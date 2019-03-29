@@ -383,7 +383,23 @@ final class signup_helper {
             return;
         }
 
-        $users = facetoface_get_attendees($seminarevent->get_id(), [booked::get_code(), waitlisted::get_code()], true);
+        $helper = new attendees_helper($seminarevent);
+
+        // Just need the list of attendees without associated user id at array key.
+        $users = array_values($helper->get_attendees_with_codes([booked::get_code(), waitlisted::get_code()]));
+        $reservedusers = $helper->get_reservations();
+
+        // We need to add reservation into this list too, because the seminar event is being udpated, and reservation
+        // without the attendee to fill up the space need to be udpated as well.
+        foreach ($reservedusers as $reserveduser) {
+            if ($reserveduser->has_bookedby() && !$reserveduser->is_valid()) {
+                // We only want the free space reservation, those reservation that had filled up would probably
+                // already included in the list of attendees_with_codes.
+                $users[] = $reserveduser;
+                continue;
+            }
+        }
+
         \core_collator::asort_objects_by_property($users, 'timesignedup', \core_collator::SORT_NUMERIC);
 
         if ($users) {
@@ -503,8 +519,8 @@ final class signup_helper {
      * @return array $result success|failure
      */
     public static function confirm_waitlist_randomly(\mod_facetoface\seminar_event $seminarevent, $userids) {
-
-        $signupcount  = facetoface_get_num_attendees($seminarevent->get_id());
+        $helper = new attendees_helper($seminarevent);
+        $signupcount = $helper->count_attendees();
         $numtoconfirm = $seminarevent->get_capacity() - $signupcount;
 
         if (count($userids) <= $seminarevent->get_capacity()) {

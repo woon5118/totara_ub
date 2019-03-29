@@ -44,9 +44,19 @@ $PAGE->set_url($url);
 require_login($course, true, $cm);
 require_capability('mod/facetoface:manageattendeesnote', $context);
 
-$attendeenote = facetoface_get_attendee($sessionid, $userid);
-$attendeenote->userid = $attendeenote->id;
-$attendeenote->id = $attendeenote->submissionid;
+$seminarevent = new \mod_facetoface\seminar_event($sessionid);
+$signup = \mod_facetoface\signup::create($userid, $seminarevent);
+
+if (!$signup->exists()) {
+    throw new coding_exception(
+        "No user with ID: {$USER->id} has signed-up for the Seminar event ID: {$seminarevent->get_id()}."
+    );
+}
+
+$attendeenote = new stdClass();
+$attendeenote->userid = $signup->get_userid();
+$attendeenote->id = $signup->get_id();
+$attendeenote->sessionid = $sessionid;
 $attendeenote->sessionid = $sessionid;
 customfield_load_data($attendeenote, 'facetofacesignup', 'facetoface_signup');
 $params = [

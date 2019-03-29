@@ -166,18 +166,19 @@ class mod_facetoface_events_testcase extends advanced_testcase {
         // Create some records (it is not correct signup sequence).
         $signup = \mod_facetoface\signup::create($user1->id, new \mod_facetoface\seminar_event($this->session->id))->save();
         \mod_facetoface\signup_status::create($signup, new \mod_facetoface\signup\state\booked($signup))->save();
-        $attendee_note = facetoface_get_attendee($this->session->id, $user1->id);
-        $attendee_note->userid = $attendee_note->id;
-        $attendee_note->id = $attendee_note->submissionid;
-        $attendee_note->sessionid = $this->session->id;
 
-        $event = \mod_facetoface\event\attendee_note_updated::create_from_instance($attendee_note, $this->context);
+        $attendeenote = new \stdClass();
+        $attendeenote->userid = $signup->get_userid();
+        $attendeenote->id = $signup->get_id();
+        $attendeenote->sessionid = $this->session->id;
+
+        $event = \mod_facetoface\event\attendee_note_updated::create_from_instance($attendeenote, $this->context);
         $event->trigger();
         $data = $event->get_data();
 
         $this->assertEquals($this->context, $event->get_context());
-        $this->assertSame($attendee_note, $event->get_instance());
-        $this->assertSame($attendee_note->id, $event->objectid);
+        $this->assertSame($attendeenote, $event->get_instance());
+        $this->assertSame($attendeenote->id, $event->objectid);
         $this->assertSame('u', $data['crud']);
         $this->assertEventContextNotUsed($event);
         $this->assertEventLegacyLogData(array($this->course->id, 'facetoface', 'update attendee note',

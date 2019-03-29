@@ -56,7 +56,7 @@ abstract class state {
 
     /**
      * All signup state classes
-     * return string[]
+     * @return string[]
      */
     final public static function get_all_states() : array {
         $classes = \core_component::get_namespace_classes(

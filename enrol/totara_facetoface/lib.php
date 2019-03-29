@@ -27,9 +27,22 @@
  */
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-use mod_facetoface\seminar_event;
-use mod_facetoface\signup;
-use mod_facetoface\signup_helper;
+use mod_facetoface\{
+    seminar_event,
+    signup,
+    signup_helper,
+    seminar,
+    signup_list,
+    attendees_helper
+};
+use mod_facetoface\signup\state\{
+    attendance_state,
+    booked,
+    requestedadmin,
+    requested,
+    requestedrole,
+    waitlisted
+};
 
 class enrol_totara_facetoface_plugin extends enrol_plugin {
 
@@ -259,24 +272,37 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         $seminarevent = new seminar_event($session->id);
         $seminar = $seminarevent->get_seminar();
 
-        // If multiple sessions are allowed then just check against this session.
-        // Otherwise check against all sessions.
-        $multisessionid = ($seminar->get_multiplesessions() ? $seminarevent->get_id() : null);
         $context = context_course::instance($course->id);
         $managers = \totara_job\job_assignment::get_all_manager_userids($USER->id);
 
         if (!$seminarevent->has_capacity($context) && (!$seminarevent->get_allowoverbook())) {
             return array('result' => false, 'message' => get_string('sessionisfull', 'facetoface'));
-        } else if (facetoface_get_user_submissions(
-            $facetoface->id,
-            $USER->id,
-            \mod_facetoface\signup\state\requested::get_code(),
-            \mod_facetoface\signup\state\fully_attended::get_code(),
-            $multisessionid)
-        ) {
-            return array('result' => true, 'message' => get_string('alreadysignedup', 'facetoface'));
-        } else if ($seminar->is_manager_required() && empty($managers)) {
-            return array('result' => false, 'message' => get_string('error:manageremailaddressmissing', 'facetoface'));
+        } else {
+            $default = [
+                'result' => true,
+                'message' => get_string('alreadysignedup', 'facetoface'),
+            ];
+
+            if ($seminar->get_multiplesessions()) {
+                // If multiple sessions are allowed then just check the signup against this session.
+                // Otherwise check against all sessions.
+                $signup = signup::create($USER->id, $seminarevent);
+                if ($signup->is_active()) {
+                    return $default;
+                }
+            } else {
+                $signups = signup_list::user_active_signups_within_seminar($USER->id, $seminar->get_id());
+                if (!$signups->is_empty()) {
+                    return $default;
+                }
+            }
+
+            if ($seminar->is_manager_required() && empty($managers)) {
+                return [
+                    'result' => false,
+                    'message' => get_string('error:manageremailaddressmissing', 'facetoface'),
+                ];
+            }
         }
 
         $signup = signup::create($USER->id, $seminarevent, $notificationtype);
@@ -1131,17 +1157,28 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         }
 
         $managers = \totara_job\job_assignment::get_all_manager_userids($USER->id);
+        $statuscodes = attendance_state::get_all_attendance_code_with(
+            [
+                requested::class,
+                requestedrole::class,
+                requestedadmin::class,
+                waitlisted::class,
+                booked::class,
+            ]
+        );
 
         foreach ($sessions as $session) {
-            $seminar = new \mod_facetoface\seminar($session->f2fid);
-            $session->signupcount = facetoface_get_num_attendees($session->id, \mod_facetoface\signup\state\requested::get_code());
-
             $seminarevent = new seminar_event($session->id);
+            $seminar = $seminarevent->get_seminar();
+            $helper = new attendees_helper($seminarevent);
+
+            $session->signupcount = $helper->count_attendees_with_codes($statuscodes);
+
             if (!empty($session->sessiondates) && $seminarevent->is_started($timenow)) {
                 continue;
             }
 
-            $hascapacity = $session->signupcount < $session->capacity;
+            $hascapacity = $session->signupcount < $seminarevent->get_capacity();
 
             $cm = get_coursemodule_from_instance('facetoface', $session->facetoface);
             $context = context_module::instance($cm->id);
@@ -1149,7 +1186,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             $canforceoverbook = has_any_capability($capabilitiesthatcanoverbook, $context, $user);
 
             // If there is no capacity, waitlist and user can't override capacity continue.
-            if (!$hascapacity && !$session->allowoverbook && !$canforceoverbook) {
+            if (!$hascapacity && !$seminarevent->get_allowoverbook() && !$canforceoverbook) {
                 continue;
             }
             if (!$ignoreapprovals && $seminar->is_manager_required() && empty($managers)) {
@@ -1157,8 +1194,8 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 continue;
             }
 
-            if (!empty($session->sessiondates)) {
-                $session->timestartsort = $session->sessiondates[0]->timestart;
+            if ($seminarevent->is_sessions()) {
+                $session->timestartsort = $seminarevent->get_sessions()->get_first()->get_timestart();
             } else {
                 // If datetime is unknown make timestartsort in the future and store at the end of the records.
                 $session->timestartsort = PHP_INT_MAX;
@@ -1416,14 +1453,14 @@ function enrol_totara_facetoface_find_best_session($totara_facetoface, $facetofa
  */
 function enrol_totara_facetoface_get_sessions_to_autoenrol($totara_facetoface, $course, $facetofaces, $user = null) {
     global $USER;
-    $sessions = array();
+    $sessions = [];
 
     if ($user == null) {
         $user = $USER;
     }
 
     $autosessions = $totara_facetoface->get_enrolable_sessions($course->id, $user, null, true);
-    $sessionstochoosefrom = array();
+    $sessionstochoosefrom = [];
 
     // Move the sessions into an array grouped by face to face id.
     foreach ($autosessions as $session) {
@@ -1433,13 +1470,18 @@ function enrol_totara_facetoface_get_sessions_to_autoenrol($totara_facetoface, $
     foreach ($sessionstochoosefrom as $facetofaceid => $facetofacesessions) {
         $facetoface = $facetofaces[$facetofaceid];
 
-        $submissions = facetoface_get_user_submissions($facetofaceid, $user->id, \mod_facetoface\signup\state\requested::get_code());
+        $seminar = new seminar();
+        $seminar->map_instance($facetoface);
 
-        // Signup to all sessions from a f2f with multiplesessions true that they haven't signed up to.
-        if ($facetofaces[$facetofaceid]->multiplesessions) {
-            $submissionsbysession = array();
-            foreach ($submissions as $submission) {
-                $submissionsbysession[$submission->sessionid] = $submission;
+        $signups = signup_list::user_active_signups_within_seminar($user->id, $seminar->get_id());
+
+        // Signup to all sessions from a f2f with multiplesessions, true that they haven't signed up to.
+        if ($seminar->get_multiplesessions()) {
+            $submissionsbysession = [];
+
+            /** @var signup $signup */
+            foreach ($signups as $signup) {
+                $submissionsbysession[$signup->get_sessionid()] = $signup->to_record();
             }
 
             foreach ($facetofacesessions as $session) {
@@ -1450,7 +1492,8 @@ function enrol_totara_facetoface_get_sessions_to_autoenrol($totara_facetoface, $
             continue;
         }
 
-        if ($submissions) { // If the user has already signed for a session on this f2f then skip it.
+        if (!$signups->is_empty()) {
+            // If the user has already signed for a session on this f2f then skip it.
             continue;
         }
 

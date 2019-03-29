@@ -2,6 +2,8 @@ This files describes API changes in /mod/facetoface/*,
 information provided here is intended especially for developers.
 
 === 13.0 ===
+
+* signup_status::get_state() has been deprecated, please use signup::get_state()
 * attendees_helper::show_customfields() function has been deprecated, please use mod_facetoface_renderer::render_seminar_event()
 * signup_status::get_state() function has been deprecated, please use signup::get_state()
 * attendees_list_helper::get_status() function has been deprecated, please use attendees_helper::get_status()
@@ -94,6 +96,14 @@ information provided here is intended especially for developers.
 * facetoface_has_session_started() function has been deprecated, please use \mod_facetoface\seminar_event::is_started()
 * facetoface_is_session_over() function has been deprecated, please use \mod_facetoface\seminar_event::is_over()
 * facetoface_get_session_dates() function has been deprecated, please use \mod_facetoface\seminar_event::get_sessions() + \mod_facetoface\seminar_event_list::sort()
+* facetoface_get_attendee() function has been deprecated, please use \mod_facetoface\signup::create() instead
+* facetoface_get_requests() function has been deprecated, please use \mod_facetoface\attendees_helper::get_attendees_in_requested() instead
+* facetoface_get_adminrequests() function has been deprecated, please use \mod_facetoface\attendees_helper::get_attendees_in_admin_requested() instead
+* facetoface_get_users_by_status() function has been deprecated, please use \mod_facetoface\attendees_helper::get_attendees_with_codes() instead
+* facetoface_get_cancellations() function has been deprecated, please use \mod_facetoface\attendees_helper::get_attendees_in_cancellation() instead
+* facetoface_get_num_attendees() function has been deprecated, please use \mod_facetoface\attendees_helper::count_attendees_with_codes() instead
+* facetoface_get_user_submissions() function has been deprecated, please use \mod_facetoface\signup_list class instead
+* facetoface_get_attendees() function has been deprecated, please use \mod_facetoface\attendees_helper::get_attendees_with_codes() instead
 
 === 12.0 ===
 
