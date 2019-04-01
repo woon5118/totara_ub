@@ -154,11 +154,11 @@ final class attendees_helper {
      * @param seminar $seminar
      * @param seminar_event $seminarevent
      * @param $context
-     * @param $session
+     * @param $session - deprecated, do not use
      * @return array
      */
     public static function get_allowed_available_actions(\mod_facetoface\seminar $seminar,
-        \mod_facetoface\seminar_event $seminarevent, $context, $session) {
+        \mod_facetoface\seminar_event $seminarevent, $context, $session = null) {
         global $USER, $DB, $CFG;
         /**
          * Capability checks to see if the current user can view this page
@@ -370,14 +370,14 @@ final class attendees_helper {
         // If this is true then we need to show attendees but limit it to just those attendees that are also staff.
         if (!in_array('attendees', $allowed_actions) && !empty($staff)) {
             // Check if any staff are attending.
-            if ($session->mintimestart) {
+            if ($seminarevent->get_mintimestart()) {
                 $get_attendees = facetoface_get_attendees(
-                    $session->id,
+                    $seminarevent->get_id(),
                     \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with([ booked::class ])
                 );
             } else {
                 $get_attendees = facetoface_get_attendees(
-                    $session->id,
+                    $seminarevent->get_id(),
                     \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with([ waitlisted::class, booked::class ])
                 );
             }

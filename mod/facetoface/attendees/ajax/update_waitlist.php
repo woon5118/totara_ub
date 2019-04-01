@@ -34,14 +34,17 @@ $data = required_param('datasubmission', PARAM_SEQUENCE);
 
 $data = explode(',', $data);
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($sessionid);
+$seminarevent = new \mod_facetoface\seminar_event($sessionid);
+$seminar = $seminarevent->get_seminar();
+$cm = $seminar->get_coursemodule();
+$context = context_module::instance($cm->id);
+
 // Check essential permissions.
-require_course_login($course, true, $cm);
+require_course_login($seminar->get_course(), true, $cm);
 require_capability('mod/facetoface:takeattendance', $context);
 require_sesskey();
 
 $result = array('result' => 'failure', 'content' => '');
-$seminarevent = new \mod_facetoface\seminar_event($sessionid);
 switch($action) {
     case 'confirmattendees':
         $result = \mod_facetoface\signup_helper::confirm_waitlist($seminarevent, $data);

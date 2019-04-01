@@ -45,10 +45,12 @@ if (count($datetimefinish) != $cntdates) {
     print_error('error:mismatchdatesdetected', 'facetoface');
 }
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
+$seminar = (new \mod_facetoface\seminar_event($s))->get_seminar();
+$cm = $seminar->get_coursemodule();
+$context = context_module::instance($cm->id);
 
 // Check essential permissions.
-require_course_login($course, true, $cm);
+require_course_login($seminar->get_course(), true, $cm);
 // Check if the user can see this information.
 require_capability('mod/facetoface:addattendees', $context);
 

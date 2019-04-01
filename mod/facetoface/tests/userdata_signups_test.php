@@ -78,19 +78,19 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->getDataGenerator()->enrol_user($student2->id, $course->id);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1);
+        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
 
         $signupcustomfieldids = [];
         $signupcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'signup', 3, 1);
 
-        $f2fgenerator->create_cancellation($student1, $session1);
+        $f2fgenerator->create_cancellation($student1, $session1->seminarevent);
 
         $cancellationcustomfieldids = [];
         $cancellationcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 1, 3);
 
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2);
+        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
+        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
+        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
 
         $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
         $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
@@ -102,7 +102,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signupcustomfieldids[21] = $f2fgenerator->create_customfield_data($signups[21], 'signup', 4, 1);
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 1, 4);
 
-        $f2fgenerator->create_cancellation($student2, $session2);
+        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
         $cancellationcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'cancellation', 3, 1);
 
         $f2fgenerator->create_file_customfield($signups[11], 'signup', 'testfile1.txt', 1);
@@ -202,10 +202,10 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->getDataGenerator()->enrol_user($student2->id, $course->id);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1);
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2);
+        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
+        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
+        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
+        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
 
         $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
         $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
@@ -223,8 +223,8 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signupcustomfieldids[21] = $f2fgenerator->create_customfield_data($signups[21], 'signup', 4, 1);
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 1, 4);
 
-        $f2fgenerator->create_cancellation($student1, $session1);
-        $f2fgenerator->create_cancellation($student2, $session2);
+        $f2fgenerator->create_cancellation($student1, $session1->seminarevent);
+        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
 
         $cancellationcustomfieldids = [];
         $cancellationcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 1, 3);
@@ -318,12 +318,12 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $session3 = $f2fgenerator->create_session_for_course($course2, 3);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1);
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2);
-        $signups[13] = $f2fgenerator->create_signup($student1, $session3);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2);
-        $signups[23] = $f2fgenerator->create_signup($student2, $session3);
+        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
+        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
+        $signups[13] = $f2fgenerator->create_signup($student1, $session3->seminarevent);
+        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
+        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
+        $signups[23] = $f2fgenerator->create_signup($student2, $session3->seminarevent);
 
         $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
         $f2fgenerator->add_session_status($signups[12]->id, $session2->sessiondates[0]->id);
@@ -344,8 +344,8 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 1, 4);
         $signupcustomfieldids[23] = $f2fgenerator->create_customfield_data($signups[23], 'signup', 5, 2);
 
-        $f2fgenerator->create_cancellation($student1, $session1);
-        $f2fgenerator->create_cancellation($student2, $session2);
+        $f2fgenerator->create_cancellation($student1, $session1->seminarevent);
+        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
 
         $cancellationcustomfieldids = [];
         $cancellationcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 1, 3);
@@ -454,12 +454,12 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $session3 = $f2fgenerator->create_session_for_course($course3, 3);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1);
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2);
-        $signups[13] = $f2fgenerator->create_signup($student1, $session3);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2);
-        $signups[23] = $f2fgenerator->create_signup($student2, $session3);
+        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
+        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
+        $signups[13] = $f2fgenerator->create_signup($student1, $session3->seminarevent);
+        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
+        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
+        $signups[23] = $f2fgenerator->create_signup($student2, $session3->seminarevent);
 
 
         $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
@@ -481,8 +481,8 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 1, 4);
         $signupcustomfieldids[23] = $f2fgenerator->create_customfield_data($signups[23], 'signup', 5, 2);
 
-        $f2fgenerator->create_cancellation($student1, $session2);
-        $f2fgenerator->create_cancellation($student2, $session2);
+        $f2fgenerator->create_cancellation($student1, $session2->seminarevent);
+        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
 
         $cancellationcustomfieldids = [];
         $cancellationcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[12], 'cancellation', 1, 3);
@@ -653,13 +653,13 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $session3 = $f2fgenerator->create_session_for_course($course2, 3);
         $session4 = $f2fgenerator->create_session_for_course($course3, 4);
 
-        $f2fgenerator->create_signup($student1, $session1);
-        $f2fgenerator->create_signup($student1, $session2);
-        $f2fgenerator->create_signup($student1, $session3);
-        $f2fgenerator->create_signup($student1, $session4);
-        $f2fgenerator->create_signup($student2, $session1);
-        $f2fgenerator->create_signup($student2, $session2);
-        $f2fgenerator->create_signup($student2, $session3);
+        $f2fgenerator->create_signup($student1, $session1->seminarevent);
+        $f2fgenerator->create_signup($student1, $session2->seminarevent);
+        $f2fgenerator->create_signup($student1, $session3->seminarevent);
+        $f2fgenerator->create_signup($student1, $session4->seminarevent);
+        $f2fgenerator->create_signup($student2, $session1->seminarevent);
+        $f2fgenerator->create_signup($student2, $session2->seminarevent);
+        $f2fgenerator->create_signup($student2, $session3->seminarevent);
 
         $emailsink = $this->redirectMessages();
         $this->execute_adhoc_tasks();
@@ -732,13 +732,13 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $session3 = $f2fgenerator->create_session_for_course($course2, 3);
         $session4 = $f2fgenerator->create_session_for_course($course3, 4);
 
-        $f2fgenerator->create_signup($student1, $session1);
-        $f2fgenerator->create_signup($student1, $session2);
-        $f2fgenerator->create_signup($student1, $session3);
-        $f2fgenerator->create_signup($student1, $session4);
-        $f2fgenerator->create_signup($student2, $session1);
-        $f2fgenerator->create_signup($student2, $session2);
-        $f2fgenerator->create_signup($student2, $session3);
+        $f2fgenerator->create_signup($student1, $session1->seminarevent);
+        $f2fgenerator->create_signup($student1, $session2->seminarevent);
+        $f2fgenerator->create_signup($student1, $session3->seminarevent);
+        $f2fgenerator->create_signup($student1, $session4->seminarevent);
+        $f2fgenerator->create_signup($student2, $session1->seminarevent);
+        $f2fgenerator->create_signup($student2, $session2->seminarevent);
+        $f2fgenerator->create_signup($student2, $session3->seminarevent);
 
         $emailsink = $this->redirectMessages();
         $this->execute_adhoc_tasks();

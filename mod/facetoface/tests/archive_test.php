@@ -130,8 +130,6 @@ class mod_facetoface_archive_testcase extends advanced_testcase {
         $seminarevent->save();
         facetoface_save_dates($seminarevent->to_record(), array($sessdate));
 
-        $sessid = $seminarevent->get_id();
-        $session = facetoface_get_session($sessid); // Reload to get the correct dates + id;
         $this->assertEquals(1, $DB->count_records('facetoface_sessions'));
 
         // Enrol user on course.
@@ -148,7 +146,7 @@ class mod_facetoface_archive_testcase extends advanced_testcase {
 
         // Signup the user to the session.
         $this->assertEquals(0, $DB->count_records('facetoface_signups'));
-        \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user->id, new \mod_facetoface\seminar_event($session->id))->set_skipusernotification());
+        \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user->id, $seminarevent)->set_skipusernotification());
         $this->assertEquals(1, $DB->count_records('facetoface_signups'));
 
         $sessdate->timestart = time() - (7 * DAYSECS);

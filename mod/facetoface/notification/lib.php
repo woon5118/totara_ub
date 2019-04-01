@@ -772,7 +772,10 @@ class facetoface_notification extends data_object {
 
         // Load session object
         if (empty($this->_sessions[$sessionid])) {
-            $this->_sessions[$sessionid] = facetoface_get_session($sessionid);
+            // work-around until facetoface_get_session_dates gets replaced
+            $session = (new \mod_facetoface\seminar_event($sessionid))->to_record();
+            $session->sessiondates = facetoface_get_session_dates($sessionid);
+            $this->_sessions[$sessionid] = $session;
         }
         $this->_sessions[$sessionid]->course = $this->_facetoface->course;
         if (!empty($sessiondate)) {

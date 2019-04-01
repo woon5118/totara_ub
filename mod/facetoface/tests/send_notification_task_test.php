@@ -50,14 +50,13 @@ class mod_facetoface_send_notification_task_testcase extends mod_facetoface_face
         global $DB;
         $this->resetAfterTest();
         $seed = $this->seed_data();
-        $seminarevent = new \mod_facetoface\seminar_event($seed['session']->id);
 
         $sink = $this->redirectEmails();
         $cron = new \mod_facetoface\task\send_notifications_task();
         $cron->testing = true;
 
         // Signup, and clear automated message (booking confirmation).
-        $signup = \mod_facetoface\signup::create($seed['users'][0]->id, $seminarevent);
+        $signup = \mod_facetoface\signup::create($seed['users'][0]->id, $seed['seminarevent']);
         \mod_facetoface\signup_helper::signup($signup);
         $cron->execute();
         $this->execute_adhoc_tasks();
@@ -97,14 +96,13 @@ class mod_facetoface_send_notification_task_testcase extends mod_facetoface_face
         global $DB;
         $this->resetAfterTest();
         $seed = $this->seed_data();
-        $seminarevent = new \mod_facetoface\seminar_event($seed['session']->id);
 
         $sink = $this->redirectEmails();
         $cron = new \mod_facetoface\task\send_notifications_task();
         $cron->testing = true;
 
         // Signup, and clear automated message (booking confirmation).
-        $signup = \mod_facetoface\signup::create($seed['users'][0]->id, $seminarevent);
+        $signup = \mod_facetoface\signup::create($seed['users'][0]->id, $seed['seminarevent']);
         \mod_facetoface\signup_helper::signup($signup);
 
         // Move it back in time a bit.
@@ -158,7 +156,7 @@ class mod_facetoface_send_notification_task_testcase extends mod_facetoface_face
         // Add user to session with role that will receive expiring notification
         $sessrole = new stdClass();
         $sessrole->roleid = $teacherrole->id;
-        $sessrole->sessionid = $seed['session']->id;
+        $sessrole->sessionid = $seed['seminarevent']->get_id();
         $sessrole->userid = $seed['users'][0]->id;
         $DB->insert_record('facetoface_session_roles', $sessrole);
 
@@ -167,7 +165,7 @@ class mod_facetoface_send_notification_task_testcase extends mod_facetoface_face
         // Set last cron run timestamp before registration expired.
         $conditions = array('component' => 'mod_facetoface', 'classname' => '\mod_facetoface\task\send_notifications_task');
         $DB->set_field('task_scheduled', 'lastruntime', $time-100, $conditions);
-        $DB->set_field('facetoface_sessions', 'registrationtimefinish', $time-50, ['id' => $seed['session']->id]);
+        $DB->set_field('facetoface_sessions', 'registrationtimefinish', $time-50, ['id' => $seed['seminarevent']->get_id()]);
 
         $notificationrec = $DB->get_record('facetoface_notification', ['conditiontype'=> MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED]);
         $notificationrec->title = 'TEST';
@@ -201,10 +199,9 @@ class mod_facetoface_send_notification_task_testcase extends mod_facetoface_face
 
         $seed = $this->seed_data();
 
-        $seminarevent = new \mod_facetoface\seminar_event($seed['session']->id);
-        \mod_facetoface\reservations::add($seminarevent, $seed['users'][0]->id, 1, 0);
+        \mod_facetoface\reservations::add($seed['seminarevent'], $seed['users'][0]->id, 1, 0);
 
-        $DB->set_field('facetoface', 'reservecanceldays', 2, ['id' => $seed['session']->facetoface]);
+        $DB->set_field('facetoface', 'reservecanceldays', 2, ['id' => $seed['seminarevent']->get_facetoface()]);
 
         $notificationrec = $DB->get_record('facetoface_notification', ['conditiontype'=> MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED]);
         $notificationrec->title = 'TEST';
@@ -268,7 +265,7 @@ class mod_facetoface_send_notification_task_testcase extends mod_facetoface_face
 
         return [
             'course' => $course1,
-            'session' => facetoface_get_session($sessionid),
+            'seminarevent' => new \mod_facetoface\seminar_event($sessionid),
             'users' => [$student1, $student2, $student3]
         ];
     }

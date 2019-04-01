@@ -156,10 +156,12 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $sessiondata->sessiondates = array($sessiondate);
 
         $sessionid = $this->facetoface_generator->add_session($sessiondata);
-        $session = facetoface_get_session($sessionid);
+        $seminarevent = new seminar_event($sessionid);
+        $session = $seminarevent->to_record();
+        $session->sessiondates = facetoface_get_session_dates($sessionid);
 
         // First of all with minimal set to true. Meaning get_regdates_tooltip_info is called.
-        $returnedoutput = $renderer->print_session_list_table(array($session), false, false, $displaytimezones, array(), null, true);
+        $returnedoutput = $renderer->print_session_list_table([ $session ], false, false, $displaytimezones, array(), null, true);
 
         // The Sign-up period open date will always been first in the string, so we can check that it will indeed
         // be part of a a title attribute.
@@ -298,11 +300,11 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      *
      * @param integer $numusers
      * @param seminar $seminar
-     * @param stdClass $session
+     * @param seminar_event $seminarevent
      * @param string|null $stateclass
      * @return array [ user_id => \mod_facetoface\signup ]
      */
-    private function create_users_signups(int $numusers, seminar $seminar, \stdClass $session, $stateclass = null) : array {
+    private function create_users_signups(int $numusers, seminar $seminar, seminar_event $seminarevent, $stateclass = null) : array {
         global $DB;
 
         $generator = $this->getDataGenerator();
@@ -311,7 +313,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
             $user = $generator->create_user();
             $generator->enrol_user($user->id, $seminar->get_course());
 
-            $signup = signup::create($user->id, new seminar_event($session->id));
+            $signup = signup::create($user->id, $seminarevent);
 
             signup_helper::signup($signup);
 
@@ -409,7 +411,9 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $renderer = $this->create_f2f_renderer();
 
         [ $seminarid, $sessionid, $roomid ] = $this->create_seminar_session_and_room(null, $cancelled, $sessionattendance, 0);
-        $session = facetoface_get_session($sessionid);
+        $seminarevent = new seminar_event($sessionid);
+        $session = $seminarevent->to_record();
+        $session->sessiondates = facetoface_get_session_dates($sessionid);
 
         $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, 0);
         $cells = $this->get_table_cells($outhtml, $sessionattendance);
@@ -454,7 +458,9 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $attendancetime = seminar::ATTENDANCE_TIME_ANY;
         [ $seminarid, $sessionid, $roomid ] = $this->create_seminar_session_and_room($startdate, $cancelled, $sessionattendance, $attendancetime);
 
-        $session = facetoface_get_session($sessionid);
+        $seminarevent = new seminar_event($sessionid);
+        $session = $seminarevent->to_record();
+        $session->sessiondates = facetoface_get_session_dates($sessionid);
 
         $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, $attendancetime);
         $cells = $this->get_table_cells($outhtml, $sessionattendance);
@@ -502,7 +508,9 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $sessionattendance = true;
         [ $seminarid, $sessionid, $roomid ] = $this->create_seminar_session_and_room($startdate, $cancelled, $sessionattendance, $attendancetime);
 
-        $session = facetoface_get_session($sessionid);
+        $seminarevent = new seminar_event($sessionid);
+        $session = $seminarevent->to_record();
+        $session->sessiondates = facetoface_get_session_dates($sessionid);
         $this->assertCount(1, $session->sessiondates);
 
         $now = time();
@@ -580,7 +588,9 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         [ $seminarid, $sessionid, $roomid ] = $this->create_seminar_session_and_room($startdate, false, $sessionattendance, $attendancetime);
 
         $seminar = new seminar($seminarid);
-        $session = facetoface_get_session($sessionid);
+        $seminarevent = new seminar_event($sessionid);
+        $session = $seminarevent->to_record();
+        $session->sessiondates = facetoface_get_session_dates($sessionid);
         $this->assertCount(1, $session->sessiondates);
 
         $now = time();
@@ -589,9 +599,9 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         if ($can_signup) {
             $helper = new \mod_facetoface\attendance\attendance_helper();
 
-            $usersignups = $this->create_users_signups(2, $seminar, $session, \mod_facetoface\signup\state\booked::class);
+            $usersignups = $this->create_users_signups(2, $seminar, $seminarevent, \mod_facetoface\signup\state\booked::class);
 
-            $before = $helper->get_attendees($session->id, $session->sessiondates[0]->id);
+            $before = $helper->get_attendees($seminarevent->get_id(), $session->sessiondates[0]->id);
             $this->assertCount(2, $before);
 
             $before_db = $DB->get_records_sql('SELECT * FROM {facetoface_signups_dates_status} WHERE sessiondateid = ?', [ $session->sessiondates[0]->id ]);
@@ -599,7 +609,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
             $this->assertTrue($this->take_session_attendance($usersignups, $users, $session->sessiondates[0]->id, $process_all_attendees));
 
-            $after = $helper->get_attendees($session->id, $session->sessiondates[0]->id);
+            $after = $helper->get_attendees($seminarevent->get_id(), $session->sessiondates[0]->id);
             $this->assertCount(2, $after);
 
             $after_db = $DB->get_records_sql('SELECT * FROM {facetoface_signups_dates_status} WHERE sessiondateid = ?', [ $session->sessiondates[0]->id ]);

@@ -52,10 +52,11 @@ $currenturl = new moodle_url('/mod/facetoface/room/ajax/sessiondates.php', $para
 $params['sessionid'] = 0;
 if ($sessiondateid) {
     $sessionid = $DB->get_field('facetoface_sessions_dates', 'sessionid', array('id' => $sessiondateid));
-    if (!$sessionid || !$session = facetoface_get_session($sessionid)) {
+    $seminarevent = \mod_facetoface\seminar_event::find($sessionid);
+    if (!$seminarevent->exists()) {
         print_error('error:incorrectcoursemodulesession', 'facetoface');
     }
-    if ($session->facetoface != $facetoface->id) {
+    if ($seminarevent->get_facetoface() != $facetoface->id) {
         print_error('error:incorrectcoursemodulesession', 'facetoface');
     }
     $currenturl->param('sessiondateid', $sessiondateid);

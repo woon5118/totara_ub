@@ -63,9 +63,12 @@ if (!$s) {
     exit;
 }
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
-$seminarevent = new seminar_event($s);
-$seminar = new seminar($seminarevent->get_facetoface());
+$seminarevent = new \mod_facetoface\seminar_event($s);
+$seminar = $seminarevent->get_seminar();
+$course = $DB->get_record('course', array('id' => $seminar->get_course()));
+$cm = $seminar->get_coursemodule();
+$context = context_module::instance($cm->id);
+$session = (object)['id' => $seminarevent->get_id()];
 
 require_login($course, false, $cm);
 /**
@@ -88,7 +91,7 @@ $PAGE->set_url($baseurl);
     $cancellations,
     $requests,
     $attendees
-] = \mod_facetoface\attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context, $session);
+] = \mod_facetoface\attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context);
 $includeattendeesnote = (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context));
 
 $can_view_session = !empty($allowed_actions);

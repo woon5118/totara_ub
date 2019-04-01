@@ -74,8 +74,7 @@ if (!$managerid || $managerid == $USER->id) { // Can only reserve for other user
 } else {
     $manager = $DB->get_record('user', array('id' => $managerid), '*', MUST_EXIST);
 }
-$session = facetoface_get_session($seminarevent->get_id());
-$reserveinfo = reservations::can_reserve_or_allocate($seminar, array($session), $context, $manager->id);
+$reserveinfo = reservations::can_reserve_or_allocate($seminar, array($seminarevent->to_record()), $context, $manager->id);
 if ($reserveinfo['reserve'] === false) { // Current user does not have permission to do the requested action for themselves.
     if (empty($reserveinfo['reserveother'])) { // Not able to reserve spaces for other users either.
         print_error('nopermissionreserve', 'mod_facetoface'); // Not allowed to reserve/allocate spaces.

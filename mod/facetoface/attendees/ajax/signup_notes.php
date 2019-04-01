@@ -33,10 +33,12 @@ $return = optional_param('return', 'view', PARAM_ALPHA);
 
 require_sesskey();
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($sessionid);
+$seminar = (new \mod_facetoface\seminar_event($sessionid))->get_seminar();
+$cm = $seminar->get_coursemodule();
+$context = context_module::instance($cm->id);
 
 // Check essential permissions.
-require_login($course, true, $cm);
+require_login($seminar->get_course(), true, $cm);
 
 if (!has_capability('mod/facetoface:manageattendeesnote', $context)) {
     print_error('nopermissions', 'error', '', 'Update attendee note');

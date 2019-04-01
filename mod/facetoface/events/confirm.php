@@ -31,20 +31,26 @@ if (!confirm_sesskey()) {
     print_error('confirmsesskeybad', 'error');
 }
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
-
+$seminarevent = new \mod_facetoface\seminar_event($s);
+$seminar = $seminarevent->get_seminar();
+$cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:editevents', $context);
 
 if ($backtoallsessions) {
-    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
+    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
 } else {
-    $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
+    $returnurl = new moodle_url('/course/view.php', array('id' => $seminar->get_course()));
 }
 
 try {
+    $session = new stdClass();
+    $session = $seminarevent->to_record();
+    $session->mintimestart = $seminarevent->get_mintimestart();
+    $session->sessiondates = facetoface_get_session_dates($seminarevent->get_id());
+
     $event = new \mod_facetoface\seminar_event($session->id);
     $event->delete();
 

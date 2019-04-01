@@ -448,13 +448,13 @@ final class reservations {
     public static function remove_allocations(seminar_event $seminarevent, seminar $seminar, $userids, $converttoreservations, $managerid = null) {
         global $DB, $USER;
 
-        $session = facetoface_get_session($seminarevent->get_id());
-
         if (!$managerid) {
             $managerid = $USER->id;
         }
 
-        $seminarevent = new seminar_event((int)$session->id);
+        // work-around until facetoface_get_session_dates gets replaced
+        $session = $seminarevent->to_record();
+        $session->sessiondates = facetoface_get_session_dates($seminarevent->get_id());
 
         foreach ($userids as $userid) {
             $transaction = $DB->start_delegated_transaction();
@@ -655,13 +655,12 @@ final class reservations {
     public static function limit_info_by_session_date(seminar_event $seminarevent, $reserveinfo) {
         $reserveinfo['reservepastdeadline'] = false;
         $reserveinfo['reservepastcancel'] = false;
-        $session = facetoface_get_session($seminarevent->get_id());
-        if ($session->mintimestart) {
-            $firstdate = reset($session->sessiondates);
-            if (!isset($reserveinfo['reservedeadline']) || $firstdate->timestart <= $reserveinfo['reservedeadline']) {
+        $mintimestart = $seminarevent->get_mintimestart();
+        if ($mintimestart) {
+            if (!isset($reserveinfo['reservedeadline']) || $mintimestart <= $reserveinfo['reservedeadline']) {
                 $reserveinfo['reservepastdeadline'] = true;
             }
-            if (!isset($reserveinfo['reservecancel']) || $firstdate->timestart <= $reserveinfo['reservecancel']) {
+            if (!isset($reserveinfo['reservecancel']) || $mintimestart <= $reserveinfo['reservecancel']) {
                 $reserveinfo['reservepastcancel'] = true;
             }
         }

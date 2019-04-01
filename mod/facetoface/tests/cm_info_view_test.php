@@ -106,7 +106,8 @@ class mod_facetoface_cm_info_view_testcase extends advanced_testcase {
         if (facetoface_has_session_started($event, time())) {
             throw new Exception("The session had started, therefore, cannot sign up the user");
         }
-        $generator->create_signup($user, $event);
+        $seminarevent = new \mod_facetoface\seminar_event($event->id);
+        $generator->create_signup($user, $seminarevent);
     }
 
     /**

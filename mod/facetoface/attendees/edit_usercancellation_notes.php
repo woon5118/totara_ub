@@ -34,9 +34,18 @@ $returnurl = new moodle_url('/mod/facetoface/attendees/cancellations.php', $retu
 
 require_sesskey();
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($sessionid);
-// Check essential permissions.
+$seminar = (new \mod_facetoface\seminar_event($sessionid))->get_seminar();
+$course = $DB->get_record('course', array('id' => $seminar->get_course()));
+$cm = $seminar->get_coursemodule();
+$context = context_module::instance($cm->id);
+
 $PAGE->set_url($url);
+$PAGE->set_context($context);
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title(format_string($seminar->get_name()));
+$PAGE->set_heading($course->fullname);
+
+// Check essential permissions.
 require_login($course, true, $cm);
 require_capability('mod/facetoface:manageattendeesnote', $context);
 
@@ -60,9 +69,9 @@ if ($fromform = $mform->get_data()) {
     redirect($returnurl);
 }
 
-$pagetitle = format_string($facetoface->name);
+$pagetitle = format_string($seminar->get_name());
 
-$PAGE->set_title(format_string($facetoface->name, true, array('context' => $context)));
+$PAGE->set_title(format_string($seminar->get_name(), true, array('context' => $context)));
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();

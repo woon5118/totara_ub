@@ -4819,7 +4819,7 @@ function facetoface_cancel_pending_requests($session) {
             if ($signup->can_switch(\mod_facetoface\signup\state\declined::class)) {
                 $signup->switch_state(\mod_facetoface\signup\state\declined::class);
             } else {
-                $failures = $signup->get_failures( \mod_facetoface\signup\state\declined::class);
+                $failures = $signup->get_failures(\mod_facetoface\signup\state\declined::class);
                 $errors[$pending->recipient] = current($failures);
             }
             // Send a registration expiration message to the user (and their manager).
@@ -4827,7 +4827,6 @@ function facetoface_cancel_pending_requests($session) {
         }
     }
 }
-
 
 /**
  * Delete entry from the facetoface_sessions table along with all
@@ -5001,7 +5000,6 @@ function facetoface_delete_session($session) {
 
     return true;
 }
-
 
 /**
  * This function has been deprecated, please use \mod_facetoface\trainer_helper class instead.
@@ -5242,8 +5240,8 @@ function facetoface_get_session_managers($userid, $sessionid, $jobassignmentid =
     global $DB;
 
     debugging(
-            "The function facetoface_get_session_managers has been deprecated, " .
-            " please use \\mod_facetoface\\signup::get_managers()"
+        "The function facetoface_get_session_managers has been deprecated, " .
+        " please use \\mod_facetoface\\signup::get_managers()"
     );
 
     $managerselect = get_config(null, 'facetoface_managerselect');
@@ -5551,15 +5549,80 @@ function facetoface_get_sessions_within($times, $userid = null, $extrawhere = ''
         ";
 
         $where .= ' AND ((ss.id IS NOT NULL AND ss.statuscode >= ?) OR sr.id IS NOT NULL)';
-        $params[]  = \mod_facetoface\signup\state\waitlisted::get_code();
+        $params[] = \mod_facetoface\signup\state\waitlisted::get_code();
     }
 
     // Ignoring cancelled sessions.
     $where .= ' AND s.cancelledstatus = ?';
-    $params[]  = 0;
+    $params[] = 0;
 
     $params = array_merge($params, $extraparams);
-    $sessions = $DB->get_record_sql($select.$source.$where.$extrawhere, $params, IGNORE_MULTIPLE);
+    $sessions = $DB->get_record_sql($select . $source . $where . $extrawhere, $params, IGNORE_MULTIPLE);
 
     return $sessions;
+}
+
+
+/**
+ * Get a record from the facetoface_sessions table
+ *
+ * @param integer $sessionid ID of the session
+ * @return stdClass
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_session($sessionid) {
+    global $DB;
+
+    debugging('facetoface_get_session() function has been deprecated, please use new \mod_facetoface\seminar_event($sessionid)',
+        DEBUG_DEVELOPER);
+
+    $sql = "SELECT s.*, m.cntdates, m.mintimestart, m.maxtimefinish
+              FROM {facetoface_sessions} s
+         LEFT JOIN (
+                SELECT sessionid, COUNT(*) AS cntdates, MIN(timestart) AS mintimestart, MAX(timefinish) AS maxtimefinish
+                  FROM {facetoface_sessions_dates}
+              GROUP BY sessionid
+              ) m ON m.sessionid = s.id
+             WHERE s.id = ?
+          ORDER BY m.mintimestart, m.maxtimefinish";
+
+    $session = $DB->get_record_sql($sql, array($sessionid));
+
+    if ($session) {
+        $session->sessiondates = facetoface_get_session_dates($sessionid);
+    }
+
+    return $session;
+}
+
+/**
+ * Get facetoface session related instances commonly used in the code
+ * Will stop code execution and display error if wrong id supplied
+ * @param int $sessionid sessionid
+ *
+ * @return array($session, $facetoface, $course, $cm, $context)
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_env_session($sessionid) {
+    global $DB;
+
+    debugging('facetoface_get_env_session() function has been deprecated, please use \mod_facetoface\seminar '
+        . 'or \mod_facetoface\seminar_event functions', DEBUG_DEVELOPER
+    );
+
+    if (!$session = facetoface_get_session($sessionid)) {
+        print_error('error:incorrectcoursemodulesession', 'facetoface');
+    }
+    if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
+        print_error('error:incorrectfacetofaceid', 'facetoface');
+    }
+    if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
+        print_error('error:coursemisconfigured', 'facetoface');
+    }
+    if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
+        print_error('error:incorrectcoursemodule', 'facetoface');
+    }
+    $context = context_module::instance($cm->id);
+
+    return array($session, $facetoface, $course, $cm, $context);
 }

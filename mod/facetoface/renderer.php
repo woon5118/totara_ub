@@ -1176,7 +1176,10 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $sessions = array();
         foreach ($bookings as $booking) {
             if (!isset($sessions[$booking->sessionid])) {
-                $session = facetoface_get_session($booking->sessionid);
+                // work-around until facetoface_get_session_dates gets replaced
+                $seminarevent = new \mod_facetoface\seminar_event($booking->sessionid);
+                $session = $seminarevent->to_record();
+                $session->sessiondates = facetoface_get_session_dates($booking->sessionid);
                 $sessions[$booking->sessionid] = (object)array(
                     'reservations' => 0,
                     'bookings' => array(),

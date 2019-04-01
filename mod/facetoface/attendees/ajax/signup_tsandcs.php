@@ -29,17 +29,19 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 $s = required_param('s', PARAM_INT); // Facetoface session ID.
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
+$seminar = (new \mod_facetoface\seminar_event($s))->get_seminar();
+$cm = $seminar->get_coursemodule();
+$context = context_module::instance($cm->id);
 
-if ($facetoface->approvaltype != \mod_facetoface\seminar::APPROVAL_SELF) {
+if ($seminar->get_approvaltype() != \mod_facetoface\seminar::APPROVAL_SELF) {
     // This should not happen unless there is a concurrent change of settings.
     print_error('error');
 }
 
-require_login($course, true, $cm);
+require_login($seminar->get_course(), true, $cm);
 require_capability('mod/facetoface:view', $context);
 
-$mform = new \mod_facetoface\form\signup_tsandcs(null, array('tsandcs' => $facetoface->approvalterms, 's' => $s));
+$mform = new \mod_facetoface\form\signup_tsandcs(null, array('tsandcs' => $seminar->get_approvalterms(), 's' => $s));
 
 // This should be json_encoded, but for now we need to use html content
 // type to not break $.get().

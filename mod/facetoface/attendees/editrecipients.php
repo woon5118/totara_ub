@@ -32,8 +32,16 @@ $s      = required_param('s', PARAM_INT); // facetoface session ID
 $add    = optional_param('add', false, PARAM_BOOL);
 $remove = optional_param('remove', false, PARAM_BOOL);
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 $seminarevent = new \mod_facetoface\seminar_event($s);
+$seminar = $seminarevent->get_seminar();
+$cm = $seminar->get_coursemodule();
+$context = context_module::instance($cm->id);
+$course = $DB->get_record('course', array('id' => $seminar->get_course()));
+
+$PAGE->set_context($context);
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title(format_string($seminar->get_name()));
+$PAGE->set_heading($course->fullname);
 
 // Check essential permissions.
 require_login($course, false, $cm);

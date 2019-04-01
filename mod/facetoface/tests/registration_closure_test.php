@@ -101,22 +101,20 @@ class mod_facetoface_registration_closure_testcase extends advanced_testcase {
         $session->registrationtimestart = $now - 2000;
         $session->registrationtimefinish = $now + 2000;
         $sessionid = $facetofacegenerator->add_session($session);
-
-        $session = facetoface_get_session($sessionid);
+        $seminarevent = new \mod_facetoface\seminar_event($sessionid);
 
         // We need admin approval.
         $this->setAdminUser();
 
-        \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user1->id, new \mod_facetoface\seminar_event($session->id)));
-        $signup2 = \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user2->id, new \mod_facetoface\seminar_event($session->id)));
+        \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user1->id, $seminarevent));
+        $signup2 = \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent));
         $signup2->switch_state(\mod_facetoface\signup\state\requestedadmin::class);
 
-        $signup3 = \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user3->id, new \mod_facetoface\seminar_event($session->id)));
+        $signup3 = \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user3->id, $seminarevent));
         $signup3->switch_state(\mod_facetoface\signup\state\booked::class);
 
-        $signup4 = \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user4->id, new \mod_facetoface\seminar_event($session->id)));
+        $signup4 = \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user4->id, $seminarevent));
         $signup4->switch_state(\mod_facetoface\signup\state\booked::class);
-        $seminarevent = new \mod_facetoface\seminar_event($session->id);
         \mod_facetoface\signup_helper::cancel_waitlist($seminarevent, array($user4->id));
 
         // Clear any events/messages caused by the signups.
@@ -132,7 +130,7 @@ class mod_facetoface_registration_closure_testcase extends advanced_testcase {
         $cron->execute();
 
         // Check that users 1 & 2 are no longer pending but are declined.
-        $closures = facetoface_get_attendees($session->id, array(\mod_facetoface\signup\state\declined::get_code()));
+        $closures = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\declined::get_code()));
         $this->assertEquals(2, count($closures));
         foreach ($closures as $closure) {
             $expected = false;
@@ -146,7 +144,7 @@ class mod_facetoface_registration_closure_testcase extends advanced_testcase {
         }
 
         // And just double check there are no pending requests.
-        $requests = facetoface_get_attendees($session->id, array(\mod_facetoface\signup\state\requested::get_code(), \mod_facetoface\signup\state\requestedadmin::get_code()));
+        $requests = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\requested::get_code(), \mod_facetoface\signup\state\requestedadmin::get_code()));
         $this->assertEquals(0, count($requests));
 
         // There should be 2 status changed events.

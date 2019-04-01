@@ -131,7 +131,7 @@ class totara_core_courselib_testcase extends reportcache_advanced_testcase {
             'cutoff' => "86400"
         );
         $sessionid = $this->facetoface_generator->add_session($sessiondata);
-        $session = facetoface_get_session($sessionid);
+        $seminarevent = new \mod_facetoface\seminar_event($sessionid);
 
         // URL.
         $url = $this->data_generator->create_module('url', array('course' => $course->id),
@@ -143,7 +143,7 @@ class totara_core_courselib_testcase extends reportcache_advanced_testcase {
 
         $this->completion_generator->set_activity_completion($course->id, array($facetoface, $url, $label), COMPLETION_AGGREGATION_ANY);
 
-        return array($facetoface, $session, $url, $label);
+        return array($facetoface, $seminarevent, $url, $label);
     }
 
     /**
@@ -154,7 +154,7 @@ class totara_core_courselib_testcase extends reportcache_advanced_testcase {
      * User5 will complete none.
      * User6 will complete all activities (user4 can have activities archived, while user6 doesn't).
      */
-    private function users_complete_modules($course, $facetoface, $session, $url, $label) {
+    private function users_complete_modules($course, $facetoface, \mod_facetoface\seminar_event $seminarevent, $url, $label) {
         global $DB;
 
         $this->data_generator->enrol_user($this->user1->id, $course->id);
@@ -173,7 +173,6 @@ class totara_core_courselib_testcase extends reportcache_advanced_testcase {
         $this->assertFalse($course1info->is_course_complete($this->user5->id));
         $this->assertFalse($course1info->is_course_complete($this->user6->id));
 
-        $seminarevent = new \mod_facetoface\seminar_event($session->id);
         // User1, 4 and 6 attend the facetoface.
         \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($this->user1->id, $seminarevent));
         \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($this->user4->id, $seminarevent));
@@ -183,10 +182,10 @@ class totara_core_courselib_testcase extends reportcache_advanced_testcase {
         $sessiondate->timestart = time() - DAYSECS;
         $sessiondate->timefinish = time() - DAYSECS + 60;
         $sessiondate->sessiontimezone = 'Pacific/Auckland';
-        facetoface_save_dates($session->id, [$sessiondate]);
+        facetoface_save_dates($seminarevent->get_id(), [$sessiondate]);
 
         $f2fsignups =
-            $DB->get_records('facetoface_signups', array('sessionid' => $session->id), '', 'userid, id');
+            $DB->get_records('facetoface_signups', ['sessionid' => $seminarevent->get_id()], '', 'userid, id');
         $attendancedata = [
             $f2fsignups[$this->user1->id]->id => \mod_facetoface\signup\state\fully_attended::get_code(),
             $f2fsignups[$this->user4->id]->id => \mod_facetoface\signup\state\fully_attended::get_code(),

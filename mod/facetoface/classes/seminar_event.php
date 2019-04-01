@@ -1043,4 +1043,18 @@ final class seminar_event implements seminar_iterator_item {
         $DB->delete_records('facetoface_notification_hist', $params);
         return true;
     }
+
+    /**
+     * Check if a seminar event exists and if it does then load it. The constructor fails if no event found for an
+     * ID provided which makes the exist() function irrelevant and in some situations we would want to know if a
+     * session exist without causing an exception.
+     *
+     * @param int $eventid
+     * @return seminar_event
+     */
+    public static function find(int $eventid) : seminar_event {
+        $s = new static();
+        $s->id = $eventid;
+        return $s->crud_load(IGNORE_MISSING);
+    }
 }

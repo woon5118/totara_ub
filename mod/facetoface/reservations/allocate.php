@@ -70,7 +70,7 @@ if (optional_param('cancel', false, PARAM_BOOL)) {
 }
 
 $manager = $USER;
-$session = facetoface_get_session($seminarevent->get_id());
+$session = $seminarevent->to_record();
 $reserveinfo = reservations::can_reserve_or_allocate($seminar, array($session), $context, $manager->id);
 if ($reserveinfo['allocate'] === false) { // Current user does not have permission to do the requested action for themselves.
     print_error('nopermissionreserve', 'mod_facetoface'); // Not allowed to reserve/allocate spaces.

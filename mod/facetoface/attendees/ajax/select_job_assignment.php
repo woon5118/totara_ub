@@ -31,14 +31,17 @@ $userid = required_param('id', PARAM_INT); // User ID.
 $listid = required_param('listid', PARAM_ALPHANUM); // Session key to list of users to add.
 $s = required_param('s', PARAM_INT); // Facetoface session ID.
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
+$seminarevent = new \mod_facetoface\seminar_event($s);
+$seminar = $seminarevent->get_seminar();
+$cm = $seminar->get_coursemodule();
+$context = context_module::instance($cm->id);
 
 // Check essential permissions.
-require_course_login($course, true, $cm);
+require_course_login($seminar->get_course(), true, $cm);
 // Person that want to set job assignment, must be able to add attendees to session.
 require_capability('mod/facetoface:addattendees', $context);
 
-if (empty($facetoface->selectjobassignmentonsignup)) {
+if (empty($seminar->get_selectjobassignmentonsignup())) {
     echo json_encode(array('result' => 'error', 'error' => get_string('error:jobassignementsonsignupdisabled', 'facetoface')));
     die();
 }
@@ -69,7 +72,7 @@ $formparams = array(
     'selectedjaid' => $jobassignmentid,
     'fullname' => fullname($user),
     'userid' => $userid,
-    'sessionid' => $session->id,
+    'sessionid' => $seminarevent->get_id(),
     'listid' => $listid
 );
 

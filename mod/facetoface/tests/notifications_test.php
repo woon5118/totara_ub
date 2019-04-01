@@ -183,7 +183,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             'cutoff' => DAYSECS - 60
         ], $params);
 
-        return facetoface_get_session($this->getSeminarGenerator()->add_session($params, $options));
+        $sessionid = $this->getSeminarGenerator()->add_session($params, $options);
+        $seminarevent = new seminar_event($sessionid);
+        $session = $seminarevent->to_record();
+        $session->sessiondates = facetoface_get_session_dates($sessionid);
+        return $session;
     }
 
     /**
@@ -302,7 +306,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         );
 
         $sessionid = $facetofacegenerator->add_session($sessiondata);
-        $session = facetoface_get_session($sessionid);
+        $seminarevent = new seminar_event($sessionid);
+        // workaround until facetoface_get_session_dates is replaced
+        $session = $seminarevent->to_record();
+        $session->mintimestart = $seminarevent->get_mintimestart();
         $session->sessiondates = facetoface_get_session_dates($session->id);
 
         // Signup user1.
@@ -431,7 +438,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // Need to cancel seminar date, in the middle!
         facetoface_save_dates($session, [$session->sessiondates[0], $session->sessiondates[2]]);
         $old = $session->sessiondates;
-        $session = facetoface_get_session($session->id);
+        $session->sessiondates = facetoface_get_session_dates($session->id);
 
         $icals['session_date_removed'] = [
             $this->dissect_ical(\mod_facetoface\messaging::generate_ical($seminar,
@@ -474,7 +481,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         facetoface_save_dates($session, array_merge($session->sessiondates, [
             $added = $this->createSeminarDate(time() + YEARSECS, null, $room->id)
         ]));
-        $session = facetoface_get_session($session->id);
+        $session->sessiondates = facetoface_get_session_dates($session->id);
 
         $icals['session_date_removed_and_added'] = [
             $this->dissect_ical(\mod_facetoface\messaging::generate_ical($seminar,
@@ -618,7 +625,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $seminarevent->save();
         facetoface_save_dates($seminarevent->to_record(), $new);
 
-        $session = facetoface_get_session($seminarevent->get_id());
+        $session = $seminarevent->to_record();
 
         // Send message.
         \mod_facetoface\notice_sender::signup_datetime_changed(
@@ -678,8 +685,9 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertContains('Seminar:   facetoface', $message->fullmessagehtml);
         $this->assertContains('Date(s) and location(s):', $message->fullmessagehtml);
 
-        $session = facetoface_get_session($session->id);
-        $this->assertEquals(1, $session->cancelledstatus);
+        // seminar event needs to be reloaded with info from DB
+        $seminarevent = new seminar_event($seminarevent->get_id());
+        $this->assertEquals(1, $seminarevent->get_cancelledstatus());
 
         $this->resetAfterTest(true);
     }
@@ -1543,18 +1551,18 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $sessiondata['datetimeknown'] = '1';
-        $session = facetoface_get_session($sessionid);
+        $seminarevent = new seminar_event($sessionid);
 
-        return array($session, $facetoface, $course, $student1, $student2, $teacher1, $manager);
+        return array($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager);
     }
 
     public function test_booking_confirmation_default() {
 
         // Default test Manager copy is enable and suppressccmanager is disabled.
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $emailsink = $this->redirectMessages();
-        signup_helper::signup(\mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id)));
+        signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -1575,8 +1583,8 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink = $this->redirectMessages();
 
         // Only send to user.
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
-        $new_signup = \mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id));
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        $new_signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
         $new_signup->set_skipusernotification(false);
         $new_signup->set_skipmanagernotification();
         signup_helper::signup($new_signup);
@@ -1587,7 +1595,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $new_signup = null;
 
         // Only send to manager.
-        $new_signup = \mod_facetoface\signup::create($student2->id, new \mod_facetoface\seminar_event($session->id));
+        $new_signup = \mod_facetoface\signup::create($student2->id, $seminarevent);
         $new_signup->set_skipusernotification();
         $new_signup->set_skipmanagernotification(false);
         signup_helper::signup($new_signup);
@@ -1598,8 +1606,8 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $new_signup = null;
 
         // Send to neither user, nor manager.
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
-        $new_signup = \mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id));
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        $new_signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
         $new_signup->set_skipusernotification();
         $new_signup->set_skipmanagernotification();
         signup_helper::signup($new_signup);
@@ -1613,10 +1621,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_confirmation_suppress_ccmanager() {
 
         // Test Manager copy is enable and suppressccmanager is enabled(do not send a copy to manager).
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $emailsink = $this->redirectMessages();
-        $signup = \mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id));
+        $signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
         $signup->set_skipmanagernotification();
         signup_helper::signup($signup);
         $this->execute_adhoc_tasks();
@@ -1629,7 +1637,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_confirmation_no_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $params = array(
             'facetofaceid'  => $facetoface->id,
@@ -1639,7 +1647,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->update_f2f_notification($params, 0);
 
         $emailsink = $this->redirectMessages();
-        signup_helper::signup(\mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id)));
+        signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -1650,7 +1658,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_confirmation_no_ccmanager_and_suppress_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $suppressccmanager = true;
 
@@ -1666,7 +1674,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             $data['ccmanager'] = 0;
         }
         $emailsink = $this->redirectMessages();
-        signup_helper::signup(\mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id)));
+        signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -1677,14 +1685,14 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_cancellation_default() {
 
         // Default test Manager copy is enable and suppressccmanager is disabled.
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $emailsink = $this->redirectMessages();
-        $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id)));
+        $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
-        $attendees = facetoface_get_attendees($session->id, array(\mod_facetoface\signup\state\booked::get_code()));
+        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\booked::get_code()));
 
         $emailsink = $this->redirectMessages();
         foreach ($attendees as $attendee) {
@@ -1703,16 +1711,16 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_cancellation_suppress_ccmanager() {
 
         // Test Manager copy is enable and suppressccmanager is enabled.
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $suppressccmanager = true;
 
         $emailsink = $this->redirectMessages();
-        $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id)));
+        $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
-        $attendees = facetoface_get_attendees($session->id, array(\mod_facetoface\signup\state\booked::get_code()));
+        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\booked::get_code()));
 
         $emailsink = $this->redirectMessages();
         foreach ($attendees as $attendee) {
@@ -1734,14 +1742,14 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_cancellation_only_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $emailsink = $this->redirectMessages();
-        $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id)));
+        $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
-        $attendees = facetoface_get_attendees($session->id, array(\mod_facetoface\signup\state\booked::get_code()));
+        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\booked::get_code()));
 
         $params = array(
             'facetofaceid'  => $facetoface->id,
@@ -1771,14 +1779,14 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_cancellation_no_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $emailsink = $this->redirectMessages();
-        $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id)));
+        $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
-        $attendees = facetoface_get_attendees($session->id, array(\mod_facetoface\signup\state\booked::get_code()));
+        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\booked::get_code()));
 
         $params = array(
             'facetofaceid'  => $facetoface->id,
@@ -1804,16 +1812,16 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_cancellation_no_ccmanager_and_suppress_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.
-        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
 
         $suppressccmanager = true;
 
         $emailsink = $this->redirectMessages();
-        $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id)));
+        $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
-        $attendees = facetoface_get_attendees($session->id, array(\mod_facetoface\signup\state\booked::get_code()));
+        $attendees = facetoface_get_attendees($seminarevent->get_id(), array(\mod_facetoface\signup\state\booked::get_code()));
 
         $params = array(
             'facetofaceid'  => $facetoface->id,
@@ -2209,11 +2217,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             'sessiondates' => [],
             'mincapacity' => '1'
         );
-        $session = facetoface_get_session($facetofacegenerator->add_session($sessiondata));
+        $seminarevent = new seminar_event($facetofacegenerator->add_session($sessiondata));
         $sessiondata['datetimeknown'] = '0';
 
         $emailsink = $this->redirectMessages();
-        signup_helper::signup(\mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id)));
+        signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
         $this->execute_adhoc_tasks();
         $emailsink->close();
 

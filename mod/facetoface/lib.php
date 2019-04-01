@@ -578,33 +578,6 @@ function facetoface_get_session_dates($sessionid, $reverseorder = false) {
 }
 
 /**
- * Get a record from the facetoface_sessions table
- *
- * @param integer $sessionid ID of the session
- */
-function facetoface_get_session($sessionid) {
-    global $DB;
-
-    $sql = "SELECT s.*, m.cntdates, m.mintimestart, m.maxtimefinish
-              FROM {facetoface_sessions} s
-         LEFT JOIN (
-                SELECT sessionid, COUNT(*) AS cntdates, MIN(timestart) AS mintimestart, MAX(timefinish) AS maxtimefinish
-                  FROM {facetoface_sessions_dates}
-              GROUP BY sessionid
-              ) m ON m.sessionid = s.id
-             WHERE s.id = ?
-          ORDER BY m.mintimestart, m.maxtimefinish";
-
-    $session = $DB->get_record_sql($sql, array($sessionid));
-
-    if ($session) {
-        $session->sessiondates = facetoface_get_session_dates($sessionid);
-    }
-
-    return $session;
-}
-
-/**
  * Get a grade for the given user from the gradebook.
  *
  * @param integer $userid        ID of the user
@@ -2343,30 +2316,4 @@ function facetoface_displaysessiontimezones_updated() {
     foreach ($seminarevents as $seminarevent) {
         \mod_facetoface\calendar::update_entries($seminarevent);
     }
-}
-
-/**
- * Get facetoface session related instances commonly used in the code
- * Will stop code execution and display error if wrong id supplied
- * @param int $sessionid sessionid
- *
- * @return array($session, $facetoface, $course, $cm, $context)
- */
-function facetoface_get_env_session($sessionid) {
-    global $DB;
-    if (!$session = facetoface_get_session($sessionid)) {
-        print_error('error:incorrectcoursemodulesession', 'facetoface');
-    }
-    if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
-        print_error('error:incorrectfacetofaceid', 'facetoface');
-    }
-    if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-        print_error('error:coursemisconfigured', 'facetoface');
-    }
-    if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
-        print_error('error:incorrectcoursemodule', 'facetoface');
-    }
-    $context = context_module::instance($cm->id);
-
-    return array($session, $facetoface, $course, $cm, $context);
 }

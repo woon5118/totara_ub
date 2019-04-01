@@ -80,14 +80,13 @@ class mod_facetoface_sessions_report_testcase extends advanced_testcase {
         );
         $sessionid = $this->facetofacegenerator->add_session($sessiondata);
         $sessiondata['datetimeknown'] = '1';
-        $session = facetoface_get_session($sessionid);
 
-        $seminarevent = new \mod_facetoface\seminar_event($session->id);
+        $seminarevent = new \mod_facetoface\seminar_event($sessionid);
         $signup11 = \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($student->id, $seminarevent));
 
         $sessiondate->timestart = time() - (2 * DAYSECS);
         $sessiondate->timefinish = time() - (2 * DAYSECS) + 60;
-        facetoface_save_dates($session->id, [$sessiondate]);
+        facetoface_save_dates($sessionid, [$sessiondate]);
 
         // Totara hack: "move time to forward"?
         $sessiondate = new stdClass();
@@ -95,11 +94,11 @@ class mod_facetoface_sessions_report_testcase extends advanced_testcase {
         $sessiondate->timefinish = time() - DAYSECS + 60;
         $sessiondate->sessiontimezone = 'Pacific/Auckland';
         $sessiondates = array($sessiondate);
-        facetoface_save_dates($session->id, $sessiondates);
+        facetoface_save_dates($sessionid, $sessiondates);
 
-        $signup = $DB->get_record('facetoface_signups', array('sessionid' => $session->id, 'userid' => $student->id));
+        $signup = $DB->get_record('facetoface_signups', ['sessionid' => $sessionid, 'userid' => $student->id]);
         // Take the user time signup.
-        $timesignup = $DB->get_record('facetoface_signups_status', array('signupid' => $signup->id, 'statuscode' => \mod_facetoface\signup\state\booked::get_code()), 'timecreated');
+        $timesignup = $DB->get_record('facetoface_signups_status', ['signupid' => $signup->id, 'statuscode' => \mod_facetoface\signup\state\booked::get_code()], 'timecreated');
 
         // Take attendees action and change user status to Fully attended.
         signup_helper::process_attendance($seminarevent, [$signup11->get_id() => fully_attended::get_code()]);
@@ -112,7 +111,7 @@ class mod_facetoface_sessions_report_testcase extends advanced_testcase {
                 \mod_facetoface\signup\state\not_set::class
             ]
         );
-        $config = (new rb_config())->set_embeddata(['sessionid' => $session->id, 'status' => $attendancestatuses]);
+        $config = (new rb_config())->set_embeddata(['sessionid' => $sessionid, 'status' => $attendancestatuses]);
         $report = reportbuilder::create_embedded($shortname, $config);
 
         list($sql, $params, $cache) = $report->build_query(false, true);

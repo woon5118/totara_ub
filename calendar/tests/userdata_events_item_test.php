@@ -168,20 +168,18 @@ class core_calendar_userdata_events_testcase extends advanced_testcase {
         $sessiondate->timefinish = $sessiondate->timestart + (DAYSECS * 2);
         $sessiondate->sessiontimezone = 'Pacific/Auckland';
         $sessionid = $facetofacegenerator->add_session(['facetoface' => $facetoface->id, 'sessiondates' => [$sessiondate]]);
-        $sessiondata = facetoface_get_session($sessionid);
         $seminarevent = new \mod_facetoface\seminar_event($sessionid);
         \mod_facetoface\calendar::add_seminar_event($seminarevent, 'user', $data->user1->id, 'session');
-        $extradata->sessions[] = $sessiondata;
+        $extradata->sessions[] = $seminarevent;
 
         $sessiondate = new stdClass();
         $sessiondate->timestart = time() + DAYSECS * 3;
         $sessiondate->timefinish = $sessiondate->timestart + (DAYSECS * 4);
         $sessiondate->sessiontimezone = 'Pacific/Auckland';
         $sessionid = $facetofacegenerator->add_session(['facetoface' => $facetoface->id, 'sessiondates' => [$sessiondate]]);
-        $sessiondata = facetoface_get_session($sessionid);
         $seminarevent = new \mod_facetoface\seminar_event($sessionid);
         \mod_facetoface\calendar::add_seminar_event($seminarevent, 'user', $data->user1->id, 'session');
-        $extradata->sessions[] = $sessiondata;
+        $extradata->sessions[] = $seminarevent;
 
         return $extradata;
     }
@@ -204,7 +202,7 @@ class core_calendar_userdata_events_testcase extends advanced_testcase {
             $this->assertFalse(
                 $DB->record_exists('event', [
                     'eventtype' => 'facetoface',
-                    'instance' => $session->id,
+                    'instance' => $session->get_id(),
                     'userid' => $data->user1->id,
                     'courseid' => 0,
                     'groupid' => 0

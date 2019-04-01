@@ -62,14 +62,13 @@ class mod_facetoface_reservation_testcase extends advanced_testcase {
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $sessiondata['datetimeknown'] = '1';
-        $session = facetoface_get_session($sessionid);
         $seminarevent = new \mod_facetoface\seminar_event($sessionid);
         $seminar = $seminarevent->get_seminar();
 
         // Allocate to session by manager.
         $this->setUser($manager);
-        \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user1->id, new \mod_facetoface\seminar_event($session->id)));
-        \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user2->id, new \mod_facetoface\seminar_event($session->id)));
+        \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user1->id, $seminarevent));
+        \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent));
 
         $this->execute_adhoc_tasks();
         $sink = $this->redirectMessages();

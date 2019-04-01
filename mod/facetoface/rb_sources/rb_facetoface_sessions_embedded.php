@@ -102,10 +102,9 @@ class rb_facetoface_sessions_embedded extends rb_base_embedded {
      */
     public function is_capable($reportfor, $report) {
         $sessionid = $report->get_param_value('sessionid');
-        $session = facetoface_get_session($sessionid);
-
-        if ($session) {
-            $cm = get_coursemodule_from_instance('facetoface', $session->facetoface);
+        $seminarevent = \mod_facetoface\seminar_event::find($sessionid);
+        if ($seminarevent->exists()) {
+            $cm = get_coursemodule_from_instance('facetoface', $seminarevent->get_facetoface());
 
             // Users can only view this report if they have the viewinterestreport capability for this context.
             return (has_capability('mod/facetoface:viewattendees', context_module::instance($cm->id), $reportfor));

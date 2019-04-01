@@ -56,7 +56,6 @@ class mod_facetoface_allocation_testcase extends advanced_testcase {
         $sessiondate->timefinish = $sessiondate->timestart + (DAYSECS * 1);
         $sessiondate->sessiontimezone = 'Pacific/Auckland';
         $sessionid = $seminargenerator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => array($sessiondate)));
-        $session = facetoface_get_session($sessionid);
 
         $this->setUser($user1);
 

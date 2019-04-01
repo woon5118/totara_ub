@@ -518,10 +518,9 @@ final class attendees_list_helper {
 
         // Log that users were edited.
         if (count($removed) > 0 || count($errors) > 0) {
-            $session = facetoface_get_session($seminarevent->get_id());
             $cm = $seminarevent->get_seminar()->get_coursemodule();
             $context = context_module::instance($cm->id);
-            \mod_facetoface\event\attendees_updated::create_from_session($session, $context)->trigger();
+            \mod_facetoface\event\attendees_updated::create_from_session($seminarevent->to_record(), $context)->trigger();
         }
         $_SESSION['f2f-bulk-results'][$seminarevent->get_id()] = array($removed, $errors);
 

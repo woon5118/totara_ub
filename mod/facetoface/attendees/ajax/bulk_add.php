@@ -30,17 +30,20 @@ $s = required_param('s', PARAM_INT);
 $listid = optional_param('listid', '',PARAM_ALPHANUM); // Session key to list of users to add.
 $bulkaddsource = 'bulkaddsourceidnumber';
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
+$seminarevent = new \mod_facetoface\seminar_event($s);
+$seminar = $seminarevent->get_seminar();
+$cm = $seminar->get_coursemodule();
+$context = context_module::instance($cm->id);
 
 // Capability checks
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:addattendees', $context);
 
 if (!empty($listid)) {
     $list = new \mod_facetoface\bulk_list($listid);
     $userresults = $list->get_validation_results();
-} else if (isset($_SESSION['f2f-bulk-results'][$session->id])) {
-    $bulkresults = $_SESSION['f2f-bulk-results'][$session->id];
+} else if (isset($_SESSION['f2f-bulk-results'][$seminarevent->get_id()])) {
+    $bulkresults = $_SESSION['f2f-bulk-results'][$seminarevent->get_id()];
     // $bulkresults[0] is for added users and $bulkrestults[1] is for users with errors.
     // In this case, we want them combined into one list of users, each with their results.
     $userresults = array_merge($bulkresults[0], $bulkresults[1]);

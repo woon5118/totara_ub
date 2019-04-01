@@ -62,7 +62,6 @@ class mod_facetoface_session_cancellation_testcase extends advanced_testcase {
         $this->assertEquals(1, $newsession->cancelledstatus);
 
         // Second call should do nothing.
-        $session = facetoface_get_session($sessionid);
         $result = $seminarevent->cancel();
         $this->assertFalse($result);
         $newsession = $DB->get_record('facetoface_sessions', array('id' => $sessionid));

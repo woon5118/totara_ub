@@ -396,17 +396,23 @@ class mod_facetoface_generator extends testing_module_generator {
         $this->mapsessioncourse[$sessionid] = $course;
         $this->mapsessionf2f[$sessionid] = $facetoface;
 
-        return facetoface_get_session($sessionid);
+        $seminarevent = new seminar_event($sessionid);
+        // work-around until facetoface_get_session_dates gets fixed
+        $session = $seminarevent->to_record();
+        $session->sessiondates = facetoface_get_session_dates($sessionid);
+        $session->seminarevent = $seminarevent;
+
+        return $session;
     }
 
     /**
      * Create a signup for given student and session.
      *
      * @param stdClass $student
-     * @param stdClass $session
+     * @param seminar_event $seminarevent
      * @return stdClass
      */
-    public function create_signup(stdClass $student, stdClass $session): stdClass {
+    public function create_signup(stdClass $student, \mod_facetoface\seminar_event $seminarevent): stdClass {
         global $DB;
 
         $this->create_job_assignment_if_not_exists($student);
@@ -414,19 +420,18 @@ class mod_facetoface_generator extends testing_module_generator {
         $discountcode = 'disc1';
         $notificationtype = 1;
 
-        $signup = \mod_facetoface\signup::create($student->id, new \mod_facetoface\seminar_event($session->id), $notificationtype);
+        $signup = \mod_facetoface\signup::create($student->id, $seminarevent, $notificationtype);
         $signup->set_discountcode($discountcode);
         signup_helper::signup($signup);
 
-        return $DB->get_record('facetoface_signups', ['userid' => $student->id, 'sessionid' => $session->id]);
+        return $DB->get_record('facetoface_signups', ['userid' => $student->id, 'sessionid' => $seminarevent->get_id()]);
     }
 
     /**
      * @param stdClass $student
-     * @param stdClass $session
+     * @param seminar_event $seminarevent
      */
-    public function create_cancellation(stdClass $student, stdClass $session) {
-        $seminarevent = new seminar_event($session->id);
+    public function create_cancellation(stdClass $student, seminar_event $seminarevent) {
         $signup = signup::create($student->id, $seminarevent);
         if (signup_helper::can_user_cancel($signup)) {
             signup_helper::user_cancel($signup);

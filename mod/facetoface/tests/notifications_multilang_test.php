@@ -476,7 +476,8 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         );
 
         $sessionid = $facetofacegenerator->add_session($sessiondata);
-        $session = facetoface_get_session($sessionid);
+        $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+        $session = $seminarevent->to_record();
         $session->sessiondates = facetoface_get_session_dates($session->id);
 
         $seed = new stdClass();

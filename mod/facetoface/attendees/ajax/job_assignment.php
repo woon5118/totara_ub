@@ -30,10 +30,13 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 $userid    = required_param('id', PARAM_INT); // Facetoface signup user ID.
 $sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($sessionid);
+$seminarevent = new \mod_facetoface\seminar_event($sessionid);
+$seminar = $seminarevent->get_seminar();
+$cm = $seminar->get_coursemodule();
+$context = context_module::instance($cm->id);
 
 // Check essential permissions.
-require_course_login($course, true, $cm);
+require_course_login($seminar->get_course(), true, $cm);
 require_capability('mod/facetoface:changesignedupjobassignment', $context);
 
 $jobassignments = \totara_job\job_assignment::get_all($userid);
@@ -86,7 +89,7 @@ if ($fromform = $mform->get_data()) {
             'objectid' => $user->signupid,
             'context' => $context,
             'other' => array(
-                'sessionid'  => $session->id,
+                'sessionid'  => $seminarevent->get_id(),
                 'attendeeid' => $user->id,
             )
         )

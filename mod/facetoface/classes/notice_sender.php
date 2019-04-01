@@ -452,6 +452,7 @@ class notice_sender {
 
         $seminareventid = $seminarevent->get_id();
         $notice = new \facetoface_notification($params);
+        $notice->facetofaceid = $seminarevent->get_facetoface();
         $notice->set_newevent($recipient, $seminareventid, null, $USER);
         $notice->send_to_user($recipient, $seminareventid);
         $notice->send_to_manager($recipient, $seminareventid);

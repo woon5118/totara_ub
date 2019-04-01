@@ -965,10 +965,6 @@ class event extends \moodleform {
             \mod_facetoface\signup_helper::update_attendees($seminarevent);
         }
 
-        // Retrieve record that was just inserted/updated.
-        if (!$session = facetoface_get_session($seminarevent->get_id())) {
-            print_error('error:couldnotfindsession', 'facetoface', $this->returnurl);
-        }
         // Get details.
         // This should be done before sending any notification as it could be a required field in their template.
         $data = file_postupdate_standard_editor($fromform, 'details', $this->editoroptions, $this->context, 'mod_facetoface', 'session', $seminarevent->get_id());
