@@ -27,18 +27,17 @@ defined('MOODLE_INTERNAL') || die();
  * Tests for Totara functionality added to DML database drivers.
  */
 class totara_core_dml_testcase extends database_driver_testcase {
-    protected $oldftslanguage = null;
-    protected $oldfts3bworkaround = null;
+    protected $olddboptions = null;
 
     public function tearDown() {
-        if (isset($this->oldftslanguage)) {
-            $this->override_ftslanguage($this->oldftslanguage);
-            $this->oldftslanguage = null;
-        }
-
-        if (isset($this->oldfts3bworkaround)) {
-            $this->override_fts3bworkaround($this->oldfts3bworkaround);
-            $this->oldfts3bworkaround = null;
+        // Set our dboptions back to their initial values.
+        if (isset($this->olddboptions)) {
+            $reflection = new ReflectionClass($this->tdb);
+            $property = $reflection->getProperty('dboptions');
+            $property->setAccessible(true);
+            $property->setValue($this->tdb, $this->olddboptions);
+            $property->setAccessible(false);
+            $this->olddboptions = null;
         }
 
         parent::tearDown();
@@ -932,47 +931,24 @@ ORDER BY tt1.groupid";
     }
 
     /**
-     * Override the fts language for tests.
+     * Override a dboption for tests.
      *
-     * @param string $ftslanguage
+     * @param string $name  The name of the option (for example, ftslanguage)
+     * @param mixed  $value New value that the option should have
      */
-    public function override_ftslanguage(string $ftslanguage) {
+    protected function override_dboption(string $name, $value) {
         $DB = $this->tdb;
 
-        if (!isset($this->oldftslanguage)) {
-            $this->oldftslanguage = $DB->get_ftslanguage();
+        if (!isset($this->olddboptions)) {
+            $cfg = $DB->export_dbconfig();
+            $this->olddboptions = $cfg->dboptions;
         }
-
-        // This is not pretty, but it is probably better to not add yet another method to DB that should be used from tests only.
 
         $reflection = new ReflectionClass($DB);
         $property = $reflection->getProperty('dboptions');
         $property->setAccessible(true);
         $dboptions = $property->getValue($DB);
-        $dboptions['ftslanguage'] = $ftslanguage;
-        $property->setValue($DB, $dboptions);
-        $property->setAccessible(false);
-    }
-
-    /**
-     * Override the fts 3byte workaround for tests.
-     *
-     * @param bool $fts3bworkaround
-     */
-    public function override_fts3bworkaround(bool $fts3bworkaround) {
-        $DB = $this->tdb;
-
-        if (!isset($this->oldfts3bworkaround)) {
-            $this->oldfts3bworkaround = $DB->get_fts3bworkaround();
-        }
-
-        // This is not pretty, but it is probably better to not add yet another method to DB that should be used from tests only.
-
-        $reflection = new ReflectionClass($DB);
-        $property = $reflection->getProperty('dboptions');
-        $property->setAccessible(true);
-        $dboptions = $property->getValue($DB);
-        $dboptions['fts3bworkaround'] = $fts3bworkaround;
+        $dboptions[$name] = $value;
         $property->setValue($DB, $dboptions);
         $property->setAccessible(false);
     }
@@ -993,33 +969,37 @@ ORDER BY tt1.groupid";
         $this->assertTrue($done);
     }
 
-    public function test_override_ftslanguage() {
+    public function test_override_dboption() {
         $DB = $this->tdb;
 
         $lang = $DB->get_ftslanguage();
+        $fts3b = $DB->get_fts3bworkaround();
+        $inparams = $DB->get_max_in_params();
+
+        $this->assertNotNull($inparams);
         $this->assertNotNull($lang);
+        $this->assertNotNull($fts3b);
 
-        $this->override_ftslanguage($lang.'xyz');
-        $this->assertSame($lang.'xyz', $DB->get_ftslanguage());
+        $this->override_dboption('maxinparams', 234);
+        $this->assertSame(234, $DB->get_max_in_params());
 
-        $this->override_ftslanguage($lang);
+        $this->override_dboption('ftslanguage', $lang . 'xyz');
+        $this->assertSame($lang . 'xyz', $DB->get_ftslanguage());
+
+        $this->override_dboption('ftslanguage', $lang);
         $this->assertSame($lang, $DB->get_ftslanguage());
-    }
 
-    public function test_override_fts3bworkaround() {
-        $DB = $this->tdb;
-
-        $old = $DB->get_fts3bworkaround();
-        $this->assertNotNull($old);
-
-        $this->override_fts3bworkaround(true);
+        $this->override_dboption('fts3bworkaround', true);
         $this->assertSame(true, $DB->get_fts3bworkaround());
 
-        $this->override_fts3bworkaround(false);
+        $this->override_dboption('fts3bworkaround', $fts3b);
+        $this->assertSame($fts3b, $DB->get_fts3bworkaround());
+
+        $this->override_dboption('fts3bworkaround', false);
         $this->assertSame(false, $DB->get_fts3bworkaround());
 
-        $this->override_fts3bworkaround($old);
-        $this->assertSame($old, $DB->get_fts3bworkaround());
+        $this->override_dboption('maxinparams', $inparams);
+        $this->assertSame($inparams, $DB->get_max_in_params());
     }
 
     /**
@@ -1436,13 +1416,13 @@ ORDER BY tt1.groupid";
         }
 
         if ($dbfamily === 'postgres') {
-            $this->override_ftslanguage('english');
-            $this->override_fts3bworkaround(true);
+            $this->override_dboption('ftslanguage', 'english');
+            $this->override_dboption('fts3bworkaround', true);
         } else if ($dbfamily === 'mysql') {
-            $this->override_fts3bworkaround(true);
+            $this->override_dboption('fts3bworkaround', true);
         } else if ($dbfamily === 'mssql') {
-            $this->override_ftslanguage('Japanese');
-            $this->override_fts3bworkaround(false);
+            $this->override_dboption('ftslanguage', 'Japanese');
+            $this->override_dboption('fts3bworkaround', false);
         }
 
         $coursetable = 'test_table_course';
@@ -1602,13 +1582,13 @@ ORDER BY tt1.groupid";
         }
 
         if ($dbfamily === 'postgres') {
-            $this->override_ftslanguage('english');
-            $this->override_fts3bworkaround(true);
+            $this->override_dboption('ftslanguage', 'english');
+            $this->override_dboption('fts3bworkaround', true);
         } else if ($dbfamily === 'mysql') {
-            $this->override_fts3bworkaround(true);
+            $this->override_dboption('fts3bworkaround', true);
         } else if ($dbfamily === 'mssql') {
-            $this->override_ftslanguage(1028); // Traditional Chinese
-            $this->override_fts3bworkaround(false);
+            $this->override_dboption('ftslanguage', 1028); // Traditional Chinese
+            $this->override_dboption('fts3bworkaround', false);
         }
 
         $coursetable = 'test_table_course';
@@ -1768,13 +1748,13 @@ ORDER BY tt1.groupid";
         }
 
         if ($dbfamily === 'postgres') {
-            $this->override_ftslanguage('english');
-            $this->override_fts3bworkaround(true);
+            $this->override_dboption('ftslanguage', 'english');
+            $this->override_dboption('fts3bworkaround', true);
         } else if ($dbfamily === 'mysql') {
-            $this->override_fts3bworkaround(true);
+            $this->override_dboption('fts3bworkaround', true);
         } else if ($dbfamily === 'mssql') {
-            $this->override_ftslanguage(2052); // Simplified Chinese
-            $this->override_fts3bworkaround(false);
+            $this->override_dboption('ftslanguage', 2052); // Simplified Chinese
+            $this->override_dboption('fts3bworkaround', false);
         }
 
         $coursetable = 'test_table_course';
@@ -1950,12 +1930,7 @@ ORDER BY tt1.groupid";
         }
 
         // Override 'maxinparams' in dboptions for this test.
-        $property = (new ReflectionClass($DB))->getProperty('dboptions');
-        $property->setAccessible(true);
-        $dboptions = $property->getValue($DB);
-        $dboptions['maxinparams'] = 100;
-        $property->setValue($DB, $dboptions);
-        $property->setAccessible(false);
+        $this->override_dboption('maxinparams', 100);
 
         // Check we have a new value now.
         self::assertEquals(100, $DB->get_max_in_params());

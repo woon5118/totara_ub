@@ -817,6 +817,7 @@ abstract class moodle_database {
         // Totara: counting arrays is expensive, do it only once.
         $itemscount = is_array($items) ? count($items) : 1;
 
+        // Totara: warn developers if their query is going to exceed allowed parameter limit.
         if ($itemscount > $this->get_max_in_params()) {
             debugging("The number of parameters passed ({$itemscount}) exceeds maximum number allowed ({$this->get_max_in_params()})", DEBUG_DEVELOPER);
         }
