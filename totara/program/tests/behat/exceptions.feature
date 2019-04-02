@@ -50,7 +50,8 @@ Feature: Generation of program assignment exceptions
     And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "fn_002 ln_002 (user002@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
-    And I wait "2" seconds
+    And I click on "Save changes" "button"
+    And I click on "Save all changes" "button"
     And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
@@ -58,13 +59,12 @@ Feature: Generation of program assignment exceptions
         | timeamount | 1 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
     And I click on "Set due date" "link" in the ".completionlink_4" "css_element"
-    And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
+    And I click on "Day(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
     And I set the following fields to these values:
-        | timeamount | 2 |
+        | timeamount | 15 |
     And I click on "Set time relative to event" "button"
     And I click on "Save changes" "button"
-    And I click on "Save all changes" "button"
     Then I should see "2 learner(s) assigned: 1 active, 1 exception(s)"
     And I wait "1" seconds
     And I run the scheduled task "\totara_program\task\send_messages_task"

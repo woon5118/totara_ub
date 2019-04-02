@@ -2294,4 +2294,79 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
             $certification->get_image()
         );
     }
+
+    /**
+     * Test update_exceptions function
+     */
+    public function test_update_exceptions() {
+        global $DB;
+
+        $timedue = new DateTime('2 weeks'); // 2 weeks from now
+        $timedue->setTime(15, 30);
+        $duedate = $timedue->getTimestamp();
+
+        $program1 = $this->program_generator->create_program();
+
+        $course1 = $this->data_generator->create_course();
+
+        $uniqueid = 'multiset';
+        $multicourseset1 = new multi_course_set($program1->id, null, $uniqueid);
+        $coursedata = new stdClass();
+        $coursedata->{$uniqueid . 'courseid'} = $course1->id;
+
+        $multicourseset1->add_course($coursedata);
+
+        // Set certifpath so exceptions are calculated correctly
+        $multicourseset1->certifpath = CERTIFPATH_STD;
+        $multicourseset1->timeallowed = (2 * WEEKSECS) - 1; // 1 second less than 2 Weeks (to ensure exception)
+        $multicourseset1->save_set();
+
+        $this->data_generator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $this->users[0]->id);
+        $assignment = $DB->get_record('prog_assignment', ['programid' => $program1->id, 'assignmenttype' => ASSIGNTYPE_INDIVIDUAL, 'assignmenttypeid' => $this->users[0]->id]);
+
+        // Check there are no exceptions
+        $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
+        $this->assertCount(0, $exceptions);
+
+        $program1->update_exceptions($this->users[0]->id, $assignment, $duedate);
+
+        // There is a slight delay (of less than a minute) we still generate an exception
+        $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
+        $this->assertCount(1, $exceptions);
+
+        $multicourseset1->certifpath = CERTIFPATH_STD;
+        $multicourseset1->timeallowed = 3 * WEEKSECS; // 3 Weeks
+        $multicourseset1->save_set();
+        // Force program reload after set changes
+        $program1 = new \program($program1->id);
+
+        // Clear exceptions table
+        $DB->delete_records('prog_exception');
+        $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
+        $this->assertCount(0, $exceptions);
+
+        $program1->update_exceptions($this->users[0]->id, $assignment, $duedate);
+
+        // This should definitely generate a time allowance exception
+        $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
+        $this->assertCount(1, $exceptions);
+        $this->assertEquals(1, reset($exceptions)->exceptiontype);
+
+        $multicourseset1->certifpath = CERTIFPATH_STD;
+        $multicourseset1->timeallowed = WEEKSECS; // 1 week
+        $multicourseset1->save_set();
+        // Force program reload after set changes
+        $program1 = new \program($program1->id);
+
+        // Clear exceptions table
+        $DB->delete_records('prog_exception');
+        $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
+        $this->assertCount(0, $exceptions);
+
+        $program1->update_exceptions($this->users[0]->id, $assignment, $duedate);
+
+        // Plenty of time to complete, no exception created
+        $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
+        $this->assertCount(0, $exceptions);
+    }
 }
