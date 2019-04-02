@@ -351,8 +351,8 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                         $value = trim($csvrow[$cf]);
                         if ($value === '') {
                             if (!$csvsaveemptyfields) {
-                                // If we are not saving empty fields then set null
-                                $value = null;
+                                // Empty means skip, don't import.
+                                continue;
                             }
                         } else if (isset($value)) {
                             $shortname = str_replace("customfield_", "", $cf);

@@ -614,10 +614,6 @@ class totara_sync_element_user extends totara_sync_element {
             require_once($CFG->dirroot.'/user/profile/lib.php');
 
             foreach ($customfields as $name => $value) {
-                if ($value === null) {
-                    continue; // Null means "don't update the existing data", so skip this field.
-                }
-
                 $profile = str_replace('customfield_', 'profile_field_', $name);
                 // If the custom field is a menu, the option index will be set by function totara_sync_data_preprocess.
                 $user->{$profile} = $value;

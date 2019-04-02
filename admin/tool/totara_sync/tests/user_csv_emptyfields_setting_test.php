@@ -45,6 +45,13 @@ class tool_totara_sync_user_csv_emptyfields_setting_testcase extends totara_sync
         'param1' => 30, 'param2' => 2048, 'param3' => 0, 'param4' => '', 'param5' => '',
     );
 
+    // User textinput profile field that requires values to be unique.
+    private $user_info_field_textinput_unique_data = array(
+        'id' => 5, 'shortname' => 'textinput_unique', 'name' => 'textinput_unique', 'datatype' => 'text', 'description' => '', 'categoryid' => 695000,
+        'sortorder' => 1, 'required' => 0, 'locked' => 0, 'visible' => 1, 'forceunique' => 1, 'signup' => 0, 'defaultdata' => '',
+        'param1' => 30, 'param2' => 2048, 'param3' => 0, 'param4' => '', 'param5' => '',
+    );
+
     private $user_info_field_textarea_data = array(
         'id' => 2, 'shortname' => 'textarea', 'name' => 'textarea', 'datatype' => 'textarea', 'description' => '', 'categoryid' => 695000,
         'sortorder' => 1, 'required' => 0, 'locked' => 0, 'visible' => 1, 'forceunique' => 0, 'signup' => 0, 'defaultdata' => '',
@@ -129,6 +136,7 @@ class tool_totara_sync_user_csv_emptyfields_setting_testcase extends totara_sync
         $this->configcsv = null;
         $this->config = null;
         $this->user_info_field_textinput_data = null;
+        $this->user_info_field_textinput_unique_data = null;
         $this->user_info_field_textarea_data = null;
         $this->user_info_field_checkbox_data = null;
         $this->user_info_field_datetime_data = null;
@@ -151,6 +159,7 @@ class tool_totara_sync_user_csv_emptyfields_setting_testcase extends totara_sync
         $this->loadDataSet($this->createArrayDataset(array(
             'user_info_field' => array(
                 $this->user_info_field_textinput_data,
+                $this->user_info_field_textinput_unique_data,
                 $this->user_info_field_textarea_data,
                 $this->user_info_field_checkbox_data,
                 $this->user_info_field_datetime_data,
@@ -286,10 +295,20 @@ class tool_totara_sync_user_csv_emptyfields_setting_testcase extends totara_sync
         return $importfield;
     }
 
+    /**
+     * Get a user record and add profile field data
+     *
+     * @param $idnumber
+     * @return bool|mixed
+     */
     public function get_user($idnumber) {
         global $DB;
 
         $user =  $DB->get_record('user', array('idnumber' => $idnumber));
+
+        if (!$user) {
+            return false;
+        }
 
         // Load custom profile fields data.
         profile_load_data($user);
@@ -925,5 +944,95 @@ class tool_totara_sync_user_csv_emptyfields_setting_testcase extends totara_sync
         $this->assertEquals('', $user->firstnamephonetic);
         $this->assertEquals('', $user->lastnamephonetic);
         $this->assertEquals('', $user->alternatename);
+    }
+
+    public function test_customfields_unique_csvsaveemptyfields_on() {
+        global $DB;
+
+        // Set the config.
+        $this->set_source_config(array_merge($this->configcsv, array(
+            'import_customfield_textinput_unique' => 1,
+            'fieldmapping_customfield_textinput_unique' => ''
+        )));
+        $config = array_merge($this->config, array('csvsaveemptyfields' => true)); // Empty fields erase existing data.
+        $this->set_element_config($config);
+
+        // Run the sync.
+        $this->add_csv('user_customfields_unique.csv', 'user');
+        $this->get_element()->sync();
+        $this->assertCount(6, $DB->get_records('user')); // Check the correct count of users.
+
+        // User 1 should not be imported, the custom field is not unique.
+        $user = $this->get_user('1');
+        $this->assertEmpty($user);
+
+        // User 2 should not be imported, the custom field is not unique.
+        $user = $this->get_user('2');
+        $this->assertEmpty($user);
+
+        // User 3 should be imported, the custom field is empty string.
+        $user = $this->get_user('3');
+        $this->assertNotEmpty($user);
+        $this->assertEquals('', $user->customfield_textinput_unique);
+
+        // User 4 should be imported, the custom field is empty string.
+        $user = $this->get_user('4');
+        $this->assertNotEmpty($user);
+        $this->assertEquals('', $user->customfield_textinput_unique);
+
+        // User 5 should be imported, the custom field is unique.
+        $user = $this->get_user('5');
+        $this->assertNotEmpty($user);
+        $this->assertEquals('5', $user->customfield_textinput_unique);
+
+        // User 6 should be imported, the custom field is unique.
+        $user = $this->get_user('6');
+        $this->assertNotEmpty($user);
+        $this->assertEquals('6', $user->customfield_textinput_unique);
+    }
+
+    public function test_customfields_unique_csvsaveemptyfields_off() {
+        global $DB;
+
+        // Set the config.
+        $this->set_source_config(array_merge($this->configcsv, array(
+            'import_customfield_textinput_unique' => 1,
+            'fieldmapping_customfield_textinput_unique' => ''
+        )));
+        $config = array_merge($this->config, array('csvsaveemptyfields' => false)); // Empty fields skip saving data.
+        $this->set_element_config($config);
+
+        // Run the sync.
+        $this->add_csv('user_customfields_unique.csv', 'user');
+        $this->get_element()->sync();
+        $this->assertCount(6, $DB->get_records('user')); // Check the correct count of users.
+
+        // User 1 should not be imported, the custom field is not unique.
+        $user = $this->get_user('1');
+        $this->assertEmpty($user);
+
+        // User 2 should not be imported, the custom field is not unique.
+        $user = $this->get_user('2');
+        $this->assertEmpty($user);
+
+        // User 3 should be imported, the custom field is empty string.
+        $user = $this->get_user('3');
+        $this->assertNotEmpty($user);
+        $this->assertEquals('', $user->customfield_textinput_unique);
+
+        // User 4 should be imported, the custom field is empty string.
+        $user = $this->get_user('4');
+        $this->assertNotEmpty($user);
+        $this->assertEquals('', $user->customfield_textinput_unique);
+
+        // User 5 should be imported, the custom field is unique.
+        $user = $this->get_user('5');
+        $this->assertNotEmpty($user);
+        $this->assertEquals('5', $user->customfield_textinput_unique);
+
+        // User 6 should be imported, the custom field is unique.
+        $user = $this->get_user('6');
+        $this->assertNotEmpty($user);
+        $this->assertEquals('6', $user->customfield_textinput_unique);
     }
 }
