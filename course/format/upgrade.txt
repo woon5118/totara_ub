@@ -4,6 +4,10 @@ Overview of this plugin type at http://docs.moodle.org/dev/Course_formats
 
 === 13.0 ===
 
+* Method create_course() will populate the new course with empty sections if $data->numsections is provided even if
+  "numsections" is not an option defined by the course format.
+* course/changenumsections.php can now be used to insert sections at any positions
+
 === 12.0 ===
 
 * format_section_renderer_base::section_edit_control_menu() has changed

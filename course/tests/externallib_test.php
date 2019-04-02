@@ -480,7 +480,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
                 $this->assertEquals($courseinfo->newsitems, $course2['newsitems']);
                 $this->assertEquals($courseinfo->startdate, $course2['startdate']);
                 $this->assertEquals($courseinfo->enddate, $course2['enddate']);
-                $this->assertEquals($courseinfo->numsections, $course2['numsections']);
+                $this->assertEquals(course_get_format($createdcourse['id'])->get_last_section_number(), $course2['numsections']);
                 $this->assertEquals($courseinfo->maxbytes, $course2['maxbytes']);
                 $this->assertEquals($courseinfo->showreports, $course2['showreports']);
                 $this->assertEquals($courseinfo->visible, $course2['visible']);
@@ -516,7 +516,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
                 $this->assertEquals($courseinfo->category, $course3['categoryid']);
                 $this->assertEquals($courseinfo->format, $course3['format']);
                 $this->assertEquals($courseinfo->hiddensections, $course3options['hiddensections']);
-                $this->assertEquals($courseinfo->numsections, $course3options['numsections']);
+                $this->assertEquals(course_get_format($createdcourse['id'])->get_last_section_number(), $course3options['numsections']);
                 $this->assertEquals($courseinfo->coursedisplay, $course3options['coursedisplay']);
             } else {
                 throw new moodle_exception('Unexpected shortname');
@@ -648,7 +648,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
             $this->assertEquals($course['newsitems'], $dbcourse->newsitems);
             $this->assertEquals($course['startdate'], $dbcourse->startdate);
             $this->assertEquals($course['enddate'], $dbcourse->enddate);
-            $this->assertEquals($course['numsections'], $dbcourse->numsections);
+            $this->assertEquals($course['numsections'], course_get_format($dbcourse)->get_last_section_number());
             $this->assertEquals($course['maxbytes'], $dbcourse->maxbytes);
             $this->assertEquals($course['showreports'], $dbcourse->showreports);
             $this->assertEquals($course['visible'], $dbcourse->visible);
@@ -807,7 +807,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
      */
     private function prepare_get_course_contents_test() {
         global $DB;
-        $course  = self::getDataGenerator()->create_course();
+        $course  = self::getDataGenerator()->create_course(['numsections' => 2]);
         $forumdescription = 'This is the forum description';
         $forum = $this->getDataGenerator()->create_module('forum',
             array('course' => $course->id, 'intro' => $forumdescription),
@@ -975,7 +975,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         // We need to execute the return values cleaning process to simulate the web service server.
         $sections = external_api::clean_returnvalue(core_course_external::get_course_contents_returns(), $sections);
 
-        $this->assertCount(2, $sections);
+        $this->assertCount(3, $sections);
         $this->assertCount(1, $sections[0]['modules']);
         $this->assertEquals($forumcm->id, $sections[0]['modules'][0]["id"]);
     }
@@ -1017,7 +1017,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         // We need to execute the return values cleaning process to simulate the web service server.
         $sections = external_api::clean_returnvalue(core_course_external::get_course_contents_returns(), $sections);
 
-        $this->assertCount(2, $sections);
+        $this->assertCount(3, $sections);
         $this->assertCount(1, $sections[0]['modules']);
         $this->assertEquals($forumcm->id, $sections[0]['modules'][0]["id"]);
     }
@@ -1039,7 +1039,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         // We need to execute the return values cleaning process to simulate the web service server.
         $sections = external_api::clean_returnvalue(core_course_external::get_course_contents_returns(), $sections);
 
-        $this->assertCount(2, $sections);
+        $this->assertCount(3, $sections);
         $this->assertCount(1, $sections[0]['modules']);
         $this->assertEquals("page", $sections[0]['modules'][0]["modname"]);
         $this->assertEquals($pagecm->instance, $sections[0]['modules'][0]["instance"]);
@@ -1204,7 +1204,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
                 $this->assertEquals($course1['categoryid'], $courseinfo->category);
                 $this->assertEquals(FORMAT_MOODLE, $courseinfo->summaryformat);
                 $this->assertEquals('topics', $courseinfo->format);
-                $this->assertEquals(5, $courseinfo->numsections);
+                $this->assertEquals(5, course_get_format($course['id'])->get_last_section_number());
                 $this->assertEquals(0, $courseinfo->newsitems);
                 $this->assertEquals(FORMAT_MOODLE, $courseinfo->summaryformat);
             } else {

@@ -1607,6 +1607,9 @@ class restore_section_structure_step extends restore_structure_step {
                 $restorefiles = true;
             }
 
+            // Totara: Make sure visible sections are visible.
+            $section->visible = $data->visible;
+
             // Don't update availability (I didn't see a useful way to define
             // whether existing or new one should take precedence).
 
