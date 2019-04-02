@@ -991,7 +991,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $seminarevent = new \mod_facetoface\seminar_event($sess0->id);
         $seminarevent->from_record($sess0);
         $seminarevent->save();
-        facetoface_save_dates($seminarevent->to_record(), array($sessiondates));
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [$sessiondates]);
 
         // Test.
         $this->assertTrue($seminarevent->exists(), $this->msgtrue);
@@ -4250,7 +4250,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             $method = 'assert' . ($test->returns ? 'True' : 'False');
 
             // Running our defined tests and displaying appropriate failure message in case if it failed.
-            $this->$method(facetoface_session_dates_check($test->olddates, $test->newdates), $test->message);
+            $this->$method(\mod_facetoface\seminar_session_list::dates_check($test->olddates, $test->newdates), $test->message);
         }, array(
             // No changes.
             (object) array(
@@ -4479,7 +4479,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         $this->resetAfterTest(true);
     }
-    
+
     public function test_save_session_dates() {
         global $DB;
 
@@ -4553,7 +4553,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             ],
         ];
 
-        facetoface_save_dates($seminarevent->to_record(), $dates);
+        \mod_facetoface\seminar_event_helper::merge_sessions(new seminar_event($session->id), $dates);
 
         $updated = $DB->get_records('facetoface_sessions_dates', [
             'sessionid' => $seminarevent->get_id(),

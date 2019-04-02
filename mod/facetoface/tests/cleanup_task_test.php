@@ -329,14 +329,16 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         $this->assertCount(0, facetoface_get_users_by_status($seminarevent4id, \mod_facetoface\signup\state\user_cancelled::get_code()));
 
         // Move dates back.
-        facetoface_save_dates($session2id, [
+        $seminarevent = new \mod_facetoface\seminar_event($session2id);
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [
             (object)[
                 'timestart' => $time - HOURSECS * 38,
                 'timefinish' => $time - HOURSECS * 36,
                 'sessiontimezone' => 'Pacific/Auckland',
             ]
         ]);
-        facetoface_save_dates($session3id, [
+        $seminarevent = new \mod_facetoface\seminar_event($session3id);
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [
             (object)[
                 'timestart' => $time - HOURSECS * 36,
                 'timefinish' => $time + HOURSECS * 36,

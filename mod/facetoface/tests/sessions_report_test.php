@@ -86,15 +86,14 @@ class mod_facetoface_sessions_report_testcase extends advanced_testcase {
 
         $sessiondate->timestart = time() - (2 * DAYSECS);
         $sessiondate->timefinish = time() - (2 * DAYSECS) + 60;
-        facetoface_save_dates($sessionid, [$sessiondate]);
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [$sessiondate]);
 
         // Totara hack: "move time to forward"?
         $sessiondate = new stdClass();
         $sessiondate->timestart = time() - DAYSECS;
         $sessiondate->timefinish = time() - DAYSECS + 60;
         $sessiondate->sessiontimezone = 'Pacific/Auckland';
-        $sessiondates = array($sessiondate);
-        facetoface_save_dates($sessionid, $sessiondates);
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [$sessiondate]);
 
         $signup = $DB->get_record('facetoface_signups', ['sessionid' => $sessionid, 'userid' => $student->id]);
         // Take the user time signup.

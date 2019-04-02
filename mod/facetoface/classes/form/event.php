@@ -950,7 +950,7 @@ class event extends \moodleform {
             $seminarevent = new \mod_facetoface\seminar_event($sessionid);
             $seminarevent->from_record($todb);
             $seminarevent->save();
-            facetoface_save_dates($seminarevent->to_record(), $sessiondates);
+            \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, $sessiondates);
         } catch (\moodle_exception $e) {
             print_error('error:couldnotsaveevent', 'facetoface', $this->returnurl);
         }
@@ -988,7 +988,7 @@ class event extends \moodleform {
 
         if ($update) {
             // Send any necessary datetime change notifications but only if date/time is known.
-            if (!empty($sessiondates) && facetoface_session_dates_check($olddates, $sessiondates)) {
+            if (!empty($sessiondates) && \mod_facetoface\seminar_session_list::dates_check($olddates, $sessiondates)) {
                 $attendees = facetoface_get_attendees($session->id);
                 foreach ($attendees as $user) {
                     $signup = \mod_facetoface\signup::create($user->id, $seminarevent);

@@ -128,7 +128,7 @@ class mod_facetoface_archive_testcase extends advanced_testcase {
         $seminarevent = new \mod_facetoface\seminar_event();
         $seminarevent->from_record($session);
         $seminarevent->save();
-        facetoface_save_dates($seminarevent->to_record(), array($sessdate));
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [$sessdate]);
 
         $this->assertEquals(1, $DB->count_records('facetoface_sessions'));
 
@@ -151,7 +151,7 @@ class mod_facetoface_archive_testcase extends advanced_testcase {
 
         $sessdate->timestart = time() - (7 * DAYSECS);
         $sessdate->timefinish = $sessdate->timestart + (8 * HOURSECS);
-        facetoface_save_dates($seminarevent->get_id(), array($sessdate));
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [$sessdate]);
 
         // Trigger the completion - manager marks signup fully attended.
         $this->assertEquals(1, $DB->count_records('facetoface_signups_status'));

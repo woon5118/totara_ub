@@ -327,7 +327,8 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         if (!$future) {
             $sessiondate->timestart = time() - WEEKSECS;
             $sessiondate->timefinish = time() - WEEKSECS + 60;
-            facetoface_save_dates($sessionid, [$sessiondate]);
+            $seminarevent = new seminar_event($sessionid);
+            \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [$sessiondate]);
         }
 
         return $session;
@@ -436,7 +437,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             $errors['location_doesnt_match']);
 
         // Need to cancel seminar date, in the middle!
-        facetoface_save_dates($session, [$session->sessiondates[0], $session->sessiondates[2]]);
+        \mod_facetoface\seminar_event_helper::merge_sessions(
+            new seminar_event($session->id),
+            [$session->sessiondates[0], $session->sessiondates[2]]
+        );
         $old = $session->sessiondates;
         $session->sessiondates = facetoface_get_session_dates($session->id);
 
@@ -478,9 +482,12 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // Adding a date and removing a date and modifying a date.
         $old = $session->sessiondates;
         array_shift($session->sessiondates);
-        facetoface_save_dates($session, array_merge($session->sessiondates, [
-            $added = $this->createSeminarDate(time() + YEARSECS, null, $room->id)
-        ]));
+        \mod_facetoface\seminar_event_helper::merge_sessions(
+            new seminar_event($session->id),
+            array_merge($session->sessiondates, [
+                $added = $this->createSeminarDate(time() + YEARSECS, null, $room->id)
+            ])
+        );
         $session->sessiondates = facetoface_get_session_dates($session->id);
 
         $icals['session_date_removed_and_added'] = [
@@ -623,7 +630,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $seminarevent = new seminar_event();
         $seminarevent->from_record($session);
         $seminarevent->save();
-        facetoface_save_dates($seminarevent->to_record(), $new);
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, $new);
 
         $session = $seminarevent->to_record();
 

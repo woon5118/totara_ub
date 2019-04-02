@@ -194,7 +194,8 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
         $sessiondate = new stdClass();
         $sessiondate->timestart = time() + $delta;
         $sessiondate->timefinish = time() + $delta + abs($delta) * 0.5;
-        facetoface_save_dates($session->id, [$sessiondate]);
+        $seminarevent = new \mod_facetoface\seminar_event($session->id);
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [$sessiondate]);
 
         $this->execute_adhoc_tasks();
         $this->assertCount(2, $sink->get_messages());

@@ -74,6 +74,7 @@ class mod_facetoface_room_search_testcase extends advanced_testcase {
         if (!$sessionid) {
             throw new Exception("Unable to add a session");
         }
+        $seminarevent = new \mod_facetoface\seminar_event($sessionid);
 
         for ($i=0; $i < $numberofrooms; $i++) {
             $room = $generator->add_site_wide_room([
@@ -93,7 +94,7 @@ class mod_facetoface_room_search_testcase extends advanced_testcase {
                     'roomid' => $room->id,
                 ];
 
-                facetoface_save_dates($sessionid, [$sessiondate]);
+                \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [$sessiondate]);
                 $sessiontime += 7200;
             }
         }

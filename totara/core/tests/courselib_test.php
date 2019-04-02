@@ -182,7 +182,7 @@ class totara_core_courselib_testcase extends reportcache_advanced_testcase {
         $sessiondate->timestart = time() - DAYSECS;
         $sessiondate->timefinish = time() - DAYSECS + 60;
         $sessiondate->sessiontimezone = 'Pacific/Auckland';
-        facetoface_save_dates($seminarevent->get_id(), [$sessiondate]);
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [$sessiondate]);
 
         $f2fsignups =
             $DB->get_records('facetoface_signups', ['sessionid' => $seminarevent->get_id()], '', 'userid, id');

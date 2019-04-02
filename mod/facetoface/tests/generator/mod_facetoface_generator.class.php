@@ -190,7 +190,7 @@ class mod_facetoface_generator extends testing_module_generator {
         $seminarevent = new \mod_facetoface\seminar_event();
         $seminarevent->from_record($record);
         $seminarevent->save();
-        facetoface_save_dates($seminarevent->to_record(), $sessiondates);
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, $sessiondates);
 
         return $seminarevent->get_id();
     }

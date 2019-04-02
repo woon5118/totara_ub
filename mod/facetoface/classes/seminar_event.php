@@ -519,10 +519,12 @@ final class seminar_event implements seminar_iterator_item {
 
     /**
      * Get sessions for this event
+     *
+     * @param bool $reload
      * @return seminar_session_list
      */
-    public function get_sessions(): seminar_session_list {
-        if (null == $this->sessions) {
+    public function get_sessions(bool $reload = false): seminar_session_list {
+        if (null == $this->sessions || $reload) {
             $this->sessions = seminar_session_list::from_seminar_event($this);
         }
 

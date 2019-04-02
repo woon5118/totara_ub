@@ -34,7 +34,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 final class seminar_session_list implements \Iterator, \Countable {
 
-    use traits\seminar_iterator;
+    use traits\seminar_iterator {
+        delete as traitDelete;
+    }
 
     /**
      * Keep track of those session's id that are already over.
@@ -240,6 +242,63 @@ final class seminar_session_list implements \Iterator, \Countable {
         }
 
         return $data;
+    }
+
+    /**
+     * Delete sessions and their associated assets.
+     */
+    public function delete() {
+        foreach ($this->items as $item) {
+            asset_helper::sync($item->get_id(), []);
+        }
+        $this->traitDelete();
+    }
+
+    /**
+     * A function to check if the dates in a session have been changed.
+     *
+     * @param array $olddates   The dates the session used to be set to
+     * @param array $newdates   The dates the session is now set to
+     *
+     * @return boolean
+     */
+    public static function dates_check($olddates, $newdates) {
+        // Dates have changed if the amount of dates has changed.
+        if (count($olddates) != count($newdates)) {
+            return true;
+        }
+
+        // Anonymous function used to compare dates to be sorted in an identical way.
+        $cmpfunction = function ($date1, $date2) {
+            // Order by session start time.
+            if (($order = strcmp($date1->timestart, $date2->timestart)) === 0) {
+                // If start time is the same, ordering by finishtime.
+                if (($order = strcmp($date1->timefinish, $date2->timefinish)) === 0) {
+                    // Just to be on a safe side, if the start and finish dates are the same let's also order by timezone.
+                    $order = strcmp($date1->sessiontimezone, $date2->sessiontimezone);
+                }
+            }
+
+            return $order;
+        };
+
+        // Sort the old and new dates in a similar way.
+        usort($olddates, $cmpfunction);
+        usort($newdates, $cmpfunction);
+
+        $dateschanged = false;
+
+        for ($i = 0; $i < count($olddates); $i++) {
+            if ($olddates[$i]->timestart != $newdates[$i]->timestart ||
+                $olddates[$i]->timefinish != $newdates[$i]->timefinish ||
+                $olddates[$i]->sessiontimezone != $newdates[$i]->sessiontimezone ||
+                $olddates[$i]->roomid != $newdates[$i]->roomid && $newdates[$i]->roomid != 0) {
+                $dateschanged = true;
+                break;
+            }
+        }
+
+        return $dateschanged;
     }
 
     /**
