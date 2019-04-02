@@ -110,6 +110,8 @@ class attendees_message extends \moodleform {
         global $DB;
 
         $s = $this->_customdata['s'];
+        $context = $this->_customdata['context'];
+        $seminarevent = $this->_customdata['seminarevent'];
         $data = $this->get_submitted_data();
 
         // Get recipients list
@@ -185,6 +187,7 @@ class attendees_message extends \moodleform {
             } else {
                 $message = get_string('xmessagessenttoattendees', 'facetoface', $emailcount);
             }
+            \mod_facetoface\event\message_sent::create_from_session($seminarevent, $context, 'messageusers')->trigger();
             $returnurl = new \moodle_url('/mod/facetoface/attendees/view.php', array('s' => $s));
             totara_set_notification($message, $returnurl, array('class' => 'notifysuccess'));
         }

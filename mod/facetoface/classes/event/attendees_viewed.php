@@ -119,8 +119,15 @@ class attendees_viewed extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'facetoface', 'view attendance', "view.php?id=$this->contextinstanceid",
-            $this->other['sessionid'], $this->contextinstanceid);
+        $s = $this->other['sessionid'];
+        return [
+            $this->courseid,
+            'facetoface',
+            'view attendance',
+            "attendees/view.php?s=$s",
+            $this->other['sessionid'],
+            $this->contextinstanceid
+        ];
     }
 
     /**

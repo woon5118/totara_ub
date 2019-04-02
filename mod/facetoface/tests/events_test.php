@@ -248,8 +248,17 @@ class mod_facetoface_events_testcase extends advanced_testcase {
 
         $this->assertSame('r', $event->crud);
         $this->assertEventContextNotUsed($event);
-        $this->assertEventLegacyLogData(array($this->course->id, 'facetoface', 'view attendance',
-            "view.php?id={$this->facetoface->cmid}", $this->session->id, $this->facetoface->cmid), $event);
+        $this->assertEventLegacyLogData(
+            [
+                $this->course->id,
+                'facetoface',
+                'view attendance',
+                "attendees/view.php?s={$this->session->id}",
+                $this->session->id,
+                $this->facetoface->cmid
+            ],
+            $event
+        );
     }
 
     public function test_attendees_updated_event() {
@@ -415,5 +424,52 @@ class mod_facetoface_events_testcase extends advanced_testcase {
         // Reload signup.
         $signup = new \mod_facetoface\signup($signup->get_id());
         $this->assertEquals(0, $signup->get_jobassignmentid());
+    }
+
+    public function test_message_users_viewed_event() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $event = \mod_facetoface\event\message_users_viewed::create_from_session($this->session, $this->context, 'messageusers');
+        $event->trigger();
+
+        $this->assertSame('r', $event->crud);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEventLegacyLogData(
+            [
+                $this->course->id,
+                'facetoface',
+                'message users',
+                "attendees/messageusers.php?s={$this->session->id}",
+                $this->session->id,
+                $this->facetoface->cmid
+            ],
+            $event
+        );
+    }
+
+    public function test_message_sent_event() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $seminarevent = new \mod_facetoface\seminar_event($this->session->id);
+        $event = \mod_facetoface\event\message_sent::create_from_session($seminarevent, $this->context, 'messageusers');
+        $event->trigger();
+        $data = $event->get_data();
+
+        $this->assertSame($event::LEVEL_TEACHING, $event->edulevel);
+        $this->assertSame('u', $data['crud']);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEventLegacyLogData(
+            [
+                $this->course->id,
+                'facetoface',
+                'message sent',
+                "attendees/messageusers.php?s={$this->session->id}",
+                $this->session->id,
+                $this->facetoface->cmid
+            ],
+            $event
+        );
     }
 }

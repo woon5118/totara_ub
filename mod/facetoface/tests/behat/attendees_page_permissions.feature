@@ -120,8 +120,8 @@ Feature: Check attendees actions are performed by users with the right permissio
     Then I should see "Attendees" in the "div.tabtree" "css_element"
     And I should see "Wait-list" in the "div.tabtree" "css_element"
     And I should see "Cancellations" in the "div.tabtree" "css_element"
+    And I should see "Message users" in the "div.tabtree" "css_element"
     And I should not see "Take attendance" in the "div.tabtree" "css_element"
-    And I should not see "Message users" in the "div.tabtree" "css_element"
     When I visit the attendees page for session "1" with action "takeattendance"
     Then I should not see "Sam1 Student1"
     And I should not see "Sam2 Student2"
@@ -165,7 +165,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     When I visit the attendees page for session "1" with action "takeattendance"
     And I should see "Cancellations" in the "div.tabtree" "css_element"
     And I should see "Take attendance" in the "div.tabtree" "css_element"
-    And I should see "Message users" in the "div.tabtree" "css_element"
+    And I should not see "Message users" in the "div.tabtree" "css_element"
     And I should not see "Attendees" in the "div.tabtree" "css_element"
     And I should not see "Wait-list" in the "div.tabtree" "css_element"
 #    I cannot visit attendees page with action=attendees because an exception is thrown a Behat doesn't like it
@@ -230,3 +230,20 @@ Feature: Check attendees actions are performed by users with the right permissio
     When I log in as "student1"
     And I am on "Course 1" course homepage
     Then I should see "Cancel booking"
+
+  Scenario: Check trainer actions on attendees page after removing send message capability
+    Given the following "permission overrides" exist:
+      | capability              | permission | role           | contextlevel | reference |
+      | moodle/site:sendmessage | Prohibit   | editingteacher | System       | C1        |
+    When I log in as "trainer1"
+    And I am on "Course 1" course homepage
+    And I click on "View all events" "link"
+    And I click on "Attendees" "link"
+    Then I should see "Attendees" in the "div.tabtree" "css_element"
+    And I should see "Wait-list" in the "div.tabtree" "css_element"
+    And I should see "Cancellations" in the "div.tabtree" "css_element"
+    And I should see "Take attendance" in the "div.tabtree" "css_element"
+    And I should not see "Message users" in the "div.tabtree" "css_element"
+    When I visit the attendees page for session "1" with action "messageusers"
+    Then I should see "You do not have the necessary permissions to send messages"
+

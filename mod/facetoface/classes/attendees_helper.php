@@ -197,6 +197,14 @@ final class attendees_helper {
 
         // Actions the user can perform
         $has_attendees = facetoface_get_num_attendees($seminarevent->get_id());
+        $sendmessagecapability = has_all_capabilities(
+            [
+                'moodle/site:sendmessage',
+                'moodle/course:bulkmessaging',
+                'mod/facetoface:viewattendees'
+            ],
+            $context
+        );
         $includedeleted = has_capability('totara/core:seedeletedusers', $context);
 
         if (has_capability('mod/facetoface:viewattendees', $context)) {
@@ -234,16 +242,9 @@ final class attendees_helper {
 
         if (has_capability('mod/facetoface:takeattendance', $context)) {
             $allowed_actions[] = 'takeattendance';
-            $allowed_actions[] = 'messageusers';
 
             if ($has_attendees && $seminarevent->is_any_attendance_open()) {
                 $available_actions[] = 'takeattendance';
-            }
-
-            if (in_array('attendees', $available_actions) ||
-                in_array('cancellations', $available_actions) ||
-                in_array('waitlist', $available_actions)) {
-                $available_actions[] = 'messageusers';
             }
         }
 
@@ -405,6 +406,15 @@ final class attendees_helper {
                     $available_actions[] = 'cancellations';
                 }
             }
+        }
+
+        if ((in_array('attendees', $available_actions) ||
+                in_array('cancellations', $available_actions) ||
+                in_array('waitlist', $available_actions) ||
+                in_array('takeattendance', $available_actions)) &&
+            $sendmessagecapability) {
+            $allowed_actions[] = 'messageusers';
+            $available_actions[] = 'messageusers';
         }
 
         return [$allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests,

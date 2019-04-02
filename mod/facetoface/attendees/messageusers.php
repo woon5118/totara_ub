@@ -66,34 +66,27 @@ $PAGE->set_url($baseurl);
 
 list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
     = \mod_facetoface\attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context);
-$includeattendeesnote = (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context));
 
-$can_view_session = !empty($allowed_actions);
-if (!$can_view_session) {
+if (!in_array($action, $allowed_actions)) {
     // If no allowed actions so far.
     $return = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
-    redirect($return);
-    die();
+    redirect($return, get_string('error:capabilitysendmessages', 'mod_facetoface'),  null, \core\notification::ERROR);
 }
-
-$actionallowed = in_array($action, $allowed_actions);
 
 /**
  * Handle submitted data
  * Send messages
  */
-if ($actionallowed) {
-    $mform = new \mod_facetoface\form\attendees_message($baseurl, array('s' => $s));
-    $returnurl = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id()));
-    // Check form validates
-    if ($mform->is_cancelled()) {
-        redirect($returnurl);
-    } else if ($mform->is_submitted()) {
-        if (!confirm_sesskey()) {
-            print_error('confirmsesskeybad', 'error');
-        }
-        $mform->send_message();
+$mform = new \mod_facetoface\form\attendees_message($baseurl, ['s' => $s, 'seminarevent' => $seminarevent, 'context' => $context]);
+$returnurl = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id()));
+// Check form validates
+if ($mform->is_cancelled()) {
+    redirect($returnurl);
+} else if ($mform->is_submitted()) {
+    if (!confirm_sesskey()) {
+        redirect($baseurl, get_string('confirmsesskeybad', 'error'), null, \core\notification::ERROR);
     }
+    $mform->send_message();
 }
 
 $pagetitle = format_string($seminar->get_name());
@@ -102,7 +95,6 @@ $PAGE->set_title($pagetitle);
 $PAGE->set_cm($cm);
 $PAGE->set_heading($course->fullname);
 \mod_facetoface\messaging::process_js($action, $seminar, $seminarevent);
-\mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
 
 /**
  * Print page content
@@ -110,19 +102,14 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->box_start();
 echo $OUTPUT->heading($pagetitle);
-if ($can_view_session) {
-    /**
-     * @var mod_facetoface_renderer $seminarrenderer
-     */
-    $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-    echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
-}
+/** @var mod_facetoface_renderer $seminarrenderer */
+$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
+echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
+
 require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
 echo $OUTPUT->container_start('f2f-attendees-table');
 
-if ($actionallowed) {
-    $mform->display();
-}
+$mform->display();
 
 // Go back.
 if ($backtoallsessions) {
@@ -130,7 +117,7 @@ if ($backtoallsessions) {
 } else {
     $url = new moodle_url('/course/view.php', array('id' => $course->id));
 }
-echo html_writer::link($url, get_string('goback', 'facetoface')) . html_writer::end_tag('p');
+echo html_writer::tag('p', html_writer::link($url, get_string('goback', 'facetoface')));
 
 /**
  * Print page footer
@@ -138,3 +125,5 @@ echo html_writer::link($url, get_string('goback', 'facetoface')) . html_writer::
 echo $OUTPUT->container_end();
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer($course);
+
+\mod_facetoface\event\message_users_viewed::create_from_session($session, $context, $action)->trigger();
