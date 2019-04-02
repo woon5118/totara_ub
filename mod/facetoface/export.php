@@ -98,6 +98,6 @@ if (!empty($selectjobassignmentonsignupglobal)) {
 $worksheet->write_string(0, $pos++, get_string('attendance', 'facetoface'));
 $worksheet->write_string(0, $pos++, get_string('datesignedup', 'facetoface'));
 
-facetoface_write_activity_attendance($worksheet, $coursecontext, 1, $seminar->get_id(), null, '', '', $dateformat);
+\mod_facetoface\export_helper::prepare($worksheet, $seminar, $dateformat);
 
 $workbook->close();

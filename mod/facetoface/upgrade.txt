@@ -81,6 +81,8 @@ information provided here is intended especially for developers.
 * $session parameter in function \mod_facetoface\attendees_helper::get_allowed_available_actions() has been deprecated, please do not use
 * facetoface_save_dates() function has been deprecated, please use \mod_facetoface\seminar_event_helper::merge_sessions()
 * facetoface_session_dates_check() function has been deprecated, please use \mod_facetoface\seminar_session_list::dates_check()
+* facetoface_write_activity_attendance() function has been deprecated, please use \mod_facetoface\export_helper::prepare()
+* facetoface_get_user_customfields() function has been deprecated, please use \mod_facetoface\export_helper::get_user_customfields()
 
 === 12.0 ===
 

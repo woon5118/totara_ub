@@ -1863,12 +1863,11 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         // Test variables.
         $userid1 = 1;
-        $userid2 = 42;
         $fieldstoinclude1 = TRUE;
 
         // Test for valid case.
-        $this->assertTrue((bool)facetoface_get_user_customfields($userid1, $fieldstoinclude1), $this->msgtrue);
-        $this->assertTrue((bool)facetoface_get_user_customfields($userid1), $this->msgtrue);
+        $this->assertTrue((bool)\mod_facetoface\export_helper::get_user_customfields($userid1, $fieldstoinclude1), $this->msgtrue);
+        $this->assertTrue((bool)\mod_facetoface\export_helper::get_user_customfields($userid1), $this->msgtrue);
     }
 
     function test_seminar_user_signup() {
