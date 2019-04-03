@@ -30,8 +30,6 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 $userid    = required_param('userid', PARAM_INT); // Facetoface signup user ID.
 $sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
 
-require_sesskey();
-
 $seminar = (new \mod_facetoface\seminar_event($sessionid))->get_seminar();
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
@@ -71,7 +69,7 @@ $output .= html_writer::empty_tag('hr');
 $output .= $renderer->single_button(
     new moodle_url('/mod/facetoface/attendees/edit_usercancellation_notes.php', array('userid' => $userid, 's' => $sessionid, 'sesskey' => sesskey())),
     get_string('edit'),
-    'get'
+    'post'
 );
 
 header('Content-type: text/html; charset=utf-8');

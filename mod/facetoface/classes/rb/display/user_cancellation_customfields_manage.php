@@ -47,7 +47,6 @@ class user_cancellation_customfields_manage extends base {
         $url = new \moodle_url('/mod/facetoface/attendees/ajax/usercancellation_notes.php', [
             's' => $extrafields->sessionid,
             'userid'  => $extrafields->userid,
-            'sesskey' => sesskey(),
             'return'  => $report->src->get_return_page()
         ]);
         $pix = new \pix_icon('t/edit', get_string('showcancelreason', 'mod_facetoface'));

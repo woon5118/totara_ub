@@ -31,8 +31,6 @@ $userid    = required_param('userid', PARAM_INT); // Facetoface signup user ID.
 $sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
 $return = optional_param('return', 'view', PARAM_ALPHA);
 
-require_sesskey();
-
 $seminar = (new \mod_facetoface\seminar_event($sessionid))->get_seminar();
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);

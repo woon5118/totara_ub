@@ -526,7 +526,7 @@ foreach ($requests as $attendee) {
 
     $icon = '';
     if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
-        $url = new moodle_url('/mod/facetoface/attendees/ajax/signup_notes.php', array('s' => $seminarevent->get_id(), 'userid' => $attendee->id, 'sesskey' => sesskey()));
+        $url = new moodle_url('/mod/facetoface/attendees/ajax/signup_notes.php', array('s' => $seminarevent->get_id(), 'userid' => $attendee->id));
         $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
     }
     if ($includeattendeesnote) {

@@ -53,7 +53,6 @@ class f2f_all_signup_customfields_manage extends base {
             $url = new \moodle_url('/mod/facetoface/attendees/ajax/signup_notes.php', array(
                 's' => $extrafields->sessionid,
                 'userid'  => $extrafields->userid,
-                'sesskey' => sesskey(),
                 'return'  => $report->src->get_return_page()
             ));
             $pix = new \pix_icon('t/edit', get_string('edit'));
