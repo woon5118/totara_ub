@@ -163,13 +163,18 @@ echo $OUTPUT->header();
 echo $OUTPUT->box_start();
 
 // Choose header depending on resulting state: waitlist or booked.
-$heading = get_string('signupfor', 'mod_facetoface', $seminar->get_name());
 $currentstate = $signup->get_state();
-if(!$currentstate->can_switch(signup\state\booked::class) &&
+$heading = get_string('signupfor', 'mod_facetoface', $seminar->get_name());
+if ($currentstate instanceof signup\state\booked ||
+    $currentstate instanceof signup\state\requested ||
+    $currentstate instanceof signup\state\waitlisted) {
+    $heading = $seminar->get_name();
+}
+if (!$currentstate->can_switch(signup\state\booked::class) &&
     $currentstate->can_switch(signup\state\waitlisted::class)) {
     $heading = get_string('waitlistfor', 'mod_facetoface', $seminar->get_name());
 }
-echo $OUTPUT->heading($heading);
+echo $OUTPUT->heading(format_string($heading));
 
 /**
  * @var mod_facetoface_renderer $seminarrenderer
