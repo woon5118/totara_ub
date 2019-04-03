@@ -517,23 +517,7 @@ class event extends \moodleform {
 
         $seminarevent = null;
         if (!empty($session)) {
-            // Just clone the record here, and clean up a few attributes first before pass it to seminar_event,
-            // so that the mapper wouldn't complain much. Note that maxtimefinish and mintimestart will be removed once
-            // the deprecated environment patch is merged.
-            $record = clone $session;
-            unset($record->cntdates);
-            unset($record->sessiondates);
-            unset($record->maxtimefinish);
-            unset($record->mintimestart);
-
-            if (!isset($record->facetoface)) {
-                // Sometimes the form is to add new record, therefore, facetofaceid might not be existing in this record object yet.
-                // It needs to be added for record obj.
-                $record->facetoface = $facetofaceid;
-            }
-
-            $seminarevent = new \mod_facetoface\seminar_event();
-            $seminarevent->from_record($record);
+            $seminarevent = new \mod_facetoface\seminar_event($session->id);
         }
 
         // Check approval by role.
@@ -571,7 +555,7 @@ class event extends \moodleform {
                 }
             }
 
-            $seminar = $seminarevent->get_seminar();
+            $seminar = new \mod_facetoface\seminar($facetofaceid);
 
             // Check if default role approval is selected.
             if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ROLE &&
