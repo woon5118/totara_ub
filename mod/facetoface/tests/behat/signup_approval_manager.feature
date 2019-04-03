@@ -181,3 +181,36 @@ Feature: Seminar Signup Manager Approval
     When I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
     Then I should see "Booked" in the "1 January 2020" "table_row"
+
+  Scenario: Trainer is given permission to approve any bookings
+    And I log out
+    When I log in as "jimmy"
+    And I am on "Classroom Connect Course" course homepage
+    And I should see "Request approval"
+    And I follow "Request approval"
+    And I should see "Manager Approval"
+    And I should see "Cassy Cas"
+    And I press "Request approval"
+    And I run all adhoc tasks
+    And I log out
+    When I log in as "trainer"
+    And I am on "Classroom Connect Course" course homepage
+    And I follow "View all events"
+    And I follow "Attendees"
+    Then I should not see "Approval required" in the ".tabtree" "css_element"
+
+    And I log out
+    And I log in as "admin"
+    And the following "permission overrides" exist:
+      | capability                       | permission | role    | contextlevel | reference |
+      | mod/facetoface:approveanyrequest | Allow      | teacher | Course       | CCC       |
+    And I log out
+    When I log in as "trainer"
+    And I am on "Classroom Connect Course" course homepage
+    And I follow "View all events"
+    And I follow "Attendees"
+    And I follow "Approval required"
+    And I click on "input[value='2']" "css_element" in the "Jimmy Jim" "table_row"
+    And I press "Update requests"
+    Then I should see "Attendance requests updated"
+    And I should not see "Jimmy Jim"

@@ -36,6 +36,14 @@ class actor_is_manager_or_admin extends restriction {
         if (\totara_job\job_assignment::is_managing($this->signup->get_actorid(), $this->signup->get_userid())) {
             return true;
         }
+
+        // Check if actor has mod/facetoface:approveanyrequest in course context.
+        $module = $this->signup->get_seminar_event()->get_seminar()->get_coursemodule();
+        $context = \context_module::instance($module->id);
+        if (has_capability('mod/facetoface:approveanyrequest', $context, $this->signup->get_actor())) {
+            return true;
+        }
+
         $admin = new actor_is_admin($this->signup);
 
         return $admin->pass($this->signup);
