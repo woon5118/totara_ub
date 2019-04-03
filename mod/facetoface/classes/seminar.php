@@ -1048,4 +1048,39 @@ final class seminar implements seminar_iterator_item {
         $completion_info->invalidatecache($course->id, $userid);
         return true;
     }
+
+    /**
+     * Checks if user is an admin approver for this seminar or site.
+     *
+     * @param int $userid
+     * @return bool
+     */
+    public function is_admin_approver(int $userid) : bool {
+        // If user is a system approver then return true.
+        $sysapprovers = get_users_from_config(
+            get_config(
+                null,
+                'facetoface_adminapprovers'
+            ),
+            'mod/facetoface:approveanyrequest'
+        );
+        foreach ($sysapprovers as $sysapprover) {
+            if ($sysapprover->id == $userid) {
+                return true;
+            }
+        }
+
+        // If user is activity approver then return true.
+        if (in_array($userid, explode(',', $this->approvaladmins))) {
+            return true;
+        }
+
+        // If user is a site administrator then return true.
+        $admins = array_keys(get_admins());
+        if (in_array($userid, $admins)) {
+            return true;
+        }
+
+        return false;
+    }
 }

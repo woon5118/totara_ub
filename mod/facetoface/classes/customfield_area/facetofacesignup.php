@@ -157,9 +157,8 @@ class facetofacesignup implements \totara_customfield\area {
 
         // 6. The current user is an admin approver.
         if ($record->approvaltype == \mod_facetoface\seminar::APPROVAL_ADMIN) {
-            if (facetoface_is_adminapprover($USER->id, $record)) {
-                return true;
-            }
+            $seminar = new \mod_facetoface\seminar($record->id);
+            return $seminar->is_admin_approver($USER->id);
         }
 
         // If none of the above have passed then this user can not view.

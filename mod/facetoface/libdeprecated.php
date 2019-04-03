@@ -5765,7 +5765,6 @@ function facetoface_session_dates_check($olddates, $newdates) {
     return $dateschanged;
 }
 
-
 /*
  * Write in the worksheet the given facetoface attendance information.
  *
@@ -6184,4 +6183,251 @@ function facetoface_get_user_customfields($userid, $fieldstoinclude=null) {
 
     $customfields[$userid] = $ret;
     return $ret;
+}
+
+
+/**
+ * Used in many places to obtain properly-formatted session date and time info
+ *
+ * @param int $start a start time Unix timestamp
+ * @param int $end an end time Unix timestamp
+ * @param string $tz a session timezone
+ * @return object Formatted date, start time, end time and timezone info
+ * @deprecated since Totara 13.0
+ */
+function facetoface_format_session_times($start, $end, $tz) {
+    debugging('facetoface_format_session_times() function has been deprecated, please use \mod_facetoface\output\session_time::format()',
+        DEBUG_DEVELOPER);
+
+    $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+
+    $formattedsession = new stdClass();
+    if (empty($tz) or empty($displaytimezones)) {
+        $targetTZ = core_date::get_user_timezone();
+    } else {
+        $targetTZ = core_date::get_user_timezone($tz);
+    }
+
+    $formattedsession->startdate = userdate($start, get_string('strftimedate', 'langconfig'), $targetTZ);
+    $formattedsession->starttime = userdate($start, get_string('strftimetime', 'langconfig'), $targetTZ);
+    $formattedsession->enddate = userdate($end, get_string('strftimedate', 'langconfig'), $targetTZ);
+    $formattedsession->endtime = userdate($end, get_string('strftimetime', 'langconfig'), $targetTZ);
+    if (empty($displaytimezones)) {
+        $formattedsession->timezone = '';
+    } else {
+        $formattedsession->timezone = core_date::get_localised_timezone($targetTZ);
+    }
+    return $formattedsession;
+}
+
+/**
+ * Determine if user can or not cancel his/her booking.
+ *
+ * @param stdClass $session Session object like facetoface_get_sessions.
+ * @return bool True if cancellation is allowed, false otherwise.
+ * @deprecated since Totara 13.0
+ */
+function facetoface_allow_user_cancellation($session) {
+    debugging('facetoface_allow_user_cancellation() function has been deprecated, please use '
+        . '\mod_facetoface\signup::can_switch()', DEBUG_DEVELOPER);
+
+    $timenow = time();
+
+    // If cancellations are not allowed, nothing else to check here.
+    if ($session->allowcancellations == \mod_facetoface\seminar_event::ALLOW_CANCELLATION_NEVER) {
+        return false;
+    }
+
+    // If no bookedsession set, something went wrong here, return false.
+    if (!property_exists($session, 'bookedsession')) {
+        return false;
+    }
+
+    // If wait-listed, let them cancel.
+    if (!$session->mintimestart) {
+        return true;
+    }
+
+    // If session has started or the user is not booked, no point in cancelling.
+    if ($session->mintimestart <= $timenow || !$session->bookedsession) {
+        return false;
+    }
+
+    // If the attendance has been marked for the user, then do not let him cancel.
+    $attendancecode = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code();
+    if ($session->bookedsession && in_array($session->bookedsession->statuscode, $attendancecode)) {
+        return false;
+    }
+
+    // If the user has been booked but he is in the waitlist, then he can cancel at any time.
+    if ($session->bookedsession && $session->bookedsession->statuscode == \mod_facetoface\signup\state\waitlisted::get_code()) {
+        return true;
+    }
+
+    // If cancellations are allowed at any time or until cut-off is reached, make the necessary checks.
+    if ($session->allowcancellations == \mod_facetoface\seminar_event::ALLOW_CANCELLATION_ANY_TIME) {
+        return true;
+    } else if ($session->allowcancellations == \mod_facetoface\seminar_event::ALLOW_CANCELLATION_CUT_OFF) {
+        // Check if we are in the range of the cancellation cut-off period.
+        if ($timenow <= $session->mintimestart - $session->cancellationcutoff) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+/**
+ * Is user approver for seminar activity
+ * @param int $userid
+ * @param stdClass $facetoface
+ * @return bool true if user is system approver or activity approver
+ * @deprecated since Totara 13.0
+ */
+function facetoface_is_adminapprover($userid, stdClass $facetoface) {
+    debugging('facetoface_is_adminapprover() function has been deprecated, please use \mod_facetoface\seminar::is_admin_approver()',
+        DEBUG_DEVELOPER);
+
+    $sysapprovers = get_users_from_config(get_config(null, 'facetoface_adminapprovers'), 'mod/facetoface:approveanyrequest');
+    $systemapprover = false;
+
+    foreach ($sysapprovers as $sysapprover) {
+        if ($sysapprover->id == $userid) {
+            $systemapprover = true;
+        }
+    }
+
+    $activityapprover = in_array($userid, explode(',', $facetoface->approvaladmins));
+
+    $admins = array_keys(get_admins());
+    if ($systemapprover || $activityapprover || in_array($userid, $admins)) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Get a full list of all managers on the system.
+ *
+ * @return array
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_manager_list() {
+    global $CFG, $DB;
+
+    debugging('facetoface_get_manager_list() function has been deprecated, please use \mod_facetoface\reservations::get_manager_list()',
+        DEBUG_DEVELOPER);
+
+    $ret = array();
+
+    $usernamefields = get_all_user_name_fields(true, 'u');
+    $sql = "SELECT DISTINCT u.id, {$usernamefields}
+              FROM {job_assignment} staffja
+              JOIN {job_assignment} managerja ON staffja.managerjaid = managerja.id
+              JOIN {user} u ON u.id = managerja.userid
+             ORDER BY u.lastname, u.firstname";
+    $managers = $DB->get_records_sql($sql);
+    foreach ($managers as $manager) {
+        $ret[$manager->id] = fullname($manager);
+    }
+
+    if (!empty($CFG->enabletempmanagers)) {
+        $sql = "SELECT DISTINCT u.id, {$usernamefields}
+                  FROM {job_assignment} staffja
+                  JOIN {job_assignment} tempmanagerja ON staffja.tempmanagerjaid = tempmanagerja.id
+                  JOIN {user} u ON u.id = tempmanagerja.userid
+                 ORDER BY u.lastname, u.firstname";
+        $params = array(time());
+        $tempmanagers = $DB->get_records_sql($sql, $params);
+        foreach ($tempmanagers as $tempmanager) {
+            $ret[$tempmanager->id] = fullname($tempmanager);
+        }
+    }
+
+    return $ret;
+}
+
+/**
+ * Update the value of a customfield for the given session/notice.
+ *
+ * @param integer $field    ID of a record from the facetoface_session_field table
+ * @param string  $data       Value for that custom field
+ * @param integer $otherid    ID of a record from the facetoface_(sessions|notice) table
+ * @param string  $table      'session' or 'notice' (part of the table name)
+ * @return true if it succeeded, false otherwise
+ * @deprecated since Totara 13.0
+ */
+function facetoface_save_customfield_value($field, $data, $otherid, $table) {
+    global $DB;
+
+    debugging('facetoface_save_customfield_value() function has been deprecated, there is no replacement',DEBUG_DEVELOPER);
+
+    $dbdata = null;
+    if (is_array($data)) {
+        // Get param1.
+        $param1 = json_decode($field->param1);
+        $values = array();
+        foreach ($param1 as $key => $option) {
+            $option->default = $data[$key];
+            $values[md5($option->option)] = $option;
+        }
+
+        $dbdata = json_encode($values);
+    } else {
+        $dbdata = trim($data);
+    }
+
+    $newrecord = new stdClass();
+    $newrecord->data = $dbdata;
+
+    $fieldname = "{$table}id";
+    if ($record = $DB->get_record("facetoface_{$table}_data", array('fieldid' => $field->id, $fieldname => $otherid))) {
+        if (empty($dbdata)) {
+            // Clear out the existing value
+            return $DB->delete_records("facetoface_{$table}_data", array('id' => $record->id));
+        }
+
+        $newrecord->id = $record->id;
+        return $DB->update_record("facetoface_{$table}_data", $newrecord);
+    } else {
+        if (empty($dbdata)) {
+            return true; // no need to store empty values
+        }
+
+        $newrecord->fieldid = $field->id;
+        $newrecord->$fieldname = $otherid;
+        return $DB->insert_record("facetoface_{$table}_data", $newrecord);
+    }
+}
+
+/**
+ * Add the customfield names-values for the given session/notice to the object passed.
+ *
+ * @param stdClass  $object   Object to add the customfield
+ * @param object  $field    A record from the facetoface_session_field table
+ * @param integer $otherid  ID of a record from the facetoface_(sessions|notice) table
+ * @param string  $table    'session' or 'notice' (part of the table name)
+ * @deprecated since Totara 13.0
+ */
+function facetoface_get_customfield_value(&$object, $field, $otherid, $table) {
+    global $DB;
+
+    debugging('facetoface_get_customfield_value() function has been deprecated, there is no replacement',DEBUG_DEVELOPER);
+
+    if ($record = $DB->get_record("facetoface_{$table}_data", array('fieldid' => $field->id, "{$table}id" => $otherid))) {
+        if (!empty($record->data)) {
+            if ('multiselect' == $field->datatype) {
+                $data = json_decode($record->data, true);
+                $index = 0;
+                foreach ($data as $key => $item) {
+                    $fieldname = "customfield_$field->shortname[$index]";
+                    $object->$fieldname =  $item['default'];
+                    $index++;
+                }
+            } else {
+                $fieldname = "customfield_$field->shortname";
+                $object->$fieldname =  $record->data;
+            }
+        }
+    }
 }

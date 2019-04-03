@@ -83,6 +83,12 @@ information provided here is intended especially for developers.
 * facetoface_session_dates_check() function has been deprecated, please use \mod_facetoface\seminar_session_list::dates_check()
 * facetoface_write_activity_attendance() function has been deprecated, please use \mod_facetoface\export_helper::prepare()
 * facetoface_get_user_customfields() function has been deprecated, please use \mod_facetoface\export_helper::get_user_customfields()
+* facetoface_format_session_times() function has been deprecated, please use \mod_facetoface\output\session_time::format()
+* facetoface_allow_user_cancellation() function has been deprecated, please use \mod_facetoface\signup::can_switch()
+* facetoface_is_adminapprover() function has been deprecated, please use \mod_facetoface\seminar::is_admin_approver()
+* facetoface_get_manager_list() function has been deprecated, please use \mod_facetoface\reservations::get_manager_list()
+* facetoface_save_customfield_value() function has been deprecated, there is no replacement
+* facetoface_get_customfield_value() function has been deprecated, there is no replacement
 
 === 12.0 ===
 

@@ -129,7 +129,7 @@ if ($reserveinfo['reservepastdeadline']) {
     $managers = array();
     if ($reserveinfo['reserveother']) {
         // Form to select which manager to reserve spaces for.
-        $managers = facetoface_get_manager_list();
+        $managers = reservations::get_manager_list();
         $preform .= html_writer::input_hidden_params($PAGE->url);
         $preform .= html_writer::select($managers, 'managerid', $manager->id).' ';
         $preform .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'selectmanager',

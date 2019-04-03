@@ -36,7 +36,7 @@ class event_dates {
      * @return string
      */
     public static function render($timestart, $timefinish, $sesiontimezone, $displaytimezone = true) {
-        $sessionobj = facetoface_format_session_times(
+        $sessionobj = output\session_time::format(
             $timestart,
             $timefinish,
             $sesiontimezone
@@ -197,7 +197,7 @@ class event_dates {
             $formatteddates = array();
             foreach ($session->sessiondates as $date) {
                 $formatteddate = '';
-                $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
+                $sessionobj = output\session_time::format($date->timestart, $date->timefinish, $date->sessiontimezone);
                 if ($sessionobj->startdate == $sessionobj->enddate) {
                     $formatteddate .= $sessionobj->startdate . ', ';
                 } else {

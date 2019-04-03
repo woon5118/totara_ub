@@ -847,7 +847,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
 
         $facetoface = $DB->get_record('facetoface', array('id' => $seminarevent->get_facetoface()));
 
-        $dates = facetoface_format_session_times(
+        $dates = \mod_facetoface\output\session_time::format(
             $sessiondate->timestart,
             $sessiondate->timefinish,
             $sessiondate->sessiontimezone

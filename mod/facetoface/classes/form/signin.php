@@ -50,7 +50,7 @@ class signin extends \moodleform {
 
         $options = array();
         foreach ($session->sessiondates as $date) {
-            $dateobject = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
+            $dateobject = \mod_facetoface\output\session_time::format($date->timestart, $date->timefinish, $date->sessiontimezone);
             $options[$date->id] = get_string('sessionstartdatewithtime', 'mod_facetoface', $dateobject);
         }
         if (count($options) > 1) {

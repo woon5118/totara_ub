@@ -325,7 +325,7 @@ final class attendees_helper {
 
         $admin_requests = array();
         if ($seminar->get_approvaltype() == \mod_facetoface\seminar::APPROVAL_ADMIN) {
-            if (facetoface_is_adminapprover($USER->id, $seminar->get_properties())) {
+            if ($seminar->is_admin_approver($USER->id)) {
                 // The current user is one of the admin approvers.
                 $allowed_actions[] = 'approvalrequired';
                 $available_actions[] = 'approvalrequired';

@@ -667,4 +667,41 @@ final class reservations {
 
         return $reserveinfo;
     }
+
+    /**
+     * Get a full list of all managers on the system.
+     *
+     * @return array
+     */
+    public static function get_manager_list() : array {
+        global $CFG, $DB;
+
+        $ret = [];
+
+        $usernamefields = get_all_user_name_fields(true, 'u');
+        $sql = "SELECT DISTINCT u.id, {$usernamefields}
+              FROM {job_assignment} staffja
+              JOIN {job_assignment} managerja ON staffja.managerjaid = managerja.id
+              JOIN {user} u ON u.id = managerja.userid
+             ORDER BY u.lastname, u.firstname";
+        $managers = $DB->get_records_sql($sql);
+        foreach ($managers as $manager) {
+            $ret[$manager->id] = fullname($manager);
+        }
+
+        if (!empty($CFG->enabletempmanagers)) {
+            $sql = "SELECT DISTINCT u.id, {$usernamefields}
+                  FROM {job_assignment} staffja
+                  JOIN {job_assignment} tempmanagerja ON staffja.tempmanagerjaid = tempmanagerja.id
+                  JOIN {user} u ON u.id = tempmanagerja.userid
+                 ORDER BY u.lastname, u.firstname";
+            $params = array(time());
+            $tempmanagers = $DB->get_records_sql($sql, $params);
+            foreach ($tempmanagers as $tempmanager) {
+                $ret[$tempmanager->id] = fullname($tempmanager);
+            }
+        }
+
+        return $ret;
+    }
 }

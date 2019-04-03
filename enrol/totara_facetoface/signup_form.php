@@ -218,7 +218,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
                 foreach ($session->sessiondates as $date) {
                     $allsessiondates .= html_writer::start_tag('li');
 
-                    $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
+                    $sessionobj = \mod_facetoface\output\session_time::format($date->timestart, $date->timefinish, $date->sessiontimezone);
                     if ($sessionobj->startdate == $sessionobj->enddate) {
                         $allsessiondates .= $sessionobj->startdate;
                     } else {

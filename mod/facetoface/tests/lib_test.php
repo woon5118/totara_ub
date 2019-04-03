@@ -4043,28 +4043,31 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->getDataGenerator()->role_assign($managerrole->id, $user5->id, $context->id);
         $this->getDataGenerator()->role_assign($managerrole->id, $user6->id, $context->id);
 
+        $user1 = $this->getDataGenerator()->create_user();
+
+        $seminar1 = new seminar($facetoface1->id);
+        $seminar2 = new seminar($facetoface2->id);
 
         // not listed in activity, not system approver.
-        $user1 = $this->getDataGenerator()->create_user();
-        $this->assertFalse(facetoface_is_adminapprover($user1->id, $facetoface1));
+        $this->assertFalse($seminar1->is_admin_approver($user1->id));
 
         // listed in different activity, not system approver.
-        $this->assertFalse(facetoface_is_adminapprover($user2->id, $facetoface1));
-        // listed in activity, not system approver.
-        $this->assertTrue(facetoface_is_adminapprover($user2->id, $facetoface2));
+        $this->assertFalse($seminar1->is_admin_approver($user2->id));
 
         // not listed in activity, system approver, no capability.
-        $this->assertFalse(facetoface_is_adminapprover($user4->id, $facetoface1));
+        $this->assertFalse($seminar1->is_admin_approver($user4->id));
 
         // not listed in activity, not system approver, has capability.
-        $this->assertFalse(facetoface_is_adminapprover($user6->id, $facetoface1));
+        $this->assertFalse($seminar1->is_admin_approver($user6->id));
 
         // not listed in activity, system approver, has capability.
-        $this->assertTrue(facetoface_is_adminapprover($user5->id, $facetoface1));
+        $this->assertTrue($seminar1->is_admin_approver($user5->id));
 
+        // listed in activity, not system approver.
+        $this->assertTrue($seminar2->is_admin_approver($user2->id));
 
         // listed in activity, system approver, has capability.
-        $this->assertTrue(facetoface_is_adminapprover($user3->id, $facetoface2));
+        $this->assertTrue($seminar2->is_admin_approver($user3->id));
     }
 
     /**

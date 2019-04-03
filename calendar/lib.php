@@ -1700,9 +1700,11 @@ function calendar_format_event_time($event, $now, $linkparams = null, $usecommon
                    AND fs.id = ?
                  WHERE fsd.timestart = ?";
         if ($sessiondata = $DB->get_record_sql($sql, array($event->uuid, $event->timestart))) {
-            $sessionobj = facetoface_format_session_times($event->timestart,
-                                                          $event->timestart + $event->timeduration,
-                                                          $sessiondata->sessiontimezone);
+            $sessionobj = \mod_facetoface\output\session_time::format(
+                $event->timestart,
+                $event->timestart + $event->timeduration,
+                $sessiondata->sessiontimezone
+            );
 
             $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
             if ($displaytimezones) {

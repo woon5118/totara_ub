@@ -238,7 +238,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     }
 
                     // Session dates
-                    $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
+                    $sessionobj = \mod_facetoface\output\session_time::format($date->timestart, $date->timefinish, $date->sessiontimezone);
                     if ($sessionobj->startdate == $sessionobj->enddate) {
                         $sessionrow[] = $sessionobj->startdate;
                     } else {
@@ -661,7 +661,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         // Signup Start Dates/times.
         if (!empty($session->registrationtimestart)) {
             if (!empty($session->registrationtimefinish)) {
-                $sessionobj = facetoface_format_session_times($session->registrationtimestart, $session->registrationtimefinish, '');
+                $sessionobj = \mod_facetoface\output\session_time::format($session->registrationtimestart, $session->registrationtimefinish, '');
                 $registrationstring = get_string('signupstartend', 'facetoface', $sessionobj);
             } else {
                 $start = new stdClass();
@@ -917,10 +917,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             && in_array($session->id, array_column(facetoface_get_user_submissions($session->facetoface, $USER->id), 'sessionid')));
 
         // Check if the user is allowed to cancel his booking.
-        $allowcancellation = facetoface_allow_user_cancellation($session);
         $seminarevent = new \mod_facetoface\seminar_event($session->id);
+        $seminarevent->set_cutoff($session->cancellationcutoff);
         $seminar = new \mod_facetoface\seminar($session->facetoface);
         $signup = \mod_facetoface\signup::create($USER->id, $seminarevent);
+        $allowcancellation = $signup->can_switch(\mod_facetoface\signup\state\user_cancelled::class);
         $state = $signup->get_state();
         if ($isbookedsession) {
             if (!$sessionstarted) {
@@ -1887,7 +1888,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
                 $output .= html_writer::empty_tag('br');
 
-                $sessionobj = facetoface_format_session_times($date->get_timestart(), $date->get_timefinish(), $date->get_sessiontimezone());
+                $sessionobj = \mod_facetoface\output\session_time::format($date->get_timestart(), $date->get_timefinish(), $date->get_sessiontimezone());
                 if ($sessionobj->startdate == $sessionobj->enddate) {
                     $html = $sessionobj->startdate . ', ';
                 } else {
