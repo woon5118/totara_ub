@@ -59,7 +59,7 @@ class f2f_room_name_link extends base {
         $extrafields = self::get_extrafields_row($row, $column);
 
         return \html_writer::link(
-            new \moodle_url('/mod/facetoface/room/edit.php', array('roomid' => $extrafields->roomid)),
+            new \moodle_url('/mod/facetoface/reports/rooms.php', array('roomid' => $extrafields->roomid)),
             $value
         );
     }
