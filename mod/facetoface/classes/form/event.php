@@ -759,7 +759,7 @@ class event extends \moodleform {
                     $sessiondata->$timefinishfield = $date->timefinish;
                     $sessiondata->$timezonefield = $date->sessiontimezone;
                     $sessiondata->$roomidfield = $date->roomid;
-                    $sessiondata->$assetsfield = $date->assetids;
+                    $sessiondata->$assetsfield = \mod_facetoface\asset_helper::get_session_assetids($date->id);
 
                     // NOTE: There is no need to remove rooms and assets
                     //       because form validation will not allow saving

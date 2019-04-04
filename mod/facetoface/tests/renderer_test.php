@@ -158,7 +158,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $sessionid = $this->facetoface_generator->add_session($sessiondata);
         $seminarevent = new seminar_event($sessionid);
         $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($sessionid);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         // First of all with minimal set to true. Meaning get_regdates_tooltip_info is called.
         $returnedoutput = $renderer->print_session_list_table([ $session ], false, false, $displaytimezones, array(), null, true);
@@ -413,7 +413,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         [ $seminarid, $sessionid, $roomid ] = $this->create_seminar_session_and_room(null, $cancelled, $sessionattendance, 0);
         $seminarevent = new seminar_event($sessionid);
         $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($sessionid);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, 0);
         $cells = $this->get_table_cells($outhtml, $sessionattendance);
@@ -460,7 +460,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
         $seminarevent = new seminar_event($sessionid);
         $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($sessionid);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, $attendancetime);
         $cells = $this->get_table_cells($outhtml, $sessionattendance);
@@ -510,7 +510,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
         $seminarevent = new seminar_event($sessionid);
         $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($sessionid);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
         $this->assertCount(1, $session->sessiondates);
 
         $now = time();
@@ -590,7 +590,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $seminar = new seminar($seminarid);
         $seminarevent = new seminar_event($sessionid);
         $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($sessionid);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
         $this->assertCount(1, $session->sessiondates);
 
         $now = time();

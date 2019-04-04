@@ -90,6 +90,10 @@ information provided here is intended especially for developers.
 * facetoface_get_manager_list() function has been deprecated, please use \mod_facetoface\reservations::get_manager_list()
 * facetoface_save_customfield_value() function has been deprecated, there is no replacement
 * facetoface_get_customfield_value() function has been deprecated, there is no replacement
+* facetoface_is_session_in_progress() function has been deprecated, please use \mod_facetoface\seminar_event::is_progress()
+* facetoface_has_session_started() function has been deprecated, please use \mod_facetoface\seminar_event::is_started()
+* facetoface_is_session_over() function has been deprecated, please use \mod_facetoface\seminar_event::is_over()
+* facetoface_get_session_dates() function has been deprecated, please use \mod_facetoface\seminar_event::get_sessions() + \mod_facetoface\seminar_event_list::sort()
 
 === 12.0 ===
 

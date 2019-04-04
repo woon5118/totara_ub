@@ -182,7 +182,8 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
         $sessionid = $f2fgenerator->add_session($sessiondata);
 
         $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         // Signup for session
         $sink = $this->redirectMessages();

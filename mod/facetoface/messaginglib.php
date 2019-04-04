@@ -58,7 +58,8 @@ function facetoface_get_unmailed_reminders() {
 
     if ($submissions) {
         foreach ($submissions as $key => $value) {
-            $submissions[$key]->sessiondates = facetoface_get_session_dates($value->sessionid);
+            $seminarevent = new \mod_facetoface\seminar_event($value->sessionid);
+            $submissions[$key]->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
         }
     }
 

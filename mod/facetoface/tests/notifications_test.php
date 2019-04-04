@@ -186,7 +186,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $sessionid = $this->getSeminarGenerator()->add_session($params, $options);
         $seminarevent = new seminar_event($sessionid);
         $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($sessionid);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
         return $session;
     }
 
@@ -307,10 +307,9 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $seminarevent = new seminar_event($sessionid);
-        // workaround until facetoface_get_session_dates is replaced
         $session = $seminarevent->to_record();
         $session->mintimestart = $seminarevent->get_mintimestart();
-        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         // Signup user1.
         $this->setUser($student1);
@@ -442,7 +441,8 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             [$session->sessiondates[0], $session->sessiondates[2]]
         );
         $old = $session->sessiondates;
-        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $seminarevent = new seminar_event($session->id);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         $icals['session_date_removed'] = [
             $this->dissect_ical(\mod_facetoface\messaging::generate_ical($seminar,
@@ -488,7 +488,8 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
                 $added = $this->createSeminarDate(time() + YEARSECS, null, $room->id)
             ])
         );
-        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $seminarevent = new seminar_event($session->id);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         $icals['session_date_removed_and_added'] = [
             $this->dissect_ical(\mod_facetoface\messaging::generate_ical($seminar,
@@ -995,9 +996,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         );
 
         $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent = new seminar_event($sessionid);
 
         $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
         $roomcf = [];
         $roomlist = \mod_facetoface\room_list::get_event_rooms($session->id);
         foreach ($roomlist as $room) {
@@ -1118,10 +1120,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         );
 
         $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent = new seminar_event($sessionid);
 
         // Now get all the date we've created.
         $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
         // Get data for room custom fields.
         $roomcf = [];
         $roomlist = \mod_facetoface\room_list::get_event_rooms($session->id);
@@ -1227,9 +1230,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         );
 
         $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent = new seminar_event($sessionid);
 
         $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
         $roomcf = [];
         $roomlist = \mod_facetoface\room_list::get_event_rooms($session->id);
         foreach ($roomlist as $room) {
@@ -1323,9 +1327,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         );
 
         $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent = new seminar_event($sessionid);
 
         $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
         $roomcf = [];
         $roomlist = \mod_facetoface\room_list::get_event_rooms($session->id);
         foreach ($roomlist as $room) {
@@ -2155,9 +2160,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         );
 
         $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent = new seminar_event($sessionid);
         $sessiondata['datetimeknown'] = '1';
         $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         signup_helper::signup(\mod_facetoface\signup::create($student1->id, new \mod_facetoface\seminar_event($session->id)));
         signup_helper::signup(\mod_facetoface\signup::create($student2->id, new \mod_facetoface\seminar_event($session->id)));

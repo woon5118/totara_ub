@@ -42,9 +42,8 @@ $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 $course = $DB->get_record('course', array('id' => $seminar->get_course()));
 
-// work-around until facetoface_get_session_dates is replaced
 $session = $seminarevent->to_record();
-$session->sessiondates = facetoface_get_session_dates($s);
+$session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 $session->cntdates = count($session->sessiondates);
 
 // Setting the count dates ($cntdates) here for a scenario: when the user is only viewing editing page for seminar's

@@ -1136,7 +1136,8 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             $seminar = new \mod_facetoface\seminar($session->f2fid);
             $session->signupcount = facetoface_get_num_attendees($session->id, \mod_facetoface\signup\state\requested::get_code());
 
-            if (!empty($session->sessiondates) && facetoface_has_session_started($session, $timenow)) {
+            $seminarevent = new seminar_event($session->id);
+            if (!empty($session->sessiondates) && $seminarevent->is_started($timenow)) {
                 continue;
             }
 

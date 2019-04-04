@@ -800,6 +800,17 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             $this->course_modules_data[$i][2] = $f2fmid;
         }
 
+        $this->facetoface_sessions_dates_data = array(
+            array('id',     'sessionid',    'timestart',    'timefinish'),
+            array(1,        1,              time() - 500,  time() + 500),
+            array(2,        2,              time() + 1900,  time() + 2100),
+            array(3,        3,              time() + 900,   time() + 1100),
+            array(4,        3,              time() + 1200,  time() + 1400),
+            array(5,        6,              time() + 1200,  time() + 1400),
+            array(6,        1,              time() - 900,   time() - 500),
+            array(7,        1,              time() - 1100,   time() - 950),
+        );
+
         $this->loadDataSet(
             $this->createArrayDataSet(
                 array(
@@ -1148,7 +1159,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $cfgenerator->set_multiselect($signuprec21, $cfids['signup_multi'], array('opt1'), 'facetofacesignup', 'facetoface_signup');
         $cfgenerator->set_datetime($signuprec21, $cfids['signup_date'], time(), 'facetofacesignup', 'facetoface_signup');
 
-
         // because facetoface_user_signup() didn't check conflicts. I've cancelled the session1 signup
         // so the second can go ahead.
         $this->assertTrue($signup21->can_switch(user_cancelled::class));
@@ -1301,36 +1311,39 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $student1 = $this->getDataGenerator()->create_user();
         $student2 = $this->getDataGenerator()->create_user();
 
-        $session1 = $f2fgenerator->create_session_for_course($course);
-        $session2 = $f2fgenerator->create_session_for_course($course, 2);
+        $seminarevent1 = $f2fgenerator->create_session_for_course($course);
+        $seminarevent2 = $f2fgenerator->create_session_for_course($course, 2);
+
+        $seminarevent1id = $seminarevent1->get_id();
+        $seminarevent2id = $seminarevent2->get_id();
 
         $this->getDataGenerator()->enrol_user($student1->id, $course->id);
         $this->getDataGenerator()->enrol_user($student2->id, $course->id);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
+        $signups[11] = $f2fgenerator->create_signup($student1, $seminarevent1);
 
-        $f2fgenerator->create_cancellation($student1, $session1->seminarevent);
+        $f2fgenerator->create_cancellation($student1, $seminarevent1);
         $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 1, 2);
 
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
+        $signups[12] = $f2fgenerator->create_signup($student1, $seminarevent2);
+        $signups[21] = $f2fgenerator->create_signup($student2, $seminarevent1);
+        $signups[22] = $f2fgenerator->create_signup($student2, $seminarevent2);
 
         $f2fgenerator->create_customfield_data($signups[12], 'signup', 3, 4);
         $f2fgenerator->create_customfield_data($signups[21], 'signup', 5, 3);
         $f2fgenerator->create_customfield_data($signups[22], 'signup', 2, 1);
 
-        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
+        $f2fgenerator->create_cancellation($student2, $seminarevent2);
         $f2fgenerator->create_customfield_data($signups[22], 'cancellation', 1, 1);
 
         // Check initial data.
-        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session1->id)));
-        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session2->id)));
-        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $session1->id)));
-        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $session2->id)));
-        $this->assert_count_signups_status($session1->id, 3);
-        $this->assert_count_signups_status($session2->id, 3);
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $seminarevent1id)));
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $seminarevent2id)));
+        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $seminarevent1id)));
+        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $seminarevent2id)));
+        $this->assert_count_signups_status($seminarevent1id, 3);
+        $this->assert_count_signups_status($seminarevent2id, 3);
         // Check customfield data for session1.
         $this->assert_count_customfield_data('signup', [$signups[11]->id, $signups[21]->id], 5, 3);
         $this->assert_count_customfield_data('cancellation', [$signups[11]->id, $signups[21]->id], 1, 2);
@@ -1338,16 +1351,16 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assert_count_customfield_data('signup', [$signups[12]->id, $signups[22]->id], 5, 5);
         $this->assert_count_customfield_data('cancellation', [$signups[12]->id, $signups[22]->id], 1, 1);
 
-        $signupslist = \mod_facetoface\signup_list::from_conditions(['sessionid' => (int)$session2->id]);
+        $signupslist = \mod_facetoface\signup_list::from_conditions(['sessionid' => (int)$seminarevent2id]);
         $signupslist->delete();
 
         // Check data after deletion.
-        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session1->id)));
-        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session2->id)));
-        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $session1->id)));
-        $this->assertCount(0, $DB->get_records('facetoface_signups', array('sessionid' => $session2->id)));
-        $this->assert_count_signups_status($session1->id, 3);
-        $this->assert_count_signups_status($session2->id, 0);
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $seminarevent1id)));
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $seminarevent2id)));
+        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $seminarevent1id)));
+        $this->assertCount(0, $DB->get_records('facetoface_signups', array('sessionid' => $seminarevent2id)));
+        $this->assert_count_signups_status($seminarevent1id, 3);
+        $this->assert_count_signups_status($seminarevent2id, 0);
         // Check customfield data for session1.
         $this->assert_count_customfield_data('signup', [$signups[11]->id, $signups[21]->id], 5, 3);
         $this->assert_count_customfield_data('cancellation', [$signups[11]->id, $signups[21]->id], 1, 2);
@@ -1443,33 +1456,36 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->getDataGenerator()->enrol_user($student1->id, $course->id);
         $this->getDataGenerator()->enrol_user($student2->id, $course->id);
 
-        $session1 = $f2fgenerator->create_session_for_course($course);
-        $session2 = $f2fgenerator->create_session_for_course($course, 2);
+        $seminarevent1 = $f2fgenerator->create_session_for_course($course);
+        $seminarevent2 = $f2fgenerator->create_session_for_course($course, 2);
+
+        $seminarevent1id = $seminarevent1->get_id();
+        $seminarevent2id = $seminarevent2->get_id();
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
+        $signups[11] = $f2fgenerator->create_signup($student1, $seminarevent1);
         $f2fgenerator->create_customfield_data($signups[11], 'signup', 3, 0);
 
-        $f2fgenerator->create_cancellation($student1, $session1->seminarevent);
+        $f2fgenerator->create_cancellation($student1, $seminarevent1);
         $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 1, 2);
 
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
+        $signups[12] = $f2fgenerator->create_signup($student1, $seminarevent2);
+        $signups[21] = $f2fgenerator->create_signup($student2, $seminarevent1);
+        $signups[22] = $f2fgenerator->create_signup($student2, $seminarevent2);
         $f2fgenerator->create_customfield_data($signups[12], 'signup', 4, 1);
         $f2fgenerator->create_customfield_data($signups[21], 'signup', 5, 3);
         $f2fgenerator->create_customfield_data($signups[22], 'signup', 2, 3);
 
-        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
+        $f2fgenerator->create_cancellation($student2, $seminarevent2);
         $f2fgenerator->create_customfield_data($signups[22], 'cancellation', 2, 1);
 
         // Check initial data.
-        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session1->id)));
-        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session2->id)));
-        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $session1->id)));
-        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $session2->id)));
-        $this->assert_count_signups_status($session1->id, 3);
-        $this->assert_count_signups_status($session2->id, 3);
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $seminarevent1id)));
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $seminarevent2id)));
+        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $seminarevent1id)));
+        $this->assertCount(2, $DB->get_records('facetoface_signups', array('sessionid' => $seminarevent2id)));
+        $this->assert_count_signups_status($seminarevent1id, 3);
+        $this->assert_count_signups_status($seminarevent2id, 3);
         // Check customfield data for session1.
         $this->assert_count_customfield_data('signup', [$signups[11]->id, $signups[21]->id], 8, 3);
         $this->assert_count_customfield_data('cancellation', [$signups[11]->id, $signups[21]->id], 1, 2);
@@ -1484,10 +1500,11 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $instance->delete();
 
         // Check data after deletion.
-        $this->assertCount(1, $DB->get_records('facetoface_signups', array('sessionid' => $session1->id)));
-        $this->assertCount(1, $DB->get_records('facetoface_signups', array('sessionid' => $session2->id)));
-        $this->assert_count_signups_status($session1->id, 1);
-        $this->assert_count_signups_status($session2->id, 1);
+        $this->assertCount(1, $DB->get_records('facetoface_signups', array('sessionid' => $seminarevent1id)));
+        $this->assertCount(1, $DB->get_records('facetoface_signups', array('sessionid' => $seminarevent2id)));
+        $this->assert_count_signups_status($seminarevent1id, 1);
+        $this->assert_count_signups_status($seminarevent2id, 1);
+
         // Check customfield data.
         $this->assert_count_customfield_data('signup', [$signups[11]->id, $signups[22]->id], 0, 0);
         $this->assert_count_customfield_data('signup', [$signups[12]->id], 4, 1);
@@ -1511,10 +1528,12 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $timenow = time();
 
         // Test for Valid case.
-        $this->assertTrue((bool)facetoface_has_session_started($sess0, $timenow), $this->msgtrue);
+        $seminarevent = new seminar_event($sess0->id);
+        $this->assertTrue($seminarevent->is_started($timenow), $this->msgtrue);
 
         // Test for invalid case.
-        $this->assertFalse((bool)facetoface_has_session_started($sess1, $timenow), $this->msgfalse);
+        $seminarevent = new seminar_event($sess1->id);
+        $this->assertFalse($seminarevent->is_started($timenow), $this->msgfalse);
     }
 
     function test_facetoface_is_session_in_progress() {
@@ -1533,10 +1552,12 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $timenow = time();
 
         // Test for valid case.
-        $this->assertTrue((bool)facetoface_is_session_in_progress($sess0, $timenow), $this->msgtrue);
+        $seminarevent = new seminar_event($sess0->id);
+        $this->assertTrue($seminarevent->is_progress($timenow), $this->msgtrue);
 
         // Test for invalid case.
-        $this->assertFalse((bool)facetoface_is_session_in_progress($sess1, $timenow), $this->msgfalse);
+        $seminarevent = new seminar_event($sess1->id);
+        $this->assertFalse($seminarevent->is_progress($timenow), $this->msgfalse);
     }
 
     function test_facetoface_get_session_dates() {
@@ -1547,22 +1568,28 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sessionid2 = 10;
 
         // Test for valid case.
-        $this->assertTrue((bool)facetoface_get_session_dates($sessionid1), $this->msgtrue);
+        $seminarevent1 = seminar_event::find($sessionid1);
+        $this->assertTrue($seminarevent1->is_sessions(), $this->msgtrue);
 
         // Test for invalid case.
-        $this->assertFalse((bool)facetoface_get_session_dates($sessionid2), $this->msgfalse);
+        $seminarevent2 = seminar_event::find($sessionid2);
+        $this->assertFalse($seminarevent2->is_sessions(), $this->msgfalse);
 
         // Test for order.
-        $default_order = facetoface_get_session_dates(1);
-        $ascending_order = facetoface_get_session_dates(1, false);
-        $descending_order = facetoface_get_session_dates(1, true);
-
+        $default_order = $seminarevent1->get_sessions()->sort('timestart')->to_records(false);
         $this->assertEquals(7, $default_order[0]->id);
         $this->assertEquals(6, $default_order[1]->id);
         $this->assertEquals(1, $default_order[2]->id);
+
+        $ascending_order = $seminarevent1->get_sessions()->sort('timestart')->to_records(false);
         $this->assertEquals(7, $ascending_order[0]->id);
         $this->assertEquals(6, $ascending_order[1]->id);
         $this->assertEquals(1, $ascending_order[2]->id);
+
+        $descending_order = $seminarevent1->get_sessions()->sort(
+            'timestart',
+            \mod_facetoface\seminar_session_list::SORT_DESC
+        )->to_records(false);
         $this->assertEquals(1, $descending_order[0]->id);
         $this->assertEquals(6, $descending_order[1]->id);
         $this->assertEquals(7, $descending_order[2]->id);
@@ -1930,9 +1957,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $seminarevent = new seminar_event($sessionid);
 
-        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = facetoface_get_session_dates($session->id);
-
         // No manager - problem.
         $signup11 = signup::create($student1->id, $seminarevent);
         $this->assertFalse(signup_helper::can_signup($signup11));
@@ -2121,13 +2145,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             'cutoff' => DAYSECS - 60
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
-        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
         $seminarevent = new seminar_event($sessionid);
-
-        $session->sessiondates = facetoface_get_session_dates($session->id);
-
-        $discountcode1 = 'disc1';
-        $notificationtype1 = 1;
 
         // Test for valid case.
         $sink = $this->redirectMessages(); // Capture any messages sent by the following tests.
@@ -2193,8 +2211,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $sessiondata['datetimeknown'] = '1';
-        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = facetoface_get_session_dates($session->id);
         $seminarevent = new seminar_event($sessionid);
 
         $signup11 = signup::create($student1->id, $seminarevent);
@@ -2202,7 +2218,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         signup_helper::signup($signup11);
 
         $sink = $this->redirectMessages();
-        $cancelreason = 'PHPUnit facetoface user cancellation submission test';
         // Normal test.
         $this->assertTrue($signup11->can_switch(user_cancelled::class));
         signup_helper::user_cancel($signup11);
@@ -2764,9 +2779,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         // User3 does not have a manager to request.
         $signup31 = signup::create($student3->id, $seminarevent);
         $this->assertFalse(signup_helper::can_signup($signup31));
-
-        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = facetoface_get_session_dates($session->id);
 
         // The first user should get booked to the session when approved.
         $this->assertTrue($signup11->can_switch(booked::class, waitlisted::class, requestedadmin::class));
@@ -4523,8 +4535,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             ],
         ]));
         $seminarevent = new seminar_event($sessionid);
-        $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($seminarevent->get_id());
+        $sessions = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         // Gimme some dates, we pretend that we get those from a user supplied form.
         $dates = [
@@ -4533,7 +4544,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
                 'timefinish' => $now + WEEKSECS,
                 'sessiontimezone' => '1Europe/London',
                 'roomid' => $room->id,
-                'id' => $session->sessiondates[0]->id
+                'id' => $sessions[0]->id
             ],
             (object) [
                 'timestart' => $now + WEEKSECS * 3,
@@ -4546,7 +4557,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
                 'timefinish' => $now + YEARSECS + HOURSECS * 2,
                 'sessiontimezone' => '3Europe/London',
                 'roomid' => $room->id,
-                'id' => $session->sessiondates[2]->id
+                'id' => $sessions[2]->id
             ],
             // User may try to sneak in the date from another event.
             (object) [
@@ -4558,7 +4569,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             ],
         ];
 
-        \mod_facetoface\seminar_event_helper::merge_sessions(new seminar_event($session->id), $dates);
+        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, $dates);
 
         $updated = $DB->get_records('facetoface_sessions_dates', [
             'sessionid' => $seminarevent->get_id(),
@@ -4614,19 +4625,17 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             ],
         ]));
         $seminarevent = new seminar_event($sessionid);
-        $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($sessionid);
-        $did = $session->sessiondates[0]->id;
+        $sessions = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         $testset = ['3','7','11','15','19'];
 
         // Assets synced successfully
-        $this->assertTrue(\mod_facetoface\asset_helper::sync($did, $testset), 'Assets sync failed');
+        $this->assertTrue(\mod_facetoface\asset_helper::sync($sessions[0]->id, $testset), 'Assets sync failed');
 
         $assets = $DB->get_fieldset_select('facetoface_asset_dates',
             'assetid',
             'sessionsdateid = :dateid',
-            ['dateid' => $did]);
+            ['dateid' => $sessions[0]->id]);
 
         sort($assets, SORT_NUMERIC);
         $this->assertEquals($testset, $assets, 'Asset sets do not match');

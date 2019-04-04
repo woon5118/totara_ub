@@ -401,9 +401,8 @@ class notice_sender {
             $icaldata = [];
             if ((int)$icalattachmenttype == MDL_F2F_BOTH && $notice->conditiontype != MDL_F2F_CONDITION_DECLINE_CONFIRMATION) {
                 // add_ical_attachment needs session dates on the session stdClass object
-                // this is a work around until facetoface_get_session_dates gets replaced
                 $session = $seminarevent->to_record();
-                $session->sessiondates = facetoface_get_session_dates($seminarevent->get_id());
+                $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
                 $notice->add_ical_attachment($user, $session, $icalattachmentmethod, null, $olddates);
                 $icaldata = [
                     'dates' => $session->sessiondates,

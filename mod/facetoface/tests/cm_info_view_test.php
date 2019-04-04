@@ -103,7 +103,8 @@ class mod_facetoface_cm_info_view_testcase extends advanced_testcase {
         $mapsessioncourse->setAccessible(true);
         $mapsessioncourse->setValue($generator, array($event->id => $course));
 
-        if (facetoface_has_session_started($event, time())) {
+        $seminarevent = new \mod_facetoface\seminar_event($event->id);
+        if ($seminarevent->is_started(time())) {
             throw new Exception("The session had started, therefore, cannot sign up the user");
         }
         $seminarevent = new \mod_facetoface\seminar_event($event->id);
@@ -234,7 +235,6 @@ class mod_facetoface_cm_info_view_testcase extends advanced_testcase {
             $this->fail("No event found for performing the test");
         }
 
-        $event->sessiondates = facetoface_get_session_dates($event->id);
         $this->create_signup($USER, $event, $facetoface, $course);
         $modinfo = get_fast_modinfo($course, $USER->id);
 

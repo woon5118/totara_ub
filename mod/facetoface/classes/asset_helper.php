@@ -112,4 +112,24 @@ final class asset_helper {
 
         return !!$res;
     }
+
+    /**
+     * Get assets for specific session.
+     *
+     * @param int $sessionid
+     * @return string
+     */
+    public static function get_session_assetids(int $sessionid): string {
+        global $DB;
+
+        $assetid = $DB->sql_group_concat($DB->sql_cast_2char('fad.assetid'), ',');
+        $sql = "
+        SELECT {$assetid} AS assetids
+          FROM {facetoface_sessions_dates} fsd
+          LEFT JOIN {facetoface_asset_dates} fad ON (fad.sessionsdateid = fsd.id)
+         WHERE fsd.id = :id";
+
+        $ret = $DB->get_field_sql($sql, array('id' => $sessionid));
+        return $ret ? $ret : '';
+    }
 }

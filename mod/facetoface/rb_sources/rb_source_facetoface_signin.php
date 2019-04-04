@@ -856,9 +856,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $data = array();
         $data[] = array(get_string('facetoface', 'mod_facetoface'), format_string($facetoface->name));
         // Get session custom fields.
-        // work-around until facetoface_get_session_dates gets replaced
         $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($sessiondate->sessionid);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
         $sessioncustomfields = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
         foreach ($sessioncustomfields as $name => $customdata) {
             $data[] = array($name, $customdata);

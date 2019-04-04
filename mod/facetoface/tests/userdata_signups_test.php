@@ -71,38 +71,40 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $student1 = $datagenerator->create_user();
         $student2 = $datagenerator->create_user();
 
-        $session1 = $f2fgenerator->create_session_for_course($course);
-        $session2 = $f2fgenerator->create_session_for_course($course, 2);
+        $seminarevent1 = $f2fgenerator->create_session_for_course($course);
+        $seminarevent2 = $f2fgenerator->create_session_for_course($course, 2);
 
         $this->getDataGenerator()->enrol_user($student1->id, $course->id);
         $this->getDataGenerator()->enrol_user($student2->id, $course->id);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
+        $signups[11] = $f2fgenerator->create_signup($student1, $seminarevent1);
 
         $signupcustomfieldids = [];
         $signupcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'signup', 3, 1);
 
-        $f2fgenerator->create_cancellation($student1, $session1->seminarevent);
+        $f2fgenerator->create_cancellation($student1, $seminarevent1);
 
         $cancellationcustomfieldids = [];
         $cancellationcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 1, 3);
 
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
+        $signups[12] = $f2fgenerator->create_signup($student1, $seminarevent2);
+        $signups[21] = $f2fgenerator->create_signup($student2, $seminarevent1);
+        $signups[22] = $f2fgenerator->create_signup($student2, $seminarevent2);
 
-        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[12]->id, $session2->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[21]->id, $session1->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[22]->id, $session2->sessiondates[0]->id);
+        $sessions1 = $seminarevent1->get_sessions()->sort('timestart')->to_records(false);
+        $sessions2 = $seminarevent2->get_sessions()->sort('timestart')->to_records(false);
+        $f2fgenerator->add_session_status($signups[11]->id, $sessions1[0]->id);
+        $f2fgenerator->add_session_status($signups[11]->id, $sessions1[0]->id);
+        $f2fgenerator->add_session_status($signups[12]->id, $sessions2[0]->id);
+        $f2fgenerator->add_session_status($signups[21]->id, $sessions1[0]->id);
+        $f2fgenerator->add_session_status($signups[22]->id, $sessions2[0]->id);
 
         $signupcustomfieldids[12] = $f2fgenerator->create_customfield_data($signups[12], 'signup', 1, 3);
         $signupcustomfieldids[21] = $f2fgenerator->create_customfield_data($signups[21], 'signup', 4, 1);
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 1, 4);
 
-        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
+        $f2fgenerator->create_cancellation($student2, $seminarevent2);
         $cancellationcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'cancellation', 3, 1);
 
         $f2fgenerator->create_file_customfield($signups[11], 'signup', 'testfile1.txt', 1);
@@ -195,23 +197,25 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $student1 = $datagenerator->create_user();
         $student2 = $datagenerator->create_user();
 
-        $session1 = $f2fgenerator->create_session_for_course($course);
-        $session2 = $f2fgenerator->create_session_for_course($course, 2);
+        $seminarevent1 = $f2fgenerator->create_session_for_course($course);
+        $seminarevent2 = $f2fgenerator->create_session_for_course($course, 2);
 
         $this->getDataGenerator()->enrol_user($student1->id, $course->id);
         $this->getDataGenerator()->enrol_user($student2->id, $course->id);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
+        $signups[11] = $f2fgenerator->create_signup($student1, $seminarevent1);
+        $signups[12] = $f2fgenerator->create_signup($student1, $seminarevent2);
+        $signups[21] = $f2fgenerator->create_signup($student2, $seminarevent1);
+        $signups[22] = $f2fgenerator->create_signup($student2, $seminarevent2);
 
-        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[12]->id, $session2->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[21]->id, $session1->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[22]->id, $session2->sessiondates[0]->id);
+        $sessions1 = $seminarevent1->get_sessions()->sort('timestart')->to_records(false);
+        $sessions2 = $seminarevent2->get_sessions()->sort('timestart')->to_records(false);
+        $f2fgenerator->add_session_status($signups[11]->id, $sessions1[0]->id);
+        $f2fgenerator->add_session_status($signups[11]->id, $sessions1[0]->id);
+        $f2fgenerator->add_session_status($signups[12]->id, $sessions2[0]->id);
+        $f2fgenerator->add_session_status($signups[21]->id, $sessions1[0]->id);
+        $f2fgenerator->add_session_status($signups[22]->id, $sessions2[0]->id);
 
         $emailsink = $this->redirectMessages();
         $this->execute_adhoc_tasks();
@@ -223,8 +227,8 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signupcustomfieldids[21] = $f2fgenerator->create_customfield_data($signups[21], 'signup', 4, 1);
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 1, 4);
 
-        $f2fgenerator->create_cancellation($student1, $session1->seminarevent);
-        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
+        $f2fgenerator->create_cancellation($student1, $seminarevent1);
+        $f2fgenerator->create_cancellation($student2, $seminarevent2);
 
         $cancellationcustomfieldids = [];
         $cancellationcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 1, 3);
@@ -241,7 +245,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->execute_adhoc_tasks();
 
         // Purge data in module context.
-        $coursemodule = get_coursemodule_from_instance('facetoface', $session2->facetoface);
+        $coursemodule = get_coursemodule_from_instance('facetoface', $seminarevent2->get_facetoface());
         $targetuser = new target_user($student1);
         $sink = $this->redirectEvents();
         $status = signups::execute_purge($targetuser, context_module::instance($coursemodule->id));
@@ -254,15 +258,15 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
 
         // Verify expected data. Only student1/session2 data should be purged.
         $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id, 'sessionid' => $session1->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
         $this->assertEquals(2, $DB->count_records('facetoface_signups', ['userid' => $student2->id]));
 
         $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id, 'sessionid' => $session1->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
         $this->assertEquals(2, $DB->count_records('facetoface_notification_sent', ['userid' => $student2->id]));
 
         $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id, 'sessionid' => $session1->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
         $this->assertEquals(2, $DB->count_records('facetoface_notification_hist', ['userid' => $student2->id]));
 
         $this->assertEquals(2, $DB->count_records('facetoface_signups_status', ['signupid' => $signups[11]->id]));
@@ -313,24 +317,27 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->getDataGenerator()->enrol_user($student1->id, $course2->id);
         $this->getDataGenerator()->enrol_user($student2->id, $course2->id);
 
-        $session1 = $f2fgenerator->create_session_for_course($course1);
-        $session2 = $f2fgenerator->create_session_for_course($course1, 2);
-        $session3 = $f2fgenerator->create_session_for_course($course2, 3);
+        $seminarevent1 = $f2fgenerator->create_session_for_course($course1);
+        $seminarevent2 = $f2fgenerator->create_session_for_course($course1, 2);
+        $seminarevent3 = $f2fgenerator->create_session_for_course($course2, 3);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
-        $signups[13] = $f2fgenerator->create_signup($student1, $session3->seminarevent);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
-        $signups[23] = $f2fgenerator->create_signup($student2, $session3->seminarevent);
+        $signups[11] = $f2fgenerator->create_signup($student1, $seminarevent1);
+        $signups[12] = $f2fgenerator->create_signup($student1, $seminarevent2);
+        $signups[13] = $f2fgenerator->create_signup($student1, $seminarevent3);
+        $signups[21] = $f2fgenerator->create_signup($student2, $seminarevent1);
+        $signups[22] = $f2fgenerator->create_signup($student2, $seminarevent2);
+        $signups[23] = $f2fgenerator->create_signup($student2, $seminarevent3);
 
-        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[12]->id, $session2->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[13]->id, $session3->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[21]->id, $session1->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[22]->id, $session2->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[23]->id, $session3->sessiondates[0]->id);
+        $sessions1 = $seminarevent1->get_sessions()->sort('timestart')->to_records(false);
+        $sessions2 = $seminarevent2->get_sessions()->sort('timestart')->to_records(false);
+        $sessions3 = $seminarevent3->get_sessions()->sort('timestart')->to_records(false);
+        $f2fgenerator->add_session_status($signups[11]->id, $sessions1[0]->id);
+        $f2fgenerator->add_session_status($signups[12]->id, $sessions2[0]->id);
+        $f2fgenerator->add_session_status($signups[13]->id, $sessions3[0]->id);
+        $f2fgenerator->add_session_status($signups[21]->id, $sessions1[0]->id);
+        $f2fgenerator->add_session_status($signups[22]->id, $sessions2[0]->id);
+        $f2fgenerator->add_session_status($signups[23]->id, $sessions3[0]->id);
 
         $emailsink = $this->redirectMessages();
         $this->execute_adhoc_tasks();
@@ -344,8 +351,8 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 1, 4);
         $signupcustomfieldids[23] = $f2fgenerator->create_customfield_data($signups[23], 'signup', 5, 2);
 
-        $f2fgenerator->create_cancellation($student1, $session1->seminarevent);
-        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
+        $f2fgenerator->create_cancellation($student1, $seminarevent1);
+        $f2fgenerator->create_cancellation($student2, $seminarevent2);
 
         $cancellationcustomfieldids = [];
         $cancellationcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 1, 3);
@@ -378,15 +385,15 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
 
         // Verify expected data. Only student1/session1&session2 data should be purged.
         $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id, 'sessionid' => $session3->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id, 'sessionid' => $seminarevent3->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_signups', ['userid' => $student2->id]));
 
         $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id, 'sessionid' => $session3->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id, 'sessionid' => $seminarevent3->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_notification_sent', ['userid' => $student2->id]));
 
         $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id, 'sessionid' => $session3->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id, 'sessionid' => $seminarevent3->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_notification_hist', ['userid' => $student2->id]));
 
         $this->assertFalse($DB->record_exists('facetoface_signups_status', ['signupid' => $signups[11]->id]));
@@ -449,25 +456,27 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->getDataGenerator()->enrol_user($student1->id, $course3->id);
         $this->getDataGenerator()->enrol_user($student2->id, $course3->id);
 
-        $session1 = $f2fgenerator->create_session_for_course($course1);
-        $session2 = $f2fgenerator->create_session_for_course($course2, 2);
-        $session3 = $f2fgenerator->create_session_for_course($course3, 3);
+        $seminarevent1 = $f2fgenerator->create_session_for_course($course1);
+        $seminarevent2 = $f2fgenerator->create_session_for_course($course2, 2);
+        $seminarevent3 = $f2fgenerator->create_session_for_course($course3, 3);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
-        $signups[13] = $f2fgenerator->create_signup($student1, $session3->seminarevent);
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
-        $signups[23] = $f2fgenerator->create_signup($student2, $session3->seminarevent);
+        $signups[11] = $f2fgenerator->create_signup($student1, $seminarevent1);
+        $signups[12] = $f2fgenerator->create_signup($student1, $seminarevent2);
+        $signups[13] = $f2fgenerator->create_signup($student1, $seminarevent3);
+        $signups[21] = $f2fgenerator->create_signup($student2, $seminarevent1);
+        $signups[22] = $f2fgenerator->create_signup($student2, $seminarevent2);
+        $signups[23] = $f2fgenerator->create_signup($student2, $seminarevent3);
 
-
-        $f2fgenerator->add_session_status($signups[11]->id, $session1->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[12]->id, $session2->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[13]->id, $session3->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[21]->id, $session1->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[22]->id, $session2->sessiondates[0]->id);
-        $f2fgenerator->add_session_status($signups[23]->id, $session3->sessiondates[0]->id);
+        $sessions1 = $seminarevent1->get_sessions()->sort('timestart')->to_records(false);
+        $sessions2 = $seminarevent2->get_sessions()->sort('timestart')->to_records(false);
+        $sessions3 = $seminarevent3->get_sessions()->sort('timestart')->to_records(false);
+        $f2fgenerator->add_session_status($signups[11]->id, $sessions1[0]->id);
+        $f2fgenerator->add_session_status($signups[12]->id, $sessions2[0]->id);
+        $f2fgenerator->add_session_status($signups[13]->id, $sessions3[0]->id);
+        $f2fgenerator->add_session_status($signups[21]->id, $sessions1[0]->id);
+        $f2fgenerator->add_session_status($signups[22]->id, $sessions2[0]->id);
+        $f2fgenerator->add_session_status($signups[23]->id, $sessions3[0]->id);
 
         $emailsink = $this->redirectMessages();
         $this->execute_adhoc_tasks();
@@ -481,8 +490,8 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 1, 4);
         $signupcustomfieldids[23] = $f2fgenerator->create_customfield_data($signups[23], 'signup', 5, 2);
 
-        $f2fgenerator->create_cancellation($student1, $session2->seminarevent);
-        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
+        $f2fgenerator->create_cancellation($student1, $seminarevent2);
+        $f2fgenerator->create_cancellation($student2, $seminarevent2);
 
         $cancellationcustomfieldids = [];
         $cancellationcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[12], 'cancellation', 1, 3);
@@ -515,15 +524,15 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
 
         // Verify expected data. Only student1/session2&session3 data should be purged.
         $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id, 'sessionid' => $session1->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_signups', ['userid' => $student2->id]));
 
         $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id, 'sessionid' => $session1->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_notification_sent', ['userid' => $student2->id]));
 
         $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id, 'sessionid' => $session1->id]));
+        $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_notification_hist', ['userid' => $student2->id]));
 
         $this->assertFalse($DB->record_exists('facetoface_signups_status', ['signupid' => $signups[12]->id]));
@@ -648,18 +657,18 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->getDataGenerator()->enrol_user($student1->id, $course3->id);
         $this->getDataGenerator()->enrol_user($student2->id, $course3->id);
 
-        $session1 = $f2fgenerator->create_session_for_course($course1);
-        $session2 = $f2fgenerator->create_session_for_course($course1, 2);
-        $session3 = $f2fgenerator->create_session_for_course($course2, 3);
-        $session4 = $f2fgenerator->create_session_for_course($course3, 4);
+        $seminarevent1 = $f2fgenerator->create_session_for_course($course1);
+        $seminarevent2 = $f2fgenerator->create_session_for_course($course1, 2);
+        $seminarevent3 = $f2fgenerator->create_session_for_course($course2, 3);
+        $seminarevent4 = $f2fgenerator->create_session_for_course($course3, 4);
 
-        $f2fgenerator->create_signup($student1, $session1->seminarevent);
-        $f2fgenerator->create_signup($student1, $session2->seminarevent);
-        $f2fgenerator->create_signup($student1, $session3->seminarevent);
-        $f2fgenerator->create_signup($student1, $session4->seminarevent);
-        $f2fgenerator->create_signup($student2, $session1->seminarevent);
-        $f2fgenerator->create_signup($student2, $session2->seminarevent);
-        $f2fgenerator->create_signup($student2, $session3->seminarevent);
+        $f2fgenerator->create_signup($student1, $seminarevent1);
+        $f2fgenerator->create_signup($student1, $seminarevent2);
+        $f2fgenerator->create_signup($student1, $seminarevent3);
+        $f2fgenerator->create_signup($student1, $seminarevent4);
+        $f2fgenerator->create_signup($student2, $seminarevent1);
+        $f2fgenerator->create_signup($student2, $seminarevent2);
+        $f2fgenerator->create_signup($student2, $seminarevent3);
 
         $emailsink = $this->redirectMessages();
         $this->execute_adhoc_tasks();
@@ -692,8 +701,8 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->assertEquals(1, signups::execute_count($targetuser2, $categorycontext2));
 
         // Module context.
-        $coursemodule3 = get_coursemodule_from_instance('facetoface', $session3->facetoface);
-        $coursemodule4 = get_coursemodule_from_instance('facetoface', $session4->facetoface);
+        $coursemodule3 = get_coursemodule_from_instance('facetoface', $seminarevent3->get_facetoface());
+        $coursemodule4 = get_coursemodule_from_instance('facetoface', $seminarevent4->get_facetoface());
         $modulecontext3 = context_module::instance($coursemodule3->id);
         $modulecontext4 = context_module::instance($coursemodule4->id);
         $this->assertEquals(1, signups::execute_count($targetuser1, $modulecontext3));
@@ -727,18 +736,18 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->getDataGenerator()->enrol_user($student1->id, $course3->id);
         $this->getDataGenerator()->enrol_user($student2->id, $course3->id);
 
-        $session1 = $f2fgenerator->create_session_for_course($course1);
-        $session2 = $f2fgenerator->create_session_for_course($course1, 2);
-        $session3 = $f2fgenerator->create_session_for_course($course2, 3);
-        $session4 = $f2fgenerator->create_session_for_course($course3, 4);
+        $seminarevent1 = $f2fgenerator->create_session_for_course($course1);
+        $seminarevent2 = $f2fgenerator->create_session_for_course($course1, 2);
+        $seminarevent3 = $f2fgenerator->create_session_for_course($course2, 3);
+        $seminarevent4 = $f2fgenerator->create_session_for_course($course3, 4);
 
-        $f2fgenerator->create_signup($student1, $session1->seminarevent);
-        $f2fgenerator->create_signup($student1, $session2->seminarevent);
-        $f2fgenerator->create_signup($student1, $session3->seminarevent);
-        $f2fgenerator->create_signup($student1, $session4->seminarevent);
-        $f2fgenerator->create_signup($student2, $session1->seminarevent);
-        $f2fgenerator->create_signup($student2, $session2->seminarevent);
-        $f2fgenerator->create_signup($student2, $session3->seminarevent);
+        $f2fgenerator->create_signup($student1, $seminarevent1);
+        $f2fgenerator->create_signup($student1, $seminarevent2);
+        $f2fgenerator->create_signup($student1, $seminarevent3);
+        $f2fgenerator->create_signup($student1, $seminarevent4);
+        $f2fgenerator->create_signup($student2, $seminarevent1);
+        $f2fgenerator->create_signup($student2, $seminarevent2);
+        $f2fgenerator->create_signup($student2, $seminarevent3);
 
         $emailsink = $this->redirectMessages();
         $this->execute_adhoc_tasks();
@@ -748,36 +757,44 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $targetuser2 = new target_user($student2);
 
         // System context.
-        $this->assert_export_data($targetuser1, context_system::instance(), [$session1->id, $session2->id, $session3->id, $session4->id]);
-        $this->assert_export_data($targetuser2, context_system::instance(), [$session1->id, $session2->id, $session3->id]);
+        $this->assert_export_data(
+            $targetuser1,
+            context_system::instance(),
+            [$seminarevent1->get_id(), $seminarevent2->get_id(), $seminarevent3->get_id(), $seminarevent4->get_id()]
+        );
+        $this->assert_export_data(
+            $targetuser2,
+            context_system::instance(),
+            [$seminarevent1->get_id(), $seminarevent2->get_id(), $seminarevent3->get_id()]
+        );
 
         // Course context.
         $coursecontext1 = context_course::instance($course1->id);
         $coursecontext2 = context_course::instance($course2->id);
         $coursecontext3 = context_course::instance($course3->id);
-        $this->assert_export_data($targetuser1, $coursecontext1, [$session1->id, $session2->id]);
-        $this->assert_export_data($targetuser1, $coursecontext2, [$session3->id]);
-        $this->assert_export_data($targetuser1, $coursecontext3, [$session4->id]);
-        $this->assert_export_data($targetuser2, $coursecontext1, [$session1->id, $session2->id]);
-        $this->assert_export_data($targetuser2, $coursecontext2, [$session3->id]);
+        $this->assert_export_data($targetuser1, $coursecontext1, [$seminarevent1->get_id(), $seminarevent2->get_id()]);
+        $this->assert_export_data($targetuser1, $coursecontext2, [$seminarevent3->get_id()]);
+        $this->assert_export_data($targetuser1, $coursecontext3, [$seminarevent4->get_id()]);
+        $this->assert_export_data($targetuser2, $coursecontext1, [$seminarevent1->get_id(), $seminarevent2->get_id()]);
+        $this->assert_export_data($targetuser2, $coursecontext2, [$seminarevent3->get_id()]);
         $this->assert_export_data($targetuser2, $coursecontext3, []);
 
         // Category context.
         $categorycontext1 = context_coursecat::instance($category1->id);
         $categorycontext2 = context_coursecat::instance($category2->id);
-        $this->assert_export_data($targetuser1, $categorycontext1, [$session1->id, $session2->id]);
-        $this->assert_export_data($targetuser1, $categorycontext2, [$session3->id, $session4->id]);
-        $this->assert_export_data($targetuser2, $categorycontext1, [$session1->id, $session2->id]);
-        $this->assert_export_data($targetuser2, $categorycontext2, [$session3->id]);
+        $this->assert_export_data($targetuser1, $categorycontext1, [$seminarevent1->get_id(), $seminarevent2->get_id()]);
+        $this->assert_export_data($targetuser1, $categorycontext2, [$seminarevent3->get_id(), $seminarevent4->get_id()]);
+        $this->assert_export_data($targetuser2, $categorycontext1, [$seminarevent1->get_id(), $seminarevent2->get_id()]);
+        $this->assert_export_data($targetuser2, $categorycontext2, [$seminarevent3->get_id()]);
 
         // Module context.
-        $coursemodule3 = get_coursemodule_from_instance('facetoface', $session3->facetoface);
-        $coursemodule4 = get_coursemodule_from_instance('facetoface', $session4->facetoface);
+        $coursemodule3 = get_coursemodule_from_instance('facetoface', $seminarevent3->get_facetoface());
+        $coursemodule4 = get_coursemodule_from_instance('facetoface', $seminarevent4->get_facetoface());
         $modulecontext3 = context_module::instance($coursemodule3->id);
         $modulecontext4 = context_module::instance($coursemodule4->id);
-        $this->assert_export_data($targetuser1, $modulecontext3, [$session3->id]);
-        $this->assert_export_data($targetuser1, $modulecontext4, [$session4->id]);
-        $this->assert_export_data($targetuser2, $modulecontext3, [$session3->id]);
+        $this->assert_export_data($targetuser1, $modulecontext3, [$seminarevent3->get_id()]);
+        $this->assert_export_data($targetuser1, $modulecontext4, [$seminarevent4->get_id()]);
+        $this->assert_export_data($targetuser2, $modulecontext3, [$seminarevent3->get_id()]);
         $this->assert_export_data($targetuser2, $modulecontext4, []);
     }
 

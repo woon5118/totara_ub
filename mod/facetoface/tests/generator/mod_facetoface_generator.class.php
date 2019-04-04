@@ -374,9 +374,9 @@ class mod_facetoface_generator extends testing_module_generator {
      *
      * @param stdClass $course
      * @param int $daysoffset how many days from now session will occur
-     * @return stdClass
+     * @return seminar_event
      */
-    public function create_session_for_course(stdClass $course, int $daysoffset = 1): stdClass {
+    public function create_session_for_course(stdClass $course, int $daysoffset = 1): seminar_event {
         // Set up facetoface.
         $facetofacedata = [
             'name' => 'facetoface1',
@@ -398,13 +398,7 @@ class mod_facetoface_generator extends testing_module_generator {
         $this->mapsessioncourse[$sessionid] = $course;
         $this->mapsessionf2f[$sessionid] = $facetoface;
 
-        $seminarevent = new seminar_event($sessionid);
-        // work-around until facetoface_get_session_dates gets fixed
-        $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($sessionid);
-        $session->seminarevent = $seminarevent;
-
-        return $session;
+        return new seminar_event($sessionid);
     }
 
     /**

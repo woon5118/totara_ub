@@ -49,7 +49,7 @@ try {
     $session = new stdClass();
     $session = $seminarevent->to_record();
     $session->mintimestart = $seminarevent->get_mintimestart();
-    $session->sessiondates = facetoface_get_session_dates($seminarevent->get_id());
+    $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
     // Start deleting now.
     \mod_facetoface\seminar_event_helper::delete_seminarevent($seminarevent);

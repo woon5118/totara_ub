@@ -153,7 +153,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         foreach ($sessions as $session) {
             $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
-            $sessionstarted = facetoface_has_session_started($session, time());
+            $seminarevent = new \mod_facetoface\seminar_event($session->id);
+            $sessionstarted = $seminarevent->is_started(time());
 
             $comp = '>='; // SQL comparison operator.
             if ($session->cancelledstatus) {
@@ -614,13 +615,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
         $timenow = time();
+        $seminarevent = new \mod_facetoface\seminar_event($session->id);
 
         $status = get_string('bookingopen', 'facetoface');
         if (!empty($session->cancelledstatus)) {
             $status = get_string('bookingsessioncancelled', 'facetoface');
-        } else if (!empty($session->sessiondates) && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
+        } else if (!empty($session->sessiondates) && $seminarevent->is_started($timenow) && $seminarevent->is_progress($timenow)) {
             $status = get_string('sessioninprogress', 'facetoface');
-        } else if (!empty($session->sessiondates) && facetoface_has_session_started($session, $timenow)) {
+        } else if (!empty($session->sessiondates) && $seminarevent->is_started($timenow)) {
             $status = get_string('sessionover', 'facetoface');
         } else if ($isbookedsession) {
             $state = \mod_facetoface\signup\state\state::from_code($session->bookedsession->statuscode);
@@ -708,6 +710,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         $options = '';
         $timenow = time();
+        $seminarevent = new \mod_facetoface\seminar_event($session->id);
 
         // NOTE: This is not a nice hack, we can only guess where to return because there is no argument above.
         $bas = 0;
@@ -719,7 +722,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         if ($editevents) {
             if ($session->cancelledstatus == 0) {
                 $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/events/edit.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/edit', get_string('editsession', 'facetoface'))) . ' ';
-                if (!facetoface_has_session_started($session, $timenow)) {
+                if (!$seminarevent->is_started($timenow)) {
                     $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/events/cancel.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/block', get_string('cancelsession', 'facetoface'))) . ' ';
                 }
             }
@@ -826,18 +829,18 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         if (!empty($session->cancelledstatus)) {
             return $reservelink;
         }
+        $seminarevent = new \mod_facetoface\seminar_event($session->id);
 
         $currentime = time();
         if (isset($session->sessiondates)
-            && facetoface_has_session_started($session, $currentime)
-            || facetoface_is_session_over($session, $currentime)) {
+            && ($seminarevent->is_started($currentime)
+            || $seminarevent->is_over($currentime))) {
             return $reservelink;
         }
 
         // Output links to reserve/allocate spaces.
         if (!empty($reserveinfo)) {
             $sessreserveinfo = $reserveinfo;
-            $seminarevent = new \mod_facetoface\seminar_event($session->id);
             if (!$session->allowoverbook) {
                 $sessreserveinfo = \mod_facetoface\reservations::limit_info_to_capacity_left($seminarevent, $sessreserveinfo,
                     max(0, $session->capacity - $signupcount));
@@ -1177,10 +1180,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $sessions = array();
         foreach ($bookings as $booking) {
             if (!isset($sessions[$booking->sessionid])) {
-                // work-around until facetoface_get_session_dates gets replaced
                 $seminarevent = new \mod_facetoface\seminar_event($booking->sessionid);
                 $session = $seminarevent->to_record();
-                $session->sessiondates = facetoface_get_session_dates($booking->sessionid);
+                $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
                 $sessions[$booking->sessionid] = (object)array(
                     'reservations' => 0,
                     'bookings' => array(),

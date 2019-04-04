@@ -39,6 +39,12 @@ final class seminar_session_list implements \Iterator, \Countable {
     }
 
     /**
+     * Define sorting orders.
+     */
+    public const SORT_ASC = '0';
+    public const SORT_DESC = '1';
+
+    /**
      * Keep track of those session's id that are already over.
      * @var seminar_session[]
      */
@@ -211,9 +217,8 @@ final class seminar_session_list implements \Iterator, \Countable {
      * @return seminar_session
      */
     public function get_last(): seminar_session {
-        $items = $this->items;
-        self::sort($items);
-        return end($items);
+        $this->sort('timefinish', seminar_session_list::SORT_DESC);
+        return reset($this->items);
     }
 
     /**
@@ -222,10 +227,8 @@ final class seminar_session_list implements \Iterator, \Countable {
      * @return seminar_session
      */
     public function get_first(): seminar_session {
-        $items = $this->items;
-        self::sort($items);
-        $o = array_shift($items);
-        return $o;
+        $this->sort('timefinish', seminar_session_list::SORT_ASC);
+        return reset($this->items);
     }
 
     /**
@@ -233,12 +236,17 @@ final class seminar_session_list implements \Iterator, \Countable {
      *
      * @return \stdClass[]
      */
-    public function to_records(): array {
+    public function to_records($preservekeys = true): array {
         $data = [];
 
         /** @var seminar_session $item */
         foreach ($this->items as $item) {
             $data[$item->get_id()] = $item->to_record();
+        }
+
+        // If you don't want the item ID as the key.
+        if (!$preservekeys) {
+            return array_values($data);
         }
 
         return $data;
@@ -302,20 +310,31 @@ final class seminar_session_list implements \Iterator, \Countable {
     }
 
     /**
-     * Sort the list of items based on finish time.
+     * Sort the list of items based on field and order provided.
      *
-     * The earliest finish time will be first, latest finish time will be last.
-     *
-     * @param seminar_session[] $items
+     * @param string $field
+     * @param string $order
+     * @return seminar_session_list
      */
-    private static function sort(array &$items): void {
+    public function sort(string $field, string $order = seminar_session_list::SORT_ASC) : seminar_session_list {
+        $function = 'get_' . $field;
+        if (!is_callable(['\mod_facetoface\seminar_session', $function])) {
+            throw new \coding_exception("Function get_$function does not exist in seminar_session");
+        }
+
         usort(
-            $items,
-            function (seminar_session $a, seminar_session $b) {
-                $result = $a->get_timefinish() > $b->get_timefinish();
+            $this->items,
+            function (seminar_session $a, seminar_session $b) use ($function, $order) {
+                if ($order == seminar_session_list::SORT_ASC) {
+                    $result = $a->{$function}() > $b->{$function}();
+                } else {
+                    $result = $a->{$function}() < $b->{$function}();
+                }
                 return $result ? 1 : -1;
             }
         );
+
+        return $this;
     }
 
     /**

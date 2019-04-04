@@ -60,10 +60,9 @@ $course = $DB->get_record('course', array('id' => $seminar->get_course()));
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
-// work-around until facetoface_get_session_dates gets replaced
 // \mod_facetoface\form\signin requires sessiondates to be set
 $session = $seminarevent->to_record();
-$session->sessiondates = facetoface_get_session_dates($seminarevent->get_id());
+$session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
 require_login($course, false, $cm);
 /**

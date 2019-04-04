@@ -772,9 +772,9 @@ class facetoface_notification extends data_object {
 
         // Load session object
         if (empty($this->_sessions[$sessionid])) {
-            // work-around until facetoface_get_session_dates gets replaced
-            $session = (new \mod_facetoface\seminar_event($sessionid))->to_record();
-            $session->sessiondates = facetoface_get_session_dates($sessionid);
+            $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+            $session = $seminarevent->to_record();
+            $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
             $this->_sessions[$sessionid] = $session;
         }
         $this->_sessions[$sessionid]->course = $this->_facetoface->course;
@@ -1386,7 +1386,8 @@ function facetoface_notification_session_dates(\stdClass $session) {
         // We add the session dates to the session object as quite possibly other session lib funcs will need them also, and we don't want
         // to continuously load them.
         // This is sadly consistently inconsistent behaviour.
-        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $seminarevent = new \mod_facetoface\seminar_event($session->id);
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
     }
 
     return $session;

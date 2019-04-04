@@ -53,7 +53,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
 
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN);
 
-        $signup = signup::create($seed->student1->id, new seminar_event($seed->session->id));
+        $signup = signup::create($seed->student1->id, new seminar_event($seed->seminarevent->get_id()));
         $signup->save();
         notice_sender::request_admin($signup);
 
@@ -94,10 +94,10 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $seed = $this->seed_data();
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS);
 
-        $signup = signup::create($seed->student1->id, new seminar_event($seed->session->id));
+        $signup = signup::create($seed->student1->id, new seminar_event($seed->seminarevent->get_id()));
         $signup->save();
 
-        notice_sender::registration_closure(new seminar_event($seed->session->id), $seed->student1->id);
+        notice_sender::registration_closure(new seminar_event($seed->seminarevent->get_id()), $seed->student1->id);
         $messages = $this->fetch_messages();
 
         $this->assertCount(3, $messages);
@@ -125,7 +125,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $seed = $this->seed_data();
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION);
 
-        $signup = signup::create($seed->student1->id, new seminar_event($seed->session->id));
+        $signup = signup::create($seed->student1->id, new seminar_event($seed->seminarevent->get_id()));
         $signup->save();
 
         notice_sender::confirm_waitlist($signup, MDL_F2F_BOTH);
@@ -146,7 +146,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $seed = $this->seed_data();
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_BOOKING_CONFIRMATION);
 
-        $signup = signup::create($seed->student1->id, new seminar_event($seed->session->id));
+        $signup = signup::create($seed->student1->id, new seminar_event($seed->seminarevent->get_id()));
         $signup->save();
 
         notice_sender::confirm_booking($signup, MDL_F2F_TEXT);
@@ -177,7 +177,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $seed = $this->seed_data();
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE);
 
-        $signup = signup::create($seed->student1->id, new seminar_event($seed->session->id));
+        $signup = signup::create($seed->student1->id, new seminar_event($seed->seminarevent->get_id()));
         $signup->save();
 
         notice_sender::signup_datetime_changed($signup, []);
@@ -198,7 +198,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $seed = $this->seed_data();
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_DECLINE_CONFIRMATION);
 
-        $signup = signup::create($seed->student1->id, new seminar_event($seed->session->id));
+        $signup = signup::create($seed->student1->id, new seminar_event($seed->seminarevent->get_id()));
         $signup->save();
 
         notice_sender::decline($signup);
@@ -225,11 +225,11 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
             'conditiontype' => MDL_F2F_CONDITION_BOOKING_CONFIRMATION
         );
 
-        $signup = signup::create($seed->student1->id, new seminar_event($seed->session->id));
+        $signup = signup::create($seed->student1->id, new seminar_event($seed->seminarevent->get_id()));
         $signup->save();
 
         set_config('facetoface_oneemailperday', '1');
-        notice_sender::send_notice(new seminar_event($seed->session->id), $seed->student1->id, $params);
+        notice_sender::send_notice(new seminar_event($seed->seminarevent->get_id()), $seed->student1->id, $params);
         $messages = $this->fetch_messages(true);
 
         $this->assertCount(3, $messages);
@@ -259,7 +259,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $seed = $this->seed_data();
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER);
 
-        $signup = signup::create($seed->student1->id, new seminar_event($seed->session->id));
+        $signup = signup::create($seed->student1->id, new seminar_event($seed->seminarevent->get_id()));
         $signup->save();
 
         notice_sender::request_manager($signup);
@@ -297,12 +297,12 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
         $trainerrole = $DB->get_record('role', array('shortname' => 'teacher'));
         $seed->facetoface->approvalrole = $trainerrole->id;
         $DB->set_field('facetoface', 'approvalrole', $seed->facetoface->approvalrole, ['id' => $seed->facetoface->id]);
-        $DB->insert_record('facetoface_session_roles', (object)['sessionid'=> $seed->session->id, 'roleid' => $trainerrole->id, 'userid' => $roleapprover1->id]);
-        $DB->insert_record('facetoface_session_roles', (object)['sessionid'=> $seed->session->id, 'roleid' => $trainerrole->id, 'userid' => $roleapprover2->id]);
+        $DB->insert_record('facetoface_session_roles', (object)['sessionid'=> $seed->seminarevent->get_id(), 'roleid' => $trainerrole->id, 'userid' => $roleapprover1->id]);
+        $DB->insert_record('facetoface_session_roles', (object)['sessionid'=> $seed->seminarevent->get_id(), 'roleid' => $trainerrole->id, 'userid' => $roleapprover2->id]);
 
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE);
 
-        $signup = signup::create($seed->student1->id, new seminar_event($seed->session->id));
+        $signup = signup::create($seed->student1->id, new seminar_event($seed->seminarevent->get_id()));
         $signup->save();
 
         notice_sender::request_role($signup);
@@ -334,7 +334,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
 
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_TRAINER_CONFIRMATION);
 
-        $seminarevent = new seminar_event($seed->session->id);
+        $seminarevent = new seminar_event($seed->seminarevent->get_id());
         $signup = signup::create($seed->student1->id, $seminarevent);
         $signup->save();
 
@@ -357,7 +357,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
 
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION);
 
-        $seminarevent = new seminar_event($seed->session->id);
+        $seminarevent = new seminar_event($seed->seminarevent->get_id());
         $signup = signup::create($seed->student1->id, $seminarevent);
         $signup->save();
 
@@ -380,7 +380,7 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
 
         $this->prepare_notification($seed->facetoface->id, MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT);
 
-        $seminarevent = new seminar_event($seed->session->id);
+        $seminarevent = new seminar_event($seed->seminarevent->get_id());
         $signup = signup::create($seed->student1->id, $seminarevent);
         $signup->save();
 
@@ -477,12 +477,10 @@ class mod_facetoface_notifications_multilang_testcase extends advanced_testcase 
 
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $seminarevent = new \mod_facetoface\seminar_event($sessionid);
-        $session = $seminarevent->to_record();
-        $session->sessiondates = facetoface_get_session_dates($session->id);
 
         $seed = new stdClass();
         $seed->facetoface = $facetoface;
-        $seed->session = $session;
+        $seed->seminarevent = $seminarevent;
         $seed->teacher1 = $teacher1;
         $seed->student1 = $student1;
         $seed->student2 = $student2;

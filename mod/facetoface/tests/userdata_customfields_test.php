@@ -80,16 +80,16 @@ class mod_facetoface_userdata_customfields_testcase extends advanced_testcase {
         $this->getDataGenerator()->enrol_user($student2->id ,$course2->id);
         $this->getDataGenerator()->enrol_user($student2->id ,$course3->id);
 
-        $session1 = $f2fgenerator->create_session_for_course($course1);
-        $session2 = $f2fgenerator->create_session_for_course($course1, 2);
-        $session3 = $f2fgenerator->create_session_for_course($course2, 3);
-        $session4 = $f2fgenerator->create_session_for_course($course3, 4);
+        $seminarevent1 = $f2fgenerator->create_session_for_course($course1);
+        $seminarevent2 = $f2fgenerator->create_session_for_course($course1, 2);
+        $seminarevent3 = $f2fgenerator->create_session_for_course($course2, 3);
+        $seminarevent4 = $f2fgenerator->create_session_for_course($course3, 4);
 
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
-        $signups[13] = $f2fgenerator->create_signup($student1, $session3->seminarevent);
-        $signups[14] = $f2fgenerator->create_signup($student1, $session4->seminarevent);
+        $signups[11] = $f2fgenerator->create_signup($student1, $seminarevent1);
+        $signups[12] = $f2fgenerator->create_signup($student1, $seminarevent2);
+        $signups[13] = $f2fgenerator->create_signup($student1, $seminarevent3);
+        $signups[14] = $f2fgenerator->create_signup($student1, $seminarevent4);
 
         $signupcustomfieldids = [];
         $signupcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'signup', 1, 2);
@@ -97,20 +97,20 @@ class mod_facetoface_userdata_customfields_testcase extends advanced_testcase {
         $signupcustomfieldids[13] = $f2fgenerator->create_customfield_data($signups[13], 'signup', 3, 4);
         $signupcustomfieldids[14] = $f2fgenerator->create_customfield_data($signups[14], 'signup', 4, 5);
 
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
-        $signups[23] = $f2fgenerator->create_signup($student2, $session3->seminarevent);
+        $signups[21] = $f2fgenerator->create_signup($student2, $seminarevent1);
+        $signups[22] = $f2fgenerator->create_signup($student2, $seminarevent2);
+        $signups[23] = $f2fgenerator->create_signup($student2, $seminarevent3);
 
         $signupcustomfieldids[21] = $f2fgenerator->create_customfield_data($signups[21], 'signup', 5, 6);
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 6, 7);
         $signupcustomfieldids[23] = $f2fgenerator->create_customfield_data($signups[23], 'signup', 7, 8);
 
-        $f2fgenerator->create_cancellation($student1, $session1->seminarevent);
+        $f2fgenerator->create_cancellation($student1, $seminarevent1);
 
         $cancellationcustomfieldids = [];
         $cancellationcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 3, 1);
 
-        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
+        $f2fgenerator->create_cancellation($student2, $seminarevent2);
         $cancellationcustomfieldids[21] = $f2fgenerator->create_customfield_data($signups[22], 'cancellation', 5, 3);
 
         // Create some file customfields. These will add to the final customfield count.
@@ -146,8 +146,8 @@ class mod_facetoface_userdata_customfields_testcase extends advanced_testcase {
         $this->assertEquals(7, customfields::execute_count($targetuser2, $categorycontext2));
 
         // Module context.
-        $coursemodule2 = get_coursemodule_from_instance('facetoface', $session2->facetoface);
-        $coursemodule3 = get_coursemodule_from_instance('facetoface', $session3->facetoface);
+        $coursemodule2 = get_coursemodule_from_instance('facetoface', $seminarevent2->get_facetoface());
+        $coursemodule3 = get_coursemodule_from_instance('facetoface', $seminarevent3->get_facetoface());
         $modulecontext2 = context_module::instance($coursemodule2->id);
         $modulecontext3 = context_module::instance($coursemodule3->id);
         $this->assertEquals(2, customfields::execute_count($targetuser1, $modulecontext2));
@@ -179,10 +179,10 @@ class mod_facetoface_userdata_customfields_testcase extends advanced_testcase {
         $this->getDataGenerator()->enrol_user($student2->id ,$course2->id);
         $this->getDataGenerator()->enrol_user($student2->id ,$course3->id);
 
-        $session1 = $f2fgenerator->create_session_for_course($course1);
-        $session2 = $f2fgenerator->create_session_for_course($course1, 2);
-        $session3 = $f2fgenerator->create_session_for_course($course2, 3);
-        $session4 = $f2fgenerator->create_session_for_course($course3, 4);
+        $seminarevent1 = $f2fgenerator->create_session_for_course($course1);
+        $seminarevent2 = $f2fgenerator->create_session_for_course($course1, 2);
+        $seminarevent3 = $f2fgenerator->create_session_for_course($course2, 3);
+        $seminarevent4 = $f2fgenerator->create_session_for_course($course3, 4);
 
         // Create signups including customfield data and data params.
 
@@ -194,10 +194,10 @@ class mod_facetoface_userdata_customfields_testcase extends advanced_testcase {
         // Create 1 field with 7 params + 5 field with 0 params for session2 and student2.
         // Create 1 field with 8 params + 6 field with 0 params for session3 and student2.
         $signups = [];
-        $signups[11] = $f2fgenerator->create_signup($student1, $session1->seminarevent);
-        $signups[12] = $f2fgenerator->create_signup($student1, $session2->seminarevent);
-        $signups[13] = $f2fgenerator->create_signup($student1, $session3->seminarevent);
-        $signups[14] = $f2fgenerator->create_signup($student1, $session4->seminarevent);
+        $signups[11] = $f2fgenerator->create_signup($student1, $seminarevent1);
+        $signups[12] = $f2fgenerator->create_signup($student1, $seminarevent2);
+        $signups[13] = $f2fgenerator->create_signup($student1, $seminarevent3);
+        $signups[14] = $f2fgenerator->create_signup($student1, $seminarevent4);
 
         $signupcustomfieldids = [];
 
@@ -206,23 +206,23 @@ class mod_facetoface_userdata_customfields_testcase extends advanced_testcase {
         $signupcustomfieldids[13] = $f2fgenerator->create_customfield_data($signups[13], 'signup', 3, 4);
         $signupcustomfieldids[14] = $f2fgenerator->create_customfield_data($signups[14], 'signup', 4, 5);
 
-        $signups[21] = $f2fgenerator->create_signup($student2, $session1->seminarevent);
-        $signups[22] = $f2fgenerator->create_signup($student2, $session2->seminarevent);
-        $signups[23] = $f2fgenerator->create_signup($student2, $session3->seminarevent);
+        $signups[21] = $f2fgenerator->create_signup($student2, $seminarevent1);
+        $signups[22] = $f2fgenerator->create_signup($student2, $seminarevent2);
+        $signups[23] = $f2fgenerator->create_signup($student2, $seminarevent3);
 
         $signupcustomfieldids[21] = $f2fgenerator->create_customfield_data($signups[21], 'signup', 5, 6);
         $signupcustomfieldids[22] = $f2fgenerator->create_customfield_data($signups[22], 'signup', 6, 7);
         $signupcustomfieldids[23] = $f2fgenerator->create_customfield_data($signups[23], 'signup', 7, 8);
 
-        $f2fgenerator->create_cancellation($student1, $session1->seminarevent);
-        $f2fgenerator->create_cancellation($student1, $session3->seminarevent);
+        $f2fgenerator->create_cancellation($student1, $seminarevent1);
+        $f2fgenerator->create_cancellation($student1, $seminarevent3);
 
         $cancellationcustomfieldids = [];
 
         $cancellationcustomfieldids[11] = $f2fgenerator->create_customfield_data($signups[11], 'cancellation', 3, 1);
         $cancellationcustomfieldids[12] = $f2fgenerator->create_customfield_data($signups[13], 'cancellation', 4, 2);
 
-        $f2fgenerator->create_cancellation($student2, $session2->seminarevent);
+        $f2fgenerator->create_cancellation($student2, $seminarevent2);
 
         $cancellationcustomfieldids[21] = $f2fgenerator->create_customfield_data($signups[22], 'cancellation', 5, 3);
 
@@ -308,7 +308,7 @@ class mod_facetoface_userdata_customfields_testcase extends advanced_testcase {
          * MODULE CONTEXT.
          *************************/
 
-        $coursemodule3 = get_coursemodule_from_instance('facetoface', $session3->facetoface);
+        $coursemodule3 = get_coursemodule_from_instance('facetoface', $seminarevent3->get_facetoface());
         $modulecontext3 = context_module::instance($coursemodule3->id);
         $export = customfields::execute_export($targetuser1, $modulecontext3);
         $data = $export->data;
