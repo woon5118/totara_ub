@@ -532,6 +532,22 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
 }
 
 /**
+ * Returns rounded current time for a database query
+ *
+ * @return array containing [ round_up, round_down ]
+ */
+function enrol_round_time_for_query() {
+    // The sql query must use the following fomula:
+    //  timestart < roundUp(now) AND roundDown(now) < timeend
+    // Otherwise users cannot see their courses right after they are enrolled
+    $now = time();
+    // Rounding helps caching in DB.
+    $now1 = $now + (99 - $now % 100);   // = ...99
+    $now2 = $now - ($now % 100);        // = ...00
+    return array($now1, $now2);
+}
+
+/**
  * Returns list of courses current $USER is enrolled in and can access
  *
  * - $fields is an array of field names to ADD
@@ -631,8 +647,9 @@ function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder AS
     $params['userid']  = $USER->id;
     $params['active']  = ENROL_USER_ACTIVE;
     $params['enabled'] = ENROL_INSTANCE_ENABLED;
-    $params['now1']    = round(time(), -2); // improves db caching
-    $params['now2']    = $params['now1'];
+    list($now1, $now2) = enrol_round_time_for_query();
+    $params['now1']    = $now1; // improves db caching
+    $params['now2']    = $now2;
 
     $courses = $DB->get_records_sql($sql, $params, 0, $limit);
 
@@ -821,8 +838,9 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
 
     if ($onlyactive) {
         $subwhere = "WHERE ue.status = :active AND e.status = :enabled AND ue.timestart < :now1 AND (ue.timeend = 0 OR ue.timeend > :now2)";
-        $params['now1']    = round(time(), -2); // improves db caching
-        $params['now2']    = $params['now1'];
+        list($now1, $now2) = enrol_round_time_for_query();
+        $params['now1']    = $now1; // improves db caching
+        $params['now2']    = $now2;
         $params['active']  = ENROL_USER_ACTIVE;
         $params['enabled'] = ENROL_INSTANCE_ENABLED;
     } else {
@@ -1335,10 +1353,10 @@ function get_enrolled_join(context $context, $useridcolumn, $onlyactive = false,
         }
 
         if ($onlyactive || $onlysuspended) {
-            $now = round(time(), -2); // Rounding helps caching in DB.
+            list($now1, $now2) = enrol_round_time_for_query(); // Rounding helps caching in DB.
             $params = array_merge($params, array($prefix . 'enabled' => ENROL_INSTANCE_ENABLED,
                     $prefix . 'active' => ENROL_USER_ACTIVE,
-                    $prefix . 'now1' => $now, $prefix . 'now2' => $now));
+                    $prefix . 'now1' => $now1, $prefix . 'now2' => $now2));
         }
     }
 
