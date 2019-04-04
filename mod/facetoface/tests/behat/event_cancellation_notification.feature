@@ -33,6 +33,7 @@ Feature: Seminar event cancellation notifications
       | mod/facetoface:view                | Allow      | ReservationRole | System       |           |
       | mod/facetoface:viewcancellations   | Allow      | ReservationRole | System       |           |
       | mod/facetoface:viewemptyactivities | Allow      | ReservationRole | System       |           |
+      | mod/facetoface:signup              | Allow      | ReservationRole | System       |           |
 
     Given the following "course enrolments" exist:
       | user     | course | role            |
