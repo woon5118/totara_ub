@@ -1115,6 +1115,7 @@ $string['testsiteupgradewarning'] = 'You are currently using the {$a} test site,
 $string['taskautomatedbackup'] = 'Automated backups';
 $string['taskbackupcleanup'] = 'Clean backup tables and logs';
 $string['taskbadgescron'] = 'Award badges';
+$string['taskbadgesmessagecron'] = 'Background processing for sending badges notifications';
 $string['taskblogcron'] = 'Sync external blogs';
 $string['taskcachecleanup'] = 'Remove expired cache entries';
 $string['taskcachecron'] = 'Background processing for caches';
