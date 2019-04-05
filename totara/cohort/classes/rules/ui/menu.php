@@ -181,6 +181,29 @@ JS;
     }
 
     /**
+     * A method for validating the form submitted data
+     * @return bool
+     */
+    public function validateResponse() {
+        /** @var core_renderer $OUTPUT */
+        global $OUTPUT;
+        $form = $this->constructForm();
+        if ($data = $form->get_submitted_data()) {
+            // Checking whether the listofvalues being passed is empty or not. If it is empty, error should be returned
+            if (empty($data->listofvalues)) {
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+                return false;
+            }
+            return true;
+        }
+
+        // If the form is not submitted at all, then there is no point to validate and false should be returned here
+        return false;
+    }
+
+    /**
      * Retrieve menu options by constructing sql string from an sql object
      * and then querying the database
      *
