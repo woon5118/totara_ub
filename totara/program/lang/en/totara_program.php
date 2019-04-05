@@ -267,7 +267,8 @@ $string['coursesetoverduemessage_help'] = 'This message will be sent at the spec
 The \'Minimum time required\' field within the course set is used to calculate when a course set is due.';
 $string['coursescorefield'] = 'Course score field';
 $string['coursescorefield_help'] = 'Specify a course custom field which is used to allocate a score to each course in the set. This is used in conjunction with **Minimum score** below to determine the course set\'s completion criteria.
-The selected field should have numeric values.';
+
+The selected field should contain only whole numerical values. To ensure only whole numerical values are entered a **Text input** type custom field should be used with the **Regular expression validation** field set as **/^[0-9]+$/**';
 $string['createandnext'] = 'Create and go to next step';
 $string['createandreturn'] = 'Create and return to overview';
 $string['createcourse'] = 'Create course';
@@ -693,7 +694,9 @@ In program messages, certain variables can be inserted into the subject and/or b
 $string['mincourses'] = 'Minimum courses completed';
 $string['mincourses_help'] = 'The minimum number of courses within this course set the assignees must complete for this course set to be considered complete.';
 $string['minimumscore'] = 'Minimum score';
-$string['minimumscore_help'] = 'A minimum score that must be reached for the course set to be marked as complete. The score is calculated by summing the values from the **Course score field** for all the courses a user has completed.For example, you might have a **Credits** custom field on your courses, so you could use this setting to mark a course set as complete when a certain number of credits have been achieved.';
+$string['minimumscore_help'] = 'A minimum score that must be reached for the course set to be marked as complete. The score is calculated by summing the values from the **Course score field** for all the courses a user has completed. For example, you might have a **Credits** custom field on your courses, so you could use this setting to mark a course set as complete when a certain number of credits have been achieved.
+
+Only whole numerical values should be used in this field.';
 $string['minimumtimerequired'] = 'Minimum time required';
 $string['minimumtimerequired_help'] = 'This value indicates a minimum amount of time that a user might realistically need to be able to complete the course set. It is used to determine if the completion period set on the **assignments** tab is realistic for a particular group of users. If the assignment is not realistic, a **time allowance** exception will be generated and the user will not be assigned to the program until the exception has been resolved.
 
