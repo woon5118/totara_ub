@@ -113,6 +113,7 @@ if ($mform && ($mform->is_cancelled() || !empty($CFG->preventscheduledtaskchange
 
         try {
             \core\task\manager::configure_scheduled_task($task);
+            \tool_task\event\scheduled_task_updated::create_from_schedule($task)->trigger();
             redirect($PAGE->url, get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
             redirect($PAGE->url, $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
