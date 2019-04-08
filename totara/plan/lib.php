@@ -181,43 +181,45 @@ function totara_plan_pluginfile($course, $cm, $context, $filearea, $args, $force
     send_stored_file($file, 86400, 0, true, $options); // Download MUST be forced - security!
 }
 
-
 /**
  * Can logged in user view specified user's plans.
  * This only checks capabilities, it does not check plan permissions.
  *
  * @access  public
- * @param   int     $ownerid   Plan user
+ *
+ * @param   int $ownerid Plan user
+ * @param   int $viewerid ID of a user trying to view the plan
+ *
  * @return  boolean
  */
-function dp_can_view_users_plans($ownerid) {
+function dp_can_view_users_plans($ownerid, int $viewerid = null) {
     global $USER;
 
-    if (!isloggedin()) {
-        return false;
+    if (empty($viewerid)) {
+        $viewerid = $USER->id;
     }
 
     $systemcontext = context_system::instance();
 
     // If the user can access all plans on the site. Implicitly includes site admins.
-    if (has_capability('totara/plan:accessanyplan', $systemcontext) ||
-        has_capability('totara/plan:manageanyplan', $systemcontext)) {
+    if (has_capability('totara/plan:accessanyplan', $systemcontext, $viewerid) ||
+        has_capability('totara/plan:manageanyplan', $systemcontext, $viewerid)) {
         // The current user has manager's capability (whether or not they are the actual manager, includes site admin).
         return true;
     }
 
     // If the user can access their own plans or the plans of their staff.
-    if (!has_capability('totara/plan:accessplan', $systemcontext)) {
+    if (!has_capability('totara/plan:accessplan', $systemcontext, $viewerid)) {
         // The user has no capability to access either their own plans or those of their staff.
         return false;
     }
 
-    if ($ownerid == $USER->id) {
+    if ($ownerid == $viewerid) {
         // This is the current user's own plan.
         return true;
     }
 
-    if (\totara_job\job_assignment::is_managing($USER->id, $ownerid)) {
+    if (\totara_job\job_assignment::is_managing($viewerid, $ownerid)) {
         // The current user is the actual manager.
         return true;
     }
@@ -1593,8 +1595,12 @@ function totara_plan_comment_add($comment) {
     $subscribers = $DB->get_records_select('comments', $sql, $params, '', 'DISTINCT userid');
     $subscribers = !empty($subscribers) ? array_keys($subscribers) : array();
     $subscriberkeys = array();
-    foreach ($subscribers as $s) {
-        $subscriberkeys[$s] = $s;
+    foreach ($subscribers as $subscriber) {
+        // Only users that can see the plan should be in the list of subscribers.
+        if (!dp_can_view_users_plans($plan->userid, $subscriber)) {
+            continue;
+        }
+        $subscriberkeys[$subscriber] = $subscriber;
     }
     $subscribers = $subscriberkeys;
     unset($subscriberkeys);
