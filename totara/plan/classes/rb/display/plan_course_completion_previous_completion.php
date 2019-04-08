@@ -45,13 +45,17 @@ class plan_course_completion_previous_completion extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $OUTPUT;
 
-        $extrafields = self::get_extrafields_row($row, $column);
+        if (!$value) {
+            return '';
+        }
 
-        if ($value !== '') {
+        if ($format !== 'html') {
+            return $value;
+        } else {
+            $extrafields = self::get_extrafields_row($row, $column);
+
             return $OUTPUT->action_link(new \moodle_url('/totara/plan/record/courses.php',
                 array('courseid' => $extrafields->courseid, 'userid' => $extrafields->userid, 'history' => 1)), $value);
-        } else {
-            return '';
         }
     }
 
