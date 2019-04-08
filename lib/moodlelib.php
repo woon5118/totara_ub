@@ -3406,15 +3406,15 @@ function user_not_fully_set_up($user, $strict = true) {
         return false;
     }
 
+    // Do not use strict mode for primary admin, they need to be able to fix
+    // problems without being interrupted by forced redirects.
+    if (is_primary_admin($user->id)) {
+        return false;
+    }
+
     if ($user->id == $USER->id) {
         // Most likely some ajax or file serving script, we certainly do not want to block those or do redirects.
         if (!WS_SERVER and NO_DEBUG_DISPLAY) {
-            return false;
-        }
-
-        // Do not use strict mode for primary admin, they need to be able to fix
-        // problems without being interrupted by forced redirects.
-        if (is_primary_admin($user->id)) {
             return false;
         }
 

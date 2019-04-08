@@ -137,7 +137,16 @@ class auth_plugin_webservice extends auth_plugin_base {
         return false;
     }
 
-   /**
+    /**
+     * Totara: WS users cannot login, which means they cannot edit profile.
+     *
+     * @return bool
+     */
+    function can_edit_profile() {
+        return false;
+    }
+
+    /**
      * Confirm the new user as registered. This should normally not be used,
      * but it may be necessary if the user auth_method is changed to manual
      * before the user is confirmed.

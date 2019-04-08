@@ -932,4 +932,152 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertTrue(remove_dir($CFG->tempdir.'/invalid_dir_test'));
         $this->assertTrue(remove_dir($CFG->tempdir.'/invalid_dir_test', true));
     }
+
+    public function test_user_not_fully_set_up_basic() {
+        global $DB, $USER;
+        $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user();
+
+        $this->setUser(null);
+        $this->assertFalse(user_not_fully_set_up($user));
+        $this->assertFalse(user_not_fully_set_up($user, false));
+        $user->firstname = '';
+        $this->assertTrue(user_not_fully_set_up($user));
+        $this->assertTrue(user_not_fully_set_up($user, false));
+        $user->firstname = ' ';
+        $this->assertFalse(user_not_fully_set_up($user));
+        $user->lastname = '';
+        $this->assertTrue(user_not_fully_set_up($user));
+        $user->lastname = ' ';
+        $this->assertFalse(user_not_fully_set_up($user));
+        $user->email = '';
+        $this->assertTrue(user_not_fully_set_up($user));
+        $user = $DB->get_record('user', ['id' => $user->id]);
+        $this->setUser($user);
+        $this->assertFalse(user_not_fully_set_up($user));
+        $this->assertFalse(user_not_fully_set_up($user, false));
+        $user->firstname = '';
+        $this->assertTrue(user_not_fully_set_up($user));
+        $this->assertTrue(user_not_fully_set_up($user, false));
+        $user->firstname = ' ';
+        $this->assertFalse(user_not_fully_set_up($user));
+        $user->lastname = '';
+        $this->assertTrue(user_not_fully_set_up($user));
+        $user->lastname = ' ';
+        $this->assertFalse(user_not_fully_set_up($user));
+        $user->email = '';
+        $this->assertTrue(user_not_fully_set_up($user));
+
+        $this->setUser(null);
+        $this->assertFalse(user_not_fully_set_up($USER));
+
+        $guest = guest_user();
+        $guest->firstname = '';
+        $guest->lastname = '';
+        $guest->email = '';
+        $this->assertFalse(user_not_fully_set_up($guest));
+        $this->setUser($guest);
+        $this->assertFalse(user_not_fully_set_up($guest));
+
+        $admin = get_admin();
+        $this->setUser($user);
+        $this->assertFalse(user_not_fully_set_up($admin));
+        $this->assertFalse(user_not_fully_set_up($admin, false));
+        $admin->firstname = '';
+        $this->assertTrue(user_not_fully_set_up($admin));
+        $this->assertTrue(user_not_fully_set_up($admin, false));
+        $admin->firstname = ' ';
+        $this->assertFalse(user_not_fully_set_up($admin));
+        $admin->lastname = '';
+        $this->assertTrue(user_not_fully_set_up($admin));
+        $admin->lastname = ' ';
+        $this->assertFalse(user_not_fully_set_up($admin));
+        $admin->email = '';
+        $this->assertTrue(user_not_fully_set_up($admin));
+        $admin = $DB->get_record('user', ['id' => $admin->id]);
+        $this->setUser($admin);
+        $this->assertFalse(user_not_fully_set_up($admin));
+        $admin->firstname = '';
+        $this->assertTrue(user_not_fully_set_up($admin));
+        $admin->firstname = ' ';
+        $this->assertFalse(user_not_fully_set_up($admin));
+        $admin->lastname = '';
+        $this->assertTrue(user_not_fully_set_up($admin));
+        $admin->lastname = ' ';
+        $this->assertFalse(user_not_fully_set_up($admin));
+        $admin->email = '';
+        $this->assertTrue(user_not_fully_set_up($admin));
+    }
+
+    public function test_user_not_fully_set_up_custom_fields() {
+        global $CFG, $DB, $USER;
+
+        // Resolve dependencies for the test
+        require_once($CFG->dirroot . '/user/lib.php');
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+
+        $this->resetAfterTest();
+
+        // Add a required, visible, unlocked custom field.
+        $DB->insert_record('user_info_field', ['shortname' => 'house', 'name' => 'House', 'required' => 1,
+            'visible' => 1, 'locked' => 0, 'categoryid' => 1, 'datatype' => 'text']);
+
+        $this->setUser(null);
+        $this->assertFalse(user_not_fully_set_up($USER));
+        $this->assertFalse(user_not_fully_set_up($USER, false));
+
+        $guest = guest_user();
+        $this->assertFalse(user_not_fully_set_up($guest));
+        $this->assertFalse(user_not_fully_set_up($guest, false));
+        $this->setUser($guest);
+        $this->assertFalse(user_not_fully_set_up($guest));
+        $this->assertFalse(user_not_fully_set_up($guest, false));
+
+        $admin = get_admin();
+        $this->assertFalse(user_not_fully_set_up($admin));
+        $this->assertFalse(user_not_fully_set_up($admin, false));
+        $this->setUser($admin);
+        $this->assertFalse(user_not_fully_set_up($admin));
+        $this->assertFalse(user_not_fully_set_up($admin, false));
+
+        $wsuser = $this->getDataGenerator()->create_user(['auth' => 'webservice']);
+        $this->setGuestUser();
+        $this->assertFalse(user_not_fully_set_up($wsuser));
+        $this->assertFalse(user_not_fully_set_up($wsuser, false));
+        $this->setUser($wsuser);
+        $this->assertFalse(user_not_fully_set_up($wsuser));
+        $this->assertFalse(user_not_fully_set_up($wsuser, false));
+
+        $user = $this->getDataGenerator()->create_user(['auth' => 'manual']);
+        $this->setGuestUser();
+        $this->assertTrue(user_not_fully_set_up($user));
+        $this->assertFalse(user_not_fully_set_up($user, false));
+        $this->setUser($user);
+        $this->assertTrue(user_not_fully_set_up($user));
+        $this->assertFalse(user_not_fully_set_up($user, false));
+
+        profile_save_data((object)['id' => $user->id, 'profile_field_house' => 'Gray']);
+
+        $this->setGuestUser();
+        $this->assertFalse(user_not_fully_set_up($user));
+        $this->assertFalse(user_not_fully_set_up($user, false));
+        $this->setUser($user);
+        $this->assertObjectNotHasAttribute('fullysetupaccount', $USER);
+        $this->assertFalse(user_not_fully_set_up($user));
+        $this->assertSame(1, $USER->fullysetupaccount);
+        unset($USER->fullysetupaccount);
+        $this->assertFalse(user_not_fully_set_up($user, false));
+        $this->assertObjectNotHasAttribute('fullysetupaccount', $USER);
+
+        $secadmin = $this->getDataGenerator()->create_user(['auth' => 'manual']);
+        set_config('siteadmins', $CFG->siteadmins . ',' . $secadmin->id);
+        $this->setGuestUser();
+        $this->assertTrue(user_not_fully_set_up($secadmin));
+        $this->assertFalse(user_not_fully_set_up($secadmin, false));
+        $this->setUser($secadmin);
+        $this->assertTrue(user_not_fully_set_up($secadmin));
+        $this->assertFalse(user_not_fully_set_up($secadmin, false));
+        $this->assertObjectNotHasAttribute('fullysetupaccount', $USER);
+    }
 }

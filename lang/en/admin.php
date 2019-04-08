@@ -901,6 +901,10 @@ $string['profilemenutoofewoptions'] = 'You must provide at least 2 options';
 $string['profilename'] = 'Name';
 $string['profilenofieldsdefined'] = 'No fields have been defined';
 $string['profilerequired'] = 'Is this field required?';
+$string['profilerequired_help'] = 'Enable if you want to force users to fill in required fields in their profile.
+
+To prevent account lockouts these requirements are not enforced for primary admin and users that cannot update their profile.
+Required fields are not required during account creation, instead if necessary users are asked to provide missing information after their first log in.';
 $string['profileroles'] = 'Profile visible roles';
 $string['profilesforenrolledusersonly'] = 'Profiles for enrolled users only';
 $string['profileshortname'] = 'Short name (must be unique)';
