@@ -476,7 +476,11 @@ final class export_helper {
 
         if ($session->timestart) {
             // Display only the first date
-            $sessionobj = facetoface_format_session_times($session->timestart, $session->timefinish, $session->sessiontimezone);
+            $sessionobj = \mod_facetoface\output\session_time::format(
+                $session->timestart,
+                $session->timefinish,
+                $session->sessiontimezone
+            );
             $sessiondates->sessiontimezone = !empty($displaytimezones) ? $sessionobj->timezone : '';
             $sessiondates->starttime = $sessionobj->starttime . ' ' . $sessiondates->sessiontimezone;
             $sessiondates->finishtime = $sessionobj->endtime . ' ' . $sessiondates->sessiontimezone;
