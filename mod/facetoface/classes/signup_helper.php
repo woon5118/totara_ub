@@ -268,16 +268,26 @@ final class signup_helper {
     }
 
     /**
-     * Calculate a final grade for given sign-up based on a grading method.
+     * Calculate a user's final grade.
      *
-     * @param seminar $seminar
-     * @param signup $signup
-     * @return float|null               a grade value or null if nothing applicable
+     * @param \stdClass|seminar $facetoface
+     * @param int $userid
+     * @return float|null a grade value or null if nothing applicable
      */
-    private static function compute_final_grade(seminar $seminar, signup $signup) : ?float {
+    public static function compute_final_grade($facetoface, int $userid) : ?float {
         global $DB;
 
-        switch ($seminar->get_eventgradingmethod()) {
+        if ($facetoface instanceof seminar) {
+            $f2fid = $facetoface->get_id();
+            $grading_method = $facetoface->get_eventgradingmethod();
+        } else if ($facetoface instanceof \stdClass) {
+            $f2fid = $facetoface->id;
+            $grading_method = $facetoface->eventgradingmethod ?? 0; // default to 0 (highest)
+        } else {
+            throw new \coding_exception('$facetoface must be a signup object or a database record');
+        }
+
+        switch ($grading_method) {
             case seminar::GRADING_METHOD_GRADEHIGHEST:
                 $select_grade = 'MAX(sus.grade) AS grade';
                 $order_by = '';
@@ -296,14 +306,10 @@ final class signup_helper {
                 break;
 
             default:
-                throw new \coding_exception(
-                    sprintf(
-                        "Bogus grading method: %d at signup #%d of seminar #%d",
-                        $grading_method,
-                        $signup->get_id(),
-                        $signup->get_seminar_event()->get_facetoface()
-                    )
-                );
+                throw new \coding_exception(sprintf(
+                    "Grading method %d of seminar #%d is not defined",
+                    $grading_method, $f2fid
+                ));
         }
 
         $sql = '
@@ -324,7 +330,7 @@ final class signup_helper {
             WHERE u.id = :uid AND s.facetoface = :f2f AND sus.superceded = 0 AND sus.grade IS NOT NULL
             ' . $order_by;
 
-        $set = $DB->get_recordset_sql($sql, ['uid' => $signup->get_userid(), 'f2f' => $seminar->get_id()], 0, 1);
+        $set = $DB->get_recordset_sql($sql, ['uid' => $userid, 'f2f' => $f2fid], 0, 1);
         try {
             if ($set->valid()) {
                 return $set->current()->grade;
@@ -350,7 +356,7 @@ final class signup_helper {
 
         $seminar = $seminarevent->get_seminar();
 
-        $finalgrade = self::compute_final_grade($seminar, $signup);
+        $finalgrade = self::compute_final_grade($seminar, $signup->get_userid());
 
         $timenow = time();
 

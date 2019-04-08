@@ -97,12 +97,16 @@ final class event_attendee extends \stdClass {
      * Map data object to class instance.
      *
      * @param \stdClass $object an element of an array returned by \mod_facetoface\attendance\attendance_helper::get_attendees()
-     * @return event_attendee new class instance or null if $object is not a valid entry.
+     * @return event_attendee new class instance
+     * @throws \coding_exception if $object->id is missing or 0
      */
     public static function map_from_record(\stdClass $object): ?event_attendee {
         $self = new static();
         $self->map_object($object);
-        return $self->is_valid() ? $self : null;
+        if (!$self->is_valid()) {
+            throw new \coding_exception(sprintf('Missing user id'));
+        }
+        return $self;
     }
 
     /**

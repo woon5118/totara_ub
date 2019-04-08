@@ -336,7 +336,7 @@ final class signup implements seminar_iterator_item {
     public function switch_state_with_grade(?float $grade, ?string $reserved, string ...$newstates): signup {
         global $DB;
         if ($reserved !== null) {
-            throw \coding_exception('the argument `$reserved` must be null at this moment.');
+            throw new \coding_exception('the argument `$reserved` must be null at this moment.');
         }
 
         $trans = $DB->start_delegated_transaction();

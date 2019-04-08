@@ -638,15 +638,16 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
  *
  * @param object $facetoface null means all facetoface activities
  * @param int $userid specific user only, 0 mean all (not used here)
- * @param bool $nullifnone If a single user is specified and $nullifnone is true, a grade item with a null rawgrade will be inserted
+ * @param bool $defaultifnone If a single user is specified and $defaultifnone is true, a grade item with a default rawgrade will be inserted
+ *                            the default rawgrade will be recalculated based on $facetoface->eventgradingmethod.
  */
-function facetoface_update_grades($facetoface=null, $userid=0, $nullifnone = true) {
+function facetoface_update_grades($facetoface=null, $userid=0, $defaultifnone = true) {
     global $DB;
 
-    if (($facetoface != null) && $userid && $nullifnone) {
+    if (($facetoface != null) && $userid && $defaultifnone) {
         $grade = new stdClass();
         $grade->userid   = $userid;
-        $grade->rawgrade = null;
+        $grade->rawgrade = \mod_facetoface\signup_helper::compute_final_grade($facetoface, $userid);
         facetoface_grade_item_update($facetoface, $grade);
     } else if ($facetoface != null) {
         facetoface_grade_item_update($facetoface);

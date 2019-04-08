@@ -104,6 +104,7 @@ information provided here is intended especially for developers.
 * facetoface_get_num_attendees() function has been deprecated, please use \mod_facetoface\attendees_helper::count_attendees_with_codes() instead
 * facetoface_get_user_submissions() function has been deprecated, please use \mod_facetoface\signup_list class instead
 * facetoface_get_attendees() function has been deprecated, please use \mod_facetoface\attendees_helper::get_attendees_with_codes() instead
+* facetoface_update_grades() function has been changed; facetoface.eventgradingmethod now takes into account when the third argument is true (by default)
 
 === 12.0 ===
 
