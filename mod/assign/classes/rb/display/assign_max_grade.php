@@ -45,6 +45,11 @@ class assign_max_grade extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $extrafields = self::get_extrafields_row($row, $column);
 
+        // If assignment doesn't require grading.
+        if ($extrafields->assign_grade == 0) {
+            return get_string('gradingnotrequired', 'rb_source_assign');
+        }
+
         // if there's no scale values, return the raw grade.
         if (empty($extrafields->scale_values)) {
             return (integer)$value;

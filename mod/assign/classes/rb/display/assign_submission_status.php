@@ -31,22 +31,16 @@ use totara_reportbuilder\rb\display\base;
  */
 class assign_submission_status extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $CFG;
-        include_once($CFG->dirroot.'/mod/assign/locallib.php');
-
         switch ($value) {
             case 'submitted':
-                $status = get_string('status_submitted', 'rb_source_assign');
-                break;
+                return get_string('status_submitted', 'rb_source_assign');
             case 'graded':
-                $status = get_string('status_graded', 'rb_source_assign');
-                break;
+                return get_string('status_graded', 'rb_source_assign');
+            case 'draft':
+                return get_string('status_draft', 'rb_source_assign');
             default:
-                $status = get_string('status_notsubmitted', 'rb_source_assign');
-                break;
+                return get_string('status_notsubmitted', 'rb_source_assign');
         }
-
-        return $status;
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {

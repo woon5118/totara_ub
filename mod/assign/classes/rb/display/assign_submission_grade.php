@@ -45,6 +45,11 @@ class assign_submission_grade extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $extrafields = self::get_extrafields_row($row, $column);
 
+        // If assignment doesn't require grading.
+        if ($extrafields->assign_grade == 0) {
+            return get_string('gradingnotrequired', 'rb_source_assign');
+        }
+
         // If there's no grade (yet), then return a string saying so.
         // If $field is 0, it is may be $mingrade or $grade.
         if ((integer)$value < 0 || empty($value)) {

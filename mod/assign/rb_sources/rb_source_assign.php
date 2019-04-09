@@ -176,8 +176,9 @@ class rb_source_assign extends rb_base_source {
                 'assignment',
                 'status',
                 get_string('submissionstatus', 'rb_source_assign'),
-                "CASE WHEN assign_grades.grade IS NOT NULL THEN 'graded'
+                "CASE WHEN assign_grades.grade >= 0 THEN 'graded'
                       WHEN base.status = '" . ASSIGN_SUBMISSION_STATUS_SUBMITTED . "' THEN 'submitted'
+                      WHEN base.status = '" . ASSIGN_SUBMISSION_STATUS_DRAFT . "' THEN 'draft'
                       ELSE 'notsubmitted' END",
                 array(
                     'joins' => 'assign_grades',
@@ -207,9 +208,10 @@ class rb_source_assign extends rb_base_source {
                 'assign_grades.grade',
                 array(
                     'displayfunc' => 'assign_submission_grade',
-                    'joins' => 'assign_grades',
+                    'joins' => array('assign_grades', 'assign'),
                     'extrafields' => array(
-                        'scale_values' => 'scale.scale'
+                        'scale_values' => 'scale.scale',
+                        'assign_grade' => 'assign.grade'
                     )
                 )
             ),
@@ -259,9 +261,10 @@ class rb_source_assign extends rb_base_source {
                 'grade_grades.rawgrademax',
                 array(
                     'displayfunc' => 'assign_max_grade',
-                    'joins' => 'grade_grades',
+                    'joins' => array('grade_grades', 'assign'),
                     'extrafields' => array(
-                        'scale_values' => 'scale.scale'
+                        'scale_values' => 'scale.scale',
+                        'assign_grade' => 'assign.grade'
                     )
                 )
             ),
@@ -274,9 +277,10 @@ class rb_source_assign extends rb_base_source {
                 'grade_grades.rawgrademin',
                 array(
                     'displayfunc' => 'assign_min_grade',
-                    'joins' => 'grade_grades',
+                    'joins' => array('grade_grades', 'assign'),
                     'extrafields' => array(
-                        'scale_values' => 'scale.scale'
+                        'scale_values' => 'scale.scale',
+                        'assign_grade' => 'assign.grade'
                     )
                 )
             )
@@ -514,15 +518,5 @@ class rb_source_assign extends rb_base_source {
         // If there are scale values, work out which scale value is the minimum.
         $v = explode(',', $record->scale_values);
         return $v[0];
-    }
-
-    /**
-     * Filter assignment types
-     * @return array
-     */
-    public function rb_filter_assignmenttype() {
-        global $CFG;
-        require_once("{$CFG->dirroot}/mod/assignment/lib.php");
-        return assignment_types();
     }
 }
