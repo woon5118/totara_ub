@@ -531,20 +531,9 @@ class core_text {
 
         // Generate/create $trans_tbl
         if (!isset($trans_tbl)) {
-            if (version_compare(phpversion(), '5.3.4') < 0) {
-                $trans_tbl = array();
-                foreach (get_html_translation_table(HTML_ENTITIES) as $val=>$key) {
-                    $trans_tbl[$key] = self::convert($val, 'ISO-8859-1', 'utf-8');
-                }
-
-            } else if (version_compare(phpversion(), '5.4.0') < 0) {
-                $trans_tbl = get_html_translation_table(HTML_ENTITIES, ENT_COMPAT, 'UTF-8');
-                $trans_tbl = array_flip($trans_tbl);
-
-            } else {
-                $trans_tbl = get_html_translation_table(HTML_ENTITIES, ENT_COMPAT | ENT_HTML401, 'UTF-8');
-                $trans_tbl = array_flip($trans_tbl);
-            }
+            // Totara: we want as many entities as possible here.
+            $trans_tbl = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $trans_tbl = array_flip($trans_tbl);
         }
 
         return $trans_tbl;

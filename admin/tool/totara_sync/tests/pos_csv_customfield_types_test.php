@@ -402,7 +402,7 @@ class tool_totara_sync_pos_csv_customfield_types_testcase extends advanced_testc
         $this->assertEquals('Item one', $item1->fullname);
         $hierarchy = hierarchy::load_hierarchy('position');
         $savedcustomfields = $hierarchy->get_custom_fields($item1->id);
-        $this->assertEquals('Option"B", Option"C"', customfield_multiselect::display_item_data(reset($savedcustomfields)->data, ['display' => 'list-text']));
+        $this->assertEquals('Option&#34;B&#34;, Option&#34;C&#34;', customfield_multiselect::display_item_data(reset($savedcustomfields)->data, ['display' => 'list-text']));
     }
 
     /**

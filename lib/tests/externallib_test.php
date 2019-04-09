@@ -226,9 +226,15 @@ class core_externallib_testcase extends advanced_testcase {
         $test = '<span lang="en" class="multilang">EN</span><span lang="fr" class="multilang">FR</span> ' .
             '<script>hi</script> <h3>there</h3>%';
         $correct = 'ENFR hi there%';
-        $this->assertSame($correct, external_format_string($test, $context->id, false, ['filter' => false]));
+        $this->assertSame($correct, external_format_string($test, $context->id, true, ['filter' => false]));
 
-        $this->assertSame("& < > \" '", format_string("& < > \" '", true, ['escape' => false]));
+        // Totara: format_string now always encodes to num entities, 'escape' option is present for backwards compatibility only.
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", true));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", false));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", true, ['escape' => false]));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", false, ['escape' => false]));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", true, ['escape' => true]));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", false, ['escape' => true]));
 
         $settings->set_raw($currentraw);
         $settings->set_filter($currentfilter);

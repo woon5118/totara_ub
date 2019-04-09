@@ -343,7 +343,7 @@ class block_course_overview_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('div', $picture, array('class' => 'profilepicture'));
 
         $output .= $this->output->box_start('welcome_message');
-        $output .= $this->output->heading(get_string('welcome', 'block_course_overview', $USER->firstname));
+        $output .= $this->output->heading(get_string('welcome', 'block_course_overview', clean_string($USER->firstname)));
 
         if (!empty($CFG->messaging)) {
             $plural = 's';

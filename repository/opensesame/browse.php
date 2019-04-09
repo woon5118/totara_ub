@@ -74,6 +74,7 @@ $a->firstname = $result['data']['FirstName'];
 $a->lastname = $result['data']['LastName'];
 $a->email = $result['data']['Email'];
 $a->userid = $result['data']['UserId'];
+$a = array_map('clean_string', (array)$a);
 
 $userlaunchurl = $result['data']['UserLaunchUrl'];
 

@@ -33,6 +33,7 @@ class repository_opensesame_form_confirm_browse extends moodleform {
         $mform = $this->_form;
 
         $a = \repository_opensesame\local\opensesame_com::get_user_info($USER);
+        $a = array_map('clean_string', $a);
         $warning = get_string('confirmbrowsewarning', 'repository_opensesame', $a);
         $warning = markdown_to_html($warning);
 

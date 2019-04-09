@@ -1440,32 +1440,35 @@ function reset_text_filters_cache($phpunitreset = false) {
  * need filter processing e.g. activity titles, post subjects,
  * glossary concepts.
  *
+ * Totara: All dangerous characters are now encoded as numeric html entities.
+ *
  * @staticvar bool $strcache
- * @param string $string The string to be filtered. Should be plain text, expect
- * possibly for multilang tags.
- * @param boolean $striplinks To strip any link in the result text. Moodle 1.8 default changed from false to true! MDL-8713
- * @param array $options options array/object or courseid
+ * @param string $string The string to be filtered. Should be plain text, expect possibly for multilang tags.
+ * @param boolean $striptags true means strip all tags, false means encode < > as numeric entities
+ * @param array $options options array/object or courseid, 'escape' option overrides $striptags for backwards compatibility
  * @return string
  */
-function format_string($string, $striplinks = true, $options = null) {
+function format_string($string, $striptags = true, $options = null) {
     global $CFG, $PAGE;
 
     // We'll use a in-memory cache here to speed up repeated strings.
-    static $strcache = false;
+    static $strcache = array();
+    static $strcachecount = 0;
 
     if (empty($CFG->version) or $CFG->version < 2013051400 or during_initial_install()) {
-        // Do not filter anything during installation or before upgrade completes.
-        return $string = strip_tags($string);
+        // Do not filter or cache anything during installation or before filter upgrade completes.
+        return $string = clean_string($string);
     }
 
-    if ($strcache === false or count($strcache) > 2000) {
+    if ($strcachecount > 2000) {
         // This number might need some tuning to limit memory usage in cron.
         $strcache = array();
+        $strcachecount = 0; // Counting of big arrays can be very slow.
     }
 
     if (is_numeric($options)) {
         // Legacy courseid usage.
-        $options  = array('context' => context_course::instance($options));
+        $options  = array('context' => context_course::instance($options, IGNORE_MISSING));
     } else {
         // Detach object, we can not modify it.
         $options = (array)$options;
@@ -1475,22 +1478,34 @@ function format_string($string, $striplinks = true, $options = null) {
         // Fallback to $PAGE->context this may be problematic in CLI and other non-standard pages :-(.
         $options['context'] = $PAGE->context;
     } else if (is_numeric($options['context'])) {
-        $options['context'] = context::instance_by_id($options['context']);
-    }
-    if (!isset($options['filter'])) {
-        $options['filter'] = true;
+        $options['context'] = context::instance_by_id($options['context'], IGNORE_MISSING);
     }
 
-    $options['escape'] = !isset($options['escape']) || $options['escape'];
-
-    if (!$options['context']) {
-        // We did not find any context? weird.
-        return $string = strip_tags($string);
+    if (empty($options['context']->id)) {
+        // This means that something is wrong with PAGE setup or context option, so no filtering.
+        // We do not want any fatal errors here caused by invalid context ids.
+        $options['filter'] = false;
+    } else if (empty($CFG->filterall)) {
+        // This means there are no filters configured to filter strings (called headings in filter config UI),
+        // this setting is updated automatically when admin changes filter settings.
+        $options['filter'] = false;
+    } else {
+        $options['filter'] = $options['filter'] ?? true;
+    }
+    if (isset($options['escape'])) {
+        $striptags = !$options['escape'];
     }
 
-    // Calculate md5.
-    $cachekeys = array($string, $striplinks, $options['context']->id,
-        $options['escape'], current_language(), $options['filter']);
+    // Totara: use just one cache if filtering is disabled.
+    if ($options['filter']) {
+        $cachekeys = ['filter', current_language(), $options['context']->id];
+    } else {
+        $cachekeys = ['nofilter'];
+    }
+    $cachekeys[] = (int)(bool)$striptags;
+
+    // Calculate fast md5 hash to use for cache indexing.
+    $cachekeys[] = $string;
     $md5 = md5(implode('<+>', $cachekeys));
 
     // Fetch from cache if possible.
@@ -1498,34 +1513,22 @@ function format_string($string, $striplinks = true, $options = null) {
         return $strcache[$md5];
     }
 
-    // First replace all ampersands not followed by html entity code
-    // Regular expression moved to its own method for easier unit testing.
-    $string = $options['escape'] ? replace_ampersands_not_followed_by_entity($string) : $string;
-
-    if (!empty($CFG->filterall) && $options['filter']) {
+    if ($options['filter']) {
         $filtermanager = filter_manager::instance();
         $filtermanager->setup_page_for_filters($PAGE, $options['context']); // Setup global stuff filters may have.
         $string = $filtermanager->filter_string($string, $options['context']);
     }
 
-    // If the site requires it, strip ALL tags from this string.
-    if (!empty($CFG->formatstringstriptags)) {
-        if ($options['escape']) {
-            $string = str_replace(array('<', '>'), array('&lt;', '&gt;'), strip_tags($string));
-        } else {
-            $string = strip_tags($string);
-        }
-    } else {
-        // Otherwise strip just links if that is required (default).
-        if ($striplinks) {
-            // Strip links in string.
-            $string = strip_links($string);
-        }
-        $string = clean_text($string);
+    // Totara: we cannot allow tags in titles for security reasons, tags must be either stripped or escaped.
+    if ($striptags) {
+        $string = strip_tags($string);
     }
+    // Totara: always encode all dangerous characters as numeric entities.
+    $string = clean_string($string);
 
     // Store to cache.
     $strcache[$md5] = $string;
+    $strcachecount++;
 
     return $string;
 }
@@ -1733,6 +1736,49 @@ function clean_text($text, $format = FORMAT_HTML, $options = array()) {
     // it was trivial to work around that (for example using style based XSS exploits).
     // We must not give false sense of security here - all developers MUST understand how to use
     // rawurlencode(), htmlentities(), htmlspecialchars(), p(), s(), moodle_url, html_writer and friends!!!
+
+    return $text;
+}
+
+
+/**
+ * This is an alternative to htmlspecialchars() for XSS protection, it is designed to be compatible with s()
+ * and both {{ }} and {{{ }}} in mustache.
+ *
+ * Named entities of special characters are converted to numeric entities
+ * and all risky characters are changed to numeric entities to prevent XSS.
+ *
+ * NOTE: this cannot protect against code that omits the quotes around html attribute values.
+ *
+ * @since Totara 13
+ *
+ * @param string|null $text mostly plain text some html entities text usually representing name/title of something
+ * @return string|null safe text suitable for attribute value or use as html fragment
+ */
+function clean_string(?string $text) {
+    if ($text === null) {
+        return null;
+    }
+
+    // Use only UTF8-safe ASCII characters in this list,
+    // note that html entity names are case sensitive.
+    $trans = [
+        '&amp;'  => '&#38;',
+        '&lt;'   => '&#60;',
+        '<'      => '&#60;',
+        '&gt;'   => '&#62;',
+        '>'      => '&#62;',
+        '&quot;' => '&#34;',
+        '"'      => '&#34;',
+        '&apos;' => '&#39;',
+        "'"      => '&#39;',
+        '{'      => '&#123;',
+        '}'      => '&#125;'
+    ];
+    $text = strtr($text, $trans);
+
+    // Replace standalone &.
+    $text = preg_replace('/&(?!([a-z]+|#\d+|#x[0-9a-f]+);)/i', '&#38;', $text);
 
     return $text;
 }

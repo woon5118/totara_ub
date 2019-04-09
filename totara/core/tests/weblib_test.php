@@ -112,4 +112,38 @@ class totara_core_weblib_testcase extends advanced_testcase {
         $this->assertSame('http://www.example.com/test.php?xx=1&bb=2#abc', purify_uri('http://username:password@www.example.com/test.php?xx=1&bb=2#abc', false));
 
     }
+
+    public function test_clean_string() {
+        $data = '&amp;&lt;&gt;&quot;&apos;<>"\'{}';
+        $expected = '&#38;&#60;&#62;&#34;&#39;&#60;&#62;&#34;&#39;&#123;&#125;';
+        $this->assertSame($expected, clean_string($data));
+        $this->assertSame(core_text::entities_to_utf8($data), core_text::entities_to_utf8($expected));
+
+        $this->assertSame('&#38;', clean_string('&'));
+        $this->assertSame(' &#38;', clean_string(' &'));
+        $this->assertSame('&#38; ', clean_string('& '));
+        $this->assertSame('&#38;amp&#38;;', clean_string('&amp&amp;;'));
+
+        $this->assertSame('&num;', clean_string('&num;'));
+    }
+
+    public function test_format_string() {
+        global $CFG;
+        $this->resetAfterTest();
+        $this->assertSame('hokus &#38; &#34;pokus&#34;', format_string('<b>hokus & "pokus"</b>', true));
+        $this->assertSame('&#60;b&#62;hokus &#38; &#34;pokus&#34;&#60;/b&#62;', format_string('<b>hokus & "pokus"</b>', false));
+        $this->assertSame('hokus &#38; &#34;pokus&#34;', format_string('<b>hokus & "pokus"</b>', true, ['escape' => false]));
+        $this->assertSame('&#60;b&#62;hokus &#38; &#34;pokus&#34;&#60;/b&#62;', format_string('<b>hokus & "pokus"</b>', true, ['escape' => true]));
+        $this->assertSame('hokus &#38; &#34;pokus&#34;', format_string('<b>hokus & "pokus"</b>', false, ['escape' => false]));
+        $this->assertSame('&#60;b&#62;hokus &#38; &#34;pokus&#34;&#60;/b&#62;', format_string('<b>hokus & "pokus"</b>', false, ['escape' => true]));
+
+        // Make sure the removed setting is ignored.
+        $CFG->formatstringstriptags = '0';
+        $this->assertSame('hokus &#38; &#34;pokus&#34;', format_string('<b>hokus & "pokus"</b>', true));
+        $this->assertSame('&#60;b&#62;hokus &#38; &#34;pokus&#34;&#60;/b&#62;', format_string('<b>hokus & "pokus"</b>', false));
+        $this->assertSame('hokus &#38; &#34;pokus&#34;', format_string('<b>hokus & "pokus"</b>', true, ['escape' => false]));
+        $this->assertSame('&#60;b&#62;hokus &#38; &#34;pokus&#34;&#60;/b&#62;', format_string('<b>hokus & "pokus"</b>', true, ['escape' => true]));
+        $this->assertSame('hokus &#38; &#34;pokus&#34;', format_string('<b>hokus & "pokus"</b>', false, ['escape' => false]));
+        $this->assertSame('&#60;b&#62;hokus &#38; &#34;pokus&#34;&#60;/b&#62;', format_string('<b>hokus & "pokus"</b>', false, ['escape' => true]));
+    }
 }

@@ -864,7 +864,7 @@ class mod_forum_mail_testcase extends advanced_testcase {
 
         // Post a discussion to the forum.
         $subject = 'This is the very long forum post subject that somebody was very kind of leaving, it is intended to check if long subject comes in mail correctly. Thank you.';
-        $a = (object)array('courseshortname' => $course->shortname, 'forumname' => $forum->name, 'subject' => $subject);
+        $a = (object)array('courseshortname' => format_string($course->shortname), 'forumname' => format_string($forum->name), 'subject' => format_string($subject));
         $expectedsubject = get_string('postmailsubject', 'forum', $a);
         list($discussion, $post) = $this->helper_post_to_forum($forum, $author, array('name' => $subject));
 
@@ -953,8 +953,8 @@ class mod_forum_mail_testcase extends advanced_testcase {
         $newcase['forums'][0]['forumposts'][0]['name'] = 'Hello Moodle\'"';
         $newcase['forums'][0]['forumposts'][0]['message'] = 'Welcome to Moodle\'"';
         $newcase['expectations'][0]['contents'] = array(
-            'Attachment example.txt:', '~{\$a', '~&amp;(quot|\#039);', 'Love Moodle\'', '101\'', 'Moodle Forum\'"',
-            'Hello Moodle\'"', 'Welcome to Moodle\'"');
+            'Attachment example.txt:', '~{\$a', '~&amp;(quot|\#039);', 'Love Moodle&\#39;', '101&\#39;', 'Moodle Forum&\#39;"',
+            'Hello Moodle&\#39;"', 'Welcome to Moodle\'"');
         $textcases['Text mail with quotes everywhere'] = array('data' => $newcase);
 
         // Lt and gt everywhere. This case is completely borked because format_string()
@@ -1026,8 +1026,8 @@ class mod_forum_mail_testcase extends advanced_testcase {
             '~{\$a',
             '~&amp;(amp|lt|gt|quot|\#039);',
             '<div class="attachments">( *\n *)?<a href',
-            '<div class="subject">\n.*Hello Moodle\'"&gt;&amp;', '>Moodle Forum\'"&gt;&amp;',
-            '>Welcome.*Moodle\'"&gt;&amp;', '>Love Moodle&\#039;&quot;&gt;&amp;', '>101\'"&gt;&amp');
+            '<div class="subject">\n.*Hello Moodle&\#39;&\#34;&\#62;&\#38', '>Moodle Forum&\#39;&\#34;&\#62;&\#38;<',
+            '>Welcome.*Moodle\'"&gt;&amp;', '>Love Moodle&\#39;&\#34;&\#62;&\#38;<', '>101&\#39;&\#34;&\#62;&\#38;<');
         $htmlcases['HTML mail with quotes, gt, lt and ampersand  everywhere'] = array('data' => $newcase);
 
         // Text+image message i.e. @@PLUGINFILE@@ token handling.

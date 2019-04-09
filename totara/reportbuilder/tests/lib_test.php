@@ -1166,7 +1166,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // should return an array
         $this->assertTrue((bool)is_array($options));
         // the strings should have the correct format
-        $this->assertEquals("User's Fullname", $options['User']['user-fullname']);
+        $this->assertEquals("User&#39;s Fullname", $options['User']['user-fullname']);
 
         $this->resetAfterTest(true);
     }
@@ -1177,7 +1177,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // should return an array
         $this->assertTrue((bool)is_array($options));
         // the strings should have the correct format
-        $this->assertEquals("User's Fullname", $options['User']['user-fullname']);
+        $this->assertEquals("User&#39;s Fullname", $options['User']['user-fullname']);
 
         $this->resetAfterTest(true);
     }

@@ -228,6 +228,7 @@ $CFG->slasharguments = '1'; // Cannot be disabled any more, admin must fix web s
 $CFG->loginhttps = '0'; // This setting was removed, use https:// in $CFG->wwwroot instead.
 $CFG->pathtounoconv = ''; // Unoconv is not secure for web servers!
 $CFG->enablemobilewebservice = '0'; // Not compatible with Totara.
+$CFG->formatstringstriptags = '1'; // Enforced for security reasons, course and activity titles must not have any html tags in them!
 
 // The current directory in PHP version 4.3.0 and above isn't necessarily the
 // directory of the script when run from the command line. The require_once()

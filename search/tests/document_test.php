@@ -90,7 +90,7 @@ class search_document_testcase extends advanced_testcase {
         $this->assertEquals('Escape & Content', $doc->get('content'));
         $this->assertEquals('Escape & Description1', $doc->get('description1'));
         $this->assertEquals('Escape & Description2', $doc->get('description2'));
-        $this->assertEquals('User Escape & Name', $doc->get('userfullname'));
+        $this->assertEquals('User Escape &#38; Name', $doc->get('userfullname'));
         $this->assertEquals('Course & Title', $doc->get('coursefullname'));
 
         // Export for template, and see if it is escaped.
@@ -99,8 +99,8 @@ class search_document_testcase extends advanced_testcase {
         $this->assertEquals('Escape &amp; Content', $export['content']);
         $this->assertEquals('Escape &amp; Description1', $export['description1']);
         $this->assertEquals('Escape &amp; Description2', $export['description2']);
-        $this->assertEquals('User Escape &amp; Name', $export['userfullname']);
-        $this->assertEquals('Course &amp; Title', $export['coursefullname']);
+        $this->assertEquals('User Escape &#38; Name', $export['userfullname']);
+        $this->assertEquals('Course &#38; Title', $export['coursefullname']);
     }
 
     protected function tearDown() {

@@ -213,10 +213,10 @@ class enrol_paypal_plugin extends enrol_plugin {
                 $coursefullname  = format_string($course->fullname, true, array('context'=>$context));
                 $courseshortname = $shortname;
                 $userfullname    = fullname($USER);
-                $userfirstname   = $USER->firstname;
-                $userlastname    = $USER->lastname;
-                $useraddress     = $USER->address;
-                $usercity        = $USER->city;
+                $userfirstname   = clean_string($USER->firstname);
+                $userlastname    = clean_string($USER->lastname);
+                $useraddress     = clean_string($USER->address);
+                $usercity        = clean_string($USER->city);
                 $instancename    = $this->get_instance_name($instance);
 
                 include($CFG->dirroot.'/enrol/paypal/enrol.html');

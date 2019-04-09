@@ -62,7 +62,7 @@ class totara_customfield_menu_test extends advanced_testcase {
             $this->assertSame($saved, $savedata);
 
             // Confirm that output is filtered.
-            $formatdata = strip_tags(format_text($saved));
+            $formatdata = clean_string($saved);
             $displaydata = $customfield->display_data();
             $this->assertSame($formatdata, $displaydata);
         }

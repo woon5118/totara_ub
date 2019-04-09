@@ -106,7 +106,7 @@ class auth_approved_util_testcase extends advanced_testcase {
         $this->assertContains('<dt>User First Name</dt><dd>test1 firstname</dd>', $report);
         $this->assertContains('<dt>User Last Name</dt><dd>test1 surname</dd>', $report);
         $this->assertContains('<dt>Username</dt><dd>test1_username</dd>', $report);
-        $this->assertContains('<dt>User\'s Email</dt><dd>test1@example.com</dd>', $report);
+        $this->assertContains('<dt>User&#39;s Email</dt><dd>test1@example.com</dd>', $report);
         $this->assertContains('<dt>Email confirmed</dt><dd>No</dd>', $report);
         $this->assertNotContains('monkey', $report);
 
@@ -123,7 +123,7 @@ class auth_approved_util_testcase extends advanced_testcase {
         $this->assertContains('<dt>User First Name</dt><dd>test2 firstname</dd>', $report);
         $this->assertContains('<dt>User Last Name</dt><dd>test2 surname</dd>', $report);
         $this->assertContains('<dt>Username</dt><dd>test2_username</dd>', $report);
-        $this->assertContains('<dt>User\'s Email</dt><dd>test2@example.com</dd>', $report);
+        $this->assertContains('<dt>User&#39;s Email</dt><dd>test2@example.com</dd>', $report);
         $this->assertContains('<dt>Email confirmed</dt><dd>No</dd>', $report);
         $this->assertNotContains('monkey', $report);
 
@@ -140,7 +140,7 @@ class auth_approved_util_testcase extends advanced_testcase {
         $this->assertContains('<dt>User First Name</dt><dd>test2 firstname</dd>', $report);
         $this->assertContains('<dt>User Last Name</dt><dd>test2 surname</dd>', $report);
         $this->assertContains('<dt>Username</dt><dd>test2_username</dd>', $report);
-        $this->assertContains('<dt>User\'s Email</dt><dd>test2@example.com</dd>', $report);
+        $this->assertContains('<dt>User&#39;s Email</dt><dd>test2@example.com</dd>', $report);
         $this->assertContains('<dt>Email confirmed</dt><dd>No</dd>', $report);
         $this->assertNotContains('monkey', $report);
     }

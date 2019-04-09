@@ -592,6 +592,13 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame('prezdivka', fullname($user, true));
     }
 
+    public function test_fullname_encoding() {
+        $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user(['firstname' => 'Kres"\'tni', 'lastname' => 'Prij&meni']);
+        $this->assertSame('Kres&#34;&#39;tni Prij&#38;meni', fullname($user));
+    }
+
     /**
      * Test all strftime() parameters.
      */

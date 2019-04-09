@@ -145,7 +145,7 @@ class question_base_test extends totara_question_testcase {
         $storage = new question_storage_mock(1);
         $question = $man->create_element($storage, 'text');
         // Assert default behaviour. Only format changes.
-        $this->assertEquals('test&gt;', $question->to_html('<a href="http://example.com/"><b>test></b></a>'));
+        $this->assertEquals('test&#62;', $question->to_html('<a href="http://example.com/"><b>test></b></a>'));
     }
 
     public function test_db_type() {

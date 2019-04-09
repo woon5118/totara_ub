@@ -33,33 +33,38 @@ class core_weblib_testcase extends advanced_testcase {
         global $CFG;
 
         // Ampersands.
-        $this->assertSame("&amp; &amp;&amp;&amp;&amp;&amp; &amp;&amp;", format_string("& &&&&& &&"));
-        $this->assertSame("ANother &amp; &amp;&amp;&amp;&amp;&amp; Category", format_string("ANother & &&&&& Category"));
-        $this->assertSame("ANother &amp; &amp;&amp;&amp;&amp;&amp; Category", format_string("ANother & &&&&& Category", true));
-        $this->assertSame("Nick's Test Site &amp; Other things", format_string("Nick's Test Site & Other things", true));
-        $this->assertSame("& < > \" '", format_string("& < > \" '", true, ['escape' => false]));
+        $this->assertSame("&#38; &#38;&#38;&#38;&#38;&#38; &#38;&#38;", format_string("& &&&&& &&"));
+        $this->assertSame("ANother &#38; &#38;&#38;&#38;&#38;&#38; Category", format_string("ANother & &&&&& Category"));
+        $this->assertSame("ANother &#38; &#38;&#38;&#38;&#38;&#38; Category", format_string("ANother & &&&&& Category", true));
+        $this->assertSame("Nick&#39;s Test Site &#38; Other things", format_string("Nick's Test Site & Other things", true));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", true));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", true, ['escape' => false]));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", true, ['escape' => true]));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", false));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", false, ['escape' => false]));
+        $this->assertSame("&#38; &#60; &#62; &#34; &#39;", format_string("& < > \" '", false, ['escape' => true]));
 
         // String entities.
-        $this->assertSame("&quot;", format_string("&quot;"));
+        $this->assertSame("&#34;", format_string("&quot;"));
 
-        // Digital entities.
-        $this->assertSame("&11234;", format_string("&11234;"));
+        // Numeric decimal entities.
+        $this->assertSame("&#11234;", format_string("&#11234;"));
 
-        // Unicode entities.
-        $this->assertSame("&#4475;", format_string("&#4475;"));
+        // Numeric hex entities.
+        $this->assertSame("&#x4475;", format_string("&#x4475;"));
 
         // < and > signs.
-        $originalformatstringstriptags = $CFG->formatstringstriptags;
+        $originalformatstringstriptags = $CFG->formatstringstriptags; // Totara: ignored
 
         $CFG->formatstringstriptags = false;
-        $this->assertSame('x &lt; 1', format_string('x < 1'));
-        $this->assertSame('x &gt; 1', format_string('x > 1'));
-        $this->assertSame('x &lt; 1 and x &gt; 0', format_string('x < 1 and x > 0'));
+        $this->assertSame('x &#60; 1', format_string('x < 1'));
+        $this->assertSame('x &#62; 1', format_string('x > 1'));
+        $this->assertSame('x &#60; 1 and x &#62; 0', format_string('x < 1 and x > 0'));
 
         $CFG->formatstringstriptags = true;
-        $this->assertSame('x &lt; 1', format_string('x < 1'));
-        $this->assertSame('x &gt; 1', format_string('x > 1'));
-        $this->assertSame('x &lt; 1 and x &gt; 0', format_string('x < 1 and x > 0'));
+        $this->assertSame('x &#60; 1', format_string('x < 1'));
+        $this->assertSame('x &#62; 1', format_string('x > 1'));
+        $this->assertSame('x &#60; 1 and x &#62; 0', format_string('x < 1 and x > 0'));
 
         $CFG->formatstringstriptags = $originalformatstringstriptags;
     }
@@ -77,13 +82,11 @@ class core_weblib_testcase extends advanced_testcase {
         $course = $generator->create_course();
         $user = $generator->create_user();
         $rawstring = 'Shortname <a href="#">link</a> curseword';
-        $expectednofilter = strip_links($rawstring);
+        $expectednofilter = strip_tags($rawstring); // Totara: no tags in results
         $expectedfilter = 'Shortname link \*\**';
-        $striplinks = true;
         $context = context_course::instance($course->id);
         $options = [
             'context' => $context,
-            'escape' => true,
             'filter' => false
         ];
 
@@ -91,7 +94,7 @@ class core_weblib_testcase extends advanced_testcase {
 
         // Format the string without filters. It should just strip the
         // links.
-        $nofilterresult = format_string($rawstring, $striplinks, $options);
+        $nofilterresult = format_string($rawstring, true, $options);
         $this->assertEquals($expectednofilter, $nofilterresult);
 
         // Add the censor filter. Make sure it's enabled globally.
@@ -102,7 +105,7 @@ class core_weblib_testcase extends advanced_testcase {
         filter_set_local_state('censor', $context->id, TEXTFILTER_ON);
         // This time we want to apply the filters.
         $options['filter'] = true;
-        $filterresult = format_string($rawstring, $striplinks, $options);
+        $filterresult = format_string($rawstring, true, $options);
         $this->assertRegExp("/$expectedfilter/", $filterresult);
 
         filter_set_local_state('censor', $context->id, TEXTFILTER_OFF);
@@ -110,7 +113,7 @@ class core_weblib_testcase extends advanced_testcase {
         // Confirm that we get back the cached string. The result should be
         // the same as the filtered text above even though we've disabled the
         // censor filter in between.
-        $cachedresult = format_string($rawstring, $striplinks, $options);
+        $cachedresult = format_string($rawstring, true, $options);
         $this->assertRegExp("/$expectedfilter/", $cachedresult);
     }
 

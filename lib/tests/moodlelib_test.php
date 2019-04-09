@@ -2605,7 +2605,7 @@ class core_moodlelib_testcase extends advanced_testcase {
 
         foreach ($configarray as $config) {
             $CFG->fullnamedisplay = $config->config;
-            $expectedname = $config->expectedname;
+            $expectedname = clean_string($config->expectedname);
             $testname = fullname($user);
             $this->assertSame($expectedname, $testname);
         }

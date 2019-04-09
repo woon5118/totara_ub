@@ -3596,14 +3596,14 @@ function fullname($user, $override=false) {
     }
     // If the template is empty, or set to language, return the language string.
     if ((empty($template) || $template == 'language') && !$override) {
-        return get_string('fullnamedisplay', null, $user);
+        return clean_string(get_string('fullnamedisplay', null, $user));
     }
 
     // Check to see if we are displaying according to the alternative full name format.
     if ($override) {
         if (empty($CFG->alternativefullnameformat) || $CFG->alternativefullnameformat == 'language') {
             // Default to show just the user names according to the fullnamedisplay string.
-            return get_string('fullnamedisplay', null, $user);
+            return clean_string(get_string('fullnamedisplay', null, $user));
         } else {
             // If the override is true, then change the template to use the complete name.
             $template = $CFG->alternativefullnameformat;
@@ -3653,7 +3653,7 @@ function fullname($user, $override=false) {
         // people in general feel is a good setting to fall back on.
         $displayname = $user->firstname;
     }
-    return $displayname;
+    return clean_string($displayname);
 }
 
 /**
@@ -6477,11 +6477,11 @@ function setnew_password_and_mail($user, $fasthash = false) {
     $a = new stdClass();
     // Totara: Keep the firstname because it is used in language packs.
     $a->firstname   = fullname($user, true);
-    $a->fullname    = $a->firstname;
+    $a->fullname    = clean_string($a->firstname);
     // Totara: New first_name is intended for language pack customisations.
-    $a->first_name  = $user->firstname;
+    $a->first_name  = clean_string($user->firstname);
     $a->sitename    = format_string($site->fullname);
-    $a->username    = $user->username;
+    $a->username    = clean_string($user->username);
     $a->newpassword = $newpassword;
     $a->link        = $CFG->wwwroot .'/login/?lang=' . $lang;
     $a->signoff     = generate_email_signoff();
@@ -6520,10 +6520,10 @@ function reset_password_and_mail($user) {
     }
 
     $a = new stdClass();
-    $a->firstname   = $user->firstname;
-    $a->lastname    = $user->lastname;
+    $a->firstname   = clean_string($user->firstname);
+    $a->lastname    = clean_string($user->lastname);
     $a->sitename    = format_string($site->fullname);
-    $a->username    = $user->username;
+    $a->username    = clean_string($user->username);
     $a->newpassword = $newpassword;
     $a->link        = $CFG->wwwroot .'/login/change_password.php';
     $a->signoff     = generate_email_signoff();
@@ -6587,9 +6587,9 @@ function send_password_change_confirmation_email($user, $resetrecord) {
     $pwresetmins = isset($CFG->pwresettime) ? floor($CFG->pwresettime / MINSECS) : 30;
 
     $data = new stdClass();
-    $data->firstname = $user->firstname;
-    $data->lastname  = $user->lastname;
-    $data->username  = $user->username;
+    $data->firstname = clean_string($user->firstname);
+    $data->lastname  = clean_string($user->lastname);
+    $data->username  = clean_string($user->username);
     $data->sitename  = format_string($site->fullname);
     $data->link      = $CFG->wwwroot .'/login/forgot_password.php?token='. $resetrecord->token;
     $data->admin     = generate_email_signoff();
@@ -6618,8 +6618,8 @@ function send_password_change_info($user) {
 
     $strmgr = get_string_manager();
     $data = new stdClass();
-    $data->firstname = $user->firstname;
-    $data->lastname  = $user->lastname;
+    $data->firstname = clean_string($user->firstname);
+    $data->lastname  = clean_string($user->lastname);
     $data->sitename  = format_string($site->fullname);
     $data->admin     = generate_email_signoff();
 

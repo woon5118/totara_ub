@@ -179,7 +179,7 @@ preferences,moodle|/user/preferences.php|preferences',
 
     // "htmlsettings" settingpage
     $temp = new admin_settingpage('htmlsettings', new lang_string('htmlsettings', 'admin'), array('totara/core:appearance'));
-    $temp->add(new admin_setting_configcheckbox('formatstringstriptags', new lang_string('stripalltitletags', 'admin'), new lang_string('configstripalltitletags', 'admin'), 1));
+    // Totara: setting 'formatstringstriptags' was removed in Totara 13 for security reasons, dangerous characters are now encoded as numeric html entities.
     $temp->add(new admin_setting_emoticons());
     $ADMIN->add('appearance', $temp);
     $ADMIN->add('appearance', new admin_externalpage('resetemoticons', new lang_string('emoticonsreset', 'admin'),

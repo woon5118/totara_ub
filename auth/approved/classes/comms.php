@@ -53,6 +53,7 @@ final class comms {
         $data->sitename = format_string($site->fullname);
         $data->support = $supportuser->email;
         $data->link = $CFG->wwwroot .'/auth/approved/confirm.php?token='. $request->confirmtoken;
+        $data = array_map('clean_string', (array)$data);
 
         $userto = \totara_core\totara_user::get_external_user($request->email);
         $subject = $sm->get_string('emailconfirmationsubject', 'auth_approved', $data, $request->lang);
@@ -121,6 +122,7 @@ final class comms {
         $data->username = $request->username;
         $data->sitename = format_string($site->fullname);
         $data->support = $supportuser->email;
+        $data = array_map('clean_string', (array)$data);
 
         $userto = \totara_core\totara_user::get_external_user($request->email);
         $subject = $sm->get_string('emailconfirmedsubject', 'auth_approved', $data, $request->lang);
@@ -241,7 +243,10 @@ final class comms {
         $data->sitename = format_string($site->fullname);
         $data->support = $supportuser->email;
         $data->link = $CFG->wwwroot .'/login/index.php';
-        $data->custommessage = $custommessage;
+        $data = array_map('clean_string', (array)$data);
+
+        // Custom message may contain markdown or html.
+        $data['custommessage'] = $custommessage;
 
         $subject = $sm->get_string('requestapprovedsubject', 'auth_approved', $data, $user->lang);
         $message = $sm->get_string('requestapprovedbody', 'auth_approved', $data, $user->lang);
@@ -269,7 +274,10 @@ final class comms {
         $data->username = $request->username;
         $data->sitename = format_string($site->fullname);
         $data->support = $supportuser->email;
-        $data->custommessage = $custommessage;
+        $data = array_map('clean_string', (array)$data);
+
+        // Custom message may contain markdown or html.
+        $data['custommessage'] = $custommessage;
 
         $userto = \totara_core\totara_user::get_external_user($request->email);
         $subject = $sm->get_string('requestrejectedsubject', 'auth_approved', $data, $request->lang);
