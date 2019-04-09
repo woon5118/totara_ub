@@ -62,7 +62,7 @@ class core_course_totara_catalog_dataformatter_image_testcase extends dataformat
         $this->assertInstanceOf(stdClass::class, $result);
         // Check that we get a url back that includes default icon in its path.
         $this->assertContains($CFG->wwwroot, $result->url);
-        $this->assertContains('/course/defaultimage', $result->url);
+        $this->assertContains('/course_defaultimage', $result->url);
         $this->assertSame('test_alt_text', $result->alt);
 
         $this->assert_exceptions($df, $test_params);

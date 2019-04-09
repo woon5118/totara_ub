@@ -504,6 +504,7 @@ class backup_course_structure_step extends backup_structure_step {
 
         $course->annotate_ids('grouping', 'defaultgroupingid');
 
+        $course->annotate_files('course', 'images', null); // Totara: background image for grid catalogue
         $course->annotate_files('course', 'summary', null);
         $course->annotate_files('course', 'overviewfiles', null);
         $course->annotate_files('course', 'legacy', null);

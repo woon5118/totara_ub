@@ -119,6 +119,7 @@ class core_course_edit_form {
     public static function save_form(edit_form_save_changes $hook) {
         global $CFG;
 
+        require_once($CFG->dirroot.'/course/lib.php');
         require_once($CFG->dirroot.'/cohort/lib.php');
         require_once($CFG->dirroot.'/totara/cohort/lib.php');
         require_once($CFG->dirroot.'/totara/program/lib.php');
@@ -126,6 +127,10 @@ class core_course_edit_form {
         if (!$hook->iscreating) {
             // Ensure all completion records are created.
             completion_start_user_bulk($hook->courseid);
+        }
+
+        if (!empty($hook->data->image)) {
+            course_save_image($hook->data, $hook->courseid);
         }
 
         $changedenrolledlearning = self::save_enrolled_learning_changes($hook);
@@ -225,6 +230,7 @@ class core_course_edit_form {
      *    - iconheader (iconheader)
      *    - icon (hidden)
      *    - currenticon (static)
+     *    - image (filepicker for background image in the Grid Catalogue)
      *
      * JavaScript is required for this element and is loaded by (@see self::initialise_course_icons_js()}
      * Icon is a column on the course table so there is no corresponding save code.
@@ -238,8 +244,8 @@ class core_course_edit_form {
         $course = $hook->customdata['course'];
         $nojs = (isset($hook->customdata['nojs'])) ? $hook->customdata['nojs'] : 0 ;
 
-        // For the next part we need the element AFTER 'Enable completion'.
-        $beforename = 'image';
+        // For the next part we need these elements at the start of "Appearance section".
+        $beforename = 'lang';
         $courseicon = isset($course->icon) ? $course->icon : 'default';
         $iconhtml = totara_icon_picker_preview('course', $courseicon);
 
@@ -281,6 +287,22 @@ class core_course_edit_form {
                 $beforename
             );
         }
+
+        // Add background image element for the Grid Catalogue.
+        $options = ['accept_types' => 'web_image', 'maxfiles' => 1, 'subdirs' => false];
+        $mform->insertElementBefore(
+            $mform->createElement('filemanager', 'image', get_string('courseimage'), null, $options),
+            $beforename
+        );
+        $mform->addHelpButton('image', 'courseimage');
+
+        // NOTE: this is a nasty hack, but it should work consistently in legacy Moodle forms for now...
+        $draftitemid = file_get_submitted_draft_itemid('image');
+        if (!empty($course->id)) {
+            $context = \context_course::instance($course->id);
+            file_prepare_draft_area($draftitemid, $context->id, 'course', 'images', 0, $options);
+        }
+        $mform->setDefault('image', $draftitemid);
     }
 
     /**

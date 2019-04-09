@@ -4127,94 +4127,74 @@ function course_get_user_administration_options($course, $context) {
 }
 
 /**
- * Saves the contents of the image field.
+ * Saves the contents of the image field used as background in the Grid Catalogue.
  * Will remove any previous images and replace with the one uploaded
  *
- * @param course_edit_form $editform
+ * @param stdClass $data data from course_edit_form
  * @param int $courseid
  */
-function course_save_image($data, int $courseid) {
+function course_save_image(stdClass $data, int $courseid) {
     $context = context_course::instance($courseid, MUST_EXIST);
-    $image = course_get_image($courseid);
-    if ($image) {
-        $fs = get_file_storage();
-        $fs->delete_area_files(
-            $context->id,
-            'course',
-            'images',
-            $courseid
-        );
+    if (empty($data->image)) {
+        debugging('Invalid use of course_save_image(), draft area item id expected', DEBUG_DEVELOPER);
+        return;
     }
-    file_save_draft_area_files($data->image,
-        $context->id,
-        'course',
-        'images',
-        $courseid,
-        [
-            'maxfiles' => 1
-        ]
-    );
+    $options = ['maxfiles' => 1, 'subdirs' => 0, 'accept_types' => 'web_image'];
+    file_save_draft_area_files($data->image, $context->id, 'course', 'images', 0, $options);
 }
 
 /**
- * Return a url to the image associated with the course.
+ * Return a url to the image associated with the course
+ * used as background in the Grid Catalogue.
  *
- * @param int $courseid
- * @return string|false
+ * @param stdClass|int $course
+ * @return moodle_url
  */
-function course_get_image(int $courseid) {
-    global $CFG;
-    $context = context_course::instance($courseid, MUST_EXIST);
+function course_get_image($course) {
+    global $DB, $OUTPUT;
+
+    if (is_object($course)) {
+        if (empty($course->cacherev)) {
+            $course = $DB->get_record('course', ['id' => $course->id]);
+        }
+    } else {
+        $course = $DB->get_record('course', ['id' => $course]);
+    }
+
+    if (!$course) {
+        return $OUTPUT->image_url('course_defaultimage', 'moodle');
+    }
+    $context = context_course::instance($course->id, IGNORE_MISSING);
+    if (!$context) {
+        return $OUTPUT->image_url('course_defaultimage', 'moodle');
+    }
+
     $fs = get_file_storage();
-    $files = array_values(
-        $fs->get_area_files(
-            $context->id,
-            'course',
-            'images',
-            $courseid
-        )
-    );
-    $files = array_values(array_filter($files, function($file) {
-        return !$file->is_directory();
-    }));
-
-    $cfgvalue = get_config('course', 'defaultimage');
-    if (empty($files) && $cfgvalue != '') {
-        // TOTARA: try to find the default image file here for course if there is any, otherwise, there should be another layer
-        // to make sure the course default image is always exist in the system.
-        $context = context_system::instance();
-        $files = $fs->get_area_files($context->id, 'course', 'defaultimage');
-
-        $files = array_values(
-            array_filter(
-                $files,
-                function ($file) use ($cfgvalue) {
-                    /** @var stored_file $file */
-                    if ($file->is_directory()) {
-                        return false;
-                    }
-
-                    return $file->get_filepath().$file->get_filename() == $cfgvalue;
-                }
-            )
-        );
+    $files = $fs->get_area_files($context->id, 'course', 'images', 0, "timemodified DESC", false);
+    if ($files) {
+        $url = moodle_url::make_pluginfile_url($context->id, 'course', 'images', $course->cacherev, '/', 'image', false);
+        return $url;
+    }
+    if (get_config('course', 'defaultimage')) { // Setting here used for performance only.
+        $syscontext = context_system::instance();
+        $files = $fs->get_area_files($syscontext->id, 'course', 'defaultimage', 0, "timemodified DESC", false);
+        if ($files) {
+            $file = reset($files);
+            $themerev = theme_get_revision();
+            $url = moodle_url::make_pluginfile_url(
+                $syscontext->id,
+                'course',
+                'defaultimage',
+                $themerev,
+                '/',
+                $file->get_filename(),
+                false
+            );
+            return $url;
+        }
     }
 
-    if (empty($files)) {
-        // TOTARA: another defense layer to make sure that we do have default image in the system.
-        return $CFG->wwwroot . '/course/defaultimage.svg';
-    }
-
-    assert(count($files) <= 1, 'There should only be one image for the course but there was ' . count($files));
-    $file = moodle_url::make_pluginfile_url(
-        $files[0]->get_contextid(),
-        $files[0]->get_component(),
-        $files[0]->get_filearea(),
-        $files[0]->get_itemid(),
-        $files[0]->get_filepath(),
-        $files[0]->get_filename()
-    );
-    return $file->out();
+    return $OUTPUT->image_url('course_defaultimage', 'moodle');
 }
 
 /**

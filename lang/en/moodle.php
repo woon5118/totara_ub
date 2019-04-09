@@ -2149,10 +2149,10 @@ $string['trainerdescription'] = 'Responsible for delivering training of learners
 $string['editingtrainer'] = 'Editing Trainer';
 $string['editingtrainerdescription'] = 'Responsible for delivering training of learners, and can alter activities';
 $string['xpercent'] = '{$a}%';
-$string['coursedefaultimage_help'] = 'Set a default image to display if no image is uploaded by the course creator.';
+$string['coursedefaultimage_help'] = 'Set a default image to display in the Grid Catalogue if no image is uploaded by the course creator.';
 $string['courseimagedefault'] = 'Default image';
 $string['courseimage'] = 'Image';
-$string['courseimage_help'] = 'Upload an image that will get displayed with the course. If no image is uploaded a default image will be used.';
+$string['courseimage_help'] = 'Upload an image that will get displayed with the course in the Grid Catalogue. If no image is uploaded a default image from theme will be used.';
 
 // Deprecated since Moodle 3.1.
 $string['filetoolarge'] = 'is too large to upload';

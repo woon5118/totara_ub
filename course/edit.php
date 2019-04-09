@@ -175,10 +175,6 @@ if ($editform->is_cancelled()) {
         $info->invalidatecache();
     }
 
-    // TOTARA changes - save the image for the course.
-    course_save_image($data, $course->id);
-    // End TOTARA changes.
-
     $hook = new core_course\hook\edit_form_save_changes($iscreating, $course->id, $data);
     $hook->execute();
 

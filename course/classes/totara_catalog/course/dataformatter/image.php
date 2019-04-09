@@ -63,7 +63,7 @@ class image extends formatter {
         }
 
         $image = new \stdClass();
-        $image->url = course_get_image($data['courseid']);
+        $image->url = course_get_image($data['courseid'])->out();
         $image->alt = format_string($data['alt'], true, ['context' => $context]);
 
         return $image;

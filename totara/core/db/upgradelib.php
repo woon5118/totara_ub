@@ -752,98 +752,104 @@ function totara_core_upgrade_course_defaultimage_config() {
 
     $cfgvalue = get_config('course', 'defaultimage');
     if (empty($cfgvalue)) {
-        return;
-    }
-
-    if (false === stripos($cfgvalue, $CFG->wwwroot)) {
-        // Weird, the defaultimage does not contain $CFG->wwwroot, there could be a posibility that the value is containing a
-        // different www path. We should do nothing here, let the system admin update it by themselves manually
-        if (false !== stripos($cfgvalue, "https://") || false !== stripos($cfgvalue, "http://")) {
-            return;
-        }
-    }
-
-    // First we need to strip out the default domain name here, so it is easier to perform the upgrade.
-    // For example: http://localhost/pluginfile.php/1/course/defaultimage/{itemid}/{filename}
-    $cfgvalue = str_replace($CFG->wwwroot, "", $cfgvalue);
-    $parts = explode("/", $cfgvalue);
-
-    // Filename is always at the end of the url, pretty much. Then we need to replace %20 with spaces, otherwise it couldn't find
-    // the file in mdl_files. The filename will be looking something like this: 'Smaky%20100%20IMG%204149.jpg'
-    $filename = array_pop($parts);
-    $filename = rawurldecode($filename);
-
-    $itemid = array_pop($parts);
-
-    if (!is_string($filename) || !is_numeric($itemid)) {
-        debugging(
-            "Either filename or itemid is invalid",
-            DEBUG_DEVELOPER
-        );
-        // Something is weird with the URI? We shouldn't do anything here. Just let the system admin to update the db by themselves.
+        // No default value for course, no point to upgrade.
         return;
     }
 
     $fs = get_file_storage();
     $context = context_system::instance();
 
-    $files = $fs->get_area_files(
-        $context->id,
-        'course',
-        'defaultimage',
-        $itemid
-    );
-
+    // If the file system has more than one files for setting 'defaultimage', then we will kinda assure that the
+    // latest file is the used file for that specific setting. Otherwise what could go wrong? ¯\_(ツ)_/¯
     $files = array_values(
-        array_filter(
-            $files,
-            function ($file) {
-                /** @var stored_file $file */
-                return !$file->is_directory();
-            }
+        $fs->get_area_files(
+            $context->id,
+            'course',
+            'defaultimage',
+            false,
+            'timemodified DESC',
+            false
         )
     );
 
-    if (count($files) !== 1) {
-        // Better to not update anything, if there are more than one file found for default image.
-        debugging(
-            'There are more than one files found for the default image',
-            DEBUG_DEVELOPER
-        );
+    if (!empty($files)) {
+        /** @var stored_file $oldfile */
+        $oldfile = $files[0];
 
-        return;
-    } else if ($files[0]->get_filename() !== $filename) {
-        debugging(
-            'The file to be upgraded for default image is not the same with the previous config',
-            DEBUG_DEVELOPER
-        );
+        // Start writing the old file to the file storage system. So that the admin settting is able to find it.
+        // There is only one default image, and it must be a ZERO.
+        $rc = [
+            'contextid' => $context->id,
+            'component' => 'course',
+            'filearea' => 'defaultimage',
+            'timemodified' => time(),
+            'itemid' => 0,
+            'source' => $oldfile->get_source(),
+            'filepath' => $oldfile->get_filepath(),
+            'filename' => $oldfile->get_filename()
+        ];
 
-        return;
+        $fs->create_file_from_storedfile($rc, $oldfile);
+        set_config('defaultimage', $oldfile->get_filepath() . $oldfile->get_filename(), 'course');
+
+        // Just remove this old file, it is no longer being used.
+        $oldfile->delete();
+    } else if (false !== get_config('course', 'defaultimage')) {
+        // This seemed wrong that system admin was trying to use some random URL as their default image. But it is
+        // really an edge case.
+        unset_config('defaultimage', 'course');
     }
+}
 
-    /** @var stored_file $file */
-    $file = $files[0];
-    // Need to prepare the draft file here for default file, before any updates are happening. This needs to be happened, because
-    // the setting object will try to save the file out of the draft file.
-    $data = $file->get_itemid();
-    if (!$fs->file_exists($context->id, 'course', 'draft', $file->get_itemid(), $file->get_filepath(), $file->get_filename())) {
-        // Draft file does not exist in the current system, we should prepare one.
-        $draftid = null;
-        file_prepare_draft_area($draftid, $context->id, 'course', 'defaultimage', $file->get_itemid());
-        $data = $draftid;
+/**
+ * Upgrading course 'images' itemid to zero. Because course image should be found via context course id. Not item id.
+ * @return void
+ */
+function totara_core_upgrade_course_images() {
+    global $DB;
+
+    $fs = get_file_storage();
+
+    // For older version, itemid of course-images is being set as courseid.
+    $sql = "SELECT DISTINCT itemid AS id FROM {files} WHERE itemid > 0 AND component = ? AND filearea = ?";
+    $records = $DB->get_records_sql($sql, ['course', 'images']);
+
+    foreach ($records as $record) {
+        $ctx = context_course::instance($record->id, IGNORE_MISSING);
+        if (!$ctx) {
+            continue;
+        }
+
+        // The latest file should be the file that is being used for the course, if not we are DOOM pretty much.
+        $files = $fs->get_area_files($ctx->id, 'course', 'images', $record->id, 'timemodified DESC', false);
+
+        if (!empty($files)) {
+            $oldfile = reset($files);
+            $existing = $fs->file_exists(
+                $ctx->id,
+                'course',
+                'images',
+                0,
+                $oldfile->get_filepath(),
+                $oldfile->get_filename()
+            );
+
+            if (!$existing) {
+                $rc = [
+                    'contextid' => $ctx->id,
+                    'component' => 'course',
+                    'filearea' => 'images',
+                    'itemid' => 0,
+                    'source' => $oldfile->get_source(),
+                    'filepath' => $oldfile->get_filepath(),
+                    'filename' => $oldfile->get_filename()
+                ];
+
+                $fs->create_file_from_storedfile($rc, $oldfile);
+            }
+        }
+
+        // Does not really matter if the files are there or not. This will ensure we are removing unused files.
+        $fs->delete_area_files($ctx->id, 'course', 'images', $record->id);
     }
-
-    // Start writing the new setting for default image file here, using the admin_setting_configstoredfile because we would want
-    // this setting to perform saving with several of pre-actions such as prepare draft file and storing file out of draft file.
-    // So that, after the upgrade, user is still able to find the default image at the setting page.
-    $setting = new admin_setting_configstoredfile(
-        'course/defaultimage',
-        new lang_string('courseimagedefault'),
-        new lang_string('coursedefaultimage_help'),
-        'defaultimage',
-        0,
-        ['accepted_types' => 'web_image']
-    );
-
-    $setting->write_setting($data);
 }

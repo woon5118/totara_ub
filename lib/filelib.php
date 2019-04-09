@@ -4441,18 +4441,64 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
     // ========================================================================================================================
     } else if ($component === 'course') {
 
-        // TOTARA changes.
-        // Images does not require a course context as they can be the default image across multiple courses.
-        if ($filearea == 'defaultimage' || $filearea == 'images') {
-            $file = $fs->get_file($contextid, $component, $filearea, $args[0], '/', $args[1]);
-            if (!$file or $file->is_directory()) {
+        // Totara: default image for course backgrounds in grid catalogue.
+        if ($filearea === 'defaultimage') {
+            if ($CFG->forcelogin) {
+                require_login();
+            }
+            if ($context->contextlevel != CONTEXT_SYSTEM) {
+                send_file_not_found();
+            }
+            if (count($args) < 2) {
                 send_file_not_found();
             }
 
+            $themerev = array_shift($args);
+            $lifetime = 60;
+            if ($themerev > 0) {
+                $lifetime = 60 * 60 * 2;
+            }
+
+            $filename = array_shift($args);
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($context->id, 'course', 'defaultimage', 0, "timemodified DESC", false);
+            if (!$files) {
+                send_file_not_found();
+            }
+            $file = reset($files);
+
             \core\session\manager::write_close(); // Unlock session during file serving.
-            send_stored_file($file, 60 * 60, 0, $forcedownload, array('preview' => $preview));
+            send_stored_file($file, $lifetime, 0, $forcedownload, ['preview' => $preview, 'filename' => $filename]);
         }
-        // End TOTARA changes.
+        // Totara: one image per course for background in grid catalogue.
+        if ($filearea === 'images') {
+            if ($CFG->forcelogin) {
+                require_login();
+            }
+            if ($context->contextlevel != CONTEXT_COURSE) {
+                send_file_not_found();
+            }
+            if (count($args) < 2) {
+                send_file_not_found();
+            }
+
+            $courserev = array_pop($args);
+            if ($courserev <= 0) {
+                $lifetime = 0;
+            } else {
+                $lifetime = 60 * 60;
+            }
+
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($context->id, 'course', 'images', 0, "timemodified DESC", false);
+            if (!$files) {
+                send_file_not_found();
+            }
+            $file = reset($files);
+
+            \core\session\manager::write_close(); // Unlock session during file serving.
+            send_stored_file($file, $lifetime, 0, $forcedownload, array('preview' => $preview));
+        }
 
         if ($context->contextlevel != CONTEXT_COURSE) {
             send_file_not_found();

@@ -2067,6 +2067,7 @@ class restore_course_structure_step extends restore_structure_step {
         global $DB;
 
         // Add course related files, without itemid to match
+        $this->add_related_files('course', 'images', null); // Totara: background image for grid catalogue
         $this->add_related_files('course', 'summary', null);
         $this->add_related_files('course', 'overviewfiles', null);
         // Restore files for file custom field types.

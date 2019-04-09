@@ -3755,13 +3755,15 @@ class core_course_courselib_testcase extends advanced_testcase {
     }
 
     public function test_course_get_image() {
-        global $USER, $CFG;
+        global $USER, $CFG, $OUTPUT;
         $this->resetAfterTest(true);
 
         $course = $this->getDataGenerator()->create_course();
 
         // Return false if there is not image anywhere.
-        $this->assertEquals($CFG->wwwroot . '/course/defaultimage.svg', course_get_image($course->id));
+        $url = course_get_image($course);
+        $expected = $OUTPUT->image_url('course_defaultimage', 'moodle');
+        $this->assertEquals($expected->out(), $url->out());
 
         $this->setAdminUser();
         $context = context_course::instance($course->id);
@@ -3782,9 +3784,11 @@ class core_course_courselib_testcase extends advanced_testcase {
             $context->id,
             'course',
             'images',
-            $course->id
+            0
         );
-        $this->assertEquals($CFG->wwwroot . "/pluginfile.php/{$context->id}/course/images/{$course->id}/example.txt", course_get_image($course->id));
+        $url = course_get_image($course);
+        $expected = "{$CFG->wwwroot}/pluginfile.php/{$context->id}/course/images/{$course->cacherev}/image";
+        $this->assertEquals($expected, $url->out());
     }
 
     public function course_get_return_url_data_provider() {

@@ -102,6 +102,29 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
         $a = get_config('course', 'defaultimage');
         $this->assertNotEmpty($a);
         $this->assertEquals($fileinfo['filepath'] . $fileinfo['filename'], $a);
+
+        // Check whether there is file presenting in mdl_file storage.
+        $fs = get_file_storage();
+        $context = context_system::instance();
+
+        $files = $fs->get_area_files($context->id, 'course', 'defaultimage');
+        $this->assertNotEmpty($files);
+
+        $files = array_values(
+            array_filter(
+                $files,
+                function (stored_file $file): bool {
+                    return !$file->is_directory();
+                }
+            )
+        );
+
+        $this->assertCount(1, $files);
+
+        /** @var stored_file $file */
+        $file = $files[0];
+
+        $this->assertEquals(0, $file->get_itemid());
     }
 
     /**
@@ -154,5 +177,28 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
         // After upgrade
         $value = get_config('course', 'defaultimage');
         $this->assertEquals('/bohemian rhapsody.png', $value);
+
+        // Check whether there is file presenting in mdl_file storage.
+        $fs = get_file_storage();
+        $context = context_system::instance();
+
+        $files = $fs->get_area_files($context->id, 'course', 'defaultimage');
+        $this->assertNotEmpty($files);
+
+        $files = array_values(
+            array_filter(
+                $files,
+                function (stored_file $file): bool {
+                    return !$file->is_directory();
+                }
+            )
+        );
+
+        $this->assertCount(1, $files);
+
+        /** @var stored_file $file */
+        $file = $files[0];
+
+        $this->assertEquals(0, $file->get_itemid());
     }
 }

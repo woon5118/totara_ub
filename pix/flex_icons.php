@@ -2528,4 +2528,6 @@ $pixonlyimages = array(
     'u/f3',
     'u/user35',
     'u/user100',
+    // Course catalogue images.
+    'course_defaultimage'
 );
