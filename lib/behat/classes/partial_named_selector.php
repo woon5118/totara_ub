@@ -262,6 +262,11 @@ XPATH
         '%ariaLabelMatch%' => [
             'moodle' => 'contains(./@aria-label, %locator%)',
         ],
+        // Totara: check aria-label for input field
+        '%labelTextMatch%' => [
+            'upstream' => './@id = //label[%tagTextMatch%]/@for',
+            'aria' => '%ariaLabelMatch%',
+        ],
     ];
 
     /**
