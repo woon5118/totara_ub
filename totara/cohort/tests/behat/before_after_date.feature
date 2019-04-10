@@ -61,7 +61,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
     And I follow "Edit profile"
     And I set the following fields to these values:
       | Timezone | America/Los_Angeles |
-    And I press "Update profile"
+    And I press "Save and go back"
 
     # Check before criteria was not changed.
     And I navigate to "Audiences" node in "Site administration > Audiences"
