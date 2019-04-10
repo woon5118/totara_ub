@@ -452,7 +452,7 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string
      */
     public function course_section_cm_completion($course, &$completioninfo, cm_info $mod, $displayoptions = array()) {
-        global $CFG;
+        global $CFG, $USER;
         $output = '';
         if (!empty($displayoptions['hidecompletion']) || !isloggedin() || isguestuser() || !$mod->uservisible) {
             return $output;
@@ -502,6 +502,15 @@ class core_course_renderer extends plugin_renderer_base {
                 $grade_item = grade_item::fetch(array('courseid' => $course->id, 'itemmodule' => $mod->modname, 'iteminstance' => $mod->instance));
                 if ($grade_item->is_hidden()) {
                     $completionicon = 'auto-y';
+                } else {
+                    require_once($CFG->dirroot . "/lib/grade/grade_grade.php");
+                    $grades = grade_grade::fetch_users_grades($grade_item, array($USER->id));
+                    if (!empty($grades[$USER->id])) {
+                        $grade_grade = $grades[$USER->id];
+                        if ($grade_grade->is_hidden()) {
+                            $completionicon = 'auto-y';
+                        }
+                    }
                 }
             }
         }

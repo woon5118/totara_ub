@@ -4,7 +4,7 @@ information provided here is intended especially for developers.
 === 13.0 ===
 
  * core_course_renderer::course_section_cm_completion() has been changed to show an activity complete tickmark when a
-   grade item is hidden, rather than a pass/fail tickmark
+   grade item or grade is hidden, rather than a pass/fail tickmark
 
 === 12.0 ===
 

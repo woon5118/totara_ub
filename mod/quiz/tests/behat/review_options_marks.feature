@@ -106,8 +106,8 @@ Feature: Test various combinations of Marks Review options
     And I navigate to "Activity completion" node in "Course administration > Reports"
     Then "//span[contains(.,'Test Quiz: Completed (achieved pass grade)')]" "xpath_element" should exist in the "Student 1" "table_row"
 
-  Scenario: student1 passes the quiz with only Marks Later checked and sees no marks, but complete with pass,
-    until 2 minutes have passed and marks become visible
+  Scenario: student1 passes the quiz with only Marks Later checked and sees no marks, and complete (but not pass),
+  until 2 minutes have passed and marks and complete with pass become visible
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Quiz"
@@ -128,25 +128,28 @@ Feature: Test various combinations of Marks Review options
     Then I should see "The correct answer is 'True'."
     Then I should not see "100.00"
     And I follow "C1"
-    Then "//span[contains(., 'Completed: Test Quiz (achieved pass grade)')]" "xpath_element" should exist in the "li.modtype_quiz" "css_element"
+    Then "//span[contains(., 'Completed: Test Quiz (achieved pass grade)')]" "xpath_element" should not exist in the "li.modtype_quiz" "css_element"
+    Then "//span[contains(., 'Completed: Test Quiz')]" "xpath_element" should exist in the "li.modtype_quiz" "css_element"
     And I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I navigate to "Activity completion" node in "Course administration > Reports"
     Then "//span[contains(.,'Test Quiz: Completed (achieved pass grade)')]" "xpath_element" should exist in the "Student 1" "table_row"
     And I log out
+    And I age the "Test Quiz" "responses" in the "mod_quiz" plugin "60" seconds
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I age the "Test Quiz" "responses" in the "mod_quiz" plugin "60" seconds
+    Then "//span[contains(., 'Completed: Test Quiz (achieved pass grade)')]" "xpath_element" should not exist in the "li.modtype_quiz" "css_element"
     And I follow "Test Quiz"
     Then I should not see "100.00"
-    And I am on "Course 1" course homepage
     And I age the "Test Quiz" "responses" in the "mod_quiz" plugin "60" seconds
+    And I am on "Course 1" course homepage
+    Then "//span[contains(., 'Completed: Test Quiz (achieved pass grade)')]" "xpath_element" should exist in the "li.modtype_quiz" "css_element"
     And I follow "Test Quiz"
     Then I should see "100.00"
 
   Scenario: student1 passes the quiz with only Marks Closed checked and sees no marks, and complete (but not pass),
-    until quiz is closed, when marks and complete with pass become visible
+  until quiz is closed, when marks and complete with pass become visible
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Quiz"
@@ -193,7 +196,7 @@ Feature: Test various combinations of Marks Review options
     Then I should see "Your final grade for this quiz is 100"
 
   Scenario: student1 passes the quiz with only Marks Immediately and Marks Later checked and sees marks, and complete with pass,
-    until quiz is closed, when marks become hidden but complete with pass stays visible
+  until quiz is closed, when marks become hidden but complete with pass stays visible
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Quiz"
@@ -238,8 +241,8 @@ Feature: Test various combinations of Marks Review options
     Then I should not see "Your final grade for this quiz is 100"
 
   Scenario: student1 passes the quiz with only Marks Immediately and Marks After checked and sees marks, and complete with pass,
-    until 2 minutes have passed, when marks disappear
-    until quiz is closed, when marks are visible again
+  until 2 minutes have passed, when marks disappear
+  until quiz is closed, when marks are visible again
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Quiz"
@@ -287,7 +290,7 @@ Feature: Test various combinations of Marks Review options
     Then I should see "Your final grade for this quiz is 100"
 
   Scenario: student1 passes the quiz with only Marks Later and Marks After checked and sees no marks, and complete (but not pass),
-    until after 2 minutes or quiz is closed, when marks and complete with pass become visible
+  until after 2 minutes or quiz is closed, when marks and complete with pass become visible
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Quiz"

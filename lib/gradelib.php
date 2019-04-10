@@ -235,6 +235,10 @@ function grade_update($source, $courseid, $itemtype, $itemmodule, $iteminstance,
             if (isset($grades[$userid]['overridden'])) {
                 $grade_grade->overridden = $grades[$userid]['overridden'];
             }
+            // Totara: allow hidden to be set as well.
+            if (isset($grades[$userid]['hidden'])) {
+                $grade_grade->hidden = $grades[$userid]['hidden'];
+            }
             unset($grades[$userid]);
             break;
         }
@@ -249,6 +253,10 @@ function grade_update($source, $courseid, $itemtype, $itemmodule, $iteminstance,
             $userid      = $grade['userid'];
             $grade_grade = new grade_grade(array('itemid'=>$grade_item->id, 'userid'=>$userid), false);
             $grade_grade->load_optional_fields(); // add feedback and info too
+            // Totara: allow hidden to be set as well.
+            if (isset($grades[$userid]['hidden'])) {
+                $grade_grade->hidden = $grades[$userid]['hidden'];
+            }
             unset($grades[$userid]);
         }
 

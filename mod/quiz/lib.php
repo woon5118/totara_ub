@@ -781,15 +781,18 @@ function quiz_grade_item_update($quiz, $grades = null) {
         }
     } else if ($immediate->marks < $show_marks && $later->marks >= $show_marks) {
         // Hidden until later.
-        if (!empty($grades)) {
-            $items = array_values($grades);
-        } else {
-            $items = array();
-        }
-        if (count($items) == 1 && !empty($items[0]->datesubmitted)) {
-            $params['hidden'] = $items[0]->datesubmitted + 120;
-        } else {
-            $params['hidden'] = 1;
+        // But this can't be implemented in grade_item because each quiz response will be different.
+        $params['hidden'] = 0;
+        if (!empty($grades) && is_array($grades)) {
+            // Set hidden on the grade_grade.
+            foreach ($grades as $ix => $item) {
+                $hidetime = $item->datesubmitted + 120;
+                // Check that hidetime is before quiz closed time.
+                if ($quiz->timeclose && $quiz->timeclose < $hidetime) {
+                    $hidetime = $quiz->timeclose;
+                }
+                $grades[$ix]->hidden = $hidetime;
+            }
         }
     } else {
         // Not hidden now.
