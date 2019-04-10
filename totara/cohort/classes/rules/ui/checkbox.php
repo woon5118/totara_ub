@@ -76,6 +76,28 @@ class checkbox extends menu {
         );
     }
 
+    /**
+     * A method for validating the form submitted data
+     * @return bool
+     */
+    public function validateResponse() {
+        /** @var core_renderer $OUTPUT */
+        global $OUTPUT;
+        $form = $this->constructForm();
+        if ($data = $form->get_submitted_data()) {
+            // Checking whether the listofvalues being passed is set, and in the acceptable options.
+            if (!isset($data->listofvalues) || !in_array($data->listofvalues, [0,1])) {
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+                return false;
+            }
+            return true;
+        }
+
+        // If the form is not submitted at all, then there is no point to validate and false should be returned here
+        return false;
+    }
 
     /**
      * Process the data returned by this UI element's form elements
