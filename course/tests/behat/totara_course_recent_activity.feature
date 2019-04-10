@@ -27,7 +27,7 @@ Feature: Correct results are shown in the recent activity screen
     And "(//a[./@href][contains(text(), 'TestForum2')])[2]" "xpath_element" should appear after "//span[contains(text(), \"Added\")]" "xpath_element"
     And "(//a[./@href][contains(text(), 'TestForum3')])[2]" "xpath_element" should appear after "//span[contains(text(), \"Added\")]" "xpath_element"
     And I should see "Removed Modules"
-    And "(//span[contains(text(), 'TestForum1')])[2]" "xpath_element" should appear after "//span[contains(text(), \"Deleted\")]" "xpath_element"
+    And "(//span[contains(text(), 'TestForum1')])[3]" "xpath_element" should appear after "//span[contains(text(), \"Deleted\")]" "xpath_element"
 
   @javascript
   Scenario: Rename should add an update
