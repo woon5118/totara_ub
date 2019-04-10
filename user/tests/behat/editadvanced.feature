@@ -14,7 +14,7 @@ Feature: Advanced editing of users
       | First name                      | User              |
       | Surname                         | One               |
       | Email address                   | u1@example.com    |
-    And I press "Update profile"
+    And I press "Save and go back"
     And I follow "User One"
     Then I should see "User details"
     And I should see "u1@example.com"
@@ -45,7 +45,7 @@ Feature: Advanced editing of users
       | First name                      | User              |
       | Surname                         | One               |
       | Email address                   | u1@example.com    |
-    And I press "Update profile"
+    And I press "Save and go back"
     Then the following should exist in the "system_browse_users" table:
       | Username | User's Email       |
       | admin    | moodle@example.com |
@@ -77,7 +77,7 @@ Feature: Advanced editing of users
     When I set the following fields to these values:
       | Username      | u1             |
       | Email address | u1@example.com |
-    And I press "Update profile"
+    And I press "Save and go back"
     Then the following should exist in the "system_browse_users" table:
       | Username | User's Email       |
       | admin    | moodle@example.com |

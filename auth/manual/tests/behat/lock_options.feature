@@ -25,7 +25,7 @@ Feature: Profile option locking of manual user accounts
     And the "City/town" "field" should be readonly
     And the "Department" "field" should be readonly
     And I set the field "Institution" to "University"
-    And I press "Save and go back"
+    And I press "Update profile"
     And I follow "Edit profile"
     Then the field "City/town" matches value "Christchurch"
     And the field "Department" matches value "Oddeleni"
@@ -42,7 +42,7 @@ Feature: Profile option locking of manual user accounts
     And the "Department" "field" should be readonly
     And I set the field "City" to "Wellington"
     And I set the field "Institution" to "Skola"
-    And I press "Save and go back"
+    And I press "Update profile"
     And I follow "Edit profile"
     Then the field "City/town" matches value "Wellington"
     And the field "Department" matches value ""
@@ -60,7 +60,7 @@ Feature: Profile option locking of manual user accounts
     And I set the field "City" to "Auckland"
     And I set the field "Institution" to "Skolka"
     And I set the field "Department" to "Jidelna"
-    And I press "Save and go back"
+    And I press "Update profile"
     And I follow "Edit profile"
     Then the field "City/town" matches value "Auckland"
     And the field "Institution" matches value "Skolka"
