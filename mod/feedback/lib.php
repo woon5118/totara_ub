@@ -1478,6 +1478,7 @@ function feedback_get_template_list($course, $onlyownorpublic = '') {
  */
 function feedback_get_item_class($typ) {
     global $CFG;
+    require_once($CFG->dirroot.'/mod/feedback/item/feedback_item_class.php');
 
     //get the class of item-typ
     $itemclass = 'feedback_item_'.$typ;
