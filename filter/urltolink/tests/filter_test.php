@@ -28,7 +28,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/filter/urltolink/filter.php'); // Include the code to test
 
-
+/**
+ * Class filter_urltolink_filter_testcase
+ */
 class filter_urltolink_filter_testcase extends basic_testcase {
 
     function get_convert_urls_into_links_test_cases() {
@@ -197,6 +199,14 @@ class filter_urltolink_filter_testcase extends basic_testcase {
         $testablefilter = new testable_filter_urltolink();
         $testablefilter->convert_urls_into_links($text);
         $this->assertEquals($correctresult, $text);
+    }
+
+    public function test_is_compatible_with_clean_text() {
+
+        $method = new ReflectionMethod('filter_urltolink', 'is_compatible_with_clean_text');
+        $method->setAccessible(true);
+        self::assertTrue($method->invoke(null));
+
     }
 
 }

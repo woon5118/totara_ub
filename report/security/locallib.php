@@ -68,6 +68,7 @@ function report_security_get_issue_list() {
         'report_security_check_repositoryurl',
         'report_security_check_xxe_risk',
         'report_security_check_preventexecpath',
+        'report_security_check_legacynocleantrusttext',
     );
 }
 
@@ -1220,6 +1221,35 @@ function report_security_check_preventexecpath($detailed = false) {
     } else {
         $result->status = REPORT_SECURITY_OK;
         $result->info   = get_string('check_preventexecpath_ok', 'report_security');
+    }
+
+    return $result;
+}
+
+/**
+ * Verifies the status of the legacy noclean and trusttext handling for format_text.
+ *
+ * @since Totara 13.0
+ * @param bool $detailed If set to true explain the consequences of the state.
+ * @return stdClass
+ */
+function report_security_check_legacynocleantrusttext($detailed = false): stdClass {
+
+    $result = new stdClass();
+    $result->issue   = 'report_security_check_legacynocleantrusttext';
+    $result->name    = get_string('check_legacynocleantrusttext_name', 'report_security');
+    $result->details = null;
+    $result->link    = null;
+
+    if (ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
+        $result->status = REPORT_SECURITY_SERIOUS;
+        $result->info = get_string('check_legacynocleantrusttext_serious', 'report_security');
+        if ($detailed) {
+            $result->details = get_string('check_legacynocleantrusttext_details', 'report_security');
+        }
+    } else {
+        $result->status = REPORT_SECURITY_OK;
+        $result->info = get_string('check_legacynocleantrusttext_ok', 'report_security');
     }
 
     return $result;

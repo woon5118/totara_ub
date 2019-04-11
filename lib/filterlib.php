@@ -302,6 +302,25 @@ class filter_manager {
             $filter->setup($page, $context);
         }
     }
+
+    /**
+     * Returns true if text can be cleaned after filters have been applied.
+     *
+     * This function only returns true if all filters for the given context are compatible with cleaning after filtering.
+     *
+     * @since Totara 13.0
+     * @param context $context
+     * @return bool
+     */
+    public function result_is_compatible_with_text_cleaning(\context $context): bool {
+        $filters = $this->get_text_filters($context);
+        foreach ($filters as $filter) {
+            if (!$filter->text_can_be_cleaned_after_filtering()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 
@@ -405,6 +424,14 @@ abstract class moodle_text_filter {
     protected $localconfig;
 
     /**
+     * An array of filter classes that debugging has been displayed for.
+     * Ensures we don't spam the developer.
+     * @since Totara 13.0
+     * @var array
+     */
+    private static $cleantext_incompatible_debug = [];
+
+    /**
      * Set any context-specific configuration for this filter.
      *
      * @param context $context The current context.
@@ -448,11 +475,54 @@ abstract class moodle_text_filter {
     /**
      * Override this function to actually implement the filtering.
      *
-     * @param $text some HTML content.
+     * @param string $text some HTML content.
      * @param array $options options passed to the filters
-     * @return the HTML content after the filtering has been applied.
+     * @return string the HTML content after the filtering has been applied.
      */
     public abstract function filter($text, array $options = array());
+
+    /**
+     * Returns true if text can be cleaned after filtering.
+     *
+     * @since Totara 13.0
+     */
+    final public function text_can_be_cleaned_after_filtering(): bool {
+        $compatible = static::is_compatible_with_clean_text();
+        if ($compatible === null) {
+            // Default to false, this is for backwards compatibility.
+            $compatible = false;
+            // If we've not shown a debugging notice for this filter do so now.
+            if (!isset(self::$cleantext_incompatible_debug[static::class])) {
+                debugging('The ' . static::class . ' filter does not declare whether it is compatible clean text.', DEBUG_DEVELOPER);
+                self::$cleantext_incompatible_debug[static::class] = true;
+            }
+        }
+        return (bool)$compatible;
+    }
+
+    /**
+     * Returns true is text can be cleaned using clean text AFTER having been filtered.
+     *
+     * Override in child filter class!
+     *
+     * Return value meanings:
+     *   - true:  This filter uses safe markup and clean_text will not impact it.
+     *   - false: This filter must be run after clean text has been run.
+     *   - null:  This filter has not yet been updated by a developer to answer the question.
+     *            This should be done as a priority.
+     *
+     * When overriding this class consider what clean_text does.
+     * Ideally your filter will produce content that is compatible with clean_text. This will ultimately lead to a more secure filter.
+     * In this case you will return true here.
+     * However if you must use markup that would not pass through clean_text then you will need to return false here.
+     * Only do this if you must.
+     *
+     * @since Totara 13.0
+     * @return bool|null
+     */
+    protected static function is_compatible_with_clean_text() {
+        return null;
+    }
 }
 
 

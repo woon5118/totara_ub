@@ -43,9 +43,6 @@ class media_swf_testcase extends advanced_testcase {
         // Reset $CFG and $SERVER.
         $this->resetAfterTest();
 
-        // We need trusttext for embedding swf.
-        $CFG->enabletrusttext = true;
-
         // Consistent initial setup: all players disabled.
         \core\plugininfo\media::set_enabled_plugins('swf');
 
@@ -104,16 +101,21 @@ class media_swf_testcase extends advanced_testcase {
      */
     public function test_embed_link() {
         global $CFG;
+
+        $CFG->allowobjectembed = true;
+
         $url = new moodle_url('http://example.org/some_filename.swf');
         $text = html_writer::link($url, 'Watch this one');
-        $content = format_text($text, FORMAT_HTML, ['trusted' => true]);
+        $content = format_text($text, FORMAT_HTML);
 
         $this->assertRegExp('~mediaplugin_swf~', $content);
         $this->assertRegExp('~</object>~', $content);
         $this->assertRegExp('~width="' . $CFG->media_default_width . '" height="' .
             $CFG->media_default_height . '"~', $content);
 
-        // Not working without trust!
+        $CFG->allowobjectembed = false;
+
+        // Not working without the setting on.
         $content = format_text($text, FORMAT_HTML);
         $this->assertNotRegExp('~mediaplugin_swf~', $content);
     }
@@ -125,11 +127,20 @@ class media_swf_testcase extends advanced_testcase {
      */
     public function test_embed_media() {
         global $CFG;
+
+        // Make sure this is turned on or nothing will be embedded.
+        $CFG->allowobjectembed = true;
+
+        // Create a user and give them the embedobject capability.
+        $context = \context_system::instance();
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
         $url = new moodle_url('http://example.org/some_filename.swf');
         $trackurl = new moodle_url('http://example.org/some_filename.vtt');
         $text = '<video controls="true"><source src="'.$url.'"/>' .
             '<track src="'.$trackurl.'">Unsupported text</video>';
-        $content = format_text($text, FORMAT_HTML, ['trusted' => true]);
+        $content = format_text($text, FORMAT_HTML);
 
         $this->assertRegExp('~mediaplugin_swf~', $content);
         $this->assertRegExp('~</object>~', $content);
@@ -143,7 +154,7 @@ class media_swf_testcase extends advanced_testcase {
 
         // Video with dimensions and source specified as src attribute without <source> tag.
         $text = '<video controls="true" width="123" height="35" src="'.$url.'">Unsupported text</video>';
-        $content = format_text($text, FORMAT_HTML, ['trusted' => true]);
+        $content = format_text($text, FORMAT_HTML);
         $this->assertRegExp('~mediaplugin_swf~', $content);
         $this->assertRegExp('~</object>~', $content);
         $this->assertRegExp('~width="123" height="35"~', $content);

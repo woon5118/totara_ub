@@ -109,4 +109,18 @@ class filter_emoticon extends moodle_text_filter {
             $text = str_replace(array_keys($excludes), $excludes, $text);
         }
     }
+
+    /**
+     * Returns true is text can be cleaned using clean text AFTER having been filtered.
+     *
+     * If false is returned then this filter must be run after clean text has been run.
+     * If null is returned then the filter has not yet been updated by a developer to answer the question.
+     * This should be done as a priority.
+     *
+     * @since Totara 13.0
+     * @return bool
+     */
+    protected static function is_compatible_with_clean_text() {
+        return true; // Class, Title, and Href in an a tag are all fine.
+    }
 }

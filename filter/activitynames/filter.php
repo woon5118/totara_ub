@@ -56,6 +56,11 @@ class filter_activitynames extends moodle_text_filter {
         }
         self::$cacheduserid = (int)$USER->id;
 
+        if (PHPUNIT_TEST) {
+            // TOTARA: Do not cache the activity list for unit tests.
+            self::$activitylist = null;
+        }
+
         /// It may be cached
 
         if (is_null(self::$activitylist)) {
@@ -116,5 +121,19 @@ class filter_activitynames extends moodle_text_filter {
         } else {
             return $text;
         }
+    }
+
+    /**
+     * Returns true is text can be cleaned using clean text AFTER having been filtered.
+     *
+     * If false is returned then this filter must be run after clean text has been run.
+     * If null is returned then the filter has not yet been updated by a developer to answer the question.
+     * This should be done as a priority.
+     *
+     * @since Totara 13.0
+     * @return bool
+     */
+    protected static function is_compatible_with_clean_text() {
+        return true; // Class, Title, and Href in an a tag are all fine.
     }
 }

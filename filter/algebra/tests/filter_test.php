@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/filter/algebra/filter.php');
  * @copyright  2012 Tim Hunt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filter_algebra_testcase extends basic_testcase {
+class filter_algebra_filter_testcase extends basic_testcase {
 
     protected $filter;
 
@@ -91,5 +91,13 @@ diff -u -r1.1 Worksheet.php
 ';
         $this->assertEquals('<pre>' . $diff . '</pre>',
                 $this->filter->filter('<pre>' . $diff . '</pre>'));
+    }
+
+    public function test_is_compatible_with_clean_text() {
+
+        $method = new ReflectionMethod('filter_algebra', 'is_compatible_with_clean_text');
+        $method->setAccessible(true);
+        self::assertFalse($method->invoke(null));
+
     }
 }

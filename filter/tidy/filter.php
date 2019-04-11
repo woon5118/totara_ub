@@ -58,13 +58,38 @@ class filter_tidy extends moodle_text_filter {
             return $text;
         }
 
+        if (PHPUNIT_TEST) {
+            // Turn off settings that will cause tidy to pretty print and wrap the HTML.
+            // We don't want to have to compensate for pretty print in all unit tests.
+            $tidyoptions['wrap'] = 0; // Don't wrap lines
+            $tidyoptions['wrap-attributes'] = 0; // Don't wrap attributes across lines
+            $tidyoptions['vertical-space'] = 0; // Don't add extraneous whitespace for readability.
+            $tidyoptions['indent'] = 0; // Don't intend any thing.
+            $tidyoptions['newline'] = 'LF'; // Normalise newlines as well.
+        }
 
     /// If enabled: run tidy over the entire string
         if (function_exists('tidy_repair_string')){
-            $text = tidy_repair_string($text, $tidyoptions, 'utf8');
+            // TOTARA: we suppress warnings from this function. Not all arguments exist in all versions of Tidy, and
+            // consequently trying to set a non-existent argument leads to a warning being generated.
+            $text = @tidy_repair_string($text, $tidyoptions, 'utf8');
         }
 
         return $text;
+    }
+
+    /**
+     * Returns true is text can be cleaned using clean text AFTER having been filtered.
+     *
+     * If false is returned then this filter must be run after clean text has been run.
+     * If null is returned then the filter has not yet been updated by a developer to answer the question.
+     * This should be done as a priority.
+     *
+     * @since Totara 13.0
+     * @return bool
+     */
+    protected static function is_compatible_with_clean_text() {
+        return true; // No additions, just tidied.
     }
 }
 

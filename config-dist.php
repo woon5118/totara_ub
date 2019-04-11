@@ -668,6 +668,15 @@ $CFG->directorypermissions = 02777;
 //
 //      $CFG->hierarchylegacyexport = 0;
 //
+// In Totara 13.0 the noclean and trusttext options were disabled.
+// This change meant that trainers could no longer introduce custom HTML content such as iframes, and scripts into
+// areas such as course descriptions, activity introductions etc.
+// The format_text function now consistently sanitizes all text.
+// The old behaviour can be brought back by adding a define to your config.php file.
+// We strongly recommend you use the default behaviour. Adding this define reintroduces numerous security issues.
+//
+//    define('ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT', true);
+//
 //
 //=========================================================================
 // 7. SETTINGS FOR DEVELOPMENT SERVERS - not intended for production use!!!

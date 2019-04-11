@@ -74,8 +74,10 @@ class filter_mediaplugin extends moodle_text_filter {
             return $text;
         }
 
-        // Check SWF permissions.
-        $this->trusted = !empty($options['noclean']) or !empty($CFG->allowobjectembed);
+        if (isset($options['noclean'])) {
+            debugging('The noclean option is no longer available. Please set allowxss for system cases, or use the capabilities.', DEBUG_DEVELOPER);
+            $options['allowxss'] = (bool) $options['noclean'];
+        }
 
         // Looking for tags.
         $matches = preg_split('/(<[^>]*>)/i', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
@@ -83,6 +85,11 @@ class filter_mediaplugin extends moodle_text_filter {
         if (!$matches) {
             return $text;
         }
+
+        // Check if the user is trusted to embed content.
+        // This is given if the text allows XSS, if the site has allowed anyone to embed objects, or if the user holds the embedobject
+        // capability at the given context.
+        $this->trusted = !empty($options['allowxss']) || !empty($CFG->allowobjectembed);
 
         // Regex to find media extensions in an <a> tag.
         $embedmarkers = core_media_manager::instance()->get_embeddable_markers();
@@ -231,5 +238,19 @@ class filter_mediaplugin extends moodle_text_filter {
             return $this->embed_alternatives($urls, $name, $width, $height, $options);
         }
         return $fulltext;
+    }
+
+    /**
+     * Returns true is text can be cleaned using clean text AFTER having been filtered.
+     *
+     * If false is returned then this filter must be run after clean text has been run.
+     * If null is returned then the filter has not yet been updated by a developer to answer the question.
+     * This should be done as a priority.
+     *
+     * @since Totara 13.0
+     * @return bool
+     */
+    protected static function is_compatible_with_clean_text() {
+        return false; // Tags would be stripped by cleaning.
     }
 }

@@ -40,7 +40,12 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
                 new lang_string('configuserquota', 'admin', $params), $defaultuserquota, PARAM_INT, 30));
 
     $temp->add(new admin_setting_configcheckbox('allowobjectembed', new lang_string('allowobjectembed', 'admin'), new lang_string('configallowobjectembed', 'admin'), 0));
-    $temp->add(new admin_setting_configcheckbox('enabletrusttext', new lang_string('enabletrusttext', 'admin'), new lang_string('configenabletrusttext', 'admin'), 0));
+
+    if (ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
+        // Do not show the trust text setting unless the legacy no clean and trust text define has been explicitly set to true.
+        $temp->add(new admin_setting_configcheckbox('enabletrusttext', new lang_string('enabletrusttext', 'admin'), new lang_string('configenabletrusttext', 'admin'), 0));
+    }
+
     $temp->add(new admin_setting_configselect('maxeditingtime', new lang_string('maxeditingtime','admin'), new lang_string('configmaxeditingtime','admin'), 1800,
                  array(60 => new lang_string('numminutes', '', 1),
                        300 => new lang_string('numminutes', '', 5),

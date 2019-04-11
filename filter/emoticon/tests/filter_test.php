@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/filter/emoticon/filter.php'); // Include the code
 /**
  * Skype icons filter testcase.
  */
-class filter_emoticon_testcase extends advanced_testcase {
+class filter_emoticon_filter_testcase extends advanced_testcase {
 
     /**
      * Verify configured target formats are observed. Just that.
@@ -59,6 +59,17 @@ class filter_emoticon_testcase extends advanced_testcase {
                     ' src="https://www.example.com/moodle/theme/image.php/_s/' . $PAGE->theme->name . '/core/1/s/angry" />';
         $options = array('originalformat' => FORMAT_HTML); // Only FORMAT_HTML is filtered, see {@link testable_filter_emoticon}.
         $this->assertEquals($expected, $filter->filter('(grr)', $options));
+
+        // Confirm that this filter is indeed compatible with clean_text.
+        $this->assertSame($expected, clean_text($expected, FORMAT_HTML));
+    }
+
+    public function test_is_compatible_with_clean_text() {
+
+        $method = new ReflectionMethod('filter_emoticon', 'is_compatible_with_clean_text');
+        $method->setAccessible(true);
+        self::assertTrue($method->invoke(null));
+
     }
 }
 

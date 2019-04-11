@@ -358,7 +358,9 @@ abstract class question_definition {
     public function format_text($text, $format, $qa, $component, $filearea, $itemid,
             $clean = false) {
         $formatoptions = new stdClass();
-        $formatoptions->noclean = !$clean;
+        // TODO: TL-20750 I don't believe this allowxss is totally necessary.
+        // We should untangle the use of format_text with the noclean operation and remove the need for it if possible.
+        $formatoptions->allowxss = !$clean;
         $formatoptions->para = false;
         $text = $qa->rewrite_pluginfile_urls($text, $component, $filearea, $itemid);
         return format_text($text, $format, $formatoptions);

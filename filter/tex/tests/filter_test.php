@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/filter/tex/filter.php');
  * @copyright  2014 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filter_tex_testcase extends advanced_testcase {
+class filter_tex_filter_testcase extends advanced_testcase {
 
     protected $filter;
 
@@ -81,6 +81,14 @@ class filter_tex_testcase extends advanced_testcase {
         $this->run_with_delimiters('(', ')', false);
         $this->run_with_delimiters('[', ']', false);
         $this->run_with_delimiters('$$', '\\]', false);
+    }
+
+    public function test_is_compatible_with_clean_text() {
+
+        $method = new ReflectionMethod('filter_tex', 'is_compatible_with_clean_text');
+        $method->setAccessible(true);
+        self::assertFalse($method->invoke(null));
+
     }
 
 }

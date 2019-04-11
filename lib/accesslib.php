@@ -2763,6 +2763,12 @@ function get_component_string($component, $contextlevel) {
             } else {
                 return get_string('activity').': '.get_string('modulename', $component);
             }
+        case 'filter': // Totara: filters still use legacy string for their names
+            if (get_string_manager()->string_exists('pluginname', $component)) {
+                return get_string('pluginname', $component);
+            } else {
+                return get_string('filtername', $component);
+            }
         default: return get_string('pluginname', $component);
     }
 }

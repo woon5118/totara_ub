@@ -28,17 +28,23 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/filter/mediaplugin/filter.php'); // Include the code to test
 
-
+/**
+ * Class filter_mediaplugin_testcase
+ *
+ * @group filter
+ */
 class filter_mediaplugin_testcase extends advanced_testcase {
 
     function test_filter_mediaplugin_link() {
         $this->resetAfterTest(true);
 
+        $context = \context_system::instance();
+
         // we need to enable the plugins somehow and the flash fallback.
         \core\plugininfo\media::set_enabled_plugins('vimeo,youtube,videojs,html5video,swf,html5audio');
         set_config('useflash', true, 'media_videojs');
 
-        $filterplugin = new filter_mediaplugin(null, array());
+        $filterplugin = new filter_mediaplugin($context, array());
 
         $longurl = '<a href="http://moodle/.mp4">my test file</a>';
         $longhref = '';
@@ -134,5 +140,81 @@ class filter_mediaplugin_testcase extends advanced_testcase {
         // Testing for cases where: to be filtered content has 6+ text afterwards.
         $filter = $filterplugin->filter($paddedurl);
         $this->assertEquals($validpaddedurl, $filter, $msg);
+    }
+
+    /**
+     * Tests that the permissions for allowing embedding of objects are working.
+     *
+     * Objects are allowed if:
+     *   1. $CFG->allowobjectembed is set to true.
+     *   2. The allowxss object was passed to format_text
+     */
+    public function test_embedobject_permission_checks() {
+        global $CFG;
+        $this->resetAfterTest(true);
+
+        // Make sure this is turned off.
+        $CFG->allowobjectembed = false;
+
+        // we need to enable the plugins somehow and the flash fallback.
+        \core\plugininfo\media::set_enabled_plugins('swf');
+
+        $context = \context_system::instance();
+        // Create a normal user.
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $url = new moodle_url('http://example.org/some_filename.swf');
+        $text = html_writer::link($url, 'Watch this one');
+
+        // Change to the normal user without the cap.
+        $this->setUser($user);
+
+        // Test that a normal user will NOT see the formatted text.
+        $formattedtext = format_text($text, FORMAT_HTML, ['context' => $context]);
+        $this->assertNotContainsObject($formattedtext, $url);
+        $this->assertEquals($text, $formattedtext);
+
+        // Test that a normal user will see the formatted text when allowxss set to true.
+        $formattedtext = format_text($text, FORMAT_HTML, ['context' => $context, 'allowxss' => true]);
+        $this->assertContainsObject($formattedtext, $url);
+        $this->assertNotEquals($text, $formattedtext);
+
+        // Test that a normal user will see the formatted text when $CFG->allowobjectembed set to true.
+        $CFG->allowobjectembed = true;
+        $formattedtext = format_text($text, FORMAT_HTML, ['context' => $context]);
+        $this->assertContainsObject($formattedtext, $url);
+        $this->assertNotEquals($text, $formattedtext);
+
+        // Test that a normal user will see the formatted text when allowxss set to true and $CFG->allowobjectembed set to true.
+        $formattedtext = format_text($text, FORMAT_HTML, ['context' => $context, 'allowxss' => true]);
+        $this->assertContainsObject($formattedtext, $url);
+        $this->assertNotEquals($text, $formattedtext);
+    }
+
+    private function assertContainsObject($text, $url) {
+        $this->assertContains('<span class="mediaplugin mediaplugin_swf">', $text);
+        $this->assertContains('<object classid="clsid:', $text);
+        $this->assertContains('<param name="movie" value="'.htmlentities($url).'" />', $text);
+    }
+
+    private function assertNotContainsObject($text, $url) {
+        $this->assertNotContains('<span class="mediaplugin mediaplugin_swf">', $text);
+        $this->assertNotContains('<object classid="clsid:', $text);
+        $this->assertNotContains('<param name="movie" value="'.htmlentities($url).'" />', $text);
+    }
+
+    /**
+     * Returns true is text can be cleaned using clean text AFTER having been filtered.
+     *
+     * If false is returned then this filter must be run after clean text has been run.
+     * If null is returned then the filter has not yet been updated by a developer to answer the question.
+     * This should be done as a priority.
+     *
+     * @since Totara 13.0
+     * @return bool
+     */
+    protected static function is_compatible_with_clean_text() {
+        return false;
     }
 }

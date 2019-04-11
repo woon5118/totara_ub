@@ -885,8 +885,14 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         $this->assertCount(4, $firstsection['modules']);
         $this->assertCount(1, $lastsection['modules']);
         $this->assertEquals(2, $lastsection['section']);
-        $this->assertContains('<iframe', $lastsection['summary']);
-        $this->assertContains('</iframe>', $lastsection['summary']);
+        if (ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
+            $this->assertContains('<iframe', $lastsection['summary']);
+            $this->assertContains('</iframe>', $lastsection['summary']);
+        } else {
+            $this->assertNotContains('<iframe', $lastsection['summary']);
+            $this->assertNotContains('</iframe>', $lastsection['summary']);
+        }
+
 
         try {
             $sections = core_course_external::get_course_contents($course->id,

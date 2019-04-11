@@ -1217,9 +1217,7 @@ function format_text_menu() {
  *
  * <pre>
  * Options:
- *      trusted     :   If true the string won't be cleaned. Default false required noclean=true.
- *      noclean     :   If true the string won't be cleaned. Default false required trusted=true.
- *      nocache     :   If true the strign will not be cached and will be formatted every call. Default false.
+ *      nocache     :   If true the string will not be cached and will be formatted every call. Default false.
  *      filter      :   If true the string will be run through applicable filters as well. Default true.
  *      para        :   If true then the returned string will be wrapped in div tags. Default true.
  *      newlines    :   If true then lines newline breaks will be converted to HTML newline breaks. Default true.
@@ -1229,6 +1227,15 @@ function format_text_menu() {
  *      allowid     :   If true then id attributes will not be removed, even when
  *                      using htmlpurifier. Default false.
  *      blanktarget :   If true all <a> tags will have target="_blank" added unless target is explicitly specified.
+ *      allowxss    :   If true text will not be passed through clean_text.
+ *                      This option should not be used unless you are ABSOLUTELY sure it is safe to do so.
+ *                      We STRONGLY recommend you do not use this option.
+ *
+ * Deprecated options:
+ *      trusted     :   If set to true, and trusttext is enabled, and ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT is defined as true then
+ *                      the given text will not be passed through clean_text to remove XSS nasties.
+ *      noclean     :   If set to true, and ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT is defined as true then the given text will not be
+ *                      passed through clean_text to remove XSS nasties.
  * </pre>
  *
  * @staticvar array $croncache
@@ -1257,8 +1264,6 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
         if ($options['trusted'] and trusttext_active()) {
             // No cleaning if text trusted and noclean not specified.
             $options['noclean'] = true;
-        } else {
-            $options['noclean'] = false;
         }
     }
     if (!isset($options['nocache'])) {
@@ -1277,6 +1282,21 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
         $options['overflowdiv'] = false;
     }
     $options['blanktarget'] = !empty($options['blanktarget']);
+
+    // Totara: if set text will not be passed through clean_text.
+    // We STRONGLY recommend you do not use this option.
+    $allowxss = false;
+    if (isset($options['allowxss']) && $options['allowxss'] === true) {
+        $allowxss = true;
+    } else if (!empty($options['noclean']) && ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
+        $allowxss = true;
+    }
+
+    // Totara: legacy options to prevent cleaning. We don't use these any more.
+    // If you absolutely require clean_text to be avoided then you can use the allowxss option.
+    // We STRONGLY recommend you do not use that option.
+    $options['trusted'] = false;
+    $options['noclean'] = false;
 
     // Calculate best context.
     if (empty($CFG->version) or $CFG->version < 2013051400 or during_initial_install()) {
@@ -1303,24 +1323,14 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
         $options['filter']  = false;
     }
 
-    if ($options['filter']) {
-        $filtermanager = filter_manager::instance();
-        $filtermanager->setup_page_for_filters($PAGE, $context); // Setup global stuff filters may have.
-        $filteroptions = array(
-            'originalformat' => $format,
-            'noclean' => $options['noclean'],
-        );
-    } else {
-        $filtermanager = new null_filter_manager();
-        $filteroptions = array();
-    }
+    // By default we are going to clean and filter the text.
+    // Formats below will need to explicitly disable this if they have done enough cleaning themselvse.
+    $cleantext = !$allowxss;
+    $filtertext = $options['filter'];
 
     switch ($format) {
         case FORMAT_HTML:
-            if (!$options['noclean']) {
-                $text = clean_text($text, FORMAT_HTML, $options);
-            }
-            $text = $filtermanager->filter_text($text, $context, $filteroptions);
+            // Nothing to do here, HTML text will be cleaned and filtered.
             break;
 
         case FORMAT_PLAIN:
@@ -1328,6 +1338,8 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
             $text = rebuildnolinktag($text);
             $text = str_replace('  ', '&nbsp; ', $text);
             $text = nl2br($text);
+            $cleantext = false;
+            $filtertext = false;
             break;
 
         case FORMAT_WIKI:
@@ -1336,36 +1348,50 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
                      this message as all texts should have been converted to Markdown format instead.
                      Please post a bug report to http://moodle.org/bugs with information about where you
                      saw this message.</p>'.s($text);
+            $cleantext = false;
+            $filtertext = false;
             break;
 
         case FORMAT_MARKDOWN:
             $text = markdown_to_html($text);
-            if (!$options['noclean']) {
-                $text = clean_text($text, FORMAT_HTML, $options);
-            }
-            $text = $filtermanager->filter_text($text, $context, $filteroptions);
             break;
 
-        default:  // FORMAT_MOODLE or anything else.
+        default:  // Anything else.
             $text = text_to_html($text, null, $options['para'], $options['newlines']);
-            if (!$options['noclean']) {
-                $text = clean_text($text, FORMAT_HTML, $options);
-            }
-            $text = $filtermanager->filter_text($text, $context, $filteroptions);
             break;
     }
-    if ($options['filter']) {
+
+    if ($filtertext) {
+        $filtermanager = filter_manager::instance();
+        $filtermanager->setup_page_for_filters($PAGE, $context); // Setup global stuff filters may have.
+        $filteroptions = array(
+            'originalformat' => $format,
+            'allowxss' => $allowxss,
+        );
+
+        if ($filtermanager->result_is_compatible_with_text_cleaning($context)) {
+            // Filter first and then clean. This is safer.
+            $text = $filtermanager->filter_text($text, $context, $filteroptions);
+        } else {
+            // Clean and then filter.
+            if ($cleantext) {
+                $text = clean_text($text, FORMAT_HTML, ['allowid' => !empty($options['allowid'])]);
+                $cleantext = false; // Set clean_text to false, we've already done it.
+            }
+            $text = $filtermanager->filter_text($text, $context, $filteroptions);
+        }
+    }
+
+    if ($filtertext) {
         // At this point there should not be any draftfile links any more,
         // this happens when developers forget to post process the text.
         // The only potential problem is that somebody might try to format
         // the text before storing into database which would be itself big bug..
         $text = str_replace("\"$CFG->wwwroot/draftfile.php", "\"$CFG->wwwroot/brokenfile.php#", $text);
 
-        if ($CFG->debugdeveloper) {
-            if (strpos($text, '@@PLUGINFILE@@/') !== false) {
-                debugging('Before calling format_text(), the content must be processed with file_rewrite_pluginfile_urls()',
-                    DEBUG_DEVELOPER);
-            }
+        if ($CFG->debugdeveloper && strpos($text, '@@PLUGINFILE@@/') !== false) {
+            debugging('Before calling format_text(), the content must be processed with file_rewrite_pluginfile_urls()',
+                DEBUG_DEVELOPER);
         }
     }
 
@@ -1374,6 +1400,7 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
     }
 
     if ($options['blanktarget']) {
+        // TODO: move this code to JS, see TL-20778
         $domdoc = new DOMDocument();
         libxml_use_internal_errors(true);
         $domdoc->loadHTML('<?xml version="1.0" encoding="UTF-8" ?>' . $text);
@@ -1393,6 +1420,11 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
         // version that travis uses doesn't work properly and ends up leaving <html><body>, so I'm forced to use
         // this regex to remove those tags.
         $text = trim(preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $domdoc->saveHTML($domdoc->documentElement)));
+    }
+
+    // Totara: text cleaning must be done at the very end, unsafe filters are the only exception.
+    if ($cleantext) {
+        $text = clean_text($text, FORMAT_HTML, ['allowid' => !empty($options['allowid'])]);
     }
 
     return $text;
@@ -1695,6 +1727,10 @@ function trusttext_trusted($context) {
  */
 function trusttext_active() {
     global $CFG;
+
+    if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
+        return false;
+    }
 
     return !empty($CFG->enabletrusttext);
 }

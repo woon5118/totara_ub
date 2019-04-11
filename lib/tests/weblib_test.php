@@ -485,12 +485,26 @@ class core_weblib_testcase extends advanced_testcase {
         $this->assertSame('', $url->get_port());
     }
 
-    public function test_clean_text() {
+    public function test_clean_text_applet() {
         $text = "lala <applet>xx</applet>";
         $this->assertSame($text, clean_text($text, FORMAT_PLAIN));
         $this->assertSame('lala xx', clean_text($text, FORMAT_MARKDOWN));
         $this->assertSame('lala xx', clean_text($text, FORMAT_MOODLE));
         $this->assertSame('lala xx', clean_text($text, FORMAT_HTML));
+    }
+
+    public function test_clean_text_xss() {
+        $text = "lala <a onclick='alert(1)'>xx</a>";
+        $this->assertSame($text, clean_text($text, FORMAT_PLAIN));
+        $this->assertSame('lala <a>xx</a>', clean_text($text, FORMAT_MARKDOWN));
+        $this->assertSame('lala <a>xx</a>', clean_text($text, FORMAT_MOODLE));
+        $this->assertSame('lala <a>xx</a>', clean_text($text, FORMAT_HTML));
+
+        $text = "lala <img src='#' onerror='alert(1)' /> xx";
+        $this->assertSame($text, clean_text($text, FORMAT_PLAIN));
+        $this->assertSame('lala <img src="#" alt="#" /> xx', clean_text($text, FORMAT_MARKDOWN));
+        $this->assertSame('lala <img src="#" alt="#" /> xx', clean_text($text, FORMAT_MOODLE));
+        $this->assertSame('lala <img src="#" alt="#" /> xx', clean_text($text, FORMAT_HTML));
     }
 
     public function test_qualified_me() {

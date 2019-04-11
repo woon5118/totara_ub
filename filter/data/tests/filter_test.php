@@ -68,16 +68,22 @@ class filter_data_filter_testcase extends advanced_testcase {
         $filtered = format_text($html, FORMAT_HTML, array('context' => $coursecontext1));
         $this->assertRegExp('/title=(\'|")CourseEntry(\'|")/', $filtered);
         $this->assertRegExp('/title=(\'|")SiteEntry(\'|")/', $filtered);
+        // Confirm that this filter is indeed compatible with clean_text.
+        $this->assertSame($filtered, clean_text($filtered, FORMAT_HTML));
 
         // Testing at site level (only site).
         $filtered = format_text($html, FORMAT_HTML, array('context' => $sitecontext));
         $this->assertNotRegExp('/title=(\'|")CourseEntry(\'|")/', $filtered);
         $this->assertRegExp('/title=(\'|")SiteEntry(\'|")/', $filtered);
+        // Confirm that this filter is indeed compatible with clean_text.
+        $this->assertSame($filtered, clean_text($filtered, FORMAT_HTML));
 
         // Changing to another course to test the caches invalidation (only site).
         $filtered = format_text($html, FORMAT_HTML, array('context' => $coursecontext2));
         $this->assertNotRegExp('/title=(\'|")CourseEntry(\'|")/', $filtered);
         $this->assertRegExp('/title=(\'|")SiteEntry(\'|")/', $filtered);
+        // Confirm that this filter is indeed compatible with clean_text.
+        $this->assertSame($filtered, clean_text($filtered, FORMAT_HTML));
     }
 
     /**
@@ -115,5 +121,13 @@ class filter_data_filter_testcase extends advanced_testcase {
             $datacontent['content'] = $entrytext;
             $contentid = $DB->insert_record('data_content', $datacontent);
         }
+    }
+
+    public function test_is_compatible_with_clean_text() {
+
+        $method = new ReflectionMethod('filter_data', 'is_compatible_with_clean_text');
+        $method->setAccessible(true);
+        self::assertTrue($method->invoke(null));
+
     }
 }

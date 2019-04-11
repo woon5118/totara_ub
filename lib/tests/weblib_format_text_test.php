@@ -104,7 +104,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
      * @param string $expected The expected filter value
      */
     public function test_format_text_blanktarget($link, $expected) {
-        $actual = format_text($link, FORMAT_MOODLE, array('blanktarget' => true, 'filter' => false, 'noclean' => true));
+        $actual = format_text($link, FORMAT_HTML, array('blanktarget' => true, 'filter' => false, 'allowxss' => true));
         $this->assertEquals($expected, $actual);
     }
 
@@ -117,45 +117,141 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         return [
             'Simple link' => [
                 '<a href="https://www.youtube.com/watch?v=JeimE8Wz6e4">Hey, that\'s pretty good!</a>',
-                '<div class="text_to_html"><a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" target="_blank"' .
-                    ' rel="noreferrer">Hey, that\'s pretty good!</a></div>'
+                '<a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" target="_blank" rel="noreferrer">Hey, that\'s pretty good!</a>'
             ],
             'Link with rel' => [
                 '<a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" rel="nofollow">Hey, that\'s pretty good!</a>',
-                '<div class="text_to_html"><a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" rel="nofollow noreferrer"' .
-                    ' target="_blank">Hey, that\'s pretty good!</a></div>'
+                '<a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" rel="nofollow noreferrer" target="_blank">Hey, that\'s pretty good!</a>'
             ],
             'Link with rel noreferrer' => [
                 '<a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" rel="noreferrer">Hey, that\'s pretty good!</a>',
-                '<div class="text_to_html"><a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" rel="noreferrer"' .
-                 ' target="_blank">Hey, that\'s pretty good!</a></div>'
+                '<a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" rel="noreferrer" target="_blank">Hey, that\'s pretty good!</a>'
             ],
             'Link with target' => [
                 '<a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" target="_self">Hey, that\'s pretty good!</a>',
-                '<div class="text_to_html"><a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" target="_self">' .
-                    'Hey, that\'s pretty good!</a></div>'
+                '<a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" target="_self">Hey, that\'s pretty good!</a>'
             ],
             'Link with target blank' => [
                 '<a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" target="_blank">Hey, that\'s pretty good!</a>',
-                '<div class="text_to_html"><a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" target="_blank"' .
-                    ' rel="noreferrer">Hey, that\'s pretty good!</a></div>'
+                '<a href="https://www.youtube.com/watch?v=JeimE8Wz6e4" target="_blank" rel="noreferrer">Hey, that\'s pretty good!</a>'
             ],
             'Link with Frank\'s casket inscription' => [
                 '<a href="https://en.wikipedia.org/wiki/Franks_Casket">ᚠᛁᛋᚳ᛫ᚠᛚᚩᛞᚢ᛫ᚪᚻᚩᚠᚩᚾᚠᛖᚱᚷ ᛖᚾᛒᛖᚱᛁᚷ ᚹᚪᚱᚦᚷᚪ᛬ᛋᚱᛁᚳᚷᚱᚩᚱᚾᚦᚫᚱᚻᛖᚩᚾᚷᚱᛖᚢᛏᚷᛁᛋᚹᚩᛗ ᚻ' .
                     'ᚱᚩᚾᚫᛋᛒᚪᚾ ᛗᚫᚷᛁᚠᛁᛋᚳ᛫ᚠᛚᚩᛞᚢ᛫ᚪᚻᚩᚠᚩᚾᚠᛖᚱᚷ ᛖᚾᛒᛖᚱᛁᚷ ᚹᚪᚱᚦᚷᚪ᛬ᛋᚱᛁᚳᚷᚱᚩᚱᚾᚦᚫᚱᚻᛖᚩᚾᚷᚱᛖᚢᛏᚷᛁᛋᚹᚩᛗ ᚻᚱᚩᚾᚫᛋᛒᚪᚾ ᛗᚫᚷᛁ</a>',
-                '<div class="text_to_html"><a href="https://en.wikipedia.org/wiki/Franks_Casket" target="_blank" ' .
-                    'rel="noreferrer">ᚠᛁᛋᚳ᛫ᚠᛚᚩᛞᚢ᛫ᚪᚻᚩᚠᚩᚾᚠᛖᚱᚷ ᛖᚾᛒᛖᚱᛁᚷ ᚹᚪᚱᚦᚷᚪ᛬ᛋᚱᛁᚳᚷᚱᚩᚱᚾᚦᚫᚱᚻᛖᚩᚾᚷᚱᛖᚢᛏᚷᛁᛋᚹᚩᛗ ᚻᚱᚩᚾᚫᛋᛒᚪᚾ ᛗᚫᚷᛁᚠᛁᛋᚳ᛫ᚠᛚᚩᛞᚢ᛫ᚪᚻᚩᚠᚩᚾᚠᛖᚱᚷ ᛖᚾ' .
-                    'ᛒᛖᚱᛁᚷ ᚹᚪᚱᚦᚷᚪ᛬ᛋᚱᛁᚳᚷᚱᚩᚱᚾᚦᚫᚱᚻᛖᚩᚾᚷᚱᛖᚢᛏᚷᛁᛋᚹᚩᛗ ᚻᚱᚩᚾᚫᛋᛒᚪᚾ ᛗᚫᚷᛁ</a></div>'
+                '<a href="https://en.wikipedia.org/wiki/Franks_Casket" target="_blank" rel="noreferrer">' .
+                    'ᚠᛁᛋᚳ᛫ᚠᛚᚩᛞᚢ᛫ᚪᚻᚩᚠᚩᚾᚠᛖᚱᚷ ᛖᚾᛒᛖᚱᛁᚷ ᚹᚪᚱᚦᚷᚪ᛬ᛋᚱᛁᚳᚷᚱᚩᚱᚾᚦᚫᚱᚻᛖᚩᚾᚷᚱᛖᚢᛏᚷᛁᛋᚹᚩᛗ ᚻᚱᚩᚾᚫᛋᛒᚪᚾ ᛗᚫᚷᛁᚠᛁᛋᚳ᛫ᚠᛚᚩᛞᚢ᛫ᚪᚻᚩᚠᚩᚾᚠᛖᚱᚷ ᛖᚾ' .
+                    'ᛒᛖᚱᛁᚷ ᚹᚪᚱᚦᚷᚪ᛬ᛋᚱᛁᚳᚷᚱᚩᚱᚾᚦᚫᚱᚻᛖᚩᚾᚷᚱᛖᚢᛏᚷᛁᛋᚹᚩᛗ ᚻᚱᚩᚾᚫᛋᛒᚪᚾ ᛗᚫᚷᛁ</a>'
              ],
             'No link' => [
                 'Some very boring text written with the Latin script',
-                '<div class="text_to_html">Some very boring text written with the Latin script</div>'
+                '<p>Some very boring text written with the Latin script</p>'
             ],
             'No link with Thror\'s map runes' => [
                 'ᛋᛏᚫᚾᛞ ᛒᚣ ᚦᛖ ᚷᚱᛖᚣ ᛋᛏᚩᚾᛖ ᚻᚹᛁᛚᛖ ᚦᛖ ᚦᚱᚢᛋᚻ ᚾᚩᚳᛋ ᚫᚾᛞ ᚦᛖ ᛋᛖᛏᛏᛁᚾᚷ ᛋᚢᚾ ᚹᛁᚦ ᚦᛖ ᛚᚫᛋᛏ ᛚᛁᚷᚻᛏ ᚩᚠ ᛞᚢᚱᛁᚾᛋ ᛞᚫᚣ ᚹᛁᛚᛚ ᛋᚻᛁᚾᛖ ᚢᛈᚩᚾ ᚦᛖ ᚳᛖᚣᚻᚩᛚᛖ',
-                '<div class="text_to_html">ᛋᛏᚫᚾᛞ ᛒᚣ ᚦᛖ ᚷᚱᛖᚣ ᛋᛏᚩᚾᛖ ᚻᚹᛁᛚᛖ ᚦᛖ ᚦᚱᚢᛋᚻ ᚾᚩᚳᛋ ᚫᚾᛞ ᚦᛖ ᛋᛖᛏᛏᛁᚾᚷ ᛋᚢᚾ ᚹᛁᚦ ᚦᛖ ᛚᚫᛋᛏ ᛚᛁᚷᚻᛏ ᚩᚠ ᛞᚢᚱᛁᚾᛋ ᛞᚫᚣ ᚹ' .
-                'ᛁᛚᛚ ᛋᚻᛁᚾᛖ ᚢᛈᚩᚾ ᚦᛖ ᚳᛖᚣᚻᚩᛚᛖ</div>'
+                '<p>ᛋᛏᚫᚾᛞ ᛒᚣ ᚦᛖ ᚷᚱᛖᚣ ᛋᛏᚩᚾᛖ ᚻᚹᛁᛚᛖ ᚦᛖ ᚦᚱᚢᛋᚻ ᚾᚩᚳᛋ ᚫᚾᛞ ᚦᛖ ᛋᛖᛏᛏᛁᚾᚷ ᛋᚢᚾ ᚹᛁᚦ ᚦᛖ ᛚᚫᛋᛏ ᛚᛁᚷᚻᛏ ᚩᚠ ᛞᚢᚱᛁᚾᛋ ᛞᚫᚣ ᚹᛁᛚᛚ ᛋᚻᛁᚾᛖ ᚢᛈᚩᚾ ᚦᛖ ᚳᛖᚣᚻᚩᛚᛖ</p>'
             ]
         ];
+    }
+
+    public function test_format_text_empty_values() {
+        self::assertSame('', format_text(''));
+        self::assertSame('', format_text('', FORMAT_HTML));
+        self::assertSame('', format_text(null));
+        self::assertSame('', format_text(null, FORMAT_HTML));
+        self::assertSame('<div class="text_to_html">0</div>', format_text(0));
+        self::assertSame('0', format_text(0, FORMAT_HTML));
+        self::assertSame('<div class="text_to_html">0</div>', format_text('0'));
+        self::assertSame('0', format_text('0', FORMAT_HTML));
+    }
+
+    public function test_format_text_wiki() {
+        $text = 'I\'m the needle<a onclick="alert(1)">Hack</a>';
+        $filtered = format_text($text, FORMAT_WIKI);
+        self::assertContains(s($text), $filtered);
+        self::assertNotContains($text, $filtered);
+        self::assertNotContains('<a', $filtered);
+        self::assertContains('NOTICE: Wiki-like formatting has been removed from Moodle', $filtered);
+    }
+
+    public function test_format_text_markdown() {
+        $text = 'I\'m the needle<a onclick="alert(1)">Hack</a>';
+        $filtered = format_text($text, FORMAT_MARKDOWN);
+        $expected = '<p>I\'m the needle<a>Hack</a></p>';
+        self::assertSame($expected, trim($filtered));
+        self::assertNotContains($text, $filtered);
+    }
+
+    public function test_format_text_fake_format() {
+        $text = 'I\'m the needle<a onclick="alert(1)">Hack</a>';
+        $filtered = format_text($text, 'sam');
+        $expected = '<div class="text_to_html">I\'m the needle<a>Hack</a></div>';
+        self::assertSame($expected, trim($filtered));
+        self::assertNotContains($text, $filtered);
+    }
+
+    public function test_format_text_option_none() {
+        $text = 'I\'m the needle<a onclick="alert(1)">Hack</a>';
+        $filtered = format_text($text, FORMAT_HTML, []);
+        $expected = 'I\'m the needle<a>Hack</a>';
+        self::assertSame($expected, trim($filtered));
+        self::assertNotContains($text, $filtered);
+    }
+
+    public function test_format_text_option_overflowdiv() {
+        $text = 'I\'m the needle<a onclick="alert(1)">Hack</a>';
+        $filtered = format_text($text, FORMAT_HTML, ['overflowdiv' => true]);
+        $expected = '<div class="no-overflow">I\'m the needle<a>Hack</a></div>';
+        self::assertSame($expected, trim($filtered));
+        self::assertNotContains($text, $filtered);
+    }
+
+    public function test_format_text_option_blanktarget() {
+        $text = 'I\'m the needle<a onclick="alert(1)">Hack</a>';
+        $filtered = format_text($text, FORMAT_HTML, ['blanktarget' => true]);
+        $expected = '<p>I\'m the needle<a target="_blank" rel="noreferrer">Hack</a></p>';
+        self::assertSame($expected, trim($filtered));
+        self::assertNotContains($text, $filtered);
+    }
+
+    public function test_format_text_option_allowxss() {
+        $text = 'I\'m the needle<a onclick="alert(1)">Hack</a>';
+        $filtered = format_text($text, FORMAT_HTML, ['allowxss' => true]);
+        $expected = $text;
+        self::assertSame($expected, $filtered);
+    }
+
+    public function test_format_text_with_cleantext_compatible_filters() {
+        global $CFG, $DB, $PAGE, $FILTERLIB_PRIVATE;
+
+        $file =  $CFG->dirroot . '/filter/multilang/filter.php';
+        if (!file_exists($file)) {
+            $this->markTestSkipped('The multilang filter is not installed.');
+            return;
+        }
+        require_once($file);
+
+        $this->resetAfterTest();
+        $context = \context_system::instance();
+        $DB->execute('DELETE FROM {filter_active}');
+        $DB->insert_record('filter_active', [
+            'filter' => 'multilang',
+            'contextid' => $context->id,
+            'active' => '1',
+            'softorder' => '1',
+        ]);
+
+        $FILTERLIB_PRIVATE = null;
+
+        $filtermanager = filter_manager::instance();
+        $filtermanager->setup_page_for_filters($PAGE, $context);
+        self::assertTrue($filtermanager->result_is_compatible_with_text_cleaning($context));
+
+        // Prep some data.
+        $text = '<span lang="en" class="multilang">English</span><span lang="xx" class="multilang">Klingon</span>';
+        $filtered = 'English';
+
+        self::assertSame($filtered, format_text($text, FORMAT_HTML, ['context' => $context]));
+
+        $FILTERLIB_PRIVATE = null;
     }
 }
