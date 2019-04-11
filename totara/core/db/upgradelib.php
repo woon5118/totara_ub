@@ -747,14 +747,7 @@ function totara_core_add_course_navigation() {
 }
 
 function totara_core_upgrade_course_defaultimage_config() {
-    global $CFG;
-    require_once("{$CFG->libdir}/adminlib.php");
-
-    $cfgvalue = get_config('course', 'defaultimage');
-    if (empty($cfgvalue)) {
-        // No default value for course, no point to upgrade.
-        return;
-    }
+    global $DB;
 
     $fs = get_file_storage();
     $context = context_system::instance();
@@ -799,6 +792,14 @@ function totara_core_upgrade_course_defaultimage_config() {
         // really an edge case.
         unset_config('defaultimage', 'course');
     }
+
+    // We need to remove pretty much all the course defaultimage that has itemid > zero. After the default image is
+    // being set to zero at this point.
+    $sql = "SELECT DISTINCT itemid FROM {files} WHERE itemid > 0 AND component = 'course' AND filearea = 'images'";
+    $records = $DB->get_records_sql($sql);
+    foreach ($records as $itemid => $unused) {
+        $fs->delete_area_files($context->id, 'course', 'defaultimage', $itemid);
+    }
 }
 
 /**
@@ -811,17 +812,17 @@ function totara_core_upgrade_course_images() {
     $fs = get_file_storage();
 
     // For older version, itemid of course-images is being set as courseid.
-    $sql = "SELECT DISTINCT itemid AS id FROM {files} WHERE itemid > 0 AND component = ? AND filearea = ?";
-    $records = $DB->get_records_sql($sql, ['course', 'images']);
+    $sql = "SELECT DISTINCT itemid FROM {files} WHERE itemid > 0 AND component = 'course' AND filearea = 'images'";
+    $records = $DB->get_records_sql($sql);
 
-    foreach ($records as $record) {
-        $ctx = context_course::instance($record->id, IGNORE_MISSING);
+    foreach ($records as $itemid => $unused) {
+        $ctx = context_course::instance($itemid, IGNORE_MISSING);
         if (!$ctx) {
             continue;
         }
 
         // The latest file should be the file that is being used for the course, if not we are DOOM pretty much.
-        $files = $fs->get_area_files($ctx->id, 'course', 'images', $record->id, 'timemodified DESC', false);
+        $files = $fs->get_area_files($ctx->id, 'course', 'images', $itemid, 'timemodified DESC', false);
 
         if (!empty($files)) {
             $oldfile = reset($files);
@@ -850,6 +851,6 @@ function totara_core_upgrade_course_images() {
         }
 
         // Does not really matter if the files are there or not. This will ensure we are removing unused files.
-        $fs->delete_area_files($ctx->id, 'course', 'images', $record->id);
+        $fs->delete_area_files($ctx->id, 'course', 'images', $itemid);
     }
 }

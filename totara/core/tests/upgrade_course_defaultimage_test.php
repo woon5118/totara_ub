@@ -22,183 +22,71 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once("{$CFG->dirroot}/totara/core/db/upgradelib.php");
 
 class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase {
     /**
-     * @return array
-     */
-    public function provide_test_data(): array {
-        global $CFG;
-        $itemid1 = time();
-        $itemid2 = time() + 260;
-
-        $context = context_system::instance();
-
-        return [
-            [
-                $CFG->wwwroot . "/pluginfile.php/1/course/defaultimage/{$itemid1}/egg.png",
-                [
-                    'contenthash' => md5('x'),
-                    'pathnamehash' => md5('boom'),
-                    'contextid' => $context->id,
-                    'component' => 'course',
-                    'filearea' => 'defaultimage',
-                    'itemid' => $itemid1,
-                    'filepath' => '/',
-                    'filename' => 'egg.png',
-                    'filesize' => time(),
-                    'mimetype' => 'png',
-                    'license' => 'public',
-                    'timecreated' => time(),
-                    'timemodified' => time(),
-                    0
-                ]
-            ],
-            [
-                // Test case without www root
-                "/pluginfile.php/1/course/defaultimage/{$itemid2}/egg.png",
-                [
-                    'contenthash' => md5('x'),
-                    'pathnamehash' => md5('boom'),
-                    'contextid' => $context->id,
-                    'component' => 'course',
-                    'filearea' => 'defaultimage',
-                    'itemid' => $itemid2,
-                    'filepath' => '/',
-                    'filename' => 'egg.png',
-                    'filesize' => time(),
-                    'mimetype' => 'png',
-                    'license' => 'public',
-                    'timecreated' => time(),
-                    'timemodified' => time(),
-                    0
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * @dataProvider provide_test_data
-     *
-     * @param string $path
-     * @param array  $fileinfo
      * @return void
      */
-    public function test_upgrade(string $path, array $fileinfo): void {
-        global $DB, $USER;
+    public function test_upgrade(): void {
+        global $CFG;
+        require_once("{$CFG->dirroot}/totara/core/db/upgradelib.php");
 
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        $fileinfo['userid'] = $USER->id;
+        $context = context_system::instance();
 
-        $DB->insert_record('files', $fileinfo);
+        // We want the item id to not be a zero, so that this test is able to assure that the file at this itemid
+        // is no longer exist after upgrade.
+        $fileinfo = [
+            'contextid' => $context->id,
+            'component' => 'course',
+            'filearea' => 'defaultimage',
+            'filepath' => DIRECTORY_SEPARATOR,
+            'filename' => 'hello_world.png',
+            'mimetype' => 'png',
+            'itemid' => file_get_unused_draft_itemid(),
+            'license' => 'Kian Bomba Bolobala'
+        ];
 
-        set_config('defaultimage', $path, 'course');
+        $fs = get_file_storage();
+        $fs->create_file_from_string($fileinfo, 'Hello world !!!');
+
+        $files = $fs->get_area_files($context->id, 'course', 'defaultimage', false, 'itemid, filepath, filename', false);
+        $file = reset($files);
+
+        $url = "{$CFG->wwwroot}/pluginfile.php/course/defaultimage/1/{$file->get_filename()}";
+        set_config('defaultimage', $url, 'course');
         totara_core_upgrade_course_defaultimage_config();
 
         $a = get_config('course', 'defaultimage');
         $this->assertNotEmpty($a);
-        $this->assertEquals($fileinfo['filepath'] . $fileinfo['filename'], $a);
+        $this->assertEquals($file->get_filepath() . $file->get_filename(), $a);
 
         // Check whether there is file presenting in mdl_file storage.
         $fs = get_file_storage();
         $context = context_system::instance();
 
-        $files = $fs->get_area_files($context->id, 'course', 'defaultimage');
-        $this->assertNotEmpty($files);
-
-        $files = array_values(
-            array_filter(
-                $files,
-                function (stored_file $file): bool {
-                    return !$file->is_directory();
-                }
-            )
+        $files = $fs->get_area_files(
+            $context->id,
+            'course',
+            'defaultimage',
+            false,
+            'itemid, filepath, filename',
+            false
         );
 
         $this->assertCount(1, $files);
 
-        /** @var stored_file $file */
-        $file = $files[0];
-
+        $file = reset($files);
         $this->assertEquals(0, $file->get_itemid());
-    }
 
-    /**
-     * Test suite of uprading default image when the file has spaces in it.
-     * @return void
-     */
-    public function test_upgrade_file_with_spaces(): void {
-        global $USER, $DB;
+        // Start creating a default course, trying to get a default image and expect it to be equal with the
+        // the one just upgraded.
+        $gen = $this->getDataGenerator();
+        $course = $gen->create_course();
 
-        $this->resetAfterTest();
-        $this->setAdminUser();
-
-        $id = time();
-
-        $filename = rawurlencode('bohemian rhapsody.png');
-        $filepath = "/pluginfile.php/1/course/defaultimage/{$id}/{$filename}";
-
-        set_config('defaultimage', $filepath, 'course');
-
-        // Save draft for this image, then we start saving the default image, that is the behaviour of most uploading action here
-        // though.
-        $record = new stdClass();
-        $record->contenthash = md5(uniqid());
-        $record->pathnamehash = md5(uniqid());
-        $record->contextid = context_system::instance()->id;
-        $record->component = 'course';
-        $record->filearea = 'draft';
-        $record->itemid = $id;
-        $record->filepath = '/';
-        $record->filename = 'bohemian rhapsody.png';
-        $record->license = 'x';
-        $record->filesize = time();
-        $record->userid = $USER->id;
-        $record->timecreated = time();
-        $record->timemodified = time();
-
-        $DB->insert_record('files', $record);
-
-        // Start saving the proper file here, with the area of 'defaultimage'
-        $record->filearea = 'defaultimage';
-        $record->timecreated = time() + 20;
-        $record->timemodified = time() + 20;
-        $record->contenthash = md5(uniqid());
-        $record->pathnamehash = md5(uniqid());
-
-        $DB->insert_record('files', $record);
-
-        totara_core_upgrade_course_defaultimage_config();
-
-        // After upgrade
-        $value = get_config('course', 'defaultimage');
-        $this->assertEquals('/bohemian rhapsody.png', $value);
-
-        // Check whether there is file presenting in mdl_file storage.
-        $fs = get_file_storage();
-        $context = context_system::instance();
-
-        $files = $fs->get_area_files($context->id, 'course', 'defaultimage');
-        $this->assertNotEmpty($files);
-
-        $files = array_values(
-            array_filter(
-                $files,
-                function (stored_file $file): bool {
-                    return !$file->is_directory();
-                }
-            )
-        );
-
-        $this->assertCount(1, $files);
-
-        /** @var stored_file $file */
-        $file = $files[0];
-
-        $this->assertEquals(0, $file->get_itemid());
+        $imageurl = course_get_image($course);
+        $this->assertContains($file->get_filename(), $imageurl->out());
     }
 }

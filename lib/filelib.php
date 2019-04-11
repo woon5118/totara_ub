@@ -4482,10 +4482,9 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
                 send_file_not_found();
             }
 
-            $courserev = array_pop($args);
-            if ($courserev <= 0) {
-                $lifetime = 0;
-            } else {
+            $courserev = array_shift($args);
+            $lifetime = 60;
+            if ($courserev > 0) {
                 $lifetime = 60 * 60;
             }
 
