@@ -41,17 +41,16 @@ class totara_core_get_course_image_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $context = context_course::instance($course->id);
-
         $fs = get_file_storage();
 
         $rc = [
             'contextid' => $context->id,
-            'component' => $course,
+            'component' => 'course',
             'filearea' => 'images',
             'filepath' => '/',
             'filename' => 'hello_world.png',
             'mimetype' => 'png',
-            'itemid' => 911,
+            'itemid' => 0,
             'license' => 'public'
         ];
 
