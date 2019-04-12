@@ -111,7 +111,7 @@ Feature: Config setting calendar_adminseesall allows admin to view all events on
     And I press "Sign-up"
     And I click on "Go to calendar" "link"
     And I click on "Edit event" "link"
-    Then I should see "Sign-up for Test Seminar Two"
+    Then I should see "Test Seminar Two"
     And I should see "Cancel booking"
 
   Scenario: Combination of moodle/calendar:manageentries capability and calendar_adminseesall setting allows a user to see all events
