@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Andrew Hancox <andrewdchancox@googlemail.com> on behalf of Synergy Learning
- * @package totara
- * @subpackage enrol_totara_facetoface
+ * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
+ * @package totara_facetoface
  */
 
-/**
- * Face-to-Face Direct enrolment plugin version specification
- */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2018120701;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017051509;       // Requires this Moodle version.
-$plugin->component = 'enrol_totara_facetoface';      // Full name of the plugin (used for diagnostics).
+$watchers = [
+    [
+        // Called during the sign-up process of a seminar event.
+        // Used by Totara to redirect to the correct sign-up page.
+        'hookname' => '\mod_facetoface\hook\alternative_signup_link',
+        'callback' => 'enrol_totara_facetoface\watcher\seminar_watcher::alter_signup_link',
+        'priority' => 100,
+    ],
+];

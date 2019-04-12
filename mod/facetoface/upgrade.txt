@@ -60,6 +60,8 @@ information provided here is intended especially for developers.
     * Changed the link text of room information on a session event list table, from "(Room details)" to "View details"
     * Deprecated room and room_details CSS classes
   * Added two new overridable functions for session/event status - session_status_table_cell() and event_status_table_cell()
+* mod_facetoface_renderer::set_signup_link() function has been deprecated, please use mod_facetoface\hook\alternative_signup_link
+* mod_facetoface_renderer::print_session_list_table() function has been changed to call get_signup_link() function to resolve signup link
 * facetoface_send_notice() function has been deprecated, please use \mod_facetoface\notice_sender::send_notice()
 * facetoface_send_oneperday_notice() function has been deprecated, please use \mod_facetoface\notice_sender::send_notice_oneperday()
 * facetoface_send_registration_closure_notice() function has been deprecated, please use \mod_facetoface\notice_sender::registration_closure()

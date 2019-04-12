@@ -534,7 +534,6 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
 
         /** @var mod_facetoface_renderer $f2frenderer */
         $f2frenderer = $PAGE->get_renderer('mod_facetoface');
-        $f2frenderer->set_signup_link('/enrol/totara_facetoface/signup.php');
 
         $sessions = $this->get_enrolable_sessions($instance->courseid);
 

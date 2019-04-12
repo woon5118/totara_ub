@@ -62,11 +62,15 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     const PARAM_FILTER_EVENTTIME = 'eventtime';
 
     /**
-     * This link will be changed if Seminar enrolment method is enabled.
-     * Enrolment link is '/enrol/totara_facetoface/signup.php';
+     * Default sign-up link
+     */
+    const DEFAULT_SIGNUP_LINK = '/mod/facetoface/signup.php';
+
+    /**
+     * This link will be changed if mod_facetoface\hook\alternative_signup_link hook is installed.
      * @var $signuplink string
      */
-    protected $signuplink = '/mod/facetoface/signup.php';
+    protected $signuplink = self::DEFAULT_SIGNUP_LINK;
 
     /** @var $context null */
     protected $context = null;
@@ -1001,10 +1005,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $urlparams['backtoallsessions'] = 1;
         }
 
-        $signupurl = new moodle_url($this->signuplink, $urlparams);
+        $seminarevent = new seminar_event($session->id);
+
+        $signupurl = new moodle_url($this->get_signup_link($seminarevent), $urlparams);
         $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', $urlparams);
 
-        $seminarevent = new seminar_event($session->id);
         $seminarevent->set_cutoff($session->cancellationcutoff);
         $seminar = $seminarevent->get_seminar();
 
@@ -2220,12 +2225,35 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Get signup link URL.
+     * This link is processed through mod_facetoface\\hook\\alternative_signup_link to allow additional plugins to set different
+     * page for users to sign up.
+     *
+     * @param seminar_event $seminarevent
+     * @param string $link
+     * @return string
+     */
+    public function get_signup_link(seminar_event $seminarevent): string {
+        // look for hooks unless set_signup_link() is called
+        if ($this->signuplink === self::DEFAULT_SIGNUP_LINK) {
+            // Start hook code
+            $signupurl = $this->signuplink;
+            $hook = new \mod_facetoface\hook\alternative_signup_link($seminarevent, $signupurl);
+            $hook->execute();
+            // End hook code
+            return $hook->signuplink;
+        }
+        return $this->signuplink;
+    }
+
+    /**
      * Set singup link when enrolment method is enabled and called.
      *
      * @param string $link
+     * @deprecated since Totara 13.0
      */
     public function set_signup_link(string $link): void {
+        debugging('mod_facetoface_renderer::set_signup_link() is deprecated. Please use mod_facetoface\\hook\\alternative_signup_link instead.', DEBUG_DEVELOPER);
         $this->signuplink = $link;
     }
 }
-

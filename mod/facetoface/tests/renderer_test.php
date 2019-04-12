@@ -189,6 +189,111 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
     }
 
     /**
+     * Test the method get_signup_link in an ordinary situation.
+     */
+    public function test_get_signup_link_default() {
+        $this->resetAfterTest(true);
+
+        [ $seminarid, $sessionid, $roomid ] = $this->create_seminar_session_and_room(null, false, false, 0);
+        $seminarevent = new seminar_event($sessionid);
+
+        $renderer = $this->create_f2f_renderer();
+        // hard-coded url instead of \mod_facetoface_renderer::DEFAULT_SIGNUP_LINK, to catch possible regression
+        $expected = '/mod/facetoface/signup.php';
+
+        $link = $renderer->get_signup_link($seminarevent);
+        $this->assertEquals($expected, $link);
+
+        $expected = '/somewhere/else/signup.php';
+
+        $this->resetDebugging();
+        $renderer->set_signup_link($expected);
+        $debugging = $this->getDebuggingMessages()[0]->message;
+        $this->assertDebuggingCalled();
+
+        $this->assertContains('deprecated', $debugging);
+        $this->assertContains('mod_facetoface\\hook\\alternative_signup_link', $debugging);
+        $link = $renderer->get_signup_link($seminarevent);
+        $this->assertEquals($expected, $link);
+    }
+
+    /**
+     * Test the method get_signup_link by activating enrol_totara_facetoface_plugin.
+     * If the plugin is missing, the whole test will be skipped.
+     */
+    public function test_get_signup_link_with_enrol_plugin() {
+        $this->resetAfterTest(true);
+        global $DB;
+        /** @var moodle_database $DB */
+
+        $plugin = enrol_get_plugin('totara_facetoface');
+        if ($plugin === null) {
+            $this->markTestSkipped('enrol_totara_facetoface_plugin is not available');
+        }
+
+        $this->assertInstanceOf('enrol_totara_facetoface_plugin', $plugin);
+        $enabled = enrol_get_plugins(true);
+        $enabled['guest'] = true;
+        $enabled['totara_facetoface'] = true;
+        set_config('enrol_plugins_enabled', implode(',', array_keys($enabled)));
+
+        [ $seminarid, $session1id, $roomid ] = $this->create_seminar_session_and_room(null, false, false, 0);
+        $seminar = new seminar($seminarid);
+        $seminarevent1 = new seminar_event($session1id);
+        $course = $DB->get_record('course', array('id' => $seminar->get_course()));
+
+        $session2id = $this->make_session((object)['id' => $seminarid], (object)['id' => $roomid], [ time() + YEARSECS ], false);
+        $seminarevent2 = new seminar_event($session1id);
+
+        $user = $this->getDataGenerator()->create_user();
+        $context = context_course::instance($course->id);
+        $renderer1 = $this->create_f2f_renderer();
+        $renderer2 = $this->create_f2f_renderer();
+
+        $alter = '/somewhere/else/signup.php';
+        $renderer2->set_signup_link($alter);
+        $this->assertDebuggingCalled();
+
+        $this->setUser($user);
+
+        $instid = $plugin->add_instance($course, ['name' => 'totara_facetoface', 'status' => ENROL_INSTANCE_ENABLED, 'customint6' => 1]);
+
+        // hard-coded url to catch possible regression
+        $expected = '/enrol/totara_facetoface/signup.php';
+
+        $link = $renderer1->get_signup_link($seminarevent1);
+        $this->assertEquals($expected, $link);
+        $link = $renderer1->get_signup_link($seminarevent2);
+        $this->assertEquals($expected, $link);
+
+        $link = $renderer2->get_signup_link($seminarevent1);
+        $this->assertEquals($alter, $link);
+        $link = $renderer2->get_signup_link($seminarevent2);
+        $this->assertEquals($alter, $link);
+
+        $inst = $DB->get_record('enrol', array('id' => $instid), '*', MUST_EXIST);
+
+        // once enrolled the signup link must be default
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $this->assertNotEmpty($studentrole);
+
+        $plugin->enrol_user($inst, $user->id, $studentrole->id);
+
+        // hard-coded url instead of \mod_facetoface_renderer::DEFAULT_SIGNUP_LINK, to catch possible regression
+        $expected = '/mod/facetoface/signup.php';
+
+        $link = $renderer1->get_signup_link($seminarevent1);
+        $this->assertEquals($expected, $link);
+        $link = $renderer1->get_signup_link($seminarevent2);
+        $this->assertEquals($expected, $link);
+
+        $link = $renderer2->get_signup_link($seminarevent1);
+        $this->assertEquals($alter, $link);
+        $link = $renderer2->get_signup_link($seminarevent2);
+        $this->assertEquals($alter, $link);
+    }
+
+    /**
      * Create f2f renderer, set system context and initialise page.
      *
      * @return \mod_facetoface_renderer
