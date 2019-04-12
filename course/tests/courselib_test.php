@@ -3754,43 +3754,6 @@ class core_course_courselib_testcase extends advanced_testcase {
         $this->assertEquals(COURSE_TIMELINE_INPROGRESS, course_classify_for_timeline($inprogresscourse));
     }
 
-    public function test_course_get_image() {
-        global $USER, $CFG, $OUTPUT;
-        $this->resetAfterTest(true);
-
-        $course = $this->getDataGenerator()->create_course();
-
-        // Return false if there is not image anywhere.
-        $url = course_get_image($course);
-        $expected = $OUTPUT->image_url('course_defaultimage', 'moodle');
-        $this->assertEquals($expected->out(), $url->out());
-
-        $this->setAdminUser();
-        $context = context_course::instance($course->id);
-        $usercontext = context_user::instance($USER->id);
-        $draftfile = core_files_external::upload(
-            $usercontext->id,
-            'user',
-            'draft',
-            0,
-            '/',
-            'example.txt',
-            'Let us create a nice simple file',
-            null,
-            null
-        );
-        file_save_draft_area_files(
-            $draftfile['itemid'],
-            $context->id,
-            'course',
-            'images',
-            0
-        );
-        $url = course_get_image($course);
-        $expected = "{$CFG->wwwroot}/pluginfile.php/{$context->id}/course/images/{$course->cacherev}/image";
-        $this->assertEquals($expected, $url->out());
-    }
-
     public function course_get_return_url_data_provider() {
         return [
             // Requests for a specific url should use it.

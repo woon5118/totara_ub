@@ -754,20 +754,17 @@ function totara_core_upgrade_course_defaultimage_config() {
 
     // If the file system has more than one files for setting 'defaultimage', then we will kinda assure that the
     // latest file is the used file for that specific setting. Otherwise what could go wrong? ¯\_(ツ)_/¯
-    $files = array_values(
-        $fs->get_area_files(
-            $context->id,
-            'course',
-            'defaultimage',
-            false,
-            'timemodified DESC',
-            false
-        )
+    $files = $fs->get_area_files(
+        $context->id,
+        'course',
+        'defaultimage',
+        false,
+        'timemodified DESC',
+        false
     );
 
     if (!empty($files)) {
-        /** @var stored_file $oldfile */
-        $oldfile = $files[0];
+        $oldfile = reset($files);
 
         // Start writing the old file to the file storage system. So that the admin settting is able to find it.
         // There is only one default image, and it must be a ZERO.
@@ -778,7 +775,7 @@ function totara_core_upgrade_course_defaultimage_config() {
             'timemodified' => time(),
             'itemid' => 0,
             'source' => $oldfile->get_source(),
-            'filepath' => $oldfile->get_filepath(),
+            'filepath' => '/',
             'filename' => $oldfile->get_filename()
         ];
 
@@ -831,7 +828,7 @@ function totara_core_upgrade_course_images() {
                 'course',
                 'images',
                 0,
-                $oldfile->get_filepath(),
+                '/',
                 $oldfile->get_filename()
             );
 
@@ -842,7 +839,7 @@ function totara_core_upgrade_course_images() {
                     'filearea' => 'images',
                     'itemid' => 0,
                     'source' => $oldfile->get_source(),
-                    'filepath' => $oldfile->get_filepath(),
+                    'filepath' => '/',
                     'filename' => $oldfile->get_filename()
                 ];
 

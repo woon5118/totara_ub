@@ -51,8 +51,6 @@ class totara_core_course_image_upgrade_testcase extends advanced_testcase {
             // Start preparing the file record for it, no point to prepare draft file, because
             // in the end, draft file will be removed from system (this means for production codes)
             $rc = new stdClass();
-            $rc->contenthash = md5(uniqid());
-            $rc->pathnamehash = md5(uniqid());
             $rc->contextid = $ctx->id;
             $rc->component = 'course';
             $rc->filearea = 'images';
@@ -63,7 +61,7 @@ class totara_core_course_image_upgrade_testcase extends advanced_testcase {
             $rc->userid = $USER->id;
             $rc->mimetype = 'png';
             $rc->author = 'Bolobala';
-            $rc->license = 'Kian Bolobala Bomba';
+            $rc->license = 'public';
 
             $file = $fs->create_file_from_string($rc, 'This is a test file');
             $files[] = $file;
@@ -83,13 +81,18 @@ class totara_core_course_image_upgrade_testcase extends advanced_testcase {
                 $file->get_filename()
             );
 
-            $this->assertFalse($result);
+            $this->assertFalse($result, "The file '{$file->get_filename()} is still existing after upgrade");
         }
 
         // Start checking the course is still able to find its own image.
         foreach ($courses as $course) {
             $url = course_get_image($course);
-            $this->assertContains($course->cacherev, $url->out());
+            $this->assertContains(
+                $course->cacherev,
+                $url->out(),
+                "The course's image for course id '{$course->id}' is invalid after upgrade, " .
+                "expected to be found with cacherev of the course: '{$course->cacherev}'"
+            );
         }
 
         $this->assertTrue(true);

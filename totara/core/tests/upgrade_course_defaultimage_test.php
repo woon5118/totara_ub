@@ -42,11 +42,11 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
             'contextid' => $context->id,
             'component' => 'course',
             'filearea' => 'defaultimage',
-            'filepath' => DIRECTORY_SEPARATOR,
+            'filepath' => '/',
             'filename' => 'hello_world.png',
             'mimetype' => 'png',
-            'itemid' => file_get_unused_draft_itemid(),
-            'license' => 'Kian Bomba Bolobala'
+            'itemid' => 999,
+            'license' => 'public'
         ];
 
         $fs = get_file_storage();
@@ -55,7 +55,7 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
         $files = $fs->get_area_files($context->id, 'course', 'defaultimage', false, 'itemid, filepath, filename', false);
         $file = reset($files);
 
-        $url = "{$CFG->wwwroot}/pluginfile.php/course/defaultimage/1/{$file->get_filename()}";
+        $url = "{$CFG->wwwroot}/pluginfile.php/{$context->id}/course/defaultimage/{$file->get_filename()}";
         set_config('defaultimage', $url, 'course');
         totara_core_upgrade_course_defaultimage_config();
 
@@ -86,7 +86,10 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
         $gen = $this->getDataGenerator();
         $course = $gen->create_course();
 
+        $themerev = theme_get_revision();
+        $expected = "{$CFG->wwwroot}/pluginfile.php/{$context->id}/course/defaultimage/{$themerev}/{$file->get_filename()}";
+
         $imageurl = course_get_image($course);
-        $this->assertContains($file->get_filename(), $imageurl->out());
+        $this->assertEquals($expected, $imageurl->out());
     }
 }
