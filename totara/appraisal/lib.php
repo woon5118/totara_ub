@@ -4264,14 +4264,14 @@ class appraisal_question extends question_storage {
         foreach ($questroles as $eachrole => $rights) {
             if (isset($otherassignments[$eachrole]) && ($rights & appraisal::ACCESS_CANANSWER) == appraisal::ACCESS_CANANSWER) {
                 // Show role user icon.
-                $subjectid = $otherassignments[$eachrole]->userid;
+                $otheruserid = $otherassignments[$eachrole]->userid;
 
                 // Add information about other roles to element.
-                $questioninfo = new question_manager($subjectid, $otherassignments[$eachrole]->id);
+                $questioninfo = new question_manager($roleassignment->subjectid, $otherassignments[$eachrole]->id);
                 $questioninfo->viewonly = true;
-                if (!$nouserpic && $subjectid != 0) {
-                    $subject = $DB->get_record('user', array('id' => $subjectid));
-                    $questioninfo->userimage = $OUTPUT->user_picture($subject);
+                if (!$nouserpic && $otheruserid != 0) {
+                    $otheruser = $DB->get_record('user', array('id' => $otheruserid));
+                    $questioninfo->userimage = $OUTPUT->user_picture($otheruser);
                 } else {
                    $questioninfo->userimage = '';
                 }

@@ -60,6 +60,7 @@ $string['dateselection'] = 'Date selection';
 $string['datefirstyear'] = 'First year available';
 $string['datelastyear'] = 'Last year available';
 $string['dateincludetime'] = 'Include time as well as date';
+$string['dateincludetimezone'] = 'Include timezone as well as time';
 $string['dateinvalid'] = 'Invalid date selection';
 $string['defaultmake'] = 'Make selected by default';
 $string['defaultselected'] = 'Selected by default';
