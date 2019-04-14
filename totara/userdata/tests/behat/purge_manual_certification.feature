@@ -74,7 +74,7 @@ Feature: Yet another manual user data purging
 
     ## DELETE USER ##
 
-    When I navigate to "Browse list of users" node in "Site administration > Users"
+    When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Delete One Uno" "link"
     And I click on "Delete" "button"
     Then I should not see "One Uno" in the "#system_browse_users" "css_element"
