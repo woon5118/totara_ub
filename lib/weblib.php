@@ -1354,6 +1354,7 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
 
         case FORMAT_MARKDOWN:
             $text = markdown_to_html($text);
+            $cleantext = false; // markdown_to_html cleans text by default as of Totara 13.
             break;
 
         default:  // Anything else.
@@ -2197,9 +2198,12 @@ function text_to_html($text, $smileyignored = null, $para = true, $newlines = tr
  * Given Markdown formatted text, make it into XHTML using external function
  *
  * @param string $text The markdown formatted text to be converted.
+ * @param array $options An array of options for markdown_to_html, options below:
+ *     - allowxss If set to true then content will not be cleaned through clean_text.
+ *       Available since Totara 13, should be left set to true unless you have a very very good reason to change it.
  * @return string Converted text
  */
-function markdown_to_html($text) {
+function markdown_to_html($text, array $options = []) {
     global $CFG;
 
     if ($text === '' or $text === null) {
@@ -2210,7 +2214,13 @@ function markdown_to_html($text) {
     require_once($CFG->libdir .'/markdown/Markdown.php');
     require_once($CFG->libdir .'/markdown/MarkdownExtra.php');
 
-    return \Michelf\MarkdownExtra::defaultTransform($text);
+    $html = \Michelf\MarkdownExtra::defaultTransform($text);
+
+    if (empty($options['allowxss'])) {
+        $html = clean_text($html, FORMAT_HTML);
+    }
+
+    return $html;
 }
 
 /**
@@ -2263,7 +2273,8 @@ function content_to_text($content, $contentformat) {
             // Nothing here.
             break;
         case FORMAT_MARKDOWN:
-            $content = markdown_to_html($content);
+            // Totara: Do not clean here, we're returning plain text!
+            $content = markdown_to_html($content, ['allowxss' => true]);
             $content = html_to_text($content, 75, false);
             break;
         default:

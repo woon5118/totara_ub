@@ -745,6 +745,7 @@ EXPECTED;
             array('asd    asd', false, 'asd asd'),
             // From markdown to html and html to text.
             array('asd __lera__ con la', FORMAT_MARKDOWN, 'asd LERA con la'),
+            array('<a href="x" onclick="alert(1)">Yo</a>', FORMAT_MARKDOWN, 'Yo'), // Totara ensure XSS gets stripped.
             // HTML to text.
             array('<p class="frogs">This is a <strong class=\'fishes\'>test</strong></p>', FORMAT_HTML, 'This is a TEST'),
             array("<span lang='en' class='multilang'>english</span>
@@ -752,6 +753,35 @@ EXPECTED;
 <span lang='es' class='multilang'>español</span>
 <span lang='fr' class='multilang'>français</span>", FORMAT_HTML, "english català español français")
         );
+
+    }
+
+    public function test_markdown_to_html() {
+
+        $text = '';
+        $html = markdown_to_html($text);
+        $expected = '';
+        self::assertSame($expected, $html);
+
+        $text = null;
+        $html = markdown_to_html($text);
+        $expected = null; // This is inconsistent with format_text.
+        self::assertSame($expected, $html);
+
+        $text = "Test\n\n* One\n* Two\n* Three\n\nFour";
+        $html = markdown_to_html($text);
+        $expected = '<p>Test</p><ul><li>One</li><li>Two</li><li>Three</li></ul><p>Four</p>';
+        self::assertSame($expected, trim(str_replace("\n", '', $html), " \n"));
+
+        $text = "Test <a href='#' onclick='alert(1)'>test</a> test\n\n* One\n* Two\n* Three";
+        $html = markdown_to_html($text);
+        $expected = '<p>Test <a href="#">test</a> test</p><ul><li>One</li><li>Two</li><li>Three</li></ul>';
+        self::assertSame($expected, trim(str_replace("\n", '', $html), " \n"));
+
+        $text = "Test <a href='#' onclick='alert(1)'>test</a> test\n\n* One\n* Two\n* Three";
+        $html = markdown_to_html($text, ['allowxss' => true]);
+        $expected = '<p>Test <a href=\'#\' onclick=\'alert(1)\'>test</a> test</p><ul><li>One</li><li>Two</li><li>Three</li></ul>';
+        self::assertSame($expected, trim(str_replace("\n", '', $html), " \n"));
 
     }
 

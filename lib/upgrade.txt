@@ -31,6 +31,8 @@ information provided here is intended especially for developers.
 * Added a new allowxss option to format_text() that should be used only when absolutely necessary to avoid clean_text during formatting.
 * Filters show now implement a protected static function is_compatible_with_clean_text() method which returns true if text can be
   cleaned after filter, and false if the filter will inject content that is not compatible with cleaning.
+* markdown_to_html() now cleans the html before returning it, stripping all XSS nasties. A new second argument now exists to set options.
+  There is one option so far, allowxss, which if set to true will cause markdown_to_html to not clean_text (old behaviour)
 
 === 12.0 ===
 
