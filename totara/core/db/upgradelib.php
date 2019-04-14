@@ -753,7 +753,7 @@ function totara_core_upgrade_course_defaultimage_config() {
     $context = context_system::instance();
 
     // If the file system has more than one files for setting 'defaultimage', then we will kinda assure that the
-    // latest file is the used file for that specific setting. Otherwise what could go wrong? ¯\_(ツ)_/¯
+    // latest file is the used file for that specific setting.
     $files = $fs->get_area_files(
         $context->id,
         'course',
@@ -766,24 +766,26 @@ function totara_core_upgrade_course_defaultimage_config() {
     if (!empty($files)) {
         $oldfile = reset($files);
 
-        // Start writing the old file to the file storage system. So that the admin settting is able to find it.
-        // There is only one default image, and it must be a ZERO.
-        $rc = [
-            'contextid' => $context->id,
-            'component' => 'course',
-            'filearea' => 'defaultimage',
-            'timemodified' => time(),
-            'itemid' => 0,
-            'source' => $oldfile->get_source(),
-            'filepath' => '/',
-            'filename' => $oldfile->get_filename()
-        ];
+        if (!$fs->file_exists($context->id, 'course', 'defaultimage', 0, '/', $oldfile->get_filename())) {
+            // Start writing the old file to the file storage system. So that the admin settting is able to find it.
+            // There is only one default image, and it must be a ZERO.
+            $rc = [
+                'contextid' => $context->id,
+                'component' => 'course',
+                'filearea' => 'defaultimage',
+                'timemodified' => time(),
+                'itemid' => 0,
+                'source' => $oldfile->get_source(),
+                'filepath' => '/',
+                'filename' => $oldfile->get_filename()
+            ];
 
-        $fs->create_file_from_storedfile($rc, $oldfile);
-        set_config('defaultimage', $oldfile->get_filepath() . $oldfile->get_filename(), 'course');
+            $fs->create_file_from_storedfile($rc, $oldfile);
+            set_config('defaultimage', $oldfile->get_filepath() . $oldfile->get_filename(), 'course');
 
-        // Just remove this old file, it is no longer being used.
-        $oldfile->delete();
+            // Just remove this old file, it is no longer being used.
+            $oldfile->delete();
+        }
     } else if (false !== get_config('course', 'defaultimage')) {
         // This seemed wrong that system admin was trying to use some random URL as their default image. But it is
         // really an edge case.
@@ -792,7 +794,7 @@ function totara_core_upgrade_course_defaultimage_config() {
 
     // We need to remove pretty much all the course defaultimage that has itemid > zero. After the default image is
     // being set to zero at this point.
-    $sql = "SELECT DISTINCT itemid FROM {files} WHERE itemid > 0 AND component = 'course' AND filearea = 'images'";
+    $sql = "SELECT DISTINCT itemid FROM {files} WHERE itemid > 0 AND component = 'course' AND filearea = 'defaultimage'";
     $records = $DB->get_records_sql($sql);
     foreach ($records as $itemid => $unused) {
         $fs->delete_area_files($context->id, 'course', 'defaultimage', $itemid);
@@ -818,21 +820,13 @@ function totara_core_upgrade_course_images() {
             continue;
         }
 
-        // The latest file should be the file that is being used for the course, if not we are DOOM pretty much.
+        // The latest file should be the file that is being used for the course.
         $files = $fs->get_area_files($ctx->id, 'course', 'images', $itemid, 'timemodified DESC', false);
 
         if (!empty($files)) {
             $oldfile = reset($files);
-            $existing = $fs->file_exists(
-                $ctx->id,
-                'course',
-                'images',
-                0,
-                '/',
-                $oldfile->get_filename()
-            );
 
-            if (!$existing) {
+            if (!$fs->file_exists($ctx->id, 'course', 'images', 0, '/', $oldfile->get_filename())) {
                 $rc = [
                     'contextid' => $ctx->id,
                     'component' => 'course',

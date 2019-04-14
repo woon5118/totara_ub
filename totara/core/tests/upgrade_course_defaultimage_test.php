@@ -92,4 +92,181 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
         $imageurl = course_get_image($course);
         $this->assertEquals($expected, $imageurl->out());
     }
+
+    /**
+     * Test suite: If the configstoredfile had been already used, and the file for course_defaultimage has been inserted
+     * into the system. Then the itemid of that file will be a zero, and the upgrade code should be ignoring it.
+     * Therefore, by the end of the upgrade process, the file should not be changed at all.
+     *
+     * @return void
+     */
+    public function test_upgrade_default_course_image_with_configstoredfile(): void {
+        global $CFG, $USER;
+        require_once("{$CFG->dirroot}/totara/core/db/upgradelib.php");
+
+        $this->resetAfterTest();
+        $context = context_system::instance();
+
+        $record = new stdClass();
+        $record->contextid = $context->id;
+        $record->component = 'course';
+        $record->filearea = 'defaultimage';
+        $record->filesize = 1024;
+        $record->itemid = 0;
+        $record->filepath = '/';
+        $record->filename = 'hello_world.png';
+        $record->userid = $USER->id;
+        $record->mimetype = 'png';
+        $record->author = 'Bolobala';
+        $record->license = 'public';
+
+        $fs = get_file_storage();
+        $storedfile = $fs->create_file_from_string($record, 'Hello World !!!');
+
+        totara_core_upgrade_course_defaultimage_config();
+
+        $files = $fs->get_area_files(
+            $context->id,
+            'course',
+            'defaultimage',
+            0,
+            'itemid, filepath, filename',
+            false
+        );
+
+        // There must be only one file for course_defaultimage.
+        $this->assertCount(1, $files);
+
+        $file = reset($files);
+        $this->assertEquals($file, $storedfile);
+    }
+
+    /**
+     * Test suite: As a system with more than one course default image that had been added, then it is to ensure that
+     * upgrade code is upgrading the right record for the config value, then check whether those un-used records would
+     * be deleted or not.
+     *
+     * @return void
+     */
+    public function test_upgrade_default_course_image(): void {
+        global $CFG, $USER;
+        require_once("{$CFG->dirroot}/totara/core/db/upgradelib.php");
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $context = context_system::instance();
+        $fs = get_file_storage();
+
+        $storedfile = null;
+        $time = time();
+
+        // Start creating more than one file for course_defaultimage. As the upgrade code will try to delete them
+        // after all. The last inserted file will be kept and modified, because it would be last update from user.
+        $itemid = rand(0, 999);
+        for ($i = 0; $i < 2; $i++) {
+            $record = new stdClass();
+            $record->contextid = $context->id;
+            $record->userid = $USER->id;
+            $record->component = 'course';
+            $record->filearea = 'defaultimage';
+            $record->filesize = 1024;
+            $record->itemid = $itemid;
+            $record->filepath = '/';
+            $record->filename = uniqid('file_') . 'png';
+            $record->mimetype = 'png';
+            $record->author = 'Bolobala';
+            $record->license = 'public';
+            $record->timemodified = $time;
+
+            $time += 3600;
+            $storedfile = $fs->create_file_from_string($record, 'Hello World !!!');
+
+            // Modify the itemid here, so that it would not add duplicated itemid.
+            $itemid += 1;
+        }
+
+        totara_core_upgrade_course_defaultimage_config();
+        $files = $fs->get_area_files(
+            $context->id,
+            'course',
+            'defaultimage',
+            false,
+            'itemid, filepath, filename',
+            false
+        );
+
+        // After upgrade, there must be only one file left.
+        $this->assertCount(1, $files);
+        $file = reset($files);
+
+        $this->assertEquals(0, $file->get_itemid());
+        $this->assertEquals($file->get_filename(), $storedfile->get_filename());
+    }
+
+    /**
+     * Test suite: A system with more than one course default images, but the latest updated record is using the
+     * configstoredfile to write the image. Then the latest file should be a valid one. And the test is to ensure that
+     * the upgrade path should not do anything to the valid default image but to remove the unused the course default
+     * image.
+     *
+     * @return void
+     */
+    public function test_upgrade_default_image_with_unused_record(): void {
+        global $CFG, $USER;
+        require_once("{$CFG->dirroot}/totara/core/db/upgradelib.php");
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $context = context_system::instance();
+        $fs = get_file_storage();
+
+        $record = new stdClass();
+        $record->contextid = $context->id;
+        $record->userid = $USER->id;
+        $record->component = 'course';
+        $record->filearea = 'defaultimage';
+        $record->filesize = 1024;
+        $record->itemid = 1920;
+        $record->filepath = '/';
+        $record->filename = 'hello_world1.png';
+        $record->mimetype = 'png';
+        $record->license = 'public';
+        $record->timemodified = time();
+
+        $fs->create_file_from_string($record, 'Hello world !!!');
+        unset($record);
+
+        $record2 = new stdClass();
+        $record2->contextid = $context->id;
+        $record2->userid = $USER->id;
+        $record2->component = 'course';
+        $record2->filearea = 'defaultimage';
+        $record2->filesize = 1080;
+        $record2->itemid = 0;
+        $record2->filepath = '/';
+        $record2->filename = 'hello_world2.png';
+        $record2->mimetype = 'png';
+        $record2->license = 'public';
+        $record2->timemodified = time() + 3600;
+
+        $storedfile = $fs->create_file_from_string($record2, 'Hello World 1 2 3 !!!');
+        unset($record2);
+
+        totara_core_upgrade_course_defaultimage_config();
+        $files = $fs->get_area_files(
+            $context->id,
+            'course',
+            'defaultimage',
+            false,
+            'itemid, filepath, filename',
+            false
+        );
+
+        $this->assertCount(1, $files);
+
+        $file = reset($files);
+        $this->assertEquals($storedfile, $file);
+    }
 }
