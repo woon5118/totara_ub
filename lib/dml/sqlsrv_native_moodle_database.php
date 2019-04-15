@@ -41,7 +41,8 @@ class sqlsrv_native_moodle_database extends moodle_database {
 
     protected $sqlsrv = null;
     protected $last_error_reporting; // To handle SQL*Server-Native driver default verbosity
-    protected $temptables; // Control existing temptables (sqlsrv_moodle_temptables object)
+    /** @var sqlsrv_native_moodle_temptables */
+    protected $temptables; // Control existing temptables
     protected $collation;  // current DB collation cache
     /**
      * Does the used db version support ANSI way of limiting (2012 and higher)
@@ -344,18 +345,18 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @return string sql
      */
     protected function fix_table_names($sql) {
-        if (preg_match_all('/\{([a-z][a-z0-9_]*)\}/i', $sql, $matches)) {
-            foreach ($matches[0] as $key => $match) {
-                $name = $matches[1][$key];
-
-                if ($this->temptables->is_temptable($name)) {
-                    $sql = str_replace($match, $this->temptables->get_correct_name($name), $sql);
-                } else {
-                    $sql = str_replace($match, $this->prefix.$name, $sql);
-                }
+        $sql = preg_replace('/"ttr_([a-z][a-z0-9_]*)"/', '{$1}', $sql);
+        $temptables = $this->temptables;
+        $prefix = $this->prefix;
+        $replacer = function ($matches) use ($temptables, $prefix) {
+            $name = $matches[1];
+            if ($temptables->is_temptable($name)) {
+                return $temptables->get_correct_name($name);
+            } else {
+                return $prefix . $name;
             }
-        }
-        return $sql;
+        };
+        return preg_replace_callback('/{([a-z][a-z0-9_]*)}/', $replacer, $sql);
     }
 
     /**

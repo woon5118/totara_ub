@@ -897,11 +897,17 @@ abstract class moodle_database {
 
     /**
      * Converts short table name {tablename} to the real prefixed table name in given sql.
+     *
+     * Totara: we also support ANSI style quoted table names "ttr_tablename",
+     *         this allows devs to use PhpStorm tools if they set the dev DB prefix to 'ttr_'.
+     *
      * @param string $sql The sql to be operated on.
      * @return string The sql with tablenames being prefixed with $CFG->prefix
      */
     protected function fix_table_names($sql) {
-        return preg_replace('/\{([a-z][a-z0-9_]*)\}/', $this->prefix.'$1', $sql);
+        $sql = preg_replace('/"ttr_([a-z][a-z0-9_]*)"/', '{$1}', $sql);
+        $sql = preg_replace('/{([a-z][a-z0-9_]*)}/', $this->prefix.'$1', $sql);
+        return $sql;
     }
 
     /**

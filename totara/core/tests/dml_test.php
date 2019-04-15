@@ -2182,4 +2182,29 @@ ORDER BY tt1.groupid";
 
         $dbman->drop_table($table);
     }
+
+    public function test_ttr_table_names() {
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        $sql = 'SELECT id, fullname FROM "ttr_course"';
+        $courses = $DB->get_records_sql($sql);
+        $this->assertCount(1, $courses);
+
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_temp_table($table);
+
+        $todb = new stdClass();
+        $todb->name = "1234567890";
+        $DB->insert_record('test_table', $todb);
+
+        $sql = 'SELECT id, name FROM "ttr_test_table"';
+        $tests = $DB->get_records_sql($sql);
+        $this->assertCount(1, $tests);
+
+        $dbman->drop_table($table);
+    }
 }
