@@ -447,7 +447,8 @@ class grade_report_user extends grade_report {
                 if (!empty($instances[$grade_object->iteminstance])) {
                     $cm = $instances[$grade_object->iteminstance];
                     $gradeitemdata['cmid'] = $cm->id;
-                    if (!$cm->uservisible) {
+                    // Totara: Explicitly check the visibility of an activity instead of cached uservisible property.
+                    if (! \core_availability\info_module::is_user_visible($cm)) {
                         // If there is 'availableinfo' text then it is only greyed
                         // out and not entirely hidden.
                         if (!$cm->availableinfo) {
