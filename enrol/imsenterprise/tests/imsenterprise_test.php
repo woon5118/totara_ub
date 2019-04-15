@@ -1082,7 +1082,8 @@ class enrol_imsenterprise_testcase extends advanced_testcase {
 </enterprise>';
 
         // Creating the XML file.
-        $filename = 'ims_' . rand(1000, 9999) . '.xml';
+        static $i = 1000;
+        $filename = 'ims_' . ($i++) . '.xml'; // Totara: make 100% sure a new file is always created.
         $tmpdir = make_temp_directory('enrol_imsenterprise');
         $xmlfilepath = $tmpdir . '/' . $filename;
         file_put_contents($xmlfilepath, $xmlcontent);
