@@ -669,30 +669,30 @@ function grade_get_grades($courseid, $itemtype, $itemmodule, $iteminstance, $use
 function grade_get_setting($courseid, $name, $default=null, $resetcache=false) {
     global $DB;
 
-    static $cache = array();
-
-    if ($resetcache or !array_key_exists($courseid, $cache)) {
-        $cache[$courseid] = array();
-
-    } else if (is_null($name)) {
+    if (!$courseid) {
         return null;
-
-    } else if (array_key_exists($name, $cache[$courseid])) {
-        return $cache[$courseid][$name];
     }
 
-    if (!$data = $DB->get_record('grade_settings', array('courseid'=>$courseid, 'name'=>$name))) {
-        $result = null;
-    } else {
-        $result = $data->value;
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'core_grade', 'grade_setting');
+    if ($resetcache) {
+        $cache->delete($courseid);
     }
 
-    if (is_null($result)) {
-        $result = $default;
+    if (is_null($name)) {
+        return null;
     }
 
-    $cache[$courseid][$name] = $result;
-    return $result;
+    $settings = $cache->get($courseid);
+    if ($settings === false) {
+        $settings = $DB->get_records_menu('grade_settings', array('courseid' => $courseid), '', 'name, value');
+        $cache->set($courseid, $settings);
+    }
+
+    if (isset($settings[$name])) {
+        return $settings[$name];
+    }
+
+    return $default;
 }
 
 /**
