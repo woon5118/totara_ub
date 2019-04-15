@@ -1361,27 +1361,17 @@ Tour.prototype.positionBackdrop = function (stepConfig) {
                 colorNode = $('body');
             }
 
+            // Calculate the background of the targeted node, and bring it forward so that
+            // it stands out against the background correctly
+            targetNode.css('backgroundColor', this.calculateInherittedBackgroundColor(targetNode));
+
             background.css({
                 width: targetNode.outerWidth() + buffer + buffer,
                 height: targetNode.outerHeight() + buffer + buffer,
-                left: targetNode.offset().left - buffer,
-                top: targetNode.offset().top - buffer,
+                left: targetNode.position().left - buffer,
+                top: targetNode.position().top - buffer,
                 backgroundColor: this.calculateInherittedBackgroundColor(colorNode)
             });
-
-            if (targetNode.offset().left < buffer) {
-                background.css({
-                    width: targetNode.outerWidth() + targetNode.offset().left + buffer,
-                    left: targetNode.offset().left
-                });
-            }
-
-            if (targetNode.offset().top < buffer) {
-                background.css({
-                    height: targetNode.outerHeight() + targetNode.offset().top + buffer,
-                    top: targetNode.offset().top
-                });
-            }
 
             var targetRadius = targetNode.css('borderRadius');
             if (targetRadius && targetRadius !== $('body').css('borderRadius')) {
