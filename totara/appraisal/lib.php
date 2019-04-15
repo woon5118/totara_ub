@@ -666,14 +666,17 @@ class appraisal {
             //     AS "triggered". The event would not fire again.
             //   - This method must then send out notifications to the newly
             //     assigned appraisees.
+            //
+            // Complicating the mess even further, the UI allows the admin to
+            // define multiple, independent message "instances" for a single
+            // activation. So it is possible for the appraisee to get multiple
+            // emails about the same appraisal activation.
             $filters = [
                 'event' => appraisal_message::EVENT_APPRAISAL_ACTIVATION,
                 'appraisalid' => $this->id,
                 'triggered' => true
             ];
-            $event = $DB->get_record("appraisal_event", $filters);
-
-            if ($event) {
+            foreach ($DB->get_records("appraisal_event", $filters) as $event) {
                 $msg = new appraisal_message($event->id);
                 $msg->event_appraisal($this->id);
 
@@ -5226,16 +5229,21 @@ class appraisal_message {
                         $eventdata->fullmessagehtml   = html_writer::tag('pre', $messagecontent);
                         $eventdata->smallmessage      = $messagecontent;
 
-                        // Send the message, preventing duplicates. E.g. If someone is a manager and appraiser and there are two
-                        // different messages set up then they will receive one of each type. If someone has multiple roles with
-                        // all roles set to the same message then they will only receive one message.
-                        if (!isset($sentaddress[$rcpt->email]) || !in_array($message->id, $sentaddress[$rcpt->email])) {
-                            tm_alert_send($eventdata);
 
-                            if (!isset($sentaddress[$rcpt->email])) {
-                                $sentaddress[$rcpt->email] = array();
-                            }
-                            $sentaddress[$rcpt->email][] = $message->id;
+                        // Send the message, preventing duplicates. "Duplicate" here refers not only to the
+                        // recipient email and message type but _also of the final message content_. For example
+                        // if the message content is the same for all roles, then each role will only receive one
+                        // email each for a given message type. If the content differs (eg the learner name changes
+                        // each time), then each role will get multiple, distinct emails for the same message type.
+                        //
+                        // Also, this method does not record details about sent emails. That means that duplicate
+                        // emails will never be sent *during an invocation* but may be sent *across* invocations.
+                        $hash = md5(sprintf(
+                            '%s/%d/%s/%s', $rcpt->email, $message->id, $messagesubject, $messagecontent
+                        ));
+                        if (!in_array($hash, $sentaddress)) {
+                            $sentaddress[] = $hash;
+                            tm_alert_send($eventdata);
                         }
                     }
                 }
@@ -6312,14 +6320,18 @@ class appraisal_user_assignment {
         //     never fire again.
         //   - Therefore this method must send out notifications to managers when
         //     the appraisee finally selects a job assignment.
+        //
+        // Complicating the mess even further, the UI allows the admin to define
+        // multiple, independent message "instances" for a single activation. So
+        // it is possible for the manager to get multiple emails about a single
+        // activation; some about his appraisees, others just because the admin
+        // defined multiple message instances.
         $filters = [
             'event' => appraisal_message::EVENT_APPRAISAL_ACTIVATION,
             'appraisalid' => $this->appraisalid,
             'triggered' => true
         ];
-        $event = $DB->get_record("appraisal_event", $filters);
-
-        if ($event) {
+        foreach ($DB->get_records("appraisal_event", $filters) as $event) {
             $eventmessage = new appraisal_message($event->id);
             $eventmessage->send_user_specific_message($this->userid, true);
         }
