@@ -174,6 +174,7 @@ final class attendees_helper {
 
         $sql = "
             SELECT u.id,
+            u.username,
             u.idnumber,
             {$usernamefields},
             u.email,
@@ -249,6 +250,7 @@ final class attendees_helper {
         $sql = "
             SELECT u.id,
             u.idnumber,
+            u.username,
             {$usernamefields},
             u.email,
             u.deleted,
@@ -367,7 +369,7 @@ final class attendees_helper {
      * @param bool $allbooked
      * @return array
      */
-    public static function get_status($allbooked = false) {
+    public static function get_status(bool $allbooked = false): array {
 
         $statecodes = \mod_facetoface\signup\state\attendance_state::get_all_attendance_code_with([ not_set::class ]);
         if ($allbooked) {
@@ -387,9 +389,11 @@ final class attendees_helper {
 
     /**
      * Prepare exit as session id is missed.
+     *
      * @param string $page
+     * @return void
      */
-    public static function process_no_sessionid(string $page = 'view') {
+    public static function process_no_sessionid(string $page = 'view'): void {
         global $PAGE, $OUTPUT;
 
         require_login();
@@ -414,11 +418,12 @@ final class attendees_helper {
     /**
      * Process JavaScript.
      *
-     * @param $action
+     * @param string $action
      * @param seminar $seminar
      * @param seminar_event $seminar_event
+     * @return void
      */
-    public static function process_js($action, seminar $seminar, seminar_event $seminar_event) {
+    public static function process_js(string $action, seminar $seminar, seminar_event $seminar_event): void {
         global $PAGE;
 
         local_js(
@@ -472,12 +477,12 @@ final class attendees_helper {
      *
      * @param seminar $seminar
      * @param seminar_event $seminarevent
-     * @param $context
-     * @param $session - deprecated, do not use
+     * @param \context $context
+     * @param null $session - deprecated, do not use
      * @return array
      */
     public static function get_allowed_available_actions(\mod_facetoface\seminar $seminar,
-        \mod_facetoface\seminar_event $seminarevent, $context, $session = null) {
+        \mod_facetoface\seminar_event $seminarevent, \context $context, string $session = null): array {
         global $USER, $DB, $CFG;
         /**
          * Capability checks to see if the current user can view this page
@@ -744,12 +749,12 @@ final class attendees_helper {
     /**
      * Load report builder for seminar attendees.
      *
-     * @param $shortname
-     * @param $attendancestatuses
+     * @param string $shortname
+     * @param array $attendancestatuses
      * @param array $extradata
      * @return \reportbuilder
      */
-    public static function load_report($shortname, $attendancestatuses, $extradata = []) {
+    public static function load_report(string $shortname, array $attendancestatuses, array $extradata = []): \reportbuilder {
         global $DB, $PAGE;
 
         $s = optional_param('s', 0, PARAM_INT);
@@ -783,11 +788,12 @@ final class attendees_helper {
 
     /**
      * Print seminar customfields.
-     * @param seminar_event $seminarevent
      *
+     * @param seminar_event $seminarevent
+     * @return void
      * @deprecated since Totara 13
      */
-    public static function show_customfields(seminar_event $seminarevent) {
+    public static function show_customfields(seminar_event $seminarevent): void {
         global $PAGE;
 
         debugging('attendees_helper::show_customfields() function has been deprecated, please use mod_facetoface_renderer::render_seminar_event()',
@@ -802,10 +808,11 @@ final class attendees_helper {
      * Show message if event is overbooked.
      *
      * @param seminar_event $seminarevent
-     * @param integer       $status         deprecated
+     * @param int       $status         deprecated
      * @param string        $comp           deprecated
+     * @return void
      */
-    public static function is_overbooked(seminar_event $seminarevent, $status = null, $comp = '') {
+    public static function is_overbooked(seminar_event $seminarevent, int $status = null, string $comp = ''): void {
         global $OUTPUT;
 
         $items = [
@@ -843,9 +850,10 @@ final class attendees_helper {
      * Print export form.
      *
      * @param \reportbuilder $report
-     * @param $sid
+     * @param int $sid
+     * @return void
      */
-    public static function report_export_form(\reportbuilder $report, $sid) {
+    public static function report_export_form(\reportbuilder $report, int $sid):void {
         global $PAGE, $OUTPUT;
 
         $renderer = $PAGE->get_renderer('totara_reportbuilder');

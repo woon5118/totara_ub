@@ -23,9 +23,20 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use \mod_facetoface\{seminar, seminar_event, seminar_session, signup};
+use \mod_facetoface\{attendees_helper, seminar, seminar_event, seminar_session, signup};
+use \mod_facetoface\attendance\event_attendee;
 
 class mod_facetoface_code_quality_testcase extends advanced_testcase {
+
+    private $tested_classes = [
+        attendees_helper::class,
+        event_attendee::class,
+        seminar::class,
+        seminar_event::class,
+        seminar_session::class,
+        signup::class,
+    ];
+
     /**
      * Inspect the docblock of a class and return either 'OK' or errors
      *
@@ -118,11 +129,11 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
                         $prototype = $method->getPrototype();
                         $prototype_parameters = $prototype->getParameters();
                         if ($prototype_parameters != $parameters) {
-                            $errors[] = "No method docblock for {$method->getName()}, which extends {$prototype->getDeclaringClass()}::{$prototype->getName()} but has different parameters";
+                            $errors[] = "No method docblock for {$method->class}::{$method->getName()}(), which extends {$prototype->getDeclaringClass()}::{$prototype->getName()}() but has different parameters";
                         }
                     } catch (\ReflectionException $e) {
                         // There is a ReflectionException thrown if the method does not have a prototype.
-                        $errors[] = "No method docblock for {$method->class}::{$method->getName()}";
+                        $errors[] = "No method docblock for {$method->class}::{$method->getName()}()";
                     }
                 } else {
                     foreach ($parameters as $parameter) {
@@ -137,7 +148,7 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
                          */
                         $pattern = '/@param [^\s]+\s+(\.\.\.|)\$'.$parameter->getName().'\W/';
                         if (preg_match($pattern, $docblock) != 1) {
-                            $errors[] = "Method {$method->getName()} docblock missing @param declaration for {$parameter->getName()} using pattern $pattern";
+                            $errors[] = "Method {$method->class}::{$method->getName()}() docblock missing @param declaration for {$parameter->getName()}";
                         }
                     }
                 }
@@ -269,21 +280,21 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
     public function test_core_seminar_classes(): void {
         $this->resetAfterTest();
 
-        foreach (['seminar', 'seminar_event', 'seminar_session', 'signup'] as $classname) {
-            $result = $this->inspect_class_docblock('\mod_facetoface\\'.$classname);
-            $this->assertEquals('OK', $result, "Problem with {$classname} class docblock");
+        foreach ($this->tested_classes as $class) {
+            $result = $this->inspect_class_docblock($class);
+            $this->assertEquals('OK', $result, "Problem with {$class} class docblock");
 
-            $result = $this->inspect_property_docblocks('\mod_facetoface\\'.$classname);
-            $this->assertEquals('OK', $result, "Problem with {$classname} property docblocks");
+            $result = $this->inspect_property_docblocks($class);
+            $this->assertEquals('OK', $result, "Problem with {$class} property docblocks");
 
-            $result = $this->inspect_method_docblocks('\mod_facetoface\\'.$classname);
-            $this->assertEquals('OK', $result, "Problem with {$classname} method docblocks");
+            $result = $this->inspect_method_docblocks($class);
+            $this->assertEquals('OK', $result, "Problem with {$class} method docblocks");
 
-            $result = $this->inspect_method_parameter_hints('\mod_facetoface\\'.$classname);
-            $this->assertEquals('OK', $result, "Problem with {$classname} method docblocks");
+            $result = $this->inspect_method_parameter_hints($class);
+            $this->assertEquals('OK', $result, "Problem with {$class} method docblocks");
 
-            $result = $this->inspect_method_return_hints('\mod_facetoface\\'.$classname);
-            $this->assertEquals('OK', $result, "Problem with {$classname} method docblocks");
+            $result = $this->inspect_method_return_hints($class);
+            $this->assertEquals('OK', $result, "Problem with {$class} method docblocks");
         }
     }
 

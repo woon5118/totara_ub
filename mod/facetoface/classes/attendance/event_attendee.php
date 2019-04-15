@@ -38,6 +38,8 @@ final class event_attendee extends \stdClass {
 
     /** @var int {user}.id */
     public $id = 0;
+    /** @var string {user}.username */
+    public $username = '';
     /** @var string {user}.idnumber */
     public $idnumber = '';
     /** @var string {user}.email */
@@ -109,7 +111,7 @@ final class event_attendee extends \stdClass {
      * @param \stdClass $object
      * @return event_attendee
      */
-    protected function map_object(\stdClass $object) {
+    protected function map_object(\stdClass $object): event_attendee {
         foreach ((array)$object as $property => $value) {
             if (property_exists($this, $property)) {
                 $this->{$property} = $value;
@@ -134,6 +136,13 @@ final class event_attendee extends \stdClass {
      */
     public function get_id(): int {
         return (int) $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_username(): string {
+        return (string) $this->username;
     }
 
     /**
