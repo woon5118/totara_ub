@@ -603,4 +603,15 @@ final class signup_helper {
 
         return $managers;
     }
+
+    /**
+     * Get user details.
+     * @param int $userid
+     * @return stdClass
+     */
+    public static function get_user_details(int $userid): \stdClass {
+        global $DB;
+
+        return $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+    }
 }

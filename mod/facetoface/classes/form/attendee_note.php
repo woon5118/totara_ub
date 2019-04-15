@@ -31,27 +31,30 @@ class attendee_note extends \moodleform {
     public function definition() {
 
         $mform = & $this->_form;
-        $attendeenote = $this->_customdata['attendeenote'];
-        $userfullname = fullname($attendeenote);
+        $signup = $this->_customdata['signup'];
+        $id = $signup->get_id();
+        $userid = $signup->get_userid();
+        $sessionid = $signup->get_sessionid();
 
+        $user = \mod_facetoface\signup_helper::get_user_details($userid);
+        $userfullname = fullname($user);
         $mform->addElement('header', 'usernoteheader', get_string('usernoteheading', 'facetoface', $userfullname));
 
-        $mform->addElement('hidden', 'id');
+        $mform->addElement('hidden', 'id', $id);
         $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $attendeenote->submissionid);
 
-        $mform->addElement('hidden', 'userid', $this->_customdata['userid']);
+        $mform->addElement('hidden', 'userid', $userid);
         $mform->setType('userid', PARAM_INT);
 
-        $mform->addElement('hidden', 's', $this->_customdata['s']);
+        $mform->addElement('hidden', 's', $sessionid);
         $mform->setType('s', PARAM_INT);
 
         $mform->addElement('hidden', 'return', $this->_customdata['return']);
         $mform->setType('return', PARAM_ALPHA);
 
-        $signup = new \stdClass();
-        $signup->id = $attendeenote->submissionid;
-        customfield_definition($mform, $signup, 'facetofacesignup', 0, 'facetoface_signup');
+        $item = new \stdClass();
+        $item->id = $id;
+        customfield_definition($mform, $item, 'facetofacesignup', 0, 'facetoface_signup');
         $mform->removeElement('customfields');
 
         $submittitle = get_string('savenote', 'facetoface');

@@ -57,13 +57,10 @@ $attendeenote = new stdClass();
 $attendeenote->userid = $signup->get_userid();
 $attendeenote->id = $signup->get_id();
 $attendeenote->sessionid = $sessionid;
-$attendeenote->sessionid = $sessionid;
 customfield_load_data($attendeenote, 'facetofacesignup', 'facetoface_signup');
 $params = [
-    's' => $sessionid,
-    'userid' => $userid,
     'return' => $return,
-    'attendeenote' => $attendeenote
+    'signup' => $signup
 ];
 $mform = new \mod_facetoface\form\attendee_note(null, $params);
 $mform->set_data($attendeenote);

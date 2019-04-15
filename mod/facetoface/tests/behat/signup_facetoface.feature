@@ -92,7 +92,11 @@ Feature: Sign up to a seminar
     And I wait "1" seconds
     Then I should not see "German"
     And I should see "English content"
-    And I click on ".closebutton" "css_element"
+    And I press "Edit"
+    And I set the following fields to these values:
+      | customfield_signupnote | Lorem ipsum dolor sit amet |
+    And I press "Save note"
+    And "Sam1 Student1" row "Requests for session organiser" column of "facetoface_sessions" table should contain "Lorem ipsum dolor sit amet"
     And I log out
 
   Scenario: Sign up to a session and unable to sign up to a full session from the course page

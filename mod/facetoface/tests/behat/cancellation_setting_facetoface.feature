@@ -76,6 +76,11 @@ Feature: Cancellation for session
     And I should see "Show cancellation reason"
     And I click on "a.attendee-cancellation-note" "css_element"
     And I should see "Sam1 Student1 - Cancellation note"
+    And I press "Edit"
+    And I set the following fields to these values:
+      | customfield_cancellationnote | Lorem ipsum dolor sit amet |
+    And I press "Save note"
+    And "Sam1 Student1" row "Cancellation note" column of "facetoface_cancellations" table should contain "Lorem ipsum dolor sit amet"
     And I am on homepage
     And I log out
 

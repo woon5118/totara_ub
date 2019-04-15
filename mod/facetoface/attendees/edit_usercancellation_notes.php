@@ -57,13 +57,13 @@ if (!$signup->exists()) {
         "No user with ID: {$USER->id} has signed-up for the Seminar event ID: {$seminarevent->get_id()}."
     );
 }
-
+$attendeenote = new stdClass();
 $attendeenote->userid = $userid;
 $attendeenote->id = $signup->get_id();
 $attendeenote->sessionid = $sessionid;
 customfield_load_data($attendeenote, 'facetofacecancellation', 'facetoface_cancellation');
 
-$mform = new \mod_facetoface\form\cancellation_note(null, array('s' => $sessionid, 'userid' => $userid, 'attendeenote' => $attendeenote));
+$mform = new \mod_facetoface\form\cancellation_note(null, ['signup' => $signup]);
 $mform->set_data($attendeenote);
 
 if ($mform->is_cancelled()) {

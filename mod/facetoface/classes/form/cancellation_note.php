@@ -30,23 +30,26 @@ class cancellation_note extends \moodleform {
     public function definition() {
 
         $mform = & $this->_form;
-        $attendeenote = $this->_customdata['attendeenote'];
-        $userfullname = fullname($attendeenote);
+        $signup = $this->_customdata['signup'];
+        $id = $signup->get_id();
+        $userid = $signup->get_userid();
+        $sessionid = $signup->get_sessionid();
 
+        $user = \mod_facetoface\signup_helper::get_user_details($userid);
+        $userfullname = fullname($user);
         $mform->addElement('header', 'usernoteheader', get_string('usercancellationnoteheading', 'facetoface', $userfullname));
 
-        $mform->addElement('hidden', 'id');
+        $mform->addElement('hidden', 'id', $id);
         $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $attendeenote->submissionid);
 
-        $mform->addElement('hidden', 'userid', $this->_customdata['userid']);
+        $mform->addElement('hidden', 'userid', $userid);
         $mform->setType('userid', PARAM_INT);
 
-        $mform->addElement('hidden', 's', $this->_customdata['s']);
+        $mform->addElement('hidden', 's', $sessionid);
         $mform->setType('s', PARAM_INT);
 
         $cancellation = new \stdClass();
-        $cancellation->id = $attendeenote->submissionid;
+        $cancellation->id = $id;
         customfield_definition($mform, $cancellation, 'facetofacecancellation', 0, 'facetoface_cancellation');
         $mform->removeElement('customfields');
 
