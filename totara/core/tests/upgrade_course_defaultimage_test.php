@@ -44,7 +44,6 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
             'filearea' => 'defaultimage',
             'filepath' => '/',
             'filename' => 'hello_world.png',
-            'mimetype' => 'png',
             'itemid' => 999,
             'license' => 'public'
         ];
@@ -111,12 +110,10 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
         $record->contextid = $context->id;
         $record->component = 'course';
         $record->filearea = 'defaultimage';
-        $record->filesize = 1024;
         $record->itemid = 0;
         $record->filepath = '/';
         $record->filename = 'hello_world.png';
         $record->userid = $USER->id;
-        $record->mimetype = 'png';
         $record->author = 'Bolobala';
         $record->license = 'public';
 
@@ -170,11 +167,9 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
             $record->userid = $USER->id;
             $record->component = 'course';
             $record->filearea = 'defaultimage';
-            $record->filesize = 1024;
             $record->itemid = $itemid;
             $record->filepath = '/';
             $record->filename = uniqid('file_') . 'png';
-            $record->mimetype = 'png';
             $record->author = 'Bolobala';
             $record->license = 'public';
             $record->timemodified = $time;
@@ -227,11 +222,9 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
         $record->userid = $USER->id;
         $record->component = 'course';
         $record->filearea = 'defaultimage';
-        $record->filesize = 1024;
         $record->itemid = 1920;
         $record->filepath = '/';
         $record->filename = 'hello_world1.png';
-        $record->mimetype = 'png';
         $record->license = 'public';
         $record->timemodified = time();
 
@@ -243,11 +236,9 @@ class totara_core_upgrade_course_defaultimage_testcase extends advanced_testcase
         $record2->userid = $USER->id;
         $record2->component = 'course';
         $record2->filearea = 'defaultimage';
-        $record2->filesize = 1080;
         $record2->itemid = 0;
         $record2->filepath = '/';
         $record2->filename = 'hello_world2.png';
-        $record2->mimetype = 'png';
         $record2->license = 'public';
         $record2->timemodified = time() + 3600;
 

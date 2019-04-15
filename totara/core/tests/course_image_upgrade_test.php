@@ -54,12 +54,10 @@ class totara_core_course_image_upgrade_testcase extends advanced_testcase {
             $rc->contextid = $ctx->id;
             $rc->component = 'course';
             $rc->filearea = 'images';
-            $rc->filesize = rand(0, 120);
             $rc->itemid = $course->id;
             $rc->filepath = '/';
             $rc->filename = uniqid('file_');
             $rc->userid = $USER->id;
-            $rc->mimetype = 'png';
             $rc->author = 'Bolobala';
             $rc->license = 'public';
 
