@@ -90,8 +90,9 @@ if ($form->is_cancelled()) {
 
         // Update all activities with notifications base off this template.
         if ($data->updateactivities) {
-            $sql = "UPDATE {facetoface_notification} SET title = ?, body = ?, ccmanager = ?, managerprefix = ?, status = ? WHERE templateid = ?";
-            $params = array($data->title, $data->body, $data->ccmanager, $data->managerprefix, $data->status, $data->id);
+            // Do not update 'Status' value as some seminar notifications might be disabled.
+            $sql = "UPDATE {facetoface_notification} SET title = ?, body = ?, ccmanager = ?, managerprefix = ? WHERE templateid = ?";
+            $params = array($data->title, $data->body, $data->ccmanager, $data->managerprefix, $data->id);
 
             $DB->execute($sql, $params);
         }

@@ -74,6 +74,9 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
                     $('input#id_title').val(templates[current].title);
                     $('textarea#id_body_editor').val(templates[current].body);
 
+                    var isChecked = !!Number(templates[current].ccmanager);
+                    $('input#id_ccmanager').prop('checked', isChecked);
+
                     var templatecontent = "";
                     if (templates[current].managerprefix) {
                         templatecontent = templates[current].managerprefix;
@@ -83,6 +86,7 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
                 } else {
                     $('input#id_title').val('');
                     $('textarea#id_body_editor').val('');
+                    $('input#id_ccmanager').prop('checked', false);
                     $('textarea#id_managerprefix_editor').val('');
                 }
                 // Try to update editor
