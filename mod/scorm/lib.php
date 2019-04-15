@@ -165,6 +165,7 @@ function scorm_add_instance($scorm, $mform=null) {
     scorm_parse($record, true);
 
     scorm_grade_item_update($record);
+    scorm_grade_item_gradepass_update($record);
 
     return $record->id;
 }
@@ -258,6 +259,7 @@ function scorm_update_instance($scorm, $mform=null) {
     scorm_parse($scorm, (bool)$scorm->updatefreq);
 
     scorm_grade_item_update($scorm);
+    scorm_grade_item_gradepass_update($scorm);
     scorm_update_grades($scorm);
 
     return true;
@@ -711,6 +713,37 @@ function scorm_grade_item_delete($scorm) {
     require_once($CFG->libdir.'/gradelib.php');
 
     return grade_update('mod/scorm', $scorm->course, 'mod', 'scorm', $scorm->id, 0, null, array('deleted' => 1));
+}
+
+/**
+ * Update the grade item gradepass if it changed via mod_form.php
+ *
+ * We must do it manually here because modedit supports only standard grade
+ * items from the grading section while SCORM handles its own required score to pass.
+ *
+ * @since Totara 13
+ * @param stdClass $scorm An object from the form in mod_form.php
+ */
+function scorm_grade_item_gradepass_update($scorm) {
+    $gradeitem = grade_item::fetch(
+        [
+            'itemtype'     => 'mod',
+            'itemmodule'   => 'scorm',
+            'iteminstance' => $scorm->id,
+            'courseid'     => $scorm->course,
+        ]
+    );
+
+    if (!empty($gradeitem)) {
+        if (isset($scorm->completionscorerequired) &&
+            $gradeitem->gradepass != $scorm->completionscorerequired) {
+            $gradeitem->gradepass = $scorm->completionscorerequired;
+            $gradeitem->update();
+        } else if (!isset($scorm->completionscorerequired) && !empty($gradeitem->gradepass)) {
+            $gradeitem->gradepass = 0;
+            $gradeitem->update();
+        }
+    }
 }
 
 /**
@@ -1278,7 +1311,7 @@ function scorm_get_completion_requirements($cm) {
  * @return string The current status of completion for the user
  */
 function scorm_get_completion_progress($cm, $userid) {
-    global $DB;
+    global $DB, $CFG;
 
     // Get scorm details.
     if (!$scorm = $DB->get_record('scorm', array('id' => $cm->instance))) {
@@ -1286,9 +1319,9 @@ function scorm_get_completion_progress($cm, $userid) {
     }
 
     $result = array();
+    $scoreachieved = '';
 
-    if ($scorm->completionstatusrequired !== null ||
-        $scorm->completionscorerequired !== null) {
+    if ($scorm->completionstatusrequired !== null || $scorm->completionscorerequired !== null) {
         // Get user's tracks data.
         $tracks = $DB->get_records_sql(
             "SELECT id, element, value
@@ -1304,7 +1337,29 @@ function scorm_get_completion_progress($cm, $userid) {
                 )", array($scorm->id, $userid)
         );
 
+        // Totara: grade may be added manually, we want to check and show this in user's progress.
+        if ($scorm->completionscorerequired !== null) {
+            require_once($CFG->libdir . '/gradelib.php');
+            $item = grade_item::fetch(
+                [
+                    'courseid'     => $scorm->course,
+                    'itemtype'     => 'mod',
+                    'itemmodule'   => 'scorm',
+                    'iteminstance' => $cm->instance,
+                ]
+            );
+            if (!empty($item)) {
+                $grades = grade_grade::fetch_users_grades($item, [$userid], false);
+                if (!empty($grades[$userid])) {
+                    $scoreachieved = get_string('scoreachieved', 'scorm', intval($grades[$userid]->finalgrade));
+                }
+            }
+        }
+
         if (!$tracks) {
+            if (!empty($scoreachieved)) {
+                $result[] = $scoreachieved;
+            }
             return $result;
         }
     }
@@ -1334,19 +1389,23 @@ function scorm_get_completion_progress($cm, $userid) {
 
     // Check for score.
     if ($scorm->completionscorerequired !== null) {
-        $maxscore = -1;
+        if (!empty($scoreachieved)) {
+            $result[] = $scoreachieved;
+        } else {
+            $maxscore = -1;
 
-        foreach ($tracks as $track) {
-            if (!in_array($track->element, array('cmi.core.score.raw', 'cmi.score.raw'))) {
-                continue;
+            foreach ($tracks as $track) {
+                if (!in_array($track->element, array('cmi.core.score.raw', 'cmi.score.raw'))) {
+                    continue;
+                }
+                if (strlen($track->value) && floatval($track->value) >= $maxscore) {
+                    $maxscore = floatval($track->value);
+                }
             }
-            if (strlen($track->value) && floatval($track->value) >= $maxscore) {
-                $maxscore = floatval($track->value);
-            }
-        }
 
-        if ($maxscore > -1) {
-            $result[] = get_string('scoreachieved', 'scorm', $maxscore);
+            if ($maxscore > -1) {
+                $result[] = get_string('scoreachieved', 'scorm', $maxscore);
+            }
         }
     }
 
@@ -1365,9 +1424,10 @@ function scorm_get_completion_progress($cm, $userid) {
  *   value depends on comparison type)
  */
 function scorm_get_completion_state($course, $cm, $userid, $type) {
-    global $DB;
+    global $DB, $CFG;
 
     $result = $type;
+    $gradepassed = null;
 
     // Get scorm.
     if (!$scorm = $DB->get_record('scorm', array('id' => $cm->instance))) {
@@ -1402,7 +1462,34 @@ function scorm_get_completion_state($course, $cm, $userid, $type) {
             array($scorm->id, $userid)
         );
 
+        // Totara: there are no track, but grade may be added manually, we want to check that.
+        if ($scorm->completionscorerequired !== null) {
+            require_once($CFG->libdir . '/gradelib.php');
+            $item = grade_item::fetch(
+                [
+                    'courseid'     => $course->id,
+                    'itemtype'     => 'mod',
+                    'itemmodule'   => 'scorm',
+                    'iteminstance' => $cm->instance,
+                ]
+            );
+            if (!empty($item)) {
+                $grades = grade_grade::fetch_users_grades($item, array($userid), false);
+                if (!empty($grades[$userid])) {
+                    $gradepassed = $grades[$userid]->is_passed($item);
+                }
+            }
+        }
+
         if (!$tracks) {
+            if (!is_null($gradepassed)) {
+                if ($scorm->completionstatusrequired !== null) {
+                    // If status is also required, we have to continue calculations.
+                    $result &= completion_info::aggregate_completion_states($type, $result, $gradepassed);
+                } else {
+                    return completion_info::aggregate_completion_states($type, $result, $gradepassed);
+                }
+            }
             return completion_info::aggregate_completion_states($type, $result, false);
         }
     }
@@ -1443,22 +1530,28 @@ function scorm_get_completion_state($course, $cm, $userid, $type) {
 
     // Check for score.
     if ($scorm->completionscorerequired !== null) {
-        $maxscore = -1;
-
-        foreach ($tracks as $track) {
-            if (!in_array($track->element, array('cmi.core.score.raw', 'cmi.score.raw'))) {
-                continue;
-            }
-
-            if (strlen($track->value) && floatval($track->value) >= $maxscore) {
-                $maxscore = floatval($track->value);
-            }
-        }
-
-        if ($scorm->completionscorerequired <= $maxscore) {
-            $result &= completion_info::aggregate_completion_states($type, $result, true);
+        // If we already have a passing grade, let's exit here.
+        // If not, we'll loop through our tracks to check what the grade is.
+        if ($gradepassed) {
+            return completion_info::aggregate_completion_states($type, $result, true);
         } else {
-            return completion_info::aggregate_completion_states($type, $result, false);
+            $maxscore = -1;
+
+            foreach ($tracks as $track) {
+                if (!in_array($track->element, array('cmi.core.score.raw', 'cmi.score.raw'))) {
+                    continue;
+                }
+
+                if (strlen($track->value) && floatval($track->value) >= $maxscore) {
+                    $maxscore = floatval($track->value);
+                }
+            }
+
+            if ($scorm->completionscorerequired <= $maxscore) {
+                $result &= completion_info::aggregate_completion_states($type, $result, true);
+            } else {
+                return completion_info::aggregate_completion_states($type, $result, false);
+            }
         }
     }
 
