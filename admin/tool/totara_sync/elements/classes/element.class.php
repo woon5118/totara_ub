@@ -301,7 +301,7 @@ abstract class totara_sync_element {
 
         $dateformat = get_string('strftimedateseconds', 'langconfig');
 
-        if (empty($this->config->notificationusedefaults)) {
+        if (isset($this->config->notificationusedefaults) && empty($this->config->notificationusedefaults)) {
             $notifymailto = !empty($this->config->notifymailto) ? explode(',', $this->config->notifymailto) : [];
             $notifytypes = !empty($this->config->notifytypes) ? explode(',', $this->config->notifytypes) : [];
         } else {
