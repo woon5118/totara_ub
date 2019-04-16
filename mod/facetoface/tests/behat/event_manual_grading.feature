@@ -73,7 +73,7 @@ Feature: Event manual grading
     And I should see "50.00" in the "Two Duex" "table_row"
     And I should see "0.00" in the "Three Toru" "table_row"
     And I should see "0.00" in the "Four Wha" "table_row"
-    And I should see "0.00" in the "Five Cinq" "table_row"
+    And I should see "-" in the "Five Cinq" "table_row"
     And I should not see "Six Sechs" in the "#user-grades" "css_element"
 
   Scenario: Take attendance and leave event grades as blank

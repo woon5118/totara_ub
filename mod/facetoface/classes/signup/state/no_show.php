@@ -65,10 +65,9 @@ class no_show extends attendance_state {
     /**
      * Get the grade value associated with the state.
      *
-     * @return int
+     * @return int|null
      */
-    public static function get_grade() : int {
-        // This is technically a graded state, but its grade is 0.
+    public static function get_grade() : ?int {
         return 0;
     }
 

@@ -62,9 +62,9 @@ class partially_attended extends attendance_state {
     /**
      * Get the grade value associated with the state.
      *
-     * @return int
+     * @return int|null
      */
-    public static function get_grade() : int {
+    public static function get_grade() : ?int {
         return 50;
     }
 

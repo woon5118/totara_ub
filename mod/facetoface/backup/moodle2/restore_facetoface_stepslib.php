@@ -224,6 +224,31 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
 
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->createdby = (int)$this->get_mappingid('user', $data->createdby);
+        // fixup grade
+        if ($data->grade == 0) {
+            $f2fversion = $this->get_task()->get_old_moduleversion();
+            $totaramajor = floor(floatval($this->get_task()->get_info()->totara_release));
+            $totarabuild = 0;
+            preg_match('/(\d{8})/', $this->get_task()->get_info()->totara_build, $matches);
+            if (!empty($matches[1])) {
+                $totarabuild = (int) $matches[1]; // The date of Totara build at the time of the backup.
+            }
+            // recalculate only for backups made with Totara 12 before TL-20720, and Totara 13 before TL-20400
+            // TODO: need more complicated solution to backups made after TL-20400 and before TL-20720
+            if (($totaramajor == 12 && $f2fversion < 2018112207)
+                    || ($totaramajor == 13 && $f2fversion < 2019030100)
+                    // T13 Evergreen
+                    || ($totaramajor == 0 && 20181207 <= $totarabuild && $totarabuild < 20190322 && $f2fversion < 2019030100)
+                    // T12 Evergreen
+                    || ($totaramajor == 0 && 20180919 <= $totarabuild && $totarabuild < 20181207 && $f2fversion < 2018112207)) {
+                try {
+                    $data->grade = \mod_facetoface\signup\state\state::from_code($data->statuscode)::get_grade();
+                } catch (\mod_facetoface\exception\signup_exception $e) {
+                    // swallow exception and set NULL if the status code is not valid
+                    $data->grade = null;
+                }
+            }
+        }
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_signups_status', $data);

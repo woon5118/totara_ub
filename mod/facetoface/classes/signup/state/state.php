@@ -177,10 +177,11 @@ abstract class state {
 
     /**
      * Get the grade value associated with the state.
-     * Override for graded states, no show, partially attended, fully attended.
+     * Override for graded states - no show, unable to attend, partially attended, fully attended.
+     * @return int|null Graded states should return int. Non-graded states should return null.
      */
-    public static function get_grade() : int {
-        return 0;
+    public static function get_grade() : ?int {
+        return null;
     }
 
     /**

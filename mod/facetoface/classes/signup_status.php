@@ -52,9 +52,9 @@ final class signup_status implements seminar_iterator_item {
      */
     private $superceded = 0;
     /**
-     * @var float {facetoface_signups_status}.grade
+     * @var float|null {facetoface_signups_status}.grade
      */
-    private $grade = 0;
+    private $grade = null;
     /**
      * @var int {facetoface_signups_status}.createdby
      */

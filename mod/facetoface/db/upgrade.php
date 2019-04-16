@@ -506,6 +506,9 @@ function xmldb_facetoface_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
+        // Fix grades if necessary
+        facetoface_upgradelib_fixup_seminar_grades();
+
         upgrade_mod_savepoint(true, 2019030100, 'facetoface');
     }
 
