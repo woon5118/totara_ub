@@ -587,12 +587,9 @@ class behat_util extends testing_util {
     private static function email_sink_file(): string {
         global $CFG;
 
-        $proc_id = behat_get_run_process();
-        return sprintf(
-            "%s/behat_emails%s.log",
-            $CFG->behat_dataroot,
-            $proc_id ? "_$proc_id" : ''
-        );
+        // $CFG->behat_dataroot is unique even for parallel Behat runs. So this
+        // file is unique per Behat run thread.
+        return $CFG->behat_dataroot . "/behat_emails.log";
     }
 
     /**
