@@ -653,6 +653,9 @@ abstract class restore_dbops {
                                                                   FROM {question}
                                                                  WHERE category = ?", array($matchcat->id));
 
+                    // Temporarily log the stamp and version of random questions when they are created.
+                    $randomqcache = array();
+
                     foreach ($questions as $question) {
                         if (isset($questioncache[$question->stamp." ".$question->version])) {
                             $matchqid = $questioncache[$question->stamp." ".$question->version];
@@ -684,6 +687,15 @@ abstract class restore_dbops {
                             }
 
                         // 5b) Match, mark q to be mapped
+                        } else if ($question->qtype == 'random') {
+                            if (in_array($matchqid, $randomqcache)) {
+                                // Random question was already created.
+                                // Match, mark q to be mapped.
+                                self::set_backup_ids_record($restoreid, 'question', $question->id, $matchqid);
+                            } else {
+                                $randomqcache[] = $matchqid;
+                                // Nothing to mark, newitemid means create
+                            }
                         } else {
                             self::set_backup_ids_record($restoreid, 'question', $question->id, $matchqid);
                         }
