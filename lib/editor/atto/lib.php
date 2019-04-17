@@ -103,6 +103,15 @@ class atto_texteditor extends texteditor {
             $this->text = clean_text($this->text, PARAM_CLEANHTML);
         }
 
+        // Totara: enforce sanitization of text unless whitelisted as needing JS.
+        $cleantext = empty($options['noclean']);
+        if (empty($options['allowxss'])) {
+            $cleantext = true;
+        }
+        if ($cleantext) {
+            $this->text = clean_text($this->text, PARAM_CLEANHTML);
+        }
+
         if (array_key_exists('atto:toolbar', $options)) {
             $configstr = $options['atto:toolbar'];
         } else {
