@@ -47,7 +47,7 @@ class event_grade_input extends \core\output\template {
             'name' => "submissiongradeid_{$attendee->get_signupid()}",
             'placeholder' => get_string('gradeinput_placeholder', 'facetoface'),
             'disabled' => $disabled,
-            'label' => get_string('gradeinput_label', 'facetoface'),
+            'label' => get_string('gradeinput_label', 'facetoface', clean_string(fullname($attendee))),
             'min' => 0,
             'max' => 100,
             'value' => ($status !== null ? $status->get_grade() : null) ?? '',
