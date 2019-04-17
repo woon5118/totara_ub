@@ -1468,13 +1468,21 @@ function get_mimetype_for_sending($filename = '') {
  * Make sure file serving of untrusted files is
  * as secure as possible.
  *
- * @param string $mimetype
+ * Since Totara 13, there is a new option 'allowxss' for plugins like mod_scorm that need JS
+ *
+ * @internal do not use outside of send_file() function
+ *
+ * @param string $mimetype modified if necessary
  * @param bool $forcedownload
- * @return string mimetype
+ * @param array $options modified if necessary
+ * @param int $lifetime modified if necessary
+ * @return string mimetype deprecated, do not use
  */
-function totara_tweak_file_sending($mimetype, $forcedownload) {
+function totara_tweak_file_sending(&$mimetype, &$forcedownload, array &$options, int &$lifetime) {
     if (!$forcedownload) {
-        return $mimetype;
+        if (ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT or !empty($options['allowxss'])) {
+            return $mimetype; // BC only
+        }
     }
 
     // No mime guessing in IE and Chrome!
@@ -1499,7 +1507,42 @@ function totara_tweak_file_sending($mimetype, $forcedownload) {
         $mimetype = 'application/x-forcedownload';
     }
 
-    return $mimetype;
+    if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT and empty($options['allowxss'])) {
+        // Add protection for areas that previously allowed XSS.
+        $hopefullysafetypes = [
+            'image/gif',
+            'image/jpeg',
+            'image/png',
+            'video/quicktime',
+            'video/mpeg',
+            'video/mp4',
+            'video/ogg',
+            'video/webm',
+            'audio/flac',
+            'audio/mp3',
+            'audio/ogg',
+            'audio/wav',
+            // NOTE: do not add SVG here yet, there is a high risk of XSS when accessing it directly!
+        ];
+
+        $extradangerous = [
+            'application/x-forcedownload',
+            'text/html',
+            'application/g-zip',
+            'application/x-rar-compressed',
+            'application/zip',
+        ];
+
+        if (in_array($mimetype, $extradangerous)) {
+            $mimetype = 'application/x-forcedownload';
+            $forcedownload = true;
+
+        } else if (!in_array($mimetype, $hopefullysafetypes)) {
+            $forcedownload = true;
+        }
+    }
+
+    return $mimetype; // BC only
 }
 
 /**
@@ -2294,7 +2337,7 @@ function send_file($path, $filename, $lifetime = null , $filter=0, $pathisstring
     }
 
     // Totara: improve file serving security if possible.
-    $mimetype = totara_tweak_file_sending($mimetype, $forcedownload);
+    totara_tweak_file_sending($mimetype, $forcedownload, $options, $lifetime);
 
     if ($forcedownload) {
         header('Content-Disposition: attachment; filename="'.$filename.'"');
@@ -2491,9 +2534,6 @@ function send_stored_file($stored_file, $lifetime=null, $filter=0, $forcedownloa
     if (!$mimetype || $mimetype === 'document/unknown') {
         $mimetype = get_mimetype_for_sending($filename);
     }
-
-    // Totara: improve file serving security if possible.
-    $mimetype = totara_tweak_file_sending($mimetype, $forcedownload);
 
     // Allow cross-origin requests only for Web Services.
     // This allow to receive requests done by Web Workers or webapps in different domains.
@@ -4788,8 +4828,14 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
                 send_file_not_found();
             }
 
+            // Totara: allow XSS from label intro only depending on setting.
+            $options = array('preview' => $preview);
+            if ($modname === 'label') {
+                $options['allowxss'] = get_config('label', 'allowxss');
+            }
+
             // finally send the file
-            send_stored_file($file, null, 0, false, array('preview' => $preview));
+            send_stored_file($file, null, 0, false, $options);
         }
 
         $filefunction = $component.'_pluginfile';

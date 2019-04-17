@@ -49,6 +49,8 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configmultiselect('resource/displayoptions',
         get_string('displayoptions', 'resource'), get_string('configdisplayoptions', 'resource'),
         $defaultdisplayoptions, $displayoptions));
+    $settings->add(new admin_setting_configcheckbox('resource/allowxss',
+        get_string('allowxss', 'mod_resource'), get_string('allowxss_desc', 'mod_resource'), '0'));
 
     //--- modedit defaults -----------------------------------------------------------------------------------
     $settings->add(new admin_setting_heading('resourcemodeditdefaults', get_string('modeditdefaults', 'admin'), get_string('condifmodeditdefaults', 'admin')));

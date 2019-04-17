@@ -328,6 +328,9 @@ function page_pluginfile($course, $cm, $context, $filearea, $args, $forcedownloa
         return false;
     }
 
+    // Totara: allow XSS depending on setting.
+    $options['allowxss'] = get_config('page', 'allowxss');
+
     // $arg could be revision number or index.html
     $arg = array_shift($args);
     if ($arg == 'index.html' || $arg == 'index.htm') {

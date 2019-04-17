@@ -23,6 +23,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['allowxss'] = 'Allow unsafe files';
+$string['allowxss_desc'] = 'If enabled all resource files uploaded by authorised users to courses with be be allowed to execute without any security restrictions.
+
+It is strongly recommended to keep this option disabled for security reasons.';
 $string['clicktodownload'] = 'Click {$a} link to download the file.';
 $string['clicktoopen2'] = 'Click {$a} link to view the file.';
 $string['configdisplayoptions'] = 'Select all options that should be available, existing settings are not modified. Hold CTRL key to select multiple fields.';

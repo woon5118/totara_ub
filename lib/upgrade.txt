@@ -29,6 +29,8 @@ information provided here is intended especially for developers.
 * Added a new define ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT that when set to true allows format_text to handle noclean and trusttext
   as it used to in earlier versions of Totara.
 * Added a new allowxss option to format_text() that should be used only when absolutely necessary to avoid clean_text during formatting.
+* Added a new allowxss option in file serving API that should be used only when absolutely necessary when it is required to allow
+  unrestricted execution fo uploaded files (such as in SCORM module).
 * Filters show now implement a protected static function is_compatible_with_clean_text() method which returns true if text can be
   cleaned after filter, and false if the filter will inject content that is not compatible with cleaning.
 * markdown_to_html() now cleans the html before returning it, stripping all XSS nasties. A new second argument now exists to set options.

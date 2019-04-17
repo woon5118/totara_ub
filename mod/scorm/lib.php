@@ -984,6 +984,10 @@ function scorm_pluginfile($course, $cm, $context, $filearea, $args, $forcedownlo
         $revision = (int)array_shift($args); // Prevents caching problems - ignored here.
         $relativepath = implode('/', $args);
         $fullpath = "/$context->id/mod_scorm/content/0/$relativepath";
+
+        // Totara: we need to allow XSS, there is no way around it here.
+        $options['allowxss'] = '1';
+
         // TODO: add any other access restrictions here if needed!
 
     } else if ($filearea === 'package') {
