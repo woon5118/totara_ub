@@ -150,8 +150,6 @@ if ($data = $mform->get_data()) {
         $data->planid = 0;
         $data->id = $DB->insert_record('dp_plan_evidence', $data);
 
-        $DB->update_record('dp_plan_evidence', $data);
-
         // Add the items custom fields.
         customfield_save_data($data, 'evidence', 'dp_plan_evidence');
 
