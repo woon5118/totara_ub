@@ -51,12 +51,41 @@ class date_no_timezone extends base_form {
      */
     public $formclass = 'totara_cohort\rules\ui\form_date';
 
+    /** @var array $operatorsfixed */
+    private static $operatorsfixed = [];
+
+    /** @var array $operatorsdynamic */
+    private static $operatorsdynamic = [];
+
+    const COHORT_RULE_DATE_FIXED = 1;
+    const COHORT_RULE_DATE_DYNAMIC = 2;
+
     /**
      * cohort_rule_ui_date_no_timezone constructor.
      * @param string $description
      */
     public function __construct($description){
         $this->description = $description;
+
+        self::$operatorsfixed = [
+            COHORT_RULE_DATE_OP_BEFORE_FIXED_DATE => get_string('datemenufixeddatebeforeandon', 'totara_cohort'),
+            COHORT_RULE_DATE_OP_AFTER_FIXED_DATE  => get_string('datemenufixeddateafterandon', 'totara_cohort')
+        ];
+
+        if ($this->rule == 'systemaccess-firstlogin' || $this->rule == 'systemaccess-lastlogin') {
+            // Don't add future options for login dates as they are impossible.
+            self::$operatorsdynamic = [
+                COHORT_RULE_DATE_OP_BEFORE_PAST_DURATION   => get_string('datemenudurationbeforepast', 'totara_cohort'),
+                COHORT_RULE_DATE_OP_WITHIN_PAST_DURATION   => get_string('datemenudurationwithinpast', 'totara_cohort'),
+            ];
+        } else {
+            self::$operatorsdynamic = [
+                COHORT_RULE_DATE_OP_BEFORE_PAST_DURATION   => get_string('datemenudurationbeforepast', 'totara_cohort'),
+                COHORT_RULE_DATE_OP_WITHIN_PAST_DURATION   => get_string('datemenudurationwithinpast', 'totara_cohort'),
+                COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION => get_string('datemenudurationwithinfuture', 'totara_cohort'),
+                COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION  => get_string('datemenudurationafterfuture', 'totara_cohort')
+            ];
+        }
     }
 
     /**
@@ -69,34 +98,24 @@ class date_no_timezone extends base_form {
     protected function addFormData() {
         // Set up default values
         $formdata = array();
-        $formdata['fixedordynamic'] = 1;
+        $formdata['fixedordynamic'] = self::COHORT_RULE_DATE_FIXED;
         $formdata['beforeafterdate'] = get_string('datepickerlongyearplaceholder', 'totara_core');
         if (isset($this->operator)) {
-            if ($this->operator == COHORT_RULE_DATE_OP_AFTER_FIXED_DATE || $this->operator == COHORT_RULE_DATE_OP_BEFORE_FIXED_DATE) {
-                $formdata['fixedordynamic'] = 1;
+            if (in_array($this->operator, array_keys(self::$operatorsfixed))) {
+                $formdata['fixedordynamic'] = self::COHORT_RULE_DATE_FIXED;
                 $formdata['beforeaftermenu'] = $this->operator;
                 if (!empty($this->date)) {
                     // For the custom date field, the date is always saved as UTC.
                     $formdata['beforeafterdate'] = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), 'UTC', false);
                 }
-            } else if (
-            in_array(
-                $this->operator,
-                array(
-                    COHORT_RULE_DATE_OP_BEFORE_PAST_DURATION,
-                    COHORT_RULE_DATE_OP_WITHIN_PAST_DURATION,
-                    COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION,
-                    COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION
-                )
-            )
-            ) {
-                $formdata['fixedordynamic'] = 2;
+            } else if (in_array($this->operator, array_keys(self::$operatorsdynamic))) {
+                $formdata['fixedordynamic'] = self::COHORT_RULE_DATE_DYNAMIC;
                 $formdata['durationmenu'] = $this->operator;
                 if (isset($this->date)) {
                     $formdata['durationdate'] = $this->date;
                 }
             } else {
-                $formdata['fixedordynamic'] = 1;
+                $formdata['fixedordynamic'] = self::COHORT_RULE_DATE_FIXED;
             }
         }
         return $formdata;
@@ -113,15 +132,12 @@ class date_no_timezone extends base_form {
 
         // Put everything on two rows to make it look cooler.
         $row = array();
-        $row[0] = $mform->createElement('radio', 'fixedordynamic', '', '', 1);
+        $row[0] = $mform->createElement('radio', 'fixedordynamic', '', '',  self::COHORT_RULE_DATE_FIXED);
         $row[1] = $mform->createElement(
             'select',
             'beforeaftermenu',
             '',
-            array(
-                COHORT_RULE_DATE_OP_BEFORE_FIXED_DATE=>get_string('datemenufixeddatebefore', 'totara_cohort'),
-                COHORT_RULE_DATE_OP_AFTER_FIXED_DATE=>get_string('datemenufixeddateafter', 'totara_cohort')
-            )
+            self::$operatorsfixed
         );
         $row[2] = $mform->createElement('text', 'beforeafterdate', '');
         $mform->addGroup($row, 'beforeafterrow', ' ', ' ', false);
@@ -148,19 +164,9 @@ JS;
     </script>
 JS;
         $mform->addElement('html', $datepickerjs);
-        $durationmenu = array(
-            COHORT_RULE_DATE_OP_BEFORE_PAST_DURATION =>   get_string('datemenudurationbeforepast', 'totara_cohort'),
-            COHORT_RULE_DATE_OP_WITHIN_PAST_DURATION =>   get_string('datemenudurationwithinpast', 'totara_cohort'),
-            COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION => get_string('datemenudurationwithinfuture', 'totara_cohort'),
-            COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION =>  get_string('datemenudurationafterfuture', 'totara_cohort'),
-        );
-        if ($this->rule == 'systemaccess-firstlogin' || $this->rule == 'systemaccess-lastlogin') {
-            // Remove COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION and COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION.
-            unset($durationmenu[COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION], $durationmenu[COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION]);
-        }
         $row = array();
         $row[0] = $mform->createElement('radio', 'fixedordynamic', '', '', 2);
-        $row[1] = $mform->createElement('select', 'durationmenu', '', $durationmenu);
+        $row[1] = $mform->createElement('select', 'durationmenu', '', self::$operatorsdynamic);
         $row[2] = $mform->createElement('text', 'durationdate', '');
         $row[3] = $mform->createElement('static', '', '', get_string('durationdays', 'totara_cohort'));
         $mform->addGroup($row, 'durationrow', ' ', ' ', false);
@@ -203,6 +209,65 @@ JS;
         $strvar->vars = get_string("dateis{$COHORT_RULE_DATE_OP[$this->operator]}", 'totara_cohort', $a);
 
         return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
+    }
+
+    /**
+     * A method for validating the form submitted data
+     * @return bool
+     */
+    public function validateResponse() {
+        /** @var core_renderer $OUTPUT */
+        global $OUTPUT;
+        $form = $this->constructForm();
+        if ($data = $form->get_submitted_data()) {
+            if (!isset($data->fixedordynamic)) {
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+                return false;
+            }
+
+            if ($data->fixedordynamic == self::COHORT_RULE_DATE_FIXED) {
+                if (!isset($data->beforeaftermenu) || !in_array($data->beforeaftermenu, array_keys(self::$operatorsfixed))) {
+                    $form->_form->addElement('html',
+                        $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                    );
+                    return false;
+                }
+
+                if (empty($data->beforeafterdate)) {
+                    $form->_form->addElement('html',
+                        $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                    );
+                    return false;
+                }
+            } else if ($data->fixedordynamic == self::COHORT_RULE_DATE_DYNAMIC) {
+                if (!isset($data->durationmenu) || !in_array($data->durationmenu, array_keys(self::$operatorsdynamic))) {
+                    $form->_form->addElement('html',
+                        $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                    );
+                    return false;
+                }
+
+                if (!isset($data->durationdate) || !is_numeric($data->durationdate)) {
+                    $form->_form->addElement('html',
+                        $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                    );
+                    return false;
+                }
+            } else {
+                // Unexpected fixedordynamic value.
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+                return false;
+            }
+
+            return true;
+        }
+
+        // If the form is not submitted at all, then there is no point to validate and false should be returned here
+        return false;
     }
 
     /**

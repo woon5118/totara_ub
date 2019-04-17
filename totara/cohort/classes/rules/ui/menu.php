@@ -167,13 +167,40 @@ class menu extends base_form {
         global $OUTPUT;
         $form = $this->constructForm();
         if ($data = $form->get_submitted_data()) {
+
+            // Check that the equal field is set to a valid value.
+            if (!isset($data->equal) || !in_array($data->equal, [COHORT_RULES_OP_IN_EQUAL, COHORT_RULES_OP_IN_NOTEQUAL])) {
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+                return false;
+            }
+
             // Checking whether the listofvalues being passed is empty or not. If it is empty, error should be returned
             if (empty($data->listofvalues)) {
                 $form->_form->addElement('html',
                     $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
                 );
                 return false;
+            } else {
+                // Note: any values in listofvalues that aren't in options should have been removed on form submission.
+                if (is_object($this->options)) {
+                    $options = $this->options_from_sqlobj($this->options);
+                } else {
+                    $options = $this->options;
+                }
+                $options = array_keys($options);
+
+                foreach ($data->listofvalues as $lov) {
+                    if (!in_array($lov, $options)) {
+                        $form->_form->addElement('html',
+                            $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                        );
+                        return false;
+                    }
+                }
             }
+
             return true;
         }
 

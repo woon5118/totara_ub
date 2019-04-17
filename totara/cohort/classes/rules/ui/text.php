@@ -115,6 +115,35 @@ class text extends base_form {
 
         return get_string('ruleformat-descjoinvars', 'totara_cohort', $strvar);
     }
+    /**
+     * A method for validating the form submitted data
+     * @return bool
+     */
+    public function validateResponse() {
+        global $COHORT_RULES_OP_IN_LIST, $OUTPUT;
+
+        $form = $this->constructForm();
+        if ($data = $form->get_submitted_data()) {
+            if (!isset($data->equal) || !in_array($data->equal, array_keys($COHORT_RULES_OP_IN_LIST))) {
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+                return false;
+            }
+
+            if ($data->equal != COHORT_RULES_OP_IN_ISEMPTY && (!isset($data->listofvalues) || strlen($data->listofvalues) < 1)) {
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+                return false;
+            }
+
+            return true;
+        }
+
+        // If the form is not submitted at all, then there is no point to validate and false should be returned here
+        return false;
+    }
 
     /**
      * Process the data returned by this UI element's form elements

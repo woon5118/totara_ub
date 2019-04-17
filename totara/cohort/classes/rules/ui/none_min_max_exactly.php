@@ -126,6 +126,38 @@ class none_min_max_exactly extends base_form {
     }
 
     /**
+     * A method for validating the form submitted data
+     * @return bool
+     */
+    public function validateResponse() {
+        /** @var core_renderer $OUTPUT */
+        global $OUTPUT;
+        $form = $this->constructForm();
+        if ($data = $form->get_submitted_data()) {
+            if (!isset($data->equal) || !in_array($data->equal, array_keys(self::$operators))) {
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+                return false;
+            }
+
+            if ($data->equal != self::COHORT_RULES_OP_NONE) {
+                if (empty($data->listofvalues) || !is_numeric($data->listofvalues) || $data->listofvalues < 0) {
+                    $form->_form->addElement('html',
+                        $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                    );
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // If the form is not submitted at all, then there is no point to validate and false should be returned here
+        return false;
+    }
+
+    /**
      * Process the data returned by this UI element's form elements
      * @param \cohort_rule_sqlhandler $sqlhandler
      */

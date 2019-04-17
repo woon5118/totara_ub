@@ -173,6 +173,21 @@ class multiselect extends base_form {
         global $OUTPUT;
         $form = $this->constructForm();
         if  ($data = $form->get_submitted_data()) {
+
+            if (!isset($data->equal) || !in_array($data->equal, [COHORT_RULES_OP_IN_ISEQUALTO, COHORT_RULES_OP_IN_NOTEQUALTO])) {
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+                return false;
+            }
+
+            if (!isset($data->exact) || !in_array($data->exact, [COHORT_RULES_OP_IN_ANY, COHORT_RULES_OP_IN_ALL])) {
+                $form->_form->addElement('html',
+                    $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
+                );
+                return false;
+            }
+
             $lov = $data->options;
             $success = false;
             foreach ($this->options as $hash => $option) {

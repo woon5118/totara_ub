@@ -86,7 +86,7 @@ class checkbox extends menu {
         $form = $this->constructForm();
         if ($data = $form->get_submitted_data()) {
             // Checking whether the listofvalues being passed is set, and in the acceptable options.
-            if (!isset($data->listofvalues) || !in_array($data->listofvalues, [0,1])) {
+            if (!isset($data->listofvalues) || !in_array($data->listofvalues, array_keys($this->options))) {
                 $form->_form->addElement('html',
                     $OUTPUT->notification(get_string('rule_selector_failure', 'totara_cohort'), \core\output\notification::NOTIFY_ERROR)
                 );
