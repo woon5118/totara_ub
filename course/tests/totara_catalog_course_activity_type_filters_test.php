@@ -57,12 +57,15 @@ class core_course_totara_catalog_course_activity_type_filters_testcase extends \
         $available_activities = [];
         $strings = get_string_manager();
         $modules = $DB->get_records('modules', ['visible' => 1], '', "id, name");
+        $generator = $this->getDataGenerator();
         foreach ($modules as $module) {
             $label = $strings->string_exists('pluginname', $module->name)
                      ? $strings->get_string('pluginname', $module->name)
                      : ucfirst($module->name);
 
-            $available_activities[] = [$module->id, $module->name, $label];
+            if ($generator->module_exists($module->name)) {
+                $available_activities[] = [$module->id, $module->name, $label];
+            }
         }
 
         // Activities are randomly assigned to courses. Hence the activities the
@@ -71,7 +74,6 @@ class core_course_totara_catalog_course_activity_type_filters_testcase extends \
         $activity_labels = [];
         $all_courses = [];
 
-        $generator = $this->getDataGenerator();
         for ($i = 0; $i < $course_count; $i++) {
             $course = $generator->create_course();
 

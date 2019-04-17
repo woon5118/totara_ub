@@ -49,10 +49,15 @@ class totara_core_totara_lang_testcase extends advanced_testcase {
 
         $types = core_component::get_plugin_types();
         foreach ($types as $type => $unused) {
+            $coreplugins = core_plugin_manager::standard_plugins_list($type);
             $plugins = core_component::get_plugin_list($type);
             foreach ($plugins as $name => $fulldir) {
                 if (!file_exists("$fulldir/lang/en/")) {
                     // Weird, all plugins should have lang files.
+                    continue;
+                }
+                if (!in_array($name, $coreplugins)) {
+                    // This is not core plugin, skip.
                     continue;
                 }
                 $component = $type . '_' . $name;

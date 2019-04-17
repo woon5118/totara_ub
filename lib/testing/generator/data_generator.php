@@ -520,6 +520,18 @@ EOD;
     }
 
     /**
+     * Check if module supports generators
+     */
+    public function module_exists($modulename) {
+        try {
+            $this->get_plugin_generator('mod_' . $modulename);
+        } catch (coding_exception $e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Create a test group for the specified course
      *
      * $record should be either an array or a stdClass containing infomation about the group to create.
