@@ -104,7 +104,10 @@ abstract class question_edit_form extends question_wizard_form {
         $this->context = context::instance_by_id($record->contextid);
 
         $this->editoroptions = array('subdirs' => 1, 'maxfiles' => EDITOR_UNLIMITED_FILES,
-                'context' => $this->context);
+                'context' => $this->context,
+                // TODO: leave this open to XSS until we sort out the sloppy security stuff here in TL-20750
+                'noclean' => 1, 'allowxss' => 1,
+            );
         $this->fileoptions = array('subdirs' => 1, 'maxfiles' => -1, 'maxbytes' => -1);
 
         $this->category = $category;

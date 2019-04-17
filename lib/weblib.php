@@ -1286,7 +1286,7 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
     // Totara: if set text will not be passed through clean_text.
     // We STRONGLY recommend you do not use this option.
     $allowxss = false;
-    if (isset($options['allowxss']) && $options['allowxss'] === true) {
+    if (isset($options['allowxss']) && !empty($options['allowxss'])) {
         $allowxss = true;
     } else if (!empty($options['noclean']) && ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
         $allowxss = true;
@@ -1647,6 +1647,12 @@ function format_module_intro($module, $activity, $cmid, $filter=true) {
     require_once("$CFG->libdir/filelib.php");
     $context = context_module::instance($cmid);
     $options = array('noclean' => true, 'para' => false, 'filter' => $filter, 'context' => $context, 'overflowdiv' => true);
+
+    // Totara: only allow XSS in labels, the rest of intros should not have any active content.
+    if ($module === 'label' and get_config('label', 'allowxss')) {
+        $options['allowxss'] = 1;
+    }
+
     $intro = file_rewrite_pluginfile_urls($activity->intro, 'pluginfile.php', $context->id, 'mod_'.$module, 'intro', null);
     return trim(format_text($intro, $activity->introformat, $options, null));
 }

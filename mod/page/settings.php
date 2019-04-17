@@ -36,6 +36,10 @@ if ($ADMIN->fulltree) {
         get_string('displayoptions', 'page'), get_string('configdisplayoptions', 'page'),
         $defaultdisplayoptions, $displayoptions));
 
+    $settings->add(new admin_setting_configcheckbox('page/allowxss',
+        get_string('allowxss', 'mod_page'), get_string('allowxss_desc', 'mod_page'), '0'));
+
+
     //--- modedit defaults -----------------------------------------------------------------------------------
     $settings->add(new admin_setting_heading('pagemodeditdefaults', get_string('modeditdefaults', 'admin'), get_string('condifmodeditdefaults', 'admin')));
 

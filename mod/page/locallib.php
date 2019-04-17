@@ -50,5 +50,12 @@ class page_content_file_info extends file_info_stored {
 
 function page_get_editor_options($context) {
     global $CFG;
-    return array('subdirs'=>1, 'maxbytes'=>$CFG->maxbytes, 'maxfiles'=>-1, 'changeformat'=>1, 'context'=>$context, 'noclean'=>1, 'trusttext'=>0);
+
+    $options = array('subdirs'=>1, 'maxbytes'=>$CFG->maxbytes, 'maxfiles'=>-1, 'changeformat'=>1, 'context'=>$context, 'noclean'=>1, 'trusttext'=>0, 'overflowdiv'=>1);
+
+    if (get_config('page', 'allowxss')) {
+        $options['allowxss'] = 1;
+    }
+
+    return $options;
 }

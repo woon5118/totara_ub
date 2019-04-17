@@ -86,6 +86,17 @@ class atto_texteditor extends texteditor {
     public function use_editor($elementid, array $options=null, $fpoptions=null) {
         global $PAGE;
 
+        // Totara: enforce sanitization of text unless whitelisted as needing JS.
+        $cleantext = empty($options['noclean']);
+        if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
+            if (empty($options['allowxss'])) {
+                $cleantext = true;
+            }
+        }
+        if ($cleantext) {
+            $this->text = clean_text($this->text, PARAM_CLEANHTML);
+        }
+
         if (array_key_exists('atto:toolbar', $options)) {
             $configstr = $options['atto:toolbar'];
         } else {
@@ -226,6 +237,8 @@ class atto_texteditor extends texteditor {
 
         $PAGE = $attopagehack->oldpage;
 
+        // Use editor may have cleaned the text - set it back to the result object.
+        $result['text'] = $this->get_text();
         $result['form_item_template'] = 'totara_form/element_editor_atto';
         $result['fptemplates'] = json_encode($fptemplates);
         $result['requiredstrings'] = json_encode($attopagehack->requiredstrings);

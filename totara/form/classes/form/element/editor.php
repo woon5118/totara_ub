@@ -68,6 +68,7 @@ class editor extends element {
             // The following just help with repository selection and defaults.
             'context' => null,
             'disable_types' => null,
+            'allowxss' => false,
         );
 
         $this->set_attributes((array)$options);
@@ -487,6 +488,7 @@ class editor extends element {
         $options->noclean = (int)(bool)$attributes['noclean'];
         $options->trusttext = 0;
         $options->trusted = false;
+        $options->allowxss = (int)(bool)$attributes['allowxss'];
 
         $options->return_types = (int)$attributes['return_types'];
 

@@ -2560,6 +2560,11 @@ class admin_setting_configtextarea extends admin_setting_configtext {
  * General text area with html editor.
  */
 class admin_setting_confightmleditor extends admin_setting_configtextarea {
+    /**
+     * Allow XSS in data.
+     * @var bool
+     */
+    protected $allowxss = false;
 
     /**
      * @param string $name
@@ -2575,6 +2580,19 @@ class admin_setting_confightmleditor extends admin_setting_configtextarea {
     }
 
     /**
+     * Use only when it is absolutely necessary to allow unsanitized markup.
+     *
+     * NOTE: Use only for settings that can be changed by highly trusted users such as admin.
+     *
+     * @since Totara 13
+     *
+     * @param bool $enabled
+     */
+    public function set_allowxss(bool $enabled) {
+        $this->allowxss = $enabled;
+    }
+
+    /**
      * Returns an XHTML string for the editor
      *
      * @param string $data
@@ -2584,8 +2602,22 @@ class admin_setting_confightmleditor extends admin_setting_configtextarea {
     public function output_html($data, $query='') {
         $editor = editors_get_preferred_editor(FORMAT_HTML);
         $editor->set_text($data);
-        $editor->use_editor($this->get_id(), array('noclean'=>true));
+        $editor->use_editor($this->get_id(), array('noclean' => true, 'allowxss' => $this->allowxss));
         return parent::output_html($data, $query);
+    }
+
+    /**
+     * Save the new setting
+     *
+     * @param string $data The new value to save
+     * @return string empty or error message
+     */
+    public function write_setting($data) {
+        // Totara: enforce sanitization of text unless whitelisted as needing JS.
+        if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT and !$this->allowxss) {
+            $data = clean_text($data, FORMAT_HTML);
+        }
+        return parent::write_setting($data);
     }
 }
 
@@ -4628,6 +4660,12 @@ class admin_setting_special_frontpagedesc extends admin_setting_confightmleditor
      */
     public function write_setting($data) {
         global $DB, $SITE, $COURSE;
+
+        // Totara: enforce sanitization of text unless whitelisted as needing JS.
+        if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT and !$this->allowxss) {
+            $data = clean_text($data, FORMAT_HTML);
+        }
+
         $record = new stdClass();
         $record->id            = $SITE->id;
         $record->{$this->name} = $data;

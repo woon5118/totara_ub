@@ -927,8 +927,13 @@ abstract class moodleform_mod extends moodleform {
         $mform = $this->_form;
         $label = is_null($customlabel) ? get_string('moduleintro') : $customlabel;
 
-        $mform->addElement('editor', 'introeditor', $label, array('rows' => 10), array('maxfiles' => EDITOR_UNLIMITED_FILES,
-            'noclean' => true, 'context' => $this->context, 'subdirs' => true));
+        // Totara: only allow XSS in labels, the rest of intros should not have any active content.
+        $options = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'noclean' => true, 'context' => $this->context, 'subdirs' => true);
+        if (static::class === 'mod_label_mod_form' and get_config('label', 'allowxss')) {
+            $options['allowxss'] = 1;
+        }
+
+        $mform->addElement('editor', 'introeditor', $label, array('rows' => 10), $options);
         $mform->setType('introeditor', PARAM_RAW); // no XSS prevention here, users must be trusted
         if ($required) {
             $mform->addRule('introeditor', get_string('required'), 'required', null, 'client');

@@ -23,6 +23,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['allowxss'] = 'Allow unsafe markup';
+$string['allowxss_desc'] = 'If enabled all users authorised to add or update labels will be able to add unsafe markup and files to course labels.
+
+It is strongly recommended to keep this option disabled for security reasons';
 $string['configdndmedia'] = 'Offer to create a label when media files are dragged & dropped onto a course';
 $string['configdndresizeheight'] = 'When a label is created from a dragged & dropped image, resize it if it is higher than this many pixels (0 for no resize)';
 $string['configdndresizewidth'] = 'When a label is created from a dragged & dropped image, resize it if it is wider than this many pixels (0 for no resize)';

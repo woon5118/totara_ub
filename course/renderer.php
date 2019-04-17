@@ -726,7 +726,11 @@ class core_course_renderer extends plugin_renderer_base {
             // nothing to be displayed to the user
             return $output;
         }
-        $content = $mod->get_formatted_content(array('overflowdiv' => true, 'noclean' => true));
+        $options = array('overflowdiv' => true);
+        if ($mod->modname === 'label' && get_config('label', 'allowxss')) {
+            $options['allowxss'] = true;
+        }
+        $content = $mod->get_formatted_content($options);
         $accesstext = '';
         $textclasses = '';
         if ($mod->uservisible) {
