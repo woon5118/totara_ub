@@ -206,7 +206,6 @@ if (!$onlycontent) {
     $PAGE->set_title($pagetitle);
     $PAGE->set_cm($cm);
     $PAGE->set_heading($course->fullname);
-    \mod_facetoface\attendees_helper::process_js($action, $seminar, $seminarevent);
     \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
 }
 

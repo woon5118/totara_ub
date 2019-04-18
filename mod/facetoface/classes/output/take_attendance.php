@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use core\output\template;
 use mod_facetoface\seminar_event;
+use mod_facetoface\signup\state\not_set;
 
 /**
  * Class take_attendance
@@ -100,7 +101,8 @@ class take_attendance extends template {
                     'value' => 'exportods',
                     'label' => get_string('exportods', 'mod_facetoface'),
                 ]
-            ]
+            ],
+            'notsetcode' => not_set::get_code()
         ];
 
         foreach ($formattributes as $key => $value) {

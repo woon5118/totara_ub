@@ -121,30 +121,6 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 );
         })();
 
-        function mark_set_unset(val, operator) {
-            // Reset all checkboxes.
-            $('.selectedcheckboxes').prop('checked', false);
-            $(":checkbox").filter(function() {
-                var selectid = $(this).data('selectid');
-                if (operator == 'EQ') {
-                    return $('#'+selectid).val() == val;
-                } else {
-                    return $('#'+selectid).val() != val;
-                }
-            }).prop("checked", "true");
-        }
-
-        // Set error (boolean).
-        function set_error(error) {
-            if (error) {
-                $('select#menubulk_select').addClass('error');
-                $('#selectoptionbefore').removeClass('hide');
-            } else {
-                $('select#menubulk_select').removeClass('error');
-                $('#selectoptionbefore').addClass('hide');
-            }
-        }
-
         /**
          * Print notice of operation
          * @param bool success true =>success false=>failure
@@ -171,61 +147,6 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 });
             }
         }
-
-        function options_validated(selectbulk) {
-            var proceed = false;
-
-            if (!selectbulk) {
-                set_error(false);
-            } else if ($(':checkbox:checked').length == 0) {
-                set_error(true);
-            } else {
-                proceed = true;
-            }
-
-            return proceed;
-        }
-
-        // Handle select list.
-        $('select#menubulk_select').change(function() {
-            var selected = $(this).val();
-            set_error(false); // Delete error if any.
-
-            switch(selected) {
-                case M.totara_f2f_attendees.config.selectall.toString():
-                    $('.selectedcheckboxes').prop('checked', true);
-                    break;
-                case M.totara_f2f_attendees.config.selectnone.toString():
-                    $('.selectedcheckboxes').prop('checked', false);
-                    break;
-                case M.totara_f2f_attendees.config.selectset.toString():
-                    mark_set_unset(notsetoption, 'NE');
-                    break;
-                case M.totara_f2f_attendees.config.selectnotset.toString():
-                    mark_set_unset(notsetoption, 'EQ');
-                    break;
-                default:
-                    $('.selectedcheckboxes').prop('checked', false);
-                    break;
-            }
-
-            // Reset drop-down bulk list.
-            $('select#menubulkattendanceop').prop('selectedIndex', 0);
-        });
-
-        // Handle drop-down bulk attendance actions.
-        $('select#menubulkattendanceop').change(function() {
-            var selected = $(this).val();
-            var idchecked = 0;
-            if (selected != notsetoption && options_validated(selected)) {
-                $(':checkbox:checked').each(function(index) {
-                    idchecked = (this.name).substring(19); // Checkbox id.
-                    $(this).val(selected); // Mark value of this checkbox with the selected option.
-                    $('select#menusubmissionid_'+idchecked+' option[value='+selected+']').prop('selected', true);
-                });
-            }
-        });
-
 
         /**
         *  Attaches mouse events to the loaded content.

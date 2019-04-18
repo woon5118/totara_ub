@@ -40,12 +40,19 @@
     * bulkaction -> options -> value: Value of option
     * bulkaction -> options -> option_label: Label of the option
     * bulkaction -> options -> selected: Whether the option is selected or not
+    * attendeesselector: an array of selector codes that are used for determinining which attendees to be picked
 
     Example context (json):
         There is no example for this template
 }}
 
-<div class="tw-takeAttendanceBulkAction f2f-takeattendance-bulk-action-box">
+<div class="tw-takeAttendanceBulkAction f2f-takeattendance-bulk-action-box"
+     {{#attendeesselector}}
+        data-{{key}}="{{value}}"
+     {{/attendeesselector}}
+     data-core-autoinitialise="true"
+     data-core-autoinitialise-amd="mod_facetoface/take_attendance_bulk_action">
+
     {{#bulkselection}}
         <div>
             <label for="menu{{name}}" class="f2f-inline-box custom-facetoface-label">
@@ -71,7 +78,7 @@
             <select name="{{name}}" id="menu{{name}}" class="f2f-inline-box bulkactions"
                 {{#disabled}} disabled {{/disabled}}>
 
-                <option>
+                <option value="">
                     {{#str}} bulkactions, mod_facetoface {{/str}}
                 </option>
 

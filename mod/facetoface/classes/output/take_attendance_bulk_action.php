@@ -52,6 +52,24 @@ class take_attendance_bulk_action extends template {
         $data = [
             'bulkselection' => self::create_bulkselection(),
             'bulkaction' => self::create_bulkaction($disabled),
+            'attendeesselector' => [
+                [
+                    'key' => 'selectall',
+                    'value' => MDL_F2F_SELECT_ALL
+                ],
+                [
+                    'key' => 'selectnone',
+                    'value' => MDL_F2F_SELECT_NONE
+                ],
+                [
+                    'key' => 'selectset',
+                    'value' => MDL_F2F_SELECT_SET
+                ],
+                [
+                    'key' => 'selectnotset',
+                    'value' => MDL_F2F_SELECT_NOT_SET
+                ]
+            ]
         ];
 
         return new static($data);
