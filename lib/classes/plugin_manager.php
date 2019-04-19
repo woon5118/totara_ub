@@ -1312,6 +1312,10 @@ class core_plugin_manager {
                 'goone'
             ),
 
+            'customfield' => array(
+                'checkbox', 'date', 'select', 'text', 'textarea'
+            ),
+
             'coursereport' => array(
                 // Deprecated!
             ),
