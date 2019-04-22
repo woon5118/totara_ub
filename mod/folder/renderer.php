@@ -134,7 +134,7 @@ class mod_folder_renderer extends plugin_renderer_base {
             $filename = $file->get_filename();
             $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
                     $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $filename, false);
-            $filenamedisplay = clean_filename($filename);
+            $filenamedisplay = clean_string($filename);
             if (file_extension_in_typegroup($filename, 'web_image')) {
                 $image = $url->out(false, array('preview' => 'tinyicon', 'oid' => $file->get_timemodified()));
                 $image = html_writer::empty_tag('img', array('src' => $image));

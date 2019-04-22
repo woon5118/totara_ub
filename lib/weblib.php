@@ -1232,10 +1232,10 @@ function format_text_menu() {
  *                      We STRONGLY recommend you do not use this option.
  *
  * Deprecated options:
- *      trusted     :   If set to true, and trusttext is enabled, and ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT is defined as true then
- *                      the given text will not be passed through clean_text to remove XSS nasties.
- *      noclean     :   If set to true, and ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT is defined as true then the given text will not be
- *                      passed through clean_text to remove XSS nasties.
+ *      trusted     :   If set to true, and trusttext is enabled, and totara_core_legacy_noclean_trusttext_enabled() returns true
+ *                      then the given text will not be passed through clean_text to remove XSS nasties.
+ *      noclean     :   If set to true, and totara_core_legacy_noclean_trusttext_enabled() returns true then the given text will
+ *                      not be passed through clean_text to remove XSS nasties.
  * </pre>
  *
  * @staticvar array $croncache
@@ -1288,7 +1288,7 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
     $allowxss = false;
     if (isset($options['allowxss']) && !empty($options['allowxss'])) {
         $allowxss = true;
-    } else if (!empty($options['noclean']) && ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
+    } else if (!empty($options['noclean']) && !empty($CFG->disableconsistentcleaning)) {
         $allowxss = true;
     }
 
@@ -1735,7 +1735,7 @@ function trusttext_trusted($context) {
 function trusttext_active() {
     global $CFG;
 
-    if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
+    if (empty($CFG->disableconsistentcleaning)) {
         return false;
     }
 

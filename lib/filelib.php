@@ -1479,8 +1479,10 @@ function get_mimetype_for_sending($filename = '') {
  * @return string mimetype deprecated, do not use
  */
 function totara_tweak_file_sending(&$mimetype, &$forcedownload, array &$options, int &$lifetime) {
+    global $CFG;
+
     if (!$forcedownload) {
-        if (ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT or !empty($options['allowxss'])) {
+        if (!empty($CFG->disableconsistentcleaning) or !empty($options['allowxss'])) {
             return $mimetype; // BC only
         }
     }
@@ -1507,7 +1509,7 @@ function totara_tweak_file_sending(&$mimetype, &$forcedownload, array &$options,
         $mimetype = 'application/x-forcedownload';
     }
 
-    if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT and empty($options['allowxss'])) {
+    if (empty($CFG->disableconsistentcleaning) and empty($options['allowxss'])) {
         // Add protection for areas that previously allowed XSS.
         $hopefullysafetypes = [
             'image/gif',

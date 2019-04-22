@@ -84,15 +84,19 @@ class atto_texteditor extends texteditor {
      * @param null $fpoptions
      */
     public function use_editor($elementid, array $options=null, $fpoptions=null) {
-        global $PAGE;
+        global $PAGE, $CFG;
 
         // Totara: enforce sanitization of text unless whitelisted as needing JS.
-        $cleantext = empty($options['noclean']);
-        if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
-            if (empty($options['allowxss'])) {
-                $cleantext = true;
+        $cleantext = true;
+        if (!empty($options['alowxss'])) {
+            $cleantext = false;
+        } else {
+            if (!empty($options['noclean']) and !empty($CFG->disableconsistentcleaning)) {
+                // No clean is true, and consisten cleaning has been disabled, legacy mode active! Don't clean.
+                $cleantext = false;
             }
         }
+
         if ($cleantext) {
             $this->text = clean_text($this->text, PARAM_CLEANHTML);
         }

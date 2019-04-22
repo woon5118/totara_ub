@@ -847,6 +847,8 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
      * Test get_course_contents
      */
     public function test_get_course_contents() {
+        global $CFG;
+
         $this->resetAfterTest(true);
 
         list($course, $forumcm, $datacm, $pagecm, $labelcm, $urlcm) = $this->prepare_get_course_contents_test();
@@ -885,7 +887,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         $this->assertCount(4, $firstsection['modules']);
         $this->assertCount(1, $lastsection['modules']);
         $this->assertEquals(2, $lastsection['section']);
-        if (ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
+        if (!empty($CFG->disableconsistentcleaning)) {
             $this->assertContains('<iframe', $lastsection['summary']);
             $this->assertContains('</iframe>', $lastsection['summary']);
         } else {

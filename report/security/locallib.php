@@ -68,7 +68,7 @@ function report_security_get_issue_list() {
         'report_security_check_repositoryurl',
         'report_security_check_xxe_risk',
         'report_security_check_preventexecpath',
-        'report_security_check_legacynocleantrusttext',
+        'report_security_check_disableconsistentcleaning',
     );
 }
 
@@ -1233,23 +1233,24 @@ function report_security_check_preventexecpath($detailed = false) {
  * @param bool $detailed If set to true explain the consequences of the state.
  * @return stdClass
  */
-function report_security_check_legacynocleantrusttext($detailed = false): stdClass {
+function report_security_check_disableconsistentcleaning($detailed = false): stdClass {
+    global $CFG;
 
     $result = new stdClass();
-    $result->issue   = 'report_security_check_legacynocleantrusttext';
-    $result->name    = get_string('check_legacynocleantrusttext_name', 'report_security');
+    $result->issue   = 'report_security_check_disableconsistentcleaning';
+    $result->name    = get_string('check_disableconsistentcleaning_name', 'report_security');
     $result->details = null;
     $result->link    = null;
 
-    if (ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
+    if (!empty($CFG->disableconsistentcleaning)) {
         $result->status = REPORT_SECURITY_SERIOUS;
-        $result->info = get_string('check_legacynocleantrusttext_serious', 'report_security');
+        $result->info = get_string('check_disableconsistentcleaning_serious', 'report_security');
         if ($detailed) {
-            $result->details = get_string('check_legacynocleantrusttext_details', 'report_security');
+            $result->details = get_string('check_disableconsistentcleaning_details', 'report_security');
         }
     } else {
         $result->status = REPORT_SECURITY_OK;
-        $result->info = get_string('check_legacynocleantrusttext_ok', 'report_security');
+        $result->info = get_string('check_disableconsistentcleaning_ok', 'report_security');
     }
 
     return $result;

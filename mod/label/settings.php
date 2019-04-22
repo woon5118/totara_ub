@@ -35,6 +35,8 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('label/dndresizeheight',
         get_string('dndresizeheight', 'mod_label'), get_string('configdndresizeheight', 'mod_label'), 400, PARAM_INT, 6));
 
-    $settings->add(new admin_setting_configcheckbox('label/allowxss',
-        get_string('allowxss', 'mod_label'), get_string('allowxss_desc', 'mod_label'), '0'));
+    if (empty($CFG->disableconsistentcleaning)) {
+        $settings->add(new admin_setting_configcheckbox('label/allowxss',
+            get_string('allowxss', 'mod_label'), get_string('allowxss_desc', 'mod_label'), '0'));
+    }
 }

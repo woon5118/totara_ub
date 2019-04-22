@@ -167,4 +167,14 @@ class behat_admin extends behat_base {
         $this->wait_for_pending_js();
     }
 
+    /**
+     * Force legacy trusttext and noclean support to be on by default.
+     *
+     * @Given /^I force legacy trusttext and noclean on$/
+     */
+    public function i_force_legacy_trusttext_and_noclean_on() {
+        \behat_hooks::set_step_readonly(false);
+
+        set_config('disableconsistentcleaning', '1');
+    }
 }

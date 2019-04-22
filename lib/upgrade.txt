@@ -26,8 +26,8 @@ information provided here is intended especially for developers.
 * Deprecated properties flex_icon::pix, flex_icon::component, flex_icon::attributes have been removed
 * Updated render_tabobject to correctly support tabobject::linkedwhenselected
 * The class admin_setting_configfilepicker has been deprecated, please use admin_setting_configstoredfile instead
-* Added a new define ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT that when set to true allows format_text to handle noclean and trusttext
-  as it used to in earlier versions of Totara.
+* Added a new setting disableconsistentcleaning which is off by default. When off trusttext will no longer work, and all content
+  is consistently sanitised to remove XSS nasties.
 * Added a new allowxss option to format_text() that should be used only when absolutely necessary to avoid clean_text during formatting.
 * Added a new allowxss option in file serving API that should be used only when absolutely necessary when it is required to allow
   unrestricted execution fo uploaded files (such as in SCORM module).

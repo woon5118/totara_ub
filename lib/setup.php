@@ -417,16 +417,6 @@ if (!defined('MOODLE_MIGRATION_VERSION')) {
     define('MOODLE_MIGRATION_RELEASE', '3.3.9 (Build: 20181112)');
 }
 
-// Totara: disable noclean and trusttext support completely by default.
-if (!defined('ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT')) {
-    define('ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT', false);
-}
-
-// Totara: disable the old trusttext system completely unless the site has explicitly chosen to allow it.
-if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
-    $CFG->enabletrusttext = '0';
-}
-
 // core_component can be used in any scripts, it does not need anything else.
 require_once($CFG->libdir .'/classes/component.php');
 
@@ -669,6 +659,11 @@ if (PHPUNIT_TEST) {
     phpunit_util::initialise_cfg();
 } else {
     initialise_cfg();
+}
+
+// Totara: disable the old trusttext system completely unless the site has explicitly chosen to allow it.
+if (empty($CFG->disableconsistentcleaning)) {
+    $CFG->enabletrusttext = '0';
 }
 
 if (isset($CFG->debug)) {

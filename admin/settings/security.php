@@ -41,8 +41,11 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     $temp->add(new admin_setting_configcheckbox('allowobjectembed', new lang_string('allowobjectembed', 'admin'), new lang_string('configallowobjectembed', 'admin'), 0));
 
-    if (ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT) {
-        // Do not show the trust text setting unless the legacy no clean and trust text define has been explicitly set to true.
+    // Totara: setting to enable the old noclean and trusttext operation.
+    $temp->add(new admin_setting_configcheckbox('disableconsistentcleaning', new lang_string('disableconsistentcleaning', 'admin'), new lang_string('disableconsistentcleaning_help', 'admin'), 0));
+
+    if (!empty($CFG->disableconsistentcleaning)) {
+        // Only show the trusttext setting IF enable_legacy_noclean_trusttext has been turned on.
         $temp->add(new admin_setting_configcheckbox('enabletrusttext', new lang_string('enabletrusttext', 'admin'), new lang_string('configenabletrusttext', 'admin'), 0));
     }
 

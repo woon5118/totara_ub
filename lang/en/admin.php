@@ -483,6 +483,11 @@ $string['enablerssfeeds'] = 'Enable RSS feeds';
 $string['enablesafebrowserintegration'] = 'Enable Safe Exam Browser integration';
 $string['enablesearchareas'] = 'Enable search areas';
 $string['enablestats'] = 'Enable statistics';
+$string['disableconsistentcleaning'] = 'Disable consistent cleaning';
+$string['disableconsistentcleaning_help'] = 'Prior to Totara 13 some areas of the product, such as course summaries and activity introductions, were not properly sanitised before being displayed to the user.
+Turning this setting on will return Totara to this behaviour, allowing privileged users to use advanced HTML in areas such as the above, re-introducing security risks at the same time.
+It will also re-introduce the trusttext setting, and capability.
+We strongly recommend it is left off, and only turned on if you have upgraded and have content that relies upon this functionality, and are happy to accept the security risks.';
 $string['enabletrusttext'] = 'Enable trusted content';
 $string['enablewebservices'] = 'Enable web services';
 $string['enablewsdocumentation'] = 'Web services documentation';

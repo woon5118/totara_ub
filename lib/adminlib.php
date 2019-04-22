@@ -2613,8 +2613,9 @@ class admin_setting_confightmleditor extends admin_setting_configtextarea {
      * @return string empty or error message
      */
     public function write_setting($data) {
+        global $CFG;
         // Totara: enforce sanitization of text unless whitelisted as needing JS.
-        if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT and !$this->allowxss) {
+        if (empty($CFG->disableconsistentcleaning) and !$this->allowxss) {
             $data = clean_text($data, FORMAT_HTML);
         }
         return parent::write_setting($data);
@@ -4659,10 +4660,10 @@ class admin_setting_special_frontpagedesc extends admin_setting_confightmleditor
      * @return string empty or error message
      */
     public function write_setting($data) {
-        global $DB, $SITE, $COURSE;
+        global $DB, $SITE, $COURSE, $CFG;
 
         // Totara: enforce sanitization of text unless whitelisted as needing JS.
-        if (!ENABLE_LEGACY_NOCLEAN_AND_TRUSTTEXT and !$this->allowxss) {
+        if (empty($CFG->disableconsistentcleaning) and !$this->allowxss) {
             $data = clean_text($data, FORMAT_HTML);
         }
 
