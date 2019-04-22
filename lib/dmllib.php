@@ -39,6 +39,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\dml\sql;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Require the essential
@@ -158,10 +160,14 @@ class dml_multiple_records_exception extends dml_exception {
 
     /**
      * Constructor
-     * @param string $sql The SQL that ran just before this read error.
+     * @param string|sql $sql The SQL that ran just before this read error.
      * @param array $params The SQL's related parameters.(optional)
      */
     function __construct($sql='', array $params=null) {
+        if ($sql instanceof sql) {
+            $params = $sql->get_params();
+            $sql = $sql->get_sql();
+        }
         $errorinfo = $sql."\n[".var_export($params, true).']';
         parent::__construct('multiplerecordsfound', null, $errorinfo);
     }
@@ -187,10 +193,15 @@ class dml_missing_record_exception extends dml_exception {
     /**
      * Constructor
      * @param string $tablename The table name if known, '' if unknown.
-     * @param string $sql Optional SQL query.
+     * @param string|sql $sql Optional SQL query.
      * @param array $params Optional SQL query's parameters.
      */
     function __construct($tablename, $sql='', array $params=null) {
+        if ($sql instanceof sql) {
+            $params = $sql->get_params();
+            $sql = $sql->get_sql();
+        }
+
         if (empty($tablename)) {
             $tablename = null;
         }

@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use core\dml\sql;
+
 /**
  * Abstract database driver class.
  *
@@ -927,13 +929,21 @@ abstract class moodle_database {
 
     /**
      * Normalizes sql query parameters and verifies parameters.
-     * @param string $sql The query or part of it.
+     * @param string|sql $sql The query or part of it.
      * @param array $params The query parameters.
      * @return array (sql, params, type of params)
      */
     public function fix_sql_params($sql, array $params=null) {
         $params = (array)$params; // mke null array if needed
         $allowed_types = $this->allowed_param_types();
+
+        if ($sql instanceof sql) {
+            if (!empty($params)) {
+                debugging('$params parameter is ignored when sql instance supplied', DEBUG_DEVELOPER);
+            }
+            $params = $sql->get_params();
+            $sql = $sql->get_sql();
+        }
 
         // convert table names
         $sql = $this->fix_table_names($sql);
@@ -1262,7 +1272,7 @@ abstract class moodle_database {
     /**
      * Executes a general sql query. Should be used only when no other method suitable.
      * Do NOT use this to make changes in db structure, use database_manager methods instead!
-     * @param string $sql query
+     * @param string|sql $sql query
      * @param array $params query parameters
      * @return bool true
      * @throws dml_exception A DML specific exception is thrown for any errors.
@@ -1340,7 +1350,7 @@ abstract class moodle_database {
      * Other arguments and the return type are like {@link function get_recordset}.
      *
      * @param string $table the table to query.
-     * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
      * @param array $params array of sql parameters
      * @param string $sort an order to sort the results in (optional, a valid SQL ORDER BY parameter).
      * @param string $fields a comma separated list of fields to return (optional, by default all fields are returned).
@@ -1350,13 +1360,22 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_recordset_select($table, $select, array $params=null, $sort='', $fields='*', $limitfrom=0, $limitnum=0) {
-        $sql = "SELECT $fields FROM {".$table."}";
-        if ($select) {
-            $sql .= " WHERE $select";
+        if ($select instanceof sql) {
+            $sql = self::sql("SELECT $fields FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+            if ($sort) {
+                $sql = $sql->append("ORDER BY $sort");
+            }
+        } else {
+            $sql = "SELECT $fields FROM {{$table}}";
+            if ($select) {
+                $sql .= " WHERE $select";
+            }
+            if ($sort) {
+                $sql .= " ORDER BY $sort";
+            }
         }
-        if ($sort) {
-            $sql .= " ORDER BY $sort";
-        }
+
         return $this->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
     }
 
@@ -1367,7 +1386,7 @@ abstract class moodle_database {
      * code where it's possible there might be large datasets being returned.  For known
      * small datasets use get_records_sql - it leads to simpler code.
      *
-     * @param string $sql the SQL select query to execute.
+     * @param string|sql $sql the SQL select query to execute.
      * @param array $params array of sql parameters
      * @param int $limitfrom return a subset of records, starting at this point (optional).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
@@ -1443,7 +1462,7 @@ abstract class moodle_database {
      * Return value is like {@link function get_records}.
      *
      * @param string $table The table to query.
-     * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
      * @param array $params An array of sql parameters
      * @param string $sort An order to sort the results in (optional, a valid SQL ORDER BY parameter).
      * @param string $fields A comma separated list of fields to return
@@ -1455,13 +1474,23 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_records_select($table, $select, array $params=null, $sort='', $fields='*', $limitfrom=0, $limitnum=0) {
-        if ($select) {
-            $select = "WHERE $select";
+        if ($select instanceof sql) {
+            $sql = self::sql("SELECT $fields FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+            if ($sort) {
+                $sql = $sql->append("ORDER BY $sort");
+            }
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
+            if ($sort) {
+                $sort = " ORDER BY $sort";
+            }
+            $sql = "SELECT $fields FROM {{$table}} $select $sort";
         }
-        if ($sort) {
-            $sort = " ORDER BY $sort";
-        }
-        return $this->get_records_sql("SELECT $fields FROM {" . $table . "} $select $sort", $params, $limitfrom, $limitnum);
+
+        return $this->get_records_sql($sql, $params, $limitfrom, $limitnum);
     }
 
     /**
@@ -1469,7 +1498,7 @@ abstract class moodle_database {
      *
      * Return value is like {@link function get_records}.
      *
-     * @param string $sql the SQL select query to execute. The first column of this SELECT statement
+     * @param string|sql $sql the SQL select query to execute. The first column of this SELECT statement
      *   must be a unique value (usually the 'id' field), as it will be used as the key of the
      *   returned array.
      * @param array $params array of sql parameters
@@ -1495,7 +1524,7 @@ abstract class moodle_database {
      *
      * @throws coding_exception if the database driver does not support this method.
      *
-     * @param string $sql the SQL select query to execute.
+     * @param string|sql $sql the SQL select query to execute.
      * @param array|null $params array of sql parameters (optional)
      * @param int $limitfrom return a subset of records, starting at this point (optional).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
@@ -1514,7 +1543,7 @@ abstract class moodle_database {
      *
      * @since Totara 2.6.45, 2.7.28, 2.9.20, 9.8
      *
-     * @param string $sql the SQL select query to execute. The first column of this SELECT statement
+     * @param string|sql $sql the SQL select query to execute. The first column of this SELECT statement
      *   must be a unique value (usually the 'id' field), as it will be used as the key of the
      *   returned array.
      * @param array|null $params An associative array of params OR null if there are none.
@@ -1576,7 +1605,7 @@ abstract class moodle_database {
      * Return value is like {@link function get_records_menu}.
      *
      * @param string $table The database table to be checked against.
-     * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
      * @param array $params array of sql parameters
      * @param string $sort Sort order (optional) - a valid SQL order parameter
      * @param string $fields A comma separated list of fields to be returned from the chosen table - the number of fields should be 2!
@@ -1604,7 +1633,7 @@ abstract class moodle_database {
      * Arguments are like {@link function get_recordset_sql}.
      * Return value is like {@link function get_records_menu}.
      *
-     * @param string $sql The SQL string you wish to be executed.
+     * @param string|sql $sql The SQL string you wish to be executed.
      * @param array $params array of sql parameters
      * @param int $limitfrom return a subset of records, starting at this point (optional).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
@@ -1647,7 +1676,7 @@ abstract class moodle_database {
      * Get a single database record as an object which match a particular WHERE clause.
      *
      * @param string $table The database table to be checked against.
-     * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
      * @param array $params array of sql parameters
      * @param string $fields A comma separated list of fields to be returned from the chosen table.
      * @param int $strictness IGNORE_MISSING means compatible mode, false returned if record not found, debug message if more found;
@@ -1657,11 +1686,17 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_record_select($table, $select, array $params=null, $fields='*', $strictness=IGNORE_MISSING) {
-        if ($select) {
-            $select = "WHERE $select";
+        if ($select instanceof sql) {
+            $sql = self::sql("SELECT $fields FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
+            $sql = "SELECT $fields FROM {{$table}} $select";
         }
         try {
-            return $this->get_record_sql("SELECT $fields FROM {" . $table . "} $select", $params, $strictness);
+            return $this->get_record_sql($sql, $params, $strictness);
         } catch (dml_missing_record_exception $e) {
             // create new exception which will contain correct table name
             throw new dml_missing_record_exception($table, $e->sql, $e->params);
@@ -1674,7 +1709,7 @@ abstract class moodle_database {
      * The SQL statement should normally only return one record.
      * It is recommended to use get_records_sql() if more matches possible!
      *
-     * @param string $sql The SQL string you wish to be executed, should normally only return one record.
+     * @param string|sql $sql The SQL string you wish to be executed, should normally only return one record.
      * @param array $params array of sql parameters
      * @param int $strictness IGNORE_MISSING means compatible mode, false returned if record not found, debug message if more found;
      *                        IGNORE_MULTIPLE means return first, ignore multiple records found(not recommended);
@@ -1730,7 +1765,7 @@ abstract class moodle_database {
      *
      * @param string $table the table to query.
      * @param string $return the field to return the value of.
-     * @param string $select A fragment of SQL to be used in a where clause returning one row with one column
+     * @param string|sql $select A fragment of SQL to be used in a where clause returning one row with one column
      * @param array $params array of sql parameters
      * @param int $strictness IGNORE_MISSING means compatible mode, false returned if record not found, debug message if more found;
      *                        IGNORE_MULTIPLE means return first, ignore multiple records found(not recommended);
@@ -1739,11 +1774,17 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_field_select($table, $return, $select, array $params=null, $strictness=IGNORE_MISSING) {
-        if ($select) {
-            $select = "WHERE $select";
+        if ($select instanceof sql) {
+            $sql = self::sql("SELECT $return FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
+            $sql = "SELECT $return FROM {{$table}} $select";
         }
         try {
-            return $this->get_field_sql("SELECT $return FROM {" . $table . "} $select", $params, $strictness);
+            return $this->get_field_sql($sql, $params, $strictness);
         } catch (dml_missing_record_exception $e) {
             // create new exception which will contain correct table name
             throw new dml_missing_record_exception($table, $e->sql, $e->params);
@@ -1753,7 +1794,7 @@ abstract class moodle_database {
     /**
      * Get a single field value (first field) using a SQL statement.
      *
-     * @param string $sql The SQL query returning one row with one column
+     * @param string|sql $sql The SQL query returning one row with one column
      * @param array $params array of sql parameters
      * @param int $strictness IGNORE_MISSING means compatible mode, false returned if record not found, debug message if more found;
      *                        IGNORE_MULTIPLE means return first, ignore multiple records found(not recommended);
@@ -1775,22 +1816,28 @@ abstract class moodle_database {
      *
      * @param string $table the table to query.
      * @param string $return the field we are intered in
-     * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
      * @param array $params array of sql parameters
      * @return array of values
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_fieldset_select($table, $return, $select, array $params=null) {
-        if ($select) {
-            $select = "WHERE $select";
+        if ($select instanceof sql) {
+            $sql = self::sql("SELECT $return FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
+            $sql = "SELECT $return FROM {{$table}} $select";
         }
-        return $this->get_fieldset_sql("SELECT $return FROM {" . $table . "} $select", $params);
+        return $this->get_fieldset_sql($sql, $params);
     }
 
     /**
      * Selects records and return values (first field) as an array using a SQL statement.
      *
-     * @param string $sql The SQL query
+     * @param string|sql $sql The SQL query
      * @param array $params array of sql parameters
      * @return array of values
      * @throws dml_exception A DML specific exception is thrown for any errors.
@@ -1816,7 +1863,7 @@ abstract class moodle_database {
      * If the return ID isn't required, then this just reports success as true/false.
      * $data is an object containing needed data
      * @param string $table The database table to be inserted into
-     * @param object $dataobject A data object with values for one or more fields in the record
+     * @param stdClass|array $dataobject A data object with values for one or more fields in the record
      * @param bool $returnid Should the id of the newly created record entry be returned? If this option is not requested then true/false is returned.
      * @param bool $bulk Set to true is multiple inserts are expected
      * @return bool|int true or new id
@@ -1969,7 +2016,7 @@ abstract class moodle_database {
      * Safety checks are NOT carried out. Lobs are supported.
      *
      * @param string $table name of database table to be inserted into
-     * @param object $dataobject A data object with values for one or more fields in the record
+     * @param stdClass|array $dataobject A data object with values for one or more fields in the record
      * @return bool true
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
@@ -1993,7 +2040,7 @@ abstract class moodle_database {
      * specify the record to update
      *
      * @param string $table The database table to be checked against.
-     * @param object $dataobject An object with contents equal to fieldname=>fieldvalue. Must have an entry for 'id' to map to the table specified.
+     * @param stdClass|array $dataobject An object with contents equal to fieldname=>fieldvalue. Must have an entry for 'id' to map to the table specified.
      * @param bool $bulk True means repeated updates expected.
      * @return bool true
      * @throws dml_exception A DML specific exception is thrown for any errors.
@@ -2021,7 +2068,7 @@ abstract class moodle_database {
      * @param string $table The database table to be checked against.
      * @param string $newfield the field to set.
      * @param string $newvalue the value to set the field to.
-     * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
      * @param array $params array of sql parameters
      * @return bool true
      * @throws dml_exception A DML specific exception is thrown for any errors.
@@ -2046,17 +2093,23 @@ abstract class moodle_database {
      * Count the records in a table which match a particular WHERE clause.
      *
      * @param string $table The database table to be checked against.
-     * @param string $select A fragment of SQL to be used in a WHERE clause in the SQL call.
+     * @param string|sql $select A fragment of SQL to be used in a WHERE clause in the SQL call.
      * @param array $params array of sql parameters
      * @param string $countitem The count string to be used in the SQL call. Default is COUNT('x').
      * @return int The count of records returned from the specified criteria.
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function count_records_select($table, $select, array $params=null, $countitem="COUNT('x')") {
-        if ($select) {
-            $select = "WHERE $select";
+        if ($select instanceof sql) {
+            $sql = self::sql("SELECT $countitem FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
+            $sql = "SELECT $countitem FROM {{$table}} $select";
         }
-        return $this->count_records_sql("SELECT $countitem FROM {" . $table . "} $select", $params);
+        return $this->count_records_sql($sql, $params);
     }
 
     /**
@@ -2067,7 +2120,7 @@ abstract class moodle_database {
      * returned. However, this method should only be used for the
      * intended purpose.) If an error occurs, 0 is returned.
      *
-     * @param string $sql The SQL string you wish to be executed.
+     * @param string|sql $sql The SQL string you wish to be executed.
      * @param array $params array of sql parameters
      * @return int the count
      * @throws dml_exception A DML specific exception is thrown for any errors.
@@ -2097,16 +2150,22 @@ abstract class moodle_database {
      * Test whether any records exists in a table which match a particular WHERE clause.
      *
      * @param string $table The database table to be checked against.
-     * @param string $select A fragment of SQL to be used in a WHERE clause in the SQL call.
+     * @param string|sql $select A fragment of SQL to be used in a WHERE clause in the SQL call.
      * @param array $params array of sql parameters
      * @return bool true if a matching record exists, else false.
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function record_exists_select($table, $select, array $params=null) {
-        if ($select) {
-            $select = "WHERE $select";
+        if ($select instanceof sql) {
+            $sql = self::sql("SELECT 'x' FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
+            $sql = "SELECT 'x' FROM {{$table}} $select";
         }
-        return $this->record_exists_sql("SELECT 'x' FROM {" . $table . "} $select", $params);
+        return $this->record_exists_sql($sql, $params);
     }
 
     /**
@@ -2115,7 +2174,7 @@ abstract class moodle_database {
      * This function returns true if the SQL statement executes
      * without any errors and returns at least one record.
      *
-     * @param string $sql The SQL statement to execute.
+     * @param string|sql $sql The SQL statement to execute.
      * @param array $params array of sql parameters
      * @return bool true if the SQL executes without errors and returns at least one record.
      * @throws dml_exception A DML specific exception is thrown for any errors.
@@ -2160,7 +2219,7 @@ abstract class moodle_database {
      * Delete one or more records from a table which match a particular WHERE clause.
      *
      * @param string $table The database table to be checked against.
-     * @param string $select A fragment of SQL to be used in a where clause in the SQL call (used to define the selection criteria).
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call (used to define the selection criteria).
      * @param array $params array of sql parameters
      * @return bool true.
      * @throws dml_exception A DML specific exception is thrown for any errors.
@@ -2176,6 +2235,36 @@ abstract class moodle_database {
      */
     public function sql_null_from_clause() {
         return '';
+    }
+
+    /**
+     * Returns raw SQL fragment representing IN condition which may be optimised to '='.
+     *
+     * @since Totara 13
+     *
+     * @param array $values
+     * @param mixed $onemptyitems This defines the behavior when the array of items provided is empty. Defaults to false,
+     *              meaning throw exceptions. Other values will become part of the returned SQL fragment.
+     * @return sql
+     */
+    final public function sql_in(array $values, $onemptyitems=false) {
+        list($sql, $param) = $this->get_in_or_equal($values, SQL_PARAMS_NAMED, 'param', true, $onemptyitems);
+        return self::sql($sql, $param);
+    }
+
+    /**
+     * Returns raw SQL fragment representing NOT IN condition which may be optimised to '<>'.
+     *
+     * @since Totara 13
+     *
+     * @param array $values
+     * @param mixed $onemptyitems This defines the behavior when the array of items provided is empty. Defaults to false,
+     *              meaning throw exceptions. Other values will become part of the returned SQL fragment.
+     * @return sql
+     */
+    final public function sql_not_in(array $values, $onemptyitems=false) {
+        list($sql, $param) = $this->get_in_or_equal($values, SQL_PARAMS_NAMED, 'param', false, $onemptyitems);
+        return self::sql($sql, $param);
     }
 
     /**
@@ -3222,7 +3311,8 @@ abstract class moodle_database {
      * @param string $prefix Defaults to param, make it something sensible for the code. Keep it short!
      * @return string
      */
-    final public function get_unique_param($prefix = 'param') {
+    final public static function get_unique_param($prefix = 'param') {
+        // Totara: method was changed to static to make the purpose of this method more clear.
         static $paramcounts = array();
         if (debugging('', DEBUG_DEVELOPER) && strlen($prefix) > 20) {
             // You should keep your param short in order to avoid running close to the limit if it gets used a lot.
@@ -3259,5 +3349,18 @@ abstract class moodle_database {
      */
     public function recommends_counted_recordset(): bool {
         return false;
+    }
+
+    /**
+     * Create instance of Raw SQL.
+     *
+     * @since Totara 13
+     *
+     * @param string $sql
+     * @param array|null $params
+     * @return sql
+     */
+    final public static function sql(string $sql, ?array $params = []): sql {
+        return new sql($sql, (array)$params);
     }
 }

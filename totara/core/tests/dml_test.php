@@ -21,6 +21,8 @@
  * @package totara_core
  */
 
+use core\dml\sql;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -1948,5 +1950,236 @@ ORDER BY tt1.groupid";
         $params = range(1, 100);
         $DB->get_in_or_equal($params);
         self::assertDebuggingNotCalled();
+    }
+
+    public function test_sql() {
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        $coursetable = 'test_table_course';
+        $table = new xmldb_table($coursetable);
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('visible', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('fullname', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('summary', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('summaryformat', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+
+        $siteid = $DB->insert_record($coursetable, [
+            'fullname' => 'Test site',
+            'shortname' => 'TS',
+            'summary' => '<p>Tiny little test site.<p>',
+            'summaryformat' => FORMAT_HTML,
+            'timemodified' => time(),
+        ]);
+        $site = $DB->get_record($coursetable, ['id' => $siteid], '*', MUST_EXIST);
+
+        $otherid = $DB->insert_record($coursetable, [
+            'fullname' => 'Course 1',
+            'shortname' => 'C1',
+            'summary' => '<p>Test 1.<p>',
+            'summaryformat' => FORMAT_HTML,
+            'timemodified' => time(),
+        ]);
+        $other = $DB->get_record($coursetable, ['id' => $otherid], '*', MUST_EXIST);
+
+        $select = "WHERE a = :a AND b = :b";
+        $params = ['b' => 1, 'a' => 2];
+        $rawsql = $DB::sql($select, $params);
+        $this->assertInstanceOf(sql::class, $rawsql);
+        $this->assertSame($select, $rawsql->get_sql());
+        $this->assertSame($params, $rawsql->get_params());
+
+        $select = "WHERE a = ? AND b = ?";
+        $params = [1, 2];
+        $rawsql = $DB::sql($select, $params);
+        $this->assertInstanceOf(sql::class, $rawsql);
+        $this->assertSame($select, $rawsql->get_sql());
+        $this->assertSame($params, $rawsql->get_params());
+
+        $select = "WHERE a = $2 AND b = $1";
+        $params = [2, 1];
+        $rawsql = $DB::sql($select, $params);
+        $this->assertInstanceOf(sql::class, $rawsql);
+        $this->assertRegExp('/WHERE a = :uq_param_\d+ AND b = :uq_param_\d+/', $rawsql->get_sql());
+        $this->assertSame([1, 2], array_values($rawsql->get_params()));
+
+        // General execute first.
+
+        $result = $DB->execute($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]));
+        $this->assertTrue($result);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->execute($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($result, $extraparamsresult);
+
+        // Test all "_sql" methods.
+
+        $record = $DB->get_record_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]));
+        $this->assertEquals($site, $record);
+        $this->assertDebuggingNotCalled();
+
+        $record = $DB->get_record_sql($DB::sql("SELECT * FROM {{$coursetable}}"));
+        $this->assertDebuggingCalled('Error: mdb->get_record() found more than one record!');
+
+        $record = $DB->get_record_sql($DB::sql("SELECT * FROM {{$coursetable}}"), null, IGNORE_MULTIPLE);
+        $this->assertDebuggingNotCalled();
+
+        try {
+            $DB->get_record_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => -1]), null, MUST_EXIST);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_missing_record_exception::class, $e);
+            $this->assertStringStartsWith('Can not find data record in database. (SELECT * FROM {test_table_course} WHERE id = :id', $e->getMessage());
+        }
+
+        $extraparamsresult = $DB->get_record_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($record, $extraparamsresult);
+
+        $exists = $DB->record_exists_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]));
+        $this->assertTrue($exists);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->record_exists_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($exists, $extraparamsresult);
+
+        $records = $DB->get_records_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]));
+        $this->assertEquals([$site->id => $site], $records);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->get_records_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($records, $extraparamsresult);
+
+        $records = $DB->get_records_sql_menu($DB::sql("SELECT id, fullname FROM {{$coursetable}} WHERE id = :id ORDER BY id ASC", ['id' => $site->id]));
+        $this->assertEquals([$site->id => $site->fullname], $records);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->get_records_sql_menu($DB::sql("SELECT id, fullname FROM {{$coursetable}} WHERE id = :id ORDER BY id ASC", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($records, $extraparamsresult);
+
+        $count = $DB->count_records_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]));
+        $this->assertEquals(1, $count);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->count_records_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($count, $extraparamsresult);
+
+        $recordset = $DB->get_recordset_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]));
+        foreach ($recordset as $record) {
+            $this->assertEquals($site, $record);
+        }
+        $this->assertDebuggingNotCalled();
+
+        $DB->get_recordset_sql($DB::sql("SELECT * FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+
+        $field = $DB->get_field_sql($DB::sql("SELECT fullname FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]));
+        $this->assertSame($site->fullname, $field);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->get_field_sql($DB::sql("SELECT fullname FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertSame($field, $extraparamsresult);
+
+        $fieldset = $DB->get_fieldset_sql($DB::sql("SELECT id, fullname FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]));
+        $this->assertSame([0 => $site->id], $fieldset);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->get_fieldset_sql($DB::sql("SELECT id, fullname FROM {{$coursetable}} WHERE id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($fieldset, $extraparamsresult);
+
+        // Test all "_select" methods.
+
+        $record = $DB->get_record_select($coursetable, $DB::sql("id = :id", ['id' => $site->id]));
+        $this->assertEquals($site, $record);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->get_record_select($coursetable, $DB::sql("id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($record, $extraparamsresult);
+
+        $exists = $DB->record_exists_select($coursetable, $DB::sql("id = :id", ['id' => $site->id]));
+        $this->assertTrue($exists);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->record_exists_select($coursetable, $DB::sql("id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($exists, $extraparamsresult);
+
+        $records = $DB->get_records_select($coursetable, $DB::sql("id = :id", ['id' => $site->id]));
+        $this->assertEquals([$site->id => $site], $records);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->get_records_select($coursetable, $DB::sql("id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($records, $extraparamsresult);
+
+        $records = $DB->get_records_select_menu($coursetable, $DB::sql("id = :id", ['id' => $site->id]), null, 'id ASC', 'id, fullname');
+        $this->assertEquals([$site->id => $site->fullname], $records);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->get_records_select_menu($coursetable, $DB::sql("id = :id", ['id' => $site->id]), ['id' => -1], 'id ASC', 'id, fullname');
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($records, $extraparamsresult);
+
+        $count = $DB->count_records_select($coursetable, $DB::sql("id = :id", ['id' => $site->id]));
+        $this->assertEquals(1, $count);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->count_records_select($coursetable, $DB::sql("id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($count, $extraparamsresult);
+
+        $recordset = $DB->get_recordset_select($coursetable, $DB::sql("id = :id", ['id' => $site->id]));
+        foreach ($recordset as $record) {
+            $this->assertEquals($site, $record);
+        }
+        $this->assertDebuggingNotCalled();
+
+        $field = $DB->get_field_select($coursetable, 'fullname', $DB::sql("id = :id", ['id' => $site->id]));
+        $this->assertSame($site->fullname, $field);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->get_field_select($coursetable, 'fullname', $DB::sql("id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($field, $extraparamsresult);
+
+        $fieldset = $DB->get_fieldset_select($coursetable, 'id, fullname', $DB::sql("id = :id", ['id' => $site->id]));
+        $this->assertSame([0 => $site->id], $fieldset);
+        $this->assertDebuggingNotCalled();
+
+        $extraparamsresult = $DB->get_fieldset_select($coursetable, 'id, fullname', $DB::sql("id = :id", ['id' => $site->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $this->assertEquals($fieldset, $extraparamsresult);
+
+        $DB->set_field_select($coursetable, 'shortname', 'CX', $DB::sql("id = :id", ['id' => $other->id]));
+        $field = $DB->get_field_select($coursetable, 'shortname', $DB::sql("id = :id", ['id' => $other->id]));
+        $this->assertSame('CX', $field);
+        $this->assertDebuggingNotCalled();
+
+        $DB->set_field_select($coursetable, 'shortname', 'XX', $DB::sql("id = :id", ['id' => $other->id]), ['id' => -1]);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+        $field = $DB->get_field_select($coursetable, 'shortname', $DB::sql("id = :id", ['id' => $other->id]));
+        $this->assertSame('XX', $field);
+
+        $DB->delete_records_select($coursetable, $DB::sql("id = :id", ['id' => $other->id]), ['id' => -1]);
+        $exists = $DB->record_exists_select($coursetable, $DB::sql("id = :id", ['id' => $other->id]));
+        $this->assertFalse($exists);
+        $this->assertDebuggingCalled('$params parameter is ignored when sql instance supplied');
+
+        $DB->delete_records_select($coursetable, $DB::sql("id = :id", ['id' => $other->id]));
+        $this->assertDebuggingNotCalled();
+
+        $dbman->drop_table($table);
     }
 }

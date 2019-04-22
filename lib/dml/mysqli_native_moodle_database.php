@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\dml\sql;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/moodle_database.php');
@@ -1049,7 +1051,7 @@ class mysqli_native_moodle_database extends moodle_database {
     /**
      * Execute general sql query. Should be used only when no other method suitable.
      * Do NOT use this to make changes in db structure, use database_manager methods instead!
-     * @param string $sql query
+     * @param string|sql $sql query
      * @param array $params query parameters
      * @return bool true
      * @throws dml_exception A DML specific exception is thrown for any errors.
@@ -1086,7 +1088,7 @@ class mysqli_native_moodle_database extends moodle_database {
      * The return type is like:
      * @see function get_recordset.
      *
-     * @param string $sql the SQL select query to execute.
+     * @param string|sql $sql the SQL select query to execute.
      * @param array $params array of sql parameters
      * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
@@ -1094,6 +1096,7 @@ class mysqli_native_moodle_database extends moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_recordset_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {
+        list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
 
         list($limitfrom, $limitnum) = $this->normalise_limit_from_num($limitfrom, $limitnum);
 
@@ -1104,7 +1107,6 @@ class mysqli_native_moodle_database extends moodle_database {
             $sql .= " LIMIT $limitfrom, $limitnum";
         }
 
-        list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
         $rawsql = $this->emulate_bound_params($sql, $params);
 
         $this->query_start($sql, $params, SQL_QUERY_SELECT);
@@ -1146,7 +1148,7 @@ class mysqli_native_moodle_database extends moodle_database {
      * Return value is like:
      * @see function get_records.
      *
-     * @param string $sql the SQL select query to execute. The first column of this SELECT statement
+     * @param string|sql $sql the SQL select query to execute. The first column of this SELECT statement
      *   must be a unique value (usually the 'id' field), as it will be used as the key of the
      *   returned array.
      * @param array $params array of sql parameters
@@ -1156,6 +1158,7 @@ class mysqli_native_moodle_database extends moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_records_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {
+        list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
 
         list($limitfrom, $limitnum) = $this->normalise_limit_from_num($limitfrom, $limitnum);
 
@@ -1166,7 +1169,6 @@ class mysqli_native_moodle_database extends moodle_database {
             $sql .= " LIMIT $limitfrom, $limitnum";
         }
 
-        list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
         $rawsql = $this->emulate_bound_params($sql, $params);
 
         $this->query_start($sql, $params, SQL_QUERY_SELECT);
@@ -1192,7 +1194,7 @@ class mysqli_native_moodle_database extends moodle_database {
     /**
      * Selects records and return values (first field) as an array using a SQL statement.
      *
-     * @param string $sql The SQL query
+     * @param string|sql $sql The SQL query
      * @param array $params array of sql parameters
      * @return array of values
      * @throws dml_exception A DML specific exception is thrown for any errors.
@@ -1528,18 +1530,20 @@ class mysqli_native_moodle_database extends moodle_database {
      * @param string $table The database table to be checked against.
      * @param string $newfield the field to set.
      * @param string $newvalue the value to set the field to.
-     * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
      * @param array $params array of sql parameters
      * @return bool true
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function set_field_select($table, $newfield, $newvalue, $select, array $params=null) {
-        if ($select) {
-            $select = "WHERE $select";
+        if ($select instanceof sql) {
+            $select = $select->prepend("WHERE");
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
         }
-        if (is_null($params)) {
-            $params = array();
-        }
+
         list($select, $params, $type) = $this->fix_sql_params($select, $params);
 
         // Get column metadata
@@ -1568,16 +1572,21 @@ class mysqli_native_moodle_database extends moodle_database {
      * Delete one or more records from a table which match a particular WHERE clause.
      *
      * @param string $table The database table to be checked against.
-     * @param string $select A fragment of SQL to be used in a where clause in the SQL call (used to define the selection criteria).
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call (used to define the selection criteria).
      * @param array $params array of sql parameters
      * @return bool true
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function delete_records_select($table, $select, array $params=null) {
-        if ($select) {
-            $select = "WHERE $select";
+        if ($select instanceof sql) {
+            $sql = self::sql("DELETE FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
+            $sql = "DELETE FROM {{$table}} $select";
         }
-        $sql = "DELETE FROM {$this->prefix}$table $select";
 
         list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
         $rawsql = $this->emulate_bound_params($sql, $params);
@@ -2038,7 +2047,7 @@ class mysqli_native_moodle_database extends moodle_database {
      *
      * @since Totara 2.6.45, 2.7.28, 2.9.20, 9.8
      *
-     * @param string $sql the SQL select query to execute.
+     * @param string|sql $sql the SQL select query to execute.
      * @param array $params array of sql parameters (optional)
      * @param int $limitfrom return a subset of records, starting at this point (optional).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
@@ -2049,6 +2058,14 @@ class mysqli_native_moodle_database extends moodle_database {
     public function get_counted_recordset_sql($sql, array $params=null, $limitfrom = 0, $limitnum = 0, &$count = 0) {
         global $CFG;
         require_once($CFG->libdir.'/dml/counted_recordset.php');
+
+        if ($sql instanceof sql) {
+            if (!empty($params)) {
+                debugging('$params parameter is ignored when sql instance supplied', DEBUG_DEVELOPER);
+            }
+            $params = $sql->get_params();
+            $sql = $sql->get_sql();
+        }
 
         if (!preg_match('/^\s*SELECT\s/is', $sql)) {
             throw new dml_exception('dmlcountedrecordseterror', null, "Counted recordset query must start with SELECT");

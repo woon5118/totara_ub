@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\dml\sql;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/moodle_database.php');
@@ -206,10 +208,16 @@ abstract class pdo_moodle_database extends moodle_database {
     }
 
     public function delete_records_select($table, $select, array $params=null) {
-        $sql = "DELETE FROM {{$table}}";
-        if ($select) {
-            $sql .= " WHERE $select";
+        if ($select instanceof sql) {
+            $sql = self::sql("DELETE FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
+            $sql = "DELETE FROM {{$table}} $select";
         }
+
         return $this->execute($sql, $params);
     }
 
@@ -227,7 +235,7 @@ abstract class pdo_moodle_database extends moodle_database {
     /**
      * Execute general sql query. Should be used only when no other method suitable.
      * Do NOT use this to make changes in db structure, use database_manager methods instead!
-     * @param string $sql query
+     * @param string|sql $sql query
      * @param array $params query parameters
      * @return bool success
      */
@@ -258,7 +266,7 @@ abstract class pdo_moodle_database extends moodle_database {
      * The return type is like:
      * @see function get_recordset.
      *
-     * @param string $sql the SQL select query to execute.
+     * @param string|sql $sql the SQL select query to execute.
      * @param array $params array of sql parameters
      * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
@@ -288,7 +296,7 @@ abstract class pdo_moodle_database extends moodle_database {
     /**
      * Selects rows and return values of first column as array.
      *
-     * @param string $sql The SQL query
+     * @param string|sql $sql The SQL query
      * @param array $params array of sql parameters
      * @return array of values
      */
@@ -312,7 +320,7 @@ abstract class pdo_moodle_database extends moodle_database {
      * Return value is like:
      * @see function get_records.
      *
-     * @param string $sql the SQL select query to execute. The first column of this SELECT statement
+     * @param string|sql $sql the SQL select query to execute. The first column of this SELECT statement
      *   must be a unique value (usually the 'id' field), as it will be used as the key of the
      *   returned array.
      * @param array $params array of sql parameters
@@ -495,17 +503,19 @@ abstract class pdo_moodle_database extends moodle_database {
      * @param string $table The database table to be checked against.
      * @param string $newfield the field to set.
      * @param string $newvalue the value to set the field to.
-     * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
      * @param array $params array of sql parameters
      * @return bool success
      */
     public function set_field_select($table, $newfield, $newvalue, $select, array $params=null) {
-        if ($select) {
-            $select = "WHERE $select";
+        if ($select instanceof sql) {
+            $select = $select->prepend("WHERE");
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
         }
-        if (is_null($params)) {
-            $params = array();
-        }
+
         list($select, $params, $type) = $this->fix_sql_params($select, $params);
 
         if (is_bool($newvalue)) {
