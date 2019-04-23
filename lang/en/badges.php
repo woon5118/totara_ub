@@ -108,6 +108,7 @@ $string['backpackconnectioncancelattempt'] = 'Connect using a different email ad
 $string['backpackconnectionconnect'] = 'Connect to Backpack';
 $string['backpackconnectionresendemail'] = 'Resend verification email';
 $string['backpackconnectionunexpectedresult'] = 'There was a problem contacting the Backpack. Please try again.<br><br>If this problem persists, please contact your system administrator.';
+$string['backpackconnectionunexpectedmessage'] = 'The backpack returned the error: "{$a}".';
 $string['backpackemailverificationpending'] = 'Verification pending';
 $string['backpackemailverifyemailbody'] = 'Hi,
 

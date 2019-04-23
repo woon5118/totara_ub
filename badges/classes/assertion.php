@@ -223,13 +223,17 @@ class core_badges_assertion {
         $issuer = array();
         if ($this->_data) {
             // Required.
-            $issuer['name'] = $this->_data->issuername;
-            $issuer['url'] = $this->_data->issuerurl;
-            // Optional.
-            if (!empty($this->_data->issuercontact)) {
-                $issuer['email'] = $this->_data->issuercontact;
+            if (badges_open_badges_backpack_api() == OPEN_BADGES_V1) {
+                $issuer['name'] = $this->_data->issuername;
+                $issuer['url'] = $this->_data->issuerurl;
+                // Optional.
+                if (!empty($this->_data->issuercontact)) {
+                    $issuer['email'] = $this->_data->issuercontact;
+                } else {
+                    $issuer['email'] = $CFG->badges_defaultissuercontact;
+                }
             } else {
-                $issuer['email'] = $CFG->badges_defaultissuercontact;
+                $issuer = badges_get_default_issuer();
             }
         }
         $this->embed_data_badge_version2($issuer, OPEN_BADGES_V2_TYPE_ISSUER);

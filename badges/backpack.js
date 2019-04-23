@@ -1,5 +1,6 @@
 /**
  * Push badges to backpack.
+ * @deprecated since Moodle 3.7
  */
 function addtobackpack(event, args) {
     var badgetable = Y.one('#issued-badge-table');
@@ -20,6 +21,7 @@ function addtobackpack(event, args) {
 
 /**
  * Check if website is externally accessible from the backpack.
+ * @deprecated since Moodle 3.7
  */
 function check_site_access() {
     // TL-18131 Added js_pending checks to better locations

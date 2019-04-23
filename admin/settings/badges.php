@@ -59,12 +59,6 @@ if (($hassiteconfig || has_any_capability(array(
             new lang_string('badgesalt_desc', 'badges'),
             'badges' . $SITE->timecreated, PARAM_ALPHANUM));
 
-    $backpacks = badges_get_site_backpacks();
-    $choices = array();
-    foreach ($backpacks as $backpack) {
-        $choices[$backpack->id] = $backpack->backpackweburl;
-    }
-
     $globalsettings->add(new admin_setting_configcheckbox('badges_allowcoursebadges',
             new lang_string('allowcoursebadges', 'badges'),
             new lang_string('allowcoursebadges_desc', 'badges'), 1));
@@ -87,6 +81,12 @@ if (($hassiteconfig || has_any_capability(array(
             empty($CFG->enablebadges)
         )
     );
+
+    $backpacks = badges_get_site_backpacks();
+    $choices = array();
+    foreach ($backpacks as $backpack) {
+        $choices[$backpack->id] = $backpack->backpackweburl;
+    }
 
     $backpacksettings = new admin_settingpage('backpacksettings', new lang_string('backpacksettings', 'badges'),
             array('moodle/badges:manageglobalsettings'), empty($CFG->enablebadges));

@@ -150,6 +150,14 @@ class badge {
             }
         }
 
+        if (badges_open_badges_backpack_api() != OPEN_BADGES_V1) {
+            // For Open Badges 2 we need to use a single site issuer with no exceptions.
+            $issuer = badges_get_default_issuer();
+            $this->issuername = $issuer['name'];
+            $this->issuercontact = $issuer['email'];
+            $this->issuerurl = $issuer['url'];
+        }
+
         $this->criteria = self::get_criteria();
     }
 
@@ -740,7 +748,6 @@ class badge {
             'relatedbadgeid' => $this->id
         );
         $DB->delete_records_select('badge_related', $relatedsql, $relatedparams);
-        $DB->delete_records('badge_alignment', array('badgeid' => $this->id));
 
         // Finally, remove badge itself.
         $DB->delete_records('badge', array('id' => $this->id));
@@ -844,46 +851,6 @@ class badge {
     }
 
     /**
-     * Insert/update alignment information of badge.
-     *
-     * @param stdClass $alignment Data of a alignment.
-     * @param int $alignmentid ID alignment.
-     * @return bool|int A status/ID when insert or update data.
-     */
-    public function save_alignment($alignment, $alignmentid = 0) {
-        global $DB;
-
-        $record = $DB->record_exists('badge_alignment', array('id' => $alignmentid));
-        if ($record) {
-            $alignment->id = $alignmentid;
-            return $DB->update_record('badge_alignment', $alignment);
-        } else {
-            return $DB->insert_record('badge_alignment', $alignment, true);
-        }
-    }
-
-    /**
-     * Delete a alignment of badge.
-     *
-     * @param int $alignmentid ID alignment.
-     * @return boolean A status for delete a alignment.
-     */
-    public function delete_alignment($alignmentid) {
-        global $DB;
-        return $DB->delete_records('badge_alignment', array('badgeid' => $this->id, 'id' => $alignmentid));
-    }
-
-    /**
-     * Get alignments of badge.
-     *
-     * @return array List content alignments.
-     */
-    public function get_alignments() {
-        global $DB;
-        return $DB->get_records('badge_alignment', array('badgeid' => $this->id));
-    }
-
-    /**
      * Insert/update Endorsement information of badge.
      *
      * @param stdClass $endorsement Data of an endorsement.
@@ -980,7 +947,7 @@ class badge {
         $issuer['url'] = $this->issuerurl;
         $issuer['email'] = $this->issuercontact;
         $issuer['@context'] = OPEN_BADGES_V2_CONTEXT;
-        $issuer['id'] = $issuerurl->out(false);
+        $issuer['id'] = $this->issuerurl;
         $issuer['type'] = OPEN_BADGES_V2_TYPE_ISSUER;
         return $issuer;
     }
