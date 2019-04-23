@@ -415,14 +415,14 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 
     $strviewallsessions = get_string('viewallsessions', 'facetoface');
     $sessions_url = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
-    $htmlviewallsessions = html_writer::link($sessions_url, $strviewallsessions, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strviewallsessions));
+    $htmlviewallsessions = html_writer::link($sessions_url, s($strviewallsessions), array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strviewallsessions));
 
     $interest = \mod_facetoface\interest::from_seminar($seminar);
     $alreadydeclaredinterest = $interest->is_user_declared();
     $declareinterest_enable = $alreadydeclaredinterest || $interest->can_user_declare();
     $declareinterest_label = $alreadydeclaredinterest ? get_string('declareinterestwithdraw', 'facetoface') : get_string('declareinterest', 'facetoface');
     $declareinterest_url = new moodle_url('/mod/facetoface/interest.php', array('f' => $facetoface->id));
-    $declareinterest_link = html_writer::link($declareinterest_url, $declareinterest_label, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $declareinterest_label));
+    $declareinterest_link = html_writer::link($declareinterest_url, s($declareinterest_label), array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $declareinterest_label));
 
     if ($seminar->has_unarchived_signups()) {
         // Get user signed up for the instance.
@@ -616,12 +616,12 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
             } else {
                 // Show only name if session display is set to zero.
                 $content = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
-                $coursemodule->set_content($content);
+                $coursemodule->set_content($content, true);
                 return;
             }
         } else if (has_capability('mod/facetoface:viewemptyactivities', $contextmodule)) {
             $content = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
-            $coursemodule->set_content($content);
+            $coursemodule->set_content($content, true);
             return;
         } else {
             // Nothing to display to this user.
@@ -630,7 +630,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         }
     }
 
-    $coursemodule->set_content($output);
+    $coursemodule->set_content($output, true);
 }
 
 /**

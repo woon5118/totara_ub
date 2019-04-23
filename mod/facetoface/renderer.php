@@ -159,7 +159,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $table = new html_table();
         $table->summary = get_string('sessionslist', 'facetoface');
         $table->attributes['class'] = 'generaltable fullwidth';
-        $table->head = $tableheader;
+        $table->head = array_map(
+            function($value) {
+                return s($value);
+            },
+            $tableheader
+        );
         $table->data = array();
 
         $context = $this->context;
@@ -816,7 +821,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         // Can view attendees.
         if ($viewattendees) {
-            $options .= html_writer::link(new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $session->id, 'backtoallsessions' => $bas)), get_string('attendees', 'facetoface'), array('title' => get_string('seeattendees', 'facetoface'), 'class' => 'mod_facetoface__sessionlist__action__link'));
+            $options .= html_writer::link(new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $session->id, 'backtoallsessions' => $bas)), s(get_string('attendees', 'facetoface')), array('title' => get_string('seeattendees', 'facetoface'), 'class' => 'mod_facetoface__sessionlist__action__link'));
             $options .= html_writer::empty_tag('br');
         }
 
@@ -1626,7 +1631,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $popupurl = clone($url);
         $popupurl->param('popup', 1);
         $action = new popup_action('click', $popupurl, 'popup', array('width' => 800, 'height' => 600));
-        $link = $this->output->action_link($url, get_string('sessionslist:roomdetails', 'facetoface'), $action, array('class' => 'mod_facetoface__sessionlist__room__link'));
+        $link = $this->output->action_link($url, s(get_string('sessionslist:roomdetails', 'facetoface')), $action, array('class' => 'mod_facetoface__sessionlist__room__link'));
         /* both room and room_details CSS classes should be considered @deprecated as of t13 */
         $roomhtml[] = html_writer::span($link, 'room room_details');
 
