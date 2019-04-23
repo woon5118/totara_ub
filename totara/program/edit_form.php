@@ -164,8 +164,8 @@ class program_edit_form extends moodleform {
 
         if ($action == 'view') {
             if ($program) {
-                $summary = file_rewrite_pluginfile_urls($program->summary, 'pluginfile.php',
-                    $context->id, 'totara_program', 'summary', 0);
+                $summary = file_rewrite_pluginfile_urls($program->summary, 'pluginfile.php', $context->id, 'totara_program', 'summary', 0);
+                $summary = format_text($summary, FORMAT_HTML, ['noclean' => true, 'context' => $context]);
                 if (!empty($summary)) {
                     $mform->addElement('static', null, get_string('description', 'totara_program'), $summary);
                 }
