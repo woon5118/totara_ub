@@ -44,7 +44,7 @@ class idnumber extends dataholder_factory {
                         'base.idnumber'
                     ),
                     formatter::TYPE_PLACEHOLDER_TEXT => new text(
-                        'base.fullname'
+                        'base.idnumber'
                     ),
                 ]
             )
