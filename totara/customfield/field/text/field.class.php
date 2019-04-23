@@ -42,7 +42,8 @@ class customfield_text extends customfield_base {
             $mform->addRule($this->inputname, get_string('regexvalidationfailed', 'totara_customfield', $fullname), 'regex', $regex);
             // Param5 is regex pattern validation help message.
             if (!empty($this->field->param5)) {
-                $mform->addElement('static', null, null, $this->field->param5);
+                // Giving element an unique name, so that the form will not complain about element without name.
+                $mform->addElement('static', uniqid("{$this->inputname}_"), null, $this->field->param5);
             }
         }
     }
