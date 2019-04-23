@@ -4,6 +4,7 @@ information provided here is intended especially for developers.
 === 13.0 ===
 
 * lib/templates/block.mustache the properties $accessible_skip_from and $accessible_skip_to have been removed.
+* block_section_links_renderer::render_section_links had been added with additional parameter $options for overriding the css class of list of links.
 
 === 12.0 ===
 

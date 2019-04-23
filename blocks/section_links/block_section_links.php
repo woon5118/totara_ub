@@ -30,6 +30,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_section_links extends block_base {
+    /**
+     * For displaying number only.
+     *
+     * @var int
+     */
+    const DISPLAY_NUMBER_ONLY = 1;
+
+    /**
+     * For displaying title only.
+     *
+     * @var int
+     */
+    const DISPLAY_TITLE_ONLY = 2;
+
+    /**
+     * For displaying both title and number.
+     *
+     * @var int
+     */
+    const DISPLAY_TITLE_AND_NUMBER = 3;
 
     /**
      * Initialises the block instance.
@@ -48,6 +68,59 @@ class block_section_links extends block_base {
             'course-view-weeks' => true,
             'course-view-topics' => true
         );
+    }
+
+    /**
+     * @param section_info $sectioninfo
+     *
+     * @return string
+     */
+    private function get_display_title(section_info $sectioninfo): string {
+        $config = $this->config;
+        if ($config === null) {
+            $config = get_config('block_section_links');
+        }
+
+        // By default, just display number only. However, if there is an overriding from config, then we should use it.
+        $titledisplay = static::DISPLAY_NUMBER_ONLY;
+        $course = $this->page->course;
+
+        if (isset($config->title_display)) {
+            $titledisplay = $config->title_display;
+        }
+
+        // Building object $section here, because format_topics::get_default_section_name is expecting the stdClass
+        // as parameter passing in. Instead of number like its parent.
+        $section = new stdClass();
+        $section->section = $sectioninfo->section;
+
+        switch ($titledisplay) {
+            case static::DISPLAY_TITLE_AND_NUMBER:
+                $sectionname = $sectioninfo->name;
+                if ($sectionname === null) {
+                    $sectionname = course_get_format($course)->get_default_section_name($section);
+                }
+
+                return get_string(
+                    'sectiontitle',
+                    'block_section_links',
+                    [
+                        'sectionnum' => $sectioninfo->section,
+                        'sectionname' => $sectionname
+                    ]
+                );
+
+            case static::DISPLAY_TITLE_ONLY:
+                if ($sectioninfo->name !== null) {
+                    return $sectioninfo->name;
+                }
+
+                return course_get_format($course)->get_default_section_name($section);
+
+            case static::DISPLAY_NUMBER_ONLY:
+            default:
+                return $sectioninfo->section;
+        }
     }
 
     /**
@@ -119,6 +192,7 @@ class block_section_links extends block_base {
             if ($section->section && ($section->visible || $canviewhidden)) {
                 $sections[$i] = (object)array(
                     'section' => $section->section,
+                    'sectiontitle' => $this->get_display_title($section),
                     'visible' => $section->visible,
                     'highlight' => false
                 );
@@ -132,7 +206,20 @@ class block_section_links extends block_base {
         if (!empty($sections)) {
             // Render the sections.
             $renderer = $this->page->get_renderer('block_section_links');
-            $this->content->text = $renderer->render_section_links($this->page->course, $sections, $sectiontojumpto);
+            $options = [];
+
+            if (isset($config->title_display) && $config->title_display != static::DISPLAY_NUMBER_ONLY) {
+                // If it is not display with number, then the list should be a proper list, instead of inline list
+                // by any default.
+                $options['class'] = 'list';
+            }
+
+            $this->content->text = $renderer->render_section_links(
+                $this->page->course,
+                $sections,
+                $sectiontojumpto,
+                $options
+            );
         }
 
         return $this->content;

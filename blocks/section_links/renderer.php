@@ -38,17 +38,27 @@ class block_section_links_renderer extends plugin_renderer_base {
      * @param stdClass $course The course we are rendering for.
      * @param array $sections An array of section objects to render.
      * @param bool|int The section to provide a jump to link for.
+     * @param array $options An array for additional data that needs to be put into the renderer function. It will
+     *                       include the css class for the list. By default it is inline-list, but it will be override
+     *                       if the options does provide 'class' attributes
+     *
      * @return string The HTML to display.
      */
-    public function render_section_links(stdClass $course, array $sections, $jumptosection = false) {
-        $html = html_writer::start_tag('ol', array('class' => 'inline-list'));
+    public function render_section_links(stdClass $course, array $sections, $jumptosection = false,
+                                         array $options = []) {
+        $css = ['class' => 'inline-list'];
+        if (isset($options['class'])) {
+            $css['class'] = $options['class'];
+        }
+
+        $html = html_writer::start_tag('ol', $css);
         foreach ($sections as $section) {
             $attributes = array();
             if (!$section->visible) {
                 $attributes['class'] = 'dimmed';
             }
             $html .= html_writer::start_tag('li');
-            $sectiontext = $section->section;
+            $sectiontext = $section->sectiontitle;
             if ($section->highlight) {
                 $sectiontext = html_writer::tag('strong', $sectiontext);
             }

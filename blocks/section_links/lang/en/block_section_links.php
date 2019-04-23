@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['configtitledisplay'] = "Title display as";
 $string['incby1'] = 'Increase by';
 $string['incby1_help'] = 'This is the value the section is incremented each time a section link is displayed starting at 1.';
 $string['incby2'] = 'Alternative increase by';
@@ -32,7 +33,11 @@ $string['numsections1'] = 'Number of sections';
 $string['numsections1_help'] = 'Once the number of sections in the course reaches this number then the increment by value is used.';
 $string['numsections2'] = 'Alternative number of sections';
 $string['numsections2_help'] = 'Once the number of sections in the course reaches this number then the alternative increment by value is used.';
+$string['numberonly'] = 'Number only';
 $string['pluginname'] = 'Section links';
 $string['section_links:addinstance'] = 'Add a new section links block';
+$string['sectiontitle'] = '{$a->sectionnum}. {$a->sectionname}';
 $string['topics'] = 'Topics';
+$string['titleandnumber'] = 'Title and number';
+$string['titleonly'] = 'Title only';
 $string['weeks'] = 'Weeks';

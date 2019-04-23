@@ -82,5 +82,18 @@ class block_section_links_edit_form extends block_edit_form {
             $mform->addHelpButton('config_incby'.$i, 'incby'.$i, 'block_section_links');
         }
 
+        $mform->addElement(
+            'select',
+            'config_title_display',
+            get_string('configtitledisplay', 'block_section_links'),
+            [
+                block_section_links::DISPLAY_NUMBER_ONLY => get_string('numberonly', 'block_section_links'),
+                block_section_links::DISPLAY_TITLE_ONLY => get_string('titleonly', 'block_section_links'),
+                block_section_links::DISPLAY_TITLE_AND_NUMBER => get_string('titleandnumber', 'block_section_links')
+            ]
+        );
+
+        $mform->setDefault('config_title_display', block_section_links::DISPLAY_NUMBER_ONLY);
+        $mform->setType('config_title_display', PARAM_INT);
     }
 }
