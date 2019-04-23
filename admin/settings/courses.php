@@ -189,12 +189,6 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $temp->add(new admin_setting_configselect('moodlecourse/groupmode', new lang_string('groupmode'), '', key($choices),$choices));
     $temp->add(new admin_setting_configselect('moodlecourse/groupmodeforce', new lang_string('force'), new lang_string('coursehelpforce'), 0,array(0 => new lang_string('no'), 1 => new lang_string('yes'))));
 
-    $temp->add(new admin_setting_heading('language', new lang_string('language'), ''));
-    $languages=array();
-    $languages[''] = new lang_string('forceno');
-    $languages += get_string_manager()->get_list_of_translations();
-    $temp->add(new admin_setting_configselect('moodlecourse/lang', new lang_string('forcelanguage'), '',key($languages),$languages));
-
     $ADMIN->add('courses', $temp);
 
 
