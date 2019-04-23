@@ -24,7 +24,7 @@
  * @since      2.9
  */
 
-define([ 'core/mustache',
+define(['core/mustache',
         'jquery',
         'core/webapi',
         'core/str',
@@ -592,7 +592,6 @@ define([ 'core/mustache',
              *
              * @method userDateHelper
              * @private
-             * @param {object} context The current mustache context.
              * @param {string} sectionText The text to parse the arguments from.
              * @param {function} helper Used to render subsections of the text.
              * @return {string}
@@ -631,15 +630,31 @@ define([ 'core/mustache',
                 });
             };
 
-            context.str = function() { return stringHelper; };
-            context.pix = function() { return pixHelper; };
-            context.flex_icon = function() { return flexIconHelper; };
-            context.js = function() { return jsHelper; };
-            context.quote = function() { return quoteHelper; };
-            context.userdate = function () {return userDateHelper; };
-            context.esc = function() { return escapeHelper; };
-            context.shortentext = function() {return shortenTextHelper; };
-            context.globals = { config : config };
+            context.str = function() {
+                return stringHelper;
+            };
+            context.pix = function() {
+                return pixHelper;
+            };
+            context.flex_icon = function() {
+                return flexIconHelper;
+            };
+            context.js = function() {
+                return jsHelper;
+            };
+            context.quote = function() {
+                return quoteHelper;
+            };
+            context.userdate = function() {
+                return userDateHelper;
+            };
+            context.esc = function() {
+                return escapeHelper;
+            };
+            context.shortentext = function() {
+                return shortenTextHelper;
+            };
+            context.globals = {config: config};
 
             var partialsComplete = $.Deferred();
 
@@ -647,7 +662,7 @@ define([ 'core/mustache',
             // wait until they have been loaded and try again.
             var loadPartials = function() {
                 // If partialPromises is an empty array, this will resolve immediately.
-                $.when.apply($, partialPromises).done(function () {
+                $.when.apply($, partialPromises).done(function() {
                     if (templatepartialsloaded && !firstLoad) {
                         // All partials have been loaded, so continue execution.
                         partialsComplete.resolve();
@@ -673,19 +688,21 @@ define([ 'core/mustache',
             };
             loadPartials();
 
-            partialsComplete.done(function () {
+            partialsComplete.done(function() {
                 // Resolve template promises.
                 for (var i = 0; i < promises.length; i++) {
                     // A closure is needed here otherwise i is highly likely to be promises.length
                     /* eslint-disable no-loop-func */
-                    promises[i].done((function(index) { return function(html, templatejs) {
-                        js.push(templatejs);
-                        result = result.replace('<_p' + index + '>', html);
-                    }; })(i));
+                    promises[i].done((function(index) {
+                        return function(html, templatejs) {
+                            js.push(templatejs);
+                            result = result.replace('<_p' + index + '>', html);
+                        };
+                    })(i));
                     /* eslint-enable no-loop-func */
                 }
 
-                $.when.apply($, promises).then(function () {
+                $.when.apply($, promises).then(function() {
                     var stringsLoaded = $.Deferred();
                     js = js.join(';\n');
 
@@ -898,7 +915,7 @@ define([ 'core/mustache',
          * @param {Object} customData - Optional. Custom data to be passed to the [Flex Icon] template.
          * @return {String} An HTML string containing the rendered icon.
          */
-        var renderIcon = function (iconName, alt, cssclasses, customData) {
+        var renderIcon = function(iconName, alt, cssclasses, customData) {
 
             var renderData = {};
             renderData.classes = (cssclasses || '');
@@ -918,7 +935,7 @@ define([ 'core/mustache',
 
             var iconhtml = $.Deferred();
 
-            flexicon.getFlexTemplateData(iconName).done(function (completetemplate) {
+            flexicon.getFlexTemplateData(iconName).done(function(completetemplate) {
 
                 if (typeof completetemplate.data === 'undefined') {
                     completetemplate.data = {};
@@ -931,9 +948,10 @@ define([ 'core/mustache',
                     completetemplate.data.customdata.title = completetemplate.data.customdata.alt;
                 }
 
-                templates.render(completetemplate.template, completetemplate.data)
-                    .done(function (html) {iconhtml.resolve(html);});
-            }).fail(function () {
+                templates.render(completetemplate.template, completetemplate.data).done(function(html) {
+                    iconhtml.resolve(html);
+                });
+            }).fail(function() {
                 // Fallback to the traditional icon
                 var parts = iconName.split('|');
 
@@ -943,9 +961,9 @@ define([ 'core/mustache',
 
                 var url = coreurl.imageUrl(parts[1], parts[0]);
                 var attributes = [
-                    { name: 'src', value: url},
-                    { name: 'alt', value: renderData.alt},
-                    { name: 'title', value: renderData.alt}
+                    {name: 'src', value: url},
+                    {name: 'alt', value: renderData.alt},
+                    {name: 'title', value: renderData.alt}
                 ];
                 var classes = renderData.classes;
                 delete(renderData.alt);
@@ -955,7 +973,7 @@ define([ 'core/mustache',
                     attributes.push({name: key, value: renderData[key]});
                 }
 
-                templates.render('core/pix_icon', {attributes:attributes, extraclasses: classes}).done(iconhtml.resolve);
+                templates.render('core/pix_icon', {attributes: attributes, extraclasses: classes}).done(iconhtml.resolve);
             });
 
             return iconhtml.promise();
@@ -1027,7 +1045,7 @@ define([ 'core/mustache',
 
                 var loadTemplate = getTemplate(templateName);
 
-                loadTemplate.done(function (templateSource) {
+                loadTemplate.done(function(templateSource) {
                     var renderPromise = doRender(templateSource, ctx);
 
                     renderPromise.done(
