@@ -91,7 +91,9 @@ class atto_texteditor extends texteditor {
         if (!empty($options['alowxss'])) {
             $cleantext = false;
         } else {
-            if (!empty($options['noclean']) and !empty($CFG->disableconsistentcleaning)) {
+            $noclean = (!empty($options['noclean']));
+            $trusted = (!empty($options['trusttext']) && !empty($options['trusted']));
+            if (($noclean || $trusted) and !empty($CFG->disableconsistentcleaning)) {
                 // No clean is true, and consisten cleaning has been disabled, legacy mode active! Don't clean.
                 $cleantext = false;
             }
