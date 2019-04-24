@@ -630,7 +630,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         }
     }
 
-    $coursemodule->set_content($output, true);
+    $coursemodule->set_content('<div class="no-overflow">' . $output . '</div>', true);
 }
 
 /**
