@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      2.9
  */
-define(['jquery', 'core/config', 'core/log'], function($, config, Log) {
+define(['jquery', 'core/config', 'core/log', 'core/notification'], function($, config, Log, notification) {
 
     // Keeps track of when the user leaves the page so we know not to show an error.
     var unloading = false;
@@ -203,6 +203,96 @@ define(['jquery', 'core/config', 'core/log'], function($, config, Log) {
             }
 
             return promises;
+        },
+
+        /**
+         * Totara: Wrap the call function with behat and a ES6 promise
+         *
+         * @method getData
+         * @param {Object} ajaxRequest Object for request data containing methodname, args properties and an optional callback array
+         * @return {Promise} es6 Promise
+         */
+        getData: function(ajaxRequest) {
+            var behatPause = ajaxRequest.methodname + '_requesting_data',
+                callback = '',
+                that = this;
+
+            if (ajaxRequest.callback) {
+                callback = ajaxRequest.callback;
+                delete ajaxRequest.callback;
+            }
+
+            M.util.js_pending(behatPause);
+            return new Promise(function(resolve, reject) {
+                // This extension currently always hardcodes loginrequired to true, if there is a usecase where this isn't required
+                // please extend here.
+                var request = that.call([ajaxRequest], true, true);
+
+                request[0].done(function(results) {
+                    resolve({'results': results, 'callbacks': callback});
+                    M.util.js_complete(behatPause);
+                }).fail(function(ex) {
+                    notification.exception(ex);
+                    reject(ex);
+                    M.util.js_complete(behatPause);
+                });
+            });
+        },
+
+        /**
+         * Totara: Make required ajax requests, then call all callbacks, then return an ES6 promise once all callbacks resolve
+         *
+         * @method getDataUpdate
+         * @param {Array} requests array of webservice request objects
+         * @return {Promise} es6 Promise
+         */
+        getDataUpdate: function(requests) {
+            var that = this;
+
+            return new Promise(function(resolve, reject) {
+                var ajaxRequest,
+                    getMultiDataPromise = [];
+
+                // Loop through passed request data
+                for (var a = 0; a < requests.length; a++) {
+                    ajaxRequest = requests[a];
+                    // Add ajax request promise to promise.all
+                    getMultiDataPromise.push(that.getData(ajaxRequest));
+                }
+
+                Promise.all(getMultiDataPromise).then(function(responses) {
+                    var a,
+                        callback,
+                        callbacks,
+                        data,
+                        i,
+                        updateList = [];
+
+                    // Loop through responses
+                    for (i = 0; i < responses.length; i++) {
+                        data = responses[i].results;
+                        callbacks = responses[i].callbacks;
+
+                        // Loop through response callbacks
+                        for (a = 0; a < callbacks.length; a++) {
+                            callback = callbacks[a];
+
+                            if (typeof callback !== 'function') {
+                                Log.error('Callback is not a function');
+                            } else {
+                                updateList.push(callback(data));
+                            }
+                        }
+                    }
+
+                    // Trigger all callbacks and resolve once all are complete
+                    Promise.all(updateList).then(function() {
+                        resolve();
+                    }).catch(function() {
+                        reject();
+                    });
+                });
+            });
         }
     };
 });
