@@ -3,6 +3,686 @@
 
 Totara Learn Changelog
 
+Release Evergreen (29th April 2019):
+====================================
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-20729   +   All text is now consistently sanitised before being displayed or edited
+
+                   Prior to this change, privileged users could introduce security
+                   vulnerabilities through areas such as course summaries, section
+                   descriptions and activity introductions.
+
+                   The original purpose of the functionality was to allow content creators to
+                   use advanced HTML functionality such as iframes, JavaScript and objects. In
+                   some areas it was explicitly allowed to happen. In others, the trusttext
+                   system was used to manage who could embed potentially harmful content.
+
+                   This patch includes the following changes:
+                    * A new setting 'Disable consistent cleaning' has been introduced. It is
+                      set to 'off' by default.
+                    * Text in the affected areas will be now be sanitised, both when it is
+                      displayed, and when it is loaded into an editor.
+                    * The trusttext system will be forced off by default and be disabled
+                      unless the new setting is turned on.
+                    * SVG images will be served with more appropriate content-disposition
+                      headers.
+
+                   The consequence of this change is that by default no user will be able to
+                   use the likes of iframes, JavaScript or object tags in the majority of
+                   places where they previously could.
+
+                   For those who rely on the old behaviour, the new 'Disable consistent
+                   cleaning' setting can be enabled in order to return the old behaviour.
+                   However we strongly recommend that you leave this setting off, as when it
+                   is turned on the security vulnerabilities will be present. When enabled,
+                   this setting will be shown in the security report.
+
+                   Please be aware that there is a data-loss risk for any sites which are
+                   upgrading to this release and have relied upon the previous behaviour if
+                   they have not enabled the new 'Disable consistent cleaning' setting. After
+                   upgrading, unless you enable the legacy behaviour, when a user edits
+                   content relying upon this functionality and saves it, they will cause the
+                   cleaned version to be saved to the database. Any unallowed HTML tags, or
+                   attributes, will have been removed.
+
+                   For more information on this change, and a list of affected areas please
+                   refer to our help documentation.
+                    [https://help.totaralearning.com/display/DEV/Totara+13+changes+to+content+sanitisation]
+
+Security issues:
+
+    TL-20532       Fixed a file path serialisation issue in TCPDF library
+
+                   Prior to this fix an attacker could trigger a deserialisation of arbitrary
+                   data by targeting the phar:// stream wrapped in PHP.
+                   In Totara 11, 12 and above The TCPDF library  has been upgraded to version
+                   6.2.26.
+                   In all older versions the fix from the TCPDF library for this issue has
+                   been cherry-picked into Totara.
+
+    TL-20607       Improved HTML sanitisation of Bootstrap tool-tips and popovers
+
+                   An XSS vulnerability was recently identified and fix in the Bootstrap 3
+                   library that we use.
+                   The vulnerability arose from a lack of sanitisation on attribute values for
+                   the popover component.
+                   The fix developed by Bootstrap has now been cherry-picked into all affected
+                   branches.
+
+    TL-20614       Removed session key from page URL on seminar attendance and cancellation note editing screens
+    TL-20615       Fixed external database credentials being passed as URL parameters in HR Import
+
+                   When using the HR Import database sync, the external DB credentials were
+                   passed to the server via query parameters in the URL. This meant that these
+                   values could be unintentionally preserved in a user's browser history, or
+                   network logs.
+
+                   This doesn't pose any risk of compromise to the Totara database, but does
+                   leave external databases vulnerable, and any other services that share its
+                   credentials.
+
+                   If you have used HR Import's external database import, it is recommended
+                   that you update the external database credentials, as well as clear browser
+                   histories and remove any network logs that might have captured the
+                   parameters.
+
+    TL-20622       Totara form editor now consistently cleans content before loading it into the editor
+    TL-20704   +   Improved the format_string() function to prevent XSS when results are not properly encoded in HTML attributes
+
+                   Previously it was possible to enable the use of arbitrary HTML tags in
+                   course and activity names. This is a security risk and is no longer
+                   allowed.
+
+Improvements:
+
+    TL-17930   +   Added the ability to set a Report Builder saved search as a default view
+
+                   As a Report Builder report curator, a saved search can be set as the report
+                   default view.
+                   This search will be applied as a default view for everyone who has
+                   visibility of the report. Viewers of the report can remove the default or
+                   change to another saved search so they have their own saved view.
+
+    TL-19493   +   A link to the component overview screen is now shown when viewing Learning Plan component items
+
+                   A link has been added to the screen for individual Learning Plan component
+                   items (e.g., a specific course, program, competency, or objective) that
+                   returns the user back to the component overview screen (e.g., all courses,
+                   programs, competencies, objectives).
+
+    TL-19808   +   Allowed CSV import of seminar attendees from files without columns for custom fields
+
+                   Seminar attendees can now be imported from CSV files that only have columns
+                   for required custom fields or, if there are no required custom fields, from
+                   a list of users with no other columns.
+
+    TL-19815   +   Improved performance of replace_all_text() method in DML layer
+
+                   This improved performance of unsupported "DB Search and replace" tool.
+                   Instead of blind attempts to search and replace content in all rows, it
+                   selects only rows that have searched content first.
+
+    TL-20147       Improved the help text in programs and certifications by specifying that course scores have to be whole numerical values.
+    TL-20360       Improved the enrolment type filter for course completion reports
+
+                   Previously the enrolment type filter was a text search against a database
+                   value stored for enrolments, this was particularly a problem for audience
+                   enrolments since the database value was 'cohort' even though it was
+                   displayed as 'Audience Sync'. While the filter worked if you searched on
+                   'cohort', this wasn't immediately obvious. This filter has been updated to
+                   a multiple-select interface which has options for each enabled enrolment
+                   plugin. To maintain all available functionality the multi-select interface
+                   for filters has also had its operators updated from "Any/All" to include
+                   "Not Any/Not All".
+
+    TL-20402       Decoupled profile editing from administration menu editing
+
+                   Users no longer require 'moodle/user:editownprofile' capability to be able
+                   to edit their own administration menu preferences.
+                   In order to edit their administration menu preferences they need just the
+                   'totara/core:editownquickaccessmenu' capability.
+
+    TL-20407       Added a Basis theme setting to override the colour of submit buttons
+
+                   A new 'Primary button color' setting provides a way to override the
+                   background colour of submit buttons in the Basis theme. The appearance of
+                   other types of buttons is still controlled by the 'Button color' setting.
+
+                   The 'Preview' buttons on the Basis theme settings form did not work as
+                   intended and have been removed. Theme designers are encouraged to use the
+                   Element Library to view the effects of theme colour changes immediately
+                   after update.
+
+    TL-20441   +   Converted seminar cancellation tab to an embedded report
+    TL-20516       Changed ambiguous wording for confirmation button in the appraisal unlock stage page
+
+                   In the appraisal unlock stage page, the confirmation button had potentially
+                   confusing text. It was not clear that clicking 'Save changes' without
+                   making any changes on the form would still have some effect. This patch
+                   changes the wording to 'Apply' instead.
+
+                   Also, the unlock stage interface on the Appraisal Assignments page has been
+                   improved.
+
+    TL-20517       Improved compatibility with Solr 7
+    TL-20537       Added an event for enabling and disabling authentication methods
+
+                   Prior to this patch, when an admin enabled or disabled an authentication
+                   method, there was no event triggered. This patch adds an event there for
+                   auditing purposes.
+
+    TL-20554       Improved navigation to user profile page after adding or updating a user
+
+                   Changes have been made to user administration in order to streamline adding
+                   and updating users. Prior to this patch, administrators were redirected to
+                   the list of users after adding a user, and to the previous screen when
+                   editing a user profile. These are not always desired behaviours.
+
+                   'Browse list of users' has been renamed 'Manage users', and 'Add a new
+                   user' has been renamed 'Create user'.
+
+                   A 'Save and view' button has been added to the 'Create user' and 'Edit user
+                   profile' forms, in order to give administrators the ability to navigate to
+                   the new user's profile after creating it. The existing 'Create user' and
+                   'Update profile' buttons have been relabelled 'Save and go back', and will
+                   take the administrator back to where they were when they clicked to add or
+                   edit the user.
+
+    TL-20579   +   Improved deletion confirmation for hierarchy frameworks and items
+
+                   This patch unifies deletion confirmation for hierarchy frameworks and
+                   items, as well as adding details about related data to be deleted in the
+                   framework confirmation and bulk delete confirmation dialogues.
+
+    TL-20610       Added event triggers for changing site administration group
+
+                   Prior to this patch, when an admin assigned users to or unassigned users
+                   from the site administration group, then there was no event to be
+                   triggered, and consequently, the system was not able to log the event.
+
+                   This patch introduces a new event triggered by changes to the site
+                   administration group, allowing the system to be able to log the event.
+
+    TL-20674       Added a 'scheduled task updated' event to log changes to scheduled tasks
+    TL-20695       Added timezone option to the appraisal and feedback 360 date question type
+
+                   The option 'Include timezone as well as time' was added when adding a date
+                   picker question to an appraisal or feedback 360. When enabled, the date
+                   question will include a timezone selector, defaulting to the user's current
+                   time zone. When the appraisal or feedback 360 is saved, other users will
+                   see the answer to the date question in the timezone that the user selected,
+                   rather their own time zone.
+
+    TL-20705       Improved validation for checkbox audience rules
+
+                   As part of server-side validation of audience rule forms, this now checks
+                   that a value has been submitted and that it is either 0 (not checked) or 1
+                   (checked).
+
+    TL-20710       Feedback activity UI for editing questions now reflects actual question and page break order
+
+                   Previously, when dragging an item and dropping it outside of appropriate
+                   drop zone, the UI would change however the database was not updated to
+                   reflect the change. Now when the item is dropped outside of the
+                   appropriate drop zone, the item will snap back to the point of origin.
+
+Bug fixes:
+
+    TL-13902       Updated the title for the seminar event 'more info' page for attendees
+
+                   Previously the header title text used on the 'more info' page for a seminar
+                   event said 'Sign up for [seminar name]' even if a user was already signed
+                   up.
+
+                   This has been fixed to show just the seminar name if the user is an
+                   attendee.
+
+    TL-14355       Fixed validation for menu type audience rules
+
+                   Previously audience rules using the menu interface were lacking validation
+                   on empty submissions, so if you attempted to save without selecting a value
+                   there would be an exception thrown, a broken rule would be added, and you
+                   would be redirected away from the page, which meant that you would have to
+                   navigate back and remove the rule. Now the form submission is halted and a
+                   warning is shown to enter a value.
+
+                   Affected audience rules are:
+                    * position type
+                    * position menu customfields
+                    * organisation type
+                    * organisation menu customfields
+                    * user menu customfields
+
+    TL-19820       Fixed bugs in quiz 'Review options' marks settings
+
+                   A quiz can be set to hide marks (grade) from learners at various times,
+                   using the 'Review options' checkboxes in quiz settings. For example, a quiz
+                   can withhold a learner's grade until the quiz has closed.
+
+                   Prior to this patch, the 'Review options' marks setting also affected the
+                   recording of activity completion. If marks were hidden from the learner,
+                   then activity completion was recorded as 'Complete' when all conditions
+                   were met, rather than as 'Complete with pass' or 'Complete with fail'.
+                   Activity completion was not updated later if the marks became visible to
+                   the learner, and was not consistent with the way grades are recorded:
+                   grades are always visible to a trainer, whether learners can see them or
+                   not.
+
+                   With this patch, quizzes (or any other activities with grade items hidden
+                   from learners) are always marked as 'Complete with pass' or 'Complete with
+                   fail' if a grade is required for completion. When learners view the course
+                   homepage, activity completion tick marks are modified to hide pass/fail
+                   status if the grade is hidden. Trainers will always see the true status.
+
+                   This patch also ensures that grade items are correctly show/hidden
+                   according to a quiz's 'Review options' marks settings, with the exception
+                   that grades that have already been revealed are not hidden later.
+
+    TL-20148       Fixed a web services error that occurred when the current language resolved to a language that was not installed
+    TL-20149       Fixed secondary navbar not showing when browsing third level child page
+    TL-20258       Fixed incorrectly appended context links when sending alerts
+
+                   Prior to this patch messages sent as alerts could, in some cases, have
+                   superfluous text appended related to context links.
+
+    TL-20338   +   Removed deleted users from seminar views
+
+                   Prior to this patch, when a user record was deleted from the system, all of
+                   the user's signup records remained visible in seminar views.
+
+                   With this patch, only users with permission to see deleted users
+                   (totara/core:seedeletedusers capability) will be able to see or modify the
+                   signups of deleted users.
+
+    TL-20448       Fixed a display issue with conditional access when audience, position, or organisation restrictions were in use
+
+                   Prior to this fix in situations where a restriction set contained an
+                   audience, position or organisation restriction the controls for
+                   manipulating the restriction set would be hidden, making it impossible to
+                   edit the restriction set.
+
+    TL-20466       The approveanyrequest capability is now correctly checked when processing a seminar approval request
+
+                   Users who hold the 'mod/facetoface:approveanyrequest' capability previously
+                   would encounter an error when attempting to approve a signup request in a
+                   context where they held the capability but did not meet any other required
+                   conditions.
+                   This has been fixed to ensure that the capability is correctly checked when
+                   processing a users approval request.
+
+    TL-20468       The grade overview report now correctly respects audience based visibility
+    TL-20475       Fixed seminar grades not being correctly updated when the override flag is removed on a gradebook
+
+                   The third argument of facetoface_update_grades() was changed as follows.
+                   In previous releases, the system set NULL as grade if true is passed.
+                   From now on, the system sets a default grade if true is passed.
+                   The default grade is calculated by using grading method in T13, and the
+                   last saved attendance state in T12.
+
+    TL-20482       Fixed 'View dates' link on program/certification assignment page
+
+                   TL-19190 introduced a regression where clicking on the 'View dates' link
+                   against a group assignment on the assignments page would display a pop-up
+                   with all the users assigned to the program. This has now been fixed and
+                   only users from the specific assigned group are displayed.
+
+    TL-20488       Added batch processing of users when being unassigned from or reassigned to a program
+    TL-20500       Fixed a bug where a manual data purge of certification assignments and completion did not purge deleted users' records
+    TL-20504       Made sure that learning plan access is being checked before sending out comment notifications
+
+                   Previously, any user that interacted with a learning plan by leaving a
+                   comment would continue to receive notifications about other users' comments
+                   to the plan, even if the user no longer had access to the plan. Now only
+                   plan owners, active managers, and users with the
+                   'totara/plan:accessanyplan' and 'totara/plan:manageanyplan' capabilities
+                   receive notifications about new comments.
+
+    TL-20513   +   Ensured that seminar activity 'View all events' link on course homepage isn't hidden by horizontal scrollbar on Mac OS
+
+                   On Mac OS, the default System Preference is to hide scrollbars until
+                   needed. When the scrollbars are shown, they may obscure content or make it
+                   difficult to click links that are underneath them. This was sometimes the
+                   case with the 'View all events' link under seminar activities on course
+                   homepages.
+
+                   The link has been made larger, and padding added, to ensure that it is
+                   still clickable if a horizontal scrollbar appears under it.
+
+    TL-20515       Fixed bug that could leave a job assignment linked to seminar signup records after the job assignment was deleted
+    TL-20520   +   Fixed saved-search functionality on seminar room and asset embedded reports
+
+                   Added rb_config and $sid to asset and room embedded reports to ensure saved
+                   searched can be viewed.
+
+    TL-20522       Fixed IE11 visual bugs and broken buttons when editing the administration menu
+    TL-20523       Fixed the display of site logs for legacy seminar status codes
+    TL-20526       Check course setting and 'grade:view' capability in course details
+
+                   Previously the report-based course catalogue displayed grades for all
+                   completed courses without taking into account the "Show gradebook to
+                   learners" course setting or the 'moodle/grade:view' capability of a report
+                   viewer. This has now been fixed.
+
+    TL-20534       Fixed a bug preventing grid catalogue filters from properly recognising unicode characters
+
+                   Previously grid catalogue filters were unable to identify courses to list
+                   when a course custom multi-select field contained options with unicode
+                   characters, e.g. Matěj, Dvořák. This patch fixes the search
+                   functionality so that options with unicode characters can be correctly
+                   identified.
+
+    TL-20535       Included helptooltip as a dialog-nobind class condition in totara_dialog.js
+    TL-20547   +   Fixed JavaScript validation on Moodle forms
+
+                   Previously, when calls were made to $PAGE->get_end_code(false), AMD
+                   JavaScript was not being added to the HTML. This has now been corrected.
+
+                   This enables Moodle form validation when editing Appraisals, Audience rules
+                   and Seminar times, rooms and assets.
+
+    TL-20568       Fixed misleading 'not answered' text for appraisal questions
+
+                   TL-20052 was supposed to fix this; however that patch was found to address
+                   the case when only the learner needed to answer questions. The bug still
+                   occurred if the appraisal had a mix of questions and permissions that other
+                   roles need to answer.
+
+                   This patch fixes the latter problem.
+
+    TL-20586       Fixed event generation when deleting hierarchy items
+
+                   Prior to the patch the same event was generated for all descendant
+                   hierarchy items when deleting an item with children.
+
+                   As a side effect this patch fixes course activity access restrictions based
+                   on a position or organisation. Prior to the patch if a child position or
+                   organisation was used to restrict access to a course activity and then its
+                   parent was deleted, the restriction setup menu for this activity was
+                   broken.
+
+    TL-20592       Removed block display when restoring an activity backup
+
+                   Blocks are not displayed while restoring a course backup, because users are
+                   expected to move though the restore workflow using the navigation buttons
+                   at the bottom of the screen, and because the 'Add a block' feature doesn't
+                   work during restore.
+
+                   Because of a bug, blocks had been displayed while restoring an activity
+                   backup. This has been fixed, and no blocks should display during any type
+                   of multiple-step restore.
+
+                   A renderer bug that resulted in an unclosed <div> tag on the second screen
+                   of the restore process has also been fixed.
+
+    TL-20598       Fixed the available actions on seminar attendees pages so they respect the 'mod/facetoface:addattendees' capability
+
+                   Prior to this patch, both the 'add' and 'remove' attendees options were
+                   shown in the drop-down menu on the seminar event attendees pages, even if a
+                   user only had the 'mod/facetoface:removeattendees' capability.
+
+                   The 'add attendees' option will now only be displayed for users with
+                   'mod/facetoface:addattendees' capability.
+
+    TL-20609       Fixed an issue in the main menu where a certain combination of preset rules caused an infinite loop
+    TL-20634       Improved security and transparency of seminar 'Message users' feature
+
+                   In previous versions, any user who had the seminar 'Take attendance'
+                   capability could use the 'Message users' form to see attendee email
+                   addresses and send messages to one or more attendees.
+
+                   'Message users' has been changed to require three permissions in the
+                   context of the seminar activity: 'Send messages to any user'
+                   (moodle/site:sendmessage), 'Send a message to many people'
+                   (moodle/course:bulkmessaging) and 'View attendance list and attendees'
+                   (mod/facetoface:viewattendees). These permissions continue to be enabled by
+                   default for trainers and editing trainers.
+
+                   Also, when a user views the 'Message users' form, a 'Messages users viewed'
+                   event is logged. When the form is used to send messages, a 'Message sent'
+                   event is logged.
+
+    TL-20635       Fixed the destination for the 'room name link' column in seminar reports
+
+                   Recent improvements to seminars changed the destination of the links to the
+                   rooms edit page, which can only be accessed by certain roles. The link now
+                   directs users to a less-restricted 'view details' page again.
+
+    TL-20637       Fixed 'Bulk add attendees' form when signup capability is disabled for learner role
+
+                   When the learner role had the 'Sign-up for an event' capability disabled,
+                   it was not possible for an administrator to add a learner to a seminar
+                   event. The system now checks the permissions of the person who is
+                   performing the action, rather than the permissions of the person being
+                   signed up.
+
+    TL-20638       Ensured that quiz question ids are unique when they are rendered on the page
+
+                   Previously, when a quiz question was displayed, the outer div of the
+                   question had an id="q123" added. Unfortunately, this id was not unique in
+                   all cases which lead to the issues in manual grading where multiple
+                   responses for the same question were displayed. This has now been fixed.
+
+    TL-20643       Ensured HR Import checks for unique user profile fields are not performed on empty or null values
+
+                   User custom fields that are set as being unique where the source value is
+                   an empty string or null are no longer included in the checks to ensure
+                   uniqueness.
+
+                   Previously where multiple records contained empty strings where uniqueness
+                   was being enforced, the entire user record was failing and not imported.
+
+    TL-20661       Fixed sending of activation emails for all of manager's appraisals
+
+                   Previously upon appraisal activation, a manager would only receive one
+                   email, regardless of how many appraisees they had. This was true even if
+                   the activation notification content explicitly included appraisee details,
+                   e.g. appraisee full name.
+
+                   This patch fixes this; now the manager gets emails for individual
+                   appraisees. However, if the message is a generic one (i.e. one that did not
+                   have placeholders to differentiate emails to different people), then they
+                   will still only get one email.
+
+                   Note: the one generic email per manager only happens if all the appraisees
+                   automatically get a job assignments upon appraisal activation (i.e.
+                   multiple job assignments is off). If the appraisee still has to view the
+                   appraisal to indicate the job assignment, then the manager will receive
+                   multiple generic emails each time their appraisee first views an appraisal.
+
+    TL-20668       Primary admin and web service users are no longer required to provide their required profile fields information
+    TL-20670       Fixed infinite recursion when generating API documentation
+    TL-20681       Made sure course completion value in the Record of Learning report export doesn't contain HTML
+    TL-20683       Fixed totara core upgrade to avoid using the system API
+
+                   Prior to this patch, the upgrade path for evergreen was using system API,
+                   which was involving the user session to perform actions. Therefore, it
+                   failed to upgrade to evergreen from CLI.
+
+                   With this patch, it is possible to upgrade to evergreen with CLI.
+
+    TL-20685   +   Fixed a bug preventing the export of seminar events
+    TL-20689       Fixed the display of submission grade and status in the "Assignment submission" report
+    TL-20700       Fixed misleading count of users with role
+
+                   A user can be assigned the same role from different contexts. The Users
+                   With Role count was incorrectly double-counting such instances leading to
+                   inaccurate totals being displayed. With this fix the system counts only the
+                   distinct users per role, not the number of assignments per role.
+
+    TL-20703       Fixed incorrect offset when creating a user tour targeting the main navigation
+    TL-20712       Fixed feedback preview with a "pagebreak" item at the top on the page
+    TL-20720       Fixed issue with grades been saved as 0.0000 on seminar table
+
+                   Since Totara 12.0, and until Evergreen-20190322, seminar grades have been
+                   saved as 0.0000 in the facetoface_signups_status table, regardless of
+                   attendance state.
+
+                   Gradebook grades were not affected by this bug.
+
+                   Previous versions correctly set the grade field to null until attendance
+                   was taken, and then set it to a grade based on attendance. This patch fixes
+                   the regression. In summary:
+                    * The correct grade value will always be saved into
+                      facetoface_signups_status table, regardless of seminar grade settings
+                    * If attendance state is 'Not set' when taking attendance, the grade field
+                      will be set to null
+                    * Incorrect facetoface_signups_status grade values will be rewritten with
+                      a correct value, based on attendance state, during this upgrade (where
+                      possible, see exception below)
+                    * If the system detects backup data made with any affected version during
+                      course or activity restore, the correct grade will be used instead of the
+                      backed-up grade
+
+                   Upgrades from Evergreen-20190322 might require some manual intervention,
+                   because it is not possible to reliably distinguish grades introduced by the
+                   bug from grades that have been set to 0.000 via manual grading.
+
+    TL-20727       Ensure email notifications work correctly in HR Import after upgrade
+
+                   Upgrading to Totara 12 or 13 from Totara 11 or earlier may have stopped
+                   email notification from being sent in HR Import. This change ensures that
+                   they are sent correctly.
+
+    TL-20747       Restored 'Update all activities' functionality for custom seminar notification templates
+    TL-20751       Fixed 'fullname' column option in user columns to return NULL when empty
+
+                   Previously the column returned a space character when no value was
+                   available which prevented users from applying "is empty" filter
+
+    TL-20764       Added horizontal scroll bar to user multiselect
+
+                   This will not work in IE11 or Firefox (Due to
+                   https://bugzilla.mozilla.org/show_bug.cgi?id=1294313).
+
+    TL-20773       Fixed unit test failure for third-party activity plugins that do not support Totara generators
+    TL-20779       Removed redundant database update call in Learning Plan Evidence
+    TL-20794       Added missing format value on Seminar 'Download sign-in sheet' hidden field
+
+API changes:
+
+    TL-18699   +   Separated the requested approval state into requested manager approval and requested role approval
+
+                   The requested approval state has been split into two separate states,
+                   requested manager approval state, and the requested role approval state.
+                   This allows for better control and transitioning when in a requested
+                   approval state.
+
+    TL-20021   +   Deprecated event time status functions in facetoface
+
+                   Deprecated functions:
+                    * facetoface_allow_user_cancellation()
+                    * facetoface_is_adminapprover()
+                    * facetoface_get_manager_list()
+                    * facetoface_save_customfield_value()
+                    * facetoface_get_customfield_value()
+
+                   For more information, see mod/facetoface/upgrade.txt
+
+    TL-20376   +   Deprecated date management functions related to facetoface
+
+                   Deprecated functions:
+                    * facetoface_save_dates()
+                    * facetoface_session_dates_check()
+
+                   For more information, see mod/facetoface/upgrade.txt
+
+    TL-20377   +   Deprecated notification-related function in mod/facetoface/lib.php
+
+                   Deprecated functions
+                    * facetoface_notify_under_capacity()
+                    * facetoface_notify_registration_ended()
+                    * facetoface_cancel_pending_requests()
+
+                   For more information, see ./mod/facetoface/upgrade.txt
+
+    TL-20378   +   Deprecated environment functions related to facetoface
+
+                   Deprecated functions:
+                    * facetoface_get_session()
+                    * facetoface_get_env_session()
+
+                   For more information, see mod/facetoface/upgrade.txt
+
+    TL-20380   +   Deprecated export functionality within facetoface
+
+                   Deprecated functions:
+                    * facetoface_write_activity_attendance()
+                    * facetoface_get_user_customfields()
+
+                   For more information, see mod/facetoface/upgrade.txt
+
+    TL-20381   +   Deprecated trivial facetoface functions
+
+                   Deprecated functions:
+                    * facetoface_allow_user_cancellation()
+                    * facetoface_is_adminapprover()
+                    * facetoface_get_manager_list()
+                    * facetoface_save_customfield_value()
+                    * facetoface_get_customfield_value()
+
+                   For more information, see mod/facetoface/upgrade.txt
+
+    TL-20383   +   Deprecated seminar's attendees retriever functions
+
+                   Deprecated functions in mod_facetoface:
+                    * facetoface_get_attendee()
+                    * facetoface_get_requests()
+                    * facetoface_get_adminrequests()
+                    * facetoface_get_users_by_status()
+                    * facetoface_get_cancellations()
+                    * facetoface_get_num_attendees()
+                    * facetoface_get_user_submission()
+                    * facetoface_get_attendees()
+
+                   For more information and the replacements of the deprecated functions, see
+                   './mod/facetoface/upgrade.txt'
+
+    TL-20536   +   Added Behat steps for checking emails
+
+                   Developers can now write behat steps that trigger the creation of emails
+                   which will be captured and can be examined for accuracy. These are the
+                   Behat steps available:
+                    * I reset the email sink
+                    * the following emails should have been sent
+                    * the following emails should not have been sent
+                    * I close the email sink
+
+    TL-20572       Improved in-code documentation for the recommends_counted_recordset() method
+
+                   Previously the documentation contained a link to our internal tracked.
+                   This has been removed as it is not accessible to those outside of the
+                   Totara development team.
+                   Additionally performance testing results have been directly added to the
+                   base method as defined in the moodle_database class.
+
+Miscellaneous Moodle fixes:
+
+    TL-20467       MDL-57486: Delete items when context already deleted
+    TL-15552       MDL-57769: Remove 'numsections' from topics and weeks, allow teachers to create and delete sections as they are needed
+
+                   This patch does not remove the 'numsections' setting from the topics and
+                   weeks course formats, but it does make it optional for other course
+                   formats. It also implements section management methods expected by
+                   third-party course format plugins.
+
+    TL-20490   +   MDL-64971: Ensure that the capability exists when fetching
+    TL-20563       MDL-61950: Fixed display of random questions in the statistics calculator in the quiz module
+
+                   Prior to this patch, if a quiz had random questions in it, then viewing the
+                   statistics report would sometimes have questions missing from the report.
+
+Contributions:
+
+    * Haitham Gasim - Kineo USA - TL-20794
+    * Jo Jones at Kineo UK - TL-19815
+    * Kineo UK - TL-20751
+    * Think Learning - TL-20764
+
+
 Release Evergreen (22nd March 2019):
 ====================================
 
