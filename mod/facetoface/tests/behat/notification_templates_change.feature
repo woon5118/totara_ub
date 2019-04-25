@@ -44,7 +44,7 @@ Feature: Test notification templates update all activities
     And I follow "Seminar TL-9052"
     When I navigate to "Notifications" node in "Seminar administration"
     Then I should see "TL-9052 booking cancellation"
-    And I should see "Inactive" in the "TL-9052 booking cancellation" "table_row"
+    And I should not see "Inactive" in the "TL-9052 booking cancellation" "table_row"
     And I should not see "Seminar booking cancellation"
 
     And I should see "TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
