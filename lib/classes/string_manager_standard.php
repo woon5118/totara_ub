@@ -361,30 +361,12 @@ class core_string_manager_standard implements core_string_manager {
 
         $string = $string[$identifier];
 
+        // Totara: use placeholders abstraction
         if ($a !== null) {
-            // Process array's and objects (except lang_strings).
-            if (is_array($a) or (is_object($a) && !($a instanceof lang_string))) {
-                $a = (array)$a;
-                $search = array();
-                $replace = array();
-                foreach ($a as $key => $value) {
-                    if (is_int($key)) {
-                        // We do not support numeric keys - sorry!
-                        continue;
-                    }
-                    if (is_array($value) or (is_object($value) && !($value instanceof lang_string))) {
-                        // We support just string or lang_string as value.
-                        continue;
-                    }
-                    $search[]  = '{$a->'.$key.'}';
-                    $replace[] = (string)$value;
-                }
-                if ($search) {
-                    $string = str_replace($search, $replace, $string);
-                }
-            } else {
-                $string = str_replace('{$a}', (string)$a, $string);
+            if (!($a instanceof core_string_placeholders)) {
+                $a = new core\string_placeholders\general($a);
             }
+            $string = $a->replace($string);
         }
 
         if ($CFG->debugdeveloper) {
