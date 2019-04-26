@@ -127,6 +127,16 @@ define(['jquery','core/yui', 'core/str', 'totara_form/form'], function($, Y, cor
     AttoElement.prototype.setEditor = function(editor) {
         this.editor = editor;
         editor.on('change', $.proxy(this.changed, this));
+
+        if (null !== this.input) {
+            var required = this.input.attr('required');
+            if ('undefined' !== typeof required) {
+                // Because the atto editor hide the text-area, therefore, if the text-area is required, then chrome
+                // will not be able to focus on that element, and it result in error for chrome browser and user will
+                // not know what is happening, or what field they are missing.
+                this.input.removeAttr('required');
+            }
+        }
     };
 
     /**
