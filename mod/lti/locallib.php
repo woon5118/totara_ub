@@ -3112,6 +3112,10 @@ function lti_sign_jwt($parms, $endpoint, $oauthconsumerkey, $typeid = 0, $nonce 
     $kid = get_config('mod_lti', 'kid');
     $jwt = JWT::encode($payload, $privatekey, 'RS256', $kid);
 
+    $newparms = array();
+    $newparms['id_token'] = $jwt;
+
+    return $newparms;
 }
 
 /**
