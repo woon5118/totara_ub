@@ -1113,3 +1113,105 @@ function facetoface_displaysessiontimezones_updated() {
         \mod_facetoface\calendar::update_entries($seminarevent);
     }
 }
+
+/**
+ * Implementation of the function for printing the form elements that control
+ * whether the course reset functionality affects the glossary.
+ *
+ * @param object $mform form passed by reference
+ */
+function facetoface_reset_course_form_definition(&$mform) {
+
+    $mform->addElement('header', 'facetofaceheader', get_string('modulenameplural', 'mod_facetoface'));
+
+    $mform->addElement('checkbox', 'reset_seminarevents', get_string('resetseminarevents', 'mod_facetoface'));
+    $mform->addHelpButton('reset_seminarevents', 'resetseminarevents', 'mod_facetoface');
+
+    $mform->addElement('checkbox', 'reset_attendees', get_string('resetattendees', 'mod_facetoface'));
+    $mform->disabledIf('reset_attendees', 'reset_seminarevents', 'checked');
+    $mform->addHelpButton('reset_attendees', 'resetattendees', 'mod_facetoface');
+}
+
+/**
+ * Course reset form defaults.
+ *
+ * @return array
+ */
+function facetoface_reset_course_form_defaults($course) {
+    return ['reset_seminarevents' => 1, 'reset_attendees' => 1];
+}
+
+/**
+ * Actual implementation of the reset course functionality, delete all the seminar events for course $data->courseid.
+ *
+ * @param $data the data submitted from the reset course.
+ * @return array status array
+ */
+function facetoface_reset_userdata($data) {
+
+    $componentstr = get_string('modulenameplural', 'mod_facetoface');
+    $status = [];
+
+    if (empty($data->reset_seminarevents) && empty($data->reset_attendees)) {
+        return $status;
+    }
+
+    $seminars = new \mod_facetoface\seminar_list(['course' => $data->courseid]);
+
+    if (!empty($data->reset_seminarevents)) {
+
+        foreach ($seminars as $seminar) {
+            $seminar_events = \mod_facetoface\seminar_event_list::from_seminar($seminar);
+            $seminar_events->delete();
+        }
+        // Remove all grades from gradebook.
+        if (empty($data->reset_gradebook_grades)) {
+            facetoface_reset_gradebook($data->courseid);
+        }
+
+        $status[] = ['component' => $componentstr, 'item' => get_string('resetseminarevents', 'mod_facetoface'), 'error' => false];
+        $status[] = ['component' => $componentstr, 'item' => get_string('resetattendees', 'mod_facetoface'), 'error' => false];
+
+    } else if (!empty($data->reset_attendees)) {
+
+        foreach ($seminars as $seminar) {
+            $seminar_events = \mod_facetoface\seminar_event_list::from_seminar($seminar);
+
+            foreach ($seminar_events as $seminar_event) {
+
+                $seminarsignups = \mod_facetoface\signup_list::from_conditions(['sessionid' => $seminar_event->get_id()]);
+                $seminarsignups->delete();
+            }
+        }
+        // Remove all grades from gradebook.
+        if (empty($data->reset_gradebook_grades)) {
+            facetoface_reset_gradebook($data->courseid);
+        }
+
+        $status[] = ['component' => $componentstr, 'item' => get_string('resetattendees', 'mod_facetoface'), 'error' => false];
+    }
+
+    return $status;
+}
+
+/**
+ * Removes all grades from gradebook
+ *
+ * @param int $courseid The ID of the course to reset
+ */
+function facetoface_reset_gradebook($courseid) {
+    global $DB;
+
+    $sql = "SELECT f.*, cm.idnumber as cmidnumber, f.course as courseid
+              FROM {facetoface} f
+              JOIN {course_modules} cm ON cm.instance = f.id
+              JOIN {modules} m ON m.id = cm.module
+             WHERE m.name = 'facetoface'
+               AND f.course = ?";
+
+    if ($seminars = $DB->get_records_sql($sql, [$courseid])) {
+        foreach ($seminars as $seminar) {
+            facetoface_grade_item_update($seminar, 'reset');
+        }
+    }
+}

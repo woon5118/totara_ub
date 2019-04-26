@@ -27,8 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class seminar_list represents all seminar activities
- *
- * @deprecated since Totara 12
  */
 final class seminar_list implements \Iterator {
 
@@ -42,8 +40,6 @@ final class seminar_list implements \Iterator {
      */
     public function __construct(array $conditions = null, string $sort = 'timecreated') {
         global $DB;
-
-        debugging('The seminar list class has been deprecated as it was never used. There is no alternative', DEBUG_DEVELOPER);
 
         $seminars = $DB->get_records('facetoface', $conditions, $sort, '*');
         foreach ($seminars as $seminar) {

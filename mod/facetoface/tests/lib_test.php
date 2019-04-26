@@ -4618,4 +4618,131 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
     }
 
+    public function test_reset_userdata() {
+        global $DB;
+
+        $this->init_sample_data();
+
+        $teacher1 = $this->getDataGenerator()->create_user();
+        $student1 = $this->getDataGenerator()->create_user();
+        $student2 = $this->getDataGenerator()->create_user();
+        $student3 = $this->getDataGenerator()->create_user();
+        $student4 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+
+        $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+
+        $this->getDataGenerator()->enrol_user($teacher1->id, $course1->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course1->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student3->id, $course1->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student4->id, $course1->id, $studentrole->id);
+
+        $this->getDataGenerator()->enrol_user($teacher1->id, $course2->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course2->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course2->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student3->id, $course2->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student4->id, $course2->id, $studentrole->id);
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = ['name' => 'facetoface11', 'course' => $course1->id];
+        $facetoface11 = $facetofacegenerator->create_instance($facetofacedata);
+        $facetofacedata = ['name' => 'facetoface12', 'course' => $course1->id];
+        $facetoface12 = $facetofacegenerator->create_instance($facetofacedata);
+
+        $facetofacedata = ['name' => 'facetoface21', 'course' => $course2->id];
+        $facetoface21 = $facetofacegenerator->create_instance($facetofacedata);
+        $facetofacedata = ['name' => 'facetoface22', 'course' => $course2->id];
+        $facetoface22 = $facetofacegenerator->create_instance($facetofacedata);
+
+
+        // Session that starts in 24hrs time.
+        $sessiondate1 = new stdClass();
+        $sessiondate1->timestart = time() + DAYSECS;
+        $sessiondate1->timefinish = time() + DAYSECS + 60;
+        $sessiondate1->sessiontimezone = 'Pacific/Auckland';
+
+        $sessiondata = ['facetoface' => $facetoface11->id, 'sessiondates' => [$sessiondate1]];
+        $sessionid11 = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent11 = new seminar_event($sessionid11);
+
+        $sessiondata = ['facetoface' => $facetoface12->id, 'sessiondates' => [$sessiondate1]];
+        $sessionid12 = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent12 = new seminar_event($sessionid12);
+
+        $sessiondate2 = new stdClass();
+        $sessiondate2->timestart = time() + DAYSECS + DAYSECS;
+        $sessiondate2->timefinish = time() + DAYSECS + DAYSECS + 60;
+        $sessiondate2->sessiontimezone = 'Pacific/Auckland';
+
+        $sessiondata = ['facetoface' => $facetoface21->id, 'sessiondates' => [$sessiondate2]];
+        $sessionid21 = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent21 = new seminar_event($sessionid21);
+
+        $sessiondata = ['facetoface' => $facetoface22->id, 'sessiondates' => [$sessiondate2]];
+        $sessionid22 = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent22 = new seminar_event($sessionid22);
+
+        $signup111 = signup::create($student1->id, $seminarevent11);
+        signup_helper::signup($signup111);
+
+        $signup112 = signup::create($student2->id, $seminarevent11);
+        signup_helper::signup($signup112);
+
+        $signup123 = signup::create($student3->id, $seminarevent12);
+        signup_helper::signup($signup123);
+
+        $signup124 = signup::create($student4->id, $seminarevent12);
+        signup_helper::signup($signup124);
+
+        $signup211 = signup::create($student1->id, $seminarevent21);
+        signup_helper::signup($signup211);
+
+        $signup212 = signup::create($student2->id, $seminarevent21);
+        signup_helper::signup($signup212);
+
+        $signup223 = signup::create($student3->id, $seminarevent22);
+        signup_helper::signup($signup223);
+
+        $signup224 = signup::create($student4->id, $seminarevent22);
+        signup_helper::signup($signup224);
+
+        // Now try and reset.
+        $data = new stdClass();
+        $data->reset_seminarevents = 1;
+        $data->courseid = $course1->id;
+
+        // Test reset data.
+        $status = facetoface_reset_userdata($data);
+        $this->assertFalse($status[0]['error']);
+
+        // Lets try to load seminar event 11 and 12
+        try {
+            $se = new seminar_event($sessionid11);
+            $this->fail('Exception expected due to MUST_EXIST in database query');
+        } catch (dml_missing_record_exception $e) {
+            $this->assertEquals('invalidrecordunknown', $e->errorcode);
+        }
+        try {
+            $se = new seminar_event($sessionid12);
+            $this->fail('Exception expected due to MUST_EXIST in database query');
+        } catch (dml_missing_record_exception $e) {
+            $this->assertEquals('invalidrecordunknown', $e->errorcode);
+        }
+        $this->assertNull($signup111->get_signup_status());
+        $this->assertNull($signup112->get_signup_status());
+        $this->assertNull($signup123->get_signup_status());
+        $this->assertNull($signup124->get_signup_status());
+
+        // Lets try to load seminar event 21 and 22
+        $this->assertEquals($seminarevent21->get_id(), (new seminar_event($sessionid21))->get_id());
+        $this->assertEquals($seminarevent22->get_id(), (new seminar_event($sessionid22))->get_id());
+        $this->assertNotNull($signup211->get_signup_status());
+        $this->assertNotNull($signup212->get_signup_status());
+        $this->assertNotNull($signup223->get_signup_status());
+        $this->assertNotNull($signup224->get_signup_status());
+    }
 }
