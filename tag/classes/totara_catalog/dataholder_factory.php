@@ -55,24 +55,31 @@ class dataholder_factory {
 
         return [
             new dataholder(
-                'tags',
+                'ftstags',
                 new \lang_string('tags', 'tag'),
+                [formatter::TYPE_FTS => new fts('ftstags.tags')],
                 [
-                    formatter::TYPE_PLACEHOLDER_TEXT => new ordered_list(
-                        'tags.tags'
-                    ),
-                    formatter::TYPE_FTS => new fts(
-                        'tags.tags'
-                    ),
-                ],
-                [
-                    'tags' =>
+                    'ftstags' =>
                         "LEFT JOIN (SELECT ti.itemid, {$DB->sql_group_concat('t.name',',')} AS tags
                                       FROM {tag_instance} ti
                                       JOIN {tag} t ON t.id = ti.tagid
                                      WHERE ti.itemtype = '{$itemtype}'
+                                     GROUP BY ti.itemid) ftstags
+                           ON ftstags.itemid = base.id"
+                ]
+            ),
+            new dataholder(
+                'tags',
+                new \lang_string('tags', 'tag'),
+                [formatter::TYPE_PLACEHOLDER_TEXT => new ordered_list('tags.tags')],
+                [
+                    'tags' =>
+                        "LEFT JOIN (SELECT ti.itemid, {$DB->sql_group_concat('t.rawname',',')} AS tags
+                                      FROM {tag_instance} ti
+                                      JOIN {tag} t ON t.id = ti.tagid
+                                     WHERE ti.itemtype = '{$itemtype}'
                                      GROUP BY ti.itemid) tags
-                           ON tags.itemid = base.id",
+                           ON tags.itemid = base.id"
                 ]
             )
         ];
