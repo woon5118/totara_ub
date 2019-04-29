@@ -1117,6 +1117,93 @@ define([ 'core/mustache',
              */
             renderPix: function(key, component, title) {
                 return renderIcon(component + '|' + key, title);
+            },
+
+            /**
+             * Totara: Render the provided template and append to the target node the rendered content as a single block
+             *
+             * @method renderAppend
+             * @param {String} templateName Name of template to request
+             * @param {Object} context Could be array, string or simple value for the context of the template.
+             * @param {Node} target Node to append additional markup
+             * @return {Promise} es6 Promise
+             */
+            renderAppend: function(templateName, context, target) {
+                var html,
+                    range = document.createRange(),
+                    that = this;
+
+                return new Promise(function(resolve, reject) {
+                    var renderedData = that.render(templateName, context);
+                    renderedData.done(function(htmlString) {
+                        range.selectNode(target);
+                        html = range.createContextualFragment(htmlString);
+                        target.insertBefore(html, null);
+                        resolve();
+                    }).fail(function(ex) {
+                        notification.exception(ex);
+                        reject();
+                    });
+                });
+            },
+
+            /**
+             * Totara: Render the provided template and filter it's content by the provided item type selector.
+             * Append the filtered items to the target node
+             *
+             * @method renderAppendByItem
+             * @param {String} templateName Name of template to request
+             * @param {Object} context Could be array, string or simple value for the context of the template.
+             * @param {Node} target Node to replace markup
+             * @param {String} itemType Node selector of items to be appeneded to target
+             * @return {Promise} es6 Promise
+             */
+            renderAppendByItem: function(templateName, context, target, itemType) {
+                var html,
+                    range = document.createRange(),
+                    that = this;
+
+                return new Promise(function(resolve, reject) {
+                    var renderedData = that.render(templateName, context);
+                    renderedData.done(function(htmlString) {
+                        range.selectNode(target);
+                        html = range.createContextualFragment(htmlString);
+
+                        var items = html.querySelectorAll(itemType);
+
+                        for (var i = 0; i < items.length; i++) {
+                            target.appendChild(items[i]);
+                        }
+                        resolve();
+
+                    }).fail(function(ex) {
+                        notification.exception(ex);
+                        reject();
+                    });
+                });
+            },
+
+            /**
+             * Totara: Render the provided template and replace the target node HTML with the rendered content
+             *
+             * @method renderReplace
+             * @param {String} templateName Name of template to request
+             * @param {Object} context Could be array, string or simple value for the context of the template.
+             * @param {Node} target Node to replace markup
+             * @return {Promise} es6 Promise
+             */
+            renderReplace: function(templateName, context, target) {
+                var that = this;
+                return new Promise(function(resolve, reject) {
+                    var renderedData = that.render(templateName, context);
+                    renderedData.done(function(html) {
+                        target.innerHTML = html;
+                        resolve();
+                    }).fail(function(ex) {
+                        notification.exception(ex);
+                        reject();
+                    });
+                });
             }
         };
 
