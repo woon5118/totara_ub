@@ -65,7 +65,7 @@ final class rb_course_sortorder_helper implements \cache_data_source {
     /**
      * Invalidates the required cache when a program is deleted.
      *
-     * @param event\program_contentupdated $event
+     * @param event\program_deleted $event
      */
     public static function handle_program_deleted(event\program_deleted $event): void {
         $programid = $event->objectid;
@@ -111,7 +111,7 @@ final class rb_course_sortorder_helper implements \cache_data_source {
                   FROM {prog_courseset_course} pcc
                   JOIN {prog_courseset} pc ON pcc.coursesetid = pc.id
                 WHERE pc.programid = :programid
-                ORDER BY pc.sortorder ASC, pcc.id ASC';
+                ORDER BY pc.sortorder ASC, pcc.sortorder ASC';
         $params = ['programid' => $programid];
         $order = $DB->get_records_sql_menu($sql, $params);
         return $order;
@@ -139,7 +139,7 @@ final class rb_course_sortorder_helper implements \cache_data_source {
                   FROM {prog_courseset_course} pcc
                   JOIN {prog_courseset} pc ON pcc.coursesetid = pc.id
                 WHERE pc.programid {$programidin}
-                ORDER BY pc.programid, pc.sortorder ASC, pcc.id ASC";
+                ORDER BY pc.programid, pc.sortorder ASC, pcc.sortorder ASC";
         $result = $DB->get_records_sql($sql, $params);
 
         foreach ($result as $row) {

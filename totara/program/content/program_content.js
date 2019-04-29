@@ -472,15 +472,6 @@ M.totara_programcontent = M.totara_programcontent || {
             return module.handleSaveChanges();
         });
 
-        // delegate course deletion to delete buttons rendered or created dynamically
-        $('.edit-program .coursedeletelink').click(function(event){
-            event.preventDefault();
-            module.deleteCourse(this.getAttribute('data-coursesetid'),
-                                this.getAttribute('data-coursesetprefix'),
-                                this.getAttribute('data-coursetodelete_id'));
-            return true;
-        });
-
         this.initCoursesets();
 
         // create instances of each dialog for the page
@@ -501,6 +492,38 @@ M.totara_programcontent = M.totara_programcontent || {
                  sameascert.removeAttribute('disabled');
             }
         }
+
+        // Move or delete courses.
+        document.getElementById('edit-program-content').addEventListener('click', function(e) {
+            // Move course up.
+            if (e.target.closest('a').getAttribute('data-action') === 'up') {
+                module.moveCourseUp(
+                    $(e.target).closest('li'),
+                    $(e.target).closest('.courselist'),
+                    e.target.closest('a').getAttribute('data-coursesetprefix'));
+                return true;
+            }
+
+            // Move course down.
+            if (e.target.closest('a').getAttribute('data-action') === 'down') {
+                module.moveCourseDown(
+                    $(e.target).closest('li'),
+                    $(e.target).closest('.courselist'),
+                    e.target.closest('a').getAttribute('data-coursesetprefix'));
+                return true;
+            }
+
+            // Delete course.
+            if (e.target.closest('a').getAttribute('data-action') === 'delete') {
+                module.deleteCourse(
+                    e.target.closest('a').getAttribute('data-coursesetid'),
+                    e.target.closest('a').getAttribute('data-coursesetprefix'),
+                    e.target.closest('a').getAttribute('data-coursetodelete_id'));
+                return true;
+            }
+
+            return true;
+        });
 
     }, // end init
 
@@ -587,8 +610,10 @@ M.totara_programcontent = M.totara_programcontent || {
      * This function changes the completion type string next to the course ('and' or 'or')
      * to match the selection
      */
-    changeCompletionTypeString: function(el, prefix){
-        if (el.value == this.config.COMPLETIONTYPE_ANY || el.value == this.config.COMPLETIONTYPE_SOME || el.value == this.config.COMPLETIONTYPE_OPTIONAL) {
+    changeCompletionTypeString: function(prefix) {
+        var completiontype = document.getElementById(prefix + 'completiontype').value;
+
+        if (completiontype == this.config.COMPLETIONTYPE_ANY || completiontype == this.config.COMPLETIONTYPE_SOME || completiontype == this.config.COMPLETIONTYPE_OPTIONAL) {
             var completiontypestr = M.util.get_string('or', 'totara_program');
         } else {
             var completiontypestr = M.util.get_string('and', 'totara_program');
@@ -687,19 +712,60 @@ M.totara_programcontent = M.totara_programcontent || {
 
             M.totara_programcontent.initCoursesets();
             //$('form[name="form_prog_content"]').submit(); // deliberately off
-
-            // re-setup delete handlers after courses re-drawn by AJAX response
-            $('.edit-program .coursedeletelink').click(function(){
-                M.totara_programcontent.deleteCourse(this.getAttribute('data-coursesetid'),
-                                                     this.getAttribute('data-coursesetprefix'),
-                                                     this.getAttribute('data-coursetodelete_id'));
-                return true;
-            });
         });
 
         return false;
     },
 
+    /**
+     * Move course up
+     *
+     * @param {object} li The li element
+     * @param {object} courselist The .courselist element
+     * @param {string} coursesetprefix The course prefix
+     * @return {boolean}
+     */
+    moveCourseUp: function(li, courselist, coursesetprefix) {
+        li.insertBefore(li.prev());
+
+        M.totara_programcontent.changeCompletionTypeString(coursesetprefix);
+        M.totara_programcontent.updateCourseList(courselist, coursesetprefix);
+
+        return true;
+    },
+
+    /**
+     * Move course down
+     *
+     * @param {object} li The li element
+     * @param {object} courselist The .courselist element
+     * @param {string} coursesetprefix The course prefix
+     * @return {boolean}
+     */
+    moveCourseDown: function(li, courselist, coursesetprefix) {
+        li.insertAfter(li.next());
+
+        M.totara_programcontent.changeCompletionTypeString(coursesetprefix);
+        M.totara_programcontent.updateCourseList(courselist, coursesetprefix);
+
+        return true;
+    },
+
+    /**
+     * Update the courses list hidden field
+     *
+     * @param {object} courselist The .courselist element
+     * @param {string} coursesetprefix
+     */
+    updateCourseList: function(courselist, coursesetprefix) {
+        var courses = [];
+        courselist.find("li").each(function() {
+            courses.push($(this).attr('data-courseid'));
+        });
+
+        $('input:hidden[name=' + coursesetprefix + 'courses]').val(courses.join());
+        $('input[name="contentchanged"]').val(1);
+    },
 
     /**
      * Stores the initial values of the form when the page is loaded

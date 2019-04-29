@@ -440,12 +440,11 @@ div.nextsetoperator-group-and {
 }
 .course_list .operator {
     float: left;
-    width: 5%;
+    width: 5ch;
     display: inline-block;
-    padding: 10px 0;
 }
 .course_list .totara-item-group {
-    width: 90%;
+    width: ~"calc(95% - 5ch)";
     float: left;
 }
 .course_list li .notifyproblem {
@@ -579,12 +578,27 @@ div.nextsetoperator-group-and {
         width: auto;
     }
 
-    .totara-item-group {
+    #program-assignments .totara-item-group {
         background-color: @gray-lighter;
         border: 1px solid @gray-light;
         border-radius: @border-radius-large;
         padding: @padding-small-vertical @padding-small-horizontal;
         margin-right: 5%;
+    }
+
+    .course_list .totara-item-group {
+        border-bottom: 1px solid @gray-light;
+        padding: @padding-small-vertical @padding-small-horizontal;
+        margin-right: 5%;
+    }
+
+    .course_list li:first-child .totara-item-group {
+        border-top: 1px solid @gray-light;
+    }
+
+    .course_list li:first-child .upitem,
+    .course_list li:last-child .downitem {
+        visibility: hidden;
     }
 
     .totara-item-group .totara-item-group-icon {

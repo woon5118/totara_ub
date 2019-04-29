@@ -207,5 +207,33 @@ function xmldb_totara_program_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018031501, 'totara', 'program');
     }
 
+    if ($oldversion < 2019042600) {
+        // Define field sortorder to be added to prog_courseset_course.
+        $table = new xmldb_table('prog_courseset_course');
+        $field = new xmldb_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'courseid');
+
+        // Conditionally launch add field sortorder.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            // Set a default sortorder for all existing courseset courses.
+            // Do this only if the field was just added, so that we can safely rerun this upgrade step.
+            $coursesets = $DB->get_recordset('prog_courseset');
+            foreach ($coursesets as $courseset) {
+                $courselist = $DB->get_recordset('prog_courseset_course', array('coursesetid' => $courseset->id), 'id ASC');
+                $sortorder = 1;
+                foreach ($courselist as $course) {
+                    $course->sortorder = $sortorder++; // Increment the sortorder within each set.
+                    $DB->update_record('prog_courseset_course', $course);
+                }
+                $courselist->close();
+            }
+            $coursesets->close();
+        }
+
+        // Program savepoint reached.
+        upgrade_plugin_savepoint(true, 2019042600, 'totara', 'program');
+    }
+
     return true;
 }

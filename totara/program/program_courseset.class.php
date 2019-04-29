@@ -584,7 +584,7 @@ class multi_course_set extends course_set {
         $this->coursesumfieldtotal = 0;
 
         if (is_object($setob)) {
-            $courseset_courses = $DB->get_records('prog_courseset_course', array('coursesetid' => $this->id), 'id asc');
+            $courseset_courses = $DB->get_records('prog_courseset_course', array('coursesetid' => $this->id), 'sortorder ASC');
             foreach ($courseset_courses as $courseset_course) {
                 $course = $DB->get_record('course', array('id' => $courseset_course->courseid));
                 if (!$course) {
@@ -730,6 +730,7 @@ class multi_course_set extends course_set {
 
 
         // then add any new courses
+        $sortorder = 1;
         foreach ($this->courses as $course) {
             if (!$ob = $DB->get_record('prog_courseset_course', array('coursesetid' => $this->id, 'courseid' => $course->id))) {
                 //check if program enrolment plugin is already enabled on this course
@@ -741,7 +742,12 @@ class multi_course_set extends course_set {
                 $ob = new stdClass();
                 $ob->coursesetid = $this->id;
                 $ob->courseid = $course->id;
+                $ob->sortorder = $sortorder++;
                 $DB->insert_record('prog_courseset_course', $ob);
+            } else {
+                // Update.
+                $ob->sortorder = $sortorder++;
+                $DB->update_record('prog_courseset_course', $ob);
             }
         }
         return true;
@@ -1295,8 +1301,6 @@ class multi_course_set extends course_set {
     }
 
     public function print_courses() {
-        global $OUTPUT;
-
         $prefix = $this->get_set_prefix();
 
         $out = '';
@@ -1308,26 +1312,23 @@ class multi_course_set extends course_set {
                 print_error('unknowncompletiontype', 'totara_program', '', $this->sortorder);
             }
 
+            $coursesinsetcount = count($this->courses);
             $firstcourse = true;
             $list = '';
+
             foreach ($this->courses as $course) {
+                $course->coursesetid = $this->id;
+
                 if ($firstcourse) {
                     $content = html_writer::tag('span', '&nbsp;', array('class' => 'operator'));
                     $firstcourse = false;
                 } else {
                     $content = html_writer::tag('span', $completiontypestr, array('class' => 'operator'));
                 }
-                $content .= html_writer::start_tag('div', array('class' => 'totara-item-group delete_item'));
-                $content .= html_writer::start_tag('a',
-                                array('class' => 'totara-item-group-icon coursedeletelink', 'href' => 'javascript:;',
-                                      'data-coursesetid' => $this->id, 'data-coursesetprefix' => $prefix,
-                                      'data-coursetodelete_id' => $course->id)
-                            );
-                $content .= $OUTPUT->pix_icon('t/delete', get_string('delete'));
-                $content .= html_writer::end_tag('a');
-                $content .= format_string($course->fullname);
-                $content .= html_writer::end_tag('div');
-                $list .= html_writer::tag('li', $content);
+
+                $content .= $this->course_content_table_toolbar($course, $prefix);
+
+                $list .= html_writer::tag('li', $content, array('data-courseid' => $course->id));
             }
             $ulattrs = array('id' => $prefix.'courselist', 'class' => 'course_list');
             $out .= html_writer::tag('div', html_writer::tag('ul', $list, $ulattrs), array('class' => 'felement'));
@@ -1336,12 +1337,14 @@ class multi_course_set extends course_set {
             foreach ($this->courses as $course) {
                 $courseidsarray[] = $course->id;
             }
+
             $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix.'courses', 'value' => implode(',', $courseidsarray)));
         } else {
             $out .= html_writer::tag('div', get_string('nocourses', 'totara_program'), array('class' => 'felement'));
             $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix.'courses', 'value' => ''));
         }
         $out .= html_writer::end_tag('div'); // End fitem.
+
         return $out;
     }
 
@@ -1480,7 +1483,7 @@ class multi_course_set extends course_set {
                 COMPLETIONTYPE_SOME => get_string('somecourses', 'totara_program'),
                 COMPLETIONTYPE_OPTIONAL => get_string('completionoptional', 'totara_program'),
             );
-            $onchange = 'return M.totara_programcontent.changeCompletionTypeString(this, '.$prefix.');';
+            $onchange = 'return M.totara_programcontent.changeCompletionTypeString('.$prefix.');';
             $mform->addElement('select', $prefix.'completiontype', get_string('label:learnermustcomplete', 'totara_program'),
                              $completiontypeoptions, array('class' => 'completiontype', 'onchange' => $onchange, 'id' => $prefix.'completiontype'));
             $mform->setType($prefix.'completiontype', PARAM_INT);
@@ -1617,11 +1620,9 @@ class multi_course_set extends course_set {
      * @param <type> $template_values
      * @param <type> $formdataobject
      * @param <type> $updateform
-     * @return <type>
+     * @return string the courses html
      */
-    public function get_courses_form_template(&$mform, &$template_values, &$formdataobject, $updateform=true) {
-        global $OUTPUT;
-
+    public function get_courses_form_template(&$mform, array &$template_values, &$formdataobject, $updateform = true) : string {
         $prefix = $this->get_set_prefix();
 
         $templatehtml = '';
@@ -1633,27 +1634,27 @@ class multi_course_set extends course_set {
                 print_error('unknowncompletiontype', 'totara_program', '', $this->sortorder);
             }
 
+            $coursesinsetcount = count($this->courses);
             $firstcourse = true;
             $list = '';
+
             foreach ($this->courses as $course) {
+                $course->coursesetid = $this->id;
+                $classes = 'operator';
+
                 if ($firstcourse) {
-                    $content = html_writer::tag('span', '&nbsp;', array('class' => 'operator'));
+                    $content = html_writer::tag('span', '&nbsp;', array('class' => $classes));
                     $firstcourse = false;
                 } else {
-                    $content = html_writer::tag('span', $completiontypestr, array('class' => 'operator'));
+                    $content = html_writer::tag('span', $completiontypestr, array('class' => $classes));
                 }
-                $content .= html_writer::start_tag('div', array('class' => 'totara-item-group delete_item'));
-                $content .= html_writer::start_tag('a',
-                                array('class' => 'totara-item-group-icon coursedeletelink', 'href' => 'javascript:;',
-                                      'data-coursesetid' => $this->id, 'data-coursesetprefix' => $prefix,
-                                      'data-coursetodelete_id' => $course->id)
-                            );
-                $content .= $OUTPUT->pix_icon('t/delete', get_string('delete'));
-                $content .= html_writer::end_tag('a');
-                $content .= format_string($course->fullname);
-                $content .= html_writer::end_tag('div');
-                $list .= html_writer::tag('li', $content);
+
+                // Get the action buttons.
+                $content .= $this->course_content_table_toolbar($course, $prefix);
+
+                $list .= html_writer::tag('li', $content, array('data-courseid' => $course->id));
             }
+
             $ulattrs = array('id' => $prefix.'displaycourselist', 'class' => 'course_list');
             $templatehtml .= html_writer::tag('div', html_writer::tag('ul', $list, $ulattrs), array('class' => 'felement'));
 
@@ -1687,7 +1688,52 @@ class multi_course_set extends course_set {
         $templatehtml .= html_writer::end_tag('div'); // End fitem.
 
         return $templatehtml;
+    }
 
+    /**
+     * Generate HTML for the toolbar attached to this course in courses_html_table().
+     *
+     * @param stdClass $course The object of the course
+     * @param string   $prefix
+     * @return string html for the toolbar
+     */
+    public function course_content_table_toolbar(stdClass $course, string $prefix) : string {
+        global $OUTPUT;
+
+        $url = new moodle_url('/totara/program/content/get_html.php', array(
+            'id'          => $this->programid,     // Program ID.
+            'courseid'    => $course->id,          // Course ID.
+            'coursesetid' => $course->coursesetid, // Course set ID.
+        ));
+
+        $params = array(
+            'removecourse' => 'delete',
+            'moveup'       => 'up',
+            'movedown'     => 'down'
+        );
+
+        $content = html_writer::start_tag('div', array('class' => 'totara-item-group'));
+        foreach ($params as $htmltype => $action) {
+            $params = array('class' => "{$action}item");
+
+            $url->param('htmltype', $htmltype);
+            $content .= html_writer::start_tag('div', $params);
+            $content .= html_writer::start_tag('a', array(
+                'class'                           => 'totara-item-group-icon course' . $action . 'link',
+                'href'                            => 'javascript:;',
+                'data-action'                     => $action,
+                'data-coursesetid'                => $this->id,
+                'data-coursesetprefix'            => $prefix,
+                'data-courseto' . $action . '_id' => $course->id,
+            ));
+            $content .= $OUTPUT->pix_icon('t/' . $action, get_string($action));
+            $content .= html_writer::end_tag('a');
+            $content .= html_writer::end_tag('div');
+        }
+        $content .= format_string($course->fullname);
+        $content .= html_writer::end_tag('div');
+
+        return $content;
     }
 
     /**
