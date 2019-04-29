@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* seminar_event_list::form_seminar() has been renamed to seminar_event_list::from_seminar()
 * signup_status::get_state() has been deprecated, please use signup::get_state()
 * attendees_helper::show_customfields() function has been deprecated, please use mod_facetoface_renderer::render_seminar_event()
 * signup_status::get_state() function has been deprecated, please use signup::get_state()

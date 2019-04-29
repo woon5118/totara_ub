@@ -37,7 +37,7 @@ final class approver {
      */
     public static function dismiss(seminar $seminar) {
         /** @var seminar_event[] $seminarevents */
-        $seminarevents = seminar_event_list::form_seminar($seminar);
+        $seminarevents = seminar_event_list::from_seminar($seminar);
 
         foreach ($seminarevents as $seminarevent) {
             $seminarevent->dismiss_approver();

@@ -193,7 +193,7 @@ function facetoface_add_instance($facetoface) {
 
     //update any calendar entries
     $seminar = new \mod_facetoface\seminar($facetoface->id);
-    $seminarevents = \mod_facetoface\seminar_event_list::form_seminar($seminar);
+    $seminarevents = \mod_facetoface\seminar_event_list::from_seminar($seminar);
     foreach ($seminarevents as $seminarevent) {
         \mod_facetoface\calendar::update_entries($seminarevent);
     }

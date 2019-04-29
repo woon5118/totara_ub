@@ -294,7 +294,7 @@ final class seminar implements seminar_iterator_item {
      * @return seminar_event_list
      */
     public function get_events(): seminar_event_list {
-        return seminar_event_list::form_seminar($this);
+        return seminar_event_list::from_seminar($this);
     }
 
     /**

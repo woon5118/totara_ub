@@ -36,18 +36,34 @@ final class seminar_event_list implements \Iterator, \Countable {
 
     /**
      * Add seminar_event to list
+     *
      * @param seminar_event $item
+     * @return void
      */
-    public function add(seminar_event $item) {
+    public function add(seminar_event $item): void {
         $this->items[$item->get_id()] = $item;
     }
 
     /**
      * Create list of events in seminar
+     *
+     * @deprecated since Totara 13
      * @param seminar $seminar
      * @return seminar_event_list
      */
-    public static function form_seminar(seminar $seminar) {
+    public static function form_seminar(seminar $seminar): seminar_event_list {
+        debugging('seminar_event_list::form_seminar() has been renamed to seminar_event_list::from_seminar()', DEBUG_DEVELOPER);
+        return seminar_event_list::from_seminar($seminar);
+    }
+
+    /**
+     * Create list of events in seminar
+     *
+     * @since Totara 13
+     * @param seminar $seminar
+     * @return seminar_event_list
+     */
+    public static function from_seminar(seminar $seminar): seminar_event_list {
         global $DB;
         $seminarevents = $DB->get_records('facetoface_sessions', ['facetoface' => $seminar->get_id()]);
         $list = new static();
@@ -60,10 +76,11 @@ final class seminar_event_list implements \Iterator, \Countable {
 
     /**
      * Get any seminar events that we need to check for waitlist entries.
+     *
      * @param int $now
      * @return seminar_event_list
      */
-    public static function pending_waitlist_clear(int $now = 0) {
+    public static function pending_waitlist_clear(int $now = 0): seminar_event_list {
         global $DB;
         if (empty($now) || $now < 0) {
             $now = time();
@@ -104,9 +121,10 @@ final class seminar_event_list implements \Iterator, \Countable {
 
     /**
      * Create list of all events in seminar
+     *
      * @return seminar_event_list
      */
-    public static function get_all() {
+    public static function get_all(): seminar_event_list {
         global $DB;
         $seminarevents = $DB->get_records('facetoface_sessions');
         $list = new static();
@@ -122,7 +140,6 @@ final class seminar_event_list implements \Iterator, \Countable {
      * and sortorder that are injected into the object before this stage.
      *
      * @param event_query $query
-     *
      * @return seminar_event_list
      */
     public static function from_query(event_query $query): seminar_event_list {
