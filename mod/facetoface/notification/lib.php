@@ -1181,7 +1181,7 @@ class facetoface_notification extends data_object {
             case MDL_F2F_NOTIFICATION_SCHEDULED:
             case MDL_F2F_NOTIFICATION_AUTO:
                 $notificationmap = new notification_map($this);
-                $html .= $notificationmap->get_condition_description($this->conditiontype);
+                $html .= $notificationmap->get_condition_description();
                 break;
         }
 
@@ -1224,7 +1224,8 @@ class facetoface_notification extends data_object {
         }
 
         $notificationmap = new notification_map($this);
-        $recipients = $notificationmap->get_recipients($this->conditiontype);
+
+        $recipients = $notificationmap->get_recipients();
         $recips = array_unique(array_merge($recips, $recipients));
 
         return implode(', ', $recips);

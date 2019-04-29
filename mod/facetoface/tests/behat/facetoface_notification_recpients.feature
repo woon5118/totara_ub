@@ -4,15 +4,14 @@ Feature: User is not able to create a notification with a booked recipients chec
     Given the following "courses" exist:
       | fullname | shortname | category |
       | c101     | c101      | 0        |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name      | course |
+      | Seminar 1 | c101   |
     And I am on a totara site
     And I log in as "admin"
 
   Scenario: User is not able to create a notification due to fail validation on booked type
-    Given I am on "c101" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Seminar 1 |
-      | Description | seminar 1 |
-    And I turn editing mode off
+    Given I am on "c101" course homepage
     And I follow "Seminar 1"
     And I click on "Notifications" "link" in the "Administration" "block"
     When I click on "Add" "button"

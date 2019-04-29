@@ -30,7 +30,6 @@ class notification_map {
     /**
      * The hash map of condition key (integer) with another hasmap of condition (language identifier only) and recipient description
      *
-     * Array<key, Array<string, string>>
      * @var array
      */
     private $map;
@@ -61,9 +60,10 @@ class notification_map {
 
         $time = $this->notification->scheduleamount;
         $unit = null;
-        if ($time == 1) {
+
+        if (1 == $time) {
             $unit = get_string('schedule_unit_'.$this->notification->scheduleunit.'_singular', 'mod_facetoface');
-        } else if ($time > 1) {
+        } else if (1 < $time) {
             $unit = get_string('schedule_unit_'.$this->notification->scheduleunit, 'mod_facetoface', $time);
         }
 
@@ -186,12 +186,12 @@ class notification_map {
     }
 
     /**
-     * @param int   $conditiontype  A condition type defined by constants in notification library.
-     *
      * @return string
      */
-    public function get_condition_description(int $conditiontype): string {
-        if (isset($this->map[$conditiontype])) {
+    public function get_condition_description(): string {
+        $conditiontype = $this->notification->conditiontype;
+
+        if (null !== $conditiontype && isset($this->map[$conditiontype])) {
             return $this->map[$conditiontype]['condition'];
         }
 
@@ -199,11 +199,12 @@ class notification_map {
     }
 
     /**
-     * @param int $conditiontype
      * @return string[]
      */
-    public function get_recipients(int $conditiontype): array {
-        if (isset($this->map[$conditiontype])) {
+    public function get_recipients(): array {
+        $conditiontype = $this->notification->conditiontype;
+
+        if (null !== $conditiontype && isset($this->map[$conditiontype])) {
             return $this->map[$conditiontype]['recipients'];
         }
 
