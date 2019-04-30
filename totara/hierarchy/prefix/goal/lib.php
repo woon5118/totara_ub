@@ -707,6 +707,8 @@ class goal extends hierarchy {
                     $currentuserassignment->assigntype = $assignmenttype;
                     $currentuserassignment->assignmentid = $assignment->id;
                     $currentuserassignment->extrainfo = 'ITEM:' . $extrainfo;
+                    $currentuserassignment->timemodified = time();
+                    $currentuserassignment->usermodified = $USER->id;
 
                     $DB->update_record('goal_user_assignment', $currentuserassignment);
 

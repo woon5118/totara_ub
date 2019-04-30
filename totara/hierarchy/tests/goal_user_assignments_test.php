@@ -240,7 +240,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
      * Check that when a new org assignment is created, existing assignments have no effect.
      */
     public function test_update_user_assignments_add_org_assignment() {
-        global $DB, $USER;
+        global $DB;
 
         $data = $this->setup_all_data();
 
@@ -248,10 +248,11 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
         $newassignment->goalid = $data->goalid;
         $newassignment->orgid = $data->org2->id;
         $newassignment->includechildren = false;
-        $newassignment->timemodified = time();
-        $newassignment->usermodified = $USER->id;
+        $newassignment->timemodified = time() - 10;
+        $newassignment->usermodified = $data->user2->id;
         $newassignment->id = $DB->insert_record('goal_grp_org', $newassignment);
 
+        $this->setUser($data->user3);
         $timebefore = time();
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $newassignment);
         $timeafter = time();
@@ -271,7 +272,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
             $data->goalid,
             $timebefore,
             $timeafter,
-            $USER->id
+            $data->user3->id
         );
     }
 
@@ -279,7 +280,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
      * Check that when a new org assignment is created with children, existing assignments have no effect.
      */
     public function test_update_user_assignments_add_org_assignment_with_children() {
-        global $DB, $USER;
+        global $DB;
 
         $data = $this->setup_all_data();
 
@@ -287,10 +288,11 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
         $newassignment->goalid = $data->goalid;
         $newassignment->orgid = $data->org2->id;
         $newassignment->includechildren = true;
-        $newassignment->timemodified = time();
-        $newassignment->usermodified = $USER->id;
+        $newassignment->timemodified = time() - 10;
+        $newassignment->usermodified = $data->user4->id;
         $newassignment->id = $DB->insert_record('goal_grp_org', $newassignment);
 
+        $this->setUser($data->user5);
         $timebefore = time();
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $newassignment);
         $timeafter = time();
@@ -314,7 +316,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
             $data->goalid,
             $timebefore,
             $timeafter,
-            $USER->id
+            $data->user5->id
         );
     }
 
@@ -322,7 +324,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
      * Check that when a new pos assignment is created, existing org assignments have no effect.
      */
     public function test_update_user_assignments_add_pos_assignment() {
-        global $DB, $USER;
+        global $DB;
 
         $data = $this->setup_all_data();
 
@@ -330,10 +332,11 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
         $newassignment->goalid = $data->goalid;
         $newassignment->posid = $data->pos1->id;
         $newassignment->includechildren = true;
-        $newassignment->timemodified = time();
-        $newassignment->usermodified = $USER->id;
+        $newassignment->timemodified = time() - 10;
+        $newassignment->usermodified = $data->user3->id;
         $newassignment->id = $DB->insert_record('goal_grp_pos', $newassignment);
 
+        $this->setUser($data->user4);
         $timebefore = time();
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_POSITION, $newassignment);
         $timeafter = time();
@@ -353,7 +356,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
             $data->goalid,
             $timebefore,
             $timeafter,
-            $USER->id
+            $data->user4->id
         );
     }
 
@@ -361,13 +364,12 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
      * Check that when a user has no assignment already, their first assignment is created.
      */
     public function test_update_user_assignments_add_primary_reason() {
-        global $USER;
-
         $data = $this->setup_all_data();
 
         // User3 does not currently have any org matching assignment1.
         \totara_job\job_assignment::create_default($data->user3->id, ['organisationid' => $data->org3->id]);
 
+        $this->setUser($data->user5);
         $timebefore = time();
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $data->assignment1);
         $timeafter = time();
@@ -387,7 +389,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
             $data->goalid,
             $timebefore,
             $timeafter,
-            $USER->id
+            $data->user5->id
         );
     }
 
@@ -395,13 +397,12 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
      * Check that when a user has an assignment already, their second assignment is created.
      */
     public function test_update_user_assignments_add_secondary_reason() {
-        global $USER;
-
         $data = $this->setup_all_data();
 
         // User1 currently has an org matching assignment1, but not for this reason.
         \totara_job\job_assignment::create_default($data->user1->id, ['organisationid' => $data->org5->id]);
 
+        $this->setUser($data->user5);
         $timebefore = time();
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $data->assignment1);
         $timeafter = time();
@@ -421,7 +422,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
             $data->goalid,
             $timebefore,
             $timeafter,
-            $USER->id
+            $data->user5->id
         );
     }
 
@@ -434,6 +435,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
         // Add a duplicate org from the user.
         \totara_job\job_assignment::create_default($data->user1->id, ['organisationid' => $data->org3->id]);
 
+        $this->setUser($data->user2);
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $data->assignment1);
 
         $this->check_expected(
@@ -459,6 +461,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
         $ja = $data->user1ja3;
         $ja->update(['organisationid' => null]);
 
+        $this->setUser($data->user3);
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $data->assignment1);
 
         $this->check_expected(
@@ -477,8 +480,6 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
      * Check that removing one out of several different reasons results in only the specific reason being removed.
      */
     public function test_update_user_assignments_remove_secondary_reason() {
-        global $USER;
-
         $data = $this->setup_all_data();
 
         // Remove a non-duplicate org from the user.
@@ -486,6 +487,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
         $ja = $data->user1ja4;
         $ja->update(['organisationid' => null]);
 
+        $this->setUser($data->user4);
         $timebefore = time();
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $data->assignment1);
         $timeafter = time();
@@ -512,13 +514,11 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
             $data->goalid,
             $timebefore,
             $timeafter,
-            $USER->id
+            $data->user4->id
         );
     }
 
     public function test_update_user_assignments_remove_primary_reason() {
-        global $USER;
-
         $data = $this->setup_all_data();
 
         // Remove the last org from the user.
@@ -526,6 +526,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
         $ja = $data->user2ja1;
         $ja->update(['organisationid' => null]);
 
+        $this->setUser($data->user4);
         $timebefore = time();
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $data->assignment1);
         $timeafter = time();
@@ -552,7 +553,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
             $data->goalid,
             $timebefore,
             $timeafter,
-            $USER->id
+            $data->user4->id
         );
     }
 
@@ -569,6 +570,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
         $ja = $data->user2ja1;
         $ja->update(['organisationid' => null]);
 
+        $this->setUser($data->user4);
         $timebefore = time();
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $data->assignment1);
         $timeafter = time();
@@ -595,12 +597,14 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
             $data->goalid,
             $timebefore,
             $timeafter,
-            $USER->id
+            $data->user4->id
         );
 
         // Add the org back (in a new JA).
         \totara_job\job_assignment::create_default($data->user2->id, ['organisationid' => $data->org3->id]);
 
+        $this->setUser($data->user5);
+        sleep(1); // Ensures that timemodified is updated for the second time.
         $timebefore = time();
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $data->assignment1);
         $timeafter = time();
@@ -620,7 +624,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
             $data->goalid,
             $timebefore,
             $timeafter,
-            $USER->id
+            $data->user5->id
         );
     }
 }
