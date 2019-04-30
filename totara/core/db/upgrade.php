@@ -569,5 +569,20 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019040901, 'totara', 'core');
     }
 
+    if ($oldversion < 2019043001) {
+
+        // Define index status (not unique) to be added to course_completions.
+        $table = new xmldb_table('course_completions');
+        $index = new xmldb_index('status', XMLDB_INDEX_NOTUNIQUE, array('status'));
+
+        // Conditionally launch add index status.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2019043001, 'totara', 'core');
+    }
+
     return true;
 }

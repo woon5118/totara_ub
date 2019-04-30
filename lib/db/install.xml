@@ -225,6 +225,7 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
         <INDEX NAME="timecompleted" UNIQUE="false" FIELDS="timecompleted"/>
         <INDEX NAME="useridcourse" UNIQUE="true" FIELDS="userid, course"/>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="enrol" COMMENT="Instances of enrolment plugins used in courses, fields marked as custom have a plugin defined meaning, core does not touch them. Create a new linked table if you need even more custom fields.">
