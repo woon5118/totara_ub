@@ -266,6 +266,13 @@ if ($data = $form->get_data()) {
             core_tag_tag::set_item_tags('totara_program', 'prog', $newid, $programcontext, $data->tags);
         }
 
+        $hook = new totara_program\hook\program_edit_form_save_changes($data, $program->id);
+        if ($newcertid) {
+            $hook->set_certification();
+        }
+
+        $hook->execute();
+
         $event = \totara_program\event\program_created::create(
             array(
                 'objectid' => $newid,

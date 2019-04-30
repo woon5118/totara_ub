@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara Learn
+ * This file is part of Totara LMS
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
- * @package totara_catalog
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package totara_certification
  */
+
+namespace totara_certification\totara_catalog\certification\dataholder_factory;
+
+use totara_program\totara_catalog\program\dataholder_factory\search_metadata as program_search_metadata;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2019061800;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017051509;       // Requires this Moodle version.
-$plugin->component = 'totara_catalog';   // To check on upgrade, that module sits in correct place
+final class search_metadata extends program_search_metadata {
+    // Program and certification are pretty much one type. Lets keep it that way.
+}
