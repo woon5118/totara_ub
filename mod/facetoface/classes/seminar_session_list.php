@@ -71,8 +71,9 @@ final class seminar_session_list implements \Iterator, \Countable {
     /**
      * Add seminar session to item list
      * @param seminar_session $item
+     * @return void
      */
-    public function add(seminar_session $item) {
+    public function add(seminar_session $item): void {
         $id = $item->get_id();
         $this->items[$id] = $item;
 
@@ -90,7 +91,7 @@ final class seminar_session_list implements \Iterator, \Countable {
      * @param seminar_event $seminarevent
      * @return seminar_session_list
      */
-    public static function from_seminar_event(seminar_event $seminarevent) : seminar_session_list {
+    public static function from_seminar_event(seminar_event $seminarevent): seminar_session_list {
         global $DB;
         $list = new seminar_session_list();
         $sessionrecords = $DB->get_records('facetoface_sessions_dates', ['sessionid' => $seminarevent->get_id()], 'timestart DESC');
@@ -232,11 +233,13 @@ final class seminar_session_list implements \Iterator, \Countable {
     }
 
     /**
-     * Returning an array of dummy class holding data of seminar_session. And the session's id associated as array key.
+     * Returning an array of dummy class holding data of seminar_session. If $preservekeys is passed with true then
+     * the session's id associated as array key.
      *
+     * @param bool $preservekeys
      * @return \stdClass[]
      */
-    public function to_records($preservekeys = true): array {
+    public function to_records(bool $preservekeys = true): array {
         $data = [];
 
         /** @var seminar_session $item */
@@ -254,8 +257,9 @@ final class seminar_session_list implements \Iterator, \Countable {
 
     /**
      * Delete sessions and their associated assets.
+     * @return void
      */
-    public function delete() {
+    public function delete(): void {
         foreach ($this->items as $item) {
             asset_helper::sync($item->get_id(), []);
         }
@@ -270,7 +274,7 @@ final class seminar_session_list implements \Iterator, \Countable {
      *
      * @return boolean
      */
-    public static function dates_check($olddates, $newdates) {
+    public static function dates_check(array $olddates, array $newdates): bool {
         // Dates have changed if the amount of dates has changed.
         if (count($olddates) != count($newdates)) {
             return true;
@@ -316,13 +320,14 @@ final class seminar_session_list implements \Iterator, \Countable {
      * @param string $order
      * @return seminar_session_list
      */
-    public function sort(string $field, string $order = seminar_session_list::SORT_ASC) : seminar_session_list {
+    public function sort(string $field, string $order = seminar_session_list::SORT_ASC): seminar_session_list {
         $function = 'get_' . $field;
         if (!is_callable(['\mod_facetoface\seminar_session', $function])) {
             throw new \coding_exception("Function get_$function does not exist in seminar_session");
         }
 
-        usort(
+        // Used uasort, because we need to maintain the index of $items (sessions id).
+        uasort(
             $this->items,
             function (seminar_session $a, seminar_session $b) use ($function, $order) {
                 if ($order == seminar_session_list::SORT_ASC) {
@@ -426,7 +431,8 @@ final class seminar_session_list implements \Iterator, \Countable {
     }
 
     /**
-     * Given the list of sessions, this factory will try to pre-build the data for $dates, then invoke ::from_user_conflicts with_date
+     * Given the list of sessions, this factory will try to pre-build the data for $dates, then invoke
+     * static::from_user_conflicts with_date function.
      *
      * @param int                  $userid
      * @param seminar_session_list $sessions
