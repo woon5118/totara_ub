@@ -21,8 +21,6 @@
  * @package totara_core
  */
 
-use totara_orm\paginator;
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -197,7 +195,34 @@ class totara_core_tests_fixtures_external extends \external_api {
             });
         }
 
-        return paginator::create(array_chunk($items, 5)[$page - 1], $page, 20, 5)->to_array();
+        $total = count($items);
+
+        if ($page === 0) {
+            return [
+                'items' => $items,
+                'page' => 1,
+                'pages' => 1,
+                'items_per_page' => $total,
+                'next' => null,
+                'prev' => null,
+                'total' => $total
+            ];
+        } else {
+            $per_page = 5;
+            $pages = ceil($total / $per_page);
+            $next = $page + 1 > $pages ? null : $page + 1;
+            $prev = $page - 1 <= 0 ? null : $page - 1;
+
+            return [
+                'items' => array_chunk($items, 5)[$page - 1],
+                'page' => $page,
+                'pages' => $pages,
+                'items_per_page' => $per_page,
+                'next' => $next,
+                'prev' => $prev,
+                'total' => $total
+            ];
+        }
     }
 
     /**
