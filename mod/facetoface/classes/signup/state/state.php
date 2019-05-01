@@ -195,4 +195,13 @@ abstract class state {
      * Statuses don't have to follow particular order (except must be unique of course)
      */
     abstract public static function get_code() : int;
+
+    /**
+     * Get the csv value associated with the state.
+     * Override for code states - no show, unable to attend, partially attended, fully attended.
+     * @return int|null csv code states should return int. Non-csv code states should return null.
+     */
+    public static function get_csv_code() : ?int {
+        return null;
+    }
 }

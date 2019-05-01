@@ -90,17 +90,20 @@ class attendees_add_confirm extends \moodleform {
         return $errors;
     }
 
+    /**
+     * Get user list by ids.
+     * @param $userlist
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     *
+     * @deprecated since Totara 13
+     */
     public static function get_user_list($userlist, $offset = 0, $limit = 0) {
-        global $DB;
 
-        $usernamefields = get_all_user_name_fields(true, 'u');
-        list($idsql, $params) = $DB->get_in_or_equal($userlist, SQL_PARAMS_NAMED);
-        $users = $DB->get_records_sql("
-                    SELECT id, $usernamefields, email, idnumber, username
-                      FROM {user} u
-                     WHERE id " . $idsql . "
-                  ORDER BY u.firstname, u.lastname", $params, $offset*$limit, $limit);
+        debugging('attendees_add_confirm::get_user_list() function has been deprecated, please use attendees_list_helper::get_user_list()',
+            DEBUG_DEVELOPER);
 
-        return $users;
+        return \mod_facetoface\attendees_list_helper::get_user_list($userlist, $offset, $limit);
     }
 }

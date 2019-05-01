@@ -45,6 +45,14 @@ class no_show extends attendance_state {
     }
 
     /**
+     * Get the csv code value associated with the status code 80.
+     * @return int|null
+     */
+    public static function get_csv_code() : ?int {
+        return 1;
+    }
+
+    /**
      * Message for user on entering the state
      *
      * @return string

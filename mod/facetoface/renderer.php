@@ -43,7 +43,8 @@ use mod_facetoface\signup\state\{
     requested,
     requestedrole,
     requestedadmin,
-    event_cancelled
+    event_cancelled,
+    fully_attended, partially_attended, unable_to_attend, no_show, not_set
 };
 
 defined('MOODLE_INTERNAL') || die();
@@ -2255,5 +2256,91 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     public function set_signup_link(string $link): void {
         debugging('mod_facetoface_renderer::set_signup_link() is deprecated. Please use mod_facetoface\\hook\\alternative_signup_link instead.', DEBUG_DEVELOPER);
         $this->signuplink = $link;
+    }
+
+    /**
+     * Render table of users used in attendance list
+     * @param \mod_facetoface\bulk_list $list User list Needed only with job assignments
+     * @param int $courseid
+     */
+    public function print_attendance_upload_table(\mod_facetoface\bulk_list $list, $courseid) {
+        global $CFG, $OUTPUT;
+        require_once($CFG->libdir.'/gradelib.php');
+
+        $status = attendance_state::get_all_attendance_csv();
+
+        $userlist = $list->get_user_ids();
+        $users = \mod_facetoface\attendees_list_helper::get_user_list($userlist);
+        $decimalpoints = grade_get_setting($courseid, 'decimalpoints', $CFG->grade_decimalpoints);
+
+        $table = new html_table();
+        $table->head = [
+            get_string('name'),
+            get_string('eventattendanceheader', 'mod_facetoface'),
+        ];
+        // Really bad hack to know if optional column exists or not.
+        // if you can think something better, let me know.
+        if (isset($list->get_user_data(current($users)->id)['eventgrade'])) {
+            $table->head[] = get_string('eventgradeheader', 'mod_facetoface');
+        }
+        $table->head[] = '';
+        $table->attributes = ['class' => 'generaltable userstoupload fullwidth'];
+
+        if (count($users) > 0) {
+            foreach ($users as $user) {
+                $error = '';
+                $row = [];
+                $userurl = new \moodle_url('/user/view.php', ['id' => $user->id, 'course' => $courseid]);
+
+                // User full name column.
+                $row[] = \html_writer::link($userurl, fullname($user));
+
+                $data = $list->get_user_data($user->id);
+
+                // Event attendance column
+                $state = $data['eventattendance'];
+                if (!in_array($state, array_keys($status))) {
+                    $row[] = $error = get_string('error:invalidvalue', 'mod_facetoface');
+                } else {
+                    $row[] = $status[$state]::get_string();
+                }
+                // Event grade column.
+                if (isset($data['eventgrade'])) {
+                    $value = trim($data['eventgrade']);
+                    if (empty($value)) {
+                        $row[] = '';
+                    } else if (is_numeric($value) && $value >= 0 && $value <= 100) {
+                        $row[] = format_float($value, $decimalpoints);
+                    } else {
+                        $row[] = $error = get_string('error:invalidvalue', 'mod_facetoface');
+                    }
+                }
+                // Result icon column.
+                if (!empty($error)) {
+                    $row[] = $OUTPUT->flex_icon('warning', ['classes' => 'ft-size-100', 'alt' => $error]);
+                } else {
+                    $row[] = $OUTPUT->flex_icon('check', ['classes' => 'ft-size-100 ft-state-success', 'alt' => get_string('success')]);
+                }
+
+                $row = new html_table_row($row);
+                $table->data[] = $row;
+            }
+        }
+
+        $data = $list->get_validation_results();
+        if (!empty($data)) {
+            foreach ($data as $entry) {
+                $row = $entry;
+                $row[] = $OUTPUT->flex_icon('warning', [
+                    'classes' => 'ft-size-100',
+                    'alt' => get_string('userdoesnotexist', 'totara_core')
+                ]);
+                $row = new html_table_row($row);
+                $table->data[] = $row;
+            }
+        }
+        $total = count($users) + count($data);
+        echo \html_writer::tag('h3', get_string('uploadattendancereview', 'mod_facetoface', $total));
+        echo $OUTPUT->render($table);
     }
 }

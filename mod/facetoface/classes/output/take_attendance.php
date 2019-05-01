@@ -65,8 +65,10 @@ class take_attendance extends template {
                                   int $sessiondateid = 0,
                                   take_attendance_session_picker $sessionpicker = null): take_attendance {
         global $USER;
+
         $backurl = new \moodle_url("/mod/facetoface/view.php");
         $backurl->param('f', $seminarevent->get_seminar()->get_id());
+        $uploadattendanceurl = new \moodle_url('/mod/facetoface/attendees/list/import_attendance.php', ['s' => $seminarevent->get_id()]);
 
         $data = [
             'url' => $url->out(),
@@ -102,7 +104,8 @@ class take_attendance extends template {
                     'label' => get_string('exportods', 'mod_facetoface'),
                 ]
             ],
-            'notsetcode' => not_set::get_code()
+            'notsetcode' => not_set::get_code(),
+            'uploadattendanceurl' => $uploadattendanceurl->out()
         ];
 
         foreach ($formattributes as $key => $value) {

@@ -564,6 +564,7 @@ $string['error:csvinconsistentrows'] = 'Rows {$a} of your file contain a differe
 $string['error:csvnoidfields'] = 'The column called \'username\', \'email\', or \'idnumber\' was not detected. Please check that the column header matches one of these fields and the CSV file delimiter setting below matches your file.';
 $string['error:csvnorequiredcf'] = 'You did not provide a column called \'{$a}\'';
 $string['error:csvtoomanyidfields'] = 'Your file contained more than one of the following columns: \'username\', \'email\', \'idnumber\'';
+$string['error:csvtoomanyfields'] = 'Your file contained too many columns. Please provide the columns as per below help description.';
 $string['error:cutofftooclose'] = 'The cut-off time for minimum bookings is too close to the events earliest start date, please set at least a 24 hours cut-off';
 $string['error:cutofftoolate'] = 'The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect.';
 $string['error:datesunavailablestuff'] = 'The new dates you have selected are unavailable due to a scheduling conflict with the following resources:<br/>{$a}Please choose different dates or change the selected room/assets.';
@@ -585,6 +586,7 @@ $string['error:incorrectfacetofaceid'] = 'Seminar ID was incorrect';
 $string['error:incorrectnotificationtype'] = 'Incorrect notification type supplied';
 $string['error:invalidstatus'] = 'Invalid signup status';
 $string['error:incorrectroomid'] = 'Room ID was incorrect';
+$string['error:invalidvalue'] = '(invalid)';
 $string['error:invaliduserid'] = 'Invalid user ID';
 $string['error:isalreadybooked'] = '{$a} is already booked';
 $string['error:jobassignementsonsignupdisabled'] = 'Select job assignments on sign up is not enabled for this Seminar activity.';
@@ -1139,6 +1141,23 @@ $string['sessionstatus:upcoming'] = 'Upcoming';
 $string['sessionstatus:waitlisted'] = 'Wait-listed';
 $string['signinsheet'] = 'Sign-in sheet';
 $string['signupworkflowheader'] = 'Sign-up Workflow';
+$string['uploadattendance'] = 'Upload event attendance';
+$string['uploadattendance_help'] = 'Preparing a file for upload: Use .CSV text file with a heading row and one or more data rows.
+
+All rows must have the following columns:
+
+* **\'username\'** OR **\'idnumber\'** OR **\'email\'** (use only one)
+* **\'eventattendance\'** - one of the following codes:
+ * 4 - Fully attended
+ * 3 - Partially attended
+ * 2 - Unable to attend
+ * 1 - No show
+
+Optional column: **\'eventgrade\'** - a number between 0 - 100 (or leave empty to skip)';
+$string['uploadattendancestep'] = 'Upload event attendance and grades (step {$a} of 2)';
+$string['uploadattendanceresults'] = 'Upload event attendance and grades results';
+$string['uploadattendancereview'] = 'Review and confirm changes ({$a} records)';
+$string['uploadcsvfile'] = 'Upload CSV file';
 $string['attendancetrackingheader'] = 'Attendance tracking and grading';
 $string['attendancetracking:open'] = 'Take attendance';
 $string['attendancetracking:openatend'] = 'Will open at session end time';

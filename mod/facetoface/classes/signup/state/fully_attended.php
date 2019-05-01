@@ -45,6 +45,14 @@ class fully_attended extends attendance_state {
     }
 
     /**
+     * Get the csv code value associated with the status code 100.
+     * @return int|null
+     */
+    public static function get_csv_code() : ?int {
+        return 4;
+    }
+
+    /**
      * Message for user on entering the state
      *
      * @return string

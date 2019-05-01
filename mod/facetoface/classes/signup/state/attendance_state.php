@@ -109,4 +109,18 @@ abstract class attendance_state extends state {
             $states
         );
     }
+
+    /**
+     * Get the csv code of all attendance state classes
+     *
+     * @return int[]
+     */
+    final public static function get_all_attendance_csv(): array {
+        $states = self::get_all_attendance_states();
+        $status = [];
+        foreach ($states as $state) {
+            $status[$state::get_csv_code()] = $state;
+        }
+        return $status;
+    }
 }

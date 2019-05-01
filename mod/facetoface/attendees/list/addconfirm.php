@@ -99,7 +99,7 @@ echo $seminarrenderer->render_seminar_event($seminarevent, false, false, true);
 $f2frenderer = $PAGE->get_renderer('mod_facetoface');
 $f2frenderer->setcontext($context);
 
-$users = attendees_add_confirm::get_user_list($userlist, $page, USERS_PER_PAGE);
+$users = attendees_list_helper::get_user_list($userlist, $page, USERS_PER_PAGE);
 $paging = new \paging_bar(count($userlist), $page, USERS_PER_PAGE, $currenturl);
 
 $jaselector = 0;

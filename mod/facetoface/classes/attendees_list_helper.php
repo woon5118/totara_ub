@@ -87,7 +87,7 @@ final class attendees_list_helper {
         // Adding new attendees.
         $userlist = $list->get_user_ids();
         // Check if we need to add anyone.
-        $users = attendees_add_confirm::get_user_list($userlist);
+        $users = attendees_list_helper::get_user_list($userlist);
         $attendeestoadd = array_diff_key($users, $original);
 
         // Confirm that new attendess have job assignments when required.
@@ -645,5 +645,26 @@ final class attendees_list_helper {
         if ($result_message != '') {
             \core\notification::add($result_message, $noticetype);
         }
+    }
+
+    /**
+     * Get user list by their ids
+     * @param $userlist
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
+    public static function get_user_list($userlist, $offset = 0, $limit = 0): array {
+        global $DB;
+
+        $usernamefields = get_all_user_name_fields(true, 'u');
+        list($idsql, $params) = $DB->get_in_or_equal($userlist, SQL_PARAMS_NAMED);
+        $users = $DB->get_records_sql("
+                    SELECT id, $usernamefields, email, idnumber, username
+                      FROM {user} u
+                     WHERE id " . $idsql . "
+                  ORDER BY u.firstname, u.lastname", $params, $offset * $limit, $limit);
+
+        return $users;
     }
 }

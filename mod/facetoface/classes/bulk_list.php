@@ -69,10 +69,24 @@ class bulk_list {
         }
     }
 
+    /**
+     * Get return url.
+     * @return \moodle_url $returnurl
+     */
     public function get_returnurl() {
         global $SESSION;
-        return clone($SESSION->mod_facetoface_attendeeslist[$this->listid]['returnurl']);
+        return $SESSION->mod_facetoface_attendeeslist[$this->listid]['returnurl'];
     }
+
+    /**
+     * Get action type.
+     * @return string $srctype
+     */
+    public function get_srctype() {
+        global $SESSION;
+        return $SESSION->mod_facetoface_attendeeslist[$this->listid]['srctype'];
+    }
+
     /**
      * Get list of user ids without any additional data
      * @return array

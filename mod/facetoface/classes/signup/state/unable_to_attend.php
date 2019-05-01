@@ -44,6 +44,14 @@ class unable_to_attend extends attendance_state {
     }
 
     /**
+     * Get the csv code value associated with the status code 85.
+     * @return int|null
+     */
+    public static function get_csv_code() : ?int {
+        return 2;
+    }
+
+    /**
      * Message for user on entering the state
      *
      * @return string

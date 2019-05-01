@@ -85,6 +85,7 @@ final class attendance_helper {
             SELECT
             {$beforeid}
             u.id,
+            u.username,
             u.idnumber,
             {$usernamefields},
             u.email,
