@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* The jQuery.extend function has had a security patch applied
 * Deprecated registration_cron_task has been removed
 * Deprecated course publishing has been removed
 * The following deprecated capabilities have been removed:
