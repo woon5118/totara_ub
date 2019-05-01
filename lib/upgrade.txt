@@ -38,6 +38,7 @@ information provided here is intended especially for developers.
   There is one option so far, allowxss, which if set to true will cause markdown_to_html to not clean_text (old behaviour)
 * Changes made for behat to be able to check aria-label attribute of buttons and form fields as label, which might break existing behat tests
 * Added a new resolvefaviconcallback property in which themes can override the URL returned by $OUTPUT->favicon().
+* Upgraded jQuery to 3.4.1
 
 === 12.0 ===
 
