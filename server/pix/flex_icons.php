@@ -91,6 +91,13 @@ $icons = array(
                         ),
                 ),
         ),
+    'archive' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-archive',
+                ),
+    ),
     'arrow-down' =>
         array(
             'data' =>
@@ -1967,6 +1974,13 @@ $icons = array(
                         ),
                 ),
         ),
+    'subitems' =>
+       array(
+           'data' =>
+               array(
+                   'classes' => 'fa-chevron-right ft-flip-rtl',
+               ),
+       ),
     'table' =>
         array(
             'data' =>

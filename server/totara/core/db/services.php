@@ -139,6 +139,28 @@ $functions = [
         'ajax' => true,
         'type' => 'write',
     ],
+
+    'totara_core_test_lists_manager' => [
+        'classname'     => 'totara_core_tests_fixtures_external',
+        'classpath'     => 'totara/core/tests/fixtures/external.php',
+        'methodname'    => 'test_list',
+        'description'   => 'This is just a test webservice to provide the lists_manager test page with fake data',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'moodle/site:config',
+    ],
+
+    'totara_core_test_lists_manager_show' => [
+        'classname'     => 'totara_core_tests_fixtures_external',
+        'classpath'     => 'totara/core/tests/fixtures/external.php',
+        'methodname'    => 'test_show',
+        'description'   => 'This is just a test webservice to provide the expanded view of the list test pages with some fake data',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'moodle/site:config',
+    ],
 ];
 
 $services = [

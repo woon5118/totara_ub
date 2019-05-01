@@ -1,7 +1,7 @@
 //
 // This file is part of Totara Learn
 //
-// Copyright (C) 2018 onwards Totara Learning Solutions LTD
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,8 +21,30 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_roots
 
-// Shadow depths
-@totara_style-shadow_0: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-@totara_style-shadow_1: 0 3px 6px 0 rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.23);
-@totara_style-shadow_2: 0 10px 20px 0 rgba(0, 0, 0, 0.19), 0 6px 6px 0 rgba(0, 0, 0, 0.26);
-@totara_style-shadow_3: 0 14px 28px 0 rgba(0, 0, 0, 0.25), 0 10px 10px 0 rgba(0, 0, 0, 0.26);
+
+// Size
+@paging-spacing_x_small: @totara_style-spacing_x_small;
+@paging-spacing_large: @totara_style-spacing_large;
+@paging-spacing_x_large: @totara_style-spacing_x_large;
+// Breakpoint
+@paging-screen_sm_min: @totara_style-screen_sm_min;
+
+
+.tw-paging {
+    margin: @paging-spacing_large @paging-spacing_x_small;
+    text-align: center;
+
+    &__btn {
+        .totara_style-btn;
+        padding-left: @paging-spacing_x_large;
+        padding-right: @paging-spacing_x_large;
+    }
+}
+
+
+@media (min-width: @paging-screen_sm_min) {
+    .tw-paging {
+        margin: @paging-spacing_large 0 @paging-spacing_x_small;
+    }
+}
+
