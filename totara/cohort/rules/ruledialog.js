@@ -320,7 +320,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
     validateList: function() {
         var listelement = document.getElementById('id_listofvalues');
         var errorMsg = document.getElementById('id_error_listofvalues');
-        if (!listelement.hasAttribute('disabled') && listelement.value.length === 0) {
+        if (listelement && !listelement.hasAttribute('disabled') && listelement.value.length === 0) {
             if (!errorMsg) {
                 $('div#fgroup_id_row1 > fieldset').prepend('<span id="id_error_listofvalues" class="error">' + listelement.getAttribute('data-error-message') + '</span><br>');
                 errorMsg = document.getElementById('id_error_listofvalues');
