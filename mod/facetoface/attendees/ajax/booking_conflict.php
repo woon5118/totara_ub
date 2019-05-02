@@ -74,8 +74,8 @@ $table = new html_table();
 $table->head = array(get_string('bulkaddsourceidnumber', 'facetoface'), get_string('name'), get_string('result', 'facetoface'));
 $table->data = array();
 
-foreach($conflictresults as $key => $result) {
-    $idnumber = new html_table_cell($result['idnumber']);
+foreach ($conflictresults as $key => $result) {
+    $idnumber = new html_table_cell(s($result['idnumber']));
     $name = new html_table_cell($result['name']);
     $message = new html_table_cell($result['result']);
     $row = new html_table_row(array($idnumber, $name, $message));
