@@ -567,6 +567,10 @@ class assign_grading_table extends table_sql implements renderable {
         return get_string('hiddenuser', 'assign') . $row->recordid;
     }
 
+    // TOTARA - Escape potential XSS in idnumber field.
+    function col_idnumber($row) {
+        return s($row->idnumber);
+    }
 
     /**
      * Add the userid to the row class so it can be updated via ajax.
