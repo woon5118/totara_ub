@@ -303,6 +303,14 @@ if (!defined('CACHE_DISABLE_STORES')) {
     define('CACHE_DISABLE_STORES', false);
 }
 
+// Disable phar wrapper as this presents a security risk if user input can make it to just
+// about any PHP file function, including file_exists().
+// If the wrapper is needed, it can be enabled where required with stream_wrapper_register('phar')
+// just before it is required.
+// This line has been included after defines of constants such as PHPUNIT_TEST in case we
+// ever need to make it conditional on those. Otherwise it needs to be as early as possible.
+@stream_wrapper_unregister('phar');
+
 // Servers should define a default timezone in php.ini, but if they don't then make sure no errors are shown.
 date_default_timezone_set(@date_default_timezone_get());
 
