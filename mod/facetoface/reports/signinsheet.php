@@ -26,14 +26,15 @@ require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-$format = optional_param('format', '', PARAM_PLUGIN); // Export format.
+$format = optional_param('docformat', '', PARAM_PLUGIN); // Export format.
 $debug = optional_param('debug', 0, PARAM_INT);
 $sessiondateid = optional_param('sessiondateid', 0, PARAM_INT);
 
 $PAGE->set_url('/mod/facetoface/reports/signinsheet.php', array('sessiondateid' => $sessiondateid));
 
-$sessiondate = $DB->get_record('facetoface_sessions_dates', array('id' => $sessiondateid));
-if (!$sessiondate) {
+$formatoptions = reportbuilder_get_export_options(null, true);
+$sessiondate   = $DB->get_record('facetoface_sessions_dates', array('id' => $sessiondateid));
+if (!$sessiondate || !array_key_exists($format, $formatoptions)) {
     require_login();
     $PAGE->set_context(context_system::instance());
     $PAGE->set_heading($SITE->fullname);

@@ -26,58 +26,41 @@ namespace mod_facetoface\form;
 defined('MOODLE_INTERNAL') || die();
 
 class signin extends \moodleform {
+
     public function definition() {
+
         $mform = $this->_form;
+        $mform->updateAttributes(['class' => 'mform signinsheet']);
+        $session = $this->_customdata;
+
+        $options = [];
+        foreach ($session->sessiondates as $i => $date) {
+            $dateobject = \mod_facetoface\output\session_time::format($date->timestart, $date->timefinish, $date->sessiontimezone);
+            $options[$date->id] = get_string('sessionstartdatewithtime', 'mod_facetoface', $dateobject);
+        }
 
         $select = reportbuilder_get_export_options(null, true);
-        if (count($select) == 0) {
+        if (count($select) == 0 || count($options) == 0) {
+            // Something happened which should not.
             // No export options - don't show form.
             return;
         }
 
-        $group = array();
+        $mform->addElement('header', 'signinsheet', get_string('signinsheet', 'mod_facetoface'));
 
-        $session = $this->_customdata;
+        $group = [];
+        $options[0] = get_string('selectsession', 'mod_facetoface');
+        ksort($options, SORT_NUMERIC);
+        $group[] = $mform->createElement('select', 'sessiondateid', get_string('sessiondate', 'mod_facetoface'), $options);
+        $mform->setType('sessiondateid', PARAM_INT);
+        $mform->setDefault('sessiondateid', 0);
 
-        $data = array('format' => null);
-        // The sign-in sheet will be most likely printed out,
-        // so use some reasonable printer friendly default here.
-        if (defined('BEHAT_SITE_RUNNING')) {
-            $data['format'] = 'csv';
-        } else if (isset($select['pdflandscape'])) {
-            $data['format'] = 'pdflandscape';
-        }
+        $select[] = get_string('selectfileformat', 'mod_facetoface');
+        $group[] = $mform->createElement('select', 'docformat', get_string('exportformat', 'totara_core'), $select);
+        $mform->setType('docformat', PARAM_PLUGIN);
+        $mform->setDefault('docformat', 0);
 
-        $options = array();
-        foreach ($session->sessiondates as $date) {
-            $dateobject = \mod_facetoface\output\session_time::format($date->timestart, $date->timefinish, $date->sessiontimezone);
-            $options[$date->id] = get_string('sessionstartdatewithtime', 'mod_facetoface', $dateobject);
-        }
-        if (count($options) > 1) {
-            $group[] = $mform->createElement('select', 'sessiondateid', get_string('sessiondate', 'mod_facetoface'), $options);
-        } else {
-            $mform->addElement('hidden', 'sessiondateid');
-            $mform->setType('sessiondateid', PARAM_INT);
-            if (count($options) === 1) {
-                $data['sessiondateid'] = key($options);
-            }
-        }
-
-        if (count($select) == 1) {
-            $mform->addElement('hidden', 'format', key($select));
-            $mform->setType('format', PARAM_PLUGIN);
-        } else {
-            $group[] = $mform->createElement('select', 'format', get_string('exportformat', 'totara_core'), $select);
-        }
-
-        $group[] = $mform->createElement('submit', 'export', get_string('downloadsigninsheet', 'mod_facetoface'));
-
-        if (count($group) > 1) {
-            $mform->addGroup($group, 'exportgroup', '', array(' '), false);
-        } else {
-            $mform->addElement($group[0]);
-        }
-
-        $this->set_data($data);
+        $group[] = $mform->createElement('submit', 'download', get_string('download', 'mod_facetoface'));
+        $mform->addGroup($group, 'downloadgroup', get_string('downloadsigninsheet', 'mod_facetoface'), [' '], false);
     }
 }

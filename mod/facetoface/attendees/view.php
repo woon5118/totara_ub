@@ -140,8 +140,7 @@ if ($seminarevent->get_cancelledstatus() == 0) {
     if (!empty($actions)) {
         echo $OUTPUT->container_start('actions last');
         // Action selector
-        echo html_writer::label(get_string('attendeeactions', 'mod_facetoface'), 'menuf2f-actions', true,
-            ['class' => 'sr-only']);
+        echo html_writer::label(get_string('attendeeactions', 'mod_facetoface'), 'menuf2f-actions', true, ['class' => 'sr-only']);
         echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('actions')));
         echo $OUTPUT->container_end();
     }
@@ -158,20 +157,16 @@ $report->display_search();
 $report->display_sidebar_search();
 echo $reporthtml;
 
-    // Session downloadable sign in sheet.
-    if ($seminarevent->is_sessions() && has_capability('mod/facetoface:exportsessionsigninsheet', $context)) {
-        $helper = new \mod_facetoface\attendees_helper($seminarevent);
-        if (0 < $helper->count_attendees_with_codes($attendancestatuses)) {
-            // We need the dates, and we only want to show this option if there are one or more dates.
-            $formurl = new moodle_url('/mod/facetoface/reports/signinsheet.php');
-            $signinform = new \mod_facetoface\form\signin($formurl, $session);
-            echo html_writer::start_div('f2fdownloadsigninsheet');
-            $signinform->display();
-            echo html_writer::end_div();
-        }
-    }
-
 attendees_helper::report_export_form($report, $sid);
+
+// Session downloadable sign in sheet.
+if ($seminarevent->is_sessions() && has_capability('mod/facetoface:exportsessionsigninsheet', $context)) {
+    if (0 < $report->get_filtered_count()) {
+        // We need the dates, and we only want to show this option if there are one or more dates.
+        $mform = new \mod_facetoface\form\signin(new moodle_url('/mod/facetoface/reports/signinsheet.php'), $session);
+        $mform->display();
+    }
+}
 
 // Go back.
 if ($backtoallsessions) {
