@@ -217,7 +217,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I should see "This is to advise that Sam1 Student1 has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "Attendees" "link"
     Then I should see "Sam1 Student1"
-    And I should not see "Cancellations" in the "div.f2f-attendees-table" "css_element"
+    And I should not see "Cancellations" in the "div.tabtree" "css_element"
     And I should not see "Take attendance" in the "div.tabtree" "css_element"
     And I should not see "Message users" in the "div.tabtree" "css_element"
     And I should not see "Attendees" in the "div.tabtree" "css_element"

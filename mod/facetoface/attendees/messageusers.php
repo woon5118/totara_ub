@@ -48,14 +48,13 @@ if (!$s) {
 
 $seminarevent = new \mod_facetoface\seminar_event($s);
 $seminar = $seminarevent->get_seminar();
-$course = $DB->get_record('course', array('id' => $seminar->get_course()));
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
 $session = new stdClass();
 $session->id = $seminarevent->get_id();
 
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 /**
  * Print page header
  */
@@ -70,7 +69,7 @@ list($allowed_actions, $available_actions, $staff, $admin_requests, $canapprovea
 if (!in_array($action, $allowed_actions)) {
     // If no allowed actions so far.
     $return = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
-    redirect($return, get_string('error:capabilitysendmessages', 'mod_facetoface'),  null, \core\notification::ERROR);
+    redirect($return, get_string('error:capabilitysendmessages', 'mod_facetoface'), null, \core\notification::ERROR);
 }
 
 /**
@@ -93,18 +92,14 @@ $pagetitle = format_string($seminar->get_name());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($pagetitle);
 $PAGE->set_cm($cm);
-$PAGE->set_heading($course->fullname);
+
 \mod_facetoface\messaging::process_js($action, $seminar, $seminarevent);
 
 /**
  * Print page content
  */
 echo $OUTPUT->header();
-echo $OUTPUT->box_start();
 echo $OUTPUT->heading($pagetitle);
-/** @var mod_facetoface_renderer $seminarrenderer */
-$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
 
 require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
 echo $OUTPUT->container_start('f2f-attendees-table');
@@ -115,15 +110,14 @@ $mform->display();
 if ($backtoallsessions) {
     $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
 } else {
-    $url = new moodle_url('/course/view.php', array('id' => $course->id));
+    $url = new moodle_url('/course/view.php', array('id' => $seminar->get_course()));
 }
-echo html_writer::tag('p', html_writer::link($url, get_string('goback', 'facetoface')));
+echo html_writer::link($url, get_string('goback', 'mod_facetoface'));
 
 /**
  * Print page footer
  */
 echo $OUTPUT->container_end();
-echo $OUTPUT->box_end();
-echo $OUTPUT->footer($course);
+echo $OUTPUT->footer();
 
 \mod_facetoface\event\message_users_viewed::create_from_session($session, $context, $action)->trigger();

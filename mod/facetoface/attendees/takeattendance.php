@@ -65,12 +65,11 @@ if (!$s) {
 
 $seminarevent = new \mod_facetoface\seminar_event($s);
 $seminar = $seminarevent->get_seminar();
-$course = $DB->get_record('course', array('id' => $seminar->get_course()));
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 $session = (object)['id' => $seminarevent->get_id()];
 
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 /**
  * Print page header
  */
@@ -103,10 +102,6 @@ if (!$can_view_session) {
 }
 // $allowed_actions is already set, so we can now know if the current action is allowed.
 $actionallowed = in_array($action, $allowed_actions);
-
-/***************************************************************************
- * Handle actions
- */
 
 //Process the submitted data here
 if ($formdata = data_submitted()) {
@@ -191,8 +186,6 @@ if (!$onlycontent) {
     $PAGE->set_pagelayout('standard');
     $PAGE->set_title($pagetitle);
     $PAGE->set_cm($cm);
-    $PAGE->set_heading($course->fullname);
-    \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
 }
 
 /**
@@ -200,15 +193,7 @@ if (!$onlycontent) {
  */
 if (!$onlycontent && !$download) {
     echo $OUTPUT->header();
-    echo $OUTPUT->box_start();
     echo $OUTPUT->heading($pagetitle);
-    if ($can_view_session) {
-        /**
-         * @var mod_facetoface_renderer $seminarrenderer
-         */
-        $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-        echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
-    }
     require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
     echo $OUTPUT->container_start('f2f-attendees-table');
 }
@@ -241,6 +226,6 @@ if ($actionallowed) {
  */
 if (!$onlycontent) {
     echo $OUTPUT->container_end();
-    echo $OUTPUT->box_end();
-    echo $OUTPUT->footer($course);
+    echo $OUTPUT->footer();
+    \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
 }

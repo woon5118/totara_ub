@@ -70,7 +70,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
-$PAGE->set_title(format_string($seminar->get_name()) . ': ' . $pagetitle);
+$PAGE->set_title($seminar->get_name() . ': ' . $pagetitle);
 
 $list = new \mod_facetoface\bulk_list($listid, $currenturl, $action);
 
@@ -256,11 +256,6 @@ echo $OUTPUT->heading($pagetitle);
 if (!empty($notification)) {
     echo $OUTPUT->notification($notification, 'notifynotice');
 }
-/**
- * @var mod_facetoface_renderer $seminarrenderer
- */
-$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-echo $seminarrenderer->render_seminar_event($seminarevent, false, false, true);
 
 // Configure selector form.
 $strusertochange = get_string('userstoadd', 'facetoface');

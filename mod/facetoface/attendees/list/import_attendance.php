@@ -53,7 +53,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
-$PAGE->set_title(format_string($seminar->get_name()) . ': ' . $pagetitle);
+$PAGE->set_title($seminar->get_name() . ': ' . $pagetitle);
 
 $list = new bulk_list($listid, $currenturl, $srctype);
 $mform = new import_attendance(null, $params);

@@ -39,53 +39,9 @@ class event_dates_period extends \totara_reportbuilder\rb\display\base {
      * @return string
      */
     public static function display($startdate, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $CFG;
-
         // Finishdate and timezone are expected as extra fields.
         $extra = self::get_extrafields_row($row, $column);
-
-        $finishdate = $extra->finishdate;
-        $startdatetext = '';
-        $finishdatetext = '';
-        $returntext = '';
-
-        if (empty($extra->timezone) || (int)$extra->timezone == 99 || empty($CFG->facetoface_displaysessiontimezones)) {
-            $targetTZ = \core_date::get_user_timezone();
-        } else {
-            $targetTZ = \core_date::normalise_timezone($extra->timezone);
-        }
-
-        if ($startdate && is_numeric($startdate)) {
-            if (!empty($CFG->facetoface_displaysessiontimezones)) {
-                $startdate = userdate($startdate, get_string('strftimedatetime', 'langconfig'), $targetTZ) . ' ';
-                $tzstring = \core_date::get_localised_timezone($targetTZ);
-                $startdatetext = $startdate . $tzstring;
-            } else {
-                $startdate = userdate($startdate, get_string('strftimedatetime', 'langconfig'), $targetTZ);
-                $startdatetext = $startdate;
-            }
-        }
-
-        if ($finishdate && is_numeric($finishdate)) {
-            if (!empty($CFG->facetoface_displaysessiontimezones)) {
-                $finishdate = userdate($finishdate, get_string('strftimedatetime', 'langconfig'), $targetTZ) . ' ';
-                $tzstring = \core_date::get_localised_timezone($targetTZ);
-                $finishdatetext = $finishdate . $tzstring;
-            } else {
-                $finishdate = userdate($finishdate, get_string('strftimedatetime', 'langconfig'), $targetTZ);
-                $finishdatetext = $finishdate;
-            }
-        }
-
-        if ($startdatetext && $finishdatetext) {
-            $returntext = get_string('datebetween', 'totara_reportbuilder', array('from' => $startdatetext, 'to' => $finishdatetext));
-        } else if ($startdatetext) {
-            $returntext = get_string('dateafter', 'totara_reportbuilder', $startdatetext);
-        } else if ($finishdatetext) {
-            $returntext = get_string('datebefore', 'totara_reportbuilder', $finishdatetext);
-        }
-
-        return $returntext;
+        return \mod_facetoface\output\session_time::signup_period($startdate, $extra->finishdate, $extra->timezone);
     }
 
     /**

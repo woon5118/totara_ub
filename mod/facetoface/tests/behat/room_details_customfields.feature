@@ -149,7 +149,7 @@ Feature: Check room details with all possible custom fields
     And I am on "Course 1" course homepage
 
     # View the room.
-    And I click on "View details" "link"
+    And I click on "Room 1" "link"
     And I switch to "popup" window
 
     # Confirm that all of the room customfields saved.

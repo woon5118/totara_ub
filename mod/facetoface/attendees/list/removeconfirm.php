@@ -52,7 +52,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
-$PAGE->set_title(format_string($seminar->get_name()));
+$PAGE->set_title($seminar->get_name() . ': ' . $pagetitle);
 
 $list = new bulk_list($listid);
 // Selected users.
@@ -83,15 +83,8 @@ if ($fromform = $mform->get_data()) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading($pagetitle);
 
-/**
- * @var mod_facetoface_renderer $seminarrenderer
- */
-$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-echo $seminarrenderer->render_seminar_event($seminarevent, false, false, true);
-
 $users = $mform->get_user_list($userlist, $page, USERS_PER_PAGE);
 $paging = new paging_bar(count($userlist), $page, USERS_PER_PAGE, $currenturl);
-
 // Table.
 $f2frenderer = $PAGE->get_renderer('mod_facetoface');
 echo $f2frenderer->render($paging);

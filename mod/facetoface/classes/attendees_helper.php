@@ -533,6 +533,11 @@ final class attendees_helper {
         );
         $includedeleted = has_capability('totara/core:seedeletedusers', $context);
 
+        if (has_capability('mod/facetoface:viewallsessions', $context)) {
+            $allowed_actions[] = 'event';
+            $available_actions[] = 'event';
+        }
+
         if (has_capability('mod/facetoface:viewattendees', $context)) {
             $allowed_actions[] = 'attendees';
             $allowed_actions[] = 'waitlist';

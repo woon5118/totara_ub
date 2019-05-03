@@ -56,7 +56,6 @@ if (!$s) {
 
 $seminarevent = new seminar_event($s);
 $seminar = $seminarevent->get_seminar();
-$course = $DB->get_record('course', array('id' => $seminar->get_course()));
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
@@ -107,19 +106,14 @@ $pagetitle = format_string($seminar->get_name());
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading($course->fullname);
+
 attendees_helper::process_js($action, $seminar, $seminarevent);
 
 /**
  * Print page content
  */
 echo $OUTPUT->header();
-echo $OUTPUT->box_start();
 echo $OUTPUT->heading($pagetitle);
-
-/** @var mod_facetoface_renderer $seminarrenderer */
-$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
 
 require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
 echo $OUTPUT->container_start('f2f-attendees-table');
@@ -194,7 +188,7 @@ $params = ['s' => $seminarevent->get_id(), 'sesskey' => sesskey(), 'return' => $
 foreach ($requests as $attendee) {
     $attendeefullname = format_string(fullname($attendee));
     $data = array();
-    $attendee_link = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $course->id));
+    $attendee_link = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $seminar->get_course()));
     $data[] = html_writer::link($attendee_link, $attendeefullname);
     $data[] = userdate($attendee->timecreated, get_string('strftimedatetime'));
 
@@ -250,8 +244,6 @@ foreach ($requests as $attendee) {
             $data[] = html_writer::span($state, 'approvalstate' . $attendee->id, array('id' => 'approvalstate' . $attendee->id));
             $data[] = html_writer::span($time, 'approvaltime' . $attendee->id, array('id' => 'approvaltime' . $attendee->id));
         }
-    } else {
-
     }
 
     $id = 'requests_' . $attendee->id . '_noaction';
@@ -315,16 +307,15 @@ if ($goback) {
     if ($backtoallsessions) {
         $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
     } else {
-        $url = new moodle_url('/course/view.php', array('id' => $course->id));
+        $url = new moodle_url('/course/view.php', array('id' => $seminar->get_course()));
     }
-    echo html_writer::link($url, get_string('goback', 'facetoface')) . html_writer::end_tag('p');
+    echo html_writer::link($url, get_string('goback', 'mod_facetoface'));
 }
 
 /**
  * Print page footer
  */
 echo $OUTPUT->container_end();
-echo $OUTPUT->box_end();
-echo $OUTPUT->footer($course);
+echo $OUTPUT->footer();
 
 \mod_facetoface\event\approval_required_viewed::create_from_session($seminarevent->to_record(), $context, $action)->trigger();

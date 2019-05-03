@@ -433,6 +433,7 @@ final class export_helper {
      * @return string
      */
     private static function get_status(\stdClass $session, int $timenow) : string {
+        // TODO: use \mod_facetoface\seminar_event_helper::booking_status();
         if ($session->timestart < $timenow) {
             $status = get_string('sessionover', 'facetoface');
         } else {

@@ -50,7 +50,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
-$PAGE->set_title(format_string($seminar->get_name()) . ': ' . $pagetitle);
+$PAGE->set_title($seminar->get_name() . ': ' . $pagetitle);
 
 // Selected users.
 $userlist = $list->get_user_ids();

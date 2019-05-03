@@ -54,7 +54,8 @@ $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
-$PAGE->set_title(format_string($seminar->get_name()) . ': ' . $pagetitle);
+$PAGE->set_title($seminar->get_name() . ': ' . $pagetitle);
+
 $PAGE->requires->js_call_amd('mod_facetoface/attendees_addconfirm', 'init', array(array('s' => $s, 'listid' => $listid)));
 
 $list = new bulk_list($listid);
@@ -88,25 +89,15 @@ if ($fromform = $mform->get_data()) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading($pagetitle);
 
-/**
- * @var mod_facetoface_renderer $seminarrenderer
- */
-$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-echo $seminarrenderer->render_seminar_event($seminarevent, false, false, true);
-
-// Table.
-$f2frenderer = $PAGE->get_renderer('mod_facetoface');
-$f2frenderer->setcontext($context);
-
-$users = attendees_list_helper::get_user_list($userlist, $page, USERS_PER_PAGE);
-$paging = new \paging_bar(count($userlist), $page, USERS_PER_PAGE, $currenturl);
-
 $jaselector = 0;
 if (!empty($seminar->get_forceselectjobassignment())) {
     $jaselector = 2;
 } else if (!empty($seminar->get_selectjobassignmentonsignup())) {
     $jaselector = 1;
 }
+
+$users = \mod_facetoface\attendees_list_helper::get_user_list($userlist, $page, USERS_PER_PAGE);
+$paging = new \paging_bar(count($userlist), $page, USERS_PER_PAGE, $currenturl);
 // Table.
 $f2frenderer = $PAGE->get_renderer('mod_facetoface');
 echo $f2frenderer->render($paging);

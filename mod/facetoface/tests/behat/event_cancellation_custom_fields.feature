@@ -24,6 +24,10 @@ Feature: Seminar event cancellation custom fields
       | learner2 | C1     | student        |
       | learner3 | C1     | student        |
 
+    And the following "permission overrides" exist:
+      | capability                     | permission | role           | contextlevel | reference |
+      | mod/facetoface:viewallsessions | Allow      | editingteacher | Course       | C1        |
+
     Given I log in as "admin"
     Given I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "Editing Trainer" "text" in the "#admin-facetoface_session_roles" "css_element"
@@ -181,6 +185,7 @@ Feature: Seminar event cancellation custom fields
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_500: filling up custom fields when cancelling events
     When I click on "Attendees" "link"
+    And I click on "Event details" "link"
     Then I should see "Yes" in the "//dt[contains(., 'cancelcheckbox')]//following-sibling::dd" "xpath_element"
     And I should see "1 December 2030" in the "//dt[contains(., 'canceldatetime')]//following-sibling::dd" "xpath_element"
     And I should see "test.jpg" in the "//dt[contains(., 'cancelfile')]//following-sibling::dd" "xpath_element"
@@ -189,7 +194,7 @@ Feature: Seminar event cancellation custom fields
     And I should see "Aye, Nay" in the "//dt[contains(., 'cancelmulti')]//following-sibling::dd" "xpath_element"
     And I should see "hi" in the "//dt[contains(., 'canceltextinput')]//following-sibling::dd" "xpath_element"
     And I should see "http://example.org" in the "//dt[contains(., 'cancelURL')]//following-sibling::dd" "xpath_element"
-    And I should see the "Green leaves on customfield text area" image in the "//dd[preceding-sibling::dt[1][. = 'canceltextarea']]" "xpath_element"
+    And I should see the "Green leaves on customfield text area" image in the "//dt[contains(., 'canceltextarea')]//following-sibling::dd" "xpath_element"
     And I should see image with alt text "Green leaves on customfield text area"
 
 

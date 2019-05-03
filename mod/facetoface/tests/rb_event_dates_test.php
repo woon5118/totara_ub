@@ -27,9 +27,8 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
     public function test_event_time_no_timezone() {
-        global $CFG;
 
-        $CFG->facetoface_displaysessiontimezones = false;
+        set_config('facetoface_displaysessiontimezones', 0);
 
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -60,7 +59,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
     public function test_event_time_timezone() {
         global $CFG;
 
-        $CFG->facetoface_displaysessiontimezones = true;
+        set_config('facetoface_displaysessiontimezones', 1);
 
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -110,7 +109,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
     public function test_event_date_timezone() {
         global $CFG;
 
-        $CFG->facetoface_displaysessiontimezones = true;
+        set_config('facetoface_displaysessiontimezones', 1);
 
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -160,7 +159,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
     public function test_event_date_no_timezone() {
         global $CFG;
 
-        $CFG->facetoface_displaysessiontimezones = false;
+        set_config('facetoface_displaysessiontimezones', 0);
 
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -210,7 +209,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
     public function test_event_dates_period_timezone() {
         global $CFG;
 
-        $CFG->facetoface_displaysessiontimezones = true;
+        set_config('facetoface_displaysessiontimezones', 1);
 
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -239,7 +238,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
         $row->$extrafieldrow = 'Pacific/Auckland';
         $display = \mod_facetoface\rb\display\event_dates_period::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('27 December 2017, 4:25 PM Pacific/Auckland to 28 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $this->assertEquals('27 December 2017, 4:25 PM to 28 December 2017, 4:25 PM Pacific/Auckland', $display);
 
         $display = \mod_facetoface\rb\display\event_dates_period::display('blah', $format, $row, $column, $report);
         $this->assertEquals('Before 28 December 2017, 4:25 PM Pacific/Auckland', $display);
@@ -247,7 +246,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
         $row->$extrafieldrow = 'Australia/Perth';
         $display = \mod_facetoface\rb\display\event_dates_period::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth to 28 December 2017, 11:25 AM Australia/Perth', $display);
+        $this->assertEquals('27 December 2017, 11:25 AM to 28 December 2017, 11:25 AM Australia/Perth', $display);
 
         $display = \mod_facetoface\rb\display\event_dates_period::display('blah', $format, $row, $column, $report);
         $this->assertEquals('Before 28 December 2017, 11:25 AM Australia/Perth', $display);
@@ -294,7 +293,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
     public function test_event_dates_period_no_timezone() {
         global $CFG;
 
-        $CFG->facetoface_displaysessiontimezones = false;
+        set_config('facetoface_displaysessiontimezones', 0);
 
         $this->resetAfterTest();
         $this->setAdminUser();

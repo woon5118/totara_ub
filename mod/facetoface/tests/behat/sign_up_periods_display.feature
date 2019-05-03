@@ -52,14 +52,14 @@ Feature: Seminar sign-up periods display
     And I should see "<signupperiod>"
 
     Examples:
-      | periodopen | startyear | startzone        | periodclose | endyear | endzone         | signupavailable     | bookingstatus       | signupperiod                                                                 |
-      | 1          | 2014      | Australia/Perth  | 1           | 2015    | Australia/Perth | Wait-listed         | Booking closed      | 30 July 2014 1:00 AM Australia/Perth to 30 July 2015 1:00 AM Australia/Perth |
-      | 1          | 2014      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open        | 30 July 2014 1:00 AM Australia/Perth to 30 July 2030 1:00 AM Australia/Perth |
-      | 1          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Wait-listed         | Booking not open    | 30 July 2029 1:00 AM Australia/Perth to 30 July 2030 1:00 AM Australia/Perth |
-      | 1          | 2029      | Pacific/Honolulu | 1           | 2030    | Pacific/Fiji    | Wait-listed         | Booking not open    | 30 July 2029 7:00 PM Australia/Perth to 29 July 2030 9:00 PM Australia/Perth |
-      | 0          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Join waitlist       | Booking open        | Booking open                                                                 |
-      | 1          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Wait-listed         | Booking not open    | After 30 July 2029 1:00 AM Australia/Perth                                   |
-      | 0          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open        | Before 30 July 2030 1:00 AM Australia/Perth                                  |
+      | periodopen | startyear | startzone        | periodclose | endyear | endzone         | signupavailable     | bookingstatus       | signupperiod                                                   |
+      | 1          | 2014      | Australia/Perth  | 1           | 2015    | Australia/Perth | Wait-listed         | Booking closed      | 30 July 2014, 1:00 AM to 30 July 2015, 1:00 AM Australia/Perth |
+      | 1          | 2014      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open        | 30 July 2014, 1:00 AM to 30 July 2030, 1:00 AM Australia/Perth |
+      | 1          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Wait-listed         | Booking not open    | 30 July 2029, 1:00 AM to 30 July 2030, 1:00 AM Australia/Perth |
+      | 1          | 2029      | Pacific/Honolulu | 1           | 2030    | Pacific/Fiji    | Wait-listed         | Booking not open    | 30 July 2029, 7:00 PM to 29 July 2030, 9:00 PM Australia/Perth |
+      | 0          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Join waitlist       | Booking open        | Booking open                                                   |
+      | 1          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Wait-listed         | Booking not open    | After 30 July 2029, 1:00 AM Australia/Perth                    |
+      | 0          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open        | Before 30 July 2030, 1:00 AM Australia/Perth                   |
 
   Scenario Outline: Sign up students regardless of sign in period status
     Given I follow "Add event"

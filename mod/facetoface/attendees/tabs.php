@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Alastair Munro <alastair.munro@totaralms.com>
- * @package totara
- * @subpackage facetoface
+ * @package mod_facetoface
  */
 
 if (!defined('MOODLE_INTERNAL')) {
@@ -28,8 +27,15 @@ if (!defined('MOODLE_INTERNAL')) {
 
 // Setup tabs
 $tabs = array();
-$activated = array();
-$currenttab = array();
+
+if (in_array('event', $allowed_actions)) {
+    $url = new \moodle_url('/mod/facetoface/attendees/event.php', ['s' => $seminarevent->get_id()]);
+    $tabs[] = new tabobject(
+        'event',
+        $url->out(),
+        get_string('eventdetails', 'mod_facetoface')
+    );
+}
 
 if (in_array('attendees', $allowed_actions)) {
     $url = new \moodle_url('/mod/facetoface/attendees/view.php', ['s' => $seminarevent->get_id()]);
@@ -38,7 +44,6 @@ if (in_array('attendees', $allowed_actions)) {
             $url->out(),
             get_string('attendees', 'facetoface')
     );
-    unset($actionurl);
 }
 
 if (in_array('waitlist', $allowed_actions)) {
@@ -48,7 +53,6 @@ if (in_array('waitlist', $allowed_actions)) {
             $url->out(),
             get_string('wait-list', 'facetoface')
     );
-    unset($actionurl);
 }
 
 if (in_array('cancellations', $allowed_actions)) {
@@ -58,7 +62,6 @@ if (in_array('cancellations', $allowed_actions)) {
             $url->out(),
             get_string('cancellations', 'facetoface')
     );
-    unset($actionurl);
 }
 
 if (in_array('takeattendance', $allowed_actions)) {
@@ -68,7 +71,6 @@ if (in_array('takeattendance', $allowed_actions)) {
             $url->out(),
             get_string('takeattendance', 'facetoface')
     );
-    unset($actionurl);
 }
 
 if (in_array('approvalrequired', $allowed_actions)) {
@@ -78,7 +80,6 @@ if (in_array('approvalrequired', $allowed_actions)) {
             $url->out(),
             get_string('approvalreqd', 'facetoface')
     );
-    unset($actionurl);
 }
 
 if (in_array('messageusers', $allowed_actions)) {
@@ -88,13 +89,11 @@ if (in_array('messageusers', $allowed_actions)) {
             $url->out(),
             get_string('messageusers', 'facetoface')
     );
-    unset($actionurl);
 }
-
-$activated[] = $action;
-$currenttab[] = $action;
 
 // Inactive tabs: get difference between allowed and available tabs
 $inactive = array_diff($allowed_actions, $available_actions);
+$activated[]  = $action;
+$currenttab[] = $action;
 
 print_tabs(array($tabs), $currenttab, $inactive, $activated);

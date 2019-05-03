@@ -70,13 +70,11 @@ Feature: Test deletion of a Seminar event
 
     When I press "Save changes"
     Then I should see "Room 1"
-    And I should see "That house"
     And a seminar custom room called "Room 1" should exist
 
     When I click on "Delete event" "link"
     Then I should see "Deleting event in Test seminar name"
     And I should see "Room 1"
-    And I should see "That house"
     And I should see "Are you completely sure you want to delete this event and all sign-ups and attendance for this event?"
 
     When I press "Continue"

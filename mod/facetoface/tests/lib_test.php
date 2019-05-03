@@ -831,7 +831,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->loadDataSet(
             $this->createArrayDataSet(
                 array(
-                    'course'            => $this->course_data,
+                    'course'                        => $this->course_data,
                     'facetoface_signups'            => $this->facetoface_signups_data,
                     'facetoface_sessions'           => $this->facetoface_sessions_data,
                     'facetoface_session_info_field' => $this->session_info_field,
@@ -949,13 +949,24 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
     }
 
     function test_facetoface_update_instance() {
+
+        $this->markTestSkipped('will be fixed in TL-21048');
+
         $this->init_sample_data();
 
         // Define test variables.
+        $seminar = new seminar($this->facetoface['f2f0']['id']);
+
+        // Test 1.
+        $this->assertEquals((int)$seminar->get_course(), (int)$this->facetoface['f2f0']['course']);
+
+        // Test 2.
+        $cm = $seminar->get_coursemodule();
+        $this->assertEquals((int)$cm->course, (int)$this->facetoface['f2f0']['course']);
+
+        // Test 3.
         $facetoface1 = $this->facetoface['f2f0'];
         $f2f = (object)$facetoface1;
-
-        // Test.
         $this->assertTrue((bool)facetoface_update_instance($f2f));
     }
 

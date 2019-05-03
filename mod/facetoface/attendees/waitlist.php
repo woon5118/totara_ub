@@ -50,14 +50,10 @@ if (!$s) {
 
 $seminarevent = new \mod_facetoface\seminar_event($s);
 $seminar = $seminarevent->get_seminar();
-$course = $DB->get_record('course', array('id' => $seminar->get_course()));
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
-$session = new stdClass();
-$session->id = $seminarevent->get_id();
-
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 /**
  * Print page header
  */
@@ -80,34 +76,21 @@ $pagetitle = format_string($seminar->get_name());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($pagetitle);
 $PAGE->set_cm($cm);
-$PAGE->set_heading($course->fullname);
 
 attendees_helper::process_js($action, $seminar, $seminarevent);
-// Verify global restrictions and process report early before any output is done (required for export).
-$shortname = 'facetoface_waitlist';
+
 $attendancestatuses = array(waitlisted::get_code());
-$report = attendees_helper::load_report($shortname, $attendancestatuses);
+$report = attendees_helper::load_report('facetoface_waitlist', $attendancestatuses);
 
 /**
  * Print page content
  */
 echo $OUTPUT->header();
-echo $OUTPUT->box_start();
 echo $OUTPUT->heading($pagetitle);
 
-/** @var mod_facetoface_renderer $seminarrenderer */
-$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-echo $seminarrenderer->render_seminar_event($seminarevent, true, false, true);
-
 require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
-echo $OUTPUT->container_start('f2f-attendees-table');
 
-/**
- * Print attendees (if user able to view)
- */
 attendees_helper::is_overbooked($seminarevent);
-// Output the section heading.
-echo $OUTPUT->heading(get_string('wait-list', 'mod_facetoface'));
 
 $report->set_baseurl($baseurl);
 $report->display_restrictions();
@@ -126,8 +109,7 @@ if (!empty($actions)) {
     $options = ['all' => get_string('all'), 'none' => get_string('none')];
     echo $OUTPUT->container_start('actions last');
     // Action selector
-    echo html_writer::label(get_string('attendeeactions', 'mod_facetoface'), 'menuf2f-actions', true,
-        array('class' => 'sr-only'));
+    echo html_writer::label(get_string('attendeeactions', 'mod_facetoface'), 'menuf2f-actions', true, ['class' => 'sr-only']);
     echo html_writer::select($options, 'f2f-select', '', ['' => get_string('selectwithdot', 'mod_facetoface')]);
     echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('actions')));
     echo $OUTPUT->help_icon('f2f-waitlist-actions', 'mod_facetoface');
@@ -151,14 +133,10 @@ attendees_helper::report_export_form($report, $sid);
 if ($backtoallsessions) {
     $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
 } else {
-    $url = new moodle_url('/course/view.php', array('id' => $course->id));
+    $url = new moodle_url('/course/view.php', array('id' => $seminar->get_course()));
 }
-echo html_writer::link($url, get_string('goback', 'mod_facetoface')) . html_writer::end_tag('p');
-/**
- * Print page footer
- */
-echo $OUTPUT->container_end();
-echo $OUTPUT->box_end();
-echo $OUTPUT->footer($course);
+echo html_writer::link($url, get_string('goback', 'mod_facetoface'));
 
-\mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
+echo $OUTPUT->footer();
+
+\mod_facetoface\event\attendees_viewed::create_from_session((object)['id' => $seminarevent->get_id()], $context, $action)->trigger();

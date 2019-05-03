@@ -3,6 +3,35 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* The following changes have been made to the mod_facetoface_renderer class:
+  * get_room_details_html() now links room name instead of linking the separate string "View details"
+  * session_resgistrationperiod_table_cell() now uses \mod_facetoface\output\session_time::signup_period() to generate its registration string
+  * event_status_table_cell() has been updated to use \mod_facetoface\seminar_event_helper::booking_status()
+  * session_status_table_cell() has been updated to use \mod_facetoface\seminar_session_helper::get_status()
+  * print_session_list() has been updated to use \mod_facetoface\seminar_event_helper::get_sessiondata()
+  * render_seminar_event() has been updated:
+      * Changed the $class default value from 'f2f' to 'mod_facetoface__event_details'
+      * Rendering info changed from 'new line' label/value to 'one line colon'
+      * Added Sign-up period date/time info
+      * Added Event booking info
+      * Added Session status info
+      * Added Asests info
+      * Session date/time format is changed
+      * rendered event information now includes:
+        * event custom fields
+        * event maximum bookings
+        * sign-up period
+        * booking status
+        * event status
+        * event trainers
+        * event cost(s)
+        * event details
+        * session list with the following for each session:
+        * session dates/times
+        * session duration
+        * linked room name
+        * room description
+        * list of assets
 * mod_facetoface_renderer::print_userlist_table() has been updated to respect the showuseridentity config
 * take_attendance::create() has been updated, added 'Upload attendance' button
 * bulk_list::returnurl() has been updated, removed url clone() as url already cloned in __construct()

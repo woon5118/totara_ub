@@ -143,7 +143,7 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
      * @param bool $timeinverse Invert future time to past
      */
     protected function create_booking($initiator, $attender, $course, $timeinverse = false) {
-        global $DB, $USER;
+        global $DB;
 
         self::$ind++;
 
@@ -172,7 +172,7 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
         // Dates time will be adjusted afte sign ups
         $sessiondate = new stdClass();
         $sessiondate->sessionid = self::$ind;
-        $sessiondate->roomid = 1;
+        $sessiondate->roomid = 0;
         $sessiondate->timestart = time() + HOURSECS * self::$ind;
         $sessiondate->timefinish = time() + 2 * HOURSECS * self::$ind - 1;
         $sessiondate->sessiontimezone = 'Europe/London';

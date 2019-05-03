@@ -50,7 +50,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
-$PAGE->set_title(format_string($seminar->get_name()) . ': ' . $pagetitle);
+$PAGE->set_title($seminar->get_name() . ': ' . $pagetitle);
 
 $mform = new attendees_add_file(null, ['s' => $s, 'listid' => $listid, 'seminar' => $seminar]);
 if ($mform->is_cancelled()) {
@@ -68,12 +68,6 @@ $PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init', array
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($pagetitle);
-
-/**
- * @var mod_facetoface_renderer $seminarrenderer
- */
-$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-echo $seminarrenderer->render_seminar_event($seminarevent, false, false, true);
 
 $mform->display();
 

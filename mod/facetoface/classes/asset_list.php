@@ -177,4 +177,29 @@ final class asset_list implements \Iterator {
 
         return $list;
     }
+
+    /**
+     * Get assets by seminar session dates
+     *
+     * @param int $sessionid
+     * @return asset_list
+     */
+    public static function from_session(int $sessionid): asset_list {
+        global $DB;
+
+        $sql = "SELECT a.*
+                  FROM {facetoface_asset} a
+            INNER JOIN {facetoface_asset_dates} fad ON fad.assetid = a.id
+            INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
+                 WHERE fsd.id = :sessionid";
+        $records = $DB->get_records_sql($sql, ['sessionid' => $sessionid]);
+
+        $list = new static();
+        foreach ($records as $record) {
+            $asset = new asset();
+            $asset->from_record($record);
+            $list->add($asset);
+        }
+        return $list;
+    }
 }

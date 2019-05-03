@@ -41,13 +41,14 @@ class session_time extends template {
      * @param string $timezone
      * @return \stdClass
      */
-    public static function format(int $start, int $end, string $timezone) : \stdClass {
-        $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+    public static function format(int $start, int $end, string $timezone): \stdClass {
 
-        if (empty($timezone) or empty($displaytimezones)) {
+        $displaytimezones = (bool)(int)get_config(null, 'facetoface_displaysessiontimezones');
+
+        if (empty($timezone) || (int)$timezone == 99 or !$displaytimezones) {
             $timezone = \core_date::get_user_timezone();
         } else {
-            $timezone = \core_date::get_user_timezone($timezone);
+            $timezone = \core_date::normalise_timezone($timezone);
         }
 
         $formattedsession = new \stdClass();
@@ -55,11 +56,65 @@ class session_time extends template {
         $formattedsession->starttime = userdate($start, get_string('strftimetime', 'langconfig'), $timezone);
         $formattedsession->enddate = userdate($end, get_string('strftimedate', 'langconfig'), $timezone);
         $formattedsession->endtime = userdate($end, get_string('strftimetime', 'langconfig'), $timezone);
-        if (empty($displaytimezones)) {
+        if (!$displaytimezones) {
             $formattedsession->timezone = '';
         } else {
             $formattedsession->timezone = \core_date::get_localised_timezone($timezone);
         }
         return $formattedsession;
+    }
+
+    public static function to_string(int $start, int $end, string $timezone): string {
+
+        $sessionobj = static::format($start, $end, $timezone);
+
+        // No timezone to display.
+        if (empty($sessionobj->timezone)) {
+            if ($sessionobj->startdate == $sessionobj->enddate) {
+                $timestring = get_string('sessionstartdateandtimewithouttimezone', 'mod_facetoface', $sessionobj);
+            } else {
+                $timestring = get_string('sessionstartfinishdateandtimewithouttimezone', 'mod_facetoface', $sessionobj);
+            }
+        } else {
+            if ($sessionobj->startdate == $sessionobj->enddate) {
+                $timestring = get_string('sessionstartdateandtime', 'mod_facetoface', $sessionobj);
+            } else {
+                $timestring = get_string('sessionstartfinishdateandtime', 'mod_facetoface', $sessionobj);
+            }
+        }
+        return $timestring;
+    }
+
+    public static function signup_period($startdate, $finishdate, $timezone = 99): string {
+
+        $returntext    = '';
+        $startdatestr  = null;
+        $finishdatestr = null;
+        $displaytimezones = (bool)(int)get_config(null, 'facetoface_displaysessiontimezones');
+        if (empty($timezone) || (int)$timezone == 99 || !$displaytimezones) {
+            $targettz = \core_date::get_user_timezone();
+        } else {
+            $targettz = \core_date::normalise_timezone($timezone);
+        }
+
+        if ($startdate && is_numeric($startdate)) {
+            $startdatestr = userdate($startdate, get_string('strftimedatetime', 'langconfig'), $targettz);
+        }
+        if ($finishdate && is_numeric($finishdate)) {
+            $finishdatestr = userdate($finishdate, get_string('strftimedatetime', 'langconfig'), $targettz);
+        }
+
+        if ($startdatestr && $finishdatestr) {
+            $returntext = get_string('signupstartend', 'mod_facetoface', ['startdate' => $startdatestr, 'enddate' => $finishdatestr]);
+        } else if ($startdatestr) {
+            $returntext = get_string('signupstartsonly', 'mod_facetoface', ['startdate' => $startdatestr]);
+        } else if ($finishdatestr) {
+            $returntext = get_string('signupendsonly', 'mod_facetoface', ['enddate' => $finishdatestr]);
+        }
+
+        if (!empty($returntext) && $displaytimezones) {
+            $returntext .= ' ' . \core_date::get_localised_timezone($targettz);
+        }
+        return $returntext;
     }
 }
