@@ -39,6 +39,7 @@
     Example context (json):
         {
             "name": "submissionid_20",
+            "label": "John Doe's attendance",
             "options": [
                 {
                     "option_label": "Fully attended",
@@ -71,10 +72,8 @@
 }}
 
 <div class="tw-takeAttendanceStatusPicker">
-    <label class="hidden" for="menu{{name}}"> {{name}} </label>
-
     <select {{#disabled}}disabled{{/disabled}} name="{{name}}" id="menu{{name}}"
-            class="mod_facetoface__take-attendance__status-picker">
+            class="mod_facetoface__take-attendance__status-picker" aria-label="{{label}}">
 
         {{#options }}
 

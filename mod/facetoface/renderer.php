@@ -1950,7 +1950,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 'excel' => get_string('excelformat', 'facetoface'),
                 'ods' => get_string('odsformat', 'facetoface')
             ];
-            echo \html_writer::select($formats, 'download', '0', '');
+            echo \html_writer::select($formats, 'download', '0', '', ['aria-label' => get_string('exportformat', 'totara_core')]);
 
             echo \html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('exporttofile', 'facetoface')));
             echo \html_writer::end_tag('div') . \html_writer::end_tag('form');

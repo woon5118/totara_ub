@@ -46,6 +46,7 @@ class take_attendance_status_picker extends template {
                                   bool $disabled = false) {
         $data = [
             'name' => "submissionid_{$attendee->submissionid}",
+            'label' => get_string('takeattendance_label', 'mod_facetoface', clean_string(fullname($attendee))),
             'options' => [],
             'disabled' => $disabled
         ];

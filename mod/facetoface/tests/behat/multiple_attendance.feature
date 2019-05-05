@@ -152,7 +152,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Continue"
     And I press "Confirm"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "first1 last1" "table_row"
+    And I set the field "first1 last1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
@@ -183,7 +183,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Continue"
     And I press "Confirm"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "first1 last1" "table_row"
+    And I set the field "first1 last1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
@@ -216,7 +216,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Continue"
     And I press "Confirm"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "first1 last1" "table_row"
+    And I set the field "first1 last1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
@@ -250,7 +250,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Continue"
     And I press "Confirm"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "first1 last1" "table_row"
+    And I set the field "first1 last1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
@@ -282,7 +282,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Continue"
     And I press "Confirm"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "first1 last1" "table_row"
+    And I set the field "first1 last1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
@@ -307,7 +307,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Continue"
     And I press "Confirm"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "first1 last1" "table_row"
+    And I set the field "first1 last1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
@@ -353,7 +353,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Continue"
     And I press "Confirm"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "first1 last1" "table_row"
+    And I set the field "first1 last1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
@@ -378,7 +378,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "Continue"
     And I press "Confirm"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "first1 last1" "table_row"
+    And I set the field "first1 last1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
@@ -442,6 +442,6 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "earlier session" "option"
     And I click on "Attendees" "link"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "first1 last1" "table_row"
+    And I set the field "first1 last1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"

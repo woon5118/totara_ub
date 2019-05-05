@@ -85,7 +85,7 @@ Feature: Take attendance for seminar sessions
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "Sam1 Student1" "table_row"
+    And I set the field "Sam1 Student1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     And I switch to "Attendees" tab
@@ -108,8 +108,8 @@ Feature: Take attendance for seminar sessions
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
     And I click on "Take attendance" "link"
-    And I click on "input[class='selectedcheckboxes']" "css_element" in the "Sam1 Student1" "table_row"
-    And I click on "input[class='selectedcheckboxes']" "css_element" in the "Sam2 Student2" "table_row"
+    And I click on "Select Sam1 Student1" "checkbox"
+    And I click on "Select Sam2 Student2" "checkbox"
     And I click on "Fully attended" "option" in the "#menubulkattendanceop" "css_element"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
@@ -132,21 +132,21 @@ Feature: Take attendance for seminar sessions
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
     And I switch to "Take attendance" tab
-    And I click on "Fully attended" "option" in the "Sam1 Student1" "table_row"
+    And I set the field "Sam1 Student1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     And I switch to "Attendees" tab
     And I should see "Fully attended" in the "Sam1 Student1" "table_row"
     And I should see "Booked" in the "Sam2 Student2" "table_row"
     When I switch to "Take attendance" tab
-    And I click on "Partially attended" "option" in the "Sam1 Student1" "table_row"
+    And I set the field "Sam1 Student1's attendance" to "Partially attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     And I switch to "Attendees" tab
     And I should see "Partially attended" in the "Sam1 Student1" "table_row"
     And I should see "Booked" in the "Sam2 Student2" "table_row"
     When I switch to "Take attendance" tab
-    And I click on "Not set" "option" in the "Sam1 Student1" "table_row"
+    And I set the field "Sam1 Student1's attendance" to "Not set"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     And I switch to "Attendees" tab

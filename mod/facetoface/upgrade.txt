@@ -63,6 +63,10 @@ information provided here is intended especially for developers.
   * Added two new overridable functions for session/event status - session_status_table_cell() and event_status_table_cell()
 * mod_facetoface_renderer::set_signup_link() function has been deprecated, please use mod_facetoface\hook\alternative_signup_link
 * mod_facetoface_renderer::print_session_list_table() function has been changed to call get_signup_link() function to resolve signup link
+* mod_facetoface_renderer::attendees_export_form() has been changed to attach an aria-label attribute to the <select> element
+* The following templates have been updated for better accessibility:
+  * In take_attendance_status_picker, replaced a non-human-readable <label> with a human-readable aria-label (XX's attendance)
+  * In event_grade_input, the aria-label now contains the name of an attendee (XX's event grade)
 * facetoface_send_notice() function has been deprecated, please use \mod_facetoface\notice_sender::send_notice()
 * facetoface_send_oneperday_notice() function has been deprecated, please use \mod_facetoface\notice_sender::send_notice_oneperday()
 * facetoface_send_registration_closure_notice() function has been deprecated, please use \mod_facetoface\notice_sender::registration_closure()

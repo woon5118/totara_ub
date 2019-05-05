@@ -2230,6 +2230,8 @@ $string['successfullyaddededitedxattendees'] = 'Successfully added/edited {$a} a
 $string['successfullyremovedxattendees'] = 'Successfully removed {$a} attendees.';
 $string['summary'] = 'Summary';
 $string['takeattendance'] = 'Take attendance';
+$string['takeattendance_label'] = '{$a}\'s attendance';
+$string['takeattendance_tick'] = 'Select {$a}';
 $string['template'] = 'Template';
 $string['templateadminrequest'] = 'Booking admin request';
 $string['templateallreservationcancel'] = 'All reservations cancelled';
@@ -2278,7 +2280,7 @@ $string['upcomingsessionsinasset'] = 'Upcoming sessions using this asset';
 $string['upcomingsessionsinroom'] = 'Upcoming sessions in this room';
 $string['upcomingsessionsinroomlist'] = 'A list of upcoming sessions taking place in this room';
 $string['updateactivities'] = 'Update all activities';
-$string['updateactivities_help'] = 'When checked any saved content changes will update the corresponding content of all seminar activities which have notifications using this template. 
+$string['updateactivities_help'] = 'When checked any saved content changes will update the corresponding content of all seminar activities which have notifications using this template.
 
 The \'status\' of seminar activity notifications will not be affected.
 
