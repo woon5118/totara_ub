@@ -3651,7 +3651,9 @@ EOD;
      * @return string The favicon URL
      */
     public function favicon() {
-        return $this->image_url('favicon', 'theme');
+        // Totara: Look for the theme_basis/favicon setting. (or equivalent)
+        // If it is empty, then look for the default favicon.
+        return $this->page->theme->resolve_favicon_url() ?: $this->image_url('favicon', 'theme');
     }
 
     /**

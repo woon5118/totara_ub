@@ -104,3 +104,16 @@ function theme_basis_pluginfile($course, $cm, $context, $filearea, $args, $force
 
     send_file_not_found();
 }
+
+/**
+ * Returns the URL of the favicon if available.
+ *
+ * @param theme_config $theme
+ * @return string|null
+ */
+function theme_basis_resolve_favicon($theme) {
+    if (!empty($theme->settings->favicon)) {
+        return $theme->setting_file_url('favicon', 'favicon');
+    }
+    return null;
+}

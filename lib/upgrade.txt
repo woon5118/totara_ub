@@ -37,6 +37,7 @@ information provided here is intended especially for developers.
 * markdown_to_html() now cleans the html before returning it, stripping all XSS nasties. A new second argument now exists to set options.
   There is one option so far, allowxss, which if set to true will cause markdown_to_html to not clean_text (old behaviour)
 * Changes made for behat to be able to check aria-label attribute of buttons and form fields as label, which might break existing behat tests
+* Added a new resolvefaviconcallback property in which themes can override the URL returned by $OUTPUT->favicon().
 
 === 12.0 ===
 

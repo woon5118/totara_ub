@@ -498,6 +498,14 @@ class theme_config {
     public $blockrendermethod = null;
 
     /**
+     * The name of the function that takes a theme_config argument and returns the URL of the favicon.
+     *
+     * @var string
+     * @since Totara 11.15, 12.6, 13.0
+     */
+    public $resolvefaviconcallback = null;
+
+    /**
      * Load the config.php file for a particular theme, and return an instance
      * of this class. (That is, this is a factory method.)
      *
@@ -577,6 +585,8 @@ class theme_config {
             'hidefromselector', 'doctype', 'yuicssmodules', 'blockrtlmanipulations',
             'lessfile', 'extralesscallback', 'lessvariablescallback', 'blockrendermethod',
             'scss', 'extrascsscallback', 'prescsscallback', 'csstreepostprocessor', 'addblockposition');
+        // Totara: Add favicon resolver
+        $configurable[] = 'resolvefaviconcallback';
 
         foreach ($config as $key=>$value) {
             if (in_array($key, $configurable)) {
@@ -2042,6 +2052,32 @@ class theme_config {
             }
             return null;
         }
+    }
+
+    /**
+     * Return the URL of the favicon by walking through the resolvefaviconcallback properties.
+     *
+     * @return string|null the URL for the favicon or null if no custom favicon.
+     * @since Totara 11.15, 12.6, 13.0
+     */
+    public function resolve_favicon_url() {
+        $function = $this->resolvefaviconcallback;
+        if (function_exists($function)) {
+            if (($url = $function($this)) != null) {
+                return $url;
+            }
+        }
+        foreach ($this->parent_configs as $parent_config) {
+            if (isset($parent_config->resolvefaviconcallback)) {
+                $function = $parent_config->resolvefaviconcallback;
+                if (function_exists($function)) {
+                    if (($url = $function($this)) != null) {
+                        return $url;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**

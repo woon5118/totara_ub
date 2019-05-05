@@ -14,6 +14,7 @@ This file describes API changes for 'theme_basis'.
 ** core/notification_success
 ** core/notification_warning
 * Added theme setting for primary button color
+* Added theme_basis_resolve_favicon() that handles the theme_basis/favicon setting
 
 === 12.0 ===
 

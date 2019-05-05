@@ -42,3 +42,6 @@ $THEME->parents_exclude_sheets = array(
     'roots' => array('totara', 'totara-rtl'),
     'base' => array('flexible-icons'),
 );
+
+// Register our favicon resolver.
+$THEME->resolvefaviconcallback = 'theme_basis_resolve_favicon';
