@@ -89,7 +89,7 @@ define([], function() {
             var nodeList = this.widget.querySelectorAll('[' + this.activeSelector + ']'),
                 that = this;
 
-            if (!nodeList) {
+            if (!nodeList.length) {
                 return;
             }
 
@@ -137,6 +137,21 @@ define([], function() {
                 if (e.target.closest('[data-tw-selectRegionPanel-clear]')) {
                     that.clear();
                 }
+            });
+
+            // Create an observer instance with a callback function for clearing active items
+            var observeClearBtn = new MutationObserver(function() {
+                if (that.widget.getAttribute(that.clearSelector) === 'true') {
+                    that.clear();
+                    that.widget.removeAttribute(that.clearSelector);
+                }
+            });
+
+            // Start observing the widget for selectGroup clear attribute mutations
+            observeClearBtn.observe(this.widget, {
+                attributes: true,
+                attributeFilter: [that.clearSelector],
+                subtree: false
             });
         },
 

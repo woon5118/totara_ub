@@ -43,6 +43,7 @@
     * selectors: array containing list of select data
     * selectors -> template_data: array containing select data
     * selectors -> template_data -> key: unique key for the selector
+    * selectors -> template_data -> placeholder_show: bool if placeholder is displayed
     * selectors -> template_data -> title: title for the selector
     * selectors -> template_name: string, template required for selector type
 }}
@@ -79,11 +80,14 @@
     {{! Display selectors }}
     <div class="tw-selectRegionPanel__content">
         {{#selectors}}
-        <section class="tw-selectRegionPanel__selector">
+        <section class="tw-selectRegionPanel__selector
+        {{#template_data}}{{#placeholder_show}}tw-selectRegionPanel__selector_small{{/placeholder_show}}{{/template_data}}">
             {{#template_data}}
+            {{^placeholder_show}}
             <h3 id="{{{key}}}" class="tw-selectRegionPanel__selector_header">
                 {{{title}}}
             </h3>
+            {{/placeholder_show}}
 
             {{> &&template_name }}
             {{/template_data}}
