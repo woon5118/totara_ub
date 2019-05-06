@@ -63,7 +63,8 @@ class catalog extends template {
         $data = new \stdClass();
 
         // Process filter params.
-        foreach (filter_handler::instance()->get_active_filters() as $filter) {
+        $filterhandler = filter_handler::instance();
+        foreach ($filterhandler->get_active_filters() as $filter) {
             $optionalparams = $filter->selector->get_optional_params();
 
             $paramdata = [];

@@ -1798,10 +1798,16 @@ class sqlsrv_native_moodle_database extends moodle_database {
         $searchjoin = array();
         $score = array();
 
+        $defaulttb = 'FREETEXTTABLE';
+        if ($this->get_fts_mode($searchtext) === self::SEARCH_MODE_BOOLEAN) {
+            $searchtext = "\"{$searchtext}\"";
+            $defaulttb = "CONTAINSTABLE";
+        }
+
         foreach ($searchfields as $field => $weight) {
             $paramname = $this->get_unique_param('fts');
             $params[$paramname] = $searchtext;
-            $searchjoin[] = "LEFT JOIN FREETEXTTABLE({{$table}},{$field},:{$paramname},LANGUAGE $language) AS join_{$field} ON basesearch.id = join_{$field}.[KEY]";
+            $searchjoin[] = "LEFT JOIN {$defaulttb}({{$table}},{$field},:{$paramname},LANGUAGE $language) AS join_{$field} ON basesearch.id = join_{$field}.[KEY]";
             $score[] = "COALESCE(join_{$field}.RANK,0)*{$weight}";
         }
 
