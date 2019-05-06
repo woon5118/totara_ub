@@ -26,6 +26,7 @@ use block_totara_featured_links\tile\meta_tile;
 
 require_once('../../config.php');
 require_once($CFG->libdir . '/pagelib.php');
+require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
 $tileid = required_param('tileid', PARAM_INT);
 $returnurl = required_param('return_url', PARAM_URL);

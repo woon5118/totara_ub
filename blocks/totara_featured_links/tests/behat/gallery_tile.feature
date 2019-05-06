@@ -1,4 +1,4 @@
-@block @totara @javascript @block_totara_featured_links
+@block @totara @javascript @block_totara_featured_links @core_course
 Feature: Tests the behaviour of the gallery tile
   - The first save should take the user to the edit content form saving form here should
     take the user back to the page with the block.
@@ -277,3 +277,55 @@ Feature: Tests the behaviour of the gallery tile
   Scenario: Check canceling the add tile form returns to the previous page
     When I click on "Cancel" "button"
     Then I should see the "Featured Links" block
+
+  Scenario: Check that course featured link gallery tile visibility can be set by audience
+    When I click on "Cancel" "button"
+    Then I should see the "Featured Links" block
+
+    Given the following "courses" exist:
+      | fullname | shortname | format |
+      | Course 1 | C1 | topics |
+    And the following "users" exist:
+      | username | firstname | lastname | email | idnumber |
+      | user1    | First     | User     | first@example.com  | T1       |
+      | user2    | Second    | User     | second@example.com | T2       |
+    And the following "cohorts" exist:
+      | name     | idnumber |
+      | Cohort 1 | CH1      |
+      | Cohort 2 | CH2      |
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | CH1    |
+      | user2 | CH1    |
+      | user2 | CH2    |
+    And I am on "Course 1" course homepage
+    And I add the "Featured Links" block
+    And I click on "Add Tile" "link"
+    And I set the following fields to these values:
+      | Tile type | Gallery |
+    And I click on "Save and Edit content" "button"
+    Then I should see "Edit content"
+    And I should see "Finished editing"
+
+    When I click on "Add Tile" "link"
+    And I set the following fields to these values:
+      | URL         | www.example.com     |
+      | Description | default description |
+    And I click on "Save changes" "button"
+    Then I should see "Finished editing"
+    And I should see "default description"
+    And I follow "Finished editing"
+
+    When I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"
+    And I click on "Visibility" "link" in the ".block-totara-featured-links-layout" "css_element"
+    And I set the "Access" Totara form field to "Apply rules"
+    And I set the "Define access by audience rules" Totara form field to "1"
+
+    When I click on "Add audiences" "button"
+    Then I should see "Cohort 2"
+    When I click on "Cohort 2" "link"
+    And I click on "OK" "button"
+    And I wait "1" seconds
+    Then I should see "Cohort 2"
+    When I click on "Save changes" "button"
+    Then I should see "Hidden" in the ".block-totara-featured-links-disabled" "css_element"
