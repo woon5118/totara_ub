@@ -92,6 +92,8 @@ class select_tree extends select {
      * @param bool $flattree true to indicate that the tree should be styled as one level only
      * @param bool $parentsareselectable true if clicking a parent name selects the option, false if it behaves like a chevron
      * @param string $calltoaction if specified then displayed as the default (and default must not be specified in options)
+     * @param bool $showborderbox true to indicate that the tree should have a solid border box
+     * @param bool $disabled true to indicate that the tree should be disabled
      * @return select_tree
      */
     public static function create(
@@ -102,7 +104,9 @@ class select_tree extends select {
         string $activekey = null,
         bool $flattree = false,
         bool $parentsareselectable = true,
-        string $calltoaction = null
+        string $calltoaction = null,
+        bool $showborderbox = false,
+        bool $disabled = false
     ) : select_tree {
         $data = parent::get_base_template_data($key, $title, $titlehidden);
 
@@ -142,7 +146,9 @@ class select_tree extends select {
             $data->active_name = $activeoption->name;
         }
 
+        $data->disabled = $disabled;
         $data->flat_tree = $flattree;
+        $data->show_border_box = $showborderbox;
 
         $data->parents_are_selectable = $parentsareselectable;
 

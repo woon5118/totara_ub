@@ -202,8 +202,22 @@ $treelist4 = \totara_core\output\select_tree::create(
     'Please select colour'
 );
 
+$treelist5 = \totara_core\output\select_tree::create(
+    'testtreelist4',
+    'Which colour disabled',
+    false,
+    $options4,
+    '',
+    false,
+    false,
+    'Please select something',
+    true,
+    true
+);
+
 echo $OUTPUT->render($treelist1);
 echo $OUTPUT->render($treelist2);
 echo $OUTPUT->render($treelist3);
 echo $OUTPUT->render($treelist4);
+echo $OUTPUT->render($treelist5);
 echo $OUTPUT->footer();

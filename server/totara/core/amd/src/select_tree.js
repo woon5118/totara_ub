@@ -35,9 +35,12 @@ define([], function() {
         this.activeClass = 'tw-selectTree__active';
         this.activeSelector = 'data-tw-selector-active';
         this.clearSelector = 'data-tw-selectorgroup-clear';
+        this.disabledClass = 'tw-selectTree--disabled';
+        this.disabledSelector = 'data-tw-selecttree-disabled';
         this.hideClass = 'tw-selectTree__hidden';
         this.key = '';
         this.keyboardClass = 'tw-selectTree__keyboard';
+        this.manualSetSelected = 'data-tw-selector-manualset';
         this.repositionClass = 'tw-selectTree__reposition';
         this.widget = '';
         this.visibility = false;
@@ -94,7 +97,8 @@ define([], function() {
 
             this.widget.addEventListener('click', function(e) {
                 e.preventDefault();
-                if (!e.target) {
+
+                if (!e.target || that.widget.classList.contains(that.disabledClass)) {
                     return;
                 }
 
@@ -253,7 +257,6 @@ define([], function() {
             var observeClearBtn = new MutationObserver(function() {
                 if (that.widget.getAttribute(that.clearSelector) === 'true') {
                     that.setToDefault();
-                    that.triggerEvent('changed', {});
                     that.widget.setAttribute(that.clearSelector, false);
                 }
             });
@@ -262,6 +265,41 @@ define([], function() {
             observeClearBtn.observe(this.widget, {
                 attributes: true,
                 attributeFilter: [that.clearSelector],
+                subtree: false
+            });
+
+            var observeSetItem = new MutationObserver(function() {
+                var setToKey = that.widget.getAttribute(that.manualSetSelected);
+
+                if (setToKey) {
+                    var node = that.widget.querySelector('[data-tw-selectTree-urlVal="' + setToKey + '"]');
+                    that.add(node);
+                }
+            });
+
+            // Start observing the widget for manual set overwrite
+            observeSetItem.observe(this.widget, {
+                attributes: true,
+                attributeFilter: [that.manualSetSelected],
+                subtree: false
+            });
+
+            // Create an observer instance with a callback function for clearing active items
+            var observeDisabled = new MutationObserver(function() {
+                if (that.widget.getAttribute(that.disabledSelector) === 'activate') {
+                    that.widget.classList.remove(that.disabledClass);
+                    that.widget.querySelector('[data-tw-selecttree-trigger]').setAttribute('aria-disabled', false);
+                } else if (that.widget.getAttribute(that.disabledSelector) === 'disable') {
+                    that.widget.classList.add(that.disabledClass);
+                    that.widget.querySelector('[data-tw-selecttree-trigger]').setAttribute('aria-disabled', true);
+                }
+                that.widget.removeAttribute(that.disabledSelector);
+            });
+
+            // Start observing the widget for selectGroup clear attribute mutations
+            observeDisabled.observe(this.widget, {
+                attributes: true,
+                attributeFilter: [that.disabledSelector],
                 subtree: false
             });
         },

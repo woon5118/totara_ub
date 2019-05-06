@@ -60,6 +60,7 @@
     &__expandable {
         height: 100%;
         margin: auto 0;
+        max-width: 100%;
         position: relative;
         max-width: 100%;
     }
@@ -99,6 +100,10 @@
 
         &:focus {
             border-color: @selectTree-color_theme_1;
+        }
+
+        &_showBox {
+            border-color: @selectTree-color_neutral_5;
         }
     }
 
@@ -200,6 +205,23 @@
 
     &__hidden {
         display: none;
+    }
+
+    &--disabled {
+        .tw-selectTree {
+            &__expandable {
+                &::after {
+                    background: @selectTree-color_neutral_1;
+                    content: "";
+                    height: 100%;
+                    opacity: .8;
+                    position: absolute;
+                    top: 0;
+                    width: 100%;
+                }
+            }
+        }
+
     }
 }
 

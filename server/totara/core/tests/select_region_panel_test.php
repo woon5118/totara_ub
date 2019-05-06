@@ -112,6 +112,8 @@ class select_region_panel_test extends advanced_testcase {
                         'active_name' => 'ABC',
                         'flat_tree' => false,
                         'parents_are_selectable' => true,
+                        'show_border_box' => false,
+                        'disabled' => false
                     ],
                 ],
             ],
