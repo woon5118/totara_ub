@@ -43,14 +43,17 @@ class upload_form extends moodleform {
             case 'course':
                 $upload_label = 'choosecoursefile';
                 $upload_field = 'course_uploadfile';
+                $field_aria_label = 'coursefieldarialabel';
                 break;
             case 'certification':
                 $upload_label = 'choosecertificationfile';
                 $upload_field = 'certification_uploadfile';
+                $field_aria_label = 'certificationfieldarialabel';
                 break;
             default:
                 $upload_label = 'choosefile';
                 $upload_field = 'uploadfile';
+                $field_aria_label = 'fieldarialabel';
         }
 
         $upload_label = get_string($upload_label, 'totara_completionimport');
@@ -81,9 +84,10 @@ class upload_form extends moodleform {
 
         // Evidence type.
         $options = $DB->get_records_select_menu('dp_evidence_type', null, null, 'sortorder', 'id, name');
-        $selector = array(0 => get_string('selectanevidencetype', 'totara_plan'));
+        $selector = array(-1 => get_string('donotcreateevidence', 'totara_completionimport'), 0 => get_string('creategenericevidence', 'totara_completionimport'));
         $selectoptions = $selector + $options;
-        $mform->addElement('select', 'evidencetype', get_string('evidencetype', 'totara_completionimport'), $selectoptions);
+        $mform->addElement('select', 'evidencetype', get_string('evidencetype', 'totara_completionimport'), $selectoptions,
+            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('evidencetype', 'totara_completionimport'))));
         $mform->setType('evidencetype', PARAM_INT);
         $mform->addHelpButton('evidencetype', 'evidencetype', 'totara_completionimport');
 
@@ -93,9 +97,11 @@ class upload_form extends moodleform {
         foreach ($options as $option) {
             $selectoptions[$option->shortname] = format_string($option->fullname);
         }
-        $mform->addElement('select', 'evidencedatefield', get_string('evidencedatefield', 'totara_completionimport'), $selectoptions);
+        $mform->addElement('select', 'evidencedatefield', get_string('evidencedatefield', 'totara_completionimport'), $selectoptions,
+            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('evidencedatefield', 'totara_completionimport'))));
         $mform->setType('evidencedatefield', PARAM_TEXT);
         $mform->addHelpButton('evidencedatefield', 'evidencedatefield', 'totara_completionimport');
+        $mform->disabledIf('evidencedatefield', 'evidencetype', 'eq', -1);
 
         // Evidence custom field for the import description.
         $selectoptions = array(get_string('selectanevidencedescriptionfield', 'totara_completionimport'));
@@ -103,17 +109,21 @@ class upload_form extends moodleform {
         foreach ($options as $option) {
             $selectoptions[$option->shortname] = format_string($option->fullname);
         }
-        $mform->addElement('select', 'evidencedescriptionfield', get_string('evidencedescriptionfield', 'totara_completionimport'), $selectoptions);
+        $mform->addElement('select', 'evidencedescriptionfield', get_string('evidencedescriptionfield', 'totara_completionimport'), $selectoptions,
+            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('evidencedescriptionfield', 'totara_completionimport'))));
         $mform->setType('evidencedescriptionfield', PARAM_TEXT);
         $mform->addHelpButton('evidencedescriptionfield', 'evidencedescriptionfield', 'totara_completionimport');
+        $mform->disabledIf('evidencedescriptionfield', 'evidencetype', 'eq', -1);
 
         $dateformats = get_dateformats();
-        $mform->addElement('select', 'csvdateformat', get_string('csvdateformat', 'totara_completionimport'), $dateformats);
+        $mform->addElement('select', 'csvdateformat', get_string('csvdateformat', 'totara_completionimport'), $dateformats,
+            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('csvdateformat', 'totara_completionimport'))));
         $mform->setType('csvdateformat', PARAM_TEXT);
 
         // Function get_delimiter_list() actually returns the list of separators as in "comma *separated* values".
         $separators = csv_import_reader::get_delimiter_list();
-        $mform->addElement('select', 'csvseparator', get_string('csvseparator', 'totara_completionimport'), $separators);
+        $mform->addElement('select', 'csvseparator', get_string('csvseparator', 'totara_completionimport'), $separators,
+            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('csvseparator', 'totara_completionimport'))));
         $mform->setType('csvseparator', PARAM_TEXT);
         if (array_key_exists('cfg', $separators)) {
             $mform->setDefault('csvseparator', 'cfg');
@@ -124,11 +134,13 @@ class upload_form extends moodleform {
         }
 
         $delimiters = array('"' => '"', "'" => "'", '' => 'none');
-        $mform->addElement('select', 'csvdelimiter', get_string('csvdelimiter', 'totara_completionimport'), $delimiters);
+        $mform->addElement('select', 'csvdelimiter', get_string('csvdelimiter', 'totara_completionimport'), $delimiters,
+            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('csvdelimiter', 'totara_completionimport'))));
         $mform->setType('csvdelimiter', PARAM_TEXT);
 
         $encodings = core_text::get_encodings();
-        $mform->addElement('select', 'csvencoding', get_string('csvencoding', 'totara_completionimport'), $encodings);
+        $mform->addElement('select', 'csvencoding', get_string('csvencoding', 'totara_completionimport'), $encodings,
+            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('csvencoding', 'totara_completionimport'))));
         $mform->setType('csvencoding', PARAM_TEXT);
         $mform->setDefault('csvencoding', 'UTF-8');
 
@@ -138,15 +150,18 @@ class upload_form extends moodleform {
                 COMPLETION_IMPORT_COMPLETE_INCOMPLETE => get_string('importactioncertificationcertify', 'totara_completionimport'),
                 COMPLETION_IMPORT_OVERRIDE_IF_NEWER => get_string('importactioncertificationnewer', 'totara_completionimport'),
             );
-            $mform->addElement('select', 'importactioncertification', get_string('importactioncertification', 'totara_completionimport'), $selectoptions);
+            $mform->addElement('select', 'importactioncertification', get_string('importactioncertification', 'totara_completionimport'), $selectoptions,
+                array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('importactioncertification', 'totara_completionimport'))));
             $mform->setType('importactioncertification', PARAM_INT);
             $mform->addHelpButton('importactioncertification', 'importactioncertification', 'totara_completionimport');
         } else {
             $overrideactivestr = get_string('overrideactive' . $data->importname, 'totara_completionimport');
-            $mform->addElement('advcheckbox', 'overrideactive' . $data->importname, $overrideactivestr);
+            $mform->addElement('advcheckbox', 'overrideactive' . $data->importname, $overrideactivestr, '',
+                array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('overrideactive'.$data->importname, 'totara_completionimport'))));
         }
 
-        $mform->addElement('advcheckbox', 'forcecaseinsensitive'.$data->importname, get_string('caseinsensitive'.$data->importname, 'totara_completionimport'));
+        $mform->addElement('advcheckbox', 'forcecaseinsensitive'.$data->importname, get_string('caseinsensitive'.$data->importname, 'totara_completionimport'), '',
+            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('caseinsensitive'.$data->importname, 'totara_completionimport'))));
         $mform->addHelpButton('forcecaseinsensitive'.$data->importname, 'caseinsensitive'.$data->importname, 'totara_completionimport');
         $mform->setAdvanced('forcecaseinsensitive'.$data->importname);
 

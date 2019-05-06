@@ -15,6 +15,7 @@ Feature: Verify course completion data can be successfully uploaded.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1.csv" file to "Choose course file to upload" filemanager
+    And I set the field "Upload course Default evidence type" to "0"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records with data errors - these were ignored"
@@ -23,6 +24,7 @@ Feature: Verify course completion data can be successfully uploaded.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1a.csv" file to "Choose course file to upload" filemanager
+    And I set the field "Upload course Default evidence type" to "0"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records with data errors - these were ignored"
@@ -34,6 +36,7 @@ Feature: Verify course completion data can be successfully uploaded.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1b.csv" file to "Choose course file to upload" filemanager
+    And I set the field "Upload course Default evidence type" to "0"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records successfully imported as courses"
@@ -48,6 +51,7 @@ Feature: Verify course completion data can be successfully uploaded.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1c.csv" file to "Choose course file to upload" filemanager
+    And I set the field "Upload course Default evidence type" to "0"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records successfully imported as courses"
@@ -62,6 +66,7 @@ Feature: Verify course completion data can be successfully uploaded.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1d.csv" file to "Choose course file to upload" filemanager
+    And I set the field "Upload course Default evidence type" to "0"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records with data errors - these were ignored"
@@ -73,6 +78,7 @@ Feature: Verify course completion data can be successfully uploaded.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1e.csv" file to "Choose course file to upload" filemanager
+    And I set the field "Upload course Default evidence type" to "0"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records with data errors - these were ignored"
@@ -85,6 +91,7 @@ Feature: Verify course completion data can be successfully uploaded.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_2.csv" file to "Choose course file to upload" filemanager
+    And I set the field "Upload course Default evidence type" to "0"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records successfully imported as courses"
@@ -136,8 +143,9 @@ Feature: Verify course completion data can be successfully uploaded.
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_2.csv" file to "Choose course file to upload" filemanager
-    And I set the field "Evidence field for completion date" to "CUSTOM - Date completed"
-    And I set the field "Evidence field for the description" to "CUSTOM - Description"
+    And I set the field "Upload course Default evidence type" to "0"
+    And I set the field "Upload course Evidence field for completion date" to "CUSTOM - Date completed"
+    And I set the field "Upload course Evidence field for the description" to "CUSTOM - Description"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records successfully imported as courses"
@@ -161,8 +169,9 @@ Feature: Verify course completion data can be successfully uploaded.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_2.csv" file to "Choose course file to upload" filemanager
-    And I set the field "Evidence field for completion date" to "Select an evidence completion date field"
-    And I set the field "Evidence field for the description" to "Select an evidence description field"
+    And I set the field "Upload course Default evidence type" to "0"
+    And I set the field "Upload course Evidence field for completion date" to "Select an evidence completion date field"
+    And I set the field "Upload course Evidence field for the description" to "Select an evidence description field"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records successfully imported as courses"
@@ -181,10 +190,31 @@ Feature: Verify course completion data can be successfully uploaded.
     And I should not see "Grade : 100"
     And I should not see "Date completed : 1 January 2015"
 
+  Scenario: Verify a successful course completion upload specifying that no evidence should be created.
+    Given I log in as "admin"
+    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_2.csv" file to "Choose course file to upload" filemanager
+    And I set the field "Upload course Default evidence type" to "-1"
+    And I click on "Upload" "button" in the "#mform1" "css_element"
+    Then I should see "CSV import completed"
+    And I should see "1 Records with data errors - these were ignored"
+    And I should see "1 Records successfully imported as courses"
+    And I should see "0 Records created as evidence"
+    And I should see "2 Records in total"
+
+    When I navigate to "Manage users" node in "Site administration > Users"
+    And I follow "Bob1 Learner1"
+    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    Then I should see "100%" in the "Course 1" "table_row"
+
+    When I follow "Other Evidence"
+    Then I should see "There are no records in this report"
+
   Scenario: Course completions can be successfully uploaded with a file that uses CR for line endings
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_CR_line_endings.csv" file to "Choose course file to upload" filemanager
+    And I set the field "Upload course Default evidence type" to "0"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records successfully imported as courses"
@@ -215,6 +245,7 @@ Feature: Verify course completion data can be successfully uploaded.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_badcolumns.csv" file to "Choose course file to upload" filemanager
+    And I set the field "Upload course Default evidence type" to "0"
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "There were errors while importing the courses"
     And I should see "Unknown column 'badcolumn'"

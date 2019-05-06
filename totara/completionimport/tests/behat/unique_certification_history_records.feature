@@ -14,7 +14,8 @@ Feature: Certification history can be imported as long as records are considered
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_history_similar_records.csv" file to "Choose certification file to upload" filemanager
-    And I set the field "Import action" to "Save to history"
+    And I set the field "Upload certification Default evidence type" to "0"
+    And I set the field "Upload certification Import action" to "Save to history"
     And I click on "Upload" "button" in the "#mform2" "css_element"
     Then I should see "CSV import completed"
     And I should see "2 Records successfully imported as certifications"
@@ -85,7 +86,8 @@ Feature: Certification history can be imported as long as records are considered
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_history_matching_records.csv" file to "Choose certification file to upload" filemanager
-    And I set the field "Import action" to "Save to history"
+    And I set the field "Upload certification Default evidence type" to "0"
+    And I set the field "Upload certification Import action" to "Save to history"
     And I click on "Upload" "button" in the "#mform2" "css_element"
     Then I should see "CSV import completed"
 

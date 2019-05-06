@@ -45,7 +45,8 @@ Feature: Verify the case insensitive shortnames for certification completion imp
     When I log in as "admin"
     And I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/certification_mismatch_fields_1.csv" file to "Choose certification file to upload" filemanager
-    And I set the field "forcecaseinsensitivecertification" to "1"
+    And I set the field "Upload certification Default evidence type" to "0"
+    And I set the field "Upload certification Case insensitive shortnames" to "1"
     And I click on "Upload" "button" in the "#mform2" "css_element"
     Then I should see "CSV import completed"
     And I should see "0 Records with data errors - these were ignored"
@@ -102,6 +103,7 @@ Feature: Verify the case insensitive shortnames for certification completion imp
     When I log in as "admin"
     And I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/certification_mismatch_fields_1.csv" file to "Choose certification file to upload" filemanager
+    And I set the field "Upload certification Default evidence type" to "0"
     And I click on "Upload" "button" in the "#mform2" "css_element"
     Then I should see "CSV import completed"
     And I should see "9 Records with data errors - these were ignored"

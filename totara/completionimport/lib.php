@@ -392,6 +392,18 @@ function import_data_checks($importname, $importtime) {
         }
     }
 
+    // Do not create evidence option.
+    $evidencetype = get_default_config($pluginname, 'evidencetype', null);
+    if ($evidencetype == -1) {
+        $importidfield = $importname . 'id';
+        $params = array_merge($stdparams, array('errorstring' => 'nomatching' . $importname . ';'));
+        $sql = "UPDATE {{$tablename}}
+                SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . "
+                {$sqlwhere}
+                AND {$importidfield} IS NULL";
+        $DB->execute($sql, $params);
+    }
+
     // Set import error so we ignore any records that have an error message from above.
     $params = array_merge($stdparams, array('importerror' => 1));
     $sql = "UPDATE {{$tablename}}

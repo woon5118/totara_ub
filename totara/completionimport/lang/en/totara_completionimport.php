@@ -47,8 +47,9 @@ $string['caseinsensitivecertification_help'] = 'When enabled, certification shor
 This is an advanced setting and will cause performance issues during uploads. We strongly advise any case issues be corrected in the uploaded file.';
 $string['certification_results'] = 'Certification results';
 $string['certificationblankrefs'] = 'Blank certification shortname and certification ID number';
-$string['certificationexpired'] = 'Import certification expired, skipping importing';
 $string['certificationdueforrecert'] = 'Import certification due for renewal, skipping import';
+$string['certificationexpired'] = 'Import certification expired, skipping importing';
+$string['certificationfieldarialabel'] = 'Upload certification {$a}';
 $string['certificationloglifetime'] = 'Keep certification completion upload logs for';
 $string['certificationloglifetime_desc'] = 'This specifies the length of time to keep certification completion upload logs. Logs that are older than this will be automatically deleted.';
 $string['choosefile'] = 'Choose file to upload';
@@ -66,14 +67,17 @@ $string['completionimport_course'] = 'Completion import: Course status';
 $string['completionimport:import'] = 'Completion import';
 $string['course_results'] = 'Course results';
 $string['courseblankrefs'] = 'Blank course shortname and course ID number';
+$string['coursefieldarialabel'] = 'Upload course {$a}';
 $string['courseloglifetime'] = 'Keep course completion upload logs for';
 $string['courseloglifetime_desc'] = 'This specifies the length of time to keep course completion upload logs. Logs that are older than this will be automatically deleted.';
+$string['creategenericevidence'] = 'Create generic evidence';
 $string['csvdateformat'] = 'CSV Date format';
 $string['csvdelimiter'] = 'CSV Text Delimited with';
 $string['csvencoding'] = 'CSV File encoding';
 $string['csvimportdone'] = 'CSV import completed';
 $string['csvimportfailed'] = 'Failed to import the CSV file';
 $string['csvseparator'] = 'CSV Values separated by';
+$string['donotcreateevidence'] = 'Do not create evidence';
 $string['duplicate'] = 'Duplicate';
 $string['duplicateidnumber'] = 'Duplicate ID Number';
 $string['emptyfile'] = 'File is empty : {$a}';
@@ -108,9 +112,12 @@ Please choose a date/time evidence custom field to store the completiondate valu
 
 If the CVS file has a column specifying the custom field directly, this value will be used instead.';
 $string['evidencetype'] = 'Default evidence type';
-$string['evidencetype_help'] = 'Any courses or certificates that can\'t be found will be added as evidence in the record of learning.
+$string['evidencetype_help'] = 'Any courses or certificates that can\'t be found can be added as evidence in the record of learning.
 
-Please choose the default evidence type you wish to use.';
+If you do not want any evidence to be created by this import, select \'Do not create evidence\'.
+
+Otherwise, please choose the default evidence type you wish to use.';
+$string['fieldarialabel'] = '{$a}';
 $string['fieldcountmismatch'] = 'Field count mismatch';
 $string['fileisinuse'] = 'File is currently being used elsewhere : {$a}';
 $string['sourcefile'] = 'Source file name';
@@ -171,6 +178,8 @@ $string['missingrequiredcolumn'] = 'Missing required column \'{$a->columnname}\'
 $string['nomanualenrol'] = 'Course needs to have manual enrol';
 $string['nousername'] = 'No user name';
 $string['nocourse'] = 'No course';
+$string['nomatchingcertification'] = 'No matching certification';
+$string['nomatchingcourse'] = 'No matching course';
 $string['nothingtoimport'] = 'No pending files to import';
 $string['overrideactivecertification'] = 'Override active certifications';
 $string['overrideactivecourse'] = 'Override current course completions';
