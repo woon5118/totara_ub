@@ -2274,8 +2274,12 @@ $string['upcomingsessionsinasset'] = 'Upcoming sessions using this asset';
 $string['upcomingsessionsinroom'] = 'Upcoming sessions in this room';
 $string['upcomingsessionsinroomlist'] = 'A list of upcoming sessions taking place in this room';
 $string['updateactivities'] = 'Update all activities';
-$string['updateactivities_help'] = 'When checked, saving changes will update the content only, of all seminar activities that have notifications currently using this template. The \'status\' of seminar activity notifications will not be updated.';
-$string['updateactivitieswarning'] = '<b>Warning:</b> If you choose to \'update all activities\', all seminar activities that have notifications currently using this template will be updated with the changed content only within this site notification template. The \'status\' of seminar activity notifications will not be updated.';
+$string['updateactivities_help'] = 'When checked any saved content changes will update the corresponding content of all seminar activities which have notifications using this template. 
+
+The \'status\' of seminar activity notifications will not be affected.
+
+Seminar activity notifications whose title or content has been customised will not be affected.';
+$string['updateactivitieswarning'] = '<b>Warning:</b> When checked any saved content changes will update the corresponding content of all seminar activities which have notifications using this template. The \'status\' of seminar activity notifications will not be affected.';
 $string['updateattendeessuccessful'] = 'Successfully updated attendance';
 $string['updateattendeesunsuccessful'] = 'An error has occurred, attendance could not be updated';
 $string['updatejobassignment'] = 'Update job assignment';
