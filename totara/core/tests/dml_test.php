@@ -941,7 +941,11 @@ ORDER BY tt1.groupid";
 
         if (!isset($this->olddboptions)) {
             $cfg = $DB->export_dbconfig();
-            $this->olddboptions = $cfg->dboptions;
+            if (!empty($cfg->dboptions)) {
+                $this->olddboptions = $cfg->dboptions;
+            } else {
+                $this->olddboptions = [];
+            }
         }
 
         $reflection = new ReflectionClass($DB);
