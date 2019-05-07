@@ -185,8 +185,10 @@ $regionpanel = \totara_core\output\select_region_panel::create(
     [$multiselect1, $searchtext1, $treelist1, $treelist2],
     true,
     true,
-    false
+    true
 );
 
+$PAGE->requires->js_call_amd('totara_core/test_select_region_panel_toggle', 'init');
+echo $OUTPUT->render_from_template('totara_core/select_region_panel_toggle', '');
 echo $OUTPUT->render($regionpanel);
 echo $OUTPUT->footer();
