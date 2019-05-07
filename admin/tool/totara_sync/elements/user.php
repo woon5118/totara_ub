@@ -697,9 +697,9 @@ class totara_sync_element_user extends totara_sync_element {
             }
         }
 
-        // If there is no email, check the default email.
+        // If there is no email or the email is invalid, use the default email if defaultsyncemail is set.
         $usedefaultemail = !empty($this->config->allowduplicatedemails) && !empty($this->config->defaultsyncemail);
-        if (empty($suser->email) && empty($user->email) && $usedefaultemail) {
+        if ((empty($user->email) || !validate_email($user->email)) && $usedefaultemail) {
             $user->email = $this->config->defaultsyncemail;
         }
     }
@@ -794,19 +794,29 @@ class totara_sync_element_user extends totara_sync_element {
         if (!isset($this->config->ignoreexistingpass)) {
             $this->config->ignoreexistingpass = 0;
         }
-        if (property_exists($syncfields, 'email') && !$this->config->allowduplicatedemails) {
-            // Get duplicated emails.
-            $badids = $this->get_duplicated_values($synctable, $synctable_clone, 'LOWER(email)', 'duplicateuserswithemailx');
-            $invalidids = array_merge($invalidids, $badids);
-            // Get empty emails.
-            $badids = $this->check_empty_values($synctable, 'email', 'emptyvalueemailx');
-            $invalidids = array_merge($invalidids, $badids);
-            // Check emails against the DB to avoid saving repeated values.
-            $badids = $this->check_values_in_db($synctable, 'email', 'duplicateusersemailxdb');
-            $invalidids = array_merge($invalidids, $badids);
-            // Get invalid emails.
-            $badids = $this->get_invalid_emails($synctable);
-            $invalidids = array_merge($invalidids, $badids);
+
+        // Check email.
+        if (property_exists($syncfields, 'email')) {
+            // Settings a Default email for empty of invalid emails is not set so lets check all email are valid.
+            if (empty($this->config->defaultsyncemail)) {
+                $badids = $this->get_invalid_emails($synctable);
+                $invalidids = array_merge($invalidids, $badids);
+            }
+
+            // Duplicate emails not allowed.
+            if (!$this->config->allowduplicatedemails) {
+                // Check for empty emails.
+                $badids = $this->check_empty_values($synctable, 'email', 'emptyvalueemailx');
+                $invalidids = array_merge($invalidids, $badids);
+
+                // Check for duplicated emails from sync table.
+                $badids = $this->get_duplicated_values($synctable, $synctable_clone, 'LOWER(email)', 'duplicateuserswithemailx');
+                $invalidids = array_merge($invalidids, $badids);
+
+                // Check emails against the user table.
+                $badids = $this->check_values_in_db($synctable, 'email', 'duplicateusersemailxdb');
+                $invalidids = array_merge($invalidids, $badids);
+            }
         }
 
         // Get invalid options (in case of menu of choices).
