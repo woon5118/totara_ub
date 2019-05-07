@@ -37,20 +37,22 @@ $page   = optional_param('page', 0, PARAM_INT); // Current page number.
 
 $seminarevent = new seminar_event($s);
 $seminar = $seminarevent->get_seminar();
-$course = $DB->get_record('course', ['id' => $seminar->get_course()]);
 $cm = $seminar->get_coursemodule();
 $context =  context_module::instance($cm->id);
 
 $returnurl  = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $s, 'backtoallsessions' => 1));
 $currenturl = new moodle_url('/mod/facetoface/attendees/list/removeconfirm.php', array('s' => $s, 'listid' => $listid, 'page' => $page));
+
 // Check essential permissions.
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:removeattendees', $context);
 
+$pagetitle = get_string('removeattendeestep2', 'mod_facetoface');
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
+$PAGE->set_title(format_string($seminar->get_name()));
 
 $list = new bulk_list($listid);
 // Selected users.
@@ -78,11 +80,8 @@ if ($fromform = $mform->get_data()) {
     redirect($returnurl);
 }
 
-$PAGE->set_title(format_string($seminar->get_name()));
-$PAGE->set_heading($course->fullname);
-
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('removeattendeestep2', 'facetoface'));
+echo $OUTPUT->heading($pagetitle);
 
 /**
  * @var mod_facetoface_renderer $seminarrenderer
@@ -90,20 +89,16 @@ echo $OUTPUT->heading(get_string('removeattendeestep2', 'facetoface'));
 $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
 echo $seminarrenderer->render_seminar_event($seminarevent, false, false, true);
 
-// Table.
-$f2frenderer = $PAGE->get_renderer('mod_facetoface');
-$f2frenderer->setcontext($context);
-
 $users = $mform->get_user_list($userlist, $page, USERS_PER_PAGE);
 $paging = new paging_bar(count($userlist), $page, USERS_PER_PAGE, $currenturl);
 
+// Table.
+$f2frenderer = $PAGE->get_renderer('mod_facetoface');
 echo $f2frenderer->render($paging);
 echo $f2frenderer->print_userlist_table($users);
 echo $f2frenderer->render($paging);
 
-$link = html_writer::link($list->get_returnurl(), get_string('changeselectedusers', 'facetoface'), [
-    'class'=>'btn btn-default'
-]);
+$link = html_writer::link($list->get_returnurl(), get_string('changeselectedusers', 'mod_facetoface'), ['class' => 'btn btn-default']);
 echo html_writer::div($link,'form-group');
 
 $mform->display();

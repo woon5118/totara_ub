@@ -52,22 +52,20 @@ $notification = '';
 
 $seminarevent = new seminar_event($s);
 $seminareventid = $seminarevent->get_id();
-
 $seminar = $seminarevent->get_seminar();
-$course = $DB->get_record('course', ['id' => $seminar->get_course()]);
 $cm = $seminar->get_coursemodule();
 $context =  context_module::instance($cm->id);
 
-$helper = new attendees_helper($seminarevent);
-
 // Check essential permissions
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:addattendees', $context);
 
+$pagetitle = get_string('removeattendeestep1', 'mod_facetoface');
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/facetoface/attendees/list/remove.php', array('s' => $s, 'listid' => $listid));
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
+$PAGE->set_title(format_string($seminar->get_name()) . ': ' . $pagetitle);
 
 $list = new \mod_facetoface\bulk_list($listid, $currenturl, $action);
 
@@ -81,7 +79,6 @@ if ($frm = data_submitted()) {
             }
             $userstoremove[] = $removeuser;
         }
-
         $list->set_user_ids($userstoremove);
     }
     // Continue button.
@@ -113,7 +110,7 @@ $waitlist = 0;
 // until a date and time is applied to the session and they are displayed in the attendees list
 // rather than the waitlist. So, only enable the waitlist tab when the date and time for the
 // session is known and there are attendees with the waitlist status.
-
+$helper = new attendees_helper($seminarevent);
 $hassessions = $seminarevent->is_sessions();
 if ($hassessions) {
     $waitlistcount = $helper->count_attendees_with_codes([waitlisted::get_code()]);
@@ -202,11 +199,8 @@ $usercount = count($availableusers);
 
 $PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init', array(array('s' => $s, 'listid' => $listid)));
 
-$PAGE->set_title(format_string($seminarevent->get_seminar()->get_name()));
-$PAGE->set_heading($course->fullname);
-
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('removeattendeestep1', 'facetoface'));
+echo $OUTPUT->heading($pagetitle);
 
 if (!empty($notification)) {
     echo $OUTPUT->notification($notification, 'notifynotice');

@@ -40,9 +40,9 @@ Feature: Add seminar attendees in bulk and see results
     Then I should see "2 problem(s) encountered during import."
     When I click on "View results" "link"
     Then the following should exist in the "generaltable" table:
-      | ID number | Name          | Result                                                   |
-      | I1        | John1 Smith1  | This user is already signed-up for this seminar activity |
-      | I2        | John2 Smith2  | This user is already signed-up for this seminar activity |
+      | Name          | Result                                                   |
+      | John1 Smith1  | This user is already signed-up for this seminar activity |
+      | John2 Smith2  | This user is already signed-up for this seminar activity |
 
   Scenario: Conflict result when choosing Add users via list of IDs option
     Given I follow "View all events"
@@ -62,8 +62,8 @@ Feature: Add seminar attendees in bulk and see results
     Then I should see "1 problem(s) encountered during import."
     When I click on "View results" "link"
     Then the following should exist in the "generaltable" table:
-      | ID number | Name          | Result                                                   |
-      | I3        | John3 Smith3  | This user is already signed-up for this seminar activity |
+      | Name          | Result                                                   |
+      | John3 Smith3  | This user is already signed-up for this seminar activity |
 
   @_file_upload
   Scenario: Success result when choosing Add users via file upload option
@@ -80,9 +80,9 @@ Feature: Add seminar attendees in bulk and see results
     And I should see "Also uploaded via csv file" in the "John2 Smith2" "table_row"
     When I click on "View results" "link"
     Then the following should exist in the "generaltable" table:
-      | ID number | Name          | Result             |
-      | I1        | John1 Smith1  | Added successfully |
-      | I2        | John2 Smith2  | Added successfully |
+      | Name          | Result             |
+      | John1 Smith1  | Added successfully |
+      | John2 Smith2  | Added successfully |
 
   Scenario: Success result when choosing Add users via list of IDs option
     Given I follow "View all events"
@@ -97,8 +97,8 @@ Feature: Add seminar attendees in bulk and see results
     And I press "Confirm"
     When I click on "View results" "link"
     Then the following should exist in the "generaltable" table:
-      | ID number | Name          | Result             |
-      | I3        | John3 Smith3  | Added successfully |
+      | Name          | Result             |
+      | John3 Smith3  | Added successfully |
 
   Scenario: Success result when choosing Add users and Remove users options
     Given I follow "View all events"
@@ -115,10 +115,10 @@ Feature: Add seminar attendees in bulk and see results
     And I press "Confirm"
     When I click on "View results" "link"
     Then the following should exist in the "generaltable" table:
-      | ID number | Name          | Result              |
-      | I1        | John1 Smith1  | Added successfully  |
-      | I2        | John2 Smith2  | Added successfully  |
-      |           | John4 Smith4  | Added successfully  |
+      | Name          | Result              |
+      | John1 Smith1  | Added successfully  |
+      | John2 Smith2  | Added successfully  |
+      | John4 Smith4  | Added successfully  |
     And I press "Cancel"
     And I should see "John1 Smith1"
     And I should see "John2 Smith2"
@@ -133,7 +133,7 @@ Feature: Add seminar attendees in bulk and see results
     And I should see "John2 Smith2"
     And I click on "View results" "link"
     Then the following should exist in the "generaltable" table:
-      | ID number | Name          | Result                |
-      | I1        | John1 Smith1  | Removed successfully  |
+      | Name          | Result                |
+      | John1 Smith1  | Removed successfully  |
     And I press "Cancel"
     And I should not see "John1 Smith1"

@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* mod_facetoface_renderer::print_userlist_table() has been updated to respect the showuseridentity config
 * take_attendance::create() has been updated, added 'Upload attendance' button
 * bulk_list::returnurl() has been updated, removed url clone() as url already cloned in __construct()
 * attendees_add_confirm::get_user_list() function has been deprecated, please use attendees_list_helper::get_user_list()

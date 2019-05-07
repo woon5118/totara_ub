@@ -1440,16 +1440,23 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string
      */
     public function print_userlist_table($users, \mod_facetoface\bulk_list $list = null, $sessionid = 0, $jaselector = 0) {
-        global $OUTPUT;
+        global $OUTPUT, $PAGE;
+
         $out = '';
         $showcfdatawarning = false;
         if (count($users) > 0) {
+
+            $showemail = in_array('email', get_extra_user_fields($PAGE->context));
+            $showidnumber = in_array('idnumber', get_extra_user_fields($PAGE->context));
+
             $table = new html_table();
-            $table->head = array(
-                get_string('name'),
-                get_string('email'),
-                get_string('username'),
-                get_string('idnumber'));
+            $table->head = [get_string('name')];
+            if ($showemail) {
+                $table->head[] = get_string('email');
+            }
+            if ($showidnumber) {
+                $table->head[] = get_string('idnumber');
+            }
             if ($jaselector) {
                 $jacolumnheader = get_string('jobassignment', 'facetoface');
                 if ($jaselector == 2) {
@@ -1470,9 +1477,13 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $table->attributes = array('class' => 'generaltable userstoadd fullwidth');
 
             foreach ($users as $user) {
-                $fullname = fullname($user);
-                $row = array($fullname, $user->email, $user->username, s($user->idnumber));
-
+                $row = [fullname($user)];
+                if ($showemail) {
+                    $row[] = $user->email;
+                }
+                if ($showidnumber) {
+                    $row[] = s($user->idnumber);
+                }
                 if ($jaselector) {
                     $janame = '';
                     // Get previously stored jobassignmentid from user list. @see attendess/select_job_assignment.php.

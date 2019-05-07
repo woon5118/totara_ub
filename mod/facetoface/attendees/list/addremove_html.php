@@ -33,11 +33,7 @@ $strsearchresults = get_string('searchresults');
 // For backwards compatibility email is always shown here.
 // Otherwise those users without viewuseridentity would suddenly lose this information.
 // In 9.0 this is fixed, and only users with viewuseridentity will see the users email address.
-$extrafields = ['email'];
-if (!empty($CFG->showuseridentity) && has_capability('moodle/site:viewuseridentity', $PAGE->context)) {
-    $extrafields = explode(',', $CFG->showuseridentity);
-}
-
+$extrafields = get_extra_user_fields($PAGE->context) ?? ['email'];
 ?>
 <form id="assignform" method="post" action="<?php echo $PAGE->url; ?>">
 <div class="f2f-usersbox">
@@ -188,15 +184,8 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
  * @return string
  */
 function facetoface_output_user_for_selection(stdClass $user, array $extrafields = null, $fullnameoverride = false) {
-    global $CFG, $PAGE;
 
     $out = fullname($user, $fullnameoverride);
-    if ($extrafields === null) {
-        $extrafields = [];
-        if (!empty($CFG->showuseridentity) && has_capability('moodle/site:viewuseridentity', $PAGE->context)) {
-            $extrafields = explode(',', $CFG->showuseridentity);
-        }
-    }
     if ($extrafields) {
         $displayfields = array();
         foreach ($extrafields as $field) {

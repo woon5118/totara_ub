@@ -58,21 +58,21 @@ $userstoadd = array();
 $seminarevent = new seminar_event($s);
 $seminar = $seminarevent->get_seminar();
 $seminareventid = $seminarevent->get_id();
-$course = $DB->get_record('course', ['id' => $seminar->get_course()]);
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
 // Check essential permissions
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:addattendees', $context);
 
+$pagetitle = get_string('addattendeestep1', 'mod_facetoface');
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
+$PAGE->set_title(format_string($seminar->get_name()) . ': ' . $pagetitle);
 
 $list = new \mod_facetoface\bulk_list($listid, $currenturl, $action);
-$helper = new attendees_helper($seminarevent);
 
 if ($frm = data_submitted()) {
     require_sesskey();
@@ -138,6 +138,7 @@ $waitlist = 0;
 // until a date and time is applied to the session and they are displayed in the attendees list
 // rather than the waitlist. So, only enable the waitlist tab when the date and time for the
 // session is known and there are attendees with the waitlist status.
+$helper = new attendees_helper($seminarevent);
 $hassessions = $seminarevent->is_sessions();
 if ($hassessions) {
     $waitlistcount = $helper->count_attendees_with_codes([waitlisted::get_code()]);
@@ -249,11 +250,8 @@ if ($usercount <= MAX_USERS_PER_PAGE) {
 local_js(array(TOTARA_JS_DIALOG));
 $PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init', array(array('s' => $s, 'listid' => $listid)));
 
-$PAGE->set_title(format_string($seminarevent->get_seminar()->get_name()));
-$PAGE->set_heading($course->fullname);
-
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('addattendeestep1', 'facetoface'));
+echo $OUTPUT->heading($pagetitle);
 
 if (!empty($notification)) {
     echo $OUTPUT->notification($notification, 'notifynotice');

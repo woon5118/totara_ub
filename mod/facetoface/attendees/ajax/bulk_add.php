@@ -28,7 +28,6 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 // Face-to-face session ID
 $s = required_param('s', PARAM_INT);
 $listid = optional_param('listid', '',PARAM_ALPHANUM); // Session key to list of users to add.
-$bulkaddsource = 'bulkaddsourceidnumber';
 
 $seminarevent = new \mod_facetoface\seminar_event($s);
 $seminar = $seminarevent->get_seminar();
@@ -39,6 +38,7 @@ $context = context_module::instance($cm->id);
 require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:addattendees', $context);
 
+$error = null;
 if (!empty($listid)) {
     $list = new \mod_facetoface\bulk_list($listid);
     $userresults = $list->get_validation_results();
@@ -47,23 +47,23 @@ if (!empty($listid)) {
     // $bulkresults[0] is for added users and $bulkrestults[1] is for users with errors.
     // In this case, we want them combined into one list of users, each with their results.
     $userresults = array_merge($bulkresults[0], $bulkresults[1]);
-    if (!empty($results[2])) {
-        $bulkaddsource = $bulkresults[2];
-    }
 } else {
-    print_error('error:noimportresultsfound', 'facetoface');
+    $error = get_string('unknownbackupexporterror', 'error');
 }
 
-$table = new html_table();
-$table->head = array(get_string($bulkaddsource, 'facetoface'), get_string('name'), get_string('result', 'facetoface'));
-$table->data = array();
-
-foreach ($userresults as $result) {
-    $idnumber = new html_table_cell(s($result['idnumber']));
-    $name = new html_table_cell($result['name']);
-    $message = new html_table_cell($result['result']);
-    $row = new html_table_row(array($idnumber, $name, $message));
-    $table->data[] = $row;
+if ($error) {
+    $notification = new \core\output\notification($error, \core\output\notification::NOTIFY_ERROR);
+    echo $OUTPUT->render($notification);
+} else {
+    $table = new html_table();
+    $table->head = [get_string('name'), get_string('result', 'mod_facetoface')];
+    $table->data = [];
+    foreach ($userresults as $result) {
+        $name = new html_table_cell($result['name']);
+        $message = new html_table_cell($result['result']);
+        $row = new html_table_row(array($name, $message));
+        $table->data[] = $row;
+    }
+    echo $OUTPUT->render($table);
 }
 
-echo $OUTPUT->render($table);

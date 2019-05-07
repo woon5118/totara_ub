@@ -39,20 +39,22 @@ $ignoreconflicts = optional_param('ignoreconflicts', false, PARAM_BOOL); // Igno
 
 $seminarevent = new seminar_event($s);
 $seminar = $seminarevent->get_seminar();
-$course = $DB->get_record('course', ['id' => $seminar->get_course()]);
 $cm = $seminar->get_coursemodule();
 $context =  context_module::instance($cm->id);
 
 $returnurl  = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $s, 'backtoallsessions' => 1));
 $currenturl = new moodle_url('/mod/facetoface/attendees/list/addconfirm.php', array('s' => $s, 'listid' => $listid, 'page' => $page));
+
 // Check essential permissions.
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:addattendees', $context);
 
+$pagetitle = get_string('addattendeestep2', 'mod_facetoface');
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
+$PAGE->set_title(format_string($seminar->get_name()) . ': ' . $pagetitle);
 $PAGE->requires->js_call_amd('mod_facetoface/attendees_addconfirm', 'init', array(array('s' => $s, 'listid' => $listid)));
 
 $list = new bulk_list($listid);
@@ -83,11 +85,8 @@ if ($fromform = $mform->get_data()) {
     redirect($returnurl);
 }
 
-$PAGE->set_title(format_string($seminar->get_name()));
-$PAGE->set_heading($course->fullname);
-
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('addattendeestep2', 'facetoface'));
+echo $OUTPUT->heading($pagetitle);
 
 /**
  * @var mod_facetoface_renderer $seminarrenderer
@@ -108,16 +107,15 @@ if (!empty($seminar->get_forceselectjobassignment())) {
 } else if (!empty($seminar->get_selectjobassignmentonsignup())) {
     $jaselector = 1;
 }
-
+// Table.
+$f2frenderer = $PAGE->get_renderer('mod_facetoface');
 echo $f2frenderer->render($paging);
 echo $f2frenderer->print_userlist_table($users, $list, $seminarevent->get_id(), $jaselector);
 echo $f2frenderer->render($paging);
 
-$link = html_writer::link($list->get_returnurl(), get_string('changeselectedusers', 'facetoface'), [
-    'class'=>'btn btn-default'
-]);
-
+$link = html_writer::link($list->get_returnurl(), get_string('changeselectedusers', 'mod_facetoface'), ['class' => 'btn btn-default']);
 echo html_writer::div($link, 'form-group');
+
 $mform->display();
 
 echo $OUTPUT->footer();

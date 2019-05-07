@@ -496,19 +496,19 @@ Feature: Add - Remove seminar attendees
     And I set the following fields to these values:
       | searchtext | Sam |
     And I press "Search"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I click on "Sam1 Student1" "option"
     And I press "Add"
     And I wait "1" seconds
     And I press "Continue"
     And I should see "Sam1 Student1"
-    And I should see "student1@example.com"
-    And I should see "sid#1"
+    And I should not see "student1@example.com"
+    And I should not see "sid#1"
     And I press "Confirm"
     Then I should see "Sam1 Student1"
 
   # View existing attendees in "Users to add" select box
     When I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    Then I should see "Sam1 Student1, student1@example.com"
+    Then I should see "Sam1 Student1"
 
     When I press "Continue"
     Then I should see "Please select users before continuing."
@@ -518,12 +518,12 @@ Feature: Add - Remove seminar attendees
     And I set the following fields to these values:
       | searchtext | Sam |
     And I press "Search"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I click on "Sam1 Student1" "option"
     And I press "Remove"
     And I wait "1" seconds
     And I press "Continue"
     And I should see "Sam1 Student1"
-    And I should see "student1@example.com"
-    And I should see "sid#1"
+    And I should not see "student1@example.com"
+    And I should not see "sid#1"
     And I press "Confirm"
     Then I should not see "Sam1 Student1"

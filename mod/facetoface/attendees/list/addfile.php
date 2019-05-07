@@ -35,20 +35,22 @@ $importid = optional_param('importid', '', PARAM_INT);
 
 $seminarevent = new seminar_event($s);
 $seminar = $seminarevent->get_seminar();
-$course = $DB->get_record('course', ['id' => $seminar->get_course()]);
 $cm = $seminar->get_coursemodule();
 $context =  context_module::instance($cm->id);
 
 $returnurl  = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $s, 'backtoallsessions' => 1));
 $currenturl = new moodle_url('/mod/facetoface/attendees/list/addfile.php', array('s' => $s, 'listid' => $listid));
+
 // Check capability
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:addattendees', $context);
 
+$pagetitle = get_string('addattendeestep1', 'mod_facetoface');
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
+$PAGE->set_title(format_string($seminar->get_name()) . ': ' . $pagetitle);
 
 $mform = new attendees_add_file(null, ['s' => $s, 'listid' => $listid, 'seminar' => $seminar]);
 if ($mform->is_cancelled()) {
@@ -64,11 +66,8 @@ if ($formdata = $mform->get_data()) {
 local_js(array(TOTARA_JS_DIALOG));
 $PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init', array(array('s' => $s, 'listid' => $listid)));
 
-$PAGE->set_title(format_string($seminar->get_name()));
-$PAGE->set_heading($course->fullname);
-
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('addattendeestep1', 'mod_facetoface'));
+echo $OUTPUT->heading($pagetitle);
 
 /**
  * @var mod_facetoface_renderer $seminarrenderer
