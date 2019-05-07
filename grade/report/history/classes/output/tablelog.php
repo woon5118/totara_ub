@@ -473,11 +473,15 @@ class tablelog extends \table_sql implements \renderable {
         } else {
             $histories = $DB->get_records_sql($sql, $params, $this->pagesize * $this->page, $this->pagesize);
         }
+
+        $extrafields = get_extra_user_fields($this->context);
         foreach ($histories as $history) {
 
-            // TOTARA - Escape potential XSS in idnumber field.
-            if (!empty($history->idnumber)) {
-                $history->idnumber = s($history->idnumber);
+            // TOTARA - Escape potential XSS in extra identity fields.
+            foreach ($extrafields as $field) {
+                if (!empty($history->{$field})) {
+                    $history->{$field} = s($history->{$field});
+                }
             }
 
             $this->rawdata[] = $history;

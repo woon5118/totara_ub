@@ -672,11 +672,13 @@ if ($mode === MODE_USERDETAILS) {    // Print simple listing.
 
             if ($mode === MODE_BRIEF) {
                 foreach ($extrafields as $field) {
-                    $data[] = $user->{$field};
+                    // TOTARA - Escape potential XSS in extra identity fields.
+                    $data[] = s($user->{$field});
                 }
             }
             if ($mode === MODE_BRIEF && !isset($hiddenfields['city'])) {
-                $data[] = $user->city;
+                // TOTARA - Escape potential XSS in extra identity fields.
+                $data[] = s($user->city);
             }
             if ($mode === MODE_BRIEF && !isset($hiddenfields['country'])) {
                 $data[] = $country;

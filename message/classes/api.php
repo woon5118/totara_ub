@@ -648,7 +648,8 @@ class api {
         $userfields = user_get_user_details($user, null, array('city', 'country', 'email', 'lastaccess'));
         if ($userfields) {
             if (isset($userfields['city'])) {
-                $data->city = $userfields['city'];
+                // TOTARA - Escape potential XSS in the extra identity fields.
+                $data->city = s($userfields['city']);
             }
             if (isset($userfields['country'])) {
                 $data->country = $userfields['country'];

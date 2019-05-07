@@ -567,8 +567,33 @@ class assign_grading_table extends table_sql implements renderable {
         return get_string('hiddenuser', 'assign') . $row->recordid;
     }
 
-    // TOTARA - Escape potential XSS in idnumber field.
-    function col_idnumber($row) {
+    // TOTARA - Escape potential XSS in extra identity fields.
+    public function col_address($row) {
+        return s($row->address);
+    }
+
+    // TOTARA - Escape potential XSS in extra identity fields.
+    public function col_phone1($row) {
+        return s($row->phone1);
+    }
+
+    // TOTARA - Escape potential XSS in extra identity fields.
+    public function col_phone2($row) {
+        return s($row->phone2);
+    }
+
+    // TOTARA - Escape potential XSS in extra identity fields.
+    public function col_institution($row) {
+        return s($row->institution);
+    }
+
+    // TOTARA - Escape potential XSS in extra identity fields.
+    public function col_department($row) {
+        return s($row->department);
+    }
+
+    // TOTARA - Escape potential XSS in extra identity fields.
+    public function col_idnumber($row) {
         return s($row->idnumber);
     }
 

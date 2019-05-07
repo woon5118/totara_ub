@@ -154,7 +154,8 @@ class mod_assign_renderer extends plugin_renderer_base {
             $fullname = fullname($summary->user, $summary->viewfullnames);
             $extrainfo = array();
             foreach ($summary->extrauserfields as $extrafield) {
-                $extrainfo[] = $summary->user->$extrafield;
+                // TOTARA - Escape potential XSS in extra identity fields.
+                $extrainfo[] = s($summary->user->$extrafield);
             }
             if (count($extrainfo)) {
                 $fullname .= ' (' . implode(', ', $extrainfo) . ')';

@@ -194,7 +194,8 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     }
 
     if (!isset($hiddenfields['city']) && $user->city) {
-        $node = new core_user\output\myprofile\node('contact', 'city', get_string('city'), null, null, $user->city);
+        // TOTARA - Escape potential XSS in extra identity fields.
+        $node = new core_user\output\myprofile\node('contact', 'city', get_string('city'), null, null, s($user->city));
         $tree->add_node($node);
     }
 
@@ -205,34 +206,39 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     }
 
     if (isset($identityfields['address']) && $user->address) {
-        $node = new core_user\output\myprofile\node('contact', 'address', get_string('address'), null, null, $user->address);
+        // TOTARA - Escape potential XSS in extra identity fields.
+        $node = new core_user\output\myprofile\node('contact', 'address', get_string('address'), null, null, s($user->address));
         $tree->add_node($node);
     }
 
     if (isset($identityfields['phone1']) && $user->phone1) {
-        $node = new core_user\output\myprofile\node('contact', 'phone1', get_string('phone1'), null, null, $user->phone1);
+        // TOTARA - Escape potential XSS in extra identity fields.
+        $node = new core_user\output\myprofile\node('contact', 'phone1', get_string('phone1'), null, null, s($user->phone1));
         $tree->add_node($node);
     }
 
     if (isset($identityfields['phone2']) && $user->phone2) {
-        $node = new core_user\output\myprofile\node('contact', 'phone2', get_string('phone2'), null, null, $user->phone2);
+        // TOTARA - Escape potential XSS in extra identity fields.
+        $node = new core_user\output\myprofile\node('contact', 'phone2', get_string('phone2'), null, null, s($user->phone2));
         $tree->add_node($node);
     }
 
     if (isset($identityfields['institution']) && $user->institution) {
+        // TOTARA - Escape potential XSS in extra identity fields.
         $node = new core_user\output\myprofile\node('contact', 'institution', get_string('institution'), null, null,
-                $user->institution);
+                s($user->institution));
         $tree->add_node($node);
     }
 
     if (isset($identityfields['department']) && $user->department) {
+        // TOTARA - Escape potential XSS in extra identity fields.
         $node = new core_user\output\myprofile\node('contact', 'department', get_string('department'), null, null,
-            $user->department);
+            s($user->department));
         $tree->add_node($node);
     }
 
     if (isset($identityfields['idnumber']) && $user->idnumber) {
-        // TOTARA - Escape potential XSS in idnumber field.
+        // TOTARA - Escape potential XSS in extra identity fields.
         $node = new core_user\output\myprofile\node('contact', 'idnumber', get_string('idnumber'), null, null,
             s($user->idnumber));
         $tree->add_node($node);

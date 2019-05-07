@@ -1136,7 +1136,8 @@ class course_enrolment_manager {
         );
 
         foreach ($extrafields as $field) {
-            $details[$field] = $user->{$field};
+            // TOTARA - Escape potential XSS in extra identity fields.
+            $details[$field] = s($user->{$field});
         }
 
         // Last time user has accessed the site.

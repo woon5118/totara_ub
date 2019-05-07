@@ -190,7 +190,8 @@ function facetoface_output_user_for_selection(stdClass $user, array $extrafields
         $displayfields = array();
         foreach ($extrafields as $field) {
             if (!empty($user->{$field})) {
-                $displayfields[] = $user->{$field};
+                // TOTARA - Escape potential XSS in extra identity fields.
+                $displayfields[] = s($user->{$field});
             }
         }
         // This little bit of hardcoding is pretty bad, but its consistent with how Seminar was working and as this

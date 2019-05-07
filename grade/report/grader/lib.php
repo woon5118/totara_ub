@@ -769,12 +769,8 @@ class grade_report_grader extends grade_report {
                 $fieldcell->attributes['class'] = 'userfield user' . $field;
                 $fieldcell->header = false;
 
-                // TOTARA - Escape potential XSS in idnumber field.
-                if ($field == 'idnumber') {
-                    $fieldcell->text = s($user->{$field});
-                } else {
-                    $fieldcell->text = $user->{$field};
-                }
+                // TOTARA - Escape potential XSS in the extra identity fields.
+                $fieldcell->text = s($user->{$field});
 
                 $userrow->cells[] = $fieldcell;
             }
