@@ -1,0 +1,361 @@
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+ * @package totara_core
+ */
+
+define(['core/ajax', 'totara_core/filters', 'totara_core/basket_manager', 'totara_core/crumb_manager',
+'totara_core/action_list_manager', 'totara_core/filter_manager', 'totara_core/loader_manager'],
+function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
+
+    /**
+     * Class constructor for the basket list.
+     * This provides the base functionality for a basket list (item selection with session storage)
+     * This should be used when providing an interface for selecting individual items from a large data set.
+     * The selection will be stored in session and can be used for conducting bulk actions.
+     *
+     * @class
+     * @constructor
+     */
+    function BasketList() {
+        if (!(this instanceof BasketList)) {
+            return new BasketList();
+        }
+
+        this.basket = null;
+        this.hideClass = 'tw-basketlist__hide';
+        this.crumb = null;
+        this.filters = null;
+        this.loader = null;
+        this.listParent = null;
+        this.list = null;
+        this.selectors = null;
+    }
+
+    /**
+     * Set list parent node
+     *
+     * @param {node} parent
+     */
+    BasketList.prototype.setListParent = function(parent) {
+        this.listParent = parent.querySelector('[data-tw-basket-list]');
+    };
+
+    /**
+     * Reset list base
+     *
+     */
+    BasketList.prototype.reset = function() {
+        this.filters.clearFilters();
+        if (this.crumb) {
+            this.crumb.clearCrumbtrail();
+            this.crumb.setHeadingToTop();
+        }
+        this.selectors.clearFiltersRegionPanel();
+        this.selectors.clearPrimarySearch();
+        this.selectors.clearPrimaryTree();
+        this.list.disableToggleLevel();
+    };
+
+    /**
+     * Update page: Trigger all requests passed within the promises and if all
+     * if finished and all is rendered remove the loading indicator
+     *
+     * @param {Array} webserviceRequestObjects array of webservice request objects
+     * @return {Promise}
+     */
+    BasketList.prototype.updatePage = function(webserviceRequestObjects) {
+        var that = this;
+
+        return new Promise(function(resolve, reject) {
+            ajax.getDataUpdate(webserviceRequestObjects).then(function() {
+                that.loader.hide();
+                resolve();
+            }).catch(function() {
+                that.loader.hide();
+                reject();
+            });
+        });
+    };
+
+    BasketList.prototype.basketEvents = function(basket) {
+        var that = this;
+
+        /**
+         * Clears basket request values
+         */
+        basket.onBasketClear = function() {
+            that.loader.show();
+            ajax.getData(basket.updateDeleteBasket()).then(function(data) {
+                var callback = data.callbacks[0];
+                callback(data);
+                basket.onBasketHide();
+            });
+        };
+
+        /**
+         * Basket selection has been hidden
+         */
+        basket.onBasketHidden = function() {
+            if (that.crumb) {
+                that.crumb.removeClass(that.hideClass);
+                that.crumb.headingRemoveClass(that.hideClass);
+            }
+            that.selectors.primarySearchRemoveClass(that.hideClass);
+            that.selectors.primaryTreeRemoveClass(that.hideClass);
+        };
+
+        /**
+         * Hide basket selection
+         */
+        basket.onBasketHide = function() {
+            basket.toggleExpandedView();
+            basket.toggleShowBasketBtn();
+            that.reset();
+            that.list.enabledActions = true;
+            that.list.enabledHierarchy = true;
+            that.list.update();
+        };
+
+        /**
+         * Show basket selection
+         */
+        basket.onBasketShow = function() {
+            basket.toggleExpandedView();
+            basket.toggleShowBasketBtn();
+
+            that.selectors.primarySearchToggleClass(that.hideClass);
+            that.selectors.primaryTreeToggleClass(that.hideClass);
+
+            if (that.crumb) {
+                that.crumb.toggleClass(that.hideClass);
+                that.crumb.headingToggleClass(that.hideClass);
+            }
+
+            that.list.disableToggleLevel();
+
+            that.loader.show();
+            that.filters.clearFilters();
+            that.selectors.clearFiltersRegionPanel();
+            // Add basket to filters and show results
+            that.filters.setFilter('basket', basket.getBasketKey());
+            that.list.enabledActions = false;
+            that.list.enabledHierarchy = false;
+            that.list.update();
+        };
+
+        basket.onBasketUpdate = function() {
+            that.list.selectedItems = basket.getSelectedItems();
+        };
+    };
+
+    BasketList.prototype.filterEvents = function(filters) {
+        var that = this;
+        filters.onFiltersUpdate = function() {
+            that.list.setRequestArg('filters', filters.getFilters());
+        };
+    };
+
+    BasketList.prototype.listEvents = function(list) {
+        var that = this;
+
+        /**
+         * Select list level change
+         *
+         * @param {event} e
+         */
+        list.onListHierarchyLevelChange = function(e) {
+            // Clear filters & filter view
+            that.filters.clearFilters();
+            that.selectors.clearFiltersRegionPanel();
+            that.selectors.clearPrimarySearch();
+
+            // Set filters for requesting level
+            that.filters.setFilter(e.detail.key, e.detail.val, e.detail.groupValues);
+
+            // Set filters for requesting level parent for crumbtrail and heading
+            that.crumb.setParentId(e.detail.val);
+
+            list.resetToggleLevel();
+
+            that.loader.show();
+            that.updatePage([that.list.getUpdateRequestArgs(), that.crumb.updateCrumbAndHeader()]);
+        };
+
+        list.onItemSelected = function(id) {
+            that.basket.setBasketArgs('add', id);
+        };
+
+        list.onItemUnselected = function(id) {
+            that.basket.setBasketArgs('remove', id);
+        };
+
+        list.onItemUpdate = function() {
+            that.updatePage([that.basket.updateBasketValAndView()]);
+        };
+
+        list.onPreRequest = function() {
+            that.loader.show();
+        };
+
+        list.onPostRequest = function() {
+            that.loader.hide();
+        };
+
+    };
+
+    BasketList.prototype.selectorEvents = function(selectors) {
+        var that = this;
+
+        /**
+         * Added filter region panel filter
+         *
+         * @param {event} e
+         */
+        selectors.onFilterRegionPanelAdd = function(e) {
+            that.filters.setFilter(e.detail.key, e.detail.val, e.detail.groupValues);
+        };
+
+        /**
+         * Update with filter region panel
+         */
+        selectors.onFilterRegionPanelUpdate = function() {
+            that.list.update();
+        };
+
+        /**
+         * Reset filter region panel
+         *
+         * @param {event} e
+         */
+        selectors.onFilterRegionPanelReset = function(e) {
+            var groupValues = e.detail.groupValues ? e.detail.groupValues : '';
+            that.filters.removeFilter(e.detail.key, groupValues);
+        };
+
+        /**
+         * Added primary search filter
+         *
+         * @param {event} e
+         */
+        selectors.onPrimaryFilterSearchAdd = function(e) {
+            that.filters.setFilter(e.detail.key, e.detail.val, e.detail.groupValues);
+        };
+
+        /**
+         * Update with primary search change
+         */
+        selectors.onPrimaryFilterSearchUpdate = function() {
+            that.list.update();
+        };
+
+        /**
+         * Removed primary search filter
+         *
+         * @param {event} e
+         */
+        selectors.onPrimaryFilterSearchReset = function(e) {
+            var groupValues = e.detail.groupValues ? e.detail.groupValues : '';
+            that.filters.removeFilter(e.detail.key, groupValues);
+        };
+
+        /**
+         * Added primary tree filter
+         *
+         * @param {event} e
+         */
+        selectors.onPrimaryFilterTreeAdd = function(e) {
+            that.filters.setFilter(e.detail.key, e.detail.val, e.detail.groupValues);
+        };
+
+        /**
+         * Update with primary tree filter change
+         */
+        selectors.onPrimaryFilterTreeUpdate = function() {
+            that.list.update();
+        };
+
+        /**
+         * Removed primary tree filter
+         *
+         * @param {event} e
+         */
+        selectors.onPrimaryFilterTreeReset = function(e) {
+            var groupValues = e.detail.groupValues ? e.detail.groupValues : '';
+            that.filters.removeFilter(e.detail.key, groupValues);
+        };
+    };
+
+    /* Placeholder function for extending initializer */
+    BasketList.prototype.initExtend = function() { /* Null */ };
+
+    /**
+     * initialise from data
+     *
+     * @param {object} data required properties for list base
+     * @return {Promise}
+     */
+    BasketList.prototype.init = function(data) {
+        var parent = data.parent,
+            behatString = data.basketKey + 'Pause',
+            that = this;
+
+        return new Promise(function(resolve) {
+            M.util.js_pending(behatString);
+            that.setListParent(parent);
+
+            that.loader = Loader.init(parent);
+            that.loader.show();
+
+            that.filters = new Filters();
+            that.filterEvents(that.filters);
+
+            that.basket = Basket.init(parent, data.basketKey);
+            that.basketEvents(that.basket);
+
+            if (data.crumbtrail) {
+                that.crumb = Crumb.init(parent, data.crumbtrail);
+            }
+
+            // A list selector base requires checkboxes
+            data.list.map.hasCheckboxes = true;
+
+            that.list = List.init(parent, data.list);
+            that.listEvents(that.list);
+
+            that.selectors = Selectors.init(parent);
+            that.selectorEvents(that.selectors);
+
+            that.initExtend();
+            resolve();
+
+            // Make sure all strings are loaded before doing the request
+            var promiseList = [that.list.prepare()];
+            if (data.crumbtrail) {
+                promiseList.push(that.crumb.loadCrumbStrings());
+            }
+            Promise.all(promiseList).then(function() {
+                that.updatePage([that.basket.updateBasketView(), that.list.getUpdateRequestArgs()]);
+                M.util.js_complete(behatString);
+            });
+        });
+    };
+
+    return BasketList;
+});
