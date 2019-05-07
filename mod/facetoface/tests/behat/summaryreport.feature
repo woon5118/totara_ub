@@ -179,7 +179,7 @@ Feature: Seminar sessions report overview
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
 
     # 3: (2nd activity of C1) Bookings available, upcoming
     And I follow "Add event"

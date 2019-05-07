@@ -67,11 +67,11 @@ echo $OUTPUT->heading($title);
 
 require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
 
-/** @var mod_facetoface_renderer $seminarrenderer */
+/** @var mod_facetoface_renderer $renderer */
 $renderer = $PAGE->get_renderer('mod_facetoface');
 $renderer->setcontext($context);
 echo $renderer->render_seminar_event($seminarevent, true, false, true);
-echo \html_writer::link($seminarurl, get_string('viewallsessions', 'mod_facetoface'), ['role' => 'button', 'class' => 'btn btn-default']);
+echo $renderer->render_action_bar_on_tabpage($seminarurl);
 echo $OUTPUT->footer();
 
 \mod_facetoface\event\attendees_viewed::create_from_session((object)['id' => $seminarevent->get_id()], $context, $action)->trigger();

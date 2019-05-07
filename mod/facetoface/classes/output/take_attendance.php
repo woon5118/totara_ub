@@ -66,13 +66,10 @@ class take_attendance extends template {
                                   take_attendance_session_picker $sessionpicker = null): take_attendance {
         global $USER;
 
-        $backurl = new \moodle_url("/mod/facetoface/view.php");
-        $backurl->param('f', $seminarevent->get_seminar()->get_id());
         $uploadattendanceurl = new \moodle_url('/mod/facetoface/attendees/list/import_attendance.php', ['s' => $seminarevent->get_id()]);
 
         $data = [
             'url' => $url->out(),
-            'backurl' => $backurl->out(),
             'sessionid' => $seminarevent->get_id(),
             'sessiondateid' => $sessiondateid,
             'formattributes' => [],

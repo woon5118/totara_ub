@@ -212,7 +212,9 @@ if (signup_helper::can_signup($signup)) {
     echo $seminarrenderer->render_signup_failures(signup_helper::get_failures($signup));
 }
 
-echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'mod_facetoface'), ['title' => get_string('goback', 'mod_facetoface')]);
+$f2f_renderer = $PAGE->get_renderer('mod_facetoface');
+$f2f_renderer->setcontext($context);
+echo $f2f_renderer->render_action_bar_on_tabpage($returnurl);
 
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer($course);

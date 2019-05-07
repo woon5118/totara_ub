@@ -142,7 +142,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
 
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -257,7 +257,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
 
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -316,7 +316,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I press "Continue"
     And I press "Confirm"
 
-    And I follow "Go back"
+    And I follow "View all events"
     And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:

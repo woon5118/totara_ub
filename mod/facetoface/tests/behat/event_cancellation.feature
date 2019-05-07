@@ -62,7 +62,7 @@ Feature: Seminar event cancellation basic
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
 
     When I log out
     And I log in as "admin"
@@ -163,7 +163,7 @@ Feature: Seminar event cancellation basic
     And I press "Continue"
     And I press "Confirm"
 
-    When I follow "Go back"
+    When I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland" in the "11 March 2026" "table_row"
     And I should see "2 / 39" in the "11 March 2026" "table_row"
@@ -237,7 +237,7 @@ Feature: Seminar event cancellation basic
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
 
     When I log out
     And I log in as "admin"
@@ -323,7 +323,7 @@ Feature: Seminar event cancellation basic
     And I press "Continue"
     And I press "Confirm"
 
-    When I follow "Go back"
+    When I follow "View all events"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see date "0 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "12:05 AM - 11:55 PM Pacific/Auckland"
@@ -383,7 +383,7 @@ Feature: Seminar event cancellation basic
     And I press "Continue"
     And I press "Confirm"
 
-    When I follow "Go back"
+    When I follow "View all events"
     Then I should see date "0 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Booking open"
     And I should see "2 / 39" in the "Booking open" "table_row"

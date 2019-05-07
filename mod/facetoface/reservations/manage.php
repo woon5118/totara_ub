@@ -56,5 +56,7 @@ echo $output->heading(format_string($seminar->get_name()));
 $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
 echo $seminarrenderer->render_seminar_event($seminarevent, false);
 echo $output->print_reservation_management_table($reservations);
-echo $output->single_button($backurl, get_string('goback', 'mod_facetoface'), 'post');
+$seminarrenderer->setcontext($context);
+echo html_writer::empty_tag('hr');
+echo $seminarrenderer->render_action_bar_on_tabpage($backurl);
 echo $output->footer();

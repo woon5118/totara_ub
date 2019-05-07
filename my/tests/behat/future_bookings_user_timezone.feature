@@ -65,7 +65,7 @@ Feature: My Future Bookings seminar sessions report overview
     And I press "Continue"
     And I press "Confirm"
     And I wait until "Alice Smith" "text" exists
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
 
     And I click on "Attendees" "link" in the "Europe/Prague" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"

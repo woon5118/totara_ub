@@ -229,6 +229,12 @@ if ($actionallowed) {
  */
 if (!$onlycontent) {
     echo $OUTPUT->container_end();
+
+    $backurl = new \moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]);
+    $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
+    $f2f_renderer->setcontext($context);
+    echo $f2f_renderer->render_action_bar_on_tabpage($backurl);
+
     echo $OUTPUT->footer();
     \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
 }

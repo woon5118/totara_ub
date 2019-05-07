@@ -93,7 +93,7 @@ Feature: Add - Remove manager reservations in Seminar
 
     When I follow "Manage reservations"
     Then I should see "2" in the "Max Manager" "table_row"
-    And I press "Go back"
+    And I press "View all events"
 
     When I click on "Allocate spaces for team" "link"
     And I click on "Sam1 Student1" "option"

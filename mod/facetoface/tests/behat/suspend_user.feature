@@ -53,7 +53,7 @@ Feature: Suspend user in different session times
     And I press "Confirm"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
 
     # Session is wait-listed
     And I follow "Add event"
@@ -74,7 +74,7 @@ Feature: Suspend user in different session times
     And I follow "Wait-list"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
 
     # Session in the past
     And I follow "Add event"
@@ -106,7 +106,7 @@ Feature: Suspend user in different session times
     And I press "Confirm"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
 
     # Session in progress
     And I follow "Add event"
@@ -138,7 +138,7 @@ Feature: Suspend user in different session times
     And I press "Confirm"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
 
     # Suspend Sam1 Student1 user
     And I navigate to "Manage users" node in "Site administration > Users"
@@ -153,19 +153,19 @@ Feature: Suspend user in different session times
     Then I should not see "Sam1 Student1"
     And I should see "Sam2 Student2"
 
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
 
     When I click on "Attendees" "link" in the "Wait-listed" "table_row"
     And I follow "Wait-list"
     Then I should not see "Sam1 Student1"
     And I should see "Sam2 Student2"
 
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
     When I click on "Attendees" "link" in the "Event over" "table_row"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
 
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
 
     When I click on "Attendees" "link" in the "Event in progress" "table_row"
     Then I should see "Sam1 Student1"

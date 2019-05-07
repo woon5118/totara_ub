@@ -114,7 +114,7 @@ Feature: Seminar event cancellation learner views
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
 
     Given I log out
     And I log in as "admin"
@@ -147,7 +147,7 @@ Feature: Seminar event cancellation learner views
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
 
     Given I log out
     And I log in as "admin"
@@ -185,7 +185,7 @@ Feature: Seminar event cancellation learner views
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
     And I click on "Cancel event" "link" in the "10 April 2030" "table_row"
     And I press "Yes"
 
@@ -218,7 +218,7 @@ Feature: Seminar event cancellation learner views
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
 
     Given I log out
     And I log in as "admin"

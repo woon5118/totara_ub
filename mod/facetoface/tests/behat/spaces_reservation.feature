@@ -115,7 +115,7 @@ Feature: Reserve spaces for team in seminar
     When I click on "Wait-list" "link"
     Then I should see "Sam2 Student2"
 
-    When I click on "Go back" "link"
+    When I click on "View all events" "link"
     Then I follow "Manage reservations"
     And I click on "Delete" "link"
     And I press "Continue"

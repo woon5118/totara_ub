@@ -200,13 +200,13 @@ Feature: Return to previous page after actions in seminar
   Scenario: Seminar attendees back link return to original page - top level only
     Given I am on "Course 1" course homepage
     When I click on "Attendees" "link" in the "Booking open" "table_row"
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
     Then I should see "View all events"
     And I should not see "All events in"
 
     Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on "Attendees" "link" in the "Booking open" "table_row"
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
     Then I should see "All events in"
     And I should not see "View all events"

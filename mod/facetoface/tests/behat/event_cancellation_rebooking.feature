@@ -63,7 +63,7 @@ Feature: Seminar event cancellation rebooking
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
 
     Given I log out
     And I log in as "learner3"
@@ -138,7 +138,7 @@ Feature: Seminar event cancellation rebooking
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
     Then I should see "2 / 19" in the "10 February 2030" "table_row"
 
   # ----------------------------------------------------------------------------

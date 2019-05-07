@@ -77,7 +77,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I should see "Sam3 Student3"
 
     # Move event back in time.
-    And I follow "Go back"
+    And I follow "View all events"
     And I click on "Edit" "link" in the ".lastrow" "css_element"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:

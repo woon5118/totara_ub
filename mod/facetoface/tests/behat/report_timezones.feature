@@ -106,7 +106,7 @@ Feature: Seminar timezones in reports
     And I press "Continue"
     And I press "Confirm"
     And I wait until "First User" "text" exists
-    And I click on "Go back" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "Room 2" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Second User, user2@example.com" "option"

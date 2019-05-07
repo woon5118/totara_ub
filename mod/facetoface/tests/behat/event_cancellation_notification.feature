@@ -96,7 +96,7 @@ Feature: Seminar event cancellation notifications
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
-    And I follow "Go back"
+    And I follow "View all events"
 
     Given I log out
     And I log in as "learner3"

@@ -158,7 +158,9 @@ if ($backtoallsessions) {
 } else {
     $url = new moodle_url('/course/view.php', array('id' => $seminar->get_course()));
 }
-echo html_writer::link($url, get_string('goback', 'facetoface'));
+$f2f_renderer = $PAGE->get_renderer('mod_facetoface');
+$f2f_renderer->setcontext($context);
+echo $f2f_renderer->render_action_bar_on_tabpage($url);
 
 echo $OUTPUT->footer();
 

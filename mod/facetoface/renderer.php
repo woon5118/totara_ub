@@ -1658,6 +1658,26 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Action bar html output for seminar tab pages.
+     *
+     * @param string|\moodle_url $goback_url the URL for the 'View all events' button (a.k.a 'Go back' button)
+     * @return string
+     */
+    public function render_action_bar_on_tabpage($goback_url): string {
+        $id = html_writer::random_id('id-');
+
+        $actionbar = \mod_facetoface\output\seminarevent_actionbar::builder($id)
+            ->set_align('near')
+            ->add_commandlink(
+                'goback',
+                $goback_url,
+                get_string('viewallsessions', 'mod_facetoface')
+            );
+
+        return $this->render($actionbar->build());
+    }
+
+    /**
      * Action bar html output.
      *
      * @param \mod_facetoface\seminar $seminar

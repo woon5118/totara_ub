@@ -31,7 +31,6 @@
     Context variables required for this template:
     * url: The base url of taking attendance
     * sessionid: Seminar's event id
-    * backurl: The seminar url, which allow user to view all the events
     * sessiondateid: The session date id of the current event, this could be zero.
     * formattributes: The list of form attributes
     * formattributes -> name: The name of attribute that need to be in the form
@@ -90,11 +89,6 @@
 
                 <input type="submit" name="cancelform"
                        value="{{#str}} cancelattendance, mod_facetoface {{/str}}">
-
-                <a href="{{backurl}}" role="button"
-                   class="btn btn-default mod_facetoface__action_goback">
-                    {{#str}} backtoseminar, mod_facetoface {{/str}}
-                </a>
             </div>
     </form>
 

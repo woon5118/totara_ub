@@ -72,7 +72,7 @@ Feature: Export seminar attendees
     When I follow "Attendees"
     Then I should not see "Job assignment"
 
-    When I follow "Go back"
+    When I follow "View all events"
     And I click on "Excel" "option" in the "#menudownload" "css_element"
     And I click on "Export to file" "button"
     Then I should not see "Can not find data record in database"
@@ -106,7 +106,7 @@ Feature: Export seminar attendees
     Then "//th[contains(@class, 'session_positionnameedit')]/a[contains(.,'Job assignment')]" "xpath_element" should exist
     And I should not see "job1" in the "Sam1 Student1" "table_row"
 
-    When I follow "Go back"
+    When I follow "View all events"
     And I click on "Excel" "option" in the "#menudownload" "css_element"
     And I click on "Export to file" "button"
     Then I should not see "Can not find data record in database"
@@ -147,7 +147,7 @@ Feature: Export seminar attendees
     Then "//th[contains(@class, 'session_positionnameedit')]/a[contains(.,'Job assignment')]" "xpath_element" should exist
     And I should see "job1" in the "Sam1 Student1" "table_row"
 
-    When I follow "Go back"
+    When I follow "View all events"
     And I click on "Excel" "option" in the "#menudownload" "css_element"
     And I click on "Export to file" "button"
     Then I should not see "Can not find data record in database"
