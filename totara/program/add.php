@@ -163,7 +163,7 @@ if ($data = $form->get_data()) {
     if (isset($data->savechanges)) {
 
         $availablefrom = ($data->availablefrom) ? $data->availablefrom : 0;
-        $availableuntil = ($data->availableuntil) ? $data->availableuntil : 0;
+        $availableuntil = ($data->availableuntil) ? $data->availableuntil + (DAYSECS - 1) : 0;
 
         $program_todb = new stdClass;
         $program_todb->category = $data->category;
