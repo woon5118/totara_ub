@@ -140,6 +140,42 @@ $functions = [
         'type' => 'write',
     ],
 
+    'totara_core_basket_show' => [
+        'classname'     => \totara_core\basket\external::class,
+        'methodname'    => 'show',
+        'description'   => 'Returns the contents of the basket with the given id',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true
+    ],
+
+    'totara_core_basket_update' => [
+        'classname'     => \totara_core\basket\external::class,
+        'methodname'    => 'update',
+        'description'   => 'Update the basket by adding or removing the given ids',
+        'type'          => 'write',
+        'loginrequired' => true,
+        'ajax'          => true
+    ],
+
+    'totara_core_basket_delete' => [
+        'classname'     => \totara_core\basket\external::class,
+        'methodname'    => 'delete',
+        'description'   => 'Deletes a basket, effectively clears all items',
+        'type'          => 'write',
+        'loginrequired' => true,
+        'ajax'          => true
+    ],
+
+    'totara_core_basket_copy' => [
+        'classname'     => \totara_core\basket\external::class,
+        'methodname'    => 'copy',
+        'description'   => 'Copy one basket into another, optionally replacing existing items',
+        'type'          => 'write',
+        'loginrequired' => true,
+        'ajax'          => true
+    ],
+
     'totara_core_test_lists_manager' => [
         'classname'     => 'totara_core_tests_fixtures_external',
         'classpath'     => 'totara/core/tests/fixtures/external.php',
@@ -161,6 +197,7 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => 'moodle/site:config',
     ],
+
 ];
 
 $services = [
