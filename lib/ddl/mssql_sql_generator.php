@@ -1195,18 +1195,12 @@ class mssql_sql_generator extends sql_generator {
      * @param bool $switch If accent sensitivity should be enabled/disabled.
      * @return array
      */
-    public function getFTSChangeAccentSensitivitySQL(bool $switch): array {
+    public function get_fts_change_accent_sensitivity_sql(bool $switch): array {
         $sqls = [];
 
         // First confirm if accent sensitivity is not already on the correct setting.
         if ($switch === $this->mdb->is_fts_accent_sensitive()) {
             return $sqls;
-        }
-
-        // Confirm current version.
-        $serverinfo = $this->mdb->get_server_info();
-        if (version_compare($serverinfo['version'], '08', '<')) {
-            throw new coding_exception("FULLTEXT CATALOG requires SQL Server 2008 or later");
         }
 
         // Rebuild catalog with accent_sensitivity on/off.

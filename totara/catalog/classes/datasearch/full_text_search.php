@@ -42,9 +42,7 @@ class full_text_search extends filter {
     /** @var array */
     protected $joinparams = null;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $fieldsandweights = false;
 
     /**
@@ -179,7 +177,7 @@ class full_text_search extends filter {
 
         $params = [];
         if (false !== stripos($this->currentdata, '*')) {
-            // Refresh FTS source joing because join snippet, params, and values depend on exact search term,
+            // Refresh FTS source joining because the join snippet, params, and values depend on exact search term,
             // which was initially unreachable. Only refresh if the currentdata has asterisk in it.
             [$this->joinsql, $this->joinparams] = $DB->get_fts_subquery(
                 $this->basealias,

@@ -1417,7 +1417,7 @@ abstract class sql_generator {
      * @param bool $switch If accent sensitivity should be enabled/disabled.
      * @return array
      */
-    public function getFTSChangeAccentSensitivitySQL(bool $switch): array {
+    public function get_fts_change_accent_sensitivity_sql(bool $switch): array {
         // Override as necessary
         return [];
     }

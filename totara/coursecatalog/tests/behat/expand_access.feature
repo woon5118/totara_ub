@@ -15,7 +15,7 @@ Feature: Users can expand the course info in course catalog
     And I log in as "admin"
     And I set the following administration settings values:
       | Guest login button | Show     |
-      | Catalogue type     | enhanced |
+      | catalogtype        | enhanced |
     And I log out
 
   @javascript

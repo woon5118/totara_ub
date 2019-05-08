@@ -8,7 +8,7 @@ Feature: Administrators can add a custom location field to complete during room 
     Given I am on a totara site
     And I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
 
     # Set up first custom field
     When I navigate to "Custom fields" node in "Site administration > Courses"

@@ -61,7 +61,7 @@ Feature: Check that searching for hidden course when toggling course catalog wor
     # Configure visibility to normal vis.
     Given I set the following administration settings values:
       | audiencevisibility | 0      |
-      | Catalogue type     | moodle |
+      | catalogtype        | moodle |
     And I log out
 
     # Seeing the course catalog as sys manager.
@@ -158,7 +158,7 @@ Feature: Check that searching for hidden course when toggling course catalog wor
   # Configure visibility to normal vis.
     Given I set the following administration settings values:
       | audiencevisibility | 0        |
-      | Catalogue type     | enhanced |
+      | catalogtype        | enhanced |
     And I log out
 
   # Seeing the enhanced catalog as sys manager.
@@ -239,7 +239,7 @@ Feature: Check that searching for hidden course when toggling course catalog wor
     # Configure visibility audience visibility.
     Given I set the following administration settings values:
       | audiencevisibility | 1        |
-      | Catalogue type     | enhanced |
+      | catalogtype        | enhanced |
     And I log out
 
     # Seeing the enhanced catalog as sys manager.
@@ -292,7 +292,7 @@ Feature: Check that searching for hidden course when toggling course catalog wor
         # Configure visibility audience visibility.
     Given I set the following administration settings values:
       | audiencevisibility | 1        |
-      | Catalogue type     | enhanced |
+      | catalogtype        | enhanced |
     And I log out
 
     # Seeing the enhanced catalog as catmanager.

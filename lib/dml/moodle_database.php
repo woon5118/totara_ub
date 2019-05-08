@@ -66,10 +66,10 @@ define('BATCH_INSERT_MAX_ROW_COUNT', 250);
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class moodle_database {
-    /** @var int Mode for boolean search */
+    /** @var int Mode for boolean full-text search */
     public const SEARCH_MODE_BOOLEAN = 2;
 
-    /** @var int Mode for natural search */
+    /** @var int Mode for natural full-text search */
     public const SEARCH_MODE_NATURAL = 1;
 
     /** @var database_manager db manager which allows db structure modifications. */

@@ -785,18 +785,12 @@ class postgres_sql_generator extends sql_generator {
      * @param bool $switch If accent sensitivity should be enabled/disabled.
      * @return array
      */
-    public function getFTSChangeAccentSensitivitySQL(bool $switch): array {
+    public function get_fts_change_accent_sensitivity_sql(bool $switch): array {
         $sqls = [];
 
         // First confirm if accent sensitivity is not already on the correct setting.
         if ($switch === $this->mdb->is_fts_accent_sensitive()) {
             return $sqls;
-        }
-
-        // Confirm current version.
-        $serverinfo = $this->mdb->get_server_info();
-        if (version_compare($serverinfo['version'], '9.4', '<')) {
-            throw new coding_exception("Extension 'unaccent' requires PostgreSQL version 9.4 or later");
         }
 
         // Drop extension if accent sensitivity required otherwise create it.

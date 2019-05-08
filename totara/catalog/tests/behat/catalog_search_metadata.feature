@@ -23,8 +23,7 @@ Feature: Catalog metadata search
     And I click on "Find Learning" in the totara menu
     And I set the field with xpath "//*[@id='catalog_fts_input']" to "hello"
     When I click on "Search" "button" in the "#region-main" "css_element"
-    Then I should see "1 item"
-    And I should see "C103"
+    Then I should see "C103"
 
   Scenario: Create a program with search terms and search for the term
     Given I navigate to "Programs > Manage programs" in site administration
@@ -35,8 +34,7 @@ Feature: Catalog metadata search
     And I click on "Find Learning" in the totara menu
     And I set the field with xpath "//*[@id='catalog_fts_input']" to "world"
     When I click on "Search" "button" in the "#region-main" "css_element"
-    Then I should see "1 item"
-    And I should see "Program fullname 101"
+    Then I should see "Program fullname 101"
 
   Scenario: Create a certification with search terms and search for the term
     Given I navigate to "Certifications > Manage certifications" in site administration
@@ -47,5 +45,4 @@ Feature: Catalog metadata search
     And I click on "Find Learning" in the totara menu
     And I set the field with xpath "//*[@id='catalog_fts_input']" to "hello"
     When I click on "Search" "button" in the "#region-main" "css_element"
-    Then I should see "1 item"
-    And I should see "Certification program fullname 101"
+    Then I should see "Certification program fullname 101"

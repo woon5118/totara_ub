@@ -122,7 +122,7 @@ Feature: Use the reportbuilder date filter
       | Course 19 | C19       | 1484737200 |
     And I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
     And I click on "Courses" in the totara menu
     And I press "Edit this report"
     And I switch to "Filters" tab
@@ -251,7 +251,7 @@ Feature: Use the reportbuilder date filter
     Given I am on a totara site
     And I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
     And I click on "Courses" in the totara menu
     And I click on "Edit this report" "link_or_button"
     And I switch to "Filters" tab
@@ -269,7 +269,7 @@ Feature: Use the reportbuilder date filter
     Given I am on a totara site
     And I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
     And I click on "Courses" in the totara menu
     And I click on "Edit this report" "link_or_button"
     And I switch to "Filters" tab

@@ -26,7 +26,7 @@ Feature: Users can auto-enrol themselves in courses where enrolment via plugins 
     And I follow "Manage enrol plugins"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
       | Guest login button | Show |
     And I log out
 

@@ -136,6 +136,16 @@ $CFG->dboptions = array(
 //       If the value changes then you need to run: admin/cli/fts_repopulate_tables.php
 //    $CFG->dboptions['fts3bworkaround'] = true;
 //
+// MySQL also has the full-text parser plugin ngram, which make the search easier for Chinese, Japanese, and Korean languages.
+// It is also useful for tokenising concatenated words. More information about ngram parser can be found in MySQL documentation.
+// To use ngram support, enable the following setting:
+//    $CFG->dboptions['ftsngram'] = true;
+//
+// NOTE: After changing the configuration of ngram support after Totara had been installed, you will need to run the
+// following scripts in the listed order:
+//    1. admin/cli/fts_rebuild_indexes.php
+//    2. admin/cli/fts_repopulate_tables.php
+//
 // MS SQL Server is using 'English' language by default, list of options is at
 // https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-fulltext-languages-transact-sql?view=sql-server-2017
 //    $CFG->dboptions['ftslanguage'] = 'English';
@@ -153,6 +163,8 @@ $CFG->dboptions = array(
 // following setting according to your requirement:
 //    $CFG->dboptions['ftsaccentsensitivity'] = true;
 //    $CFG->dboptions['ftsaccentsensitivity'] = false;
+//    $CFG->dboptions['ftsaccentsensitivity'] = 1;
+//    $CFG->dboptions['ftsaccentsensitivity'] = 0;
 //    $CFG->dboptions['ftsaccentsensitivity'] = 'dbdefault';
 //
 // NOTE: After changing the accent sensitivity setting you need to run the following scripts in the listed order:

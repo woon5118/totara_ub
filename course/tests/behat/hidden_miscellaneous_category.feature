@@ -27,7 +27,7 @@ Feature: Check that hiding the Miscellaneous category does not break Find Learni
   @javascript
   Scenario: Check that learner can view the Moodle Catalogue without exception when Miscellaneous is hidden
     Given I set the following administration settings values:
-      | Catalogue type     | moodle |
+      | catalogtype | moodle |
     Then I log out
     And I log in as "user1"
     And I click on "Courses" in the totara menu
@@ -46,7 +46,7 @@ Feature: Check that hiding the Miscellaneous category does not break Find Learni
   @javascript
   Scenario: Check that learner can view the Enhanced Catalogue without exception when Miscellaneous is hidden
     Given I set the following administration settings values:
-      | Catalogue type     | enhanced |
+      | catalogtype | enhanced |
     Then I log out
     And I log in as "user1"
     And I click on "Courses" in the totara menu
@@ -62,7 +62,7 @@ Feature: Check that hiding the Miscellaneous category does not break Find Learni
   @javascript
   Scenario: Check that learner can view the Totara Catalog without exception when Miscellaneous is hidden
     Given I set the following administration settings values:
-      | Catalogue type     | totara |
+      | catalogtype | totara |
     Then I log out
     And I log in as "user1"
     And I click on "Find Learning" in the totara menu

@@ -1291,10 +1291,11 @@ class database_manager {
     /**
      * Change DB to enable/disable accent sensitive searches.
      *
+     * @since Totara 12
      * @param bool $switch If accent sensitivity should be enabled/disabled.
      */
     public function fts_change_accent_sensitivity(bool $switch) {
-        $sqlarr = $this->generator->getFTSChangeAccentSensitivitySQL($switch);
+        $sqlarr = $this->generator->get_fts_change_accent_sensitivity_sql($switch);
         if (!empty($sqlarr)) {
             $this->execute_sql_arr($sqlarr);
         }

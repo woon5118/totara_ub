@@ -42,5 +42,9 @@ $watchers = [
     [
         'hookname' => '\totara_program\hook\program_edit_form_save_changes',
         'callback' => '\totara_catalog\watcher\program_form_watcher::process_searchmetadata_for_program'
+    ],
+    [
+        'hookname' => '\totara_core\hook\fts_repopulation',
+        'callback' => '\totara_catalog\watcher\fts_watcher::rebuild_catalog'
     ]
 ];
