@@ -668,8 +668,6 @@ M.core_filepicker.init = function(Y, options) {
                 params['newfilename'] = data.newfile.filename;
                 params['newfilepath'] = data.newfile.filepath;
                 this.hide_header();
-                // Pause the behat.
-                window.M.util.js_pending('filepicker_process_existing_file_overwrite');
                 this.request({
                     'params': params,
                     'scope': this,
@@ -689,8 +687,6 @@ M.core_filepicker.init = function(Y, options) {
                                 'file':data.existingfile.filename};
                         var formcallback_scope = scope.options.magicscope ? scope.options.magicscope : scope;
                         scope.options.formcallback.apply(formcallback_scope, [fileinfo]);
-                        // Release the behat.
-                        window.M.util.js_complete('filepicker_process_existing_file_overwrite');
                     }
                 }, true);
             }
@@ -1169,6 +1165,8 @@ M.core_filepicker.init = function(Y, options) {
             // register event on clicking submit button
             getfile.on('click', function(e) {
                 e.preventDefault();
+                // Pause behat.
+                window.M.util.js_pending('filepicker_getfile_on');
                 var client_id = this.options.client_id;
                 var scope = this;
                 var repository_id = this.active_repo.id;
@@ -1216,6 +1214,8 @@ M.core_filepicker.init = function(Y, options) {
                         selectnode.removeClass('loading');
                         if (obj.event == 'fileexists') {
                             scope.process_existing_file(obj);
+                            // Release behat.
+                            window.M.util.js_complete('filepicker_getfile_on');
                             return;
                         }
                         if (scope.options.editor_target && scope.options.env=='editor') {
@@ -1226,6 +1226,8 @@ M.core_filepicker.init = function(Y, options) {
                         obj.client_id = client_id;
                         var formcallback_scope = args.scope.options.magicscope ? args.scope.options.magicscope : args.scope;
                         scope.options.formcallback.apply(formcallback_scope, [obj]);
+                        // Release behat.
+                        window.M.util.js_complete('filepicker_getfile_on');
                     }
                 }, false);
             }, this);
@@ -1759,6 +1761,8 @@ M.core_filepicker.init = function(Y, options) {
             var scope = this;
             content.one('.fp-upload-btn').on('click', function(e) {
                 e.preventDefault();
+                // Pause behat.
+                window.M.util.js_pending('filepicker_file_upload_on');
                 var license = content.one('.fp-setlicense select');
 
                 this.set_preference('recentlicense', license.get('value'));
@@ -1781,6 +1785,8 @@ M.core_filepicker.init = function(Y, options) {
                             if (o.event == 'fileexists') {
                                 scope.create_upload_form(data);
                                 scope.process_existing_file(o);
+                                // Release behat.
+                                window.M.util.js_complete('filepicker_file_upload_on');
                                 return;
                             }
                             if (scope.options.editor_target&&scope.options.env=='editor') {
@@ -1791,6 +1797,8 @@ M.core_filepicker.init = function(Y, options) {
                             o.client_id = client_id;
                             var formcallback_scope = args.scope.options.magicscope ? args.scope.options.magicscope : args.scope;
                             scope.options.formcallback.apply(formcallback_scope, [o]);
+                            // Release behat.
+                            window.M.util.js_complete('filepicker_file_upload_on');
                         }
                 }, true);
             }, this);
