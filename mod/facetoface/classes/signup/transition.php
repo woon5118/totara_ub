@@ -52,6 +52,7 @@ final class transition {
 
     /**
      * Transition must be created using tansition::to() factory function
+     * @param state $state
      */
     private function __construct(state $state) {
         $this->to = $state;
@@ -72,7 +73,7 @@ final class transition {
      *
      * Conditions are lazy-initialised when they needed, because most of them will not be needed
      *
-     * @param string[] $conditions condition classes
+     * @param string $conditions ... condition classes
      * @return transition
      */
     public function with_conditions(string ...$conditions) : transition {
@@ -85,7 +86,7 @@ final class transition {
      *
      * Restrictions are lazy-initialised when they needed, because most of them will not be needed
      *
-     * @param string[] $restrictions all restrictions
+     * @param string $restrictions ... all restrictions
      * @return transition
      */
     public function with_restrictions(string ...$restrictions) : transition {
@@ -201,7 +202,7 @@ final class transition {
      * Get target signup state
      * @return state
      */
-    public function get_to() {
+    public function get_to(): state {
         return $this->to;
 
     }

@@ -59,8 +59,7 @@ final class event_time_filter extends filter {
     }
 
     /**
-     * @return array
-     * @inheritdoc
+     * @inheritDoc
      */
     public function get_where_and_params(int $time): array {
         return $this->filter->get_where_and_params($time);

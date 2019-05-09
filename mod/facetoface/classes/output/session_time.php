@@ -39,11 +39,11 @@ class session_time {
     /**
      * Format the session time according to specific timezone.
      *
-     * @param int $start
-     * @param int $end
+     * @param int $start Unix timestamp to start
+     * @param int $end Unix timestamp to finish
      * @param int|string|float|DateTimeZone $timezone
-     * @param bool $displaytimezones
-     * @return \stdClass
+     * @param boolean|null $displaytimezones true to display timezone, null to use facetoface_displaysessiontimezones config
+     * @return \stdClass of startdate, starttime, enddate, endtime and timezone
      */
     public static function format(int $start, int $end, $timezone, bool $displaytimezones = null): \stdClass {
         if ($displaytimezones === null) {
@@ -70,10 +70,11 @@ class session_time {
     }
 
     /**
-     * Returns self::format in string lang format
-     * @param int $start date/time
-     * @param int $end date/time
-     * @param string $timezone date/time
+     * Format the session time as localised string according to specific timezone.
+     *
+     * @param int $start Unix timestamp to start
+     * @param int $end Unix timestamp to finish
+     * @param string $timezone Timezone string e.g. "Pacific/Auckland"
      * @return string
      */
     public static function to_string(int $start, int $end, string $timezone): string {
@@ -98,10 +99,11 @@ class session_time {
     }
 
     /**
-     * Returns seminar event sing-up period
-     * @param $startdate date/time
-     * @param $finishdate date/time
-     * @param int $timezone date/time
+     * Format the sign-up period time as localised string according to specific timezone.
+     *
+     * @param int|string|null $startdate - string or Unix timestamp
+     * @param int|string|null $finishdate - string or Unix timestamp
+     * @param int|string|float|DateTimeZone $timezone
      * @param string $format - export format
      * @return string
      */
@@ -140,12 +142,12 @@ class session_time {
     }
 
     /**
-     * Format the session time as HTML.
+     * Format the session time as HTML according to specific timezone.
      *
-     * @param string|integer $startdate
-     * @param string|integer $finishdate
-     * @param integer|string|float|DateTimeZone $timezone
-     * @param boolean|null $displaytimezones
+     * @param int $timestart Unix timestamp to start
+     * @param int $timefinish Unix timestamp to finish
+     * @param int|string|float|DateTimeZone $timezone
+     * @param boolean|null $displaytimezones true to display timezone, null to use facetoface_displaysessiontimezones config
      * @return string
      */
     public static function to_html(int $timestart, int $timefinish, $timezone = 99, bool $displaytimezones = null): string {
@@ -191,7 +193,9 @@ class session_time {
     }
 
     /**
-     * @param string $time
+     * Wrap a date/time string with a <time> tag.
+     *
+     * @param string $time  The date/time string
      * @return string
      */
     private static function wrap_eventtime(string $time): string {
@@ -216,7 +220,7 @@ class session_time {
      * @uses \mod_facetoface\rb\display\event_date
      * @uses \mod_facetoface\rb\display\event_date_link
      *
-     * @param $value - timestamp
+     * @param int|string|null $value - timestamp
      * @param string $format - export format
      * @param int|string $timezone 99 - force 99 for reportbuilder local_session_date() display
      * @param bool $sessiontimezone true|false - force false for reportbuilder local_session_date() display
@@ -268,7 +272,7 @@ class session_time {
      * @uses \mod_facetoface\export_helper::download_ods
      * @uses \mod_facetoface\rb\display\event_time
      *
-     * @param $value - timestamp
+     * @param int|string|null $value - timestamp
      * @param string $format - export format
      * @param int|string $timezone 99 - force 99 for reportbuilder local_session_date() display
      * @param bool $sessiontimezone true|false - force false for reportbuilder local_session_date() display
@@ -320,7 +324,7 @@ class session_time {
      * @uses \mod_facetoface\export_helper::download_ods
      * @uses \mod_facetoface\rb\display\session_date
      *
-     * @param $value - timestamp
+     * @param int|string|null $value - timestamp
      * @param string $format - export format
      * @param int|string $timezone 99 - force 99 for reportbuilder local_session_date() display
      * @param bool $sessiontimezone true|false - force false for reportbuilder local_session_date() display
@@ -369,12 +373,12 @@ class session_time {
      * Return MS Excel export value
      * @param int $value - timestamp
      * @param int $excelformat 14|15|16|17|22|24
-        * $numbers[14] = 'm/d/yyyy';
-        * $numbers[15] = 'd-mmm-yy';
-        * $numbers[16] = 'd-mmm';
-        * $numbers[17] = 'mmm-yy';
-        * $numbers[22] = 'm/d/yyyy h:mm';
-        * $numbers[24] = 'h:mm';
+     * - $numbers[14] = 'm/d/yyyy';
+     * - $numbers[15] = 'd-mmm-yy';
+     * - $numbers[16] = 'd-mmm';
+     * - $numbers[17] = 'mmm-yy';
+     * - $numbers[22] = 'm/d/yyyy h:mm';
+     * - $numbers[24] = 'h:mm';
      * @return array
      */
     private static function export_excel(int $value, int $excelformat = MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATETIME): array {
@@ -388,13 +392,13 @@ class session_time {
      * Return ODS export value
      * @param int $value
      * @param int $odsformat 14|15|16|17|22|24|26
-        * $numbers[14] = 'mm-dd-yy';
-        * $numbers[15] = 'd-mmm-yy';
-        * $numbers[16] = 'd-mmm';
-        * $numbers[17] = 'mmm-yy';
-        * $numbers[22] = 'm/d/yy h:mm';
-        * $numbers[24] = 'h:mm';
-        * $numbers[26] = 'm/d/yy';
+     * - $numbers[14] = 'mm-dd-yy';
+     * - $numbers[15] = 'd-mmm-yy';
+     * - $numbers[16] = 'd-mmm';
+     * - $numbers[17] = 'mmm-yy';
+     * - $numbers[22] = 'm/d/yy h:mm';
+     * - $numbers[24] = 'h:mm';
+     * - $numbers[26] = 'm/d/yy';
      * @return array
      */
     private static function export_ods(int $value, int $odsformat = 22): array {

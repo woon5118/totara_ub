@@ -32,10 +32,13 @@ use mod_facetoface\signup\transition;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is used in booking class and responsible for exact state
+ * This class represents the initial state.
  */
 class not_set extends state {
 
+    /**
+     * @inheritDoc
+     */
     final public function get_map() : array {
         return [
             // Straight-forward booking
@@ -105,6 +108,7 @@ class not_set extends state {
      * Code of status as it is stored in DB
      * Numeric statuses are backward compatible except not_set which was not meant to be written into DB.
      * Statuses don't have to follow particular order (except must be unique of course)
+     * @return integer
      */
     public static function get_code() : int {
         return 0;

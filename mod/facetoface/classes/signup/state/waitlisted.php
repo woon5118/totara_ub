@@ -39,7 +39,7 @@ use mod_facetoface\event\abstract_signup_event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is used in booking class and responsible for exact state
+ * This class represents wait-listed state.
  */
 class waitlisted extends state implements interface_event {
     /**
@@ -48,6 +48,7 @@ class waitlisted extends state implements interface_event {
      * waitlisted -- Booking basic conditions --> booked
      * waitlisted --> user_cancelled
      * waitlisted -- Session is cancelled --> event_cancelled
+     * @return array
      */
     final public function get_map() : array {
         return [
@@ -83,6 +84,7 @@ class waitlisted extends state implements interface_event {
      * Code of status as it is stored in DB
      * Numeric statuses are backward compatible except not_set which was not meant to be written into DB.
      * Statuses don't have to follow particular order (except must be unique of course)
+     * @return integer
      */
     public static function get_code() : int {
         return 60;

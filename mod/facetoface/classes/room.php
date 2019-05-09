@@ -190,7 +190,7 @@ final class room implements seminar_iterator_item {
     /**
      * Store room into database
      */
-    public function save() {
+    public function save(): void {
         global $USER;
 
         $this->usermodified = $USER->id;
@@ -207,7 +207,7 @@ final class room implements seminar_iterator_item {
     /**
      * Deletes a seminar room.
      */
-    public function delete() {
+    public function delete(): void {
         global $DB;
 
         // Nothing to delete.
@@ -229,7 +229,7 @@ final class room implements seminar_iterator_item {
     /**
      * Deletes all custom fields related to a room.
      */
-    private function delete_customfields() {
+    private function delete_customfields(): void {
         global $DB, $CFG;
 
         // Room doesn't exist.
@@ -253,7 +253,7 @@ final class room implements seminar_iterator_item {
     /**
      * Deletes all files embedded in the room description.
      */
-    private function delete_embedded_files() {
+    private function delete_embedded_files(): void {
         // Room doesn't exist.
         if ($this->id == 0) {
             return;
@@ -291,7 +291,7 @@ final class room implements seminar_iterator_item {
     /**
      * @param string $name
      */
-    public function set_name(string $name) {
+    public function set_name(string $name): void {
         $this->name = $name;
     }
 
@@ -309,7 +309,7 @@ final class room implements seminar_iterator_item {
     /**
      * @param int $capacity
      */
-    public function set_capacity(int $capacity) {
+    public function set_capacity(int $capacity): void {
         $this->capacity = $capacity;
     }
 
@@ -321,9 +321,9 @@ final class room implements seminar_iterator_item {
     }
 
     /**
-     * @param int $allowconflicts
+     * @param bool $allowconflicts
      */
-    public function set_allowconflicts(bool $allowconflicts) {
+    public function set_allowconflicts(bool $allowconflicts): void {
         $this->allowconflicts = (int)$allowconflicts;
     }
 
@@ -337,7 +337,7 @@ final class room implements seminar_iterator_item {
     /**
      * @param string $description
      */
-    public function set_description(string $description) {
+    public function set_description(string $description): void {
         $this->description = $description;
     }
 
@@ -421,7 +421,7 @@ final class room implements seminar_iterator_item {
     /**
      * @param int $usermodified
      */
-    public function set_usermodified(int $usermodified) {
+    public function set_usermodified(int $usermodified): void {
         $this->usermodified = $usermodified;
     }
 
@@ -442,7 +442,7 @@ final class room implements seminar_iterator_item {
     /**
      * @param int $timemodified
      */
-    public function set_timemodified(int $timemodified) {
+    public function set_timemodified(int $timemodified): void {
         $this->timemodified = $timemodified;
     }
 
@@ -454,7 +454,7 @@ final class room implements seminar_iterator_item {
      *
      * @param int $timestart
      * @param int $timefinish
-     * @param seminar_event $sessionid
+     * @param seminar_event $event
      * @return bool
      */
     public function is_available(int $timestart, int $timefinish, seminar_event $event) : bool {

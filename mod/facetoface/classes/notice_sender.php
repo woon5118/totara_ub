@@ -428,9 +428,8 @@ class notice_sender {
     /**
      * Send registration closure notice to user, manager, all session admins.
      *
-     * @param object $facetoface    Facetoface instance
-     * @param object $session       Session instance
-     * @param int    $recipientid   The id of the user requesting a booking
+     * @param seminar_event $seminarevent   Session instance
+     * @param int           $recipientid    The id of the user requesting a booking
      */
     public static function registration_closure(seminar_event $seminarevent, $recipientid) {
         global $DB, $USER;

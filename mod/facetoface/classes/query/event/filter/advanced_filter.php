@@ -61,8 +61,7 @@ final class advanced_filter extends filter {
     }
 
     /**
-     * @return array
-     * @inheritdoc
+     * @inheritDoc
      */
     public function get_where_and_params(int $time): array {
         global $DB;

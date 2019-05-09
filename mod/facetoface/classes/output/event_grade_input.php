@@ -34,15 +34,17 @@ use mod_facetoface\signup_status;
  */
 class event_grade_input extends \core\output\template {
     /**
-     * @param event_attendee $attendee
-     * @param signup_status  $status
-     * @param bool           $disabled  Set false to disable the input field
+     * Instantiate event_grade_input.
+     *
+     * @param event_attendee        $attendee
+     * @param signup_status|null    $status
+     * @param bool                  $disabled  Set false to disable the input field
      *
      * @return event_grade_input
      */
     public static function create(event_attendee $attendee,
                                   signup_status $status = null,
-                                  bool $disabled = false) {
+                                  bool $disabled = false): event_grade_input {
 
         $value = $status !== null ? $status->get_grade() : null;
 

@@ -156,6 +156,7 @@ final class seminar_session implements seminar_iterator_item {
      * Set seminar event id (known as sessionid)
      *
      * @param int $sessionid
+     * @return seminar_session
      */
     public function set_sessionid(int $sessionid): seminar_session {
         $this->sessionid = $sessionid;
@@ -164,14 +165,15 @@ final class seminar_session implements seminar_iterator_item {
 
     /**
      * Get timezone for this session date
-     * @return int
+     * @return string
      */
     public function get_sessiontimezone(): string {
         return (string)$this->sessiontimezone;
     }
     /**
      * Set timezone for this session date
-     * @param int $sessiontimezone
+     * @param string $sessiontimezone
+     * @return seminar_session
      */
     public function set_sessiontimezone(string $sessiontimezone): seminar_session {
         $this->sessiontimezone = $sessiontimezone;
@@ -198,6 +200,7 @@ final class seminar_session implements seminar_iterator_item {
      * Set room id for this session date
      *
      * @param int $roomid
+     * @return seminar_session
      */
     public function set_roomid(int $roomid): seminar_session {
         $this->roomid = $roomid;
@@ -216,6 +219,7 @@ final class seminar_session implements seminar_iterator_item {
      * Set start time for this session date
      *
      * @param int $timestart
+     * @return seminar_session
      */
     public function set_timestart(int $timestart): seminar_session {
         $this->timestart = $timestart;
@@ -234,6 +238,7 @@ final class seminar_session implements seminar_iterator_item {
      * Set end time for this session date
      *
      * @param int $timefinish
+     * @return seminar_session
      */
     public function set_timefinish(int $timefinish): seminar_session {
         $this->timefinish = $timefinish;

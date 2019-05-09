@@ -40,7 +40,7 @@ use mod_facetoface\event\abstract_signup_event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is used in booking class and responsible for exact state
+ * This class represents booked state.
  */
 class booked extends state implements interface_event {
     /**
@@ -69,6 +69,7 @@ class booked extends state implements interface_event {
      * booked -- Event session in the past <br/> Event is not cancelled --> fully_attended
      * booked -- Attendee request/Session in future <br/> Event is not cancelled --> user_cancelled
      * booked -- Event is cancelled --> event_cancelled
+     * @return array
      */
     final public function get_map() : array {
         $transitions = $this->get_transitions_to_attendance_states();
@@ -117,6 +118,7 @@ class booked extends state implements interface_event {
      * Code of status as it is stored in DB
      * Numeric statuses are backward compatible except not_set which was not meant to be written into DB.
      * Statuses don't have to follow particular order (except must be unique of course)
+     * @return integer
      */
     public static function get_code() : int {
         return 70;

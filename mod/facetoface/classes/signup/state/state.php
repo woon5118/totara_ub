@@ -50,7 +50,7 @@ abstract class state {
      * Get signup which current state belongs to
      * @return signup
      */
-    final public function get_signup() {
+    final public function get_signup(): signup {
         return $this->signup;
     }
 
@@ -70,7 +70,7 @@ abstract class state {
     /**
      * Get state class from code
      * @param int $code The code to create a state of.
-     * @return string[]
+     * @return string
      */
     final public static function from_code(int $code) : string {
         $allstates = self::get_all_states();
@@ -187,6 +187,7 @@ abstract class state {
 
     /**
      * Callback called on event when signup has switched to current state.
+     * @return mixed
      */
     public function on_enter() {
         // Override if required.
@@ -209,6 +210,7 @@ abstract class state {
 
     /**
      * Get conditions and validations of transitions from current state
+     * @return array
      */
     abstract public function get_map() : array;
 
@@ -216,6 +218,7 @@ abstract class state {
      * Code of status as it is stored in DB
      * Numeric statuses are backward compatible except not_set which was not meant to be written into DB.
      * Statuses don't have to follow particular order (except must be unique of course)
+     * @return integer
      */
     abstract public static function get_code() : int;
 

@@ -23,6 +23,7 @@
 
 namespace mod_facetoface\dashboard\filters;
 
+use context;
 use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\filter\room_filter as query_room_filter;
@@ -128,7 +129,7 @@ final class room_filter implements filter {
     /**
      * @inheritDoc
      */
-    public static function is_visible(seminar $seminar, \context $context, ?int $userid): bool {
+    public static function is_visible(seminar $seminar, context $context, ?int $userid): bool {
         return true;
     }
 

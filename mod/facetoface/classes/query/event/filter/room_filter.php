@@ -25,6 +25,9 @@ namespace mod_facetoface\query\event\filter;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Filter by room.
+ */
 final class room_filter extends filter {
     /**
      * @var int
@@ -54,8 +57,7 @@ final class room_filter extends filter {
     }
 
     /**
-     * @return array
-     * @inheritdoc
+     * @inheritDoc
      */
     public function get_where_and_params(int $time): array {
         if (0 == $this->roomid) {

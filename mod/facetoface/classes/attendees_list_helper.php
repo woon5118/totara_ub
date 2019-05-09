@@ -36,24 +36,27 @@ use \context_module;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Additional attendees list functionality.
+ */
 final class attendees_list_helper {
 
     /**
      * Add attendees to seminar event via html form.
      *
      * @param \stdClass $data submitted users to add to seminar event:
-     *      @var s seminar event id
-     *      @var listid list id
-     *      @var isapprovalrequired
-     *      @var enablecustomfields
-     *      @var ignoreconflicts
-     *      @var is_notification_active
-     *      @var notifyuser
-     *      @var notifymanager
-     *      @var ignoreapproval
+     *      - s seminar event id
+     *      - listid list id
+     *      - isapprovalrequired
+     *      - enablecustomfields
+     *      - ignoreconflicts
+     *      - is_notification_active
+     *      - notifyuser
+     *      - notifymanager
+     *      - ignoreapproval
      *      customfields optional
      */
-    public static function add($data) {
+    public static function add(\stdClass $data): void {
         global $USER, $DB, $CFG;
 
         $seminarevent = new seminar_event($data->s);
@@ -182,12 +185,12 @@ final class attendees_list_helper {
      * Add attendees to seminar event via file.
      *
      * @param \stdClass $formdata users to add to seminar event via file
-     *      @var s seminar event id
-     *      @var listid list id
-     *      @var requiredcfnames
+     *      - s seminar event id
+     *      - listid list id
+     *      - requiredcfnames
      *      data via file
      */
-    public static function add_file($formdata) {
+    public static function add_file(\stdClass $formdata): void {
         global $DB;
 
         $importid = optional_param('importid', '', PARAM_INT);
@@ -368,11 +371,11 @@ final class attendees_list_helper {
      * Add attendees to seminar event via textarea input.
      *
      * @param \stdClass $data submitted users to add to seminar event via textarea input
-     *      @var s seminar event id
-     *      @var listid list id
-     *      @var csvinput textarea input
+     *      - s seminar event id
+     *      - listid list id
+     *      - csvinput textarea input
      */
-    public static function add_list($data) {
+    public static function add_list(\stdClass $data): void {
         global $DB;
 
         $seminarevent = new seminar_event($data->s);
@@ -457,13 +460,13 @@ final class attendees_list_helper {
      * Remove attendees from seminar event.
      *
      * @param \stdClass $data submitted remove users confirmation form data
-     *      @var s seminar event id
-     *      @var listid list id
-     *      @var notifyuser
-     *      @var notifymanager
+     *      - s seminar event id
+     *      - listid list id
+     *      - notifyuser
+     *      - notifymanager
      *      customfields optional
      */
-    public static function remove($data) {
+    public static function remove(\stdClass $data): void {
 
         $listid = $data->listid;
         $seminarevent = new seminar_event($data->s);
@@ -553,7 +556,7 @@ final class attendees_list_helper {
      *
      * @deprecated since Totara 13
      */
-    public static function get_status($allbooked = false) {
+    public static function get_status(bool $allbooked = false): array {
 
         debugging('attendees_list_helper::get_status() function has been deprecated, please use attendees_helper::get_status()',
             DEBUG_DEVELOPER);
@@ -567,7 +570,7 @@ final class attendees_list_helper {
      *
      * @deprecated since Totara 13
      */
-    public static function process_no_sessionid(string $page = 'view') {
+    public static function process_no_sessionid(string $page = 'view'): void {
         debugging('attendees_list_helper::process_no_sessionid() function has been deprecated, please use attendees_helper::process_no_sessionid()',
             DEBUG_DEVELOPER);
 
@@ -575,13 +578,13 @@ final class attendees_list_helper {
     }
 
     /**
-     * @param $action
+     * @param mixed $action
      * @param seminar $seminar
      * @param seminar_event $seminar_event
      *
      * @deprecated since Totara 13
      */
-    public static function process_js($action, \mod_facetoface\seminar $seminar, \mod_facetoface\seminar_event $seminar_event) {
+    public static function process_js($action, \mod_facetoface\seminar $seminar, \mod_facetoface\seminar_event $seminar_event): void {
         debugging('attendees_list_helper::process_js() function has been deprecated, please use attendees_helper::process_js()',
             DEBUG_DEVELOPER);
 
@@ -596,14 +599,14 @@ final class attendees_list_helper {
      *
      * @param seminar $seminar
      * @param seminar_event $seminarevent
-     * @param $context
-     * @param $session
+     * @param mixed $context
+     * @param mixed $session
      * @return array
      *
      * @deprecated since Totara 13
      */
     public static function get_allowed_available_actions(\mod_facetoface\seminar $seminar,
-        \mod_facetoface\seminar_event $seminarevent, $context, $session) {
+        \mod_facetoface\seminar_event $seminarevent, $context, $session): array {
 
         debugging('attendees_list_helper::get_allowed_available_actions() function has been deprecated, please use attendees_helper::get_allowed_available_actions()',
             DEBUG_DEVELOPER);
@@ -616,7 +619,7 @@ final class attendees_list_helper {
      * @param array $results
      * @param string $type
      */
-    public static function set_bulk_result_notification($results, $type = 'bulkadd') {
+    public static function set_bulk_result_notification(array $results, string $type = 'bulkadd'): void {
         $added          = $results[0];
         $errors         = $results[1];
         $result_message = '';
@@ -650,12 +653,12 @@ final class attendees_list_helper {
 
     /**
      * Get user list by their ids
-     * @param $userlist
+     * @param mixed $userlist
      * @param int $offset
      * @param int $limit
      * @return array
      */
-    public static function get_user_list($userlist, $offset = 0, $limit = 0): array {
+    public static function get_user_list($userlist, int $offset = 0, int $limit = 0): array {
         global $DB;
 
         $usernamefields = get_all_user_name_fields(true, 'u');
@@ -682,7 +685,7 @@ final class attendees_list_helper {
      * @param bool $fullnameoverride Passed through to the fullname function as the override arg.
      * @return string
      */
-    public static function output_user_for_selection($user, array $extrafields = null, $fullnameoverride = false) {
+    public static function output_user_for_selection($user, array $extrafields = null, bool $fullnameoverride = false): string {
 
         $out = fullname($user, $fullnameoverride);
         if ($extrafields) {

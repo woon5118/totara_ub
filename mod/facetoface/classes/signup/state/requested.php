@@ -47,7 +47,7 @@ use mod_facetoface\event\abstract_signup_event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is used in booking class and responsible for exact state
+ * This class represents requested state.
  */
 class requested extends state implements interface_event {
     /**
@@ -62,6 +62,7 @@ class requested extends state implements interface_event {
      *
      * Event cancelled
      * requested -- Session is cancelled <br/> Event is not cancelled --> event_cancelled
+     * @return array
      */
     final public function get_map() : array {
         return [
@@ -146,6 +147,7 @@ class requested extends state implements interface_event {
      * Numeric statuses are backward compatible except not_set which was not meant to be written into DB.
      * Statuses follow a logical order of operations i.e. none->requested->waitlisted->booked->completed from lower to higher,
      * which must be adhered to for some database queries to work. For example status > booked::get_code()
+     * @return integer
      */
     public static function get_code() : int {
         return 40;

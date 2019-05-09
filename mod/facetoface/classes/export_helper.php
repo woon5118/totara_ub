@@ -23,17 +23,20 @@
 
 namespace mod_facetoface;
 
+/**
+ * Additional export functionality.
+ */
 final class export_helper {
 
     /**
      * Download data in CSV format
+     * Note: this function does not return
      *
      * @param array $fields Array of column headings
-     * @param string $datarows Array of data to populate table with
-     * @param string $file Name of file for exportig
-     * @return returns the CSV file
+     * @param array $datarows Array of data to populate table with
+     * @param string|null $file Name of file for exportig
      */
-    public static function download_csv($fields, $datarows, $file = null) {
+    public static function download_csv(array $fields, array $datarows, string $file = null): void {
         global $CFG;
 
         require_once($CFG->libdir . '/csvlib.class.php');
@@ -57,13 +60,13 @@ final class export_helper {
 
     /**
      * Download data in ODS format
+     * Note: this function does not return
      *
      * @param array $fields Array of column headings
-     * @param string $datarows Array of data to populate table with
-     * @param string $file Name of file for exportig
-     * @return returns the ODS file
+     * @param array $datarows Array of data to populate table with
+     * @param string|null $file Name of file for exportig
      */
-    public static function download_ods($fields, $datarows, $file = null) {
+    public static function download_ods(array $fields, array $datarows, string $file = null): void {
         global $CFG;
 
         require_once("$CFG->libdir/odslib.class.php");
@@ -116,13 +119,13 @@ final class export_helper {
 
     /**
      * Download data in XLS format
+     * Note: this function does not return
      *
      * @param array $fields Array of column headings
-     * @param string $datarows Array of data to populate table with
-     * @param string $file Name of file for exportig
-     * @return returns the Excel file
+     * @param array $datarows Array of data to populate table with
+     * @param string|null $file Name of file for exportig
      */
-    public static function download_xls($fields, $datarows, $file = null) {
+    public static function download_xls(array $fields, array $datarows, string $file = null): void {
         global $CFG;
 
         require_once($CFG->libdir . '/excellib.class.php');
@@ -182,7 +185,7 @@ final class export_helper {
         global $CFG;
 
         $usercustomfields = explode(',', $CFG->facetoface_export_customprofilefields);
-        $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+        $displaytimezones = (bool)get_config(null, 'facetoface_displaysessiontimezones');
         $coursecontext = \context_course::instance($seminar->get_course());
         $fields = static::get_fields($usercustomfields);
         $sessionsignups = static::get_sessionsignups($seminar, $usercustomfields);
@@ -216,7 +219,7 @@ final class export_helper {
      *
      * @param int $userid
      * @param mixed $fieldstoinclude Limit the fields returned/cached to these ones (optional)
-     * @return object
+     * @return stdClass
      */
     public static function get_user_customfields(int $userid, $fieldstoinclude = null) : \stdClass {
         global $DB;
@@ -482,10 +485,10 @@ final class export_helper {
      *
      * @param \stdClass $session
      * @param \MoodleExcelWorksheet|\MoodleODSWorksheet $worksheet
-     * @param $displaytimezones
+     * @param bool $displaytimezones
      * @return \stdClass
      */
-    private static function get_sessiondates(\stdClass $session, $worksheet, $displaytimezones) : \stdClass {
+    private static function get_sessiondates(\stdClass $session, $worksheet, bool $displaytimezones) : \stdClass {
         $sessiondates = new \stdClass();
         $sessiondates->sessionstartdate = false;
         $sessiondates->sessionenddate = false;
@@ -613,8 +616,8 @@ final class export_helper {
      * @param \MoodleExcelWorksheet|\MoodleODSWorksheet $worksheet
      * @param \context_course $coursecontext
      * @param \stdClass $session
-     * @param $i
-     * @param $j
+     * @param int $i
+     * @param int $j
      */
     private static function write_trainerroles($worksheet, \context_course $coursecontext, \stdClass $session,
                                                int $i, int &$j) : void {

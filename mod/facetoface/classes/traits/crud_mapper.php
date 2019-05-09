@@ -31,6 +31,12 @@ defined('MOODLE_INTERNAL') || die();
  */
 trait crud_mapper {
 
+    /**
+     * Load object from a database record.
+     *
+     * @param integer $strictness   IGNORE_MISSING, IGNORE_MULTIPLE or MUST_EXIST
+     * @return self
+     */
     protected function crud_load(int $strictness = MUST_EXIST) : self {
         global $DB;
 
@@ -49,7 +55,10 @@ trait crud_mapper {
         return $this;
     }
 
-    protected function crud_save() {
+    /**
+     * Save object to a database.
+     */
+    protected function crud_save() : void {
         global $DB;
 
         $todb = $this->unmap_object();
@@ -63,6 +72,13 @@ trait crud_mapper {
         $this->crud_load();
     }
 
+    /**
+     * Load object from a given object.
+     *
+     * @param \stdClass $object
+     * @param boolean $strict   Set false to suppress debugging() messages for non-existent properties.
+     * @return self
+     */
     protected function map_object(\stdClass $object, bool $strict = true) : self {
 
         foreach ((array)$object as $property => $value) {
@@ -75,6 +91,11 @@ trait crud_mapper {
         return $this;
     }
 
+    /**
+     * Convert object into a generic object.
+     *
+     * @return \stdClass
+     */
     protected function unmap_object() : \stdClass {
         global $DB;
 

@@ -23,21 +23,24 @@
 
 namespace mod_facetoface;
 
+/**
+ * Additional asset functionality.
+ */
 final class asset_helper {
 
     /**
      * Asset data
      *
-     * @param object $data to be saved includes:
-     *      @var int {facetoface_asset}.id
-     *      @var string {facetoface_asset}.name
-     *      @var int {facetoface_asset}.allowconflicts
-     *      @var string {facetoface_asset}.description
-     *      @var int {facetoface_asset}.custom
-     *      @var int {facetoface_asset}.hidden
+     * @param \stdClass $data to be saved includes:
+     *      - int {facetoface_asset}.id
+     *      - string {facetoface_asset}.name
+     *      - int {facetoface_asset}.allowconflicts
+     *      - string {facetoface_asset}.description
+     *      - int {facetoface_asset}.custom
+     *      - int {facetoface_asset}.hidden
      * @return asset
      */
-    public static function save($data) {
+    public static function save(\stdClass $data): asset {
         global $TEXTAREA_OPTIONS;
 
         if ($data->id) {
@@ -87,7 +90,7 @@ final class asset_helper {
      * @param array $assets List of asset Ids
      * @return bool
      */
-    public static function sync(int $date, array $assets = []) {
+    public static function sync(int $date, array $assets = []): bool {
         global $DB;
 
         if (empty($assets)) {

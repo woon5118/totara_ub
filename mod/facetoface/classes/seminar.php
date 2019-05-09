@@ -327,8 +327,6 @@ final class seminar implements seminar_iterator_item {
 
     /**
      * Delete grade item for given facetoface
-     *
-     * @param object $facetoface object
      */
     private function grade_item_delete(): void {
         grade_update('mod/facetoface', $this->course, 'mod', 'facetoface', $this->id, 0, NULL, ['deleted' => 1]);
@@ -496,6 +494,7 @@ final class seminar implements seminar_iterator_item {
      * Set course id
      * There is no course class, so use id
      * @param int $course
+     * @return seminar
      */
     public function set_course(int $course): seminar {
         $this->course = $course;
@@ -509,6 +508,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param string $name
+     * @return seminar
      */
     public function set_name(string $name): seminar {
         $this->name = $name;
@@ -523,6 +523,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param string $intro
+     * @return seminar
      */
     public function set_intro(string $intro): seminar {
         $this->intro = $intro;
@@ -537,6 +538,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $introformat
+     * @return seminar
      */
     public function set_introformat(int $introformat): seminar {
         $this->introformat = $introformat;
@@ -551,6 +553,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param string $thirdparty
+     * @return seminar
      */
     public function set_thirdparty(string $thirdparty): seminar {
         $this->thirdparty = $thirdparty;
@@ -565,6 +568,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param string $thirdpartywaitlist
+     * @return seminar
      */
     public function set_thirdpartywaitlist(string $thirdpartywaitlist): seminar {
         $this->thirdpartywaitlist = $thirdpartywaitlist;
@@ -579,6 +583,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param bool $waitlistautoclean
+     * @return seminar
      */
     public function set_waitlistautoclean(bool $waitlistautoclean): seminar {
         $this->waitlistautoclean = (int) $waitlistautoclean;
@@ -593,6 +598,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $display
+     * @return seminar
      */
     public function set_display(int $display): seminar {
         $this->display = $display;
@@ -607,6 +613,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $timecreated
+     * @return seminar
      */
     public function set_timecreated(int $timecreated): seminar {
         $this->timecreated = $timecreated;
@@ -621,6 +628,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $timemodified
+     * @return seminar
      */
     public function set_timemodified(int $timemodified): seminar {
         $this->timemodified = $timemodified;
@@ -635,6 +643,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param string $shortname
+     * @return seminar
      */
     public function set_shortname(string $shortname): seminar {
         $this->shortname = $shortname;
@@ -649,6 +658,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $showoncalendar
+     * @return seminar
      */
     public function set_showoncalendar(int $showoncalendar): seminar {
         $this->showoncalendar = $showoncalendar;
@@ -663,6 +673,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $usercalentry
+     * @return seminar
      */
     public function set_usercalentry(int $usercalentry): seminar {
         $this->usercalentry = $usercalentry;
@@ -681,6 +692,7 @@ final class seminar implements seminar_iterator_item {
      * Note: saved in the database as multiplesessions,
      *       referred to elsewhere as multiplesignups.
      * @param int $multiplesignups
+     * @return seminar
      */
     public function set_multiplesessions(int $multiplesignups): seminar {
         $this->multiplesessions = $multiplesignups;
@@ -723,7 +735,7 @@ final class seminar implements seminar_iterator_item {
     }
 
     /**
-     * @param int $multisignupfully
+     * @param bool $multisignupfully
      * @return seminar
      */
     public function set_multisignupfully(bool $multisignupfully): seminar {
@@ -732,7 +744,7 @@ final class seminar implements seminar_iterator_item {
     }
 
     /**
-     * @param int $multisignuppartly
+     * @param bool $multisignuppartly
      * @return seminar
      */
     public function set_multisignuppartly(bool $multisignuppartly): seminar {
@@ -741,7 +753,7 @@ final class seminar implements seminar_iterator_item {
     }
 
     /**
-     * @param int $multisignupnoshow
+     * @param bool $multisignupnoshow
      * @return seminar
      */
     public function set_multisignupnoshow(bool $multisignupnoshow): seminar {
@@ -750,8 +762,8 @@ final class seminar implements seminar_iterator_item {
     }
 
     /**
-     * @param int $multisignupunableto
-     * @return this
+     * @param bool $multisignupunableto
+     * @return seminar
      */
     public function set_multisignupunableto(bool $multisignupunableto): seminar {
         $this->multisignupunableto = (int)$multisignupunableto;
@@ -1000,6 +1012,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $sessionattendance
+     * @return seminar
      */
     public function set_sessionattendance(int $sessionattendance): seminar {
         $this->sessionattendance = $sessionattendance;
@@ -1014,6 +1027,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $attendancetime
+     * @return seminar
      */
     public function set_attendancetime(int $attendancetime): seminar {
         $this->attendancetime = $attendancetime;
@@ -1028,6 +1042,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $eventgradingmanual
+     * @return seminar
      */
     public function set_eventgradingmanual(int $eventgradingmanual) : seminar {
         $this->eventgradingmanual = $eventgradingmanual;
@@ -1042,6 +1057,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $eventgradingmethod
+     * @return seminar
      */
     public function set_eventgradingmethod(int $eventgradingmethod) : seminar {
         $this->eventgradingmethod = $eventgradingmethod;
@@ -1056,6 +1072,7 @@ final class seminar implements seminar_iterator_item {
     }
     /**
      * @param int $completionpass
+     * @return seminar
      */
     public function set_completionpass(int $completionpass) : seminar {
         $this->completionpass = $completionpass;

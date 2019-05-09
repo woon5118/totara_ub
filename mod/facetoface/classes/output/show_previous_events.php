@@ -35,16 +35,18 @@ defined('MOODLE_INTERNAL') || die();
  */
 class show_previous_events extends template {
     /**
+     * Instantiate show_previous_events.
+     *
      * @param seminar       $seminar
      * @param filter_list   $filters
-     * @param string        $anchor
-     * @param string        $class
+     * @param string        $anchor     The anchor link without '#'
+     * @param string        $class      Part of CSS class name
      * @return show_previous_events
      */
     public static function create(seminar $seminar,
                                   filter_list $filters,
                                   string $anchor = '',
-                                  string $class = 'sessionlist') {
+                                  string $class = 'sessionlist'): show_previous_events {
         $data = [
             'class' => $class,
         ];

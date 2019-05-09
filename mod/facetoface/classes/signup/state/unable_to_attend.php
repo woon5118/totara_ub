@@ -27,7 +27,7 @@ namespace mod_facetoface\signup\state;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is used in booking class and responsible for exact state
+ * This class represents unable to attend graded state.
  */
 class unable_to_attend extends attendance_state {
 

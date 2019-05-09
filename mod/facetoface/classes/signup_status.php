@@ -91,6 +91,7 @@ final class signup_status implements seminar_iterator_item {
 
     /**
      * Create/update {facetoface_signups_status}.record
+     * @return signup_status
      */
     public function save() : signup_status {
         global $DB;
@@ -176,8 +177,9 @@ final class signup_status implements seminar_iterator_item {
      * Map data object to class instance.
      *
      * @param \stdClass $object
+     * @return signup_status
      */
-    public function from_record(\stdClass $object) {
+    public function from_record(\stdClass $object) : signup_status {
 
         return $this->map_object($object);
     }
@@ -185,7 +187,7 @@ final class signup_status implements seminar_iterator_item {
     /**
      * Delete {facetoface_signups_status}.record
      */
-    public function delete() {
+    public function delete() : void {
         global $DB;
 
         $DB->delete_records(self::DBTABLE, ['id' => $this->id]);
@@ -193,6 +195,10 @@ final class signup_status implements seminar_iterator_item {
         $this->map_object((object)get_object_vars(new self()));
     }
 
+    /**
+     * Get the class name of the current status.
+     * @return string
+     */
     public function get_state_class() : string {
         return state::from_code((int)$this->statuscode);
     }
@@ -237,6 +243,7 @@ final class signup_status implements seminar_iterator_item {
     }
     /**
      * @param int $signupid
+     * @return signup_status
      */
     public function set_signupid(int $signupid) : signup_status {
         $this->signupid = $signupid;
@@ -251,6 +258,7 @@ final class signup_status implements seminar_iterator_item {
     }
     /**
      * @param int $statuscode
+     * @return signup_status
      */
     public function set_statuscode(int $statuscode) : signup_status {
         $this->statuscode = $statuscode;
@@ -265,6 +273,7 @@ final class signup_status implements seminar_iterator_item {
     }
     /**
      * @param int $superceded
+     * @return signup_status
      */
     public function set_superceded(int $superceded) : signup_status {
         $this->superceded = $superceded;
@@ -279,6 +288,7 @@ final class signup_status implements seminar_iterator_item {
     }
     /**
      * @param float|null $grade
+     * @return signup_status
      */
     public function set_grade(?float $grade) : signup_status {
         $this->grade = $grade;
@@ -293,6 +303,7 @@ final class signup_status implements seminar_iterator_item {
     }
     /**
      * @param int $createdby
+     * @return signup_status
      */
     public function set_createdby(int $createdby) : signup_status {
         $this->createdby = $createdby;
@@ -306,7 +317,8 @@ final class signup_status implements seminar_iterator_item {
         return (int)$this->timecreated;
     }
     /**
-     * @param int $
+     * @param int $timecreated
+     * @return signup_status
      */
     public function set_timecreated(int $timecreated) : signup_status {
         $this->timecreated = $timecreated;

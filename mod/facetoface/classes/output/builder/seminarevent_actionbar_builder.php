@@ -55,7 +55,7 @@ class seminarevent_actionbar_builder {
     private $commandlinks = [];
 
     /**
-     * @param string $id part of element id
+     * @param string $id    part of element id
      */
     public function __construct(string $id) {
         $this->id = $id;
@@ -71,7 +71,7 @@ class seminarevent_actionbar_builder {
      *
      * @return seminarevent_actionbar_builder
      */
-    public function add_commandlink(string $name, $url, string $text, $primary = false): seminarevent_actionbar_builder {
+    public function add_commandlink(string $name, $url, string $text, bool $primary = false): seminarevent_actionbar_builder {
         if ($url instanceof \moodle_url) {
             $url = $url->out();
         }
@@ -99,7 +99,7 @@ class seminarevent_actionbar_builder {
     /**
      * Set the alignment of buttons.
      *
-     * @param string $align one of far, near or center
+     * @param string $align     one of far, near or center
      *
      * @return seminarevent_actionbar_builder
      */

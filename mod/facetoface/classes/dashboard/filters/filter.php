@@ -23,6 +23,7 @@
 
 namespace mod_facetoface\dashboard\filters;
 
+use context;
 use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 
@@ -111,7 +112,7 @@ interface filter {
      * @param integer|null $userid  A user ID or null to use the current user
      * @return boolean
      */
-    public static function is_visible(seminar $seminar, \context $context, ?int $userid): bool;
+    public static function is_visible(seminar $seminar, context $context, ?int $userid): bool;
 
     /**
      * Get an optional value for a filter bar.

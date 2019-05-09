@@ -74,8 +74,7 @@ final class booking_filter extends filter {
     }
 
     /**
-     * @return array
-     * @inheritdoc
+     * @inheritDoc
      */
     public function get_where_and_params(int $time): array {
         // The external use will always have the keyword 'AND' before hand, therefore, it should have something here to returned

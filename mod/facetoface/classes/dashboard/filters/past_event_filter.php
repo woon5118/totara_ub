@@ -23,6 +23,7 @@
 
 namespace mod_facetoface\dashboard\filters;
 
+use context;
 use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\filter\past_event_filter as query_past_event_filter;
@@ -120,7 +121,7 @@ final class past_event_filter implements filter {
     /**
      * @inheritDoc
      */
-    public static function is_visible(seminar $seminar, \context $context, ?int $userid): bool {
+    public static function is_visible(seminar $seminar, context $context, ?int $userid): bool {
         return false;
     }
 

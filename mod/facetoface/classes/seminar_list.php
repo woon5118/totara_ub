@@ -35,7 +35,7 @@ final class seminar_list implements \Iterator {
     /**
      * seminar_list constructor.
      *
-     * @param array $conditions optional array $fieldname => requestedvalue with AND in between
+     * @param array|null $conditions optional array $fieldname => requestedvalue with AND in between
      * @param string $sort an order to sort the results in.
      */
     public function __construct(array $conditions = null, string $sort = 'timecreated') {
@@ -52,7 +52,7 @@ final class seminar_list implements \Iterator {
      * Add seminar to list
      * @param seminar $item
      */
-    public function add(seminar $item) {
+    public function add(seminar $item): void {
         $this->items[$item->get_id()] = $item;
     }
 }

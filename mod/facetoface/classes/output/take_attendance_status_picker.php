@@ -43,7 +43,7 @@ class take_attendance_status_picker extends template {
      */
     public static function create(stdClass $attendee,
                                   array $statusoptions,
-                                  bool $disabled = false) {
+                                  bool $disabled = false): take_attendance_status_picker {
         $data = [
             'name' => "submissionid_{$attendee->submissionid}",
             'label' => get_string('takeattendance_label', 'mod_facetoface', clean_string(fullname($attendee))),

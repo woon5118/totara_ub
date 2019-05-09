@@ -44,7 +44,7 @@ class event_taking_attendance extends condition {
     /**
      * Get description of condition
      *
-     * @return mixed
+     * @return string
      */
     public static function get_description() : string {
         return get_string('state_eventtakingattendance_desc', 'mod_facetoface');

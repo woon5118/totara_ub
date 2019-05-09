@@ -86,8 +86,8 @@ class seminarevent_filterbar_builder {
     /**
      * Add a query parameter.
      *
-     * @param string         $name
-     * @param string|integer $value
+     * @param string         $name      The name of the query parameter
+     * @param string|integer $value     The value of the query parameter
      *
      * @return seminarevent_filterbar_builder
      */
@@ -102,14 +102,14 @@ class seminarevent_filterbar_builder {
      * @param string  $name     the name attribute of an element
      * @param array   $options  key/value array of options
      * @param string  $class    part of css class
-     * @param string  $label    label
+     * @param string  $label    label text
      * @param boolean $disabled true to disable/hide an element
      * @param boolean $tooltips true to show tooltips on an element
      *
      * @return seminarevent_filterbar_builder
      */
-    public function add_filter(string $name, array $options, $class = '',
-                               $label = '', $disabled = false, $tooltips = false): seminarevent_filterbar_builder {
+    public function add_filter(string $name, array $options, string $class = '',
+                               string $label = '', bool $disabled = false, bool $tooltips = false): seminarevent_filterbar_builder {
         $this->filters[$name] = [
             'options' => $options,
             'class' => $class,

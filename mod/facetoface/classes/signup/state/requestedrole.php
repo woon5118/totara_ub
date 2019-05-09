@@ -44,6 +44,9 @@ use mod_facetoface\signup\transition;
 use mod_facetoface\event\booking_requested;
 use mod_facetoface\event\abstract_signup_event;
 
+/**
+ * This class represents requested with role approval state.
+ */
 class requestedrole extends state implements interface_event {
     final public function get_map() : array {
         return [

@@ -25,6 +25,9 @@ namespace mod_facetoface;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Additional seminar_session functionality.
+ */
 final class seminar_session_helper {
 
     /**

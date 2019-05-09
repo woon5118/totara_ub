@@ -23,22 +23,25 @@
 
 namespace mod_facetoface;
 
+/**
+ * Additional room functionality.
+ */
 final class room_helper {
 
     /**
      * Room data
      *
-     * @param object $data to be saved includes:
-     *      @var int {facetoface_room}.id
-     *      @var string {facetoface_room}.name
-     *      @var int {facetoface_room}.capacity
-     *      @var int {facetoface_room}.allowconflicts
-     *      @var string {facetoface_room}.description
-     *      @var bool {facetoface_room}.custom (optional)
-     *      @var int {facetoface_room}.hidden
+     * @param \stdClass $data to be saved includes:
+     *      - int {facetoface_room}.id
+     *      - string {facetoface_room}.name
+     *      - int {facetoface_room}.capacity
+     *      - int {facetoface_room}.allowconflicts
+     *      - string {facetoface_room}.description
+     *      - bool {facetoface_room}.custom (optional)
+     *      - int {facetoface_room}.hidden
      * @return room
      */
-    public static function save($data) {
+    public static function save(\stdClass $data): room {
         global $TEXTAREA_OPTIONS;
 
         $custom = $data->custom ?? false; // $data->custom is not always passed

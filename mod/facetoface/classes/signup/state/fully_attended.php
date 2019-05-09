@@ -29,7 +29,7 @@ use mod_facetoface\signup\condition\{event_is_not_cancelled, event_in_the_past};
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is used in booking class and responsible for exact state
+ * This class represents fully attended graded state.
  */
 class fully_attended extends attendance_state {
 

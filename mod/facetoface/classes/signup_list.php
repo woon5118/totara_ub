@@ -44,7 +44,7 @@ final class signup_list implements \Iterator, \Countable {
      * @param string $sort an order to sort the results in.
      * @return signup_list
      */
-    public static function from_conditions(array $conditions = null, string $sort = '') {
+    public static function from_conditions(array $conditions = null, string $sort = ''): signup_list {
         global $DB;
 
         $list = new static();
@@ -64,7 +64,7 @@ final class signup_list implements \Iterator, \Countable {
      * @param int $seminarid
      * @return signup_list
      */
-    public static function user_active_signups_within_seminar($userid, $seminarid) : signup_list {
+    public static function user_active_signups_within_seminar(int $userid, int $seminarid) : signup_list {
         global $DB;
 
         // Note: We want to specifically exclude cancelled and declined signups because they are not 'active' signups.
@@ -180,7 +180,7 @@ final class signup_list implements \Iterator, \Countable {
      * @param int $eventid
      * @return signup_list
      */
-    public static function signups_for_event($eventid) {
+    public static function signups_for_event(int $eventid): signup_list {
         global $DB;
 
         $list = new static();
@@ -199,7 +199,7 @@ final class signup_list implements \Iterator, \Countable {
      * @param int $statuscode
      * @return signup_list
      */
-    public static function signups_by_statuscode_for_event($eventid, $statuscode) {
+    public static function signups_by_statuscode_for_event(int $eventid, int $statuscode): signup_list {
         global $DB;
 
         $sql = 'SELECT s.*
@@ -226,7 +226,7 @@ final class signup_list implements \Iterator, \Countable {
      * Add signup to item list
      * @param signup $item
      */
-    public function add(signup $item) {
+    public function add(signup $item): void {
         $this->items[$item->get_id()] = $item;
     }
 

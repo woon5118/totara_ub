@@ -34,7 +34,7 @@ use mod_facetoface\signup\condition\{
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is used in booking class and responsible for exact state
+ * This abstract class represents graded states.
  */
 abstract class attendance_state extends state {
 

@@ -262,6 +262,7 @@ final class signup implements seminar_iterator_item {
      * Map data object to signup instance.
      *
      * @param \stdClass $object
+     * @return signup
      */
     public function map_instance(\stdClass $object): signup {
 
@@ -270,6 +271,7 @@ final class signup implements seminar_iterator_item {
 
     /**
      * Delete {facetoface_signups}.record where id
+     * @return signup
      */
     public function delete(): signup {
         global $DB;
@@ -328,12 +330,12 @@ final class signup implements seminar_iterator_item {
     /**
      * Switch signup state and set grade.
      * This function must be used for any state changes
-     * @param mixed $grade grade
+     * @param float|null $grade grade
      * @param null $reserved must be null
      * @param string ...$newstates class names
      * @return \signup
      */
-    public function switch_state_with_grade(?float $grade, ?string $reserved, string ...$newstates): signup {
+    public function switch_state_with_grade(?float $grade, $reserved, string ...$newstates): signup {
         global $DB;
         if ($reserved !== null) {
             throw new \coding_exception('the argument `$reserved` must be null at this moment.');
@@ -417,6 +419,7 @@ final class signup implements seminar_iterator_item {
 
     /**
      * Delete records from facetoface_signup_info_data/facetoface_cancellation_info_data
+     * @return signup
      */
     protected function delete_customfields(): signup {
         global $DB;
@@ -458,9 +461,14 @@ final class signup implements seminar_iterator_item {
      * @param int           $userbyid
      * @param float|null    $grade
      * @param null          $reserved        must be null
+     * @return signup_status
      */
-    protected function update_status(state $state, int $timecreated = 0, int $userbyid = 0, ?float $grade = null, ?string $reserved = null): signup_status {
+    protected function update_status(state $state, int $timecreated = 0, int $userbyid = 0, ?float $grade = null, $reserved = null): signup_status {
         global $USER, $CFG;
+
+        if ($reserved !== null) {
+            throw new \coding_exception('The $reserved argument must be null');
+        }
 
         // We need the completionlib for \completion_info and the COMPLETION_UNKNOWN constant.
         require_once($CFG->libdir . '/completionlib.php');
@@ -526,6 +534,7 @@ final class signup implements seminar_iterator_item {
     }
     /**
      * @param int $sessionid
+     * @return signup
      */
     public function set_sessionid(int $sessionid): signup {
         $this->sessionid = $sessionid;
@@ -540,6 +549,7 @@ final class signup implements seminar_iterator_item {
     }
     /**
      * @param int $userid
+     * @return signup
      */
     public function set_userid(int $userid): signup {
         $this->userid = $userid;
@@ -554,6 +564,7 @@ final class signup implements seminar_iterator_item {
     }
     /**
      * @param string $discountcode
+     * @return signup
      */
     public function set_discountcode(string $discountcode): signup {
         $this->discountcode = $discountcode;
@@ -580,6 +591,7 @@ final class signup implements seminar_iterator_item {
     }
     /**
      * @param int $notificationtype
+     * @return signup
      */
     public function set_notificationtype(int $notificationtype): signup {
         $this->notificationtype = $notificationtype;
@@ -594,6 +606,7 @@ final class signup implements seminar_iterator_item {
     }
     /**
      * @param int $archived
+     * @return signup
      */
     public function set_archived(int $archived) : signup {
         $this->archived = $archived;
@@ -609,6 +622,7 @@ final class signup implements seminar_iterator_item {
 
     /**
      * @param int $bookedby
+     * @return signup
      */
     public function set_bookedby(int $bookedby) : signup {
         $this->bookedby = $bookedby;
@@ -632,6 +646,7 @@ final class signup implements seminar_iterator_item {
 
     /**
      * @param int $managerid
+     * @return signup
      */
     public function set_managerid(int $managerid) : signup {
         $this->managerid = $managerid;
@@ -646,6 +661,7 @@ final class signup implements seminar_iterator_item {
     }
     /**
      * @param int $jobassignmentid
+     * @return signup
      */
     public function set_jobassignmentid(int $jobassignmentid) : signup {
         $this->jobassignmentid = $jobassignmentid;

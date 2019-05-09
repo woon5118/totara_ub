@@ -97,6 +97,7 @@ final class event_attendee extends \stdClass {
      * Map data object to class instance.
      *
      * @param \stdClass $object an element of an array returned by \mod_facetoface\attendance\attendance_helper::get_attendees()
+     * @return event_attendee
      */
     public function from_record(\stdClass $object): event_attendee {
         return $this->map_object($object);

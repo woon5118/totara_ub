@@ -50,10 +50,6 @@ use mod_facetoface\query\event\sortorder\past_sortorder;
 use mod_facetoface\signup\state\attendance_state;
 use mod_facetoface\signup\state\booked;
 use mod_facetoface\signup\state\event_cancelled;
-use mod_facetoface\signup\state\fully_attended;
-use mod_facetoface\signup\state\no_show;
-use mod_facetoface\signup\state\not_set;
-use mod_facetoface\signup\state\partially_attended;
 use mod_facetoface\signup\state\requested;
 use mod_facetoface\signup\state\requestedadmin;
 use mod_facetoface\signup\state\requestedrole;
@@ -67,6 +63,9 @@ require_once('classes/output/seminarevent_filterbar.php');
 require_once('classes/output/seminarevent_actionbar.php');
 require_once('classes/output/attendance_tracking_table_cell.php');
 
+/**
+ * mod_facetoface renderer class.
+ */
 class mod_facetoface_renderer extends plugin_renderer_base {
 
     /**
@@ -86,7 +85,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
     /**
      * This link will be changed if mod_facetoface\hook\alternative_signup_link hook is installed.
-     * @var $signuplink string
+     * @var string
      */
     protected $signuplink = self::DEFAULT_SIGNUP_LINK;
 
@@ -115,21 +114,21 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param bool $displaytimezones - true if the timezones should be displayed.
      * @param array $reserveinfo - if managereserve if set to true for the facetoface, use facetoface_can_reserve_or_allocate
      * to fill out this array.
-     * @param string $currenturl - generally this would be $PAGE->url.
+     * @param string|null $currenturl - generally this would be $PAGE->url.
      * @param bool $minimal - setting this to true will hide customfields, session status, attendance tracking and registration dates
      * in a tooltip when hovering over the signup link rather than in a column.
      * @param bool $returntoallsessions Returns the user to view all sessions after they signup/cancel.
-     * @param bool $attendancetracking - true to display the attendance tracking column
+     * @param bool|int $attendancetracking - true to display the attendance tracking column
      * @param int $attendancetime - one of seminar::ATTENDANCE_TIME_xxx
      * @param bool $viewsignupperiod - true to display the "Sign-up period" table column
      * @param bool $viewactions - true to display the "Actions" table column
      * @return string containing html for this table.
      * @throws coding_exception
      */
-    public function print_session_list_table($sessions, $viewattendees, $editevents, $displaytimezones, $reserveinfo = array(),
-                                             $currenturl = null, $minimal = false, $returntoallsessions = true,
+    public function print_session_list_table(array $sessions, bool $viewattendees, bool $editevents, bool $displaytimezones, array $reserveinfo = array(),
+                                             string $currenturl = null, bool $minimal = false, bool $returntoallsessions = true,
                                              $attendancetracking = false, int $attendancetime = seminar::ATTENDANCE_TIME_END,
-                                             $viewsignupperiod = true, $viewactions = true) {
+                                             bool $viewsignupperiod = true, bool $viewactions = true): string {
         $output = '';
 
         if (empty($sessions)) {
@@ -388,7 +387,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string
      * @deprecated Totara 13
      */
-    public function print_session_list(seminar $seminar, int $roomid, int $eventtime = event_time::ALL) {
+    public function print_session_list(seminar $seminar, int $roomid, int $eventtime = event_time::ALL): string {
         debugging('mod_facetoface_renderer::print_session_list() is deprecated. Please use mod_facetoface_renderer::render_session_list() instead.');
 
         // Create a dummy filter_list on the fly.
@@ -420,8 +419,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      *
      * @param seminar               $seminar    seminar instance
      * @param filter_list           $filters    filter_list instance to filter out session events
-     * @param render_session_option $option     an empty array or an array containing event_time constants
-     * @param integer|null          $userid
+     * @param render_session_option $option     render_session_option instance for extra rendering options
+     * @param integer|null          $userid     user ID or null to use the current user
      * @return string
      */
     public function render_session_list(seminar $seminar, filter_list $filters, render_session_option $option, int $userid = null): string {
@@ -508,7 +507,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param int $datescount - this determines the rowspan. Count the number of session dates to get this figure.
      * @return array of table cells to be merged with an array for the rest of the cells.
      */
-    private function session_customfield_table_cells($session, $customfields, $datescount = 0) {
+    private function session_customfield_table_cells(\stdClass $session, array $customfields, int $datescount = 0): array {
 
         $customfieldsdata = customfield_get_data($session, 'facetoface_session', 'facetofacesession', false);
         $sessionrow = array();
@@ -548,7 +547,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return html_table_cell
      * @throws coding_exception
      */
-    private function session_capacity_table_cell($seminarevent, $viewattendees, $signupcount, $datescount = 0) {
+    private function session_capacity_table_cell(seminar_event $seminarevent, bool $viewattendees, int $signupcount, int $datescount = 0): \html_table_cell {
         $context = $this->context;
         if (null == $context) {
             // Using $PAGE->context if the internal $context had not been set.
@@ -618,7 +617,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return \mod_facetoface\output\attendance_tracking_table_cell
      * @throws coding_exception
      */
-    protected function attendance_tracking_table_cell($session, $date, $attendancetime) {
+    protected function attendance_tracking_table_cell(\stdClass $session, \stdClass $date, int $attendancetime): \mod_facetoface\output\attendance_tracking_table_cell {
         $cell = new \mod_facetoface\output\attendance_tracking_table_cell();
 
         if (!empty($session->cancelledstatus)) {
@@ -671,13 +670,13 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * Create a table cell containing the status of a session.
      *
      * @param \stdClass $session
-     * @param \stdClass $date
+     * @param \stdClass|null $date
      * @param integer $timenow current time
      * @return html_table_cell
      */
-    protected function session_status_table_cell($session, $date, int $timenow) {
+    protected function session_status_table_cell(\stdClass $session, ?\stdClass $date, int $timenow): \html_table_cell {
 
-        $status = \mod_facetoface\seminar_session_helper::get_status($session, $date);
+        $status = \mod_facetoface\seminar_session_helper::get_status($session, $date, $timenow);
         if ($status === false) {
             return new html_table_cell();
         }
@@ -695,7 +694,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return html_table_cell
      * @throws coding_exception
      */
-    protected function event_status_table_cell($session, $signupcount, $datescount = 0) {
+    protected function event_status_table_cell(\stdClass $session, int $signupcount, int $datescount = 0): html_table_cell {
         [ $event_status, $booking_status, $user_status ] = seminar_event_helper::event_status($session, $signupcount);
         $statuses = \html_writer::tag('li', clean_string($event_status), [ 'class' => 'mod_facetoface__sessionlist__event-status__event']);
         if ($booking_status !== '') {
@@ -718,11 +717,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      *
      * @param seminar_event $seminarevent
      * @param int $datescount - determines the number for the rowspan.
-     * @param boolean|null $displaytimezones
+     * @param boolean|null $displaytimezones true/false or null to use facetoface_displaysessiontimezones config
      * @return html_table_cell
      * @throws coding_exception
      */
-    private function session_resgistrationperiod_table_cell($seminarevent, $datescount = 0, $displaytimezones = null) {
+    private function session_resgistrationperiod_table_cell(seminar_event $seminarevent, int $datescount = 0, bool $displaytimezones = null): \html_table_cell {
         // Signup Start Dates/times.
         $registrationstring = \mod_facetoface\output\session_time::to_html($seminarevent->get_registrationtimestart(), $seminarevent->get_registrationtimefinish(), 99, $displaytimezones);
 
@@ -746,7 +745,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return html_table_cell
      * @throws coding_exception
      */
-    private function session_options_table_cell($seminarevent, $viewattendees, $editevents, $reservelink, $signuplink, $datescount = 0) {
+    private function session_options_table_cell(seminar_event $seminarevent, bool $viewattendees, bool $editevents, string $reservelink, string $signuplink, int $datescount = 0): \html_table_cell {
 
         global $CFG;
 
@@ -829,10 +828,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * Returns the text containing registration start and end dates if there are any.
      *
      * @param seminar_event $seminarevent
+     * @param boolean $displaytimezones Set true to display timezone
      * @return string to add to the tooltip and aria-label attributes of an html link.
      * @throws coding_exception
      */
-    private function get_regdates_tooltip_info($seminarevent, $displaytimezones) {
+    private function get_regdates_tooltip_info(seminar_event $seminarevent, bool $displaytimezones): string {
         $tooltip = array();
         if (!empty($seminarevent->get_registrationtimestart())) {
             $start = new stdClass();
@@ -871,7 +871,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string
      * @throws coding_exception
      */
-    private function session_options_reserve_link($seminarevent, $signupcount, $reserveinfo = array()) {
+    private function session_options_reserve_link(seminar_event $seminarevent, int $signupcount, array $reserveinfo = array()): string {
 
         $reservelink = '';
         if ($seminarevent->get_cancelledstatus()) {
@@ -935,10 +935,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param int $cancellationcutoff - event cancellation cut off.
      * @param bool $regdatestooltip - true if we want the dates in a tooltip for the signup link.
      * @param bool $returntoallsessions True if we want the user to return to view all sessions after an action.
+     * @param bool $displaytimezones
      * @return string to be put into an options cell in the sessions table.
      * @throws coding_exception
      */
-    private function session_options_signup_link($seminarevent, $cancellationcutoff, $regdatestooltip = false, $returntoallsessions = true, $displaytimezones = true) {
+    private function session_options_signup_link(seminar_event $seminarevent, int $cancellationcutoff, bool $regdatestooltip = false, bool $returntoallsessions = true, bool $displaytimezones = true): string {
         global $USER;
         $signuplink = '';
 
@@ -1040,7 +1041,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      *
      * @return string html
      */
-    public function calendar_filter_controls() {
+    public function calendar_filter_controls(): string {
         global $SESSION;
 
         // Custom fields.
@@ -1062,12 +1063,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * Generates a custom field select for a f2f custom field
      *
      * @param string $type Custom field set ("room", "sess", etc)
-     * @param int $field
-     * @param string $currentvalue
+     * @param stdClass $field
+     * @param string|null $currentvalue
      *
      * @return string html
      */
-    public function custom_field_chooser($type, $field, $currentvalue) {
+    public function custom_field_chooser(string $type, \stdClass $field, ?string $currentvalue): string {
         // Same $fieldname  must be used in lib.php facetoface_calendar_set_filter().
         $fieldname = "field_{$type}_{$field->shortname}";
         $stringsource = '';
@@ -1134,7 +1135,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
     }
 
-    public function setcontext($context) {
+    /**
+     * @param context|null $context
+     * @return void
+     */
+    public function setcontext(?context $context): void {
         $this->context = $context;
     }
 
@@ -1154,12 +1159,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * Generate the multiselect inputs + add/remove buttons to control allocating / deallocating users
      * for this session
      *
-     * @param object $team containing the lists of users who can be allocated / deallocated
-     * @param object $session
+     * @param stdClass $team containing the lists of users who can be allocated / deallocated
+     * @param stdClass $session
      * @param array $reserveinfo details of the number of allocations allowed / left
      * @return string HTML fragment to be output
      */
-    public function session_user_selector($team, $session, $reserveinfo) {
+    public function session_user_selector(\stdClass $team, \stdClass $session, array $reserveinfo): string {
         $output = html_writer::start_tag('div', array('class' => 'row-fluid user-multiselect'));
 
         // Current allocations.
@@ -1242,11 +1247,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * Output the given list of reservations/allocations that this manager has made
      * in other sessions in this facetoface.
      *
-     * @param object[] $bookings
-     * @param object $manager
+     * @param stdClass[] $bookings
+     * @param stdClass $manager
      * @return string HTML fragment to output the list
      */
-    public function other_reservations($bookings, $manager) {
+    public function other_reservations(array $bookings, \stdClass $manager): string {
         global $USER;
 
         if (!$bookings) {
@@ -1309,7 +1314,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param string $currenttab
      * @return string tabs
      */
-    public function customfield_management_tabs($currenttab = 'facetofacesession') {
+    public function customfield_management_tabs(string $currenttab = 'facetofacesession'): string {
         $tabs = array();
         $row = array();
         $activated = array();
@@ -1340,7 +1345,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param string $currenttab
      * @return string tabs
      */
-    public function reports_management_tabs($currenttab = 'facetofaceeventreport') {
+    public function reports_management_tabs(string $currenttab = 'facetofaceeventreport'): string {
 
         $tabs = array();
         $row = array();
@@ -1362,9 +1367,10 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     /**
      * Show a list of all reservations for a session and allow them to be removed.
      *
-     * @param object $reservations Data about all the reservations
+     * @param stdClass[] $reservations Data about all the reservations
+     * @return string
      */
-    public function print_reservation_management_table($reservations) {
+    public function print_reservation_management_table(array $reservations): string {
 
         $out = '';
 
@@ -1410,7 +1416,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param int $jaselector Job assignements selection: 0 - no, 1 - optional, 2 - required
      * @return string
      */
-    public function print_userlist_table($users, \mod_facetoface\bulk_list $list = null, $sessionid = 0, $jaselector = 0) {
+    public function print_userlist_table(array $users, \mod_facetoface\bulk_list $list = null, int $sessionid = 0, int $jaselector = 0): string {
         global $OUTPUT, $PAGE;
 
         $out = '';
@@ -1497,9 +1503,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * Displays the dismiss action icon the mismatched approval types notice.
      *
      * @param int $f2fid The id of the facetoface currently being viewed
-     * @return string       The html for the icon
+     * @return void
      */
-    public function selfapproval_notice($f2fid) {
+    public function selfapproval_notice(int $f2fid): void {
         global $OUTPUT;
 
         $approvalcount = \mod_facetoface\approver::count_selfapproval($f2fid);
@@ -1518,7 +1524,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param room $room
      * @return string
      */
-    public function render_room_details(room $room) {
+    public function render_room_details(room $room): string {
         global $DB;
 
         $output = array();
@@ -1605,9 +1611,10 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * Gets the HTML output for room details.
      *
      * @param \room $room - The room instance to get details for
+     * @param string|null $backurl
      * @return string containing room details with relevant html tags.
      */
-    public function get_room_details_html(room $room, $backurl = null): string {
+    public function get_room_details_html(room $room, string $backurl = null): string {
 
         $url = new moodle_url('/mod/facetoface/reports/rooms.php', array(
             'roomid' => $room->get_id(),
@@ -1629,7 +1636,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param \mod_facetoface\asset $asset
      * @return string
      */
-    public function render_asset_details(\mod_facetoface\asset $asset) {
+    public function render_asset_details(\mod_facetoface\asset $asset): string {
         global $DB;
 
         $output = [];
@@ -1716,11 +1723,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     /**
      * Output for a removable approver in the facetoface mod_form.
      *
-     * @param int       $user           The user object for the approver being displayed
+     * @param stdClass  $user           The user object for the approver being displayed
      * @param boolean   $activity       Whether the approver is activity level or site level
      * @return string                   The html output for the approver
      */
-    public function display_approver($user, $activity = false) : string {
+    public function display_approver(\stdClass $user, bool $activity = false) : string {
 
         $uniqueid = "facetoface_approver_{$user->id}";
         if ($activity) {
@@ -1742,7 +1749,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      *
      * @param \mod_facetoface\seminar $seminar
      */
-    public function declare_interest(\mod_facetoface\seminar $seminar) {
+    public function declare_interest(\mod_facetoface\seminar $seminar) : void {
         global $OUTPUT;
 
         $interest = \mod_facetoface\interest::from_seminar($seminar);
@@ -1937,7 +1944,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return int
      * @deprecated since Totara 13
      */
-    public function filter_by_room(\mod_facetoface\seminar $seminar, int $roomid) {
+    public function filter_by_room(\mod_facetoface\seminar $seminar, int $roomid): int {
         global $OUTPUT, $PAGE;
 
         debugging('The method ' . __METHOD__ . '() has been deprecated. Please use mod_facetoface_renderer::render_filter_bar() instead.', DEBUG_DEVELOPER);
@@ -1974,7 +1981,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      *
      * @param \mod_facetoface\seminar $seminar
      */
-    public function attendees_export_form(\mod_facetoface\seminar $seminar) {
+    public function attendees_export_form(\mod_facetoface\seminar $seminar): void {
         global $OUTPUT;
 
         if (has_capability('mod/facetoface:viewattendees', $this->context)) {
@@ -2006,11 +2013,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      */
     public function render_seminar_event(
         \mod_facetoface\seminar_event $seminarevent,
-        $showcapacity,
-        $calendaroutput = false,
-        $hidesignup = false,
-        $class = 'mod_facetoface__event_details'
-    ) {
+        bool $showcapacity,
+        bool $calendaroutput = false,
+        bool $hidesignup = false,
+        string $class = 'mod_facetoface__event_details'
+    ): string {
         global $PAGE, $USER;
 
         $output = html_writer::start_tag('dl', ['class' => $class]);
@@ -2273,8 +2280,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
     /**
      * Displays a bulk actions selector
+     * @return string
      */
-    public function display_bulk_actions_picker() {
+    public function display_bulk_actions_picker(): string {
         global $OUTPUT;
 
         $status_options = \mod_facetoface\attendees_helper::get_status();
@@ -2331,7 +2339,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param \mod_facetoface\bulk_list $list User list Needed only with job assignments
      * @param int $courseid
      */
-    public function print_attendance_upload_table(\mod_facetoface\bulk_list $list, $courseid) {
+    public function print_attendance_upload_table(\mod_facetoface\bulk_list $list, int $courseid): void {
         global $OUTPUT;
 
         $status = attendance_state::get_all_attendance_csv();

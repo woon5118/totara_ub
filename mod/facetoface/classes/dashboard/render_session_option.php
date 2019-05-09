@@ -51,21 +51,21 @@ final class render_session_option {
     private $sessionascendingorder = false;
 
     /**
-     * @return boolean
+     * @return boolean  true to display upcoming events
      */
     public function is_upcoming(): bool {
         return empty($this->eventtimes) || !empty(array_intersect([event_time::ALL, event_time::UPCOMING, event_time::INPROGRESS], $this->eventtimes));
     }
 
     /**
-     * @return boolean
+     * @return boolean  true to display timezones
      */
     public function get_displaytimezones(): bool {
         return $this->displaytimezones ?? (bool)get_config(null, 'facetoface_displaysessiontimezones');
     }
 
     /**
-     * @param boolean $value Set true to display timezones, null to use facetoface_displaysessiontimezones config
+     * @param boolean|null $value Set true to display timezones, null to use facetoface_displaysessiontimezones config
      * @return render_session_option
      */
     public function set_displaytimezones(?bool $value): render_session_option {
@@ -74,7 +74,8 @@ final class render_session_option {
     }
 
     /**
-     * @return boolean
+     * @return boolean  true to display reservation information on upcoming events
+     *                  Note that the function returns false if the option is configured not to display upcoming events
      */
     public function get_displayreservation(): bool {
         return $this->displayreservation && $this->is_upcoming();
@@ -90,7 +91,7 @@ final class render_session_option {
     }
 
     /**
-     * @return boolean
+     * @return boolean  true to display the "Sign-up period" column
      */
     public function get_displaysignupperiod(): bool {
         return $this->displaysignupperiod;
@@ -106,7 +107,7 @@ final class render_session_option {
     }
 
     /**
-     * @return boolean
+     * @return boolean  true to display the "Action" column
      */
     public function get_displayactions(): bool {
         return $this->displayactions;
@@ -129,7 +130,7 @@ final class render_session_option {
     }
 
     /**
-     * @param integer[] $eventtimes One or more event_time constants
+     * @param integer[] $values One or more event_time constants
      * @return render_session_option
      */
     public function set_eventtimes(array $values): render_session_option {
@@ -138,7 +139,7 @@ final class render_session_option {
     }
 
     /**
-     * @return boolean
+     * @return boolean  true to sort events by past first
      */
     public function get_eventascendingorder(): bool {
         return $this->eventascendingorder;
@@ -154,7 +155,7 @@ final class render_session_option {
     }
 
     /**
-     * @return boolean
+     * @return boolean  true to sort sessions by past first
      */
     public function get_sessionascendingorder(): bool {
         return $this->sessionascendingorder;

@@ -32,12 +32,24 @@ defined('MOODLE_INTERNAL') || die();
 class attendance_tracking_table_cell extends \html_table_cell {
     const CSS_CLASS = 'mod_facetoface__sessionlist__attendance';
 
+    /** @var string */
     protected $class = '';
+
+    /** @var string */
     protected $html = '';
+
+    /** @var string|null */
     protected $icon = null;
+
+    /** @var string|\moodle_url|null */
     protected $url = null;
+
+    /** @var string|null */
     protected $linkhtml = null;
 
+    /**
+     * Constructor.
+     */
     public function __construct() {
         $this->set_state();
     }
@@ -73,11 +85,11 @@ class attendance_tracking_table_cell extends \html_table_cell {
     /**
      * Set an icon of this cell.
      *
-     * @param string $icon The flex icon identifier
+     * @param string|null $icon The flex icon identifier
      *
      * @return attendance_tracking_table_cell
      */
-    public function set_icon(string $icon): attendance_tracking_table_cell {
+    public function set_icon(?string $icon): attendance_tracking_table_cell {
         $this->icon = $icon;
         return $this;
     }

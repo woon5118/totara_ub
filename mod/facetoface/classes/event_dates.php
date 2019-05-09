@@ -26,34 +26,34 @@ namespace mod_facetoface;
 global $CFG;
 require_once($CFG->dirroot."/mod/facetoface/lib.php");
 
+/**
+ * Yet another helper class to format session times.
+ */
 class event_dates {
     /**
      * Get rendered start date, finish date and timestamp.
      * @param int $timestart start timestamp
      * @param int $timefinish finish timestamp
-     * @param string $sesiontimezone
-     * @param bool $displaytimezone should timezone be displayed
+     * @param int|string|float|DateTimeZone $sesiontimezone
+     * @param bool $displaytimezones should timezone be displayed
      * @return string
      */
-    public static function render($timestart, $timefinish, $sesiontimezone, $displaytimezone = true) {
+    public static function render(int $timestart, int $timefinish, $sesiontimezone, bool $displaytimezones = true): string {
         $sessionobj = output\session_time::format(
             $timestart,
             $timefinish,
-            $sesiontimezone
+            $sesiontimezone,
+            $displaytimezones
         );
-
-        if (empty($displaytimezone)) {
-            $sessionobj->timezone = '';
-        }
 
         return get_string('sessiondatecolumn_html', 'facetoface', $sessionobj);
     }
 
     /**
      * Return default start and end date/time of session
-     * @return array($defaultstart, $defaultfinish)
+     * @return int[] of [$defaultstart, $defaultfinish]
      */
-    public static function get_default() {
+    public static function get_default(): array {
         $config = get_config('facetoface');
         $now = time();
         $defaultstart = $now;
@@ -111,7 +111,7 @@ class event_dates {
      * @param int $facetofaceid
      * @return array errors ('timestart' => string, 'timefinish' => string, 'assetids' => string, 'roomid' => string)
      */
-    public static function validate($timestart, $timefinish, $roomid, $assetids, $sessionid, $facetofaceid) {
+    public static function validate(int $timestart, int $timefinish, int $roomid, array $assetids, int $sessionid, int $facetofaceid): array {
         $seminar = new seminar($facetofaceid);
         $seminarevent = new seminar_event($sessionid);
 
@@ -189,10 +189,10 @@ class event_dates {
      * Format the dates for the given session, when listing the other bookings made by a given manager
      * in a particular face to face instance.
      *
-     * @param $session
+     * @param \stdClass $session
      * @return string
      */
-    public static function format_dates($session) {
+    public static function format_dates(\stdClass $session): string {
         if (!empty($session->sessiondates)) {
             $formatteddates = array();
             foreach ($session->sessiondates as $date) {

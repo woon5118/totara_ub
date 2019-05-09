@@ -25,20 +25,21 @@ namespace mod_facetoface;
 
 use \csv_import_reader as csv;
 
+/**
+ * Additional import functionality.
+ */
 class import_helper {
 
     /**
      * If user's choice is 'automatic' delimiter lets try to find out
      *
      * @param \stdClass $formdata Fields and file submitted by html form
-     *      @var s seminar event id
-     *      @var listid list id
-     *      @var content file content
-     *      @var delimiter
+     *      - content file content
+     *      - delimiter
      *      data via file
      * @return string
      */
-    public static function csv_detect_delimiter($formdata): string {
+    public static function csv_detect_delimiter(\stdClass $formdata): string {
         // User's choice is auto detect delimiter, lets try it, if failed, return false.
         $detectdelimiter = function($delimiters, $content) {
             foreach($delimiters as $name => $delimiter) {

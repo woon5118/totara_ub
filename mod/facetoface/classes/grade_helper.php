@@ -25,13 +25,16 @@ namespace mod_facetoface;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Additional grade functionality.
+ */
 final class grade_helper {
 
     /**
      * Format grade into value with respect of course grade settings.
      * @param float|null $grade raw grade value
      * @param int $course course id
-     * @return string locale float or empty
+     * @return string|null locale float or empty, or null if $grade is null
      */
     public static function format(?float $grade, int $course): ?string {
         global $CFG;

@@ -159,7 +159,7 @@ final class attendees_helper {
      * @param int[] $statuscodes
      * @param bool  $includedeleted
      *
-     * @return event_attendee[] | \stdClass[]
+     * @return (event_attendee|\stdClass)[]
      */
     public function get_attendees_with_codes(array $statuscodes, bool $includedeleted = true): array {
         global $DB;
@@ -482,7 +482,7 @@ final class attendees_helper {
      * @return array
      */
     public static function get_allowed_available_actions(\mod_facetoface\seminar $seminar,
-        \mod_facetoface\seminar_event $seminarevent, \context $context, string $session = null): array {
+        \mod_facetoface\seminar_event $seminarevent, \context $context, $session = null): array {
         global $USER, $DB, $CFG;
         /**
          * Capability checks to see if the current user can view this page

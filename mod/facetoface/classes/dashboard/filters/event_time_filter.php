@@ -23,6 +23,7 @@
 
 namespace mod_facetoface\dashboard\filters;
 
+use context;
 use mod_facetoface\seminar;
 use mod_facetoface\event_time;
 use mod_facetoface\query\event\query;
@@ -116,7 +117,7 @@ final class event_time_filter implements filter {
     /**
      * @inheritDoc
      */
-    public static function is_visible(seminar $seminar, \context $context, ?int $userid): bool {
+    public static function is_visible(seminar $seminar, context $context, ?int $userid): bool {
         global $DB;
         /** @var \moodle_database $DB */
 

@@ -44,7 +44,7 @@ class bulk_list {
      * @param string $srctype specifies type of action that this list is being used for, e.g. 'add', 'addfile' etc
      * @param int $seminareventid
      */
-    public function __construct($listid, \moodle_url $returnurl = null, $srctype = '', int $seminareventid = 0) {
+    public function __construct(string $listid, \moodle_url $returnurl = null, string $srctype = '', int $seminareventid = 0) {
         global $SESSION;
         $this->listid = $listid;
 
@@ -75,7 +75,7 @@ class bulk_list {
      * Get return url.
      * @return \moodle_url $returnurl
      */
-    public function get_returnurl() {
+    public function get_returnurl(): \moodle_url {
         global $SESSION;
         return $SESSION->mod_facetoface_attendeeslist[$this->listid]['returnurl'];
     }
@@ -84,7 +84,7 @@ class bulk_list {
      * Get action type.
      * @return string $srctype
      */
-    public function get_srctype() {
+    public function get_srctype(): string {
         global $SESSION;
         return $SESSION->mod_facetoface_attendeeslist[$this->listid]['srctype'];
     }
@@ -93,7 +93,7 @@ class bulk_list {
      * Get list of user ids without any additional data
      * @return array
      */
-    public function get_user_ids() {
+    public function get_user_ids(): array {
         global $SESSION;
         return array_keys($SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata']);
     }
@@ -102,7 +102,7 @@ class bulk_list {
      * Set user ids without any additional data
      * @param array $userids
      */
-    public function set_user_ids(array $userids) {
+    public function set_user_ids(array $userids): void {
         global $SESSION;
         $emptyvalues = array_fill(0, count($userids), null);
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata'] = array_combine($userids, $emptyvalues);
@@ -113,7 +113,7 @@ class bulk_list {
      * Check if list has user data
      * @return bool
      */
-    public function has_user_data() {
+    public function has_user_data(): bool {
         global $SESSION;
         return !empty($SESSION->mod_facetoface_attendeeslist[$this->listid]['hasdata']);
     }
@@ -122,7 +122,7 @@ class bulk_list {
      * Store all users with additional data
      * @param array $userdata
      */
-    public function set_all_user_data(array $userdata) {
+    public function set_all_user_data(array $userdata): void {
         global $SESSION;
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata'] = $userdata;
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['hasdata'] = true;
@@ -133,7 +133,7 @@ class bulk_list {
      * @param array $userdata
      * @param int $userid
      */
-    public function set_user_data(array $userdata, $userid) {
+    public function set_user_data(array $userdata, int $userid): void {
         global $SESSION;
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata'][$userid] = $userdata;
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['hasdata'] = true;
@@ -141,9 +141,10 @@ class bulk_list {
 
     /**
      * Get user list with additional data
+     * @param int $userid
      * @return array $userdata
      */
-    public function get_user_data($userid) {
+    public function get_user_data(int $userid): array {
         global $SESSION;
         $userdata =  $SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata'][$userid];
         if (empty($userdata)) {
@@ -156,7 +157,7 @@ class bulk_list {
      * Store user list form data. Used to repopulate the form when user decides to change selected users
      * @param \stdClass $formdata
      */
-    public function set_form_data(\stdClass $formdata) {
+    public function set_form_data(\stdClass $formdata): void {
         global $SESSION;
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['formdata'] = $formdata;
     }
@@ -168,7 +169,7 @@ class bulk_list {
      *
      * @return array
      */
-    public function get_form_data() {
+    public function get_form_data(): array {
         global $SESSION;
         if (isset($SESSION->mod_facetoface_attendeeslist[$this->listid]['formdata'])) {
             return (array) $SESSION->mod_facetoface_attendeeslist[$this->listid]['formdata'];
@@ -179,7 +180,7 @@ class bulk_list {
     /**
      * Remove all data about this list
      */
-    public function clean() {
+    public function clean(): void {
         global $SESSION;
         unset($SESSION->mod_facetoface_attendeeslist[$this->listid]);
     }
@@ -189,7 +190,7 @@ class bulk_list {
      *
      * @param array $results
      */
-    public function set_validaton_results($results) {
+    public function set_validaton_results(array $results): void {
         global $SESSION;
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['validation'] = $results;
     }
@@ -199,7 +200,7 @@ class bulk_list {
      *
      * @return array
      */
-    public function get_validation_results() {
+    public function get_validation_results(): array {
         global $SESSION;
         if (isset($SESSION->mod_facetoface_attendeeslist[$this->listid]['validation'])) {
             return $SESSION->mod_facetoface_attendeeslist[$this->listid]['validation'];
@@ -209,9 +210,9 @@ class bulk_list {
 
     /**
      * Get current list id
-     * @return int
+     * @return string
      */
-    public function get_list_id() {
+    public function get_list_id(): string {
         return $this->listid;
     }
 

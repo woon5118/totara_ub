@@ -44,9 +44,10 @@ final class seminar_event_helper {
      * If dates provided matches any current session then update current session with new dates
      * If dates provided do not match any current sessions then remove unmatched current sessions and insert new dates
      *
+     * @param seminar_event $seminarevent
      * @param array $dates Dates used for updating/creating sessions
      */
-    public static function merge_sessions(seminar_event $seminarevent, array $dates) {
+    public static function merge_sessions(seminar_event $seminarevent, array $dates): void {
         global $DB;
 
         // Refresh list of current sessions from the database for merging, then clear it again.  This ensures that
@@ -95,7 +96,7 @@ final class seminar_event_helper {
      * @param seminar_session_list $sessions
      * @return array $dates
      */
-    private static function filter_sessions(array $dates, seminar_session_list $sessions) {
+    private static function filter_sessions(array $dates, seminar_session_list $sessions): array {
         return array_filter($dates, function ($date) use (&$sessions) {
             $date->id = isset($date->id) ? $date->id : 0;
             if ($sessions->contains($date->id)) {
@@ -247,8 +248,8 @@ final class seminar_event_helper {
 
     /**
      * Return Event booking status string.
-     * @param $session
-     * @param $signupcount
+     * @param stdClass $session
+     * @param integer $signupcount
      * @return string
      */
     public static function booking_status(\stdClass $session, int $signupcount): string {

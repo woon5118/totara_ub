@@ -35,7 +35,7 @@ final class role_list implements \Iterator {
     /**
      * role_list constructor.
      *
-     * @param array $conditions optional array $fieldname => requestedvalue with AND in between
+     * @param array|null $conditions optional array $fieldname => requestedvalue with AND in between
      * @param string $sort an order to sort the results in.
      */
     public function __construct(array $conditions = null, string $sort = 'roleid') {
@@ -52,7 +52,7 @@ final class role_list implements \Iterator {
      * Add session_role to item list
      * @param role $item
      */
-    public function add(role $item) {
+    public function add(role $item): void {
         $this->items[$item->get_id()] = $item;
     }
 }

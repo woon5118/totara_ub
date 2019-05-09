@@ -96,7 +96,7 @@ final class signup_helper {
      * Get expected state upon signup
      *
      * @param signup $signup
-     * @return bool
+     * @return state
      */
     public static function expected_signup_state(signup $signup) : state {
         $oldstate = $signup->get_state();
@@ -230,7 +230,7 @@ final class signup_helper {
      * @param signup        $signup
      * @param string        $desiredstate       the class name of a new state
      * @param bool          $eventgradingmanual true to use $grade value, false to use default value instead of $grade value
-     * @param float         $grade              new grade or null to use default by $desiredstate::get_grade()
+     * @param float|null    $grade              new grade or null to use default by $desiredstate::get_grade()
      * @return bool
      */
     private static function switch_state_and_grade(seminar_event $seminarevent, signup $signup, string $desiredstate, bool $eventgradingmanual, float $grade = null) : bool {
@@ -384,7 +384,7 @@ final class signup_helper {
 
         $timenow = time();
 
-        $grade = new \stdclass();
+        $grade = new \stdClass();
         $grade->userid = $signup->get_userid();
         $grade->rawgrade = $finalgrade;
         $grade->rawgrademin = 0;
@@ -437,7 +437,7 @@ final class signup_helper {
      * Update attendees status regarding new event settingss
      * @param seminar_event $seminarevent
      */
-    public static function update_attendees(seminar_event $seminarevent) {
+    public static function update_attendees(seminar_event $seminarevent): void {
         if ($seminarevent->is_started()) {
             return;
         }
@@ -486,8 +486,9 @@ final class signup_helper {
 
     /**
      * Add default job assignment if required
+     * @param signup $signup
      */
-    protected static function set_default_job_assignment(signup $signup) {
+    protected static function set_default_job_assignment(signup $signup): void {
         $seminar = $signup->get_seminar_event()->get_seminar();
         $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
         $jobassignmentrequired = !empty($selectjobassignmentonsignupglobal) && !empty($seminar->get_selectjobassignmentonsignup());
@@ -505,7 +506,7 @@ final class signup_helper {
      * Trigger signup event
      * @param signup $signup
      */
-    protected static function trigger_event(signup $signup) {
+    protected static function trigger_event(signup $signup): void {
         $cm = $signup->get_seminar_event()->get_seminar()->get_coursemodule();
         $context = \context_module::instance($cm->id);
         \mod_facetoface\event\session_signup::create_from_signup($signup, $context)->trigger();
@@ -516,7 +517,7 @@ final class signup_helper {
      *
      * @param signup $signup
      */
-    protected static function withdraw_interest(signup $signup) {
+    protected static function withdraw_interest(signup $signup): void {
         $interest = interest::from_seminar($signup->get_seminar_event()->get_seminar(), $signup->get_userid());
         $interest->withdraw();
     }
@@ -528,7 +529,7 @@ final class signup_helper {
      * @param array  $userids    Array of user ids to confirm
      * @return array $result success|failures
      */
-    public static function confirm_waitlist(\mod_facetoface\seminar_event $seminarevent, $userids) {
+    public static function confirm_waitlist(\mod_facetoface\seminar_event $seminarevent, array $userids): array {
         global $DB;
 
         $errors = [];
@@ -577,7 +578,7 @@ final class signup_helper {
      * @param array $userids a list of user ids
      * @return array $result success|failure
      */
-    public static function confirm_waitlist_randomly(\mod_facetoface\seminar_event $seminarevent, $userids) {
+    public static function confirm_waitlist_randomly(\mod_facetoface\seminar_event $seminarevent, array $userids): array {
         $helper = new attendees_helper($seminarevent);
         $signupcount = $helper->count_attendees();
         $numtoconfirm = $seminarevent->get_capacity() - $signupcount;
@@ -598,7 +599,7 @@ final class signup_helper {
      * @param seminar_event $seminarevent
      * @param array  $userids    Array of user ids to cancel
      */
-    public static function cancel_waitlist(\mod_facetoface\seminar_event $seminarevent, $userids) {
+    public static function cancel_waitlist(\mod_facetoface\seminar_event $seminarevent, array $userids): void {
 
         foreach ($userids as $userid) {
             $signup = signup::create($userid, $seminarevent);

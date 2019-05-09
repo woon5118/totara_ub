@@ -64,7 +64,7 @@ final class room_list implements \Iterator {
      * Add room to list
      * @param room $item
      */
-    public function add(room $item) {
+    public function add(room $item): void {
         $this->items[$item->get_id()] = $item;
     }
 
@@ -111,12 +111,10 @@ final class room_list implements \Iterator {
      *
      * @param int $timestart start of requested slot
      * @param int $timefinish end of requested slot
-     * @param string $fields db fields for which data should be retrieved, with mandatory 'fr.' prefix
-     * @param int $sessionid current session id, 0 if session is being created, all current session rooms are always included
-     * @param int $facetofaceid facetofaceid custom rooms can be used in all dates of one seminar activity
+     * @param seminar_event $event current session, 0 if session is being created, all current session rooms are always included
      * @return room_list
      */
-    public static function get_available_rooms($timestart, $timefinish, seminar_event $event) : room_list {
+    public static function get_available_rooms(int $timestart, int $timefinish, seminar_event $event) : room_list {
         global $DB, $USER;
 
         $list = new room_list('', ['id' => 0]); // Create an empty list

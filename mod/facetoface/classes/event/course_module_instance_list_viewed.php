@@ -23,5 +23,9 @@
 
 namespace mod_facetoface\event;
 defined('MOODLE_INTERNAL') || die();
+
+/**
+ * {@inheritDoc}
+ */
 class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
 }

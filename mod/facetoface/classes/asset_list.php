@@ -36,10 +36,16 @@ final class asset_list implements \Iterator {
      * Add asset to item list
      * @param asset $item
      */
-    public function add(asset $item) {
+    public function add(asset $item): void {
         $this->items[$item->get_id()] = $item;
     }
 
+    /**
+     * See if the list contains the specified asset ID.
+     *
+     * @param integer $assetid
+     * @return boolean
+     */
     public function contains(int $assetid) : bool {
         return array_key_exists($assetid, $this->items);
     }
@@ -49,13 +55,13 @@ final class asset_list implements \Iterator {
      *
      * NOTE: performance is not critical here because this function should be used only when assigning assets to sessions.
      *
-     * @param int $timestart start of requested slot
-     * @param int $timefinish end of requested slot
+     * @param int|string $timestart start of requested slot
+     * @param int|string $timefinish end of requested slot
      * @param seminar_event $seminarevent
-     * @return asset_list|asset[] assets
+     * @return asset_list assets
      *
      */
-    public static function get_available($timestart, $timefinish, seminar_event $seminarevent) {
+    public static function get_available($timestart, $timefinish, seminar_event $seminarevent): asset_list {
         global $DB, $USER;
 
         $eventid = $seminarevent->get_id();

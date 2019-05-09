@@ -26,11 +26,12 @@ namespace mod_facetoface\signup\state;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is used in booking class and responsible for exact state
+ * This class represents event cancelled state.
  */
 class event_cancelled extends state {
     /**
      * Get conditions and validations of transitions from current state
+     * @return array
      */
     final public function get_map() : array {
         // Final state.
@@ -41,6 +42,7 @@ class event_cancelled extends state {
      * Code of status as it is stored in DB
      * Numeric statuses are backward compatible except not_set which was not meant to be written into DB.
      * Statuses don't have to follow particular order (except must be unique of course)
+     * @return integer
      */
     public static function get_code() : int {
         return 20;

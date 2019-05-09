@@ -26,7 +26,7 @@ namespace mod_facetoface\signup\state;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is used in booking class and responsible for exact state
+ * This class represents partially attended graded state.
  */
 class partially_attended extends attendance_state {
 

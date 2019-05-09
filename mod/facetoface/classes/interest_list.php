@@ -35,7 +35,7 @@ final class interest_list implements \Iterator {
     /**
      * interest_list constructor.
      *
-     * @param array $conditions optional array $fieldname => requestedvalue with AND in between
+     * @param array|null $conditions optional array $fieldname => requestedvalue with AND in between
      * @param string $sort an order to sort the results in.
      */
     public function __construct(array $conditions = null, string $sort = '') {
@@ -52,7 +52,7 @@ final class interest_list implements \Iterator {
      * Add seminar interest to item list
      * @param interest $item
      */
-    public function add(interest $item) {
+    public function add(interest $item): void {
         $this->items[$item->get_id()] = $item;
     }
 }

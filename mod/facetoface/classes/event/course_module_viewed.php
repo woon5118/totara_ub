@@ -25,6 +25,9 @@ namespace mod_facetoface\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * {@inheritDoc}
+ */
 class course_module_viewed extends \core\event\course_module_viewed {
     protected function init() {
         $this->data['objecttable'] = 'facetoface';

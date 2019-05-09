@@ -23,6 +23,7 @@
 
 namespace mod_facetoface\dashboard\filters;
 
+use context;
 use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\filter\advanced_filter as query_advanced_filter;
@@ -115,7 +116,7 @@ final class advanced_filter implements filter {
     /**
      * @inheritDoc
      */
-    public static function is_visible(seminar $seminar, \context $context, ?int $userid): bool {
+    public static function is_visible(seminar $seminar, context $context, ?int $userid): bool {
         // Hide if session attendance tracking is disabled.
         if (!$seminar->get_sessionattendance()) {
             return false;

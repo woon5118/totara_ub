@@ -48,7 +48,7 @@ final class recipients_list_helper {
     /**
      * Set recipients submitted by $_POST request.
      */
-    public function set_recipients() {
+    public function set_recipients(): void {
         $recipients = optional_param('recipients', [], PARAM_SEQUENCE);
         $this->recipients = explode(',', $recipients);
         foreach ($this->recipients as $key => $recipient) {
@@ -70,7 +70,7 @@ final class recipients_list_helper {
      * Add recipients
      * @param \stdClass $data submitted by $_POST request
      */
-    public function add_recipients($data) {
+    public function add_recipients(\stdClass $data): void {
         if (!empty($data->addselect) && confirm_sesskey()) {
             foreach ($data->addselect as $adduser) {
                 if (!$adduser = clean_param($adduser, PARAM_INT)) {
@@ -85,7 +85,7 @@ final class recipients_list_helper {
      * Remove recipients
      * @param object $data submitted $_POST request
      */
-    public function remove_recipients($data) {
+    public function remove_recipients($data): void {
         if (!empty($data->removeselect) and confirm_sesskey()) {
             foreach ($data->removeselect as $removeuser) {
                 if (!$removeuser = clean_param($removeuser, PARAM_INT)) {
@@ -157,7 +157,7 @@ final class recipients_list_helper {
      * Local location for the all name fields to keep consistency with get_selected_users() and get_available_users() methods.
      * @return string All name fields as an SQL fragment
      */
-    private static function get_all_user_name_fields() {
+    private static function get_all_user_name_fields(): string {
         static $fields = null;
         if (!is_null($fields)) {
             return $fields;

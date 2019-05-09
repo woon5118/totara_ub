@@ -23,6 +23,8 @@
 
 namespace mod_facetoface\dashboard;
 
+use context;
+use moodle_url;
 use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 use mod_facetoface\dashboard\filters\filter;
@@ -66,7 +68,7 @@ class filter_list {
     }
 
     /**
-     * Add a filter.
+     * Add a filter. If the same filter already exists, the existing filter will be overwritten.
      *
      * @param filter $filter
      * @return filter_list
@@ -97,7 +99,8 @@ class filter_list {
     }
 
     /**
-     * See if all parameter values are default.
+     * Return true if all parameter values are default.
+     *
      * @return boolean
      */
     public function are_default(): bool {
@@ -112,7 +115,7 @@ class filter_list {
      * Get the filter value of a given filter class.
      *
      * @param string $class     The name of a filter class
-     * @return string|integer
+     * @return string|integer   The current filter value
      */
     public function get_filter_value(string $class) {
         if (!array_key_exists($class, $this->filters)) {
@@ -124,8 +127,8 @@ class filter_list {
     /**
      * Set the filter value of a given filter class.
      *
-     * @param string $class     The name of a filter class
-     * @param string|integer $value
+     * @param string            $class      The name of a filter class
+     * @param string|integer    $value      A new filter value
      * @return filter_list
      */
     public function set_filter_value(string $class, $value): filter_list {
@@ -139,13 +142,13 @@ class filter_list {
     /**
      * See if the filter is available.
      *
-     * @param seminar           $seminar    A seminar instance
      * @param filter            $filter     A filter instance
+     * @param seminar           $seminar    A seminar instance
      * @param context           $context    A context
      * @param integer|null      $userid     A user ID or null to use the current user
      * @return boolean
      */
-    private static function is_filter_available(filter $filter, seminar $seminar, \context $context, int $userid = null): bool {
+    private static function is_filter_available(filter $filter, seminar $seminar, context $context, int $userid = null): bool {
         if ($filter->is_visible($seminar, $context, $userid)) {
             return true;
         }
@@ -161,7 +164,7 @@ class filter_list {
      * @param integer|null      $userid     A user ID or null to use the current user
      * @return seminarevent_filterbar_builder
      */
-    public function to_filterbar_builder(seminar $seminar, string $id, \context $context, int $userid = null): seminarevent_filterbar_builder {
+    public function to_filterbar_builder(seminar $seminar, string $id, context $context, int $userid = null): seminarevent_filterbar_builder {
         $filterbar = \mod_facetoface\output\seminarevent_filterbar::builder($id);
         $filterbar->add_param(self::PARAM_FILTER_F2FID, $seminar->get_id());
         // Sort filters by sort order defined by filter classes
@@ -202,7 +205,7 @@ class filter_list {
      * @param integer|null      $userid     A user ID or null to use the current user
      * @return query
      */
-    public function to_query(seminar $seminar, \context $context, int $userid = null): query {
+    public function to_query(seminar $seminar, context $context, int $userid = null): query {
         $query = new query($seminar);
         foreach ($this->filters as $unused => $filter) {
             $filter->modify_query($query);
@@ -217,7 +220,7 @@ class filter_list {
      * @param string  $baseurl      A page url
      * @return moodle_url
      */
-    public function to_url(seminar $seminar, string $baseurl = '/mod/facetoface/view.php'): \moodle_url {
+    public function to_url(seminar $seminar, string $baseurl = '/mod/facetoface/view.php'): moodle_url {
         $params = [
             self::PARAM_FILTER_F2FID => $seminar->get_id()
         ];
@@ -228,6 +231,6 @@ class filter_list {
                 $params[$name] = $value;
             }
         }
-        return new \moodle_url($baseurl, $params);
+        return new moodle_url($baseurl, $params);
     }
 }

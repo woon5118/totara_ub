@@ -29,7 +29,7 @@ use mod_facetoface\signup\condition\{event_is_not_cancelled, event_in_the_past};
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is used in booking class and responsible for exact state
+ * This class represents no show graded state.
  */
 class no_show extends attendance_state {
 

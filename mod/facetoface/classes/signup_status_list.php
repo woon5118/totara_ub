@@ -53,7 +53,7 @@ final class signup_status_list implements \Iterator {
      *
      * @param signup_status $item
      */
-    public function add(signup_status $item) {
+    public function add(signup_status $item): void {
         $this->items[$item->get_id()] = $item;
     }
 }
