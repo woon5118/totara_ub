@@ -355,6 +355,20 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'status',
+                'grade',
+                get_string('eventgradeheader', 'mod_facetoface'),
+                'status.grade',
+                [
+                    'joins' => 'status',
+                    'displayfunc' => 'session_grade',
+                    'outputformat' => 'float',
+                    'extrafields' => [
+                        'courseid' => 'facetoface.course'
+                    ]
+                ]
+            ),
+            new rb_column_option(
+                'status',
                 'createdby',
                 get_string('createdby', 'rb_source_facetoface_sessions'),
                 $DB->sql_concat_join("' '", $usernamefieldscreator),
