@@ -41,6 +41,13 @@ class rb_source_dp_course extends rb_base_source {
     use \totara_cohort\rb\source\report_trait;
 
     /**
+     * Stored during post_params() so that it can be used later to update our source joins.
+     *
+     * @var int
+     */
+    protected $userid;
+
+    /**
      * Constructor
      */
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
@@ -59,10 +66,13 @@ class rb_source_dp_course extends rb_base_source {
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = array();
-        $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_course');
         $this->usedcomponents[] = 'totara_plan';
         $this->usedcomponents[] = 'totara_cohort';
+
+        // Caching is disabled because visibility needs to be calculated using live data that cannot be cached.
+        $this->cacheable = false;
+
         parent::__construct();
     }
 
@@ -645,63 +655,35 @@ class rb_source_dp_course extends rb_base_source {
         return $defaultcolumns;
     }
 
-    protected function define_requiredcolumns() {
-        $requiredcolumns = array();
+    /**
+     * Used to inject $userid into the base sql to improve base sub-query performance,
+     * and to apply totara_visibility_where SQL restrictions.
+     *
+     * @param reportbuilder $report
+     */
+    public function post_params(reportbuilder $report) {
+        $this->userid = $report->get_param_value('userid');
 
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'id',
-            '',
-            "course.id",
-            array('joins' => 'course')
-        );
+        if ($this->userid) {
+            $this->base = $this->get_dp_status_base_sql($this->userid);
 
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'visible',
-            '',
-            "course.visible",
-            array('joins' => 'course')
-        );
+            // Visibility checks are only applied if viewing a single user's records.
+            list($sql, $params) = totara_visibility_where(
+                $this->userid,
+                'course.id',
+                'course.visible',
+                'course.audiencevisible',
+                'course',
+                'course',
+                false,
+                true
+            );
+            $this->sourcewhere = "(course_completion.status > :notyetstarted) OR ({$sql})";
 
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'audiencevisible',
-            '',
-            "course.audiencevisible",
-            array('joins' => 'course')
-        );
+            $params['notyetstarted'] = COMPLETION_STATUS_NOTYETSTARTED;
+            $this->sourceparams = $params;
 
-        $requiredcolumns[] = new rb_column(
-            'ctx',
-            'id',
-            '',
-            "ctx.id",
-            array('joins' => 'ctx')
-        );
-
-        $requiredcolumns[] = new rb_column(
-            'visibility',
-            'completionstatus',
-            '',
-            "course_completion.status",
-            array(
-                'joins' => array('course_completion'),
-            )
-        );
-
-        return $requiredcolumns;
-    }
-
-    public function post_config(reportbuilder $report) {
-        // Visibility checks are only applied if viewing a single user's records.
-        if ($report->get_param_value('userid')) {
-            list($visibilitysql, $whereparams) = $report->post_config_visibility_where('course', 'course',
-                $report->get_param_value('userid'), true);
-            $completionstatus = $report->get_field('visibility', 'completionstatus', 'course_completion.status');
-            $wheresql = "(({$visibilitysql}) OR ({$completionstatus} > :notyetstarted))";
-            $whereparams['notyetstarted'] = COMPLETION_STATUS_NOTYETSTARTED;
-            $report->set_post_config_restrictions(array($wheresql, $whereparams));
+            $this->sourcejoins = ['ctx', 'course_completion'];
         }
     }
 

@@ -783,7 +783,7 @@ trait report_trait {
         global $CFG;
         require_once($CFG->dirroot.'/totara/plan/rb_sources/rb_source_dp_course.php');
         // Use base query from rb_source_dp_course, and column/joins of statusandapproval.
-        $base_sql = $this->get_dp_status_base_sql();
+        $base_sql = $this->get_dp_status_base_sql($userid);
         $sql = "SELECT CASE WHEN dp_course.planstatus = " . DP_PLAN_STATUS_COMPLETE . "
                             THEN dp_course.completionstatus
                             ELSE course_completion.status
@@ -805,9 +805,12 @@ trait report_trait {
 
     /**
      * Get base sql for course record of learning.
+     *
+     * @param int|null $userid
+     *
      * @return string
      */
-    public function get_dp_status_base_sql() {
+    public function get_dp_status_base_sql(int $userid = null) {
         global $DB;
 
         // Apply global user restrictions.
@@ -822,20 +825,31 @@ trait report_trait {
                 $DB->sql_cast_2char('courseid')
             )
         );
-        return  "(SELECT " . $uniqueid . " AS id, userid, courseid
+
+        $ue_userid_sql = '';
+        $cc_userid_sql = '';
+        $p1_userid_sql = '';
+        if ($userid) {
+            $ue_userid_sql = " AND ue.userid = {$userid} ";
+            $cc_userid_sql = " AND cc.userid = {$userid} ";
+            $p1_userid_sql = " AND p1.userid = {$userid} ";
+        }
+
+        return  "(SELECT {$uniqueid} AS id, userid, courseid
                     FROM (SELECT ue.userid AS userid, e.courseid AS courseid
                            FROM {user_enrolments} ue
-                           JOIN {enrol} e ON ue.enrolid = e.id
+                           JOIN {enrol} e ON ue.enrolid = e.id {$ue_userid_sql}
                            {$global_restriction_join_ue}
                           UNION
                          SELECT cc.userid AS userid, cc.course AS courseid
                            FROM {course_completions} cc
                            {$global_restriction_join_cc}
                           WHERE cc.status > " . COMPLETION_STATUS_NOTYETSTARTED . "
+                           {$cc_userid_sql}
                           UNION
                          SELECT p1.userid AS userid, pca1.courseid AS courseid
                            FROM {dp_plan_course_assign} pca1
-                           JOIN {dp_plan} p1 ON pca1.planid = p1.id
+                           JOIN {dp_plan} p1 ON pca1.planid = p1.id {$p1_userid_sql}
                            {$global_restriction_join_p1}
                     )
                 basesub)";
