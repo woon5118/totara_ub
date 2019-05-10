@@ -88,6 +88,9 @@ class core_component {
         'PHPMailer\\PHPMailer' => 'lib/phpmailer/src',
         // Totara: extra libraries
         'GraphQL' => 'totara/webapi/lib/graphql-php/src',
+        'RedeyeVentures\\GeoPattern' => 'lib/geopattern-php/GeoPattern',
+        'MongoDB' => 'cache/stores/mongodb/MongoDB',
+        'Firebase\\JWT' => 'lib/php-jwt/src',
     );
 
     /** @var string Totara build */
