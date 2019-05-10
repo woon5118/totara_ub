@@ -532,5 +532,30 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019032000, 'facetoface');
     }
 
+    if ($oldversion < 2019050100) {
+        // Define field completionpass to be added to facetoface.
+        $table = new xmldb_table('facetoface');
+
+        // Conditionally launch add field completionpass.
+        $field = new xmldb_field('completionpass', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'eventgradingmethod');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Set "Require grade" to "Yes, any grade" if "Learner must receive a grade to complete this activity" is already enabled
+        $sql = "UPDATE {facetoface}
+                   SET completionpass = 1
+                 WHERE id IN (
+                    SELECT cm.instance
+                      FROM {course_modules} cm
+                      JOIN {modules} m ON m.id = cm.module
+                     WHERE m.name = 'facetoface' AND cm.completion = 2 AND cm.completiongradeitemnumber = 0
+                 ) AND completionpass = 0";
+        $DB->execute($sql);
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2019050100, 'facetoface');
+    }
+
     return true;
 }

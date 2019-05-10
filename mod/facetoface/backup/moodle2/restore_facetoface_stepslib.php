@@ -20,6 +20,8 @@
  * @package mod_facetoface
  */
 
+use mod_facetoface\seminar;
+
 /**
  * Structure step to restore one facetoface activity
  */
@@ -87,6 +89,24 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         // insert the facetoface record
         $newitemid = $DB->insert_record('facetoface', $data);
         $this->apply_activity_instance($newitemid);
+
+        // Fix up the facetoface database record, which has just been inserted, in the same way as upgrade.php.
+        $DB->execute(
+            "UPDATE {facetoface}
+                SET completionpass = :cpa
+              WHERE id = :fid AND EXISTS(
+                SELECT *
+                  FROM {course_modules} cm
+                 WHERE cm.instance = :cmi AND cm.completion = :cc AND cm.completiongradeitemnumber = 0
+              ) AND completionpass = :cpd",
+            array(
+                'cc' => COMPLETION_TRACKING_AUTOMATIC,
+                'cpa' => seminar::COMPLETION_PASS_ANY,
+                'cpd' => seminar::COMPLETION_PASS_DISABLED,
+                'fid' => $newitemid,
+                'cmi' => $newitemid
+            )
+        );
     }
 
     protected function process_facetoface_notification($data) {

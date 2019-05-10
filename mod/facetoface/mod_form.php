@@ -24,6 +24,25 @@
 require_once "$CFG->dirroot/course/moodleform_mod.php";
 require_once "$CFG->dirroot/mod/facetoface/lib.php";
 
+require_once($CFG->libdir . '/pear/HTML/QuickForm/Rule.php');
+
+/**
+ * Provide numeric range rule.
+ */
+class mod_facetoface_rule_numeric_range extends HTML_QuickForm_Rule {
+    /**
+     * Validates a value.
+     *
+     * @param mixed $value
+     * @param array|null $options contains ['min', 'max']
+     * @return mixed
+     */
+    public function validate($value, $options = null) {
+        $float = unformat_float($value, true);
+        return $float !== false && $options['min'] <= $float && $float <= $options['max'];
+    }
+}
+
 class mod_facetoface_mod_form extends moodleform_mod {
 
     public function definition() {
@@ -118,6 +137,16 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->addElement('select', 'eventgradingmethod', get_string('eventgradingmethod', 'facetoface'), $options);
         $mform->addHelpButton('eventgradingmethod', 'eventgradingmethod', 'facetoface');
         $mform->setDefault('eventgradingmethod', get_config('facetoface', 'eventgradingmethod'));
+
+        // In order to update {grade_items}.gradepass, the "Grade to pass" field must be named 'gradepass'.
+        $mform->addElement('text', 'gradepass', get_string('gradepass', 'mod_facetoface'));
+        $mform->setType('gradepass', PARAM_RAW);
+        $mform->registerRule('f2f_numericrange', 'rule', 'mod_facetoface_rule_numeric_range');
+        $minmax = ['min' => \mod_facetoface\seminar::GRADE_PASS_MINIMUM, 'max' => \mod_facetoface\seminar::GRADE_PASS_MAXIMUM];
+        $mform->addRule('gradepass', get_string('err_numeric', 'form'), 'required');
+        $mform->addRule('gradepass', get_string('gradepass_error', 'mod_facetoface', $minmax), 'f2f_numericrange', $minmax);
+        $mform->setDefault('gradepass', get_config('facetoface', 'gradepass'));
+        $mform->addHelpButton('gradepass', 'gradepass', 'mod_facetoface');
 
         $mform->addElement('header', 'approvaloptionsheader', get_string('signupworkflowheader', 'facetoface'));
 
@@ -401,10 +430,44 @@ class mod_facetoface_mod_form extends moodleform_mod {
         }
     }
 
+    public function definition_after_data() {
+        $mform =& $this->_form;
+
+        parent::definition_after_data();
+
+        // The 'completionpass' may not exist when activity completion is disabled.
+        if ($mform->elementExists('completionpass')) {
+            $completionpass = (int)$mform->getElementValue('completionpass')[0];
+            $completionusegrade = $mform->getElement('completionusegrade');
+            /** @var MoodleQuickForm_checkbox $completionusegrade */
+            if ($completionpass == \mod_facetoface\seminar::COMPLETION_PASS_ANY) {
+                $completionusegrade->setValue('1');
+            } else {
+                $completionusegrade->setValue('0');
+            }
+        }
+    }
+
     function add_completion_rules() {
 
         $mform =& $this->_form;
         $items = array();
+
+        // Replace the existing completionusegrade with a hidden placeholder. (Yes, we need it!)
+        // Then display our own completionpass instead.
+        $mform->removeElement('completionusegrade');
+        $mform->addElement('hidden', 'completionusegrade', 0);
+        $mform->setType('completionusegrade', PARAM_INT);
+
+        $options = array(
+            \mod_facetoface\seminar::COMPLETION_PASS_DISABLED   => get_string('completionpass:no', 'mod_facetoface'),
+            \mod_facetoface\seminar::COMPLETION_PASS_ANY        => get_string('completionpass:any', 'mod_facetoface'),
+            \mod_facetoface\seminar::COMPLETION_PASS_GRADEPASS  => get_string('completionpass:pass', 'mod_facetoface'),
+        );
+        $mform->addElement('select', 'completionpass', get_string('completionpass', 'mod_facetoface'), $options);
+        $mform->disabledIf('completionpass', 'completion', 'ne', COMPLETION_TRACKING_AUTOMATIC);
+        $mform->addHelpButton('completionpass', 'completionpass', 'mod_facetoface');
+        $items[] = 'completionpass';
 
         // Require status.
         $first = true;
@@ -430,7 +493,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
     }
 
     function completion_rule_enabled($data) {
-        return (!empty($data['completionstatusrequired']));
+        return (!empty($data['completionpass']) || !empty($data['completionstatusrequired']));
     }
 
     function get_data($slashed = true) {
@@ -542,6 +605,25 @@ class mod_facetoface_mod_form extends moodleform_mod {
 
         $data->waitlistautoclean = empty($data->waitlistautoclean) ? 0 : 1;
 
+        // Set completionusegrade based on completionpass as below.
+        // These fields are used by the system.
+        //
+        // completionpass      DISABLED ANY              GRADEPASS
+        // ---------------     -------- ---              ---------
+        // completionusegrade  0        1                0
+
+        switch ($data->completionpass ?? \mod_facetoface\seminar::COMPLETION_PASS_DISABLED) {
+            case \mod_facetoface\seminar::COMPLETION_PASS_DISABLED:
+                $data->completionusegrade = 0;
+                break;
+            case \mod_facetoface\seminar::COMPLETION_PASS_ANY:
+                $data->completionusegrade = 1;
+                break;
+            case \mod_facetoface\seminar::COMPLETION_PASS_GRADEPASS:
+                $data->completionusegrade = 0;
+                break;
+        }
+
         return $data;
     }
 
@@ -589,12 +671,29 @@ class mod_facetoface_mod_form extends moodleform_mod {
             }
         }
 
+        if (!isset($defaultvalues['gradepass'])) {
+            global $CFG;
+            // Manually load the default setting to correctly format the value.
+            $gradepass = get_config('facetoface', 'gradepass');
+            $decimalpoints = grade_get_setting($this->current->course, 'decimalpoints', $CFG->grade_decimalpoints);
+            $defaultvalues['gradepass'] = format_float($gradepass, $decimalpoints);
+        }
+
         parent::set_data($defaultvalues);
     }
 
     public function validation($data, $files) {
         global $DB;
         $errors = parent::validation($data, $files);
+
+        // Override the validation made by moodleform_mod
+        if (array_key_exists('completion', $data) && $data['completion'] == COMPLETION_TRACKING_AUTOMATIC && !empty($data['completionunlocked'])) {
+            unset($errors['completion']);
+
+            if (empty($data['completionview']) && empty($data['completionpass']) && !$this->completion_rule_enabled($data)) {
+                $errors['completion'] = get_string('badautocompletion', 'completion');
+            }
+        }
 
         if (!empty($data['selectedapprovers'])) {
             $selectedapprovers = explode(',', $data['selectedapprovers']);

@@ -106,25 +106,15 @@ class mod_facetoface_event_taking_attendance_testcase extends advanced_testcase 
     }
 
     /**
-     * Convert string grade to float grade if necessary.
-     * For some reason grade_get_grades() returns string when GRADE_TYPE_VALUE.
+     * Convert string grade to float grade using grade_floatval().
+     * grade_get_grades() returns decimal number as string when GRADE_TYPE_VALUE.
      *
      * @param mixed $grade
      * @return float|null
      */
     private static function fixup_grade($grade) : ?float {
-        if (is_null($grade)) {
-            return null;
-        }
-        if (is_float($grade)) {
-            return $grade;
-        }
-        if (is_string($grade)) {
-            if ($grade === '') {
-                return null;
-            } else if (is_numeric($grade)) {
-                return (float)$grade;
-            }
+        if (is_null($grade) || is_numeric($grade)) {
+            return grade_floatval($grade);
         }
         throw new Exception("'{$grade}' is neither numeric string, float nor null");
     }

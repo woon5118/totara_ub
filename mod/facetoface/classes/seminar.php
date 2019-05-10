@@ -60,6 +60,20 @@ final class seminar implements seminar_iterator_item {
     const GRADING_METHOD_EVENTLAST = 3;
 
     /**
+     * Event grading value to pass
+     */
+    const GRADE_PASS_DEFAULT = 100.;
+    const GRADE_PASS_MINIMUM = 0.;
+    const GRADE_PASS_MAXIMUM = 100.;
+
+    /**
+     * Activity completion grade types
+     */
+    const COMPLETION_PASS_DISABLED = 0;
+    const COMPLETION_PASS_ANY = 1;
+    const COMPLETION_PASS_GRADEPASS = 2;
+
+    /**
      * @var int {facetoface}.id
      */
     private $id = 0;
@@ -217,6 +231,10 @@ final class seminar implements seminar_iterator_item {
      * @var int {facetoface}.eventgradingmethod
      */
     private $eventgradingmethod = self::GRADING_METHOD_GRADEHIGHEST;
+    /**
+     * @var int {facetoface}.completionpass
+     */
+    private $completionpass = self::COMPLETION_PASS_DISABLED;
     /**
      * @var string facetoface table name
      */
@@ -1017,6 +1035,20 @@ final class seminar implements seminar_iterator_item {
      */
     public function set_eventgradingmethod(int $eventgradingmethod) : seminar {
         $this->eventgradingmethod = $eventgradingmethod;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_completionpass(): int {
+        return (int)$this->completionpass;
+    }
+    /**
+     * @param int $completionpass
+     */
+    public function set_completionpass(int $completionpass) : seminar {
+        $this->completionpass = $completionpass;
         return $this;
     }
 

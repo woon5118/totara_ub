@@ -32,6 +32,7 @@ use mod_facetoface\{
     seminar_event,
     notice_sender,
     signup_list,
+    signup_helper,
     seminar_event_list,
     reservations
 };
@@ -146,6 +147,68 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
     $params = array('fid' => $cm->instance);
     if (!$facetoface = $DB->get_record_sql($sql, $params)) {
         print_error('cannotfindfacetoface');
+    }
+
+    // Check for passing grade.
+    if ($facetoface->completionpass != seminar::COMPLETION_PASS_DISABLED) {
+        require_once($CFG->libdir . '/gradelib.php');
+        $item = grade_item::fetch(array(
+            'courseid'      => $course->id,
+            'itemtype'      => 'mod',
+            'itemmodule'    => 'facetoface',
+            'iteminstance'  => $cm->instance,
+            'outcomeid'     => null,
+        ));
+        if ($item) {
+            $grades = grade_grade::fetch_users_grades($item, array($userid), false);
+            if (empty($grades[$userid])) {
+                // If a learner has not received a seminar grade, then the activity completion is still incomplete.
+            } else {
+                $grade = $grades[$userid];
+                /** @var grade_grade $grade */
+                // The following pseudo-code illustrates how the activity completion copes with seminar grade:
+                //  if 'require grade' is 'yes, passing grade' then:
+                //    if passing grade > 0 then:
+                //      if seminar grade >= passing grade then:
+                //        status := 'completed and passed' (green check)
+                //      else
+                //        status := still 'incomplete' (black circle)
+                //      endif
+                //    else
+                //      status := 'completed' (black check)
+                //    endif
+                //  else   # 'require grade' is 'yes, any grade'
+                //    if passing grade > 0 then:
+                //      if seminar grade >= passing grade then:
+                //        status := 'completed and passed' (green check)
+                //      else
+                //        status := 'completed and failed' (red cross)
+                //      endif
+                //    else
+                //      status := 'completed' (black check)
+                //    endif
+                //  endif
+                if ($facetoface->completionpass == seminar::COMPLETION_PASS_GRADEPASS) {
+                    // Here is the trickiest part.
+                    // If passing grade is 0, then the grade_grade::is_passed() function returns null,
+                    // in which case 'true' is what we need to let the completionlib keep the completion status *incomplete*.
+                    $newstate = $grade->is_passed($item) ?? true;
+                } else {
+                    $newstate = true;
+                }
+                if ($newstate) {
+                    $final = signup_helper::compute_final_grade_with_time($facetoface, $userid);
+                    // Tell completion_criteria_activity::review exact time of completion, otherwise it will use time of review run.
+                    if ($final) {
+                        $cm->timecompleted = $final->timefinish;
+                    } else {
+                        // None of the signup states can determine the final grade.
+                        unset($cm->timecompleted);
+                    }
+                }
+                $result = completion_info::aggregate_completion_states($type, $result, $newstate);
+            }
+        }
     }
 
     // Only check for existence of tracks and return false if completionstatusrequired.
@@ -639,18 +702,19 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 /**
  * Update grades by firing grade_updated event
  *
- * @param object $facetoface null means all facetoface activities
- * @param int $userid specific user only, 0 mean all (not used here)
- * @param bool $defaultifnone If a single user is specified and $defaultifnone is true, a grade item with a default rawgrade will be inserted
- *                            the default rawgrade will be recalculated based on $facetoface->eventgradingmethod.
+ * @param \stdClass|null $facetoface    null means all facetoface activities
+ * @param int            $userid        specific user only, 0 mean all (not used here)
+ * @param bool           $defaultifnone If a single user is specified and $defaultifnone is true, a grade item with a default rawgrade will be inserted
+ *                                      the default rawgrade will be recalculated based on $facetoface->eventgradingmethod.
+ * @return bool true
  */
-function facetoface_update_grades($facetoface=null, $userid=0, $defaultifnone = true) {
+function facetoface_update_grades($facetoface = null, $userid = 0, $defaultifnone = true) {
     global $DB;
 
     if (($facetoface != null) && $userid && $defaultifnone) {
         $grade = new stdClass();
         $grade->userid   = $userid;
-        $grade->rawgrade = \mod_facetoface\signup_helper::compute_final_grade($facetoface, $userid);
+        $grade->rawgrade = signup_helper::compute_final_grade($facetoface, $userid);
         facetoface_grade_item_update($facetoface, $grade);
     } else if ($facetoface != null) {
         facetoface_grade_item_update($facetoface);
@@ -673,12 +737,12 @@ function facetoface_update_grades($facetoface=null, $userid=0, $defaultifnone = 
 /**
  * Create grade item for given Face-to-face session
  *
- * @param int facetoface  Face-to-face activity (not the session) to grade
- * @param mixed grades    grades objects or 'reset' (means reset grades in gradebook)
- * @return int 0 if ok, error code otherwise
+ * @param \stdClass             $facetoface Face-to-face activity (not the session) to grade
+ * @param \stdClass|string|null $grades     grades objects or 'reset' (means reset grades in gradebook)
+ * @return bool true if grade is updated successfully
  */
-function facetoface_grade_item_update($facetoface, $grades=NULL) {
-    global $CFG, $DB;
+function facetoface_grade_item_update($facetoface, $grades = null): bool {
+    global $DB;
 
     if (!isset($facetoface->cmidnumber)) {
 
@@ -694,7 +758,6 @@ function facetoface_grade_item_update($facetoface, $grades=NULL) {
 
     $params['gradetype'] = GRADE_TYPE_VALUE;
     $params['grademin']  = 0;
-    $params['gradepass'] = 100;
     $params['grademax']  = 100;
 
     if ($grades  === 'reset') {
@@ -808,7 +871,7 @@ function facetoface_user_outline($course, $user, $mod, $facetoface) {
  */
 function facetoface_user_complete($course, $user, $mod, $facetoface) {
     $grade = facetoface_get_grade($user->id, $course->id, $facetoface->id);
-    
+
     $signups = signup_list::user_signups_within_seminar($user->id, $facetoface->id);
     if (!$signups->is_empty()) {
         echo get_string('grade').': '.$grade->grade.html_writer::empty_tag('br');

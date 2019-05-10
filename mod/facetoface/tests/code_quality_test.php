@@ -258,7 +258,8 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
                 continue;
             }
             // Ignore media files, add other extensions here as necessary.
-            if (in_array(substr($file,-4), ['.gif', '.jpg', '.png', '.svg'])) {
+            // TODO: more generic solution in TL-21072
+            if (in_array(substr($file,-4), ['.gif', '.jpg', '.png', '.svg', '.mbz'])) {
                 continue;
             }
             $file_name = $directory.DIRECTORY_SEPARATOR.$file;

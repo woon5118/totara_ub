@@ -177,21 +177,19 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
     public function data_provider_name_expect_attendancetime_duration_timediff() {
         $before_attendance_start = mod_facetoface\signup\condition\event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START + 300;
         $after_attendance_start = mod_facetoface\signup\condition\event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START - 300;
-        $dataset = json_decode(
-            '[
-                { "case": "Far past", "expects": [ true, true, true ], "duration": 3600, "timediff": -31536000 },
-                { "case": "Just ended", "expects": [ true, true, true ], "duration": 86390, "timediff": -86400 },
-                { "case": "Just started", "expects": [ false, true, true ], "duration": 3600, "timediff": -1 },
-                { "case": "Starts within attendance unlock period", "expects": [ false, true, true ], "duration": 3600, "timediff": '.$after_attendance_start.' },
-                { "case": "Starts before attendance unlock period", "expects": [ false, false, true ], "duration": 3600, "timediff": '.$before_attendance_start.' },
-                { "case": "Far future", "expects": [ false, false, true ], "duration": 3600, "timediff": 31536000 }
-            ]'
-        );
+        $dataset = [
+            [ 'case' => 'Far past', /*                          */'expects' => [ true, true, true ], /*  */'duration' => HOURSECS, /**/'timediff' => -YEARSECS ],
+            [ 'case' => 'Just ended', /*                        */'expects' => [ true, true, true ], /*  */'duration' => DAYSECS - 10, 'timediff' => -DAYSECS ],
+            [ 'case' => 'Just started', /*                      */'expects' => [ false, true, true ], /* */'duration' => HOURSECS, /**/'timediff' => -1 ],
+            [ 'case' => 'Starts within attendance unlock period', 'expects' => [ false, true, true ], /* */'duration' => HOURSECS, /**/'timediff' => $after_attendance_start ],
+            [ 'case' => 'Starts before attendance unlock period', 'expects' => [ false, false, true ], /**/'duration' => HOURSECS, /**/'timediff' => $before_attendance_start ],
+            [ 'case' => 'Far future', /*                        */'expects' => [ false, false, true ], /**/'duration' => HOURSECS, /**/'timediff' => YEARSECS ],
+        ];
         $data = [];
         foreach ($dataset as $e) {
             // add seminar::ATTENDANCE_TIME_xxx
             for ($i = 0; $i <= 2; $i++) {
-                $data[] = [ $e->case, $e->expects[$i], $i, $e->duration, $e->timediff ];
+                $data[] = [ $e['case'], $e['expects'][$i], $i, $e['duration'], $e['timediff'] ];
             }
         }
         return $data;

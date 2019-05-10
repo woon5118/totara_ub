@@ -111,6 +111,7 @@ class mod_facetoface_generator extends testing_module_generator {
         $defaults['attendancetime'] = \mod_facetoface\seminar::ATTENDANCE_TIME_END;
         $defaults['eventgradingmanual'] = 0;
         $defaults['eventgradingmethod'] = \mod_facetoface\seminar::GRADING_METHOD_GRADEHIGHEST;
+        $defaults['completionpass'] = \mod_facetoface\seminar::COMPLETION_PASS_DISABLED;
         foreach ($defaults as $field => $value) {
             if (!isset($record->$field)) {
                 $record->$field = $value;

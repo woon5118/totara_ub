@@ -224,6 +224,8 @@ final class signup_helper {
      * @return bool
      */
     private static function switch_state_and_grade(seminar_event $seminarevent, signup $signup, string $desiredstate, bool $eventgradingmanual, float $grade = null) : bool {
+        global $USER;
+
         $currentstate = $signup->get_state();
 
         if ($desiredstate == not_set::class) {
@@ -248,6 +250,7 @@ final class signup_helper {
                 // same states but different grade
                 if ($signupstatus->get_grade() !== $grade) {
                     $signupstatus = signup_status::create($signup, $currentstate, 0, $grade, null);
+                    $signupstatus->set_createdby((int)$USER->id);
                     $signupstatus->save();
                 }
             }
@@ -271,11 +274,25 @@ final class signup_helper {
      * Calculate a user's final grade.
      *
      * @param \stdClass|seminar $facetoface
-     * @param int $userid
+     * @param int               $userid
      * @return float|null a grade value or null if nothing applicable
      */
     public static function compute_final_grade($facetoface, int $userid) : ?float {
-        global $DB;
+        $object = static::compute_final_grade_with_time($facetoface, $userid);
+        return $object !== null ? $object->grade : null;
+    }
+
+    /**
+     * Calculate a user's final grade.
+     *
+     * @param \stdClass|seminar $facetoface
+     * @param int               $userid
+     * @return \stdClass|null an object containing [ grade, timecreated ], or null if nothing applicable
+     */
+    public static function compute_final_grade_with_time($facetoface, int $userid) : ?\stdClass {
+        global $DB, $CFG;
+
+        require_once($CFG->dirroot . '/lib/gradelib.php');
 
         if ($facetoface instanceof seminar) {
             $f2fid = $facetoface->get_id();
@@ -289,20 +306,16 @@ final class signup_helper {
 
         switch ($grading_method) {
             case seminar::GRADING_METHOD_GRADEHIGHEST:
-                $select_grade = 'MAX(sus.grade) AS grade';
-                $order_by = '';
+                $order_by = 'sus.grade DESC';
                 break;
             case seminar::GRADING_METHOD_GRADELOWEST:
-                $select_grade = 'MIN(sus.grade) AS grade';
-                $order_by = '';
+                $order_by = 'sus.grade';
                 break;
             case seminar::GRADING_METHOD_EVENTFIRST:
-                $select_grade = 'sus.grade';
-                $order_by = 'ORDER BY m.mintimestart';
+                $order_by = 'm.mintimestart';
                 break;
             case seminar::GRADING_METHOD_EVENTLAST:
-                $select_grade = 'sus.grade';
-                $order_by = 'ORDER BY m.maxtimefinish DESC';
+                $order_by = 'm.maxtimefinish DESC';
                 break;
 
             default:
@@ -313,7 +326,7 @@ final class signup_helper {
         }
 
         $sql = '
-            SELECT ' . $select_grade . '
+            SELECT sus.grade, m.maxtimefinish AS timefinish
             FROM {facetoface_signups_status} sus
             JOIN {facetoface_signups} su ON su.id = sus.signupid
             JOIN {facetoface_sessions} s ON s.id = su.sessionid
@@ -327,13 +340,14 @@ final class signup_helper {
                 GROUP BY fsd.sessionid
             ) m ON m.sessionid = s.id
             JOIN {user} u ON u.id = su.userid
-            WHERE u.id = :uid AND s.facetoface = :f2f AND sus.superceded = 0 AND sus.grade IS NOT NULL
-            ' . $order_by;
+            WHERE u.id = :uid AND s.facetoface = :f2f AND sus.superceded = 0 AND sus.grade IS NOT NULL AND (su.archived = 0 OR su.archived IS NULL)
+            ORDER BY ' . $order_by;
 
         $set = $DB->get_recordset_sql($sql, ['uid' => $userid, 'f2f' => $f2fid], 0, 1);
         try {
             if ($set->valid()) {
-                return $set->current()->grade;
+                $e = $set->current();
+                return (object)[ 'grade' => grade_floatval($e->grade), 'timefinish' => $e->timefinish ];
             }
             return null;
         } finally {
@@ -363,7 +377,6 @@ final class signup_helper {
         $grade = new \stdclass();
         $grade->userid = $signup->get_userid();
         $grade->rawgrade = $finalgrade;
-        // TODO: support scale, pass, min, max
         $grade->rawgrademin = 0;
         $grade->rawgrademax = 100;
         $grade->timecreated = $timenow;
@@ -377,7 +390,37 @@ final class signup_helper {
             error_log("F2F: could not grade signup '{$signup->get_id()}' as '$grade'");
             return false;
         }
+        self::update_activity_completion($signup->get_id());
         return true;
+    }
+
+    /**
+     * Update the activty completion of a seminar.
+     *
+     * @param integer $signupid
+     * @return void
+     */
+    protected static function update_activity_completion(int $signupid): void {
+        global $DB;
+        /** @var \moodle_database $DB */
+
+        // Update activity completion.
+        $rec = $DB->get_record_sql(
+            'SELECT c.*, f.id AS facetofaceid, fsu.userid AS userid
+              FROM {course} c
+              JOIN {facetoface} f ON f.course = c.id
+              JOIN {facetoface_sessions} fs ON fs.facetoface = f.id
+              JOIN {facetoface_signups} fsu ON fsu.sessionid = fs.id
+             WHERE fsu.id = ?', [ $signupid ], MUST_EXIST);
+
+        $completion = new \completion_info($rec);
+        if ($completion->is_enabled()) {
+            $course_module = get_coursemodule_from_instance('facetoface', $rec->facetofaceid, $rec->id);
+            // The aggregation of activty completion state is not necessary here.
+            // \completion_indo::update_state() calls internal_get_state() that calls facetoface_get_completion_state(),
+            // in which other criteria take account of activity completion.
+            $completion->update_state($course_module, COMPLETION_UNKNOWN, $rec->userid);
+        }
     }
 
     /**

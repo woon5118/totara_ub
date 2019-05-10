@@ -189,6 +189,8 @@ if ($ADMIN->fulltree) {
         )
     );
 
+    $settings->add(new admin_setting_configtext('facetoface/gradepass', new lang_string('gradepass', 'mod_facetoface'), new lang_string('gradepass_help', 'mod_facetoface'), (string)\mod_facetoface\seminar::GRADE_PASS_DEFAULT, PARAM_FLOAT));
+
     $settings->add(new admin_setting_heading('facetoface_signupworkflow_header', new lang_string('signupworkflowheader', 'facetoface'), ''));
 
     $amounts = [];

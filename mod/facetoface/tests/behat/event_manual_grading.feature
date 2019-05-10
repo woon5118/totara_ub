@@ -73,7 +73,6 @@ Feature: Event manual grading
     And I follow "Attendee"
     When I follow "Take attendance"
 
-    # (Then|And) the field "Event grade" in the "(user_name)" "table_row" matches value "(event_grade)"
     Then the field "One Uno's event grade" matches value ""
     And the field "Two Duex's event grade" matches value ""
     And the field "Three Toru's event grade" matches value ""
