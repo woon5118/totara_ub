@@ -524,5 +524,9 @@ $string['version_help'] = 'When you have multiple related badges and want to kee
 $string['warnexpired'] = ' (This badge has expired!)';
 $string['year'] = 'Year(s)';
 
-// Deprecated since Moodle 3.6.
+// Deprecated since Totara 13.
 $string['error:invalidbadgeurl'] = 'Invalid issuer URL format. The URL should have a prefix http:// or https://.';
+$string['backpackbadges'] = 'You have {$a->totalbadges} badge(s) displayed from {$a->totalcollections} collection(s). <a href="mybackpack.php">Change backpack settings</a>.';
+$string['error:nogroups'] = '<p>There are no public collections of badges available in your backpack. </p> <p>Only public collections are shown. <a href="https://backpack.openbadges.org">Visit your backpack</a> to create some public collections.</p>';
+$string['nobackpackbadges'] = 'There are no badges in the collections you have selected. <a href="mybackpack.php">Add more collections</a>.';
+$string['nobackpackcollections'] = 'No badge collections have been selected. <a href="mybackpack.php">Add collections</a>.';
