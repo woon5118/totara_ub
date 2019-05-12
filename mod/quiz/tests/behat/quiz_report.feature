@@ -1,4 +1,4 @@
-@mod @mod_quiz
+@mod @mod_quiz @core_grades
 Feature: Quiz report for all user and groups
   In order to ensure a trainer can review reports
   As a trainer

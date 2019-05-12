@@ -1,4 +1,4 @@
-@totara @totara_reportbuilder @javascript @mod_facetoface
+@totara @totara_reportbuilder @javascript @core_grades @mod_facetoface
 Feature: Test expand course details in Reportbuilder
   As a admin
   I need to be able to expand course details in reports regardless whether the

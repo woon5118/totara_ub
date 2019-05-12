@@ -1,4 +1,4 @@
-@core @core_user
+@core @core_user @core_grades
 Feature: The student can navigate to their grades page and user grade report.
   In order to view my grades and the user grade report
   As a user

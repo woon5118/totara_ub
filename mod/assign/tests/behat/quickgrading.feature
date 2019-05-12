@@ -1,4 +1,4 @@
-@mod @mod_assign @javascript
+@mod @mod_assign @core_grades @javascript
 Feature: In an assignment, teachers grade multiple students on one page
   In order to quickly give students grades and feedback
   As a teacher

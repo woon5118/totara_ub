@@ -1,4 +1,4 @@
-@mod @mod_facetoface @javascript
+@mod @mod_facetoface @core_grades @javascript
 Feature: Event manual grading
   Background:
     Given the following "courses" exist:

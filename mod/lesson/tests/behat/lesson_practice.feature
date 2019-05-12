@@ -1,4 +1,4 @@
-@mod @mod_lesson
+@mod @mod_lesson @core_grades
 Feature: Practice mode in a lesson activity
   In order to improve my students understanding of a subject
   As a teacher

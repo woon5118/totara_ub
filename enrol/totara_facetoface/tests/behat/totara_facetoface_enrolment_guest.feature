@@ -1,4 +1,4 @@
-@enrol @javascript @totara @enrol_totara_facetoface @mod @mod_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface @mod @mod_facetoface @core_grades
 Feature: Guest users enrol themselves in courses where seminar direct enrolment is allowed
   Background:
     Given I am on a totara site
