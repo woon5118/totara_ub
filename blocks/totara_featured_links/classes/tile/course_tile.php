@@ -95,7 +95,7 @@ class course_tile extends learning_item_tile {
         }
 
         $data = parent::get_content_template_data();
-        $data['heading'] = $this->get_course()->fullname;
+        $data['heading'] = format_string($this->get_course()->fullname);
         $data['progress_bar'] = $progressbar;
 
         return $data;

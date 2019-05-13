@@ -99,7 +99,7 @@ class program_tile extends learning_item_tile {
             $progressbar = false;
         }
         $data = parent::get_content_template_data();
-        $data['heading'] = $this->get_program()->fullname;
+        $data['heading'] = format_string($this->get_program()->fullname);
         $data['progress_bar'] = $progressbar;
 
         return $data;
