@@ -133,6 +133,8 @@ class select_tree_test extends advanced_testcase {
             'active_name' => 'Level 2b',
             'flat_tree' => false,
             'parents_are_selectable' => true,
+            'show_border_box' => false,
+            'disabled' => false
         ];
 
         $actual1 = $treelist1->get_template_data();
@@ -216,6 +218,8 @@ class select_tree_test extends advanced_testcase {
             'active_name' => 'Earthquake',
             'flat_tree' => true,
             'parents_are_selectable' => false,
+            'show_border_box' => false,
+            'disabled' => false
         ];
 
         $actual3 = $treelist3->get_template_data();

@@ -339,6 +339,8 @@ class totara_catalog_merge_select_single_testcase extends advanced_testcase {
             'active_name' => 'testoptionname2',
             'flat_tree' => true,
             'parents_are_selectable' => true,
+            'show_border_box' => false,
+            'disabled' => false
         ];
         $this->assertEquals($expecteddata, $data);
     }
