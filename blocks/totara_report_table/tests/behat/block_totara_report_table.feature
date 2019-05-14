@@ -287,7 +287,7 @@ Feature: Report builder table block
   Scenario: Test view full report link for embedded report block navigation
     # Enable report-based catalogue to be able to select it.
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |

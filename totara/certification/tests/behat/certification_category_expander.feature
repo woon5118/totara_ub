@@ -23,7 +23,7 @@ Feature: Find learning certificate category management
         | c1bc2     | c1bc2     | 4        | 1       |
     And I log in as "admin"
     And I set the following administration settings values:
-        | Catalogue type | moodle |
+        | catalogtype | moodle |
     And I press "Save changes"
     And I log out
 

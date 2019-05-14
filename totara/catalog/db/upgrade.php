@@ -32,5 +32,40 @@ function xmldb_totara_catalog_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 2019052300) {
+        // Add legacy search option in admin settings.
+        // When enabled, 'like' search will be used instead of FTS.
+        set_config('cataloglegacysearch', 0);
+
+        // Define table catalog_search_metadata to be created.
+        $table = new xmldb_table('catalog_search_metadata');
+
+        // Adding fields to table catalog_search_metadata.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('value', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('instanceid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('pluginname', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('plugintype', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+
+        // Adding keys to table catalog_search_metadata.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table catalog_search_metadata.
+        $table->add_index('unique_component_instance', XMLDB_INDEX_UNIQUE, array('instanceid', 'pluginname', 'plugintype'));
+        $table->add_index('component_instance', XMLDB_INDEX_NOTUNIQUE, array('instanceid'));
+        $table->add_index('plugin_name', XMLDB_INDEX_NOTUNIQUE, array('pluginname'));
+        $table->add_index('plugin_type', XMLDB_INDEX_NOTUNIQUE, array('plugintype'));
+
+        // Conditionally launch create table for catalog_search_metadata.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2019052300, 'totara', 'catalog');
+    }
+
     return true;
 }

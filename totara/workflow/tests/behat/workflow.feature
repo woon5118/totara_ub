@@ -6,7 +6,7 @@ Feature: Visit a workflow and experience the different possible behaviours
     Given I am on a totara site
     And I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
     And I navigate to "Setup Content Marketplaces" node in "Site administration > Content Marketplace"
     And I should see "What is Content Marketplace?"
     And I should see "Enable" in the ".contentmarketplace_goone" "css_element"

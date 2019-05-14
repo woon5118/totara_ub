@@ -2094,13 +2094,18 @@ class mysqli_native_moodle_database extends moodle_database {
      * @return array [sql, params[]]
      */
     protected function build_fts_subquery(string $table, array $searchfields, string $searchtext): array {
+        $mode = 'NATURAL LANGUAGE MODE';
+        if ($this->get_fts_mode($searchtext) === self::SEARCH_MODE_BOOLEAN) {
+            $mode = 'BOOLEAN MODE';
+        }
+
         $params = array();
         $score = array();
 
         foreach ($searchfields as $field => $weight) {
             $paramname = $this->get_unique_param('fts');
             $params[$paramname] = $searchtext;
-            $score[] = "(MATCH ({$field}) AGAINST (:{$paramname} IN NATURAL LANGUAGE MODE))*{$weight}";
+            $score[] = "(MATCH ({$field}) AGAINST (:{$paramname} IN {$mode}))*{$weight}";
         }
 
         $scoresum = implode(' + ', $score);

@@ -100,6 +100,8 @@ class full_text_search_filter {
             new \lang_string('fts_search_input', 'totara_catalog')
         );
         $selector->set_title_hidden(true);
+        $selector->set_hintidentifier('fts_search_hint');
+        $selector->set_hintcomponent('totara_catalog');
 
         return new filter(
             'catalog_fts',

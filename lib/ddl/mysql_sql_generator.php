@@ -375,8 +375,15 @@ class mysql_sql_generator extends sql_generator {
      * @throws coding_exception Thrown if the xmldb_index does not validate with the xmldb_table.
      */
     public function getCreateIndexSQL($xmldb_table, $xmldb_index) {
+        global $CFG;
+
         if ($error = $xmldb_index->validateDefinition($xmldb_table)) {
             throw new coding_exception($error);
+        }
+
+        $enablengram = false;
+        if (isset($CFG->dboptions['ftsngram'])) {
+            $enablengram = (bool) $CFG->dboptions['ftsngram'];
         }
 
         $hints = $xmldb_index->getHints();
@@ -388,7 +395,20 @@ class mysql_sql_generator extends sql_generator {
             $language = $this->mdb->get_ftslanguage();
 
             $sqls = array();
-            $sqls[] = "CREATE FULLTEXT INDEX {$indexname} ON {$tablename} ({$fieldname})";
+            $sqlindex = "CREATE FULLTEXT INDEX {$indexname} ON {$tablename} ({$fieldname})";
+
+            if ($enablengram && $this->mdb->get_dbvendor() === 'mysql') {
+                // Exclude mariadb;
+                $ngram = $this->mdb->record_exists_sql(
+                    "SELECT 1 FROM information_schema.PLUGINS WHERE PLUGIN_NAME = 'ngram' AND PLUGIN_STATUS = 'ACTIVE'"
+                );
+
+                if ($ngram) {
+                    $sqlindex .= " WITH PARSER NGRAM";
+                }
+            }
+
+            $sqls[] = $sqlindex;
             $sqls[] = "ALTER TABLE {$tablename} MODIFY COLUMN {$fieldname} LONGTEXT COLLATE {$language}";
             return $sqls;
         }

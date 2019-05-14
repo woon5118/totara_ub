@@ -84,6 +84,10 @@ class totara_catalog_external_testcase extends output_test_base {
             }
         }
 
+        // We need to subtract one from expected_count as two filters share the same data selector.
+        // full_text_search_filter and legacy_search_filter have the same selector.
+        --$expected_count;
+
         $filterparams = $params->keys['filterparams'];
         $this->assertInstanceOf(external_single_structure::class, $filterparams);
         $this->assertCount($expected_count, $filterparams->keys);

@@ -89,7 +89,7 @@ class totara_catalog_filter_handler_testcase extends advanced_testcase {
 
     public function test_get_active_filters() {
         // check default filters
-        $this->assertCount(3, $this->filter_handler->get_active_filters());
+        $this->assertCount(4, $this->filter_handler->get_active_filters());
 
         // update config and check the filters
         config::instance()->update(
@@ -102,14 +102,15 @@ class totara_catalog_filter_handler_testcase extends advanced_testcase {
         );
         provider_handler::instance()->reset_cache();
         $this->filter_handler->reset_cache();
-        $this->assertCount(5, $this->filter_handler->get_active_filters());
+        $this->assertCount(6, $this->filter_handler->get_active_filters());
     }
 
     public function test_get_region_filters() {
         // fts region filters
         $fts_filters = $this->filter_handler->get_region_filters(filter::REGION_FTS);
-        $this->assertCount(1, $fts_filters);
+        $this->assertCount(2, $fts_filters);
         $this->assertArrayHasKey('catalog_fts', $fts_filters);
+        $this->assertArrayHasKey('catalog_like', $fts_filters);
 
         // Find course tag collection id.
         $tagcollectionid = \core_tag_area::get_collection('core', 'course');

@@ -505,6 +505,7 @@
       <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_core_xml_external_entities_check" />
       <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_check" />
       <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_read_committed_snapshot" />
+      <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_core_check_for_ngram" />
     </CUSTOM_CHECKS>
   </TOTARA>
 </COMPATIBILITY_MATRIX>

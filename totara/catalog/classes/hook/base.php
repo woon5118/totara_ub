@@ -56,7 +56,7 @@ abstract class base extends base_hook {
      */
     public function set_item(stdClass $item): void {
         if (!object_property_exists($item, 'id')) {
-            throw new coding_exception("The object passed in does not have attribute 'id'");
+            throw new \coding_exception("The object passed in does not have attribute 'id'");
         }
 
         $this->item = $item;

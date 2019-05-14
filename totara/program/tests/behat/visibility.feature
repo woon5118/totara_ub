@@ -31,7 +31,7 @@ Feature: Users visibility of programs can be toggled
   Scenario Outline: A user can view programs on the catalog with old visibility (show).
     Given I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type | <Catalog type> |
+      | catalogtype | <Catalog type> |
     And I log out
 
     When I log in as "user001"
@@ -65,7 +65,7 @@ Feature: Users visibility of programs can be toggled
     And I click on "visible" "checkbox"
     And I press "Save changes"
     And I set the following administration settings values:
-      | Catalogue type | <Catalog type> |
+      | catalogtype | <Catalog type> |
     And I log out
 
     When I log in as "user001"
@@ -93,7 +93,7 @@ Feature: Users visibility of programs can be toggled
     Given I log in as "admin"
     And I set the following administration settings values:
         | Enable audience-based visibility | 1              |
-        | Catalogue type                   | <Catalog type> |
+        | catalogtype                      | <Catalog type> |
     And I log out
 
     When I log in as "user001"
@@ -121,7 +121,7 @@ Feature: Users visibility of programs can be toggled
     Given I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1              |
-      | Catalogue type                   | <Catalog type> |
+      | catalogtype                      | <Catalog type> |
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Visibility Program Tests" "link"
@@ -156,7 +156,7 @@ Feature: Users visibility of programs can be toggled
     Given I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1              |
-      | Catalogue type                   | <Catalog type> |
+      | catalogtype                      | <Catalog type> |
     And I press "Save changes"
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
@@ -192,7 +192,7 @@ Feature: Users visibility of programs can be toggled
     Given I log in as "admin"
     And I set the following administration settings values:
       | Enable audience-based visibility | 1              |
-      | Catalogue type                   | <Catalog type> |
+      | catalogtype                      | <Catalog type> |
     And I press "Save changes"
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"

@@ -63,7 +63,8 @@ class catalog extends template {
         $data = new \stdClass();
 
         // Process filter params.
-        foreach (filter_handler::instance()->get_active_filters() as $filter) {
+        $filterhandler = filter_handler::instance();
+        foreach ($filterhandler->get_active_filters() as $filter) {
             $optionalparams = $filter->selector->get_optional_params();
 
             $paramdata = [];
@@ -222,6 +223,8 @@ class catalog extends template {
      * @return select_region_primary
      */
     private static function get_primary_region_template() {
+        global $CFG;
+
         $selectortemplates = [];
 
         $filterhandler = filter_handler::instance();
@@ -231,8 +234,13 @@ class catalog extends template {
             $selectortemplates[] = $browsefilter->selector->get_template();
         }
 
-        $fulltextsearchselector = $filterhandler->get_full_text_search_filter()->selector;
-        $selectortemplates[] = $fulltextsearchselector->get_template();
+        if (!$CFG->cataloglegacysearch) {
+            $fulltextsearchselector = $filterhandler->get_full_text_search_filter()->selector;
+            $selectortemplates[] = $fulltextsearchselector->get_template();
+        } else {
+            $legacysearchselector = $filterhandler->get_legacy_search_filter()->selector;
+            $selectortemplates[] = $legacysearchselector->get_template();
+        }
 
         return select_region_primary::create($selectortemplates);
     }

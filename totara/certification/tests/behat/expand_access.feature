@@ -14,7 +14,7 @@ Feature: Users can expand the certification info
       | Course 1 | C1 | topics |
     And I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type     | enhanced |
+      | catalogtype | enhanced |
     And I click on "Certifications" in the totara menu
     And I press "Create Certification"
     And I press "Save changes"

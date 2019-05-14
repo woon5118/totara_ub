@@ -23,7 +23,7 @@ Feature: Behat generators for programs work
       |  gentest | user002 |
     When I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
     And I click on "Programs" in the totara menu
     And I should see "Generator Program Tests"
     And I click on "Generator Program Tests" "link"
@@ -34,7 +34,7 @@ Feature: Behat generators for programs work
   Scenario: Verify the user interface works the same as program generators
     Given I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
     And I click on "Programs" in the totara menu
     And I press "Create Program"
     And I set the following fields to these values:

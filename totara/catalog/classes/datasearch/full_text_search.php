@@ -37,10 +37,13 @@ defined('MOODLE_INTERNAL') || die();
 class full_text_search extends filter {
 
     /** @var string */
-    protected $joinsql;
+    protected $joinsql = null;
 
     /** @var array */
-    protected $joinparams;
+    protected $joinparams = null;
+
+    /** @var array */
+    protected $fieldsandweights = false;
 
     /**
      * @param array $fieldsandweights containing $field => $weight
@@ -55,7 +58,10 @@ class full_text_search extends filter {
             );
         }
 
-        list($this->joinsql, $this->joinparams) = $DB->get_fts_subquery($this->basealias, $fieldsandweights, 'placeholder');
+        // We need to cache the $fieldsandweights here. There are a few reason behind it, but first of all, that
+        // at somepoint, we might need to re-calculating the fts_subquery.
+        $this->fieldsandweights = $fieldsandweights;
+        [$this->joinsql, $this->joinparams] = $DB->get_fts_subquery($this->basealias, $fieldsandweights, 'placeholder');
     }
 
     /**
@@ -99,6 +105,11 @@ class full_text_search extends filter {
         );
     }
 
+    /**
+     * @param filter $otherfilter
+     *
+     * @return bool
+     */
     public function can_merge(filter $otherfilter) {
         if (!parent::can_merge($otherfilter)) {
             return false;
@@ -120,6 +131,14 @@ class full_text_search extends filter {
         return true;
     }
 
+    /**
+     * Returning the formatted data for this filter. Which is going to be used in static::make_sql.
+     *
+     * @see full_text_search::make_sql()
+     * @param mixed $data
+     *
+     * @return null|string
+     */
     protected function validate_current_data($data) {
         if (is_null($data) || is_string($data)) {
             return $data;
@@ -134,30 +153,46 @@ class full_text_search extends filter {
      * @return bool
      */
     public function is_active(): bool {
-        // There is no current data - it hasn't been set.
-        if (is_null($this->currentdata)) {
+        global $CFG;
+        if (is_null($this->currentdata) || $CFG->cataloglegacysearch) {
             return false;
         }
 
-        // Active if any string has been set, even if empty.
+        // Only available if the catalog legacy search (like statement) is enabled.
         return true;
     }
 
+    /**
+     * @param \stdClass $source
+     * @return array [string $where, array $params]
+     */
     protected function make_compare(\stdClass $source): array {
+        global $DB;
+
         if (!$this->is_active()) {
             throw new \coding_exception(
                 'Tried to do full text search without specifying some text'
             );
         }
 
-        $where = "";
-
-        // Replace the value 'placeholder' with the actual current data.
         $params = [];
-        foreach ($this->joinparams as $key => $value) {
-            $params[$key] = $this->currentdata;
+        if (false !== stripos($this->currentdata, '*')) {
+            // Refresh FTS source joining because the join snippet, params, and values depend on exact search term,
+            // which was initially unreachable. Only refresh if the currentdata has asterisk in it.
+            [$this->joinsql, $this->joinparams] = $DB->get_fts_subquery(
+                $this->basealias,
+                $this->fieldsandweights,
+                $this->currentdata
+            );
+
+            $source->table = $this->joinsql;
+            $params = $this->joinparams;
+        } else {
+            foreach ($this->joinparams as $key => $value) {
+                $params[$key] = $this->currentdata;
+            }
         }
 
-        return [$where, $params];
+        return ["", $params];
     }
 }

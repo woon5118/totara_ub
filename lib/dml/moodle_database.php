@@ -66,6 +66,11 @@ define('BATCH_INSERT_MAX_ROW_COUNT', 250);
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class moodle_database {
+    /** @var int Mode for boolean full-text search */
+    public const SEARCH_MODE_BOOLEAN = 2;
+
+    /** @var int Mode for natural full-text search */
+    public const SEARCH_MODE_NATURAL = 1;
 
     /** @var database_manager db manager which allows db structure modifications. */
     protected $database_manager;
@@ -3368,5 +3373,36 @@ abstract class moodle_database {
      */
     final public static function sql(string $sql, ?array $params = []): sql {
         return new sql($sql, (array)$params);
+    }
+
+    /**
+     * Check if accent sensitivity is currently active or not.
+     *
+     * @since Totara 13
+     * @return bool
+     */
+    public function is_fts_accent_sensitive(): bool {
+        // Override if necessary
+        return false;
+    }
+
+    /**
+     * Detecting the mode of fts, base on the pattern of the search text. The pattern would be something like:
+     * "hello-world*" or "hello*". It only accepts one word with one asterisk for now.
+     *
+     * @since Totara 13
+     * @param string $searchtext
+     * @return int
+     */
+    protected function get_fts_mode(string $searchtext): int {
+        $default = self::SEARCH_MODE_NATURAL;
+
+        // With \p{L} we will be able to match pretty much most of the characters in most of the language,
+        // including alphabeticals.
+        if (preg_match('/^[\p{L}\d-_]+\*$/u', $searchtext)) {
+            $default = self::SEARCH_MODE_BOOLEAN;
+        }
+
+        return $default;
     }
 }

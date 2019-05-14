@@ -53,7 +53,7 @@ class totara_catalog_cache_handler_testcase extends advanced_testcase {
 
         // Show that the singletons now return the updated information, so must have been reset.
         $this->assertEquals(1, count(\totara_catalog\local\feature_handler::instance()->get_all_features()));
-        $this->assertEquals(5, count(\totara_catalog\local\filter_handler::instance()->get_all_filters()));
+        $this->assertEquals(6, count(\totara_catalog\local\filter_handler::instance()->get_all_filters()));
         $this->assertEmpty(\totara_catalog\provider_handler::instance()->get_active_providers());
         $this->assertFalse(\totara_catalog\local\config::instance()->is_provider_active('course'));
     }

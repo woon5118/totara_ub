@@ -24,7 +24,7 @@ Feature: Test expand course details in Reportbuilder
 
     And I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I am on homepage

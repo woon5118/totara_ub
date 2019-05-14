@@ -8,7 +8,7 @@ Feature: Totara Main menu navigation
     Given I am on a totara site
     And I log in as "admin"
     And I set the following administration settings values:
-      | Catalogue type | enhanced |
+      | catalogtype | enhanced |
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
     And I set the following Totara form fields to these values:

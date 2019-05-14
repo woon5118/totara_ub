@@ -229,4 +229,12 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     );
     $setting->set_updatedcallback('totara_menu_reset_all_caches');
     $optionalsubsystems->add($setting);
+
+    $setting = new admin_setting_configcheckbox(
+        'cataloglegacysearch',
+        new lang_string('cataloglegacysearch', 'totara_catalog'),
+        new lang_string('configcataloglegacysearch', 'totara_catalog'),
+        0
+    );
+    $optionalsubsystems->add($setting);
 }
