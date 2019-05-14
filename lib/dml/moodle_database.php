@@ -3529,4 +3529,13 @@ abstract class moodle_database {
     final public static function sql(string $sql, ?array $params = []): sql {
         return new sql($sql, (array)$params);
     }
+
+    /**
+     * @since Totara 13
+     * @return bool
+     */
+    public function is_fts_accent_sensitive(): bool {
+        // Override if necessary
+        return false;
+    }
 }

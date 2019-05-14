@@ -1857,4 +1857,16 @@ class sqlsrv_native_moodle_database extends moodle_database {
     public function recommends_counted_recordset(): bool {
         return false;
     }
+
+    /**
+     * Check if accent sensitivity is currently active or not.
+     *
+     * @since Totara 12
+     * @return bool
+     */
+    public function is_fts_accent_sensitive(): bool {
+        $sql = "SELECT fulltextcatalogproperty(:catalog, 'AccentSensitivity')";
+        $params = ['catalog' => $this->get_prefix() . 'search_catalog'];
+        return !empty($this->get_field_sql($sql, $params));
+    }
 }

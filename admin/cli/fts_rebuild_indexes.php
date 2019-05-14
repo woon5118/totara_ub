@@ -71,6 +71,16 @@ if (moodle_needs_upgrading()) {
 }
 
 $dbmanager = $DB->get_manager();
+
+// If ftsaccentsensitivity has changed we need to update the DB.
+if (isset($CFG->dboptions['ftsaccentsensitivity']) && $CFG->dboptions['ftsaccentsensitivity'] !== 'dbdefault') {
+    if (!is_bool($CFG->dboptions['ftsaccentsensitivity'])) {
+        cli_writeln('Invalid ftsaccentsensitivity value, only true/false allowed.');
+        exit(1);
+    }
+    $dbmanager->fts_change_accent_sensitivity($CFG->dboptions['ftsaccentsensitivity']);
+}
+
 $schema = $dbmanager->get_install_xml_schema();
 
 $errorfound = false;

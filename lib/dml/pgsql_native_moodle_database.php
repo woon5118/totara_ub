@@ -1225,7 +1225,11 @@ class pgsql_native_moodle_database extends moodle_database {
             debugging('Potential SQL injection detected, sql_like() expects bound parameters (? or :named)');
         }
 
-        // postgresql does not support accent insensitive text comparisons, sorry
+        if (!$this->is_fts_accent_sensitive() && !$accentsensitive) {
+            $fieldname = "unaccent({$fieldname})";
+            $param = "unaccent({$param})";
+        }
+
         if ($casesensitive) {
             $LIKE = $notlike ? 'NOT LIKE' : 'LIKE';
         } else {
@@ -1631,6 +1635,8 @@ class pgsql_native_moodle_database extends moodle_database {
         $language = $this->get_ftslanguage();
         $paramname = $this->get_unique_param('fts');
 
+        $accentsensitive = $this->is_fts_accent_sensitive();
+
         if (preg_match('/^\s*"[^"]+"\s*$/', $searchtext)) {
             // One exact phrase search.
             $searchtext = trim($searchtext);
@@ -1638,17 +1644,29 @@ class pgsql_native_moodle_database extends moodle_database {
             $serverinfo = $this->get_server_info();
             if (version_compare($serverinfo['version'], '9.6', '<')) {
                 // Old PostgreSQL version, bad luck, the results will be less accurate.
-                $q = "plainto_tsquery('{$language}',:{$paramname})";
+                $q = "plainto_tsquery('{$language}',"
+                    . ($accentsensitive ? ":{$paramname}" : "unaccent(:{$paramname})") . ")";
             } else {
-                $q = "phraseto_tsquery('{$language}',:{$paramname})";
+                $q = "phraseto_tsquery('{$language}',"
+                    . ($accentsensitive ? ":{$paramname}" : "unaccent(:{$paramname})") . ")";
             }
+        } else if ($this->get_fts_mode($searchtext) === self::SEARCH_MODE_BOOLEAN) {
+            // Using 'simple' here, because sometimes the search text does not mean anything for specific language.
+            $language = 'simple';
+            $q = "to_tsquery('{$language}', "
+                . ($accentsensitive ? ":{$paramname}" : "unaccent(:{$paramname})") . ")";
+            $searchtext = str_replace('*', ':*', $searchtext);
         } else {
-            $q = "plainto_tsquery('{$language}',:{$paramname})";
+            $q = "plainto_tsquery('{$language}',"
+                . ($accentsensitive ? ":{$paramname}" : "unaccent(:{$paramname})") . ")";
         }
 
         $score = array();
         $condition = array();
         foreach ($searchfields as $field => $weight) {
+            if (!$accentsensitive) {
+                $field = "unaccent({$field})";
+            }
             $score[] = "COALESCE(ts_rank(to_tsvector('{$language}',{$field}),query),0)*{$weight}";
             $condition[] = "query @@ to_tsvector('{$language}',{$field})";
         }
@@ -1672,5 +1690,22 @@ class pgsql_native_moodle_database extends moodle_database {
      */
     public function recommends_counted_recordset(): bool {
         return false;
+    }
+
+    /**
+     * Check if accent sensitivity is currently active or not.
+     *
+     * This function's name contains 'fts' which indicates that it is part of FTS functionality although
+     * it is not specifically related to FTS as UNACCENT is a DB wide function. The reason for 'fts' in
+     * the name is because in other databases it is specifically used for FTS queries and only in PGSQL
+     * can UNACCENT be used in normal queries as well to flatten accents.
+     *
+     * @return bool
+     */
+    public function is_fts_accent_sensitive(): bool {
+        $sql = "SELECT COUNT(*) FROM pg_extension WHERE extname = 'unaccent'";
+
+        // If extension is not created then it means accent sensitivity is on.
+        return empty($this->get_field_sql($sql));
     }
 }

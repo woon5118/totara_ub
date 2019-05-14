@@ -1287,4 +1287,16 @@ class database_manager {
     public function snapshot_drop() {
         $this->generator->snapshot_drop();
     }
+
+    /**
+     * Change DB to enable/disable accent sensitive searches.
+     *
+     * @param bool $switch If accent sensitivity should be enabled/disabled.
+     */
+    public function fts_change_accent_sensitivity(bool $switch) {
+        $sqlarr = $this->generator->getFTSChangeAccentSensitivitySQL($switch);
+        if (!empty($sqlarr)) {
+            $this->execute_sql_arr($sqlarr);
+        }
+    }
 }

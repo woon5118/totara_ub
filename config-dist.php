@@ -144,6 +144,21 @@ $CFG->dboptions = array(
 //    $CFG->dboptions['ftslanguage'] = 1028; // Traditional Chinese
 //    $CFG->dboptions['ftslanguage'] = 2052; // Simplified Chinese
 //
+// PostgreSQL and MS SQL have built in support for accent sensitive full text searches.
+// PostgreSQL provides this by means of an extension called unaccent which is not created by default.
+// MS SQL accent sensitivity is on by default and to turn it off the fulltext catalog will need to
+// be rebuilt.
+//
+// To change accent sensitive fulltext searches for either PostgreSQL or MS SQL you can set the
+// following setting according to your requirement:
+//    $CFG->dboptions['ftsaccentsensitivity'] = true;
+//    $CFG->dboptions['ftsaccentsensitivity'] = false;
+//    $CFG->dboptions['ftsaccentsensitivity'] = 'dbdefault';
+//
+// NOTE: After changing the accent sensitivity setting you need to run the following scripts in the listed order:
+//    1. admin/cli/fts_rebuild_indexes.php
+//    2. admin/cli/fts_repopulate_tables.php
+//
 
 
 //=========================================================================
