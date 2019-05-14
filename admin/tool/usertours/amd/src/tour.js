@@ -1365,13 +1365,33 @@ Tour.prototype.positionBackdrop = function (stepConfig) {
             // it stands out against the background correctly
             targetNode.css('backgroundColor', this.calculateInherittedBackgroundColor(targetNode));
 
-            background.css({
+            var bgCss = {
+                top: targetNode.position().top - buffer,
+                left: targetNode.position().left - buffer,
                 width: targetNode.outerWidth() + buffer + buffer,
                 height: targetNode.outerHeight() + buffer + buffer,
-                left: targetNode.position().left - buffer,
-                top: targetNode.position().top - buffer,
                 backgroundColor: this.calculateInherittedBackgroundColor(colorNode)
-            });
+            };
+
+            if (!stepConfig.zIndex) {
+                // If this is being attached to body, then we need to take the offset instead of the
+                // relative position
+                bgCss.left = targetNode.offset().left - buffer;
+                bgCss.top = targetNode.offset().top - buffer;
+            }
+
+            // Check that the targetNode isn't too close to the edge of the screen
+            if (targetNode.offset().left < buffer) {
+               bgCss.width = targetNode.outerWidth() +  targetNode.offset().left + buffer;
+               bgCss.left = targetNode.offset().left;
+            }
+
+            if (targetNode.offset().top < buffer) {
+                bgCss.height = targetNode.outerHeight() + targetNode.offset().top + buffer;
+                bgCss.top = targetNode.offset().top;
+            }
+            background.css(bgCss);
+
 
             var targetRadius = targetNode.css('borderRadius');
             if (targetRadius && targetRadius !== $('body').css('borderRadius')) {
