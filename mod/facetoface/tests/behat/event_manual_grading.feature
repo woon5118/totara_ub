@@ -120,14 +120,14 @@ Feature: Event manual grading
     And I follow "Take attendance"
 
     And I set the field "One Uno's event grade" to "12"
-    And I set the field "Two Duex's event grade" to "34"
+    And I set the field "Two Duex's event grade" to "31.415"
     And I set the field "Three Toru's event grade" to "56"
     And I set the field "Four Wha's event grade" to "78"
     And I set the field "Five Cinq's event grade" to ""
     When I click on "Save attendance" "button"
 
     Then the field "One Uno's event grade" matches value "12"
-    And the field "Two Duex's event grade" matches value "34"
+    And the field "Two Duex's event grade" matches value "31.415"
     And the field "Three Toru's event grade" matches value "56"
     And the field "Four Wha's event grade" matches value "78"
     And the field "Five Cinq's event grade" matches value ""
@@ -139,7 +139,7 @@ Feature: Event manual grading
 
     When I follow "Grader report"
     Then I should see "12.00" in the "One Uno" "table_row"
-    And I should see "34.00" in the "Two Duex" "table_row"
+    And I should see "31.42" in the "Two Duex" "table_row"
     And I should see "56.00" in the "Three Toru" "table_row"
     And I should see "78.00" in the "Four Wha" "table_row"
     And I should not see ".00" in the "Five Cinq" "table_row"

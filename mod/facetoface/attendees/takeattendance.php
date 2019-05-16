@@ -149,8 +149,8 @@ if ($formdata = data_submitted()) {
                 if ($item === '') {
                     $grades[$keyparts[1]] = null;
                 } else {
-                    $val = (float)$item;
-                    if (!is_number($item) || $val < 0 || $val > 100) {
+                    $val = unformat_float($item, true);
+                    if ($val === false || $val < 0 || $val > 100) {
                         $error[] = get_string('eventgradingoutofrange', 'facetoface', ['min' => 0, 'max' => 100, 'val' => $item]);
                         continue;
                     }
