@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/db/upgradelib.php');
  */
 class totara_reportbuilder_upgradelib_testcase extends advanced_testcase {
 
-    private $report, $user, $rbcolumn, $contcol, $rbfilter, $contfil, $rbsaved, $contsave;
+    private $report, $user, $rbcolumn, $contcol, $rbfilter, $contfil, $rbsaved, $contsave, $rbgraph;
 
     public function setUp() {
         global $DB;
@@ -123,6 +123,17 @@ class totara_reportbuilder_upgradelib_testcase extends advanced_testcase {
         $contsave->ispublic = 1;
         $contsave->id = $DB->insert_record('report_builder_saved', $contsave);
         $this->contsave = $contsave;
+
+        $rbgraph = new stdClass();
+        $rbgraph->reportid = $report->id;
+        $rbgraph->type = 'column';
+        $rbgraph->stacked = false;
+        $rbgraph->maxrecords = 500;
+        $rbgraph->category = 'none';
+        $rbgraph->series = json_encode(['user-username']);
+        $rbgraph->settings = '';
+        $rbgraph->id = $DB->insert_record('report_builder_graph', $rbgraph);
+        $this->rbgraph = $rbgraph;
     }
 
     protected function tearDown() {
@@ -134,6 +145,7 @@ class totara_reportbuilder_upgradelib_testcase extends advanced_testcase {
         $this->contfil = null;
         $this->rbsaved = null;
         $this->contsave = null;
+        $this->rbgraph = null;
 
         parent::tearDown();
     }
@@ -367,5 +379,57 @@ class totara_reportbuilder_upgradelib_testcase extends advanced_testcase {
 
             $DB->get_records('report_builder_schedule')
         );
+    }
+
+    public function test_upgradelib_totara_reportbuilder_migrate_svggraph_settings() {
+        global $DB;
+
+        // Test the basics
+        $this->rbgraph->settings = "
+            graph_title=Hello
+            graph_title_font_size=24
+            graph_title_colour=#f00
+            show_legend=true
+            show_tooltips=false
+            axis_text_angle_h=-90
+        ";
+
+        $DB->update_record('report_builder_graph', $this->rbgraph);
+        totara_reportbuilder_migrate_svggraph_settings();
+        $graph = $DB->get_record('report_builder_graph', array('id' => $this->rbgraph->id));
+
+        // the way this converts, booleans are converted into strings, but it doesn't matter
+        // so long as they are correctly truthy and falsy values. These aren't converted because
+        // we can't tell whether the value is meant to be 'true', or the integer '1'
+        $expected = json_encode([
+            'title' => [
+                'text' => 'Hello',
+                'fontSize' => '24',
+                'color' => '#f00'
+            ],
+            'legend' => [
+                'display' => '1'
+            ],
+            'tooltips' => [
+                'display' => ''
+            ],
+            // Makes sure the unrecognized settings are placed into the "custom" field for full backwards compatibility
+            'custom' => [
+                'axis_text_angle_h' => '-90'
+            ]
+        ], JSON_PRETTY_PRINT);
+        $this->assertEquals($expected, $graph->settings);
+
+        $settings = json_decode($graph->settings);
+
+        // Check truthy and falsy values
+        $this->assertEquals(false, $settings->tooltips->display);
+        $this->assertEquals(true, $settings->legend->display);
+
+        // When we run the upgrade a second time, verify that the settings remain unchanged
+        totara_reportbuilder_migrate_svggraph_settings();
+
+        $graph = $DB->get_record('report_builder_graph', array('id' => $this->rbgraph->id));
+        $this->assertEquals($expected, $graph->settings);
     }
 }

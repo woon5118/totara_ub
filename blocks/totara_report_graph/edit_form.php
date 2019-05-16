@@ -127,21 +127,6 @@ class block_totara_report_graph_edit_form extends block_edit_form {
         $mform->addHelpButton('config_reportfor', 'reportfor', 'block_totara_report_graph');
         $mform->setDefault('config_reportfor', $USER->id);
 
-        // Cache lifetime.
-
-        $options = array(
-            60*1 => '1 ' . get_string('minute'),
-            60*10 => '10 ' . get_string('minutes'),
-            60*30 => '30 ' . get_string('minutes'),
-            60*60*1 => '1 ' . get_string('hour'),
-            60*60*3 => '3 ' . get_string('hours'),
-            60*60*6 => '6 ' . get_string('hours'),
-            60*60*12 => '12 ' . get_string('hours'),
-            60*60*24 => '1 ' . get_string('day'),
-        );
-        $mform->addElement('select', 'config_cachettl', get_string('cachettl', 'block_totara_report_graph'), $options);
-        $mform->setDefault('config_cachettl', 60*60*1);
-
         $mform->addElement('header', 'graphappearance', get_string('graphappearance', 'block_totara_report_graph'));
 
         $mform->addElement('text', 'config_graphimage_maxheight', get_string('maxheight', 'block_totara_report_graph'));

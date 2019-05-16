@@ -17,6 +17,10 @@ Feature: Graphs in Report builder
       | learner4 | Learner4  | US      |
       | learner5 | Learner5  | AU      |
       | learner6 | Learner6  | CZ      |
+    And I navigate to "General settings" node in "Site administration > Reports"
+#    Can't run this on ChartJS, since behat can't look into the resulting chart elements
+    And I set the field "Graph Library" to "SVGGraph"
+    And I press "Save changes"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
     And I press "Create report"
     And I set the following fields to these values:

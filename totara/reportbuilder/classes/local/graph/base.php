@@ -21,13 +21,13 @@
  * @package totara_reportbuilder
  */
 
-namespace totara_reportbuilder\graph;
+namespace totara_reportbuilder\local\graph;
 
 /**
  * Class to draw Graphs based on reporting data
  *
  * Class graph_base
- * @package totara_reportbuilder\graph
+ * @package totara_reportbuilder\local\graph
  */
 abstract class base {
     const GRAPH_CATEGORY_SIMPLE = -1;
@@ -49,6 +49,8 @@ abstract class base {
     protected $legendcolumn;
     /** @var array Settings supplied by user */
     protected $usersettings;
+    /** @var  array list of supported chart types */
+    protected static $allowed_types;
 
     /**
      * Class constructor
@@ -60,24 +62,22 @@ abstract class base {
         $this->report = $report;
         $this->init();
 
-        if ($autoload && !empty($this->record->type)) {
+        if ($autoload && $this->is_valid()) {
             $this->load();
         }
     }
 
     /**
      * Load graph record, and set up graph object
-     *
-     * @param \reportbuilder $report the relevant reportbuilder instance
      */
-    protected function init() : void {
+    protected function init(): void {
         global $DB;
 
         $this->processedcount = 0;
-        $this->values = array();
-        $this->series = array();
+        $this->values = [];
+        $this->series = [];
 
-        $this->record = $DB->get_record('report_builder_graph', array('reportid' => $this->report->_id));
+        $this->record = $DB->get_record('report_builder_graph', ['reportid' => $this->report->_id]);
         if (!$this->record) {
             $this->record = new \stdClass();
             $this->record->type = '';
@@ -86,13 +86,13 @@ abstract class base {
 
         // Load user settings.
         if (isset($this->record->settings)) {
-            $this->usersettings = parse_ini_string($this->record->settings, false);
+            $this->usersettings = fix_utf8(json_decode($this->record->settings, true));
         } else {
-            $this->usersettings = array();
+            $this->usersettings = [];
         }
 
-        $columns = array();
-        $columnsmap = array();
+        $columns = [];
+        $columnsmap = [];
         $i = 0;
         foreach ($this->report->columns as $colkey => $column) {
             if (!$column->display_column(true)) {
@@ -101,8 +101,8 @@ abstract class base {
             $columns[$colkey] = $column;
             $columnsmap[$colkey] = $i++;
         }
-        $rawseries = json_decode($this->record->series, true);
-        $series = array();
+        $rawseries = fix_utf8(json_decode($this->record->series, true));
+        $series = [];
         foreach ($rawseries as $colkey) {
             $series[$colkey] = $colkey;
         }
@@ -126,7 +126,6 @@ abstract class base {
             if (isset($columns[$this->record->category])) {
                 $this->category = $columnsmap[$this->record->category];
                 unset($series[$this->record->category]);
-
             } else { // Category value 'none' or problem detected.
                 $this->category = base::GRAPH_CATEGORY_SIMPLE;
             }
@@ -144,9 +143,9 @@ abstract class base {
     /**
      * Initialise object with report data
      */
-    public function load() : void {
+    public function load(): void {
         if (!$this->is_valid()) {
-            throw new \coding_exception('Tried to load invalid graph');
+            throw new \moodle_exception('Tried to load invalid graph');
         }
 
         $order = $this->report->get_report_sort();
@@ -159,7 +158,7 @@ abstract class base {
         }
     }
 
-    public function add_record($record) : void {
+    public function add_record($record): void {
         $recorddata = $this->report->src->process_data_row($record, 'graph', $this->report);
         $this->process_data($recorddata);
     }
@@ -169,9 +168,9 @@ abstract class base {
      *
      * This function creates legend entries, axis labels, and sorts data into datasets.
      *
-     * @param $data \stdObject report data row
+     * @param $data array report data row
      */
-    protected abstract function process_data($data) : void;
+    abstract protected function process_data(array $data): void;
 
     /**
      * Returns the rendered graph markup
@@ -179,13 +178,13 @@ abstract class base {
      * @param int $height height of the graph
      * @return string
      */
-    public abstract function render(?int $width = null, ?int $height = null) : string;
+    abstract public function render(?int $width = null, ?int $height = null): string;
 
-    public function count_records() : int {
+    public function count_records(): int {
         return $this->processedcount;
     }
 
-    public function get_max_records() : int {
+    public function get_max_records(): int {
         return $this->record->maxrecords;
     }
 
@@ -193,8 +192,7 @@ abstract class base {
      * Returns whether this graph is valid
      * @return bool
      */
-    public function is_valid() : bool {
-
+    public function is_valid(): bool {
         if (empty($this->record->type)) {
             return false;
         }
@@ -207,29 +205,49 @@ abstract class base {
      *
      * @return string
      */
-    public function save_for_cache() : string {
+    public function save_for_cache(): string {
         // Method stub -- override in subclass
         return '';
     }
 
     /**
-     * Load data into this report from cached data
+     * Load data into this report from cached data.
      *
-     * @param $string
+     * This function must be implemented if allow_caching() returns true
+     *
+     * @param string $cached
      * @return bool
      */
     public function load_from_cache(string $cached): bool {
-        throw new \coding_exception("The class".get_called_class()." has not overridden the method load_from_cache. This issue must be fixed by a developer");
+        throw new \coding_exception("The class ".get_called_class()." has not overridden the method load_from_cache. This issue must be fixed by a developer");
     }
 
     /**
      * Gets the name to display for the charting library
      * @return string display name
      */
-    public static function get_name() : string {
+    public static function get_name(): string {
         // Simply provide the class name if they haven't set it
         $path = explode('\\', get_called_class());
         return array_pop($path);
+    }
+
+    /**
+     * Gets the allowed chart types for a the selected graph
+     * @return array
+     */
+    public static function get_allowed_types(): array {
+        if (get_called_class() === 'totara_reportbuilder\local\graph\base') {
+            $class = get_config('totara_reportbuilder', 'graphlibclass');
+            if ($class && class_exists($class)) {
+                return $class::get_allowed_types();
+            }
+
+            // fallback to chartjs
+            return chartjs::get_allowed_types();
+        }
+
+        return static::$allowed_types;
     }
 
     /**
@@ -239,12 +257,14 @@ abstract class base {
      * @param $autoload bool whether to load the data from the report into the graph immediately (use load() otherwise)
      * @return base
      */
-    public static final function create_graph(\reportbuilder $report, bool $autoload = true) : base {
-        $settings = get_config('totara_reportbuilder', 'graphlib');
-        $classes = \core_component::get_namespace_classes('graph', '\totara_reportbuilder\graph\base');
+    final public static function create_graph(\reportbuilder $report, bool $autoload = true): base {
+        $class = get_config('totara_reportbuilder', 'graphlibclass');
+        if ($class && class_exists($class)) {
+            return new $class($report, $autoload);
+        }
 
-        $class = $classes[$settings];
-        return new $class($report, $autoload);
+        // fallback to chartjs
+        return new chartjs($report, $autoload);
     }
 
     /**
@@ -254,12 +274,9 @@ abstract class base {
      * @param string $cached
      * @return base|null
      */
-    public static final function create_from_cache(\reportbuilder $report, string $cached) : ?base {
-        $settings = get_config('totara_reportbuilder', 'graphlib');
-        $classes = \core_component::get_namespace_classes('graph', '\totara_reportbuilder\graph\base');
-
-        $class = $classes[$settings];
-        if (!$class::allow_caching()) {
+    final public static function create_from_cache(\reportbuilder $report, string $cached): ?base {
+        $class = get_config('totara_reportbuilder', 'graphlibclass');
+        if (!class_exists($class) || !$class::allow_caching()) {
             return null;
         }
 
@@ -273,7 +290,7 @@ abstract class base {
      * Whether this report allows caching of results
      * @return bool
      */
-    public static function allow_caching() : bool {
+    public static function allow_caching(): bool {
         // To allow caching, set set this to true in subclass
         return false;
     }

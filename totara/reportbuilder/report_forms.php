@@ -861,8 +861,8 @@ class report_builder_edit_graph_form extends moodleform {
         $graph = $this->_customdata['graph'];
 
         // Graph types.
-        $types = array(
-            '' => get_string('none'),
+        $allowed_types = \totara_reportbuilder\local\graph\base::get_allowed_types();
+        $all_types = array(
             'column' => get_string('graphtypecolumn', 'totara_reportbuilder'),
             'line' => get_string('graphtypeline', 'totara_reportbuilder'),
             'bar' => get_string('graphtypebar', 'totara_reportbuilder'),
@@ -872,6 +872,16 @@ class report_builder_edit_graph_form extends moodleform {
             'doughnut' => get_string('graphtypedonut', 'totara_reportbuilder'),
             'progress' => get_string('graphtypeprogressdonut', 'totara_reportbuilder'),
         );
+        $types = [
+            '' => get_string('none'), // always allow an empty value
+        ];
+        foreach ($allowed_types as $type) {
+            if (!isset($all_types[$type])) {
+                continue;
+            }
+            $types[$type] = $all_types[$type];
+        }
+
         $mform->addElement('select', 'type', get_string('graphtype', 'totara_reportbuilder'), $types);
         $mform->addHelpButton('type', 'graphtype', 'totara_reportbuilder');
 
@@ -928,8 +938,8 @@ class report_builder_edit_graph_form extends moodleform {
         $mform->setType('maxrecords', PARAM_INT);
         $mform->disabledIf('maxrecords', 'type', 'eq', '');
 
-        $mform->addElement('textarea', 'settings', get_string('graphsettings', 'totara_reportbuilder'), array('rows' => 10));
-        $mform->addHelpButton('settings', 'graphsettings', 'totara_reportbuilder');
+        $mform->addElement('textarea', 'settings', get_string('graphcustomsettings', 'totara_reportbuilder'), array('rows' => 10));
+        $mform->addHelpButton('settings', 'graphcustomsettings', 'totara_reportbuilder');
         $mform->setType('settings', PARAM_RAW);
         $mform->disabledIf('settings', 'type', 'eq', '');
 
@@ -967,10 +977,9 @@ class report_builder_edit_graph_form extends moodleform {
         }
 
         if (isset($data['settings']) and trim($data['settings'])) {
-            // Unfortunately it is not easy to get meaningful errors from this parser.
-            $test = @parse_ini_string($data['settings'], false);
-            if ($test === false) {
-                $errors['settings'] = get_string('error');
+            @json_decode($data['settings']);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $errors['settings'] = json_last_error_msg(); // not localised
             }
         }
 

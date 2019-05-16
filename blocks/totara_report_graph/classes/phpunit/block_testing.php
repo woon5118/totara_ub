@@ -63,7 +63,6 @@ trait block_testing {
 
         $rid = $this->create_report('user', 'Test user report 1', true);
         $config = new \rb_config();
-        $config->set_nocache(true);
         $report = \reportbuilder::create($rid, $config);
         // First up delete all columns.
         $this->add_column($report, 'user', 'username', null, 'countdistinct', null, 0);
@@ -71,7 +70,6 @@ trait block_testing {
         $this->add_graph($rid, 'pie', 0, 500, 'user-country', '', ['user-username'], '');
 
         $config = new \rb_config();
-        $config->set_nocache(true);
         $report = \reportbuilder::create($rid, $config);
 
         // Assert graph.
@@ -127,8 +125,7 @@ trait block_testing {
             'reportorsavedid' => $rid,
             'reportfor' => 1,
             'graphimage_maxwidth' => '789px',
-            'graphimage_maxheight' => '327px',
-            'cachettl' => 3600
+            'graphimage_maxheight' => '327px'
         ];
         foreach ($config as $key => $value) {
             if (isset($realconfig->{$key})) {

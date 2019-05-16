@@ -610,5 +610,11 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019070300, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2019073000) {
+        totara_reportbuilder_migrate_svggraph_settings();
+
+        upgrade_plugin_savepoint(true, 2019073000, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

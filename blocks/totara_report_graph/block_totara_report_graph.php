@@ -149,7 +149,7 @@ class block_totara_report_graph extends block_base {
             $this->content->footer = '<a href="'.$url.'">'.get_string('report', 'totara_reportbuilder').'</a>';
         }
 
-        $chart = \totara_reportbuilder\graph\base::create_graph(reportbuilder::create($this->rawreport->id));
+        $chart = \totara_reportbuilder\local\graph\base::create_graph(reportbuilder::create($this->rawreport->id));
         $this->content->text = $chart->render(400,400);
 
         return $this->content;

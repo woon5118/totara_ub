@@ -30,34 +30,37 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
     public function test_normalize_numeric_value() {
-        $this->assertSame(111,    totara_reportbuilder\local\graph::normalize_numeric_value('111'));
-        $this->assertSame(-1e10,  totara_reportbuilder\local\graph::normalize_numeric_value('-1e10'));
-        $this->assertSame(111,    totara_reportbuilder\local\graph::normalize_numeric_value(111));
-        $this->assertSame(11.1,   totara_reportbuilder\local\graph::normalize_numeric_value(11.1));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value(0));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value('0'));
-        $this->assertSame(0.0,    totara_reportbuilder\local\graph::normalize_numeric_value('0.0'));
-        $this->assertSame(111,    totara_reportbuilder\local\graph::normalize_numeric_value(' 111 '));
-        $this->assertSame(111.11, totara_reportbuilder\local\graph::normalize_numeric_value('111.11'));
-        $this->assertSame(111.11, totara_reportbuilder\local\graph::normalize_numeric_value('111,11'));
-        $this->assertSame(99,     totara_reportbuilder\local\graph::normalize_numeric_value('99%'));
-        $this->assertSame(99,     totara_reportbuilder\local\graph::normalize_numeric_value('99 %'));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value('1 111'));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value('111,111.111'));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value('%99'));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value('  '));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value(''));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value(null));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value('abc'));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value(true));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value(false));
-        $this->assertSame(10,     totara_reportbuilder\local\graph::normalize_numeric_value(012));
-        $this->assertSame(12.0,   totara_reportbuilder\local\graph::normalize_numeric_value('012')); // No octal support in strings - cast to float.
-        $this->assertSame(800.0,  totara_reportbuilder\local\graph::normalize_numeric_value('0800')); // No octal support in strings - cast to float.
-        $this->assertSame(496,    totara_reportbuilder\local\graph::normalize_numeric_value(0x1f0));
-        $this->assertEquals(0,    totara_reportbuilder\local\graph::normalize_numeric_value('0x1f0')); // No hexadecimal support in strings - cast to float. PHP7 returns 0, older 0.0.
-        $this->assertSame(255,    totara_reportbuilder\local\graph::normalize_numeric_value(0b11111111));
-        $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value('0b11111111')); // No binary support in strings.
+        $method = new ReflectionMethod('totara_reportbuilder\local\graph\svggraph', 'normalize_numeric_value');
+        $method->setAccessible(true);
+
+        $this->assertSame(111,    $method->invoke(null, '111'));
+        $this->assertSame(-1e10,  $method->invoke(null, '-1e10'));
+        $this->assertSame(111,    $method->invoke(null, 111));
+        $this->assertSame(11.1,   $method->invoke(null, 11.1));
+        $this->assertSame(0,      $method->invoke(null, 0));
+        $this->assertSame(0,      $method->invoke(null, '0'));
+        $this->assertSame(0.0,    $method->invoke(null, '0.0'));
+        $this->assertSame(111,    $method->invoke(null, ' 111 '));
+        $this->assertSame(111.11, $method->invoke(null, '111.11'));
+        $this->assertSame(111.11, $method->invoke(null, '111,11'));
+        $this->assertSame(99,     $method->invoke(null, '99%'));
+        $this->assertSame(99,     $method->invoke(null, '99 %'));
+        $this->assertSame(0,      $method->invoke(null, '1 111'));
+        $this->assertSame(0,      $method->invoke(null, '111,111.111'));
+        $this->assertSame(0,      $method->invoke(null, '%99'));
+        $this->assertSame(0,      $method->invoke(null, '  '));
+        $this->assertSame(0,      $method->invoke(null, ''));
+        $this->assertSame(0,      $method->invoke(null, null));
+        $this->assertSame(0,      $method->invoke(null, 'abc'));
+        $this->assertSame(0,      $method->invoke(null, true));
+        $this->assertSame(0,      $method->invoke(null, false));
+        $this->assertSame(10,     $method->invoke(null, 012));
+        $this->assertSame(12.0,   $method->invoke(null, '012')); // No octal support in strings - cast to float.
+        $this->assertSame(800.0,  $method->invoke(null, '0800')); // No octal support in strings - cast to float.
+        $this->assertSame(496,    $method->invoke(null, 0x1f0));
+        $this->assertEquals(0,    $method->invoke(null, '0x1f0')); // No hexadecimal support in strings - cast to float. PHP7 returns 0, older 0.0.
+        $this->assertSame(255,    $method->invoke(null, 0b11111111));
+        $this->assertSame(0,      $method->invoke(null, '0b11111111')); // No binary support in strings.
     }
 
     public function test_is_graphable() {
@@ -129,7 +132,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
 
     protected function init_graph($rid) {
         $report = reportbuilder::create($rid);
-        $graph = new \totara_reportbuilder\local\graph($report);
+        $graph = new \totara_reportbuilder\local\graph\svggraph($report, false);
         $this->assertTrue($graph->is_valid());
         list($sql, $params, $cache) = $report->build_query(false, true);
         $order = $report->get_report_sort(false);
@@ -163,54 +166,54 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $graphrecord = reset($graphrecords);
 
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
+        $data = $graph->render();
         $this->assertNotContains('Zero length axis', $data);
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
 
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_block_svg();
+        $data = $graph->render(400, 400, false);
         $this->assertNotContains('Zero length axis', $data);
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
 
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_export_svg(1000, 1000);
+        $data = $graph->render(1000, 1000);
         $this->assertNotContains('Zero length axis', $data);
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
 
         $DB->set_field('report_builder_graph', 'type', 'bar', array('id' => $graphrecord->id));
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
+        $data = $graph->render();
         $this->assertNotContains('Zero length axis', $data);
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
 
         $DB->set_field('report_builder_graph', 'type', 'line', array('id' => $graphrecord->id));
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
+        $data = $graph->render();
         $this->assertNotContains('Zero length axis', $data);
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
 
         $DB->set_field('report_builder_graph', 'type', 'scatter', array('id' => $graphrecord->id));
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
+        $data = $graph->render();
         $this->assertNotContains('Zero length axis', $data);
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
 
         $DB->set_field('report_builder_graph', 'type', 'area', array('id' => $graphrecord->id));
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
+        $data = $graph->render();
         $this->assertNotContains('Zero length axis', $data);
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
 
         $DB->set_field('report_builder_graph', 'type', 'pie', array('id' => $graphrecord->id));
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
+        $data = $graph->render();
         $this->assertContains('Empty pie chart', $data);
     }
 
@@ -234,19 +237,19 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $this->add_column($report, 'statistics', 'coursescompleted', null, null, null, 0);
         $graphrecords = $this->add_graph($rid, 'column', 0, 500, 'user-username', '', array('statistics-coursescompleted'), 'remove_empty_series=0');
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
-        $this->assertNotNull($data);
+        $data = $graph->render();
+        $this->assertNotEquals($data, '');
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
         $this->assertContains('admin', $data);
         $this->assertContains('guest', $data);
 
         $graphrecord = reset($graphrecords);
-        $graphrecord->settings = 'remove_empty_series=1';
+        $graphrecord->settings = '{ "custom": { "remove_empty_series" : true }}';
         $DB->update_record('report_builder_graph', $graphrecord);
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
-        $this->assertNull($data);
+        $data = $graph->render();
+        $this->assertEquals($data, '');
 
         // No empty series the data has to be the same (not exactly the same because there are static properties in svggraph).
 
@@ -263,18 +266,18 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $graphrecords = $this->add_graph($rid, 'column', 0, 500, 'user-username', '', array('user-timecreated'), 'remove_empty_series=0');
 
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
-        $this->assertNotNull($data);
+        $data = $graph->render();
+        $this->assertNotEquals($data, '');
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
         $this->assertContains('admin', $data);
         $this->assertContains('guest', $data);
 
         $graphrecord = reset($graphrecords);
-        $graphrecord->settings = 'remove_empty_series=1';
+        $graphrecord->settings = '{ "custom": { "remove_empty_series" : true }}';
         $DB->update_record('report_builder_graph', $graphrecord);
         $graph = $this->init_graph($rid);
-        $this->assertNotNull($data);
+        $this->assertNotEquals($data, '');
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
         $this->assertContains('admin', $data);
@@ -297,8 +300,8 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $graphrecords = $this->add_graph($rid, 'column', 0, 500, 'user-username', '', array('user-timecreated', 'statistics-coursescompleted', 'statistics-coursesstarted'), 'remove_empty_series=0');
 
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
-        $this->assertNotNull($data);
+        $data = $graph->render();
+        $this->assertNotEquals($data, '');
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
         $this->assertContains('admin', $data);
@@ -308,11 +311,11 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $this->assertContains('User\'s Courses Started Count', $data);
 
         $graphrecord = reset($graphrecords);
-        $graphrecord->settings = 'remove_empty_series=1';
+        $graphrecord->settings = '{ "custom": { "remove_empty_series" : true }}';
         $DB->update_record('report_builder_graph', $graphrecord);
         $graph = $this->init_graph($rid);
-        $data = $graph->fetch_svg();
-        $this->assertNotNull($data);
+        $data = $graph->render();
+        $this->assertNotEquals($data, '');
         $this->assertContains($user1->username, $data);
         $this->assertContains($user2->username, $data);
         $this->assertContains('admin', $data);

@@ -4503,7 +4503,7 @@ class reportbuilder {
 
         $graph = null;
         if (!totara_feature_disabled('reportgraphs')) {
-            $graph = \totara_reportbuilder\graph\base::create_graph($this, false);
+            $graph = \totara_reportbuilder\local\graph\base::create_graph($this, false);
 
             if (!$graph->is_valid()) {
                 $graph = null;

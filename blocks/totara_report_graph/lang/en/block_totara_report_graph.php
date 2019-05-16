@@ -21,8 +21,6 @@
  * @package block_totara_report_graph
  */
 
-$string['cachedef_graph'] = 'Graph cache';
-$string['cachettl'] = 'Cache lifetime';
 $string['errorconfigreportfor'] = 'Invalid user option';
 $string['errorconfigreport'] = 'Cannot access report';
 $string['errormaxheightinvalid'] = 'The max height you have entered is invalid. Valid values are like: 200, 200px, 30em.';

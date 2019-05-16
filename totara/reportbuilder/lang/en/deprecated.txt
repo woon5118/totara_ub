@@ -39,3 +39,5 @@ currentsearchparams,totara_reportbuilder
 publicallyavailable,totara_reportbuilder
 savedsearchdesc,totara_reportbuilder
 publicsearch,totara_reportbuilder
+graphsettings,totara_reportbuilder
+graphsettings_help,totara_reportbuilder

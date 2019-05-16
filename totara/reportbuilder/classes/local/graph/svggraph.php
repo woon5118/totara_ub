@@ -21,8 +21,13 @@
  * @package totara_reportbuilder
  */
 
-namespace totara_reportbuilder\graph;
+namespace totara_reportbuilder\local\graph;
 
+/**
+ * Abstraction for SVGGraph library for use with reports.
+ *
+ * @package totara_reportbuilder\local\graph
+ */
 final class svggraph extends base {
     /** @var array SVGGraph settings */
     protected $svggraphsettings;
@@ -30,12 +35,22 @@ final class svggraph extends base {
     protected $svggraphtype;
     /** @var string SVGGraph colours */
     protected $svggraphcolours;
+    /** @var  array list of supported chart types */
+    protected static $allowed_types = [
+        'column',
+        'line',
+        'bar',
+        'pie',
+        'scatter',
+        'area',
+        'doughnut',
+    ];
 
     /** @var string rendered SVG from cache */
     private $rendered;
 
-    protected function init() : void {
-        $this->svggraphsettings = array(
+    protected function init(): void {
+        $this->svggraphsettings = [
             'preserve_aspect_ratio' => 'xMidYMid meet',
             'auto_fit' => true,
             'axis_font' => 'sans-serif',
@@ -57,13 +72,19 @@ final class svggraph extends base {
             // Custom Totara hacks.
             'label_shorten' => 40,
             'legend_shorten' => 80,
-            'legend_entries' => array()
-        );
+            'legend_entries' => []
+        ];
 
         parent::init();
+
+        if (!empty($this->usersettings)) {
+            $this->usersettings = settings\svggraph::create($this->usersettings);
+        } else {
+            $this->usersettings = [];
+        }
     }
 
-    protected function process_data($data) : void {
+    protected function process_data(array $data): void {
         if ($this->category == base::GRAPH_CATEGORY_COLUMN) {
             $this->series[] = $this->processedcount;
             foreach ($data as $k => $val) {
@@ -80,7 +101,7 @@ final class svggraph extends base {
             return;
         }
 
-        $value = array();
+        $value = [];
         if ($this->category == base::GRAPH_CATEGORY_SIMPLE) {
             $value[base::GRAPH_CATEGORY_SIMPLE] = $this->processedcount + 1;
         } else {
@@ -96,7 +117,7 @@ final class svggraph extends base {
         $this->processedcount++;
     }
 
-    public function render(?int $width = null, ?int $height = null, $fix_rtl = true) : string {
+    public function render(?int $width = null, ?int $height = null, $fix_rtl = true): string {
         // If we already have a rendered version of this graph, return that instead
         if (isset($this->rendered)) {
             return $this->rendered;
@@ -105,7 +126,7 @@ final class svggraph extends base {
         $this->init_svggraph();
         if (!$this->svggraphtype) {
             // Nothing to do.
-            return null;
+            return '';
         }
         $settings = $this->get_final_settings();
 
@@ -118,7 +139,7 @@ final class svggraph extends base {
         $data = $svggraph->Fetch($this->svggraphtype, false, false);
 
         if (strpos($data, 'Zero length axis (min >= max)') === false) {
-            return $data;
+            return !empty($data) ? $data : '';
         }
 
         // Use a workaround to prevent axis problems caused by zero only values.
@@ -129,16 +150,17 @@ final class svggraph extends base {
         if (!isset($settings['axis_max_' . $dir]) or $settings['axis_max_' . $dir] <= $settings['axis_min_' . $dir]) {
             $settings['axis_max_' . $dir] = $settings['axis_min_' . $dir] + 1;
         }
-        $svggraph = new \SVGGraph($width, $height, $settings);
+        $svggraph = new \SVGGraph($renderwidth, $renderheight, $settings);
         $svggraph->Colours($this->svggraphcolours);
         $svggraph->Values($this->shorten_labels($this->values, $settings));
 
         $data = $svggraph->Fetch($this->svggraphtype, false, false);
 
         if ($fix_rtl) {
-            $data = self::fix_svg_rtl($data, null, null);
+            $data = self::fix_svg_rtl($data);
         }
-        return $data;
+
+        return !empty($data) ? $data : '';
     }
 
     protected function init_svggraph() {
@@ -151,9 +173,9 @@ final class svggraph extends base {
             return;
         }
 
-        if ($this->record->type === 'pie') {
+        if ($this->is_pie_chart()) {
             // Rework the structure because Pie graph may use only one series.
-            $legend = array();
+            $legend = [];
             foreach ($this->values as $value) {
                 $legend[] = $value[$this->category];
             }
@@ -196,8 +218,8 @@ final class svggraph extends base {
             }
 
             // Create legend items.
-            if ($this->category != GRAPH_CATEGORY_COLUMN) {
-                $legend = array();
+            if ($this->category != base::GRAPH_CATEGORY_COLUMN) {
+                $legend = [];
                 foreach ($this->series as $i => $colkey) {
                     $legend[] = $this->report->format_column_heading($this->report->columns[$colkey], true);
                 }
@@ -207,7 +229,7 @@ final class svggraph extends base {
         unset($this->usersettings['remove_empty_series']);
 
         $this->svggraphsettings['structured_data'] = true;
-        $this->svggraphsettings['structure'] = array('key' => $this->category, 'value' => array_keys($this->series));
+        $this->svggraphsettings['structure'] = ['key' => $this->category, 'value' => array_keys($this->series)];
         $seriescount = count($this->series);
         $singleseries = ($seriescount === 1);
 
@@ -261,6 +283,8 @@ final class svggraph extends base {
         } else if ($this->record->type === 'pie') {
             $this->svggraphtype = 'PieGraph';
 
+        } else if ($this->record->type === 'doughnut') {
+            $this->svggraphtype = 'DonutGraph';
         } else { // Type 'column' or unknown.
             $this->record->type = 'column';
             if ($seriescount <= 2) {
@@ -280,7 +304,7 @@ final class svggraph extends base {
         }
 
         // Rotate data labels if necessary.
-        if ($this->count_records() > 5 and $this->record->type !== 'pie') {
+        if ($this->count_records() > 5 and !$this->is_pie_chart()) {
             if (get_string('thisdirectionvertical', 'core_langconfig') === 'btt') {
                 $this->svggraphsettings['axis_text_angle_h'] = 90;
             } else {
@@ -288,21 +312,19 @@ final class svggraph extends base {
             }
         }
 
-        // Colors are copied from D3 that used http://colorbrewer2.org by Cynthia Brewer, Mark Harrower and The Pennsylvania State University
-        if ($seriescount == 1 and $this->record->type !== 'pie') {
-            $this->svggraphcolours = array('#2ca02c'); // Green is the best colour!
+        $this->svggraphcolours = [
+            '#3869B1',
+            '#DA7E31',
+            '#3F9852',
+            '#CC2428',
+            '#958C3D',
+            '#6B4C9A',
+            '#8C8C8C',
+        ];
 
-        } else if ($seriescount <= 10) {
-            $this->svggraphcolours = array(
-                '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-                '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf');
-
-        } else {
-            $this->svggraphcolours = array(
-                '#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c',
-                '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5',
-                '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
-                '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5');
+        if ($seriescount == 1 and !$this->is_pie_chart()) {
+            // Set this to the first colour so a single series doesn't come out looking like a rainbow
+            $this->svggraphcolours = [$this->svggraphcolours[0]];
         }
     }
 
@@ -323,6 +345,7 @@ final class svggraph extends base {
             $this->svggraphcolours = $colours;
         }
         unset($settings['colours']);
+
         return $settings;
     }
 
@@ -341,8 +364,11 @@ final class svggraph extends base {
 
         // Set up legend defaults and shorten entries if requested.
         $settings = $this->shorten_legend($settings);
+        $settings = $this->apply_custom_colours($settings);
 
-        return $this->apply_custom_colours($settings);
+        $settings = array_merge($settings, $this->usersettings);
+
+        return $settings;
     }
 
     /**
@@ -431,7 +457,8 @@ final class svggraph extends base {
     public function set_font($font) {
         // this place require set all font settings for pdf svg graph, see svggraph.ini file
         $svgfonts = ['axis_font', 'tooltip_font', 'graph_title_font', 'legend_font', 'legend_title_font', 'data_label_font',
-            'label_font', 'guideline_font', 'crosshairs_text_font', 'bar_total_font', 'inner_text_font'];
+            'label_font', 'guideline_font', 'crosshairs_text_font', 'bar_total_font', 'inner_text_font'
+        ];
         foreach ($svgfonts as $svgfont) {
             $this->svggraphsettings[$svgfont] = $font;
         }
@@ -442,10 +469,9 @@ final class svggraph extends base {
      *
      * @param string $data
      * @param null|bool $rtl apply RTL hacks, NULL means detect RTL from current language
-     * @param null|bool $msrtlhack true means hack text anchors, NULL means true if IE/Edge detected
      * @return string SVG markup
      */
-    private static function fix_svg_rtl($data, $rtl = null, $msrtlhack = null) {
+    private static function fix_svg_rtl($data, $rtl = null) {
         if ($rtl === null) {
             $rtl = right_to_left();
         }
@@ -455,18 +481,9 @@ final class svggraph extends base {
 
         $data = str_replace('<svg ', '<svg direction="rtl" ', $data);
 
-        if ($msrtlhack === null) {
-            // NOTE: Silly MS devs always read the standards in a different way, oh well...
-            //       Ignore lower IE versions because they do not support SVG,
-            //       we fallback to PDF rendering that does not support RTL anyway.
-            $msrtlhack = (\core_useragent::check_ie_version(9) || \core_useragent::is_edge());
-        }
-
-        if (!$msrtlhack) {
-            $data = str_replace('text-anchor="end"', 'text-anchor="xxx"', $data);
-            $data = str_replace('text-anchor="start"', 'text-anchor="end"', $data);
-            $data = str_replace('text-anchor="xxx"', 'text-anchor="start"', $data);
-        }
+        $data = str_replace('text-anchor="end"', 'text-anchor="xxx"', $data);
+        $data = str_replace('text-anchor="start"', 'text-anchor="end"', $data);
+        $data = str_replace('text-anchor="xxx"', 'text-anchor="start"', $data);
 
         return $data;
     }
@@ -510,21 +527,30 @@ final class svggraph extends base {
         return $val;
     }
 
-    public function save_for_cache() : string {
+    /**
+     * Returns whether this is one of the pie chart variants
+     * @return bool
+     */
+    private function is_pie_chart(): bool {
+        return $this->record->type === 'pie'
+            || $this->record->type === 'doughnut';
+    }
+
+    public function save_for_cache(): string {
         return $this->render(400, 400, false);
     }
 
-    public function load_from_cache(string $cached) : bool {
+    public function load_from_cache(string $cached): bool {
         $this->rendered = self::fix_svg_rtl($cached);
+        return true;
     }
 
-    public static function allow_caching() : bool {
+    public static function allow_caching(): bool {
         // To allow caching, set set this to true in subclass
         return true;
     }
 
-    public static function get_name() : string {
-        return get_string('graphsvggraph', 'totara_reportbuilder');
+    public static function get_name(): string {
+        return get_string('graphlibsvggraph', 'totara_reportbuilder');
     }
-
 }

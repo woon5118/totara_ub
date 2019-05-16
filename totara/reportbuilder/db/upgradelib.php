@@ -368,3 +368,73 @@ function totara_reportbuilder_populate_scheduled_reports_usermodified() {
     }
 }
 
+function totara_reportbuilder_migrate_svggraph_settings() {
+    global $DB;
+
+    $records = $DB->get_records('report_builder_graph', null, '', 'id,settings');
+    if (empty($records)) {
+        return;
+    }
+
+    // Fetch the SVGGraph Settings object, and invert it
+    $translation = totara_reportbuilder\local\graph\settings\svggraph::$translation;
+    $translate_setting = function ($key, $value, $translation) use (&$translate_setting) {
+
+        // Check all translation settings to see if we have a matched value -- this is inefficient,
+        // but we only do it once
+        foreach (array_keys($translation) as $k) {
+            // Skip non-string keys, and default values
+            if (!is_string($k) || $k === '_default') {
+                continue;
+            }
+
+            $val = $translation[$k];
+            if (is_array($val)) {
+                $child_response = $translate_setting($key, $value, $val);
+                if (is_array($child_response)) {
+                    return [
+                        $k => $child_response
+                    ];
+                }
+            } else if ($translation[$k] === $key) {
+                return [
+                    $k => $value
+                ];
+            }
+        }
+
+        return false;
+    };
+
+    foreach ($records as $record) {
+        if (empty($record->settings)) {
+            continue;
+        }
+
+        // Try to parse the settings ini
+        $oldsettings = @parse_ini_string($record->settings);
+        if (!$oldsettings) {
+            // The settings are invalid (or already JSON), so leave them alone
+            continue;
+        }
+
+        $newsettings = [];
+        foreach ($oldsettings as $key => $value) {
+            $translated = $translate_setting($key, $value, $translation);
+            if ($translated) {
+                $newsettings = array_merge_recursive($newsettings, $translated);
+            } else {
+                // If there isn't any setting for this, put it in the custom settings so it isn't
+                // lost
+                $newsettings = array_merge_recursive($newsettings, [
+                    'custom' => [
+                        $key => $value
+                    ]
+                ]);
+            }
+        }
+
+        $record->settings = json_encode($newsettings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $DB->update_record('report_builder_graph', $record);
+    }
+}

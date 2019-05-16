@@ -21,6 +21,12 @@
  */
 define(['core/chartjs'], function(Chart) {
 
+    /**
+     * Constructor for ChartJS widget
+     *
+     * @param {HTMLCanvasElement} element Canvas element to load ChartJS on
+     * @constructor
+     */
     function ChartJSController(element) {
         var ctx = element.getContext('2d');
 
