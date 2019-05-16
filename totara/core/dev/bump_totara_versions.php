@@ -25,7 +25,7 @@ define('CLI_SCRIPT', true);
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir.'/clilib.php');
 
-define('MOODLE_DEFAULT_TAG', 'v3.3.9'); // The upstream release that Totara 13 is based on.
+define('MOODLE_DEFAULT_TAG', dev_get_moodle_tag()); // The upstream release that Totara is based on.
 
 list($options, $unrecognized) = cli_get_params(
     array(
@@ -284,6 +284,23 @@ function dev_get_maturity() {
     $maturity = null;
     include($versionfile);
     return $maturity;
+}
+
+/**
+ * Returns relevant tag in upstream code.
+ *
+ * @return string Moodle tag name
+ */
+function dev_get_moodle_tag() {
+    global $CFG;
+    $versionfile = $CFG->dirroot . '/version.php';
+    $release = null;
+    include($versionfile);
+    if (!preg_match('/^\d\.\d+\.\d+/', $release, $matches)) {
+        throw new coding_exception('Invalid main moodle release detected');
+    }
+
+    return 'v' . $matches[0];
 }
 
 /**
