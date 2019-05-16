@@ -1874,10 +1874,10 @@ class reportbuilder {
                     $heading = get_string("aggregatetype{$column->aggregate}_heading", 'totara_reportbuilder', $heading);
                 }
             }
+            $heading = format_string($heading);
         }
 
         if ($plaintext) {
-            $heading = strip_tags($heading);
             $heading = core_text::entities_to_utf8($heading);
         }
 
@@ -1995,6 +1995,8 @@ class reportbuilder {
      *    get the defaultheading from the columnoption
      *  - if that isn't specified, use the columnoption name
      *
+     * NOTE: Since Totara 13 the texts are not passed through format_string()
+     *
      * @return array Associtive array of default headings for all the column options in this report
      *               Key is "{$type}-{$value]", value is the default heading string
      */
@@ -2009,7 +2011,7 @@ class reportbuilder {
 
             if ($this->embedobj && $embeddedheading = $this->embedobj->get_embedded_heading($option->type, $option->value)) {
                 // Use heading from embedded source, but do not add the type because embedded report has own default!
-                $out[$key] = format_string($embeddedheading);
+                $out[$key] = $embeddedheading;
                 continue;
             } else {
                 if (isset($option->defaultheading)) {
@@ -2029,7 +2031,7 @@ class reportbuilder {
                 $defaultheading = get_string ('headingformat', 'totara_reportbuilder', $text);
             }
 
-            $out[$key] = format_string($defaultheading);
+            $out[$key] = $defaultheading;
         }
         return $out;
     }
