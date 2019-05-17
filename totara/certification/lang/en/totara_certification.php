@@ -119,6 +119,7 @@ $string['completionprogstatus'] = 'Program status';
 $string['completionprogstatus_help'] = 'When a user is certified, before the recertification window has opened, the program status should be **Program complete**, otherwise it should be **Program incomplete**.
 
 This field is only used internally - it is not displayed to the learner or in reports. It is presented here to ensure that it has the correct value.';
+$string['completionstateedited'] = 'Certification completion state edited';
 $string['completionprogtimecompleted'] = 'Program completion date';
 $string['completionprogtimecompleted_help'] = 'When a user is certified, before the recertification window has opened, the program completion date should be equal to the certification completion date, otherwise it should be empty.
 

@@ -213,6 +213,7 @@ $string['completionsforuserinprog'] = 'Completion records for {$a->user} in {$a-
 $string['completionoptional'] = 'All courses are optional';
 $string['completionstask'] = 'Program completions';
 $string['completionstatus'] = 'Status';
+$string['completionstateedited'] = 'Program completion state edited';
 $string['completionswithproblems'] = 'Program completion records with problems';
 $string['completiontimecompleted'] = 'Completion date';
 $string['completiontimedue'] = 'Due date';
