@@ -21,15 +21,19 @@
  * @subpackage facetoface
  */
 
+use mod_facetoface\dashboard\filter_list;
+use mod_facetoface\event_time;
+use mod_facetoface\output\show_previous_events;
+use mod_facetoface\dashboard\render_session_option;
+
 require_once '../../config.php';
 require_once $CFG->dirroot . '/mod/facetoface/lib.php';
 require_once $CFG->dirroot . '/mod/facetoface/renderer.php';
 require_once($CFG->dirroot . '/totara/customfield/field/location/field.class.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
-$f = optional_param(\mod_facetoface_renderer::PARAM_FILTER_F2FID, 0, PARAM_INT); // facetoface ID
-$roomid = optional_param(\mod_facetoface_renderer::PARAM_FILTER_ROOMID, 0, PARAM_INT);
-$eventtime = optional_param(\mod_facetoface_renderer::PARAM_FILTER_EVENTTIME, 0, PARAM_INT);
+$f = optional_param(filter_list::PARAM_FILTER_F2FID, 0, PARAM_INT); // facetoface ID
+$filters = filter_list::from_query_params();
 
 if ($id) {
     if (!$cm = get_coursemodule_from_id('facetoface', $id)) {
@@ -47,7 +51,7 @@ if (!$course = $DB->get_record('course', array('id' => $seminar->get_course())))
 }
 
 $context = context_module::instance($cm->id);
-$PAGE->set_url('/mod/facetoface/view.php', array('id' => $cm->id));
+$PAGE->set_url($filters->to_url($seminar));
 $PAGE->set_context($context);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
@@ -80,6 +84,7 @@ $PAGE->set_heading($course->fullname);
 $pagetitle = format_string($seminar->get_name());
 
 $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
+/** @var mod_facetoface_renderer $f2f_renderer */
 $f2f_renderer->setcontext($context);
 
 $completion = new \completion_info($course);
@@ -92,10 +97,10 @@ if (empty($cm->visible) and !has_capability('mod/facetoface:viewemptyactivities'
 }
 echo $OUTPUT->box_start();
 
-if ($roomid || $eventtime) {
-    $stringid = 'allfilteredsessionsin';
-} else {
+if ($filters->are_default()) {
     $stringid = 'allsessionsin';
+} else {
+    $stringid = 'allfilteredsessionsin';
 }
 echo $OUTPUT->heading(get_string($stringid, 'facetoface', $seminar->get_name()), 2);
 
@@ -108,16 +113,34 @@ if (!empty($seminar->get_intro())) {
 // Display a warning about previously mismatched self approval sessions.
 $f2f_renderer->selfapproval_notice($seminar->get_id());
 
-$f2f_renderer->print_action_bar($seminar);
-
-$hassessions = $seminar->get_events()->count() > 0;
+$hassessions = $seminar->has_events();
 
 // only print the filter bar if this seminar has events
 if ($hassessions) {
-    $f2f_renderer->print_filter_bar($seminar, $roomid, $eventtime);
+    echo $f2f_renderer->render_filter_bar($seminar, $filters);
 }
 
-echo $f2f_renderer->print_session_list($seminar, $roomid, $eventtime);
+echo $f2f_renderer->render_action_bar($seminar);
+
+// Upcoming sessions
+$option = (new render_session_option())
+    ->set_displayreservation(true)
+    ->set_eventascendingorder(true)
+    ->set_sessionascendingorder(true)
+    ->set_eventtimes([ event_time::UPCOMING, event_time::INPROGRESS ]);
+echo $OUTPUT->heading(get_string('upcomingsessions', 'mod_facetoface'), 3);
+echo $f2f_renderer->render_session_list($seminar, $filters, $option);
+
+// Previous sessions
+$option = (new render_session_option())
+    ->set_displayreservation(false)
+    ->set_displaysignupperiod(false)
+    ->set_eventascendingorder(false)
+    ->set_sessionascendingorder(false)
+    ->set_eventtimes([ event_time::OVER ]);
+echo $OUTPUT->heading(get_string('previoussessions', 'mod_facetoface'), 3, null, 'previoussessionheading');
+echo $OUTPUT->render(show_previous_events::create($seminar, $filters, 'previoussessionheading'));
+echo $f2f_renderer->render_session_list($seminar, $filters, $option);
 
 // only print the export form if this seminar has events
 if ($hassessions) {

@@ -19,30 +19,41 @@ Feature: Suspend user in different session times
 
   @javascript
   Scenario: Create sessions with different dates and add users to a face to face sessions
+    # Create four events (sessions) using relative formats
+    # 1) 1 January in two years future
+    # 2) Wait-listed = an event with no sessions
+    # 3) 1 February in two years past
+    # 4) from 1 March last year to 1 March next year
+
+    # Then use a month name to look up each event
+    # * January = future event
+    # * February = past event
+    # * March = ongoing event
+
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
 
-    # Session in the fututre
+    # 1) Session in the fututre
     And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
+      | timestart[day]     | 1                  |
+      | timestart[month]   | 1                  |
+      | timestart[year]    | ## 2 years ## Y ## |
+      | timestart[hour]    | 11                 |
+      | timestart[minute]  | 00                 |
+      | timefinish[day]    | 1                  |
+      | timefinish[month]  | 1                  |
+      | timefinish[year]   | ## 2 years ## Y ## |
+      | timefinish[hour]   | 12                 |
+      | timefinish[minute] | 00                 |
     And I press "OK"
     And I set the following fields to these values:
       | Maximum bookings | 1 |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on "Attendees" "link" in the "January" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
@@ -55,7 +66,7 @@ Feature: Suspend user in different session times
     And I should see "Sam2 Student2"
     And I click on "View all events" "link"
 
-    # Session is wait-listed
+    # 2) Session is wait-listed
     And I follow "Add event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
@@ -76,26 +87,26 @@ Feature: Suspend user in different session times
     And I should see "Sam2 Student2"
     And I click on "View all events" "link"
 
-    # Session in the past
+    # 3) Session in the past
     And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | 2015 |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | 2015 |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
+      | timestart[day]     | 1                      |
+      | timestart[month]   | 2                      |
+      | timestart[year]    | ## 2 years ago ## Y ## |
+      | timestart[hour]    | 11                     |
+      | timestart[minute]  | 00                     |
+      | timefinish[day]    | 1                      |
+      | timefinish[month]  | 2                      |
+      | timefinish[year]   | ## 2 years ago ## Y ## |
+      | timefinish[hour]   | 12                     |
+      | timefinish[minute] | 00                     |
     And I press "OK"
     And I set the following fields to these values:
       | Maximum bookings | 2 |
     And I press "Save changes"
 
-    When I click on "Attendees" "link" in the "Event over" "table_row"
+    When I click on "Attendees" "link" in the "February" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
@@ -108,26 +119,26 @@ Feature: Suspend user in different session times
     And I should see "Sam2 Student2"
     And I click on "View all events" "link"
 
-    # Session in progress
+    # 4) Session in progress
     And I follow "Add event"
     And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | timestart[day]     | 0    |
-      | timestart[month]   | 0    |
-      | timestart[year]    | 0    |
-      | timestart[hour]    | 0    |
-      | timestart[minute]  | -30  |
-      | timefinish[day]    | 0    |
-      | timefinish[month]  | 0    |
-      | timefinish[year]   | 0    |
-      | timefinish[hour]   | 0    |
-      | timefinish[minute] | +30  |
+    And I set the following fields to these values:
+      | timestart[day]     | 1                    |
+      | timestart[month]   | 3                    |
+      | timestart[year]    | ## last year ## Y ## |
+      | timestart[hour]    | 0                    |
+      | timestart[minute]  | 0                    |
+      | timefinish[day]    | 1                    |
+      | timefinish[month]  | 3                    |
+      | timefinish[year]   | ## next year ## Y ## |
+      | timefinish[hour]   | 1                    |
+      | timefinish[minute] | 0                    |
     And I press "OK"
     And I set the following fields to these values:
       | Maximum bookings | 2 |
     And I press "Save changes"
 
-    When I click on "Attendees" "link" in the "Event in progress" "table_row"
+    When I click on "Attendees" "link" in the "March" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
@@ -149,7 +160,7 @@ Feature: Suspend user in different session times
     And I follow "Test seminar name"
 
     # Check the result
-    When I click on "Attendees" "link" in the "Booking full" "table_row"
+    When I click on "Attendees" "link" in the "January" "table_row"
     Then I should not see "Sam1 Student1"
     And I should see "Sam2 Student2"
 
@@ -161,12 +172,12 @@ Feature: Suspend user in different session times
     And I should see "Sam2 Student2"
 
     And I click on "View all events" "link"
-    When I click on "Attendees" "link" in the "Event over" "table_row"
+    When I click on "Attendees" "link" in the "February" "table_row"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
 
     And I click on "View all events" "link"
 
-    When I click on "Attendees" "link" in the "Event in progress" "table_row"
+    When I click on "Attendees" "link" in the "March" "table_row"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"

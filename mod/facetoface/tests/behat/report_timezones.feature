@@ -95,9 +95,11 @@ Feature: Seminar timezones in reports
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
 
     And I press "Save changes"
-    And I should see "6:15 PM - 8:45 PM Europe/Prague" in the "Room 1" "table_row"
+    And I should see "6:15 PM - 8:45 PM" in the "Room 1" "table_row"
+    And I should see "Timezone: Europe/Prague" in the "Room 1" "table_row"
     And I should see "1 January 2020" in the "Room 1" "table_row"
-    And I should see "1:00 AM - 2:30 AM Australia/Perth" in the "Room 2" "table_row"
+    And I should see "1:00 AM - 2:30 AM" in the "Room 2" "table_row"
+    And I should see "Timezone: Australia/Perth" in the "Room 2" "table_row"
     And I should see "4 February 2021" in the "Room 2" "table_row"
     And I click on "Attendees" "link" in the "Room 1" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"

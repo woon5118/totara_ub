@@ -18,11 +18,11 @@ Feature: Hide elements on the page based on sessions available
   Scenario: Check that there is no event time filter and export form when there are no events
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "No events"
-    And I should not see "Event time"
-    And I should not see "Export attendance"
+    Then I should see "No results"
+    And ".mod_facetoface__filter" "css_element" should not exist
+    And "Export format" "select" should not exist
 
-  Scenario: Adding one event should display the export form and event filter
+  Scenario: Adding one event should display the export form but event time filter
     Given I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add event"
@@ -41,5 +41,44 @@ Feature: Hide elements on the page based on sessions available
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
-    Then I should see "Event time"
-    And I should see "Export attendance"
+    And ".mod_facetoface__filter" "css_element" should exist
+    And "Event:" "select" should not exist
+    And "Export format" "select" should exist
+
+  Scenario: Adding one past event and one future event should display the export form and event time filter
+    Given I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I follow "Add event"
+    And I click on "Edit session" "link"
+    And I fill seminar session with relative date in form data:
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | -2               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | -2               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | +1               |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I press "Save changes"
+    And I follow "Add event"
+    And I click on "Edit session" "link"
+    And I fill seminar session with relative date in form data:
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | +2               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | +2               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | +1               |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I press "Save changes"
+    And "Event:" "select" should exist
+    And "Export format" "select" should exist

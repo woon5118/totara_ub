@@ -85,7 +85,7 @@ Feature: Seminar event cancellation reporting
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
+    And I click on "Cancel event" "link" in the "10:00 AM - 4:00 PM" "table_row"
     And I press "Yes"
 
 

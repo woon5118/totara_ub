@@ -129,7 +129,7 @@ Feature: Check the seminar events and sessions reports display correctly
     And I set the field "sessiontimezone" to "America/Toronto"
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    Then I should see "10:00 PM - 11:00 PM America/Toronto"
+    Then I should see "Timezone: America/Toronto" in the "31 December 2019, 10:00 PM - 11:00 PM" "table_row"
 
     # Check the events start and finish date display correctly.
     When I navigate to "Events report" node in "Site administration > Seminars"

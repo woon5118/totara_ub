@@ -28,6 +28,7 @@
 
     Context variables required for this template:
     * id: string id
+    * class: part of css class
     * align: content alignment (far, center or near)
     * commandlinks: array containing buttons
     * commandlinks.name: name used for part of the css class name
@@ -38,6 +39,7 @@
     Example content (json):
     {
         "id" : "id-123456",
+        "class" : "",
         "align" : "far",
         "commandlinks" : [
             {
@@ -56,7 +58,7 @@
     }
 }}
 
-<div class="mod_facetoface__action{{#align}} mod_facetoface__action--{{.}}{{/align}}"{{#id}} id="{{.}}"{{/id}}>
+<div class="mod_facetoface__action{{#class}} mod_facetoface__action-{{.}}{{/class}}{{#align}} mod_facetoface__action--{{.}}{{/align}}"{{#id}} id="{{.}}"{{/id}}>
     {{#commandlinks}}
         <a href="{{{href}}}" role="button" class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-default{{/primary}} mod_facetoface__action__{{name}}">{{{text}}}</a>
     {{/commandlinks}}

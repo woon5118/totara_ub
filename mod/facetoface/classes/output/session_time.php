@@ -26,24 +26,26 @@ namespace mod_facetoface\output;
 defined('MOODLE_INTERNAL') || die();
 
 use core\output\template;
+use mod_facetoface\seminar_session;
 
 /**
- * Class session_time
- *
+ * Provide functions to format session times.
  */
-class session_time extends template {
+class session_time {
 
     /**
      * Format the session time according to specific timezone.
      *
      * @param int $start
      * @param int $end
-     * @param string $timezone
+     * @param int|string|float|DateTimeZone $timezone
+     * @param bool $displaytimezones
      * @return \stdClass
      */
-    public static function format(int $start, int $end, string $timezone): \stdClass {
-
-        $displaytimezones = (bool)(int)get_config(null, 'facetoface_displaysessiontimezones');
+    public static function format(int $start, int $end, $timezone, bool $displaytimezones = null): \stdClass {
+        if ($displaytimezones === null) {
+            $displaytimezones = (bool)(int)get_config(null, 'facetoface_displaysessiontimezones');
+        }
 
         if (empty($timezone) || (int)$timezone == 99 or !$displaytimezones) {
             $timezone = \core_date::get_user_timezone();
@@ -116,5 +118,65 @@ class session_time extends template {
             $returntext .= ' ' . \core_date::get_localised_timezone($targettz);
         }
         return $returntext;
+    }
+
+    /**
+     * Format the session time as HTML.
+     *
+     * @param string|integer $startdate
+     * @param string|integer $finishdate
+     * @param integer|string|float|DateTimeZone $timezone
+     * @param boolean|null $displaytimezones
+     * @return string
+     */
+    public static function to_html(int $timestart, int $timefinish, $timezone = 99, bool $displaytimezones = null): string {
+        $sessionobj = static::format($timestart, $timefinish, $timezone, $displaytimezones);
+
+        if ($timestart && $timefinish) {
+            if ($sessionobj->startdate == $sessionobj->enddate) {
+                // <startdate>, <starttime> - <finishtime> [Timezone: <timezone>]
+                $html = get_string('sessionstartdateandtimewithouttimezone', 'mod_facetoface', [
+                    'startdate' => self::wrap_eventtime($sessionobj->startdate),
+                    'starttime' => self::wrap_eventtime($sessionobj->starttime),
+                    'endtime' => self::wrap_eventtime($sessionobj->endtime),
+                ]);
+            } else {
+                // <startdate>, <starttime> - <finishdate>, <finishtime> [Timezone: <timezone>]
+                $html = get_string('sessionstartfinishdateandtimewithouttimezone', 'mod_facetoface', [
+                    'startdate' => self::wrap_eventtime($sessionobj->startdate),
+                    'starttime' => self::wrap_eventtime($sessionobj->starttime),
+                    'enddate' => self::wrap_eventtime($sessionobj->enddate),
+                    'endtime' => self::wrap_eventtime($sessionobj->endtime),
+                ]);
+            }
+        } else if ($timestart) {
+            // After <startdate>, <starttime> [Timezone: <timezone>]
+            $html = get_string('signupstartdateandtimeonlywithouttimezone', 'mod_facetoface', [
+                'startdate' => self::wrap_eventtime($sessionobj->startdate),
+                'starttime' => self::wrap_eventtime($sessionobj->starttime),
+            ]);
+        } else if ($timefinish) {
+            // Before <enddate>, <endtime> [Timezone: <timezone>]
+            $html = get_string('signupenddateandtimeonlywithouttimezone', 'mod_facetoface', [
+                'enddate' => self::wrap_eventtime($sessionobj->enddate),
+                'endtime' => self::wrap_eventtime($sessionobj->endtime),
+            ]);
+        } else {
+            return '';
+        }
+
+        if ($sessionobj->timezone) {
+            $timezonestring = clean_string(get_string('timezoneformat', 'mod_facetoface', $sessionobj->timezone));
+            $html .= \html_writer::tag('span', $timezonestring, ['class' => 'mod_facetoface__sessionlist__timezone']);
+        }
+        return $html;
+    }
+
+    /**
+     * @param string $time
+     * @return string
+     */
+    private static function wrap_eventtime(string $time): string {
+        return \html_writer::tag('time', clean_string($time), ['class' => 'mod_facetoface__sessionlist__eventtime']);
     }
 }

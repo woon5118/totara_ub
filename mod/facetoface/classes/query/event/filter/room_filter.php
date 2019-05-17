@@ -57,7 +57,7 @@ final class room_filter extends filter {
      * @return array
      * @inheritdoc
      */
-    public function get_where_and_params(): array {
+    public function get_where_and_params(int $time): array {
         if (0 == $this->roomid) {
             // No point to query for a room with id as zero.
             return ["(1=1)", []];

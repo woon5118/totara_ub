@@ -34,7 +34,7 @@ Feature: Viewing take attendance page with multiple seminar sessions
   Scenario: Viewing session attendance
     Given I am on "c101" course homepage
     And I follow "seminar1"
-    And I click on "Attendee" "link" in the "Event over" "table_row"
+    And I click on "Attendee" "link" in the "Over" "table_row"
     And I follow "Take attendance"
     And the field with xpath "//table//tbody//tr[contains(.,'kian bomba')]//select[@class='mod_facetoface__take-attendance__status-picker']" matches value "Not set"
 

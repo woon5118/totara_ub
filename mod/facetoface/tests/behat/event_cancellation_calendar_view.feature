@@ -98,8 +98,9 @@ Feature: Seminar event cancellation calendar views
     And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
-    And I should see "Event cancelled" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
-    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
+    And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM" "table_row"
+    And ".mod_facetoface__sessionlist__action__links" "css_element" should not exist
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
@@ -131,8 +132,9 @@ Feature: Seminar event cancellation calendar views
     And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
-    And I should see "Event cancelled" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
-    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
+    And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM" "table_row"
+    And ".mod_facetoface__sessionlist__action__links" "css_element" should exist
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
@@ -156,8 +158,9 @@ Feature: Seminar event cancellation calendar views
     And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
-    And I should see "Event cancelled" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
-    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM Australia/Perth" "table_row"
+    And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM" "table_row"
+    And ".mod_facetoface__sessionlist__action__links" "css_element" should exist
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"

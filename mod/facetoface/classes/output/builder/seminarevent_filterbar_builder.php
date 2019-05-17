@@ -28,6 +28,9 @@ defined('MOODLE_INTERNAL') || die();
 
 use mod_facetoface\output\seminarevent_filterbar;
 
+/**
+ * A builder class for seminarevent_filterbar.
+ */
 class seminarevent_filterbar_builder {
     /**
      * @var string
@@ -40,6 +43,11 @@ class seminarevent_filterbar_builder {
     private $method;
 
     /**
+     * @var \flex_icon
+     */
+    private $icon = null;
+
+    /**
      * @var array
      */
     private $params = [];
@@ -50,12 +58,29 @@ class seminarevent_filterbar_builder {
     private $filters = [];
 
     /**
+     * @var array
+     */
+    private $links = [];
+
+    /**
      * @param string $id     part of form id
      * @param string $method get or post
      */
     public function __construct(string $id, string $method = 'get') {
         $this->id = $id;
         $this->method = $method;
+    }
+
+    /**
+     * Set an icon.
+     *
+     * @param pix_icon|null $icon
+     *
+     * @return seminarevent_filterbar_builder
+     */
+    public function set_icon(?\pix_icon $icon): seminarevent_filterbar_builder {
+        $this->icon = $icon;
+        return $this;
     }
 
     /**
@@ -79,16 +104,36 @@ class seminarevent_filterbar_builder {
      * @param string  $class    part of css class
      * @param string  $label    label
      * @param boolean $disabled true to disable/hide an element
+     * @param boolean $tooltips true to show tooltips on an element
      *
      * @return seminarevent_filterbar_builder
      */
     public function add_filter(string $name, array $options, $class = '',
-                               $label = '', $disabled = false): seminarevent_filterbar_builder {
+                               $label = '', $disabled = false, $tooltips = false): seminarevent_filterbar_builder {
         $this->filters[$name] = [
             'options' => $options,
             'class' => $class,
             'label' => $label,
             'disabled' => $disabled,
+            'tooltips' => $tooltips,
+        ];
+        return $this;
+    }
+
+    /**
+     * Append an arbitrary link at the end of filter.
+     *
+     * @param string                $label  label
+     * @param string|\moodle_url    $url    url
+     * @return seminarevent_filterbar_builder
+     */
+    public function add_link(string $label, $url): seminarevent_filterbar_builder {
+        if ($url instanceof \moodle_url) {
+            $url = $url->out();
+        }
+        $this->links[] = [
+            'label' => $label,
+            'url' => $url,
         ];
         return $this;
     }
@@ -128,17 +173,30 @@ class seminarevent_filterbar_builder {
                 'label' => $opts['label'],
                 'disabled' => $opts['disabled'],
                 'webkit_init_value' => $selectedvalue,
+                'show_tooltips' => $opts['tooltips'],
                 'options' => $options,
             ];
         }
 
-        return new seminarevent_filterbar(
-            [
-                'formid' => $this->id,
-                'method' => $this->method,
-                'params' => $params,
-                'filters' => $filters,
-            ]
-        );
+        $data = [
+            'formid' => $this->id,
+            'method' => $this->method,
+            'params' => $params,
+            'filters' => $filters,
+            'links' => $this->links,
+        ];
+
+        if ($this->icon) {
+            global $OUTPUT;
+            $iconattr = array(
+                'template' => $this->icon->get_template(),
+                'context' => $this->icon->export_for_template($OUTPUT),
+            );
+            $data['icon'] = $iconattr;
+        } else {
+            $data['icon'] = null;
+        }
+
+        return new seminarevent_filterbar($data);
     }
 }

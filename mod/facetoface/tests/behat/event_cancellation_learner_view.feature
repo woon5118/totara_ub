@@ -127,10 +127,10 @@ Feature: Seminar event cancellation learner views
     And I log in as "learner1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
-    And I should see "Event cancelled" in the "10 February 2025" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
+    And I should see "Cancelled" in the "10 February 2025" "table_row"
     And I should not see "Sign-up" in the "10 February 2025" "table_row"
-    And I should see "10:00 AM - 4:00 PM Pacific/Auckland" in the "10 February 2026" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10 February 2026, 10:00 AM - 4:00 PM" "table_row"
     And I should see "Booking open" in the "10 February 2026" "table_row"
     And I should see "Sign-up" in the "10 February 2026" "table_row"
 

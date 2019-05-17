@@ -26,10 +26,10 @@ namespace mod_facetoface;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * event_time enumeration.
+ */
 abstract class event_time {
-    /**
-     * Constants for facetoface_get_sessions
-     */
     const ALL = 0;
     const UPCOMING = 1;
     const INPROGRESS = 2;

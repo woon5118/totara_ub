@@ -37,15 +37,30 @@
     * filters.class: part of the css class name
     * filters.label: label text attached to the select menu
     * filters.webkit_init_value: must be filters.options.value whose selected is true
+    * filters.show_tooltips: true to display the selected text as a tooltip
     * filters.options: array containing options for the select menu
     * filters.options.name: label text
     * filters.options.value: value attribute
     * filters.options.selected: true if the option is selected
+    * array containing buttons
+    * links.label: label text
+    * links.url: url
 
     Example content (json):
     {
         "method" : "get",
         "formid" : "id-123456",
+        "icon": {
+            "template": "core/flex_icon",
+            "context": {
+                "identifier" : "filter",
+                "customdata": {
+                    "classes": "custom-class another-custom-class",
+                    "alt": "Settings"
+                },
+                "classes": "fa-filter"
+            }
+        },
         "params" : [
             {
                 "name" : "id",
@@ -62,6 +77,7 @@
                 "class" : "room",
                 "label" : "Filter by rooms:",
                 "webkit_init_value" : "4",
+                "show_tooltips": false,
                 "options" : [
                     {
                         "name" : "All rooms",
@@ -85,6 +101,7 @@
                 "class" : "eventtime",
                 "label" : "Event time:",
                 "webkit_init_value" : "1",
+                "show_tooltips": false,
                 "options" : [
                     {
                         "name" : "All events",
@@ -108,19 +125,26 @@
                     }
                 ]
             }
+        ],
+        "links" : [
+            {
+                "label" : "Reset",
+                "url" : "?"
+            }
         ]
     }
 }}
 
 <form method="{{method}}" class="mod_facetoface__filter" id="mod_facetoface__filter_{{formid}}" data-core-autoinitialise-amd="mod_facetoface/seminarevent_filterbar" data-core-autoinitialise="true">
+    {{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}
     {{#params}}
         <input type="hidden" name="{{name}}" value="{{value}}">
     {{/params}}
     {{#filters}}
         {{^disabled}}
-            <div class="mod_facetoface__filter__item">
-                <label for="mod_facetoface__filter_{{formid}}__{{name}}" class="mod_facetoface__filter__item__label">{{{label}}}</label>
-                <select id="mod_facetoface__filter_{{formid}}__{{name}}" name="{{name}}" disabled class="mod_facetoface__filter__item__{{class}}-select" data-webkit-init-value="{{webkit_init_value}}">
+            <div class="mod_facetoface__filter__item__{{class}}">
+                <label for="mod_facetoface__filter_{{formid}}__{{name}}" class="mod_facetoface__filter__item__{{class}}__label">{{{label}}}</label>
+                <select id="mod_facetoface__filter_{{formid}}__{{name}}" name="{{name}}" disabled class="mod_facetoface__filter__item__{{class}}__select" data-webkit-init-value="{{webkit_init_value}}"{{#show_tooltips}} data-show-tooltips="true"{{/show_tooltips}}>
                     {{#options}}
                         <option value="{{value}}"{{#selected}} selected{{/selected}}>{{name}}</option>
                     {{/options}}
@@ -128,4 +152,7 @@
             </div>
         {{/disabled}}
     {{/filters}}
+    {{#links}}
+        <a class="mod_facetoface__filter__link" href="{{url}}">{{label}}</a>
+    {{/links}}
 </form>

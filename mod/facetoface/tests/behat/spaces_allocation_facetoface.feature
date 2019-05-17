@@ -279,7 +279,7 @@ Feature: Allocate spaces for team in seminar
     When I log in as "sitemanager1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Event in progress" in the "0 / 33" "table_row"
+    Then I should see "In progress" in the "0 / 33" "table_row"
     And I should not see "Allocate spaces for team" in the "0 / 33" "table_row"
     And I should not see "Reserve spaces for team" in the "0 / 33" "table_row"
     And I should not see "Manage reservations" in the "0 / 33" "table_row"

@@ -23,6 +23,8 @@
 
 namespace mod_facetoface;
 use mod_facetoface\signup\condition\event_taking_attendance;
+use mod_facetoface\attendance\attendance_helper;
+use mod_facetoface\signup\state\booked;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -294,7 +296,7 @@ final class seminar_session implements seminar_iterator_item {
 
         // If the current time exceed the timestart, which means that the session
         // has already started
-        return $this->timestart < $time;
+        return $this->timestart <= $time;
     }
 
     /**
@@ -347,18 +349,36 @@ final class seminar_session implements seminar_iterator_item {
      * @return bool
      */
     public function is_attendance_open(int $time = 0): bool {
+        return $this->get_attendance_taking_status(null, $time, false) > 0;
+    }
+
+    /**
+     * Return attendance_taking_status.
+     *
+     * @param integer|null  $attendancetime One of seminar::ATTENDANCE_TIME_xxx, or null to load the seminar setting
+     * @param integer       $time           The current timestamp
+     * @param boolean       $checksaved     Set true to see if all attendees are taken or not
+     * @return integer  One of attendance_taking_status constants
+     */
+    public function get_attendance_taking_status(int $attendancetime = null, int $time = 0, bool $checksaved = true): int {
         $seminarevent = $this->get_seminar_event();
         $seminar = $seminarevent->get_seminar();
-        if (!$seminar->get_sessionattendance() || (0 != $seminarevent->get_cancelledstatus())) {
-            // Attendance tracking is not enabled, or when the seminar event is cancelled.
-            return false;
+        if (!$seminar->get_sessionattendance()) {
+            $f2f = $seminarevent->get_facetoface();
+            return attendance_taking_status::NOTAVAILABLE;
+        }
+        if (0 != $seminarevent->get_cancelledstatus()) {
+            // The seminar event is cancelled.
+            return attendance_taking_status::CANCELLED;
         }
 
         if (0 >= $time) {
             $time = time();
         }
 
-        $attendancetime = $seminar->get_attendancetime();
+        if ($attendancetime === null) {
+            $attendancetime = $seminar->get_attendancetime();
+        }
         switch ($attendancetime) {
             case seminar::ATTENDANCE_TIME_ANY:
                 if ($seminarevent->get_sessions()->is_empty()) {
@@ -368,31 +388,56 @@ final class seminar_session implements seminar_iterator_item {
                     // check for another session, inside of this session.
                     // However, there is a case where the session/event was not saved previously
                     // and developer somehow use this checking method for their logic.
-                    return false;
-                } else if (empty($this->timestart) || empty($this->timefinish)) {
-                    // A scenario where developer accidently did not provide timestart or timefinish
+                    return attendance_taking_status::UNKNOWN;
+                } else if ((int)$this->timestart <= 0 || (int)$this->timefinish <= 0) {
+                    // A scenario where developer accidentally did not provide timestart or timefinish
                     // previously, and either saved it to the database or using the logic check
                     // straight away. Despite of attendance time is set to any time, but it needs
                     // times to be checked against any time.
-                    return false;
+                    return attendance_taking_status::UNKNOWN;
                 }
+                break;
 
-                return true;
             case seminar::ATTENDANCE_TIME_START:
                 // For attendance time start, it need to allow actor to mark attendnace number of
                 // minutes before the actual start time.
                 $time += event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
-                return $this->is_start($time);
+                if (!$this->is_start($time)) {
+                    return attendance_taking_status::CLOSED_UNTILSTART;
+                }
+                break;
+
             case seminar::ATTENDANCE_TIME_END:
-                return $this->is_over($time);
+                if (!$this->is_over($time)) {
+                    return attendance_taking_status::CLOSED_UNTILEND;
+                }
+                break;
+
+            default:
+                debugging("The attendance time {$attendancetime} is not defined.", DEBUG_DEVELOPER);
+                return attendance_taking_status::UNKNOWN;
         }
 
-        // Last fall back here, and it should probably be an error.
-        debugging(
-            "Unable to find the attendance time: {$attendancetime}",
-            DEBUG_DEVELOPER
-        );
+        // Skip digging into attendees to improve performance.
+        if (!$checksaved) {
+            return attendance_taking_status::OPEN;
+        }
 
-        return false;
+        $helper = new attendance_helper();
+        $attendees = $helper->get_attendees($seminarevent->get_id(), $this->get_id());
+
+        $saved = true;
+        foreach ($attendees as $attendee) {
+            if (!$attendee->statuscode || $attendee->statuscode == booked::get_code()) {
+                $saved = false;
+                break;
+            }
+        }
+
+        if ($saved) {
+            return attendance_taking_status::ALLSAVED;
+        } else {
+            return attendance_taking_status::OPEN;
+        }
     }
 }

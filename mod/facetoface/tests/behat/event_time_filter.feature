@@ -9,72 +9,43 @@ Feature: Filter session by event time
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | intro        | course  | multisignupamount |
+      | Test seminar | Test seminar | C1      | 0                 |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details |
+      | Test seminar | event 1 |
+      | Test seminar | event 2 |
+      | Test seminar | event 3 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               |
+      | event 2      | 01-Jan-1999 11:00:00 | 01-Jan-1999 12:00:00 |
+      | event 3      | 01-Jan-2050 11:00:00 | 01-Jan-2050 12:00:00 |
     And I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                                 | Test seminar |
-      | Description                          | Test seminar |
-      | How many times the user can sign-up? | Unlimited    |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Delete" "link"
-    And I press "Save changes"
-
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | 1999 |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | 1999 |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I press "OK"
-    And I press "Save changes"
-
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | 2050 |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | 2050 |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I press "OK"
-    And I press "Save changes"
 
   Scenario: Check filter sessions by event time
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Wait-listed" in the ".mod_facetoface__sessionlist" "css_element"
+    Then I should see "Wait-listed" in the ".upcomingsessionlist tr:nth-child(2)" "css_element"
     And I should see "Upcoming" in the "1 January 2050" "table_row"
     And I should see "Session over" in the "1 January 1999" "table_row"
 
-    When I click on "Upcoming events" "option"
-    Then I should see "Wait-listed" in the ".mod_facetoface__sessionlist" "css_element"
+    When I set the field "Event:" to "Upcoming"
+    Then I should see "Wait-listed" in the ".upcomingsessionlist tr:nth-child(2)" "css_element"
     And I should see "Upcoming" in the "1 January 2050" "table_row"
     And I should not see "Session over" in the ".mod_facetoface__sessionlist" "css_element"
 
-    When I click on "Events in progress" "option"
-    Then I should see "No events" in the ".mod_facetoface__sessionlist--empty" "css_element"
+    When I set the field "Event:" to "In progress"
+    Then I should see "No results" in the ".mod_facetoface__sessionlist--empty" "css_element"
     And ".mod_facetoface__sessionlist" "css_element" should not exist
 
-    When I click on "Past events" "option"
+    When I set the field "Event:" to "Over"
     Then I should see "Session over" in the "1 January 1999" "table_row"
     And I should not see "Wait-listed" in the ".mod_facetoface__sessionlist" "css_element"
     And I should not see "Upcoming" in the ".mod_facetoface__sessionlist" "css_element"
 
-    When I click on "All events" "option"
-    Then I should see "Wait-listed" in the ".mod_facetoface__sessionlist" "css_element"
+    When I set the field "Event:" to "All"
+    Then I should see "Wait-listed" in the ".upcomingsessionlist tr:nth-child(2)" "css_element"
     And I should see "Upcoming" in the "1 January 2050" "table_row"
     And I should see "Session over" in the "1 January 1999" "table_row"
 
@@ -84,21 +55,14 @@ Feature: Filter session by event time
 
     When I click on "Cancel event" "link" in the "Wait-listed" "table_row"
     And I click on "Yes" "button"
-    Then I should see "Cancelled" in the "Event cancelled" "table_row"
+    Then I should see "Cancelled" in the ".previoussessionlist tr:nth-child(2) .mod_facetoface__sessionlist__event-status__event" "css_element"
     And I click on "Cancel event" "link" in the "1 January 2050" "table_row"
     And I click on "Yes" "button"
     Then I should see "Cancelled" in the "1 January 2050" "table_row"
 
-    When I click on "Upcoming events" "option"
-    Then I should see "No events" in the ".mod_facetoface__sessionlist--empty" "css_element"
-    And ".mod_facetoface__sessionlist" "css_element" should not exist
+    And "Event:" "select" should not exist
+    And I should see "No results" in the ".mod_facetoface__sessionlist--empty" "css_element"
 
-    When I click on "Events in progress" "option"
-    Then I should see "No events" in the ".mod_facetoface__sessionlist--empty" "css_element"
-    And ".mod_facetoface__sessionlist" "css_element" should not exist
-
-    When I click on "Past events" "option"
-    Then I should see "Cancelled" in the "Event cancelled" "table_row"
-    And I should see "Cancelled" in the "Wait-listed" "table_row"
+    And I should see "Cancelled" in the ".previoussessionlist tr:nth-child(2) .mod_facetoface__sessionlist__event-status__event" "css_element"
     And I should see "Cancelled" in the "1 January 2050" "table_row"
     And I should not see "Upcoming" in the ".mod_facetoface__sessionlist" "css_element"

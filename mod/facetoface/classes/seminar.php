@@ -316,6 +316,16 @@ final class seminar implements seminar_iterator_item {
     }
 
     /**
+     * Return true if a seminar has at least one seminar event
+     * @return boolean
+     */
+    public function has_events(): bool {
+        global $DB;
+        $any = $DB->get_records('facetoface_sessions', [ 'facetoface' => $this->id ], '', 'id', 0, 1);
+        return !empty($any);
+    }
+
+    /**
      * Delete grade item for given facetoface
      *
      * @param object $facetoface object

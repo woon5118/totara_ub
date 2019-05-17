@@ -42,7 +42,7 @@ Feature: Test deletion of a Seminar event
 
     When I press "Continue"
     Then I should see "All events in Test seminar name"
-    And I should see "No events"
+    And I should see "No results"
     And a seminar custom asset called "Projector" should not exist
 
   # Tests that it is possible to delete a room with custom event and that the room is cleaned up.
@@ -79,5 +79,5 @@ Feature: Test deletion of a Seminar event
 
     When I press "Continue"
     Then I should see "All events in Test seminar name"
-    And I should see "No events"
+    And I should see "No results"
     And a seminar custom room called "Room 1" should not exist

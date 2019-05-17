@@ -69,7 +69,9 @@ abstract class filter {
      *
      * Always be sure that the sql return has something like '1=1', because empty string will fail the sql builder.
      *
+     * @param integer $time The current timestamp.
+     *
      * @return array
      */
-    abstract public function get_where_and_params(): array;
+    abstract public function get_where_and_params(int $time): array;
 }

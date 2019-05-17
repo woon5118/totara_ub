@@ -65,8 +65,8 @@ Feature: Seminar Signup Manager Approval
     When I log out
     When I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "More info"
-    And I follow "More info"
+    And I should see "Event info"
+    And I follow "Event info"
     And I should see "Manager Approval"
     And I should see "This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
 
@@ -136,7 +136,7 @@ Feature: Seminar Signup Manager Approval
     And I follow "View all events"
     Then I should see "Booked" in the "1 January 2020" "table_row"
 
-    When I click on "More info" "link"
+    When I click on "Event info" "link"
     Then I should see "Manager's name"
     And I should see "Cassy Cas"
 

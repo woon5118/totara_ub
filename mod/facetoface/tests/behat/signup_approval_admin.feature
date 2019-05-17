@@ -79,8 +79,8 @@ Feature: Seminar Signup Admin Approval
   Scenario: Student signs up with no manager assigned when admin approval is required
     When I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "More info"
-    And I follow "More info"
+    And I should see "Event info"
+    And I follow "Event info"
     And I should see "Manager and Administrative approval"
     Then I should see "This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
 

@@ -97,6 +97,27 @@ if ($ADMIN->fulltree) { // Improve performance.
     $calendarfilters = $customfields;
     $settings->add(new admin_setting_configmultiselect('facetoface_calendarfilters', new lang_string('setting:calendarfilterscaption', 'facetoface'), new lang_string('setting:calendarfilters', 'facetoface'), array('room', 'building', 'address'), $calendarfilters));
 
+    // Show previous event within time period.
+    $settings->add(
+        new admin_setting_configselect(
+            'facetoface_previouseventstimeperiod',
+            new lang_string('previouseventstimeperiod', 'mod_facetoface'),
+            new lang_string('previouseventstimeperiod_help', 'mod_facetoface'),
+            0,
+            array(
+                0 => new lang_string('showallpreviousevents', 'mod_facetoface'),
+                1000 => new lang_string('numdays', '', 1000),
+                365 => new lang_string('numdays', '', 365),
+                180 => new lang_string('numdays', '', 180),
+                150 => new lang_string('numdays', '', 150),
+                120 => new lang_string('numdays', '', 120),
+                90 => new lang_string('numdays', '', 90),
+                60 => new lang_string('numdays', '', 60),
+                30 => new lang_string('numdays', '', 30)
+            )
+        )
+    );
+
     $settings->add(new admin_setting_heading('facetoface_notifications_header', get_string('notificationsheading', 'facetoface'), ''));
 
     $settings->add(new admin_setting_configcheckbox('facetoface_notificationdisable', new lang_string('setting:notificationdisable_caption', 'facetoface'),

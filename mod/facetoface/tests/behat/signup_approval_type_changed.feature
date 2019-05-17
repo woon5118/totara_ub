@@ -120,8 +120,8 @@ Feature: Seminar Manager signup approval changes
     Then I should see "Booked" in the "Jimmy Jim" "table_row"
 
     When I follow "Wait-list"
-    And I should see "Wait-listed" in the "Timmy Tim" "table_row"
+    And I should see "On waitlist" in the "Timmy Tim" "table_row"
     And I should not see "Thursday, 1 January 1970, 1:00 AM" in the "Timmy Tim" "table_row"
-    And I should see "Wait-listed" in the "Sammy Sam" "table_row"
+    And I should see "On waitlist" in the "Sammy Sam" "table_row"
     And I should see "Cassy Cas" in the "Sammy Sam" "table_row"
 

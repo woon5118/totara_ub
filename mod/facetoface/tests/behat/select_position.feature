@@ -101,7 +101,7 @@ Feature: Add a seminar with select position
     And I set the following fields to these values:
       | Select a job assignment | Unnamed job assignment (ID: 2) (Position2) |
     And I press "Sign-up"
-    When I click on "More info" "link"
+    When I click on "Event info" "link"
     Then I should see "Job assignment"
     And I should see "Unnamed job assignment (ID: 2)"
     And I log out
@@ -152,7 +152,7 @@ Feature: Add a seminar with select position
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "More info"
+    And I follow "Event info"
     Then I should see "You must have a suitable job assignment to sign up for this seminar activity"
 
   @javascript

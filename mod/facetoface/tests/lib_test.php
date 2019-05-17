@@ -48,7 +48,7 @@ use \mod_facetoface\signup\state\{
     fully_attended
 };
 use mod_facetoface\query\event\filter\{room_filter, event_time_filter};
-use mod_facetoface\query\event\sortorder\{default_sortorder, future_sortorder};
+use mod_facetoface\query\event\sortorder\{past_sortorder, future_sortorder};
 use mod_facetoface\query\event\query;
 
 if (!defined('MOODLE_INTERNAL')) {
@@ -1797,7 +1797,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $can_wait   = $this->make_session($f2f, $room, [], true);
         $can_future = $this->make_session($f2f, $room, [$date_furtherfuture], true);
 
-        $default = new default_sortorder();
+        $default = new past_sortorder();
         $future = new future_sortorder();
 
         $filter = new event_time_filter(event_time::ALL);

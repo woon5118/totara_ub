@@ -34,17 +34,22 @@ defined('MOODLE_INTERNAL') || die();
  * + waitlisted
  */
 final class default_sortorder extends sortorder {
+    /** @var past_sortorder */
+    private $order;
+
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        debugging('default_sortorder is deprecated. Please use future_sortorder or past_sortorder instead.', DEBUG_DEVELOPER);
+        $this->order = new past_sortorder();
+    }
+
     /**
      * @return string
      * @inheritdoc
      */
     public function get_sort_sql(): string {
-        // PostgreSQL and MySQL sort NULL in a different order. We need wait-listed events to be the furthest future
-        // events, meaning NULL needs to act as a positive maximum value. So we use PHP_INT_MAX as the
-        // timestart/timefinish for events that are waitlisted (whose actual timestart/finish is NULL)
-        $max = PHP_INT_MAX;
-        return
-            "ORDER BY s.cancelledstatus DESC, coalesce(m.mintimestart, {$max}), " .
-            "coalesce(m.maxtimefinish, {$max}), s.id";
+        return $this->order->get_sort_sql();
     }
 }

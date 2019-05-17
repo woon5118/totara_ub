@@ -8,8 +8,25 @@ information provided here is intended especially for developers.
   * to disable the 'Upload attendance' button when an event is upcoming or in progress
   * to hide the 'Upload attendance' button when the current page is session take attendance
 * signup\condition\user_is_enrolable::pass() has been updated to allow suspended users to be enrolled into seminar event
+* The following functions and constants have been deprecated in mod_facetoface_renderer
+  * print_session_list: please use mod_facetoface_renderer::render_session_list()
+  * print_filter_bar: please use mod_facetoface_renderer::render_filter_bar()
+  * filter_by_room: please use mod_facetoface_renderer::render_filter_bar()
+  * get_filter_by_room: please use mod_facetoface\filter_list
+  * get_filter_by_event_time: please use mod_facetoface\filter_list
+  * set_signup_link: please use mod_facetoface\hook\alternative_signup_link
+  * PARAM_FILTER_xxx: please use mod_facetoface\filter_list
+* The following CSS classes have been deprecated or removed in mod_facetoface_renderer
+  * highlight and dimmed_text CSS classes have been deprecated in print_session_list_table()
+  * upcomingsessionlist and previoussessionlist CSS classes have been deprecated in print_session_list()
+  * room and room_details CSS classes have been deprecated in get_room_details_html()
+  * generaltable and fullwidth CSS classes have been removed from print_session_list_table(),
+    please use mod_facetoface__sessionlist__table instead
+* The class parameter has been added to the seminarevent_actionbar mustache template
+* The icon, filters.show_tooltips and links parameters have been added to the seminarevent_filterbar mustache template
+  Also, the CSS class name has been changed to contain the class parameter
 * The following changes have been made to the mod_facetoface_renderer class:
-  * get_room_details_html() now links room name instead of linking the separate string "View details"
+  * get_room_details_html() now links room name instead of linking the separate string "(Room details)" or "View details"
   * session_resgistrationperiod_table_cell() now uses \mod_facetoface\output\session_time::signup_period() to generate its registration string
   * event_status_table_cell() has been updated to use \mod_facetoface\seminar_event_helper::booking_status()
   * session_status_table_cell() has been updated to use \mod_facetoface\seminar_session_helper::get_status()
@@ -50,6 +67,7 @@ information provided here is intended especially for developers.
 * attendees_list_helper::process_no_sessionid() function has been deprecated, please use attendees_helper::process_no_sessionid()
 * attendees_list_helper::process_js() function has been deprecated, please use attendees_helper::process_js()
 * attendees_list_helper::get_allowed_available_actions() function has been deprecated, please use attendees_helper::get_allowed_available_actions()
+* query\event\sortorder\default_sortorder has been deprecated, please use query\event\sortorder\past_sortorder
 * facetoface_confirm_attendees() function has been deprecated, please use signup_helper::confirm_waitlist()
 * facetoface_waitlist_randomly_confirm_users() function has been deprecated, please use signup_helper::confirm_waitlist_randomly()
 * facetoface_cancel_attendees() function has been deprecated, please use signup_helper::cancel_waitlist()
@@ -83,9 +101,9 @@ information provided here is intended especially for developers.
 * The following changes have been made to the mod_facetoface_renderer class
   * In print_session_list() function
     * Added an optional parameter for filtering by event time, to the function
-    * Removed upcomingsessionlist and previoussessionlist CSS classes as session event tables are merged, please use mod_facetoface__sessionlist
   * In print_session_list_table() function
-    * Added two optional parameters for attendance tracking
+    * Table columns have been reordered, please refer to lib/renderer_test.php
+    * Added optional arguments: $attendancetracking, $attendancetime, $hidesignupperiod, $hideactions
     * The summary text of a session event list table no longer says 'past events'
     * Added a session status column to the session event list table
     * Added an attendance tracking column to the session event list table; the column will be hidden if attendance tracking is off
@@ -94,12 +112,17 @@ information provided here is intended especially for developers.
     * The capacity column on the session event list table now hides "(0 Wait-listed)" text when nobody is wait-listed
     * Removed a "Sign-up unavailable" link from Actions table cells
     * The Room column on the session event list table does not have room information if a session is over
-    * Deprecated highlight and dimmed_text CSS classes
-  * In get_room_details_html() function
-    * Changed the link text of room information on a session event list table, from "(Room details)" to "View details"
-    * Deprecated room and room_details CSS classes
+    * Combined session date and time, and added CSS class to session times and timezone
+    * Added mod_facetoface__sessionlist__table__sessionrow CSS class to each table row
+    * The "Actions" table column now uses <nav> to group action links instead of <br> tags
+      * mod_facetoface__sessionlist__action__buttons for icon links
+      * mod_facetoface__sessionlist__action__links for text links
+      * mod_facetoface__sessionlist__action__reserve for reserve links
+      * The "More info" text has been changed to "Event info"
+    * The "Event status" table column now reports three different kinds of status separately, grouping by <ul>/<li>
   * Added two new overridable functions for session/event status - session_status_table_cell() and event_status_table_cell()
-* mod_facetoface_renderer::set_signup_link() function has been deprecated, please use mod_facetoface\hook\alternative_signup_link
+  * attendance_tracking_table_cell() has been updated to use seminar_session::get_attendance_taking_status()
+  * event_status_table_cell() has been updated to use seminar_event_helper::event_status()
 * mod_facetoface_renderer::print_session_list_table() function has been changed to call get_signup_link() function to resolve signup link
 * mod_facetoface_renderer::attendees_export_form() has been changed to attach an aria-label attribute to the <select> element
 * The following templates have been updated for better accessibility:

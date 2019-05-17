@@ -219,48 +219,174 @@ select.menuf2f-select {
         padding: 0 @totara_style-spacing_small @totara_style-spacing_small @totara_style-spacing_small;
         margin: @totara_style-spacing_medium 0;
         border: 1px #e6e6e6 solid;
-        border-radius: 2px;
+        border-radius: @border-radius-default;
 
-        &__item {
+        .flex-icon {
+            font-size: @ft-size-400;
+            margin-top: @totara_style-spacing_small;
+        }
+
+        .child() {
             .flex-wrap-vertical-center();
-            margin: @totara_style-spacing_small 0 0 0;
+            margin: @totara_style-spacing_small @totara_style-spacing_small 0 @totara_style-spacing_small;
             max-width: 100%;
+        }
+
+        .filter-item() {
+            .child();
 
             &__label {
-                font-weight: normal;
+                margin: 0;
+                // Override Moodle form
+                font: inherit;
+                padding: 0;
             }
 
-            .selectmenu() {
+            &__select {
                 margin: 0 @totara_style-spacing_small;
                 max-width: 100%;
+                // Override Moodle form
+                font-size: inherit;
+                height: 2.5em;
+            }
+        }
+
+        &__item {
+            // Note: use 'ch' unit only if we can drop the support of IE
+
+            &__room {
+                .filter-item();
+                &__select {
+                    // Avoid min-width here
+                    // Otherwise the <select> element could cover the whole screen width if a room name is very loooong!
+                    max-width: 15em;
+                    text-overflow: ellipsis;
+                }
             }
 
-            &__room-select {
-                .selectmenu();
-                width: 250px;
+            &__eventtime {
+                .filter-item();
+                &__select {
+                    min-width: 8em;
+                }
             }
 
-            &__eventtime-select {
-                .selectmenu();
-                width: 200px;
+            &__advanced {
+                .filter-item();
+                &__select {
+                    min-width: 10em;
+                }
             }
+
+            &__book {
+                .filter-item();
+                &__select {
+                    min-width: 12em;
+                }
+            }
+        }
+
+        &__link {
+            .child();
         }
     }
 
     &__sessionlist {
+        // Make the session list table horizontally scrollable in the content area,
+        // so it wouldn't overlap the blocks on right side
+        overflow-x: auto;
+        margin-bottom: @totara_style-spacing_large;
+
         &--empty {
             padding: @totara_style-spacing_medium;
         }
 
+        &__show-previous--hidden {
+            display: none;
+        }
+
+        &__table {
+            .table;
+            // Override .table
+            margin-bottom: 0;
+            > thead,
+            > tbody,
+            > tfoot {
+                > tr {
+                    > th,
+                    > td {
+                        // Override the border inserted by Bootstrap
+                        border-top: none;
+                    }
+                }
+            }
+            // Add bottom border
+            > tbody {
+                border-bottom: 2px solid @table-border-color;
+            }
+            // Always accent
+            > tbody > tr {
+                background-color: @table-bg-accent;
+                // &:hover {
+                //     background-color: @table-bg-hover;
+                // }
+            }
+            // Add a border between sessions
+            &__sessionrow {
+                @table-thin-border-color: mix(@table-border-color, @totara_style-color_neutral_7, 80%);
+                border-top: 1px solid @table-thin-border-color;
+                // Add a thick border between events
+                &.firstsession, &.waitlisted {
+                    border-top: 2px solid @table-border-color;
+                }
+            }
+        }
+
+        &__eventtime {
+            white-space: nowrap;
+        }
+
+        &__event-status {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            &__event, &__booking, &__user {
+                white-space: nowrap;
+            }
+            &__user {
+                font-size: @totara_style-size_13;
+            }
+        }
+
+        &__timezone {
+            font-size: @totara_style-size_12;
+            display: block;
+        }
+
         &__room {
+            max-width: 15em;
             &__link {
                 .force-link-color();
             }
         }
 
         &__action {
+            &__buttons {
+                display: flex;
+                font-size: @totara_style-size_16;
+                margin-bottom: @totara_style-spacing_x_small;
+            }
             &__link {
                 .force-link-color();
+                display: block;
+                white-space: nowrap;
+            }
+            &__reserve {
+                display: block;
+                &__link {
+                    .force-link-color();
+                }
             }
         }
 
@@ -284,11 +410,20 @@ select.menuf2f-select {
             }
         }
     }
+
+    // Put "Add event" on the right side of <h3>Events</h3>
+    &__action-dashboard {
+        float: right;
+    }
+    &__sessionlist {
+        clear: right;
+    }
 }
 
 .dimmed_text {
     a.mod_facetoface__sessionlist__room__link,
     a.mod_facetoface__sessionlist__action__link,
+    a.mod_facetoface__sessionlist__action__reserve__link,
     a.mod_facetoface__sessionlist__attendance--saved__link,
     a.mod_facetoface__sessionlist__attendance--open__link {
         &, &:link {

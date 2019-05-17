@@ -48,7 +48,7 @@ Feature: Take seminar attendance with job assignment on signup
       | timefinish[timezone]| Pacific/Auckland |
     And I press "OK"
     When I press "Save changes"
-    Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
     And I log out
 
 
@@ -61,9 +61,9 @@ Feature: Take seminar attendance with job assignment on signup
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "More info"
+    Then I should see "Event info"
 
-    When I follow "More info"
+    When I follow "Event info"
     Then I should not see "Job assignment"
     And I log out
 
@@ -74,9 +74,9 @@ Feature: Take seminar attendance with job assignment on signup
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "More info"
+    Then I should see "Event info"
 
-    When I follow "More info"
+    When I follow "Event info"
     Then I should not see "Job assignment"
     And I log out
 
@@ -118,9 +118,9 @@ Feature: Take seminar attendance with job assignment on signup
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "More info"
+    Then I should see "Event info"
 
-    When I follow "More info"
+    When I follow "Event info"
     Then I should not see "Job assignment"
     And I log out
 
@@ -131,9 +131,9 @@ Feature: Take seminar attendance with job assignment on signup
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "More info"
+    Then I should see "Event info"
 
-    When I follow "More info"
+    When I follow "Event info"
     Then I should not see "Job assignment"
     And I log out
 
@@ -183,9 +183,9 @@ Feature: Take seminar attendance with job assignment on signup
     Then I should see "Select a job assignment"
 
     When I press "Sign-up"
-    Then I should see "More info"
+    Then I should see "Event info"
 
-    When I follow "More info"
+    When I follow "Event info"
     Then I should see "Job assignment"
     And I should see "job1"
     And I log out
@@ -197,9 +197,9 @@ Feature: Take seminar attendance with job assignment on signup
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "More info"
+    Then I should see "Event info"
 
-    When I follow "More info"
+    When I follow "Event info"
     Then I should not see "Job assignment"
     And I log out
 

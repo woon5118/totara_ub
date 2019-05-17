@@ -65,6 +65,6 @@ Feature: Seminar actions in upcoming block are correct
 
     And I click on "Join waitlist" "link"
     And I press "Join waitlist"
-    Then I should see "Wait-listed" in the "Cancel waitlist" "table_row"
-    And I should see "Wait-listed" in the "Upcoming events" "block"
+    Then I should see "(On waitlist)" in the "Cancel waitlist" "table_row"
+    And I should see "On waitlist" in the "Upcoming events" "block"
     And I should not see "Sign-up" in the "Upcoming events" "block"

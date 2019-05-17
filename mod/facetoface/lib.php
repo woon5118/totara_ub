@@ -38,7 +38,7 @@ use mod_facetoface\{
 };
 
 use mod_facetoface\query\event\query;
-use mod_facetoface\query\event\sortorder\future_sortorder;
+use mod_facetoface\query\event\sortorder\past_sortorder;
 
 require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->dirroot.'/grade/lib.php');
@@ -518,29 +518,9 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 continue;
             }
 
-            $state = $signup->get_state();
-
-            // Workaround to build a dummy data of signup/submission.
-            $submission = $signup->to_record();
-
-            $submission->facetoface = $seminarevent->get_facetoface();
-            $submission->cancelledstatus = $seminarevent->get_cancelledstatus();
-            $submission->timemodified = $seminarevent->get_timemodified();
-            $submission->timecreated = $signupstatus->get_timecreated();
-            $submission->timegraded = $submission->timecreated;
-            $submission->statuscode = $state::get_code();
-            $submission->timecancelled = 0;
-            $submission->mailedconfirmation = 0;
-
-            $session = $seminarevent->to_record();
-
-            $session->mintimestart = $seminarevent->get_mintimestart();
-            $session->maxtimefinish = $seminarevent->get_maxtimefinish();
-            $session->sessiondates = $seminarevent->get_sessions()->to_records();
-            $session->cntdates = count($session->sessiondates);
-            $session->bookedsession = $submission;
-
-            $sessions[$session->id] = $session;
+            $id = $seminarevent->get_id();
+            $sessiondata = \mod_facetoface\seminar_event_helper::get_sessiondata($seminarevent, $signup, true);
+            $sessions[$id] = $sessiondata;
         }
 
         // If the user can sign up for multiple events, we should show all upcoming events in this seminar.
@@ -565,7 +545,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
             $maximum = $seminar->get_multisignup_maximum();
             if ($checkremaining && (empty($maximum) || count($signups) < $maximum)) {
                 $query = new query($seminar);
-                $query->with_sortorder(new future_sortorder());
+                $query->with_sortorder(new past_sortorder());
                 $seminarevents = seminar_event_list::from_query($query);
 
                 $numberofeventstodisplay = isset($facetoface->display) ? (int)$facetoface->display : 0;
@@ -628,7 +608,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     } else {
         // If user does not have signed-up, then start querying the list of seminar_events, and displaying it on screen.
         $query = new query($seminar);
-        $query->with_sortorder(new future_sortorder());
+        $query->with_sortorder(new past_sortorder());
         $seminarevents = seminar_event_list::from_query($query);
 
         if (!$seminarevents->is_empty()) {
@@ -644,13 +624,8 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     }
 
                     $id = $seminarevent->get_id();
-
-                    $session = $seminarevent->to_record();
-                    $session->mintimestart = $seminarevent->get_mintimestart();
-                    $session->maxtimefinish = $seminarevent->get_maxtimefinish();
-                    $session->sessiondates = $seminarevent->get_sessions()->to_records();
-                    $session->cntdates = count($session->sessiondates);
-                    $sessions[$id] = $session;
+                    $sessiondata = \mod_facetoface\seminar_event_helper::get_sessiondata($seminarevent, null, true);
+                    $sessions[$id] = $sessiondata;
                 }
 
                 // Limit number of sessions display. $sessions is in order of start time.

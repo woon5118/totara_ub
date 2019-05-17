@@ -195,10 +195,11 @@ final class seminar_event_helper {
     /**
      * Collect event session and sign-up data to get event booking status/event session status/etc.
      * @param seminar_event $seminarevent
-     * @param signup $signup
+     * @param signup|null $signup
+     * @param boolean $sortbyascending Set true to sort sessions by past first
      * @return \stdClass
      */
-    public static function get_sessiondata(seminar_event $seminarevent, signup $signup): \stdClass {
+    public static function get_sessiondata(seminar_event $seminarevent, ?signup $signup, bool $sortbyascending = true): \stdClass {
 
         $timenow = time();
         $statuscodes = attendance_state::get_all_attendance_code_with([
@@ -209,17 +210,19 @@ final class seminar_event_helper {
             booked::class,
         ]);
 
-        /** @var seminar_event $seminarevent */
+        $sessions = $seminarevent->get_sessions();
+        $sessions->sort('timestart', $sortbyascending ? seminar_session_list::SORT_ASC : seminar_session_list::SORT_DESC);
+
         $sessiondata = $seminarevent->to_record();
         $sessiondata->mintimestart = $seminarevent->get_mintimestart();
         $sessiondata->maxtimefinish = $seminarevent->get_maxtimefinish();
-        $sessiondata->sessiondates = $seminarevent->get_sessions()->to_records();
+        $sessiondata->sessiondates = $sessions->to_records();
         $sessiondata->isstarted = $seminarevent->is_started($timenow);
         $sessiondata->isprogress = $seminarevent->is_progress($timenow);
         $sessiondata->cntdates = count($sessiondata->sessiondates);
 
         $bookedsession = null;
-        if ($signup->exists() && in_array($signup->get_state()::get_code(), $statuscodes)) {
+        if ($signup !== null && $signup->exists() && in_array($signup->get_state()::get_code(), $statuscodes)) {
             // The signup is only counted if the state is within the requested state up to fully attended state.
             // Work arround to build booked session record object.
             $bookedsession = $signup->to_record();
@@ -280,5 +283,65 @@ final class seminar_event_helper {
             }
         }
         return $status;
+    }
+
+    /**
+     * Return event status, event booking status and user booking status strings.
+     * @param \stdClass $session
+     * @param integer $signupcount
+     * @return array packs [ event_status, event_booking_status, user_booking_status ]
+     */
+    public static function event_status(\stdClass $session, int $signupcount): array {
+        global $CFG;
+
+        $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
+        $timenow = time();
+        $seminarevent = new \mod_facetoface\seminar_event($session->id);
+        $sessionover = $seminarevent->is_over();
+        $cancelled = !empty($session->cancelledstatus);
+
+        if ($cancelled) {
+            $event_status = get_string('sessioncancelled', 'mod_facetoface');
+        } else if (empty($session->sessiondates)) {
+            $event_status = get_string('wait-listed', 'mod_facetoface');
+        } else if ($seminarevent->is_over($timenow)) {
+            $event_status = get_string('sessionover', 'mod_facetoface');
+        } else if ($seminarevent->is_progress($timenow)) {
+            $event_status = get_string('sessioninprogress', 'mod_facetoface');
+        } else {
+            $event_status = get_string('sessionupcoming', 'mod_facetoface');
+        }
+
+        if ($cancelled) {
+            // Don't display event booking status on a cancelled event.
+            $event_booking_status = '';
+        } else {
+            if ($seminarevent->is_started($timenow)) {
+                $event_booking_status = '';
+            } else {
+                $event_booking_status = get_string('bookingopen', 'mod_facetoface');
+            }
+            if ($signupcount >= $session->capacity) {
+                $event_booking_status = get_string('bookingfull', 'mod_facetoface');
+            } else if (!empty($session->registrationtimestart) && $session->registrationtimestart > $timenow) {
+                $event_booking_status = get_string('registrationnotopen', 'mod_facetoface');
+            } else if (!empty($session->registrationtimefinish) && $timenow > $session->registrationtimefinish) {
+                $event_booking_status = get_string('registrationclosed', 'mod_facetoface');
+            }
+            if ($CFG->enableavailability) {
+                $cm = get_coursemodule_from_instance('facetoface', $session->facetoface);
+                if (!get_fast_modinfo($cm->course)->get_cm($cm->id)->available) {
+                    $event_booking_status = get_string('bookingrestricted', 'mod_facetoface');
+                }
+            }
+        }
+
+        $user_booking_status = '';
+        if (!$sessionover && !$cancelled && $isbookedsession) {
+            // Display user booking status only on an upcoming and not-cancelled event.
+            $state = \mod_facetoface\signup\state\state::from_code($session->bookedsession->statuscode);
+            $user_booking_status = $state::get_string();
+        }
+        return [ $event_status, $event_booking_status, $user_booking_status ];
     }
 }

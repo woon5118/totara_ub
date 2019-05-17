@@ -37,7 +37,7 @@ Feature: Add seminar attendees without signup capability
     Given I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    When I follow "More info"
+    When I follow "Event info"
     Then I should see "You don't have permission to signup to this seminar event."
     And I log out
 

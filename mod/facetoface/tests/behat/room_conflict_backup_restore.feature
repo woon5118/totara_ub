@@ -87,9 +87,9 @@ Feature: Test room conflicts through backup/restore
 
     When I click on "Duplicate" "link" in the "Facetoface TL12734" activity
     And I turn editing mode off
-    Then "//li[@id='section-0']/div[@class='content']/ul/li[1]/div/div/div[2]/div[2]/div/table/tbody/tr[1]/td[3]/span/a[contains(text(), 'Room 2')]" "xpath_element" should exist
-    And "//li[@id='section-0']/div[@class='content']/ul/li[1]/div/div/div[2]/div[2]/div/table/tbody/tr[2]/td[3]/span/a[contains(text(), 'Room 1')]" "xpath_element" should exist
+    Then I should see "Room 2" in the "#module-1.facetoface" "css_element"
+    And I should see "Room 1" in the "#module-1.facetoface" "css_element"
     # The room with prevent conflict should not appear.
-    And "//li[@id='section-0']/div[@class='content']/ul/li[2]/div/div/div[2]/div[2]/div/table/tbody/tr[1]/td[3]/span/a[contains(text(), 'Room 2')]" "xpath_element" should exist
-    And "//li[@id='section-0']/div[@class='content']/ul/li[2]/div/div/div[2]/div[2]/div/table/tbody/tr[2]/td[3]/span/a[contains(text(), 'Room 1')]" "xpath_element" should not exist
+    And I should see "Room 2" in the "#module-2.facetoface" "css_element"
+    And I should not see "Room 1" in the "#module-2.facetoface" "css_element"
 

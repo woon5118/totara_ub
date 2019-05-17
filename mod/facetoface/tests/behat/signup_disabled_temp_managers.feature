@@ -59,5 +59,5 @@ Feature: Test suitable job assignment for session sign-up
     And I follow "Course 1"
     And I follow "Go to course"
     And I follow "Test seminar name"
-    And I click on "More info" "link" in the "1 January 2020" "table_row"
+    And I click on "Event info" "link" in the "1 January 2020" "table_row"
     Then I should see "You must have a suitable job assignment to sign up for this seminar activity."

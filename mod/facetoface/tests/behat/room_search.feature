@@ -237,4 +237,4 @@ Feature: Search pre-defined rooms in seminar
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     Then I should see "Room 10278"
     When I press "Save changes"
-    Then I should see "Room 10278" in the "//div[@class='mod_facetoface__sessionlist']" "xpath_element"
+    Then I should see "Room 10278" in the ".mod_facetoface__sessionlist" "css_element"

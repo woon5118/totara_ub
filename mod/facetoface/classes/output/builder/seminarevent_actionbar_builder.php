@@ -28,12 +28,19 @@ defined('MOODLE_INTERNAL') || die();
 
 use mod_facetoface\output\seminarevent_actionbar;
 
-
+/**
+ * A builder class for seminarevent_actionbar.
+ */
 class seminarevent_actionbar_builder {
     /**
      * @var string
      */
     private $id;
+
+    /**
+     * @var string
+     */
+    private $class = '';
 
     /**
      * @var string
@@ -78,6 +85,18 @@ class seminarevent_actionbar_builder {
     }
 
     /**
+     * Set the class of this bar.
+     *
+     * @param string $class
+     *
+     * @return seminarevent_actionbar_builder
+     */
+    public function set_class(string $class): seminarevent_actionbar_builder {
+        $this->class = $class;
+        return $this;
+    }
+
+    /**
      * Set the alignment of buttons.
      *
      * @param string $align one of far, near or center
@@ -98,6 +117,7 @@ class seminarevent_actionbar_builder {
         return new seminarevent_actionbar(
             [
                 'id' => $this->id,
+                'class' => $this->class,
                 'align' => $this->align ?: 'near',
                 'commandlinks' => array_values($this->commandlinks),
             ]

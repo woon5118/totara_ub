@@ -153,7 +153,7 @@ Feature: Seminar event cancellation custom fields
 
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
+    And I click on "Cancel event" "link" in the "10:00 AM - 4:00 PM" "table_row"
     And I set the following fields to these values:
       | customfield_cancelcheckbox          | 1                  |
       | customfield_canceldatetime[enabled] | 1                  |

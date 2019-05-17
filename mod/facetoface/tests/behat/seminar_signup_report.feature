@@ -35,11 +35,8 @@ Feature: Users that are in waitlist of seminar's event should be displayed in th
       | Report Name | Report 1            |
       | Source      | facetoface_sessions |
     And I click on "Create report" "button"
-    And I follow "Columns"
-    And I set the field "newcolumns" to "status-statuscode"
-    And I click on "Add" "button"
-    And I click on "Save changes" "button"
-    And I click on "Reports" in the totara menu
-    And I follow "Report 1"
+    And I switch to "Columns" tab
+    And I add the "Status" column to the report
+    When I navigate to my "Report 1" report
     Then I should see "kian bomba"
-    And I should see "Wait-listed"
+    And I should see "On waitlist"

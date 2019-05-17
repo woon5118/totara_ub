@@ -107,9 +107,11 @@ Feature: Seminar session date with timezone management
     And I click on "Room 2" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     When I press "Save changes"
-    Then I should see "3:00 PM - 4:00 PM Pacific/Auckland" in the "Room 1" "table_row"
-    And I should see "5:00 PM - 6:00 PM Australia/Perth" in the "Room 2" "table_row"
-    When I click on "Edit" "link" in the "Room 2" "table_row"
+    Then I should see "3:00 PM - 4:00 PM" in the "Room 1" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "Room 1" "table_row"
+    And I should see "5:00 PM - 6:00 PM" in the "Room 2" "table_row"
+    And I should see "Timezone: Australia/Perth" in the "Room 2" "table_row"
+    When I click on "Edit" "link" in the "Room 1" "table_row"
     And I click on "Edit session" "link"
     Then I set the following fields to these values:
       | sessiontimezone      | Pacific/Auckland |
@@ -127,7 +129,7 @@ Feature: Seminar session date with timezone management
       | timefinish[timezone] | Pacific/Auckland |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    When I click on "Edit" "link" in the "Room 2" "table_row"
+    When I click on "Edit" "link" in the "Room 1" "table_row"
     And I click on "Edit session" "link" in the ".f2fmanagedates .lastrow" "css_element"
     Then I set the following fields to these values:
       | sessiontimezone      | User timezone    |
@@ -169,17 +171,23 @@ Feature: Seminar session date with timezone management
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
 
     When I press "Save changes"
-    Then I should see "3:00 PM - 4:00 PM Pacific/Auckland" in the "Room 1" "table_row"
-    And I should see "5:00 PM - 6:00 PM Australia/Perth" in the "Room 2" "table_row"
-    And I should see "3:00 PM - 4:00 PM Europe/Prague" in the "Room 3" "table_row"
+    Then I should see "3:00 PM - 4:00 PM" in the "Room 1" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "Room 1" "table_row"
+    And I should see "5:00 PM - 6:00 PM" in the "Room 2" "table_row"
+    And I should see "Timezone: Australia/Perth" in the "Room 2" "table_row"
+    And I should see "3:00 PM - 4:00 PM" in the "Room 3" "table_row"
+    And I should see "Timezone: Europe/Prague" in the "Room 3" "table_row"
 
     When I log out
     And I log in as "teacher2"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    Then I should see "3:00 PM - 4:00 PM Pacific/Auckland" in the "Room 1" "table_row"
-    And I should see "10:00 AM - 11:00 AM Europe/Prague" in the "Room 2" "table_row"
-    And I should see "3:00 PM - 4:00 PM Europe/Prague" in the "Room 3" "table_row"
+    Then I should see "3:00 PM - 4:00 PM" in the "Room 1" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "Room 1" "table_row"
+    And I should see "10:00 AM - 11:00 AM" in the "Room 2" "table_row"
+    And I should see "Timezone: Europe/Prague" in the "Room 2" "table_row"
+    And I should see "3:00 PM - 4:00 PM" in the "Room 3" "table_row"
+    And I should see "Timezone: Europe/Prague" in the "Room 3" "table_row"
 
     When I log out
     And I log in as "admin"
@@ -189,6 +197,6 @@ Feature: Seminar session date with timezone management
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    Then I should see "10:00 AM - 11:00 AM " in the "Room 1" "table_row"
-    And I should see "5:00 PM - 6:00 PM " in the "Room 2" "table_row"
+    Then I should see "10:00 AM - 11:00 AM" in the "Room 1" "table_row"
+    And I should see "5:00 PM - 6:00 PM" in the "Room 2" "table_row"
     And I should see "9:00 PM - 10:00 PM" in the "Room 3" "table_row"

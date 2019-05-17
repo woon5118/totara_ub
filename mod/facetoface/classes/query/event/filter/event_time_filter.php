@@ -33,9 +33,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 final class event_time_filter extends filter {
     /**
-     * @var int
+     * @var event_times_filter
      */
-    private $eventtime;
+    private $filter;
 
     /**
      * event_time_filter constructor.
@@ -44,7 +44,7 @@ final class event_time_filter extends filter {
      */
     public function __construct(int $eventtime = event_time::ALL) {
         parent::__construct('event_time');
-        $this->eventtime = $eventtime;
+        $this->filter = new event_times_filter([$eventtime]);
     }
 
     /**
@@ -54,7 +54,7 @@ final class event_time_filter extends filter {
      * @return event_time_filter
      */
     public function set_eventtime(int $value): event_time_filter {
-        $this->eventtime = $value;
+        $this->filter->set_eventtimes([$value]);
         return $this;
     }
 
@@ -62,28 +62,7 @@ final class event_time_filter extends filter {
      * @return array
      * @inheritdoc
      */
-    public function get_where_and_params(): array {
-        // The external use will always have the keyword 'AND' before hand, therefore, it should have something here to returned
-        // for the event_time criteria.
-        $sql = "(1=1)";
-        $params = [];
-
-        if ($this->eventtime !== event_time::ALL) {
-            $params['timenow'] = time();
-
-            if ($this->eventtime === event_time::UPCOMING) {
-                // (wait-listed OR first session_date not started) AND (not cancelled)
-                $sql = "(m.cntdates IS NULL OR :timenow < m.mintimestart) AND s.cancelledstatus = 0";
-            } else if ($this->eventtime === event_time::INPROGRESS) {
-                // (first session_date started AND last session_date not finished) AND (not cancelled)
-                $sql = "(m.mintimestart <= :timenow AND :timenow2 < m.maxtimefinish) AND s.cancelledstatus = 0";
-                $params['timenow2'] = time();
-            } else if ($this->eventtime === event_time::OVER) {
-                // (last session_date finished) OR (cancelled)
-                $sql = "(m.maxtimefinish  <= :timenow OR s.cancelledstatus = 1)";
-            }
-        }
-
-        return [$sql, $params];
+    public function get_where_and_params(int $time): array {
+        return $this->filter->get_where_and_params($time);
     }
 }

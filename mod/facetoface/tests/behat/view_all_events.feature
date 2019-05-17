@@ -110,12 +110,12 @@ Feature: Check previous and upcomings sections are right populated
     Given I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Event in progress" in the ".mod_facetoface__sessionlist" "css_element"
-    And I should see "1 January 2020" in the ".mod_facetoface__sessionlist" "css_element"
-    And I should see "1 January 1999" in the ".mod_facetoface__sessionlist" "css_element"
+    Then I should see "In progress" in the ".upcomingsessionlist" "css_element"
+    And I should see "1 January 2020" in the ".upcomingsessionlist" "css_element"
+    And I should see "1 January 1999" in the ".previoussessionlist" "css_element"
 
     When I follow "C1"
-    Then I should see "Event in progress"
+    Then I should see "In progress"
     And I should see "1 January 2020"
     And I should not see "1 January 1999"
 
@@ -124,12 +124,12 @@ Feature: Check previous and upcomings sections are right populated
     And I press "Sign-up"
     When I follow "C1"
     Then I should see "Booked"
-    And I should not see "Event in progress"
-    And I should not see "Event over"
+    And I should not see "In progress"
+    And I should not see "Over"
     And I follow "View all events"
     Then I should see "Booked"
-    And I should see "Event in progress"
-    And I should see "Event over"
+    And I should see "In progress"
+    And I should see "Over"
     And I log out
 
     # Change sign up for multiple events setting.
@@ -146,5 +146,5 @@ Feature: Check previous and upcomings sections are right populated
     And I am on "Course 1" course homepage
     Then I should see "1 January 2020"
     And I should not see "1 January 1999"
-    And I should not see "Event in progress"
+    And I should not see "In progress"
     And I log out

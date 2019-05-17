@@ -126,7 +126,7 @@ Feature: Seminar event cancellation rebooking
     And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "Booking open" in the "10 February 2030" "table_row"
-    And I should see "Event cancelled" in the "10 February 2025" "table_row"
+    And I should see "Cancelled" in the "10 February 2025" "table_row"
 
     When I click on "Attendees" "link" in the "10 February 2030" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
@@ -156,7 +156,7 @@ Feature: Seminar event cancellation rebooking
     And I follow "View all events"
     Then I should see "Booking open" in the "10 February 2030" "table_row"
     Then I should see "19" in the "10 February 2030" "table_row"
-    And I should see "Event cancelled" in the "10 February 2025" "table_row"
+    And I should see "Cancelled" in the "10 February 2025" "table_row"
 
     When I click on "Sign-up" "link" in the "10 February 2030" "table_row"
     And I press "Sign-up"
@@ -169,7 +169,7 @@ Feature: Seminar event cancellation rebooking
     And I follow "View all events"
     Then I should see "Booking open" in the "10 February 2030" "table_row"
     Then I should see "18" in the "10 February 2030" "table_row"
-    And I should see "Event cancelled" in the "10 February 2025" "table_row"
+    And I should see "Cancelled" in the "10 February 2025" "table_row"
 
     When I click on "Sign-up" "link" in the "10 February 2030" "table_row"
     And I press "Sign-up"
@@ -182,7 +182,7 @@ Feature: Seminar event cancellation rebooking
     And I follow "View all events"
     Then I should see "Booking open" in the "10 February 2030" "table_row"
     Then I should see "17" in the "10 February 2030" "table_row"
-    And I should see "Event cancelled" in the "10 February 2025" "table_row"
+    And I should see "Cancelled" in the "10 February 2025" "table_row"
 
     When I click on "Sign-up" "link" in the "10 February 2030" "table_row"
     And I press "Sign-up"

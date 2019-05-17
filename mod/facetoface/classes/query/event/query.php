@@ -51,6 +51,11 @@ final class query implements event_query {
     private $sortorder;
 
     /**
+     * @var integer
+     */
+    private $time = 0;
+
+    /**
      * By default, seminar must always be injected into the query, because the query need to narrow down retrieving.
      *
      * query constructor.
@@ -102,6 +107,16 @@ final class query implements event_query {
     }
 
     /**
+     * @param integer $time
+     *
+     * @return query
+     */
+    public function with_time(int $time): query {
+        $this->time = $time;
+        return $this;
+    }
+
+    /**
      * This is the final call from query, to build up the SQL statement of retrieving seminar_events,
      * base on filters and sortorder injected into this object.
      *
@@ -110,18 +125,20 @@ final class query implements event_query {
      */
     public function get_statement(): statement {
         $sql = "
-          SELECT s.* 
+          SELECT s.*
           FROM {facetoface_sessions} s
 
           LEFT JOIN (
-            SELECT fsd.sessionid,
-            COUNT(fsd.id) AS cntdates,
-            MIN(fsd.timestart) AS mintimestart,
-            MAX(fsd.timefinish) AS maxtimefinish
+            SELECT
+              fsd.sessionid,
+              COUNT(fsd.id) AS cntdates,
+              MIN(fsd.timestart) AS mintimestart,
+              MIN(fsd.timefinish) AS mintimefinish,
+              MAX(fsd.timefinish) AS maxtimefinish
             FROM {facetoface_sessions_dates} fsd
             GROUP BY fsd.sessionid
           ) m ON m.sessionid = s.id
-                 
+
           WHERE s.facetoface = :facetoface
         ";
 
@@ -131,10 +148,11 @@ final class query implements event_query {
 
         if (!empty($this->filters)) {
             // Start building our where clause here, if there are any filters provided for this query object.
+            $time = $this->time > 0 ? $this->time : time();
             $wheresqls = [];
 
             foreach ($this->filters as $filter) {
-                [$wheresql, $whereparams] = $filter->get_where_and_params();
+                [$wheresql, $whereparams] = $filter->get_where_and_params($time);
 
                 $wheresqls[] = $wheresql;
                 $params = array_merge($params, $whereparams);

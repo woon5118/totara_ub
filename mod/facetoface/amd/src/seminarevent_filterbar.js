@@ -22,7 +22,8 @@
 
 
 define([], function () {
-    var ATTR_INIT_VALUE = 'data-webkit-init-value';
+    const ATTR_INIT_VALUE = 'data-webkit-init-value';
+    const ATTR_SHOW_TOOLTIPS = 'data-show-tooltips';
     var filter = {
         init: function (root) {
             /**
@@ -47,6 +48,20 @@ define([], function () {
                     }
                 }
             }
+            /**
+             * Update a tooltip text i.e. the title attribute.
+             * @param {HTMLSelectElement} el <select> element
+             */
+            function updateTooltip(el) {
+                if (el.getAttribute(ATTR_SHOW_TOOLTIPS) == 'true') {
+                    var selectedText = '';
+                    var index = el.selectedIndex;
+                    if (0 < index && index < el.options.length) {
+                        selectedText = el.options[index].text;
+                    }
+                    el.setAttribute('title', selectedText);
+                }
+            }
             window.addEventListener(
                 'pageshow',
                 function () {
@@ -54,6 +69,8 @@ define([], function () {
                         function (el) {
                             // restore the initial selection for Safari
                             initialSelection(el);
+                            // restore the tooltip text for Safari
+                            updateTooltip(el);
                             // enable filter when the page is displayed
                             el.disabled = false;
                         }
@@ -64,6 +81,8 @@ define([], function () {
                 function (el) {
                     // restore the initial selection for Chrome
                     initialSelection(el);
+                    // restore the tooltip text for all web browsers
+                    updateTooltip(el);
                     el.addEventListener('change', function (e) {
                         e.target.closest('form').submit();
                         forEachSelectElement(
