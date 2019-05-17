@@ -6,6 +6,9 @@ information provided here is intended especially for developers.
 * Removed deprecated methods:
   * program::is_required_learning()
   * program::display_progress()
+* Class program_utilities has been moved into its own autoloaded class \totara_program\utils.
+* TIME_SELECTOR_* globals have been deprecated. Please use \totara_program\utils::TIME_SELECTOR_* constants.
+* $TIMEALLOWANCESTRINGS global variable has been deprecated. Please use \totara_program\utils::$timeallowancestrings.
 
 === 12.0 ===
 

@@ -1205,9 +1205,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         global $DB;
 
         $timebefore = time();
-        $originaldurationstring = "20 " . TIME_SELECTOR_DAYS;
+        $originaldurationstring = "20 " . \totara_program\utils::TIME_SELECTOR_DAYS;
         $originalduration = DAYSECS * 20;
-        $newdurationstring = "10 " . TIME_SELECTOR_DAYS;
+        $newdurationstring = "10 " . \totara_program\utils::TIME_SELECTOR_DAYS;
         $newduration = DAYSECS * 10;
 
         // Add audience assignment.
@@ -1563,7 +1563,7 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $originalcompletiontime = date($this->updateassignmentsdateformat, $timebefore + DAYSECS * 100);
         $originalduedate = totara_date_parse_from_format($this->updateassignmentsdateformat, $originalcompletiontime);
         // Give the audience the smaller date, and we will make sure that it is not being applied.
-        $newdurationstring = "10 " . TIME_SELECTOR_DAYS;
+        $newdurationstring = "10 " . \totara_program\utils::TIME_SELECTOR_DAYS;
         $newduration = DAYSECS * 10;
 
         // Add audience assignment.

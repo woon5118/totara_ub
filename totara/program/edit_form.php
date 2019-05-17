@@ -491,7 +491,7 @@ class program_content_nonedit_form extends moodleform {
         // Only display the time allowance if it is greater than zero
         if ($total_time_allowed > 0) {
             // Break the time allowed details down into human readable form
-            $numperiod = program_utilities::get_duration_num_and_period($total_time_allowed);
+            $numperiod = \totara_program\utils::get_duration_num_and_period($total_time_allowed);
             $timeallowedstr = html_writer::tag('p', get_string('allowtimeforprogram' . $numperiod->periodkey, 'totara_program', $numperiod->num), array('class' => 'timeallowed'));
             $mform->addElement('static', 'timeallowance_'.$certifpath, '', $timeallowedstr);
         }

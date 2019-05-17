@@ -76,7 +76,7 @@ abstract class course_set {
             $this->certifpath = 0;
         }
 
-        $timeallowed = program_utilities::duration_explode($this->timeallowed);
+        $timeallowed = \totara_program\utils::duration_explode($this->timeallowed);
         $this->timeallowednum = $timeallowed->num;
         $this->timeallowedperiod = $timeallowed->period;
 
@@ -99,7 +99,7 @@ abstract class course_set {
         $this->nextsetoperator = isset($formdata->{$formnameprefix.'nextsetoperator'}) ? $formdata->{$formnameprefix.'nextsetoperator'} : 0;
         $this->timeallowednum = $formdata->{$formnameprefix.'timeallowednum'};
         $this->timeallowedperiod = $formdata->{$formnameprefix.'timeallowedperiod'};
-        $this->timeallowed = program_utilities::duration_implode($this->timeallowednum, $this->timeallowedperiod);
+        $this->timeallowed = \totara_program\utils::duration_implode($this->timeallowednum, $this->timeallowedperiod);
     }
 
     protected function get_completion_type_string() {
@@ -142,7 +142,7 @@ abstract class course_set {
         }
 
         if ($this->timeallowed > 0) {
-            $numperiod = program_utilities::get_duration_num_and_period($this->timeallowed);
+            $numperiod = \totara_program\utils::get_duration_num_and_period($this->timeallowed);
             $typestr .= html_writer::tag('p', get_string('allowtimeforset' . $numperiod->periodkey, 'totara_program', $numperiod->num));
         }
 
@@ -1074,7 +1074,7 @@ class multi_course_set extends course_set {
                 break;
         }
 
-        $numperiod = program_utilities::get_duration_num_and_period($this->timeallowed);
+        $numperiod = \totara_program\utils::get_duration_num_and_period($this->timeallowed);
 
         if ($this->timeallowed > 0) {
             $out .= html_writer::tag('p', get_string('allowtimeforset' . $numperiod->periodkey, 'totara_program', $numperiod->num));
@@ -1283,7 +1283,7 @@ class multi_course_set extends course_set {
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."mincourses", 'value' => 0));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."coursesumfield", 'value' => 0));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."coursesumfieldtotal", 'value' => 0));
-        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."timeallowedperiod", 'value' => TIME_SELECTOR_DAYS));
+        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."timeallowedperiod", 'value' => \totara_program\utils::TIME_SELECTOR_DAYS));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."timeallowednum", 'value' => '1'));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."certifpath", 'value' => CERTIFPATH_CERT));
 
@@ -1565,7 +1565,7 @@ class multi_course_set extends course_set {
             $mform->setType($prefix.'timeallowednum', PARAM_INT);
             $mform->addRule($prefix.'timeallowednum', get_string('required'), 'required', null, 'server');
 
-            $timeallowanceoptions = program_utilities::get_standard_time_allowance_options(true);
+            $timeallowanceoptions = \totara_program\utils::get_standard_time_allowance_options(true);
             $select = $mform->addElement('select', $prefix.'timeallowedperiod', '', $timeallowanceoptions, array('id' => $prefix.'timeperiod'));
             $mform->setType($prefix.'timeallowedperiod', PARAM_INT);
             $templatehtml .= html_writer::tag('label', get_string('timeperiod', 'totara_program'), array('for' => $prefix.'timeperiod', 'class' => 'accesshide'));
@@ -2028,7 +2028,7 @@ class competency_course_set extends course_set {
                 break;
         }
 
-        $numperiod = program_utilities::get_duration_num_and_period($this->timeallowed);
+        $numperiod = \totara_program\utils::get_duration_num_and_period($this->timeallowed);
 
         if ($this->timeallowed > 0) {
             $out .= html_writer::tag('p', get_string('allowtimeforset' . $numperiod->periodkey, 'totara_program', $numperiod->num));
@@ -2157,7 +2157,7 @@ class competency_course_set extends course_set {
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."sortorder", 'value' => $this->sortorder));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."contenttype", 'value' => $this->contenttype));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."nextsetoperator", 'value' => ''));
-        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."timeallowedperiod", 'value' => TIME_SELECTOR_DAYS));
+        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."timeallowedperiod", 'value' => \totara_program\utils::TIME_SELECTOR_DAYS));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."timeallowednum", 'value' => '1'));
 
         if ($this->competencyid > 0) {
@@ -2291,7 +2291,7 @@ class competency_course_set extends course_set {
             $mform->setType($prefix.'timeallowednum', PARAM_INT);
             $mform->addRule($prefix.'timeallowednum', get_string('required'), 'required', null, 'server');
 
-            $timeallowanceoptions = program_utilities::get_standard_time_allowance_options(true);
+            $timeallowanceoptions = \totara_program\utils::get_standard_time_allowance_options(true);
             $mform->addElement('select', $prefix.'timeallowedperiod', '', $timeallowanceoptions);
             $mform->setType($prefix.'timeallowedperiod', PARAM_INT);
 
@@ -2461,10 +2461,10 @@ class recurring_course_set extends course_set {
                     $this->course = $course;
                 }
             }
-            $recurrencetime = program_utilities::duration_explode($this->recurrencetime);
+            $recurrencetime = \totara_program\utils::duration_explode($this->recurrencetime);
             $this->recurrencetimenum = $recurrencetime->num;
             $this->recurrencetimeperiod = $recurrencetime->period;
-            $recurcreatetime = program_utilities::duration_explode($this->recurcreatetime);
+            $recurcreatetime = \totara_program\utils::duration_explode($this->recurcreatetime);
             $this->recurcreatetimenum = $recurcreatetime->num;
             $this->recurcreatetimeperiod = $recurcreatetime->period;
         } else {
@@ -2482,11 +2482,11 @@ class recurring_course_set extends course_set {
 
         $this->recurrencetimenum = $data->{$formnameprefix.'recurrencetimenum'};
         $this->recurrencetimeperiod = $data->{$formnameprefix.'recurrencetimeperiod'};
-        $this->recurrencetime = program_utilities::duration_implode($this->recurrencetimenum, $this->recurrencetimeperiod);
+        $this->recurrencetime = \totara_program\utils::duration_implode($this->recurrencetimenum, $this->recurrencetimeperiod);
 
         $this->recurcreatetimenum = $data->{$formnameprefix.'recurcreatetimenum'};
         $this->recurcreatetimeperiod = $data->{$formnameprefix.'recurcreatetimeperiod'};
-        $this->recurcreatetime = program_utilities::duration_implode($this->recurcreatetimenum, $this->recurcreatetimeperiod);
+        $this->recurcreatetime = \totara_program\utils::duration_implode($this->recurcreatetimenum, $this->recurcreatetimeperiod);
 
         $courseid = $data->{$formnameprefix.'courseid'};
         if ($course = $DB->get_record('course', array('id' => $courseid))) {
@@ -2631,7 +2631,7 @@ class recurring_course_set extends course_set {
         $out .= html_writer::start_tag('div', array('class' => 'surround display-program'));
         $out .= $OUTPUT->heading(format_string($this->label), 3);
 
-        $numperiod = program_utilities::get_duration_num_and_period($this->timeallowed);
+        $numperiod = \totara_program\utils::get_duration_num_and_period($this->timeallowed);
 
         if ($this->timeallowed > 0) {
             $out .= html_writer::tag('p', get_string('allowtimeforset' . $numperiod->periodkey, 'totara_program', $numperiod->num));
@@ -2723,11 +2723,11 @@ class recurring_course_set extends course_set {
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."recurrencetime", 'value' => $this->recurrencetime));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."nextsetoperator", 'value' => $this->nextsetoperator));
 
-        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."timeallowedperiod", 'value' => TIME_SELECTOR_DAYS));
+        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."timeallowedperiod", 'value' => \totara_program\utils::TIME_SELECTOR_DAYS));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."timeallowednum", 'value' => '30'));
-        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."recurrencetimeperiod", 'value' => TIME_SELECTOR_DAYS));
+        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."recurrencetimeperiod", 'value' => \totara_program\utils::TIME_SELECTOR_DAYS));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."recurrencetimenum", 'value' => '365'));
-        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."recurcreatetimeperiod", 'value' => TIME_SELECTOR_DAYS));
+        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."recurcreatetimeperiod", 'value' => \totara_program\utils::TIME_SELECTOR_DAYS));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $prefix."recurcreatetimenum", 'value' => '1'));
 
         return $out;
@@ -2848,7 +2848,7 @@ class recurring_course_set extends course_set {
             $mform->setType($prefix.'timeallowednum', PARAM_INT);
             $mform->addRule($prefix.'timeallowednum', get_string('required'), 'required', null, 'server');
 
-            $timeallowanceoptions = program_utilities::get_standard_time_allowance_options(true);
+            $timeallowanceoptions = \totara_program\utils::get_standard_time_allowance_options(true);
             $mform->addElement('select', $prefix.'timeallowedperiod', '', $timeallowanceoptions);
             $mform->setType($prefix.'timeallowedperiod', PARAM_INT);
 
@@ -2873,7 +2873,7 @@ class recurring_course_set extends course_set {
             $mform->setType($prefix.'recurrencetimenum', PARAM_INT);
             $mform->addRule($prefix.'recurrencetimenum', get_string('required'), 'required', null, 'server');
 
-            $timeallowanceoptions = program_utilities::get_standard_time_allowance_options();
+            $timeallowanceoptions = \totara_program\utils::get_standard_time_allowance_options();
             $mform->addElement('select', $prefix.'recurrencetimeperiod', '', $timeallowanceoptions);
             $mform->setType($prefix.'recurrencetimeperiod', PARAM_INT);
 
@@ -2897,7 +2897,7 @@ class recurring_course_set extends course_set {
             $mform->addElement('text', $prefix.'recurcreatetimenum', $this->recurcreatetimenum, array('size' => 4, 'maxlength' => 3));
             $mform->setType($prefix.'recurcreatetimenum', PARAM_INT);
 
-            $timeallowanceoptions = program_utilities::get_standard_time_allowance_options();
+            $timeallowanceoptions = \totara_program\utils::get_standard_time_allowance_options();
             $mform->addElement('select', $prefix.'recurcreatetimeperiod', '', $timeallowanceoptions);
             $mform->setType($prefix.'recurcreatetimeperiod', PARAM_INT);
             $mform->addRule($prefix.'recurcreatetimeperiod', get_string('required'), 'required', null, 'server');

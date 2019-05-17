@@ -114,7 +114,7 @@ abstract class prog_message {
             $this->triggertime = 0;
         }
 
-        $tiggertime = program_utilities::duration_explode($this->triggertime);
+        $tiggertime = \totara_program\utils::duration_explode($this->triggertime);
         $this->triggernum = $tiggertime->num;
         $this->triggerperiod = $tiggertime->period;
 
@@ -151,7 +151,7 @@ abstract class prog_message {
         $this->managermessage = isset($formdata->{$formnameprefix.'managermessage'}) ? $formdata->{$formnameprefix.'managermessage'} : '';
         $this->triggerperiod = isset($formdata->{$formnameprefix.'triggerperiod'}) ? $formdata->{$formnameprefix.'triggerperiod'} : 0;
         $this->triggernum = isset($formdata->{$formnameprefix.'triggernum'}) ? $formdata->{$formnameprefix.'triggernum'} : 0;
-        $this->triggertime = program_utilities::duration_implode($this->triggernum, $this->triggerperiod);
+        $this->triggertime = \totara_program\utils::duration_implode($this->triggernum, $this->triggerperiod);
     }
 
     public function get_message_prefix() {
@@ -307,7 +307,7 @@ abstract class prog_message {
                                 $ccriteria = prog_assignment_category::build_completion_string($formatedtime, $event, $instance);
                             }
                         } else {
-                            $parts = program_utilities::duration_explode($time);
+                            $parts = \totara_program\utils::duration_explode($time);
                             $formatedtime = $parts->num . ' ' . $parts->period;
                             $ccriteria = prog_assignment_category::build_completion_string($formatedtime, $event, $instance);
                         }
@@ -571,7 +571,7 @@ abstract class prog_message {
             $mform->setDefault($prefix.'triggernum', '1');
             //$mform->addRule($prefix.'triggernum', get_string('required'), 'required', null, 'server');
 
-            $timeallowanceoptions = program_utilities::get_standard_time_allowance_options();
+            $timeallowanceoptions = \totara_program\utils::get_standard_time_allowance_options();
             $mform->addElement('select', $prefix.'triggerperiod', '', $timeallowanceoptions, array('id' => $prefix.'triggerperiod'));
             $mform->setType($prefix.'triggerperiod', PARAM_INT);
 

@@ -516,7 +516,7 @@ abstract class prog_assignment_category {
                         }
                         $num = $parts[0];
                         $period = $parts[1];
-                        $object->completiontime = program_utilities::duration_implode($num, $period);
+                        $object->completiontime = \totara_program\utils::duration_implode($num, $period);
                     }
                 }
 
@@ -697,7 +697,7 @@ abstract class prog_assignment_category {
                 $show_deletecompletionlink = true;
             }
         } else {
-            $parts = program_utilities::duration_explode($item->completiontime);
+            $parts = \totara_program\utils::duration_explode($item->completiontime);
             $item->completiontime = $parts->num . ' ' . $parts->period;
             $completion_string = self::build_completion_string(
                 $item->completiontime, $item->completionevent, $item->completioninstance);
@@ -761,7 +761,7 @@ abstract class prog_assignment_category {
 
     public static function build_completion_string($completiontime, $completionevent, $completioninstance,
                                                    $completiontimehour = 0, $completiontimeminute = 0) {
-        global $COMPLETION_EVENTS_CLASSNAMES, $TIMEALLOWANCESTRINGS;
+        global $COMPLETION_EVENTS_CLASSNAMES;
         if (isset($COMPLETION_EVENTS_CLASSNAMES[$completionevent])) {
             $eventobject = new $COMPLETION_EVENTS_CLASSNAMES[$completionevent];
 
@@ -775,8 +775,8 @@ abstract class prog_assignment_category {
 
             $a = new stdClass();
             $a->num = $parts[0];
-            if (isset($TIMEALLOWANCESTRINGS[$parts[1]])) {
-                $a->period = get_string($TIMEALLOWANCESTRINGS[$parts[1]], 'totara_program');
+            if (isset(\totara_program\utils::$timeallowancestrings[$parts[1]])) {
+                $a->period = get_string(\totara_program\utils::$timeallowancestrings[$parts[1]], 'totara_program');
             } else {
                 return '';
             }

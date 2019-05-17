@@ -41,12 +41,21 @@ define('STATUS_PROGRAM_COMPLETE', 1);
 define('STATUS_COURSESET_INCOMPLETE', 2);
 define('STATUS_COURSESET_COMPLETE', 3);
 
+// Note: TIME_SELECTOR_* globals have been deprecated.
+// Please use \totara_program\utils::TIME_SELECTOR_* constants instead.
+/** @deprecated since Totara 13 */
 define('TIME_SELECTOR_HOURS', 1);
+/** @deprecated since Totara 13 */
 define('TIME_SELECTOR_DAYS', 2);
+/** @deprecated since Totara 13 */
 define('TIME_SELECTOR_WEEKS', 3);
+/** @deprecated since Totara 13 */
 define('TIME_SELECTOR_MONTHS', 4);
+/** @deprecated since Totara 13 */
 define('TIME_SELECTOR_YEARS', 5);
+/** @deprecated since Totara 13 */
 define('TIME_SELECTOR_INFINITY', 6); // Deprecated.
+/** @deprecated since Totara 13 */
 define('TIME_SELECTOR_NOMINIMUM', 6);
 
 define('DURATION_MINUTE', 60);
@@ -74,6 +83,7 @@ define('PROG_UPDATE_ASSIGNMENTS_DEFERRED', 2);
 // The maximum number of user assignments that will be processed while the user waits, otherwise processing is deferred until cron.
 define('PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT', 200);
 
+/** @deprecated since Totara 13 */
 global $TIMEALLOWANCESTRINGS;
 
 $TIMEALLOWANCESTRINGS = array(
@@ -2483,199 +2493,6 @@ class program {
         );
         return $file->out();
     }
-}
-
-/**
- * Class providing various utility functions for use by programs but which can
- * be used independently of and without instantiating a program object
- */
-class program_utilities {
-
-    /**
-     * Given an integer and a time period (e.g. a day = 60*60*24) this function
-     * calculates the length covered by the period and returns returns it as a
-     * timestamp
-     *
-     * E.g. if $num = 4 and $period = 1 (hours) then the timestamp returned
-     * would be the equivalent of 4 hours.
-     *
-     * @param int $num The number of units of the time pariod to calculate
-     * @param int $period An integer denoting the time period (hours, days, weeks, etc)
-     * @return int A timestamp
-     */
-    public static function duration_implode($num, $period) {
-
-        $duration = 0;
-
-        if ($period == TIME_SELECTOR_YEARS) {
-            $duration = $num * DURATION_YEAR;
-        } else if ($period == TIME_SELECTOR_MONTHS) {
-            $duration = $num * DURATION_MONTH;
-        } else if ($period == TIME_SELECTOR_WEEKS) {
-            $duration = $num * DURATION_WEEK;
-        } else if ($period == TIME_SELECTOR_DAYS) {
-            $duration = $num * DURATION_DAY;
-        } else if ($period == TIME_SELECTOR_HOURS) {
-            $duration = $num * DURATION_HOUR;
-        } else {
-            $duration = 0;
-        }
-
-        return $duration;
-    }
-
-    /**
-     * Given a timestamp representing a duration, this function factors the
-     * timestamp out into a time period (e.g. an hour, a day, a week, etc)
-     * and the number of units of the time period.
-     *
-     * This is mainly for use in forms which provide 2 fields for specifying
-     * a duration.
-     *
-     * @global array $TIMEALLOWANCESTRINGS
-     * @param int $duration
-     * @return object Containing $num and $period properties
-     */
-    public static function duration_explode($duration) {
-        global $TIMEALLOWANCESTRINGS;
-
-        $ob = new stdClass();
-
-        if ($duration == 0) {
-            $ob->num = 0;
-            $ob->period = TIME_SELECTOR_NOMINIMUM;
-        } else if ($duration % DURATION_YEAR == 0) {
-            $ob->num = $duration / DURATION_YEAR;
-            $ob->period = TIME_SELECTOR_YEARS;
-        } else if ($duration % DURATION_MONTH == 0) {
-            $ob->num = $duration / DURATION_MONTH;
-            $ob->period = TIME_SELECTOR_MONTHS;
-        } else if ($duration % DURATION_WEEK == 0) {
-            $ob->num = $duration / DURATION_WEEK;
-            $ob->period = TIME_SELECTOR_WEEKS;
-        } else if ($duration % DURATION_DAY == 0) {
-            $ob->num = $duration / DURATION_DAY;
-            $ob->period = TIME_SELECTOR_DAYS;
-        } else if ($duration % DURATION_HOUR == 0) {
-            $ob->num = $duration / DURATION_HOUR;
-            $ob->period = TIME_SELECTOR_HOURS;
-        } else {
-            $ob->num = 0;
-            $ob->period = 0;
-        }
-
-        if (array_key_exists($ob->period, $TIMEALLOWANCESTRINGS)) {
-            $ob->periodstr = strtolower(get_string($TIMEALLOWANCESTRINGS[$ob->period], 'totara_program'));
-        } else {
-            $ob->periodstr = '';
-        }
-
-        return $ob;
-
-    }
-
-    /**
-     * Given a timestamp representing a duration, this function factors the
-     * timestamp out into a time period (e.g. an hour, a day, a week, etc)
-     * and the number of units of the time period.
-     *
-     * The period is included in two forms:
-     * $period - A constant such as TIME_SELECTOR_YEARS.
-     * $periodkey - A string such as 'years' (not translated, but might be used as part of
-     *  a lang string key).
-     *
-     * @param int $duration
-     * @return object Containing $num, $period and $periodkey properties
-     */
-    public static function get_duration_num_and_period($duration) {
-        $object = new stdClass();
-
-        if ($duration == 0) {
-            $object->num = 0;
-            $object->period = TIME_SELECTOR_NOMINIMUM;
-            $object->periodkey = 'nominimum';
-        } else if ($duration % DURATION_YEAR == 0) {
-            $object->num = $duration / DURATION_YEAR;
-            $object->period = TIME_SELECTOR_YEARS;
-            $object->periodkey = 'years';
-        } else if ($duration % DURATION_MONTH == 0) {
-            $object->num = $duration / DURATION_MONTH;
-            $object->period = TIME_SELECTOR_MONTHS;
-            $object->periodkey = 'months';
-        } else if ($duration % DURATION_WEEK == 0) {
-            $object->num = $duration / DURATION_WEEK;
-            $object->period = TIME_SELECTOR_WEEKS;
-            $object->periodkey = 'weeks';
-        } else if ($duration % DURATION_DAY == 0) {
-            $object->num = $duration / DURATION_DAY;
-            $object->period = TIME_SELECTOR_DAYS;
-            $object->periodkey = 'days';
-        } else if ($duration % DURATION_HOUR == 0) {
-            $object->num = $duration / DURATION_HOUR;
-            $object->period = TIME_SELECTOR_HOURS;
-            $object->periodkey = 'hours';
-        } else {
-            throw new ProgramException('Unrecognised datetime');
-        }
-
-        return $object;
-    }
-
-    /**
-     * Prints or returns the html for the time allowance fields
-     *
-     * @param <type> $prefix
-     * @param <type> $periodvalue
-     * @param <type> $numbervalue
-     * @param <type> $return
-     * @return <type>
-     */
-    public static function print_duration_selector($prefix, $periodelementname, $periodvalue, $numberelementname, $numbervalue, $includehours=true) {
-
-        $timeallowances = array();
-        if ($includehours) {
-            $timeallowances[TIME_SELECTOR_HOURS] = get_string('hours', 'totara_program');
-        }
-        $timeallowances[TIME_SELECTOR_DAYS] = get_string('days', 'totara_program');
-        $timeallowances[TIME_SELECTOR_WEEKS] = get_string('weeks', 'totara_program');
-        $timeallowances[TIME_SELECTOR_MONTHS] = get_string('months', 'totara_program');
-        $timeallowances[TIME_SELECTOR_YEARS] = get_string('years', 'totara_program');
-        if ($periodvalue == '') { $periodvalue = '' . TIME_SELECTOR_DAYS; }
-        $m_name = $prefix.$periodelementname;
-        $m_id = $prefix.$periodelementname;
-        $m_selected = $periodvalue;
-        $m_nothing = '';
-        $m_nothingvalue = '';
-        $m_disabled = false;
-        $m_tabindex = 0;
-
-        $out = '';
-        $out .= html_writer::empty_tag('input', array('type' => 'text', 'id' => $prefix.$numberelementname, 'name' => $prefix.$numberelementname, 'value' => $numbervalue, 'size' => '4', 'maxlength' => '3'));
-
-        $attributes = array();
-        $attributes['disabled'] = $m_disabled;
-        $attributes['tabindex'] = $m_tabindex;
-        $attributes['multiple'] = null;
-        $attributes['class'] = null;
-        $attributes['id'] = $m_id;
-        $out .= html_writer::select($timeallowances, $m_name, $m_selected, array($m_nothingvalue=>$m_nothing), $attributes);
-
-        return $out;
-    }
-
-    public static function get_standard_time_allowance_options($includenominimum=false) {
-        $timeallowances = array(
-            TIME_SELECTOR_DAYS => get_string('days', 'totara_program'),
-            TIME_SELECTOR_WEEKS => get_string('weeks', 'totara_program'),
-            TIME_SELECTOR_MONTHS => get_string('months', 'totara_program'),
-            TIME_SELECTOR_YEARS => get_string('years', 'totara_program')
-        );
-        if ($includenominimum) {
-            $timeallowances[TIME_SELECTOR_NOMINIMUM] = get_string('nominimumtime', 'totara_program');
-        }
-        return $timeallowances;
-    }
-
 }
 
 class ProgramException extends Exception {

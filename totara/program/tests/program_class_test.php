@@ -2014,33 +2014,29 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $month = $day * 30;
         $year = $day * 365;
 
-        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_HOURS));
-        $this->assertSame(1 * $hour, program_utilities::duration_implode(1, TIME_SELECTOR_HOURS));
-        $this->assertSame(17 * $hour, program_utilities::duration_implode(17, TIME_SELECTOR_HOURS));
+        $this->assertSame(0, \totara_program\utils::duration_implode(0, \totara_program\utils::TIME_SELECTOR_HOURS));
+        $this->assertSame(1 * $hour, \totara_program\utils::duration_implode(1, \totara_program\utils::TIME_SELECTOR_HOURS));
+        $this->assertSame(17 * $hour, \totara_program\utils::duration_implode(17, \totara_program\utils::TIME_SELECTOR_HOURS));
 
-        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_DAYS));
-        $this->assertSame(1 * $day, program_utilities::duration_implode(1, TIME_SELECTOR_DAYS));
-        $this->assertSame(23 * $day, program_utilities::duration_implode(23, TIME_SELECTOR_DAYS));
+        $this->assertSame(0, \totara_program\utils::duration_implode(0, \totara_program\utils::TIME_SELECTOR_DAYS));
+        $this->assertSame(1 * $day, \totara_program\utils::duration_implode(1, \totara_program\utils::TIME_SELECTOR_DAYS));
+        $this->assertSame(23 * $day, \totara_program\utils::duration_implode(23, \totara_program\utils::TIME_SELECTOR_DAYS));
 
-        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_WEEKS));
-        $this->assertSame(1 * $week, program_utilities::duration_implode(1, TIME_SELECTOR_WEEKS));
-        $this->assertSame(5 * $week, program_utilities::duration_implode(5, TIME_SELECTOR_WEEKS));
+        $this->assertSame(0, \totara_program\utils::duration_implode(0, \totara_program\utils::TIME_SELECTOR_WEEKS));
+        $this->assertSame(1 * $week, \totara_program\utils::duration_implode(1, \totara_program\utils::TIME_SELECTOR_WEEKS));
+        $this->assertSame(5 * $week, \totara_program\utils::duration_implode(5, \totara_program\utils::TIME_SELECTOR_WEEKS));
 
-        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_MONTHS));
-        $this->assertSame(1 * $month, program_utilities::duration_implode(1, TIME_SELECTOR_MONTHS));
-        $this->assertSame(51 * $month, program_utilities::duration_implode(51, TIME_SELECTOR_MONTHS));
+        $this->assertSame(0, \totara_program\utils::duration_implode(0, \totara_program\utils::TIME_SELECTOR_MONTHS));
+        $this->assertSame(1 * $month, \totara_program\utils::duration_implode(1, \totara_program\utils::TIME_SELECTOR_MONTHS));
+        $this->assertSame(51 * $month, \totara_program\utils::duration_implode(51, \totara_program\utils::TIME_SELECTOR_MONTHS));
 
-        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_YEARS));
-        $this->assertSame(1 * $year, program_utilities::duration_implode(1, TIME_SELECTOR_YEARS));
-        $this->assertSame(42 * $year, program_utilities::duration_implode(42, TIME_SELECTOR_YEARS));
+        $this->assertSame(0, \totara_program\utils::duration_implode(0, \totara_program\utils::TIME_SELECTOR_YEARS));
+        $this->assertSame(1 * $year, \totara_program\utils::duration_implode(1, \totara_program\utils::TIME_SELECTOR_YEARS));
+        $this->assertSame(42 * $year, \totara_program\utils::duration_implode(42, \totara_program\utils::TIME_SELECTOR_YEARS));
 
-        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_NOMINIMUM));
-        $this->assertSame(0, program_utilities::duration_implode(1, TIME_SELECTOR_NOMINIMUM));
-        $this->assertSame(0, program_utilities::duration_implode(18, TIME_SELECTOR_NOMINIMUM));
-
-        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_INFINITY));
-        $this->assertSame(0, program_utilities::duration_implode(1, TIME_SELECTOR_INFINITY));
-        $this->assertSame(0, program_utilities::duration_implode(34, TIME_SELECTOR_INFINITY));
+        $this->assertSame(0, \totara_program\utils::duration_implode(0, \totara_program\utils::TIME_SELECTOR_NOMINIMUM));
+        $this->assertSame(0, \totara_program\utils::duration_implode(1, \totara_program\utils::TIME_SELECTOR_NOMINIMUM));
+        $this->assertSame(0, \totara_program\utils::duration_implode(18, \totara_program\utils::TIME_SELECTOR_NOMINIMUM));
     }
 
     /**
@@ -2054,75 +2050,75 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $month = $day * 30;
         $year = $day * 365;
 
-        $result = program_utilities::duration_explode(0);
+        $result = \totara_program\utils::duration_explode(0);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_INFINITY, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_NOMINIMUM, $result->period);
         $this->assertEquals(0, $result->num);
         $this->assertEquals('no minimum time', $result->periodstr);
 
-        $result = program_utilities::duration_explode(1);
+        $result = \totara_program\utils::duration_explode(1);
         $this->assertInstanceOf('stdClass', $result);
         $this->assertEquals(0, $result->period);
         $this->assertEquals(0, $result->num);
         $this->assertEquals('', $result->periodstr);
 
-        $result = program_utilities::duration_explode($hour * 7);
+        $result = \totara_program\utils::duration_explode($hour * 7);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_HOURS, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_HOURS, $result->period);
         $this->assertEquals(7, $result->num);
         $this->assertEquals('hour(s)', $result->periodstr);
 
-        $result = program_utilities::duration_explode($day * 3);
+        $result = \totara_program\utils::duration_explode($day * 3);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_DAYS, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_DAYS, $result->period);
         $this->assertEquals(3, $result->num);
         $this->assertEquals('day(s)', $result->periodstr);
 
-        $result = program_utilities::duration_explode($day * 7);
+        $result = \totara_program\utils::duration_explode($day * 7);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_WEEKS, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_WEEKS, $result->period);
         $this->assertEquals(1, $result->num);
         $this->assertEquals('week(s)', $result->periodstr);
 
-        $result = program_utilities::duration_explode($day * 21);
+        $result = \totara_program\utils::duration_explode($day * 21);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_WEEKS, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_WEEKS, $result->period);
         $this->assertEquals(3, $result->num);
         $this->assertEquals('week(s)', $result->periodstr);
 
-        $result = program_utilities::duration_explode($week * 3);
+        $result = \totara_program\utils::duration_explode($week * 3);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_WEEKS, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_WEEKS, $result->period);
         $this->assertEquals(3, $result->num);
         $this->assertEquals('week(s)', $result->periodstr);
 
-        $result = program_utilities::duration_explode($week * 7);
+        $result = \totara_program\utils::duration_explode($week * 7);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_WEEKS, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_WEEKS, $result->period);
         $this->assertEquals(7, $result->num);
         $this->assertEquals('week(s)', $result->periodstr);
 
-        $result = program_utilities::duration_explode($month * 7);
+        $result = \totara_program\utils::duration_explode($month * 7);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_MONTHS, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_MONTHS, $result->period);
         $this->assertEquals(7, $result->num);
         $this->assertEquals('month(s)', $result->periodstr);
 
-        $result = program_utilities::duration_explode($month * 18);
+        $result = \totara_program\utils::duration_explode($month * 18);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_MONTHS, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_MONTHS, $result->period);
         $this->assertEquals(18, $result->num);
         $this->assertEquals('month(s)', $result->periodstr);
 
-        $result = program_utilities::duration_explode($month * 24);
+        $result = \totara_program\utils::duration_explode($month * 24);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_MONTHS, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_MONTHS, $result->period);
         $this->assertEquals(24, $result->num);
         $this->assertEquals('month(s)', $result->periodstr);
 
-        $result = program_utilities::duration_explode($year * 7);
+        $result = \totara_program\utils::duration_explode($year * 7);
         $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals(TIME_SELECTOR_YEARS, $result->period);
+        $this->assertEquals(\totara_program\utils::TIME_SELECTOR_YEARS, $result->period);
         $this->assertEquals(7, $result->num);
         $this->assertEquals('year(s)', $result->periodstr);
 
@@ -2132,9 +2128,8 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
      * Test the get_standard_time_allowance_options static method.
      */
     public function test_get_standard_time_allowance_options() {
-
-        $options_limited = program_utilities::get_standard_time_allowance_options();
-        $options_all = program_utilities::get_standard_time_allowance_options(true);
+        $options_limited = \totara_program\utils::get_standard_time_allowance_options();
+        $options_all = \totara_program\utils::get_standard_time_allowance_options(true);
 
         $this->assertIsArray($options_limited);
         $this->assertIsArray($options_all);
@@ -2143,15 +2138,14 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->assertCount(5, $options_all);
 
         $expected = array(
-            TIME_SELECTOR_DAYS => 'Day(s)',
-            TIME_SELECTOR_WEEKS => 'Week(s)',
-            TIME_SELECTOR_MONTHS => 'Month(s)',
-            TIME_SELECTOR_YEARS => 'Year(s)',
+            \totara_program\utils::TIME_SELECTOR_DAYS => 'Day(s)',
+            \totara_program\utils::TIME_SELECTOR_WEEKS => 'Week(s)',
+            \totara_program\utils::TIME_SELECTOR_MONTHS => 'Month(s)',
+            \totara_program\utils::TIME_SELECTOR_YEARS => 'Year(s)',
         );
         $this->assertSame($expected, $options_limited);
-        $expected[TIME_SELECTOR_NOMINIMUM] = 'No minimum time';
+        $expected[\totara_program\utils::TIME_SELECTOR_NOMINIMUM] = 'No minimum time';
         $this->assertSame($expected, $options_all);
-
     }
 
     /**
@@ -2160,13 +2154,11 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
      * This function doesn't test what is output, its just testing the code is executable and that it returns a string.
      */
     public function test_print_duration_selector() {
-
-        $html = program_utilities::print_duration_selector('t_', 'name_test', TIME_SELECTOR_WEEKS, 'number_test', 7);
+        $html = \totara_program\utils::print_duration_selector('t_', 'name_test', \totara_program\utils::TIME_SELECTOR_WEEKS, 'number_test', 7);
         $this->assertIsString($html);
         $this->assertSame(1, preg_match('/name=([\'"])t_name_test\1/', $html));
         $this->assertSame(1, preg_match('/name=([\'"])t_number_test\1/', $html));
         $this->assertSame(1, preg_match('/value=([\'"])7\1/', $html));
-
     }
 
     public function test_get_image_program() {

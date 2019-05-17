@@ -179,7 +179,7 @@ class totara_program_message_testcase extends advanced_testcase {
         /** @var totara_program_generator $programgenerator */
         $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
         $programgenerator->assign_to_program($this->program1->id, ASSIGNTYPE_INDIVIDUAL, $this->user1->id,
-            array('completiontime' => '5 ' . TIME_SELECTOR_DAYS, 'completionevent' => COMPLETION_EVENT_ENROLLMENT_DATE), true);
+            array('completiontime' => '5 ' . \totara_program\utils::TIME_SELECTOR_DAYS, 'completionevent' => COMPLETION_EVENT_ENROLLMENT_DATE), true);
 
         $messagetext = 'TestMessage1 %completioncriteria%';
         $this->send_noneventbased_message($this->user1, $this->program1, $messagetext);
@@ -199,7 +199,7 @@ class totara_program_message_testcase extends advanced_testcase {
         /** @var totara_program_generator $programgenerator */
         $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
         $programgenerator->assign_to_program($this->program1->id, ASSIGNTYPE_INDIVIDUAL, $this->user1->id,
-            array('completiontime' => '5 ' . TIME_SELECTOR_DAYS, 'completionevent' => COMPLETION_EVENT_ENROLLMENT_DATE), true);
+            array('completiontime' => '5 ' . \totara_program\utils::TIME_SELECTOR_DAYS, 'completionevent' => COMPLETION_EVENT_ENROLLMENT_DATE), true);
 
         // The latest assignment will be used for the displayed completion criteria. Sleep for 1 second so
         // the timestamps are different.
@@ -211,7 +211,7 @@ class totara_program_message_testcase extends advanced_testcase {
         $cohortgenerator->cohort_assign_users($audience1->id, array($this->user1->id));
 
         $programgenerator->assign_to_program($this->program1->id, ASSIGNTYPE_COHORT, $audience1->id,
-            array('completiontime' => '8 ' . TIME_SELECTOR_DAYS, 'completionevent' => COMPLETION_EVENT_ENROLLMENT_DATE), true);
+            array('completiontime' => '8 ' . \totara_program\utils::TIME_SELECTOR_DAYS, 'completionevent' => COMPLETION_EVENT_ENROLLMENT_DATE), true);
 
         $messagetext = 'TestMessage1 %completioncriteria%';
         $this->send_noneventbased_message($this->user1, $this->program1, $messagetext);

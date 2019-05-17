@@ -514,7 +514,7 @@ class totara_program_renderer extends plugin_renderer_base {
 
         $out .= html_writer::start_tag('div', array('id' => 'prog-completion-relative-date'));
         $out .= html_writer::tag('span', get_string('completewithin', 'totara_program'));
-        $out .= program_utilities::print_duration_selector($prefix = '', $periodelementname = 'timeperiod', $periodvalue = '', $numberelementname = 'timeamount', $numbervalue = '1', $includehours = false);
+        $out .= \totara_program\utils::print_duration_selector($prefix = '', $periodelementname = 'timeperiod', $periodvalue = '', $numberelementname = 'timeamount', $numbervalue = '1', $includehours = false);
         $out .= ' ' . get_string('of', 'totara_program') . ' ';
         $out .= $this->completion_events_dropdown("eventtype", $programid);
         $out .= html_writer::empty_tag('input', array('id' => 'instance', 'type' => 'hidden', 'name' => "instance", 'value' => ''));
