@@ -584,5 +584,20 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019043001, 'totara', 'core');
     }
 
+    // This code moved here from lib/db/upgrade.php because it was excluded from
+    // Totara 12 during the merge from Moodle 3.3.9. This code and comment should
+    // be removed from here if a merge from a Moodle version higher than 3.6.4
+    // were to occur, effectively moving this back into Moodle core upgrade.php
+    if ($oldversion < 2019051700) {
+        // Conditionally add field requireconfirmation to oauth2_issuer.
+        $table = new xmldb_table('oauth2_issuer');
+        $field = new xmldb_field('requireconfirmation', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1', 'sortorder');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_main_savepoint(true, 2019051700);
+    }
+
     return true;
 }

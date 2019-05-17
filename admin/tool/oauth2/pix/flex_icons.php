@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aaron Barnes <aaron.barnes@totaralms.com>
- * @package totara_core
+ * @author Vernon Denny <vernon.denny@totaralearning.com>
+ * @package auth_oauth2
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-/* NOTE: the following version number must be bumped during each major or minor Totara release. */
-
-$plugin->version  = 2019051700;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017051509;       // Requires this Moodle version.
-$plugin->component = 'totara_core';   // To check on upgrade, that module sits in correct place
+$icons = [
+    'tool_oauth2|yes' => [
+        'data' => [
+            'classes' => 'fa-check ft-state-success',
+        ],
+    ],
+    'tool_oauth2|no' => [
+        'data' => [
+            'classes' => 'fa-times ft-state-danger',
+        ],
+    ],
+    'tool_oauth2|auth' => [
+        'data' => [
+            'classes' => 'fa-sign-out',
+        ],
+    ],
+    'tool_oauth2|endpoints' => [
+        'data' => [
+            'classes' => 'fa-th-list',
+        ],
+    ],
+];

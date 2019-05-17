@@ -557,7 +557,7 @@ class auth_plugin_db extends auth_plugin_base {
      * @param bool $updatekeys
      * @return stdClass
      */
-    function update_user_record($username, $updatekeys=false) {
+    function update_user_record($username, $updatekeys=false, $triggerevent = false, $suspenduser = false) {
         global $CFG, $DB;
 
         //just in case check text case

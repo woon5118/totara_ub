@@ -339,9 +339,7 @@ function totara_core_upgrade_delete_moodle_plugins() {
         'block_community',
 
         // Moodle 3.3 removals.
-        'auth_oauth2',
         'repository_onedrive',
-        'tool_oauth2',
         'tool_dataprivacy',
         'tool_policy',
         'block_myoverview',
@@ -407,19 +405,8 @@ function totara_core_upgrade_delete_moodle_plugins() {
                 continue;
             }
         }
-        if ($deleteplugin === 'auth_oauth2') {
-            if ($DB->record_exists('user', array('auth' => 'oauth2', 'deleted' => 0))) {
-                // Do not uninstall if users with this auth exist!
-                continue;
-            }
-        }
         if ($deleteplugin === 'repository_onedrive') {
             if ($DB->record_exists('repository_onedrive_access', array())) {
-                continue;
-            }
-        }
-        if ($deleteplugin === 'tool_oauth2') {
-            if ($DB->record_exists('oauth2_issuer', array())) {
                 continue;
             }
         }

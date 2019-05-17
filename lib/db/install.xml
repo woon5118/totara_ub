@@ -3491,7 +3491,7 @@
         <INDEX NAME="cmidcompetencyid" UNIQUE="true" FIELDS="cmid, competencyid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="oauth2_endpoint" COMMENT="Totara: Not used (MDL-58220). Describes the named endpoint for an oauth2 service.">
+    <TABLE NAME="oauth2_endpoint" COMMENT="Describes the named endpoint for an oauth2 service.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time this record was created."/>
@@ -3506,7 +3506,7 @@
         <KEY NAME="issuer_id_key" TYPE="foreign" FIELDS="issuerid" REFTABLE="oauth2_issuer" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="oauth2_issuer" COMMENT="Totara: Not used (MDL-58220). Details for an oauth 2 connect identity issuer.">
+    <TABLE NAME="oauth2_issuer" COMMENT="Details for an oauth 2 connect identity issuer.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time this record was created."/>
@@ -3527,12 +3527,13 @@
         <FIELD NAME="showonloginpage" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="basicauth" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Use HTTP Basic authentication scheme when sending client ID and password"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The defined sort order."/>
+        <FIELD NAME="requireconfirmation" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Authentication requires email confirmation"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="oauth2_system_account" COMMENT="Totara: Not used (MDL-58220). Stored details used to get an access token as a system user for this oauth2 service.">
+    <TABLE NAME="oauth2_system_account" COMMENT="Stored details used to get an access token as a system user for this oauth2 service.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time this record was created."/>
@@ -3549,7 +3550,7 @@
         <KEY NAME="issueridkey" TYPE="foreign-unique" FIELDS="issuerid" REFTABLE="oauth2_issuer" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="oauth2_user_field_mapping" COMMENT="Totara: Not used (MDL-58220). Mapping of oauth user fields to moodle fields.">
+    <TABLE NAME="oauth2_user_field_mapping" COMMENT="Mapping of oauth user fields to moodle fields.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time this record was modified"/>

@@ -149,7 +149,10 @@
             <div class="potentialidplist">
                 {{#identityproviders}}
                     <div class="potentialidp">
-                        <a href="{{{url}}}">
+                        <a href="{{{url}}}" class="btn btn-default">
+                            {{#iconurl}}
+                                <img src="{{iconurl}}" alt="" width="24" height="24"/>
+                            {{/iconurl}}
                             {{#icon}}
                                 {{#context}}{{>&&template}}{{/context}}
                             {{/icon}}

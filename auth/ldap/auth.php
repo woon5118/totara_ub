@@ -953,7 +953,7 @@ class auth_plugin_ldap extends auth_plugin_base {
      *             This will not affect user_password_updated event triggering.
      * @return stdClass|bool updated user record or false if there is no new info to update.
      */
-    function update_user_record($username, $updatekeys = false, $triggerevent = false) {
+    function update_user_record($username, $updatekeys = false, $triggerevent = false, $suspenduser = false) {
         global $CFG, $DB;
 
         require_once($CFG->dirroot.'/user/profile/lib.php');

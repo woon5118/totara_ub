@@ -129,12 +129,7 @@ class login implements renderable, templatable {
         }
 
         // Identity providers.
-        $identityproviders = [];
-        foreach ($authsequence as $authname) {
-            $authplugin = get_auth_plugin($authname);
-            $identityproviders = array_merge($identityproviders, $authplugin->loginpage_idp_list($SESSION->wantsurl));
-        }
-        $this->identityproviders = $identityproviders;
+        $this->identityproviders = \auth_plugin_base::get_identity_providers($authsequence);
     }
 
     /**
@@ -149,15 +144,7 @@ class login implements renderable, templatable {
     public function export_for_template(renderer_base $output) {
         global $CFG;
 
-        $identityproviders = array_map(function($idp) use ($output) {
-            $icon = $idp['icon'];
-            $idp['icon'] = array(
-                'context' => $icon->export_for_template($output),
-                'template' => $icon->get_template($output)
-            );
-            $idp['icon'] = array_merge($idp['icon'], $icon->export_for_pix($output));
-            return $idp;
-        }, $this->identityproviders);
+        $identityproviders = \auth_plugin_base::prepare_identity_providers_for_output($this->identityproviders, $output);
 
         $data = new stdClass();
         $data->autofocusform = $this->autofocusform;

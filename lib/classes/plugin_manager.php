@@ -1143,7 +1143,7 @@ class core_plugin_manager {
             'block_community',
 
             // Moodle merge 3.3 removals.
-            'block_myoverview', 'auth_oauth2', 'tool_oauth2', 'repository_onedrive',
+            'block_myoverview', 'repository_onedrive',
             'fileconverter_googledrive', 'fileconverter_unoconv',
             'tool_dataprivacy', 'tool_policy',
 
