@@ -150,6 +150,13 @@ function xmldb_totara_core_install() {
         $dbman->add_field($table, $field);
     }
 
+    $index = new xmldb_index('status', XMLDB_INDEX_NOTUNIQUE, array('status'));
+
+    // Conditionally launch add index status.
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
+    }
+
     $field = new xmldb_field('renewalstatus', XMLDB_TYPE_INTEGER, '2', null, null, null, '0');
 
     // Conditionally launch add field renewalstatus.
