@@ -197,6 +197,8 @@ class database_manager {
      * Given one xmldb_index, the function returns the name of the index in DB
      * of false if it doesn't exist
      *
+     * NOTE: This method does not check if relevant index is unique or not.
+     *
      * @param xmldb_table $xmldb_table table to be searched
      * @param xmldb_index $xmldb_index the index to be searched
      * @param bool $returnall true means return array of all indexes, false means first index only as string
@@ -246,9 +248,11 @@ class database_manager {
     /**
      * Given one xmldb_index, check if it exists in DB (true/false).
      *
+     * NOTE: This method does not check if relevant index is unique or not.
+     *
      * @param xmldb_table $xmldb_table The table to be searched.
      * @param xmldb_index $xmldb_index The index to be searched for.
-     * @return boolean true id index exists, false otherwise.
+     * @return boolean true if index exists, false otherwise.
      */
     public function index_exists(xmldb_table $xmldb_table, xmldb_index $xmldb_index) {
         if (!$this->table_exists($xmldb_table)) {
@@ -258,52 +262,86 @@ class database_manager {
     }
 
     /**
-     * This function IS NOT IMPLEMENTED. ONCE WE'LL BE USING RELATIONAL
-     * INTEGRITY IT WILL BECOME MORE USEFUL. FOR NOW, JUST CALCULATE "OFFICIAL"
-     * KEY NAMES WITHOUT ACCESSING TO DB AT ALL.
-     * Given one xmldb_key, the function returns the name of the key in DB (if exists)
-     * of false if it doesn't exist
+     * Returns name of a real foreign key if it exists.
+     *
+     * NOTE: This does not differentiate between 'enforce' and 'cascade' options.
      *
      * @param xmldb_table $xmldb_table The table to be searched.
      * @param xmldb_key $xmldb_key The key to be searched.
-     * @return string key name if found
+     * @return string|false key name if it is supposed to exist, false if not applicable or not present
      */
     public function find_key_name(xmldb_table $xmldb_table, xmldb_key $xmldb_key) {
-
-        $keycolumns = $xmldb_key->getFields();
-
-        // Get list of keys in table
-        // first primaries (we aren't going to use this now, because the MetaPrimaryKeys is awful)
-            //TODO: To implement when we advance in relational integrity
-        // then uniques (note that Moodle, for now, shouldn't have any UNIQUE KEY for now, but unique indexes)
-            //TODO: To implement when we advance in relational integrity (note that AdoDB hasn't any MetaXXX for this.
-        // then foreign (note that Moodle, for now, shouldn't have any FOREIGN KEY for now, but indexes)
-            //TODO: To implement when we advance in relational integrity (note that AdoDB has one MetaForeignKeys()
-            //but it's far from perfect.
-        // TODO: To create the proper functions inside each generator to retrieve all the needed KEY info (name
-        //       columns, reftable and refcolumns
-
-        // So all we do is to return the official name of the requested key without any confirmation!)
-        // One exception, hardcoded primary constraint names
-        if ($this->generator->primary_key_name && $xmldb_key->getType() == XMLDB_KEY_PRIMARY) {
-            return $this->generator->primary_key_name;
-        } else {
-            // Calculate the name suffix
-            switch ($xmldb_key->getType()) {
-                case XMLDB_KEY_PRIMARY:
-                    $suffix = 'pk';
-                    break;
-                case XMLDB_KEY_UNIQUE:
-                    $suffix = 'uk';
-                    break;
-                case XMLDB_KEY_FOREIGN_UNIQUE:
-                case XMLDB_KEY_FOREIGN:
-                    $suffix = 'fk';
-                    break;
-            }
-            // And simply, return the official name
-            return $this->generator->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), $suffix);
+        if ($xmldb_key->getType() != XMLDB_KEY_FOREIGN and $xmldb_key->getType() != XMLDB_KEY_FOREIGN_UNIQUE) {
+            return false;
         }
+
+        if (!$xmldb_key->getOnDelete()) {
+            return false;
+        }
+
+        $keyname = $this->generator->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), 'fk');
+        if (!preg_match('/^[a-z0-9_]+$/D', $keyname)) {
+            // This should never happen.
+            throw new coding_exception('Invalid foreign key name');
+        }
+
+        $sql = $this->generator->exists_foreign_key;
+        $sql = str_replace('TABLENAME', $this->generator->getTableName($xmldb_table), $sql);
+        $sql = str_replace('KEYNAME', $keyname, $sql);
+
+        if (!$this->mdb->record_exists_sql($sql)) {
+            return false;
+        }
+
+        return $keyname;
+    }
+
+    /**
+     * Given one xmldb_key, check if some similar key exists in DB (true/false).
+     *
+     * NOTE: This method does not check if relevant index is unique or not
+     *       and it does not differentiate between 'enforce' and 'cascade' options.
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_table $xmldb_table The table to be searched.
+     * @param xmldb_key $xmldb_key The key to be searched for.
+     * @return boolean true if key exists, false otherwise.
+     */
+    public function key_exists(xmldb_table $xmldb_table, xmldb_key $xmldb_key) {
+        if (!$this->table_exists($xmldb_table)) {
+            return false;
+        }
+
+        if ($xmldb_key->getType() == XMLDB_KEY_PRIMARY) {
+            if ($xmldb_key->getFields() !== ['id']) {
+                debugging('Primary keys should be used for ID columns only', DEBUG_DEVELOPER);
+            }
+            // NOTE: all tables in Totara should have id as primary key and no other primary keys should exits!
+            return true;
+        }
+
+        // Create the interim index
+        if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN) {
+            $indextype = XMLDB_INDEX_NOTUNIQUE;
+        } else {
+            $indextype = XMLDB_INDEX_UNIQUE;
+        }
+        $index = new xmldb_index('anyname', $indextype);
+        $index->setFields($xmldb_key->getFields());
+        if (!$this->index_exists($xmldb_table, $index)) {
+            return false;
+        }
+
+        if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN or $xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE) {
+            if ($xmldb_key->getOnDelete()) {
+                if (!$this->find_key_name($xmldb_table, $xmldb_key)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -439,7 +477,7 @@ class database_manager {
      * This function will generate all the needed SQL statements, specific for each
      * RDBMS type and, finally, it will execute all those statements against the DB.
      *
-     * @param stdClass $xmldb_structure xmldb_structure object.
+     * @param xmldb_structure $xmldb_structure object.
      * @return void
      */
     public function install_from_xmldb_structure($xmldb_structure) {

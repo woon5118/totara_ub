@@ -43,9 +43,6 @@ class sqlite_sql_generator extends sql_generator {
     /** @var string Template to drop PKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
     public $drop_primary_key = 'ALTER TABLE TABLENAME DROP PRIMARY KEY';
 
-    /** @var string Template to drop UKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
-    public $drop_unique_key = 'ALTER TABLE TABLENAME DROP KEY KEYNAME';
-
     /** @var string Template to drop FKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
     public $drop_foreign_key = 'ALTER TABLE TABLENAME DROP FOREIGN KEY KEYNAME';
 
@@ -66,9 +63,6 @@ class sqlite_sql_generator extends sql_generator {
 
     /** @var string SQL sentence to rename one index where 'TABLENAME', 'OLDINDEXNAME' and 'NEWINDEXNAME' are dynamically replaced.*/
     public $rename_index_sql = null;
-
-    /** @var string SQL sentence to rename one key 'TABLENAME', 'OLDKEYNAME' and 'NEWKEYNAME' are dynamically replaced.*/
-    public $rename_key_sql = null;
 
     /**
      * Creates one new XMLDBmysql
@@ -94,44 +88,6 @@ class sqlite_sql_generator extends sql_generator {
         $value = (int)$this->mdb->get_field_sql('SELECT MAX(id) FROM {'.$table.'}');
         $value = $value + (int)$offset;
         return array("UPDATE sqlite_sequence SET seq=$value WHERE name='{$this->prefix}{$table}'");
-    }
-
-    /**
-     * Given one correct xmldb_key, returns its specs
-     */
-    public function getKeySQL($xmldb_table, $xmldb_key) {
-
-        $key = '';
-
-        switch ($xmldb_key->getType()) {
-            case XMLDB_KEY_PRIMARY:
-                if ($this->primary_keys && count($xmldb_key->getFields())>1) {
-                    if ($this->primary_key_name !== null) {
-                        $key = $this->getEncQuoted($this->primary_key_name);
-                    } else {
-                        $key = $this->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), 'pk');
-                    }
-                    $key .= ' PRIMARY KEY (' . implode(', ', $this->getEncQuoted($xmldb_key->getFields())) . ')';
-                }
-                break;
-            case XMLDB_KEY_UNIQUE:
-                if ($this->unique_keys) {
-                    $key = $this->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), 'uk');
-                    $key .= ' UNIQUE (' . implode(', ', $this->getEncQuoted($xmldb_key->getFields())) . ')';
-                }
-                break;
-            case XMLDB_KEY_FOREIGN:
-            case XMLDB_KEY_FOREIGN_UNIQUE:
-                if ($this->foreign_keys) {
-                    $key = $this->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), 'fk');
-                    $key .= ' FOREIGN KEY (' . implode(', ', $this->getEncQuoted($xmldb_key->getFields())) . ')';
-                    $key .= ' REFERENCES ' . $this->getEncQuoted($this->prefix . $xmldb_key->getRefTable());
-                    $key .= ' (' . implode(', ', $this->getEncQuoted($xmldb_key->getRefFields())) . ')';
-                }
-                break;
-        }
-
-        return $key;
     }
 
     /**

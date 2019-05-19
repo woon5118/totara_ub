@@ -83,9 +83,6 @@ class mssql_sql_generator extends sql_generator {
     /** @var string SQL sentence to rename one index where 'TABLENAME', 'OLDINDEXNAME' and 'NEWINDEXNAME' are dynamically replaced.*/
     public $rename_index_sql = "sp_rename 'TABLENAME.OLDINDEXNAME', 'NEWINDEXNAME', 'INDEX'";
 
-    /** @var string SQL sentence to rename one key 'TABLENAME', 'OLDKEYNAME' and 'NEWKEYNAME' are dynamically replaced.*/
-    public $rename_key_sql = null;
-
     /**
      * Reset a sequence to the id field of a table.
      *

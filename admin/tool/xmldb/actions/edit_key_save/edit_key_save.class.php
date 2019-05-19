@@ -96,15 +96,21 @@ class edit_key_save extends XMLDBAction {
         $type = required_param('type', PARAM_INT);
         $fields = required_param('fields', PARAM_CLEAN);
         $fields = str_replace(' ', '', trim(strtolower($fields)));
+        $ondelete = null;
 
         if ($type == XMLDB_KEY_FOREIGN ||
             $type == XMLDB_KEY_FOREIGN_UNIQUE) {
             $reftable = trim(strtolower(required_param('reftable', PARAM_PATH)));
             $reffields= required_param('reffields', PARAM_CLEAN);
             $reffields = str_replace(' ', '', trim(strtolower($reffields)));
+            $ondelete = optional_param('ondelete', null, PARAM_ALPHA);
+            if (!$ondelete) {
+                $ondelete = null;
+            }
         }
 
         $editeddir = $XMLDB->editeddirs[$dirpath];
+        /** @var xmldb_structure $structure */
         $structure = $editeddir->xml_file->getStructure();
         $table = $structure->getTable($tableparam);
         $key = $table->getKey($keyparam);
@@ -240,6 +246,7 @@ class edit_key_save extends XMLDBAction {
                 $type == XMLDB_KEY_FOREIGN_UNIQUE) {
                 $tempkey->setRefTable($reftable);
                 $tempkey->setRefFields($reffieldsarr);
+                $tempkey->setOnDelete($ondelete);
             }
             // Prepare the output
             $o = '<p>' .implode(', ', $errors) . '</p>
@@ -277,6 +284,7 @@ class edit_key_save extends XMLDBAction {
                 $type == XMLDB_KEY_FOREIGN_UNIQUE) {
                 $key->setRefTable($reftable);
                 $key->setRefFields($reffieldsarr);
+                $key->setOnDelete($ondelete);
             }
 
             // If the hash has changed from the old one, change the version

@@ -79,23 +79,22 @@ abstract class sql_generator {
     /** @var string To force primary key names to one string (null=no force).*/
     public $primary_key_name = null;
 
-    /** @var bool True if the generator builds primary keys.*/
-    public $primary_keys = true;
-
-    /** @var bool True if the generator builds unique keys.*/
-    public $unique_keys = false;
-
-    /** @var bool True if the generator builds foreign keys.*/
-    public $foreign_keys = false;
+    /*
+     * Totara supports real foreign keys, following properties are not used any more
+     *
+     *  public $primary_keys = true; - primary keys are always created
+     *  public $unique_keys = false; - Unique index is always used instead
+     *  public $foreign_keys = false; - creation of real foreign key now depends on ONDELETE parameter
+     */
 
     /** @var string Template to drop PKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
     public $drop_primary_key = 'ALTER TABLE TABLENAME DROP CONSTRAINT KEYNAME';
 
-    /** @var string Template to drop UKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
-    public $drop_unique_key = 'ALTER TABLE TABLENAME DROP CONSTRAINT KEYNAME';
-
     /** @var string Template to drop FKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
     public $drop_foreign_key = 'ALTER TABLE TABLENAME DROP CONSTRAINT KEYNAME';
+
+    /** @var string Template to finding if FKs exist. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
+    public $exists_foreign_key = "SELECT 'x' FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_NAME = 'KEYNAME'";
 
     /** @var bool True if the generator needs to add extra code to generate the sequence fields.*/
     public $sequence_extra_code = true;
@@ -156,9 +155,6 @@ abstract class sql_generator {
 
     /** @var string SQL sentence to rename one index where 'TABLENAME', 'OLDINDEXNAME' and 'NEWINDEXNAME' are dynamically replaced.*/
     public $rename_index_sql = 'ALTER INDEX OLDINDEXNAME RENAME TO NEWINDEXNAME';
-
-    /** @var string SQL sentence to rename one key 'TABLENAME', 'OLDKEYNAME' and 'NEWKEYNAME' are dynamically replaced.*/
-    public $rename_key_sql = 'ALTER TABLE TABLENAME CONSTRAINT OLDKEYNAME RENAME TO NEWKEYNAME';
 
     /** @var string The prefix to be used for all the DB objects.*/
     public $prefix;
@@ -314,14 +310,6 @@ abstract class sql_generator {
                 if ($keytext = $this->getKeySQL($xmldb_table, $xmldb_key)) {
                     $table .= "\nCONSTRAINT " . $keytext . ',';
                 }
-                // If the key is XMLDB_KEY_FOREIGN_UNIQUE, create it as UNIQUE too
-                if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE) {
-                    //Duplicate the key
-                    $xmldb_key->setType(XMLDB_KEY_UNIQUE);
-                    if ($keytext = $this->getKeySQL($xmldb_table, $xmldb_key)) {
-                        $table .= "\nCONSTRAINT " . $keytext . ',';
-                    }
-                }
                 // make sure sequence field is unique
                 if ($sequencefield and $xmldb_key->getType() == XMLDB_KEY_PRIMARY) {
                     $fields = $xmldb_key->getFields();
@@ -364,30 +352,19 @@ abstract class sql_generator {
         // Also, add the indexes needed from keys, based on configuration (each one, one statement)
         if ($xmldb_keys = $xmldb_table->getKeys()) {
             foreach ($xmldb_keys as $xmldb_key) {
-                // If we aren't creating the keys OR if the key is XMLDB_KEY_FOREIGN (not underlying index generated
-                // automatically by the RDBMS) create the underlying (created by us) index (if doesn't exists)
-                if (!$this->getKeySQL($xmldb_table, $xmldb_key) || $xmldb_key->getType() == XMLDB_KEY_FOREIGN) {
+                // Totara: always create an index together for these keys.
+                if ($xmldb_key->getType() == XMLDB_KEY_UNIQUE || $xmldb_key->getType() == XMLDB_KEY_FOREIGN || $xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE) {
                     // Create the interim index
-                    $index = new xmldb_index('anyname');
-                    $index->setFields($xmldb_key->getFields());
-                    //tables do not exist yet, which means indexed can not exist yet
-                    $createindex = false; //By default
-                    switch ($xmldb_key->getType()) {
-                        case XMLDB_KEY_UNIQUE:
-                        case XMLDB_KEY_FOREIGN_UNIQUE:
-                            $index->setUnique(true);
-                            $createindex = true;
-                            break;
-                        case XMLDB_KEY_FOREIGN:
-                            $index->setUnique(false);
-                            $createindex = true;
-                            break;
+                    if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN) {
+                        $indextype = XMLDB_INDEX_NOTUNIQUE;
+                    } else {
+                        $indextype = XMLDB_INDEX_UNIQUE;
                     }
-                    if ($createindex) {
-                        if ($indextext = $this->getCreateIndexSQL($xmldb_table, $index)) {
-                            // Add the INDEX to the array
-                            $results = array_merge($results, $indextext);
-                        }
+                    $index = new xmldb_index('anyname', $indextype);
+                    $index->setFields($xmldb_key->getFields());
+                    if ($indextext = $this->getCreateIndexSQL($xmldb_table, $index)) {
+                        // Add the INDEX to the array
+                        $results = array_merge($results, $indextext);
                     }
                 }
             }
@@ -539,28 +516,25 @@ abstract class sql_generator {
 
         switch ($xmldb_key->getType()) {
             case XMLDB_KEY_PRIMARY:
-                if ($this->primary_keys) {
-                    if ($this->primary_key_name !== null) {
-                        $key = $this->getEncQuoted($this->primary_key_name);
-                    } else {
-                        $key = $this->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), 'pk');
-                    }
-                    $key .= ' PRIMARY KEY (' . implode(', ', $this->getEncQuoted($xmldb_key->getFields())) . ')';
+                if ($this->primary_key_name !== null) {
+                    $key = $this->getEncQuoted($this->primary_key_name);
+                } else {
+                    $key = $this->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), 'pk');
                 }
+                $key .= ' PRIMARY KEY (' . implode(', ', $this->getEncQuoted($xmldb_key->getFields())) . ')';
                 break;
             case XMLDB_KEY_UNIQUE:
-                if ($this->unique_keys) {
-                    $key = $this->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), 'uk');
-                    $key .= ' UNIQUE (' . implode(', ', $this->getEncQuoted($xmldb_key->getFields())) . ')';
-                }
                 break;
             case XMLDB_KEY_FOREIGN:
             case XMLDB_KEY_FOREIGN_UNIQUE:
-                if ($this->foreign_keys) {
+                if ($xmldb_key->getOnDelete() === 'enforce' or $xmldb_key->getOnDelete() === 'cascade') {
                     $key = $this->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), 'fk');
                     $key .= ' FOREIGN KEY (' . implode(', ', $this->getEncQuoted($xmldb_key->getFields())) . ')';
                     $key .= ' REFERENCES ' . $this->getEncQuoted($this->prefix . $xmldb_key->getRefTable());
                     $key .= ' (' . implode(', ', $this->getEncQuoted($xmldb_key->getRefFields())) . ')';
+                    if ($xmldb_key->getOnDelete() === 'cascade') {
+                        $key .= ' ON DELETE CASCADE';
+                    }
                 }
                 break;
         }
@@ -852,9 +826,8 @@ abstract class sql_generator {
             $results[] = $key;
         }
 
-        // If we aren't creating the keys OR if the key is XMLDB_KEY_FOREIGN (not underlying index generated
-        // automatically by the RDBMS) create the underlying (created by us) index (if doesn't exists)
-        if (!$keyclause || $xmldb_key->getType() == XMLDB_KEY_FOREIGN) {
+        // Totara: always create indexes for these keys.
+        if ($xmldb_key->getType() == XMLDB_KEY_UNIQUE || $xmldb_key->getType() == XMLDB_KEY_FOREIGN || $xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE) {
             // Only if they don't exist
             if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN) {      //Calculate type of index based on type ok key
                 $indextype = XMLDB_INDEX_NOTUNIQUE;
@@ -865,13 +838,6 @@ abstract class sql_generator {
             if (!$this->mdb->get_manager()->index_exists($xmldb_table, $xmldb_index)) {
                 $results = array_merge($results, $this->getAddIndexSQL($xmldb_table, $xmldb_index));
             }
-        }
-
-        // If the key is XMLDB_KEY_FOREIGN_UNIQUE, create it as UNIQUE too
-        if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE && $this->unique_keys) {
-            //Duplicate the key
-            $xmldb_key->setType(XMLDB_KEY_UNIQUE);
-            $results = array_merge($results, $this->getAddKeySQL($xmldb_table, $xmldb_key));
         }
 
         // Return results
@@ -889,60 +855,33 @@ abstract class sql_generator {
 
         $results = array();
 
-        // Get the key name (note that this doesn't introspect DB, so could cause some problems sometimes!)
-        // TODO: We'll need to overwrite the whole getDropKeySQL() method inside each DB to do the proper queries
-        // against the dictionary or require ADOdb to support it or change the find_key_name() method to
-        // perform DB introspection directly. But, for now, as we aren't going to enable referential integrity
-        // it won't be a problem at all
-        $dbkeyname = $this->mdb->get_manager()->find_key_name($xmldb_table, $xmldb_key);
-
-        // Only if such type of key generation is enabled
-        $dropkey = false;
-        switch ($xmldb_key->getType()) {
-            case XMLDB_KEY_PRIMARY:
-                if ($this->primary_keys) {
-                    $template = $this->drop_primary_key;
-                    $dropkey = true;
-                }
-                break;
-            case XMLDB_KEY_UNIQUE:
-                if ($this->unique_keys) {
-                    $template = $this->drop_unique_key;
-                    $dropkey = true;
-                }
-                break;
-            case XMLDB_KEY_FOREIGN_UNIQUE:
-            case XMLDB_KEY_FOREIGN:
-                if ($this->foreign_keys) {
-                    $template = $this->drop_foreign_key;
-                    $dropkey = true;
-                }
-                break;
-        }
-        // If we have decided to drop the key, let's do it
-        if ($dropkey) {
-            // Replace TABLENAME, CONSTRAINTTYPE and KEYNAME as needed
-            $dropsql = str_replace('TABLENAME', $this->getTableName($xmldb_table), $template);
-            $dropsql = str_replace('KEYNAME', $dbkeyname, $dropsql);
-
-            $results[] = $dropsql;
+        if ($xmldb_key->getType() == XMLDB_KEY_PRIMARY) {
+            debugging('Primary key cannot be dropped', DEBUG_DEVELOPER);
+            return [];
         }
 
-        // If we aren't dropping the keys OR if the key is XMLDB_KEY_FOREIGN (not underlying index generated
-        // automatically by the RDBMS) drop the underlying (created by us) index (if exists)
-        if (!$dropkey || $xmldb_key->getType() == XMLDB_KEY_FOREIGN) {
-            // Only if they exist
-            $xmldb_index = new xmldb_index('anyname', XMLDB_INDEX_UNIQUE, $xmldb_key->getFields());
-            if ($this->mdb->get_manager()->index_exists($xmldb_table, $xmldb_index)) {
-                $results = array_merge($results, $this->getDropIndexSQL($xmldb_table, $xmldb_index));
+        if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN or $xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE) {
+            $dbkeyname = $this->mdb->get_manager()->find_key_name($xmldb_table, $xmldb_key);
+            if ($dbkeyname) {
+                // Replace TABLENAME, CONSTRAINTTYPE and KEYNAME as needed
+                $dropsql = str_replace('TABLENAME', $this->getTableName($xmldb_table), $this->drop_foreign_key);
+                $dropsql = str_replace('KEYNAME', $dbkeyname, $dropsql);
+
+                $results[] = $dropsql;
             }
         }
 
-        // If the key is XMLDB_KEY_FOREIGN_UNIQUE, drop the UNIQUE too
-        if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE && $this->unique_keys) {
-            //Duplicate the key
-            $xmldb_key->setType(XMLDB_KEY_UNIQUE);
-            $results = array_merge($results, $this->getDropKeySQL($xmldb_table, $xmldb_key));
+        if ($xmldb_key->getType() == XMLDB_KEY_UNIQUE || $xmldb_key->getType() == XMLDB_KEY_FOREIGN || $xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE) {
+            if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN) {
+                $indextype = XMLDB_INDEX_NOTUNIQUE;
+            } else {
+                $indextype = XMLDB_INDEX_UNIQUE;
+            }
+            // Only if they exist
+            $xmldb_index = new xmldb_index('anyname', $indextype, $xmldb_key->getFields());
+            if ($this->mdb->get_manager()->index_exists($xmldb_table, $xmldb_index)) {
+                $results = array_merge($results, $this->getDropIndexSQL($xmldb_table, $xmldb_index));
+            }
         }
 
         // Return results
@@ -960,34 +899,24 @@ abstract class sql_generator {
      */
     public function getRenameKeySQL($xmldb_table, $xmldb_key, $newname) {
 
-        $results = array();
-
-        // Get the real key name
-        $dbkeyname = $this->mdb->get_manager()->find_key_name($xmldb_table, $xmldb_key);
-
         // Check we are really generating this type of keys
-        if (($xmldb_key->getType() == XMLDB_KEY_PRIMARY && !$this->primary_keys) ||
-            ($xmldb_key->getType() == XMLDB_KEY_UNIQUE && !$this->unique_keys) ||
-            ($xmldb_key->getType() == XMLDB_KEY_FOREIGN && !$this->foreign_keys) ||
-            ($xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE && !$this->unique_keys && !$this->foreign_keys)) {
-            // We aren't generating this type of keys, delegate to child indexes
-            $xmldb_index = new xmldb_index($xmldb_key->getName());
+        if (($xmldb_key->getType() == XMLDB_KEY_UNIQUE) ||
+            ($xmldb_key->getType() == XMLDB_KEY_FOREIGN) ||
+            ($xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE)) {
+            // Totara: Delegate to child indexes that are always created.
+            if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN) {
+                $indextype = XMLDB_INDEX_NOTUNIQUE;
+            } else {
+                $indextype = XMLDB_INDEX_UNIQUE;
+            }
+            $xmldb_index = new xmldb_index($xmldb_key->getName(), $indextype);
             $xmldb_index->setFields($xmldb_key->getFields());
             return $this->getRenameIndexSQL($xmldb_table, $xmldb_index, $newname);
         }
 
-        // Arrived here so we are working with keys, lets rename them
-        // Replace TABLENAME and KEYNAME as needed
-        $renamesql = str_replace('TABLENAME', $this->getTableName($xmldb_table), $this->rename_key_sql);
-        $renamesql = str_replace('OLDKEYNAME', $dbkeyname, $renamesql);
-        $renamesql = str_replace('NEWKEYNAME', $newname, $renamesql);
+        // Totara: there is nothing to rename because real foreign keys are using fixed names based on table name and columns.
 
-        // Some DB doesn't support key renaming so this can be empty
-        if ($renamesql) {
-            $results[] = $renamesql;
-        }
-
-        return $results;
+        return [];
     }
 
     /**
@@ -1067,6 +996,20 @@ abstract class sql_generator {
      * @return string Object's name.
      */
     public function getNameForObject($tablename, $fields, $suffix='') {
+
+        // Totara: do not mess with REAL foreign key names, just return the one correct name that does not change.
+        if ($suffix === 'fk') {
+            // We are not restricted by the stupid 30 char limit in Oracle, so create proper unique key names!
+            $fields = explode(',', $fields);
+            $fields = array_map('trim', $fields);
+            $name = $tablename . '_' . implode('_', $fields);
+            $fullname = $this->prefix . $name . '_fk';
+            if (strlen($fullname) > 63) {
+                // MD5 is fine here, it is used only for shortening here, collisions are extremely unlikely.
+                $fullname = $this->prefix . md5($name) . '_fk';
+            }
+            return $fullname;
+        }
 
         $name = '';
 

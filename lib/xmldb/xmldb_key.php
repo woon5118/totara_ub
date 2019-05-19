@@ -41,20 +41,33 @@ class xmldb_key extends xmldb_object {
     protected $reffields;
 
     /**
+     * Specifies behaviour of foreign keys during deletes,
+     *  - 'enforce' blocks violation of foreign keys
+     *  - 'cascade' propagates deletes
+     *  - null - backwards compatibility, foreign keys are ignored and only indexes are created
+     *
+     * @since Totara 13
+     *
+     * @var string|null
+     */
+    protected $ondelete = null;
+
+    /**
      * Creates one new xmldb_key
      * @param string $name
      * @param string $type XMLDB_KEY_[PRIMARY|UNIQUE|FOREIGN|FOREIGN_UNIQUE]
      * @param array $fields an array of fieldnames to build the key over
      * @param string $reftable name of the table the FK points to or null
      * @param array $reffields an array of fieldnames in the FK table or null
+     * @param string|null $ondelete null, 'enforce' or 'cascade' (used for foreign keys only)
      */
-    public function __construct($name, $type=null, $fields=array(), $reftable=null, $reffields=null) {
+    public function __construct($name, $type=null, $fields=array(), $reftable=null, $reffields=null, $ondelete=null) {
         $this->type = null;
         $this->fields = array();
         $this->reftable = null;
         $this->reffields = array();
         parent::__construct($name);
-        $this->set_attributes($type, $fields, $reftable, $reffields);
+        $this->set_attributes($type, $fields, $reftable, $reffields, $ondelete);
     }
 
     /**
@@ -64,12 +77,14 @@ class xmldb_key extends xmldb_object {
      * @param array $fields an array of fieldnames to build the key over
      * @param string $reftable name of the table the FK points to or null
      * @param array $reffields an array of fieldnames in the FK table or null
+     * @param string|null $ondelete null, 'enforce' or 'cascade' (used for foreign keys only)
      */
-    public function set_attributes($type, $fields, $reftable=null, $reffields=null) {
+    public function set_attributes($type, $fields, $reftable=null, $reffields=null, $ondelete=null) {
         $this->type = $type;
         $this->fields = $fields;
         $this->reftable = $reftable;
         $this->reffields = empty($reffields) ? array() : $reffields;
+        $this->ondelete = $ondelete;
     }
 
     /**
@@ -113,6 +128,21 @@ class xmldb_key extends xmldb_object {
     }
 
     /**
+     * Defines what happens when linked entry of foreign key
+     * is deleted.
+     *
+     * @since Totara 13
+     *
+     * @param string|null $ondelete
+     */
+    public function setOnDelete(?string $ondelete) {
+        if ($ondelete !== null and $ondelete !== 'enforce' and $ondelete !== 'cascade') {
+            throw new coding_exception('Invalid ondelete option');
+        }
+        $this->ondelete = $ondelete;
+    }
+
+    /**
      * Get the key fields
      * @return array
      */
@@ -134,6 +164,17 @@ class xmldb_key extends xmldb_object {
      */
     public function getRefFields() {
         return $this->reffields;
+    }
+
+    /**
+     * What happens on delete of data referenced by a foreign key.
+     *
+     * @since Totara 13
+     *
+     * @return string|null
+     */
+    public function getOnDelete() {
+        return $this->ondelete;
     }
 
     /**
@@ -271,6 +312,32 @@ class xmldb_key extends xmldb_object {
             $this->comment = trim($xmlarr['@']['COMMENT']);
         }
 
+        // Totara: add support for foreign keys.
+        if (isset($xmlarr['@']['ONDELETE'])) {
+            $ondelete = trim($xmlarr['@']['ONDELETE']);
+            if ($ondelete === '') {
+                $this->ondelete = null;
+            } else if ($this->type == XMLDB_KEY_FOREIGN || $this->type == XMLDB_KEY_FOREIGN_UNIQUE) {
+                if ($ondelete === 'enforce' or $ondelete === 'cascade') {
+                    $this->ondelete = $ondelete;
+                } else {
+                    $this->ondelete = null;
+                    if ($result) {
+                        $this->errormsg = 'Invalid ONDELETE value';
+                        $this->debug($this->errormsg);
+                        $result = false;
+                    }
+                }
+            } else {
+                $this->ondelete = null;
+                if ($result) {
+                    $this->errormsg = 'ONDELETE can be used with foreign keys only';
+                    $this->debug($this->errormsg);
+                    $result = false;
+                }
+            }
+        }
+
         // Set some attributes
         if ($result) {
             $this->loaded = true;
@@ -353,8 +420,8 @@ class xmldb_key extends xmldb_object {
             if ($this->type == XMLDB_KEY_FOREIGN ||
                 $this->type == XMLDB_KEY_FOREIGN_UNIQUE) {
                 $key .= $this->reftable . implode(', ', $this->reffields);
+                $key .= $this->ondelete;
             }
-                    ;
             $this->hash = md5($key);
         }
     }
@@ -372,6 +439,9 @@ class xmldb_key extends xmldb_object {
             $this->type == XMLDB_KEY_FOREIGN_UNIQUE) {
             $o.= ' REFTABLE="' . $this->reftable . '"';
             $o.= ' REFFIELDS="' . implode(', ', $this->reffields) . '"';
+            if ($this->ondelete) {
+                $o.= ' ONDELETE="' . $this->ondelete . '"';
+            }
         }
         if ($this->comment) {
             $o.= ' COMMENT="' . htmlspecialchars($this->comment) . '"';
@@ -451,6 +521,9 @@ class xmldb_key extends xmldb_object {
             } else {
                 $result .= 'null';
             }
+            if ($this->ondelete) {
+                $result .= ", '{$this->ondelete}'";
+            }
         }
         // Return result
         return $result;
@@ -470,6 +543,9 @@ class xmldb_key extends xmldb_object {
         if ($this->type == XMLDB_KEY_FOREIGN ||
             $this->type == XMLDB_KEY_FOREIGN_UNIQUE) {
             $o .= ' references ' . $this->reftable . ' (' . implode(', ', $this->reffields) . ')';
+            if ($this->ondelete) {
+                $o .= ' on delete ' . $this->ondelete;
+            }
         }
 
         return $o;

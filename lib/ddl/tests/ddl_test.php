@@ -1538,9 +1538,9 @@ class core_ddl_testcase extends database_driver_testcase {
         $table = $this->create_deftable('test_table0');
         $key = $table->getKey('primary');
 
-        // With Mysql, the return value is actually "mdl_test_id_pk".
+        // Totara: this is now intended to return real foreign key names only.
         $result = $dbman->find_key_name($table, $key);
-        $this->assertTrue(!empty($result));
+        $this->assertFalse($result);
     }
 
     public function testDeleteTablesFromXmldbFile() {

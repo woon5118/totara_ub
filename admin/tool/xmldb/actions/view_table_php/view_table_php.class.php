@@ -128,7 +128,6 @@ class view_table_php extends XMLDBAction {
                          'Keys',
                          $optionspacer . 'add_key',
                          $optionspacer . 'drop_key',
-                         $optionspacer . 'rename_key',
                          'Indexes',
                          $optionspacer . 'add_index',
                          $optionspacer . 'drop_index',
@@ -238,13 +237,6 @@ class view_table_php extends XMLDBAction {
                 case 'drop_key':
                     if ($fieldkeyindexinitial == 'k') { // Only if we have got one key
                         $o.= s($this->drop_key_php($structure, $tableparam, $fieldkeyindexparam));
-                    } else {
-                        $o.= $this->str['mustselectonekey'];
-                    }
-                    break;
-                case 'rename_key':
-                    if ($fieldkeyindexinitial == 'k') { // Only if we have got one key
-                        $o.= s($this->rename_key_php($structure, $tableparam, $fieldkeyindexparam));
                     } else {
                         $o.= $this->str['mustselectonekey'];
                     }
@@ -713,55 +705,6 @@ class view_table_php extends XMLDBAction {
         $result .= XMLDB_LINEFEED;
         $result .= '        // Launch drop key ' . $key->getName() . '.' . XMLDB_LINEFEED;
         $result .= '        $dbman->drop_key($table, $key);' . XMLDB_LINEFEED;
-
-        // Add the proper upgrade_xxxx_savepoint call
-        $result .= $this->upgrade_savepoint_php ($structure);
-
-        // Add standard PHP footer
-        $result .= XMLDB_PHP_FOOTER;
-
-        return $result;
-    }
-
-    /**
-     * This function will generate all the PHP code needed to
-     * rename one key using XMLDB objects and functions
-     *
-     * @param xmldb_structure structure object containing all the info
-     * @param string table table name
-     * @param string key key name to be renamed
-     * @return string PHP code to be used to rename the key
-     */
-    function rename_key_php($structure, $table, $key) {
-
-        $result = '';
-        // Validate if we can do it
-        if (!$table = $structure->getTable($table)) {
-            return false;
-        }
-        if (!$key = $table->getKey($key)) {
-            return false;
-        }
-        if ($table->getAllErrors()) {
-            return false;
-        }
-
-        // Prepend warning. This function isn't usable!
-        $result .= 'DON\'T USE THIS FUNCTION (IT\'S ONLY EXPERIMENTAL). SOME DBs DON\'T SUPPORT IT!' . XMLDB_LINEFEED . XMLDB_LINEFEED;
-
-        // Add the standard PHP header
-        $result .= XMLDB_PHP_HEADER;
-
-        // Add contents
-        $result .= XMLDB_LINEFEED;
-        $result .= '        // Define key ' . $key->getName() . ' ('. $key->getXMLDBKeyName($key->getType()) . ') to be renamed to NEWNAMEGOESHERE.' . XMLDB_LINEFEED;
-        $result .= '        $table = new xmldb_table(' . "'" . $table->getName() . "'" . ');' . XMLDB_LINEFEED;
-        $result .= '        $key = new xmldb_key(' . "'" . $key->getName() . "', " . $key->getPHP(true) . ');' . XMLDB_LINEFEED;
-
-        // Launch the proper DDL
-        $result .= XMLDB_LINEFEED;
-        $result .= '        // Launch rename key ' . $key->getName() . '.' . XMLDB_LINEFEED;
-        $result .= '        $dbman->rename_key($table, $key, ' . "'" . 'NEWNAMEGOESHERE' . "'" . ');' . XMLDB_LINEFEED;
 
         // Add the proper upgrade_xxxx_savepoint call
         $result .= $this->upgrade_savepoint_php ($structure);

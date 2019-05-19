@@ -78,6 +78,7 @@ class edit_key extends XMLDBAction {
         }
         if (!empty($XMLDB->editeddirs)) {
             $editeddir = $XMLDB->editeddirs[$dirpath];
+            /** @var xmldb_structure $structure */
             $structure = $editeddir->xml_file->getStructure();
         }
 
@@ -138,6 +139,11 @@ class edit_key extends XMLDBAction {
         // xmldb_key Reffields
         $o.= '      <tr valign="top"><td><label for="reffields" accesskey="t">Reffields:</label></td>';
         $o.= '        <td colspan="2"><input name="reffields" type="text" size="40" maxlength="80" id="reffields" value="' . s(implode(', ', $key->getRefFields())) . '" /></td></tr>';
+        // xmldb_key ondelete field
+        $ondeleteoptions = ['' => 'Ignore', 'enforce' => 'Enforce', 'cascade' => 'Cascade'];
+        $ondeleteselect = html_writer::select($ondeleteoptions, 'ondelete', (string)$key->getOnDelete(), false);
+        $o.= '      <tr valign="top"><td><label for="menuondelete" accesskey="t">On delete:</label></td>';
+        $o.= '        <td colspan="2">' . $ondeleteselect . '</td></tr>';
         // Change button
         $o.= '      <tr valign="top"><td>&nbsp;</td><td colspan="2"><input type="submit" value="' .$this->str['change'] . '" /></td></tr>';
         $o.= '    </table>';

@@ -59,9 +59,6 @@ class mysql_sql_generator extends sql_generator {
     /** @var string Template to drop PKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
     public $drop_primary_key = 'ALTER TABLE TABLENAME DROP PRIMARY KEY';
 
-    /** @var string Template to drop UKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
-    public $drop_unique_key = 'ALTER TABLE TABLENAME DROP KEY KEYNAME';
-
     /** @var string Template to drop FKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
     public $drop_foreign_key = 'ALTER TABLE TABLENAME DROP FOREIGN KEY KEYNAME';
 
@@ -84,9 +81,6 @@ class mysql_sql_generator extends sql_generator {
 
     /** @var string SQL sentence to rename one index where 'TABLENAME', 'OLDINDEXNAME' and 'NEWINDEXNAME' are dynamically replaced.*/
     public $rename_index_sql = null;
-
-    /** @var string SQL sentence to rename one key 'TABLENAME', 'OLDKEYNAME' and 'NEWKEYNAME' are dynamically replaced.*/
-    public $rename_key_sql = null;
 
     /** Maximum size of InnoDB row in Antelope file format, this is now abused to decide if we should use Compressed or Dynamic row format */
     const ANTELOPE_MAX_ROW_SIZE = 8126;

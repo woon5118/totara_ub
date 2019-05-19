@@ -47,12 +47,14 @@ function transformForm(event) {
     var fieldsField       = document.getElementById('fields');
     var reftableField     = document.getElementById('reftable');
     var reffieldsField    = document.getElementById('reffields');
+    var ondeleteField     = document.getElementById('menuondelete');
 
     // Initially, enable everything
     typeField.disabled = false;
     fieldsField.disabled = false;
     reftableField.disabled = false;
     reffieldsField.disabled = false;
+    ondeleteField.disabled = false;
 
     // Based on type, disable some items
     switch (typeField.value) {
@@ -62,6 +64,8 @@ function transformForm(event) {
             reftableField.value = '';
             reffieldsField.disabled = true;
             reffieldsField.value = '';
+            ondeleteField.disabled = true;
+            ondeleteField.value = '';
             break;
         case '3':  // XMLDB_KEY_FOREIGN
         case '5':  // XMLDB_KEY_FOREIGN_UNIQUE

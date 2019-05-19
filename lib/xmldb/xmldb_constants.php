@@ -62,13 +62,13 @@ define ('XMLDB_TYPE_TIMESTAMP',   8);
 define ('XMLDB_KEY_INCORRECT',     0);
 /** Primary Keys */
 define ('XMLDB_KEY_PRIMARY',       1);
-/** Unique Keys */
+/** Unique Keys - alias of Unique index */
 define ('XMLDB_KEY_UNIQUE',        2);
-/** Foreign Keys */
+/** Foreign Keys - not enforce by default, use 'ondelete' parameter to enforce checks or cascade deletes */
 define ('XMLDB_KEY_FOREIGN',       3);
 /** Check Constraints - NOT USED! */
 define ('XMLDB_KEY_CHECK',         4);
-/** Foreign Key + Unique Key */
+/** Foreign Key + Unique index */
 define ('XMLDB_KEY_FOREIGN_UNIQUE',5);
 
 // ==== Some other useful Constants ====

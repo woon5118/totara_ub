@@ -63,9 +63,6 @@ class postgres_sql_generator extends sql_generator {
     /** @var string SQL sentence to rename one index where 'TABLENAME', 'OLDINDEXNAME' and 'NEWINDEXNAME' are dynamically replaced.*/
     public $rename_index_sql = 'ALTER TABLE OLDINDEXNAME RENAME TO NEWINDEXNAME';
 
-    /** @var string SQL sentence to rename one key 'TABLENAME', 'OLDKEYNAME' and 'NEWKEYNAME' are dynamically replaced.*/
-    public $rename_key_sql = null;
-
     /** @var string type of string quoting used - '' or \' quotes*/
     protected $std_strings = null;
 
