@@ -158,13 +158,12 @@ Feature: Totara form editor element tests
 
     When I press "Reset"
     Then I should see "Form: Basic editor element"
-    When I start watching to see if a new page loads
     And I set the following Totara form fields to these values:
       | Basic editor | One |
       | Required basic editor | |
-    And I press "Save changes"
-    And a new page should not have loaded since I started watching
+    When I press "Save changes"
     Then I should not see "The form has been submit"
+    And I should see "Form could not be submitted, validation failed"
     And I should see "Form: Basic editor element"
 
     When I set the following Totara form fields to these values:
