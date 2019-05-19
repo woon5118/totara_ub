@@ -57,7 +57,7 @@ class xmldb_index extends xmldb_object {
      * Creates one new xmldb_index
      *
      * @param string $name
-     * @param string $type XMLDB_INDEX_UNIQUE, XMLDB_INDEX_NOTUNIQUE
+     * @param bool $type XMLDB_INDEX_UNIQUE, XMLDB_INDEX_NOTUNIQUE
      * @param array $fields an array of fieldnames to build the index over
      * @param array $hints an array of optional hints
      */

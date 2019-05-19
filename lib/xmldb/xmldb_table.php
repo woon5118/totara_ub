@@ -103,7 +103,7 @@ class xmldb_table extends xmldb_object {
         // Add the new field
         $this->fields[] = $field;
         // Reorder the field
-        $this->orderFields($this->fields);
+        $this->orderFields();
         // Recalculate the hash
         $this->calculateHash(true);
         // We have one new field, so the table has changed
@@ -167,7 +167,7 @@ class xmldb_table extends xmldb_object {
         // Add the new key
         $this->keys[] = $key;
         // Reorder the keys
-        $this->orderKeys($this->keys);
+        $this->orderKeys();
         // Recalculate the hash
         $this->calculateHash(true);
         // We have one new field, so the table has changed
@@ -230,7 +230,7 @@ class xmldb_table extends xmldb_object {
         // Add the new index
         $this->indexes[] = $index;
         // Reorder the indexes
-        $this->orderIndexes($this->indexes);
+        $this->orderIndexes();
         // Recalculate the hash
         $this->calculateHash(true);
         // We have one new index, so the table has changed
@@ -239,7 +239,7 @@ class xmldb_table extends xmldb_object {
 
     /**
      * This function will return the array of fields in the table
-     * @return array
+     * @return xmldb_field[]
      */
     public function getFields() {
         return $this->fields;
@@ -247,7 +247,7 @@ class xmldb_table extends xmldb_object {
 
     /**
      * This function will return the array of keys in the table
-     * @return array
+     * @return xmldb_key[]
      */
     public function getKeys() {
         return $this->keys;
@@ -255,7 +255,7 @@ class xmldb_table extends xmldb_object {
 
     /**
      * This function will return the array of indexes in the table
-     * @return array
+     * @return xmldb_index[]
      */
     public function getIndexes() {
         return $this->indexes;
@@ -264,7 +264,7 @@ class xmldb_table extends xmldb_object {
     /**
      * Returns one xmldb_field
      * @param string $fieldname
-     * @return mixed
+     * @return xmldb_field|null
      */
     public function getField($fieldname) {
         $i = $this->findFieldInArray($fieldname);
@@ -305,7 +305,7 @@ class xmldb_table extends xmldb_object {
     /**
      * Returns one xmldb_key
      * @param string $keyname
-     * @return mixed
+     * @return xmldb_key|null
      */
     public function getKey($keyname) {
         $i = $this->findKeyInArray($keyname);
@@ -346,7 +346,7 @@ class xmldb_table extends xmldb_object {
     /**
      * Returns one xmldb_index
      * @param string $indexname
-     * @return mixed
+     * @return xmldb_index|null
      */
     public function getIndex($indexname) {
         $i = $this->findIndexInArray($indexname);
@@ -430,7 +430,7 @@ class xmldb_table extends xmldb_object {
             // Delete the field
             unset($this->fields[$i]);
             // Reorder the whole structure
-            $this->orderFields($this->fields);
+            $this->orderFields();
             // Recalculate the hash
             $this->calculateHash(true);
             // We have one deleted field, so the table has changed
@@ -460,7 +460,7 @@ class xmldb_table extends xmldb_object {
             // Delete the key
             unset($this->keys[$i]);
             // Reorder the Keys
-            $this->orderKeys($this->keys);
+            $this->orderKeys();
             // Recalculate the hash
             $this->calculateHash(true);
             // We have one deleted key, so the table has changed
@@ -490,7 +490,7 @@ class xmldb_table extends xmldb_object {
             // Delete the index
             unset($this->indexes[$i]);
             // Reorder the indexes
-            $this->orderIndexes($this->indexes);
+            $this->orderIndexes();
             // Recalculate the hash
             $this->calculateHash(true);
             // We have one deleted index, so the table has changed
@@ -565,7 +565,7 @@ class xmldb_table extends xmldb_object {
             // Compute prev/next.
             $this->fixPrevNext($this->fields);
             // Order fields
-            if ($result && !$this->orderFields($this->fields)) {
+            if ($result && !$this->orderFields()) {
                 $this->errormsg = 'Error ordering the fields';
                 $this->debug($this->errormsg);
                 $result = false;
@@ -605,7 +605,7 @@ class xmldb_table extends xmldb_object {
             // Compute prev/next.
             $this->fixPrevNext($this->keys);
             // Order keys
-            if ($result && !$this->orderKeys($this->keys)) {
+            if ($result && !$this->orderKeys()) {
                 $this->errormsg = 'Error ordering the keys';
                 $this->debug($this->errormsg);
                 $result = false;
@@ -644,7 +644,7 @@ class xmldb_table extends xmldb_object {
             // Compute prev/next.
             $this->fixPrevNext($this->indexes);
             // Order indexes
-            if ($result && !$this->orderIndexes($this->indexes)) {
+            if ($result && !$this->orderIndexes()) {
                 $this->errormsg = 'Error ordering the indexes';
                 $this->debug($this->errormsg);
                 $result = false;
@@ -775,7 +775,7 @@ class xmldb_table extends xmldb_object {
      * @param bool $sequence XMLDB_SEQUENCE or null (or false)
      * @param mixed $default meaningful default o null (or false)
      * @param xmldb_object $previous name of the previous field in the table or null (or false)
-     * @return xmlddb_field
+     * @return xmldb_field
      */
     public function add_field($name, $type, $precision=null, $unsigned=null, $notnull=null, $sequence=null, $default=null, $previous=null) {
         $field = new xmldb_field($name, $type, $precision, $unsigned, $notnull, $sequence, $default);

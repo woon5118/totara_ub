@@ -160,7 +160,7 @@ class xmldb_structure extends xmldb_object {
         // Add the new table
         $this->tables[] = $table;
         // Reorder the whole structure
-        $this->orderTables($this->tables);
+        $this->orderTables();
         // Recalculate the hash
         $this->calculateHash(true);
         // We have one new table, so the structure has changed
@@ -190,7 +190,7 @@ class xmldb_structure extends xmldb_object {
             // Delete the table
             unset($this->tables[$i]);
             // Reorder the tables
-            $this->orderTables($this->tables);
+            $this->orderTables();
             // Recalculate the hash
             $this->calculateHash(true);
             // We have one deleted table, so the structure has changed
@@ -281,7 +281,7 @@ class xmldb_structure extends xmldb_object {
             // Compute prev/next.
             $this->fixPrevNext($this->tables);
             // Order tables
-            if ($result && !$this->orderTables($this->tables)) {
+            if ($result && !$this->orderTables()) {
                 $this->errormsg = 'Error ordering the tables';
                 $this->debug($this->errormsg);
                 $result = false;
