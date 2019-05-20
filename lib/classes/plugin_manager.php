@@ -1474,7 +1474,7 @@ class core_plugin_manager {
                 'webapi',
             ),
             'tabexport' => array(
-                'csv', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',
+                'csv', 'csv_excel', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',
             ),
 
             'webservice' => array(

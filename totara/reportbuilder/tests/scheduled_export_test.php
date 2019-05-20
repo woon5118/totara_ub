@@ -622,6 +622,7 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
 
         $schedules = array();
         $plugins = \totara_core\tabexport_writer::get_export_classes();
+        $options = [];
 
         foreach ($plugins as $plugin => $classname) {
             if (!$classname::is_ready()) {
@@ -642,8 +643,13 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
             $schedule->lastmodified = time();
             $schedule->id = $DB->insert_record('report_builder_schedule', $schedule);
             $schedules[$schedule->id] = $DB->get_record('report_builder_schedule', array('id' => $schedule->id));
+
+            // Add it to the enabled options, so that we can test it shortly.
+            $options[] = $plugin;
         }
         $this->assertNotEmpty($schedules);
+
+        set_config('exportoptions', join(',', $options), 'reportbuilder');
 
         // Everything is ready, now create and test the files.
         foreach ($schedules as $schedule) {

@@ -182,7 +182,7 @@ abstract class tabexport_writer {
         if (is_numeric($format)) {
             return '';
         }
-        $format = clean_param($format, PARAM_ALPHANUM);
+        $format = clean_param($format, PARAM_COMPONENT);
         return strtolower($format);
     }
 
