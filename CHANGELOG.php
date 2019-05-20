@@ -3,6 +3,260 @@
 
 Totara Learn Changelog
 
+Release Evergreen (22nd May 2019):
+==================================
+
+Key:           + Evergreen only
+
+Security issues:
+
+    TL-20730       Course grouping descriptions are now consistently cleaned
+
+                   Prior to this fix grouping descriptions for the most part were consistently
+                   cleaned.
+                   There was however one use of the description field that was not cleaned in
+                   the same way as all other uses.
+                   This fix was to make that one use consistent with all other uses.
+
+    TL-20803       Improved the sanitisation of user ID number field for display in various places
+
+                   The user ID number field is treated as raw, unfiltered text, which means
+                   that HTML tags are not removed when a user's profile is saved. While it is
+                   desirable to treat it that way, for compatibility with systems that might
+                   allow HTML entities to be part of user IDs, it is extremely important to
+                   properly sanitise ID numbers whenever they are used in output.
+
+                   This patch explicitly sanitises user ID numbers in all places where they
+                   are known to be displayed.
+
+                   Even with this patch, admins are strongly encouraged to set the 'Show user
+                   identity' setting so that the display of ID number is disabled.
+
+    TL-20822       Applied fix to prevent prototype pollution vulnerability via jQuery
+
+                   Code within jQuery was recently found to be vulnerable to a JavaScript
+                   exploit known as prototype pollution if good practices are not adhered to
+                   around sanitisation of user input. Totara was not found to be vulnerable to
+                   this type of exploit via jQuery. However, a fix has been applied to the
+                   version of jQuery we currently use out of caution, and as a safeguard for
+                   future changes.
+
+New features:
+
+    TL-20583       Cherry-pick OAuth2 from Moodle
+
+                   Implementation of OAuth2 user authentication for identity providers such as
+                   Facebook, Google and Microsoft.
+
+                   Note: Please ensure that the "Allow accounts with same email" setting is
+                   disabled when OAuth2 authentication is enabled.
+
+Performance improvements:
+
+    TL-20858       Improved record of learning performance by adding an index to the 'course_completions' table
+
+Improvements:
+
+    TL-7808    +   Added seminar reset functionality to course reset
+
+                   Previously, seminars did not have any code supporting course reset
+                   functionality.
+
+                   Now if you attempt to reset a course containing a seminar activity there
+                   are options to 'Delete attendees' and 'Delete all events'. Both are ticked
+                   by the 'Select default' button, but can be unticked to keep events, or keep
+                   events and their attendees, after the course is reset.
+
+    TL-8300    +   Added the ability to order courses within a Program or Certification courseset
+    TL-20063   +   Converted seminar take attendance JavaScript from YUI module to AMD module
+    TL-20427   +   Improved the usability of downloads for seminar attendees sign-in sheets
+    TL-20508       Added a new database option to configure maximum number of IN-clause parameters in SQL queries
+
+                   Previously the maximum number of parameters was always set to 30 000. With
+                   this change, it is now possible to override this number via the
+                   'maxinparams' dboptions setting in config.php.
+
+    TL-20511       Added aria-label lookup to Behat field label selector
+
+                   Previously, when looking for form field inputs, Behat was only able to look
+                   for matching <label> elements. This meant that form fields without a
+                   <label> were difficult to select.
+
+                   Behat is now able to check the aria-label attributes of form fields to see
+                   if the text matches the requested label. So for example, a step like 'And I
+                   set the field "export" to "csv"' will find the first field with either a
+                   <label> element or an aria-label attribute that matches 'export', and set
+                   it to 'csv'.
+
+                   This means that labels that were only visible to screen readers are
+                   replaceable using <input aria-label="label name"> without any changes to
+                   behat steps. In addition, steps matching form fields with CSS or XPath
+                   could be changed to be more readable, and more robust, provided the form
+                   field is uniquely identifiable by aria-label text.
+
+                   This patch could break existing Behat tests. In cases where an input with a
+                   matching aria-label attribute appears before a second input with a matching
+                   <label> element, the first field will now be matched, whereas before it
+                   would have been ignored.
+
+    TL-20656   +   Improved server-side validation of audience rules
+    TL-20756   +   Added new custom setting in section links block for the display style of topic link
+
+                   The new custom setting in section links block will allow the course editor
+                   to change the display style of topics within this block. By default, it
+                   will display the section link as a number. However, the course editor is
+                   able to switch to either section 'title only' or 'number and title'.
+
+    TL-20857   +   Added method to clear visible notifications banners via JavaScript
+    TL-20872       Clarified explanatory text for the 'Update all activities' setting in seminar notification templates
+
+Bug fixes:
+
+    TL-18946   +   Added missing recipient types and descriptions to seminar notifications
+
+                   Prior to this patch, there were a few notifications in seminar that did not
+                   specify the recipient types nor the description of the notification.
+
+                   With this patch, the recipient types and description of notifications are
+                   now specified.
+
+    TL-20429       Requests for theme images by Google Image Proxy no longer return SVGs
+
+                   It came to our attention that the Google Image Proxy system used by the
+                   likes of Gmail does not support SVG.
+
+                   When serving theme images now, we check if the request is coming from the
+                   Google Image Proxy system and return an appropriate version of the image if
+                   it is.
+
+    TL-20489       Fixed occasional delay between enrolment via seminar sign-up and learner appearing in the grader report
+
+                   When a learner was enrolled in a course by signing up or being manually
+                   added to a seminar, the user sometimes could not immediately see the
+                   course, and was not visible in the grader report for the first 50 seconds.
+
+                   This delay has been fixed. Learners enrolled in a course via seminar will
+                   be immediately visible in the grader report, and able to see the course.
+
+    TL-20519       Made sure grade override is taken into account when calculating SCORM activity completion
+
+                   Previously, SCORM activity completion relied only on the package tracking
+                   data to calculate learner's activity progress. In cases where grades were
+                   manually overridden they were not taken into account and the activity would
+                   still appear as incomplete. This has now been fixed, and manually added
+                   grades are included into the SCORM completion progress calculations where
+                   they are required for completing the activity.
+
+    TL-20629   +   Fixed sign-up links on course page that pointed to the wrong URL when seminar direct enrolment was enabled
+    TL-20682       Ensured new random questions are created when duplicating quiz activity
+
+                   Previously when a quiz was duplicated via activity/course backup and
+                   restore process, random questions in the new quiz were still linked to the
+                   random questions in the original quiz. This has now been fixed and the new
+                   random questions are created during activity duplication.
+
+    TL-20721       Fixed the grader report not taking hidden access restrictions into account
+
+                   Previously if an activity had an access restriction using 'Member of
+                   Audience', and the restriction was set to 'hide entirely' rather than
+                   'display greyed out', the activity was not visible on the grader report
+                   even if the viewer was part of the audience.
+
+                   The activity will now be correctly displayed on the grader report as long
+                   as the restriction is met.
+
+    TL-20767       Removed duplicate settings and unused headings from course default settings
+    TL-20787       Fixed grid catalogue to display the tag name in the same case as the value entered by the user
+
+                   Prior to this patch, when tags were configured to be displayed in the grid
+                   catalogue, the tag name was displayed in all lowercase.
+
+                   With this patch, the tag name will be displayed in the same case as the
+                   value entered by the user.
+
+    TL-20788       Fixed bug causing grid catalogue to display incorrect information for the certification ID number
+    TL-20792       Fixed goal user assignment 'timemodified' and 'usermodified' fields not being updated
+
+                   When a user re-met the criteria for a company goal, the 'timemodified' and
+                   'usermodified' fields were not being updated. This has been corrected.
+
+    TL-20793   +   Fixed Atto editor to remove attribute required on initialisation
+    TL-20805       Fixed course's custom fields to have a unique name for each static element
+
+                   Prior to this patch, when a course had custom fields with the description
+                   that was not unique for a static element in the form, then the form would
+                   display a debugging message to notify developers that the name of static
+                   element was missing.
+
+                   With this patch, each static element now has a unique name associated with
+                   it.
+
+    TL-20813       Fixed a bug that displayed the Totara favicon instead of the theme's favicon on new SCORM windows
+    TL-20832       Fixed a missing require statement in the unit tests for assignment module reports
+    TL-20847   +   Fixed bug that prevented taking seminar session attendance in some cases
+
+                   In the previous release of Totara Evergreen, when the in-memory list of
+                   seminar sessions was sorted, it did not maintain an ID-to-session
+                   relationship. This caused seminar session attendance to fail with an error
+                   because the requested session could not be looked up by ID.
+
+                   With this patch, session IDs in the list are preserved during sorting,
+                   allowing the requested session to be found.
+
+    TL-20854   +   Fixed the creation and editing of multi-select cohort rules
+
+                   TL-20547 introduced a regression when editing a multi-select cohort rule
+                   where it couldn't be saved. This is now fixed.
+
+    TL-20860       Fixed bug preventing course gallery tile visibility being set by audience rule
+    TL-20912       Fixed parsing of program availability date
+
+                   Previously, programs were created with the 'Available until' value set to
+                   the beginning of the day (00:00:00), while subsequent editing of a program
+                   set the date to the end of the day (23:59:59). This has now been fixed and
+                   the dates during program creation and program editing are always set to the
+                   end of the selected date (23:59:59).
+
+    TL-20936       Fixed multi-language filtering for course/program/certification tile in the 'Featured links' block
+
+                   Prior to this patch, the multi-language filter was not being applied for
+                   the learning tile's heading.
+
+                   With this patch, the multi-language filter is applied.
+
+    TL-20956       Fixed user tours being incorrectly aligned when a using a backdrop
+    TL-20998   +   Fixed possible double entity encoding when rendering templates in javascript
+
+                   This was evident in default column names when creating new reports in
+                   report builder, but has been fixed in core template to resolve any unfound
+                   instances.
+
+    TL-21001   +   Fixed regression in the Report Builder management UI where special characters were incorrectly encoded as entities
+
+API changes:
+
+    TL-20542   +   The phar stream wrapper is now disabled by default during setup
+
+                   Phar is an advanced means of packaging and reading PHP code. It is not used
+                   by Totara, and in order to reduce the security surface area of the product
+                   we have disabled it by default.
+
+                   If you have a plugin or customisation that requires the phar stream wrapper
+                   to be available, we recommend you enable it in code immediately before it
+                   is required, and disable it again immediately afterwards.
+
+    TL-20825       Fixed a typo in seminar function name introduced during refactoring
+
+                   Function name 'seminar_event_list::form_seminar()' has been renamed
+                   'seminar_event_list::from_seminar()'.
+
+Contributions:
+
+    * Chris Wharton at Catalyst EU - TL-8300
+    * Krzysztof Kozubek at Webanywhere - TL-20860
+    * Russell England at Kineo USA - TL-20756
+
+
 Release Evergreen (29th April 2019):
 ====================================
 
