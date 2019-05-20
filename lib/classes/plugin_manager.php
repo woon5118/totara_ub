@@ -1223,7 +1223,7 @@ class core_plugin_manager {
 
             'auth' => array(
                 'cas', 'db', 'email', 'ldap', 'lti', 'manual', 'mnet',
-                'nologin', 'shibboleth', 'webservice'
+                'nologin', 'oauth2', 'shibboleth', 'webservice'
                 // Totara
                 , 'connect', 'approved'
             ),
@@ -1458,7 +1458,7 @@ class core_plugin_manager {
             'tool' => array(
                 'assignmentupgrade', 'availabilityconditions', 'behat', 'capability', 'customlang',
                 'dbtransfer', 'filetypes', 'generator', 'health', 'innodb',
-                'langimport', 'log', 'messageinbound', 'mobile', 'multilangupgrade', 'monitor',
+                'langimport', 'log', 'messageinbound', 'mobile', 'multilangupgrade', 'monitor', 'oauth2',
                 'phpunit', 'profiling', 'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',
                 'uploadcourse', 'uploaduser', 'unsuproles', 'usertours', 'xmldb'
                 // Totara:
