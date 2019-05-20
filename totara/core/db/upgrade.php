@@ -596,7 +596,7 @@ function xmldb_totara_core_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_main_savepoint(true, 2019051700);
+        upgrade_plugin_savepoint(true, 2019051700, 'totara', 'core');
     }
 
     return true;
