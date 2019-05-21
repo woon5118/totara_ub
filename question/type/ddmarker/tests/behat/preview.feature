@@ -30,7 +30,7 @@ Feature: Preview a drag-drop marker question
     And I switch to "questionpreview" window
     # Increase window size and wait 2 seconds to ensure elements are placed properly by js.
     # Keep window large else drag will scroll the window to find element.
-    And I change window size to "large"
+    And I change viewport size to "large"
     And I wait "2" seconds
     # Odd, but the <br>s go to nothing, not a space.
     And I drag "OU" to "342,230" in the drag and drop markers question
@@ -48,7 +48,7 @@ Feature: Preview a drag-drop marker question
     And I switch to "questionpreview" window
     # Increase window size and wait 2 seconds to ensure elements are placed properly by js.
     # Keep window large else drag will scroll the window to find element.
-    And I change window size to "large"
+    And I change viewport size to "large"
     And I wait "2" seconds
     And I type "up" "89" times on marker "Railway station" in the drag and drop markers question
     And I type "right" "21" times on marker "Railway station" in the drag and drop markers question
@@ -63,7 +63,7 @@ Feature: Preview a drag-drop marker question
     And I switch to "questionpreview" window
     # Decrease window size and wait 2 seconds to ensure elements are placed properly by js.
     # Using a slightly taller screen than a standard size so that it can move the OU marker
-    And I change window size to "640x800"
+    And I change viewport size to "640x800"
     And I wait "2" seconds
     # Odd, but the <br>s go to nothing, not a space.
     And I drag "OU" to "295,197" in the drag and drop markers question
@@ -80,7 +80,7 @@ Feature: Preview a drag-drop marker question
     When I click on "Preview" "link" in the "Drag markers" "table_row"
     And I switch to "questionpreview" window
     # Decrease window size and wait 2 seconds to ensure elements are placed properly by js.
-    And I change window size to "small"
+    And I change viewport size to "small"
     And I wait "2" seconds
     And I type "up" "75" times on marker "Railway station" in the drag and drop markers question
     And I type "right" "22" times on marker "Railway station" in the drag and drop markers question
