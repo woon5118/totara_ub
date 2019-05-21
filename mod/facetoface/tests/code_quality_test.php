@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use \mod_facetoface\{
     attendees_helper, seminar, seminar_event, seminar_event_list,
-    seminar_session, signup, seminar_session_list
+    seminar_session, signup, seminar_session_list, trainer_helper
 };
 use \mod_facetoface\attendance\event_attendee;
 
@@ -39,7 +39,8 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
         seminar_event_list::class,
         seminar_session::class,
         signup::class,
-        seminar_session_list::class
+        seminar_session_list::class,
+        trainer_helper::class,
     ];
 
     /**

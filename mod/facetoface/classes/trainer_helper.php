@@ -24,6 +24,9 @@
 namespace mod_facetoface;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * A class for working with trainers that are assigned to seminar events.
+ */
 final class trainer_helper {
     /**
      * @var seminar_event
@@ -39,6 +42,7 @@ final class trainer_helper {
      * trainer_helper constructor.
      *
      * @param seminar_event $seminarevent
+     * @return void
      */
     public function __construct(seminar_event $seminarevent) {
         $this->seminarevent = $seminarevent;
@@ -135,7 +139,7 @@ final class trainer_helper {
             {$usernamefields},
             r.roleid
             FROM {facetoface_session_roles} r
-            LEFT JOIN {user} u ON u.id = r.userid
+            INNER JOIN {user} u ON u.id = r.userid
             WHERE r.sessionid = ?
         ";
 
@@ -156,11 +160,11 @@ final class trainer_helper {
     }
 
     /**
-     * @param int   $roleid             Role to be added for the list of user ids.
-     * @param int[] $userids            An array of user's id to be added as a role/trainer into seminar-event.
+     * @param int   $roleid    Role to be added for the list of user ids.
+     * @param int[] $userids   An array of user ids to be added as a role/trainer into seminar-event.
      * @param bool  $sendnotification
      *
-     * @return array
+     * @return string[] Array of userid:roleid pairs
      */
     public function add_trainers(int $roleid, array $userids, bool $sendnotification = true): array {
         if (!$this->seminarevent->exists()) {
@@ -172,6 +176,9 @@ final class trainer_helper {
 
         $added = [];
         foreach ($userids as $userid) {
+            if (empty($userid)) {
+                continue;
+            }
             if (!isset($trainers[$roleid][$userid])) {
                 $role = new role();
                 $role->set_roleid($roleid);
@@ -185,7 +192,7 @@ final class trainer_helper {
                 }
             }
 
-            $added[] = $userid;
+            $added[] = $userid . ':' . $roleid;
         }
 
         return $added;
@@ -195,7 +202,7 @@ final class trainer_helper {
      * Removing the trainers/roles from the seminar_event, as if user does not exist in the list. If the list is empty, it means
      * that external usage call want to remove all the trainers from the event.
      *
-     * @param int[] $excludeusers       An array of user's id.
+     * @param string[] $excludeusers    An array of userid:roleid pairs.
      * @param bool  $sendnotification   Determine whether it should send the notification to the deleted users or not.
      *                                  By default, it is.
      *
@@ -217,7 +224,7 @@ final class trainer_helper {
             foreach ($users as $user) {
                 $userid = $user->id;
                 // If the current trainer is existing in the list of excluded user, then we should skip it.
-                if (in_array($userid, $excludeusers)) {
+                if (in_array($userid . ':' . $roleid, $excludeusers)) {
                     continue;
                 }
 

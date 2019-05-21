@@ -995,7 +995,9 @@ class event extends \moodleform {
                 if (!empty($sessiontrainers)) {
                     foreach ($sessiontrainers as $roleid => $trainers) {
                         foreach ($trainers as $trainer) {
-                            \mod_facetoface\notice_sender::event_datetime_changed($trainer->id, $seminarevent, $olddates);
+                            if (!empty($trainer->id)) {
+                                \mod_facetoface\notice_sender::event_datetime_changed($trainer->id, $seminarevent, $olddates);
+                            }
                         }
                     }
                 }
