@@ -264,7 +264,7 @@ class database_manager {
     /**
      * Returns name of a real foreign key if it exists.
      *
-     * NOTE: This does not differentiate between 'enforce' and 'cascade' options.
+     * NOTE: This does not differentiate between 'restrict' and 'cascade' options.
      *
      * @param xmldb_table $xmldb_table The table to be searched.
      * @param xmldb_key $xmldb_key The key to be searched.
@@ -300,7 +300,7 @@ class database_manager {
      * Given one xmldb_key, check if some similar key exists in DB (true/false).
      *
      * NOTE: This method does not check if relevant index is unique or not
-     *       and it does not differentiate between 'enforce' and 'cascade' options.
+     *       and it does not differentiate between 'restrict' and 'cascade' options.
      *
      * @since Totara 13
      *

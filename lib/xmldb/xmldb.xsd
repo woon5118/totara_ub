@@ -56,7 +56,7 @@
 
   <xs:simpleType name="keyOnDelete">
     <xs:restriction base="xs:NMTOKEN">
-      <xs:enumeration value="enforce" />
+      <xs:enumeration value="restrict" />
       <xs:enumeration value="cascade" />
     </xs:restriction>
   </xs:simpleType>

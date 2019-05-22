@@ -527,7 +527,7 @@ abstract class sql_generator {
                 break;
             case XMLDB_KEY_FOREIGN:
             case XMLDB_KEY_FOREIGN_UNIQUE:
-                if ($xmldb_key->getOnDelete() === 'enforce' or $xmldb_key->getOnDelete() === 'cascade') {
+                if ($xmldb_key->getOnDelete() === 'restrict' or $xmldb_key->getOnDelete() === 'cascade') {
                     $key = $this->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), 'fk');
                     $key .= ' FOREIGN KEY (' . implode(', ', $this->getEncQuoted($xmldb_key->getFields())) . ')';
                     $key .= ' REFERENCES ' . $this->getEncQuoted($this->prefix . $xmldb_key->getRefTable());

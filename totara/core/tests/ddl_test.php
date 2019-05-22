@@ -55,7 +55,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table4->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table4->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
         $table4->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table4->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'enforce');
+        $table4->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->create_table($table4);
 
         $table5 = new xmldb_table('test_other5');
@@ -71,7 +71,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table6->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table6->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
         $table6->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table6->add_key('courseid', XMLDB_KEY_FOREIGN_UNIQUE, ['courseid'], 'test_course', ['id'], 'enforce');
+        $table6->add_key('courseid', XMLDB_KEY_FOREIGN_UNIQUE, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->create_table($table6);
 
         $table7 = new xmldb_table('test_other7');
@@ -148,7 +148,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table4->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table4->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
         $table4->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table4->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'enforce');
+        $table4->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->create_table($table4);
 
         $table5 = new xmldb_table('test_other5');
@@ -164,7 +164,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table6->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table6->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
         $table6->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table6->add_key('courseid', XMLDB_KEY_FOREIGN_UNIQUE, ['courseid'], 'test_course', ['id'], 'enforce');
+        $table6->add_key('courseid', XMLDB_KEY_FOREIGN_UNIQUE, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->create_table($table6);
 
         $table7 = new xmldb_table('test_other7');
@@ -294,7 +294,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $dbman->drop_table($table);
     }
 
-    public function test_foreign_key_enforced() {
+    public function test_foreign_key_restrict() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();
 
@@ -309,7 +309,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table2->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
         $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table2->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'enforce');
+        $table2->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->create_table($table2);
 
         $course1 = (object)['name' => 'XX'];
@@ -335,6 +335,18 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertSame(2, $DB->count_records('test_course'));
 
         try {
+            $trans = $DB->start_delegated_transaction();
+            $other2 = (object)['name' => 'AA', 'courseid' => $course1->id - 10];
+            $DB->insert_record('test_other', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+            $trans->allow_commit();
+        }
+        $this->assertSame(1, $DB->count_records('test_other'));
+        $this->assertSame(2, $DB->count_records('test_course'));
+
+        try {
             $DB->delete_records('test_course', ['id' => $course1->id]);
             $this->fail('Exception expected');
         } catch (moodle_exception $ex) {
@@ -344,7 +356,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertSame(2, $DB->count_records('test_course'));
 
 
-        $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'enforce');
+        $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->drop_key($table2, $key);
 
         $other2 = (object)['name' => 'AA', 'courseid' => $course1->id - 10];
@@ -360,7 +372,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $dbman->drop_table($table1);
     }
 
-    public function test_foreign_key_enforced_null() {
+    public function test_foreign_key_restrict_null() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();
 
@@ -375,7 +387,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
         $table2->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
         $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table2->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'enforce');
+        $table2->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->create_table($table2);
 
         $course1 = (object)['name' => 'XX'];
@@ -517,7 +529,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertTrue($dbman->table_exists('test_course4'));
         $this->assertTrue($dbman->table_exists('test_other4'));
 
-        // Test "foreign" + "enforce".
+        // Test "foreign" + "restrict".
 
         $course1 = (object)['name' => 'XX'];
         $course1->id = $DB->insert_record('test_course1', $course1);
@@ -582,7 +594,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertSame(0, $DB->count_records('test_other2'));
         $this->assertSame(1, $DB->count_records('test_course2'));
 
-        // Test "foreign-unique" + "enforce".
+        // Test "foreign-unique" + "restrict".
 
         $course1 = (object)['name' => 'XX'];
         $course1->id = $DB->insert_record('test_course3', $course1);

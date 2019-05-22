@@ -42,7 +42,7 @@ class xmldb_key extends xmldb_object {
 
     /**
      * Specifies behaviour of foreign keys during deletes,
-     *  - 'enforce' blocks violation of foreign keys
+     *  - 'restrict' blocks violation of foreign keys
      *  - 'cascade' propagates deletes
      *  - null - backwards compatibility, foreign keys are ignored and only indexes are created
      *
@@ -59,7 +59,7 @@ class xmldb_key extends xmldb_object {
      * @param array $fields an array of fieldnames to build the key over
      * @param string $reftable name of the table the FK points to or null
      * @param array $reffields an array of fieldnames in the FK table or null
-     * @param string|null $ondelete null, 'enforce' or 'cascade' (used for foreign keys only)
+     * @param string|null $ondelete null, 'restrict' or 'cascade' (used for foreign keys only)
      */
     public function __construct($name, $type=null, $fields=array(), $reftable=null, $reffields=null, $ondelete=null) {
         $this->type = null;
@@ -77,7 +77,7 @@ class xmldb_key extends xmldb_object {
      * @param array $fields an array of fieldnames to build the key over
      * @param string $reftable name of the table the FK points to or null
      * @param array $reffields an array of fieldnames in the FK table or null
-     * @param string|null $ondelete null, 'enforce' or 'cascade' (used for foreign keys only)
+     * @param string|null $ondelete null, 'restrict' or 'cascade' (used for foreign keys only)
      */
     public function set_attributes($type, $fields, $reftable=null, $reffields=null, $ondelete=null) {
         $this->type = $type;
@@ -136,7 +136,7 @@ class xmldb_key extends xmldb_object {
      * @param string|null $ondelete
      */
     public function setOnDelete(?string $ondelete) {
-        if ($ondelete !== null and $ondelete !== 'enforce' and $ondelete !== 'cascade') {
+        if ($ondelete !== null and $ondelete !== 'restrict' and $ondelete !== 'cascade') {
             throw new coding_exception('Invalid ondelete option');
         }
         $this->ondelete = $ondelete;
@@ -318,7 +318,7 @@ class xmldb_key extends xmldb_object {
             if ($ondelete === '') {
                 $this->ondelete = null;
             } else if ($this->type == XMLDB_KEY_FOREIGN || $this->type == XMLDB_KEY_FOREIGN_UNIQUE) {
-                if ($ondelete === 'enforce' or $ondelete === 'cascade') {
+                if ($ondelete === 'restrict' or $ondelete === 'cascade') {
                     $this->ondelete = $ondelete;
                 } else {
                     $this->ondelete = null;
