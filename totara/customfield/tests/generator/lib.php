@@ -255,7 +255,12 @@ class totara_customfield_generator extends testing_data_generator {
             $cf = new customfield_define_datetime();
             $cf->define_save($cfsettings, $tableprefix);
             // define_save does not presently return the saved record or id.
-            $results[$name] = $DB->get_field($tableprefix.'_info_field', 'id', array('fullname' => $name), IGNORE_MULTIPLE);
+            $results[$name] = $DB->get_field(
+                $tableprefix.'_info_field',
+                'id',
+                array('shortname' => $cfsettings->shortname),
+                IGNORE_MULTIPLE
+            );
         }
 
         return $results;
