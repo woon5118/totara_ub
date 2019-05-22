@@ -1141,6 +1141,25 @@ class database_manager {
                     $errors[$tablename][] = "column '$fieldname' is not expected ($dbfield->meta_type)";
                 }
             }
+
+            // Totara: check indexes.
+            $indexes = $table->getIndexes();
+            foreach ($indexes as $index) {
+                $indexname = $index->getName();
+                if (!$this->index_exists($table, $index)) {
+                    $errors[$tablename][] = "index '$indexname' is missing";
+                }
+            }
+
+            // Totara: check keys.
+            $keys = $table->getKeys();
+            foreach ($keys as $key) {
+                $keyname = $key->getName();
+                if (!$this->key_exists($table, $key)) {
+                    $errors[$tablename][] = "key '$keyname' is missing";
+                }
+            }
+
             unset($dbtables[$tablename]);
         }
 
