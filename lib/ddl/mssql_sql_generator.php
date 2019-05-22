@@ -683,6 +683,24 @@ class mssql_sql_generator extends sql_generator {
     }
 
     /**
+     * Given one correct xmldb_key, returns its specs.
+     *
+     * @param xmldb_table $xmldb_table The table related to $xmldb_key.
+     * @param xmldb_key $xmldb_key The xmldb_key's specifications requested.
+     * @return string SQL statement about the xmldb_key.
+     */
+    public function getKeySQL($xmldb_table, $xmldb_key) {
+
+        $key = parent::getKeySQL($xmldb_table, $xmldb_key);
+        if (!$key) {
+            return $key;
+        }
+
+        $key = str_replace('ON DELETE RESTRICT', 'ON DELETE NO ACTION', $key);
+        return $key;
+    }
+
+    /**
      * Given three strings (table name, list of fields (comma separated) and suffix),
      * create the proper object name quoting it if necessary.
      *

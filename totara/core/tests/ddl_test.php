@@ -358,6 +358,17 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
         $this->assertSame(1, $DB->count_records('test_other'));
         $this->assertSame(2, $DB->count_records('test_course'));
 
+        try {
+            $trans = $DB->start_delegated_transaction();
+            $DB->delete_records('test_course', ['id' => $course1->id]);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+            $trans->allow_commit();
+        }
+        $this->assertSame(1, $DB->count_records('test_other'));
+        $this->assertSame(2, $DB->count_records('test_course'));
+
 
         $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->drop_key($table2, $key);

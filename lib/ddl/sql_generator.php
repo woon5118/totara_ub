@@ -534,6 +534,8 @@ abstract class sql_generator {
                     $key .= ' (' . implode(', ', $this->getEncQuoted($xmldb_key->getRefFields())) . ')';
                     if ($xmldb_key->getOnDelete() === 'cascade') {
                         $key .= ' ON DELETE CASCADE';
+                    } else if ($xmldb_key->getOnDelete() === 'restrict') {
+                        $key .= ' ON DELETE RESTRICT';
                     }
                 }
                 break;
