@@ -97,6 +97,7 @@ class edit_key_save extends XMLDBAction {
         $fields = required_param('fields', PARAM_CLEAN);
         $fields = str_replace(' ', '', trim(strtolower($fields)));
         $ondelete = null;
+        $onupdate = null;
 
         if ($type == XMLDB_KEY_FOREIGN ||
             $type == XMLDB_KEY_FOREIGN_UNIQUE) {
@@ -106,6 +107,10 @@ class edit_key_save extends XMLDBAction {
             $ondelete = optional_param('ondelete', null, PARAM_ALPHA);
             if (!$ondelete) {
                 $ondelete = null;
+            }
+            $onupdate = optional_param('onupdate', null, PARAM_ALPHA);
+            if (!$onupdate) {
+                $onupdate = null;
             }
         }
 
@@ -247,6 +252,7 @@ class edit_key_save extends XMLDBAction {
                 $tempkey->setRefTable($reftable);
                 $tempkey->setRefFields($reffieldsarr);
                 $tempkey->setOnDelete($ondelete);
+                $tempkey->setOnUpdate($onupdate);
             }
             // Prepare the output
             $o = '<p>' .implode(', ', $errors) . '</p>
@@ -285,6 +291,7 @@ class edit_key_save extends XMLDBAction {
                 $key->setRefTable($reftable);
                 $key->setRefFields($reffieldsarr);
                 $key->setOnDelete($ondelete);
+                $key->setOnUpdate($onupdate);
             }
 
             // If the hash has changed from the old one, change the version

@@ -44,6 +44,7 @@ class xmldb_key extends xmldb_object {
      * Specifies behaviour of foreign keys during deletes,
      *  - 'restrict' blocks violation of foreign keys
      *  - 'cascade' propagates deletes
+     *  - 'setnull' changes value to NULL
      *  - null - backwards compatibility, foreign keys are ignored and only indexes are created
      *
      * @since Totara 13
@@ -53,21 +54,35 @@ class xmldb_key extends xmldb_object {
     protected $ondelete = null;
 
     /**
+     * Specifies behaviour of foreign keys during updates,
+     *  - 'restrict' blocks violation of foreign keys
+     *  - 'cascade' propagates updates
+     *  - 'setnull' changes value to NULL
+     *  - null - backwards compatibility, foreign keys are ignored and only indexes are created
+     *
+     * @since Totara 13
+     *
+     * @var string|null
+     */
+    protected $onupdate = null;
+
+    /**
      * Creates one new xmldb_key
      * @param string $name
      * @param string $type XMLDB_KEY_[PRIMARY|UNIQUE|FOREIGN|FOREIGN_UNIQUE]
      * @param array $fields an array of fieldnames to build the key over
      * @param string $reftable name of the table the FK points to or null
      * @param array $reffields an array of fieldnames in the FK table or null
-     * @param string|null $ondelete null, 'restrict' or 'cascade' (used for foreign keys only)
+     * @param string|null $ondelete null, 'restrict', 'setnull' or 'cascade' (used for foreign keys only)
+     * @param string|null $onupdate null, 'restrict', 'setnull' or 'cascade' (used for foreign keys only)
      */
-    public function __construct($name, $type=null, $fields=array(), $reftable=null, $reffields=null, $ondelete=null) {
+    public function __construct($name, $type=null, $fields=array(), $reftable=null, $reffields=null, $ondelete=null, $onupdate=null) {
         $this->type = null;
         $this->fields = array();
         $this->reftable = null;
         $this->reffields = array();
         parent::__construct($name);
-        $this->set_attributes($type, $fields, $reftable, $reffields, $ondelete);
+        $this->set_attributes($type, $fields, $reftable, $reffields, $ondelete, $onupdate);
     }
 
     /**
@@ -77,14 +92,16 @@ class xmldb_key extends xmldb_object {
      * @param array $fields an array of fieldnames to build the key over
      * @param string $reftable name of the table the FK points to or null
      * @param array $reffields an array of fieldnames in the FK table or null
-     * @param string|null $ondelete null, 'restrict' or 'cascade' (used for foreign keys only)
+     * @param string|null $ondelete null, 'restrict', 'setnull' or 'cascade' (used for foreign keys only)
+     * @param string|null $onupdate null, 'restrict', 'setnull' or 'cascade' (used for foreign keys only)
      */
-    public function set_attributes($type, $fields, $reftable=null, $reffields=null, $ondelete=null) {
+    public function set_attributes($type, $fields, $reftable=null, $reffields=null, $ondelete=null, $onupdate=null) {
         $this->type = $type;
         $this->fields = $fields;
         $this->reftable = $reftable;
         $this->reffields = empty($reffields) ? array() : $reffields;
-        $this->ondelete = $ondelete;
+        $this->setOnDelete($ondelete);
+        $this->setOnUpdate($onupdate);
     }
 
     /**
@@ -136,10 +153,31 @@ class xmldb_key extends xmldb_object {
      * @param string|null $ondelete
      */
     public function setOnDelete(?string $ondelete) {
-        if ($ondelete !== null and $ondelete !== 'restrict' and $ondelete !== 'cascade') {
-            throw new coding_exception('Invalid ondelete option');
+        if ($ondelete !== null) {
+            $options = self::getOnDeleteOptions();
+            if (!isset($options[$ondelete])) {
+                throw new coding_exception('Invalid ondelete option');
+            }
         }
         $this->ondelete = $ondelete;
+    }
+
+    /**
+     * Defines what happens when linked entry of foreign key
+     * is updated.
+     *
+     * @since Totara 13
+     *
+     * @param string|null $onupdate
+     */
+    public function setOnUpdate(?string $onupdate) {
+        if ($onupdate !== null) {
+            $options = self::getOnUpdateOptions();
+            if (!isset($options[$onupdate])) {
+                throw new coding_exception('Invalid onupdate option');
+            }
+        }
+        $this->onupdate = $onupdate;
     }
 
     /**
@@ -175,6 +213,57 @@ class xmldb_key extends xmldb_object {
      */
     public function getOnDelete() {
         return $this->ondelete;
+    }
+
+    /**
+     * What happens on update of data referenced by a foreign key.
+     *
+     * @since Totara 13
+     *
+     * @return string|null
+     */
+    public function getOnUpdate() {
+        return $this->onupdate;
+    }
+
+    /**
+     * Returns true if either ondelete or onupdate is set.
+     *
+     * False means this is not a real foreign key which is is
+     * needed for backwards compatibility.
+     *
+     * @since Totara 13
+     *
+     * @return bool
+     */
+    public function isRealForeignKey() {
+        return ($this->ondelete or $this->onupdate);
+    }
+
+    /**
+     * Returns list of valid ondelete options.
+     * @return string[]
+     */
+    public static function getOnDeleteOptions() {
+        // NOTE: SET DEFAULT is not supported because Totara does not use defaults that would be suitable for foreign keys.
+        return [
+            'restrict' => 'RESTRICT',
+            'cascade' => 'CASCADE',
+            'setnull' => 'SET NULL',
+        ];
+    }
+
+    /**
+     * Returns list of valid onupdate options.
+     * @return string[]
+     */
+    public static function getOnUpdateOptions() {
+        // NOTE: SET DEFAULT is not supported because Totara does not use defaults that would be suitable for foreign keys.
+        return [
+            'restrict' => 'RESTRICT',
+            'cascade' => 'CASCADE',
+            'setnull' => 'SET NULL',
+        ];
     }
 
     /**
@@ -314,11 +403,12 @@ class xmldb_key extends xmldb_object {
 
         // Totara: add support for foreign keys.
         if (isset($xmlarr['@']['ONDELETE'])) {
+            $ondeleteoptions = self::getOnDeleteOptions();
             $ondelete = trim($xmlarr['@']['ONDELETE']);
             if ($ondelete === '') {
                 $this->ondelete = null;
             } else if ($this->type == XMLDB_KEY_FOREIGN || $this->type == XMLDB_KEY_FOREIGN_UNIQUE) {
-                if ($ondelete === 'restrict' or $ondelete === 'cascade') {
+                if (isset($ondeleteoptions[$ondelete])) {
                     $this->ondelete = $ondelete;
                 } else {
                     $this->ondelete = null;
@@ -332,6 +422,31 @@ class xmldb_key extends xmldb_object {
                 $this->ondelete = null;
                 if ($result) {
                     $this->errormsg = 'ONDELETE can be used with foreign keys only';
+                    $this->debug($this->errormsg);
+                    $result = false;
+                }
+            }
+        }
+        if (isset($xmlarr['@']['ONUPDATE'])) {
+            $onupdateoptions = self::getOnUpdateOptions();
+            $onupdate = trim($xmlarr['@']['ONUPDATE']);
+            if ($onupdate === '') {
+                $this->onupdate = null;
+            } else if ($this->type == XMLDB_KEY_FOREIGN || $this->type == XMLDB_KEY_FOREIGN_UNIQUE) {
+                if (isset($onupdateoptions[$onupdate])) {
+                    $this->onupdate = $onupdate;
+                } else {
+                    $this->onupdate = null;
+                    if ($result) {
+                        $this->errormsg = 'Invalid ONUPDATE value';
+                        $this->debug($this->errormsg);
+                        $result = false;
+                    }
+                }
+            } else {
+                $this->onupdate = null;
+                if ($result) {
+                    $this->errormsg = 'ONUPDATE can be used with foreign keys only';
                     $this->debug($this->errormsg);
                     $result = false;
                 }
@@ -420,7 +535,7 @@ class xmldb_key extends xmldb_object {
             if ($this->type == XMLDB_KEY_FOREIGN ||
                 $this->type == XMLDB_KEY_FOREIGN_UNIQUE) {
                 $key .= $this->reftable . implode(', ', $this->reffields);
-                $key .= $this->ondelete;
+                $key .= $this->ondelete . '_' . $this->onupdate;
             }
             $this->hash = md5($key);
         }
@@ -441,6 +556,9 @@ class xmldb_key extends xmldb_object {
             $o.= ' REFFIELDS="' . implode(', ', $this->reffields) . '"';
             if ($this->ondelete) {
                 $o.= ' ONDELETE="' . $this->ondelete . '"';
+            }
+            if ($this->onupdate) {
+                $o.= ' ONUPDATE="' . $this->onupdate . '"';
             }
         }
         if ($this->comment) {
@@ -523,6 +641,11 @@ class xmldb_key extends xmldb_object {
             }
             if ($this->ondelete) {
                 $result .= ", '{$this->ondelete}'";
+                if ($this->onupdate) {
+                    $result .= ", '{$this->onupdate}'";
+                }
+            } else if ($this->onupdate) {
+                $result .= ", null, '{$this->onupdate}'";
             }
         }
         // Return result
@@ -545,6 +668,9 @@ class xmldb_key extends xmldb_object {
             $o .= ' references ' . $this->reftable . ' (' . implode(', ', $this->reffields) . ')';
             if ($this->ondelete) {
                 $o .= ' on delete ' . $this->ondelete;
+            }
+            if ($this->onupdate) {
+                $o .= ' on update ' . $this->onupdate;
             }
         }
 

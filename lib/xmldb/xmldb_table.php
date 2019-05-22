@@ -793,10 +793,11 @@ class xmldb_table extends xmldb_object {
      * @param array $fields an array of fieldnames to build the key over
      * @param string $reftable name of the table the FK points to or null
      * @param array $reffields an array of fieldnames in the FK table or null
-     * @param string|null $ondelete null, 'restrict' or 'cascade' (used for foreign keys only)
+     * @param string|null $ondelete null, 'restrict', 'setnull' or 'cascade' (used for foreign keys only)
+     * @param string|null $onupdate null, 'restrict', 'setnull' or 'cascade' (used for foreign keys only)
      */
-    public function add_key($name, $type, $fields, $reftable=null, $reffields=null, $ondelete=null) {
-        $key = new xmldb_key($name, $type, $fields, $reftable, $reffields, $ondelete);
+    public function add_key($name, $type, $fields, $reftable=null, $reffields=null, $ondelete=null, $onupdate=null) {
+        $key = new xmldb_key($name, $type, $fields, $reftable, $reffields, $ondelete, $onupdate);
         $this->addKey($key);
     }
 

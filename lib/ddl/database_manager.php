@@ -264,7 +264,7 @@ class database_manager {
     /**
      * Returns name of a real foreign key if it exists.
      *
-     * NOTE: This does not differentiate between 'restrict' and 'cascade' options.
+     * NOTE: This does not differentiate between ONDELETE and ONUPDATE options.
      *
      * @param xmldb_table $xmldb_table The table to be searched.
      * @param xmldb_key $xmldb_key The key to be searched.
@@ -275,7 +275,7 @@ class database_manager {
             return false;
         }
 
-        if (!$xmldb_key->getOnDelete()) {
+        if (!$xmldb_key->isRealForeignKey()) {
             return false;
         }
 
@@ -300,7 +300,7 @@ class database_manager {
      * Given one xmldb_key, check if some similar key exists in DB (true/false).
      *
      * NOTE: This method does not check if relevant index is unique or not
-     *       and it does not differentiate between 'restrict' and 'cascade' options.
+     *       and it does not differentiate between ONDELETE and ONUPDATE options.
      *
      * @since Totara 13
      *
@@ -334,7 +334,7 @@ class database_manager {
         }
 
         if ($xmldb_key->getType() == XMLDB_KEY_FOREIGN or $xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE) {
-            if ($xmldb_key->getOnDelete()) {
+            if ($xmldb_key->isRealForeignKey()) {
                 if (!$this->find_key_name($xmldb_table, $xmldb_key)) {
                     return false;
                 }

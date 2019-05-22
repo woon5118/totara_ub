@@ -690,13 +690,13 @@ class mssql_sql_generator extends sql_generator {
      * @return string SQL statement about the xmldb_key.
      */
     public function getKeySQL($xmldb_table, $xmldb_key) {
-
         $key = parent::getKeySQL($xmldb_table, $xmldb_key);
         if (!$key) {
             return $key;
         }
 
         $key = str_replace('ON DELETE RESTRICT', 'ON DELETE NO ACTION', $key);
+        $key = str_replace('ON UPDATE RESTRICT', 'ON UPDATE NO ACTION', $key);
         return $key;
     }
 

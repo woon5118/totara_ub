@@ -82,6 +82,46 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table7->add_key('courseid', XMLDB_KEY_FOREIGN_UNIQUE, ['courseid'], 'test_course', ['id'], 'cascade');
         $dbman->create_table($table7);
 
+        $table8 = new xmldb_table('test_other8');
+        $table8->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table8->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table8->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table8->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table8->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'setnull');
+        $dbman->create_table($table8);
+
+        $table9 = new xmldb_table('test_other9');
+        $table9->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table9->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table9->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table9->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table9->add_key('courseid', XMLDB_KEY_FOREIGN_UNIQUE, ['courseid'], 'test_course', ['id'], 'setnull');
+        $dbman->create_table($table9);
+
+        $table10 = new xmldb_table('test_other10');
+        $table10->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table10->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table10->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table10->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table10->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], null, 'cascade');
+        $dbman->create_table($table10);
+
+        $table11 = new xmldb_table('test_other11');
+        $table11->add_field('id', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table11->add_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '0');
+        $table11->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table11->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table11->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], null, 'restrict');
+        $dbman->create_table($table11);
+
+        $table12 = new xmldb_table('test_other12');
+        $table12->add_field('id', XMLDB_TYPE_INTEGER, '12', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table12->add_field('courseid', XMLDB_TYPE_INTEGER, '12', null, null, null, '0');
+        $table12->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table12->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table12->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], null, 'setnull');
+        $dbman->create_table($table12);
+
         $this->assertFalse($dbman->find_key_name($table1, $table1->getKey('primary')));
         $this->assertFalse($dbman->find_key_name($table2, $table2->getKey('courseid')));
         $this->assertFalse($dbman->find_key_name($table3, $table3->getKey('courseid')));
@@ -89,25 +129,55 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table5, $table5->getKey('courseid')));
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table6, $table6->getKey('courseid')));
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table7, $table7->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table8, $table8->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table9, $table9->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table10, $table9->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table11, $table9->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table10, $table9->getKey('courseid')));
 
         // Now the unexpected matches.
 
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table4, $table5->getKey('courseid')));
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table4, $table6->getKey('courseid')));
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table4, $table7->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table4, $table8->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table4, $table9->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table4, $table10->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table4, $table11->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table4, $table12->getKey('courseid')));
 
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table5, $table4->getKey('courseid')));
-        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table6, $table6->getKey('courseid')));
-        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table7, $table7->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table5, $table6->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table5, $table7->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table5, $table8->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table5, $table9->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table5, $table10->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table5, $table11->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table5, $table12->getKey('courseid')));
 
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table6, $table5->getKey('courseid')));
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table6, $table4->getKey('courseid')));
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table6, $table7->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table6, $table8->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table6, $table9->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table6, $table10->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table6, $table11->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table6, $table12->getKey('courseid')));
 
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table7, $table5->getKey('courseid')));
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table7, $table6->getKey('courseid')));
         $this->assertRegExp('/_fk$/', $dbman->find_key_name($table7, $table4->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table7, $table8->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table7, $table9->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table7, $table10->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table7, $table11->getKey('courseid')));
+        $this->assertRegExp('/_fk$/', $dbman->find_key_name($table7, $table12->getKey('courseid')));
 
+        $dbman->drop_table($table12);
+        $dbman->drop_table($table11);
+        $dbman->drop_table($table10);
+        $dbman->drop_table($table9);
+        $dbman->drop_table($table8);
         $dbman->drop_table($table7);
         $dbman->drop_table($table6);
         $dbman->drop_table($table5);
@@ -175,6 +245,22 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table7->add_key('courseid', XMLDB_KEY_FOREIGN_UNIQUE, ['courseid'], 'test_course', ['id'], 'cascade');
         $dbman->create_table($table7);
 
+        $table8 = new xmldb_table('test_other8');
+        $table8->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table8->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table8->add_field('name', XMLDB_TYPE_CHAR, '288', null, XMLDB_NOTNULL, null);
+        $table8->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table8->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict', 'restrict');
+        $dbman->create_table($table8);
+
+        $table9 = new xmldb_table('test_other9');
+        $table9->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table9->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table9->add_field('name', XMLDB_TYPE_CHAR, '299', null, XMLDB_NOTNULL, null);
+        $table9->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table9->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], null, 'restrict');
+        $dbman->create_table($table9);
+
         $this->assertTrue($dbman->key_exists($table1, $table1->getKey('primary')));
         $this->assertTrue($dbman->key_exists($table2, $table2->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table3, $table3->getKey('courseid')));
@@ -182,6 +268,8 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertTrue($dbman->key_exists($table5, $table5->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table6, $table6->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table7, $table7->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table8, $table8->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table9, $table9->getKey('courseid')));
 
         $this->assertFalse($dbman->key_exists($table2, $table4->getKey('courseid')));
         $this->assertFalse($dbman->key_exists($table3, $table4->getKey('courseid')));
@@ -191,6 +279,10 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertFalse($dbman->key_exists($table3, $table6->getKey('courseid')));
         $this->assertFalse($dbman->key_exists($table2, $table7->getKey('courseid')));
         $this->assertFalse($dbman->key_exists($table3, $table7->getKey('courseid')));
+        $this->assertFalse($dbman->key_exists($table2, $table8->getKey('courseid')));
+        $this->assertFalse($dbman->key_exists($table3, $table8->getKey('courseid')));
+        $this->assertFalse($dbman->key_exists($table2, $table9->getKey('courseid')));
+        $this->assertFalse($dbman->key_exists($table3, $table9->getKey('courseid')));
 
         // Now the unexpected results.
 
@@ -199,29 +291,55 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertTrue($dbman->key_exists($table5, $table2->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table6, $table2->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table7, $table2->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table8, $table2->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table9, $table2->getKey('courseid')));
 
         $this->assertTrue($dbman->key_exists($table2, $table3->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table4, $table3->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table5, $table3->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table6, $table3->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table7, $table3->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table8, $table3->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table9, $table3->getKey('courseid')));
 
         $this->assertTrue($dbman->key_exists($table4, $table5->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table4, $table6->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table4, $table7->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table4, $table8->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table4, $table9->getKey('courseid')));
 
         $this->assertTrue($dbman->key_exists($table5, $table4->getKey('courseid')));
-        $this->assertTrue($dbman->key_exists($table6, $table6->getKey('courseid')));
-        $this->assertTrue($dbman->key_exists($table7, $table7->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table5, $table6->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table5, $table7->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table5, $table8->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table5, $table9->getKey('courseid')));
 
         $this->assertTrue($dbman->key_exists($table6, $table5->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table6, $table4->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table6, $table7->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table6, $table8->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table6, $table9->getKey('courseid')));
 
         $this->assertTrue($dbman->key_exists($table7, $table5->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table7, $table6->getKey('courseid')));
         $this->assertTrue($dbman->key_exists($table7, $table4->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table7, $table8->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table7, $table9->getKey('courseid')));
 
+        $this->assertTrue($dbman->key_exists($table8, $table5->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table8, $table6->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table8, $table4->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table8, $table7->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table8, $table9->getKey('courseid')));
+
+        $this->assertTrue($dbman->key_exists($table9, $table5->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table9, $table6->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table9, $table4->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table9, $table7->getKey('courseid')));
+        $this->assertTrue($dbman->key_exists($table9, $table8->getKey('courseid')));
+
+        $dbman->drop_table($table9);
+        $dbman->drop_table($table8);
         $dbman->drop_table($table7);
         $dbman->drop_table($table6);
         $dbman->drop_table($table5);
@@ -266,38 +384,23 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $DB->insert_record('test_other', $record);
         $this->assertSame(3, $DB->count_records('test_other'));
 
+        $record = ['courseid' => null, 'name' => 'ZZ'];
+        $DB->insert_record('test_other', $record);
+        $this->assertSame(4, $DB->count_records('test_other'));
+
         $key = new xmldb_key('courseid', XMLDB_KEY_UNIQUE, ['courseid']);
         $dbman->drop_key($table, $key);
         $record = ['courseid' => 10, 'name' => 'YY'];
         $DB->insert_record('test_other', $record);
-        $this->assertSame(4, $DB->count_records('test_other'));
-/*
-
-WARNING: Apparently MS SQL server does not like NULLs in unique indexes with multiple columns.
-
-        $key = new xmldb_key('courseid', XMLDB_KEY_UNIQUE, ['courseid', 'name']);
-        $dbman->add_key($table, $key);
-        $record = ['courseid' => 10, 'name' => 'ZZ'];
-        $DB->insert_record('test_other', $record);
         $this->assertSame(5, $DB->count_records('test_other'));
 
-        $record = ['courseid' => null, 'name' => 'XX'];
-        $DB->insert_record('test_other', $record);
-        $this->assertSame(6, $DB->count_records('test_other'));
+        // WARNING: MS SQL server does not like NULLs in unique indexes with multiple columns,
+        //          we have a nasty hack for Unique indexes on single nullable columns in DDL.
 
-        try {
-            $record = ['courseid' => 10, 'name' => 'YY'];
-            $DB->insert_record('test_other', $record);
-            $this->fail('Exception expected');
-        } catch (moodle_exception $ex) {
-            $this->assertInstanceOf(dml_write_exception::class, $ex);
-        }
-        $this->assertSame(6, $DB->count_records('test_other'));
-*/
         $dbman->drop_table($table);
     }
 
-    public function test_foreign_key_restrict() {
+    public function test_foreign_key_ondelete_restrict() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();
 
@@ -386,7 +489,7 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
         $dbman->drop_table($table1);
     }
 
-    public function test_foreign_key_restrict_null() {
+    public function test_foreign_key_ondelete_restrict_null() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();
 
@@ -435,7 +538,56 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
         $dbman->drop_table($table1);
     }
 
-    public function test_foreign_key_cascade() {
+    public function test_foreign_key_ondelete_setnull() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table1 = new xmldb_table('test_course');
+        $table1->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table1->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table1->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $dbman->create_table($table1);
+
+        $table2 = new xmldb_table('test_other');
+        $table2->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table2->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table2->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table2->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'setnull');
+        $dbman->create_table($table2);
+
+        $course1 = (object)['name' => 'XX'];
+        $course1->id = $DB->insert_record('test_course', $course1);
+        $this->assertSame(1, $DB->count_records('test_course'));
+
+        $course2 = (object)['name' => 'YY'];
+        $course2->id = $DB->insert_record('test_course', $course2);
+        $this->assertSame(2, $DB->count_records('test_course'));
+
+        $other1 = (object)['name' => 'AA', 'courseid' => $course1->id];
+        $other1->id = $DB->insert_record('test_other', $other1);
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        try {
+            $other2 = (object)['name' => 'AA', 'courseid' => $course1->id - 10];
+            $DB->insert_record('test_other', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other'));
+        $this->assertSame(2, $DB->count_records('test_course'));
+
+        $DB->delete_records('test_course', ['id' => $course1->id]);
+        $this->assertSame(1, $DB->count_records('test_other'));
+        $this->assertSame(1, $DB->count_records('test_course'));
+        $this->assertNull($DB->get_field('test_other', 'courseid', ['id' => $other1->id]));
+
+        $dbman->drop_table($table2);
+        $dbman->drop_table($table1);
+    }
+
+    public function test_foreign_key_ondelete_cascade() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();
 
@@ -483,7 +635,7 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
         $dbman->drop_table($table1);
     }
 
-    public function test_foreign_key_cascade_multi() {
+    public function test_foreign_key_ondelete_cascade_multi() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();
 
@@ -535,11 +687,11 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
         $dbman->drop_table($table1);
     }
 
-    public function test_foreign_key_file() {
+    public function test_foreign_keys_ondelete_file() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();
 
-        $dbman->install_from_xmldb_file(__DIR__ . '/fixtures/xmldb_foreign_keys.xml');
+        $dbman->install_from_xmldb_file(__DIR__ . '/fixtures/xmldb_foreign_keys_ondelete.xml');
         $this->assertTrue($dbman->table_exists('test_course4'));
         $this->assertTrue($dbman->table_exists('test_other4'));
 
@@ -594,8 +746,12 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
         $other1->id = $DB->insert_record('test_other2', $other1);
         $this->assertSame(1, $DB->count_records('test_other2'));
 
+        $other1b = (object)['name' => 'PP', 'courseid' => $course1->id];
+        $other1b->id = $DB->insert_record('test_other2b', $other1b);
+        $this->assertSame(1, $DB->count_records('test_other2b'));
+
         try {
-            $other2 = (object)['name' => 'AA', 'courseid' => $course1->id - 10];
+            $other2 = (object)['name' => 'YY', 'courseid' => $course1->id - 10];
             $DB->insert_record('test_other2', $other2);
             $this->fail('Exception expected');
         } catch (moodle_exception $ex) {
@@ -604,9 +760,21 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
         $this->assertSame(1, $DB->count_records('test_other2'));
         $this->assertSame(2, $DB->count_records('test_course2'));
 
+        try {
+            $other2b = (object)['name' => 'YY', 'courseid' => $course1->id - 10];
+            $DB->insert_record('test_other2b', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other2b'));
+        $this->assertSame(2, $DB->count_records('test_course2'));
+
         $DB->delete_records('test_course2', ['id' => $course1->id]);
         $this->assertSame(0, $DB->count_records('test_other2'));
+        $this->assertSame(1, $DB->count_records('test_other2b'));
         $this->assertSame(1, $DB->count_records('test_course2'));
+        $this->assertNull($DB->get_field('test_other2b', 'courseid', ['id' => $other1b->id]));
 
         // Test "foreign-unique" + "restrict".
 
@@ -665,6 +833,10 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
         $other1->id = $DB->insert_record('test_other4', $other1);
         $this->assertSame(1, $DB->count_records('test_other4'));
 
+        $other1b = (object)['name' => 'PP', 'courseid' => $course1->id];
+        $other1b->id = $DB->insert_record('test_other4b', $other1b);
+        $this->assertSame(1, $DB->count_records('test_other4b'));
+
         try {
             $other2 = (object)['name' => 'AA', 'courseid' => $course1->id - 10];
             $DB->insert_record('test_other4', $other2);
@@ -673,6 +845,16 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
             $this->assertInstanceOf(dml_write_exception::class, $ex);
         }
         $this->assertSame(1, $DB->count_records('test_other4'));
+        $this->assertSame(2, $DB->count_records('test_course4'));
+
+        try {
+            $other2b = (object)['name' => 'AA', 'courseid' => $course1->id - 10];
+            $DB->insert_record('test_other4b', $other2b);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other4b'));
         $this->assertSame(2, $DB->count_records('test_course4'));
 
         try {
@@ -685,18 +867,32 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
         $this->assertSame(1, $DB->count_records('test_other4'));
         $this->assertSame(2, $DB->count_records('test_course4'));
 
+        try {
+            $other3b = (object)['name' => 'PP', 'courseid' => $course1->id];
+            $DB->insert_record('test_other4b', $other3b);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other4b'));
+        $this->assertSame(2, $DB->count_records('test_course4'));
+
         $DB->delete_records('test_course4', ['id' => $course1->id]);
         $this->assertSame(0, $DB->count_records('test_other4'));
+        $this->assertSame(1, $DB->count_records('test_other4b'));
         $this->assertSame(1, $DB->count_records('test_course4'));
+        $this->assertNull($DB->get_field('test_other4b', 'courseid', ['id' => $other1b->id]));
 
 
         $dbman->drop_table(new xmldb_table('test_other1'));
         $dbman->drop_table(new xmldb_table('test_course1'));
         $dbman->drop_table(new xmldb_table('test_other2'));
+        $dbman->drop_table(new xmldb_table('test_other2b'));
         $dbman->drop_table(new xmldb_table('test_course2'));
         $dbman->drop_table(new xmldb_table('test_other3'));
         $dbman->drop_table(new xmldb_table('test_course3'));
         $dbman->drop_table(new xmldb_table('test_other4'));
+        $dbman->drop_table(new xmldb_table('test_other4b'));
         $dbman->drop_table(new xmldb_table('test_course4'));
     }
 
@@ -743,6 +939,235 @@ WARNING: Apparently MS SQL server does not like NULLs in unique indexes with mul
         $DB->delete_records('test_sessions', ['sid' => $session1->sid]);
         $this->assertSame(1, $DB->count_records('test_sessions'));
         $this->assertSame(0, $DB->count_records('test_other'));
+
+        $dbman->drop_table($table2);
+        $dbman->drop_table($table1);
+    }
+
+    public function test_foreign_key_onupdate_restrict() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table1 = new xmldb_table('test_sessions');
+        $table1->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table1->add_field('sid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table1->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table1->add_index('sid', XMLDB_INDEX_UNIQUE, ['sid']);
+        $dbman->create_table($table1);
+
+        $table2 = new xmldb_table('test_other');
+        $table2->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table2->add_field('sid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table2->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table2->add_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], null, 'restrict');
+        $dbman->create_table($table2);
+
+        $session1 = (object)['sid' => 'abc123'];
+        $session1->id = $DB->insert_record('test_sessions', $session1);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+
+        $session2 = (object)['sid' => 'def456'];
+        $session2->id = $DB->insert_record('test_sessions', $session2);
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+
+        $other1 = (object)['name' => 'AA', 'sid' => $session1->sid];
+        $other1->id = $DB->insert_record('test_other', $other1);
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        try {
+            $other2 = (object)['name' => 'AA', 'sid' => 'xyz'];
+            $DB->insert_record('test_other', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        try {
+            $session1->sid = 'grrr';
+            $DB->update_record('test_sessions', $session1);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame('abc123', $DB->get_field('test_sessions', 'sid', ['id' => $session1->id]));
+
+        try {
+            $DB->delete_records('test_sessions', ['id' => $session1->id]);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        $dbman->drop_table($table2);
+        $dbman->drop_table($table1);
+    }
+
+    public function test_foreign_key_onupdate_cascade() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table1 = new xmldb_table('test_sessions');
+        $table1->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table1->add_field('sid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table1->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table1->add_index('sid', XMLDB_INDEX_UNIQUE, ['sid']);
+        $dbman->create_table($table1);
+
+        $table2 = new xmldb_table('test_other');
+        $table2->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table2->add_field('sid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table2->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table2->add_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], null, 'cascade');
+        $dbman->create_table($table2);
+
+        $session1 = (object)['sid' => 'abc123'];
+        $session1->id = $DB->insert_record('test_sessions', $session1);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+
+        $session2 = (object)['sid' => 'def456'];
+        $session2->id = $DB->insert_record('test_sessions', $session2);
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+
+        $other1 = (object)['name' => 'AA', 'sid' => $session1->sid];
+        $other1->id = $DB->insert_record('test_other', $other1);
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        try {
+            $other2 = (object)['name' => 'AA', 'sid' => 'xyz'];
+            $DB->insert_record('test_other', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        $session1->sid = 'grrr';
+        $DB->update_record('test_sessions', $session1);
+        $this->assertSame($session1->sid, $DB->get_field('test_sessions', 'sid', ['id' => $session1->id]));
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        try {
+            $DB->delete_records('test_sessions', ['id' => $session1->id]);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        $dbman->drop_table($table2);
+        $dbman->drop_table($table1);
+    }
+
+    public function test_foreign_key_onupdate_cascade_ondelete_cascade() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table1 = new xmldb_table('test_sessions');
+        $table1->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table1->add_field('sid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table1->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table1->add_index('sid', XMLDB_INDEX_UNIQUE, ['sid']);
+        $dbman->create_table($table1);
+
+        $table2 = new xmldb_table('test_other');
+        $table2->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table2->add_field('sid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table2->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table2->add_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], 'cascade', 'cascade');
+        $dbman->create_table($table2);
+
+        $session1 = (object)['sid' => 'abc123'];
+        $session1->id = $DB->insert_record('test_sessions', $session1);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+
+        $session2 = (object)['sid' => 'def456'];
+        $session2->id = $DB->insert_record('test_sessions', $session2);
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+
+        $other1 = (object)['name' => 'AA', 'sid' => $session1->sid];
+        $other1->id = $DB->insert_record('test_other', $other1);
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        try {
+            $other2 = (object)['name' => 'AA', 'sid' => 'xyz'];
+            $DB->insert_record('test_other', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        $session1->sid = 'grrr';
+        $DB->update_record('test_sessions', $session1);
+        $this->assertSame($session1->sid, $DB->get_field('test_sessions', 'sid', ['id' => $session1->id]));
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        $DB->delete_records('test_sessions', ['id' => $session1->id]);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+        $this->assertSame(0, $DB->count_records('test_other'));
+
+        $dbman->drop_table($table2);
+        $dbman->drop_table($table1);
+    }
+
+    public function test_foreign_key_onupdate_setnull() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table1 = new xmldb_table('test_sessions');
+        $table1->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table1->add_field('sid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table1->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table1->add_index('sid', XMLDB_INDEX_UNIQUE, ['sid']);
+        $dbman->create_table($table1);
+
+        $table2 = new xmldb_table('test_other');
+        $table2->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table2->add_field('sid', XMLDB_TYPE_CHAR, '255', null, null, null);
+        $table2->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table2->add_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], null, 'setnull');
+        $dbman->create_table($table2);
+
+        $session1 = (object)['sid' => 'abc123'];
+        $session1->id = $DB->insert_record('test_sessions', $session1);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+
+        $session2 = (object)['sid' => 'def456'];
+        $session2->id = $DB->insert_record('test_sessions', $session2);
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+
+        $other1 = (object)['name' => 'AA', 'sid' => $session1->sid];
+        $other1->id = $DB->insert_record('test_other', $other1);
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        try {
+            $other2 = (object)['name' => 'AA', 'sid' => 'xyz'];
+            $DB->insert_record('test_other', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        $session1->sid = 'grrr';
+        $DB->update_record('test_sessions', $session1);
+        $this->assertNull(null, $DB->get_field('test_sessions', 'sid', ['id' => $session1->id]));
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other'));
+
+        $DB->delete_records('test_sessions', ['id' => $session1->id]);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other'));
 
         $dbman->drop_table($table2);
         $dbman->drop_table($table1);

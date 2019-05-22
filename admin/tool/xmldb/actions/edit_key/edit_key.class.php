@@ -139,11 +139,16 @@ class edit_key extends XMLDBAction {
         // xmldb_key Reffields
         $o.= '      <tr valign="top"><td><label for="reffields" accesskey="t">Reffields:</label></td>';
         $o.= '        <td colspan="2"><input name="reffields" type="text" size="40" maxlength="80" id="reffields" value="' . s(implode(', ', $key->getRefFields())) . '" /></td></tr>';
-        // xmldb_key ondelete field
-        $ondeleteoptions = ['' => 'Ignore', 'restrict' => 'RESTRICT', 'cascade' => 'CASCADE'];
+        // Totara: xmldb_key ondelete field
+        $ondeleteoptions = ['' => 'Ignore'] + xmldb_key::getOnDeleteOptions();
         $ondeleteselect = html_writer::select($ondeleteoptions, 'ondelete', (string)$key->getOnDelete(), false);
-        $o.= '      <tr valign="top"><td><label for="menuondelete" accesskey="t">On delete:</label></td>';
+        $o.= '      <tr valign="top"><td><label for="menuondelete" accesskey="d">On delete:</label></td>';
         $o.= '        <td colspan="2">' . $ondeleteselect . '</td></tr>';
+        // Totara: xmldb_key onupdate field
+        $onupdateoptions = ['' => 'Ignore'] + xmldb_key::getOnUpdateOptions();
+        $onupdateselect = html_writer::select($onupdateoptions, 'onupdate', (string)$key->getOnUpdate(), false);
+        $o.= '      <tr valign="top"><td><label for="menuonupdate" accesskey="u">On update:</label></td>';
+        $o.= '        <td colspan="2">' . $onupdateselect . '</td></tr>';
         // Change button
         $o.= '      <tr valign="top"><td>&nbsp;</td><td colspan="2"><input type="submit" value="' .$this->str['change'] . '" /></td></tr>';
         $o.= '    </table>';

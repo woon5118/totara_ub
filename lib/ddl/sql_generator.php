@@ -84,7 +84,7 @@ abstract class sql_generator {
      *
      *  public $primary_keys = true; - primary keys are always created
      *  public $unique_keys = false; - Unique index is always used instead
-     *  public $foreign_keys = false; - creation of real foreign key now depends on ONDELETE parameter
+     *  public $foreign_keys = false; - creation of real foreign key now depends on ONDELETE and ONUPDATE parameter
      */
 
     /** @var string Template to drop PKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
@@ -527,15 +527,24 @@ abstract class sql_generator {
                 break;
             case XMLDB_KEY_FOREIGN:
             case XMLDB_KEY_FOREIGN_UNIQUE:
-                if ($xmldb_key->getOnDelete() === 'restrict' or $xmldb_key->getOnDelete() === 'cascade') {
+                if ($xmldb_key->isRealForeignKey()) {
                     $key = $this->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_key->getFields()), 'fk');
                     $key .= ' FOREIGN KEY (' . implode(', ', $this->getEncQuoted($xmldb_key->getFields())) . ')';
                     $key .= ' REFERENCES ' . $this->getEncQuoted($this->prefix . $xmldb_key->getRefTable());
                     $key .= ' (' . implode(', ', $this->getEncQuoted($xmldb_key->getRefFields())) . ')';
                     if ($xmldb_key->getOnDelete() === 'cascade') {
                         $key .= ' ON DELETE CASCADE';
-                    } else if ($xmldb_key->getOnDelete() === 'restrict') {
+                    } else if ($xmldb_key->getOnDelete() === 'setnull') {
+                        $key .= ' ON DELETE SET NULL';
+                    } else {
                         $key .= ' ON DELETE RESTRICT';
+                    }
+                    if ($xmldb_key->getOnUpdate() === 'cascade') {
+                        $key .= ' ON UPDATE CASCADE';
+                    } else if ($xmldb_key->getOnUpdate() === 'setnull') {
+                        $key .= ' ON UPDATE SET NULL';
+                    } else {
+                        $key .= ' ON UPDATE RESTRICT';
                     }
                 }
                 break;

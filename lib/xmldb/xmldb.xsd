@@ -58,6 +58,15 @@
     <xs:restriction base="xs:NMTOKEN">
       <xs:enumeration value="restrict" />
       <xs:enumeration value="cascade" />
+      <xs:enumeration value="setnull" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="keyOnUpdate">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="restrict" />
+      <xs:enumeration value="cascade" />
+      <xs:enumeration value="setnull" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -117,6 +126,7 @@
       <xs:attribute name="REFFIELDS" type="fieldsList" use="optional" />
       <xs:attribute name="COMMENT"   type="xs:string"  use="optional" />
       <xs:attribute name="ONDELETE"  type="keyOnDelete" use="optional" />
+      <xs:attribute name="ONUPDATE"  type="keyOnUpdate" use="optional" />
       <!-- TODO: Moodle 2.6 - Drop ignored PREVIOUS/NEXT attributes -->
       <xs:attribute name="PREVIOUS"  type="xs:NMTOKEN" use="optional" />
       <xs:attribute name="NEXT"      type="xs:NMTOKEN" use="optional" />

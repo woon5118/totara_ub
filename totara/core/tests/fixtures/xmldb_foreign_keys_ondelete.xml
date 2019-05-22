@@ -44,6 +44,17 @@
                 <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="test_course2" REFFIELDS="id" ONDELETE="cascade"/>
             </KEYS>
         </TABLE>
+        <TABLE NAME="test_other2b" COMMENT="Table linking fake course">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
+                <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+                <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="test_course2" REFFIELDS="id" ONDELETE="setnull"/>
+            </KEYS>
+        </TABLE>
         <TABLE NAME="test_course3" COMMENT="Just a fake course table">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
@@ -82,6 +93,17 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" />
                 <KEY NAME="courseid" TYPE="foreign-unique" FIELDS="courseid" REFTABLE="test_course4" REFFIELDS="id" ONDELETE="cascade"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="test_other4b" COMMENT="Table linking fake course">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
+                <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+                <KEY NAME="courseid" TYPE="foreign-unique" FIELDS="courseid" REFTABLE="test_course4" REFFIELDS="id" ONDELETE="setnull"/>
             </KEYS>
         </TABLE>
     </TABLES>
