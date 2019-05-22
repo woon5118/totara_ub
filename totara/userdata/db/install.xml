@@ -57,13 +57,10 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign-unique" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="suspendedpurgetypeid" TYPE="foreign" FIELDS="suspendedpurgetypeid" REFTABLE="totara_userdata_purge_type" REFFIELDS="id"/>
         <KEY NAME="deletedpurgetypeid" TYPE="foreign" FIELDS="deletedpurgetypeid" REFTABLE="totara_userdata_purge_type" REFFIELDS="id"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="userid" UNIQUE="true" FIELDS="userid"/>
-      </INDEXES>
     </TABLE>
     <TABLE NAME="totara_userdata_purge" COMMENT="List of all user data purges and their result">
       <FIELDS>

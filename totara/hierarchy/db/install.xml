@@ -645,9 +645,6 @@
         <KEY NAME="goal_par_fk" TYPE="foreign" FIELDS="parentid" REFTABLE="goal" REFFIELDS="id"/>
         <KEY NAME="goal_typ_fk" TYPE="foreign" FIELDS="typeid" REFTABLE="goal_type" REFFIELDS="id"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="parentid" UNIQUE="false" FIELDS="parentid"/>
-      </INDEXES>
     </TABLE>
     <TABLE NAME="goal_framework" COMMENT="A collection of goals">
       <FIELDS>

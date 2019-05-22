@@ -129,10 +129,6 @@
         <KEY NAME="repobuilsave_rep_fk" TYPE="foreign" FIELDS="reportid" REFTABLE="report_builder" REFFIELDS="id"/>
         <KEY NAME="repobuilsave_use_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="reportid" UNIQUE="false" FIELDS="reportid" COMMENT="Index on reportid field"/>
-        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" COMMENT="Index on the userid field"/>
-      </INDEXES>
     </TABLE>
     <TABLE NAME="report_builder_saved_user_default" COMMENT="Stores the default search to be used for a user">
       <FIELDS>

@@ -38,10 +38,9 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="serverid" TYPE="foreign" FIELDS="serverid" REFTABLE="auth_connect_servers" REFFIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign-unique" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid" UNIQUE="true" FIELDS="userid"/>
         <INDEX NAME="serverid-serveruserid" UNIQUE="true" FIELDS="serverid, serveruserid"/>
       </INDEXES>
     </TABLE>

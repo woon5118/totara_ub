@@ -107,7 +107,7 @@ class xmldb_structure extends xmldb_object {
 
     /**
      * Returns the tables of the structure
-     * @return array
+     * @return xmldb_table[]
      */
     public function getTables() {
         return $this->tables;
