@@ -51,4 +51,53 @@ class totara_core_install_xmls_testcase extends advanced_testcase {
             }
         }
     }
+
+    public function test_foreign_key_ref_index() {
+        global $DB;
+        $dbmanager = $DB->get_manager();
+
+        $schema = $dbmanager->get_install_xml_schema();
+
+        /** @var xmldb_table[] $tables */
+        $tables = [];
+        foreach ($schema->getTables() as $table) {
+            $tables[$table->getName()] = $table;
+        }
+
+        foreach ($tables as $table) {
+            $tablename = $table->getName();
+            $keys = $table->getKeys();
+            foreach ($keys as $key) {
+                if ($key->getType() != XMLDB_KEY_FOREIGN and $key->getType() != XMLDB_KEY_FOREIGN_UNIQUE) {
+                    continue;
+                }
+                $keyname = $key->getName();
+                $reftable = $key->getRefTable();
+                $reffields = $key->getRefFields();
+                if ($reffields === ['id']) {
+                    continue;
+                }
+                $found = false;
+                $indexes = $tables[$reftable]->getIndexes();
+                foreach ($indexes as $index) {
+                    if ($reffields === array_slice($index->getFields(), 0, count($reffields))) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $xkeys = $tables[$reftable]->getKeys();
+                    foreach ($xkeys as $xkey) {
+                        if ($reffields === array_slice($xkey->getFields(), 0, count($reffields))) {
+                            $found = true;
+                            break;
+                        }
+                    }
+                }
+                if (!$found) {
+                    $this->fail("'$tablename' table key '$keyname' references fields that are not indexed");
+                }
+            }
+        }
+    }
 }
