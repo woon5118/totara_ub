@@ -118,7 +118,9 @@ define(['core/templates'], function(templates) {
             // hide button if no more pages
             } else {
                 target.innerHTML = '';
-                that.resetPageNumber();
+                if (data.page > 0) {
+                    that.resetPageNumber();
+                }
                 resolve();
             }
         });

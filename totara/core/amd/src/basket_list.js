@@ -130,6 +130,7 @@ function(ajax, Filters, BasketManager, Crumb, List, Selectors, Loader, SimpleBas
             that.reset();
             that.list.enabledActions = true;
             that.list.enabledHierarchy = true;
+            that.list.paging.resetPageNumber();
             that.list.update();
         };
 
@@ -155,6 +156,8 @@ function(ajax, Filters, BasketManager, Crumb, List, Selectors, Loader, SimpleBas
             that.selectors.clearFiltersRegionPanel();
             that.list.enabledActions = false;
             that.list.enabledHierarchy = false;
+
+            that.list.paging.setPageNumber(0);
             // Add basket to filters and show results
             if (basketManager.getBasket() instanceof SessionBasket) {
                 that.filters.setFilter('basket', basketManager.getBasketKey());
