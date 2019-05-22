@@ -634,7 +634,6 @@ class totara_core_dml_testcase extends database_driver_testcase {
      * @param bool $userecordset If true: get_counted_recordset_sql, false: get_counted_records_sql
      */
     public function test_get_counted_records_sql($userecordset) {
-        global $DB;
         $DB = $this->tdb;
         $dbman = $DB->get_manager();
 
@@ -755,8 +754,7 @@ class totara_core_dml_testcase extends database_driver_testcase {
         }
 
         // The following tests is basically one complex query written in different way that should return the same result.
-        $complexassert = function($sql) use ($userecordset, $makerecords) {
-            global $DB;
+        $complexassert = function($sql) use ($userecordset, $makerecords, $DB) {
             $count = 0;
             if ($userecordset) {
                 $recordset = $DB->get_counted_recordset_sql($sql, array('orderby' => 4), 1, 2, $count);
@@ -1914,7 +1912,8 @@ ORDER BY tt1.groupid";
      * For results on performance testing of paginated results see moodle_database class.
      */
     public function test_recommends_counted_recordset() {
-        global $DB;
+        $DB = $this->tdb;
+
         $expected = false;
         $dbfamily = $DB->get_dbvendor(); // Cannot use get_dbfamily() here because MariaDB returns 'mysql'.
         if ($dbfamily === 'mariadb') {
