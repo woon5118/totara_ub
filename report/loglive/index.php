@@ -69,7 +69,7 @@ if ($page == 0 && !empty($logreader)) {
     $jsparams = array('since' => time() , 'courseid' => $id, 'page' => $page, 'logreader' => $logreader,
             'interval' => $refresh, 'perpage' => $renderable->perpage);
     $PAGE->requires->strings_for_js(array('pause', 'resume'), 'report_loglive');
-    $PAGE->requires->yui_module('moodle-report_loglive-fetchlogs', 'Y.M.report_loglive.FetchLogs.init', array($jsparams));
+    $PAGE->requires->js_call_amd('report_loglive/fetchlogs', 'init', $jsparams);
 }
 
 $strlivelogs = get_string('livelogs', 'report_loglive');
