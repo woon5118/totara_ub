@@ -3,6 +3,7 @@ This file describes API changes for 'theme_roots'.
 === 13.0 ===
 
 * "secure" page layout now uses layout/secure.php
+* Styling changes applied to login page theme/roots/less/totara/login.less
 
 === 12.0 ===
 

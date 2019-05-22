@@ -240,7 +240,7 @@ final class behat_email extends behat_base {
         $this->execute("behat_general::i_am_on_homepage");
         $this->execute("behat_navigation::get_expand_navbar_step");
         $this->execute("behat_general::i_click_on_in_the", ["Log in", "link", ".logininfo", "css_element"]);
-        $this->execute("behat_general::click_link", ["Forgotten your username or password?"]);
+        $this->execute("behat_general::click_link", ["Lost username or password"]);
         $this->execute("behat_forms::i_set_the_field_to", ["Username", $this->escape($user)]);
         $this->execute("behat_forms::press_button", ["Search"]);
         $this->execute("behat_forms::press_button", ["Continue"]);

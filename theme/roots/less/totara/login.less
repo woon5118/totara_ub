@@ -48,8 +48,9 @@
     .loginform {
         .form-label {
             text-align: left;
-            width: 100%;
             margin-bottom: 5px;
+            float: left;
+            display: inline-block;
         }
         .form-input {
             width: 100%;
@@ -69,13 +70,40 @@
         margin: 10px 0 0;
     }
     .desc {
-        line-height: 30px;
+        line-height: @totara_style-font_line_height_large;
         color: @text-color;
+        clear: both;
     }
 
     .subcontent {
         padding: 0;
         margin: 0;
+    }
+
+    .userforget {
+        width: 100%;
+    }
+
+    .forgetpass {
+        .totara_style-body_x_small;
+        float: right;
+        display: inline-block;
+    }
+
+    #loginbtn {
+        width: 100%;
+        color: #ffffff;
+        font-weight: bold;
+        background-color: @totara_style-color_theme_1;
+    }
+
+    .potentialidplist {
+        float: left;
+    }
+
+    .potentialidp {
+        padding: 5px;
+        display: inline-block;
     }
 }
 
