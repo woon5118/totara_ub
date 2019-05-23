@@ -525,7 +525,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $contentoptions = array();
 
         // Add the manager/position/organisation content options.
-        $this->add_basic_user_content_options($contentoptions);
+        $this->add_basic_user_content_options($contentoptions, 'modifiedby');
 
         $contentoptions[] = new rb_content_option(
             'date',
