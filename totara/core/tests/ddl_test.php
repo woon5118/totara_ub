@@ -1172,6 +1172,177 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $dbman->drop_table($table2);
         $dbman->drop_table($table1);
     }
+    public function test_foreign_keys_onupdate_file() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $dbman->install_from_xmldb_file(__DIR__ . '/fixtures/xmldb_foreign_keys_onupdate.xml');
+        $this->assertTrue($dbman->table_exists('test_sessions'));
+        $this->assertTrue($dbman->table_exists('test_other1'));
+        $this->assertTrue($dbman->table_exists('test_other2'));
+        $this->assertTrue($dbman->table_exists('test_other3'));
+        $this->assertTrue($dbman->table_exists('test_other4'));
+
+        // Test "foreign" + "restrict".
+
+        $session1 = (object)['sid' => 'abc123'];
+        $session1->id = $DB->insert_record('test_sessions', $session1);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+
+        $session2 = (object)['sid' => 'def456'];
+        $session2->id = $DB->insert_record('test_sessions', $session2);
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+
+        $other1 = (object)['name' => 'AA', 'sid' => $session1->sid];
+        $other1->id = $DB->insert_record('test_other1', $other1);
+        $this->assertSame(1, $DB->count_records('test_other1'));
+
+        try {
+            $other2 = (object)['name' => 'AA', 'sid' => 'xyz'];
+            $DB->insert_record('test_other1', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other1'));
+
+        try {
+            $session1->sid = 'grrr';
+            $DB->update_record('test_sessions', $session1);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame('abc123', $DB->get_field('test_sessions', 'sid', ['id' => $session1->id]));
+
+        try {
+            $DB->delete_records('test_sessions', ['id' => $session1->id]);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other1'));
+
+        $DB->delete_records('test_other1');
+        $DB->delete_records('test_sessions');
+
+        // "foreign" + "cascade"
+
+        $session1 = (object)['sid' => 'abc123'];
+        $session1->id = $DB->insert_record('test_sessions', $session1);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+
+        $session2 = (object)['sid' => 'def456'];
+        $session2->id = $DB->insert_record('test_sessions', $session2);
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+
+        $other1 = (object)['name' => 'AA', 'sid' => $session1->sid];
+        $other1->id = $DB->insert_record('test_other2', $other1);
+        $this->assertSame(1, $DB->count_records('test_other2'));
+
+        try {
+            $other2 = (object)['name' => 'AA', 'sid' => 'xyz'];
+            $DB->insert_record('test_other2', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other2'));
+
+        $session1->sid = 'grrr';
+        $DB->update_record('test_sessions', $session1);
+        $this->assertSame($session1->sid, $DB->get_field('test_sessions', 'sid', ['id' => $session1->id]));
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other2'));
+
+        try {
+            $DB->delete_records('test_sessions', ['id' => $session1->id]);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other2'));
+
+        $DB->delete_records('test_other2');
+        $DB->delete_records('test_sessions');
+
+        // "foreign" + "setnull"
+
+        $session1 = (object)['sid' => 'abc123'];
+        $session1->id = $DB->insert_record('test_sessions', $session1);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+
+        $session2 = (object)['sid' => 'def456'];
+        $session2->id = $DB->insert_record('test_sessions', $session2);
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+
+        $other1 = (object)['name' => 'AA', 'sid' => $session1->sid];
+        $other1->id = $DB->insert_record('test_other3', $other1);
+        $this->assertSame(1, $DB->count_records('test_other3'));
+
+        try {
+            $other2 = (object)['name' => 'AA', 'sid' => 'xyz'];
+            $DB->insert_record('test_other3', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other3'));
+
+        $session1->sid = 'grrr';
+        $DB->update_record('test_sessions', $session1);
+        $this->assertNull(null, $DB->get_field('test_sessions', 'sid', ['id' => $session1->id]));
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other3'));
+
+        $DB->delete_records('test_sessions', ['id' => $session1->id]);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other3'));
+
+        $DB->delete_records('test_other3');
+        $DB->delete_records('test_sessions');
+
+        // "foreign" + "cascade" + "cascade"
+
+        $session1 = (object)['sid' => 'abc123'];
+        $session1->id = $DB->insert_record('test_sessions', $session1);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+
+        $session2 = (object)['sid' => 'def456'];
+        $session2->id = $DB->insert_record('test_sessions', $session2);
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+
+        $other1 = (object)['name' => 'AA', 'sid' => $session1->sid];
+        $other1->id = $DB->insert_record('test_other4', $other1);
+        $this->assertSame(1, $DB->count_records('test_other4'));
+
+        try {
+            $other2 = (object)['name' => 'AA', 'sid' => 'xyz'];
+            $DB->insert_record('test_other4', $other2);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+        $this->assertSame(1, $DB->count_records('test_other4'));
+
+        $session1->sid = 'grrr';
+        $DB->update_record('test_sessions', $session1);
+        $this->assertSame($session1->sid, $DB->get_field('test_sessions', 'sid', ['id' => $session1->id]));
+        $this->assertSame(2, $DB->count_records('test_sessions'));
+        $this->assertSame(1, $DB->count_records('test_other4'));
+
+        $DB->delete_records('test_sessions', ['id' => $session1->id]);
+        $this->assertSame(1, $DB->count_records('test_sessions'));
+        $this->assertSame(0, $DB->count_records('test_other4'));
+
+        $dbman->drop_table(new xmldb_table('test_other4'));
+        $dbman->drop_table(new xmldb_table('test_other3'));
+        $dbman->drop_table(new xmldb_table('test_other2'));
+        $dbman->drop_table(new xmldb_table('test_other1'));
+        $dbman->drop_table(new xmldb_table('test_sessions'));
+    }
 
     public function test_change_field_type() {
         $DB = $this->tdb;
