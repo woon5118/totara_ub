@@ -46,15 +46,21 @@ Feature: Event manual grading
     And I set the field "Manual event grading" to "0"
     And I click on "Save and display" "button"
     And I follow "Attendee"
-    And I follow "Take attendance"
-    And I set the field "One Uno's attendance" to "Fully attended"
-    And I set the field "Two Duex's attendance" to "Partially attended"
-    And I set the field "Three Toru's attendance" to "Unable to attend"
-    And I set the field "Four Wha's attendance" to "No show"
-    And I set the field "Five Cinq's attendance" to "Not set"
+    When I follow "Take attendance"
+    Then "One Uno's event grade" "select" should not exist
+    And "Two Duex's event grade" "select" should not exist
+    And "Three Toru's event grade" "select" should not exist
+    And "Four Wha's event grade" "select" should not exist
+    And "Five Cinq's event grade" "select" should not exist
+    When I set the following fields to these values:
+      | One Uno's attendance    | Fully attended     |
+      | Two Duex's attendance   | Partially attended |
+      | Three Toru's attendance | Unable to attend   |
+      | Four Wha's attendance   | No show            |
+      | Five Cinq's attendance  | Not set            |
     And I click on "Save attendance" "button"
 
-    And I should see "Successfully updated attendance" in the ".alert-success" "css_element"
+    Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"
     And I click on "Close" "button" in the ".alert-success" "css_element"
 
     And I navigate to "Grades" node in "Course administration"
@@ -72,31 +78,32 @@ Feature: Event manual grading
     And I follow "seminar 1"
     And I follow "Attendee"
     When I follow "Take attendance"
+    Then the following fields match these values:
+      | One Uno's event grade    | |
+      | Two Duex's event grade   | |
+      | Three Toru's event grade | |
+      | Four Wha's event grade   | |
+      | Five Cinq's event grade  | |
 
-    Then the field "One Uno's event grade" matches value ""
-    And the field "Two Duex's event grade" matches value ""
-    And the field "Three Toru's event grade" matches value ""
-    And the field "Four Wha's event grade" matches value ""
-    And the field "Five Cinq's event grade" matches value ""
+    When I set the following fields to these values:
+      | One Uno's attendance     | Fully attended     |
+      | Two Duex's attendance    | Partially attended |
+      | Three Toru's attendance  | Unable to attend   |
+      | Four Wha's attendance    | No show            |
+      | Five Cinq's attendance   | Not set            |
+    And I click on "Save attendance" "button"
 
-    And I set the field "One Uno's attendance" to "Fully attended"
-    And I set the field "Two Duex's attendance" to "Partially attended"
-    And I set the field "Three Toru's attendance" to "Unable to attend"
-    And I set the field "Four Wha's attendance" to "No show"
-    And I set the field "Five Cinq's attendance" to "Not set"
-    When I click on "Save attendance" "button"
-
-    Then the field "One Uno's attendance" matches value "Fully attended"
-    And the field "Two Duex's attendance" matches value "Partially attended"
-    And the field "Three Toru's attendance" matches value "Unable to attend"
-    And the field "Four Wha's attendance" matches value "No show"
-    And the field "Five Cinq's attendance" matches value "Not set"
-
-    And the field "One Uno's event grade" matches value ""
-    And the field "Two Duex's event grade" matches value ""
-    And the field "Three Toru's event grade" matches value ""
-    And the field "Four Wha's event grade" matches value ""
-    And the field "Five Cinq's event grade" matches value ""
+    Then the following fields match these values:
+      | One Uno's attendance     | Fully attended     |
+      | Two Duex's attendance    | Partially attended |
+      | Three Toru's attendance  | Unable to attend   |
+      | Four Wha's attendance    | No show            |
+      | Five Cinq's attendance   | Not set            |
+      | One Uno's event grade    | |
+      | Two Duex's event grade   | |
+      | Three Toru's event grade | |
+      | Four Wha's event grade   | |
+      | Five Cinq's event grade  | |
 
     And I should see "Successfully updated attendance" in the ".alert-success" "css_element"
     And I click on "Close" "button" in the ".alert-success" "css_element"
@@ -117,18 +124,25 @@ Feature: Event manual grading
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    And I set the field "One Uno's event grade" to "12"
-    And I set the field "Two Duex's event grade" to "31.415"
-    And I set the field "Three Toru's event grade" to "56"
-    And I set the field "Four Wha's event grade" to "78"
-    And I set the field "Five Cinq's event grade" to ""
-    When I click on "Save attendance" "button"
+    When I set the following fields to these values:
+      | One Uno's event grade    | 12     |
+      | Two Duex's event grade   | 31.415 |
+      | Three Toru's event grade | 56     |
+      | Four Wha's event grade   | 99.999 |
+      | Five Cinq's event grade  |        |
+    And I click on "Save attendance" "button"
 
-    Then the field "One Uno's event grade" matches value "12"
-    And the field "Two Duex's event grade" matches value "31.415"
-    And the field "Three Toru's event grade" matches value "56"
-    And the field "Four Wha's event grade" matches value "78"
-    And the field "Five Cinq's event grade" matches value ""
+    Then the following fields match these values:
+      | One Uno's attendance     | Not set |
+      | Two Duex's attendance    | Not set |
+      | Three Toru's attendance  | Not set |
+      | Four Wha's attendance    | Not set |
+      | Five Cinq's attendance   | Not set |
+      | One Uno's event grade    | 12      |
+      | Two Duex's event grade   | 31.415  |
+      | Three Toru's event grade | 56      |
+      | Four Wha's event grade   | 99.999  |
+      | Five Cinq's event grade  |         |
 
     And I should see "Successfully updated attendance" in the ".alert-success" "css_element"
     And I click on "Close" "button" in the ".alert-success" "css_element"
@@ -139,7 +153,7 @@ Feature: Event manual grading
     Then I should see "12.00" in the "One Uno" "table_row"
     And I should see "31.42" in the "Two Duex" "table_row"
     And I should see "56.00" in the "Three Toru" "table_row"
-    And I should see "78.00" in the "Four Wha" "table_row"
+    And I should see "100.00" in the "Four Wha" "table_row"
     And I should not see ".00" in the "Five Cinq" "table_row"
     And I should not see "Six Sechs" in the "#user-grades" "css_element"
 

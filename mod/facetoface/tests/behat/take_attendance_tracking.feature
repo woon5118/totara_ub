@@ -39,8 +39,10 @@ Feature: Take attendance tracking general
     And I follow "Attendee"
     When I follow "Take attendance"
     Then I should see "2 session(s) (1 upcoming; 1 over)"
-    And the ".bulkactions" "css_element" should be disabled
-    And the ".mod_facetoface__take-attendance__status-picker" "css_element" should be disabled
+    And the "Bulk action: Mark as" "select" should be disabled
+    And the "bolo bala's attendance" "select" should be disabled
+    And the "kian bomba's attendance" "select" should be disabled
+    And the "loc nguyen's attendance" "select" should be disabled
     And I should see "2" in the "bolo bala" "table_row"
     And I should see "2" in the "kian bomba" "table_row"
     And I should see "2" in the "loc nguyen" "table_row"
@@ -53,16 +55,18 @@ Feature: Take attendance tracking general
     And I set the field "Take attendance:" to "1"
     And I set the field "bolo bala's attendance" to "Partially attended"
     When I click on "Save attendance" "button"
-    Then I should see "Partially attended" in the "bolo bala" "table_row"
-    And I should see "Not set" in the "kian bomba" "table_row"
-    And I should see "Not set" in the "loc nguyen" "table_row"
+    Then the following fields match these values:
+      | bolo bala's attendance  | Partially attended |
+      | kian bomba's attendance | Not set            |
+      | loc nguyen's attendance | Not set            |
     When I set the field "Take attendance:" to "0"
     Then I should see "1" in the "bolo bala" "table_row"
     And I should see "2" in the "kian bomba" "table_row"
     And I should see "2" in the "loc nguyen" "table_row"
-    And I should see "Not set" in the "kian bomba" "table_row"
-    And I should see "Not set" in the "bolo bala" "table_row"
-    And I should see "Not set" in the "loc nguyen" "table_row"
+    And the following fields match these values:
+      | kian bomba's attendance | Not set |
+      | bolo bala's attendance  | Not set |
+      | loc nguyen's attendance | Not set |
 
   Scenario: Take attendance tracking for event when mark attendance tracking is set for any time
     Given I am on "course1" course homepage
@@ -74,9 +78,10 @@ Feature: Take attendance tracking general
     And I follow "Take attendance"
     And I set the field "bolo bala's attendance" to "Partially attended"
     When I click on "Save attendance" "button"
-    Then I should see "Partially attended" in the "bolo bala" "table_row"
-    And I should see "Not set" in the "kian bomba" "table_row"
-    And I should see "Not set" in the "loc nguyen" "table_row"
+    Then the following fields match these values:
+      | bolo bala's attendance  | Partially attended |
+      | kian bomba's attendance | Not set            |
+      | loc nguyen's attendance | Not set            |
 
   Scenario: Take attendance tracking for event, when session attendance is not enabled
     Given I am on "course1" course homepage
@@ -98,6 +103,7 @@ Feature: Take attendance tracking general
     And I click on "All" "option"
     And I click on "Fully attended" "option" in the "#menubulkattendanceop" "css_element"
     When I click on "Save attendance" "button"
-    Then I should see "Fully attended" in the "bolo bala" "table_row"
-    And I should see "Fully attended" in the "kian bomba" "table_row"
-    And I should see "Fully attended" in the "loc nguyen" "table_row"
+    Then the following fields match these values:
+      | bolo bala's attendance  | Fully attended |
+      | kian bomba's attendance | Fully attended |
+      | loc nguyen's attendance | Fully attended |
