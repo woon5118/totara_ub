@@ -38,6 +38,7 @@ function(str, TemplatesManager, ModalFactory, ajax) {
         if (!(this instanceof ModalList)) {
             return new ModalList();
         }
+        this.externalBasket = null;
     }
 
     /**
@@ -58,60 +59,6 @@ function(str, TemplatesManager, ModalFactory, ajax) {
     };
 
     /**
-    * Prepare adder baskets for showing modal
-    * @returns {Promise}
-    */
-    ModalList.prototype.prepareAdderBasket = function() {
-        var that = this;
-        return new Promise(function(resolve) {
-            // Get values from normal basket
-            ajax.getData({
-                args: {
-                    basket: that.settings.basketKey
-                },
-                methodname: 'totara_core_basket_show'
-            }).then(function(data) {
-                // Set disabled items based on normal basket
-                var disabledItems = data.results.ids;
-                that.list.disabledItems = disabledItems;
-
-                // empty temporary basket
-                ajax.getData({
-                    args: {
-                        basket: that.tempBasketKey
-                    },
-                    methodname: 'totara_core_basket_delete'
-                }).then(function() {
-                    resolve();
-                });
-            });
-        });
-    };
-
-    /**
-    * Prepare selector basket for showing modal
-    * @returns {Promise}
-    */
-    ModalList.prototype.prepareSelectorBasket = function() {
-        var that = this;
-        return new Promise(function(resolve) {
-            // Copy the normal basket to a temporary one
-            ajax.getData({
-                args: {
-                    options: {
-                        replace: true
-                    },
-                    sourcebasket: that.settings.basketKey,
-                    targetbasket: that.tempBasketKey
-                },
-                methodname: 'totara_core_basket_copy'
-            }).then(function() {
-                resolve();
-            });
-        });
-    };
-
-    /**
     * Event listeners for when modal is saved/closed
     */
     ModalList.prototype.propagatedModalEvents = function() {
@@ -119,29 +66,47 @@ function(str, TemplatesManager, ModalFactory, ajax) {
             that = this;
 
         modalRoot.on('modal-save-cancel:save', function() {
-            var replace = that.settings.mode !== 'adder';
+            // Load selected items from basket
+            // Load data for selected items
+            // trigger onSaved callback
 
-            // - Populate real basket with selected values
-            // - overwriting the existing basket if not an adder
-            // - Delete the temporary basket
-            ajax.getData({
-                args: {
-                    options: {
-                        deletesource: true,
-                        replace: replace
-                    },
-                    sourcebasket: that.tempBasketKey,
-                    targetbasket: that.settings.basketKey
-                },
-                methodname: 'totara_core_basket_copy'
-            }).then(function(data) {
+            var basketPromise = new Promise(function(resolve) {
+                if (that.settings.mode === 'adder') {
+                    that.basketManager.load().then(function(values) {
+                        if (values.length === 0) {
+                            resolve(that.list.disabledItems);
+                        } else if (that.externalBasket) {
+                            that.externalBasket.add(values).then(function(values) {
+                                resolve(values);
+                            });
+                        } else {
+                            resolve(values.concat(that.list.disabledItems));
+                        }
+                    });
+                } else if (that.settings.mode === 'selector') {
+                    if (that.externalBasket) {
+                        that.externalBasket.copyFrom(that.basketManager.getBasket()).then(function(values) {
+                            resolve(values);
+                        });
+                    } else {
+                        that.basketManager.load().then(function(values) {
+                            resolve(values);
+                        });
+                    }
+                } else {
+                    resolve([]);
+                }
+            });
 
+            // basketPromise returns all selected items
+            // including previously selected items
+            basketPromise.then(function(selectedItems) {
                 // get basket item data
                 var requestParams = {
                     args: that.list.getRequestArgs(),
                     methodname: that.list.getWebservice(),
                 };
-                requestParams.args.filters = {'basket': that.settings.basketKey};
+                requestParams.args.filters = {'ids': selectedItems};
                 requestParams.args.page = 0;
 
                 ajax.getData(requestParams).then(function(items) {
@@ -151,7 +116,7 @@ function(str, TemplatesManager, ModalFactory, ajax) {
 
                     // Trigger saved callback
                     if (that.settings.onSaved) {
-                        that.settings.onSaved(that, data.results.ids, selectionData);
+                        that.settings.onSaved(that, selectedItems, selectionData);
                     }
                 });
             });
@@ -160,9 +125,12 @@ function(str, TemplatesManager, ModalFactory, ajax) {
         // On modal close
         modalRoot.on('modal:hidden', function() {
             // Close basket view
-            if (that.basket && that.basket.widget.classList.contains('tw-selectionBasket__displayed')) {
-                that.basket.onBasketHide();
-                that.basket.onBasketHidden();
+            if (that.basketManager && that.basketManager.widget.classList.contains('tw-selectionBasket__displayed')) {
+                that.basketManager.onBasketHide();
+                that.basketManager.onBasketHidden();
+            }
+            if (that.basketManager) {
+                that.basketManager.delete();
             }
 
             that.reset();
@@ -200,27 +168,50 @@ function(str, TemplatesManager, ModalFactory, ajax) {
      };
 
      /**
-     *  Display the modal
+      *  Display the modal
+      *
+      * @param {Array} ids
      */
-     ModalList.prototype.show = function() {
+     ModalList.prototype.show = function(ids) {
+         if (typeof ids === 'undefined') {
+             ids = null;
+         }
+
          var that = this;
 
          // Prepare the baskets
          var prepBasketsPromise = new Promise(function(resolve) {
              if (that.settings.mode === 'adder') {
-                 that.prepareAdderBasket().then(function() {
-                     resolve();
+                 // Make sure we start with a clean basket
+                 // and have the given ids shown as disabled
+                 that.basketManager.delete().then(function() {
+                     if (that.externalBasket && ids === null) {
+                         that.externalBasket.load().then(function(values) {
+                             that.list.disabledItems = values;
+                             resolve([]);
+                         });
+                     } else {
+                         that.list.disabledItems = ids;
+                         resolve([]);
+                     }
                  });
              } else if (that.settings.mode === 'selector') {
-                 that.prepareSelectorBasket().then(function() {
-                     resolve();
-                 });
+                 // If we've provided an external basket make sure we copy the existing ids into our internal one
+                 if (that.externalBasket && ids === null) {
+                     that.basketManager.getBasket().copyFrom(that.externalBasket).then(function(values) {
+                         resolve(values);
+                     });
+                 } else {
+                     that.basketManager.getBasket().replace(ids).then(function(values) {
+                         resolve(values);
+                     });
+                 }
              } else {
                  resolve();
              }
          });
 
-         prepBasketsPromise.then(function() {
+         prepBasketsPromise.then(function(ids) {
              that.loader.show();
 
              if (that.settings.mode === 'viewer') {
@@ -228,8 +219,10 @@ function(str, TemplatesManager, ModalFactory, ajax) {
                      that.modal.show();
                  });
              } else {
-                 that.updatePage([that.basket.updateBasketView(), that.list.getUpdateRequestArgs()]).then(function() {
-                     that.modal.show();
+                 that.basketManager.renderBasket(ids).then(function() {
+                     return that.updatePage([that.list.getUpdateRequestArgs()]);
+                 }).then(function() {
+                    that.modal.show();
                  });
              }
          });
@@ -244,8 +237,6 @@ function(str, TemplatesManager, ModalFactory, ajax) {
         return new Promise(function(resolve, reject) {
             if (options.key === undefined) {
                 reject('Required option "key" has not been defined');
-            } else if (options.mode !== 'viewer' && options.basketKey === undefined) {
-                reject('Required option "basketKey" has not been defined, this is required when using a ' + options.basketKey);
             } else if (options.list === undefined) {
                 reject('Required option "list" has not been defined');
             } else if (options.list.service === undefined) {
@@ -257,6 +248,66 @@ function(str, TemplatesManager, ModalFactory, ajax) {
             } else {
                 resolve();
             }
+        });
+    };
+
+    /**
+     * Function for constructing initial template data
+     * @param {Object} settings
+     * @return {promise}
+     */
+    var constructTemplateData = function(settings) {
+        var templateData = {
+            has_paging: true,
+            modal_display: true,
+            has_count: true
+        };
+
+        if (settings.mode === 'adder' || settings.mode === 'selector') {
+            templateData.crumbs = null;
+            templateData.hasToggleSelection = true;
+            templateData.selection_basket = true;
+        }
+
+        if (settings.expandable) {
+            templateData.expandTemplate = settings.expandable.template;
+            templateData.expandTemplateWebservice = settings.expandable.service;
+            templateData.expandTemplateWebserviceArgs = settings.expandable.args;
+        }
+
+        if (settings.list.map.hasHierarchy) {
+            templateData.crumbtrail_template_name = 'totara_core/crumb_with_title';
+            templateData.has_crumbtrail = true;
+            templateData.has_level_toggle = settings.levelToggle;
+        }
+
+        return new Promise(function(resolve) {
+            var promiseList = [];
+
+            if (settings.title) {
+                promiseList.push(constructTitleString(settings.title));
+            }
+
+            if (settings.primarySearch) {
+                promiseList.push(constructSearchData(settings.primarySearch));
+            }
+
+            if (settings.primaryDropDown) {
+                promiseList.push(constructDropDownData(settings.primaryDropDown));
+            }
+
+            // Collected all required data
+            Promise.all(promiseList).then(function(data) {
+                for (var a = 0; a < data.length; a++) {
+                    var feature = data[a];
+                    if (typeof feature == 'object') {
+                        for (var key in feature) {
+                            templateData[key] = feature[key];
+                        }
+                    }
+                }
+                resolve(templateData);
+            });
         });
     };
 
@@ -396,66 +447,6 @@ function(str, TemplatesManager, ModalFactory, ajax) {
     };
 
     /**
-    * Function for constructing initial template data
-    * @param {Object} settings
-    * @return {promise}
-    */
-    var constructTemplateData = function(settings) {
-        var templateData = {
-            has_paging: true,
-            modal_display: true,
-            has_count: true
-        };
-
-        if (settings.mode === 'adder' || settings.mode === 'selector') {
-            templateData.crumbs = null;
-            templateData.hasToggleSelection = true;
-            templateData.selection_basket = true;
-        }
-
-        if (settings.expandable) {
-            templateData.expandTemplate = settings.expandable.template;
-            templateData.expandTemplateWebservice = settings.expandable.service;
-            templateData.expandTemplateWebserviceArgs = settings.expandable.args;
-        }
-
-        if (settings.list.map.hasHierarchy) {
-            templateData.crumbtrail_template_name = 'totara_core/crumb_with_title';
-            templateData.has_crumbtrail = true;
-            templateData.has_level_toggle = settings.levelToggle;
-        }
-
-        return new Promise(function(resolve) {
-            var promiseList = [];
-
-            if (settings.title) {
-                promiseList.push(constructTitleString(settings.title));
-            }
-
-            if (settings.primarySearch) {
-                promiseList.push(constructSearchData(settings.primarySearch));
-            }
-
-            if (settings.primaryDropDown) {
-                promiseList.push(constructDropDownData(settings.primaryDropDown));
-            }
-
-            // Collected all required data
-            Promise.all(promiseList).then(function(data) {
-                for (var a = 0; a < data.length; a++) {
-                    var feature = data[a];
-                    if (typeof feature == 'object') {
-                        for (var key in feature) {
-                            templateData[key] = feature[key];
-                        }
-                    }
-                }
-                resolve(templateData);
-            });
-        });
-    };
-
-    /**
     * initialisation method
     * @param {Object} options
     * @returns {Object} promise
@@ -464,11 +455,9 @@ function(str, TemplatesManager, ModalFactory, ajax) {
         return new Promise(function(resolve) {
             addListTemplate(options).then(function(modal) {
 
-                var basketKey = options.basketKey ? options.basketKey + '___temp' : null,
-                    crumbtrail = options.crumbtrail ? options.crumbtrail : null;
+                var crumbtrail = options.crumbtrail ? options.crumbtrail : null;
 
                 var data = {
-                    basketKey: basketKey,
                     crumbtrail: crumbtrail,
                     list: options.list,
                     parent: modal.body[0],
@@ -494,7 +483,10 @@ function(str, TemplatesManager, ModalFactory, ajax) {
                     var modalList = new ListBase();
                     modalList.modal = modal;
                     modalList.settings = options;
-                    modalList.tempBasketKey = basketKey;
+
+                    if (options.externalBasket) {
+                        modalList.externalBasket = options.externalBasket;
+                    }
 
                     modalList.init(data).then(function() {
                         resolve(modalList);

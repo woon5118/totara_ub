@@ -21,8 +21,8 @@
  */
 
 define(['core/ajax', 'totara_core/filters', 'totara_core/basket_manager', 'totara_core/crumb_manager',
-'totara_core/action_list_manager', 'totara_core/filter_manager', 'totara_core/loader_manager'],
-function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
+'totara_core/action_list_manager', 'totara_core/filter_manager', 'totara_core/loader_manager', 'totara_core/simple_basket', 'totara_core/session_basket'],
+function(ajax, Filters, BasketManager, Crumb, List, Selectors, Loader, SimpleBasket, SessionBasket) {
 
     /**
      * Class constructor for the basket list.
@@ -38,7 +38,7 @@ function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
             return new BasketList();
         }
 
-        this.basket = null;
+        this.basketManager = null;
         this.hideClass = 'tw-basketlist__hide';
         this.crumb = null;
         this.filters = null;
@@ -94,25 +94,25 @@ function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
         });
     };
 
-    BasketList.prototype.basketEvents = function(basket) {
+    BasketList.prototype.basketEvents = function(basketManager) {
         var that = this;
 
         /**
          * Clears basket request values
          */
-        basket.onBasketClear = function() {
+        basketManager.onBasketClear = function() {
             that.loader.show();
-            ajax.getData(basket.updateDeleteBasket()).then(function(data) {
-                var callback = data.callbacks[0];
-                callback(data);
-                basket.onBasketHide();
+
+            that.basketManager.deleteAndRender().then(function() {
+                basketManager.onBasketHide();
+                that.loader.hide();
             });
         };
 
         /**
          * Basket selection has been hidden
          */
-        basket.onBasketHidden = function() {
+        basketManager.onBasketHidden = function() {
             if (that.crumb) {
                 that.crumb.removeClass(that.hideClass);
                 that.crumb.headingRemoveClass(that.hideClass);
@@ -124,9 +124,9 @@ function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
         /**
          * Hide basket selection
          */
-        basket.onBasketHide = function() {
-            basket.toggleExpandedView();
-            basket.toggleShowBasketBtn();
+        basketManager.onBasketHide = function() {
+            basketManager.toggleExpandedView();
+            basketManager.toggleShowBasketBtn();
             that.reset();
             that.list.enabledActions = true;
             that.list.enabledHierarchy = true;
@@ -136,9 +136,9 @@ function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
         /**
          * Show basket selection
          */
-        basket.onBasketShow = function() {
-            basket.toggleExpandedView();
-            basket.toggleShowBasketBtn();
+        basketManager.onBasketShow = function() {
+            basketManager.toggleExpandedView();
+            basketManager.toggleShowBasketBtn();
 
             that.selectors.primarySearchToggleClass(that.hideClass);
             that.selectors.primaryTreeToggleClass(that.hideClass);
@@ -153,15 +153,22 @@ function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
             that.loader.show();
             that.filters.clearFilters();
             that.selectors.clearFiltersRegionPanel();
-            // Add basket to filters and show results
-            that.filters.setFilter('basket', basket.getBasketKey());
             that.list.enabledActions = false;
             that.list.enabledHierarchy = false;
-            that.list.update();
+            // Add basket to filters and show results
+            if (basketManager.getBasket() instanceof SessionBasket) {
+                that.filters.setFilter('basket', basketManager.getBasketKey());
+                that.list.update();
+            } else {
+                basketManager.load().then(function(values) {
+                    that.filters.setFilter('ids', values);
+                    that.list.update();
+                });
+            }
         };
 
-        basket.onBasketUpdate = function() {
-            that.list.selectedItems = basket.getSelectedItems();
+        basketManager.onBasketUpdate = function(ids) {
+            that.list.selectedItems = ids;
         };
     };
 
@@ -199,15 +206,21 @@ function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
         };
 
         list.onItemSelected = function(id) {
-            that.basket.setBasketArgs('add', id);
+            list.toggleSelectDisable(true);
+            // Queue this action, it wil be processed by onItemUpdate()
+            that.basketManager.queueAdd(id);
         };
 
         list.onItemUnselected = function(id) {
-            that.basket.setBasketArgs('remove', id);
+            list.toggleSelectDisable(true);
+            // Queue this action, it wil be processed by onItemUpdate()
+            that.basketManager.queueRemove(id);
         };
 
         list.onItemUpdate = function() {
-            that.updatePage([that.basket.updateBasketValAndView()]);
+            that.basketManager.updateAndRender().then(function() {
+                list.toggleSelectDisable(false);
+            });
         };
 
         list.onPreRequest = function() {
@@ -306,6 +319,15 @@ function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
     BasketList.prototype.initExtend = function() { /* Null */ };
 
     /**
+     * Generate a pseudo uuid basket key
+     *
+     * @return {string}
+     */
+    BasketList.prototype.generateBasketKey = function() {
+        return 'simplebasket.' + (Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER))).toString(36);
+    };
+
+    /**
      * initialise from data
      *
      * @param {object} data required properties for list base
@@ -326,8 +348,27 @@ function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
             that.filters = new Filters();
             that.filterEvents(that.filters);
 
-            that.basket = Basket.init(parent, data.basketKey);
-            that.basketEvents(that.basket);
+            var basket = null;
+            // Either we use the basket provided
+            // or we create a new basket depending on the type passed
+            // if no basket type and key is passed we create a random basket key
+            // and use a simple basket by default
+            if (data.basket) {
+                basket = data.basket;
+            } else {
+                if (!data.basketKey) {
+                    data.basketKey = that.generateBasketKey();
+                }
+                if (data.basketType === 'session') {
+                    basket = new SessionBasket(data.basketKey);
+                } else {
+                    basket = new SimpleBasket(data.basketKey);
+                }
+            }
+
+            that.basketManager = BasketManager.init(parent, basket);
+
+            that.basketEvents(that.basketManager);
 
             if (data.crumbtrail) {
                 that.crumb = Crumb.init(parent, data.crumbtrail);
@@ -351,8 +392,10 @@ function(ajax, Filters, Basket, Crumb, List, Selectors, Loader) {
                 promiseList.push(that.crumb.loadCrumbStrings());
             }
             Promise.all(promiseList).then(function() {
-                that.updatePage([that.basket.updateBasketView(), that.list.getUpdateRequestArgs()]);
-                M.util.js_complete(behatString);
+                that.basketManager.loadAndRender().then(function() {
+                    that.updatePage([that.list.getUpdateRequestArgs()]);
+                    M.util.js_complete(behatString);
+                });
             });
         });
     };

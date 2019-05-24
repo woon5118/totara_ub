@@ -427,9 +427,9 @@ define(['core/notification', 'core/templates', 'core/ajax'], function(notificati
         },
 
         /**
-        * Toggle select state of all rows
-        * @param {string} checkedState
-        */
+         * Toggle select state of all rows
+         * @param {string} checkedState
+         */
         toggleSelectAll: function(checkedState) {
             var checkBoxes = this.widget.querySelectorAll('[data-tw-list-rowSelect]:not([disabled])'),
                 changingState,

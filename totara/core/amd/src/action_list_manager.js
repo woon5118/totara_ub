@@ -39,6 +39,7 @@ function(str, templates, notification, Paging, ajax) {
         this.appendType = 'replace';
         this.counter = '';
         this.disabledItems = [];
+        this.disabledItemClass = '.tw-list__cell_select_label_disabled';
         this.enabledActions = true;
         this.enabledHierarchy = true;
         this.eventListener = 'totara_core/lists';
@@ -634,6 +635,29 @@ function(str, templates, notification, Paging, ajax) {
     ListManager.prototype.resetToggleLevel = function() {
         if (this.toggleLevel) {
             this.toggleLevel.setAttribute('data-tw-list-toggleLevel-manual', 'current');
+        }
+    };
+
+    /**
+     * Toggle disable state of all select boxes making sure predisabled rows stay disabled
+     *
+     * @param {Boolean} disable true to disable, false to enable
+     */
+    ListManager.prototype.toggleSelectDisable = function(disable) {
+        var selects = this.widget.querySelectorAll('[data-tw-list-rowSelect');
+        for (var i = 0; i < selects.length; i++) {
+            if (disable) {
+                selects[i].setAttribute('disabled', true);
+            } else {
+                if (!selects[i].closest(this.disabledItemClass)) {
+                    selects[i].removeAttribute('disabled');
+                }
+            }
+        }
+        if (disable) {
+            this.widget.querySelector('[data-tw-list-selectall]').setAttribute('disabled', true);
+        } else {
+            this.widget.querySelector('[data-tw-list-selectall]').removeAttribute('disabled');
         }
     };
 
