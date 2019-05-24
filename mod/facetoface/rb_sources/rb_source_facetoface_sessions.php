@@ -381,7 +381,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'date',
                 'sessiondate',
-                get_string('sessdate', 'rb_source_facetoface_sessions'),
+                get_string('sessstartdatetime', 'rb_source_facetoface_sessions'),
                 'sessiondate.timestart',
                 array(
                     'extrafields' => array(
@@ -394,12 +394,12 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'date',
                 'sessiondate_link',
-                get_string('sessdatelink', 'rb_source_facetoface_sessions'),
+                get_string('sessstartdatetimelink', 'rb_source_facetoface_sessions'),
                 'sessiondate.timestart',
                 array(
                     'joins' => 'sessiondate',
                     'displayfunc' => 'event_date_link',
-                    'defaultheading' => get_string('sessdate', 'rb_source_facetoface_sessions'),
+                    'defaultheading' => get_string('sessstartdatetime', 'rb_source_facetoface_sessions'),
                     'extrafields' => array(
                         'session_id' => 'base.sessionid',
                         'timezone' => 'sessiondate.sessiontimezone'),
@@ -409,7 +409,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'date',
                 'datefinish',
-                get_string('sessdatefinish', 'rb_source_facetoface_sessions'),
+                get_string('sessfinishdatetime', 'rb_source_facetoface_sessions'),
                 'sessiondate.timefinish',
                 array(
                     'joins' => 'sessiondate',
@@ -423,7 +423,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'date',
                 'timestart',
-                get_string('sessstart', 'rb_source_facetoface_sessions'),
+                get_string('sessstarttime', 'rb_source_facetoface_sessions'),
                 'sessiondate.timestart',
                 array(
                     'joins' => 'sessiondate',
@@ -437,7 +437,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'date',
                 'timefinish',
-                get_string('sessfinish', 'rb_source_facetoface_sessions'),
+                get_string('sessfinishtime', 'rb_source_facetoface_sessions'),
                 'sessiondate.timefinish',
                 array(
                     'joins' => 'sessiondate',
@@ -456,7 +456,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 array(
                     'joins' => 'sessiondate',
                     'displayfunc' => 'local_event_date',
-                    'defaultheading' => get_string('sessdate', 'rb_source_facetoface_sessions'),
+                    'defaultheading' => get_string('sessstartdatetime', 'rb_source_facetoface_sessions'),
                     'dbdatatype' => 'timestamp'
                 )
             ),
@@ -468,7 +468,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 array(
                     'joins' => 'sessiondate',
                     'displayfunc' => 'local_event_date',
-                    'defaultheading' => get_string('sessdatefinish', 'rb_source_facetoface_sessions'),
+                    'defaultheading' => get_string('sessfinishdatetime', 'rb_source_facetoface_sessions'),
                     'dbdatatype' => 'timestamp'
                 )
             ),

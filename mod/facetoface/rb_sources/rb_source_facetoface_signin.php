@@ -247,7 +247,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             new rb_column_option(
                 'date',
                 'sessiondate',
-                get_string('sessdate', 'rb_source_facetoface_signin'),
+                get_string('sessstartdatetime', 'rb_source_facetoface_signin'),
                 'sessiondate.timestart',
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
@@ -259,24 +259,24 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             new rb_column_option(
                 'date',
                 'localsessionstartdate',
-                get_string('localsessstartdate', 'rb_source_facetoface_sessions'),
+                get_string('localsessstartdate', 'rb_source_facetoface_signin'),
                 'sessiondate.timefinish',
                 array(
                     'joins' => 'sessiondate',
                     'displayfunc' => 'local_event_date',
                     'dbdatatype' => 'timestamp',
-                    'defaultheading' => get_string('sessdate', 'rb_source_facetoface_sessions')
+                    'defaultheading' => get_string('sessstartdatetime', 'rb_source_facetoface_signin')
                 )
             ),
             new rb_column_option(
                 'date',
                 'sessiondate_link',
-                get_string('sessdatelink', 'rb_source_facetoface_signin'),
+                get_string('sessstartdatetimelink', 'rb_source_facetoface_signin'),
                 'sessiondate.timestart',
                 array(
                     'joins' => 'sessiondate',
                     'displayfunc' => 'event_date_link',
-                    'defaultheading' => get_string('sessdate', 'rb_source_facetoface_signin'),
+                    'defaultheading' => get_string('sessstartdatetime', 'rb_source_facetoface_signin'),
                     'extrafields' => array('session_id' => 'base.sessionid', 'timezone' => 'sessiondate.sessiontimezone'),
                     'dbdatatype' => 'timestamp'
                 )
@@ -284,7 +284,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             new rb_column_option(
                 'date',
                 'datefinish',
-                get_string('sessdatefinish', 'rb_source_facetoface_signin'),
+                get_string('sessfinishdatetime', 'rb_source_facetoface_signin'),
                 'sessiondate.timefinish',
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
@@ -295,13 +295,13 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             new rb_column_option(
                 'date',
                 'localsessionfinishdate',
-                get_string('localsessfinishdate', 'rb_source_facetoface_sessions'),
+                get_string('localsessfinishdate', 'rb_source_facetoface_signin'),
                 'sessiondate.timefinish',
                 array(
                     'joins' => 'sessiondate',
                     'displayfunc' => 'local_event_date',
                     'dbdatatype' => 'timestamp',
-                    'defaultheading' => get_string('sessdatefinish', 'rb_source_facetoface_sessions')
+                    'defaultheading' => get_string('sessfinishdatetime', 'rb_source_facetoface_signin')
                 )
             ),
             new rb_column_option(

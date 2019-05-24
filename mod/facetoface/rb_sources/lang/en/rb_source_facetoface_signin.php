@@ -37,6 +37,8 @@ $string['endtime'] = 'End Time';
 $string['facilitator'] = 'Facilitator';
 $string['f2fname'] = 'Seminar Name';
 $string['f2fnamelink'] = 'Seminar Name (linked to session page)';
+$string['localsessfinishdate'] = 'Local Session Finish Date/Time';
+$string['localsessstartdate'] = 'Local Session Start Date/Time';
 $string['maxbookings'] = 'Maximum bookings';
 $string['normalcost'] = 'Normal cost';
 $string['numattendees'] = 'Number of Attendees';
@@ -46,16 +48,16 @@ $string['roomdescription'] = 'Room description';
 $string['roomname'] = 'Room name';
 $string['usernote'] = 'User\'s note';
 $string['sesscapacity'] = 'Session Capacity';
-$string['sessdate'] = 'Session Start Date';
-$string['sessdatefinish'] = 'Session Finish Date';
-$string['sessdatelink'] = 'Session Start Date (linked to activity)';
 $string['sessdetails'] = 'Session Details';
 $string['sessduration'] = 'Session Duration';
 $string['sessfinish'] = 'Session Finish Time';
+$string['sessfinishdatetime'] = 'Session Finish Date/Time';
 $string['sessionrole'] = 'Session {$a}';
 $string['sessionx'] = 'Session {$a}';
 $string['sessname'] = 'Session Name';
 $string['sessstart'] = 'Session Start Time';
+$string['sessstartdatetime'] = 'Session Start Date/Time';
+$string['sessstartdatetimelink'] = 'Session Start Date/Time (linked to activity)';
 $string['starttime'] = 'Start Time';
 $string['status'] = 'Status';
 
@@ -82,3 +84,8 @@ $string['type_status'] = 'Status';
 $string['type_role'] = 'Role';
 $string['type_room'] = 'Room';
 $string['type_user_signups'] = 'User Session Signups';
+
+# Deprecated in 13.0
+$string['sessdate'] = 'Session Start Date';
+$string['sessdatelink'] = 'Session Start Date (linked to activity)';
+$string['sessdatefinish'] = 'Session Finish Date';
