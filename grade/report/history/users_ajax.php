@@ -62,7 +62,7 @@ foreach ($users as $user) {
     $newuser->fullname = fullname($user);
     $fieldvalues = array();
     foreach ($extrafields as $field) {
-        $fieldvalues[] = s($user->{$field});
+        $fieldvalues[] = $user->{$field};
     }
     $newuser->extrafields = implode(', ', $fieldvalues);
     $outcome->response['users'][] = $newuser;
