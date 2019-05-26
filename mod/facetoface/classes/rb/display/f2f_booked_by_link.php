@@ -23,7 +23,6 @@
 
 namespace mod_facetoface\rb\display;
 use totara_reportbuilder\rb\display\base;
-use totara_reportbuilder\rb\display\user_link;
 
 /**
  * Display class intended for the booking managers name (linked to their profile).
@@ -47,7 +46,7 @@ class f2f_booked_by_link extends base {
         $extrafields = self::get_extrafields_row($row, $column);
 
         $user = fullname($extrafields);
-        return user_link::display($user, $format, $row, $column, $report);
+        return f2f_user_link::display($user, $format, $row, $column, $report);
     }
 
     /**
