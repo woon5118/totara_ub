@@ -623,6 +623,60 @@ class totara_core_dml_sql_testcase extends advanced_testcase {
         $this->assertSame(['id' => 10, 'uq_param_' . $lastid => 1], $rawsql->get_params());
     }
 
+    public function test_array_access() {
+        $sql = "SELECT * FROM {course} WHERE id = ? AND visible = ?";
+        $params = [1, true];
+        $rawsql = new sql($sql, $params);
+
+        $this->assertTrue(isset($rawsql[0]));
+        $this->assertTrue(isset($rawsql[1]));
+        $this->assertFalse(isset($rawsql[2]));
+        $this->assertSame($sql, $rawsql[0]);
+        $this->assertSame($params, $rawsql[1]);
+
+        list($a, $b) = $rawsql;
+        $this->assertSame($sql, $a);
+        $this->assertSame($params, $b);
+
+        try {
+            $rawsql[0] = 'a';
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(coding_exception::class, $ex);
+        }
+
+        try {
+            $rawsql[1] = 'a';
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(coding_exception::class, $ex);
+        }
+
+        try {
+            $rawsql[2] = 'a';
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(coding_exception::class, $ex);
+        }
+
+        try {
+            unset($rawsql[0]);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(coding_exception::class, $ex);
+        }
+
+        try {
+            unset($rawsql[1]);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(coding_exception::class, $ex);
+        }
+
+        $this->assertSame($sql, $rawsql[0]);
+        $this->assertSame($params, $rawsql[1]);
+    }
+
     /**
      * Return $i in the last unique database param.
      *

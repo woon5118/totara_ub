@@ -2180,6 +2180,25 @@ ORDER BY tt1.groupid";
         $DB->delete_records_select($coursetable, $DB::sql("id = :id", ['id' => $other->id]));
         $this->assertDebuggingNotCalled();
 
+        // Test backwards "list($sql, $param) = new sql()" compatibility.
+        $rawsql = $DB::sql("id = :id", ['id' => $other->id]);
+        list($sql, $params) = $rawsql;
+        $this->assertSame($rawsql->get_sql(), $sql);
+        $this->assertSame($rawsql->get_params(), $params);
+        $this->assertSame($rawsql->get_sql(), $rawsql[0]);
+        $this->assertSame($rawsql->get_params(), $rawsql[1]);
+
+        $oldfunc = function() use ($rawsql) {
+            return [$rawsql->get_sql(), $rawsql->get_params()];
+        };
+        $newfunct = function() use ($rawsql) {
+            return $rawsql;
+        };
+        list($sql1, $params1) = call_user_func($oldfunc);
+        list($sql2, $params2) = call_user_func($newfunct);
+        $this->assertSame($sql1, $sql2);
+        $this->assertSame($params1, $params2);
+
         $dbman->drop_table($table);
     }
 

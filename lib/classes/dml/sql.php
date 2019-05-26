@@ -33,7 +33,7 @@ use coding_exception, dml_exception, moodle_database;
  *
  * @since Totara 13
  */
-class sql {
+class sql implements \ArrayAccess {
     /**
      * The SQL fragment.
      *
@@ -387,5 +387,50 @@ class sql {
         }
 
         return $result;
+    }
+
+    // NOTE: following ArrayAccess methods add support for: list($sql, $params) = new \code\dml\sql('SELECT ..' , [...]);
+
+    /**
+     * Whether a offset exists
+     * @param mixed $offset <p>
+     * @return boolean true on success or false on failure.
+     */
+    public function offsetExists($offset) {
+        return ($offset == 0 or $offset == 1);
+    }
+
+    /**
+     * Offset to retrieve
+     * @param mixed $offset <p>
+     * @return mixed Can return all value types.
+     */
+    public function offsetGet($offset) {
+        if ($offset == 0) {
+            return $this->get_sql();
+        }
+        if ($offset == 1) {
+            return $this->get_params();
+        }
+        return null;
+    }
+
+    /**
+     * Offset to set
+     * @param mixed $offset <p>
+     * @param mixed $value <p>
+     * @return void
+     */
+    public function offsetSet($offset, $value) {
+        throw new coding_exception('sql instance cannot be modified');
+    }
+
+    /**
+     * Offset to unset
+     * @param mixed $offset <p>
+     * @return void
+     */
+    public function offsetUnset($offset) {
+        throw new coding_exception('sql instance cannot be modified');
     }
 }
