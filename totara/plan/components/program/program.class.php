@@ -688,12 +688,9 @@ class dp_program_component extends dp_base_component {
             $PAGE->requires->string_for_js('cancel', 'moodle');
             $PAGE->requires->string_for_js('continue', 'moodle');
             $PAGE->requires->string_for_js('addprograms', 'totara_plan');
-
-            $jsmodule = array(
-                'name' => 'totara_plan_program_find',
-                'fullpath' => '/totara/plan/components/program/find.js',
-                'requires' => array('json'));
-            $PAGE->requires->js_init_call('M.totara_plan_program_find.init', array('args' => '{"plan_id":'.$this->plan->id.', "page":"'.$paginated.'", "component_name":"'.$component_name.'"}'), false, $jsmodule);
+            
+            $jsparams = [$this->plan->id, $paginated, $component_name];
+            $PAGE->requires->js_call_amd('totara_plan/components_program_find', 'init', $jsparams);
         }
     }
 
