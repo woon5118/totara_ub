@@ -25,6 +25,7 @@ use totara_core\quickaccessmenu\group;
 use totara_core\quickaccessmenu\item;
 use totara_core\quickaccessmenu\helper;
 use totara_core\quickaccessmenu\preference_helper;
+use totara_core\quickaccessmenu\provider;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/adminlib.php');
@@ -133,6 +134,9 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
     }
 
     public function test_default_menu_for_admin() {
+        if ($this->is_addon_with_item_present()) {
+            $this->markTestSkipped('Test is for standard distribution only.');
+        }
 
         // Needed because of capability checks.
         $this->setAdminUser();
@@ -185,6 +189,10 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
     public function test_default_menu_for_site_manager() {
         global $DB;
 
+        if ($this->is_addon_with_item_present()) {
+            $this->markTestSkipped('Test is for standard distribution only.');
+        }
+
         $this->resetAfterTest();
 
         $roleid = $DB->get_field('role', 'id', ['shortname' => 'manager']);
@@ -227,6 +235,10 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
     public function test_default_menu_for_staff_manager() {
         global $DB;
 
+        if ($this->is_addon_with_item_present()) {
+            $this->markTestSkipped('Test is for standard distribution only.');
+        }
+
         $this->resetAfterTest();
 
         $roleid = $DB->get_field('role', 'id', ['shortname' => 'staffmanager']);
@@ -246,6 +258,10 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
 
     public function test_default_menu_for_course_creator() {
         global $DB;
+
+        if ($this->is_addon_with_item_present()) {
+            $this->markTestSkipped('Test is for standard distribution only.');
+        }
 
         $this->resetAfterTest();
 
@@ -267,6 +283,10 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
     public function test_default_menu_for_learner() {
         global $DB;
 
+        if ($this->is_addon_with_item_present()) {
+            $this->markTestSkipped('Test is for standard distribution only.');
+        }
+
         $this->resetAfterTest();
 
         $roleid = $DB->get_field('role', 'id', ['shortname' => 'student']);
@@ -280,6 +300,10 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
     }
 
     public function test_default_menu_for_custom_role() {
+        if ($this->is_addon_with_item_present()) {
+            $this->markTestSkipped('Test is for standard distribution only.');
+        }
+
         $this->resetAfterTest();
 
         $roleid = $this->getDataGenerator()->create_role();
@@ -299,6 +323,10 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
     }
 
     public function test_default_menu_for_custom_role_with_access_but_no_default() {
+        if ($this->is_addon_with_item_present()) {
+            $this->markTestSkipped('Test is for standard distribution only.');
+        }
+
         $this->resetAfterTest();
 
         $roleid = $this->getDataGenerator()->create_role();
@@ -1486,5 +1514,31 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         $weights = array_unique($weights);
 
         $this->assertEquals(count($groups), count($weights), 'Coding error: Two or more default groups have the same weight, this needs to be fixed!');
+    }
+
+    /**
+     * Is add-on with menu item present?
+     *
+     * @return bool false for standard installation, true if any addons with menu items are present
+     */
+    public function is_addon_with_item_present() {
+        $items = \core_component::get_namespace_classes('quickaccessmenu', provider::class);
+
+        foreach ($items as $item) {
+            $parts = explode('\\', $item);
+            $component = reset($parts);
+            if ($component === 'core') {
+                continue;
+            }
+            list($plugin_type, $plugin_name) = core_component::normalize_component($component);
+            if ($plugin_type === 'core') {
+                continue;
+            }
+            $standardplugins = core_plugin_manager::standard_plugins_list($plugin_type);
+            if (!in_array($plugin_name, $standardplugins)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
