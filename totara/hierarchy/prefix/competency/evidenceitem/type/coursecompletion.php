@@ -78,18 +78,16 @@ class competency_evidence_type_coursecompletion extends competency_evidence_type
      * @return  void
      */
     public function cron() {
+        global $DB;
 
-        global $CFG, $DB;
+        $proficient_values = competency::get_all_proficient_scale_values();
 
-        // A note on the sub-query, it returns:
-        //   scaleid | proficient
-        // where proficient is the ID of the lowest scale
-        // value in that scale that has the proficient flag
-        // set to 1
-        //
-        // The sub-sub-query is needed to allow us to return
-        // the ID, when the actual item is determined by
-        // the sortorder
+        if (empty($proficient_values)) {
+            return;
+        }
+
+        list($in_sql, $in_params) = $DB->get_in_or_equal(array_keys($proficient_values), SQL_PARAMS_QM, 'prof', false);
+
         $sql = "
             SELECT DISTINCT
                 ccr.id AS id,
@@ -98,7 +96,7 @@ class competency_evidence_type_coursecompletion extends competency_evidence_type
                 cc.userid,
                 ccr.timecreated,
                 cc.timecompleted,
-                proficient.proficient,
+                cs.minproficiencyid,
                 cs.defaultid
             FROM
                 {comp_criteria} ccrit
@@ -118,20 +116,6 @@ class competency_evidence_type_coursecompletion extends competency_evidence_type
             INNER JOIN
                 {comp_scale} cs
                 ON csa.scaleid = cs.id
-            INNER JOIN
-            (
-                SELECT csv.scaleid, csv.id AS proficient
-                FROM {comp_scale_values} csv
-                INNER JOIN
-                (
-                    SELECT scaleid, MAX(sortorder) AS maxsort
-                    FROM {comp_scale_values}
-                    WHERE proficient = 1
-                    GROUP BY scaleid
-                ) grouped
-                ON csv.scaleid = grouped.scaleid AND csv.sortorder = grouped.maxsort
-            ) proficient
-            ON cs.id = proficient.scaleid
             LEFT JOIN
                 {comp_criteria_record} ccr
              ON ccr.itemid = ccrit.id
@@ -139,16 +123,15 @@ class competency_evidence_type_coursecompletion extends competency_evidence_type
             WHERE
                 ccrit.itemtype = 'coursecompletion'
             AND cc.id IS NOT NULL
-            AND proficient.proficient IS NOT NULL
             AND
             (
-                ccr.proficiencymeasured <> proficient.proficient
+                ccr.proficiencymeasured " . $in_sql . "
              OR ccr.proficiencymeasured IS NULL
             )
         ";
 
         // Loop through evidence itmes, and mark as complete
-        if ($rs = $DB->get_recordset_sql($sql)) {
+        if ($rs = $DB->get_recordset_sql($sql, $in_params)) {
             foreach ($rs as $record) {
 
                 if (debugging()) {
@@ -158,7 +141,7 @@ class competency_evidence_type_coursecompletion extends competency_evidence_type
                 $evidence = new comp_criteria_record((array)$record, false);
 
                 if ($record->timecompleted) {
-                    $evidence->proficiencymeasured = $record->proficient;
+                    $evidence->proficiencymeasured = $record->minproficiencyid;
                 }
                 else if ($record->defaultid) {
                     $evidence->proficiencymeasured = $record->defaultid;

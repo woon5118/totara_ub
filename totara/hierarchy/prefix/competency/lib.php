@@ -585,9 +585,14 @@ class competency extends hierarchy {
      * record for, keyed on the competencyid. Also returns the required
      * proficiency value and isproficient, which is 1 if the user meets the
      * proficiency and 0 otherwise
+     *
+     * @deprecated since Totara 13
      */
     static function get_proficiencies($userid) {
         global $DB;
+
+        debugging('competency::get_proficiencies has been deprecated. Use competency::get_user_completed_competencies to check what competencies a user has completed.');
+
         $sql = "SELECT cr.competencyid, prof.proficiency, csv.proficient AS isproficient
             FROM {comp_record} cr
             LEFT JOIN {comp} c ON c.id=cr.competencyid
@@ -768,18 +773,63 @@ class competency extends hierarchy {
     static function get_user_completed_competencies($userid) {
         global $DB;
 
-        $proficient_sql = "SELECT
-            cr.competencyid
-            FROM
-                {comp_record} cr
-            JOIN
-                {comp_scale_values} csv ON csv.id = cr.proficiency
-            WHERE csv.proficient = 1
-              AND cr.userid = ?
-              ";
-        $completed = $DB->get_records_sql($proficient_sql, array($userid));
+        $proficient_values = self::get_all_proficient_scale_values();
 
-        return is_array($completed) ? array_keys($completed) : array();
+        if (empty($proficient_values)) {
+            return array();
+        }
+
+        list($in_sql, $in_params) = $DB->get_in_or_equal(array_keys($proficient_values));
+
+        return $DB->get_fieldset_sql(
+            "SELECT competencyid
+                 FROM {comp_record}
+                 WHERE userid = ?
+                 AND proficiency " . $in_sql,
+            array_merge(array($userid), $in_params)
+        );
+    }
+
+    /**
+     * Provides all competency scale values for all competencies that are proficient.
+     *
+     * @return array of all competency scale value records
+     */
+    public static function get_all_proficient_scale_values() {
+        global $DB;
+
+        return $DB->get_records_sql(
+            "SELECT csv.*
+                   FROM {comp_scale_values} csv
+                   JOIN {comp_scale} cs ON cs.id = csv.scaleid
+                   JOIN {comp_scale_values} csvmin ON cs.minproficiencyid = csvmin.id 
+                  WHERE csv.sortorder <= csvmin.sortorder"
+        );
+    }
+
+    /**
+     * Given an Id for a competency scale value, returns whether or not it is proficient.
+     *
+     * @param int $valueid Id from the comp_scale_values table
+     * @return bool True if the value is proficient
+     */
+    public static function value_is_proficient($valueid) {
+        global $DB;
+
+        if (empty($valueid)) {
+            return false;
+        }
+
+        return $DB->record_exists_sql(
+            "SELECT csv.id
+                   FROM {comp_scale_values} csv
+                   JOIN {comp_scale} cs ON cs.id = csv.scaleid
+                   JOIN {comp_scale_values} csvmin ON cs.minproficiencyid = csvmin.id 
+                  WHERE csv.sortorder <= csvmin.sortorder
+                    AND csv.id = ?
+            ",
+            array($valueid)
+        );
     }
 
 

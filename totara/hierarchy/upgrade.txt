@@ -3,6 +3,11 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Added minproficiencyid field to the comp_scale table. This should be relied on over the proficient field in the
+  comp_scale_values table when determining if a value should be considered proficient.
+* totara_competency_scale_proficient_not_in_order has been deprecated. There should always be a minimum proficient id according to the scale.
+* totara_competency_scale_proficient_not_in_order has been deprecated. Please use the minproficiencyid value on the scale to ensure proficiency cannot be out of order.
+* competency::get_proficiencies has been deprecated. Use competency::get_user_completed_competencies to check what competencies a user has completed.
 * Removed deprecated methods:
   * build_nojs_treeview()
   * build_nojs_breadcrumbs()

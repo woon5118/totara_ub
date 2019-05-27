@@ -243,7 +243,7 @@ class update_competencies_task extends \core\task\scheduled_task {
         // competencyid = the competency id
         // path = the competency's path, shows competency and parents, / delimited
         // aggregationmethod = the competency's aggregation method
-        // proficienyexpected = the proficiency scale value for this competencies scale
+        // minproficiencyid = the minimum value that is considered proficient for this scale
         // itemid = the competencies evidence item id (if we are selecting an evidence item)
         // itemstatus = the competency evidence item status for this user
         // itemproficiency = the competency evidence item proficiency for this user
@@ -260,7 +260,7 @@ class update_competencies_task extends \core\task\scheduled_task {
                 c.id AS competencyid,
                 c.path,
                 c.aggregationmethod,
-                proficient.proficient AS proficiencyexpected,
+                cs.minproficiencyid,
                 cc.evidenceid AS itemid,
                 ccr.status AS itemstatus,
                 ccr.proficiencymeasured AS itemproficiency,
@@ -291,20 +291,7 @@ class update_competencies_task extends \core\task\scheduled_task {
             INNER JOIN {comp} c ON cc.competencyid = c.id
             INNER JOIN {comp_record} cr ON cr.competencyid = c.id
             INNER JOIN {comp_scale_assignments} csa ON c.frameworkid = csa.frameworkid
-            INNER JOIN
-            (
-                SELECT csv.scaleid, csv.id AS proficient
-                FROM {comp_scale_values} csv
-                INNER JOIN
-                (
-                    SELECT scaleid, MAX(sortorder) AS maxsort
-                    FROM {comp_scale_values}
-                    WHERE proficient = 1
-                    GROUP BY scaleid
-                ) grouped
-                ON csv.scaleid = grouped.scaleid AND csv.sortorder = grouped.maxsort
-            ) proficient
-            ON csa.scaleid = proficient.scaleid
+            INNER JOIN {comp_scale} cs ON csa.scaleid = cs.id
             LEFT JOIN {comp_criteria_record} ccr ON cc.evidenceid = ccr.itemid AND cr.userid = ccr.userid
             LEFT JOIN {comp_record} chldcr ON chldcr.competencyid = cc.childid AND cr.userid = chldcr.userid
             WHERE
@@ -375,9 +362,9 @@ class update_competencies_task extends \core\task\scheduled_task {
             foreach ($records as $record) {
                 // Get proficiency.
                 $proficiency = max($record->itemproficiency, $record->childproficiency);
-                if (!isset($this->scale_values[$record->proficiencyexpected])) {
+                if (!isset($this->scale_values[$record->minproficiencyid])) {
                     if (debugging()) {
-                        mtrace('Could not find proficiency expected scale value');
+                        mtrace('Could not find minimum proficiency scale value');
                     }
                     $aggregated_status = null;
                     break;
@@ -396,7 +383,7 @@ class update_competencies_task extends \core\task\scheduled_task {
                 }
 
                 // Get the competencies minimum proficiency.
-                $min_value = $this->scale_values[$record->proficiencyexpected];
+                $min_value = $this->scale_values[$record->minproficiencyid];
 
                 // Flag to break out of aggregation loop (if we already have enough info).
                 $stop_agg = false;
@@ -404,11 +391,11 @@ class update_competencies_task extends \core\task\scheduled_task {
                 // Handle different aggregation types.
                 switch ($record->aggregationmethod) {
                     case $COMP_AGGREGATION['ALL']:
-                        if (!$item_value || $item_value->proficient == 0) {
+                        if (!$item_value || $item_value->sortorder > $min_value->sortorder) {
                             // Learner is not yet proficient so no action required.
                             $aggregated_status = null;
                             $stop_agg = true;
-                        } else if ($current_value && $current_value->proficient == 1) {
+                        } else if ($current_value && $current_value->sortorder <= $min_value->sortorder) {
                             // If a proficiency level has already been set - don't update it.
                             $aggregated_status = null;
                             $stop_agg = true;
@@ -418,11 +405,11 @@ class update_competencies_task extends \core\task\scheduled_task {
                         }
                         break;
                     case $COMP_AGGREGATION['ANY']:
-                        if ($current_value && $current_value->proficient == 1) {
+                        if ($current_value && $current_value->sortorder <= $min_value->sortorder) {
                             // Proficiency level has already been set - don't update it.
                             $aggregated_status = null;
                             $stop_agg = true;
-                        } else if ($item_value && $item_value->proficient == 1) {
+                        } else if ($item_value && $item_value->sortorder <= $min_value->sortorder) {
                             // User is now proficient, so set their proficiency value.
                             $aggregated_status = $min_value->id;
                             $stop_agg = true;

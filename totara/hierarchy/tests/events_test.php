@@ -58,7 +58,7 @@ class totara_hierarchy_events_testcase extends advanced_testcase {
 
     // TODO - extend the hierarchy datagenerator to support scales.
     protected $comp_scale_data = array(
-        'id' => 1, 'name' => 'Competency Scale', 'description' => 'Test Description', 'timemodified' => 1234567890, 'usermodified' => 2, 'defaultid' => 1
+        'id' => 1, 'name' => 'Competency Scale', 'description' => 'Test Description', 'timemodified' => 1234567890, 'usermodified' => 2, 'defaultid' => 1, 'minproficiencyid' => 1
     );
 
     protected $comp_scale_value_data = array(

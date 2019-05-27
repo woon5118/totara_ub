@@ -50,17 +50,10 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I press "Save changes"
     Then I should see "Competency scale \"Graded Scale 1-5\" added"
 
-    # Make scale values 4 a proficient value.
-    When I click on "Edit" "link" in the "4" "table_row"
-    And I set the field "Proficient value" to "1"
-    And I press "Save changes"
-    Then I should see "Competency scale value \"4\" has been updated"
-
-    # Make scale values 3 a proficient value.
-    When I click on "Edit" "link" in the "3" "table_row"
-    And I set the field "Proficient value" to "1"
-    And I press "Save changes"
-    Then I should see "Competency scale value \"3\" has been updated"
+    # Set scale value "3" as the minimum proficient value
+    When I click on "[name=minproficiencyid]" "css_element" in the "3" "table_row"
+    And I press "Save"
+    Then I should see "Changes to scale value settings have been applied"
 
     # Define the competency framework and competency using the new custom sca;e.
     And the following "competency" frameworks exist:

@@ -724,51 +724,11 @@ class dp_competency_component extends dp_base_component {
      * @return  boolean
      */
     protected function is_item_complete($item) {
-
-        // Get proficiencies
-        if (!$proficiencies = competency::get_proficiencies($this->plan->userid)) {
-            $proficiencies = array();
-        }
-
-        // If no record
-        if (!array_key_exists($item->competencyid, $proficiencies)) {
-            return false;
-        }
-
-        // Something wrong with get_proficiencies()
-        if (!isset($proficiencies[$item->competencyid]->isproficient)) {
-            return false;
-        }
-
-        return $proficiencies[$item->competencyid]->isproficient;
+        return in_array(
+            $item->competencyid,
+            competency::get_user_completed_competencies($this->plan->userid)
+        );
     }
-
-
-    /**
-     * Get item's proficiency value
-     *
-     * @access  private
-     * @param   object  $item
-     * @return  string
-     */
-    private function get_item_proficiency($item) {
-
-        // Get proficiencies
-        $proficiencies = competency::get_proficiencies($this->plan->userid);
-
-        // If no record
-        if (!array_key_exists($item->id, $proficiencies)) {
-            return false;
-        }
-
-        // Something wrong with get_proficiencies()
-        if (!isset($proficiencies[$item->id]->isproficient)) {
-            return false;
-        }
-
-        return $proficiencies[$item->id]->proficiency;
-    }
-
 
     /**
      * Display item's name
@@ -1694,10 +1654,8 @@ class dp_competency_component extends dp_base_component {
      *    $progress->text => String description of completion (for use in tooltip)
      */
     public function progress_stats() {
-        global $DB;
-
         // array of all comp scale value ids that represent a status of proficient
-        $proficient_scale_values = $DB->get_records('comp_scale_values', array('proficient' => 1));
+        $proficient_scale_values = competency::get_all_proficient_scale_values();
         $proficient_ids = ($proficient_scale_values) ? array_keys($proficient_scale_values) : array();
 
         $completedcount = 0;

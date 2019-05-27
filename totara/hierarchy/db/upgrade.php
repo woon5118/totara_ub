@@ -227,5 +227,29 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019030700, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2019052700) {
+        // Define field minproficiencyid to be added to comp_scale.
+        $table = new xmldb_table('comp_scale');
+        $field = new xmldb_field('minproficiencyid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'defaultid');
+
+        // Conditionally launch add field minproficiencyid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define key compscal_min_fk (foreign) to be added to comp_scale.
+        $table = new xmldb_table('comp_scale');
+        $key = new xmldb_key('compscal_min_fk', XMLDB_KEY_FOREIGN, array('minproficiencyid'), 'comp_scale_values', array('id'));
+
+        // Launch add key compscal_min_fk.
+        $dbman->add_key($table, $key);
+
+        // Now set the min proficiency id for each scale.
+        totara_hierarchy_upgrade_set_minproficiencyid();
+
+        // Hierarchy savepoint reached.
+        upgrade_plugin_savepoint(true, 2019052700, 'totara', 'hierarchy');
+    }
+
     return true;
 }

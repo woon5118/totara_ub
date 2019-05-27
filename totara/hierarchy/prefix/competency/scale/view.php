@@ -40,6 +40,8 @@ $movedown = optional_param('movedown', 0, PARAM_INT);
 // Set default value
 $default = optional_param('default', 0, PARAM_INT);
 $prefix = required_param ('prefix', PARAM_ALPHA);
+$minproficiencyid = optional_param('minproficiencyid', 0, PARAM_INT);
+$confirmupdate = optional_param('confirmupdate', false, PARAM_BOOL);
 
 // Check if Competencies are enabled.
 competency::check_feature_enabled();
@@ -74,7 +76,8 @@ if (!$scale = $DB->get_record('comp_scale', array('id' => $id))) {
     print_error('incorrectcompetencyscaleid', 'totara_hierarchy');
 }
 
-$scale_used = competency_scale_is_used($id);
+$scale_assigned_to_framework = competency_scale_is_assigned($id);
+$scale_used_by_users = competency_scale_is_used($id);
 
 // Cache text
 $str_edit = get_string('edit');
@@ -92,7 +95,7 @@ if ($canupdatescales || $candeletescales) {
     if ((!empty($moveup) or !empty($movedown))) {
 
         // Can't reorder a scale that's in use
-        if (competency_scale_is_used($scale->id)) {
+        if ($scale_used_by_users) {
             $returnurl = new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $scale->id, 'prefix' => 'competency'));
             print_error('error:noreorderscaleinuse', 'totara_hierarchy', $returnurl);
         }
@@ -144,28 +147,93 @@ if ($canupdatescales || $candeletescales) {
         }
     }
 
-    // Handle default settings
-    if ($default) {
+    if ($default && $minproficiencyid) {
+        // Confirmation is only required when users have values from this scale.
+        if ($scale_used_by_users && !$confirmupdate) {
+            // If the scale is used by users, present a dialog asking for confirmation.
+            echo $OUTPUT->header();
 
-        // Check value exists
-        if (!$DB->get_record('comp_scale_values', array('id' => $default))) {
-            print_error('incorrectcompetencyscalevalueid', 'totara_hierarchy');
+            $title = get_string('confirmupdatescale_title', 'totara_hierarchy');
+            $message = nl2br(get_string('confirmupdatescale_content', 'totara_hierarchy'));
+
+            // This will be going into a single_button with method set to post, which means params will be post params.
+            $continue_url = new moodle_url(
+                $CFG->wwwroot . '/totara/hierarchy/prefix/competency/scale/view.php',
+                array(
+                    'id' => $scale->id,
+                    'prefix' => 'competency',
+                    'default' => $default,
+                    'minproficiencyid' => $minproficiencyid,
+                    'confirmupdate' => 1
+                )
+            );
+            $continue = new single_button($continue_url, get_string('yes'), 'post', true);
+
+            $cancel_url = new moodle_url(
+                $CFG->wwwroot . '/totara/hierarchy/prefix/competency/scale/view.php',
+                array(
+                    'id' => $scale->id,
+                    'prefix' => 'competency'
+                )
+            );
+            $cancel = new single_button($cancel_url, get_string('no'), 'get');
+
+            echo $OUTPUT->confirm($message, $continue, $cancel, $title);
+
+            echo $OUTPUT->footer();
+            exit;
         }
+
+        require_sesskey();
 
         // Update
         $s = new stdClass();
         $s->id = $scale->id;
 
-        if ($default) {
-            $s->defaultid = $default;
+        // Check value exists
+        if (!$DB->get_record('comp_scale_values', array('id' => $default))) {
+            print_error('incorrectcompetencyscalevalueid', 'totara_hierarchy');
         }
+        $s->defaultid = $default;
+
+        // Check value exists
+        if (!$DB->get_record('comp_scale_values', array('id' => $minproficiencyid))) {
+            print_error('incorrectcompetencyscalevalueid', 'totara_hierarchy');
+        }
+        $s->minproficiencyid = $minproficiencyid;
 
         if (!$DB->update_record('comp_scale', $s)) {
             print_error('updatecompetencyscale', 'totara_hierarchy');
         } else {
             // Fetch the update scale record so it'll show up to the user.
             $scale = $DB->get_record('comp_scale', array('id' => $id));
-            \core\notification::success(get_string('scaledefaultupdated', 'totara_hierarchy'));
+
+            // We'll also make sure the scale value 'proficient' fields are up-to-date. These are legacy,
+            // but we're keeping them aligned with minproficiencyid on the scale for backwards compatibility for now.
+            $values = $DB->get_records('comp_scale_values', array('scaleid' => $scale->id), 'sortorder ASC');
+            $proficient = true;
+            foreach ($values as $value) {
+                if ($proficient) {
+                    if ($value->proficient != 1) {
+                        $value->proficient = 1;
+                        $DB->update_record('comp_scale_values', $value);
+                    }
+                } else {
+                    if ($value->proficient != 0) {
+                        $value->proficient = 0;
+                        $DB->update_record('comp_scale_values', $value);
+                    }
+                }
+
+                if ($value->id == $scale->minproficiencyid) {
+                    $proficient = false;
+                }
+            }
+
+            // Unset as we use another variable of the same name later.
+            unset($proficient);
+
+            \core\notification::success(get_string('competencyscalechangeapplied', 'totara_hierarchy'));
         }
     }
 }
@@ -190,17 +258,20 @@ echo $OUTPUT->heading(get_string('scalex', 'totara_hierarchy', format_string($sc
 $scale->description = file_rewrite_pluginfile_urls($scale->description, 'pluginfile.php', $sitecontext->id, 'totara_hierarchy', 'comp_scale', $scale->id);
 echo html_writer::tag('p', $scale->description);
 
-// Display warning if scale is in use
-if ($canupdatescales && $scale_used) {
-    echo $OUTPUT->container(get_string('competencyscaleinuse', 'totara_hierarchy'), 'notifysuccess');
+// Print button for creating new scale value
+$button_editscale = '';
+if ($canupdatescales && !$scale_used_by_users) {
+    echo $button_editscale = $OUTPUT->single_button(
+        new moodle_url('/totara/hierarchy/prefix/competency/scale/editvalue.php', array('scaleid' => $scale->id, 'prefix' => 'competency')),
+        get_string('addscalevalue', 'totara_hierarchy'),
+        'get',
+        array('class' => 'pull-right')
+    );
 }
 
-
-// Display warning if proficient values don't make sense
-if (totara_competency_scale_proficient_not_in_order($id)) {
-    echo html_writer::empty_tag('br');
-    $warning_icon = $OUTPUT->render(new \core\output\flex_icon('warning'));
-    echo html_writer::div($warning_icon . ' ' . get_string('competenctscaleoutoforderthis', 'totara_hierarchy'));
+// Display warning if scale is in use
+if ($canupdatescales && $scale_used_by_users) {
+    echo $OUTPUT->container(get_string('competencyscaleinusemayaffect', 'totara_hierarchy'), 'notifysuccess');
 }
 
 // Display scale values
@@ -209,6 +280,7 @@ if ($values) {
         echo html_writer::start_tag('form', array('id' => 'compscaledefaultprofform', 'action' => new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php'), 'method' => 'POST'));
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $id));
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'prefix', 'value' => 'competency'));
+        echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
         echo html_writer::empty_tag('br');
     }
     $table = new html_table();
@@ -218,12 +290,16 @@ if ($values) {
     $table->align = array('left');
 
     if ($canupdatescales || $candeletescales) {
-        $table->head[] = get_string('competencyscaledefault', 'totara_hierarchy').' '.
-            $OUTPUT->help_icon('competencyscaledefault', 'totara_hierarchy');
+        $table->head[] = get_string('plandefaultvalue', 'totara_hierarchy').' '.
+            $OUTPUT->help_icon('plandefaultvalue', 'totara_hierarchy');
         $table->align[] = 'center';
 
-        $table->head[] = get_string('competencyscaleproficient', 'totara_hierarchy').' '.
-            $OUTPUT->help_icon('competencyscaleproficient', 'totara_hierarchy');
+        $table->head[] = get_string('competencyscaleminprofvalue', 'totara_hierarchy').' '.
+            $OUTPUT->help_icon('competencyscaleminprofvalue', 'totara_hierarchy');
+        $table->align[] = 'center';
+
+        $table->head[] = get_string('competencyscaleprofcolumn', 'totara_hierarchy').' '.
+            $OUTPUT->help_icon('competencyscaleprofcolumn', 'totara_hierarchy');
         $table->align[] = 'center';
 
         $table->head[] = get_string('edit');
@@ -234,8 +310,9 @@ if ($values) {
 
     // Add rows to table
     $count = 0;
-    // get ID of the proficient scale value, if there is only one
-    $onlyprof = competency_scale_only_proficient_value($scale->id);
+
+    $proficient = true;
+
     foreach ($values as $value) {
         $count++;
 
@@ -256,11 +333,23 @@ if ($values) {
 
             $row[] = html_writer::empty_tag('input', $attributes);
 
-            // Is this the proficient value?
-            if ($value->proficient) {
-                $row[] = get_string('yes');
+            $minprof_attributes = array('type' => 'radio', 'name' => 'minproficiencyid', 'value' => $value->id);
+            if ($numvalues == 1 || !$canupdatescales) {
+                $minprof_attributes['disabled'] = 'disabled';
             }
-            else {
+            if ($value->id == $scale->minproficiencyid) {
+                $minprof_attributes['checked'] = 'checked';
+            }
+            $row[] = html_writer::empty_tag('input', $minprof_attributes);
+
+            // Is this the proficient value?
+            if ($proficient) {
+                $row[] = get_string('yes');
+                if ($value->id == $scale->minproficiencyid) {
+                    // Values after this will not be proficient.
+                    $proficient = false;
+                }
+            } else {
                 $row[] = get_string('no');
             }
 
@@ -273,13 +362,10 @@ if ($values) {
                     array('class' => 'action-icon', 'title' => $str_edit));
             }
 
-            if (!$scale_used && $candeletescales) {
+            if (!$scale_used_by_users && $candeletescales) {
                 /// prevent deleting default value
                 if ($value->id == $scale->defaultid) {
                     $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeletecompetencyscalevaluedefault', 'totara_hierarchy'), 'totara_core', array('class' => 'iconsmall action-icon'));
-                // prevent deleting last proficient value
-                } else if ($value->id == $onlyprof) {
-                    $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeletecompetencyscalevalueonlyprof', 'totara_hierarchy'), 'totara_core', array('class' => 'iconsmall action-icon'));
                 } else {
                     $buttons[] = $OUTPUT->action_icon(
                         new moodle_url('/totara/hierarchy/prefix/competency/scale/deletevalue.php',
@@ -291,7 +377,7 @@ if ($values) {
             }
 
             // If value can be moved up
-            if ($count > 1 && !$scale_used && $canupdatescales) {
+            if ($count > 1 && !$scale_used_by_users && $canupdatescales) {
                 $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $scale->id, 'moveup' => $value->id, 'prefix' => 'competency')),
                         new pix_icon('t/up', $str_moveup), null, array('class' => 'action-icon', 'title' => $str_moveup));
             } else {
@@ -299,7 +385,7 @@ if ($values) {
             }
 
             // If value can be moved down
-            if ($count < $numvalues && !$scale_used && $canupdatescales) {
+            if ($count < $numvalues && !$scale_used_by_users && $canupdatescales) {
                 $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $scale->id, 'movedown' => $value->id, 'prefix' => 'competency')),
                         new pix_icon('t/down', $str_movedown), null, array('class' => 'action-icon', 'title' => $str_movedown));
             } else {
@@ -312,16 +398,22 @@ if ($values) {
         $table->data[] = $row;
     }
 
-    if ($canupdatescales && $numvalues != 1) {
-        $row = array();
-        $row[] = '';
-        $row[] = html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('update')));
-        $row[] = '';
-        $row[] = '';
-        $table->data[] = $row;
-    }
     echo html_writer::table($table);
     if ($canupdatescales) {
+        if ($numvalues != 1) {
+            if ($scale_used_by_users || $scale_assigned_to_framework) {
+                $submit_string = get_string('competencyscalesaveapply', 'totara_hierarchy');
+            } else {
+                $submit_string = get_string('competencyscalesave', 'totara_hierarchy');
+            }
+
+            $save = new single_button(new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $scale->id, 'prefix' => 'competency')), $submit_string, 'post', true);
+            $save->class = 'btn btn-xs single-button';
+            $cancel = new single_button(new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $scale->id, 'prefix' => 'competency')), get_string('cancel'), 'get', false);
+            $cancel->class = 'btn btn-xs single-button';
+
+            echo html_writer::tag('div', $OUTPUT->render($save) . $OUTPUT->render($cancel), array('class' => 'btn-block'));
+        }
         echo html_writer::end_tag('form');
     }
 } else {
@@ -331,15 +423,7 @@ if ($values) {
 }
 
 
-// Print button for creating new scale value
-$button_editscale = '';
-if ($canupdatescales && !$scale_used) {
-    $button_editscale = $OUTPUT->single_button(new moodle_url('/totara/hierarchy/prefix/competency/scale/editvalue.php', array('scaleid' => $scale->id, 'prefix' => 'competency')),
-            get_string('addnewscalevalue', 'totara_hierarchy'), 'get');
-}
 
-// Navigation / editing buttons
-echo html_writer::tag('div', $button_editscale, array('class' => "buttons"));
 
 /// and proper footer
 echo $OUTPUT->footer();

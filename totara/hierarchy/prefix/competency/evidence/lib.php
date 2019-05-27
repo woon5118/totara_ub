@@ -115,12 +115,12 @@ function hierarchy_add_competency_evidence($competencyid, $userid, $prof, $compo
         $todb->assessmenttype = $details->assessmenttype;
     }
 
+    $isproficient = competency::value_is_proficient($prof);
+
     // Set the timeproficient value if it has been passed through and the selected value is considered proficient.
     $todb->timeproficient = null;
-    if (!empty($prof) && $proficient = $DB->get_field('comp_scale_values', 'proficient', array('id' => $prof))) {
-        if (!empty($details->timeproficient) && $proficient == 1) {
-            $todb->timeproficient = $details->timeproficient;
-        }
+    if ($isproficient && !empty($details->timeproficient)) {
+        $todb->timeproficient = $details->timeproficient;
     }
 
     if (!empty($details->manual)) {
@@ -143,7 +143,6 @@ function hierarchy_add_competency_evidence($competencyid, $userid, $prof, $compo
     $data2 = $competencyid;
     $time = $todb->reaggregate;
     $count = $DB->count_records('block_totara_stats', array('userid' => $currentuser, 'eventtype' => $event, 'data2' => $data2));
-    $isproficient = $DB->get_field('comp_scale_values', 'proficient', array('id' => $prof));
 
     // Check the proficiency is set to "proficient" and check for duplicate data.
     if ($isproficient && $count == 0) {

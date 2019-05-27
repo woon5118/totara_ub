@@ -60,6 +60,7 @@ $string['addorganisations'] = 'Add organisation(s)';
 $string['addpersonalgoaltype'] = 'Add a new personal goal type';
 $string['addposition'] = 'Add Position';
 $string['addpositions'] = 'Add position(s)';
+$string['addscalevalue'] = 'Add scale value';
 $string['addtype'] = 'Add a new type';
 $string['aggregationmethod'] = 'Aggregation method';
 $string['aggregationmethod1'] = 'All';
@@ -275,18 +276,28 @@ The competency scale is set in the competency framework. Only one competency sca
 A new competency scale can be set up under *Hierarchies > Competencies > Manage Frameworks* in the **Site Administration** menu.';
 $string['competencyscaleassign'] = 'Competency scale';
 $string['competencyscaleassign_help'] = 'A Competency scales defines the criteria by which a competency can be measured. This is the name of scale the value is being added to.';
+$string['competencyscalechangeapplied'] = 'Changes to scale value settings have been applied';
 $string['competencyscaledefault'] = 'Default value';
 $string['competencyscaledefault_help'] = 'The **Default Value** is automatically assigned to a user when they have not yet demonstrated the proficiency required by the competency\'s specified evidence item(s) (course/activity completion, or passing course/activity grade).';
 $string['competencyscaledescription'] = 'Description';
 $string['competencyscaleinuse'] = 'This scale is in use (i.e. users have competencies marked with values from this scale). Scale values cannot be created, re-ordered or deleted to preserve data integrity. You can still rename scale values but this may confuse users when their proficiency changes without warning.';
 $string['competenctscaleoutoforderexist'] = 'There are scales with non-proficient values that are set higher than proficient ones. Scale values should be ordered from most proficient to least proficient – please adjust the proficiency setting on affected scale values to reflect this.';
 $string['competenctscaleoutoforderthis'] = 'This scale has non-proficient values that are set higher than proficient ones. Scale values should be ordered from most proficient to least proficient – please adjust the proficiency setting on affected scale values to reflect this.';
+$string['competencyscaleinusemayaffect'] = 'This scale is in use (i.e. users have competencies marked with values from this scale). Scale values cannot be created, re-ordered or deleted to preserve data integrity. You can still rename scale values but this may confuse users when their proficiency changes without warning. Changing the minimum required proficiency value may impact the proficiency status of users currently assigned to competencies using this scale.';
+$string['competencyscaleminprofvalue'] = 'Minimum required proficiency value';
+$string['competencyscaleminprofvalue_help'] = 'The lowest value a user has to achieve to be considered proficient in a competency using this scale. All higher scale values are automatically classified as proficient values (i.e. values at which the user will be considered proficient).';
+$string['competencyscaleprofcolumn'] = 'Proficient value';
+$string['competencyscaleprofcolumn_help'] = 'Proficient values provide a way for the system to track that a user is \'competent\' in a particular competency. A user is considered \'competent\' if the scale value has \'proficient\' checked. This is used to show progress in learning plans and only show overdue notices for incomplete competencies.
+
+Within Learning Plans, the lowest scale value that is marked as proficient is automatically given to any user who has demonstrated the proficiency required by the competency\'s specified evidence item(s) (e.g., course/activity completion, passing course/activity grade).';
 $string['competencyscaleproficient'] = 'Proficient value';
 $string['competencyscaleproficient_help'] = 'Proficient values provide a way for the system to track if a user is \'competent\' in a particular competency. This is used to show progress in learning plans and only show overdue notices for incomplete competencies.
 A user is considered \'competent\' if the scale value set has \'proficent\' checked. You can have multiple scale values set to proficient, but you must have at least one scale value marked as proficient. The proficient value is edited by editing the scale value.
 
 The lowest scale value that is marked as proficient is automatically given to any user who has demonstrated the proficiency required by the competency\'s specified evidence item(s) (e.g., course/activity completion, passing course/activity grade).';
 $string['competencyscales'] = 'Competency scales';
+$string['competencyscalesave'] = 'Save';
+$string['competencyscalesaveapply'] = 'Save and apply changes';
 $string['competencyscalescalename'] = 'Name';
 $string['competencyscalescalename_help'] = 'The name of the Competency Scale that will be used by Competency frameworks.';
 $string['competencyscalescalevalues'] = 'Values';
@@ -299,6 +310,9 @@ $string['competencyscalesgeneral'] = 'Competency Scale';
 $string['competencyscalesgeneral_help'] = '**Competency scales** enable you to define the criteria by which a competency can be measured. For example, a scale might have three values; \'competent, competent with supervision, not competent\'.
 
 You must have a competency scale set up before you set up a competency framework, or any competencies.';
+$string['competencyscaleupgradeorder'] = 'There are competency scales on this site with values in an invalid order, i.e. where non-proficient values are set higher on the scale than proficient ones. You must fix this before upgrading.
+
+Please revert to Totara versions 9.33, 10.22, 11.16, 12.7 or above, and review and update the affected competency scales.';
 $string['competencyscalevalueconfirmtitle'] = 'Confirm updates to scale values';
 $string['competencyscalevalueconfirmproficient'] = 'The proficiency status of users currently assigned to competencies using this scale may be affected.
 
@@ -343,6 +357,10 @@ $string['configshowhierarchyshortnames'] = 'Toggles the use of shortnames in add
 $string['confirmmoveitems'] = 'Are you sure you want to move {$a->num} {$a->items} into "{$a->parentname}"?<br /><br />Any children of the {$a->items} being moved will also be relocated at the same time.';
 $string['confirmpersonaldelete'] = 'Are you sure you want to delete {$a->username}\'s personal goal {$a->goalname}';
 $string['confirmproceed'] = 'Are you sure you want to proceed?';
+$string['confirmupdatescale_title'] = 'Confirm updates to scale values';
+$string['confirmupdatescale_content'] = 'The proficiency status of users currently assigned to competencies using this scale may be affected.
+
+Do you want to proceed with applying these changes?';
 $string['confirmtypechange'] = 'Reclassify items and transfer/delete data';
 $string['couldnotdeletescalevalue'] = 'There was a problem deleting that scale value';
 $string['createdon'] = 'Created on';
@@ -1092,6 +1110,8 @@ $string['pickaframework'] = 'Pick a framework';
 $string['pickfilehelp'] = 'If the file you want to restore is not available, make sure that the hierarchy backup .zip file is saved in {$a} and that permissions are correctly set.';
 $string['pickfilemultiple'] = 'Pick a file to restore';
 $string['pickfileone'] = 'One file found. Would you like to restore the file {$a}?';
+$string['plandefaultvalue'] = 'Learning plan default value';
+$string['plandefaultvalue_help'] = 'Within Learning Plans, this is the value that will automatically be awarded to a user when they have not yet demonstrated the proficiency required by the competency\'s evidence item(s) (course/activity completion, or passing course/activity grade), as specified in the learning plan.';
 $string['pluginname'] = 'Hierarchies';
 $string['posincludechildrenno'] = 'Ignore children';
 $string['posincludechildrenyes'] = 'Assign to child positions';
@@ -1288,6 +1308,10 @@ $string['xitemsdeleted'] = '{$a->num} {$a->items} and all children have been del
 $string['xitemsmoved'] = '{$a->num} {$a->items} and all children have been moved';
 
 // Deprecated in 13
+$string['competencyscalevalueconfirmtitle'] = 'Confirm updates to scale values';
+$string['competencyscalevalueconfirmproficient'] = 'The proficiency status of users currently assigned to competencies using this scale may be affected.
+
+Do you want to proceed with applying these changes?';
 $string['confirmframeworkdeletion'] = 'Confirm framework deletion';
 $string['deleteincludexcustomfields'] = '- {$a} custom field record(s)';
 $string['deleteincludexuserstatusrecords'] = '- {$a} user status record(s)';

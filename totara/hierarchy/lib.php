@@ -109,6 +109,11 @@ function totara_hierarchy_install_default_comp_scale() {
         }
         $svid = $DB->insert_record('comp_scale_values', $svalue);
 
+        if ($svalue->sortorder == 1) {
+            // We will set the 'competent' value as minimum proficient value for this scale.
+            $DB->set_field('comp_scale', 'minproficiencyid', $svid, ['id' => $scaleid]);
+        }
+
         // Make the notcompetent scale value the default for the scale.
         if ($svalue->sortorder == 3) {
             $scale->id = $scaleid;

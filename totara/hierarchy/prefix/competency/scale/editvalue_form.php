@@ -63,9 +63,6 @@ class competencyscalevalue_edit_form extends moodleform {
         $mform->addHelpButton('numericscore', 'competencyscalevaluenumericalvalue', 'totara_hierarchy');
         $mform->setType('numericscore', PARAM_RAW);
 
-        $mform->addElement('advcheckbox', 'proficient', get_string('competencyscaleproficient', 'totara_hierarchy'));
-        $mform->addHelpButton('proficient', 'competencyscaleproficient', 'totara_hierarchy');
-
         $mform->addElement('editor', 'description_editor', get_string('description'), null, $TEXTAREA_OPTIONS);
         $mform->addHelpButton('description_editor', 'competencyscalevaluedescription', 'totara_hierarchy');
         $mform->setType('description_editor', PARAM_CLEANHTML);
@@ -102,13 +99,6 @@ class competencyscalevalue_edit_form extends moodleform {
             }
         } else {
             $valuenew->numericscore = null;
-        }
-
-        // Check that we're not removing the last proficient value from this scale
-        if ($valuenew->proficient == 0) {
-            if (!$DB->record_exists_select('comp_scale_values', "scaleid = ? AND proficient = 1 AND id != ?", array($valuenew->scaleid, $valuenew->id))) {
-                $err['proficient'] = get_string('error:onescalevaluemustbeproficient', 'totara_hierarchy');
-            }
         }
 
         if (count($err) > 0) {

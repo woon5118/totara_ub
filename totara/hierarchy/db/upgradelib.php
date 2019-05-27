@@ -155,3 +155,87 @@ function totara_hierarchy_upgrade_user_assignment_extrainfo() {
 
     // After upgrade, we only have OLD:x,z (which we can't match to an original assignment) and ITEM:x,y,z records.
 }
+
+/**
+ * Sets the minproficiencyid field for all competency scales, using the proficient field of the scale values.
+ *
+ * This is correct if all scales have no proficient values that are out of order. The environment check performed
+ * using totara_hierarchy_check_comp_value_order should have prevented upgrade if it didn't.
+ */
+function totara_hierarchy_upgrade_set_minproficiencyid() {
+    global $DB;
+
+    $scales = $DB->get_records('comp_scale');
+
+    if (!empty($scales)) {
+        foreach ($scales as $scale) {
+            $min_prof_values = $DB->get_records('comp_scale_values', ['scaleid' => $scale->id, 'proficient' => 1], 'sortorder DESC', 'id', 0, 1);
+            if (!empty($min_prof_values)) {
+                $scale->minproficiencyid = reset($min_prof_values)->id;
+                $DB->update_record('comp_scale', $scale);
+            }
+            // If there wasn't any values returned above, then perhaps there are no scale values, or just no proficient
+            // ones. That's not right, but not our concern here.
+        }
+    }
+}
+
+/**
+ * Used by the environment check on install/upgrade (and for admins going to Server -> Environment in the admin menu).
+ *
+ * This checks if there are any scales on the site where proficient scale values are not in correct order (that is, all
+ * proficient scale values at the top and all non-proficient values below them).
+ *
+ * Upgrade will be blocked if any incorrectly ordered scales are found.
+ *
+ * @param environment_results $result
+ * @return environment_results|null
+ */
+function totara_hierarchy_check_comp_value_order(environment_results $result) {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+    $table = new xmldb_table('comp_scale_values');
+    if (!$dbman->table_exists($table)) {
+        // We're likely on a fresh install, so there's no problems.
+        return null;
+    }
+
+    $result->info = 'competency_value_order';
+
+    // The result below will have values for the scales together within that, ordered from top sortorder.
+    $values = $DB->get_records('comp_scale_values', null, 'scaleid, sortorder ASC');
+
+    if (empty($values)) {
+        return null;
+    }
+
+    $current_scale_id = reset($values)->scaleid;
+    $expect_not_proficient = false;
+
+    foreach ($values as $value) {
+        if ($current_scale_id != $value->scaleid) {
+            // We take this to mean we've moved on to values for another scale.
+            $current_scale_id = $value->scaleid;
+            $expect_not_proficient = false;
+        }
+
+        if ($value->proficient) {
+            if ($expect_not_proficient) {
+                // So we've come across a proficient value. But we'd already seen a not proficient one for this
+                // scale id.
+                // We can answer of the question of whether all the values are in order (they're not).
+                // No need to check any futher.
+                $result->setRestrictStr(array('competencyscaleupgradeorder', 'totara_hierarchy'));
+                $result->setStatus(false);
+                return $result;
+            }
+        } else {
+            // If it wasn't proficient, then the rest of the values for this scale shouldn't be proficient.
+            $expect_not_proficient = true;
+        }
+    }
+
+    // We've made it through all the values and proficient fields were all as expected.
+    return null;
+}

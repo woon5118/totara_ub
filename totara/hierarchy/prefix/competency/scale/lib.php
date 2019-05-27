@@ -92,9 +92,13 @@ function competency_scale_is_used($scaleid) {
  *
  * @param integer $scaleid ID of the scale to check
  * @return integer|false The ID of the sole proficient scale value or false
+ * @deprecated since Totara 13
  */
 function competency_scale_only_proficient_value($scaleid) {
     global $DB;
+
+    debugging('totara_competency_scale_proficient_not_in_order has been deprecated. There should always be a minimum proficient id according to the scale.');
+
     $sql = "
         SELECT csv.id
         FROM {comp_scale_values} csv
@@ -172,10 +176,6 @@ function competency_scale_display_table($scales) {
     ///
 
     if ($scales) {
-
-        $warning_icon = $OUTPUT->render(new \core\output\flex_icon('warning'));
-        $included_outoforder = false;
-
         $table = new html_table();
         $table->head  = array(get_string('scale'), get_string('used'));
         if ($can_edit || $can_delete) {
@@ -187,14 +187,9 @@ function competency_scale_display_table($scales) {
             $scale_used = competency_scale_is_used($scale->id);
             $scale_assigned = competency_scale_is_assigned($scale->id);
             $line = array();
-            $name_link = $OUTPUT->action_link(new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $scale->id, 'prefix' => 'competency')), format_string($scale->name));
 
-            if (totara_competency_scale_proficient_not_in_order($scale->id)) {
-                $name_link .= ' ' . $warning_icon;
-                $included_outoforder = true;
-            }
+            $line[] = $OUTPUT->action_link(new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $scale->id, 'prefix' => 'competency')), format_string($scale->name));
 
-            $line[] = $name_link;
             if ($scale_used) {
                 $line[] = get_string('yes');
             } else if ($scale_assigned) {
@@ -232,10 +227,6 @@ function competency_scale_display_table($scales) {
     $templatedata = new stdClass();
     $templatedata->heading = get_string('competencyscales', 'totara_hierarchy');
 
-    if ($included_outoforder) {
-        $templatedata->informationaltext = $warning_icon . get_string('competenctscaleoutoforderexist', 'totara_hierarchy');
-    }
-
     if ($scales) {
         $templatedata->scales = $table->export_for_template($OUTPUT);
     } else {
@@ -251,10 +242,30 @@ function competency_scale_display_table($scales) {
     echo $OUTPUT->render_from_template('totara_hierarchy/admin_scales', $templatedata);
 }
 
+/**
+ * Tests whether or not a scale has values where those set as proficient are all above those that are not.
+ *
+ * @param int $scaleid
+ * @return bool True if the proficient settings on values are not in order.
+ * @deprecated since Totara 13
+ */
 function totara_competency_scale_proficient_not_in_order($scaleid) {
     global $DB;
+
+    debugging('totara_competency_scale_proficient_not_in_order has been deprecated. Please use the minproficiencyid value on the scale to ensure proficiency cannot be out of order.');
+
     $maxprof = $DB->get_field('comp_scale_values', 'MAX(sortorder)', array('proficient' => 1, 'scaleid' => $scaleid));
     $minnoneprof = $DB->get_field('comp_scale_values', 'MIN(sortorder)', array('proficient' => 0, 'scaleid' => $scaleid));
+
+    // It seems appropriate here to check whether the min proficient value calculated the old way
+    // matches the value that we use for the new way.
+    $minproficiencyid = $DB->get_field('comp_scale', 'minproficiencyid', array('id' => $scaleid));
+    if ($DB->record_exists('comp_scale_values', array('id' => $minproficiencyid, 'sortorder' => $maxprof, 'scaleid' => $scaleid))) {
+        // No match, so warn via debug message. But given we don't know exactly how this function might
+        // be used, don't return false, just calculate that the old way further below.
+        debugging('Min proficiency ID for scale does not align with proficient settings on scale values');
+    }
+
     if (isset($maxprof) && isset($minnoneprof) && $maxprof > $minnoneprof) {
         return true;
     } else {

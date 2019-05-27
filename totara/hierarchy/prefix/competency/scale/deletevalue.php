@@ -102,6 +102,41 @@ if (!confirm_sesskey()) {
     redirect($returnurl);
 }
 
+if ($value->id == $scale->minproficiencyid) {
+    // Deal with this being the minimum proficiency value.
+
+    $values = $DB->get_records('comp_scale_values', array('scaleid' => $scale->id), 'sortorder ASC');
+    $choose_next = false;
+    $new_minimum = null;
+    foreach ($values as $this_value) {
+        if ($choose_next) {
+            $new_minimum = $this_value;
+            break;
+        }
+
+        if ($this_value->id == $value->id) {
+            if (is_null($new_minimum)) {
+                // We haven't got a previous value to use, meaning this was the highest.
+                // Choose the next value.
+                $choose_next = true;
+                continue;
+            } else {
+                // The next highest record, which is what $new_minimum will have been set to, is going
+                // to be our new minimum.
+                break;
+            }
+        }
+
+        // Set this latest value as candidate for the new minimum.
+        $new_minimum = $this_value;
+    }
+
+    $DB->set_field('comp_scale', 'minproficiencyid', $new_minimum->id, array('id' => $scale->id));
+    if ($new_minimum->proficient != 1) {
+        $DB->set_field('comp_scale_values', 'proficient', 1, array('id' => $new_minimum->id));
+    }
+}
+
 $DB->delete_records('comp_scale_values', array('id' => $value->id));
 
 \hierarchy_competency\event\scale_value_deleted::create_from_instance($value)->trigger();

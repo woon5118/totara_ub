@@ -73,8 +73,8 @@ class totara_hierarchy_update_competencies_task_testcase extends advanced_testca
         $comp2 = $generator_hierarchy->create_comp(['frameworkid' => $framework->id, 'idnumber' => 'c2', 'parentid' => $comp1->id]);
         $comp3 = $generator_hierarchy->create_comp(['frameworkid' => $framework->id, 'idnumber' => 'c3', 'parentid' => $comp2->id]);
         $generator_hierarchy->assign_linked_course_to_competency($comp2, $course);
-        $proficiencyid = $DB->get_field('comp_scale_values', 'id', ['proficient' => '1'], IGNORE_MULTIPLE);
-        $notproficiencyid = $DB->get_field('comp_scale_values', 'id', ['proficient' => '0'], IGNORE_MULTIPLE);
+        $proficiencyid = $DB->get_field('comp_scale_values', 'id', ['sortorder' => '1'], IGNORE_MULTIPLE);
+        $notproficiencyid = $DB->get_field('comp_scale_values', 'id', ['sortorder' => '3'], IGNORE_MULTIPLE);
 
         $comp1id = (int)$comp1->id;
         $comp2id = (int)$comp2->id;
@@ -167,7 +167,8 @@ class totara_hierarchy_update_competencies_task_testcase extends advanced_testca
         $comp8 = $generator_hierarchy->create_comp(['frameworkid' => $framework->id, 'idnumber' => 'c8', 'parentid' => $comp7->id]);
         $comp9 = $generator_hierarchy->create_comp(['frameworkid' => $framework->id, 'idnumber' => 'c9', 'parentid' => $comp8->id]);
         $generator_hierarchy->assign_linked_course_to_competency($comp9, $course);
-        $proficiencyid = $DB->get_field('comp_scale_values', 'id', ['proficient' => '1'], IGNORE_MULTIPLE);
+        // In the default scale, value with sortorder = 1 is a proficient value.
+        $proficiencyid = $DB->get_field('comp_scale_values', 'id', ['sortorder' => '1'], IGNORE_MULTIPLE);
 
         $comp1id = (int)$comp1->id;
         $comp2id = (int)$comp2->id;

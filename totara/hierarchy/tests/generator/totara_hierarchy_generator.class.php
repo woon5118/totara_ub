@@ -261,7 +261,7 @@ class totara_hierarchy_generator extends component_generator_base {
                       'timemodified' => time(),
                       'usermodified' => $USER->id,
                       'defaultid' => 1];
-        $scaledata = array_merge($scaledata, $sdefaults);
+        $scaledata = array_merge($sdefaults, $scaledata);
         $scaleid = $DB->insert_record("{$prefix}_scale", $scaledata);
 
         // Create the scale values, filling in any missing information.
@@ -274,9 +274,9 @@ class totara_hierarchy_generator extends component_generator_base {
         // You can't have a scale without values, so if values is empty chuck in these.
         if (empty($valuedata)) {
             $valuedata = [
-                1 => ['name' => 'Assigned', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
+                1 => ['name' => 'Assigned', 'proficient' => 0, 'sortorder' => 3, 'default' => 1],
                 2 => ['name' => 'Progress', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
-                3 => ['name' => 'Complete', 'proficient' => 1, 'sortorder' => 3, 'default' => 0]
+                3 => ['name' => 'Complete', 'proficient' => 1, 'sortorder' => 1, 'default' => 0]
             ];
         }
 
@@ -287,7 +287,7 @@ class totara_hierarchy_generator extends component_generator_base {
 
             $valueid = $DB->insert_record("{$prefix}_scale_values", $vdata);
 
-            if (!empty($vdata->default)) {
+            if (!empty($vdata['default'])) {
                 $defaultid = $valueid;
             }
         }
@@ -297,8 +297,24 @@ class totara_hierarchy_generator extends component_generator_base {
             $defaultid = $valueid;
         }
 
-        // Finally update the default value and return the scale.
         $DB->set_field("{$prefix}_scale", 'defaultid', $defaultid, ['id' => $scaleid]);
+
+        if ($prefix == 'comp') {
+            // Work out the minimum proficient value.
+            $minproficiencyid = $DB->get_records(
+                'comp_scale_values',
+                array('scaleid' => $scaleid, 'proficient' => 1),
+                'sortorder DESC',
+                'id',
+                0,
+                1
+            );
+            if (count($minproficiencyid) > 0) {
+                $minproficiencyid = array_pop($minproficiencyid)->id;
+                $DB->set_field('comp_scale', 'minproficiencyid', $minproficiencyid, array('id' => $scaleid));
+            }
+        }
+
         return $DB->get_record("{$prefix}_scale", array('id' => $scaleid));
     }
 

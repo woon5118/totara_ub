@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/db/upgradelib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
+require_once($CFG->dirroot . '/lib/environmentlib.php');
 
 /**
  * Unit tests for upgrade functions
@@ -499,5 +500,198 @@ class totara_hierarchy_upgradelib_testcase extends advanced_testcase {
             }
         }
         $this->assertEquals($expected_user_assignments, $actual_user_assignments);
+    }
+
+    /**
+     * Tests totara_hierarchy_upgrade_set_minproficiencyid to ensure it chooses correct minproficiencyid values.
+     */
+    public function test_upgrade_set_minproficiencyid() {
+        $this->resetAfterTest();
+        global $DB;
+
+        // Remove all scales and values and check things still go ok.
+        $DB->delete_records('comp_scale');
+        $DB->delete_records('comp_scale_values');
+
+        totara_hierarchy_upgrade_set_minproficiencyid();
+
+        // For above function call, just need to make it here without exceptions being thrown.
+
+        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
+        $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+
+        $scale1 = $totara_hierarchy_generator->create_scale(
+            'comp',
+            [],
+            [
+                ['name' => 'A', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
+                ['name' => 'B', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                ['name' => 'C', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
+                ['name' => 'D', 'proficient' => 0, 'sortorder' => 4, 'default' => 1],
+            ]
+        );
+        $expected_min1 = $DB->get_record('comp_scale_values', ['scaleid' => $scale1->id, 'sortorder' => 2]);
+
+        $scale2 = $totara_hierarchy_generator->create_scale(
+            'comp',
+            [],
+            [
+                ['name' => 'X', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
+                ['name' => 'Y', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                ['name' => 'Z', 'proficient' => 0, 'sortorder' => 3, 'default' => 1],
+            ]
+        );
+        $expected_min2 = $DB->get_record('comp_scale_values', ['scaleid' => $scale2->id, 'sortorder' => 1]);
+
+        $scale3 = $totara_hierarchy_generator->create_scale(
+            'comp',
+            [],
+            [
+                ['name' => 'One', 'proficient' => 1, 'sortorder' => 100, 'default' => 0],
+                ['name' => 'Two', 'proficient' => 1, 'sortorder' => 250, 'default' => 0],
+                ['name' => 'Three', 'proficient' => 1, 'sortorder' => 300, 'default' => 1],
+                ['name' => 'Four', 'proficient' => 0, 'sortorder' => 4000, 'default' => 0],
+            ]
+        );
+        $expected_min3 = $DB->get_record('comp_scale_values', ['scaleid' => $scale3->id, 'sortorder' => 300]);
+
+        // Unset the minproficiencyid field on all scales to simulate the state during upgrade.
+        $DB->set_field('comp_scale', 'minproficiencyid', null);
+        $this->assertNull($DB->get_field('comp_scale', 'minproficiencyid', ['id' => $scale1->id]));
+        $this->assertNull($DB->get_field('comp_scale', 'minproficiencyid', ['id' => $scale2->id]));
+        $this->assertNull($DB->get_field('comp_scale', 'minproficiencyid', ['id' => $scale3->id]));
+
+        totara_hierarchy_upgrade_set_minproficiencyid();
+
+        $this->assertEquals(
+            $expected_min1->id,
+            $DB->get_field('comp_scale', 'minproficiencyid', ['id' => $scale1->id])
+        );
+        $this->assertEquals(
+            $expected_min2->id,
+            $DB->get_field('comp_scale', 'minproficiencyid', ['id' => $scale2->id])
+        );
+        $this->assertEquals(
+            $expected_min3->id,
+            $DB->get_field('comp_scale', 'minproficiencyid', ['id' => $scale3->id])
+        );
+    }
+
+    public function test_upgrade_check_comp_value_order_no_scales() {
+        $this->resetAfterTest();
+        global $DB;
+
+        // First test is run with no scales or values.
+        $DB->delete_records('comp_scale');
+        $DB->delete_records('comp_scale_values');
+
+        $result = totara_hierarchy_check_comp_value_order(new environment_results('custom_check'));
+
+        $this->assertNull($result);
+    }
+
+    public function test_upgrade_check_comp_value_order_correct_scales() {
+        $this->resetAfterTest();
+        global $DB;
+
+        $DB->delete_records('comp_scale');
+        $DB->delete_records('comp_scale_values');
+
+        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
+        $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+
+        $totara_hierarchy_generator->create_scale(
+            'comp',
+            [],
+            [
+                ['name' => 'A', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
+                ['name' => 'B', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                ['name' => 'C', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
+                ['name' => 'D', 'proficient' => 0, 'sortorder' => 4, 'default' => 1],
+            ]
+        );
+
+        $totara_hierarchy_generator->create_scale(
+            'comp',
+            [],
+            [
+                ['name' => 'X', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
+                ['name' => 'Y', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                ['name' => 'Z', 'proficient' => 0, 'sortorder' => 3, 'default' => 1],
+            ]
+        );
+
+        $totara_hierarchy_generator->create_scale(
+            'comp',
+            [],
+            [
+                ['name' => 'One', 'proficient' => 1, 'sortorder' => 100, 'default' => 0],
+                ['name' => 'Two', 'proficient' => 1, 'sortorder' => 250, 'default' => 0],
+                ['name' => 'Three', 'proficient' => 1, 'sortorder' => 300, 'default' => 1],
+                ['name' => 'Four', 'proficient' => 0, 'sortorder' => 4000, 'default' => 0],
+            ]
+        );
+
+        $result = totara_hierarchy_check_comp_value_order(new environment_results('custom_check'));
+
+        $this->assertNull($result);
+    }
+
+    public function test_upgrade_check_comp_value_order_incorrect_scale() {
+        $this->resetAfterTest();
+        global $DB;
+
+        $DB->delete_records('comp_scale');
+        $DB->delete_records('comp_scale_values');
+
+        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
+        $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+
+        // First test is run with no scales or values.
+        $DB->delete_records('comp_scale');
+        $DB->delete_records('comp_scale_values');
+
+        // Keeping this one in order.
+        $totara_hierarchy_generator->create_scale(
+            'comp',
+            [],
+            [
+                ['name' => 'A', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
+                ['name' => 'B', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                ['name' => 'C', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
+                ['name' => 'D', 'proficient' => 0, 'sortorder' => 4, 'default' => 1],
+            ]
+        );
+
+        // This one is out of order.
+        $totara_hierarchy_generator->create_scale(
+            'comp',
+            [],
+            [
+                ['name' => 'X', 'proficient' => 0, 'sortorder' => 1, 'default' => 0],
+                ['name' => 'Y', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                ['name' => 'Z', 'proficient' => 0, 'sortorder' => 3, 'default' => 1],
+            ]
+        );
+
+        // Follow the above out of order scale with one that does have correct ordering.
+        $totara_hierarchy_generator->create_scale(
+            'comp',
+            [],
+            [
+                ['name' => 'One', 'proficient' => 1, 'sortorder' => 100, 'default' => 0],
+                ['name' => 'Two', 'proficient' => 1, 'sortorder' => 250, 'default' => 0],
+                ['name' => 'Three', 'proficient' => 1, 'sortorder' => 300, 'default' => 1],
+                ['name' => 'Four', 'proficient' => 0, 'sortorder' => 4000, 'default' => 0],
+            ]
+        );
+
+        $result = totara_hierarchy_check_comp_value_order(new environment_results('custom_check'));
+
+        $this->assertInstanceOf(environment_results::class, $result);
+        // A false status means failed.
+        $this->assertFalse($result->getStatus());
+        // The key and component for the message explaining the failure should be present.
+        $this->assertEquals(['competencyscaleupgradeorder', 'totara_hierarchy'], $result->getRestrictStr());
     }
 }

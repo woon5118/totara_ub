@@ -198,7 +198,7 @@ class totara_competency_evidence_form extends moodleform {
             $mform->addElement('date_selector', 'timeproficient', get_string('timeproficient', 'totara_plan'));
             $mform->addHelpButton('timeproficient', 'timeproficient', 'totara_plan');
             foreach ($scalevalues as $scalevalue) {
-                if (empty($scalevalue->proficient)) {
+                if (!competency::value_is_proficient($scalevalue->id)) {
                     $mform->disabledIf('timeproficient', 'proficiency', 'eq', $scalevalue->id);
                 }
             }
@@ -227,7 +227,7 @@ class totara_competency_evidence_form extends moodleform {
             $mform->addElement('date_selector', 'timeproficient', get_string('timeproficient', 'totara_plan'));
             $mform->addHelpButton('timeproficient', 'timeproficient', 'totara_plan');
             foreach ($scalevalues as $scalevalue) {
-                if (empty($scalevalue->proficient)) {
+                if (!competency::value_is_proficient($scalevalue->id)) {
                     $mform->disabledIf('timeproficient', 'proficiency', 'eq', $scalevalue->id);
                 }
             }

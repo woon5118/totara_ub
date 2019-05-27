@@ -121,10 +121,10 @@ if ($mform->is_cancelled()) {
             }
         }
         // Set the default scale value to the least competent one, and the
-        // "proficient" scale value to the most competent one
+        // minimum proficient scale value to the most competent one
         if (count($scaleidlist)) {
             $scalenew->defaultid = $scaleidlist[count($scaleidlist)-1];
-            $scalenew->proficient = $scaleidlist[0];
+            $scalenew->minproficiencyid = $scaleidlist[0];
             $DB->update_record('comp_scale', $scalenew);
         }
         $transaction->allow_commit();
