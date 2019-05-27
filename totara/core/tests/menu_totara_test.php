@@ -378,6 +378,18 @@ class totara_core_menu_totara_testcase extends advanced_testcase {
                 $this->assertFalse($node->is_selected);
             }
         }
+
+        // Use REAL class name without the leading backslash.
+        $PAGE->set_totara_menu_selected(totara_core\totara\menu\home::class);
+        $menuitem = '\\' . totara_core\totara\menu\home::class;
+        $menu = totara_build_menu();
+        foreach ($menu as $k => $node) {
+            if ($node->classname === $menuitem) {
+                $this->assertTrue($node->is_selected);
+            } else {
+                $this->assertFalse($node->is_selected);
+            }
+        }
     }
 
     public function test_totara_upgrade_menu() {

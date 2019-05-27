@@ -347,7 +347,7 @@ class moodle_page {
     protected $_popup_notification_allowed = true;
 
     /**
-     * Totara specific Page variable
+     * Active Totara menu item class name
      */
     protected $_totara_menu_selected = null;
 
@@ -793,7 +793,7 @@ class moodle_page {
     }
 
     /**
-     * Returns the totara menu selected string
+     * Returns the totara menu selected item class name
      * @return String totara_menu_selected
      */
     protected function magic_get_totara_menu_selected() {
@@ -1264,16 +1264,23 @@ class moodle_page {
     }
 
     /**
-     * @param string $menuitemname The name of the bottom level selected item
+     * Select active Totara menu item for the current page.
+     * @param string $menuitemname The class name of the selected menu item
      */
-    public function set_totara_menu_selected($menuitemname) {
+    public function set_totara_menu_selected(string $menuitemname) {
+
+        // Real class names do not start with backslash, but existing code elsewhere expects it...
+        if (substr($menuitemname, 0, 1) !== '\\') {
+            $menuitemname = '\\' . $menuitemname;
+        }
 
         // Check to make sure that fully qualified classes are being passed
-        if (!preg_match('/^\\\([a-zA-Z0-9_]+\\\)*[a-zA-Z0-9_]+$/', $menuitemname)) {
-            debugging('Incorrect menuitem class given. Please provide the full classname 
-            including leading backslash, e.g. \totara_core\totara\menu\myreports. Actual value: \''.$menuitemname.'\'', DEBUG_DEVELOPER);
+        if (!preg_match('/^\\\[a-zA-Z0-9_]+\\\totara\\\menu\\\*[a-zA-Z0-9_]+$/', $menuitemname)) {
+            debugging('Incorrect menuitem class given. Please provide the full classname, e.g. totara_core\totara\menu\myreports. Actual value: \''.$menuitemname.'\'', DEBUG_DEVELOPER);
+            $menuitemname = null;
         } else if (!class_exists($menuitemname)) {
             debugging('No class '.$menuitemname.' was found. Please check the class is correct.', DEBUG_DEVELOPER);
+            $menuitemname = null;
         }
 
         $this->_totara_menu_selected = $menuitemname;
