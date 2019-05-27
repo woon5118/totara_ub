@@ -230,7 +230,7 @@ function user_get_default_fields() {
         'address', 'phone1', 'phone2', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'department',
         'institution', 'interests', 'firstaccess', 'lastaccess', 'auth', 'confirmed',
         'idnumber', 'lang', 'theme', 'timezone', 'mailformat', 'description', 'descriptionformat',
-        'city', 'url', 'country', 'profileimageurlsmall', 'profileimageurl', 'customfields',
+        'city', 'url', 'country', 'profileimageurlsmall', 'profileimageurl', 'imagealt', 'customfields',
         'groups', 'roles', 'preferences', 'enrolledcourses', 'suspended'
     );
 }
@@ -249,262 +249,216 @@ function user_get_default_fields() {
  * @return array|null
  */
 function user_get_user_details($user, $course = null, array $userfields = array()) {
-    global $USER, $DB, $CFG, $PAGE;
-    require_once($CFG->dirroot . "/user/profile/lib.php"); // Custom field library.
-    require_once($CFG->dirroot . "/lib/filelib.php");      // File handling on description and friends.
-
-    $defaultfields = user_get_default_fields();
-
-    if (empty($userfields)) {
-        $userfields = $defaultfields;
-    }
-
-    foreach ($userfields as $thefield) {
-        if (!in_array($thefield, $defaultfields)) {
-            throw new moodle_exception('invaliduserfield', 'error', '', $thefield);
-        }
-    }
-
-    // Make sure id and fullname are included.
-    if (!in_array('id', $userfields)) {
-        $userfields[] = 'id';
-    }
-
-    if (!in_array('fullname', $userfields)) {
-        $userfields[] = 'fullname';
-    }
-
-    if (!empty($course)) {
-        $context = context_course::instance($course->id);
-        $usercontext = context_user::instance($user->id);
-        $canviewdetailscap = (has_capability('moodle/user:viewdetails', $context) || has_capability('moodle/user:viewdetails', $usercontext));
-    } else {
-        $context = context_user::instance($user->id);
-        $usercontext = $context;
-        $canviewdetailscap = has_capability('moodle/user:viewdetails', $usercontext);
-    }
-
-    $currentuser = ($user->id == $USER->id);
-    $isadmin = is_siteadmin($USER);
-
-    $showuseridentityfields = get_extra_user_fields($context);
-
-    if (!empty($course)) {
-        $canviewhiddenuserfields = has_capability('moodle/course:viewhiddenuserfields', $context);
-    } else {
-        $canviewhiddenuserfields = has_capability('moodle/user:viewhiddendetails', $context);
-    }
-    $canviewfullnames = has_capability('moodle/site:viewfullnames', $context);
-    if (!empty($course)) {
-        $canviewuseremail = has_capability('moodle/course:useremail', $context);
-    } else {
-        $canviewuseremail = false;
-    }
-    $cannotviewdescription   = !empty($CFG->profilesforenrolledusersonly) && !$currentuser && !$DB->record_exists('role_assignments', array('userid' => $user->id));
-    if (!empty($course)) {
-        $canaccessallgroups = has_capability('moodle/site:accessallgroups', $context);
-    } else {
-        $canaccessallgroups = false;
-    }
-
-    if (!$currentuser && !$canviewdetailscap && !has_coursecontact_role($user->id)) {
-        // Skip this user details.
+    $controller = \core_user\access_controller::for($user, $course);
+    if (!$controller->can_view_profile()) {
         return null;
     }
 
-    $userdetails = array();
-    $userdetails['id'] = $user->id;
+    $defaultfields = user_get_default_fields();
+    if (!empty($userfields)) {
+        foreach ($userfields as $thefield) {
+            if (!in_array($thefield, $defaultfields)) {
+                throw new moodle_exception('invaliduserfield', 'error', '', $thefield);
+            }
+        }
+    } else {
+        $userfields = $defaultfields;
+    }
 
-    if (in_array('username', $userfields)) {
-        if ($currentuser or has_capability('moodle/user:viewalldetails', $context)) {
-            $userdetails['username'] = $user->username;
+    // Make sure id and fullname are included.
+    foreach (['id', 'fullname'] as $field) {
+        if (!in_array($field, $userfields)) {
+            $userfields[] = $field;
         }
     }
-    if ($isadmin or $canviewfullnames) {
-        if (in_array('firstname', $userfields)) {
-            $userdetails['firstname'] = $user->firstname;
-        }
-        if (in_array('lastname', $userfields)) {
-            $userdetails['lastname'] = $user->lastname;
-        }
-    }
-    $userdetails['fullname'] = fullname($user);
 
-    if (in_array('customfields', $userfields)) {
-        $fields = $DB->get_recordset_sql("SELECT f.*
+    // This will be the array that we return.
+    $return = array();
+
+    // TOTARA: Rewritten so that checks are consistent and functional.
+    $resolver_isset = function ($field, $user) use (&$return) {
+        if (isset($user->{$field})) {
+            $return[$field] = $user->{$field};
+        }
+    };
+    $resolver_notempty = function ($field, $user) use (&$return) {
+        if (!empty($user->{$field})) {
+            $return[$field] = $user->{$field};
+        }
+    };
+
+    $resolvers = [
+        'id' => $resolver_isset,
+        'imagealt' => $resolver_isset,
+        'firstname' => $resolver_isset,
+        'lastname' => $resolver_isset,
+        'username' => $resolver_isset,
+        'email' => $resolver_isset,
+        'institution' => $resolver_notempty,
+        'idnumber' => $resolver_isset,
+        'msn' => $resolver_notempty,
+        'aim' => $resolver_notempty,
+        'yahoo' => $resolver_notempty,
+        'skype' => $resolver_notempty,
+        'icq' => $resolver_notempty,
+        'city' => $resolver_notempty,
+        'country' => $resolver_notempty,
+        'auth' => $resolver_isset,
+        'confirmed' => $resolver_isset,
+        'lang' => $resolver_isset,
+        'theme' => $resolver_isset,
+        'timezone' => $resolver_isset,
+        'mailformat' => $resolver_isset,
+        'department' => $resolver_isset,
+        'phone1' => $resolver_notempty,
+        'phone2' => $resolver_notempty,
+        'address' => $resolver_notempty,
+
+        // Fullname needs to be generated by the fullname function.
+        'fullname' => function ($field, $user) use (&$return) {
+            $return[$field] = fullname($user);
+        },
+
+        // The following do something separate for each field.
+        'description' => function ($field, $user) use (&$return) {
+            global $CFG;
+            require_once($CFG->dirroot . "/lib/filelib.php");
+            if (!isset($user->description)) {
+                return;
+            }
+            // This is terrible practice, don't ever copy this code!
+            require_once($CFG->libdir . '/externallib.php');
+            // Always return the descriptionformat if description is requested.
+            $usercontext = context_user::instance($user->id);
+            list($return['description'], $return['descriptionformat']) =
+                external_format_text($user->description, $user->descriptionformat, $usercontext->id, 'user', 'profile', null);
+        },
+
+        'url' => function ($field, $user) use (&$return) {
+            $url = $user->url;
+            if (strpos($user->url, '://') === false) {
+                $url = 'http://'. $url;
+            }
+            $user->url = clean_param($url, PARAM_URL);
+            $return['url'] = $user->url;
+        },
+
+        'suspended' => function ($field, $user) use (&$return) {
+            $return['suspended'] = (bool)$user->suspended;
+        },
+
+        'firstaccess' => function ($field, $user) use (&$return) {
+            $return['firstaccess'] = ($user->firstaccess) ? $user->firstaccess : 0;
+        },
+
+        'lastaccess' => function ($field, $user) use (&$return) {
+            $return['lastaccess'] = ($user->lastaccess) ? $user->lastaccess : 0;
+        },
+
+        'profileimageurl' => function ($field, $user) use (&$return) {
+            global $PAGE;
+            $return['profileimageurl'] = (new user_picture($user, 1))->get_url($PAGE)->out(false);
+        },
+
+        'profileimageurlsmall' => function ($field, $user) use (&$return) {
+            global $PAGE;
+            $return['profileimageurlsmall'] = (new user_picture($user, 0))->get_url($PAGE)->out(false);
+        },
+
+        'interests' => function ($field, $user) use (&$return) {
+            $interests = core_tag_tag::get_item_tags_array(
+                'core',
+                'user',
+                $user->id,
+                core_tag_tag::BOTH_STANDARD_AND_NOT,
+                0,
+                false
+            );
+            if ($interests) {
+                $return['interests'] = join(', ', $interests);
+            }
+        },
+
+        'enrolledcourses' => function ($field, $user) use (&$return) {
+            $enrolledcourses = array();
+            $mycourses = enrol_get_users_courses($user->id, true);
+            if ($mycourses) {
+                foreach ($mycourses as $mycourse) {
+                    if ($mycourse->category) {
+                        $coursecontext = context_course::instance($mycourse->id);
+                        $enrolledcourses[] = [
+                            'id' => $mycourse->id,
+                            'fullname' => format_string($mycourse->fullname, true, array('context' => $coursecontext)),
+                            'shortname' => format_string($mycourse->shortname, true, array('context' => $coursecontext))
+                        ];
+                    }
+                }
+                $return['enrolledcourses'] = $enrolledcourses;
+            }
+        },
+
+        'preferences' => function ($field, $user) use (&$return) {
+            $preferences = array();
+            $userpreferences = get_user_preferences();
+            foreach ($userpreferences as $prefname => $prefvalue) {
+                $preferences[] = array('name' => $prefname, 'value' => $prefvalue);
+            }
+            $return['preferences'] = $preferences;
+        },
+
+        'customfields' => function ($field, $user) use (&$return) {
+            global $CFG, $DB;
+            require_once($CFG->dirroot . "/user/profile/lib.php");
+            $fields = $DB->get_recordset_sql("SELECT f.*
                                             FROM {user_info_field} f
                                             JOIN {user_info_category} c
                                                  ON f.categoryid=c.id
                                         ORDER BY c.sortorder ASC, f.sortorder ASC");
-        $userdetails['customfields'] = array();
-        foreach ($fields as $field) {
-            require_once($CFG->dirroot.'/user/profile/field/'.$field->datatype.'/field.class.php');
-            $newfield = 'profile_field_'.$field->datatype;
-            $formfield = new $newfield($field->id, $user->id);
-            if ($formfield->is_visible() and !$formfield->is_empty()) {
+            $return['customfields'] = array();
+            foreach ($fields as $field) {
+                require_once($CFG->dirroot.'/user/profile/field/'.$field->datatype.'/field.class.php');
+                $newfield = 'profile_field_'.$field->datatype;
+                $formfield = new $newfield($field->id, $user->id);
+                if ($formfield->is_visible() and !$formfield->is_empty()) {
+                    // TODO: Part of MDL-50728, this conditional coding must be moved to
+                    // proper profile fields API so they are self-contained.
+                    // We only use display_data in fields that require text formatting.
+                    if ($field->datatype == 'text' or $field->datatype == 'textarea') {
+                        $fieldvalue = $formfield->display_data();
+                    } else {
+                        // Cases: datetime, checkbox and menu.
+                        $fieldvalue = $formfield->data;
+                    }
 
-                // TODO: Part of MDL-50728, this conditional coding must be moved to
-                // proper profile fields API so they are self-contained.
-                // We only use display_data in fields that require text formatting.
-                if ($field->datatype == 'text' or $field->datatype == 'textarea') {
-                    $fieldvalue = $formfield->display_data();
-                } else {
-                    // Cases: datetime, checkbox and menu.
-                    $fieldvalue = $formfield->data;
+                    $return['customfields'][] = [
+                        'name' => $formfield->field->name,
+                        'value' => $fieldvalue,
+                        'type' => $field->datatype,
+                        'shortname' => $formfield->field->shortname
+                    ];
                 }
-
-                $userdetails['customfields'][] =
-                    array('name' => $formfield->field->name, 'value' => $fieldvalue,
-                        'type' => $field->datatype, 'shortname' => $formfield->field->shortname);
+            }
+            $fields->close();
+            // Unset customfields if it's empty.
+            if (empty($return['customfields'])) {
+                unset($return['customfields']);
             }
         }
-        $fields->close();
-        // Unset customfields if it's empty.
-        if (empty($userdetails['customfields'])) {
-            unset($userdetails['customfields']);
+    ];
+    foreach ($resolvers as $field => $callback) {
+        if (in_array($field, $userfields) && $controller->can_view_field($field)) {
+            $callback($field, $user);
         }
     }
 
-    // Profile image.
-    if (in_array('profileimageurl', $userfields)) {
-        $userpicture = new user_picture($user);
-        $userpicture->size = 1; // Size f1.
-        $userdetails['profileimageurl'] = $userpicture->get_url($PAGE)->out(false);
-    }
-    if (in_array('profileimageurlsmall', $userfields)) {
-        if (!isset($userpicture)) {
-            $userpicture = new user_picture($user);
-        }
-        $userpicture->size = 0; // Size f2.
-        $userdetails['profileimageurlsmall'] = $userpicture->get_url($PAGE)->out(false);
-    }
-
-    // Hidden user field.
-    if ($canviewhiddenuserfields) {
-        $hiddenfields = array();
-        // Address, phone1 and phone2 not appears in hidden fields list but require viewhiddenfields capability
-        // according to user/profile.php.
-        if (!empty($user->address) && in_array('address', $userfields)) {
-            $userdetails['address'] = $user->address;
-        }
-    } else {
-        $hiddenfields = array_flip(explode(',', $CFG->hiddenuserfields));
-    }
-
-    if (!empty($user->phone1) && in_array('phone1', $userfields) &&
-            (in_array('phone1', $showuseridentityfields) or $canviewhiddenuserfields)) {
-        $userdetails['phone1'] = $user->phone1;
-    }
-    if (!empty($user->phone2) && in_array('phone2', $userfields) &&
-            (in_array('phone2', $showuseridentityfields) or $canviewhiddenuserfields)) {
-        $userdetails['phone2'] = $user->phone2;
-    }
-
-    if (isset($user->description) &&
-        ((!isset($hiddenfields['description']) && !$cannotviewdescription) or $isadmin)) {
-        if (in_array('description', $userfields)) {
-            // Always return the descriptionformat if description is requested.
-            list($userdetails['description'], $userdetails['descriptionformat']) =
-                    external_format_text($user->description, $user->descriptionformat,
-                            $usercontext->id, 'user', 'profile', null);
-        }
-    }
-
-    if (in_array('country', $userfields) && (!isset($hiddenfields['country']) or $isadmin) && $user->country) {
-        $userdetails['country'] = $user->country;
-    }
-
-    if (in_array('city', $userfields) && (!isset($hiddenfields['city']) or $isadmin) && $user->city) {
-        $userdetails['city'] = $user->city;
-    }
-
-    if (in_array('url', $userfields) && $user->url && (!isset($hiddenfields['webpage']) or $isadmin)) {
-        $url = $user->url;
-        if (strpos($user->url, '://') === false) {
-            $url = 'http://'. $url;
-        }
-        $user->url = clean_param($user->url, PARAM_URL);
-        $userdetails['url'] = $user->url;
-    }
-
-    if (in_array('icq', $userfields) && $user->icq && (!isset($hiddenfields['icqnumber']) or $isadmin)) {
-        $userdetails['icq'] = $user->icq;
-    }
-
-    if (in_array('skype', $userfields) && $user->skype && (!isset($hiddenfields['skypeid']) or $isadmin)) {
-        $userdetails['skype'] = $user->skype;
-    }
-    if (in_array('yahoo', $userfields) && $user->yahoo && (!isset($hiddenfields['yahooid']) or $isadmin)) {
-        $userdetails['yahoo'] = $user->yahoo;
-    }
-    if (in_array('aim', $userfields) && $user->aim && (!isset($hiddenfields['aimid']) or $isadmin)) {
-        $userdetails['aim'] = $user->aim;
-    }
-    if (in_array('msn', $userfields) && $user->msn && (!isset($hiddenfields['msnid']) or $isadmin)) {
-        $userdetails['msn'] = $user->msn;
-    }
-    if (in_array('suspended', $userfields) && (!isset($hiddenfields['suspended']) or $isadmin)) {
-        $userdetails['suspended'] = (bool)$user->suspended;
-    }
-
-    if (in_array('firstaccess', $userfields) && (!isset($hiddenfields['firstaccess']) or $isadmin)) {
-        if ($user->firstaccess) {
-            $userdetails['firstaccess'] = $user->firstaccess;
-        } else {
-            $userdetails['firstaccess'] = 0;
-        }
-    }
-    if (in_array('lastaccess', $userfields) && (!isset($hiddenfields['lastaccess']) or $isadmin)) {
-        if ($user->lastaccess) {
-            $userdetails['lastaccess'] = $user->lastaccess;
-        } else {
-            $userdetails['lastaccess'] = 0;
-        }
-    }
-
-    if (in_array('email', $userfields) && ($isadmin // The admin is allowed the users email.
-      or $currentuser // Of course the current user is as well.
-      or $canviewuseremail  // This is a capability in course context, it will be false in usercontext.
-      or in_array('email', $showuseridentityfields)
-      or $user->maildisplay == 1
-      or ($user->maildisplay == 2 and enrol_sharing_course($user, $USER)))) {
-        $userdetails['email'] = $user->email;
-    }
-
-    if (in_array('interests', $userfields)) {
-        $interests = core_tag_tag::get_item_tags_array('core', 'user', $user->id, core_tag_tag::BOTH_STANDARD_AND_NOT, 0, false);
-        if ($interests) {
-            $userdetails['interests'] = join(', ', $interests);
-        }
-    }
-
-    // Departement/Institution/Idnumber are not displayed on any profile, however you can get them from editing profile.
-    if (in_array('idnumber', $userfields) && $user->idnumber) {
-        if (in_array('idnumber', $showuseridentityfields) or $currentuser or
-                has_capability('moodle/user:viewalldetails', $context)) {
-            $userdetails['idnumber'] = $user->idnumber;
-        }
-    }
-    if (in_array('institution', $userfields) && $user->institution) {
-        if (in_array('institution', $showuseridentityfields) or $currentuser or
-                has_capability('moodle/user:viewalldetails', $context)) {
-            $userdetails['institution'] = $user->institution;
-        }
-    }
-    // Isset because it's ok to have department 0.
-    if (in_array('department', $userfields) && isset($user->department)) {
-        if (in_array('department', $showuseridentityfields) or $currentuser or
-                has_capability('moodle/user:viewalldetails', $context)) {
-            $userdetails['department'] = $user->department;
-        }
-    }
-
+    // TOTARA: The following are only available if we are looking at a course.
     if (in_array('roles', $userfields) && !empty($course)) {
         // Not a big secret.
+        $context = context_course::instance($course->id);
         $roles = get_user_roles($context, $user->id, false);
-        $userdetails['roles'] = array();
+        $return['roles'] = array();
         foreach ($roles as $role) {
-            $userdetails['roles'][] = array(
+            $return['roles'][] = array(
                 'roleid'       => $role->roleid,
                 'name'         => $role->name,
                 'shortname'    => $role->shortname,
@@ -512,66 +466,46 @@ function user_get_user_details($user, $course = null, array $userfields = array(
             );
         }
     }
-
-    // If groups are in use and enforced throughout the course, then make sure we can meet in at least one course level group.
-    if (in_array('groups', $userfields) && !empty($course) && $canaccessallgroups) {
-        $usergroups = groups_get_all_groups($course->id, $user->id, $course->defaultgroupingid,
-                'g.id, g.name,g.description,g.descriptionformat');
-        $userdetails['groups'] = array();
-        foreach ($usergroups as $group) {
-            list($group->description, $group->descriptionformat) =
-                external_format_text($group->description, $group->descriptionformat,
-                        $context->id, 'group', 'description', $group->id);
-            $userdetails['groups'][] = array('id' => $group->id, 'name' => $group->name,
-                'description' => $group->description, 'descriptionformat' => $group->descriptionformat);
-        }
-    }
-    // List of courses where the user is enrolled.
-    if (in_array('enrolledcourses', $userfields) && !isset($hiddenfields['mycourses'])) {
-        $enrolledcourses = array();
-        if ($mycourses = enrol_get_users_courses($user->id, true)) {
-            foreach ($mycourses as $mycourse) {
-                if ($mycourse->category) {
-                    $coursecontext = context_course::instance($mycourse->id);
-                    $enrolledcourse = array();
-                    $enrolledcourse['id'] = $mycourse->id;
-                    $enrolledcourse['fullname'] = format_string($mycourse->fullname, true, array('context' => $coursecontext));
-                    $enrolledcourse['shortname'] = format_string($mycourse->shortname, true, array('context' => $coursecontext));
-                    $enrolledcourses[] = $enrolledcourse;
-                }
-            }
-            $userdetails['enrolledcourses'] = $enrolledcourses;
-        }
-    }
-
-    // User preferences.
-    if (in_array('preferences', $userfields) && $currentuser) {
-        $preferences = array();
-        $userpreferences = get_user_preferences();
-        foreach ($userpreferences as $prefname => $prefvalue) {
-            $preferences[] = array('name' => $prefname, 'value' => $prefvalue);
-        }
-        $userdetails['preferences'] = $preferences;
-    }
-
-    if ($currentuser or has_capability('moodle/user:viewalldetails', $context)) {
-        $extrafields = ['auth', 'confirmed', 'lang', 'theme', 'timezone', 'mailformat'];
-        foreach ($extrafields as $extrafield) {
-            if (in_array($extrafield, $userfields) && isset($user->$extrafield)) {
-                $userdetails[$extrafield] = $user->$extrafield;
+    if (in_array('groups', $userfields) && !empty($course)) {
+        // If groups are in use and enforced throughout the course, then make sure we can meet in at least one course level group.
+        $context = context_course::instance($course->id);
+        if (has_capability('moodle/site:accessallgroups', $context)) {
+            $usergroups = groups_get_all_groups(
+                $course->id,
+                $user->id,
+                $course->defaultgroupingid,
+                'g.id, g.name,g.description,g.descriptionformat'
+            );
+            $return['groups'] = array();
+            foreach ($usergroups as $group) {
+                list($group->description, $group->descriptionformat) =
+                    external_format_text(
+                        $group->description,
+                        $group->descriptionformat,
+                        $context->id,
+                        'group',
+                        'description',
+                        $group->id
+                    );
+                $return['groups'][] = [
+                    'id' => $group->id,
+                    'name' => $group->name,
+                    'description' => $group->description,
+                    'descriptionformat' => $group->descriptionformat
+                ];
             }
         }
     }
 
     // Clean lang and auth fields for external functions (it may content uninstalled themes or language packs).
-    if (isset($userdetails['lang'])) {
-        $userdetails['lang'] = clean_param($userdetails['lang'], PARAM_LANG);
+    if (isset($return['lang'])) {
+        $return['lang'] = clean_param($return['lang'], PARAM_LANG);
     }
-    if (isset($userdetails['theme'])) {
-        $userdetails['theme'] = clean_param($userdetails['theme'], PARAM_THEME);
+    if (isset($return['theme'])) {
+        $return['theme'] = clean_param($return['theme'], PARAM_THEME);
     }
 
-    return $userdetails;
+    return $return;
 }
 
 /**
@@ -582,30 +516,11 @@ function user_get_user_details($user, $course = null, array $userfields = array(
  * @return array if unsuccessful or the allowed user details.
  */
 function user_get_user_details_courses($user) {
-    global $USER;
-    $userdetails = null;
-
-    // Get the courses that the user is enrolled in (only active).
-    $courses = enrol_get_users_courses($user->id, true);
-
-    $systemprofile = false;
-    if (can_view_user_details_cap($user) || ($user->id == $USER->id) || has_coursecontact_role($user->id)) {
-        $systemprofile = true;
-    }
-
-    // Try using system profile.
-    if ($systemprofile) {
-        $userdetails = user_get_user_details($user, null);
-    } else {
-        // Try through course profile.
-        foreach ($courses as $course) {
-            if (can_view_user_details_cap($user, $course) || ($user->id == $USER->id) || has_coursecontact_role($user->id)) {
-                $userdetails = user_get_user_details($user, $course);
-            }
-        }
-    }
-
-    return $userdetails;
+    // TOTARA: The code from Moodle here would try this first at the system, and then by courses one by one.
+    // However there was a bug in the code whereit it would iterate all courses, but not return, break or merge.
+    // It was basically just wasting cycles.
+    // We refactored user_get_user_details and it already does what this function is trying to do.
+    return user_get_user_details($user);
 }
 
 /**
@@ -1140,67 +1055,7 @@ function user_mygrades_url($userid = null, $courseid = SITEID) {
  * @return bool true for ability to view this user, else false.
  */
 function user_can_view_profile($user, $course = null, $usercontext = null) {
-    global $USER, $CFG;
-
-    if ($user->deleted) {
-        return false;
-    }
-
-    // Do we need to be logged in?
-    if (empty($CFG->forceloginforprofiles)) {
-        return true;
-    } else {
-       if (!isloggedin() || isguestuser()) {
-            // User is not logged in and forceloginforprofile is set, we need to return now.
-            return false;
-        }
-    }
-
-    // Current user can always view their profile.
-    if ($USER->id == $user->id) {
-        return true;
-    }
-
-    // Course contacts have visible profiles always.
-    if (has_coursecontact_role($user->id)) {
-        return true;
-    }
-
-    // If we're only checking the capabilities in the single provided course.
-    if (isset($course)) {
-        // Confirm that $user is enrolled in the $course we're checking.
-        if (is_enrolled(context_course::instance($course->id), $user)) {
-            $userscourses = array($course);
-        }
-    } else {
-        // Else we're checking whether the current user can view $user's profile anywhere, so check user context first.
-        if (empty($usercontext)) {
-            $usercontext = context_user::instance($user->id);
-        }
-        if (has_capability('moodle/user:viewdetails', $usercontext) || has_capability('moodle/user:viewalldetails', $usercontext)) {
-            return true;
-        }
-        // This returns context information, so we can preload below.
-        $userscourses = enrol_get_all_users_courses($user->id);
-    }
-
-    if (empty($userscourses)) {
-        return false;
-    }
-
-    foreach ($userscourses as $userscourse) {
-        context_helper::preload_from_record($userscourse);
-        $coursecontext = context_course::instance($userscourse->id);
-        if (has_capability('moodle/user:viewdetails', $coursecontext) ||
-            has_capability('moodle/user:viewalldetails', $coursecontext)) {
-            if (!groups_user_groups_visible($userscourse, $user->id)) {
-                // Not a member of the same group.
-                continue;
-            }
-            return true;
-        }
-    }
-    return false;
+    return (\core_user\access_controller::for($user, $course))->can_view_profile();
 }
 
 /**
@@ -1217,23 +1072,12 @@ function user_can_view_profile($user, $course = null, $usercontext = null) {
 function core_user_myprofile_navigation(core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
     global $CFG;
 
-    if (isguestuser($user)) {
-        return false;
+    if (\core_user\access_controller::for($user, $course)->can_manage_files()) {
+        $url = new moodle_url('/user/files.php', array('returnurl' => $CFG->wwwroot. '/user/profile.php'));
+        $title = get_string('privatefilesmanage') . '...';
+        $notesnode = new core_user\output\myprofile\node('administration', 'privatefiles', $title, null, $url);
+        $tree->add_node($notesnode);
     }
-
-    if (!$iscurrentuser) {
-        return false;
-    }
-
-    $usercontext = context_user::instance($user->id);
-    if (!has_capability('moodle/user:manageownfiles', $usercontext)) {
-        return false;
-    }
-
-    $url = new moodle_url('/user/files.php', array('returnurl' => $CFG->wwwroot. '/user/profile.php'));
-    $title = get_string('privatefilesmanage') . '...';
-    $notesnode = new core_user\output\myprofile\node('administration', 'privatefiles', $title, null, $url);
-    $tree->add_node($notesnode);
 }
 
 /**

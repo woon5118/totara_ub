@@ -164,7 +164,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertFalse($user->ismessaging);
         $this->assertNull($user->lastmessage);
         $this->assertNull($user->messageid);
-        $this->assertNull($user->isonline);
+        $this->assertTrue($user->isonline);
         $this->assertFalse($user->isread);
         $this->assertTrue($user->isblocked);
         $this->assertNull($user->unreadcount);

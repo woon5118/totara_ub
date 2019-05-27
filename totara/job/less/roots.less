@@ -8,11 +8,19 @@
 
         margin-left: 0;
 
-        > li:first-of-type a[data-action="up"] {
-            visibility: hidden;
-        }
-        > li:last-of-type a[data-action="down"] {
-            visibility: hidden;
+        > li {
+            transition: all .06s ease;
+            transition-property: background;
+
+            &:first-of-type a[data-action="up"] {
+                visibility: hidden;
+            }
+            &:last-of-type a[data-action="down"] {
+                visibility: hidden;
+            }
+            &.highlight {
+                background-color: #fefdb2;
+            }
         }
     }
 

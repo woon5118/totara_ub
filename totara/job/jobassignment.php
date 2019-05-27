@@ -193,9 +193,7 @@ if ($submitted = $form->get_data()) {
     }
 
     if (!empty($submitted->description_editor) && !empty($submitted->description_editor)) {
-        $data->description_editor = $submitted->description_editor;
-    } else {
-        $data->description_editor = null;
+        $description = $submitted->description_editor;
     }
 
     if (!empty($submitted->positionid) && $submitted->positionid > 0) {
@@ -314,6 +312,14 @@ if ($submitted = $form->get_data()) {
     } else {
         $data->userid = $userid;
         $jobassignment = \totara_job\job_assignment::create($data);
+    }
+
+    if (isset($description)) {
+        $record = new \stdClass();
+        $record->id = $jobassignment->id;
+        $record->description_editor = $description;
+        $record = file_postupdate_standard_editor($record, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],'totara_job', 'job_assignment', $record->id);
+        $jobassignment->update_description($record->description, $record->descriptionformat);
     }
 
     // Display success message

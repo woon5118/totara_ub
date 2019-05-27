@@ -3779,7 +3779,7 @@ function order_in_string($values, $stringformat) {
 /**
  * Checks if current user is shown any extra fields when listing users.
  *
- * @param content|true $context Context. If set to true then the capability check is ignored and all user identity fields will be included.
+ * @param context|true $context Context. If set to true then the capability check is ignored and all user identity fields will be included.
  *      This is useful in situations where you are fetching the fields from the database, and intend to check the capability later.
  * @param array $already Array of fields that we're going to show anyway
  *   so don't bother listing them

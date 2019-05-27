@@ -41,6 +41,9 @@ class execution_context {
     /** @var \GraphQL\Type\Definition\ResolveInfo|null */
     private $resolveinfo;
 
+    /** @var \context */
+    private $relevantcontext;
+
     /**
      * Constructor.
      *
@@ -103,6 +106,39 @@ class execution_context {
         return $this->operationname;
     }
 
+    /**
+     * Sets the context most relevant to this execution.
+     * @param \context $context
+     */
+    final public function set_relevant_context(\context $context) {
+        if (isset($this->context)) {
+            throw new \coding_exception('Context can only be set once per execution');
+        }
+        if ($context->contextlevel == CONTEXT_SYSTEM) {
+            // We don't want developers just setting the system context here, that would be bad form.
+            // It doesn't provide us with anything.
+            // In a multitenant world if a query or mutation has a relevant context then it will always be child of system.
+            throw new \coding_exception('Do not use the system context, provide an specific context or do not set a context.');
+        }
+        $this->relevantcontext = $context;
+    }
+
+    /**
+     * Returns the context.
+     */
+    final public function get_relevant_context(): \context {
+        if (!isset($this->relevantcontext)) {
+            throw new \coding_exception('Context has not been provided for this execution');
+        }
+        return $this->relevantcontext;
+    }
+
+    /**
+     * Returns true if the execution has provided a relevant context.
+     */
+    final public function has_relevant_context(): bool {
+        return isset($this->relevantcontext);
+    }
     // === Utility functions for resolvers ===
 
     /**

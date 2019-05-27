@@ -206,8 +206,9 @@ class user_picture implements renderable {
      *
      * @param stdClass $user user record with at least id, picture, imagealt, firstname and lastname set.
      *                 It is recommended to add also contextid of the user for performance reasons.
+     * @param int $size The size in pixels, special values are (true/1 = 100px) and (false/0 = 35px)
      */
-    public function __construct(stdClass $user) {
+    public function __construct(stdClass $user, int $size = null) {
         global $DB;
 
         if (empty($user->id)) {
@@ -229,6 +230,10 @@ class user_picture implements renderable {
             $this->user = $DB->get_record('user', array('id'=>$user->id), self::fields(), MUST_EXIST);
         } else {
             $this->user = clone($user);
+        }
+
+        if ($size !== null) {
+            $this->size = $size;
         }
     }
 

@@ -23,12 +23,14 @@
 
 namespace totara_job;
 
-use Horde\Socket\Client\Exception;
 use totara_job\event\job_assignment_viewed;
 use totara_job\event\job_assignment_updated;
 use totara_job\event\job_assignment_deleted;
 
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/lib/formslib.php'); // Needed for $TEXTAREA_OPTIONS;
 
 /**
  * Class job_assignment.
@@ -327,88 +329,128 @@ class job_assignment {
         if (!is_array($data)) {
             $data = (array)$data;
         }
+        $descriptioneditor = false;
 
         // Verify the specified data is sufficient.
         if (empty($data['userid'])) {
-            throw new exception('User id is required when creating new job assignment');
+            throw new \coding_exception('User id is required when creating new job assignment');
         }
         if (!isset($data['idnumber']) || $data['idnumber'] === "") {
-            throw new exception('ID Number is required when creating new job assignment');
+            throw new \coding_exception('ID Number is required when creating new job assignment');
         }
         if (empty($CFG->totara_job_allowmultiplejobs) && $DB->record_exists('job_assignment', ['userid' => $data['userid']])) {
-            throw new exception('Attempting to create multiple job assignments for user');
+            throw new \coding_exception('Attempting to create multiple job assignments for user');
         }
-        foreach ($data as $key => $value) {
-            if (!in_array($key, array('userid', 'fullname', 'shortname', 'idnumber', 'description', 'description_editor',
-                                      'positionid', 'organisationid', 'startdate', 'enddate', 'managerjaid',
-                                      'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid', 'totarasync', 'synctimemodified'))) {
-                throw new exception('Invalid field specified when creating new job assignment');
-            }
-        }
-        if (!empty($data['tempmanagerjaid']) XOR !empty($data['tempmanagerexpirydate'])) {
-            throw new exception('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::create');
+        if (isset($data['description_editor'])) {
+            debugging('Description editor content must be processed BEFORE after you create the Job Assignment.', DEBUG_DEVELOPER);
+            $descriptioneditor = $data['description_editor'];
+            unset($data['description_editor']);
         }
 
-        $record = (object)$data;
+        $additionalfields = array_diff(array_keys($data), [
+            'userid', 'fullname', 'shortname', 'idnumber', 'description',
+            'positionid', 'organisationid', 'startdate', 'enddate', 'managerjaid',
+            'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid', 'totarasync', 'synctimemodified'
+        ]);
+        if (!empty($additionalfields)) {
+            throw new \coding_exception('Invalid field specified when creating new job assignment', join(',', $additionalfields));
+        }
+
+        if (!empty($data['tempmanagerjaid']) xor !empty($data['tempmanagerexpirydate'])) {
+            throw new \coding_exception('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::create');
+        }
 
         // Check that the short name is unique for this user.
-        if ($DB->record_exists('job_assignment', array('userid' => $record->userid, 'idnumber' => $record->idnumber))) {
-            throw new Exception('Tried to create job assignment idnumber which is not unique for this user');
+        if ($DB->record_exists('job_assignment', array('userid' => $data['userid'], 'idnumber' => $data['idnumber']))) {
+            throw new \coding_exception('Tried to create job assignment idnumber which is not unique for this user');
         }
 
-        // Remove the description_editor and save it for later.
-        if (property_exists($record, 'description_editor')) {
-            $descriptioneditor = $record->description_editor;
-            unset($record->description_editor);
-        } else {
-            $descriptioneditor = false;
-        }
+        $existingjobs = self::get_all($data['userid']);
 
         $now = time();
+
+        $record = new \stdClass();
+        $record->userid = $data['userid'];
+        $record->idnumber = $data['idnumber'];
+        if (isset($data['fullname'])) {
+            $record->fullname = $data['fullname'] ;
+        }
+        if (isset($data['shortname'])) {
+            $record->shortname = $data['shortname'] ;
+        }
+        if (isset($data['description'])) {
+            $record->description = $data['description'] ;
+        }
+        if (!empty($data['positionid'])) {
+            $record->positionid = (int)$data['positionid'] ;
+        }
+        if (!empty($data['organisationid'])) {
+            $record->organisationid = (int)$data['organisationid'] ;
+        }
+        if (!empty($data['startdate'])) {
+            $record->startdate = (int)$data['startdate'] ;
+        }
+        if (!empty($data['enddate'])) {
+            $record->enddate = (int)$data['enddate'] ;
+        }
+        if (!empty($data['managerjaid'])) {
+            $record->managerjaid = (int)$data['managerjaid'] ;
+        }
+        if (!empty($data['tempmanagerjaid'])) {
+            $record->tempmanagerjaid = (int)$data['tempmanagerjaid'] ;
+        }
+        if (!empty($data['tempmanagerexpirydate'])) {
+            $record->tempmanagerexpirydate = (int)$data['tempmanagerexpirydate'] ;
+        }
+        if (!empty($data['appraiserid'])) {
+            $record->appraiserid = (int)$data['appraiserid'] ;
+        }
+        if (isset($data['totarasync'])) {
+            $record->totarasync = (bool)$data['totarasync'] ;
+        }
+        if (!empty($data['synctimemodified'])) {
+            $record->synctimemodified = (int)$data['synctimemodified'] ;
+        }
         $record->timecreated = $now;
         $record->timemodified = $now;
         $record->usermodified = $USER->id;
         $record->positionassignmentdate = $now;
+        $record->sortorder = 1 + array_reduce(
+            $existingjobs,
+            function ($sortorder, $job) {
+                return max($sortorder, $job->sortorder);
+            },
+            0
+        );
 
-        // Put the job_assignment at the end of the list.
-        $maxsortorder = $DB->get_field('job_assignment', 'MAX(sortorder)', array('userid' => $record->userid), IGNORE_MISSING);
-        if ($maxsortorder === false) {
-            $record->sortorder = 1;
-        } else {
-            $record->sortorder = $maxsortorder + 1;
+        if (!empty(array_filter($existingjobs, function ($job) use ($record) {
+            return ($job->idnumber == $record->idnumber);
+        }))) {
+            throw new \coding_exception('Tried to create job assignment idnumber which is not unique for this user');
         }
 
         $transaction = $DB->start_delegated_transaction();
         try {
             // Create the record and find the new job_assignment id.
             $record->id = $DB->insert_record('job_assignment', $record);
+            $jobassignment = self::get_with_id($record->id);
 
             // Save the extra data which needed a record id before it could be saved.
             // Make sure to save all extrafields data into $record.
             $extrafields = new \stdClass();
-            $extrafields->id = $record->id;
-
-            if (empty($record->managerjaid)) {
-                $record->managerjaid = null;
-            }
-            $extrafields->managerjapath = self::calculate_managerjapath($record->id, $record->managerjaid);
-            $record->managerjapath = $extrafields->managerjapath;
+            $extrafields->id = $jobassignment->id;
+            $extrafields->managerjapath = self::calculate_managerjapath($jobassignment->id, $jobassignment->managerjaid);
 
             if (!empty($descriptioneditor)) {
                 $extrafields->description_editor = $descriptioneditor;
                 file_postupdate_standard_editor($extrafields, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
                     'totara_job', 'job_assignment', $extrafields->id);
-                $record->description = $extrafields->description;
             }
 
             $DB->update_record('job_assignment', $extrafields);
 
-            // Fetch from database to get correct data types and defaults.
-            $record = $DB->get_record('job_assignment', array('id' => $record->id), '*', MUST_EXIST);
-
-            // Record is identical to the data in the database, so we can create the object from it.
-            $jobassignment = new job_assignment($record);
-
+            // Get it from the database to ensure it is accurate.
+            $jobassignment = self::get_with_id($jobassignment->id);
             $jobassignment->updated_manager(null);
             $jobassignment->updated_temporary_manager(null, null);
 
@@ -437,6 +479,20 @@ class job_assignment {
     }
 
     /**
+     * Updates the description for the job assginment.
+     * @param string $text
+     * @param string $format
+     */
+    public function update_description(string $text, string $format = FORMAT_HTML) {
+        global $DB;
+        if ($format !== FORMAT_HTML) {
+            debugging('Job assignment description does not currently allow formats other than HTML', DEBUG_DEVELOPER);
+        }
+        $DB->set_field('job_assignment', 'description', $text, ['id' => $this->id]);
+        $this->description = $text;
+    }
+
+    /**
      * Create a default job assignment for the specified user. Is saved to the db.
      *
      * @param $userid
@@ -451,7 +507,7 @@ class job_assignment {
         }
 
         if (isset($data['userid']) && $data['userid'] != $userid) {
-            throw new exception("Mismatched userids specified when creating default job assignment");
+            throw new \coding_exception("Mismatched userids specified when creating default job assignment");
         }
 
         if (empty($data['userid'])) {
@@ -485,7 +541,7 @@ class job_assignment {
 
             // Check that the parent managerjapath doesn't contain the same id as we're adding to it.
             if (strpos($path, '/' . $id . '/') !== false) {
-                throw new exception("Tried to create a manager path loop in job_assignment::calculate_managerjapath");
+                throw new \coding_exception("Tried to create a manager path loop in job_assignment::calculate_managerjapath");
             }
         } else {
             $path = '/';
@@ -503,14 +559,16 @@ class job_assignment {
      * @return mixed type depends on field accessed
      */
     public function __get($name) {
-        global $DB, $TEXTAREA_OPTIONS;
+        global $CFG, $DB, $TEXTAREA_OPTIONS;
 
         if ($name === 'description') {
+            require_once($CFG->dirroot . '/lib/filelib.php');
             $description = file_rewrite_pluginfile_urls($this->description, 'pluginfile.php', $TEXTAREA_OPTIONS['context']->id,
                 'totara_job', 'job_assignment', $this->id);
             return $description;
 
         } else if ($name === 'description_editor') {
+            require_once($CFG->dirroot . '/lib/filelib.php');
             $obj = new \stdClass();
             $obj->descriptionformat = FORMAT_HTML;
             $obj->description = $this->description;
@@ -569,7 +627,7 @@ class job_assignment {
             return $this->$name;
 
         } else {
-            throw new exception("Tried to get job assignment property that cannot be retrieved (not allowed or doesn't exist).");
+            throw new \coding_exception("Tried to get job assignment property that cannot be retrieved (not allowed or doesn't exist).");
         }
     }
 
@@ -654,7 +712,7 @@ class job_assignment {
             if (!in_array($key, array('fullname', 'shortname', 'idnumber', 'description', 'description_editor', 'positionid',
                                       'organisationid', 'startdate', 'enddate', 'managerjaid',
                                       'tempmanagerjaid', 'tempmanagerexpirydate', 'appraiserid', 'totarasync', 'synctimemodified'))) {
-                throw new exception("Invalid field specified when updating job_assignment (not allowed or doesn't exist).");
+                throw new \coding_exception("Invalid field specified when updating job_assignment (not allowed or doesn't exist).");
             }
         }
 
@@ -675,18 +733,18 @@ class job_assignment {
         if (array_key_exists('idnumber', $data)) {
             if (is_null($data['idnumber']) || $data['idnumber'] === "") {
                 // Null and empty string are not allow (but "0" is, so not checking "empty").
-                throw new Exception('Tried to update job assignment idnumber to an empty value which is not allowed');
+                throw new \coding_exception('Tried to update job assignment idnumber to an empty value which is not allowed');
             }
 
             // Check that it is unique for this user.
             if ($data['idnumber'] != $this->idnumber &&
                 $DB->record_exists('job_assignment', array('userid' => $this->userid, 'idnumber' => $data['idnumber']))) {
-                throw new Exception('Tried to update job assignment to an idnumber which is not unique for this user');
+                throw new \coding_exception('Tried to update job assignment to an idnumber which is not unique for this user');
             }
         }
 
         if (!empty($data['tempmanagerjaid']) XOR !empty($data['tempmanagerexpirydate'])) {
-            throw new exception('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::update_internal');
+            throw new \coding_exception('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::update_internal');
         }
 
         // Create a record ready for $DB->update_record.
@@ -874,7 +932,7 @@ class job_assignment {
         $params = array('likethisid' => "%/{$this->id}/%", 'now' => $now);
 
         if (!$DB->execute($sql, $params)) {
-            throw new exception('job_assignment::update_descendant_manager_paths: Could not update manager path of child items in manager hierarchy');
+            throw new \coding_exception('job_assignment::update_descendant_manager_paths: Could not update manager path of child items in manager hierarchy');
         }
     }
 
@@ -1155,7 +1213,7 @@ class job_assignment {
         global $DB;
 
         if (!in_array($field, array('fullname', 'shortname', 'positionid', 'organisationid', 'appraiserid'))) {
-            throw new exception("Invalid field specified in job_assignment::get_all_by_criteria");
+            throw new \coding_exception("Invalid field specified in job_assignment::get_all_by_criteria");
         }
 
         $sql = "SELECT * FROM {job_assignment} WHERE {$field} = :value ORDER BY id";
@@ -1183,7 +1241,7 @@ class job_assignment {
         global $DB, $USER;
 
         if (!in_array($field, array('positionid', 'organisationid', 'appraiserid'))) {
-            throw new exception("Invalid field specified in job_assignment::update_to_empty_by_criteria");
+            throw new \coding_exception("Invalid field specified in job_assignment::update_to_empty_by_criteria");
         }
 
         // Save a list of the record ids and old values we are about to update.
@@ -1488,6 +1546,75 @@ class job_assignment {
     }
 
     /**
+     * Returns true if both users are related via jobs
+     *
+     * This is true if:
+     *   - User 1 is managed or appraised by user 2
+     *   - User 2 is managed or appraised by user 1
+     *   - User 1 and User 2 are manager and appraiser for the same user.
+     *
+     * @param int $userid1
+     * @param int $userid2
+     * @return bool
+     */
+    public static function users_share_relation(int $userid1, int $userid2): bool {
+        global $DB;
+
+        if ($userid1 == $userid2) {
+            // The same user!
+            return true;
+        }
+
+        $sql = 'SELECT 1
+                  FROM "ttr_job_assignment" ja 
+             LEFT JOIN "ttr_job_assignment" mja ON mja.id = ja.managerjaid
+                 WHERE (ja.userid = :userid1 AND (mja.userid = :managerid1 OR ja.appraiserid = :appraiser1))
+                    OR (ja.userid = :userid2 AND (mja.userid = :managerid2 OR ja.appraiserid = :appraiser2))
+                    OR (mja.userid = :managerid3 AND ja.appraiserid = :appraiser3)
+                    OR (mja.userid = :managerid4 AND ja.appraiserid = :appraiser4)';
+        return $DB->record_exists_sql($sql, [
+            // Test one: User 1 is managed or appraised by user 2
+            'userid1' => $userid1,
+            'managerid1' => $userid2,
+            'appraiser1' => $userid2,
+
+            // Test two: User 2 is managed or appraised by user 1
+            'userid2' => $userid2,
+            'managerid2' => $userid1,
+            'appraiser2' => $userid1,
+
+            // Test three: User 1 manages a user and User 2 is the appraiser.
+            'managerid3' => $userid1,
+            'appraiser3' => $userid2,
+
+            // Test four: User 2 manages a user and User 1 is the appraiser.
+            'managerid4' => $userid2,
+            'appraiser4' => $userid1,
+        ]);
+    }
+
+    /**
+     * Check if a user is appraiser for another user.
+     *
+     * @param int $appraiserid user ID of a potential appraiser to check
+     * @param int $staffid user ID of the staff
+     * @return bool true if user $staffid is appraised by user $managerid
+     **/
+    public static function is_appraising($appraiserid, $staffid) {
+        global $DB;
+
+        $sql = 'SELECT 1
+                  FROM "ttr_job_assignment" ja
+                 WHERE ja.userid = :staffid
+                   AND ja.appraiserid = :appraiserid';
+        $params = [
+            'staffid' => $staffid,
+            'appraiserid' => $appraiserid
+        ];
+        return $DB->record_exists_sql($sql, $params);
+    }
+
+    /**
      * Check if a user is the manager for any users.
      *
      * Note that mismatch between $managerid and $managerjaid will not be detected by this function and will cause empty results.
@@ -1692,7 +1819,7 @@ class job_assignment {
         global $DB;
 
         if ($jobassignment1->userid != $jobassignment2->userid) {
-            throw new exception('Cannot swap order of two job assignments belonging to different users.');
+            throw new \coding_exception('Cannot swap order of two job assignments belonging to different users.');
         }
 
         $sortorder1 = $jobassignment1->sortorder;
@@ -1731,7 +1858,7 @@ class job_assignment {
             array('userid' => $targetja->userid, 'sortorder' => $targetja->sortorder - 1), '*', IGNORE_MISSING);
 
         if (empty($otherjarecord)) {
-            throw new exception('Tried to move the first job assignment up.');
+            throw new \coding_exception('Tried to move the first job assignment up.');
         }
 
         $otherja = new job_assignment($otherjarecord);
@@ -1754,7 +1881,7 @@ class job_assignment {
             array('userid' => $targetja->userid, 'sortorder' => $targetja->sortorder + 1), '*', IGNORE_MISSING);
 
         if (empty($otherjarecord)) {
-            throw new exception('Tried to move the last job assignment down.');
+            throw new \coding_exception('Tried to move the last job assignment down.');
         }
 
         $otherja = new job_assignment($otherjarecord);
@@ -1819,6 +1946,56 @@ class job_assignment {
         $transaction->allow_commit();
 
         return $map;
+    }
+
+    /**
+     * Sorts a new job assignment to a new position.
+     *
+     * @param int $userid
+     * @param int $jobassignmentid
+     * @param int $newposition
+     */
+    public static function move($userid, $jobassignmentid, $newposition) {
+        $jobs = job_assignment::get_all($userid);
+        if ($newposition < 0 || $newposition >= count($jobs)) {
+            throw new \coding_exception('Invalid job position.');
+        }
+
+        $position = 0;
+        $found = false;
+        $moved = false;
+        $sortorder = [];
+        foreach ($jobs as $job) {
+            if ($job->id == $jobassignmentid) {
+                $found = true;
+                continue;
+            }
+            if ($newposition === $position) {
+                $moved = true;
+                $sortorder[] = $jobassignmentid;
+                $position++;
+            }
+            $sortorder[] = $job->id;
+            $position++;
+        }
+        if ($newposition === $position) {
+            $moved = true;
+            $sortorder[] = $jobassignmentid;
+        }
+
+        if (!$found) {
+            throw new \coding_exception('Invalid job.');
+        }
+        if (!$moved) {
+            // This should never happen; the code above has a bug if it does.
+            throw new \coding_exception('Job not moved.');
+        }
+        if (count($sortorder) !== count($jobs)) {
+            // This should never happen; the code above has a bug if it does.
+            throw new \coding_exception('Jobs have been lost');
+        }
+
+        job_assignment::resort_all($userid, $sortorder);
     }
 
     /**

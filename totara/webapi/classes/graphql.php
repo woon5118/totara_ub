@@ -292,6 +292,9 @@ final class graphql {
                 $component = array_shift($parts) . '_' . array_shift($parts);
                 $name = implode('_', $parts);
             }
+            if (empty($name)) {
+                throw new \coding_exception('Type resolvers must be named as component_name, e.g. totara_job_job');
+            }
             $classname = "{$component}\\webapi\\resolver\\type\\{$name}";
             if (class_exists($classname)) {
                 /** @var \core\webapi\type_resolver $classname */

@@ -20,38 +20,183 @@
  * @package totara_job
  * @module totara_job/job_management_listing
  */
-define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Ajax, Notification, Str) {
+define(['core/notification', 'core/str', 'core/webapi'], function(Notification, Str, WebAPI) {
 
-    function ListManager(userid) {
+    /**
+     * The component this module belongs to.
+     * @type {string}
+     */
+    const COMPONENT = 'totara_job';
 
-        this.items = [];
-        this.userid = userid;
+    /**
+     * Services used by this module.
+     * @type {{deleteAssignment: string, getAssignment: string, sortAssignments: string}}
+     */
+    const SERVICE = {
+        getAssignment: 'totara_job_assignment',
+        deleteAssignment: 'totara_job_delete_assignment',
+        sortAssignments: 'totara_job_sort_assignments'
+    };
 
-        var self = this;
-        this.container = $('[data-enhance="job-management-listing"][data-enhanced="false"][data-userid="'+userid+'"]');
-        if (!this.container) {
-            return;
-        }
-        this.container.attr('data-enhanced', 'true');
-        this.container.find('li a.editjoblink[data-id]').each(function() {
-            var item = $(this),
-                id = item.data('id'),
-                sortorder = item.data('sortorder');
-            self.register_item(id, sortorder, item);
-        });
-        this.container.delegate('a[data-action]', 'click', function(ev) {
-            ev.preventDefault();
-            ev.stopPropagation();
-            var item = $(ev.currentTarget),
-                action = item.data('action'),
-                id = item.data('id');
-            if (action === 'up') {
-                self.move_item_up(id);
-            } else if (action === 'down') {
-                self.move_item_down(id);
-            } else if (action === 'delete') {
-                self.confirm_delete(id);
+    /**
+     * Actions for this module.
+     * @type {{deleteItem: string, up: string, down: string}}
+     */
+    const ACTIONS = {
+        up: 'up',
+        down: 'down',
+        deleteItem: 'delete'
+    };
+
+    /**
+     * Helper functions for this module.
+     * @type {{
+     *      itemIds: (function(HTMLElement): Array),
+     *      itemIndex: (function(Int, Array): number),
+     *      jobListItem: (function(HTMLElement, Integer): HTMLLIElement),
+     *      containers: (function(Integer): NodeListOf<Element>),
+     *      moveJobItemUp: (function(HTMLElement, Integer): void)
+     * }}
+     */
+    const HELPER = {
+        /**
+         * Returns the container element for the given user.
+         * @param {Integer} userid
+         * @returns {HTMLElement}
+         */
+        containers: function(userid) {
+            return document.querySelectorAll('[data-enhance="job-management-listing"][data-enhanced="false"][data-userid="' + userid + '"]');
+        },
+
+        /**
+         * Returns the job list item for the given job id.
+         * @param {HTMLElement} container
+         * @param {Integer} itemId
+         * @returns {HTMLLIElement}
+         */
+        jobListItem: function(container, itemId) {
+            var itema = container.querySelector('ul a.editjoblink[data-id="' + itemId + '"]'),
+                li;
+            if (!itema) {
+                Notification.alert('Could not find job list item link'); // Coding exception: this should never happen.
+                return false;
             }
+            li = itema.closest('li');
+            if (!li) {
+                Notification.alert('Could not find job list item'); // Coding exception: this should never happen.
+                return false;
+            }
+            return li;
+        },
+
+        /**
+         * Moves the given item up.
+         * @param {HTMLElement} container
+         * @param {Integer} itemId
+         * @param {Boolean|String} highlight Either true of 'current' to highlight the top node, anything else to highlight the bottom.
+         */
+        moveJobItemUp: function(container, itemId, highlight) {
+            var li = HELPER.jobListItem(container, itemId),
+                ul = li.closest('ul'),
+                libefore = li.previousElementSibling;
+            if (ul === null || libefore === null) {
+                // Can't find the UL or this is the first node. Nothing to do here.
+                return;
+            }
+            ul.insertBefore(li, libefore);
+
+            if (highlight === true || highlight === 'current') {
+                highlight = li;
+            } else {
+                highlight = libefore;
+            }
+            highlight.classList.add('highlight');
+            setTimeout(function() {
+                highlight.classList.remove('highlight');
+            }, 500);
+        },
+
+        /**
+         * Returns an array of all itemIds that appear in the job list.
+         * @param {HTMLElement} container
+         * @returns {Array}
+         */
+        itemIds: function(container) {
+            var data = [],
+                items = container.querySelectorAll('ul.joblist > li > a'),
+                i = 0;
+            for (i = 0; i < items.length; i++) {
+                data.push(items[i].dataset.id);
+            }
+            return data;
+        },
+
+        /**
+         * Finds the index of the given item
+         * @param {Int} needle
+         * @param {Array} haystack
+         * @returns {index|*|number}
+         */
+        itemIndex: function(needle, haystack) {
+            return haystack.findIndex(function(id) {
+                return (id.toString() === needle.toString());
+            });
+        }
+    };
+
+    /**
+     * ListManager class.
+     * @param {Integer} userid
+     * @param {HTMLElement} container
+     * @constructor
+     */
+    function ListManager(userid, container) {
+        var self = this;
+
+        this.userid = userid;
+        this.container = container;
+        this.container.setAttribute('data-enhanced', 'true');
+        this.container.addEventListener('click', function(ev) {
+            if (!ev.target) {
+                return;
+            }
+            var anchor = ev.target.closest('a[data-action]'),
+                id, li, link;
+            if (anchor) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                li = anchor.closest('li');
+                if (!li) {
+                    Notification.alert('Could not find clicked job list item'); // Coding exception: this should never happen.
+                    return;
+                }
+                link = li.querySelector('a.editjoblink');
+                if (!link) {
+                    Notification.alert('Could not find clicked job list item link'); // Coding exception: this should never happen.
+                    return;
+                }
+                id = link.dataset.id;
+                if (!id) {
+                    Notification.alert('Could not find clicked job assignment id'); // Coding exception: this should never happen.
+                    return;
+                }
+                switch (anchor.dataset.action) {
+                    case ACTIONS.up:
+                        self.moveAssignmentUp(id);
+                        break;
+                    case ACTIONS.down:
+                        self.moveAssignmentDown(id);
+                        break;
+                    case ACTIONS.deleteItem:
+                        self.confirmDelete(id);
+                        break;
+                    // Equivalent of coding_exception, should never happen so no translation.
+                    default:
+                        Notification.alert('No valid action found');
+                        break;
+                }
+            }
+
         });
     }
 
@@ -62,267 +207,177 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Aja
     ListManager.prototype.userid = null;
 
     /**
-     * An array of job assignment list items.
-     * @type {Array}
+     * The container element, set during construction.
+     * @type {HTMLElement}
      */
-    ListManager.prototype.items = [];
     ListManager.prototype.container = null;
-    ListManager.prototype.register_item = function(id, sortorder, node) {
-        var self;
-        // Set the ID on all data actions to make our life easier.
-        $(node).parent('li').find('a[data-action]').each(function(){
-            $(this).attr('data-id', id);
-        });
-        this.items.push({
-            'id': id,
-            'sortorder': sortorder
-        });
-    };
-    ListManager.prototype.confirm_delete = function(itemid) {
-        var node = this.container.find('a.editjoblink[data-id="'+itemid+'"]'),
-            self = this,
-            params = [];
 
-        // Get staff users that will be affected for this decision.
-        var promise = $.ajax({
-            url: M.cfg.wwwroot + '/totara/job/dialog/get_deletion_notification.php',
-            type: "GET",
-            data: ({
-                sesskey: M.cfg.sesskey,
-                userid: this.userid,
-                jobassignmentid: itemid,
-                jobassignmenttext: node.text()
-            })
-        });
-
-        promise.done(function(data) {
-            params['jobassignment'] = node.text();
-            var  deferred = Str.get_strings([
-                { key: 'deletejobassignment', component: 'totara_job', param: null, lang: null },
-                { key: 'confirmdeletejobassignment', component: 'totara_job', param: params, lang: null },
-                { key: 'yesdelete', component: 'totara_core', param: null, lang: null },
-                { key: 'cancel', component: 'core', param: null, lang: null }
-            ]);
-            deferred.done(function(results){
-                if (data) {
-                    results[1] = data;
+    /**
+     * Confirms that users intent to delete this job assignment.
+     * @param {Integer} itemId
+     */
+    ListManager.prototype.confirmDelete = function(itemId) {
+        var self = this;
+        M.util.js_pending(SERVICE.getAssignment);
+        WebAPI.call({
+            operationName: SERVICE.getAssignment,
+            variables: {
+                assignmentid: itemId
+            }
+        }).then(
+            function(data) {
+                var ja = data[SERVICE.getAssignment],
+                    strings = [
+                        {key: 'deletejobassignment', component: COMPONENT, param: null, lang: null},
+                        {key: 'confirmdeletejobassignment', component: COMPONENT, param: ja.fullname, lang: null},
+                        {key: 'yesdelete', component: 'totara_core', param: null, lang: null},
+                        {key: 'cancel', component: 'core', param: null, lang: null}
+                    ];
+                if (ja.staffcount && ja.tempstaffcount) {
+                    strings.push({key: 'warningstaffaffectednote', component: COMPONENT, param: null, lang: null});
+                    strings.push({key: 'warningallstafftypeassigned', component: COMPONENT, param: {
+                        countstaffassigned: ja.staffcount,
+                        counttempstaffassigned: ja.tempstaffcount,
+                    }, lang: null});
+                } else if (ja.staffcount) {
+                    strings.push({key: 'warningstaffassigned', component: COMPONENT, param: ja.staffcount, lang: null});
+                } else if (ja.tempstaffcount) {
+                    strings.push({key: 'warningtempstaffassigned', component: COMPONENT, param: ja.tempstaffcount, lang: null});
                 }
-                results.push(function() {
-                    M.util.js_pending('totara_job-delete');
-                    var deferred = self.delete_job_assignment(itemid);
-                    deferred.done(function(){
-                        M.util.js_complete('totara_job-delete');
-                    });
-                });
-                Notification.confirm.apply(Notification.confirm, results);
-            });
-        }).fail(Notification.exception);
-    };
-    ListManager.prototype.delete_job_assignment = function(itemid) {
-        var ajaxrequests = [{
-                methodname: 'totara_job_external_delete_job_assignment',
-                args: {
-                    userid: this.userid,
-                    jobassignmentid: itemid
-                }
-            }],
-            deferred = $.Deferred(),
-            self = this;
 
-        var deferreds = Ajax.call(ajaxrequests, true, true);
-        $.when.apply(null, deferreds).done(
-            function() {
-                // Turn the list of arguments (unknown length) into a real array.
-                self.update_list(arguments[0]);
-                deferred.resolve();
-            }
-        ).fail(
-            function(ex) {
-                deferred.reject(ex);
-            }
-        );
-        return deferred.promise();
-    };
-    ListManager.prototype.move_item_up = function(itemid) {
-        var i = 0,
-            currentSort = 0,
-            switchItem = false,
-            targetItem = this.get_item_by_id(itemid),
-            ul = this.container.find('ul');
-        if (targetItem === false) {
-            // Can't find it.
-            return false;
-        }
-        for (i in this.items) {
-            if (this.items.hasOwnProperty(i) && this.items[i].sortorder >= currentSort && this.items[i].sortorder < targetItem.sortorder) {
-                switchItem = this.items[i];
-                currentSort = this.items[i].sortorder;
-            }
-        }
-        if (!switchItem) {
-            // Can't find the next item.
-            return false;
-        }
-        M.util.js_pending('totara_job-move_item_up');
-        var deferred = this.switch_items(switchItem, targetItem);
-        deferred.done(function() {
-            var li = $(ul.find('a.editjoblink[data-id="'+targetItem.id+'"]').parents('li')[0]);
-            li.fadeOut(50, function() {
-                li.css({backgroundColor: '#fefdb2'});
-            }).fadeIn(500, function(){
-                li.css({backgroundColor: 'initial'});
-            });
-            M.util.js_complete('totara_job-move_item_up');
-        });
-    };
-    ListManager.prototype.move_item_down = function(itemid) {
-        var i = 0,
-            currentSort = 2147483646,
-            switchItem = false,
-            targetItem = this.get_item_by_id(itemid),
-            ul = this.container.find('ul');
-        if (targetItem === false) {
-            // Can't find it.
-            return false;
-        }
-        for (i in this.items) {
-            if (this.items.hasOwnProperty(i) && this.items[i].sortorder <= currentSort && this.items[i].sortorder > targetItem.sortorder) {
-                switchItem = this.items[i];
-                currentSort = this.items[i].sortorder;
-            }
-        }
-        if (!switchItem) {
-            // Can't find the next item.
-            return false;
-        }
-        M.util.js_pending('totara_job-move_item_down');
-        var deferred = this.switch_items(switchItem, targetItem);
-        deferred.done(function() {
-            var li = $(ul.find('a.editjoblink[data-id="'+targetItem.id+'"]').parents('li')[0]);
-            li.fadeOut(50, function() {
-                li.css({backgroundColor: '#fefdb2'});
-            }).fadeIn(500, function(){
-                li.css({backgroundColor: 'initial'});
-            });
-            M.util.js_complete('totara_job-move_item_down');
-        });
-    };
-    ListManager.prototype.get_item_by_id = function(itemid) {
-        var i;
-        for (i in this.items) {
-            if (this.items.hasOwnProperty(i) && this.items[i].id == itemid) {
-                return this.items[i];
-            }
-        }
-        return false;
-    };
-    ListManager.prototype.switch_items = function(itema, itemb) {
-        var i,
-            changeda = false,
-            valuea = itemb.sortorder,
-            changedb = false,
-            valueb = itema.sortorder,
-            data = [],
-            deferred = $.Deferred(),
-            self = this;
-
-        for (i in this.items) {
-            if (this.items.hasOwnProperty(i)) {
-                if (this.items[i].id === itema.id) {
-                    this.items[i].sortorder = valuea;
-                    changeda = i;
-                }
-                if (this.items[i].id === itemb.id) {
-                    this.items[i].sortorder = valueb;
-                    changedb = i;
-                }
-                data.push({
-                    jobassignid: this.items[i].id,
-                    sortorder: this.items[i].sortorder
-                });
-            }
-        }
-        if (!changeda && !changedb) {
-            // We didn't flip, quit now.
-            deferred.reject();
-            return deferred.promise();
-        }
-
-        var ajaxrequests = [{
-            methodname: 'totara_job_external_resort_job_assignments',
-            args: {
-                userid: this.userid,
-                sort: data
-            }
-        }];
-
-        var deferreds = Ajax.call(ajaxrequests, true, true);
-        $.when.apply(null, deferreds).done(
-            function() {
-                // Turn the list of arguments (unknown length) into a real array.
-                self.update_list(arguments[0]);
-                deferred.resolve();
-            }
-        ).fail(
-            function(ex) {
-                deferred.reject(ex);
-            }
-        );
-        return deferred.promise();
-    };
-
-    ListManager.prototype.update_list = function(newpositions) {
-        var i, j,
-            html = [],
-            jobassignid,
-            sortorder,
-            itemanchor,
-            ul = this.container.find('ul'),
-            li,
-            updated;
-        for (i in newpositions) {
-            if (newpositions.hasOwnProperty(i)) {
-
-                jobassignid = newpositions[i].jobassignid;
-                sortorder = newpositions[i].sortorder;
-
-                // Update the sortorder on the item we are tracking.
-                updated = false;
-                for (j in this.items) {
-                    if (this.items.hasOwnProperty(j)) {
-                        if (this.items[j].id == jobassignid) {
-                            this.items[j].sortorder = sortorder;
-                            updated = true;
-                            break;
+                Str.get_strings(strings).done(
+                    function(results) {
+                        var question = results[1];
+                        if (results[4]) {
+                            question += "\n" + results[4];
                         }
+                        if (results[5]) {
+                            question += "\n" + results[5];
+                        }
+                        Notification.confirm(results[0], question, results[2], results[3], function() {
+                            self.deleteAssignment(itemId);
+                        });
+                        // The current notification doesn't work with promises and has no was to attach to the completion of the
+                        // show event. There will be a small window here where behat may beat the pending call.
+                        // Delay the resolution just by 100ms to give us a chance of avoiding it while not delaying it too long.
+                        setTimeout(
+                            function() {
+                                M.util.js_complete(SERVICE.getAssignment);
+                            },
+                            100
+                        );
                     }
-                }
-                if (!updated) {
-                    // Woah!
-                    continue;
-                }
+                );
 
-                // Now grab the HTML, we'll piece it back together later.
-                itemanchor = this.container.find('a[data-id="'+jobassignid+'"]');
-                itemanchor.attr('data-sortorder', sortorder);
-                li = itemanchor.parent('li');
-                html.push('<li>'+li.html()+'</li>');
             }
+        );
+    };
+
+    /**
+     * Deletes the given job assignment.
+     * @param {Integer} itemId
+     */
+    ListManager.prototype.deleteAssignment = function(itemId) {
+        var self = this;
+
+        M.util.js_pending(SERVICE.deleteAssignment);
+        WebAPI.call({
+            operationName: SERVICE.deleteAssignment,
+            variables: {
+                userid: this.userid,
+                assignmentid: itemId
+            }
+        }).then(
+            function() {
+                // Turn the list of arguments (unknown length) into a real array.
+                var li = HELPER.jobListItem(self.container, itemId);
+                li.parentElement.removeChild(li);
+                self.container.setAttribute('data-jobcount', HELPER.itemIds(self.container).length);
+                M.util.js_complete(SERVICE.deleteAssignment);
+            },
+            function() {
+                M.util.js_complete(SERVICE.deleteAssignment);
+            }
+        );
+    };
+
+    /**
+     * Moves the job assignment up.
+     * @param {Integer} itemId
+     */
+    ListManager.prototype.moveAssignmentUp = function(itemId) {
+        var self = this,
+            data = HELPER.itemIds(this.container),
+            index = HELPER.itemIndex(itemId, data) - 1;
+
+        if (index < 0) {
+            return;
         }
-        ul.empty();
-        ul.append.apply(ul, html);
-        this.container.attr('data-jobcount', html.length);
+        data.splice(index, 2, itemId.toString(), data[index]);
+
+        this.sortAssignments(data, function() {
+            HELPER.moveJobItemUp(self.container, itemId, true);
+        });
+    };
+
+    /**
+     * Moves the given job assignment down.
+     * @param {Integer} itemId
+     */
+    ListManager.prototype.moveAssignmentDown = function(itemId) {
+        var self = this,
+            nextid,
+            data = HELPER.itemIds(this.container),
+            index = HELPER.itemIndex(itemId, data);
+
+        if (index >= data.length) {
+            return;
+        }
+        nextid = data[(index + 1)];
+        data.splice(index, 2, nextid, itemId.toString());
+
+        this.sortAssignments(data, function() {
+            HELPER.moveJobItemUp(self.container, nextid, false);
+        });
+    };
+
+    /**
+     * Saves a new job sort order
+     * @param {Array} orderedJobIds
+     * @param {callable} successCallback
+     */
+    ListManager.prototype.sortAssignments = function(orderedJobIds, successCallback) {
+        M.util.js_pending(SERVICE.sortAssignments);
+        WebAPI.call(
+            {
+                operationName: SERVICE.sortAssignments,
+                variables: {
+                    userid: this.userid,
+                    assignmentids: orderedJobIds
+                }
+            }
+        ).then(
+            function() {
+                successCallback();
+                M.util.js_complete(SERVICE.sortAssignments);
+            },
+            function() {
+                M.util.js_complete(SERVICE.sortAssignments);
+            }
+        );
     };
 
     return {
         /**
          * Allow a new job management listing to be initialised for the given used.
-         *
          * @param {Integer} userid
-         * @returns {ListManager}
          */
         init: function(userid) {
-            return new ListManager(userid);
+            var containers = HELPER.containers(userid),
+                i = 0;
+            for (i = 0; i < containers.length; i++) {
+                new ListManager(userid, containers[i]);
+            }
         }
     };
 

@@ -19,6 +19,7 @@
  *
  * @author Maria Torres <maria.torres@totaralms.com>
  * @package totara_job
+ * @deprecated since Totara 13
  */
 
 //define('AJAX_SCRIPT', true);
@@ -28,6 +29,13 @@ require_once($CFG->dirroot . '/totara/job/lib.php');
 
 require_login();
 require_sesskey();
+
+// If debugging is turned on fail this script.
+if (debugging()) {
+    // If you are here because you were using this script then I suggest you copy what totara/job/amd/src/job_management_listing.js
+    // does in the confirmDelete() method.
+    throw new coding_exception('The totara/job/dialog/get_deletion_notification.php script has been deprecated, please update your code');
+}
 
 $userid = required_param('userid', PARAM_INT);
 $jobassignmentid = required_param('jobassignmentid', PARAM_INT);

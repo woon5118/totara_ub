@@ -65,7 +65,6 @@ class mod_facetoface_send_thirdparty_testcase extends advanced_testcase {
                 'fullname' => "fullname{$i}",
                 'shortname' => "shortname{$i}",
                 'description' => "description{$i}",
-                'description_editor' => '',
                 'positionid' => null,
                 'organisationid' => null,
                 'startdate' => null,

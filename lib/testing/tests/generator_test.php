@@ -137,6 +137,7 @@ class core_test_generator_testcase extends advanced_testcase {
 
         // Test generating user with interests.
         $user = $generator->create_user(array('interests' => 'Cats, Dogs'));
+        $this->setUser($user);
         $userdetails = user_get_user_details($user);
         $this->assertSame('Cats, Dogs', $userdetails['interests']);
 

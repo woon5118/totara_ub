@@ -617,9 +617,10 @@ class hierarchy {
      * NOTE: Includes the given item as well!
      *
      * @param int $id
+     * @param string $fields
      * @return array
      */
-    function get_item_descendants($id) {
+    public function get_item_descendants($id, $fields = 'base.id, base.fullname, base.parentid, base.path, base.sortthread') {
         global $DB;
         $path = $DB->get_field($this->shortprefix, 'path', array('id' => $id));
         if ($path) {
@@ -631,7 +632,7 @@ class hierarchy {
             list($contentjoin, $contentwhere, $contentparams) = $this->get_content_sql_elements('', '', 'AND', true);
             $params = array_merge($params, $contentparams);
 
-            $sql = "SELECT base.id, base.fullname, base.parentid, base.path, base.sortthread
+            $sql = "SELECT {$fields}
                     FROM {{$this->shortprefix}} base
                     WHERE ({$where})
                           {$contentwhere}

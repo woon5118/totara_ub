@@ -1,0 +1,138 @@
+"""
+Hierarchy framework interface
+"""
+interface totara_hierarchy_framework {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    idnumber : String
+    shortname(format: core_format = HTML) : String
+    description(format: core_format = HTML) : String
+}
+
+"""
+Hierarchy type interface
+"""
+interface totara_hierarchy_type {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    idnumber : String
+    shortname(format: core_format = HTML) : String
+    description(format: core_format = HTML) : String
+}
+
+"""
+Hierarchy item interface
+"""
+interface totara_hierarchy_item {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    idnumber: String
+    shortname(format: core_format = HTML) : String
+    description(format: core_format = HTML) : String
+    frameworkid: core_id
+    framework: totara_hierarchy_framework
+    path: String!
+    visible: Boolean!
+    parentid: core_id
+    parent: totara_hierarchy_item
+    children: [totara_hierarchy_item!]!
+    typeid: core_id
+    type: totara_hierarchy_type
+}
+
+"""
+Position
+
+The query is responsible for ensuring the user can see the position.
+"""
+type totara_hierarchy_position implements totara_hierarchy_item {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    idnumber: String
+    shortname(format: core_format = HTML) : String
+    description(format: core_format = HTML) : String
+    frameworkid: core_id
+    framework: totara_hierarchy_position_framework
+    path: String!
+    visible: Boolean!
+    parentid: core_id
+    parent: totara_hierarchy_position
+    children: [totara_hierarchy_position!]!
+    typeid: core_id
+    type: totara_hierarchy_position_type
+}
+
+"""
+Position type
+
+The query is responsible for ensuring the user can see the position type
+"""
+type totara_hierarchy_position_type implements totara_hierarchy_type {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    idnumber : String
+    shortname(format: core_format = HTML) : String
+    description(format: core_format = HTML) : String
+}
+
+"""
+Position framework
+
+The query is responsible for ensuring the user can see the position framework
+"""
+type totara_hierarchy_position_framework implements totara_hierarchy_framework {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    shortname(format: core_format = HTML) : String
+    idnumber : String
+    description(format: core_format = HTML) : String
+    positions: [totara_hierarchy_position!]!
+}
+
+"""
+Organisation
+
+The query is responsible for ensuring the user can see the organisation.
+"""
+type totara_hierarchy_organisation implements totara_hierarchy_item {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    idnumber: String
+    shortname(format: core_format = HTML) : String
+    description(format: core_format = HTML) : String
+    frameworkid: core_id
+    framework: totara_hierarchy_organisation_framework
+    path: String!
+    visible: Boolean!
+    parentid: core_id
+    parent: totara_hierarchy_organisation
+    children: [totara_hierarchy_organisation!]!
+    typeid: core_id
+    type: totara_hierarchy_organisation_type
+}
+
+"""
+Organisation type
+
+The query is responsible for ensuring the user can see the organisation type
+"""
+type totara_hierarchy_organisation_type implements totara_hierarchy_type {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    idnumber : String
+    shortname(format: core_format = HTML) : String
+    description(format: core_format = HTML) : String
+}
+
+"""
+Organisation framework
+
+The query is responsible for ensuring the user can see the organisation framework
+"""
+type totara_hierarchy_organisation_framework implements totara_hierarchy_framework {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    idnumber : String
+    shortname(format: core_format = HTML) : String
+    description(format: core_format = HTML) : String
+}

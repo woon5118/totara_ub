@@ -57,17 +57,6 @@ Feature: Show only links to member information the manager has permission to see
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Plans" "link" should not exist in the "User 1" "table_row"
 
-  Scenario: Profile links are not available if the manager can't view the member's profile
-    Given I log in as "admin"
-    And the following "permission overrides" exist:
-      | capability                       | permission | role          | contextlevel | reference |
-      | moodle/user:viewdetails          | Prohibit   | staffmanager  | User         | user1     |
-    And I log out
-    When I log in as "manager1"
-    And I click on "Team" in the totara menu
-    Then "User 1" "link" should not exist in the "team_members" "table"
-    And "Profile" "link" should not exist in the "User 1" "table_row"
-
   Scenario: Appraisals link is not available if appraisals feature is not visible
     Given I log in as "admin"
     And I navigate to "Advanced features" node in "Site administration > System information"

@@ -201,14 +201,12 @@ class totara_job_lib_testcase extends advanced_testcase {
     }
 
     public function test_totara_job_can_view_job_assignments() {
-        global $USER, $DB;
-
-        $this->resetAfterTest();
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
         $invuser = new stdClass();
         $deluser = $this->getDataGenerator()->create_user(array('deleted'=>1));
         $course = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user($user2->id, $course->id);
 
         // Null and empty userid
         $this->setUser($user1);
@@ -231,26 +229,32 @@ class totara_job_lib_testcase extends advanced_testcase {
 
         $systemcontext = context_system::instance();
         $user2context = context_user::instance($user2->id);
-        $user_role = $DB->get_record('role', array('shortname'=>'user'), '*', MUST_EXIST);
+        $roleid = $this->getDataGenerator()->create_role([]);
         $coursecontext = context_course::instance($course->id);
-
-        // Own profile access
-        $this->assertTrue(totara_job_can_view_job_assignments($user1));
-        assign_capability('totara/hierarchy:viewposition', CAP_PROHIBIT, $user_role->id, $systemcontext->id, true);
-        $systemcontext->mark_dirty();
-        $this->assertFalse(totara_job_can_view_job_assignments($user1));
+        role_assign($roleid, $user1->id, $coursecontext);
 
         // Course access
-        assign_capability('totara/hierarchy:viewposition', CAP_ALLOW, $user_role->id, $systemcontext->id, true); // reset
-        $systemcontext->mark_dirty();
         $this->assertFalse(totara_job_can_view_job_assignments($user2, $course));
-        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $user_role->id, $coursecontext->id, true);
+
+        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $coursecontext->id, true);
         $systemcontext->mark_dirty();
         $this->assertTrue(totara_job_can_view_job_assignments($user2, $course));
 
-        // User details
+        assign_capability('moodle/user:viewalldetails', CAP_ALLOW, $roleid, $coursecontext->id, true);
+        assign_capability('moodle/user:viewdetails', CAP_INHERIT, $roleid, $coursecontext->id, true);
+        $systemcontext->mark_dirty();
+        $this->assertTrue(totara_job_can_view_job_assignments($user2, $course));
+
+        // Can view outside of a course, as they have a course in common still.
+        $this->assertTrue(totara_job_can_view_job_assignments($user2));
+
+        // Reset the caps.
+        assign_capability('moodle/user:viewalldetails', CAP_INHERIT, $roleid, $coursecontext->id, true);
+        assign_capability('moodle/user:viewdetails', CAP_INHERIT, $roleid, $coursecontext->id, true);
+        $systemcontext->mark_dirty();
         $this->assertFalse(totara_job_can_view_job_assignments($user2));
-        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $user_role->id, $user2context->id, true);
+        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $user2context->id, true);
+        role_assign($roleid, $user1->id, $user2context);
         $systemcontext->mark_dirty();
         $this->assertTrue(totara_job_can_view_job_assignments($user2));
     }

@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* totara/job/dialog/get_deletion_notification.php has been deprecated, please use get_string AMD module instead.
+
 === 12.0 ===
 
 * totara/job/templates/job_management_listing.mustache Icon helpers are no longer used, icon data is passed via context data.

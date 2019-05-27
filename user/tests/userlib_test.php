@@ -60,6 +60,7 @@ class core_userliblib_testcase extends advanced_testcase {
         accesslib_clear_all_caches_for_unit_testing();
 
         // Get user2 details as a user with super system capabilities.
+        $this->setAdminUser(); // TOTARA: No lies they wanted to check with super user, but didn't set the user and didn't check perms!
         $result = user_get_user_details_courses($user2);
         $this->assertEquals($user2->id, $result['id']);
         $this->assertEquals(fullname($user2), $result['fullname']);
@@ -672,7 +673,7 @@ class core_userliblib_testcase extends advanced_testcase {
     /**
      * Test user_get_user_details
      */
-    public function test_user_get_user_details() {
+    public function test_user_get_user_details_basic() {
         global $DB;
 
         $this->resetAfterTest();
@@ -694,6 +695,7 @@ class core_userliblib_testcase extends advanced_testcase {
         accesslib_clear_all_caches_for_unit_testing();
 
         // Get student details as a user with super system capabilities.
+        $this->setAdminUser(); // TOTARA: No shit they wanted to check with super user, but didn't set the user and didn't check perms!
         $result = user_get_user_details($student, $course1);
         $this->assertEquals($student->id, $result['id']);
         $this->assertEquals($studentfullname, $result['fullname']);
