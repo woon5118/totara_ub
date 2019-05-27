@@ -3060,6 +3060,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sink = $this->redirectMessages();
         $helper = new \mod_facetoface\notification\notification_helper();
         $helper->notify_under_capacity();
+        $this->execute_adhoc_tasks();
         $messages = $sink->get_messages();
 
         // Only the teacher should get a message.
@@ -3067,7 +3068,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertEquals($messages[0]->useridto, $teacher1->id);
 
         // Check they got the right message.
-        $this->assertEquals(get_string('sessionundercapacity', 'facetoface', format_string($facetoface1->name)), $messages[0]->subject);
+        $this->assertEquals(str_replace('[facetofacename]', format_string($facetoface1->name), get_string('setting:defaultundercapacitysubjectdefault', 'facetoface')), $messages[0]->subject);
     }
 
     // Face-to-face minimum bookings specification.
@@ -3112,6 +3113,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sink = $this->redirectMessages();
         $helper = new \mod_facetoface\notification\notification_helper();
         $helper->notify_under_capacity();
+        $this->execute_adhoc_tasks();
         $messages = $sink->get_messages();
 
         // There should be no messages received.
@@ -3162,6 +3164,11 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertTrue(signup_helper::can_signup($signup11));
         signup_helper::signup($signup11);
 
+        // Clean messages stack.
+        $sink = $this->redirectMessages();
+        $this->execute_adhoc_tasks();
+        $sink->close();
+
         // Set the session date back an hour, this is enough for facetoface_notify_under_capacity to find this session.
         $sql = 'UPDATE {facetoface_sessions_dates} SET timestart = (timestart - 360) WHERE sessionid = :sessionid';
         $DB->execute($sql, array('sessionid' => $sessionid));
@@ -3169,6 +3176,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sink = $this->redirectMessages();
         $helper = new \mod_facetoface\notification\notification_helper();
         $helper->notify_under_capacity();
+        $this->execute_adhoc_tasks();
         $messages = $sink->get_messages();
 
         // There should be one messages received.

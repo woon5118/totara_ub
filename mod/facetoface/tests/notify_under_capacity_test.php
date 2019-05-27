@@ -44,6 +44,8 @@ class mod_facetoface_notify_under_capacity_testcase extends advanced_testcase {
      * @return void
      */
     private function create_facetoface_with_session(): void {
+        global $DB;
+
         $generator = $this->getDataGenerator();
         $course = $generator->create_course([], ['createsections' => true]);
 
@@ -66,7 +68,7 @@ class mod_facetoface_notify_under_capacity_testcase extends advanced_testcase {
                 ]
             ],
             'mincapacity' => 3,
-            'cutoff' => 3603,
+            'cutoff' => 3620,
             'sendcapacityemail' => 1
         ];
 
@@ -80,6 +82,15 @@ class mod_facetoface_notify_under_capacity_testcase extends advanced_testcase {
         // Signing up users to the session here
         $this->sign_up_user_to_session($user1, $session, $course, $f2f);
         $this->sign_up_user_to_session($user2, $session, $course, $f2f);
+
+        // Clean messages stack.
+        $sink = $this->redirectMessages();
+        $this->execute_adhoc_tasks();
+        $sink->close();
+
+        // Set the session date back an hour, this is enough for facetoface_notify_under_capacity to find this session.
+        $sql = 'UPDATE {facetoface_sessions_dates} SET timestart = (timestart - 360) WHERE sessionid = :sessionid';
+        $DB->execute($sql, array('sessionid' => $session->id));
     }
 
     /**
@@ -140,6 +151,7 @@ class mod_facetoface_notify_under_capacity_testcase extends advanced_testcase {
 
         $helper = new \mod_facetoface\notification\notification_helper();
         $helper->notify_under_capacity();
+        $this->execute_adhoc_tasks();
 
         $messages = $sink->get_messages();
         $this->assertCount(2, $messages, "The test suite was expecting only 2 messages sent out in the environment setup");

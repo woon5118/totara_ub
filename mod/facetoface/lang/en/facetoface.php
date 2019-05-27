@@ -184,6 +184,9 @@ The details of the seminar can be added to the notification by using the desired
 * [latestfinishtime] - Finish time of the event. If there are multiple sessions it will use the last one.
 * [latestfinishdate] - Date at the end of the event. If there are multiple sessions it will use the last one.
 * [registrationcutoff] - The deadline for registrations, if not set this will default to [starttime].
+* [booked] - Number of attendees booked for the event
+* [capacity] - Total number of seats available in an event
+* [mincapacity] - Minimum bookings setting for the event
 
 ### 2. Event custom fields
 
@@ -933,6 +936,8 @@ $string['place'] = 'Room';
 $string['placeholder:address'] = '[address]';
 $string['placeholder:aim'] = '[aim]';
 $string['placeholder:alternatename'] = '[alternatename]';
+$string['placeholder:booked'] = '[booked]';
+$string['placeholder:capacity'] = '[capacity]';
 $string['placeholder:city'] = '[city]';
 $string['placeholder:country'] = '[country]';
 $string['placeholder:department'] = '[department]';
@@ -948,6 +953,7 @@ $string['placeholder:lang'] = '[lang]';
 $string['placeholder:lastname'] = '[lastname]';
 $string['placeholder:lastnamephonetic'] = '[lastnamephonetic]';
 $string['placeholder:middlename'] = '[middlename]';
+$string['placeholder:mincapacity'] = '[mincapacity]';
 $string['placeholder:msn'] = '[msn]';
 $string['placeholder:phone1'] = '[phone1]';
 $string['placeholder:phone2'] = '[phone2]';
@@ -1197,6 +1203,7 @@ $string['roomcustomfieldtab'] = 'Room';
 $string['roomhide'] = 'Hide from users when choosing a room on the Add/Edit event page';
 $string['roomshow'] = 'Show to users when choosing a room on the Add/Edit event page';
 $string['sessionattendanceheader'] = 'Session Attendance';
+$string['sessioncancellationcustomfieldtab'] = 'Event cancellation';
 $string['sessiondate'] = 'Session';
 $string['sessiondatecolumn_html'] = '{$a->startdate} {$a->starttime} -<br>{$a->enddate} {$a->endtime}<br>{$a->timezone}';
 $string['sessiondatetime'] = 'Event date/time';
@@ -1237,14 +1244,6 @@ $string['sessiontimedescription'] = '{$a->start} - {$a->end}';
 $string['sessiontimezone'] = 'Timezone displayed';
 $string['sessiontimezone_help'] = 'Select the timezone you want this event to be displayed in e.g. \'Pacific/Auckland\'. This will display the start time, finish time and timezone in accordance with the timezone selected. If you choose **User timezone**, this will display the start time, finish date and timezone in relation to the timezone of the user viewing the event.';
 $string['sessiontimezoneunknown'] = 'Unknown Timezone';
-$string['sessionundercapacity'] = 'Event under minimum bookings for: {$a}';
-$string['sessioncancellationcustomfieldtab'] = 'Event cancellation';
-$string['sessionundercapacity_body'] = 'The following event is under minimum bookings:
-
-Name: {$a->name}
-Event start: {$a->starttime}
-Capacity: {$a->booked} / {$a->capacity} (minimum: {$a->mincapacity})
-{$a->link}';
 $string['sessionvenue'] = 'Event venue';
 $string['setactive'] = 'Set active';
 $string['setinactive'] = 'Set inactive';
@@ -2012,6 +2011,25 @@ $string['setting:defaulttrainersessionunassignedsubject'] = 'Default subject lin
 $string['setting:defaulttrainersessionunassignedsubject_caption'] = 'Trainer event unassigned subject';
 $string['setting:defaulttrainersessionunassignedsubjectdefault'] = 'Face-to-face session trainer unassigned';
 $string['setting:defaulttrainersessionunassignedsubjectdefault_v9'] = 'Seminar event trainer unassigned';
+$string['setting:defaultundercapacitysubjectdefault'] = 'Event under minimum bookings for: [facetofacename]';
+$string['setting:defaultundercapacitymessagedefault'] = 'The following event is under minimum bookings:
+
+***EVENT UNDER CAPACITY***
+
+Course:   [coursename]
+Seminar:   [facetofacename]
+
+Capacity: [booked] / [capacity] (minimum: [mincapacity])
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]';
 $string['setting:defaultvalue'] = 'Default value';
 $string['setting:defaultwaitlistautocleansubjectdefault'] = 'Waitlisted signup expired';
 $string['setting:defaultwaitlistautocleanmessagedefault'] = 'This is to advise you that your waitlisted signup for the following course has been cancelled due to the event starting:
@@ -2703,3 +2721,10 @@ The following fields must be provided:
 
 * Either username, idnumber, or email (only one)
 {$a->requiredcustomfields}';
+$string['sessionundercapacity'] = 'Event under minimum bookings for: {$a}';
+$string['sessionundercapacity_body'] = 'The following event is under minimum bookings:
+
+Name: {$a->name}
+Event start: {$a->starttime}
+Capacity: {$a->booked} / {$a->capacity} (minimum: {$a->mincapacity})
+{$a->link}';

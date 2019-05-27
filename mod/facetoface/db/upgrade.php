@@ -557,5 +557,63 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019050100, 'facetoface');
     }
 
+    if ($oldversion < 2019061200) {
+        // Create the default notification template for undercapacity.
+        $title = get_string('setting:defaultundercapacitysubjectdefault', 'facetoface');
+        if (\core_text::strlen($title) > 255) {
+            $title = \core_text::substr($title, 0, 255);
+        }
+
+        $body = text_to_html(get_string('setting:defaultundercapacitymessagedefault', 'facetoface'));
+
+        if (!$DB->record_exists('facetoface_notification_tpl', ['reference' => 'undercapacity'])) {
+            $tpl_undercapacity = new stdClass();
+            $tpl_undercapacity->status = 1;
+            $tpl_undercapacity->reference = 'undercapacity';
+            $tpl_undercapacity->title = $title;
+            $tpl_undercapacity->body = $body;
+            $tpl_undercapacity->ccmanager = 0;
+            $templateid = $DB->insert_record('facetoface_notification_tpl', $tpl_undercapacity);
+        } else {
+            $templateid = $DB->get_field('facetoface_notification_tpl', 'id', ['reference' => 'undercapacity']);
+        }
+
+        // Now add the new template to existing seminars that don't already have one.
+        // NOTE: We don't normally want to do this, but it's safe to do
+        //       here since this is replacing an existing non-template notification.
+        $conditiontype = 1048576; // Constant MDL_F2F_CONDITION_SESSION_UNDER_CAPACITY.
+        $sql = 'SELECT f.*
+                  FROM {facetoface} f
+             LEFT JOIN {facetoface_notification} fn
+                    ON fn.facetofaceid = f.id
+                   AND fn.conditiontype = :ctype
+             WHERE fn.id IS NULL';
+        $f2fs = $DB->get_records_sql($sql, ['ctype' => $conditiontype]);
+
+        $data = new stdClass();
+        $data->type = 4; // MDL_F2F_NOTIFICATION_AUTO.
+        $data->conditiontype = $conditiontype;
+        $data->booked = 0;
+        $data->waitlisted = 0;
+        $data->cancelled = 0;
+        $data->requested = 0;
+        $data->issent = 0;
+        $data->status = 1; // Replacing a hard-coded template
+        $data->templateid = $templateid;
+        $data->ccmanager = 0;
+        $data->title = $title;
+        $data->body = $body;
+
+        foreach ($f2fs as $f2f) {
+            $notification = clone($data);
+            $notification->facetofaceid = $f2f->id;
+            $notification->courseid = $f2f->course;
+
+            $DB->insert_record('facetoface_notification', $notification);
+        }
+
+        upgrade_mod_savepoint(true, 2019061200, 'facetoface');
+    }
+
     return true;
 }

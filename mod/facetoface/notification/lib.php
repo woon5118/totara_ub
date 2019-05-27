@@ -23,6 +23,8 @@
  * @subpackage facetoface
  */
 
+use mod_facetoface\{attendees_helper, seminar_event};
+use mod_facetoface\signup\state\{attendance_state, booked, waitlisted};
 use mod_facetoface\task\send_user_message_adhoc_task;
 use mod_facetoface\notification\notification_map;
 
@@ -75,6 +77,7 @@ define('MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE',         65536);
 define('MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN',        131072);
 define('MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS',     262144);
 define('MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN',           524288);
+define('MDL_F2F_CONDITION_SESSION_UNDER_CAPACITY',       1048576);
 
 /**
  * Notification sent state
@@ -599,13 +602,101 @@ class facetoface_notification extends data_object {
 
             if ($notificationhistory != null) {
                 // Notification has already  been sent.
-                return;
+                continue;
             }
 
             $notice->set_facetoface($facetoface);
             $notice->_sessions = $sessions;
             $notice->set_newevent($user, $notif->id);
             $notice->send_to_user($user, $notif->id);
+        }
+    }
+
+    /**
+     * Sends the 'Event under capacity' notification to users
+     *
+     * @param $session
+     */
+    public function send_notification_session_under_capacity($session) {
+        global $DB, $CFG;
+
+        // Clone the object without minstart here, so that crud_mapper would not complain about properties that are not defined
+        // in the child class.
+        $sc = clone $session;
+        unset($sc->minstart);
+
+        $seminarevent = new seminar_event();
+        $seminarevent->from_record($sc);
+
+        $statuscodes = attendance_state::get_all_attendance_code_with([waitlisted::class, booked::class]);
+        $helper = new attendees_helper($seminarevent);
+        $booked = $helper->count_attendees_with_codes($statuscodes);
+
+        if ($booked >= $seminarevent->get_mincapacity()) {
+            return;
+        }
+
+        // No cutoff period means the notify bookings email checkbox was not checked.
+        if (!$seminarevent->has_cutoff()) {
+            return;
+        }
+
+        // We've found a session that has not reached the minimum bookings by the cut-off - time to send out emails.
+        $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
+        $seminar = new \mod_facetoface\seminar();
+        $seminar->map_instance($facetoface);
+        $cm = $seminar->get_coursemodule();
+
+        // Workaround to build the seminar_event record, that has mintimestart, maxtimefinish and
+        // sessiondates properties
+        $sessions = [];
+        $session = $seminarevent->to_record();
+        $session->mintimestart = $seminarevent->get_mintimestart();
+        $session->maxtimefinish = $seminarevent->get_maxtimefinish();
+        $session->sessiondates = array_values($seminarevent->get_sessions()->to_records());
+        $session->cntdates = count($session->sessiondates);
+        $sessions[$session->id] = $session;
+
+        if (CLI_SCRIPT && !PHPUNIT_TEST) {
+            $info = new \stdClass();
+            $info->name = format_string($seminar->get_name());
+            $info->capacity = $seminarevent->get_capacity();
+            $info->mincapacity = $seminarevent->get_mincapacity();
+            $info->booked = $booked;
+            mtrace(
+                "Facetoface '{$info->name}' in course {$seminar->get_course()} is under minimum bookings" .
+                " - {$info->booked}/{$info->capacity} (min capacity {$info->mincapacity}) - emailing session roles."
+            );
+        }
+
+        // Get all the users who need to receive the under capacity warning.
+        $modcontext = \context_module::instance($cm->id);
+
+        // Note: remove the true to limit to users with the roles within the module.
+        $roles = $CFG->facetoface_session_rolesnotify;
+        $recipients = get_role_users(explode(',', $roles), $modcontext, true, 'u.*');
+
+        $notificationparams = array(
+            "facetofaceid" => $seminar->get_id(),
+            "type" => MDL_F2F_NOTIFICATION_AUTO,
+            "conditiontype" => MDL_F2F_CONDITION_SESSION_UNDER_CAPACITY,
+        );
+
+        // And send them the notification.
+        foreach ($recipients as $recipient) {
+            $notice = new facetoface_notification($notificationparams);
+
+            // Check notification hasn't already need sent.
+            $notificationhistory = $DB->get_record('facetoface_notification_sent', array('notificationid' => $notice->id, 'sessionid' => $session->id, 'userid' => $recipient->id));
+            if ($notificationhistory != null) {
+                // Notification has already  been sent.
+                continue;
+            }
+
+            $notice->set_facetoface($facetoface);
+            $notice->_sessions = $sessions;
+            $notice->set_newevent($recipient, $session->id);
+            $notice->send_to_user($recipient, $session->id);
         }
     }
 
@@ -1307,6 +1398,7 @@ class facetoface_notification extends data_object {
             'adminrequest' => MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN,
             'registrationclosure' => MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS,
             'waitlistautoclean' => MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN,
+            'undercapacity' => MDL_F2F_CONDITION_SESSION_UNDER_CAPACITY,
         );
     }
 }
@@ -1403,6 +1495,11 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $seminarevent = new \mod_facetoface\seminar_event($sessionid);
         $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
         $cost = $signup->get_cost();
+
+        // Also get number of attendees.
+        $statuscodes = attendance_state::get_all_attendance_code_with([waitlisted::class, booked::class]);
+        $helper = new attendees_helper($seminarevent);
+        $booked = $helper->count_attendees_with_codes($statuscodes);
     } catch (dml_missing_record_exception $e) {
         // Session has been deleted. Before refactoring, facetoface_cost() used to return the normal cost by default.
         if (!empty($data->normalcost)) {
@@ -1410,6 +1507,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         } else {
             $cost = '';
         }
+        $booked = 0;
     }
 
     // Get timezone setting.
@@ -1480,6 +1578,9 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace('[latestfinishtime]', $latestfinishtime, $msg);
     $msg = str_replace('[latestfinishdate]', $latestfinishdate, $msg);
     $msg = str_replace('[duration]', $data->duration, $msg);
+    $msg = str_replace('[booked]', $booked, $msg);
+    $msg = str_replace('[capacity]', $data->capacity, $msg);
+    $msg = str_replace('[mincapacity]', $data->mincapacity, $msg);
     // Legacy.
     $msg = str_replace(get_string('placeholder:coursename', 'facetoface'), $coursename, $msg);
     $msg = str_replace(get_string('placeholder:facetofacename', 'facetoface'), $facetofacename, $msg);
@@ -1496,6 +1597,10 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace(get_string('placeholder:latestfinishtime', 'facetoface'), $latestfinishtime, $msg);
     $msg = str_replace(get_string('placeholder:latestfinishdate', 'facetoface'), $latestfinishdate, $msg);
     $msg = str_replace(get_string('placeholder:duration', 'facetoface'), $data->duration, $msg);
+    $msg = str_replace(get_string('placeholder:booked', 'facetoface'), $booked, $msg);
+    $msg = str_replace(get_string('placeholder:capacity', 'facetoface'), $data->capacity, $msg);
+    $msg = str_replace(get_string('placeholder:mincapacity', 'facetoface'), $data->mincapacity, $msg);
+
 
     if (!empty($data->registrationtimefinish)) {
         $registrationcutoff = userdate($data->registrationtimefinish, get_string('strftimerecent'));
@@ -2312,6 +2417,22 @@ function facetoface_get_default_notifications($facetofaceid) {
         $notifications[MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN] = $waitlistautoclean;
     } else {
         $missingtemplates[] = 'waitlistautoclean';
+    }
+
+    if (isset($templates['undercapacity'])) {
+        $template = $templates['undercapacity'];
+        $undercapacity = new facetoface_notification($defaults, false);
+        $undercapacity->title = $template->title;
+        $undercapacity->body = $template->body;
+        $undercapacity->managerprefix = $template->managerprefix;
+        $undercapacity->conditiontype = MDL_F2F_CONDITION_SESSION_UNDER_CAPACITY;
+        $undercapacity->ccmanager = $template->ccmanager;
+        $undercapacity->status = $template->status;
+        $undercapacity->requested = 1;
+        $undercapacity->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_SESSION_UNDER_CAPACITY] = $undercapacity;
+    } else {
+        $missingtemplates[] = 'undercapacity';
     }
 
     return array($notifications, $missingtemplates);

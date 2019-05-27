@@ -2385,6 +2385,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $helper = new \mod_facetoface\notification\notification_helper();
         $helper->notify_under_capacity();
+        $this->execute_adhoc_tasks();
 
         $messages = $emailsink->get_messages();
         $emailsink->close();

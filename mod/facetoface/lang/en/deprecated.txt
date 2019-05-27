@@ -103,3 +103,5 @@ setting:fromaddressdefault,mod_facetoface
 schedule_unit_3,mod_facetoface
 schedule_unit_3_singular,mod_facetoface
 scvtextfile_help,mod_facetoface
+sessionundercapacity,mod_facetoface
+sessionundercapacity_body,mod_facetoface

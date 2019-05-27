@@ -25,8 +25,6 @@ namespace mod_facetoface\notification;
 
 defined('MOODLE_INTERNAL') || die();
 
-
-use mod_facetoface\{attendees_helper, seminar_event, facetoface_user};
 use mod_facetoface\signup\state\{attendance_state, booked, waitlisted};
 use mod_facetoface\task\send_notifications_task;
 
@@ -62,8 +60,6 @@ class notification_helper {
         global $CFG;
 
         $this->roles = $CFG->facetoface_session_rolesnotify;
-        $this->iscli = defined(CLI_SCRIPT) && CLI_SCRIPT;
-        $this->istest = defined(PHPUNIT_TEST) && PHPUNIT_TEST;
     }
 
     /**
@@ -84,7 +80,8 @@ class notification_helper {
 
         $params = [
             'lastcron' => $lastcron,
-            'now' => $now
+            'now1' => $now,
+            'now2' => $now,
         ];
 
         $sql = "
@@ -94,86 +91,21 @@ class notification_helper {
               SELECT s.id as sessid, MIN(d.timestart) AS minstart
               FROM {facetoface_sessions} s
               INNER JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
+              WHERE timestart >= :now1
               GROUP BY s.id
             ) dt ON dt.sessid = s.id
             WHERE s.mincapacity > 0
-              AND (dt.minstart - s.cutoff) < :now
+              AND (dt.minstart - s.cutoff) < :now2
               AND (dt.minstart - s.cutoff) >= :lastcron
               AND s.cancelledstatus = 0";
 
-        $records = $DB->get_records_sql($sql, $params);
-        $statuscodes = attendance_state::get_all_attendance_code_with([waitlisted::class, booked::class]);
+        $records = $DB->get_recordset_sql($sql, $params);
 
         foreach ($records as $record) {
-            // Clone the object without minstart here, so that crud_mapper would not complain about properties that are not defined
-            // in the child class.
-            $rc = clone $record;
-            unset($rc->minstart);
-
-            $seminarevent = new seminar_event();
-            $seminarevent->from_record($rc);
-
-            $helper = new attendees_helper($seminarevent);
-            $booked = $helper->count_attendees_with_codes($statuscodes);
-
-            if ($booked >= $seminarevent->get_mincapacity()) {
-                continue;
-            }
-
-            // No cutoff period means the notify bookings email checkbox was not checked.
-            if (!$seminarevent->has_cutoff()) {
-                continue;
-            }
-
-            // We've found a session that has not reached the minimum bookings by the cut-off - time to send out emails.
-            $seminar = $seminarevent->get_seminar();
-            $cm = $seminar->get_coursemodule();
-
-            $info = new \stdClass();
-            $info->name = format_string($seminar->get_name());
-            $info->capacity = $seminarevent->get_capacity();
-            $info->mincapacity = $seminarevent->get_mincapacity();
-            $info->booked = $booked;
-            $info->link = (new \moodle_url('/mod/facetoface/view.php', ['id' => $cm->id]))->out(false);
-
-            if (!$record->minstart) {
-                $info->starttime = get_string('nostarttime', 'facetoface');
-            } else {
-                $info->starttime = userdate($record->minstart, get_string('strftimedatetime'));
-            }
-
-            $eventdata = new \stdClass();
-            $eventdata->userfrom = facetoface_user::get_facetoface_user();
-            $eventdata->subject = get_string('sessionundercapacity', 'mod_facetoface', $info->name);
-            $eventdata->fullmessage = get_string('sessionundercapacity_body', 'mod_facetoface', $info);
-            $eventdata->msgtype = TOTARA_MSG_TYPE_FACE2FACE;
-            $eventdata->msgstatus = TOTARA_MSG_STATUS_NOTOK;
-            $eventdata->urgency = TOTARA_MSG_URGENCY_NORMAL;
-            $eventdata->sendmail = TOTARA_MSG_EMAIL_YES;
-
-            if ($this->iscli && !$this->istest) {
-                mtrace(
-                    "Facetoface '{$info->name}' in course {$seminar->get_course()} is under minimum bookings" .
-                    " - {$info->booked}/{$info->capacity} (min capacity {$info->mincapacity}) - emailing session roles."
-                );
-            }
-
-            // Get all the users who need to receive the under capacity warning.
-            $modcontext = \context_module::instance($cm->id);
-
-            // Note: remove the true to limit to users with the roles within the module.
-            $recipients = get_role_users(explode(',', $this->roles), $modcontext, true, 'u.*');
-
-            // And send them the notifications.
-            foreach ($recipients as $recipient) {
-                // At this point, to prevent the object $eventdata added up data, it needed to be cloned and reset after sent.
-                $copy = clone $eventdata;
-                $copy->userto = $recipient;
-
-                tm_alert_send($copy);
-                unset($copy);
-            }
+            $notification = new \facetoface_notification((array)$record, false);
+            $notification->send_notification_session_under_capacity($record);
         }
+        $records->close();
     }
 
     /**

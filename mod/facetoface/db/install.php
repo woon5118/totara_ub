@@ -46,6 +46,7 @@ function xmldb_facetoface_install() {
         'setting:defaultregistrationexpiredsubjectdefault' => get_string('setting:defaultregistrationexpiredsubjectdefault', 'facetoface'),
         'setting:defaultpendingreqclosuresubjectdefault' => get_string('setting:defaultpendingreqclosuresubjectdefault', 'facetoface'),
         'setting:defaultwaitlistautocleansubjectdefault' => get_string('setting:defaultwaitlistautocleansubjectdefault', 'facetoface'),
+        'setting:defaultundercapacitysubjectdefault' => get_string('setting:defaultundercapacitysubjectdefault', 'facetoface'),
     );
 
     foreach ($titles as $key => $title) {
@@ -211,6 +212,14 @@ function xmldb_facetoface_install() {
     $tpl_waitlistautoclean->body = text_to_html(get_string('setting:defaultwaitlistautocleanmessagedefault', 'facetoface'));
     $tpl_waitlistautoclean->ccmanager = 0;
     $DB->insert_record('facetoface_notification_tpl', $tpl_waitlistautoclean);
+
+    $tpl_undercapacity = new stdClass();
+    $tpl_undercapacity->status = 1;
+    $tpl_undercapacity->reference = 'undercapacity';
+    $tpl_undercapacity->title = $titles['setting:defaultundercapacitysubjectdefault'];
+    $tpl_undercapacity->body = text_to_html(get_string('setting:defaultundercapacitymessagedefault', 'facetoface'));
+    $tpl_undercapacity->ccmanager = 0;
+    $DB->insert_record('facetoface_notification_tpl', $tpl_undercapacity);
 
     // Setting room, building, and address as default filters.
     set_config('facetoface_calendarfilters', 'room_1');
