@@ -270,9 +270,16 @@ function(str, TemplatesManager, ModalFactory, ajax) {
         }
 
         if (settings.expandable) {
+            // We need at least a template to render the expanded view
             templateData.expandTemplate = settings.expandable.template;
-            templateData.expandTemplateWebservice = settings.expandable.service;
-            templateData.expandTemplateWebserviceArgs = settings.expandable.args;
+            // If a service is provided it will use it to load the data for the template
+            if (settings.expandable.service) {
+                templateData.expandTemplateWebservice = settings.expandable.service;
+                if (settings.expandable.args) {
+                    templateData.expandTemplateWebserviceArgs = JSON.stringify(settings.expandable.args);
+                }
+            }
+
         }
 
         if (settings.list.map.hasHierarchy) {
