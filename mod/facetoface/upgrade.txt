@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* signup\condition\user_is_enrolable::pass() has been updated to allow suspended users to be enrolled into seminar event
 * The following changes have been made to the mod_facetoface_renderer class:
   * get_room_details_html() now links room name instead of linking the separate string "View details"
   * session_resgistrationperiod_table_cell() now uses \mod_facetoface\output\session_time::signup_period() to generate its registration string

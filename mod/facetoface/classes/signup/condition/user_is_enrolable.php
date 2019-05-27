@@ -34,14 +34,17 @@ class user_is_enrolable extends condition {
      * Is the restriction met.
      * @return bool
      */
-    public function pass() : bool {
+    public function pass(): bool {
         global $DB;
-        if(empty($this->signup->get_userid())) {
+
+        if (empty($this->signup->get_userid())) {
             return false;
         }
-        $user = $DB->get_record('user', ['id' => $this->signup->get_userid()]);
 
-        if ($user->deleted || $user->suspended) {
+        $user = $DB->get_record('user', ['id' => $this->signup->get_userid()]);
+        // $user->suspended is allowed with a reason sample: "A manager may be allocating reserved space to a team
+        // member who is on maternity leave, who will not be suspended anymore by the time the event starts."
+        if ($user->deleted) {
             return false;
         }
 
@@ -66,7 +69,7 @@ class user_is_enrolable extends condition {
      * Get description of condition
      * @return string
      */
-    public static function get_description() : string {
+    public static function get_description(): string {
         return get_string('state_userisnotenrolable_desc', 'mod_facetoface');
     }
 
@@ -74,7 +77,7 @@ class user_is_enrolable extends condition {
      * Return explanation why condition has not passed
      * @return array of strings
      */
-    public function get_failure() : array {
+    public function get_failure(): array {
         return ['user_is_enrolable' => get_string('state_userisenrolable_fail', 'mod_facetoface')];
     }
 }
