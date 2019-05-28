@@ -1254,47 +1254,6 @@ class sqlsrv_native_moodle_database extends moodle_database {
     }
 
     /**
-     * Set a single field in every table record which match a particular WHERE clause.
-     *
-     * @param string $table The database table to be checked against.
-     * @param string $newfield the field to set.
-     * @param string $newvalue the value to set the field to.
-     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
-     * @param array $params array of sql parameters
-     * @return bool true
-     * @throws dml_exception A DML specific exception is thrown for any errors.
-     */
-    public function set_field_select($table, $newfield, $newvalue, $select, array $params = null) {
-        if ($select instanceof sql) {
-            $select = $select->prepend("WHERE");
-        } else {
-            if ($select) {
-                $select = "WHERE $select";
-            }
-        }
-
-        list($select, $params, $type) = $this->fix_sql_params($select, $params);
-
-        // Get column metadata
-        $columns = $this->get_columns($table);
-        $column = $columns[$newfield];
-
-        $newvalue = $this->normalise_value($column, $newvalue);
-
-        if (is_null($newvalue)) {
-            $newfield = '"' . $newfield . '" = NULL';
-        } else {
-            $newfield = '"' . $newfield . '" = ?';
-            array_unshift($params, $newvalue);
-        }
-        $sql = "UPDATE {".$table."} SET $newfield $select";
-
-        $this->do_query($sql, $params, SQL_QUERY_UPDATE);
-
-        return true;
-    }
-
-    /**
      * Delete one or more records from a table which match a particular WHERE clause.
      *
      * @param string $table The database table to be checked against.

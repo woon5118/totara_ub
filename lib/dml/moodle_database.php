@@ -2070,7 +2070,7 @@ abstract class moodle_database {
      */
     public function set_field($table, $newfield, $newvalue, array $conditions=null) {
         list($select, $params) = $this->where_clause($table, $conditions);
-        return $this->set_field_select($table, $newfield, $newvalue, $select, $params);
+        return $this->set_fields_select($table, [$newfield => $newvalue], $select, $params);
     }
 
     /**
@@ -2084,7 +2084,9 @@ abstract class moodle_database {
      * @return bool true
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
-    public abstract function set_field_select($table, $newfield, $newvalue, $select, array $params=null);
+    public function set_field_select($table, $newfield, $newvalue, $select, array $params=null) {
+        return $this->set_fields_select($table, [$newfield => $newvalue], $select, $params);
+    }
 
     /**
      * Totara: Set one or more fields in every table record where all the given conditions met.

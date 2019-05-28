@@ -1177,48 +1177,6 @@ class pgsql_native_moodle_database extends moodle_database {
     }
 
     /**
-     * Set a single field in every table record which match a particular WHERE clause.
-     *
-     * @param string $table The database table to be checked against.
-     * @param string $newfield the field to set.
-     * @param string $newvalue the value to set the field to.
-     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
-     * @param array $params array of sql parameters
-     * @return bool true
-     * @throws dml_exception A DML specific exception is thrown for any errors.
-     */
-    public function set_field_select($table, $newfield, $newvalue, $select, array $params=null) {
-        if ($select instanceof sql) {
-            $select = $select->prepend("WHERE");
-        } else {
-            if ($select) {
-                $select = "WHERE $select";
-            }
-        }
-
-        list($select, $params, $type) = $this->fix_sql_params($select, $params);
-        $i = count($params)+1;
-
-        // Get column metadata
-        $columns = $this->get_columns($table);
-        $column = $columns[$newfield];
-
-        $normalisedvalue = $this->normalise_value($column, $newvalue);
-
-        $newfield = '"' . $newfield . '" = $' . $i;
-        $params[] = $normalisedvalue;
-        $sql = "UPDATE {$this->prefix}$table SET $newfield $select";
-
-        $this->query_start($sql, $params, SQL_QUERY_UPDATE);
-        $result = pg_query_params($this->pgsql, $sql, $params);
-        $this->query_end($result);
-
-        pg_free_result($result);
-
-        return true;
-    }
-
-    /**
      * Delete one or more records from a table which match a particular WHERE clause, lobs not supported.
      *
      * @param string $table The database table to be checked against.
