@@ -193,16 +193,22 @@ class sqlsrv_native_moodle_database extends moodle_database {
             $dbhost .= ','.$dboptions['dbport'];
         }
 
-        $this->sqlsrv = sqlsrv_connect($dbhost, array
-         (
-          'UID' => $this->dbuser,
-          'PWD' => $this->dbpass,
-          'Database' => $this->dbname,
-          'CharacterSet' => 'UTF-8',
-          'MultipleActiveResultSets' => true,
-          'ConnectionPooling' => !empty($this->dboptions['dbpersist']),
-          'ReturnDatesAsStrings' => true,
-         ));
+        $options = array(
+            'UID' => $this->dbuser,
+            'PWD' => $this->dbpass,
+            'Database' => $this->dbname,
+            'CharacterSet' => 'UTF-8',
+            'MultipleActiveResultSets' => true,
+            'ConnectionPooling' => !empty($this->dboptions['dbpersist']),
+            'ReturnDatesAsStrings' => true,
+        );
+
+        // Totara: add database communication encryption support
+        if (!empty($this->dboptions['encrypt'])) {
+            $options['encrypt'] = true;
+        }
+
+        $this->sqlsrv = sqlsrv_connect($dbhost, $options);
 
         if ($this->sqlsrv === false) {
             $this->sqlsrv = null;

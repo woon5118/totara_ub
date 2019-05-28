@@ -170,6 +170,12 @@ class pgsql_native_moodle_database extends moodle_database {
             $connection .= " options='" . implode(' ', $options) . "'";
         }
 
+        // Totara: add database communication encryption support
+        if (!empty($this->dboptions['sslmode'])) {
+            $sslmode = $this->dboptions['sslmode'];
+            $connection .= " sslmode='$sslmode'";
+        }
+
         ob_start();
         if (empty($this->dboptions['dbpersist'])) {
             $this->pgsql = pg_connect($connection, PGSQL_CONNECT_FORCE_NEW);

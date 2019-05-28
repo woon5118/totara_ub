@@ -71,6 +71,37 @@ $CFG->dboptions = array(
 
 
 //=========================================================================
+// 1a. DATABASE COMMUNICATION ENCRYPTION
+//=========================================================================
+//
+// PostgreSQL specific options:
+//    $CFG->dboptions['sslmode'] = 'require';
+// More information at:
+//  * https://www.php.net/manual/en/function.pg-connect.php
+//  * https://www.postgresql.org/docs/current/libpq-ssl.html
+//  * https://www.postgresql.org/docs/current/runtime-config-connection.html#RUNTIME-CONFIG-CONNECTION-SSL
+//  * https://www.postgresql.org/docs/current/ssl-tcp.html
+//
+// MySQL specific options:
+//    $CFG->dboptions['client_ssl'] = true;
+//    $CFG->dboptions['client_dont_verify_server_cert'] = false;
+//    $CFG->dboptions['ssl_key'] = NULL;
+//    $CFG->dboptions['ssl_cert'] = NULL;
+//    $CFG->dboptions['ssl_ca'] = NULL;
+//    $CFG->dboptions['ssl_capath'] = NULL;
+//    $CFG->dboptions['ssl_cipher'] = NULL;
+//    $CFG->dboptions['ssl_verify_server_cert'] = false;
+// More information at:
+//  * https://www.php.net/manual/en/mysqli.ssl-set.php
+//  * https://www.php.net/manual/en/mysqli.real-connect.php
+//  * https://dev.mysql.com/doc/refman/8.0/en/using-encrypted-connections.html
+//
+// MS SQL Server specific options:
+//    $CFG->dboptions['encrypt'] = true;
+// More information at:
+//  * https://docs.microsoft.com/en-gb/sql/connect/php/connection-options?view=sql-server-2017
+
+//=========================================================================
 // 1b. FULL TEXT SEARCH
 //=========================================================================
 

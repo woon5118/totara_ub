@@ -555,7 +555,61 @@ class mysqli_native_moodle_database extends moodle_database {
         if ($dbhost and !empty($this->dboptions['dbpersist'])) {
             $dbhost = "p:$dbhost";
         }
-        $this->mysqli = @new mysqli($dbhost, $dbuser, $dbpass, $dbname, $dbport, $dbsocket);
+
+        // Totara: use real_connect() so that we can specify all options.
+        $this->mysqli = mysqli_init();
+        if (!$this->mysqli) {
+            throw new dml_connection_exception('cannot init mysqli');
+        }
+
+        // Totara: add database communication encryption support
+        if (!empty($this->dboptions['ssl_key'])
+            or !empty($this->dboptions['ssl_cert'])
+            or !empty($this->dboptions['ssl_ca'])
+            or !empty($this->dboptions['ssl_capath'])
+            or !empty($this->dboptions['ssl_cipher'])
+        ) {
+            $this->mysqli->ssl_set(
+                $this->dboptions['ssl_key'] ?? null,
+                $this->dboptions['ssl_cert'] ?? null,
+                $this->dboptions['ssl_ca'] ?? null,
+                $this->dboptions['ssl_capath'] ?? null,
+                $this->dboptions['ssl_cipher'] ?? null
+            );
+        }
+        if (!empty($this->dboptions['ssl_verify_server_cert'])) {
+            $this->mysqli->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, true);
+        }
+        $flags = 0;
+        if (!empty($this->dboptions['client_ssl'])) {
+            $flags = $flags | MYSQLI_CLIENT_SSL;
+        }
+        if (!empty($this->dboptions['client_dont_verify_server_cert'])) {
+            $flags = $flags | MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT;
+        }
+        if ($flags === 0) {
+            $flags = null;
+        }
+
+        // Always log errors instead of showing them to users during MySQL connection.
+        $orig_display_errors = null;
+        if (ini_get_bool('display_errors')) {
+            $orig_display_errors = '1';
+            ini_set('display_errors', '0');
+        }
+        $orig_log_errors = null;
+        if (!ini_get_bool('log_errors')) {
+            $orig_log_errors = '0';
+            ini_set('log_errors', '1');
+        }
+        $this->mysqli->real_connect($dbhost, $dbuser, $dbpass, $dbname, $dbport, $dbsocket, $flags);
+        // Set original error handling values if changed.
+        if ($orig_display_errors !== null) {
+            ini_set('display_errors', $orig_display_errors);
+        }
+        if ($orig_log_errors !== null) {
+            ini_set('log_errors', $orig_log_errors);
+        }
 
         if ($this->mysqli->connect_errno !== 0) {
             $dberr = $this->mysqli->connect_error;
