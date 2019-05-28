@@ -2187,6 +2187,11 @@ ORDER BY tt1.groupid";
         $this->assertSame($rawsql->get_params(), $params);
         $this->assertSame($rawsql->get_sql(), $rawsql[0]);
         $this->assertSame($rawsql->get_params(), $rawsql[1]);
+        list('sql' => $sql, 'params' => $params) = $rawsql;
+        $this->assertSame($rawsql->get_sql(), $sql);
+        $this->assertSame($rawsql->get_params(), $params);
+        $this->assertSame($rawsql->get_sql(), $rawsql['sql']);
+        $this->assertSame($rawsql->get_params(), $rawsql['params']);
 
         $oldfunc = function() use ($rawsql) {
             return [$rawsql->get_sql(), $rawsql->get_params()];
@@ -2196,8 +2201,11 @@ ORDER BY tt1.groupid";
         };
         list($sql1, $params1) = call_user_func($oldfunc);
         list($sql2, $params2) = call_user_func($newfunct);
+        list('sql' => $sql3, 'params' => $params3) = call_user_func($newfunct);
         $this->assertSame($sql1, $sql2);
         $this->assertSame($params1, $params2);
+        $this->assertSame($sql1, $sql3);
+        $this->assertSame($params1, $params3);
 
         $dbman->drop_table($table);
     }

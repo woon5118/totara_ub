@@ -629,12 +629,18 @@ class totara_core_dml_sql_testcase extends advanced_testcase {
         $rawsql = new sql($sql, $params);
 
         $this->assertTrue(isset($rawsql[0]));
+        $this->assertTrue(isset($rawsql['sql']));
         $this->assertTrue(isset($rawsql[1]));
+        $this->assertTrue(isset($rawsql['params']));
         $this->assertFalse(isset($rawsql[2]));
         $this->assertSame($sql, $rawsql[0]);
         $this->assertSame($params, $rawsql[1]);
 
         list($a, $b) = $rawsql;
+        $this->assertSame($sql, $a);
+        $this->assertSame($params, $b);
+
+        list('sql' => $a, 'params' => $b) = $rawsql;
         $this->assertSame($sql, $a);
         $this->assertSame($params, $b);
 
@@ -647,6 +653,20 @@ class totara_core_dml_sql_testcase extends advanced_testcase {
 
         try {
             $rawsql[1] = 'a';
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(coding_exception::class, $ex);
+        }
+
+        try {
+            $rawsql['sql'] = 'a';
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(coding_exception::class, $ex);
+        }
+
+        try {
+            $rawsql['params'] = 'a';
             $this->fail('Exception expected');
         } catch (moodle_exception $ex) {
             $this->assertInstanceOf(coding_exception::class, $ex);
@@ -673,8 +693,28 @@ class totara_core_dml_sql_testcase extends advanced_testcase {
             $this->assertInstanceOf(coding_exception::class, $ex);
         }
 
+        try {
+            unset($rawsql['sql']);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(coding_exception::class, $ex);
+        }
+
+        try {
+            unset($rawsql['params']);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(coding_exception::class, $ex);
+        }
+
         $this->assertSame($sql, $rawsql[0]);
         $this->assertSame($params, $rawsql[1]);
+
+        $this->assertSame($sql, $rawsql['0']);
+        $this->assertSame($params, $rawsql['1']);
+
+        $this->assertSame($sql, $rawsql['sql']);
+        $this->assertSame($params, $rawsql['params']);
     }
 
     /**
