@@ -403,12 +403,9 @@ class dp_course_component extends dp_base_component {
             $PAGE->requires->string_for_js('save', 'totara_core');
             $PAGE->requires->string_for_js('cancel', 'moodle');
             $PAGE->requires->string_for_js('addcourses', 'totara_plan');
-
-            $jsmodule = array(
-                'name' => 'totara_plan_course_find',
-                'fullpath' => '/totara/plan/components/course/find.js',
-                'requires' => array('json'));
-            $PAGE->requires->js_init_call('M.totara_plan_course_find.init', array('args' => '{"plan_id":'.$this->plan->id.', "page":"'.$paginated.'", "component_name":"'.$component_name.'"}'), false, $jsmodule);
+            
+            $jsparams = [$this->plan->id, $paginated, $component_name];
+            $PAGE->requires->js_call_amd('totara_plan/components_course_find', 'init', $jsparams);
         }
     }
 
