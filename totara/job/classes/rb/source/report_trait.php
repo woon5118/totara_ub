@@ -1077,10 +1077,10 @@ trait report_trait {
                     $displayfunc = 'delimitedlist_yes_no';
                     break;
                 case 'text' :
-                    $displayfunc = 'delimitedlist_to_newline';
+                    $displayfunc = 'orderedlist_to_newline';
                     break;
                 case 'menu' :
-                    $displayfunc = 'delimitedlist_to_newline';
+                    $displayfunc = 'orderedlist_to_newline';
                     break;
                 case 'multiselect' :
                     $displayfunc = 'delimitedlist_multi_to_newline';
@@ -1180,7 +1180,6 @@ trait report_trait {
                         'grpconcat_menu',
                         array(
                             'selectchoices' => $this->list_to_array($field->param1, "\n"),
-                            'simplemode' => true,
                         )
                     );
                     break;
