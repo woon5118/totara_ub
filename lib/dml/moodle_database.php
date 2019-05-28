@@ -2086,6 +2086,84 @@ abstract class moodle_database {
      */
     public abstract function set_field_select($table, $newfield, $newvalue, $select, array $params=null);
 
+    /**
+     * Totara: Set one or more fields in every table record where all the given conditions met.
+     *
+     * @param string $table The database table to be checked against.
+     * @param array|stdClass $newdata the data to set, cannot include id
+     * @param array $conditions optional array $fieldname=>requestedvalue with AND in between
+     * @return bool true
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     */
+    public function set_fields($table, $newdata, array $conditions=null) {
+        list($select, $params) = $this->where_clause($table, $conditions);
+        return $this->set_fields_select($table, $newdata, $select, $params);
+    }
+
+    /**
+     * Totara: Set one or more fields in every table record which match a particular WHERE clause.
+     *
+     * @since Totara 13
+     *
+     * @param string $table The database table to be checked against.
+     * @param array|stdClass $newdata the data to set, cannot include id
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call (used to define the selection criteria).
+     * @param array $params array of sql parameters
+     * @return bool true.
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     */
+    public function set_fields_select($table, $newdata, $select, array $params = null) {
+        $newdata = (array) $newdata;
+        if (empty($newdata)) {
+            throw new coding_exception('moodle_database::set_fields_select() no data to set provided.');
+        }
+
+        if (isset($newdata['id'])) {
+            throw new coding_exception('moodle_database::set_fields_select() id cannot be set, to update a single record use update_record instead.');
+        }
+
+        // Convert it to raw sql string for easier param handling
+        if ($select instanceof sql) {
+            if (!empty($params)) {
+                debugging('$params parameter is ignored when sql instance supplied', DEBUG_DEVELOPER);
+            }
+        } else {
+            $select = self::sql($select, $params);
+        }
+        $select = $select->prepend("WHERE");
+
+        $sets = array();
+        $set_params = array();
+        $columns = $this->get_columns($table);
+
+        foreach ($newdata as $field => $value) {
+            if (!isset($columns[$field])) {
+                continue;
+            }
+
+            $normalised_value = $this->normalise_value($columns[$field], $value);
+            if (is_null($normalised_value)) {
+                $sets[] = "\"{$field}\" = NULL";
+            } else {
+                $param_name = self::get_unique_param('set_fields_param');
+                $set_params[$param_name] = $normalised_value;
+                $sets[] = "\"{$field}\" = :{$param_name}";
+            }
+        }
+
+        if (empty($sets)) {
+            // We obviously filtered out all the columns
+            throw new coding_exception('moodle_database::set_fields_select() no data to set provided.');
+        }
+
+        $sets = implode(',', $sets);
+        $sql = "UPDATE {{$table}} SET {$sets}";
+        $update = self::sql($sql, $set_params)->append($select);
+
+        $this->execute($update);
+
+        return true;
+    }
 
     /**
      * Count the records in a table where all the given conditions met.

@@ -2824,6 +2824,264 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertEquals(1e300, $DB->get_field($tablename, 'onetext', array('id' => $id)));
     }
 
+    public function test_set_fields() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = $this->get_test_table();
+        $tablename = $table->getName();
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '100', null, false, null, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+
+        $record1id = $DB->insert_record($tablename, array('course' => 1, 'name' => 'foo'));
+        $record2id = $DB->insert_record($tablename, array('course' => 3, 'name' => 'bar'));
+        $record3id = $DB->insert_record($tablename, array('course' => 5, 'name' => 'test'));
+
+        // Update a single record
+        $record = new stdClass();
+        $record->course = 2;
+
+        $this->assertTrue($DB->set_fields($tablename, $record, ['course' => 1]));
+
+        $this->assertEquals(0, $DB->count_records($tablename, array('course' => 1)));
+        $this->assertEquals(1, $DB->count_records($tablename, array('course' => 2)));
+        $this->assertEquals(1, $DB->count_records($tablename, array('course' => 3)));
+
+        $record = $DB->get_record($tablename, ['id' => $record1id]);
+        $this->assertEquals(2, $record->course);
+
+        // Update setting multiple columns
+        $record = new stdClass();
+        $record->course = 4;
+        $record->name = 'bar';
+
+        $DB->set_fields($tablename, $record, ['course' => 3]);
+
+        $record = $DB->get_record($tablename, ['id' => $record2id]);
+        $this->assertEquals(4, $record->course);
+        $this->assertEquals('bar', $record->name);
+
+        // Setting null
+        $record = new stdClass();
+        $record->name = null;
+
+        $DB->set_fields($tablename, $record, ['course' => 5]);
+
+        $record = $DB->get_record($tablename, ['id' => $record3id]);
+        $this->assertEquals(null, $record->name);
+
+        // Update setting multiple columns
+        $record = new stdClass();
+        $record->course = 6;
+        $record->name = 'bar';
+
+        $DB->set_fields($tablename, $record, ['course' => 2, 'name' => 'foo']);
+
+        $record = $DB->get_record($tablename, ['course' => 6]);
+        $this->assertEquals('bar', $record->name);
+        $this->assertEmpty($DB->get_record($tablename, ['course' => 2]));
+
+        // setting multiple rows
+        $record = new stdClass();
+        $record->name = 'multiple';
+
+        $DB->set_fields($tablename, $record, ['name' => 'bar']);
+
+        $records = $DB->get_records($tablename, ['name' => 'multiple']);
+        $this->assertCount(2, $records);
+        foreach ($records as $record) {
+            $this->assertContains($record->course, [6, 4]);
+        }
+
+        // Setting all
+        $record = new stdClass();
+        $record->name = 'all';
+        $record->course = 1;
+
+        $DB->set_fields($tablename, $record);
+
+        $records = $DB->get_records($tablename);
+        foreach ($records as $record) {
+            $this->assertEquals('all', $record->name);
+            $this->assertEquals(1, $record->course);
+        }
+    }
+
+    public function test_set_fields_select() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = $this->get_test_table();
+        $tablename = $table->getName();
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '100', null, false, null, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+
+        $record1id = $DB->insert_record($tablename, array('course' => 1, 'name' => 'foo'));
+        $record2id = $DB->insert_record($tablename, array('course' => 3, 'name' => 'bar'));
+        $record3id = $DB->insert_record($tablename, array('course' => 5, 'name' => 'test'));
+
+        // Update a single record
+        $record = new stdClass();
+        $record->course = 2;
+
+        $this->assertTrue($DB->set_fields_select($tablename, $record, "course = :course", ['course' => 1]));
+
+        $this->assertEquals(0, $DB->count_records($tablename, array('course' => 1)));
+        $this->assertEquals(1, $DB->count_records($tablename, array('course' => 2)));
+        $this->assertEquals(1, $DB->count_records($tablename, array('course' => 3)));
+
+        $record = $DB->get_record($tablename, ['id' => $record1id]);
+        $this->assertEquals(2, $record->course);
+
+        // Update setting multiple columns
+        $record = new stdClass();
+        $record->course = 4;
+        $record->name = 'bla';
+
+        $DB->set_fields_select($tablename, $record, "course = :course", ['course' => 3]);
+
+        $record = $DB->get_record($tablename, ['id' => $record2id]);
+        $this->assertEquals(4, $record->course);
+        $this->assertEquals('bla', $record->name);
+
+        // Update multiple rows
+        $record = new stdClass();
+        $record->name = 'new';
+
+        $DB->set_fields_select($tablename, $record, "course IN (:course1, :course2)", ['course1' => 2, 'course2' => 4]);
+
+        $record = $DB->get_record($tablename, ['id' => $record1id]);
+        $this->assertEquals('new', $record->name);
+        $record = $DB->get_record($tablename, ['id' => $record2id]);
+        $this->assertEquals('new', $record->name);
+        // control record is untouched
+        $record = $DB->get_record($tablename, ['id' => $record3id]);
+        $this->assertEquals('test', $record->name);
+
+        // non existing columns are skipped
+        $record = new stdClass();
+        $record->idonotexist = 123;
+        $record->name = 'foobar';
+
+        $DB->set_fields_select($tablename, $record, "course = :course", ['course' => 2]);
+        $record = $DB->get_record($tablename, ['course' => 2]);
+        $this->assertEquals('foobar', $record->name);
+
+        // set null
+        $record = new stdClass();
+        $record->name = null;
+
+        $DB->set_fields_select($tablename, $record, "course = :course", ['course' => 2]);
+        $record = $DB->get_record($tablename, ['course' => 2]);
+        $this->assertNull($record->name);
+
+        // Question mark parameters
+        $record = new stdClass();
+        $record->name = 'questionmark';
+
+        $DB->set_fields_select($tablename, $record, "course = ? AND name = ?", [5, 'test']);
+        $records = $DB->get_records($tablename, ['name' => 'questionmark']);
+        $this->assertCount(1, $records);
+        $this->assertEquals(5, array_shift($records)->course);
+
+        // Dollar parameters
+        $record = new stdClass();
+        $record->name = 'dollars';
+
+        $DB->set_fields_select($tablename, $record, "course = $1 AND name = $2", [5, 'questionmark']);
+        $records = $DB->get_records($tablename, ['name' => 'dollars']);
+        $this->assertCount(1, $records);
+        $this->assertEquals(5, array_shift($records)->course);
+
+        // Update all
+        $record = new stdClass();
+        $record->name = 'all';
+
+        $DB->set_fields_select($tablename, $record, '1 = 1');
+        $records = $DB->get_records($tablename);
+        foreach ($records as $record) {
+            $this->assertEquals('all', $record->name);
+        }
+
+        // Empty select
+        $record = new stdClass();
+        $record->name = 'all2';
+
+        $DB->set_fields_select($tablename, $record, '');
+        $records = $DB->get_records($tablename);
+        foreach ($records as $record) {
+            $this->assertEquals('all2', $record->name);
+        }
+
+        // Use raw sql for select
+        $raw_sql = $DB::sql('course = $1 AND name = $2', [5, 'all2']);
+
+        $record = new stdClass();
+        $record->name = 'raw';
+
+        $DB->set_fields_select($tablename, $record, $raw_sql);
+        $records = $DB->get_records($tablename, ['name' => 'raw']);
+        $this->assertCount(1, $records);
+        $this->assertEquals(5, array_shift($records)->course);
+
+
+        // Try to set the id should fail
+        try {
+            $record = new stdClass();
+            $record->id = 12;
+            $record->name = 'fail';
+
+            $DB->set_fields_select($tablename, $record, "course = 2");
+            $this->fail('Expected coding exception for existence of id in data');
+        } catch (Exception $exception) {
+            $this->assertInstanceOf(coding_exception::class, $exception);
+            $this->assertRegExp('/id cannot be set, to update a single record use update_record instead./', $exception->getMessage());
+        }
+
+        // No existing column used
+        try {
+            $record = new stdClass();
+            $record->abc = 12;
+            $record->def = 'fail';
+
+            $DB->set_fields_select($tablename, $record, "course = 2");
+            $this->fail('Expected coding exception for no data set');
+        } catch (Exception $exception) {
+            $this->assertInstanceOf(coding_exception::class, $exception);
+            $this->assertRegExp('/no data to set provided./', $exception->getMessage());
+        }
+
+        // No data set
+        try {
+            $DB->set_fields_select($tablename, [], "course = 2");
+            $this->fail('Expected coding exception for no data set');
+        } catch (Exception $exception) {
+            $this->assertInstanceOf(coding_exception::class, $exception);
+            $this->assertRegExp('/no data to set provided./', $exception->getMessage());
+        }
+
+        // Try to set an object
+        try {
+            $record = new stdClass();
+            $record->course = new stdClass();
+            $record->name = 'fail';
+
+            $DB->set_fields_select($tablename, $record, "course = 2");
+            $this->fail('Expected coding exception for setting an object');
+        } catch (Exception $exception) {
+            $this->assertInstanceOf(coding_exception::class, $exception);
+            $this->assertRegExp('/Invalid database query parameter value/', $exception->getMessage());
+        }
+    }
+
     public function test_set_field() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();
@@ -6245,6 +6503,7 @@ class moodle_database_for_testing extends moodle_database {
     public function rollback_transaction() {}
     public function get_counted_recordset_sql($sql, array $params = null, $limitfrom = 0, $limitnum = 0, &$count = 0) { }
     public function get_counted_records_sql($sql, array $params = null, $limitfrom = 0, $limitnum = 0, &$count = 0) { }
+    public function set_fields_select($table, $newdata, $select, array $params = null) { }
 }
 
 
