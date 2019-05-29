@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* output\event_grade_input::create() has been updated to respect the course grade_decimalpoints config
 * take_attendance mustache has been updated:
   * to disable the 'Upload attendance' button when an event is upcoming or in progress
   * to hide the 'Upload attendance' button when the current page is session take attendance

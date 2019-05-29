@@ -2193,14 +2193,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param int $courseid
      */
     public function print_attendance_upload_table(\mod_facetoface\bulk_list $list, $courseid) {
-        global $CFG, $OUTPUT;
-        require_once($CFG->libdir.'/gradelib.php');
+        global $OUTPUT;
 
         $status = attendance_state::get_all_attendance_csv();
 
         $userlist = $list->get_user_ids();
         $users = \mod_facetoface\attendees_list_helper::get_user_list($userlist);
-        $decimalpoints = grade_get_setting($courseid, 'decimalpoints', $CFG->grade_decimalpoints);
 
         $table = new html_table();
         $table->head = [
@@ -2239,7 +2237,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     if (empty($value)) {
                         $row[] = '';
                     } else if (is_numeric($value) && $value >= 0 && $value <= 100) {
-                        $row[] = format_float($value, $decimalpoints);
+                        $row[] = \mod_facetoface\grade_helper::format($value, $courseid);
                     } else {
                         $row[] = $error = get_string('error:invalidvalue', 'mod_facetoface');
                     }

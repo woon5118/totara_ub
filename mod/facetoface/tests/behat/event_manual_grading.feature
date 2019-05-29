@@ -139,9 +139,9 @@ Feature: Event manual grading
       | Four Wha's attendance    | Not set |
       | Five Cinq's attendance   | Not set |
       | One Uno's event grade    | 12      |
-      | Two Duex's event grade   | 31.415  |
+      | Two Duex's event grade   | 31.42   |
       | Three Toru's event grade | 56      |
-      | Four Wha's event grade   | 99.999  |
+      | Four Wha's event grade   | 100.00  |
       | Five Cinq's event grade  |         |
 
     And I should see "Successfully updated attendance" in the ".alert-success" "css_element"
@@ -181,7 +181,7 @@ Feature: Event manual grading
     Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"
     And I click on "Close" "button" in the ".alert-success" "css_element"
 
-  @_file_upload @oleg
+  @_file_upload
   Scenario: Take attendance via CSV file with valid and invalid data
     Given I am on "course1" course homepage
     And I follow "seminar 1"

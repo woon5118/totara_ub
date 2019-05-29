@@ -672,11 +672,9 @@ class mod_facetoface_mod_form extends moodleform_mod {
         }
 
         if (!isset($defaultvalues['gradepass'])) {
-            global $CFG;
             // Manually load the default setting to correctly format the value.
             $gradepass = get_config('facetoface', 'gradepass');
-            $decimalpoints = grade_get_setting($this->current->course, 'decimalpoints', $CFG->grade_decimalpoints);
-            $defaultvalues['gradepass'] = format_float($gradepass, $decimalpoints);
+            $defaultvalues['gradepass'] = \mod_facetoface\grade_helper::format($gradepass, $this->current->course);
         }
 
         parent::set_data($defaultvalues);

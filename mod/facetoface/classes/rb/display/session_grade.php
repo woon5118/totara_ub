@@ -35,8 +35,6 @@ class session_grade extends \totara_reportbuilder\rb\display\base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $CFG;
-        require_once($CFG->libdir.'/gradelib.php');
 
         if (empty($value)) {
             return '';
@@ -47,9 +45,7 @@ class session_grade extends \totara_reportbuilder\rb\display\base {
         }
 
         $extra = self::get_extrafields_row($row, $column);
-        $decimalpoints = grade_get_setting($extra->courseid, 'decimalpoints', $CFG->grade_decimalpoints);
-
-        return format_float($value, $decimalpoints);
+        return \mod_facetoface\grade_helper::format($value, $extra->courseid);
     }
 
     /**

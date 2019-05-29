@@ -43,6 +43,9 @@ class event_grade_input extends \core\output\template {
     public static function create(event_attendee $attendee,
                                   signup_status $status = null,
                                   bool $disabled = false) {
+
+        $value = $status !== null ? $status->get_grade() : null;
+
         $data = [
             'name' => "submissiongradeid_{$attendee->get_signupid()}",
             'placeholder' => get_string('gradeinput_placeholder', 'facetoface'),
@@ -50,7 +53,7 @@ class event_grade_input extends \core\output\template {
             'label' => get_string('gradeinput_label', 'facetoface', clean_string(fullname($attendee))),
             'min' => 0,
             'max' => 100,
-            'value' => ($status !== null ? $status->get_grade() : null) ?? '',
+            'value' => \mod_facetoface\grade_helper::format($value, $attendee->course)
         ];
 
         return new static($data);
