@@ -18,9 +18,10 @@
  *
  * @author Eugene Venter <eugene@catalyst.net.nz>
  * @author Dave Wallace <dave.wallace@kineo.co.nz>
- * @package totara
- * @subpackage reportbuilder
+ * @package totara_reportbuilder
  */
+
+/* global $ */
 M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
     Y: null,
@@ -135,7 +136,12 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                     group.remove();
                 }
             });
-
+            // One group means we have only 'None' left after removing incompatible options.
+            // So, hide the entire advanced options selector.
+            if (advancedSelector.children().length === 1) {
+                advancedSelector.hide();
+                advancedSelector.val('');
+            }
         } else {
             advancedSelector.hide();
             customHeadingCheckbox.show();
@@ -166,8 +172,51 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
     },
 
     /**
+     * Add a warning if any selected columns are not compatible with selected aggregations.
      *
+     * Unfortunately, we have to scan through all selected columns and options to always show
+     * correct information in our warnings.
      */
+    rb_check_col_compatibility: function() {
+        var module = this;
+
+        require(['core/notification'], function(notification) {
+            var warnings = document.getElementsByClassName('rb-column-warning');
+            while (warnings.length > 0) {
+                warnings[0].remove();
+            }
+
+            // Looks through all selected columns.
+            $('select.column_selector').each(function() {
+                var colName = $(this).val();
+
+                // If column is a sub-query, loop through the advanced settings of other selected columns
+                // to check if aggregations are used anywhere.
+                if (colName != 0 && this.options[this.selectedIndex].getAttribute('data-issubquery') === "1") {
+                    $('select.advanced_selector').each(function() {
+                        var advancedSelectorVal = $(this).val();
+                        if (advancedSelectorVal.indexOf('aggregate_') !== -1) {
+                            var advancedSelector = $('select.column_selector', $(this).parents('tr:first'));
+                            var aggregatedHeading = module.config.rb_column_headings[$(advancedSelector).val()];
+                            var subqueryHeading = module.config.rb_column_headings[colName];
+
+                            var warning = M.util.get_string('warnincompatiblecolumns', 'totara_reportbuilder', {
+                                subquery: subqueryHeading,
+                                aggregated: aggregatedHeading
+                            });
+
+                            notification.addNotification({
+                                message: warning,
+                                type: 'warning',
+                                extraclasses: 'rb-column-warning'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    },
+
     rb_init_col_rows: function(){
 
         var module = this;
@@ -181,6 +230,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         $('select.column_selector').on('change', function() {
             window.onbeforeunload = null;
             module.rb_update_col_row(this);
+            module.rb_check_col_compatibility();
         });
 
         // handle changes to the advanced pulldowns
@@ -189,6 +239,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             window.onbeforeunload = null;
             var column_selector = $('select.column_selector', $(this).parents('tr:first'));
             module.rb_update_col_row(column_selector);
+            module.rb_check_col_compatibility();
         });
 
         // handle changes to the customise checkbox
@@ -224,18 +275,21 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             module.rb_update_col_row(this);
         });
 
+        // Check for column compatibility issues.
+        module.rb_check_col_compatibility();
+
         // Set up delete button events
-        this.rb_init_deletebuttons();
+        module.rb_init_deletebuttons();
 
         // Set up hide button events
-        this.rb_init_hidebuttons();
+        module.rb_init_hidebuttons();
 
         // Set up show button events
-        this.rb_init_showbuttons();
+        module.rb_init_showbuttons();
 
         // Set up 'move' button events
-        this.rb_init_movedown_btns();
-        this.rb_init_moveup_btns();
+        module.rb_init_movedown_btns();
+        module.rb_init_moveup_btns();
     },
 
     /**

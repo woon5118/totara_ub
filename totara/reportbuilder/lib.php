@@ -5335,17 +5335,18 @@ class reportbuilder {
      * Parses the column options data for this source into a data structure
      * suitable for an HTML select pulldown
      *
-     * @return array An array with $type-$value as key and $name as value
+     * @return array An array with $type-$value as key and an object with
+     *               a name and any additional properties as value
      */
-    function get_columns_select() {
+    public function get_columns_select() {
         $columns = $this->columnoptions;
-        $ret = array();
+        $result = [];
         if (!isset($this->columnoptions)) {
-            return $ret;
+            return $result;
         }
 
         $deprecated_section = get_string('type_deprecated', 'totara_reportbuilder');
-        $deprecated = array();
+        $deprecated = [];
         foreach ($columns as $column) {
             // don't include unselectable columns
             if (!$column->selectable) {
@@ -5355,19 +5356,22 @@ class reportbuilder {
             $section = $this->get_type_heading($column->type);
             $key = $column->type . '-' . $column->value;
             if ($column->deprecated) {
-                $deprecated[$key] = get_string('deprecated', 'totara_reportbuilder', format_string($column->name));
-            }
-            else {
-                $ret[$section][$key] = format_string($column->name);
+                $deprecated[$key] = new stdClass();
+                $deprecated[$key]->name = get_string('deprecated', 'totara_reportbuilder', format_string($column->name));
+                $deprecated[$key]->attributes = ['deprecated' => true, 'issubquery' => $column->issubquery];
+            } else {
+                $result[$section][$key] = new stdClass();
+                $result[$section][$key]->name = format_string($column->name);
+                $result[$section][$key]->attributes = ['deprecated' => false, 'issubquery' => $column->issubquery];
             }
         }
 
         // Add deprecated column options into their own group at the end of all options.
         if (!empty($deprecated)) {
-            $ret[$deprecated_section] = $deprecated;
+            $result[$deprecated_section] = $deprecated;
         }
 
-        return $ret;
+        return $result;
     }
 
     /**

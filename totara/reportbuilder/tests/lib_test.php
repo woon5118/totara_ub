@@ -1177,7 +1177,13 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // should return an array
         $this->assertTrue((bool)is_array($options));
         // the strings should have the correct format
-        $this->assertEquals("User&#39;s Fullname", $options['User']['user-fullname']);
+        $this->assertEquals("User&#39;s Fullname", $options['User']['user-fullname']->name);
+        $this->assertFalse($options['User']['user-fullname']->attributes['deprecated']);
+        $this->assertFalse($options['User']['user-fullname']->attributes['issubquery']);
+
+        $this->assertEquals("User&#39;s Position Name(s)", $options['All User\'s Job Assignments']['job_assignment-allpositionnames']->name);
+        $this->assertFalse($options['All User\'s Job Assignments']['job_assignment-allpositionnames']->attributes['deprecated']);
+        $this->assertTrue($options['All User\'s Job Assignments']['job_assignment-allpositionnames']->attributes['issubquery']);
 
         $this->resetAfterTest(true);
     }

@@ -153,7 +153,7 @@ $jsmodule = array(
 $PAGE->requires->js_init_call('M.totara_reportbuildercolumns.init', array($config), false, $jsmodule);
 
 $PAGE->requires->strings_for_js(array('saving', 'confirmcoldelete', 'hide', 'show', 'delete', 'moveup', 'movedown', 'add',
-                                      'deprecated', 'deprecatedcolumn'), 'totara_reportbuilder');
+                                      'deprecated', 'deprecatedcolumn', 'warnincompatiblecolumns'), 'totara_reportbuilder');
 $report->src->columns_page_requires();
 
 // Display the form.

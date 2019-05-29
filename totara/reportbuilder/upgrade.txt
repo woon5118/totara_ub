@@ -24,6 +24,8 @@ information provided here is intended especially for developers.
 * totara_reportbuilder_renderer::saved_searches_table() has been updated to also display the report saved search default.
 * reportbuilder::get_saved_searches() first argument is no longer used. Functionality has not changed.
 * reportbuilder::get_saved_searches() second argument is no longer used. Functionality has not changed.
+* reportbuilder::get_columns_select() now returns an array of objects instead of strings (previously, column names).
+  To extract column names, please use 'name' property of the result array.
 
 === 12.0 ===
 

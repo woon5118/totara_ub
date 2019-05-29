@@ -519,7 +519,6 @@ class report_builder_edit_columns_form extends moodleform {
                 html_writer::tag('th', get_string('options', 'totara_reportbuilder') . html_writer::end_tag('tr')));
 
             $columnsList = $report->get_columns_select();
-            $deprecatedList = $report->src->get_deprecated_column_options(); // A list of column options that are deprecated.
             $defaultoptions = array('' => get_string('noneselected', 'totara_reportbuilder'));
 
             $badcolumns = array();
@@ -564,8 +563,7 @@ class report_builder_edit_columns_form extends moodleform {
                         $field = "{$column->type}-{$column->value}";
                         $mform->addElement('html', html_writer::start_tag('tr', array('data-colid' => $cid)) .
                             html_writer::start_tag('td'));
-                        $columnselect = $this->create_columns_select_groups($mform, "column{$cid}", $columnsList,
-                                                                            ['class' => 'column_selector'], $deprecatedList);
+                        $columnselect = $this->create_columns_select_groups($mform, "column{$cid}", $columnsList, ['class' => 'column_selector']);
                         $mform->setDefault("column{$cid}", $field);
                         $mform->addElement($columnselect);
                         $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
@@ -651,11 +649,13 @@ class report_builder_edit_columns_form extends moodleform {
             }
 
             $mform->addElement('html', html_writer::start_tag('tr') . html_writer::start_tag('td'));
-            $newcolumnsselect = array_merge(
-                array(
-                    get_string('new') => array(0 => get_string('addanothercolumn', 'totara_reportbuilder'))
-                ),
-                $columnsList);
+
+            // Add a "new column" option to the new column selector.
+            $newcolumnOption = new stdClass();
+            $newcolumnOption->name = get_string('addanothercolumn', 'totara_reportbuilder');
+            $newcolumnOption->attributes = [];
+            $newcolumnsselect = array_merge([get_string('new') => [0 => $newcolumnOption]], $columnsList);
+
             // Remove already-added cols from the new col selector
             $cleanednewcolselect = $newcolumnsselect;
             foreach ($newcolumnsselect as $okey => $optgroup) {
@@ -672,7 +672,7 @@ class report_builder_edit_columns_form extends moodleform {
             unset($cleanednewcolselect);
 
             $newcolumn = $this->create_columns_select_groups($mform, 'newcolumns', $newcolumnsselect,
-                                                                array('class' => 'column_selector new_column_selector'), $deprecatedList);
+                                                                ['class' => 'column_selector new_column_selector']);
             $mform->addElement($newcolumn);
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
             $mform->addElement('selectgroups', 'newadvanced', '', $advoptions,
@@ -765,29 +765,28 @@ class report_builder_edit_columns_form extends moodleform {
     }
 
     /**
-     * Generates a custom selectgroups element for column selector with data attribute in options
-     * to indicate whether the column has been deprecated or not.
+     * Generates a custom selectgroups element for column selector with data attributes in options.
      *
      * @param moodleform $mform          Form where we are adding our element
      * @param string     $id             Select element id
      * @param array      $list           List of options to fill the select
-     * @param array      $attr           Eleme
-     * @param array      $deprecatedList A list of deprecated columns to check against
+     * @param array      $attr           Element's attributes
+     * @param array      $unused         This parameter is deprecated and no longer used
      *
      * @return mixed
      */
-    private function create_columns_select_groups(&$mform, string $id, array $list, array $attr, array $deprecatedList) {
+    private function create_columns_select_groups(&$mform, string $id, array $list, array $attr, array $unused = null) {
         $element = $mform->createElement('selectgroups', $id, '', null, $attr);
 
         $group = 0;
         foreach ($list as $heading => $values) {
-            $element->addOptGroup($heading, array());
+            $element->addOptGroup($heading, []);
             foreach ($values as $key => $option) {
-                $attributes = array('data-deprecated' => false);
-                if (isset($deprecatedList[$key])) {
-                    $attributes['data-deprecated'] = true;
+                $attributes = [];
+                foreach ($option->attributes as $aname => $avalue) {
+                    $attributes['data-' . $aname] = $avalue;
                 }
-                $element->addOption($group, $option, $key, $attributes);
+                $element->addOption($group, $option->name, $key, $attributes);
             }
             $group++;
         }
