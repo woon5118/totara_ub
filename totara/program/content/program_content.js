@@ -495,30 +495,38 @@ M.totara_programcontent = M.totara_programcontent || {
 
         // Move or delete courses.
         document.getElementById('edit-program-content').addEventListener('click', function(e) {
+            var actionlink = e.target.closest('a');
+
+            if (actionlink === null) {
+                return;
+            }
+
+            var action = actionlink.getAttribute('data-action');
+
             // Move course up.
-            if (e.target.closest('a').getAttribute('data-action') === 'up') {
+            if (action === 'up') {
                 module.moveCourseUp(
                     $(e.target).closest('li'),
                     $(e.target).closest('.courselist'),
-                    e.target.closest('a').getAttribute('data-coursesetprefix'));
+                    actionlink.getAttribute('data-coursesetprefix'));
                 return true;
             }
 
             // Move course down.
-            if (e.target.closest('a').getAttribute('data-action') === 'down') {
+            if (action === 'down') {
                 module.moveCourseDown(
                     $(e.target).closest('li'),
                     $(e.target).closest('.courselist'),
-                    e.target.closest('a').getAttribute('data-coursesetprefix'));
+                    actionlink.getAttribute('data-coursesetprefix'));
                 return true;
             }
 
             // Delete course.
-            if (e.target.closest('a').getAttribute('data-action') === 'delete') {
+            if (action === 'delete') {
                 module.deleteCourse(
-                    e.target.closest('a').getAttribute('data-coursesetid'),
-                    e.target.closest('a').getAttribute('data-coursesetprefix'),
-                    e.target.closest('a').getAttribute('data-coursetodelete_id'));
+                    actionlink.getAttribute('data-coursesetid'),
+                    actionlink.getAttribute('data-coursesetprefix'),
+                    actionlink.getAttribute('data-coursetodelete_id'));
                 return true;
             }
 
