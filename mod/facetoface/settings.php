@@ -147,7 +147,7 @@ if ($ADMIN->fulltree) {
             'facetoface/sessionattendance',
             new lang_string('sessionattendance', 'facetoface'),
             new lang_string('sessionattendance_help', 'facetoface'),
-            1
+            0
         )
     );
 
