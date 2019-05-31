@@ -373,12 +373,9 @@ class dp_competency_component extends dp_base_component {
             $PAGE->requires->string_for_js('continue', 'moodle');
             $PAGE->requires->string_for_js('addcompetencys', 'totara_plan');
             $PAGE->requires->string_for_js('error:nocompetency', 'totara_program');
-
-            $jsmodule = array(
-                'name' => 'totara_plan_competency_find',
-                'fullpath' => '/totara/plan/components/competency/find.js',
-                'requires' => array('json'));
-            $PAGE->requires->js_init_call('M.totara_plan_competency_find.init', array('args' => '{"plan_id":'.$this->plan->id.', "page":"'.$paginated.'", "component_name":"'.$component_name.'"}'), false, $jsmodule);
+            
+            $jsparams = [$this->plan->id, $paginated, $component_name];
+            $PAGE->requires->js_call_amd('totara_plan/components_competency_find', 'init', $jsparams);
         }
     }
 

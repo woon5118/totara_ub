@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Replaced /totara/plan/components/competency/find.js YUI module with AMD module
 * Replaced /totara/plan/components/program/find.js YUI module with AMD module
 * Replaced /totara/plan/components/course/find.js YUI module with AMD module
 * dp_can_view_users_plans() has a new parameter $viewerid to allow access checks for any user. It defaults to the current user.
