@@ -38,7 +38,7 @@ class event_taking_attendance extends condition {
      */
     public function pass() : bool {
         $event = $this->signup->get_seminar_event();
-        return $event->is_any_attendance_open();
+        return $event->is_attendance_open();
     }
 
     /**

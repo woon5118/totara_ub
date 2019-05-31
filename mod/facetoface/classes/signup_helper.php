@@ -194,12 +194,22 @@ final class signup_helper {
      * @param array         $grades         an array containing [ signup::id => grade or null ]
      *                                      only valid for seminars with manual event grading
      * @return bool
+     * @throws coding_exception             thrown if $grades has any keys that do not exist in $attendance
      */
     public static function process_attendance(seminar_event $seminarevent, array $attendance, array $grades = null) : bool {
         if ($grades === null) {
             $grades = [];
         }
         $eventgradingmanual = $seminarevent->get_seminar()->get_eventgradingmanual() != 0;
+
+        // Validation: The $attendance array must contain all the keys of the $grades array.
+        $attendance_keys = array_keys($attendance);
+        $grades_keys = array_keys($grades);
+        $diff_keys = array_diff($grades_keys, $attendance_keys);
+        if (count($diff_keys) > 0) {
+            sort($diff_keys);
+            throw new \coding_exception('Strayed signups found in $grades: ' . implode(', ', $diff_keys));
+        }
 
         foreach ($attendance as $signupid => $statuscode) {
             $grade = $grades[$signupid] ?? null;

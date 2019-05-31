@@ -33,6 +33,7 @@
         "min": 0,
         "max": 100,
         "value": 80,
+        "disabled": false,
         "label": "Event grade",
         "placeholder": "Grade",
         "name": "signupid_5"
@@ -40,5 +41,5 @@
 }}
 
 <div class="mod_facetoface__grade input-group">
-    <input type="text" min="{{min}}" max="{{max}}" value="{{value}}" placeholder="{{placeholder}}" name="{{name}}" class="form-control" aria-label="{{label}}">
+    <input type="text" min="{{min}}" max="{{max}}" value="{{value}}" placeholder="{{placeholder}}" name="{{name}}" class="form-control" aria-label="{{label}}"{{#disabled}} disabled{{/disabled}}>
 </div>

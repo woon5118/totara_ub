@@ -15,8 +15,8 @@ Feature: Take attendance tracking general
       | bolobala  | course1 | student |
       | kian      | course1 | student |
     And the following "seminars" exist in "mod_facetoface" plugin:
-      | name      | course  | sessionattendance |
-      | seminar 1 | course1 | 1                 |
+      | name      | course  | sessionattendance | eventgradingmanual |
+      | seminar 1 | course1 | 1                 | 1                  |
     And the following "seminar events" exist in "mod_facetoface" plugin:
       | facetoface | details |
       | seminar 1  | event 1 |
@@ -43,6 +43,9 @@ Feature: Take attendance tracking general
     And the "bolo bala's attendance" "select" should be disabled
     And the "kian bomba's attendance" "select" should be disabled
     And the "loc nguyen's attendance" "select" should be disabled
+    And the "bolo bala's event grade" "field" should be disabled
+    And the "kian bomba's event grade" "field" should be disabled
+    And the "loc nguyen's event grade" "field" should be disabled
     And I should see "2" in the "bolo bala" "table_row"
     And I should see "2" in the "kian bomba" "table_row"
     And I should see "2" in the "loc nguyen" "table_row"
