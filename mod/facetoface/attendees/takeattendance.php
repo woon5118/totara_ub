@@ -78,6 +78,9 @@ $baseurl = new moodle_url(
     '/mod/facetoface/attendees/takeattendance.php',
     ['s' => $seminarevent->get_id()]
 );
+if ($sd) {
+    $baseurl->param('sd', $sd);
+}
 $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
 
