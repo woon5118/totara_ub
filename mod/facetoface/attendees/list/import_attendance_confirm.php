@@ -30,6 +30,7 @@ use mod_facetoface\seminar_event;
 use mod_facetoface\form\import_attendance_confirm;
 
 $s = required_param('s', PARAM_INT);
+$sd = optional_param('sd', 0, PARAM_INT);
 $listid = required_param('listid', PARAM_INT);
 
 $seminarevent = new seminar_event($s);
@@ -38,7 +39,7 @@ $cm = $seminar->get_coursemodule();
 $context = $seminar->get_contextmodule($cm->id);
 
 $list = new bulk_list($listid);
-$params = ['s' => $seminarevent->get_id(), 'listid' => $list->get_list_id()];
+$params = ['s' => $seminarevent->get_id(), 'sd' => $sd, 'listid' => $list->get_list_id()];
 $currenturl = new moodle_url('/mod/facetoface/attendees/list/import_attendance_confirm.php', $params);
 
 // Check capability

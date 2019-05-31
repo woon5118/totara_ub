@@ -37,6 +37,9 @@ class import_attendance_confirm  extends \moodleform {
         $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
 
+        $mform->addElement('hidden', 'sd', $this->_customdata['sd']);
+        $mform->setType('sd', PARAM_INT);
+
         $mform->addElement('hidden', 'listid', $this->_customdata['listid']);
         $mform->setType('listid', PARAM_ALPHANUM);
 
@@ -87,6 +90,7 @@ class import_attendance_confirm  extends \moodleform {
         }
         $result = \mod_facetoface\signup_helper::process_attendance($seminarevent, $attendance, $grades);
         if ($result) {
+            $params = ['s' => $seminarevent->get_id(), 'sd' => $this->_customdata['sd']];
             // Trigger take attendance update event.
             \mod_facetoface\event\attendance_updated::create_from_session(
                 $seminarevent->to_record(),
@@ -94,13 +98,11 @@ class import_attendance_confirm  extends \moodleform {
             )->trigger();
             // All good we can clean temp data.
             $this->cancel($list);
-            $url  = new \moodle_url('/mod/facetoface/attendees/takeattendance.php', ['s' => $seminarevent->get_id()]);
+            $url  = new \moodle_url('/mod/facetoface/attendees/takeattendance.php', $params);
             \core\notification::success(get_string('updateattendeessuccessful', 'mod_facetoface'));
         } else {
-            $url = new \moodle_url(
-                '/mod/facetoface/attendees/list/import_attendance_confirm.php',
-                ['s' => $seminarevent->get_id(), 'listid' => $list->get_list_id()]
-            );
+            $params['listid'] = $list->get_list_id();
+            $url = new \moodle_url('/mod/facetoface/attendees/list/import_attendance_confirm.php', $params);
             \core\notification::error(get_string('error:takeattendance', 'mod_facetoface'));
         }
         redirect($url);

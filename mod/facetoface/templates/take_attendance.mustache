@@ -46,6 +46,8 @@
     * exports -> label: Public string for export type
     * notsetcode: code for state not_set, which the front-end needs
     * uploadattendanceurl: Upload event attendace and grades
+    * disableupload: Disable Upload event button for upcoming/in-progress event attendance
+    * showupload: Hide Upload event button if it is session attendance
 
     Example context (json):
         There is no example for this template
@@ -77,10 +79,13 @@
         {{{ tablecontent }}}
 
             <div>
-                <a href="{{uploadattendanceurl}}" role="button"
-                   class="btn btn-default mod_facetoface__action_uploadattendance">
-                    {{#str}} uploadattendance, mod_facetoface {{/str}}
-                </a>
+                {{#showupload}}
+                    <a href="{{#disableupload}}#{{/disableupload}}{{^disableupload}}{{{uploadattendanceurl}}}{{/disableupload}}"
+                       role="button" {{#disableupload}}aria-disabled="true"{{/disableupload}}
+                       class="btn btn-default mod_facetoface__action_uploadattendance {{#disableupload}}disabled{{/disableupload}}">
+                        {{#str}} uploadattendance, mod_facetoface {{/str}}
+                    </a>
+                {{/showupload}}
 
                 <input type="submit" name="saveattendance"
                        value="{{#str}} saveattendance, mod_facetoface {{/str}}"

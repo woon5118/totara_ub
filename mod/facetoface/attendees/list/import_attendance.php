@@ -30,18 +30,24 @@ use mod_facetoface\seminar_event;
 use mod_facetoface\form\import_attendance;
 
 $s = required_param('s', PARAM_INT);
+$sd = optional_param('sd', 0, PARAM_INT);
 $listid = optional_param('listid', null, PARAM_INT);
 
+$seminarevent = new seminar_event($s);
+$returnurl  = new moodle_url('/mod/facetoface/attendees/takeattendance.php', ['s' => $s, 'sd' => $sd]);
+
+if (!$seminarevent->is_attendance_open() || (bool)$sd) {
+     \core\notification::error(get_string('error:takeattendance', 'mod_facetoface'));
+     redirect($returnurl);
+}
 $srctype = 'importattendance';
 $listid = $listid ?: \csv_import_reader::get_new_iid($srctype);
 
-$seminarevent = new seminar_event($s);
 $seminar = $seminarevent->get_seminar();
 $cm = $seminar->get_coursemodule();
 $context = $seminar->get_contextmodule($cm->id);
 
-$returnurl  = new moodle_url('/mod/facetoface/attendees/takeattendance.php', ['s' => $s]);
-$params = ['s' => $s, 'listid' => $listid];
+$params = ['s' => $s, 'sd' => $sd, 'listid' => $listid];
 $currenturl = new moodle_url('/mod/facetoface/attendees/list/import_attendance.php', $params);
 
 // Check capability

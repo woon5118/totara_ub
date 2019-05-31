@@ -38,6 +38,9 @@ class import_attendance extends \moodleform {
         $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
 
+        $mform->addElement('hidden', 'sd', $this->_customdata['sd']);
+        $mform->setType('sd', PARAM_INT);
+
         $mform->addElement('hidden', 'listid', $this->_customdata['listid']);
         $mform->setType('listid', PARAM_ALPHANUM);
 
@@ -153,7 +156,6 @@ class import_attendance extends \moodleform {
         // Check that no extra fields are provided.
         if (empty($errors)) {
             if (count($headers) > 3) {
-                //$unknowheaders = array_diff($headers, [$idfield], $requiredfields, $optionalfields);
                 $errors[] = get_string('error:csvtoomanyfields', 'mod_facetoface');
             }
         }
@@ -212,7 +214,10 @@ class import_attendance extends \moodleform {
         } else {
             $list->set_all_user_data($addusers);
             $cir->cleanup();
-            redirect(new \moodle_url('/mod/facetoface/attendees/list/import_attendance_confirm.php', ['s' => $seminarevent->get_id(), 'listid' => $listid]));
+            redirect(new \moodle_url(
+                '/mod/facetoface/attendees/list/import_attendance_confirm.php',
+                ['s' => $seminarevent->get_id(), 'sd' => $formdata->sd, 'listid' => $listid]
+            ));
         }
     }
 }
