@@ -3254,9 +3254,14 @@ class restore_course_completion_structure_step extends restore_structure_step {
             );
 
             $transaction = $DB->start_delegated_transaction();
-            $DB->insert_record('course_completion_history', $params);
-            \core_completion\helper::log_course_completion($courseid, $userid,
-                "Created historical completion in restore_course_completion_structure_step->process_course_completion_history");
+            $newid = $DB->insert_record('course_completion_history', $params);
+
+            \core_completion\helper::log_course_completion_history(
+                $newid,
+                "Created historical completion in " .
+                "restore_course_completion_structure_step->process_course_completion_history"
+            );
+
             $transaction->allow_commit();
         }
     }
