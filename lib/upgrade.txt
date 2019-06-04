@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* user_can_view_profile() now also checks that target user is actually enrolled in course, use user_get_profile_url()
+  if you need fallback to system profiles when users not enrolled.
 * Deprecated all no longer used classes in lib/googleapi.php file:
   - google_docs
   - google_picasa

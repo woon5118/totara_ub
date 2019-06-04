@@ -24,6 +24,7 @@ Feature: Deleted user data purging
       | totara/userdata:viewinfo          | Allow      | datamanager| System       |           |
       | totara/core:seedeletedusers       | Allow      | datamanager| System       |           |
       | moodle/user:update                | Allow      | datamanager| System       |           |
+      | moodle/user:viewalldetails        | Allow      | datamanager | System       |           |
       | moodle/user:delete                | Allow      | datamanager| System       |           |
 
   Scenario: Automatic deleted user data purging

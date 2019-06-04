@@ -56,13 +56,23 @@ define('UU_PWRESET_ALL', 2);
  */
 class uu_progress_tracker {
     private $_row;
-    public $columns = array('status', 'line', 'id', 'username', 'firstname', 'lastname', 'email', 'password', 'auth', 'enrolments', 'suspended', 'deleted');
+    public $columns;
+
+    public function __construct() {
+        global $CFG;
+        if ($CFG->tenantsenabled) {
+            $this->columns = array('status', 'line', 'id', 'username', 'firstname', 'lastname', 'email', 'password', 'auth', 'tenant', 'enrolments', 'suspended', 'deleted');
+        } else {
+            $this->columns = array('status', 'line', 'id', 'username', 'firstname', 'lastname', 'email', 'password', 'auth', 'enrolments', 'suspended', 'deleted');
+        }
+    }
 
     /**
      * Print table header.
      * @return void
      */
     public function start() {
+        global $CFG;
         $ci = 0;
         echo '<table id="uuresults" class="generaltable boxaligncenter flexible-wrap" summary="'.get_string('uploadusersresult', 'tool_uploaduser').'">';
         echo '<tr class="heading r0">';
@@ -75,6 +85,9 @@ class uu_progress_tracker {
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('email').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('password').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('authentication').'</th>';
+        if ($CFG->tenantsenabled) {
+            echo '<th class="header c'.$ci++.'" scope="col">'.get_string('tenant', 'totara_tenant').'</th>';
+        }
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('enrolments', 'enrol').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('suspended', 'auth').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('delete').'</th>';

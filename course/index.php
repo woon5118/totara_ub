@@ -37,17 +37,21 @@ if (!$categoryid) {
     }
 }
 
+if ($CFG->forcelogin) {
+    require_login();
+}
+
 $site = get_site();
 
+$category = null;
 if ($categoryid) {
+    $category = coursecat::get($categoryid);
     $PAGE->set_category_by_id($categoryid);
     $PAGE->set_url(new moodle_url('/course/index.php', array('categoryid' => $categoryid)));
     $PAGE->set_pagetype('course-index-category');
-    // And the object has been loaded for us no need for another DB call
-    $category = $PAGE->category;
 } else {
     // Check if there is only one category, if so use that.
-    if (coursecat::count_all() == 1) {
+    if (!empty($USER->tenantid) or coursecat::count_all() == 1) {
         $category = coursecat::get_default();
 
         $categoryid = $category->id;
@@ -61,22 +65,19 @@ if ($categoryid) {
 }
 
 $PAGE->set_pagelayout('coursecategory');
+/** @var core_course_renderer $courserenderer */
 $courserenderer = $PAGE->get_renderer('core', 'course');
 
-if ($CFG->forcelogin) {
-    require_login();
-}
-
-if ($categoryid && !$category->visible && !has_capability('moodle/category:viewhiddencategories', $PAGE->context)) {
+if ($category and !$category->is_uservisible()) {
     throw new moodle_exception('unknowncategory');
 }
 $PAGE->set_totara_menu_selected('\totara_coursecatalog\totara\menu\courses');
 $PAGE->set_heading($site->fullname);
-$content = $courserenderer->course_category($categoryid);
 
 echo $OUTPUT->header();
 echo $OUTPUT->skip_link_target();
-echo $content;
+
+echo $courserenderer->course_category($categoryid);
 
 // Trigger event, course category viewed.
 $eventparams = array('context' => $PAGE->context, 'objectid' => $categoryid);

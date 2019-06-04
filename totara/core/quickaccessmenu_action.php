@@ -39,7 +39,7 @@ $PAGE->set_url(new moodle_url('/totara/core/quickaccessmenu_action.php', ['actio
 $PAGE->set_cacheable(false);
 
 require_login(null, false, null, false);
-require_capability('totara/core:editownquickaccessmenu', $context);
+require_capability('totara/core:editownquickaccessmenu', context_user::instance($USER->id));
 require_sesskey();
 
 $actions = [

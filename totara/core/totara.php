@@ -135,6 +135,10 @@ function totara_course_is_viewable($courseorid, $userid = null) {
     }
     $coursecontext = context_course::instance($course->id);
 
+    if ($coursecontext->is_user_access_prevented($userid)) {
+        return false;
+    }
+
     if (empty($CFG->audiencevisibility)) {
         // This check is moved from require_login().
         if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', $coursecontext, $userid)) {

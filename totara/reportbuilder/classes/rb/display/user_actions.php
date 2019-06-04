@@ -88,7 +88,7 @@ class user_actions extends base {
             $issiteadmin = is_siteadmin($userid);
             $iscurrentuser = ($userid == $USER->id);
             $canupdate = has_capability('moodle/user:update', $sitecontext);
-            $candelete = has_capability('moodle/user:delete', $sitecontext);
+            $candelete = has_capability('moodle/user:delete', $usercontext);
 
             // Add edit action icon but prevent editing of admins by non-admin users.
             if ((is_siteadmin($USER) || !$issiteadmin)) {

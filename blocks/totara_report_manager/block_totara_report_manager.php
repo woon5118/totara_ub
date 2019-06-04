@@ -52,4 +52,3 @@ class block_totara_report_manager extends block_base {
     }
 
 }
-?>

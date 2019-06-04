@@ -60,6 +60,10 @@
 
     // Check visibility.
     if (!totara_course_is_viewable($course->id)) {
+        if ($id == SITEID) {
+            // Totara: Most likely tenant isolation used.
+            redirect(new moodle_url('/'));
+        }
         print_error('coursehidden');
     }
 

@@ -57,6 +57,11 @@ $context = context::instance_by_id($cohort->contextid);
 require_capability('totara/cohort:managerules', $context);
 $PAGE->set_context($context);
 
+if (!empty($USER->tenantid)) {
+    // NOTE: no dynamic rules for tenant members, we have no way to restrict what they select.
+    redirect(new moodle_url('/cohort/index.php', ['contextid' => $cohort->contextid]));
+}
+
 if ($type == 'rule') {
     $ruleobj = $DB->get_record('cohort_rules', array('id' => $id));
     $ruleinstanceid = $id;

@@ -46,6 +46,7 @@ use totara_cohort\rules\ui\menu as cohort_rule_ui_menu;
 use totara_cohort\rules\ui\multiselect as cohort_rule_ui_multiselect;
 use totara_cohort\rules\ui\checkbox as cohort_rule_ui_checkbox;
 use totara_cohort\rules\ui\authentication_type as cohort_rule_ui_authentication_type;
+use totara_cohort\rules\ui\tenant_member as cohort_rule_ui_tenant_member;
 use totara_cohort\rules\ui\date as cohort_rule_ui_date;
 use totara_cohort\rules\ui\date_no_timezone as cohort_rule_ui_date_no_timezone;
 use totara_cohort\rules\ui\base_selector_hierarchy as cohort_rule_ui_picker_hierarchy;
@@ -307,6 +308,18 @@ function cohort_rules_list($reset = false){
             ),
             new cohort_rule_sqlhandler_in_userfield_char('auth', COHORT_RULES_TYPE_MENU)
         );
+
+        // Tenant
+        if ($CFG->tenantsenabled) {
+            $rules[] = new cohort_rule_option(
+                'user',
+                'tenantmember',
+                new cohort_rule_ui_tenant_member(
+                    get_string('ruledesc-user-tenantmember', 'totara_cohort')
+                ),
+                new cohort_rule_sqlhandler_in_userfield_char('tenantid', COHORT_RULES_TYPE_MENU)
+            );
+        }
 
         // Audience rules applied across all job assignments.
         $rules[] = new cohort_rule_option(

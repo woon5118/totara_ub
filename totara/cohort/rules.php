@@ -53,9 +53,15 @@ $PAGE->set_context($context);
 if ($context->contextlevel == CONTEXT_SYSTEM) {
     admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout'=>'report'));
 } else {
+    require_login();
     $PAGE->set_url('/totara/cohort/rules.php', array('id' => $id));
     $PAGE->set_title(get_string('cohort:assign', 'cohort'));
     $PAGE->set_heading($COURSE->fullname);
+}
+
+if (!empty($USER->tenantid)) {
+    // NOTE: no dynamic rules for tenant members, we have no way to restrict what they select.
+    redirect(new moodle_url('/cohort/index.php', ['contextid' => $context->id]));
 }
 
 require_capability('totara/cohort:managerules', $context);

@@ -42,6 +42,11 @@ $coursecontext = context_course::instance($course->id);
 
 require_login();
 
+// Login-as is not supported for tenant contexts and it cannot be used by tenant members.
+if ($coursecontext->tenantid or !empty($USER->tenantid)) {
+    print_error('nologinas');
+}
+
 if (has_capability('moodle/user:loginas', $systemcontext)) {
     if (is_siteadmin($userid)) {
         print_error('nologinas');

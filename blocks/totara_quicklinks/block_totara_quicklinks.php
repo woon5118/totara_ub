@@ -131,5 +131,3 @@ class block_totara_quicklinks extends block_base {
         return true;
     }
 }
-
-?>

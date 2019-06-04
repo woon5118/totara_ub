@@ -33,7 +33,8 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -54,7 +55,8 @@ $capabilities = array(
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -77,7 +79,8 @@ $capabilities = array(
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ),
@@ -94,7 +97,8 @@ $capabilities = array(
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'gradereport/grader:view'
     ),
@@ -104,7 +108,8 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -114,7 +119,8 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'moodle/grade:manage'
     ),
@@ -124,7 +130,8 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'moodle/grade:manage'
     ),
@@ -134,7 +141,8 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'moodle/grade:manage'
     ),
@@ -144,7 +152,8 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'moodle/grade:manage'
     ),
@@ -155,7 +164,8 @@ $capabilities = array(
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW
+            'teacher' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -165,7 +175,8 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -175,7 +186,8 @@ $capabilities = array(
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -185,7 +197,8 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 );

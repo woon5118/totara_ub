@@ -103,7 +103,9 @@ if ($form->is_cancelled()) {
 if ($data = $form->get_data()) {
     ignore_user_abort(true); // Make sure we do not get interrupted!
 
-    $success = request::approve_request($data->requestid, $data->custommessage, false);
+    $tenantid = empty($data->tenantid) ? null : $data->tenantid;
+
+    $success = request::approve_request($data->requestid, $data->custommessage, false, $tenantid);
     if ($success) {
         \core\notification::success(get_string('successapprove', 'auth_approved', $request->email));
     } else {

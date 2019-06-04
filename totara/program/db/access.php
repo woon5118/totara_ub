@@ -78,7 +78,8 @@ $capabilities = array(
             'coursecreator' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -88,7 +89,8 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -99,6 +101,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -110,6 +113,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'totara/program:createprogram'
     ),
@@ -123,6 +127,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -135,6 +140,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -146,6 +152,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -157,6 +164,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -168,6 +176,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -176,7 +185,8 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -186,7 +196,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
-            'staffmanager' => CAP_ALLOW
+            'staffmanager' => CAP_ALLOW,
         )
     ),
 
@@ -204,6 +214,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 );

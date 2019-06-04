@@ -46,19 +46,23 @@ class totara_dashboard_renderer extends plugin_renderer_base {
      * @return string HTML table
      */
     public function dashboard_manage_table($dashboards) {
+        global $CFG, $DB;
         if (empty($dashboards)) {
             return get_string('nodashboards', 'totara_dashboard');
         }
 
         $tableheader = array(get_string('name', 'totara_dashboard'),
-                             get_string('availability', 'totara_dashboard'),
-                             get_string('options', 'totara_dashboard'));
+                             get_string('availability', 'totara_dashboard'));
+        if (!empty($CFG->tenantsenabled)) {
+            $tableheader[] = get_string('tenant', 'totara_tenant');
+        }
+        $tableheader[] = get_string('options', 'totara_dashboard');
 
         $dashboardstable = new html_table();
         $dashboardstable->summary = '';
         $dashboardstable->head = $tableheader;
         $dashboardstable->data = array();
-        $dashboardstable->attributes = array('class' => 'generaltable fullwidth');
+        $dashboardstable->attributes = array('class' => 'generaltable fullwidth', 'id' => 'alldashboards');
 
         $strpublish = get_string('publish', 'totara_dashboard');
         $strunpublish = get_string('unpublish', 'totara_dashboard');
@@ -95,6 +99,14 @@ class totara_dashboard_renderer extends plugin_renderer_base {
                     break;
                 default:
                     $row[] = get_string('availableunknown', 'totara_dashboard');
+            }
+
+            if (!empty($CFG->tenantsenabled)) {
+                if ($dashboard->tenantid) {
+                    $row[] = format_string($DB->get_field('tenant', 'name', ['id' => $dashboard->tenantid]));
+                }  else {
+                    $row[] = '&nbsp;';
+                }
             }
 
             $options = '';

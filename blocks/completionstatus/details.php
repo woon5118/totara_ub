@@ -102,8 +102,11 @@ echo html_writer::start_tag('dl', array('class' => 'dl-horizontal'));
 
 // If not display logged in user, show user name.
 if ($USER->id != $user->id) {
-    $url = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
-    $userlink = html_writer::link($url, fullname($user));
+    $userlink = fullname($user);
+    $url = user_get_profile_url($user, $course);
+    if ($user) {
+        $userlink = html_writer::link($url, $userlink);
+    }
     echo html_writer::tag('dt', get_string('showinguser', 'completion'));
     echo html_writer::tag('dd', $userlink);
 }

@@ -1,5 +1,8 @@
 <?php
 
+defined('MOODLE_INTERNAL') || die();
+/** @var admin_root $ADMIN */
+
 // This file defines settingpages and externalpages under the "server" category
 
 if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page

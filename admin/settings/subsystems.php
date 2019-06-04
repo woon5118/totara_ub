@@ -1,5 +1,8 @@
 <?php
 
+defined('MOODLE_INTERNAL') || die();
+/** @var admin_root $ADMIN */
+
 if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('enableoutcomes', new lang_string('enableoutcomes', 'grades'), new lang_string('enableoutcomes_help', 'grades'), 0));
@@ -89,7 +92,9 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 */
 
     // Report caching and global restrictions.
-    $optionalsubsystems->add(new admin_setting_configcheckbox('enablereportcaching', new lang_string('enablereportcaching','totara_reportbuilder'), new lang_string('configenablereportcaching','totara_reportbuilder'), 0));
+    if (empty($CFG->tenantsenabled)) {
+        $optionalsubsystems->add(new admin_setting_configcheckbox('enablereportcaching', new lang_string('enablereportcaching','totara_reportbuilder'), new lang_string('configenablereportcaching','totara_reportbuilder'), 0));
+    }
     $optionalsubsystems->add(new admin_setting_configcheckbox('enableglobalrestrictions', new lang_string('enableglobalrestrictions', 'totara_reportbuilder'), new lang_string('enableglobalrestrictions_desc', 'totara_reportbuilder'), 0));
 
     // Audience visibility.

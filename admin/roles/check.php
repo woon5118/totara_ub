@@ -77,6 +77,8 @@ $contextname = $context->get_context_name();
 $options = array('accesscontext' => $context);
 $userselector = new core_role_check_users_selector('reportuser', $options);
 $userselector->set_rows(20);
+// Totara: do not show all system users here unless current user is a privileged non-tenant user account.
+$userselector->enabletenantrestrictions = !has_any_capability(array('moodle/role:assign', 'moodle/role:safeoverride', 'moodle/role:override', 'moodle/role:manage'), context_system::instance());
 
 // Work out an appropriate page title.
 $title = get_string('checkpermissionsin', 'core_role', $contextname);

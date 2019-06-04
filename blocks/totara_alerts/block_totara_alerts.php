@@ -75,5 +75,3 @@ class block_totara_alerts extends block_base {
         return $this->content;
     }
 }
-
-?>

@@ -67,10 +67,12 @@ class block_recent_activity_renderer extends plugin_renderer_base {
             //Accessibility: new users now appear in an <OL> list.
             $output .= html_writer::start_tag('ol', array('class' => 'list'));
             foreach ($recentenrolments as $user) {
-                $output .= html_writer::tag('li',
-                        html_writer::link(new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id)),
-                                fullname($user, $viewfullnames)),
-                        array('class' => 'name'));
+                $profileurl = user_get_profile_url($user, $course);
+                $fullname = fullname($user, $viewfullnames);
+                if ($profileurl) {
+                    $fullname = html_writer::link($profileurl, $fullname);
+                }
+                $output .= html_writer::tag('li', $fullname, array('class' => 'name'));
             }
             $output .= html_writer::end_tag('ol');
             $output .= html_writer::end_tag('div');

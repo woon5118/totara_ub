@@ -66,7 +66,7 @@ if ($info['error']) {
 if ($user) {
     if ($user = $DB->get_record('user', array('id'=>$user, 'deleted'=>0))) {
         // note: better not show full names to everybody
-        if (has_capability('moodle/user:viewdetails', context_user::instance($user->id))) {
+        if (has_capability('moodle/user:viewalldetails', context_user::instance($user->id))) {
             array_unshift($info['title'], fullname($user));
         }
     }

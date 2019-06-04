@@ -34,7 +34,19 @@ class courses implements \totara_core\quickaccessmenu\provider {
                 group::get(group::LEARN),
                 new \lang_string('coursemgmt', 'admin'),
                 1000
-            )
+            ),
+            item::from_provider( // Available only if 'coursemgmt', but user can see hidden course categories somewhere.
+                'tenantcategory',
+                group::get(group::LEARN),
+                new \lang_string('coursemgmt', 'admin'),
+                1000
+            ),
+            item::from_provider( // Available only if 'coursemgmt', but user can see hidden course categories somewhere.
+                'coursecategories',
+                group::get(group::LEARN),
+                new \lang_string('coursemgmt', 'admin'),
+                1000
+            ),
         ];
     }
 }

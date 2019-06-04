@@ -279,15 +279,55 @@ function enrol_sharing_course($user1, $user2) {
 function enrol_get_shared_courses($user1, $user2, $preloadcontexts = false, $checkexistsonly = false) {
     global $DB, $CFG;
 
+    if ($checkexistsonly) {
+        $nothing = false;
+    } else {
+        $nothing = [];
+    }
+
     $user1 = isset($user1->id) ? $user1->id : $user1;
     $user2 = isset($user2->id) ? $user2->id : $user2;
 
     if (empty($user1) or empty($user2)) {
-        return false;
+        return $nothing;
+    }
+
+    // Totara: enforce tenant separation rules.
+    if (!$user1context = context_user::instance($user1, IGNORE_MISSING)) {
+        return $nothing;
+    }
+    if (!$user2context = context_user::instance($user2, IGNORE_MISSING)) {
+        return $nothing;
+    }
+    $tenantjoin = "";
+    if ($CFG->tenantsenabled) {
+        if ($CFG->tenantsisolated) {
+            if ($user1context->tenantid) {
+                if ($user2context->tenantid and $user1context->tenantid != $user2context->tenantid) {
+                    // Different tenant members cannot see each other at all.
+                    return $nothing;
+                } else {
+                    $tenantjoin = "JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE. " AND ctx.tenantid = " . $user1context->tenantid;
+                }
+            } else if ($user2context->tenantid) {
+                $tenantjoin = "JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE. " AND ctx.tenantid = " . $user2context->tenantid;
+            }
+        } else {
+            if ($user1context->tenantid) {
+                if ($user2context->tenantid and $user1context->tenantid != $user2context->tenantid) {
+                    // Different tenant members cannot see each other outside of tenants only.
+                    $tenantjoin = "JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE. " AND ctx.tenantid IS NULL";
+                } else {
+                    $tenantjoin = "JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE. " AND (ctx.tenantid IS NULL OR ctx.tenantid = " . $user1context->tenantid . ")";
+                }
+            } else if ($user2context->tenantid) {
+                $tenantjoin = "JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE. " AND (ctx.tenantid IS NULL OR ctx.tenantid = " . $user2context->tenantid . ")";
+            }
+        }
     }
 
     if (!$plugins = explode(',', $CFG->enrol_plugins_enabled)) {
-        return false;
+        return $nothing;
     }
 
     list($plugins1, $params1) = $DB->get_in_or_equal($plugins, SQL_PARAMS_NAMED, 'ee1');
@@ -317,9 +357,11 @@ function enrol_get_shared_courses($user1, $user2, $preloadcontexts = false, $che
                   JOIN {user_enrolments} ue1 ON (ue1.enrolid = e1.id AND ue1.status = :active1 AND ue1.userid = :user1)
                   JOIN {enrol} e2 ON (c.id = e2.courseid AND e2.status = :enabled2 AND e2.enrol $plugins2)
                   JOIN {user_enrolments} ue2 ON (ue2.enrolid = e2.id AND ue2.status = :active2 AND ue2.userid = :user2)
+                  $tenantjoin
                  WHERE c.visible = 1
               ) ec ON ec.id = c.id
-              $ctxjoin";
+              $ctxjoin
+          ORDER BY c.id";
 
     if ($checkexistsonly) {
         return $DB->record_exists_sql($sql, $params);
@@ -796,6 +838,21 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
         return(array());
     }
 
+    // Totara: enforce tenant restrictions.
+    if (!$usercontext = context_user::instance($userid, IGNORE_MISSING)) {
+        return(array());
+    }
+    $tenantjoin = "";
+    if (!empty($CFG->tenantsenabled)) {
+        if ($usercontext->tenantid) {
+            if ($CFG->tenantsisolated) {
+                $tenantjoin = "JOIN {context} ctx ON ctx.instanceid = e.courseid AND ctx.contextlevel = " . CONTEXT_COURSE . " AND ctx.tenantid = " . $usercontext->tenantid;
+            } else {
+                $tenantjoin = "JOIN {context} ctx ON ctx.instanceid = e.courseid AND ctx.contextlevel = " . CONTEXT_COURSE . " AND (ctx.tenantid IS NULL OR ctx.tenantid = " . $usercontext->tenantid . ")";
+            }
+        }
+    }
+
     $basefields = array('id', 'category', 'sortorder',
             'shortname', 'fullname', 'idnumber',
             'startdate', 'visible',
@@ -866,6 +923,7 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
               JOIN (SELECT DISTINCT e.courseid
                       FROM {enrol} e
                       JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.userid = :userid)
+               $tenantjoin
                  $subwhere
                    ) en ON (en.courseid = c.id)
            $ccjoin
@@ -1152,6 +1210,11 @@ function is_enrolled(context $context, $user = null, $withcapability = '', $only
         return false;
     }
 
+    // Totara: enforce tenant separation rules.
+    if ($coursecontext->is_user_access_prevented($userid)) {
+        return false;
+    }
+
     // Note everybody participates on frontpage, so for other contexts...
     if ($coursecontext->instanceid != SITEID) {
         // Try cached info first - the enrolled flag is set only when active enrolment present.
@@ -1305,6 +1368,8 @@ function get_enrolled_sql(context $context, $withcapability = '', $groupid = 0, 
  * @return \core\dml\sql_join Contains joins, wheres, params
  */
 function get_enrolled_join(context $context, $useridcolumn, $onlyactive = false, $onlysuspended = false) {
+    global $CFG;
+
     // Use unique prefix just in case somebody makes some SQL magic with the result.
     static $i = 0;
     $i++;
@@ -1326,7 +1391,8 @@ function get_enrolled_join(context $context, $useridcolumn, $onlyactive = false,
     $wheres = array();
     $params = array();
 
-    $wheres[] = "1 = 1"; // Prevent broken where clauses later on.
+    $guestid = (int)$CFG->siteguest;
+    $wheres[] = "$useridcolumn <> $guestid"; // Totara: never return guests
 
     // Note all users are "enrolled" on the frontpage, but for others...
     if (!$isfrontpage) {
@@ -1357,6 +1423,17 @@ function get_enrolled_join(context $context, $useridcolumn, $onlyactive = false,
             $params = array_merge($params, array($prefix . 'enabled' => ENROL_INSTANCE_ENABLED,
                     $prefix . 'active' => ENROL_USER_ACTIVE,
                     $prefix . 'now1' => $now1, $prefix . 'now2' => $now2));
+        }
+
+        if ($CFG->tenantsenabled) {
+            if ($onlyactive and $context->tenantid) {
+                $joins[] = "JOIN {user} {$prefix}tu ON {$prefix}tu.id = $useridcolumn AND ({$prefix}tu.tenantid IS NULL OR {$prefix}tu.tenantid = $context->tenantid)";
+            }
+        }
+
+    } else {
+        if ($CFG->tenantsenabled and $CFG->tenantsisolated) {
+            $joins[] = "JOIN {user} {$prefix}tu ON {$prefix}tu.id = $useridcolumn AND {$prefix}tu.tenantid IS NULL";
         }
     }
 

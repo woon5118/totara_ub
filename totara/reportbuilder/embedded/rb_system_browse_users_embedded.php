@@ -103,10 +103,7 @@ class rb_system_browse_users_embedded extends rb_base_embedded {
     public function is_capable($userid, $report) {
         $systemcontext = context_system::instance();
 
-        return has_any_capability([
-            'moodle/user:update',
-            'moodle/user:delete'
-        ], $systemcontext);
+        return has_capability('moodle/user:viewalldetails', $systemcontext);
     }
 
     /**

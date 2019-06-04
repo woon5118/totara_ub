@@ -240,7 +240,9 @@ class totara_job_lib_testcase extends advanced_testcase {
         $systemcontext->mark_dirty();
         $this->assertTrue(totara_job_can_view_job_assignments($user2, $course));
 
-        assign_capability('moodle/user:viewalldetails', CAP_ALLOW, $roleid, $coursecontext->id, true);
+        $roleidx = $this->getDataGenerator()->create_role([]);
+        role_assign($roleidx, $user1->id, $user2context);
+        assign_capability('moodle/user:viewalldetails', CAP_ALLOW, $roleidx, $user2context->id, true);
         assign_capability('moodle/user:viewdetails', CAP_INHERIT, $roleid, $coursecontext->id, true);
         $systemcontext->mark_dirty();
         $this->assertTrue(totara_job_can_view_job_assignments($user2, $course));
@@ -249,12 +251,10 @@ class totara_job_lib_testcase extends advanced_testcase {
         $this->assertTrue(totara_job_can_view_job_assignments($user2));
 
         // Reset the caps.
-        assign_capability('moodle/user:viewalldetails', CAP_INHERIT, $roleid, $coursecontext->id, true);
-        assign_capability('moodle/user:viewdetails', CAP_INHERIT, $roleid, $coursecontext->id, true);
+        assign_capability('moodle/user:viewalldetails', CAP_INHERIT, $roleidx, $user2context->id, true);
         $systemcontext->mark_dirty();
         $this->assertFalse(totara_job_can_view_job_assignments($user2));
-        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $user2context->id, true);
-        role_assign($roleid, $user1->id, $user2context);
+        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleidx, $user2context->id, true);
         $systemcontext->mark_dirty();
         $this->assertTrue(totara_job_can_view_job_assignments($user2));
     }

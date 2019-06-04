@@ -79,6 +79,7 @@ echo $OUTPUT->notification(get_string('removeuserwarning', 'core_cohort'));
 
 // Get the user_selector we will need.
 $potentialuserselector = new cohort_candidate_selector('addselect', array('cohortid'=>$cohort->id, 'accesscontext'=>$context));
+$potentialuserselector->enabletenantrestrictions = true;
 $existinguserselector = new cohort_existing_selector('removeselect', array('cohortid'=>$cohort->id, 'accesscontext'=>$context));
 
 // Get current roles assigned to this cohort.

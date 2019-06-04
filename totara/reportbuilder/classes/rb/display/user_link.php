@@ -87,55 +87,18 @@ class user_link extends base {
             return $fullname;
         }
 
-        $url = new \moodle_url("/user/view.php", ["id" => $userid]);
         if (CLI_SCRIPT && !PHPUNIT_TEST) {
-            // It is CLI_SCRIPT, most likely that the course is not being set for $PAGE, and neither the $PAGE itself.
-            return \html_writer::link($url, $fullname);
-        }
-
-        $course = $PAGE->course;
-
-        // A hacky way to detect whether we are displaying the user name link within a course context or not.
-        // TL-18965 reported with inconsistency link for username that it goes to system context instead of course
-        // context even though the embedded report was view within course.
-        if ($course->id == SITEID) {
-            return \html_writer::link($url, $fullname);
-        }
-
-        // Only adding the course id if user the course is not one of the SITE course
-        $context = \context_course::instance($course->id);
-        if (is_enrolled($context, $userid) || is_viewing($context, $userid)) {
-            $url->param('course', $course->id);
-            return \html_writer::link($url, $fullname);
-        } else if ($userid == $USER->id) {
-            // If the user is self, throw the profile url
-            return \html_writer::link($url, $fullname);
+            $course = null;
         } else {
-            $usercontext = \context_user::instance($userid);
-            $capabilities = [
-                'moodle/user:viewdetails',
-                'moodle/user:viewalldetails'
-            ];
-
-            if (has_any_capability($capabilities, $usercontext)) {
-                // User has capability to view other's full detail within site profile.
-                return \html_writer::link($url, $fullname);
-            } else {
-                // Last resource of checking. Well, it should never get to here at all, but who knows ¯\_(ツ)_/¯
-                $userobj = new \stdClass();
-                $userobj->id = $userid;
-                $userobj->deleted = $isdeleted;
-
-                if (user_can_view_profile($userobj)) {
-                    // Yep, the current actor is able to view the target user, but could be in any course context,
-                    // and it will be redirected to user profile page.
-                    return \html_writer::link($url, $fullname);
-                }
-            }
+            $course = $PAGE->course;
         }
 
-        // The current actor is not able to view the profile of target user within course.
-        return $fullname;
+        $url = user_get_profile_url($userid, $course);
+        if (!$url) {
+            return $fullname;
+        }
+
+        return \html_writer::link($url, $fullname);
     }
 
     /**

@@ -37,6 +37,7 @@ class totara_core_quickaccessmenu_external_testcase extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $capabilities = [
             'moodle/user:update',
+            'moodle/user:viewalldetails',
             'moodle/role:assign',
             'moodle/role:manage',
             'totara/core:manageprofilefields',

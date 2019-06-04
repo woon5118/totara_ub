@@ -90,4 +90,3 @@ function totara_block_addtoplan_get_content($courseid, $userid) {
 
     return $html;
 }
-?>

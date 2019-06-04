@@ -145,7 +145,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertSame((int)$user->maildisplay, self::get_controller_property($controller, 'usermaildisplay'));
         self::assertSame(false, self::get_controller_property($controller, 'iscurrentuser'));
         self::assertSame($context, self::get_controller_property($controller, 'context_user'));
-        self::assertSame(null, self::get_controller_property($controller, 'course'));
+        self::assertSame(null, self::get_controller_property($controller, 'courseid'));
+        self::assertSame(null, self::get_controller_property($controller, 'cachedcourse'));
 
         // Test we load data from the database when required
         $controller = access_controller::for((object)['id' => $user->id], $course);
@@ -155,7 +156,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertSame((int)$user->maildisplay, self::get_controller_property($controller, 'usermaildisplay'));
         self::assertSame(false, self::get_controller_property($controller, 'iscurrentuser'));
         self::assertSame($context, self::get_controller_property($controller, 'context_user'));
-        self::assertSame($course, self::get_controller_property($controller, 'course'));
+        self::assertSame($course->id, self::get_controller_property($controller, 'courseid'));
+        self::assertSame($course, self::get_controller_property($controller, 'cachedcourse'));
 
         // Test for the current user
         $this->setUser($user);
@@ -164,7 +166,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertSame((int)$user->maildisplay, self::get_controller_property($controller, 'usermaildisplay'));
         self::assertSame(true, self::get_controller_property($controller, 'iscurrentuser'));
         self::assertSame($context, self::get_controller_property($controller, 'context_user'));
-        self::assertSame($course, self::get_controller_property($controller, 'course'));
+        self::assertSame($course->id, self::get_controller_property($controller, 'courseid'));
+        self::assertSame($course, self::get_controller_property($controller, 'cachedcourse'));
 
         // Test for deleted user.
         $user = $this->getDataGenerator()->create_user();
@@ -174,7 +177,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertSame((int)$user->maildisplay, self::get_controller_property($controller, 'usermaildisplay'));
         self::assertSame(false, self::get_controller_property($controller, 'iscurrentuser'));
         self::assertSame(false, self::get_controller_property($controller, 'context_user'));
-        self::assertSame($course, self::get_controller_property($controller, 'course'));
+        self::assertSame($course->id, self::get_controller_property($controller, 'courseid'));
+        self::assertSame($course, self::get_controller_property($controller, 'cachedcourse'));
 
         // Test for fake user.
         try {
@@ -211,7 +215,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertNotEmpty($CFG->forceloginforprofiles);
 
         $user = $this->getDataGenerator()->create_user();
-        
+
         self::assertFalse(access_controller::for($user)->can_view_profile());
         $CFG->forceloginforprofiles = false;
         self::assertTrue(access_controller::for($user)->can_view_profile());
@@ -223,7 +227,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertNotEmpty($CFG->forceloginforprofiles);
 
         $user = $this->getDataGenerator()->create_user();
-        
+
         $this->setGuestUser();
         self::assertFalse(access_controller::for($user)->can_view_profile());
         $CFG->forceloginforprofiles = false;
@@ -239,7 +243,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
-        
+
         self::assertFalse(access_controller::for(guest_user())->can_view_profile());
         $CFG->forceloginforprofiles = false;
         self::assertTrue(access_controller::for(guest_user())->can_view_profile());
@@ -252,7 +256,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $user = $this->getDataGenerator()->create_user();
         $this->setAdminUser();
-        
+
         self::assertTrue(access_controller::for($user)->can_view_profile());
     }
 
@@ -262,7 +266,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertNotEmpty($CFG->forceloginforprofiles);
 
         $this->setUser($this->getDataGenerator()->create_user());
-        
+
         self::assertFalse(access_controller::for(get_admin())->can_view_profile());
         $CFG->forceloginforprofiles = false;
         self::assertTrue(access_controller::for(get_admin())->can_view_profile());
@@ -275,7 +279,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $this->setUser($this->getDataGenerator()->create_user());
         $user = $this->getDataGenerator()->create_user();
-        
+
         self::assertFalse(access_controller::for($user)->can_view_profile());
         $this->setUser($user);
         self::assertTrue(access_controller::for($user)->can_view_profile());
@@ -387,6 +391,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $user1 = $this->getDataGenerator()->create_user();
+        $user1context = context_user::instance($user1->id);
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
         $viewrole = $this->getDataGenerator()->create_role();
@@ -396,9 +401,9 @@ class core_user_access_controller_testcase extends advanced_testcase {
         $this->getDataGenerator()->enrol_user($user3->id, $course->id);
         $context = \context_course::instance($course->id);
         assign_capability('moodle/user:viewdetails', CAP_ALLOW, $viewrole, $context);
-        assign_capability('moodle/user:viewalldetails', CAP_ALLOW, $viewallrole, $context);
+        assign_capability('moodle/user:viewalldetails', CAP_ALLOW, $viewallrole, $user1context);
         $this->getDataGenerator()->role_assign($viewrole, $user2->id, $context);
-        $this->getDataGenerator()->role_assign($viewallrole, $user3->id, $context);
+        $this->getDataGenerator()->role_assign($viewallrole, $user3->id, $user1context);
 
         // Remove the viewdetails cap from the learner, so that our custom roles have to grant it.
         $role_student = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
@@ -406,16 +411,19 @@ class core_user_access_controller_testcase extends advanced_testcase {
         assign_capability('moodle/user:viewalldetails', CAP_PREVENT, $role_student, $context);
 
         $this->setUser($user1);
+        self::assertTrue(access_controller::for($user1)->can_view_profile());
         self::assertFalse(access_controller::for($user2)->can_view_profile());
         self::assertFalse(access_controller::for($user3)->can_view_profile());
 
         $this->setUser($user2);
         self::assertTrue(access_controller::for($user1)->can_view_profile());
+        self::assertTrue(access_controller::for($user2)->can_view_profile());
         self::assertTrue(access_controller::for($user3)->can_view_profile());
 
         $this->setUser($user3);
         self::assertTrue(access_controller::for($user1)->can_view_profile());
-        self::assertTrue(access_controller::for($user2)->can_view_profile());
+        self::assertFalse(access_controller::for($user2)->can_view_profile());
+        self::assertTrue(access_controller::for($user3)->can_view_profile());
     }
 
     public function test_can_view_profile_view_details_capability_at_course_separate_groups() {
@@ -652,6 +660,142 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse(access_controller::for($user1)->can_view_profile());
         self::assertFalse(access_controller::for($user2)->can_view_profile());
         self::assertFalse(access_controller::for($user3)->can_view_profile());
+    }
+
+    public function test_get_profile_url() {
+        global $CFG;
+
+        $admin = get_admin();
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
+        $this->getDataGenerator()->enrol_user($user2->id, $course2->id, 'student', 'manual', 0, 0, ENROL_USER_SUSPENDED);
+
+        $this->setUser($admin);
+
+        $url = access_controller::for($admin, null)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$admin->id", $url->out(false));
+
+        $url = access_controller::for($admin, $course1)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$admin->id", $url->out(false));
+
+        $url = access_controller::for($user1, null)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id", $url->out(false));
+
+        $url = access_controller::for($user1, $course1)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/view.php?id=$user1->id&course=$course1->id", $url->out(false));
+
+        $url = access_controller::for($user1, $course2)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id", $url->out(false));
+
+        $url = access_controller::for($user2, null)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user2->id", $url->out(false));
+
+        $url = access_controller::for($user2, $course1)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user2->id", $url->out(false));
+
+        $url = access_controller::for($user2, $course2)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/view.php?id=$user2->id&course=$course2->id", $url->out(false));
+
+        $this->setUser($user1);
+
+        $url = access_controller::for($admin, null)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($admin, $course1)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user1, null)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id", $url->out(false));
+
+        $url = access_controller::for($user1, $course1)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/view.php?id=$user1->id&course=$course1->id", $url->out(false));
+
+        $url = access_controller::for($user1, $course2)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id", $url->out(false));
+
+        $url = access_controller::for($user2, null)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user2, $course1)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user2, $course2)->get_profile_url();
+        $this->assertNull($url);
+
+        $this->setUser($user2);
+
+        $url = access_controller::for($admin, null)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($admin, $course1)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user1, null)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user1, $course1)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user1, $course2)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user2, null)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user2->id", $url->out(false));
+
+        $url = access_controller::for($user2, $course1)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user2->id", $url->out(false));
+
+        $url = access_controller::for($user2, $course2)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user2->id", $url->out(false));
+
+        $this->setUser($user3);
+
+        $url = access_controller::for($admin, null)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($admin, $course1)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user1, null)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user1, $course1)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user1, $course2)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user2, null)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user2, $course1)->get_profile_url();
+        $this->assertNull($url);
+
+        $url = access_controller::for($user2, $course2)->get_profile_url();
+        $this->assertNull($url);
+        $this->assertNull($url);
+
+        $url = access_controller::for($user3, null)->get_profile_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user3->id", $url->out(false));
     }
 
     public function test_has_view_details_capability_deleted_user() {
@@ -970,6 +1114,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
     }
 
     public function test_job_manager_can_see_report_at_site() {
+        global $CFG;
+
         $manager = $this->getDataGenerator()->create_user();
         /** @var totara_job_generator $jobgen */
         $jobgen = $this->getDataGenerator()->get_plugin_generator('totara_job');
@@ -977,6 +1123,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $this->setUser($manager);
         $controller = access_controller::for($user);
+
+        $CFG->profilesforenrolledusersonly = false;
 
         self::assertTrue($controller->can_view_profile());
         self::assertTrue($controller->can_view_enrolledcourses());
@@ -986,21 +1134,20 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse($controller->can_manage_files());
 
         $allowed = [
-            'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'email'
+            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
+            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
+            'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
+            'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
         ];
         $notallowed = [
-            'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
-            'phone1', 'phone2', 'institution', 'department', 'address', 'lang',
-            'theme', 'timezone', 'description', 'descriptionformat', 'mailformat',
-            'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
-            'alternatename', 'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
+            'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
             'lastip', 'picture', 'maildigest', 'maildisplay', 'autosubscribe', 'trackforums', 'trustbitmask', 'totarasync'
         ];
         self::assert_expected_fields($controller, $allowed, $notallowed);
     }
 
-    public function test_job_manager_can_see_report_at_course_not_enrolled() {
+    public function test_job_manager_cannot_see_report_at_course_not_enrolled() {
         $course = $this->getDataGenerator()->create_course();
         $manager = $this->getDataGenerator()->create_user();
         /** @var totara_job_generator $jobgen */
@@ -1010,26 +1157,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
         $this->setUser($manager);
         $controller = access_controller::for($user, $course);
 
-        self::assertTrue($controller->can_view_profile());
-        self::assertTrue($controller->can_view_enrolledcourses());
-        self::assertFalse($controller->can_view_preferences());
-        self::assertTrue($controller->can_view_customfields());
-        self::assertTrue($controller->can_view_interests());
-        self::assertFalse($controller->can_manage_files());
-
-        $allowed = [
-            'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'email'
-        ];
-        $notallowed = [
-            'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
-            'phone1', 'phone2', 'institution', 'department', 'address', 'lang',
-            'theme', 'timezone', 'description', 'descriptionformat', 'mailformat',
-            'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
-            'alternatename', 'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
-            'lastip', 'picture', 'maildigest', 'maildisplay', 'autosubscribe', 'trackforums', 'trustbitmask', 'totarasync'
-        ];
-        self::assert_expected_fields($controller, $allowed, $notallowed);
+        self::assertFalse($controller->can_view_profile());
     }
 
     public function test_job_manager_can_see_report_at_course_enrolled_not_shared() {
@@ -1051,14 +1179,14 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse($controller->can_manage_files());
 
         $allowed = [
-            'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
+            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
+            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
+            'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
+            'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
         ];
         $notallowed = [
-            'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
-            'phone1', 'phone2', 'institution', 'department', 'address', 'lang', 'theme', 'timezone', 'mailformat',
-            'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
-            'alternatename', 'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
+            'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
             'lastip', 'picture', 'maildigest', 'maildisplay', 'autosubscribe', 'trackforums', 'trustbitmask', 'totarasync'
         ];
         self::assert_expected_fields($controller, $allowed, $notallowed);
@@ -1084,14 +1212,14 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse($controller->can_manage_files());
 
         $allowed = [
-            'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
+            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
+            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
+            'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
+            'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
         ];
         $notallowed = [
-            'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
-            'phone1', 'phone2', 'institution', 'department', 'address', 'lang', 'theme', 'timezone', 'mailformat',
-            'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
-            'alternatename', 'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
+            'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
             'lastip', 'picture', 'maildigest', 'maildisplay', 'autosubscribe', 'trackforums', 'trustbitmask', 'totarasync'
         ];
         self::assert_expected_fields($controller, $allowed, $notallowed);
@@ -1128,7 +1256,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assert_expected_fields($controller, $allowed, $notallowed);
     }
 
-    public function test_job_report_can_see_manager_at_course_not_enrolled() {
+    public function test_job_report_cannot_see_manager_at_course_not_enrolled() {
         $course = $this->getDataGenerator()->create_course();
         $manager = $this->getDataGenerator()->create_user();
         /** @var totara_job_generator $jobgen */
@@ -1138,26 +1266,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
         $this->setUser($user);
         $controller = access_controller::for($manager, $course);
 
-        self::assertTrue($controller->can_view_profile());
-        self::assertTrue($controller->can_view_enrolledcourses());
-        self::assertFalse($controller->can_view_preferences());
-        self::assertTrue($controller->can_view_customfields());
-        self::assertTrue($controller->can_view_interests());
-        self::assertFalse($controller->can_manage_files());
-
-        $allowed = [
-            'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
-        ];
-        $notallowed = [
-            'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
-            'phone1', 'phone2', 'institution', 'department', 'address', 'lang',
-            'theme', 'timezone', 'mailformat',
-            'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
-            'alternatename', 'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
-            'lastip', 'picture', 'maildigest', 'maildisplay', 'autosubscribe', 'trackforums', 'trustbitmask', 'totarasync'
-        ];
-        self::assert_expected_fields($controller, $allowed, $notallowed);
+        self::assertFalse($controller->can_view_profile());
     }
 
     public function test_job_report_can_see_manager_at_course_enrolled_not_shared() {
@@ -1366,13 +1475,13 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'auth', 'confirmed', 'username',
-            'idnumber', 'firstname', 'lastname', 'phone1', 'phone2', 'institution', 'department', 'address', 'lang',
-            'theme', 'timezone', 'mailformat', 'description', 'descriptionformat',
-            'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename', 'alternatename',
+            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'firstname', 'lastname',
+            'phone1', 'phone2', 'description', 'descriptionformat', 'address'
         ];
         $notallowed = [
-            'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
+            'auth', 'confirmed', 'username', 'idnumber', 'institution', 'department', 'lang', 'theme', 'timezone', 'mailformat',
+            'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
+            'alternatename', 'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
             'lastip', 'picture', 'maildigest', 'maildisplay', 'autosubscribe', 'trackforums', 'trustbitmask', 'totarasync'
         ];
         self::assert_expected_fields($controller, $allowed, $notallowed);

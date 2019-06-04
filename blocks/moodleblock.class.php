@@ -94,7 +94,7 @@ class block_base {
 
     /**
      * This blocks's context.
-     * @var stdClass
+     * @var context
      */
     public $context    = NULL;
 
@@ -221,7 +221,20 @@ class block_base {
      * @return boolean
      */
     function is_empty() {
-        if ( !has_capability('moodle/block:view', $this->context) ) {
+        global $CFG;
+
+        // Tenant hack: we need the system level settings block in tenant contexts too, so test permissions in tenant category instead.
+        $parentcontext = $this->context->get_parent_context();
+        if (!empty($CFG->tenantsenabled) and $CFG->tenantsisolated and $parentcontext->contextlevel == CONTEXT_SYSTEM and !empty($this->page->context->tenantid)) {
+            if ($this->name() !== 'settings') {
+                return true;
+            }
+            $tenant = core\record\tenant::fetch($this->page->context->tenantid);
+            $catcontext = context_coursecat::instance($tenant->categoryid);
+            if (!has_capability('moodle/block:view', $catcontext)) {
+                return true;
+            }
+        } else if ( !has_capability('moodle/block:view', $this->context) ) {
             return true;
         }
 
@@ -283,6 +296,13 @@ class block_base {
         }
 
         if ($this->page->user_is_editing()) {
+            // Tenant hack: do not show system blocks except 'settings' if editing blocks in tenant context.
+            $parentcontext = $this->context->get_parent_context();
+            if (!empty($CFG->tenantsenabled) and $CFG->tenantsisolated and $parentcontext->contextlevel == CONTEXT_SYSTEM and !empty($this->page->context->tenantid)) {
+                if ($this->name() !== 'settings') {
+                    return null;
+                }
+            }
             $bc->controls = $this->page->blocks->edit_controls($this);
         } else {
             // we must not use is_empty on hidden blocks

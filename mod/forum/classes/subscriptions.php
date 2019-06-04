@@ -411,6 +411,7 @@ class subscriptions {
                       u.theme,
                       u.lang,
                       u.trackforums,
+                      u.tenantid,
                       u.mnethostid";
         }
 

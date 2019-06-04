@@ -33,4 +33,3 @@ class block_totara_my_learning_nav extends block_base {
     }
 
 }
-?>

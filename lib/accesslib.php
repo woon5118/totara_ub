@@ -120,6 +120,8 @@ define('CAP_PROHIBIT', -1000);
 
 /** System context level - only one instance in every system */
 define('CONTEXT_SYSTEM', 10);
+/** Totara Tenant context level - one for each tenant, parents all tenant members */
+define('CONTEXT_TENANT', 15);
 /** User context level -  one instance for each user describing what others can do to user */
 define('CONTEXT_USER', 30);
 /** Course category context level - one instance for each category */
@@ -382,6 +384,25 @@ function get_guest_role() {
  * Guest and not-logged-in users can never get any dangerous capability - that is any write capability
  * or capabilities with XSS, config or data loss risks.
  *
+ * When tenants are enabled on the site the following behavior is enforced.
+ *
+ * When the user is a guest user or not-logged-in:
+ * -- If the context belongs to any tenant then the user cannot hold this capability.
+ * -- If the context does not belong to a tenant then normal checking applies.
+ *
+ * When the user is a member of a tenant:
+ * -- When tenant isolation mode is enabled:
+ * --- If the context belongs to the users tenant then normal checking applies
+ * --- If the context belongs to any other tenant then the user cannot hold this capability.
+ * --- If the context does not belong to a tenant then the user cannot hold this capability.
+ * -- When tenant isolation mode is disabled:
+ * --- If the context belongs to the users tenant then normal checking applies
+ * --- If the context belongs to any other tenant then the user cannot hold this capability.
+ * --- If the context does not belong to a tenant then normal checking applies.
+ *
+ * When the user is not a member of a tenant:
+ * -- Normal checking applies in all situations.
+ *
  * @category access
  *
  * @param string $capability the name of the capability to check. For example mod/forum:view
@@ -459,6 +480,11 @@ function has_capability($capability, context $context, $user = null, $doanything
                 return false;
             }
         }
+    }
+
+    // Totara: enforce tenant separation
+    if ($context->is_user_access_prevented($userid)) {
+        return false;
     }
 
     // context path/depth must be valid
@@ -566,6 +592,41 @@ function has_all_capabilities(array $capabilities, context $context, $user = nul
         }
     }
     return true;
+}
+
+/**
+ * Find out if user has he capability at given levels (or any level if not specified).
+ *
+ * @since Totara 13
+ *
+ * @param string $capability capability name
+ * @param array|null $levels null means all levels
+ * @param int|\stdClass $user
+ * @param bool $doanything
+ * @return bool
+ */
+function has_capability_in_any_context(string $capability, array $levels = null, $user = null, $doanything = true) {
+    global $DB;
+
+    list($hascapsql, $params) = totara_core\access::get_has_capability_sql($capability, 'c.id', $user, $doanything);
+    if ($hascapsql === "1=1") {
+        return true;
+    }
+    if ($hascapsql === "1=0") {
+        return false;
+    }
+    if ($levels !== null) {
+        list($levelsql, $levelparams) = $DB->get_in_or_equal($levels, SQL_PARAMS_NAMED, 'xontextlevel');
+        $levelsql = "AND c.contextlevel $levelsql";
+        $params = array_merge($params, $levelparams);
+    } else {
+        $levelsql = '';
+    }
+
+    $params['contextlevel'] = CONTEXT_COURSECAT;
+    $sql = "SELECT 'x' FROM {context} c WHERE {$hascapsql} {$levelsql}";
+
+    return $DB->record_exists_sql($sql, $params);
 }
 
 /**
@@ -1073,7 +1134,9 @@ function get_role_archetypes() {
         'guest'          => 'guest',
         'user'           => 'user',
         'frontpage'      => 'frontpage',
-        'assessor'       => 'assessor'
+        'assessor'       => 'assessor',
+        'tenantdomainmanager' => 'tenantdomainmanager',
+        'tenantusermanager' => 'tenantusermanager',
     );
 }
 
@@ -2266,7 +2329,7 @@ function get_default_role_archetype_allows($type, $archetype) {
 
     $defaults = array(
         'assign' => array(
-            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'staffmanager', 'assessor', 'regionalmanager', 'regionaltrainer'),
+            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'staffmanager', 'assessor', 'regionalmanager', 'regionaltrainer', 'tenantusermanager', 'tenantdomainmanager'),
             'coursecreator'  => array(),
             'editingteacher' => array('teacher', 'student'),
             'teacher'        => array(),
@@ -2276,9 +2339,11 @@ function get_default_role_archetype_allows($type, $archetype) {
             'user'           => array(),
             'frontpage'      => array(),
             'assessor'       => array(),
+            'tenantdomainmanager' => array('coursecreator', 'editingteacher', 'teacher', 'student', 'tenantdomainmanager'),
+            'tenantusermanager' => array(),
         ),
         'override' => array(
-            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user', 'frontpage', 'staffmanager', 'assessor', 'regionalmanager', 'regionaltrainer'),
+            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user', 'frontpage', 'staffmanager', 'assessor', 'regionalmanager', 'regionaltrainer', 'tenantusermanager', 'tenantdomainmanager'),
             'coursecreator'  => array(),
             'editingteacher' => array('teacher', 'student', 'guest'),
             'teacher'        => array(),
@@ -2288,6 +2353,8 @@ function get_default_role_archetype_allows($type, $archetype) {
             'user'           => array(),
             'frontpage'      => array(),
             'assessor'       => array(),
+            'tenantdomainmanager' => array('coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user'),
+            'tenantusermanager' => array(),
         ),
         'switch' => array(
             'manager'        => array('editingteacher', 'teacher', 'student', 'guest', 'staffmanager'),
@@ -2300,6 +2367,8 @@ function get_default_role_archetype_allows($type, $archetype) {
             'user'           => array(),
             'frontpage'      => array(),
             'assessor'       => array(),
+            'tenantdomainmanager' => array(),
+            'tenantusermanager' => array(),
         ),
     );
 
@@ -2731,6 +2800,7 @@ function get_component_string($component, $contextlevel) {
         switch ($contextlevel) {
             // TODO MDL-46123: this should probably use context level names instead
             case CONTEXT_SYSTEM:    return get_string('coresystem');
+            case CONTEXT_TENANT:    return get_string('tenant', 'totara_tenant');
             case CONTEXT_USER:      return get_string('users');
             case CONTEXT_COURSECAT: return get_string('categories');
             case CONTEXT_PROGRAM:   return get_string('program', 'totara_program');
@@ -3214,6 +3284,11 @@ function get_assignable_roles(context $context, $rolenamedisplay = ROLENAME_ALIA
 function get_switchable_roles(context $context) {
     global $USER, $DB;
 
+    // Totara: role switching is not compatible with tenant members and tenant contexts.
+    if ($context->tenantid or !empty($USER->tenantid)) {
+        return [];
+    }
+
     // You can't switch roles without this capability.
     if (!has_capability('moodle/role:switchroles', $context)) {
         return [];
@@ -3419,7 +3494,10 @@ function get_default_contextlevels($rolearchetype) {
         'assessor'       => array(CONTEXT_COURSE, CONTEXT_MODULE),
         'guest'          => array(),
         'user'           => array(),
-        'frontpage'      => array());
+        'frontpage'      => array(),
+        'tenantdomainmanager' => array(CONTEXT_COURSECAT, CONTEXT_COURSE, CONTEXT_MODULE),
+        'tenantusermanager' => array(CONTEXT_TENANT),
+    );
 
     if (isset($defaults[$rolearchetype])) {
         return $defaults[$rolearchetype];
@@ -3458,6 +3536,24 @@ function set_role_contextlevels($roleid, array $contextlevels) {
  * Note if $fields is empty this function attempts to get u.*
  * which can get rather large - and has a serious perf impact
  * on some DBs.
+ *
+ * Tenant rules do not apply to guests and not-logged-in users here because they
+ * are never returned from this function.
+ *
+ * When tenants are enabled on the site the following behavior is enforced.
+ *
+ * When the user is a member of a tenant:
+ * -- When tenant isolation mode is enabled:
+ * --- If the context belongs to the users tenant then normal rules apply.
+ * --- If the context belongs to any other tenant then the user is not returned.
+ * --- If the context does not belong to a tenant then the user is not returned.
+ * -- When tenant isolation mode is disabled:
+ * --- If the context belongs to the users tenant then normal rules apply.
+ * --- If the context belongs to any other tenant then the user is not returned
+ * --- If the context does not belong to a tenant then normal rules apply.
+ *
+ * When the user is not a member of a tenant:
+ * -- Normal rules apply in all situations.
  *
  * @param context $context
  * @param string|array $capability - capability name(s)
@@ -3713,6 +3809,19 @@ function get_users_by_capability(context $context, $capability, $fields = '', $s
         }
     }
 
+    // Totara: add tenant context separation logic
+    if (!empty($CFG->tenantsenabled)) {
+        if ($context->tenantid) {
+            // Only tenant members and other users are allowed in tenant context.
+            $wherecond[] = "(u.tenantid IS NULL OR u.tenantid = {$context->tenantid})";
+        } else {
+            if (!empty($CFG->tenantsisolated)) {
+                // Tenants can access only their dedicated contexts.
+                $wherecond[] = "u.tenantid IS NULL";
+            }
+        }
+    }
+
     // Collect WHERE conditions and needed joins
     $where = implode(' AND ', $wherecond);
     if ($where !== '') {
@@ -3849,7 +3958,7 @@ function get_role_users($roleid, context $context, $parent = false, $fields = ''
                   'u.maildisplay, u.mailformat, u.maildigest, u.email, u.emailstop, u.city, '.
                   'u.country, u.picture, u.idnumber, u.department, u.institution, '.
                   'u.lang, u.timezone, u.lastaccess, u.mnethostid, r.name AS rolename, r.sortorder, '.
-                  'r.shortname AS roleshortname, rn.name AS rolecoursealias';
+                  'r.shortname AS roleshortname, rn.name AS rolecoursealias, u.tenantid';
     }
 
     // Totara: Moodle had some weird code dealing with multiple roles introduced by MDL-22309 - let's use recordsets instead!
@@ -4331,6 +4440,9 @@ function role_get_name(stdClass $role, $context = null, $rolenamedisplay = ROLEN
             case 'editingtrainer':  $original = get_string('editingtrainer'); break;
             case 'trainer':         $original = get_string('trainer'); break;
             case 'learner':         $original = get_string('learner'); break;
+            // Multitenancy roles
+            case 'tenantdomainmanager': $original = get_string('tenantdomainmanager', 'role'); break;
+            case 'tenantusermanager': $original = get_string('tenantusermanager', 'role'); break;
             // We should not get here, the role UI should require the name for custom roles!
             default:                $original = $role->shortname; break;
         }
@@ -4394,6 +4506,9 @@ function role_get_description(stdClass $role) {
         case 'editingtrainer':  return get_string('editingtrainerdescription');
         case 'trainer':         return get_string('trainerdescription');
         case 'learner':         return get_string('learnerdescription');
+        // Multitenancy roles
+        case 'tenantdomainmanager': return get_string('tenantdomainmanagerdescription', 'role');
+        case 'tenantusermanager': return get_string('tenantusermanagerdescription', 'role');
         default:                return '';
     }
 }
@@ -4828,6 +4943,7 @@ function role_change_permission($roleid, $context, $capname, $permission) {
  * @property-read int $instanceid id of related instance in each context
  * @property-read string $path path to context, starts with system context
  * @property-read int $depth
+ * @property-read int|null $tenantid
  */
 abstract class context extends stdClass implements IteratorAggregate {
 
@@ -4865,6 +4981,12 @@ abstract class context extends stdClass implements IteratorAggregate {
      * @var int
      */
     protected $_depth;
+
+    /**
+     * Totara tenant id
+     * @var int|null
+     */
+    protected $_tenantid;
 
     /**
      * @var array Context caching info
@@ -4999,12 +5121,20 @@ abstract class context extends stdClass implements IteratorAggregate {
      *
      * @static
      * @param stdClass $rec
-     * @return void (modifies $rec)
+     * @return context|null (modifies $rec)
      */
      protected static function preload_from_record(stdClass $rec) {
+         global $CFG;
+
          if (empty($rec->ctxid) or empty($rec->ctxlevel) or !isset($rec->ctxinstance) or empty($rec->ctxpath) or empty($rec->ctxdepth)) {
              // $rec does not have enough data, passed here repeatedly or context does not exist yet
-             return;
+             return null;
+         }
+         if (empty($CFG->tenantready)) {
+             $rec->ctxtenantid = null;
+         } else if (!property_exists($rec, 'ctxtenantid')) {
+             debugging('Context preloading now requires ctxtenantid property', DEBUG_DEVELOPER);
+             return null;
          }
 
          // note: in PHP5 the objects are passed by reference, no need to return $rec
@@ -5014,6 +5144,7 @@ abstract class context extends stdClass implements IteratorAggregate {
          $record->instanceid   = $rec->ctxinstance; unset($rec->ctxinstance);
          $record->path         = $rec->ctxpath;     unset($rec->ctxpath);
          $record->depth        = $rec->ctxdepth;    unset($rec->ctxdepth);
+         $record->tenantid     = $rec->ctxtenantid; unset($rec->ctxtenantid);
 
          // Totara: remove additional parentid too.
          if (!empty($rec->ctxparentid)) {
@@ -5024,6 +5155,72 @@ abstract class context extends stdClass implements IteratorAggregate {
          return context::create_instance_from_record($record);
      }
 
+    /**
+     * Check if user is prevented from accessing given context.
+     *
+     * By default this is used for permission evaluation and course category visibility,
+     * but this is not a hard rule for blocking user access to different areas
+     * outside of course contexts, each subsystem and plugin need to define
+     * their own rules relevant to tenant users.
+     *
+     * The logic here is following:
+     *
+     * When tenants are disabled or the user is not member of any tenant
+     * then false is returned always.
+     *
+     * When the user is a member of a tenant:
+     * -- When tenant isolation mode is enabled:
+     * --- If the context belongs to the users tenant then they are not prevented.
+     * --- If the context belongs to any other tenant then they are prevented.
+     * --- If the context does not belong to a tenant then they are prevented.
+     * -- When tenant isolation mode is disabled:
+     * --- If the context belongs to the users tenant then they are not prevented.
+     * --- If the context belongs to any other tenant then they are prevented.
+     * --- If the context does not belong to a tenant then they are prevented.
+     *
+     * @since Totara 13
+     *
+     * @param int|stdClass|null $user
+     * @return bool
+     */
+    public function is_user_access_prevented($user = null) {
+        global $USER, $CFG;
+
+        // NOTE: add any other future restrictions types here.
+
+        if (empty($CFG->tenantsenabled)) {
+            return false;
+        }
+
+        // Make sure there is a real user specified.
+        if ($user === null) {
+            $userid = $USER->id ?? 0;
+        } else {
+            $userid = is_object($user) ? $user->id : $user;
+        }
+
+        if (!$userid or isguestuser($userid)) {
+            if ($this->tenantid) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        $usercontext = context_user::instance($userid, IGNORE_MISSING);
+        if (!$usercontext) {
+            return true;
+        }
+        if (!$usercontext->tenantid) {
+            return false;
+        }
+
+        if (!empty($CFG->tenantsisolated)) {
+            return ($this->tenantid != $usercontext->tenantid);
+        } else {
+            return ($this->tenantid and $this->tenantid != $usercontext->tenantid);
+        }
+    }
 
     // ====== magic methods =======
 
@@ -5048,6 +5245,7 @@ abstract class context extends stdClass implements IteratorAggregate {
             case 'instanceid':   return $this->_instanceid;
             case 'path':         return $this->_path;
             case 'depth':        return $this->_depth;
+            case 'tenantid':     return $this->_tenantid;
 
             default:
                 debugging('Invalid context property accessed! '.$name);
@@ -5067,6 +5265,7 @@ abstract class context extends stdClass implements IteratorAggregate {
             case 'instanceid':   return isset($this->_instanceid);
             case 'path':         return isset($this->_path);
             case 'depth':        return isset($this->_depth);
+            case 'tenantid':     return isset($this->_tenantid);
 
             default: return false;
         }
@@ -5095,7 +5294,8 @@ abstract class context extends stdClass implements IteratorAggregate {
             'contextlevel' => $this->contextlevel,
             'instanceid'   => $this->instanceid,
             'path'         => $this->path,
-            'depth'        => $this->depth
+            'depth'        => $this->depth,
+            'tenantid'     => $this->tenantid
         );
         return new ArrayIterator($ret);
     }
@@ -5109,11 +5309,18 @@ abstract class context extends stdClass implements IteratorAggregate {
      * @param stdClass $record
      */
     protected function __construct(stdClass $record) {
+        global $CFG;
+
         $this->_id           = (int)$record->id;
         $this->_contextlevel = (int)$record->contextlevel;
         $this->_instanceid   = $record->instanceid;
         $this->_path         = $record->path;
         $this->_depth        = $record->depth;
+
+        // Totara: the tenantid does not exist before upgrade is initialed.
+        if (!empty($CFG->tenantready)) {
+            $this->_tenantid = $record->tenantid;
+        }
     }
 
     /**
@@ -5154,6 +5361,7 @@ abstract class context extends stdClass implements IteratorAggregate {
         $table->add_field('path', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
         $table->add_field('depth', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
         $table->add_field('parentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('tenantid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
         $dbman->create_temp_table($table);
@@ -5202,12 +5410,13 @@ abstract class context extends stdClass implements IteratorAggregate {
             $updatesql = "UPDATE {context} ct, {context_temp} temp
                              SET ct.path     = temp.path,
                                  ct.depth    = temp.depth,
-                                 ct.parentid = temp.parentid
+                                 ct.parentid = temp.parentid,
+                                 ct.tenantid = temp.tenantid
                            WHERE ct.id = temp.id";
         } else if ($dbfamily == 'oracle') {
             $updatesql = "UPDATE {context} ct
-                             SET (ct.path, ct.depth, ct.parentid) =
-                                 (SELECT temp.path, temp.depth, temp.parentid
+                             SET (ct.path, ct.depth, ct.parentid, ct.tenantid) =
+                                 (SELECT temp.path, temp.depth, temp.parentid, temp.tenantid
                                     FROM {context_temp} temp
                                    WHERE temp.id=ct.id)
                            WHERE EXISTS (SELECT 'x'
@@ -5217,7 +5426,8 @@ abstract class context extends stdClass implements IteratorAggregate {
             $updatesql = "UPDATE {context}
                              SET path     = temp.path,
                                  depth    = temp.depth,
-                                 parentid = temp.parentid
+                                 parentid = temp.parentid,
+                                 tenantid = temp.tenantid
                             FROM {context_temp} temp
                            WHERE temp.id={context}.id";
         } else {
@@ -5225,7 +5435,8 @@ abstract class context extends stdClass implements IteratorAggregate {
             $updatesql = "UPDATE {context}
                              SET path     = (SELECT path FROM {context_temp} WHERE id = {context}.id),
                                  depth    = (SELECT depth FROM {context_temp} WHERE id = {context}.id),
-                                 parentid = (SELECT parentid FROM {context_temp} WHERE id = {context}.id)
+                                 parentid = (SELECT parentid FROM {context_temp} WHERE id = {context}.id),
+                                 tenantid = (SELECT tenantid FROM {context_temp} WHERE id = {context}.id)
                              WHERE id IN (SELECT id FROM {context_temp})";
         }
 
@@ -5276,9 +5487,11 @@ abstract class context extends stdClass implements IteratorAggregate {
      * Update context info after moving context in the tree structure.
      *
      * @param context $newparent
+     * @param bool $readddeletedmapentries value true value is not compatible with transactions,
+     *             if false then totara_core\access::add_missing_map_entries(false) must be called later after commit.
      * @return void
      */
-    public function update_moved(context $newparent) {
+    public function update_moved(context $newparent, bool $readddeletedmapentries = true) {
         global $DB;
 
         $frompath = $this->_path;
@@ -5295,20 +5508,23 @@ abstract class context extends stdClass implements IteratorAggregate {
         }
         $sql = "UPDATE {context}
                    SET path = ?,
-                       parentid = ?
+                       parentid = ?,
+                       tenantid = ?
                        $setdepth
                  WHERE id = ?";
-        $params = array($newpath, $newparent->id, $this->_id);
+        $params = array($newpath, $newparent->id, $newparent->tenantid, $this->_id);
         $DB->execute($sql, $params);
 
         $this->_path  = $newpath;
         $this->_depth = $newparent->depth + 1;
+        $this->_tenantid = $newparent->tenantid;
 
         $sql = "UPDATE {context}
-                   SET path = ".$DB->sql_concat("?", $DB->sql_substr("path", strlen($frompath)+1))."
+                   SET path = ".$DB->sql_concat("?", $DB->sql_substr("path", strlen($frompath)+1)).",
+                       tenantid = ?
                        $setdepth
                  WHERE path LIKE ?";
-        $params = array($newpath, "{$frompath}/%");
+        $params = array($newpath, $newparent->tenantid, "{$frompath}/%");
         $DB->execute($sql, $params);
 
         $this->mark_dirty();
@@ -5321,6 +5537,11 @@ abstract class context extends stdClass implements IteratorAggregate {
 
         $trans->allow_commit();
 
+        if (!$readddeletedmapentries) {
+            // Totara: hack to work around incompatibility of context map building with DB transactions,
+            //         the \totara_core\access::add_missing_map_entries(false); must be called later after transaction commit.
+            return;
+        }
         // Totara: Add all entries back, this may take a few minutes and it is safe if it gets interrupted,
         //         so do it after the transaction.
         \totara_core\access::add_missing_map_entries(false);
@@ -5344,6 +5565,7 @@ abstract class context extends stdClass implements IteratorAggregate {
             $DB->set_field('context', 'depth', 0, array('id'=>$this->_id));
             $DB->set_field('context', 'path', NULL, array('id'=>$this->_id));
             $DB->set_field('context', 'parentid', NULL, array('id'=>$this->_id));
+            // Totara: do not remove tenantid info here
             $this->_depth = 0;
             $this->_path = null;
         }
@@ -5446,16 +5668,28 @@ abstract class context extends stdClass implements IteratorAggregate {
      * @param int $contextlevel
      * @param int $instanceid
      * @param string $parentpath
+     * @param int|null $tenantid Totara Tenant id if known
      * @return stdClass context record
      */
-    protected static function insert_context_record($contextlevel, $instanceid, $parentpath) {
-        global $DB;
+    protected static function insert_context_record($contextlevel, $instanceid, $parentpath, $tenantid = null) {
+        global $DB, $CFG;
 
         $record = new stdClass();
         $record->contextlevel = $contextlevel;
         $record->instanceid   = $instanceid;
         $record->depth        = 0;
         $record->path         = null; //not known before insert
+
+        // Totara: value is updated later if not specified, we must make sure the value is valid if supplied
+        if (!empty($CFG->tenantready)) {
+            if ($tenantid !== null) {
+                if (!$DB->record_exists('tenant', ['id' => $tenantid])) {
+                    debugging('Invalid tenantid parameter specified', DEBUG_DEVELOPER);
+                    $record->tenantid  = null;
+                }
+            }
+            $record->tenantid  = $tenantid;
+        }
 
         $record->id = $DB->insert_record('context', $record);
 
@@ -5465,6 +5699,9 @@ abstract class context extends stdClass implements IteratorAggregate {
             $record->depth = substr_count($record->path, '/');
             $DB->update_record('context', $record);
         }
+
+        // Totara: normalise the types by refetching from DB.
+        $record = $DB->get_record('context', ['id' => $record->id], '*', MUST_EXIST);
 
         // Totara: add context map entries for all parents of this context and self.
         \totara_core\access::context_created($record);
@@ -5582,7 +5819,7 @@ abstract class context extends stdClass implements IteratorAggregate {
     /**
      * Returns parent context
      *
-     * @return context
+     * @return context|false
      */
     public function get_parent_context() {
         if (empty($this->_path) or $this->_id == SYSCONTEXTID) {
@@ -5601,7 +5838,7 @@ abstract class context extends stdClass implements IteratorAggregate {
      * Is this context part of any course? If yes return course context.
      *
      * @param bool $strict true means throw exception if not found, false means return false if not found
-     * @return context_course context of the enclosing course, null if not found or exception
+     * @return context_course|false context of the enclosing course, null if not found or exception
      */
     public function get_course_context($strict = true) {
         if ($strict) {
@@ -5754,6 +5991,7 @@ class context_helper extends context {
         }
         self::$alllevels = array(
             CONTEXT_SYSTEM    => 'context_system',
+            CONTEXT_TENANT    => 'context_tenant',
             CONTEXT_USER      => 'context_user',
             CONTEXT_COURSECAT => 'context_coursecat',
             CONTEXT_PROGRAM   => 'context_program',
@@ -5876,6 +6114,8 @@ class context_helper extends context {
     /**
      * Rebuild paths and depths in all context levels.
      *
+     * Totara: if $force is true then tenantid is updated too
+     *
      * @static
      * @param bool $force false means add missing only
      * @param bool $verbose true means print verbose output for performance debugging
@@ -5924,7 +6164,12 @@ class context_helper extends context {
      * @return array (table.column=>alias, ...)
      */
     public static function get_preload_record_columns($tablealias) {
-        return array("$tablealias.id"=>"ctxid", "$tablealias.path"=>"ctxpath", "$tablealias.depth"=>"ctxdepth", "$tablealias.contextlevel"=>"ctxlevel", "$tablealias.instanceid"=>"ctxinstance");
+        global $CFG;
+        if (!empty($CFG->tenantready)) {
+            return array("$tablealias.id"=>"ctxid", "$tablealias.path"=>"ctxpath", "$tablealias.depth"=>"ctxdepth", "$tablealias.contextlevel"=>"ctxlevel", "$tablealias.instanceid"=>"ctxinstance", "$tablealias.tenantid"=>"ctxtenantid");
+        } else {
+            return array("$tablealias.id"=>"ctxid", "$tablealias.path"=>"ctxpath", "$tablealias.depth"=>"ctxdepth", "$tablealias.contextlevel"=>"ctxlevel", "$tablealias.instanceid"=>"ctxinstance");
+        }
     }
 
     /**
@@ -5937,7 +6182,12 @@ class context_helper extends context {
      * @return string
      */
     public static function get_preload_record_columns_sql($tablealias) {
-        return "$tablealias.id AS ctxid, $tablealias.path AS ctxpath, $tablealias.depth AS ctxdepth, $tablealias.contextlevel AS ctxlevel, $tablealias.instanceid AS ctxinstance";
+        global $CFG;
+        if (!empty($CFG->tenantready)) {
+            return "$tablealias.id AS ctxid, $tablealias.path AS ctxpath, $tablealias.depth AS ctxdepth, $tablealias.contextlevel AS ctxlevel, $tablealias.instanceid AS ctxinstance, $tablealias.tenantid AS ctxtenantid";
+        } else {
+            return "$tablealias.id AS ctxid, $tablealias.path AS ctxpath, $tablealias.depth AS ctxdepth, $tablealias.contextlevel AS ctxlevel, $tablealias.instanceid AS ctxinstance";
+        }
     }
 
     /**
@@ -6121,6 +6371,7 @@ class context_system extends context {
                 $record->path         = '/'.SYSCONTEXTID;
                 $record->depth        = 1;
                 $record->parentid     = 0;
+                $record->tenantid     = null;
                 context::$systemcontext = new context_system($record);
             }
             return context::$systemcontext;
@@ -6146,6 +6397,7 @@ class context_system extends context {
             $record->depth        = 1;
             $record->path         = null; //not known before insert
             $record->parentid     = 0;
+            $record->tenantid     = null;
 
             try {
                 if ($DB->count_records('context')) {
@@ -6172,10 +6424,11 @@ class context_system extends context {
         }
 
         // Totara: do not verify the parentid here, it would cause notices before upgrade.
-        if ($record->depth != 1 or $record->path != '/'.$record->id) {
+        if ($record->depth != 1 or $record->path != '/'.$record->id or !empty($record->tenantid)) {
             // fix path if necessary, initial install or path reset
             $record->depth = 1;
             $record->path  = '/'.$record->id;
+            $record->tenantid = null;
             $DB->update_record('context', $record);
 
             // Totara: add context map entry.
@@ -6255,13 +6508,218 @@ class context_system extends context {
             debugging('Invalid SYSCONTEXTID detected');
         }
 
-        if ($record->depth != 1 or $record->path != '/'.$record->id or $record->parentid !== '0') {
+        if ($record->depth != 1 or $record->path != '/'.$record->id or $record->parentid !== '0' or $record->parentid !== null or !empty($record->tenantid)) {
             // fix path if necessary, initial install or path reset
             $record->depth    = 1;
             $record->path     = '/'.$record->id;
             $record->perentid = 0;
+            $record->tenantid = null;
             $DB->update_record('context', $record);
         }
+    }
+}
+
+
+/**
+ * Totara Tenant context class
+ *
+ * @package   core_access
+ * @since     Totara 13
+ */
+class context_tenant extends context {
+    /**
+     * Please use context_tenant::instance($tenantid) if you need the instance of context.
+     * Alternatively if you know only the context id use context::instance_by_id($contextid)
+     *
+     * @param stdClass $record
+     */
+    protected function __construct(stdClass $record) {
+        parent::__construct($record);
+        if ($record->contextlevel != CONTEXT_TENANT) {
+            throw new coding_exception('Invalid $record->contextlevel in context_tenant constructor.');
+        }
+    }
+
+    /**
+     * Returns human readable context level name.
+     *
+     * @static
+     * @return string the human readable context level name.
+     */
+    public static function get_level_name() {
+        return get_string('tenant', 'totara_tenant');
+    }
+
+    /**
+     * Returns human readable context identifier.
+     *
+     * @param boolean $withprefix whether to prefix the name of the context with Tenant
+     * @param boolean $short does not apply to tenants
+     * @return string the human readable context name.
+     */
+    public function get_context_name($withprefix = true, $short = false) {
+        $name = '';
+        $tenant = \core\record\tenant::fetch($this->_instanceid, IGNORE_MISSING);
+        if ($tenant) {
+            if ($withprefix){
+                $name = get_string('tenant', 'totara_tenant') . ': ';
+            }
+            $name .= format_string($tenant->name, true, array('context' => $this));
+        }
+        return $name;
+    }
+
+    /**
+     * Returns the most relevant URL for this context.
+     *
+     * @return moodle_url
+     */
+    public function get_url() {
+        $tenant = \core\record\tenant::fetch($this->_instanceid, IGNORE_MISSING);
+        if (!$tenant) {
+            return new moodle_url('/totara/tenant/index.php');
+        }
+
+        return new moodle_url('/course/index.php', array('categoryid' => $tenant->categoryid));
+    }
+
+    /**
+     * Returns array of relevant context capability records.
+     *
+     * @return array
+     */
+    public function get_capabilities() {
+        global $DB;
+
+        $extracaps = [
+            'moodle/role:assign',
+            'moodle/role:review',
+            'moodle/role:override',
+            'moodle/role:safeoverride',
+            'moodle/grade:viewall',
+            'moodle/site:viewuseridentity',
+            'moodle/user:viewdetails',
+            'moodle/site:viewfullnames',
+        ];
+        list($extra, $params) = $DB->get_in_or_equal($extracaps, SQL_PARAMS_NAMED, 'cap');
+        $sql = 'SELECT *
+                  FROM "ttr_capabilities"
+                 WHERE contextlevel IN (' . CONTEXT_TENANT . ',' . CONTEXT_USER . ')
+                       OR name ' . $extra . '
+              ORDER BY contextlevel ASC, component ASC, name ASC';
+
+        return $records = $DB->get_records_sql($sql, $params);
+    }
+
+    /**
+     * Returns tenant context instance.
+     *
+     * @static
+     * @param int $tenantid id from {tenant} table
+     * @param int $strictness
+     * @return context_tenant|false context instance
+     */
+    public static function instance($tenantid, $strictness = MUST_EXIST) {
+        global $DB;
+
+        if ($context = context::cache_get(CONTEXT_TENANT, $tenantid)) {
+            return $context;
+        }
+
+        if (!$record = $DB->get_record('context', array('contextlevel' => CONTEXT_TENANT, 'instanceid' => $tenantid))) {
+            $tenant = $DB->get_record('tenant', array('id' => $tenantid), 'id', $strictness);
+            if (!$tenant) {
+                return false;
+            }
+            $record = context::insert_context_record(CONTEXT_TENANT, $tenant->id, '/' . SYSCONTEXTID, $tenant->id);
+        }
+
+        if ($record) {
+            $context = new context_tenant($record);
+            context::cache_add($context);
+            return $context;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns user contexts of all members of Totara tenant.
+     *
+     * @return array
+     */
+    public function get_child_contexts() {
+        global $DB;
+
+        $sql = 'SELECT ctx.*
+                  FROM "ttr_context" ctx
+                  JOIN "ttr_user" u ON u.id = ctx.instanceid AND ctx.contextlevel = :userlevel
+                 WHERE u.deleted = 0 AND u.tenantid = :tenantid';
+        $params = ['userlevel' => CONTEXT_USER, 'tenantid' => $this->_instanceid];
+        $records = $DB->get_records_sql($sql, $params);
+
+        $result = array();
+        foreach ($records as $record) {
+            $result[$record->id] = context::create_instance_from_record($record);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Create missing context instances at tenant context level
+     * @static
+     */
+    protected static function create_level_instances() {
+        global $DB;
+
+        $sql = 'SELECT t.id
+                  FROM "ttr_tenant" t
+                 WHERE NOT EXISTS (SELECT cx.id
+                                     FROM "ttr_context" cx
+                                    WHERE t.id = cx.instanceid AND cx.contextlevel='.CONTEXT_TENANT.')';
+        $tenants = $DB->get_recordset_sql($sql);
+        foreach ($tenants as $tenant) {
+            context::insert_context_record(CONTEXT_TENANT, $tenant->id, '/' . SYSCONTEXTID, $tenant->id);
+        }
+    }
+
+    /**
+     * Returns sql necessary for purging of stale context instances.
+     *
+     * @static
+     * @return string cleanup SQL
+     */
+    protected static function get_cleanup_sql() {
+        // This should not be necessary if foreign keys were added properly.
+        $sql = 'SELECT c.*
+                  FROM "ttr_context" c
+             LEFT JOIN "ttr_tenant" t ON c.instanceid = t.id
+                 WHERE t.id IS NULL AND c.contextlevel = '.CONTEXT_TENANT;
+        return $sql;
+    }
+
+    /**
+     * Rebuild context paths and depths at tenant context level.
+     *
+     * @static
+     * @param bool $force
+     */
+    protected static function build_paths($force) {
+        global $DB;
+
+        // Ignore force param and always do a full update if anything is wrong.
+
+        $path = $DB->sql_concat("'/" . SYSCONTEXTID . "/'", 'id');
+
+        $sql = 'UPDATE "ttr_context"
+                   SET depth = 2,
+                       path = ' . $path . ',
+                       parentid = ' . SYSCONTEXTID . ',
+                       tenantid = instanceid
+                 WHERE contextlevel = ' . CONTEXT_TENANT . '
+                   AND (depth <> 2 OR path <> (' . $path . ') OR parentid <> ' . SYSCONTEXTID . ' OR tenantid IS NULL OR tenantid <> instanceid)';
+        $DB->execute($sql);
     }
 }
 
@@ -6345,7 +6803,17 @@ class context_user extends context {
 
         $sort = 'ORDER BY contextlevel,component,name';   // To group them sensibly for display
 
-        $extracaps = array('moodle/grade:viewall');
+        $extracaps = [
+            'moodle/role:assign',
+            'moodle/role:review',
+            'moodle/role:override',
+            'moodle/role:safeoverride',
+            'moodle/grade:viewall',
+            'moodle/site:viewuseridentity',
+            'moodle/user:viewdetails',
+            'moodle/site:viewfullnames',
+        ];
+
         list($extra, $params) = $DB->get_in_or_equal($extracaps, SQL_PARAMS_NAMED, 'cap');
         $sql = "SELECT *
                   FROM {capabilities}
@@ -6361,7 +6829,7 @@ class context_user extends context {
      * @static
      * @param int $userid id from {user} table
      * @param int $strictness
-     * @return context_user context instance
+     * @return context_user|false context instance
      */
     public static function instance($userid, $strictness = MUST_EXIST) {
         global $DB;
@@ -6371,12 +6839,18 @@ class context_user extends context {
         }
 
         if (!$record = $DB->get_record('context', array('contextlevel' => CONTEXT_USER, 'instanceid' => $userid))) {
-            if ($user = $DB->get_record('user', array('id' => $userid, 'deleted' => 0), 'id', $strictness)) {
+            if ($user = $DB->get_record('user', array('id' => $userid, 'deleted' => 0), 'id, tenantid', $strictness)) {
                 // Keep the context id the same when undeleting users.
                 $record = \totara_userdata\local\util::recover_user_context($userid);
                 if (!$record) {
-                    $record = context::insert_context_record(CONTEXT_USER, $user->id, '/'.SYSCONTEXTID);
-                    \totara_userdata\local\util::backup_user_context_id($record->instanceid, $record->id);
+                    if ($user->tenantid) {
+                        $tenantctx = context_tenant::instance($user->tenantid);
+                        $record = context::insert_context_record(CONTEXT_USER, $user->id, '/'.SYSCONTEXTID.'/'.$tenantctx->id, $user->tenantid);
+                        \totara_userdata\local\util::backup_user_context_id($record->instanceid, $record->id);
+                    } else {
+                        $record = context::insert_context_record(CONTEXT_USER, $user->id, '/'.SYSCONTEXTID, null);
+                        \totara_userdata\local\util::backup_user_context_id($record->instanceid, $record->id);
+                    }
                 }
             }
         }
@@ -6407,22 +6881,29 @@ class context_user extends context {
     protected static function create_level_instances() {
         global $DB;
 
-        $sql = "SELECT ".CONTEXT_USER.", u.id
-                  FROM {user} u
+        $sql = 'SELECT u.id, u.tenantid
+                  FROM "ttr_user" u
                  WHERE u.deleted = 0
-                       AND NOT EXISTS (SELECT 'x'
-                                         FROM {context} cx
-                                        WHERE u.id = cx.instanceid AND cx.contextlevel=".CONTEXT_USER.")";
-        $contextdata = $DB->get_recordset_sql($sql);
-        foreach ($contextdata as $context) {
+                       AND NOT EXISTS (SELECT cx.id
+                                         FROM "ttr_context" cx
+                                        WHERE u.id = cx.instanceid AND cx.contextlevel='.CONTEXT_USER.')';
+        $users = $DB->get_recordset_sql($sql);
+        foreach ($users as $user) {
             // Keep the context id the same when undeleting users.
-            $record = \totara_userdata\local\util::recover_user_context($context->id);
-            if (!$record) {
-                $record = context::insert_context_record(CONTEXT_USER, $context->id, null);
+            $record = \totara_userdata\local\util::recover_user_context($user->id);
+            if ($record) {
+                continue;
+            }
+            if ($user->tenantid) {
+                $tenantctx = context_tenant::instance($user->tenantid);
+                $record = context::insert_context_record(CONTEXT_USER, $user->id, $tenantctx->path, $user->tenantid);
+                \totara_userdata\local\util::backup_user_context_id($record->instanceid, $record->id);
+            } else {
+                $record = context::insert_context_record(CONTEXT_USER, $user->id, '/'.SYSCONTEXTID, null);
                 \totara_userdata\local\util::backup_user_context_id($record->instanceid, $record->id);
             }
         }
-        $contextdata->close();
+        $users->close();
     }
 
     /**
@@ -6451,27 +6932,57 @@ class context_user extends context {
     protected static function build_paths($force) {
         global $DB;
 
-        $syscontextid = SYSCONTEXTID;
+        // Totara: Ignore force param and always do a full update if anything is wrong.
 
-        // First update normal users.
-        $path = $DB->sql_concat('?', 'id');
-        $pathstart = '/' . SYSCONTEXTID . '/';
-        $params = array($pathstart);
-
-        if ($force) {
-            $where = "depth <> 2 OR path IS NULL OR path <> ({$path}) OR parentid <> {$syscontextid}";
-            $params[] = $pathstart;
-        } else {
-            $where = "depth = 0 OR path IS NULL OR parentid IS NULL";
+        // First of all we need to make sure the tenantid is the same in user and context records.
+        $dbfamily = $DB->get_dbfamily();
+        if ($dbfamily === 'mysql') {
+            $sql = 'UPDATE "ttr_context" c
+                      JOIN "ttr_user" u ON u.id = c.instanceid AND c.contextlevel = ' . CONTEXT_USER . '
+                       SET c.tenantid = u.tenantid
+                     WHERE c.tenantid <> u.tenantid OR (c.tenantid IS NULL AND u.tenantid IS NOT NULL) OR (c.tenantid IS NOT NULL AND u.tenantid IS NULL)';
+        } else if ($dbfamily === 'mssql') {
+            $sql = 'UPDATE c
+                       SET tenantid = u.tenantid
+                      FROM "ttr_context" c 
+                      JOIN "ttr_user" u ON u.id = c.instanceid AND c.contextlevel = ' . CONTEXT_USER . '
+                     WHERE c.tenantid <> u.tenantid OR (c.tenantid IS NULL AND u.tenantid IS NOT NULL) OR (c.tenantid IS NOT NULL AND u.tenantid IS NULL)';
+        } else { // PostgreSQL
+            $sql = 'UPDATE "ttr_context"
+                       SET tenantid = u.tenantid
+                      FROM "ttr_user" u
+                     WHERE u.id = "ttr_context".instanceid AND "ttr_context".contextlevel = ' . CONTEXT_USER . '
+                           AND ("ttr_context".tenantid <> u.tenantid OR ("ttr_context".tenantid IS NULL AND u.tenantid IS NOT NULL) OR ("ttr_context".tenantid IS NOT NULL AND u.tenantid IS NULL))';
         }
+        $DB->execute($sql);
 
-        $sql = "UPDATE {context}
+        // First fix invalid non-tenant user contexts if necessary.
+        $path = $DB->sql_concat("'/" . SYSCONTEXTID . "/'", 'id');
+        $sql = 'UPDATE "ttr_context"
                    SET depth = 2,
-                       path = {$path},
-                       parentid = {$syscontextid}
-                 WHERE contextlevel = " . CONTEXT_USER . "
-                   AND ($where)";
-        $DB->execute($sql, $params);
+                       path = ' . $path . ',
+                       parentid = ' . SYSCONTEXTID . '
+                 WHERE contextlevel = ' . CONTEXT_USER . ' AND tenantid IS NULL
+                   AND (depth <> 2 OR path <> (' . $path . ') OR parentid <> ' . SYSCONTEXTID . ')';
+        $DB->execute($sql);
+
+        // Totara: now fix Tenant members too, there should not be many invalid records,
+        //         so update one by one without complex UPDATE statements.
+        $path = $DB->sql_concat("'/" . SYSCONTEXTID . "/'", 'tc.id', "'/'", 'uc.id');
+        $sql = 'SELECT u.id, u.tenantid, uc.id AS ucid, tc.id AS tcid
+                  FROM "ttr_user" u
+                  JOIN "ttr_context" uc ON uc.contextlevel = ' . CONTEXT_USER . ' AND uc.instanceid = u.id
+                  JOIN "ttr_context" tc ON tc.contextlevel = ' . CONTEXT_TENANT . ' AND tc.instanceid = u.tenantid
+                 WHERE uc.depth <> 3 OR uc.path <> (' . $path . ') OR uc.parentid <> tc.id';
+        $users = $DB->get_recordset_sql($sql);
+        foreach ($users as $user) {
+            $ctx = new stdClass();
+            $ctx->id = $user->ucid;
+            $ctx->depth = 3;
+            $ctx->path = '/' . SYSCONTEXTID . '/' . $user->tcid . '/' . $user->ucid;
+            $ctx->parentid = $user->tcid;
+            $DB->update_record('context', $ctx);
+        }
     }
 }
 
@@ -6562,7 +7073,7 @@ class context_coursecat extends context {
      * @static
      * @param int $categoryid id from {course_categories} table
      * @param int $strictness
-     * @return context_coursecat context instance
+     * @return context_coursecat|false context instance
      */
     public static function instance($categoryid, $strictness = MUST_EXIST) {
         global $DB;
@@ -6575,9 +7086,13 @@ class context_coursecat extends context {
             if ($category = $DB->get_record('course_categories', array('id' => $categoryid), 'id,parent', $strictness)) {
                 if ($category->parent) {
                     $parentcontext = context_coursecat::instance($category->parent);
-                    $record = context::insert_context_record(CONTEXT_COURSECAT, $category->id, $parentcontext->path);
+                    $record = context::insert_context_record(CONTEXT_COURSECAT, $category->id, $parentcontext->path, $parentcontext->tenantid);
                 } else {
-                    $record = context::insert_context_record(CONTEXT_COURSECAT, $category->id, '/'.SYSCONTEXTID, 0);
+                    $tenantid = null;
+                    if ($tenant = $DB->get_record('tenant', ['categoryid' => $category->id], 'id')) {
+                        $tenantid = $tenant->id;
+                    }
+                    $record = context::insert_context_record(CONTEXT_COURSECAT, $category->id, '/'.SYSCONTEXTID, $tenantid);
                 }
             }
         }
@@ -6626,14 +7141,16 @@ class context_coursecat extends context {
     protected static function create_level_instances() {
         global $DB;
 
-        $sql = "SELECT ".CONTEXT_COURSECAT.", cc.id
-                  FROM {course_categories} cc
-                 WHERE NOT EXISTS (SELECT 'x'
-                                     FROM {context} cx
-                                    WHERE cc.id = cx.instanceid AND cx.contextlevel=".CONTEXT_COURSECAT.")";
+        $sql = 'SELECT cc.id, t.id AS tenantid
+                  FROM "ttr_course_categories" cc
+             LEFT JOIN "ttr_tenant" t ON t.categoryid = cc.id
+                 WHERE NOT EXISTS (SELECT cx.id
+                                     FROM "ttr_context" cx
+                                    WHERE cc.id = cx.instanceid AND cx.contextlevel='.CONTEXT_COURSECAT.')';
         $contextdata = $DB->get_recordset_sql($sql);
         foreach ($contextdata as $context) {
-            context::insert_context_record(CONTEXT_COURSECAT, $context->id, null);
+            // NOTE: do not set path here because course categories are nested.
+            context::insert_context_record(CONTEXT_COURSECAT, $context->id, null, $context->tenantid);
         }
         $contextdata->close();
     }
@@ -6665,47 +7182,126 @@ class context_coursecat extends context {
         global $DB;
 
         $syscontextid = SYSCONTEXTID;
+        $purgecatcache = false;
+
+        // Totara: convert orphaned categories to regular top categories.
+        $sql = 'SELECT cc.id
+                  FROM "ttr_course_categories" cc
+             LEFT JOIN "ttr_course_categories" pc ON pc.id = cc.parent
+                 WHERE cc.parent > 0 AND pc.id IS NULL';
+        $orphaned = $DB->get_records_sql($sql);
+        foreach ($orphaned as $category) {
+            $category->parent = 0;
+            $category->depth = 1;
+            $DB->update_record('course_categories', $category);
+            $force = true;
+            $purgecatcache = true;
+        }
+
+        // Totara: make sure top level depth is correct.
+        if ($DB->record_exists_select('course_categories', "parent = 0 AND depth <> 1")) {
+            $sql = 'UPDATE "ttr_course_categories"
+                   SET depth = 1
+                 WHERE parent = 0 AND depth <> 1';
+            $DB->execute($sql);
+            $force = true;
+            $purgecatcache = true;
+        }
+
+        // Totara: Make sure nobody messed with tenant categories.
+        $path = $DB->sql_concat("'/" . $syscontextid . "/'", 'ctx.id');
+        $sql = 'SELECT ctx.id, t.id AS tenantid, cc.parent AS ccparent, cc.id AS ccid, cc.depth AS ccdepth
+                  FROM "ttr_context" ctx
+                  JOIN "ttr_course_categories" cc ON cc.id = ctx.instanceid
+                  JOIN "ttr_tenant" t ON t.categoryid = cc.id
+                 WHERE ctx.contextlevel = ' . CONTEXT_COURSECAT . '
+                       AND (cc.parent <> 0 OR cc.depth <> 1 OR ctx.depth <> 2 OR ctx.path <> (' . $path . ') OR ctx.parentid <> ' . $syscontextid . ' OR ctx.tenantid IS NULL OR ctx.tenantid <> t.id)';
+        $contexts = $DB->get_records_sql($sql);
+        foreach ($contexts as $context) {
+            // Somebody hacked the tenant top category, revert it now!
+            if ($context->ccparent != 0) {
+                $DB->set_field('course_categories', 'parent', 0, ['id' => $context->ccid]);
+                $purgecatcache = true;
+            }
+            if ($context->ccdepth != 1) {
+                $DB->set_field('course_categories', 'depth', 1, ['id' => $context->ccid]);
+                $purgecatcache = true;
+            }
+            unset($context->ccparent);
+            unset($context->ccid);
+            unset($context->ccdepth);
+            $context->depth = 2;
+            $context->path = '/' . $syscontextid . '/' . $context->id;
+            $context->parentid = $syscontextid;
+            $DB->update_record('context', $context);
+            $force = true;
+        }
+
+        // Totara: Always make sure that non-tenant top categories are correct too.
+        $path = $DB->sql_concat("'/" . $syscontextid . "/'", 'ctx.id');
+        $sql = 'SELECT ctx.id
+                  FROM "ttr_context" ctx
+                  JOIN "ttr_course_categories" cc ON cc.id = ctx.instanceid AND cc.parent = 0
+             LEFT JOIN "ttr_tenant" t ON t.categoryid = cc.id
+                 WHERE ctx.contextlevel = ' . CONTEXT_COURSECAT . ' AND t.id IS NULL AND
+                       (ctx.depth <> 2 OR ctx.path <> (' . $path . ') OR ctx.parentid <> ' . $syscontextid . ' OR ctx.tenantid IS NOT NULL)';
+        $contexts = $DB->get_records_sql($sql);
+        foreach ($contexts as $context) {
+            $context->depth = 2;
+            $context->path = '/' . $syscontextid . '/' . $context->id;
+            $context->parentid = $syscontextid;
+            $context->tenantid = null;
+            $DB->update_record('context', $context);
+            $force = true;
+            $purgecatcache = true;
+        }
 
         if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_COURSECAT." AND (depth = 0 OR path IS NULL OR parentid IS NULL)")) {
             if ($force) {
-                $ctxemptyclause = $emptyclause = '';
+                $ctxemptyclause = '';
             } else {
                 $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0 OR ctx.parentid IS NULL)";
-                $emptyclause    = "AND ({context}.path IS NULL OR {context}.depth = 0 OR {context}.parentid IS NULL)";
             }
 
-            $base = '/'.SYSCONTEXTID;
+            // Deeper categories - one query per depth level.
+            $pdepth = 1;
+            while (true) {
+                // Fix category depths if necessary.
+                $sql = 'SELECT cc.id
+                          FROM "ttr_course_categories" cc
+                          JOIN "ttr_course_categories" pc ON pc.id = cc.parent AND pc.depth = :pdepth
+                         WHERE cc.depth + 1 <> pc.depth';
+                $cats = $DB->get_records_sql($sql, ['pdepth' => $pdepth]);
+                foreach ($cats as $category) {
+                    $DB->set_field('course_categories', 'depth', $pdepth + 1, ['id' => $category->id]);
+                    $purgecatcache = true;
+                }
 
-            // Normal top level categories
-            $sql = "UPDATE {context}
-                       SET depth=2,
-                           path=".$DB->sql_concat("'$base/'", 'id').",
-                           parentid = {$syscontextid}
-                     WHERE contextlevel=".CONTEXT_COURSECAT."
-                           AND EXISTS (SELECT 'x'
-                                         FROM {course_categories} cc
-                                        WHERE cc.id = {context}.instanceid AND cc.depth=1)
-                           $emptyclause";
-            $DB->execute($sql);
+                if (!$DB->record_exists('course_categories', ['depth' => $pdepth + 1])) {
+                    // All levels were processed.
+                    break;
+                }
 
-            // Deeper categories - one query per depthlevel
-            $maxdepth = $DB->get_field_sql("SELECT MAX(depth) FROM {course_categories}");
-            for ($n=2; $n<=$maxdepth; $n++) {
-                $sql = "INSERT INTO {context_temp} (id, path, depth, parentid)
-                        SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id
-                          FROM {context} ctx
-                          JOIN {course_categories} cc ON (cc.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_COURSECAT." AND cc.depth = $n)
-                          JOIN {context} pctx ON (pctx.instanceid = cc.parent AND pctx.contextlevel = ".CONTEXT_COURSECAT.")
-                         WHERE pctx.path IS NOT NULL AND pctx.depth > 0
-                               $ctxemptyclause";
+                // Fill temp table with correct data and update in bulk.
+                $sql = 'INSERT INTO "ttr_context_temp" (id, path, depth, parentid, tenantid)
+                             SELECT ctx.id, ' . $DB->sql_concat('pctx.path', "'/'", 'ctx.id') . ', pctx.depth+1, pctx.id, pctx.tenantid
+                               FROM "ttr_context" ctx
+                               JOIN "ttr_course_categories" cc ON (cc.id = ctx.instanceid AND ctx.contextlevel = ' . CONTEXT_COURSECAT . ' AND cc.depth = :depth)
+                               JOIN "ttr_context" pctx ON (pctx.instanceid = cc.parent AND pctx.contextlevel = ' . CONTEXT_COURSECAT . ')
+                              WHERE pctx.path IS NOT NULL AND pctx.depth > 0 ' . $ctxemptyclause;
                 $trans = $DB->start_delegated_transaction();
                 $DB->delete_records('context_temp');
-                $DB->execute($sql);
+                $DB->execute($sql, ['depth' => $pdepth + 1]);
                 context::merge_context_temp_table();
                 $DB->delete_records('context_temp');
                 $trans->allow_commit();
 
+                $pdepth++;
             }
+        }
+
+        if ($purgecatcache) {
+            cache_helper::purge_by_event('changesincoursecat');
         }
     }
 }
@@ -6819,7 +7415,7 @@ class context_course extends context {
      * @static
      * @param int $courseid id from {course} table
      * @param int $strictness
-     * @return context_course context instance
+     * @return context_course|false context instance
      */
     public static function instance($courseid, $strictness = MUST_EXIST) {
         global $DB;
@@ -6832,9 +7428,9 @@ class context_course extends context {
             if ($course = $DB->get_record('course', array('id' => $courseid), 'id,category', $strictness)) {
                 if ($course->category) {
                     $parentcontext = context_coursecat::instance($course->category);
-                    $record = context::insert_context_record(CONTEXT_COURSE, $course->id, $parentcontext->path);
+                    $record = context::insert_context_record(CONTEXT_COURSE, $course->id, $parentcontext->path, $parentcontext->tenantid);
                 } else {
-                    $record = context::insert_context_record(CONTEXT_COURSE, $course->id, '/'.SYSCONTEXTID, 0);
+                    $record = context::insert_context_record(CONTEXT_COURSE, $course->id, '/'.SYSCONTEXTID, null);
                 }
             }
         }
@@ -6855,14 +7451,22 @@ class context_course extends context {
     protected static function create_level_instances() {
         global $DB;
 
-        $sql = "SELECT ".CONTEXT_COURSE.", c.id
-                  FROM {course} c
-                 WHERE NOT EXISTS (SELECT 'x'
-                                     FROM {context} cx
-                                    WHERE c.id = cx.instanceid AND cx.contextlevel=".CONTEXT_COURSE.")";
+        $sql = 'SELECT c.id, c.category
+                  FROM "ttr_course" c
+                 WHERE NOT EXISTS (SELECT cx.id
+                                     FROM "ttr_context" cx
+                                    WHERE c.id = cx.instanceid AND cx.contextlevel='.CONTEXT_COURSE.')';
         $contextdata = $DB->get_recordset_sql($sql);
         foreach ($contextdata as $context) {
-            context::insert_context_record(CONTEXT_COURSE, $context->id, null);
+            if ($context->category) {
+                $parentcontext = context_coursecat::instance($context->category, IGNORE_MISSING);
+                if (!$parentcontext) {
+                    continue;
+                }
+            } else {
+                $parentcontext = context_system::instance();
+            }
+            context::insert_context_record(CONTEXT_COURSE, $context->id, $parentcontext->path, $parentcontext->tenantid);
         }
         $contextdata->close();
     }
@@ -6909,7 +7513,8 @@ class context_course extends context {
             $sql = "UPDATE {context}
                        SET depth = 2,
                            path = ".$DB->sql_concat("'$base/'", 'id').",
-                           parentid = {$syscontextid}
+                           parentid = {$syscontextid},
+                           tenantid = null
                      WHERE contextlevel = ".CONTEXT_COURSE."
                            AND EXISTS (SELECT 'x'
                                          FROM {course} c
@@ -6918,8 +7523,8 @@ class context_course extends context {
             $DB->execute($sql);
 
             // standard courses
-            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid)
-                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id
+            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid, tenantid)
+                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id, pctx.tenantid
                       FROM {context} ctx
                       JOIN {course} c ON (c.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_COURSE." AND c.category <> 0)
                       JOIN {context} pctx ON (pctx.instanceid = c.category AND pctx.contextlevel = ".CONTEXT_COURSECAT.")
@@ -7046,9 +7651,9 @@ class context_program extends context {
             if ($program = $DB->get_record('prog', array('id' => $instanceid), 'id, category', $strictness)) {
                 if ($program->category) {
                     $parentcontext = context_coursecat::instance($program->category);
-                    $record = context::insert_context_record(CONTEXT_PROGRAM, $program->id, $parentcontext->path);
+                    $record = context::insert_context_record(CONTEXT_PROGRAM, $program->id, $parentcontext->path, $parentcontext->tenantid);
                 } else {
-                    $record = context::insert_context_record(CONTEXT_PROGRAM, $program->id, '/'.SYSCONTEXTID, 0);
+                    $record = context::insert_context_record(CONTEXT_PROGRAM, $program->id, '/'.SYSCONTEXTID);
                 }
             }
         }
@@ -7062,28 +7667,32 @@ class context_program extends context {
         return false;
     }
 
+
     /**
      * Create missing context instances at program context level
      * @static
      */
     protected static function create_level_instances() {
         global $DB;
-        $dbman = $DB->get_manager();
 
-        // check the program table exists in case this is during an upgrade
-        // to totara and the table hasn't yet been created
-        $table = new xmldb_table('prog');
-        if (!$dbman->table_exists($table)) {
-            return;
+        $sql = 'SELECT p.id, p.category
+                  FROM "ttr_prog" p
+                 WHERE NOT EXISTS (SELECT cx.id
+                                     FROM "ttr_context" cx
+                                    WHERE p.id = cx.instanceid AND cx.contextlevel='.CONTEXT_PROGRAM.')';
+        $contextdata = $DB->get_recordset_sql($sql);
+        foreach ($contextdata as $context) {
+            if ($context->category) {
+                $parentcontext = context_coursecat::instance($context->category, IGNORE_MISSING);
+                if (!$parentcontext) {
+                    continue;
+                }
+            } else {
+                $parentcontext = context_system::instance();
+            }
+            context::insert_context_record(CONTEXT_PROGRAM, $context->id, $parentcontext->path, $parentcontext->tenantid);
         }
-
-        $sql = "INSERT INTO {context} (contextlevel, instanceid)
-                SELECT ".CONTEXT_PROGRAM.", p.id
-                  FROM {prog} p
-                 WHERE NOT EXISTS (SELECT 'x'
-                                     FROM {context} cx
-                                    WHERE p.id = cx.instanceid AND cx.contextlevel=".CONTEXT_PROGRAM.")";
-        $DB->execute($sql);
+        $contextdata->close();
     }
 
     /**
@@ -7154,8 +7763,8 @@ class context_program extends context {
             $DB->execute($sql);
 
             // standard programs
-            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid)
-                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id
+            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid, tenantid)
+                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id, pctx.tenantid
                       FROM {context} ctx
                       JOIN {prog} p ON (p.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_PROGRAM." AND p.category <> 0)
                       JOIN {context} pctx ON (pctx.instanceid = p.category AND pctx.contextlevel = ".CONTEXT_COURSECAT.")
@@ -7331,7 +7940,7 @@ class context_module extends context {
         if (!$record = $DB->get_record('context', array('contextlevel' => CONTEXT_MODULE, 'instanceid' => $cmid))) {
             if ($cm = $DB->get_record('course_modules', array('id' => $cmid), 'id,course', $strictness)) {
                 $parentcontext = context_course::instance($cm->course);
-                $record = context::insert_context_record(CONTEXT_MODULE, $cm->id, $parentcontext->path);
+                $record = context::insert_context_record(CONTEXT_MODULE, $cm->id, $parentcontext->path, $parentcontext->tenantid);
             }
         }
 
@@ -7351,14 +7960,18 @@ class context_module extends context {
     protected static function create_level_instances() {
         global $DB;
 
-        $sql = "SELECT ".CONTEXT_MODULE.", cm.id
-                  FROM {course_modules} cm
-                 WHERE NOT EXISTS (SELECT 'x'
-                                     FROM {context} cx
-                                    WHERE cm.id = cx.instanceid AND cx.contextlevel=".CONTEXT_MODULE.")";
+        $sql = 'SELECT cm.id, cm.course
+                  FROM "ttr_course_modules" cm
+                 WHERE NOT EXISTS (SELECT cx.id
+                                     FROM "ttr_context" cx
+                                    WHERE cm.id = cx.instanceid AND cx.contextlevel='.CONTEXT_MODULE.')';
         $contextdata = $DB->get_recordset_sql($sql);
         foreach ($contextdata as $context) {
-            context::insert_context_record(CONTEXT_MODULE, $context->id, null);
+            $parentcontext = context_course::instance($context->course, IGNORE_MISSING);
+            if (!$parentcontext) {
+                continue;
+            }
+            context::insert_context_record(CONTEXT_MODULE, $context->id, $parentcontext->path, $parentcontext->tenantid);
         }
         $contextdata->close();
     }
@@ -7396,8 +8009,8 @@ class context_module extends context {
                 $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0 OR ctx.parentid IS NULL)";
             }
 
-            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid)
-                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id
+            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid, tenantid)
+                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id, pctx.tenantid
                       FROM {context} ctx
                       JOIN {course_modules} cm ON (cm.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_MODULE.")
                       JOIN {context} pctx ON (pctx.instanceid = cm.course AND pctx.contextlevel = ".CONTEXT_COURSE.")
@@ -7543,7 +8156,7 @@ class context_block extends context {
         if (!$record = $DB->get_record('context', array('contextlevel' => CONTEXT_BLOCK, 'instanceid' => $blockinstanceid))) {
             if ($bi = $DB->get_record('block_instances', array('id' => $blockinstanceid), 'id,parentcontextid', $strictness)) {
                 $parentcontext = context::instance_by_id($bi->parentcontextid);
-                $record = context::insert_context_record(CONTEXT_BLOCK, $bi->id, $parentcontext->path);
+                $record = context::insert_context_record(CONTEXT_BLOCK, $bi->id, $parentcontext->path, $parentcontext->tenantid);
             }
         }
 
@@ -7571,14 +8184,18 @@ class context_block extends context {
     protected static function create_level_instances() {
         global $DB;
 
-        $sql = "SELECT ".CONTEXT_BLOCK.", bi.id
-                  FROM {block_instances} bi
-                 WHERE NOT EXISTS (SELECT 'x'
-                                     FROM {context} cx
-                                    WHERE bi.id = cx.instanceid AND cx.contextlevel=".CONTEXT_BLOCK.")";
+        $sql = 'SELECT bi.id, bi.parentcontextid
+                  FROM "ttr_block_instances" bi
+                 WHERE NOT EXISTS (SELECT cx.id
+                                     FROM "ttr_context" cx
+                                    WHERE bi.id = cx.instanceid AND cx.contextlevel='.CONTEXT_BLOCK.')';
         $contextdata = $DB->get_recordset_sql($sql);
         foreach ($contextdata as $context) {
-            context::insert_context_record(CONTEXT_BLOCK, $context->id, null);
+            $parentcontext = context::instance_by_id($context->parentcontextid, IGNORE_MISSING);
+            if (!$parentcontext) {
+                continue;
+            }
+            context::insert_context_record(CONTEXT_BLOCK, $context->id, $parentcontext->path, $parentcontext->tenantid);
         }
         $contextdata->close();
     }
@@ -7617,8 +8234,8 @@ class context_block extends context {
             }
 
             // pctx.path IS NOT NULL prevents fatal problems with broken block instances that point to invalid context parent
-            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid)
-                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id
+            $sql = "INSERT INTO {context_temp} (id, path, depth, parentid, tenantid)
+                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1, pctx.id, pctx.tenantid
                       FROM {context} ctx
                       JOIN {block_instances} bi ON (bi.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_BLOCK.")
                       JOIN {context} pctx ON (pctx.id = bi.parentcontextid)

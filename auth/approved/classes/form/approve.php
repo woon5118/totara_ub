@@ -24,6 +24,7 @@
 namespace auth_approved\form;
 
 use totara_form\form\element\hidden;
+use totara_form\form\element\select;
 use totara_form\form\element\static_html;
 use totara_form\form\element\textarea;
 
@@ -34,6 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 final class approve extends \totara_form\form {
     public function definition() {
+        global $CFG, $DB;
 
         $this->model->add(new static_html('sure', '', get_string('approvesure', 'auth_approved')));
 
@@ -43,6 +45,22 @@ final class approve extends \totara_form\form {
         $curretdata = $this->model->get_current_data(null);
         $details = \auth_approved\util::render_request_details_view($curretdata['requestid']);
         $this->model->add(new static_html('requestdetails', '', $details));
+
+        if ($CFG->tenantsenabled) {
+            $tenants = $DB->get_records_menu('tenant', [], 'name ASC', 'id,name');
+            foreach ($tenants as $tenantid => $tenantname) {
+                $tenantcontext = \context_tenant::instance($tenantid);
+                if (!has_capability('totara/tenant:usercreate', $tenantcontext)) {
+                    unset($tenants[$tenantid]);
+                    continue;
+                }
+                $tenants[$tenantid] = format_string($tenantname);
+            }
+            if ($tenants) {
+                $tenants = [0 => get_string('no')] + $tenants;
+                $this->model->add(new select('tenantid', get_string('tenant', 'totara_tenant'), $tenants));
+            }
+        }
 
         $this->model->add(new textarea('custommessage', get_string('custommessage', 'auth_approved'), PARAM_CLEANHTML));
 

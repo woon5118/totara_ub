@@ -23,6 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Test Totara-specific functionality in lib/accesslib.php
+ */
 class totara_core_accesslib_testcase extends advanced_testcase {
     public function test_capability_names() {
         global $DB;
@@ -118,5 +121,71 @@ class totara_core_accesslib_testcase extends advanced_testcase {
 
         $newviewbadges = $DB->get_record('capabilities', array('name' => 'moodle/badges:viewbadges'), '*', MUST_EXIST);
         $this->assertEquals($viewbadges, $newviewbadges);
+    }
+
+    public function test_has_capability_in_any_context() {
+        global $DB, $USER;
+
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
+        $teacherrole = $DB->get_record('role', array('shortname'=>'editingteacher'), '*', MUST_EXIST);
+        $teacher = $this->getDataGenerator()->create_user();
+        role_assign($teacherrole->id, $teacher->id, $coursecontext);
+        $admin = $DB->get_record('user', array('username'=>'admin'));
+
+        $courses2 = $this->getDataGenerator()->create_course();
+        $coursecontext2 = context_course::instance($course->id);
+        role_assign($teacherrole->id, $teacher->id, $coursecontext2);
+
+        // Any course level capabilities that editing teacher has will do.
+        $this->assertTrue($DB->record_exists('capabilities', array('name'=>'moodle/backup:backupsection')));
+        $this->assertTrue($DB->record_exists('capabilities', array('name'=>'moodle/backup:backupcourse')));
+        // Same admin only capability.
+        $this->assertTrue($DB->record_exists('capabilities', array('name'=>'moodle/site:approvecourse')));
+
+        $this->setUser(0);
+        $this->assertFalse(has_capability_in_any_context('moodle/backup:backupsection', null));
+        $this->assertFalse(has_capability_in_any_context('moodle/backup:backupcourse', null));
+        $this->assertFalse(has_capability_in_any_context('moodle/site:approvecourse', null));
+        $this->assertFalse(has_capability_in_any_context('moodle/backup:backupsection', null, $USER));
+        $this->assertFalse(has_capability_in_any_context('moodle/backup:backupcourse', null, $USER));
+        $this->assertFalse(has_capability_in_any_context('moodle/site:approvecourse', null, $USER));
+        $this->setUser($admin);
+        $this->assertFalse(has_capability_in_any_context('moodle/backup:backupsection', null, 0));
+        $this->assertFalse(has_capability_in_any_context('moodle/backup:backupcourse', null, 0));
+        $this->assertFalse(has_capability_in_any_context('moodle/site:approvecourse', null, 0));
+
+        $this->setUser($teacher);
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupsection', null));
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupcourse', null));
+        $this->assertFalse(has_capability_in_any_context('moodle/site:approvecourse', null));
+        $this->assertFalse(has_capability_in_any_context('moodle/backup:backupsection', [CONTEXT_COURSECAT]));
+        $this->assertFalse(has_capability_in_any_context('moodle/backup:backupcourse', [CONTEXT_COURSECAT]));
+        $this->assertFalse(has_capability_in_any_context('moodle/site:approvecourse', [CONTEXT_COURSECAT]));
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupsection', [CONTEXT_COURSECAT, CONTEXT_COURSE]));
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupcourse', [CONTEXT_COURSECAT, CONTEXT_COURSE]));
+        $this->assertFalse(has_capability_in_any_context('moodle/site:approvecourse', [CONTEXT_COURSECAT, CONTEXT_COURSE]));
+        $this->setUser(0);
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupsection', [CONTEXT_COURSECAT, CONTEXT_COURSE], $teacher));
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupcourse', [CONTEXT_COURSECAT, CONTEXT_COURSE], $teacher));
+        $this->assertFalse(has_capability_in_any_context('moodle/site:approvecourse', [CONTEXT_COURSECAT, CONTEXT_COURSE], $teacher));
+
+        $this->setUser($admin);
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupsection', null));
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupcourse', null));
+        $this->assertTrue(has_capability_in_any_context('moodle/site:approvecourse', null));
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupsection', [CONTEXT_COURSECAT]));
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupcourse', [CONTEXT_COURSECAT]));
+        $this->assertTrue(has_capability_in_any_context('moodle/site:approvecourse', [CONTEXT_COURSECAT]));
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupsection', [CONTEXT_COURSECAT, CONTEXT_COURSE]));
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupcourse', [CONTEXT_COURSECAT, CONTEXT_COURSE]));
+        $this->assertTrue(has_capability_in_any_context('moodle/site:approvecourse', [CONTEXT_COURSECAT, CONTEXT_COURSE]));
+        $this->setUser(0);
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupsection', [CONTEXT_COURSECAT, CONTEXT_COURSE], $admin));
+        $this->assertTrue(has_capability_in_any_context('moodle/backup:backupcourse', [CONTEXT_COURSECAT, CONTEXT_COURSE], $admin));
+        $this->assertTrue(has_capability_in_any_context('moodle/site:approvecourse', [CONTEXT_COURSECAT, CONTEXT_COURSE], $admin));
+        $this->assertFalse(has_capability_in_any_context('moodle/backup:backupsection', [CONTEXT_COURSECAT, CONTEXT_COURSE], $admin, false));
+        $this->assertFalse(has_capability_in_any_context('moodle/backup:backupcourse', [CONTEXT_COURSECAT, CONTEXT_COURSE], $admin, false));
+        $this->assertFalse(has_capability_in_any_context('moodle/site:approvecourse', [CONTEXT_COURSECAT, CONTEXT_COURSE], $admin, false));
     }
 }

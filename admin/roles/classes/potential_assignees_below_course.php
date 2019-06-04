@@ -32,6 +32,15 @@ defined('MOODLE_INTERNAL') || die();
  * This returns only enrolled users in this context.
  */
 class core_role_potential_assignees_below_course extends core_role_assign_user_selector_base {
+    /**
+     * @param string $name control name
+     * @param array $options should have two elements with keys groupid and courseid.
+     */
+    public function __construct($name, $options) {
+        parent::__construct($name, $options);
+        $this->enabletenantrestrictions = true;
+    }
+
     public function find_users($search) {
         global $DB;
 

@@ -494,12 +494,12 @@ function totara_core_migrate_bogus_course_backup_areas() {
 }
 
 /**
- * Makes sure that context related tables are up to date.
+ * Makes sure that context and tenant related tables are up to date.
  *
  * NOTE: this must be called before upgrade starts executing.
  */
 function totara_core_upgrade_context_tables() {
-    global $DB;
+    global $DB, $CFG;
 
     $dbman = $DB->get_manager();
 
@@ -533,6 +533,48 @@ function totara_core_upgrade_context_tables() {
     if (!$dbman->table_exists($table)) {
         $dbman->create_table($table);
         $updated = true;
+    }
+
+    // Add tenant stuff.
+    if (empty($CFG->tenantready)) {
+        $table = new xmldb_table('tenant');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('name', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('idnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('description', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+            $table->add_field('descriptionformat', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+            $table->add_field('suspended', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('categoryid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('cohortid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('usercreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $table->add_key('categoryid', XMLDB_KEY_FOREIGN_UNIQUE, array('categoryid'), 'course_categories', array('id'), 'restrict');
+            $table->add_key('cohortid', XMLDB_KEY_FOREIGN_UNIQUE, array('cohortid'), 'cohort', array('id'), 'restrict'); // Deferred installation in install.xml, the cohort table exists now.
+            $table->add_key('usercreated', XMLDB_KEY_FOREIGN, array('usercreated'), 'user', array('id'));
+            $table->add_index('idnumber', XMLDB_INDEX_UNIQUE, array('idnumber'));
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('context');
+        $field = new xmldb_field('tenantid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'parentid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+            $key = new xmldb_key('tenantid', XMLDB_KEY_FOREIGN, array('tenantid'), 'tenant', array('id'), 'restrict');
+            $dbman->add_key($table, $key);
+        }
+
+        $table = new xmldb_table('user');
+        $field = new xmldb_field('tenantid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'totarasync');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+            $key = new xmldb_key('tenantid', XMLDB_KEY_FOREIGN, array('tenantid'), 'tenant', array('id'), 'restrict');
+            $dbman->add_key($table, $key);
+        }
+
+        set_config('tenantready', '1');
+        // NOTE: no need to set $updated to true here, there are no tenants yet, so the tenantid will be null in all contexts.
     }
 
     if ($updated) {

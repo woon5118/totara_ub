@@ -48,8 +48,21 @@ if ($issearching) {
     $viewmode = 'courses';
 }
 
-$url = new moodle_url('/course/management.php');
+// Totara: Login is required for all management pages, the access control is a bit weird here,
+// so just make sure matching external page is selected, but do not use it to enforce permission checks.
 $systemcontext = $context = context_system::instance();
+require_login(null, false);
+
+if (!coursecat::has_capability_on_any(array('moodle/category:manage', 'moodle/course:create'))) {
+    // The user isn't able to manage any categories. Lets redirect them to the relevant course/index.php page.
+    $url = new moodle_url('/course/index.php');
+    if ($categoryid) {
+        $url->param('categoryid', $categoryid);
+    }
+    redirect($url);
+}
+
+$url = new moodle_url('/course/management.php');
 if ($courseid) {
     $record = get_course($courseid);
     $course = new course_in_list($record);
@@ -107,50 +120,36 @@ $PAGE->set_heading($pageheading);
 
 //TOTARA: Set this as an admin page
 $PAGE->set_pagetype('admin-' . $PAGE->pagetype);
+$PAGE->set_category_by_id($category->id);
 
-// This is a system level page that operates on other contexts.
-require_login();
-
-if (!coursecat::has_capability_on_any(array('moodle/category:manage', 'moodle/course:create'))) {
-    // The user isn't able to manage any categories. Lets redirect them to the relevant course/index.php page.
-    $url = new moodle_url('/course/index.php');
-    if ($categoryid) {
-        $url->param('categoryid', $categoryid);
+// NOTE: this must match logic in admin/settings/courses.php,
+//        this is not real access control, we do it to sync quick access menu only.
+$topurl = null;
+if (has_any_capability(['moodle/category:manage', 'moodle/course:create'], $systemcontext)) {
+    admin_externalpage_setup('coursemgmt', '', $url->params());
+    $topurl = new moodle_url('/course/management.php');
+} else if (!empty($USER->tenantid)) {
+    $tenant = \core\record\tenant::fetch($USER->tenantid);
+    $categorycontext = context_coursecat::instance($tenant->categoryid);
+    if (has_any_capability(['moodle/category:manage', 'moodle/course:create'], $categorycontext)) {
+        admin_externalpage_setup('tenantcategory', '', $url->params());
+        $topurl = new moodle_url('/course/management.php');
     }
-    redirect($url);
 }
 
-// If the user poses any of these capabilities then they will be able to see the admin
-// tree and the management link within it.
-// This is the most accurate form of navigation.
-$capabilities = array(
-    'moodle/site:config',
-    'moodle/backup:backupcourse',
-    'moodle/category:manage',
-    'moodle/course:create',
-    'moodle/site:approvecourse'
-);
-if ($category && !has_any_capability($capabilities, $systemcontext)) {
-    // If the user doesn't poses any of these system capabilities then we're going to mark the manage link in the settings block
-    // as active, tell the page to ignore the active path and just build what the user would expect.
-    // This will at least give the page some relevant navigation.
-    navigation_node::override_active_url(new moodle_url('/course/management.php', array('categoryid' => $category->id)));
-    $PAGE->set_category_by_id($category->id);
-    $PAGE->navbar->ignore_active(true);
-    $PAGE->navbar->add(get_string('coursemgmt', 'admin'), $PAGE->url->out_omit_querystring());
-} else {
-    // If user has system capabilities, make sure the "Courses and categories" item in Administration block is active.
-    navigation_node::require_admin_tree();
-    navigation_node::override_active_url(new moodle_url('/course/management.php'));
-}
+$PAGE->navbar->ignore_active(true);
+$PAGE->navbar->add(get_string('coursemgmt', 'admin'), $topurl);
+
 if (!$issearching && $category !== null) {
     $parents = coursecat::get_many($category->get_parents());
     $parents[] = $category;
     foreach ($parents as $parent) {
-        $PAGE->navbar->add(
-            $parent->get_formatted_name(),
-            new moodle_url('/course/management.php', array('categoryid' => $parent->id))
-        );
+        if (!$courseid and $parent->id == $categoryid) {
+            $caturl = null;
+        } else {
+            $caturl = new moodle_url('/course/management.php', array('categoryid' => $parent->id));
+        }
+        $PAGE->navbar->add($parent->get_formatted_name(), $caturl);
     }
     if ($course instanceof course_in_list) {
         // Use the list name so that it matches whats being displayed below.
@@ -300,8 +299,7 @@ if ($action !== false && confirm_sesskey()) {
 
             if ($bulkmovecourses) {
                 // Move courses out of the current category and into a new category.
-                // They must have specified a category.
-                required_param('categoryid', PARAM_INT);
+                // Totara: categoryid parameter is irrelevant here
                 $movetoid = required_param('movecoursesto', PARAM_INT);
                 $courseids = optional_param_array('bc', false, PARAM_INT);
                 if ($courseids === false) {
@@ -484,9 +482,6 @@ $renderer->enhance_management_interface();
 $displaycategorylisting = ($viewmode === 'default' || $viewmode === 'combined' || $viewmode === 'categories');
 $displaycourselisting = ($viewmode === 'default' || $viewmode === 'combined' || $viewmode === 'courses');
 $displaycoursedetail = (isset($courseid));
-
-// TOTARA: Add button to add/remove for quickaccess menu
-\totara_core\quickaccessmenu\helper::add_quickaction_page_button($PAGE, 'coursemgmt');
 
 echo $renderer->header();
 

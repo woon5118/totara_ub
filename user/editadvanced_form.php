@@ -249,14 +249,12 @@ class user_editadvanced_form extends moodleform {
                 } else {
                     $imagevalue = get_string('none');
                 }
-            } else {
-                $imagevalue = get_string('none');
-            }
-            $imageelement = $mform->getElement('currentpicture');
-            $imageelement->setValue($imagevalue);
+                $imageelement = $mform->getElement('currentpicture');
+                $imageelement->setValue($imagevalue);
 
-            if ($user && $mform->elementExists('deletepicture') && !$hasuploadedpicture) {
-                $mform->removeElement('deletepicture');
+                if ($mform->elementExists('deletepicture') && !$hasuploadedpicture) {
+                    $mform->removeElement('deletepicture');
+                }
             }
         }
 

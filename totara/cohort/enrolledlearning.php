@@ -110,7 +110,7 @@ $jsmodule = array(
         'name' => 'totara_cohortlearning',
         'fullpath' => '/totara/cohort/dialog/learningitem.js',
         'requires' => array('json'));
-$args = array('args'=>'{"cohortid":'.$cohort->id.','.
+$args = array('args'=>'{"cohortid":'.$cohort->id.','.'"contextid":'.$context->id.','.
         '"COHORT_ASSN_ITEMTYPE_CERTIF":' . COHORT_ASSN_ITEMTYPE_CERTIF . ',' .
         '"COHORT_ASSN_ITEMTYPE_PROGRAM":' . COHORT_ASSN_ITEMTYPE_PROGRAM . ','.
         '"COHORT_ASSN_ITEMTYPE_COURSE":' . COHORT_ASSN_ITEMTYPE_COURSE . ','.

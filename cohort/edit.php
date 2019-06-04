@@ -131,6 +131,9 @@ if ($editform->is_cancelled()) {
                 'description' => $data->description, 'contextid' => $context->id);
             cohort_update_cohort($updatedata);
         }
+        if (!isset($data->cohorttype)) {
+            $data->cohorttype = \cohort::TYPE_STATIC;
+        }
         $message = get_string('successfullyaddedcohort', 'totara_cohort');
     }
     // Totara: handle tags and go to relevant page after insert.

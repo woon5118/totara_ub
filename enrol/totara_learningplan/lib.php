@@ -140,8 +140,14 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
             return false;
         }
 
-        $course = $DB->get_record('course', array('id' => $instance->courseid));
+        // Enforce tenant restrictions.
+        $coursecontext = context_course::instance($instance->courseid);
+        if ($coursecontext->is_user_access_prevented()) {
+            return false;
+        }
+
         if ($this->is_user_approved($instance->courseid)) {
+            $course = $DB->get_record('course', array('id' => $instance->courseid));
             // Get default roleid.
             $instance->roleid = parent::get_config('roleid');
             parent::enrol_user($instance, $USER->id, $instance->roleid);

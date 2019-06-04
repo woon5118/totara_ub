@@ -55,22 +55,9 @@ if (!$user = $DB->get_record('user', array('id' => $userid))) {
 // Check permissions.
 $coursecontext = context_course::instance($course->id);
 $personalcontext = context_user::instance($user->id);
-$canview = false;
-if (!empty($USER->id) && ($user->id == $USER->id)) {
-    // Can view own profile
-    $canview = true;
-} else if (has_capability('moodle/user:viewdetails', $coursecontext)) {
-    $canview = true;
-} else if (has_capability('moodle/user:viewdetails', $personalcontext)) {
-    $canview = true;
-}
-if (!$canview) {
-    print_error('cannotviewprofile');
-}
 
-// Is user deleted?
-if ($user->deleted) {
-    print_error('userdeleted', 'moodle');
+if (!user_can_view_profile($user, $course)) {
+    print_error('cannotviewprofile');
 }
 
 if (empty($jobassignmentid) && empty($CFG->totara_job_allowmultiplejobs) && \totara_job\job_assignment::get_all($userid)) {

@@ -38,31 +38,56 @@ require_once($CFG->dirroot.'/totara/cohort/lib.php');
  * @return bool
  */
 function block_totara_featured_links_pluginfile($course, $birecord_or_cm, context $context, $filearea, $args, $forcedownload, array $options= []) {
-    global $CFG, $DB, $USER;
-    $fs = get_file_storage();
+    global $DB, $CFG, $USER;
 
     if ($context->contextlevel != CONTEXT_BLOCK) {
         send_file_not_found();
     }
+
+    $blockinstance = $DB->get_record('block_instances', ['id' => $context->instanceid]);
+    if (!$blockinstance) {
+        send_file_not_found();
+    }
+
+    // Get parent context and see if user have proper permission.
+    $parentcontext = $context->get_parent_context();
+    if (!$parentcontext) {
+        send_file_not_found();
+    }
+
+    // If block is in course context, then check if user has capability to access course.
     if ($context->get_course_context(false)) {
         require_course_login($course);
     } else if ($CFG->forcelogin) {
         require_login();
-    } else {
-        // Get parent context and see if user have proper permission.
-        $parentcontext = $context->get_parent_context();
-        if ($parentcontext->contextlevel === CONTEXT_COURSECAT) {
-            // Check if category is visible and user can view this category.
-            $category = $DB->get_record('course_categories', ['id' => $parentcontext->instanceid], '*', MUST_EXIST);
-            if (!$category->visible) {
-                require_capability('moodle/category:viewhiddencategories', $parentcontext);
-            }
-        } else if ($parentcontext->contextlevel === CONTEXT_USER && $parentcontext->instanceid != $USER->id) {
-            // The block is in the context of a user, it is only visible to the user who it belongs to.
+    }
+
+    if ($context->is_user_access_prevented()) {
+        send_file_not_found();
+    }
+
+    // NOTE: temporary fix for TL-21682
+    if ($parentcontext->contextlevel == CONTEXT_COURSECAT) {
+        // Check if category is visible and user can view this category.
+        $category = coursecat::get($parentcontext->instanceid);
+        if (!$category->is_uservisible()) {
             send_file_not_found();
         }
-        // At this point there is no way to check SYSTEM context, so ignoring it.
+    } else if ($parentcontext->contextlevel == CONTEXT_USER) {
+        if ($parentcontext->instanceid != $USER->id) {
+            if ($blockinstance->pagetypepattern !== 'user-profile') {
+                // There is only one page that can be viewed by other users where users can customise blocks,
+                // it is their public profile page.
+                send_file_not_found();
+            }
+            if (!user_can_view_profile($parentcontext->instanceid)) {
+                send_file_not_found();
+            }
+        }
     }
+    // At this point there is no way to check SYSTEM context, so ignoring it.
+
+    $fs = get_file_storage();
 
     $fileid = $args[0];
     $filename = $args[1];

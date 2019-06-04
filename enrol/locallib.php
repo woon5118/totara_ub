@@ -453,16 +453,31 @@ class course_enrolment_manager {
      * @return array Array(totalusers => int, users => array)
      */
     public function get_potential_users($enrolid, $search='', $searchanywhere=false, $page=0, $perpage=25, $addedenrollment=0) {
-        global $DB;
+        global $DB, $CFG;
 
         list($ufields, $params, $wherecondition) = $this->get_basic_search_conditions($search, $searchanywhere);
+
+        // Totara: restrict users to tenant participants
+        $tenantjoin = '';
+        $tenantwhere = '';
+        if (!empty($CFG->tenantsenabled)) {
+            if ($this->context->tenantid) {
+                $tenant = \core\record\tenant::fetch($this->context->tenantid);
+                $tenantjoin = "JOIN {cohort_members} tp ON tp.userid = u.id AND tp.cohortid = " . $tenant->cohortid;
+            } else {
+                if (!empty($CFG->tenantsisolated)) {
+                    $tenantwhere = 'AND u.tenantid IS NULL';
+                }
+            }
+        }
 
         $fields      = 'SELECT '.$ufields;
         $countfields = 'SELECT COUNT(1)';
         $sql = " FROM {user} u
+                 $tenantjoin
             LEFT JOIN {user_enrolments} ue ON (ue.userid = u.id AND ue.enrolid = :enrolid)
                 WHERE $wherecondition
-                      AND ue.id IS NULL";
+                      AND ue.id IS NULL $tenantwhere";
         $params['enrolid'] = $enrolid;
 
         return $this->execute_search_queries($search, $fields, $countfields, $sql, $params, $page, $perpage, $addedenrollment);
@@ -483,12 +498,28 @@ class course_enrolment_manager {
 
         list($ufields, $params, $wherecondition) = $this->get_basic_search_conditions($search, $searchanywhere);
 
+        // Totara: enforce tenant restriction.
+        $tenantjoin = '';
+        $tenantwhere = '';
+        if (!empty($CFG->tenantsenabled)) {
+            if ($this->context->tenantid) {
+                // If you there is a need to give roles to non-participants then add them as participants and remove them after adding the role here.
+                $tenant = \core\record\tenant::fetch($this->context->tenantid);
+                $tenantjoin = 'JOIN {cohort_members} tp ON tp.userid = u.id AND tp.cohortid = '. $tenant->cohortid;
+            } else {
+                if (!empty($CFG->tenantsisolated)) {
+                    $tenantwhere = 'AND u.tenantid IS NULL';
+                }
+            }
+        }
+
         $fields      = 'SELECT ' . $ufields;
         $countfields = 'SELECT COUNT(u.id)';
         $sql   = " FROM {user} u
+                   $tenantjoin
               LEFT JOIN {role_assignments} ra ON (ra.userid = u.id AND ra.contextid = :contextid)
                   WHERE $wherecondition
-                    AND ra.id IS NULL";
+                    AND ra.id IS NULL $tenantwhere";
         $params['contextid'] = $this->context->id;
 
         return $this->execute_search_queries($search, $fields, $countfields, $sql, $params, $page, $perpage);
@@ -942,7 +973,7 @@ class course_enrolment_manager {
     /**
      * Returns the course context
      *
-     * @return stdClass
+     * @return context
      */
     public function get_context() {
         return $this->context;
@@ -1126,10 +1157,15 @@ class course_enrolment_manager {
      * additional fields from $extrafields
      */
     private function prepare_user_for_display($user, $extrafields, $now) {
+        $course = $this->get_course();
+        $userpicture = new user_picture($user);
+        $userpicture->courseid = $course->id;
+        $userpicture->link = !empty(user_get_profile_url($user, $course));
+
         $details = array(
             'userid'              => $user->id,
-            'courseid'            => $this->get_course()->id,
-            'picture'             => new user_picture($user),
+            'courseid'            => $course->id,
+            'picture'             => $userpicture,
             'userfullnamedisplay' => fullname($user, has_capability('moodle/site:viewfullnames', $this->get_context())),
             'lastaccess'          => get_string('never'),
             'lastcourseaccess'    => get_string('never'),

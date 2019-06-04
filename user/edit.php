@@ -114,7 +114,7 @@ $personalcontext = context_user::instance($user->id);
 // Check access control.
 if ($user->id == $USER->id) {
     // Editing own profile - require_login() MUST NOT be used here, it would result in infinite loop!
-    if (!has_capability('moodle/user:editownprofile', $systemcontext)) {
+    if (!has_capability('moodle/user:editownprofile', $personalcontext)) {
         print_error('cannotedityourprofile', 'error', useredit_get_return_url($user, $returnto, $course, $customreturn));
     }
 
@@ -182,7 +182,7 @@ $user->imagefile = $draftitemid;
 // Create form.
 $formurl = new moodle_url($PAGE->url, array('returnto' => $returnto));
 if ($customreturn) {
-    $formurl->param('returnto', $customreturn);
+    $formurl->param('returnurl', $customreturn);
 }
 $userform = new user_edit_form($formurl, array(
     'editoroptions' => $editoroptions,
@@ -202,7 +202,7 @@ if ($usernew = $userform->get_data()) {
 
     $emailchangedhtml = '';
 
-    if ($CFG->emailchangeconfirmation) {
+    if ($CFG->emailchangeconfirmation and $user->id == $USER->id) { // Totara: send email change confirmation only when modifying own email
         // Users with 'moodle/user:update' can change their email address immediately.
         // Other users require a confirmation email.
         if (isset($usernew->email) and $user->email != $usernew->email && !has_capability('moodle/user:update', $systemcontext)) {
@@ -319,7 +319,7 @@ if ($usernew = $userform->get_data()) {
         redirect(new moodle_url('/admin/index.php'));
     }
 
-    if (!$emailchanged || !$CFG->emailchangeconfirmation) {
+    if ($emailchangedhtml === '') {
         redirect(useredit_get_return_url($user, $returnto, $course, $customreturn));
     }
 }

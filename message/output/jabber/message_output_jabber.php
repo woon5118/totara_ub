@@ -41,11 +41,21 @@ class message_output_jabber extends message_output {
      * @return true if ok, false if error
      */
     function send_message($eventdata){
-        global $CFG;
+        global $CFG, $DB;
 
         // Skip any messaging of suspended and deleted users.
         if ($eventdata->userto->auth === 'nologin' or $eventdata->userto->suspended or $eventdata->userto->deleted) {
             return true;
+        }
+
+        // Totara: make sure tenant is not suspended.
+        if ($eventdata->userto->id > 0) {
+            $usercontext = context_user::instance($eventdata->userto->id, IGNORE_MISSING);
+            if (!empty($usercontext->tenantid)) {
+                if ($DB->record_exists('tenant', ['id' => $usercontext->tenantid, 'suspended' => 1])) {
+                    return true;
+                }
+            }
         }
 
         if (!empty($CFG->noemailever)) {

@@ -47,7 +47,7 @@ $PAGE->set_context(context_user::instance($USER->id));
 $PAGE->navbar->includesettingsbase = true;
 
 $systemcontext = context_system::instance();
-require_capability('totara/core:editownquickaccessmenu', $systemcontext);
+require_capability('totara/core:editownquickaccessmenu', context_user::instance($USER->id));
 
 // Display page header.
 $settingsheading = get_string('quickaccessmenu:settingsheading', 'totara_core');

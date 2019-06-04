@@ -226,9 +226,10 @@ final class request {
      * @param int $id id of record from auth_approved_request table
      * @param string $custommessage custom message for user
      * @param bool $autoapprove true for automatic approval
+     * @param int|null $tenantid
      * @return int The new users id
      */
-    public static function approve_request($id, $custommessage, $autoapprove) {
+    public static function approve_request($id, $custommessage, $autoapprove, ?int $tenantid = null) {
         global $DB, $USER, $CFG;
         require_once("$CFG->dirroot/user/lib.php");
         require_once("$CFG->dirroot/user/profile/lib.php");
@@ -263,6 +264,7 @@ final class request {
         $user->confirmed = 1; // Approval supersedes email confirmation!
         $user->deleted = 0;
         $user->suspended = 0;
+        $user->tenantid = $tenantid;
 
         $trans = $DB->start_delegated_transaction();
 

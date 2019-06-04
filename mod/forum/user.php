@@ -83,8 +83,7 @@ if ($user->deleted) {
 
 $isloggedin = isloggedin();
 $isguestuser = $isloggedin && isguestuser();
-$isparent = !$iscurrentuser && $DB->record_exists('role_assignments', array('userid'=>$USER->id, 'contextid'=>$usercontext->id));
-$hasparentaccess = $isparent && has_all_capabilities(array('moodle/user:viewdetails', 'moodle/user:readuserposts'), $usercontext);
+$hasparentaccess = !$iscurrentuser && has_all_capabilities(array('moodle/user:viewalldetails', 'moodle/user:readuserposts'), $usercontext);
 
 // Check whether a specific course has been requested
 if ($isspecificcourse) {
@@ -135,7 +134,7 @@ if (empty($result->posts)) {
     // In either case we need to decide whether we can show personal information
     // about the requested user to the current user so we will execute some checks
 
-    $canviewuser = user_can_view_profile($user, null, $usercontext);
+    $canviewuser = user_can_view_profile($user, null);
 
     // Prepare the page title
     $pagetitle = get_string('noposts', 'mod_forum');

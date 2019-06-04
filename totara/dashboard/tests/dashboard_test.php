@@ -31,11 +31,8 @@ require_once($CFG->libdir . '/testing/generator/lib.php');
 /**
  * Test totara dashboard
  *
- * To test, run this from the command line from the $CFG->dirroot
- * vendor/bin/phpunit totara_dashboard_testcase
- *
  */
-class totara_dashboard_testcase extends advanced_testcase {
+class totara_dashboard_dashboard_testcase extends advanced_testcase {
     /**
      * Test creation of dashboard
      */

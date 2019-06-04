@@ -29,7 +29,7 @@
  * @return bool
  */
 function totara_job_can_view_job_assignments(stdClass $user, stdClass $course = null) {
-    global $CFG, $DB, $USER;
+    global $USER;
 
     if (empty($user->id)) {
         // Not a real boy... I mean user.
@@ -43,39 +43,17 @@ function totara_job_can_view_job_assignments(stdClass $user, stdClass $course = 
         // Guests don't have job assignments.
         return false;
     }
-    if ($user->deleted != '0') {
-        // They've obviously been deleted.
-        return false;
-    }
-
-    try {
-        $usercontext = context_user::instance($user->id);
-    } catch (Exception $e) {
+    $usercontext = context_user::instance($user->id, IGNORE_MISSING);
+    if (!$usercontext) {
         // user deleted
         return false;
     }
 
-    if ($user->id == $USER->id) {
-        if ($course) {
-            // Course included, follow the logic in user/view.php
-            $coursecontext = \context_course::instance($course->id);
-            return (is_viewing($coursecontext) || is_enrolled($coursecontext));
-        }
-        return true;
+    if (!user_can_view_profile($user, $course)) {
+        return false;
     }
 
-    require_once($CFG->dirroot . '/user/lib.php');
-    if (user_can_view_profile($user, $course, $usercontext)) {
-        return true;
-    }
-
-    // Final check, have they been given a role on the user. Dodgy hacky logic copied from user/view.php
-    if ($DB->record_exists('role_assignments', array('userid' => $USER->id, 'contextid' => $usercontext->id))
-        and has_capability('moodle/user:viewdetails', $usercontext)) {
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 /**
@@ -113,7 +91,7 @@ function totara_job_can_edit_job_assignments($userid) {
     }
 
     // Editing own job assignments and have capability to assign own job assignments.
-    if ($USER->id == $userid && has_capability('totara/hierarchy:assignselfposition', context_system::instance())) {
+    if ($USER->id == $userid && has_capability('totara/hierarchy:assignselfposition', $usercontext)) {
         return true;
     }
 

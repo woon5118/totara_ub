@@ -100,7 +100,7 @@ $allowedscheduledrecipients = explode(',', $allowedscheduledrecipients);
 
 $context = context_system::instance();
 $allow_audiences = in_array('audiences', $allowedscheduledrecipients) && has_capability('moodle/cohort:view', $context);
-$allow_systemusers = in_array('systemusers', $allowedscheduledrecipients) && has_capability('moodle/user:viewdetails', $context);
+$allow_systemusers = in_array('systemusers', $allowedscheduledrecipients) && has_capability('moodle/user:viewalldetails', $context);
 $allow_emailexternalusers = in_array('emailexternalusers', $allowedscheduledrecipients);
 $allow_sendtoself = in_array('sendtoself', $allowedscheduledrecipients) && $myscheduledreport;
 // Clean up.

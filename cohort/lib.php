@@ -79,7 +79,9 @@ function cohort_add_cohort($cohort, $addcollections=true) {
     $cohort->id = $DB->insert_record('cohort', $cohort);
     $cohort = $DB->get_record('cohort', array('id' => $cohort->id));
 
-    totara_cohort_increment_automatic_id($cohort->idnumber);
+    if ($cohort->component !== 'totara_tenant') {
+        totara_cohort_increment_automatic_id($cohort->idnumber);
+    }
 
     if ($addcollections) {
         // Add initial collections
@@ -119,6 +121,24 @@ function cohort_add_cohort($cohort, $addcollections=true) {
  */
 function cohort_update_cohort($cohort) {
     global $DB, $USER;
+
+    $oldcohort = $DB->get_record('cohort', ['id' => $cohort->id]);
+    if (!$oldcohort) {
+        // Nothing to do.
+        return;
+    }
+
+    // Totara: prevent some changes in Tenant participants audience.
+    if ($DB->record_exists('tenant', ['cohortid' => $cohort->id])) {
+        $cohort->cohorttype = '1'; // Static cohort always.
+        $cohort->component = 'totara_tenant';
+        $cohort->contextid = $oldcohort->contextid;
+    } else {
+        if (empty($cohort->contextid)) {
+            $cohort->contextid = $oldcohort->contextid;
+        }
+    }
+
     if (property_exists($cohort, 'component') and empty($cohort->component)) {
         // prevent NULLs
         $cohort->component = '';
@@ -151,6 +171,11 @@ function cohort_update_cohort($cohort) {
  */
 function cohort_delete_cohort($cohort) {
     global $DB;
+
+    // TOTARA: do not allow deleting of tenant categories!
+    if ($DB->record_exists('tenant', ['cohortid' => $cohort->id])) {
+        throw new coding_exception('Tenant audience cannot be deleted');
+    }
 
     if ($cohort->component) {
         // TODO: add component delete callback
@@ -309,7 +334,7 @@ function cohort_is_member($cohortid, $userid) {
  * @return array
  */
 function cohort_get_available_cohorts($currentcontext, $withmembers = 0, $offset = 0, $limit = 25, $search = '') {
-    global $DB;
+    global $DB, $CFG;
 
     $params = array();
 
@@ -369,9 +394,17 @@ function cohort_get_available_cohorts($currentcontext, $withmembers = 0, $offset
         $params = array_merge($params, $searchparams);
     }
 
+    $tenantcondition = '';
+    if (!empty($CFG->tenantsenabled)) {
+        if ($currentcontext->tenantid) {
+            $tenantcondition = "AND ctx.tenantid = {$currentcontext->tenantid}";
+        }
+    }
+
     if ($withmembers) {
         $sql = "SELECT " . str_replace('c.', 'cohort.', $fieldssql) . "
                   FROM {cohort} cohort
+                  JOIN {context} ctx ON ctx.id = cohort.contextid $tenantcondition
                   JOIN (SELECT $subfields
                           FROM {cohort} c $fromsql
                          WHERE $wheresql $groupbysql $havingsql
@@ -380,6 +413,7 @@ function cohort_get_available_cohorts($currentcontext, $withmembers = 0, $offset
     } else {
         $sql = "SELECT $fieldssql
                   FROM {cohort} c $fromsql
+                  JOIN {context} ctx ON ctx.id = c.contextid $tenantcondition
                  WHERE $wheresql
               ORDER BY c.name, c.idnumber";
     }
@@ -642,7 +676,7 @@ function cohort_edit_controls(context $context, moodle_url $currenturl) {
  * @param $cohorttype int
  */
 function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
-    global $CFG;
+    global $CFG, $USER;
 
     if ($cohort && totara_cohort_is_active($cohort)) {
         print html_writer::tag('div', '', array('class' => 'plan_box', 'style' => 'display:none;'));
@@ -665,7 +699,7 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
     $cohortcontext = context::instance_by_id($cohort->contextid, MUST_EXIST);
     $systemcontext = context_system::instance();
     $canmanage = has_capability('moodle/cohort:manage', $cohortcontext);
-    $canmanagerules = has_capability('totara/cohort:managerules', $cohortcontext);
+    $canmanagerules = (empty($USER->tenantid) && has_capability('totara/cohort:managerules', $cohortcontext));
     $cancreateplancohort = has_capability('totara/plan:cancreateplancohort', $systemcontext);
     $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext);
     $canassign = has_capability('moodle/cohort:assign', $cohortcontext);

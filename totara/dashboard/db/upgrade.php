@@ -142,5 +142,29 @@ function xmldb_totara_dashboard_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018050801, 'totara', 'dashboard');
     }
 
+    if ($oldversion < 2019083001) {
+
+        // Define field tenantid to be added to totara_dashboard.
+        $table = new xmldb_table('totara_dashboard');
+        $field = new xmldb_field('tenantid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'locked');
+
+        // Conditionally launch add field tenantid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define key tenantid (foreign) to be added to totara_dashboard.
+        $table = new xmldb_table('totara_dashboard');
+        $key = new xmldb_key('tenantid', XMLDB_KEY_FOREIGN, array('tenantid'), 'tenant', array('id'), 'restrict');
+
+        // Launch add key tenantid.
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Dashboard savepoint reached.
+        upgrade_plugin_savepoint(true, 2019083001, 'totara', 'dashboard');
+    }
+
     return true;
 }

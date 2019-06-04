@@ -308,6 +308,13 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return coursecat
      */
     public static function get_default() {
+        global $USER, $DB;
+
+        if (!empty($USER->tenantid)) {
+            $tenant = \core\record\tenant::fetch($USER->tenantid);
+            return self::get($tenant->categoryid);
+        }
+
         if ($visiblechildren = self::get(0)->get_children()) {
             $defcategory = reset($visiblechildren);
         } else {
@@ -472,6 +479,11 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         $newcategory = new stdClass();
         $newcategory->id = $this->id;
 
+        // Totara: prevent parameter mess-ups!
+        if (isset($data->id) and $data->id != $this->id) {
+            throw new coding_exception('Incorrect ID in data parameter');
+        }
+
         // Copy all description* fields regardless of whether this is form data or direct field update.
         foreach ($data as $key => $value) {
             if (preg_match("/^description/", $key)) {
@@ -514,6 +526,10 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
 
         if (isset($data->parent) && $data->parent != $this->parent) {
+            // TOTARA: do not allow change of parent!
+            if ($DB->record_exists('tenant', ['categoryid' => $this->id])) {
+                throw new coding_exception('Top level tenant categories cannot be moved');
+            }
             if ($changes) {
                 cache_helper::purge_by_event('changesincoursecat');
             }
@@ -548,15 +564,28 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
     /**
      * Checks if this course category is visible to current user
      *
-     * Please note that methods coursecat::get (without 3rd argumet),
+     * Please note that methods coursecat::get (without 3rd argument),
      * coursecat::get_children(), etc. return only visible categories so it is
      * usually not needed to call this function outside of this class
      *
      * @return bool
      */
     public function is_uservisible() {
-        return !$this->id || $this->visible ||
-                has_capability('moodle/category:viewhiddencategories', $this->get_context());
+        global $USER;
+
+        if (!$this->id) {
+            // Not created yet.
+            return true;
+        }
+
+        $context = $this->get_context();
+
+        // Totara: enforce standard tenant separation logic.
+        if ($context->is_user_access_prevented($USER->id)) {
+            return false;
+        }
+
+        return $this->visible || has_capability('moodle/category:viewhiddencategories', $context);
     }
 
     /**
@@ -1002,7 +1031,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return array
      */
     protected function get_not_visible_children_ids() {
-        global $DB;
+        global $DB, $CFG, $USER;
         $coursecatcache = cache::make('core', 'coursecat');
         if (($invisibleids = $coursecatcache->get('ic'. $this->id)) === false) {
             // We never checked visible children before.
@@ -1022,6 +1051,35 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                 foreach ($hidden as $id) {
                     if (!has_capability('moodle/category:viewhiddencategories', context_coursecat::instance($id))) {
                         $invisibleids[] = $id;
+                    }
+                }
+            }
+            if (!empty($CFG->tenantsenabled)) {
+                if ($this->id == 0) {
+                    // Top category is special, we need to apply tenant restrictions there.
+                    if (!isloggedin() or isguestuser()) {
+                        // No tenant categories!
+                        $tenantcats = $DB->get_fieldset_select('tenant', 'categoryid', "categoryid IS NOT NULL");
+                        $invisibleids = array_merge($invisibleids, $tenantcats);
+                        $invisibleids = array_unique($invisibleids);
+                    } else {
+                        $usercontext = context_user::instance($USER->id);
+                        if ($usercontext->tenantid) {
+                            if (empty($CFG->tenantsisolated)) {
+                                $othertenants = $DB->get_fieldset_select('tenant', 'categoryid', "categoryid IS NOT NULL AND id <> ?", [$usercontext->tenantid]);
+                                $invisibleids = array_merge($invisibleids, $othertenants);
+                                $invisibleids = array_unique($invisibleids);
+                            } else {
+                                $tenant = \core\record\tenant::fetch($usercontext->tenantid);
+                                $invisibleids = self::get_tree($this->id); // All are invisible except the tenant category.
+                                foreach ($invisibleids as $k => $v) {
+                                    if ($v == $tenant->categoryid) {
+                                        unset($invisibleids[$k]);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1175,65 +1233,36 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return bool
      */
     public static function has_capability_on_any($capabilities) {
-        global $DB;
         if (!isloggedin() || isguestuser()) {
             return false;
         }
-
-        if (!is_array($capabilities)) {
-            $capabilities = array($capabilities);
-        }
-        $keys = array();
-        foreach ($capabilities as $capability) {
-            $keys[$capability] = sha1($capability);
-        }
+        $capabilities = (array)$capabilities;
 
         /* @var cache_session $cache */
         $cache = cache::make('core', 'coursecat');
-        $hascapability = $cache->get_many($keys);
-        $needtoload = false;
-        foreach ($hascapability as $capability) {
-            if ($capability === '1') {
-                return true;
-            } else if ($capability === false) {
-                $needtoload = true;
-            }
-        }
-        if ($needtoload === false) {
-            // All capabilities were retrieved and the user didn't have any.
-            return false;
-        }
 
-        $haskey = null;
-        $fields = context_helper::get_preload_record_columns_sql('ctx');
-        $sql = "SELECT ctx.instanceid AS categoryid, $fields
-                      FROM {context} ctx
-                     WHERE contextlevel = :contextlevel
-                  ORDER BY depth ASC";
-        $params = array('contextlevel' => CONTEXT_COURSECAT);
-        $recordset = $DB->get_recordset_sql($sql, $params);
-        foreach ($recordset as $context) {
-            context_helper::preload_from_record($context);
-            $context = context_coursecat::instance($context->categoryid);
-            foreach ($capabilities as $capability) {
-                if (has_capability($capability, $context)) {
-                    $haskey = $capability;
-                    break 2;
-                }
+        // Totara: use improved access API instead of testing access in all categories one by one.
+        foreach ($capabilities as $capability) {
+            if (!$capinfo = get_capability_info($capability)) {
+                debugging('Capability "'.$capability.'" was not found! This has to be fixed in code.');
+                continue;
             }
-        }
-        $recordset->close();
-        if ($haskey === null) {
-            $data = array();
-            foreach ($keys as $key) {
-                $data[$key] = '0';
+            $key = 'caponany-' . sha1($capability);
+            $value = $cache->get($key);
+            if ($value === '1') {
+                return true;
             }
-            $cache->set_many($data);
-            return false;
-        } else {
-            $cache->set($haskey, '1');
-            return true;
+            if ($value !== false) {
+                continue;
+            }
+            // No value set yet.
+            if (has_capability_in_any_context($capability, [CONTEXT_COURSECAT])) {
+                $cache->set($key, '1');
+                return true;
+            }
+            $cache->set($key, '0');
         }
+        return false;
     }
 
     /**
@@ -1611,7 +1640,12 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return boolean
      */
     public function can_delete() {
+        global $DB;
         if (!$this->has_manage_capability()) {
+            return false;
+        }
+        // Totara: do not allow deleting of tenant categories.
+        if ($DB->record_exists('tenant', ['categoryid' => $this->id])) {
             return false;
         }
         return $this->parent_has_manage_capability();
@@ -1631,6 +1665,11 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         // Prevent deletion the default category.
         if (!$this->id || $CFG->defaultrequestcategory == $this->id) {
             // Fool-proof.
+            return false;
+        }
+
+        // Totara: do not allow deleting of tenant categories.
+        if ($DB->record_exists('tenant', ['categoryid' => $this->id])) {
             return false;
         }
 
@@ -1702,6 +1741,11 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         require_once($CFG->libdir.'/gradelib.php');
         require_once($CFG->libdir.'/questionlib.php');
         require_once($CFG->dirroot.'/cohort/lib.php');
+
+        // TOTARA: do not allow deleting of tenant categories!
+        if ($DB->record_exists('tenant', ['categoryid' => $this->id])) {
+            throw new coding_exception('Tenant category cannot be deleted');
+        }
 
         // Make sure we won't timeout when deleting a lot of courses.
         $settimeout = core_php_time_limit::raise();
@@ -1896,6 +1940,11 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         require_once($CFG->libdir.'/questionlib.php');
         require_once($CFG->dirroot.'/cohort/lib.php');
 
+        // TOTARA: do not allow deleting of tenant categories!
+        if ($DB->record_exists('tenant', ['categoryid' => $this->id])) {
+            throw new coding_exception('Tenant category cannot be deleted');
+        }
+
         // Get all objects and lists because later the caches will be reset so.
         // We don't need to make extra queries.
         $newparentcat = self::get($newparentid, MUST_EXIST, true);
@@ -2009,6 +2058,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return bool
      */
     public function can_change_parent($newparentcat) {
+        global $DB;
         if (!has_capability('moodle/category:manage', $this->get_context())) {
             return false;
         }
@@ -2022,6 +2072,10 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
         if ($newparentcat->id == $this->id || in_array($this->id, $newparentcat->get_parents())) {
             // Can not move to itself or it's own child.
+            return false;
+        }
+        // Totara: do not allow moving of tenant categories.
+        if ($DB->record_exists('tenant', ['categoryid' => $this->id])) {
             return false;
         }
         if ($newparentcat->id) {
@@ -2044,6 +2098,11 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      */
     protected function change_parent_raw(coursecat $newparentcat) {
         global $DB;
+
+        // TOTARA: do not allow moving of tenant categories!
+        if ($DB->record_exists('tenant', ['categoryid' => $this->id])) {
+            throw new coding_exception('Tenant category cannot be moved');
+        }
 
         $context = $this->get_context();
 
@@ -2372,6 +2431,10 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                         // No cap to view category, added to neither $baselist nor $thislist.
                         continue;
                     }
+                    // Totara: enforce tenant separation rules.
+                    if ($context->is_user_access_prevented()) {
+                        continue;
+                    }
                     $baselist[$record->id] = array(
                         'name' => format_string($record->name, true, array('context' => $context)),
                         'path' => $record->path
@@ -2397,7 +2460,11 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $thislist = array();
             foreach (array_keys($baselist) as $id) {
                 context_helper::preload_from_record($contexts[$id]);
-                if (has_all_capabilities($requiredcapability, context_coursecat::instance($id))) {
+                $context = context_coursecat::instance($id);
+                if ($context->is_user_access_prevented()) {
+                    continue;
+                }
+                if (has_all_capabilities($requiredcapability, $context)) {
                     $thislist[] = $id;
                 }
             }
@@ -2462,11 +2529,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                 }
             }
         }
-        $record->ctxid = $a['xi'];
-        $record->ctxpath = $a['xp'];
-        $record->ctxdepth = $record->depth + 1;
-        $record->ctxlevel = CONTEXT_COURSECAT;
-        $record->ctxinstance = $record->id;
+        // Totara: do NOT mess with context caches, only real records from database can be preloaded!!!!!!!!!!!!!!!
         return new coursecat($record, true);
     }
 

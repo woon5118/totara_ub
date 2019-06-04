@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->libdir/formslib.php");
+require_once($CFG->dirroot.'/blocks/totara_stats/locallib.php');
 
 class block_totara_stats_edit_form extends block_edit_form {
 

@@ -29,6 +29,7 @@ $string['assigncohorts'] = 'Assign new audiences';
 $string['assignedcohorts'] = 'Assigned audiences';
 $string['availability'] = 'Availability';
 $string['availableall'] = 'Available to all logged in users';
+$string['availablealltenant'] = 'Available to all tenant members';
 $string['availableaudience'] = 'Available only to the following audiences';
 $string['availableaudiencecnt'] = 'Assigned to {$a} audiences';
 $string['availablenone'] = 'Available to no users';

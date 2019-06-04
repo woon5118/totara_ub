@@ -817,6 +817,20 @@ class core_renderer extends renderer_base {
             $this->page->add_body_class('userswitchedrole');
         }
 
+        // Totara: add tenant body classes
+        if (!empty($USER->tenantid)) {
+            $tenant = \core\record\tenant::fetch($USER->tenantid);
+            $this->page->add_body_class('tenant-user');
+            $this->page->add_body_class('tenant-user-' . $tenant->id);
+            $this->page->add_body_class('tenant-user-' . $tenant->idnumber);
+        }
+        if (!empty($this->page->context->tenantid)) {
+            $tenant = \core\record\tenant::fetch($this->page->context->tenantid);
+            $this->page->add_body_class('tenant-context');
+            $this->page->add_body_class('tenant-context-' . $tenant->id);
+            $this->page->add_body_class('tenant-context-' . $tenant->idnumber);
+        }
+
         // Give themes a chance to init/alter the page object.
         $this->page->theme->init_page($this->page);
 
@@ -3706,7 +3720,7 @@ EOD;
             // If page context is NOT course, then check across all courses.
             $course = ($this->page->context->contextlevel == CONTEXT_COURSE) ? $this->page->course : null;
 
-            if (user_can_view_profile($user, $course)) {
+            if (user_get_profile_url($user, $course)) { // Totara: unlike user_can_view_profile() this falls back to system profile if user not enrolled.
                 // Use the user's full name if the heading isn't set.
                 if (!isset($heading)) {
                     $heading = fullname($user);
@@ -3715,7 +3729,10 @@ EOD;
                 $imagedata = $this->user_picture($user, array('size' => 100));
 
                 // Check to see if we should be displaying a message button.
-                if (!empty($CFG->messaging) && $USER->id != $user->id && has_capability('moodle/site:sendmessage', $context)) {
+                if (!empty($CFG->messaging) && isloggedin() && $USER->id != $user->id
+                    && has_capability('moodle/site:sendmessage', context_user::instance($USER->id))
+                    && (is_siteadmin() || \core_message\api::can_post_message($user, $USER))
+                ) {
                     $iscontact = !empty(message_get_contact($user->id));
                     $contacttitle = $iscontact ? 'removefromyourcontacts' : 'addtoyourcontacts';
                     $contacturlaction = $iscontact ? 'removecontact' : 'addcontact';

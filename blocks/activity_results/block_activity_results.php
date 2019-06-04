@@ -542,9 +542,10 @@ class block_activity_results extends block_base {
                             break;
                             default:
                             case B_ACTIVITYRESULTS_NAME_FORMAT_FULL:
-                                if (has_capability('moodle/user:viewdetails', $context)) {
-                                    $thisname = html_writer::link(new moodle_url('/user/view.php',
-                                        array('id' => $userid, 'course' => $courseid)), fullname($users[$userid]));
+                                if (user_can_view_profile($users[$userid], $courseid)) {
+                                    // Totara: we are interested in course profiles only here.
+                                    $thisname = html_writer::link(user_get_profile_url($users[$userid], $courseid),
+                                        fullname($users[$userid]));
                                 } else {
                                     $thisname = fullname($users[$userid]);
                                 }
@@ -605,9 +606,10 @@ class block_activity_results extends block_base {
                             break;
                             default:
                             case B_ACTIVITYRESULTS_NAME_FORMAT_FULL:
-                                if (has_capability('moodle/user:viewdetails', $context)) {
-                                    $thisname = html_writer::link(new moodle_url('/user/view.php',
-                                        array('id' => $userid, 'course' => $courseid)), fullname($users[$userid]));
+                                if (user_can_view_profile($users[$userid], $courseid)) {
+                                    // Totara: we are interested in course profiles only here.
+                                    $thisname = html_writer::link(user_get_profile_url($users[$userid], $courseid),
+                                        fullname($users[$userid]));
                                 } else {
                                     $thisname = fullname($users[$userid]);
                                 }

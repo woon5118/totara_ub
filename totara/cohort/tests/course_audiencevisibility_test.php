@@ -393,11 +393,15 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
         global $PAGE, $CFG;
         $visible = false;
 
-        if ($audiencevisibility) {
+        $coursecontext = context_course::instance($course->id);
+
+        if ($coursecontext->is_user_access_prevented($userid)) {
+            $access = false;
+        } else if ($audiencevisibility) {
             $access = check_access_audience_visibility('course', $course, $userid);
         } else {
             $access = $course->visible ||
-                has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id), $userid);
+                has_capability('moodle/course:viewhiddencourses', $coursecontext, $userid);
         }
 
         if ($CFG->catalogtype === 'enhanced') { // Enhanced catalog.

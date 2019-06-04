@@ -121,6 +121,7 @@ final class helper {
                 new group(
                     [
                         new item('coursemgmt', 'courses', 'admin', ['courses']),
+                        new item('coursecategories', 'courses', 'admin', ['courses']), // Special hack to let users access categories if they cannot access 'coursemgmt'.
                         new item('programmgmt', 'programs', 'totara_program', ['programs']),
                         new item('managecertifications', 'certifications', 'totara_certification', ['certifications']),
                         new item('managebadges', 'badges', 'badges', ['badges']),

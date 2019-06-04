@@ -58,7 +58,7 @@ if ($cohort->cohorttype == cohort::TYPE_DYNAMIC) {
 }
 $membercount = $DB->count_records('cohort_members', array('cohortid' => $cohort->id));
 
-$returnurl = new moodle_url('/cohort/index.php');
+$returnurl = new moodle_url('/cohort/index.php', ['contextid' => $context->id]);
 
 if (!$cancelurl) {
     $nourl = new moodle_url("$CFG->wwwroot/cohort/view.php", array('id'=>$cohort->id));
@@ -244,8 +244,10 @@ if ($cohort->cohorttype == cohort::TYPE_DYNAMIC) {
 echo $out;
 if ($canedit) {
     $cloneurl = new moodle_url("/cohort/view.php", array('id' => $cohort->id, 'clone' => 1));
-    $delurl = new moodle_url("/cohort/view.php", array('id' => $cohort->id, 'delete' => 1));
     echo $OUTPUT->single_button($cloneurl, get_string('clonethiscohort', 'totara_cohort'));
-    echo $OUTPUT->single_button($delurl, get_string('deletethiscohort', 'totara_cohort'));
+    if (!$DB->record_exists('tenant', ['cohortid' => $cohort->id])) {
+        $delurl = new moodle_url("/cohort/view.php", array('id' => $cohort->id, 'delete' => 1));
+        echo $OUTPUT->single_button($delurl, get_string('deletethiscohort', 'totara_cohort'));
+    }
 }
 echo $OUTPUT->footer();

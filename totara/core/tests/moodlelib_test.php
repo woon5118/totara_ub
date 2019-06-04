@@ -1227,4 +1227,58 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertFalse(user_not_fully_set_up($secadmin, false));
         $this->assertObjectNotHasAttribute('fullysetupaccount', $USER);
     }
+
+    /**
+     * Test more relaxed parameters.
+     */
+    public function test_user_can_view_profile() {
+        global $SITE;
+
+        $admin = get_admin();
+        $user1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
+
+        $this->setUser($admin);
+
+        $this->assertTrue(user_can_view_profile($user1));
+        $this->assertTrue(user_can_view_profile($user1, null));
+        $this->assertTrue(user_can_view_profile($user1, $SITE));
+        $this->assertTrue(user_can_view_profile($user1, $course1));
+        $this->assertTrue(user_can_view_profile($user1->id, $course1->id));
+    }
+
+    /**
+     * Test new function parameter handling, the logic is tested in \core_user_access_controller_testcase::test_get_profile_url().
+     */
+    public function test_user_get_profile_url() {
+        global $CFG, $SITE;
+
+        $admin = get_admin();
+        $user1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
+
+        $this->setUser($admin);
+
+        $url = user_get_profile_url($user1);
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id", $url->out(false));
+
+        $url = user_get_profile_url($user1, null);
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id", $url->out(false));
+
+        $url = user_get_profile_url($user1, $SITE);
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id", $url->out(false));
+
+        $url = user_get_profile_url($user1, $course1);
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/view.php?id=$user1->id&course=$course1->id", $url->out(false));
+
+        $url = user_get_profile_url($user1->id, $course1->id);
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $this->assertSame("$CFG->wwwroot/user/view.php?id=$user1->id&course=$course1->id", $url->out(false));
+    }
 }

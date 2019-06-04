@@ -1632,9 +1632,10 @@ class core_course_renderer extends plugin_renderer_base {
      * Invoked from /course/index.php
      *
      * @param int|stdClass|coursecat $category
+     * @return string
      */
     public function course_category($category) {
-        global $CFG;
+        global $CFG, $USER;
         require_once($CFG->libdir. '/coursecatlib.php');
         $coursecat = coursecat::get(is_object($category) ? $category->id : $category);
         $site = get_site();
@@ -1647,7 +1648,7 @@ class core_course_renderer extends plugin_renderer_base {
             $this->page->set_button($managebutton);
         }
         if (!$coursecat->id) {
-            if (coursecat::count_all() == 1) {
+            if (!empty($USER->tenantid) or coursecat::count_all() == 1) {
                 // There exists only one category in the system, do not display link to it
                 $coursecat = coursecat::get_default();
                 $strfulllistofcourses = get_string('fulllistofcourses');
@@ -1664,7 +1665,8 @@ class core_course_renderer extends plugin_renderer_base {
             $this->page->set_title($title);
 
             // Print the category selector
-            if (coursecat::count_all() > 1) {
+            $catlist = coursecat::make_categories_list();
+            if ($catlist) {
                 $output .= html_writer::start_tag('div', array('class' => 'categorypicker'));
                 $select = new single_select(new moodle_url('/course/index.php'), 'categoryid',
                         coursecat::make_categories_list(), $coursecat->id, null, 'switchcategory');
@@ -1745,6 +1747,18 @@ class core_course_renderer extends plugin_renderer_base {
         $output .= $this->container_end();
 
         return $output;
+    }
+
+    /**
+     * Listing of all course categories.
+     *
+     * @since Totara 13
+     */
+    public function all_categories() {
+        $chelper = new coursecat_helper();
+        $chelper->set_show_courses(core_course_renderer::COURSECAT_SHOW_COURSES_NONE);
+        $chelper->set_subcat_depth(100);
+        return $this->coursecat_tree($chelper, coursecat::get(0));
     }
 
     /**

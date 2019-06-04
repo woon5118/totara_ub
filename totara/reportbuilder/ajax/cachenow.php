@@ -29,6 +29,10 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/dialogs/dialog_content_cachenow.class.php');
 
+if (empty($CFG->enablereportcaching)) {
+    die;
+}
+
 /**
  * Start report generation using process fork when it possible
  *

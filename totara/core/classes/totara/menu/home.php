@@ -33,6 +33,17 @@ class home extends item {
         return '/index.php?redirect=0';
     }
 
+    protected function check_visibility() {
+        global $USER, $CFG;
+
+        if (!empty($USER->tenantid) and $CFG->tenantsisolated) {
+            // The front page is not accessible when tenant isolation is active.
+            return false;
+        }
+
+        return true;
+    }
+
     public function get_default_sortorder() {
         return 10000;
     }

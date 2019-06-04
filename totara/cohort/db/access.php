@@ -25,8 +25,9 @@
 $capabilities = array(
     'totara/cohort:managerules' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
+        'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            // Do not add tenantdomainmanager here, we have no way to restrict them!
         )
     ));

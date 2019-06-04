@@ -61,6 +61,8 @@ final class access {
             $userid = is_object($user) ? $user->id : intval($user);
         }
 
+        $tenantwhere = '';
+
         // Capability must exist.
         if (!$capinfo = get_capability_info($capability)) {
             debugging('Capability "'.$capability.'" was not found! This has to be fixed in code.', DEBUG_DEVELOPER);
@@ -77,11 +79,26 @@ final class access {
                 return array("1=0", array());
             }
 
+            if (!empty($CFG->tenantsenabled)) {
+                $tenantwhere = "AND hascapabilitycontext.tenantid IS NULL";
+            }
+
         } else {
             // Make sure that the user exists and is not deleted.
             $usercontext = \context_user::instance($userid, IGNORE_MISSING);
             if (!$usercontext) {
                 return array("1=0", array());
+            }
+
+            if (!empty($CFG->tenantsenabled)) {
+                if ($usercontext->tenantid) {
+                    // NOTE: ignore top level block contexts exceptions here.
+                    if (!empty($CFG->tenantsisolated)) {
+                        $tenantwhere = "AND hascapabilitycontext.tenantid = " . $usercontext->tenantid;
+                    } else {
+                        $tenantwhere = "AND (hascapabilitycontext.tenantid = " . $usercontext->tenantid . " OR hascapabilitycontext.tenantid IS NULL)";
+                    }
+                }
             }
         }
 
@@ -98,7 +115,7 @@ final class access {
 EXISTS (
     SELECT 'x'
       FROM {context} hascapabilitycontext
-     WHERE hascapabilitycontext.id = {$contextidfield}
+     WHERE hascapabilitycontext.id = {$contextidfield} $tenantwhere
 
        AND EXISTS (
 {$allowpreventsql}

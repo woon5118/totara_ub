@@ -2947,6 +2947,31 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         $cmcontext = null;
     }
 
+    // Totara: enforce tenant separation.
+    if ($coursecontext->is_user_access_prevented()) {
+        if (isguestuser()) {
+            if ($preventredirect) {
+                throw new require_login_exception('Cannot access course');
+            }
+            if ($setwantsurltome) {
+                $SESSION->wantsurl = qualified_me();
+            }
+            $referer = get_local_referer(false);
+            if (!empty($referer)) {
+                $SESSION->fromurl = $referer;
+            }
+            redirect(get_login_url());
+        }
+        // Do not block access to frontpage course because they will not see much there,
+        // but some other scripts might use require_login() without $course parameter.
+        if ($cm or $course->id != SITEID) {
+            if ($preventredirect) {
+                throw new require_login_exception('Cannot access course');
+            }
+            redirect(new moodle_url('/'));
+        }
+    }
+
     // If the site is currently under maintenance, then print a message.
     if (!empty($CFG->maintenance_enabled) and !has_capability('moodle/site:maintenanceaccess', $sysctx)) {
         if ($preventredirect) {
@@ -3285,7 +3310,7 @@ function require_course_login($courseorid, $autologinguest = true, $cm = null, $
  * @return int Instance ID
  */
 function require_user_key_login($script, $instance=null) {
-    global $DB;
+    global $DB, $CFG;
 
     if (!NO_MOODLE_COOKIES) {
         print_error('sessioncookiesdisable');
@@ -3311,8 +3336,18 @@ function require_user_key_login($script, $instance=null) {
         }
     }
 
-    if (!$user = $DB->get_record('user', array('id' => $key->userid))) {
+    if (!$user = $DB->get_record('user', array('id' => $key->userid, 'deleted' => 0, 'suspended' => 0))) {
         print_error('invaliduserid');
+    }
+    if ($user->auth === 'nologin') {
+        print_error('invaliduserid');
+    }
+
+    // Totara: prevent
+    if ($user->tenantid) {
+        if (!$DB->record_exists('tenant', ['id' => $user->tenantid, 'active' => 1])) {
+            print_error('invaliduserid');
+        }
     }
 
     // Emulate normal session.
@@ -3505,9 +3540,13 @@ function user_not_fully_set_up($user, $strict = true) {
         // because these requirements are not real hard limits to use of system,
         // match the access control used in user/edit.php page.
         // Ignore external profile editing pages, because we have no control over that.
+        $usercontext = context_user::instance($user->id, IGNORE_MISSING);
+        if (!$usercontext) {
+            return false;
+        }
         if (exists_auth_plugin($user->auth)) {
             $auth = get_auth_plugin($user->auth);
-            if ($auth->can_edit_profile() and has_capability('moodle/user:editownprofile', context_system::instance(), $user)) {
+            if ($auth->can_edit_profile() and has_capability('moodle/user:editownprofile', $usercontext, $user)) {
                 // Finally we know user may fix their own profile.
                 return true;
             }
@@ -3611,6 +3650,57 @@ function ismoving($courseid) {
         return ($USER->activitycopycourse == $courseid);
     }
     return false;
+}
+
+/**
+ * Check if the current user has permission to view details of the supplied user.
+ *
+ * This function supports two modes:
+ * If the optional $course param is omitted, then this function finds all shared courses and checks whether the current user has
+ * permission in any of them, returning true if so.
+ * If the $course param is provided, then this function checks permissions in ONLY that course.
+ *
+ * NOTE: this function does not check is target user is actually enrolled in course,
+ *       it is recommended to use user_get_profile_url() instead.
+ *
+ * Totara: this was moved here from user/lib.php to eliminate unnecessary includes.
+ *
+ * @param int|stdClass $userorid The other user's details.
+ * @param int|stdClass|null $courseorid if provided check access to coruse profile.
+ * @param context $ignoredusercontext Do not use, user context is not expected any more
+ * @return bool true for ability to view this user, else false.
+ */
+function user_can_view_profile($userorid, $courseorid = null, $ignoredusercontext = null): bool {
+    if (!$userorid) {
+        return false;
+    }
+    if (is_object($userorid)) {
+        $access = \core_user\access_controller::for($userorid, $courseorid);
+    } else {
+        $access = \core_user\access_controller::for_user_id($userorid, $courseorid);
+    }
+    return $access->can_view_profile();
+}
+
+/**
+ * Returns either course or system profile page URL for given user if accessible for current user.
+ *
+ * @since Totara 13
+ *
+ * @param int|stdClass $userorid
+ * @param int|stdClass|null $courseorid
+ * @return moodle_url|null
+ */
+function user_get_profile_url($userorid, $courseorid = null): ?moodle_url {
+    if (!$userorid) {
+        return null;
+    }
+    if (is_object($userorid)) {
+        $access = \core_user\access_controller::for($userorid, $courseorid);
+    } else {
+        $access = \core_user\access_controller::for_user_id($userorid, $courseorid);
+    }
+    return $access->get_profile_url();
 }
 
 /**
@@ -4600,7 +4690,9 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
         $event = \core\event\user_login_failed::create(array('userid' => $user->id,
             'other' => array('username' => $username, 'reason' => $failurereason)));
         $event->trigger();
-        error_log('[client '.getremoteaddr()."]  $CFG->wwwroot  Invalid Login Token:  $username  ".$_SERVER['HTTP_USER_AGENT']);
+        if (!PHPUNIT_TEST) {
+            error_log('[client ' . getremoteaddr() . "]  $CFG->wwwroot  Invalid Login Token:  $username  " . $_SERVER['HTTP_USER_AGENT']);
+        }
         return false;
     }
 
@@ -4622,7 +4714,9 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
             $event = \core\event\user_login_failed::create(array('userid' => $user->id,
                     'other' => array('username' => $username, 'reason' => $failurereason)));
             $event->trigger();
-            error_log('[client '.getremoteaddr()."]  $CFG->wwwroot  Suspended Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
+            if (!PHPUNIT_TEST) {
+                error_log('[client '.getremoteaddr()."]  $CFG->wwwroot  Suspended Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
+            }
             return false;
         }
         if ($auth=='nologin' or !is_enabled_auth($auth)) {
@@ -4633,8 +4727,25 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
             $event = \core\event\user_login_failed::create(array('userid' => $user->id,
                     'other' => array('username' => $username, 'reason' => $failurereason)));
             $event->trigger();
-            error_log('[client '.getremoteaddr()."]  $CFG->wwwroot  Disabled Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
+            if (!PHPUNIT_TEST) {
+                error_log('[client ' . getremoteaddr() . "]  $CFG->wwwroot  Disabled Login:  $username  " . $_SERVER['HTTP_USER_AGENT']);
+            }
             return false;
+        }
+        // Totara: do not allow log-ins from inactive tenants
+        if ($user->tenantid) {
+            if (empty($CFG->tenantsenabled) or !$DB->record_exists('tenant', ['id' => $user->tenantid, 'suspended' => 0])) {
+                // Legacy way to suspend user.
+                $failurereason = AUTH_LOGIN_SUSPENDED;
+                // Trigger login failed event.
+                $event = \core\event\user_login_failed::create(array('userid' => $user->id,
+                    'other' => array('username' => $username, 'reason' => $failurereason)));
+                $event->trigger();
+                if (!PHPUNIT_TEST) {
+                    error_log('[client ' . getremoteaddr() . "]  $CFG->wwwroot  Suspended Tenant Login:  $username  " . $_SERVER['HTTP_USER_AGENT']);
+                }
+                return false;
+            }
         }
         $auths = array($auth);
 
@@ -4647,7 +4758,9 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
             $event = \core\event\user_login_failed::create(array('other' => array('username' => $username,
                     'reason' => $failurereason)));
             $event->trigger();
-            error_log('[client '.getremoteaddr()."]  $CFG->wwwroot  Deleted Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
+            if (!PHPUNIT_TEST) {
+                error_log('[client ' . getremoteaddr() . "]  $CFG->wwwroot  Deleted Login:  $username  " . $_SERVER['HTTP_USER_AGENT']);
+            }
             return false;
         }
 
@@ -4670,7 +4783,9 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
                     'other' => array('username' => $username, 'reason' => $failurereason)));
             $event->trigger();
 
-            error_log('[client '.getremoteaddr()."]  $CFG->wwwroot  Login lockout:  $username  ".$_SERVER['HTTP_USER_AGENT']);
+            if (!PHPUNIT_TEST) {
+                error_log('[client ' . getremoteaddr() . "]  $CFG->wwwroot  Login lockout:  $username  " . $_SERVER['HTTP_USER_AGENT']);
+            }
             return false;
         }
     } else {
@@ -4712,8 +4827,9 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
                         'reason' => $failurereason)));
                 $event->trigger();
 
-                error_log('[client '.getremoteaddr()."]  $CFG->wwwroot  Unknown user, can not create new accounts:  $username  ".
-                        $_SERVER['HTTP_USER_AGENT']);
+                if (!PHPUNIT_TEST) {
+                    error_log('[client ' . getremoteaddr() . "]  $CFG->wwwroot  Unknown user, can not create new accounts:  $username  " . $_SERVER['HTTP_USER_AGENT']);
+                }
                 return false;
             } else {
                 $user = create_user_record($username, $password, $auth);
@@ -4743,7 +4859,9 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
             $event = \core\event\user_login_failed::create(array('userid' => $user->id,
                     'other' => array('username' => $username, 'reason' => $failurereason)));
             $event->trigger();
-            error_log('[client '.getremoteaddr()."]  $CFG->wwwroot  Suspended Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
+            if (!PHPUNIT_TEST) {
+                error_log('[client ' . getremoteaddr() . "]  $CFG->wwwroot  Suspended Login:  $username  " . $_SERVER['HTTP_USER_AGENT']);
+            }
             return false;
         }
 
@@ -4754,7 +4872,9 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
 
     // Failed if all the plugins have failed.
     if (debugging('', DEBUG_ALL)) {
-        error_log('[client '.getremoteaddr()."]  $CFG->wwwroot  Failed Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
+        if (!PHPUNIT_TEST) {
+            error_log('[client ' . getremoteaddr() . "]  $CFG->wwwroot  Failed Login:  $username  " . $_SERVER['HTTP_USER_AGENT']);
+        }
     }
 
     if ($user->id) {
@@ -6109,7 +6229,7 @@ function generate_email_messageid($localpart = null) {
 function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', $attachment = '', $attachname = '',
                        $usetrueaddress = true, $replyto = '', $replytoname = '', $wordwrapwidth = 79) {
 
-    global $CFG, $PAGE, $SITE;
+    global $CFG, $PAGE, $SITE, $DB;
 
     // Totara: RTL hack that is not in upstream...
     if ($messagehtml && right_to_left()) {
@@ -6129,8 +6249,7 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     // Totara: make sure developers included all necessary fields in $user object.
     if ($user->id > 0) {
         if (!isset($user->deleted) or !isset($user->suspended) or !isset($user->auth) or !isset($user->mailformat)) {
-            global $DB;
-            $u = $DB->get_record('user', array('id' => $user->id), 'id, deleted, suspended, auth, mailformat', IGNORE_MISSING);
+            $u = $DB->get_record('user', array('id' => $user->id), 'id, deleted, suspended, auth, mailformat, tenantid', IGNORE_MISSING);
             if ($u) {
                 // Note: it is ok to add missing fields to user object, because they may be getting more emails,
                 //       ideally there should be a debugging message in the future.
@@ -6146,6 +6265,14 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
                 if (!isset($user->mailformat)) {
                     $user->mailformat = $u->mailformat;
                 }
+                $user->tenantid = $u->tenantid;
+            }
+        }
+        // Totara: make sure we have tenantid too, getting it via context should be cheaper than DB read.
+        if (!property_exists($user, 'tenantid')) {
+            $usercontext = context_user::instance($user->id, IGNORE_MISSING);
+            if ($usercontext) {
+                $user->tenantid = $usercontext->tenantid;
             }
         }
     }
@@ -6178,6 +6305,13 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     if ((isset($user->auth) && $user->auth=='nologin') or (isset($user->suspended) && $user->suspended)) {
         // Totara: this does not work properly without the hack above because devs keep forgetting to add these fields.
         return true;
+    }
+
+    // Totara: make sure tenant is not suspended.
+    if (!empty($user->tenantid)) {
+        if ($DB->record_exists('tenant', ['id' => $user->tenantid, 'suspended' => 1])) {
+            return true;
+        }
     }
 
     if (!validate_email($user->email)) {
@@ -6722,7 +6856,8 @@ function send_password_change_info($user) {
         $data->link = '';
     }
 
-    if (!empty($data->link) and has_capability('moodle/user:changeownpassword', $systemcontext, $user->id)) {
+    $usercontext = context_user::instance($user->id);
+    if (!empty($data->link) and has_capability('moodle/user:changeownpassword', $usercontext, $user->id)) {
         $message = $strmgr->get_string('emailpasswordchangeinfo', 'moodle', $data, $user->lang);
         $subject = $strmgr->get_string('emailpasswordchangeinfosubject', 'moodle', format_string($site->fullname), $user->lang);
     } else {
@@ -10235,6 +10370,11 @@ function get_home_page() {
 
     if (totara_feature_disabled('totaradashboard')) {
         return HOMEPAGE_SITE;
+    }
+
+    if (!empty($USER->tenantid) and $CFG->tenantsisolated) {
+        // The front page is not accessible when tenant isolation is active.
+        return HOMEPAGE_TOTARA_DASHBOARD;
     }
 
     if (empty($CFG->allowdefaultpageselection)) {

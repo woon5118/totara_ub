@@ -22,11 +22,30 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+/** @var admin_root $ADMIN */
+/** @var context_system $systemcontext */
 
-$ADMIN->add('certifications', new admin_externalpage('managecertifications', new lang_string('managecertifications', 'totara_core'),
-    $CFG->wwwroot . '/totara/program/manage.php?viewtype=certification',
-    array('totara/certification:createcertification', 'totara/certification:configurecertification'),
-    totara_feature_disabled('certifications')
-));
+$certificationsenabled = totara_feature_disabled('certifications');
+
+if (has_any_capability(['totara/certification:createcertification', 'totara/certification:configurecertification'], $systemcontext)) {
+    $ADMIN->add('certifications', new admin_externalpage('managecertifications',
+        new lang_string('managecertifications', 'totara_core'),
+        $CFG->wwwroot . '/totara/program/manage.php?viewtype=certification',
+        ['totara/certification:createcertification', 'totara/certification:configurecertification'],
+        $certificationsenabled
+    ));
+} else if (!empty($USER->tenantid)) {
+    $tenant = core\record\tenant::fetch($USER->tenantid);
+    $categorycontext = context_coursecat::instance($tenant->categoryid);
+    if (has_any_capability(['totara/certification:createcertification', 'totara/certification:configurecertification'], $categorycontext)) {
+        $ADMIN->add('certifications', new admin_externalpage('managecertifications',
+            new lang_string('managecertifications', 'totara_core'),
+            $CFG->wwwroot . '/totara/program/manage.php?viewtype=certification&categoryid=' . $tenant->categoryid,
+            ['totara/certification:createcertification', 'totara/certification:configurecertification'],
+            $certificationsenabled,
+            $categorycontext
+        ));
+    }
+}
 
 // TODO create link to custom fields.

@@ -82,6 +82,7 @@ class totara_reportbuilder_rb_jobassignment_cache_testcase extends reportcache_a
      * tests that filters of the type job_assignment can be added to the report
      */
     public function test_cache_filters() {
+        set_config('enablereportcaching', 1);
         $this->resetAfterTest();
         $this->enable_caching($this->report_builder_data['id']);
         $this->assertSame(RB_CACHE_FLAG_OK, $this->get_report_cache_status($this->report_builder_data['id'], array()));
@@ -109,6 +110,7 @@ class totara_reportbuilder_rb_jobassignment_cache_testcase extends reportcache_a
      */
     public function test_cache_job_assignment_sql_collsion(){
         $this->resetAfterTest();
+        set_config('enablereportcaching', 1);
         $this->enable_caching($this->report_builder_data['id']);
         $this->assertSame(RB_CACHE_FLAG_OK, $this->get_report_cache_status($this->report_builder_data['id'], array()));
 

@@ -127,6 +127,7 @@ class rb_source_user extends rb_base_source {
      * @return array
      */
     protected function define_joinlist() {
+        global $CFG;
 
         $joinlist = array(
             new rb_join(
@@ -205,6 +206,17 @@ class rb_source_user extends rb_base_source {
             'user_extra.deletedpurgetypeid = deleted_purge_type.id',
             null,
             'user_extra');
+
+        // Special join intended to be used for 'participantstenantid' parameter only.
+        if (!empty($CFG->tenantsenabled)) {
+            $joinlist[] = new rb_join(
+                'tenant_participants',
+                'INNER',
+                '(SELECT t.id AS tenantid, cm.userid
+                    FROM {tenant} t
+                    JOIN {cohort_members} cm ON cm.cohortid = t.cohortid)',
+                'base.id = tenant_participants.userid');
+        }
 
         $this->add_totara_job_tables($joinlist, 'base', 'id');
 
@@ -662,9 +674,9 @@ class rb_source_user extends rb_base_source {
         }
 
         $usercontext = context_user::instance($userid, MUST_EXIST);
-        $show_profile_link = user_can_view_profile($row, null, $usercontext);
+        $show_profile_link = user_can_view_profile($row, null);
 
-        $user_pic = $OUTPUT->user_picture($row, array('courseid' => 1, 'link' => $show_profile_link));
+        $user_pic = $OUTPUT->user_picture($row, array('courseid' => SITEID, 'link' => $show_profile_link));
 
         $recordstr = get_string('records', 'rb_source_user');
         $requiredstr = get_string('required', 'rb_source_user');
@@ -741,12 +753,26 @@ class rb_source_user extends rb_base_source {
     }
 
     protected function define_paramoptions() {
+        global $CFG;
+
         $paramoptions = array(
             new rb_param_option(
                 'deleted',
                 'base.deleted'
             ),
+            new rb_param_option(
+                'tenantid',
+                'base.tenantid'
+            ),
         );
+
+        if (!empty($CFG->tenantsenabled)) {
+            $paramoptions[] = new rb_param_option(
+                'participantstenantid',
+                'tenant_participants.tenantid',
+                'tenant_participants'
+            );
+        }
 
         return $paramoptions;
     }

@@ -142,15 +142,10 @@ class totara_reportbuilder_rb_cohort_admin_embedded_cache_testcase extends repor
      * - Check that cohort2 has four memebrs
      * - Check that cohort3 has zero members
      *
-     * @param int $usecache Use cache or not (1/0)
-     * @dataProvider provider_use_cache
      */
-    public function test_cohort_admin($usecache) {
+    public function test_cohort_admin() {
         $this->resetAfterTest();
-        if ($usecache) {
-            $this->enable_caching($this->report_builder_data['id']);
-        }
-        $result = $this->get_report_result($this->report_builder_data['shortname'], array(), $usecache);
+        $result = $this->get_report_result($this->report_builder_data['shortname'], array(), false);
         $this->assertCount(3, $result);
         $was = array();
         foreach ($result as $r) {

@@ -51,8 +51,9 @@ class core_role_admins_potential_selector extends user_selector_base {
         $fields      = 'SELECT ' . $this->required_fields_sql('');
         $countfields = 'SELECT COUNT(1)';
 
+        // Totara: tenant users must not be administrators
         $sql = " FROM {user}
-                WHERE $wherecondition AND mnethostid = :localmnet";
+                WHERE $wherecondition AND mnethostid = :localmnet AND tenantid IS NULL";
 
         // It could be dangerous to make remote users admins and also this could lead to other problems.
         $params['localmnet'] = $CFG->mnet_localhost_id;

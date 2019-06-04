@@ -67,6 +67,9 @@ class core_course_editcategory_form extends moodleform {
         }
 
         $mform->addElement('select', 'parent', get_string('parentcategory'), $options);
+        if ($categoryid and $DB->record_exists('tenant', ['categoryid' => $categoryid])) {
+            $mform->hardFreeze('parent');
+        }
 
         $mform->addElement('text', 'name', get_string('categoryname'), array('size' => '30'));
         $mform->addRule('name', get_string('required'), 'required', null);
@@ -93,7 +96,7 @@ class core_course_editcategory_form extends moodleform {
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
         $mform->setDefault('id', $categoryid);
-     
+
         $mform->addElement('hidden', 'type', $type);
         $mform->setType('type', PARAM_TEXT);
 

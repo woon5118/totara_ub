@@ -41,6 +41,10 @@ if (!$categoryid) {
     }
 }
 
+if ($CFG->forcelogin) {
+    require_login();
+}
+
 // Check if programs or certifications are enabled.
 if ($viewtype == 'program') {
     check_program_enabled();
@@ -50,11 +54,12 @@ if ($viewtype == 'program') {
 
 $site = get_site();
 
+$category = null;
 if ($categoryid) {
     $PAGE->set_category_by_id($categoryid);
     $PAGE->set_url(new moodle_url('/totara/program/index.php', array('categoryid' => $categoryid, 'viewtype' => $viewtype)));
     $PAGE->set_pagetype('course-index-category');
-    $category = $PAGE->category;
+    $category = coursecat::get($categoryid);
     // Add program breadcrumbs.
     $navname = $viewtype == 'program' ? get_string('programs', 'totara_program') : get_string('certifications', 'totara_certification');
     $PAGE->navbar->add($navname, new moodle_url('/totara/program/index.php', ['viewtype' => $viewtype]));
@@ -64,7 +69,7 @@ if ($categoryid) {
     }
 } else {
     // Check if there is only one category, if so use that.
-    if (coursecat::count_all() == 1) {
+    if (!empty($USER->tenantid) or coursecat::count_all() == 1) {
         $category = coursecat::get_default();
         $categoryid = $category->id;
         $PAGE->set_category_by_id($categoryid);
@@ -78,11 +83,7 @@ if ($categoryid) {
 $PAGE->set_pagelayout('coursecategory');
 $programrenderer = $PAGE->get_renderer('totara_program');
 
-if ($CFG->forcelogin) {
-    require_login();
-}
-
-if ($categoryid && !$category->visible && !has_capability('moodle/category:viewhiddencategories', $PAGE->context)) {
+if ($category and !$category->is_uservisible()) {
     throw new moodle_exception('unknowncategory');
 }
 

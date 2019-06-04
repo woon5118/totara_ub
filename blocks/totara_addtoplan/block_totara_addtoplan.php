@@ -92,4 +92,3 @@ class block_totara_addtoplan extends block_base {
     }
 
 }
-?>

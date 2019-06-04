@@ -651,8 +651,9 @@ if ($mode === MODE_USERDETAILS) {    // Print simple listing.
 
             $usercontext = context_user::instance($user->id);
 
-            if ($piclink = ($USER->id == $user->id || has_capability('moodle/user:viewdetails', $context) || has_capability('moodle/user:viewdetails', $usercontext))) {
-                $profilelink = '<strong><a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$course->id.'">'.fullname($user).'</a></strong>';
+            $profileurl = user_get_profile_url($user, $course);
+            if ($profileurl) {
+                $profilelink = '<strong><a href="'.$profileurl.'">'.fullname($user).'</a></strong>';
             } else {
                 $profilelink = '<strong>'.fullname($user).'</strong>';
             }
@@ -667,7 +668,7 @@ if ($mode === MODE_USERDETAILS) {    // Print simple listing.
                 // TL-6296: added aria-label
                 $data[] = '<input type="checkbox" class="usercheckbox" name="user'.$user->id.'" ' . $checked .' aria-label="' . get_string('select', 'grades', fullname($user)) . '"/>';
             }
-            $data[] = $OUTPUT->user_picture($user, array('size' => 35, 'courseid' => $course->id));
+            $data[] = $OUTPUT->user_picture($user, array('size' => 35, 'courseid' => $course->id, 'link' => !empty($profileurl)));
             $data[] = $profilelink;
 
             if ($mode === MODE_BRIEF) {

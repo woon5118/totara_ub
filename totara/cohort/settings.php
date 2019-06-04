@@ -22,10 +22,24 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+/** @var admin_root $ADMIN */
+/** @var context_system $systemcontext */
 
 global $COHORT_ALERT;
 
-$ADMIN->add('audiences', new admin_externalpage('cohorts', new lang_string('cohorts', 'cohort'), $CFG->wwwroot . '/cohort/index.php', array('moodle/cohort:manage', 'moodle/cohort:view')));
+$syscontext = context_system::instance();
+
+if (has_capability('moodle/cohort:view', $syscontext)) {
+    $ADMIN->add('audiences', new admin_externalpage('cohorts', new lang_string('cohorts', 'cohort'),
+        $CFG->wwwroot . '/cohort/index.php', 'moodle/cohort:view'));
+} else if (!empty($USER->tenantid)) {
+    $tenant = core\record\tenant::fetch($USER->tenantid);
+    $categorycontext = context_coursecat::instance($tenant->categoryid);
+    if (has_capability('moodle/cohort:view', $categorycontext)) {
+        $ADMIN->add('audiences', new admin_externalpage('cohorts', new lang_string('cohorts', 'cohort'),
+            $CFG->wwwroot . '/cohort/index.php?contextid=' . $categorycontext->id, 'moodle/cohort:view', false, $categorycontext));
+    }
+}
 
 $globalsettings = new admin_settingpage('cohortglobalsettings', new lang_string('cohortglobalsettings', 'totara_cohort'), 'moodle/cohort:manage');
 $globalsettings->add(new admin_setting_configmulticheckbox('cohort/alertoptions',

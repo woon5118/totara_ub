@@ -16,7 +16,7 @@ Feature: Test the embedded scheduled reports report source.
     And the following "permission overrides" exist:
       | capability                                  | permission | role                   | contextlevel | reference |
       | moodle/cohort:view                          | Allow      | ScheduledReportManager | System       |           |
-      | moodle/user:viewdetails                     | Allow      | ScheduledReportManager | System       |           |
+      | moodle/user:viewalldetails                  | Allow      | ScheduledReportManager | System       |           |
       | totara/reportbuilder:managescheduledreports | Allow      | ScheduledReportManager | System       |           |
       | totara/reportbuilder:manageembeddedreports  | Allow      | EmbeddedReportManager  | System       |           |
     And the following "role assigns" exist:

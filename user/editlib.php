@@ -89,7 +89,7 @@ function useredit_setup_preference_page($userid, $courseid) {
     // Check access control.
     if ($user->id == $USER->id) {
         // Editing own profile - require_login() MUST NOT be used here, it would result in infinite loop!
-        if (!has_capability('moodle/user:editownprofile', $systemcontext)) {
+        if (!has_capability('moodle/user:editownprofile', $personalcontext)) {
             print_error('cannotedityourprofile');
         }
 
@@ -359,10 +359,12 @@ function useredit_shared_definition(&$mform, $editoroptions, $filemanageroptions
             $mform->addElement('html', html_writer::tag('p', get_string('gravatarenabled')));
         }
 
-        $mform->addElement('static', 'currentpicture', get_string('currentpicture'));
+        if ($user->id > 0) {
+            $mform->addElement('static', 'currentpicture', get_string('currentpicture'));
 
-        $mform->addElement('checkbox', 'deletepicture', get_string('delete'));
-        $mform->setDefault('deletepicture', 0);
+            $mform->addElement('checkbox', 'deletepicture', get_string('delete'));
+            $mform->setDefault('deletepicture', 0);
+        }
 
         $mform->addElement('filemanager', 'imagefile', get_string('newpicture'), '', $filemanageroptions);
         $mform->addHelpButton('imagefile', 'newpicture');

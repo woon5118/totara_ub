@@ -112,6 +112,7 @@ $string['seeall'] = 'See all';
 $string['selectmessagestodelete'] = 'Select messages to delete';
 $string['selectnotificationtoview'] = 'Select from the list of notifications on the side to view more details';
 $string['send'] = 'Send';
+$string['sendnotallowed'] = 'You are not allowed to send messages to this user'; // Totara: displayed when user cannot for some reason send message to user
 $string['sendingvia'] = 'Sending "{$a->provider}" via "{$a->processor}"';
 $string['sendingviawhen'] = 'Sending "{$a->provider}" via "{$a->processor}" when {$a->state}';
 $string['sendmessage'] = 'Send message';

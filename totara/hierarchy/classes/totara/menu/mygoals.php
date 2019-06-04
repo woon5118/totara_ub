@@ -47,6 +47,10 @@ class mygoals extends \totara_core\totara\menu\item {
             return false;
         }
 
+        if (!empty($USER->tenantid)) {
+            return false;
+        }
+
         static $cache = null;
 
         if (isset($cache)) {

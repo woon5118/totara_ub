@@ -63,10 +63,8 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     // Add core nodes.
     // Full profile node.
     if (!empty($course)) {
-        if (empty($CFG->forceloginforprofiles) || $iscurrentuser ||
-            has_capability('moodle/user:viewdetails', $usercontext)
-            || has_coursecontact_role($user->id)) {
-            $url = new moodle_url('/user/profile.php', array('id' => $user->id));
+        $url = user_get_profile_url($user);
+        if ($url) {
             $node = new core_user\output\myprofile\node('miscellaneous', 'fullprofile', get_string('fullprofile'), null, $url);
             $tree->add_node($node);
         }
@@ -82,7 +80,7 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
                 null, null, 'editprofile');
             $tree->add_node($node);
         } else if ((has_capability('moodle/user:editprofile', $usercontext) && !is_siteadmin($user))
-                   || ($iscurrentuser && has_capability('moodle/user:editownprofile', $systemcontext))) {
+                   || ($iscurrentuser && has_capability('moodle/user:editownprofile', $usercontext))) {
             $userauthplugin = false;
             if (!empty($user->auth)) {
                 $userauthplugin = get_auth_plugin($user->auth);
@@ -124,7 +122,7 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     }
 
     // Login as ...
-    if (!$user->deleted && !$iscurrentuser &&
+    if (!$user->deleted && !$iscurrentuser && !$courseorsystemcontext->tenantid && empty($USER->tenantid) && // Totara: not usable in tenant contexts and by tenant users
                 !\core\session\manager::is_loggedinas() && has_capability('moodle/user:loginas',
                 $courseorsystemcontext) && !is_siteadmin($user->id)) {
         $url = new moodle_url('/course/loginas.php',
@@ -145,6 +143,37 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $url = new moodle_url('/totara/userdata/export_request.php');
         $node = new  core_user\output\myprofile\node('administration', 'userdataexport', get_string('exportrequest', 'totara_userdata'), null, $url);
         $tree->add_node($node);
+    }
+
+
+    // Totara: add tenant info.
+    if (!empty($CFG->tenantsenabled) and !isguestuser($user) && !is_mnet_remote_user($user)) {
+        $editaction = '';
+        if (has_capability('totara/tenant:manageparticipants', $systemcontext)) {
+            $editurl = new \moodle_url('/totara/tenant/participant_manage.php', array('id' => $user->id));
+            $editaction = $OUTPUT->action_icon($editurl, new \core\output\flex_icon('settings', array('alt' => get_string('participantmanage', 'totara_tenant'))));
+        }
+        if ($user->tenantid) {
+            $tenant = \core\record\tenant::fetch($user->tenantid);
+            $node = new core_user\output\myprofile\node('contact', 'tenant', get_string('tenantmember', 'totara_tenant'), null, null, format_string($tenant->name) . $editaction);
+            $tree->add_node($node);
+        } else if (empty($USER->tenantid)) { // Hide participation info when tenant user looks
+            $sql = 'SELECT t.id, t.name
+                      FROM "ttr_tenant" t
+                      JOIN "ttr_cohort" c ON c.id = t.cohortid
+                      JOIN "ttr_cohort_members" cm ON cm.cohortid = c.id
+                     WHERE cm.userid = :userid
+                  ORDER BY t.name ASC';
+            $tenants = $DB->get_records_sql_menu($sql, ['userid' => $user->id]);
+            if ($tenants) {
+                $tenants = implode(', ', $tenants);
+                $tenants = format_string($tenants);
+            } else {
+                $tenants = get_string('no');
+            }
+            $node = new core_user\output\myprofile\node('contact', 'tenant', get_string('participant', 'totara_tenant'), null, null, $tenants . $editaction);
+            $tree->add_node($node);
+        }
     }
 
     // Contact details.

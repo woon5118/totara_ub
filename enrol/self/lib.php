@@ -290,6 +290,12 @@ class enrol_self_plugin extends enrol_plugin {
             }
         }
 
+        // Enforce tenant restrictions.
+        $coursecontext = context_course::instance($instance->courseid);
+        if ($coursecontext->is_user_access_prevented()) {
+            return get_string('canntenrol', 'enrol_self');
+        }
+
         if ($instance->status != ENROL_INSTANCE_ENABLED) {
             return get_string('canntenrol', 'enrol_self');
         }

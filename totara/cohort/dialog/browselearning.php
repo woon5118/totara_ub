@@ -28,15 +28,14 @@ require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_programs.class.p
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_certifications.class.php');
 require_once("{$CFG->dirroot}/cohort/lib.php");
 
-$sitecontext = context_system::instance();
-$PAGE->set_context($sitecontext);
 require_login();
-require_capability('moodle/cohort:manage', $sitecontext);
+require_capability('moodle/cohort:manage', context_system::instance());
 
 $cohortid = required_param('cohortid', PARAM_INT);
 $type = required_param('type', PARAM_INT);
 $value = optional_param('v', COHORT_ASSN_VALUE_ENROLLED, PARAM_INT);
 $categoryid = optional_param('parentid', 'cat0', PARAM_ALPHANUM); // Category id
+$contextid = optional_param('contextid', 0, PARAM_INT);
 // Strip cat from begining of categoryid
 $categoryid = (int) substr($categoryid, 3);
 
@@ -47,6 +46,13 @@ foreach ($assigned as $item) {
     $selected[$item->instanceid] = $item;
 }
 unset($assigned);
+
+if ($contextid) {
+    $context = context::instance_by_id($contextid);
+} else {
+    $context = context_system::instance();
+}
+$PAGE->set_context($context);
 
 ///
 /// Setup dialog

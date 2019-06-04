@@ -15,7 +15,7 @@ Feature: Test the generation of scheduled reports events.
       | capability                                  | permission | role                   | contextlevel | reference |
       | totara/reportbuilder:managescheduledreports | Allow      | ScheduledReportManager | System       |           |
       | moodle/cohort:view                          | Allow      | ScheduledReportManager | System       |           |
-      | moodle/user:viewdetails                     | Allow      | ScheduledReportManager | System       |           |
+      | moodle/user:viewalldetails                  | Allow      | ScheduledReportManager | System       |           |
     And the following "role assigns" exist:
       | user | role                   | contextlevel | reference |
       | srm  | ScheduledReportManager | System       |           |

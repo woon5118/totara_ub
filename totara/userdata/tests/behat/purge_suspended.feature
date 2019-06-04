@@ -25,6 +25,7 @@ Feature: Suspended user data purging
       | totara/core:seedeletedusers       | Allow      | datamanager| System       |           |
       | moodle/user:update                | Allow      | datamanager| System       |           |
       | moodle/user:delete                | Allow      | datamanager| System       |           |
+      | moodle/user:viewalldetails        | Allow      | datamanager| System       |           |
 
   Scenario: Automatic suspended user data purging
     Given I log in as "manager"

@@ -3266,7 +3266,7 @@ function tag_print_user_box($user, $return=false) {
     $usercontext = context_user::instance($user->id);
     $profilelink = '';
 
-    if ($usercontext and (has_capability('moodle/user:viewdetails', $usercontext) || has_coursecontact_role($user->id))) {
+    if ($usercontext and (has_capability('moodle/user:viewalldetails', $usercontext) || has_coursecontact_role($user->id))) {
         $profilelink = $CFG->wwwroot .'/user/view.php?id='. $user->id;
     }
 

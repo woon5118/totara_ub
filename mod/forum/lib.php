@@ -5248,7 +5248,7 @@ function forum_user_can_see_post($forum, $discussion, $post, $user = null, $cm =
     }
 
     $canviewdiscussion = !empty($cm->cache->caps['mod/forum:viewdiscussion']) || has_capability('mod/forum:viewdiscussion', $modcontext, $user->id);
-    if (!$canviewdiscussion && !has_all_capabilities(array('moodle/user:viewdetails', 'moodle/user:readuserposts'), context_user::instance($post->userid))) {
+    if (!$canviewdiscussion && !has_all_capabilities(array('moodle/user:viewalldetails', 'moodle/user:readuserposts'), context_user::instance($post->userid))) {
         return false;
     }
 
@@ -7431,15 +7431,14 @@ function forum_get_posts_by_user($user, array $courses, $musthaveaccess = false,
     // user and if so they have the capabilities required to view the requested
     // users content.
     $usercontext = context_user::instance($user->id, MUST_EXIST);
-    $hascapsonuser = !$iscurrentuser && $DB->record_exists('role_assignments', array('userid' => $USER->id, 'contextid' => $usercontext->id));
-    $hascapsonuser = $hascapsonuser && has_all_capabilities(array('moodle/user:viewdetails', 'moodle/user:readuserposts'), $usercontext);
+    $hasparentaccess = !$iscurrentuser && has_all_capabilities(array('moodle/user:viewalldetails', 'moodle/user:readuserposts'), $usercontext);
 
     // Before we actually search each course we need to check the user's access to the
     // course. If the user doesn't have the appropraite access then we either throw an
     // error if a particular course was requested or we just skip over the course.
     foreach ($courses as $course) {
         $coursecontext = context_course::instance($course->id, MUST_EXIST);
-        if ($iscurrentuser || $hascapsonuser) {
+        if ($iscurrentuser || $hasparentaccess) {
             // If it is the current user, or the current user has capabilities to the
             // requested user then all we need to do is check the requested users
             // current access to the course.
@@ -7558,13 +7557,13 @@ function forum_get_posts_by_user($user, array $courses, $musthaveaccess = false,
             // Check that either the current user can view the forum, or that the
             // current user has capabilities over the requested user and the requested
             // user can view the discussion
-            if (!has_capability('mod/forum:viewdiscussion', $cm->context) && !($hascapsonuser && has_capability('mod/forum:viewdiscussion', $cm->context, $user->id))) {
+            if (!has_capability('mod/forum:viewdiscussion', $cm->context) && !($hasparentaccess && has_capability('mod/forum:viewdiscussion', $cm->context, $user->id))) {
                 continue;
             }
 
             // This will contain forum specific where clauses
             $forumsearchselect = array();
-            if (!$iscurrentuser && !$hascapsonuser) {
+            if (!$iscurrentuser && !$hasparentaccess) {
                 // Make sure we check group access
                 if (groups_get_activity_groupmode($cm, $course) == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $cm->context)) {
                     $groups = $modinfo->get_groups($cm->groupingid);

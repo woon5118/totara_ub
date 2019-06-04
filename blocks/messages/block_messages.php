@@ -69,9 +69,17 @@ class block_messages extends block_base {
             $this->content->text .= '<ul class="list">';
             foreach ($users as $user) {
                 $timeago = format_time(time() - $user->lastaccess);
-                $this->content->text .= '<li class="listentry"><div class="user"><a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.SITEID.'" title="'.$timeago.'">';
-                $this->content->text .= $OUTPUT->user_picture($user, array('courseid'=>SITEID)); //TODO: user might not have capability to view frontpage profile :-(
-                $this->content->text .= fullname($user).'</a></div>';
+                $profileurl = user_get_profile_url($user);
+                $this->content->text .= '<li class="listentry"><div class="user">';
+                if ($profileurl) {
+                    $this->content->text .= '<a href="' . $profileurl . '" title="' . $timeago . '">';
+                }
+                $this->content->text .= $OUTPUT->user_picture($user, ['link' => false]);
+                $this->content->text .= fullname($user);
+                if ($profileurl) {
+                    $this->content->text .= '</a>';
+                }
+                $this->content->text .= '</div>';
 
                 $link = '/message/index.php?usergroup=unread&id='.$user->id;
                 $anchortagcontents = $OUTPUT->flex_icon('comment') . '&nbsp;'.$user->count;

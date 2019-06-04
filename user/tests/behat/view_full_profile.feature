@@ -25,22 +25,25 @@ Feature: Access to full profiles of users
   Scenario: Viewing full profiles with default settings
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    # Another student's full profile is not visible
+    # Another student's full profile IS visible, previously the link was missing. Sharing course means you can view their full profile.
     And I navigate to course participants
     And I follow "Student 2"
-    Then I should not see "Full profile"
+    And I follow "Full profile"
+    Then I should see "First access to site"
+
     # Teacher's full profile is visible
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to course participants
     And I follow "Teacher 1"
     And I follow "Full profile"
-    And I should see "First access to site"
+    Then I should see "First access to site"
+
     # Own full profile is visible
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I navigate to course participants
     And I click on "Student 1" "link" in the "#participants" "css_element"
     And I follow "Full profile"
-    And I should see "First access to site"
+    Then I should see "First access to site"
 
   @javascript
   Scenario: Viewing full profiles with forceloginforprofiles off
@@ -53,6 +56,7 @@ Feature: Access to full profiles of users
     And I follow "Full profile"
     Then I should see "First access to site"
 
+  @javascript
   Scenario: Viewing full profiles with global permission
     Given I log in as "admin"
     And I set the following system permissions of "Authenticated user" role:

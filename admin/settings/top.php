@@ -1,5 +1,11 @@
 <?php
 
+defined('MOODLE_INTERNAL') || die();
+
+global $USER;
+
+/** @var admin_root $ADMIN */
+
 // This is the first file read by the lib/adminlib.php script
 // We use it to create the categories in correct order,
 // since they need to exist *before* settingpages and externalpages

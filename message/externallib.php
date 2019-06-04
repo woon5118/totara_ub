@@ -81,7 +81,7 @@ class core_message_external extends external_api {
         // Ensure the current user is allowed to run this function
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('moodle/site:sendmessage', $context);
+        require_capability('moodle/site:sendmessage', context_user::instance($USER->id));
 
         $params = self::validate_parameters(self::send_instant_messages_parameters(), array('messages' => $messages));
 
@@ -141,6 +141,12 @@ class core_message_external extends external_api {
                 $success = false;
                 $errormessage = get_string('userisblockingyounoncontact', 'message',
                         fullname(core_user::get_user($message['touserid'])));
+            }
+
+            // Totara: Make sure sending is actually allowed to recipient!
+            if (!\core_message\api::can_post_message($tousers[$message['touserid']], $USER)) {
+                $success = false;
+                $errormessage = get_string('sendnotallowed', 'message');
             }
 
             //now we can send the message (at least try)
@@ -2327,7 +2333,8 @@ class core_message_external extends external_api {
         // Check access control.
         if ($user->id == $USER->id) {
             // Editing own message profile.
-            require_capability('moodle/user:editownmessageprofile', $systemcontext);
+            $personalcontext = context_user::instance($user->id);
+            require_capability('moodle/user:editownmessageprofile', $personalcontext);
         } else {
             // Teachers, parents, etc.
             $personalcontext = context_user::instance($user->id);

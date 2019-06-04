@@ -101,6 +101,11 @@ switch ($context->contextlevel) {
     case CONTEXT_SYSTEM:
         print_error('cannotoverridebaserole', 'error');
         break;
+    case CONTEXT_TENANT:
+        $tenant = \core\record\tenant::fetch($context->instanceid);
+        $PAGE->set_heading($tenant->name);
+        $PAGE->set_cacheable(false);
+        break;
     case CONTEXT_USER:
         $fullname = fullname($user, has_capability('moodle/site:viewfullnames', $context));
         $PAGE->set_heading($fullname);

@@ -23,7 +23,7 @@
  * @category  files
  * @param stdClass $course course object
  * @param stdClass $birecord_or_cm block instance record
- * @param stdClass $context context object
+ * @param context $context context object
  * @param string $filearea file area
  * @param array $args extra arguments
  * @param bool $forcedownload whether or not force download
@@ -31,10 +31,21 @@
  * @return bool
  * @todo MDL-36050 improve capability check on stick blocks, so we can check user capability before sending images.
  */
-function block_html_pluginfile($course, $birecord_or_cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+function block_html_pluginfile($course, $birecord_or_cm, context $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $DB, $CFG, $USER;
 
     if ($context->contextlevel != CONTEXT_BLOCK) {
+        send_file_not_found();
+    }
+
+    $blockinstance = $DB->get_record('block_instances', ['id' => $context->instanceid]);
+    if (!$blockinstance) {
+        send_file_not_found();
+    }
+
+    // Get parent context and see if user have proper permission.
+    $parentcontext = $context->get_parent_context();
+    if (!$parentcontext) {
         send_file_not_found();
     }
 
@@ -43,25 +54,36 @@ function block_html_pluginfile($course, $birecord_or_cm, $context, $filearea, $a
         require_course_login($course);
     } else if ($CFG->forcelogin) {
         require_login();
-    } else {
-        // Get parent context and see if user have proper permission.
-        $parentcontext = $context->get_parent_context();
-        if ($parentcontext->contextlevel === CONTEXT_COURSECAT) {
-            // Check if category is visible and user can view this category.
-            $category = $DB->get_record('course_categories', array('id' => $parentcontext->instanceid), '*', MUST_EXIST);
-            if (!$category->visible) {
-                require_capability('moodle/category:viewhiddencategories', $parentcontext);
-            }
-        } else if ($parentcontext->contextlevel === CONTEXT_USER && $parentcontext->instanceid != $USER->id) {
-            // The block is in the context of a user, it is only visible to the user who it belongs to.
-            send_file_not_found();
-        }
-        // At this point there is no way to check SYSTEM context, so ignoring it.
     }
 
-    if ($filearea !== 'content') {
+    if ($context->is_user_access_prevented()) {
         send_file_not_found();
     }
+
+    // NOTE: temporary fix for TL-21682
+    $forcedownload = false;
+    if ($parentcontext->contextlevel == CONTEXT_COURSECAT) {
+        // Check if category is visible and user can view this category.
+        $category = coursecat::get($parentcontext->instanceid);
+        if (!$category->is_uservisible()) {
+            send_file_not_found();
+        }
+    } else if ($parentcontext->contextlevel == CONTEXT_USER) {
+        // force download on all personal pages including /my/
+        // because we do not have reliable way to find out from where this is used
+        $forcedownload = true;
+        if ($parentcontext->instanceid != $USER->id) {
+            if ($blockinstance->pagetypepattern !== 'user-profile') {
+                // There is only one page that can be viewed by other users where users can customise blocks,
+                // it is their public profile page.
+                send_file_not_found();
+            }
+            if (!user_can_view_profile($parentcontext->instanceid)) {
+                send_file_not_found();
+            }
+        }
+    }
+    // At this point there is no way to check SYSTEM context, so ignoring it.
 
     $fs = get_file_storage();
 
@@ -72,19 +94,8 @@ function block_html_pluginfile($course, $birecord_or_cm, $context, $filearea, $a
         send_file_not_found();
     }
 
-    if ($parentcontext = context::instance_by_id($birecord_or_cm->parentcontextid, IGNORE_MISSING)) {
-        if ($parentcontext->contextlevel == CONTEXT_USER) {
-            // force download on all personal pages including /my/
-            //because we do not have reliable way to find out from where this is used
-            $forcedownload = true;
-        }
-    } else {
-        // weird, there should be parent context, better force dowload then
-        $forcedownload = true;
-    }
-
-    // NOTE: it woudl be nice to have file revisions here, for now rely on standard file lifetime,
-    //       do not lower it because the files are dispalyed very often.
+    // NOTE: it would be nice to have file revisions here, for now rely on standard file lifetime,
+    //       do not lower it because the files are displayed very often.
     \core\session\manager::write_close();
     send_stored_file($file, null, 0, $forcedownload, $options);
 }

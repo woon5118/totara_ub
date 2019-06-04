@@ -77,7 +77,11 @@ if (!$id) {
     if (!$dashboard->is_locked() && $userpageid) {
         $context = context_user::instance($USER->id);
     } else {
-        $context = context_system::instance();
+        if ($dashboard->tenantid) {
+            $context = context_tenant::instance($dashboard->tenantid);
+        } else {
+            $context = context_system::instance();
+        }
         $userpageid = 'default';
     }
 
@@ -125,9 +129,7 @@ if (!$id) {
                 // editing on, copy the system pages as new user pages, and get the
                 // new page record.
                 $userpageid = $dashboard->user_copy($userid);
-                $context = context_user::instance($userid);
-                $PAGE->set_context($context);
-                $PAGE->set_subpage($userpageid);
+                redirect(new moodle_url($PAGE->url, ['id' => $id]));
             }
         } else { // Editing state is in session.
             if ($userpageid != 'default') {

@@ -76,6 +76,13 @@ class totara_dashboard {
     public $sortorder = 0;
 
     /**
+     * Tenant id
+     *
+     * @var int|null
+     */
+    public $tenantid = null;
+
+    /**
      * Assigned cohorts
      *
      * @var array of int id's
@@ -107,7 +114,7 @@ class totara_dashboard {
      * @return array of dashboard records
      */
     public static function get_user_dashboards($userid) {
-        global $DB;
+        global $DB, $CFG;
 
         // If dashboards are disabled then return an empty array
         // so redirects are done where necessary.
@@ -129,15 +136,52 @@ class totara_dashboard {
             list($cohortlistsql, $cohortsparams) = $DB->get_in_or_equal($cohorts, SQL_PARAMS_NAMED);
             $cohortsql = 'tdc.cohortid ' . $cohortlistsql;
         }
+
+        // Add tenant restrictions.
+        $tenantwhere = "";
+        $tenantjoin = "";
+        $tenantidfirst = null;
+        if (!empty($CFG->tenantsenabled)) {
+            $tenantjoin = "LEFT JOIN {tenant} t ON t.id = td.tenantid";
+            $usercontext = context_user::instance($userid, IGNORE_MISSING);
+            if ($usercontext and $usercontext->tenantid) {
+                if ($CFG->tenantsisolated) {
+                    $tenantwhere = "AND td.tenantid = :tenantid";
+                    $cohortsparams['tenantid'] = $usercontext->tenantid;
+                } else {
+                    $tenantwhere = "AND (td.tenantid = :tenantid OR td.tenantid IS NULL)";
+                    $cohortsparams['tenantid'] = $usercontext->tenantid;
+                    $tenantidfirst = $usercontext->tenantid;
+                }
+            }
+            $tenantwhere .= " AND (td.tenantid IS NULL OR t.suspended = 0)";
+        } else {
+            $tenantwhere = "AND td.tenantid IS NULL";
+        }
+
         // Check relevant dashboards.
         $sql = "SELECT DISTINCT td.*
-                FROM {totara_dashboard} td
-                LEFT JOIN {totara_dashboard_cohort} tdc ON (tdc.dashboardid = td.id)
-                WHERE ($cohortsql OR td.published = 2)
-                  AND td.published > 0
-                ORDER BY td.sortorder
+                  FROM {totara_dashboard} td
+             LEFT JOIN {totara_dashboard_cohort} tdc ON (tdc.dashboardid = td.id)
+           $tenantjoin
+                 WHERE ($cohortsql OR td.published = 2)
+                       AND td.published > 0
+                       $tenantwhere
+              ORDER BY td.sortorder
                ";
         $results = $DB->get_records_sql($sql, $cohortsparams);
+        if ($tenantidfirst) {
+            // Make sure tenant members always get some tenant dashboard as default.
+            $tenantdashboards = [];
+            foreach ($results as $k => $td) {
+                if ($td->tenantid == $tenantidfirst) {
+                    $tenantdashboards[$k] = $td;
+                    unset($results[$k]);
+                }
+            }
+            $results = $tenantdashboards + $results;
+        }
+
         $cache->set('user_' . $userid, $results);
         return $results;
     }
@@ -160,6 +204,7 @@ class totara_dashboard {
         $this->published = $record->published;
         $this->locked = $record->locked;
         $this->sortorder = $record->sortorder;
+        $this->tenantid = $record->tenantid;
     }
 
     /**
@@ -264,6 +309,7 @@ class totara_dashboard {
         $instance->published = (int)$this->published;
         $instance->locked = (int)$this->locked;
         $instance->sortorder = (int)$this->sortorder;
+        $instance->tenantid = $this->tenantid;
         $instance->cohorts = implode(',', $this->get_cohorts());
 
         return $instance;
@@ -304,6 +350,13 @@ class totara_dashboard {
                     }
                 }
                 $this->cohorts = $exploded;
+            }
+        }
+        if (empty($data->id)) {
+            if (!empty($data->tenantid)) {
+                $this->tenantid = $data->tenantid;
+            } else {
+                $this->tenantid = null;
             }
         }
         return $this;
@@ -402,86 +455,95 @@ class totara_dashboard {
      * This method clones the dashboard including its blocks, their configuration, and any assigned audiences.
      * It does NOT clone any user customisations of this dashboard.
      *
+     * @param string|null $dashboardname
+     * @param int|null $tenantid
      * @return int The id of the newly created dashboard.
      */
-    public function clone_dashboard() {
+    public function clone_dashboard(string $dashboardname = null, int $tenantid = null) {
         global $DB;
 
-        // First create the dashboard record.
-        $dashboard = $DB->get_record('totara_dashboard', array('id' => $this->id));
+        $trans = $DB->start_delegated_transaction();
+
+        $olddashboard = $DB->get_record('totara_dashboard', array('id' => $this->id), '*', MUST_EXIST);
+        if ($olddashboard->tenantid) {
+            $oldcontext = context_tenant::instance($olddashboard->tenantid);
+        } else {
+            $oldcontext = context_system::instance();
+        }
+
+        if ($tenantid) {
+            $tenant = \core\record\tenant::fetch($tenantid);
+            $context = $tenant->context;
+        } else {
+            if ($olddashboard->tenantid) {
+                // Clone into the same tenant.
+                $tenant = \core\record\tenant::fetch($olddashboard->tenantid);
+                $context = $tenant->context;
+            } else {
+                $tenant = null;
+                $context = context_system::instance();
+            }
+        }
+
+        // First clone the dashboard record.
+        $dashboard = clone($olddashboard);
         unset($dashboard->id);
-        $dashboard->name = $this->generate_clone_name();
+        $dashboard->name = empty($dashboardname) ? $this->generate_clone_name() : $dashboardname;
+        $dashboard->tenantid = $tenant ? $tenant->id : null;
+        if ($tenant) {
+            $dashboard->published = totara_dashboard::AUDIENCE;
+        }
+        // Add to the end.
+        $dashboard->sortorder = $DB->get_field('totara_dashboard', "MAX(sortorder) + 1", []);
         $dashboard->id = $DB->insert_record('totara_dashboard', $dashboard);
-        // Move the newly created dashboard to the end of the list.
-        db_reorder($dashboard->id, -1, 'totara_dashboard');
 
-        // Now copy across the blocks and their content.
-        $context = context_system::instance();
-        $sql = "SELECT
-                    bi.*,
-                    bp.blockinstanceid,
-                    bp.contextid,
-                    bp.pagetype,
-                    bp.subpage,
-                    bp.visible,
-                    bp.region,
-                    bp.weight
-                FROM {block_instances} bi
-                LEFT JOIN {block_positions} bp ON bp.blockinstanceid = bi.id
-                WHERE parentcontextid = :parentcontextid AND pagetypepattern = :pagetypepattern
-                ORDER BY bi.id";
+        // Now copy across the blocks and their content. exclude user customisations.
         $params = array(
-            'parentcontextid' => $context->id,
-            'pagetypepattern' => 'totara-dashboard-' . $this->id
+            'parentcontextid' => $oldcontext->id,
+            'pagetypepattern' => 'totara-dashboard-' . $olddashboard->id
         );
-        $blockinstances = $DB->get_records_sql($sql, $params);
-        if ($blockinstances) {
-            foreach ($blockinstances as $bi) {
-                // Clone block record.
-                $block = new stdClass();
-                // Amend the page type pattern to the newly cloned dashboard.
-                $block->pagetypepattern = 'totara-dashboard-' . $dashboard->id;
-                $block->blockname = $bi->blockname;
-                $block->parentcontextid = $bi->parentcontextid;
-                $block->showinsubcontexts = $bi->showinsubcontexts;
-                $block->subpagepattern = $bi->subpagepattern;
-                $block->defaultregion = $bi->defaultregion;
-                $block->defaultweight = $bi->defaultweight;
-                $block->configdata = $bi->configdata;
-                $block->common_config = $bi->common_config;
-                // Create the new block record.
-                $block->id = $DB->insert_record('block_instances', $block);
+        $blockinstances = $DB->get_records('block_instances', $params, 'id ASC');
+        foreach ($blockinstances as $bi) {
+            $block = clone($bi);
+            unset($block->id);
+            $block->parentcontextid = $context->id;
+            $block->pagetypepattern = 'totara-dashboard-' . $dashboard->id;
+            $block->id = $DB->insert_record('block_instances', $block);
 
-                // If block position exists then clone it too.
-                if ($bi->blockinstanceid) {
-                    $bp = new stdClass();
-                    $bp->blockinstanceid = $block->id;
-                    $bp->contextid = $bi->contextid;
-                    $bp->pagetype  = $block->pagetypepattern;
-                    $bp->subpage   = $bi->subpage;
-                    $bp->visible   = $bi->visible;
-                    $bp->region    = $bi->region;
-                    $bp->weight    = $bi->weight;
-                    // Create the new block position record.
-                    $bp->id = $DB->insert_record('block_positions', $bp);
-                }
+            $position = $DB->get_record('block_positions', ['blockinstanceid' => $bi->id, 'contextid' => $oldcontext->id]);
+            if ($position) {
+                unset($position->id);
+                $position->blockinstanceid = $block->id;
+                $position->contextid = $context->id;
+                $position->pagetype = $block->pagetypepattern;
+                $position->id = $DB->insert_record('block_positions', $position);
+            }
 
-                // Force the creation of the block context.
-                context_block::instance($block->id);
-                // Copy the block content from one to the next.
-                $block = block_instance($block->blockname, $block);
-                if (!$block->instance_copy($bi->id)) {
-                    debugging("Unable to copy block data for original block instance: $bi->id to new block instance: $block->id", DEBUG_DEVELOPER);
-                }
+            // Force the creation of the block context.
+            context_block::instance($block->id);
+
+            // Copy the block content from one to the next.
+            $blockinstance = block_instance($block->blockname, $block);
+            if (!$blockinstance->instance_copy($bi->id)) {
+                debugging("Unable to copy block data for original block instance: $bi->id to new block instance: $block->id", DEBUG_DEVELOPER);
             }
         }
 
         // Finally copy across any assigned audiences.
-        $assignedcohorts = $DB->get_records('totara_dashboard_cohort', array('dashboardid' => $this->id));
-        foreach ($assignedcohorts as $cohort) {
+        if ($dashboard->tenantid) {
+            $cohort = new stdClass();
+            $cohort->cohortid = $tenant->cohortid;
             $cohort->dashboardid = $dashboard->id;
             $DB->insert_record('totara_dashboard_cohort', $cohort);
+        } else {
+            $assignedcohorts = $DB->get_records('totara_dashboard_cohort', array('dashboardid' => $this->id));
+            foreach ($assignedcohorts as $cohort) {
+                $cohort->dashboardid = $dashboard->id;
+                $DB->insert_record('totara_dashboard_cohort', $cohort);
+            }
         }
+
+        $trans->allow_commit();
 
         return $dashboard->id;
     }
@@ -550,9 +612,14 @@ class totara_dashboard {
         // Copy block instances.
         $systemcontext = context_system::instance();
         $usercontext = context_user::instance($userid);
+        if ($this->tenantid) {
+            $parentcontext = context_tenant::instance($this->tenantid);
+        } else {
+            $parentcontext = $systemcontext;
+        }
 
         // Copy instances.
-        $blockinstances = $DB->get_records('block_instances', array('parentcontextid' => $systemcontext->id,
+        $blockinstances = $DB->get_records('block_instances', array('parentcontextid' => $parentcontext->id,
                                                                     'pagetypepattern' => 'totara-dashboard-' . $this->id,
                                                                     'subpagepattern' => 'default'));
         $clonedids = array();
@@ -570,7 +637,7 @@ class totara_dashboard {
 
         // Copy positions of system blocks.
         $blockpositions = $DB->get_records('block_positions', array(
-            'contextid' => $systemcontext->id,
+            'contextid' => $parentcontext->id,
             'pagetype' => 'totara-dashboard-' . $this->id,
             'subpage' => 'default'
         ));

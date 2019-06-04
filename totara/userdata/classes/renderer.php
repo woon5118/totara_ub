@@ -61,7 +61,7 @@ class totara_userdata_renderer extends plugin_renderer_base {
             }
         } else {
             if (!$user->deleted) {
-                if (has_capability('moodle/user:viewdetails', $context)) {
+                if (has_capability('moodle/user:viewalldetails', $context)) {
                     $url = new \moodle_url('/user/profile.php', array('id' => $user->id));
                     $fullname = html_writer::link($url, $fullname);
                 }

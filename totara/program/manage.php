@@ -42,13 +42,6 @@ $perpage = optional_param('perpage', $CFG->coursesperpage, PARAM_INT);
 // Search words.
 $search = optional_param('search', '', PARAM_RAW);
 
-// Check if programs or certifications are enabled.
-if ($viewtype == 'program') {
-    check_program_enabled();
-} else {
-    check_certification_enabled();
-}
-
 if (!$id && !empty($search)) {
     $searchcriteria = array('search' => $search);
 } else {
@@ -72,11 +65,23 @@ $movetocat = optional_param('movetocat', -1, PARAM_INT);
 $moveupcat = optional_param('moveupcat', 0, PARAM_INT);
 $movedowncat = optional_param('movedowncat', 0, PARAM_INT);
 
-require_login();
+// Login as required for all management pages.
+require_login(null, false);
+
+// Check if programs or certifications are enabled.
+if ($viewtype === 'program') {
+    check_program_enabled();
+} else {
+    check_certification_enabled();
+    $viewtype = 'certification';
+}
 
 // Retrieve coursecat object
 // This will also make sure that category is accessible and create default category if missing
 $coursecat = coursecat::get($id);
+if (!$coursecat->is_uservisible()) {
+    throw new moodle_exception('unknowncategory');
+}
 
 if ($id) {
     $PAGE->set_category_by_id($id);
@@ -523,6 +528,9 @@ if (!empty($searchcriteria)) {
         // Preload the context we will need it to format the category name shortly.
         context_helper::preload_from_record($subcategory);
         $context = context_coursecat::instance($subcategory->id);
+        if ($context->is_user_access_prevented()) {
+            continue;
+        }
         // Prepare the things we need to create a link to the subcategory.
         $attributes = $subcategory->visible ? array() : array('class' => 'dimmed');
         $text = format_string($subcategory->name, true, array('context' => $context));

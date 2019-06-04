@@ -74,14 +74,16 @@ switch ($action) {
         $outcome->response = $manager->get_potential_users($enrolid, $search, $searchanywhere, $page, $perpage, $addedenrollment);
         $extrafields = get_extra_user_fields($context);
         $useroptions = array();
-        // User is not enrolled yet, either link to site profile or do not link at all.
-        if (has_capability('moodle/user:viewdetails', context_system::instance())) {
-            $useroptions['courseid'] = SITEID;
-        } else {
-            $useroptions['link'] = false;
-        }
         $viewfullnames = has_capability('moodle/site:viewfullnames', $context);
         foreach ($outcome->response['users'] as &$user) {
+            // Totara: User is not enrolled, either link to site profile or do not link at all.
+            $useroptions = array();
+            if (user_can_view_profile($user, null)) {
+                $useroptions['courseid'] = SITEID;
+                $useroptions['link'] = true;
+            } else {
+                $useroptions['link'] = false;
+            }
             $user->picture = $OUTPUT->user_picture($user, $useroptions);
             $user->fullname = fullname($user, $viewfullnames);
             $fieldvalues = array();

@@ -479,8 +479,12 @@ class enrol_manual_plugin extends enrol_plugin {
      * @return bool|int false means not enrolled, integer means timeend
      */
     public function try_autoenrol(stdClass $instance) {
-        //if not already enroled, users with the moodle/course:update capability in this context should be allowed in
+        // Enforce tenant restrictions.
         $coursecontext = context_course::instance($instance->courseid);
+        if ($coursecontext->is_user_access_prevented()) {
+            return false;
+        }
+        //if not already enroled, users with the moodle/course:update capability in this context should be allowed in
         return (has_capability('moodle/course:update', $coursecontext)) ? 0 : false;
     }
 

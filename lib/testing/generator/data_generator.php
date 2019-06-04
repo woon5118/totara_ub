@@ -282,8 +282,60 @@ EOD;
             $record['picture']  = 0;
         }
 
+        // Totara: add tenant support for testing.
+        $participatingintenants = [];
+        if (!empty($record['tenantid'])) {
+            $tenant = $DB->get_record('tenant', ['id' => $record['tenantid']], '*', MUST_EXIST);
+            $participatingintenants[$tenant->id] = $tenant;
+        } else if (!empty($record['tenantmember'])) {
+            $tenant = $DB->get_record('tenant', ['idnumber' => $record['tenantmember']], '*', MUST_EXIST);
+            $record['tenantid'] = $tenant->id;
+            $participatingintenants[$tenant->id] = $tenant;
+        } else if (!empty($record['tenantparticipant'])) {
+            $record['tenantid'] = null;
+            $tenantidnumbers = array_map('trim', explode(',', $record['tenantparticipant']));
+            foreach ($tenantidnumbers as $tidnumber) {
+                if (!$tidnumber) {
+                    continue;
+                }
+                $tenant = $DB->get_record('tenant', ['idnumber' => $tidnumber], '*', MUST_EXIST);
+                $participatingintenants[$tenant->id] = $tenant;
+            }
+        } else {
+            $record['tenantid'] = null;
+        }
+        $managetenantusers = [];
+        if (!empty($record['tenantusermanager'])) {
+            $tenantidnumbers = array_map('trim', explode(',', $record['tenantusermanager']));
+            foreach ($tenantidnumbers as $tidnumber) {
+                if (!$tidnumber) {
+                    continue;
+                }
+                $tenant = $DB->get_record('tenant', ['idnumber' => $tidnumber], '*', MUST_EXIST);
+                $managetenantusers[$tenant->id] = $tenant;
+            }
+        }
+        $managetenantdomains = [];
+        if (!empty($record['tenantdomainmanager'])) {
+            $tenantidnumbers = array_map('trim', explode(',', $record['tenantdomainmanager']));
+            foreach ($tenantidnumbers as $tidnumber) {
+                if (!$tidnumber) {
+                    continue;
+                }
+                $tenant = $DB->get_record('tenant', ['idnumber' => $tidnumber], '*', MUST_EXIST);
+                $managetenantdomains[$tenant->id] = $tenant;
+            }
+        }
+        unset($record['tenantmember']);
+        unset($record['tenantparticipant']);
+        unset($record['tenantusermanager']);
+        unset($record['tenantdomainmanager']);
+
         // Totara: we want to do bulk inserts.
         if (!empty($options['noinsert'])) {
+            if ($participatingintenants or $managetenantusers or $managetenantdomains) {
+                debugging('Tenant relations will not be added because user record was not created in generator', DEBUG_DEVELOPER);
+            }
             return $record;
         }
 
@@ -303,6 +355,27 @@ EOD;
             useredit_update_interests($user, $record['interests']);
         }
 
+        // Totara: add tenant stuff.
+        if (!$user->deleted) {
+            foreach ($participatingintenants as $tenant) {
+                cohort_add_member($tenant->cohortid, $user->id);
+            }
+            if ($managetenantusers) {
+                $role = $DB->get_record('role', ['shortname' => 'tenantusermanager'], '*', MUST_EXIST);
+                foreach ($managetenantusers as $tenant) {
+                    $context = context_tenant::instance($tenant->id);
+                    role_assign($role->id, $user->id, $context->id);
+                }
+            }
+            if ($managetenantdomains) {
+                $role = $DB->get_record('role', ['shortname' => 'tenantdomainmanager'], '*', MUST_EXIST);
+                foreach ($managetenantdomains as $tenant) {
+                    $context = context_coursecat::instance($tenant->categoryid);
+                    role_assign($role->id, $user->id, $context->id);
+                }
+            }
+        }
+
         return $user;
     }
 
@@ -313,9 +386,6 @@ EOD;
      * @return coursecat course category record
      */
     public function create_category($record=null, array $options=null) {
-        global $DB, $CFG;
-        require_once("$CFG->libdir/coursecatlib.php");
-
         $this->categorycount++;
         $i = $this->categorycount;
 

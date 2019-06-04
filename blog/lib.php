@@ -1113,8 +1113,8 @@ function blog_get_tagged_posts($tag, $exclusivemode = false, $fromctx = 0, $ctx 
                 $subject = html_writer::link($url, $subject, array('class' => $class));
 
                 $fullname = fullname($user);
-                if (user_can_view_profile($user)) {
-                    $profilelink = new moodle_url('/user/view.php', array('id' => $blog->userid));
+                $profilelink = user_get_profile_url($user);
+                if ($profilelink) {
                     $fullname = html_writer::link($profilelink, $fullname);
                 }
                 $details = $fullname . ', ' . userdate($blog->created);

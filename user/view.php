@@ -34,35 +34,29 @@ $showallcourses = optional_param('showallcourses', 0, PARAM_INT);
 
 // See your own profile by default.
 if (empty($id)) {
-    require_login();
     $id = $USER->id;
 }
 
-if ($courseid == SITEID) {   // Since Moodle 2.0 all site-level profiles are shown by profile.php.
+$user = $DB->get_record('user', array('id' => $id), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+
+// Totara: Not logged-in users are not allowed into courses!
+require_login();
+
+$coursecontext = context_course::instance($course->id);
+
+$PAGE->set_context($coursecontext);
+$PAGE->set_url('/user/view.php', array('id' => $id, 'course' => $courseid));
+
+if ($user->deleted or $courseid == SITEID) {   // Since Moodle 2.0 all site-level profiles are shown by profile.php.
+    // Totara: this is needed because in some places suchas in user_picture class we are not checking if courseid is SITEID.
     redirect($CFG->wwwroot.'/user/profile.php?id='.$id);  // Immediate redirect.
 }
 
-$PAGE->set_url('/user/view.php', array('id' => $id, 'course' => $courseid));
-
-$user = $DB->get_record('user', array('id' => $id), '*', MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $currentuser = ($user->id == $USER->id);
-
-$systemcontext = context_system::instance();
-$coursecontext = context_course::instance($course->id);
-$usercontext   = context_user::instance($user->id, IGNORE_MISSING);
-
-// Check we are not trying to view guest's profile.
-if (isguestuser($user)) {
-    // Can not view profile of guest - thre is nothing to see there.
-    print_error('invaliduserid');
-}
-
-$PAGE->set_context($coursecontext);
+$usercontext = context_user::instance($user->id);
 
 if (!empty($CFG->forceloginforprofiles)) {
-    require_login(); // We can not log in to course due to the parent hack below.
-
     // Guests do not have permissions to view anyone's profile if forceloginforprofiles is set.
     if (isguestuser()) {
         echo $OUTPUT->header();
@@ -74,6 +68,12 @@ if (!empty($CFG->forceloginforprofiles)) {
     }
 }
 
+// Check we are not trying to view guest's profile.
+if (isguestuser($user)) {
+    // Can not view profile of guest - thre is nothing to see there.
+    print_error('invaliduserid');
+}
+
 $PAGE->set_course($course);
 $PAGE->set_pagetype('course-view-' . $course->format);  // To get the blocks exactly like the course.
 $PAGE->add_body_class('path-user');                     // So we can style it independently.
@@ -83,21 +83,24 @@ $PAGE->set_other_editing_capability('moodle/course:manageactivities');
 // of inhereting the pagetype will lead to an incorrect docs location.
 $PAGE->set_docs_path('user/profile');
 
-$isparent = false;
+// Totara: Make sure user may view course profile.
+if (!user_can_view_profile($user, $course)) {
+    if (user_can_view_profile($user)) {
+        redirect(new moodle_url('/user/profile.php', ['id' => $id]));
+    }
+    if (isguestuser()) {
+        // Let them log in.
+        redirect(get_login_url());
+    }
+    print_error('cannotviewprofile');
+}
 
-if (!$currentuser and !$user->deleted
-  and $DB->record_exists('role_assignments', array('userid' => $USER->id, 'contextid' => $usercontext->id))
-  and has_capability('moodle/user:viewdetails', $usercontext)) {
-    // TODO: very ugly hack - do not force "parents" to enrol into course their child is enrolled in,
-    //       this way they may access the profile where they get overview of grades and child activity in course,
-    //       please note this is just a guess!
-    require_login();
-    $isparent = true;
+if (!$currentuser and has_capability('moodle/user:viewalldetails', $usercontext)) {
+    // Totara: do not require staff managers assigned in user context to be enrolled in courses.
     $PAGE->navigation->set_userid_for_parent_checks($id);
 } else {
-    // Normal course.
+    // Normal user, check user can access course.
     require_login($course);
-    // What to do with users temporary accessing this course? should they see the details?
 }
 
 $strpersonalprofile = get_string('personalprofile');
@@ -106,55 +109,12 @@ $struser = get_string("user");
 
 $fullname = fullname($user, has_capability('moodle/site:viewfullnames', $coursecontext));
 
-// Now test the actual capabilities and enrolment in course.
-if ($currentuser) {
-    if (!is_viewing($coursecontext) && !is_enrolled($coursecontext)) {
-        // Need to have full access to a course to see the rest of own info.
-        $referer = get_local_referer(false);
-        if (!empty($referer)) {
-            redirect($referer, get_string('notenrolled', '', $fullname));
-        }
-        echo $OUTPUT->header();
-        echo $OUTPUT->heading(get_string('notenrolled', '', $fullname));
-        echo $OUTPUT->footer();
-        die;
-    }
+// Totara: there is no need to check enrolment any more, user_can_view_profile() does it automatically!
 
-} else {
+if (!$currentuser) {
     // Somebody else.
     $PAGE->set_title("$strpersonalprofile: ");
     $PAGE->set_heading("$strpersonalprofile: ");
-
-    // Check to see if the user can see this user's profile.
-    if (!user_can_view_profile($user, $course, $usercontext) && !$isparent) {
-        print_error('cannotviewprofile');
-    }
-
-    if (!is_enrolled($coursecontext, $user->id)) {
-        // TODO: the only potential problem is that managers and inspectors might post in forum, but the link
-        //       to profile would not work - maybe a new capability - moodle/user:freely_acessile_profile_for_anybody
-        //       or test for course:inspect capability.
-        if (has_capability('moodle/role:assign', $coursecontext)) {
-            $PAGE->navbar->add($fullname);
-            $notice = get_string('notenrolled', '', $fullname);
-        } else {
-            $PAGE->navbar->add($struser);
-            $notice = get_string('notenrolledprofile', '', $fullname);
-        }
-        $referer = get_local_referer(false);
-        if (!empty($referer)) {
-            redirect($referer, $notice);
-        }
-        echo $OUTPUT->header();
-        echo $OUTPUT->heading($notice);
-        echo $OUTPUT->footer();
-        exit;
-    }
-
-    if (!isloggedin() or isguestuser()) {
-        // Do not use require_login() here because we might have already used require_login($course).
-        redirect(get_login_url());
-    }
 }
 
 $PAGE->set_title("$course->fullname: $strpersonalprofile: $fullname");
@@ -180,14 +140,6 @@ echo $OUTPUT->header();
 echo '<div class="userprofile">';
 $headerinfo = array('heading' => fullname($user), 'user' => $user, 'usercontext' => $usercontext);
 echo $OUTPUT->context_header($headerinfo, 2);
-
-if ($user->deleted) {
-    echo $OUTPUT->heading(get_string('userdeleted'));
-    if (!has_capability('moodle/user:update', $coursecontext)) {
-        echo $OUTPUT->footer();
-        die;
-    }
-}
 
 // OK, security out the way, now we are showing the user.
 // Trigger a user profile viewed event.

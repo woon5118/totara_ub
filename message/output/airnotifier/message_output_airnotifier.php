@@ -59,6 +59,16 @@ class message_output_airnotifier extends message_output {
             return true;
         }
 
+        // Totara: make sure tenant is not suspended.
+        if ($eventdata->userto->id > 0) {
+            $usercontext = context_user::instance($eventdata->userto->id, IGNORE_MISSING);
+            if (!empty($usercontext->tenantid)) {
+                if ($DB->record_exists('tenant', ['id' => $usercontext->tenantid, 'suspended' => 1])) {
+                    return true;
+                }
+            }
+        }
+
         // If username is empty we try to retrieve it, since it's required to generate the siteid.
         if (empty($eventdata->userto->username)) {
             $eventdata->userto->username = $DB->get_field('user', 'username', array('id' => $eventdata->userto->id));

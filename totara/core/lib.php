@@ -751,6 +751,9 @@ function totara_get_categoryid_with_capability($capability) {
     foreach ($recordset as $record) {
         context_helper::preload_from_record($record);
         $context = context_coursecat::instance($record->id);
+        if ($context->is_user_access_prevented()) {
+            continue;
+        }
         if (!$record->visible && !has_capability('moodle/category:viewhiddencategories', $context)) {
             continue;
         }

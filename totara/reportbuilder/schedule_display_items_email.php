@@ -51,7 +51,7 @@ switch ($filtername) {
         }
         break;
     case 'systemusers':
-        require_capability('moodle/user:viewdetails', $context);
+        require_capability('moodle/user:viewalldetails', $context);
         if (!empty($ids)) {
             list($insql, $params) = $DB->get_in_or_equal($ids);
             $usernamefields = get_all_user_name_fields(true);

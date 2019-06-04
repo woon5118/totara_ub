@@ -153,6 +153,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
 
         // We need to be able to calculate the total count.
         set_config('allowtotalcount', 1, 'totara_reportbuilder');
+        set_config('enablereportcaching', 1);
 
         $rid = $this->create_report('user', 'Test user report 1', true);
         $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $rid));

@@ -22,31 +22,37 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+/** @var admin_root $ADMIN */
+/** @var context_system $systemcontext */
 
-$capabilities = array(
-    'totara/program:createprogram',
-    'totara/program:configuredetails',
-    'totara/core:programmanagecustomfield',
-);
-if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
+$programsenabled = totara_feature_disabled('programs');
 
-    $programsenabled = totara_feature_disabled('programs');
-
-    $ADMIN->add('programs', new admin_externalpage(
-        'programmgmt',
+if (has_any_capability(['totara/program:createprogram', 'totara/program:configuredetails'], $systemcontext)) {
+    $ADMIN->add('programs', new admin_externalpage('programmgmt',
         new lang_string('manageprograms', 'admin'),
         $CFG->wwwroot . '/totara/program/manage.php',
         ['totara/program:createprogram', 'totara/program:configuredetails'],
         $programsenabled
     ));
-
-    $ADMIN->add('programs', new admin_externalpage(
-        'programcustomfields',
-        new lang_string('customfields', 'totara_customfield'),
-    $CFG->wwwroot . '/totara/customfield/index.php?prefix=program',
-        ['totara/core:programmanagecustomfield'],
-        $programsenabled
-    ));
-
-    unset($programsenabled);
+} else if (!empty($USER->tenantid)) {
+    $tenant = core\record\tenant::fetch($USER->tenantid);
+    $categorycontext = context_coursecat::instance($tenant->categoryid);
+    if (has_any_capability(['totara/program:createprogram', 'totara/program:configuredetails'], $categorycontext)) {
+        $ADMIN->add('programs', new admin_externalpage('programmgmt',
+            new lang_string('manageprograms', 'admin'),
+            $CFG->wwwroot . '/totara/program/manage.php?viewtype=program&categoryid=' . $tenant->categoryid,
+            ['totara/program:createprogram', 'totara/program:configuredetails'],
+            $programsenabled,
+            $categorycontext
+        ));
+    }
 }
+
+$ADMIN->add('programs', new admin_externalpage('programcustomfields',
+    new lang_string('customfields', 'totara_customfield'),
+    $CFG->wwwroot . '/totara/customfield/index.php?prefix=program',
+    ['totara/core:programmanagecustomfield'],
+    $programsenabled
+));
+
+unset($programsenabled);

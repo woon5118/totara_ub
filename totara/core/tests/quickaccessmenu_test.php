@@ -250,6 +250,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
 
         self::assertMenuStructure([
             group::PLATFORM => [
+                'editusers' => 'Users',
                 'cohorts' => 'Audiences',
             ]
         ], $user);
@@ -833,7 +834,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
 
         // Now try removing a default item. Implies having a default item.
         $roleid = $this->getDataGenerator()->create_role();
-        role_change_permission($roleid, context_system::instance(), 'moodle/user:update', CAP_ALLOW);
+        role_change_permission($roleid, context_system::instance(), 'moodle/user:viewalldetails', CAP_ALLOW);
         $this->getDataGenerator()->role_assign($roleid, $user->id);
 
         admin_get_root(true, false);
@@ -1463,8 +1464,8 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         $roleid = $this->getDataGenerator()->create_role();
         $user = $this->getDataGenerator()->create_user();
         $capabilities = [
-            'moodle/user:update',
-            'moodle/cohort:manage',
+            'moodle/user:viewalldetails',
+            'moodle/cohort:view',
             'moodle/category:manage',
         ];
         foreach ($capabilities as $cap) {
@@ -1540,8 +1541,8 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         $roleid = $this->getDataGenerator()->create_role();
         $user = $this->getDataGenerator()->create_user();
         $capabilities = [
-            'moodle/user:update',
-            'moodle/cohort:manage',
+            'moodle/user:viewalldetails',
+            'moodle/cohort:view',
             'moodle/category:manage',
         ];
         foreach ($capabilities as $cap) {

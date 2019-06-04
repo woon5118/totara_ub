@@ -32,7 +32,7 @@ class cohort_edit_form extends moodleform {
      * Define the cohort edit form
      */
     public function definition() {
-        global $CFG, $COHORT_ALERT;
+        global $CFG, $COHORT_ALERT, $USER;
 
         $mform = $this->_form;
         $editoroptions = $this->_customdata['editoroptions'];
@@ -56,7 +56,8 @@ class cohort_edit_form extends moodleform {
         $mform->addHelpButton('visible', 'visible', 'cohort');
         */
 
-        if (!$cohort->id) {
+        // NOTE: no dynamic rules for tenant members, we have no way to restrict what they select.
+        if (!$cohort->id and empty($USER->tenantid)) {
             $mform->addElement('select', 'cohorttype', get_string('type', 'totara_cohort'), cohort::getCohortTypes());
             $mform->addHelpButton('cohorttype', 'type', 'totara_cohort');
         }

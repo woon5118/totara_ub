@@ -84,9 +84,9 @@ class user_with_components_links extends base {
         }
 
         $usercontext = \context_user::instance($userid, MUST_EXIST);
-        $show_profile_link = user_can_view_profile($extrafields, null, $usercontext);
+        $show_profile_link = user_can_view_profile($extrafields, null);
 
-        $user_pic = $OUTPUT->user_picture($extrafields, array('courseid' => 1, 'link' => $show_profile_link));
+        $user_pic = $OUTPUT->user_picture($extrafields, array('courseid' => SITEID, 'link' => $show_profile_link));
 
         $recordstr = get_string('records', 'rb_source_user');
         $requiredstr = get_string('required', 'rb_source_user');

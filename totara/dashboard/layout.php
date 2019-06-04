@@ -36,6 +36,14 @@ admin_externalpage_setup('totaradashboard', '', array('id' => $id),
 // Check Totara Dashboard is enable.
 totara_dashboard::check_feature_enabled();
 
+$record = $DB->get_record('totara_dashboard', ['id' => $id], '*', MUST_EXIST);
+if ($record->tenantid) {
+    $context = context_tenant::instance($record->tenantid);
+} else {
+    $context = context_system::instance();
+}
+$PAGE->set_context($context);
+
 $header = $SITE->shortname . ': ' . get_string('editdashboard', 'totara_dashboard');
 
 // Override pagetype to show blocks properly.

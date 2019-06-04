@@ -40,6 +40,7 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 );

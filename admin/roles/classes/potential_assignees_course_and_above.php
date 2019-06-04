@@ -30,6 +30,15 @@ defined('MOODLE_INTERNAL') || die();
  * show all the users in the system who do not already have the role.
  */
 class core_role_potential_assignees_course_and_above extends core_role_assign_user_selector_base {
+    /**
+     * @param string $name control name
+     * @param array $options should have two elements with keys groupid and courseid.
+     */
+    public function __construct($name, $options) {
+        parent::__construct($name, $options);
+        $this->enabletenantrestrictions = true;
+    }
+
     public function find_users($search) {
         global $DB;
 

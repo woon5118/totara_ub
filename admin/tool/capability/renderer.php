@@ -79,7 +79,7 @@ class tool_capability_renderer extends plugin_renderer_base {
         $strpermissions = $this->get_permission_strings();
         $permissionclasses = $this->get_permission_classes();
 
-        if ($contextid === context_system::instance()->id) {
+        if ($contextid == context_system::instance()->id) {
             $strpermissions[CAP_INHERIT] = new lang_string('notset', 'role');
         }
 

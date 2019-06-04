@@ -158,6 +158,11 @@ switch ($context->contextlevel) {
         require_once($CFG->libdir.'/adminlib.php');
         admin_externalpage_setup('assignroles', '', array('contextid' => $contextid, 'roleid' => $roleid));
         break;
+    case CONTEXT_TENANT:
+        $tenant = \core\record\tenant::fetch($context->instanceid);
+        $PAGE->set_heading($tenant->name);
+        $PAGE->set_cacheable(false);
+        break;
     case CONTEXT_USER:
         $fullname = fullname($user, has_capability('moodle/site:viewfullnames', $context));
         $PAGE->set_heading($fullname);
@@ -277,7 +282,12 @@ if ($roleid) {
             if (!empty($roleusers)) {
                 $strroleusers = array();
                 foreach ($roleusers as $user) {
-                    $strroleusers[] = '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $user->id . '" >' . fullname($user) . '</a>';
+                    $profilelink = user_get_profile_url($user);
+                    if ($profilelink) {
+                        $strroleusers[] = '<a href="' . $profilelink . '" >' . fullname($user) . '</a>';
+                    } else {
+                        $strroleusers[] = fullname($user);
+                    }
                 }
                 $roleholdernames[$roleid] = implode('<br />', $strroleusers);
                 $showroleholders = true;

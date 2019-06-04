@@ -571,7 +571,7 @@ final class helper {
     public static function add_quickaction_page_button(\moodle_page $page, string $key, ?\moodle_url $returnurl = null) {
         global $USER;
 
-        if (!has_capability('totara/core:editownquickaccessmenu', $page->context)) {
+        if (!has_capability('totara/core:editownquickaccessmenu', \context_user::instance($USER->id))) {
             return;
         }
 

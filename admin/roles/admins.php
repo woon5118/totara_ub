@@ -93,6 +93,9 @@ if (optional_param('add', false, PARAM_BOOL) and confirm_sesskey()) {
     $admins = array();
     $oldvalue = $CFG->siteadmins;
 
+    // Totara: make sure user id exists and is valid admin user candidate.
+    $adduser = $DB->get_record('user', ['id' => $confirmadd, 'deleted' => 0, 'tenantid' => null, 'mnethostid' => $CFG->mnet_localhost_id], 'id', MUST_EXIST);
+
     foreach (explode(',', $CFG->siteadmins) as $admin) {
         $admin = (int)$admin;
         if ($admin) {

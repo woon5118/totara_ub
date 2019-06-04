@@ -635,6 +635,7 @@ require_once($CFG->libdir .'/modinfolib.php');      // Cached information on cou
 require_once($CFG->dirroot.'/cache/lib.php');       // Cache API
 
 /* Requires for Totara */
+require_once($CFG->libdir . '/coursecatlib.php');   // coursecat class is used all over the place, so include it always.
 require_once($CFG->dirroot .'/totara/core/totara.php');// Standard functions used by Totara
 totara_setup();
 
@@ -672,6 +673,13 @@ if (PHPUNIT_TEST) {
 // Totara: disable the old trusttext system completely unless the site has explicitly chosen to allow it.
 if (empty($CFG->disableconsistentcleaning)) {
     $CFG->enabletrusttext = '0';
+}
+if (!empty($CFG->tenantsenabled)) {
+    // Totara: force-disable incompatible features and subsystems
+    $CFG->enablereportcaching = '0';
+    $CFG->config_php_settings['enablereportcaching'] = $CFG->enablereportcaching;
+    $CFG->mnet_dispatcher_mode = 'off';
+    $CFG->config_php_settings['mnet_dispatcher_mode'] = $CFG->mnet_dispatcher_mode;
 }
 
 if (isset($CFG->debug)) {

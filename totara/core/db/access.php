@@ -86,7 +86,8 @@ $capabilities = array(
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'moodle/course:update'
     ),
@@ -95,7 +96,8 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -159,7 +161,7 @@ $capabilities = array(
     // Edit own admin navigation preferences.
     'totara/core:editownquickaccessmenu' => array(
         'captype'      => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
+        'contextlevel' => CONTEXT_USER,
         'archetypes'   => array(
             'user'    => CAP_ALLOW,
         ),

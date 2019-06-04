@@ -27,7 +27,7 @@ require_once($CFG->dirroot . '/totara/core/dialogs/dialog_content.class.php');
 require_login();
 require_sesskey();
 $context = context_system::instance();
-require_capability('moodle/user:viewdetails', $context);
+require_capability('moodle/user:viewalldetails', $context);
 
 // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
 send_headers('text/html; charset=utf-8', false);

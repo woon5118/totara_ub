@@ -613,7 +613,7 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
         $this->assertSame('0', $DB->get_field('totara_connect_sso_sessions', 'active', array('id' => $session->id)));
         $result = sep_services::get_sso_user($client, array('ssotoken' => $session->ssotoken));
         $this->assertSame('success', $result['status']);
-        $this->assertCount(54, (array)$result['data']);
+        $this->assertCount(55, (array)$result['data']);
         $this->assertSame('1', $DB->get_field('totara_connect_sso_sessions', 'active', array('id' => $session->id)));
 
         $user = (object)$result['data'];
@@ -632,7 +632,7 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
         $DB->set_field('totara_connect_sso_sessions', 'active', 0, array('id' => $session->id));
         $result = sep_services::get_sso_user($client, array('ssotoken' => $session->ssotoken));
         $this->assertSame('success', $result['status']);
-        $this->assertCount(54, (array)$result['data']);
+        $this->assertCount(55, (array)$result['data']);
         $this->assertSame('1', $DB->get_field('totara_connect_sso_sessions', 'active', array('id' => $session->id)));
 
         $user = (object)$result['data'];

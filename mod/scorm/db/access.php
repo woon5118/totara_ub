@@ -37,7 +37,8 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -52,7 +53,8 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'mod/scorm:savetrack'
     ),
@@ -64,7 +66,8 @@ $capabilities = array(
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ),
@@ -76,7 +79,8 @@ $capabilities = array(
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -101,7 +105,8 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
 
@@ -113,7 +118,8 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
     'mod/scorm:deleteresponses' => array(
@@ -123,7 +129,8 @@ $capabilities = array(
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
     'mod/scorm:deleteownresponses' => array(

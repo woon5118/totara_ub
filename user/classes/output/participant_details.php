@@ -248,7 +248,8 @@ class participant_details implements \renderable {
             );
         }
 
-        if ($USER->id != $user->id && !\core\session\manager::is_loggedinas() && has_capability('moodle/user:loginas', $context) && !is_siteadmin($user->id)) {
+        if ($USER->id != $user->id && !$context->tenantid && empty($USER->tenantid) && // Totara: not usable in tenant contexts and by tenant users
+                !\core\session\manager::is_loggedinas() && has_capability('moodle/user:loginas', $context) && !is_siteadmin($user->id)) {
             $links[] = array(
                 'url' => new \moodle_url('/course/loginas.php?id='. $course->id .'&user='. $user->id .'&sesskey='. sesskey()),
                 'text' => get_string('loginas')

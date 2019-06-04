@@ -49,7 +49,8 @@ if (!empty($ids)) {
     $names = coursecat::make_categories_list();
     $viewhidden = has_capability('moodle/category:viewhiddencategories', context_system::instance());
     foreach ($items as $item) {
-        if (empty($item->visible) and !$viewhidden) {
+        $category = coursecat::get($item->id);
+        if (!$category->is_uservisible()) {
             continue;
         }
         echo display_selected_category_item($names, $item, $filtername);

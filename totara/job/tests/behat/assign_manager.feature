@@ -27,7 +27,7 @@ Feature: Assigning a manager to a user via the job assignment page
      | capability                          | permission |
      | totara/hierarchy:assignuserposition | Allow      |
      | moodle/user:update                  | Allow      |
-     | moodle/user:viewdetails             | Allow      |
+     | moodle/user:viewalldetails          | Allow      |
     And the following "role assigns" exist:
       | user     | role          | contextlevel | reference |
       | jobadmin | jobadmin      | System       |           |

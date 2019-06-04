@@ -28,6 +28,7 @@ use \context_course;
 use \context_helper;
 use \context_user;
 use \stdClass;
+use \moodle_url;
 
 /**
  * User access controller.
@@ -90,9 +91,22 @@ class access_controller {
     /**
      * The course this access controller is specifically focus on.
      * If none are provided then all courses are taken into account.
+     * @var null|int
+     */
+    private $courseid = null;
+
+    /**
+     * Context matching $this->>courseid
+     * @var null|context_course
+     */
+    private $context_course = null;
+
+    /**
+     * Cached course data, to be used only if courseid set.
+     * @internal
      * @var null|stdClass
      */
-    private $course = null;
+    private $cachedcourse = null;
 
     /**
      * An array of already resolved checks for quick lookup.
@@ -115,17 +129,17 @@ class access_controller {
     private $identifyfields = null;
 
     /**
+     * Current user id, if it changes then we must purge caches.
+     * @var int
+     */
+    private static $myuserid = null;
+
+    /**
      * Cache of instantiated instances, limited to INSTANCE_CACHE_MAX_SIZE
      * Please note this cache is not used when running unit tests.
      * @var access_controller[]
      */
     private static $instancecache = [];
-
-    /**
-     * An array of keys in the instance cache in the order that they were added.
-     * @var string[]
-     */
-    private static $instancecachekeys = [];
 
     /**
      * The maximum size for the instance cache.
@@ -142,8 +156,19 @@ class access_controller {
      * @return access_controller
      */
     public static function for($user, $courseorid = null): access_controller {
+        global $SITE, $USER;
+
         if (empty($user->id) || $user->id <= 0) {
             throw new coding_exception('User access controllers can only be used for real users.');
+        }
+
+        // Use null instead of frontpage course.
+        if (is_object($courseorid)) {
+            if ($courseorid->id == $SITE->id) {
+                $courseorid = null;
+            }
+        } else if (!$courseorid or $courseorid == $SITE->id) {
+            $courseorid = null;
         }
 
         $key = (string)$user->id;
@@ -152,15 +177,21 @@ class access_controller {
             $key .= $courseorid->id ?? $courseorid;
         }
 
-        if (!isset(self::$instancecache[$key]) || (defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+        // Make sure the current $USER did not change, if it did throw aways all caches.
+        if (PHPUNIT_TEST) {
+            self::clear_instance_cache(); // No caching in PHPUnit tests.
+        } else if (self::$myuserid !== null and self::$myuserid != $USER->id) {
+            self::clear_instance_cache();
+        }
+        self::$myuserid = $USER->id;
+
+        if (!isset(self::$instancecache[$key])) {
             if (count(self::$instancecache) >= self::INSTANCE_CACHE_MAX_SIZE) {
                 // Drop the oldest key.
-                unset(self::$instancecache[array_shift(self::$instancecachekeys)]);
+                array_shift(self::$instancecache);
             }
-            $course = (is_null($courseorid) || is_object($courseorid)) ? $courseorid : get_course($courseorid);
-            $controller = new access_controller($user, $course);
+            $controller = new access_controller($user, $courseorid);
             self::$instancecache[$key] = $controller;
-            array_push(self::$instancecachekeys, $key);
         }
         return self::$instancecache[$key];
     }
@@ -190,25 +221,25 @@ class access_controller {
         if (!isloggedin()) {
             throw new \coding_exception('There is no current user');
         }
-        return self::for_user_id($USER->id, $courseorid);
+        return self::for($USER, $courseorid);
     }
 
     /**
      * Resets the static instance cache when required.
      */
-    public static function clear_instance_cache() {
+    public static function clear_instance_cache(): void {
+        self::$myuserid = null;
         self::$instancecache = [];
-        self::$instancecachekeys = [];
     }
 
     /**
      * Constructor.
      *
      * @param stdClass $user
-     * @param stdClass|null $course
+     * @param int|stdClass|null $courseorid
      */
-    private function __construct(stdClass $user, stdClass $course = null) {
-        global $DB, $USER;
+    private function __construct(stdClass $user, $courseorid = null) {
+        global $DB, $USER, $SITE;
         if (empty($user->id)) {
             throw new coding_exception('User access controllers can only be used for real users.');
         }
@@ -231,9 +262,65 @@ class access_controller {
         if (!$this->userdeleted) {
             $this->context_user = context_user::instance($user->id, MUST_EXIST);
         }
-        if ($course) {
-            $this->course = $course;
+        if ($courseorid) {
+            if (is_object($courseorid)) {
+                if ($courseorid->id and $courseorid->id != $SITE) {
+                    $this->courseid = $courseorid->id;
+                    $this->cachedcourse = $courseorid;
+                }
+            } else {
+                if ($courseorid != $SITE) {
+                    $this->courseid = $courseorid;
+                    // Do not fetch the course if it is not needed.
+                }
+            }
         }
+        if ($this->courseid) {
+            $this->context_course = context_course::instance($this->courseid);
+        }
+    }
+
+    /**
+     * Returns targeted course if specified in constructor and if it exists.
+     * @return null|stdClass
+     */
+    private function get_course(): ?stdClass {
+        global $DB;
+
+        if (!$this->courseid) {
+            return null;
+        }
+
+        if (isset($this->cachedcourse)) {
+            if ($this->cachedcourse === false) {
+                return null;
+            }
+            return $this->cachedcourse;
+        }
+
+        // List of fields taken from \enrol_get_all_users_courses()
+
+        $basefields = 'id, category, sortorder, shortname, fullname, idnumber, startdate, visible, defaultgroupingid, groupmode, groupmodeforce';
+        $this->cachedcourse = $DB->get_record('course', ['id' => $this->courseid], $basefields);
+
+        if ($this->cachedcourse === false) {
+            return null;
+        }
+        return $this->cachedcourse;
+    }
+
+    /**
+     * Recreate original $user parameter for use in recursive calls.
+     *
+     * @return stdClass
+     */
+    private function export_user(): stdClass {
+        $user = new stdClass();
+        $user->id = (string)$this->userid;
+        $user->deleted = (string)(int)$this->userdeleted;
+        $user->maildisplay = (string)$this->usermaildisplay;
+
+        return $user;
     }
 
     /**
@@ -390,10 +477,14 @@ class access_controller {
      *
      * @return bool
      */
-    public function can_view_profile() {
+    public function can_view_profile(): bool {
         global $CFG;
 
         if ($this->userdeleted) {
+            return false;
+        }
+
+        if ($this->is_user_access_prevented()) {
             return false;
         }
 
@@ -408,6 +499,12 @@ class access_controller {
             }
         }
 
+        if ($this->courseid && !$this->is_enrolled()) {
+            // NOTE: this is a major change compared to previous version,
+            //       use get_profile_url() if you are creating links to profiles instead.
+            return false;
+        }
+
         return (
             $this->iscurrentuser ||
             $this->has_coursecontact_role() ||
@@ -417,11 +514,43 @@ class access_controller {
     }
 
     /**
+     * Returns profile user for target user on condition
+     * user can access it.
+     *
+     * NOTE: if user is not enrolled in target course,
+     *       system profile link is returned is accessible.
+     *
+     * @return moodle_url|null
+     */
+    public function get_profile_url(): ?moodle_url {
+        if ($this->courseid) {
+            if ($this->is_enrolled()) {
+                if ($this->can_view_profile()) {
+                    return new moodle_url('/user/view.php', ['id' => $this->userid, 'course' => $this->courseid]);
+                } else {
+                    // No need to check system profile, because if they had access
+                    // the course profile would be most likely accessible too.
+                    return null;
+                }
+            }
+            // User is not enrolled, so better do not link course profile page, let's try system profile instead.
+            $user = $this->export_user();
+            return (self::for($user))->get_profile_url();
+        } else {
+            if ($this->can_view_profile()) {
+                return new moodle_url('/user/profile.php', ['id' => $this->userid]);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
      * Returns true if the current user can view the tracked users enrolled courses.
      *
      * @return bool
      */
-    public function can_view_enrolledcourses() {
+    public function can_view_enrolledcourses(): bool {
         return (
             $this->iscurrentuser ||
             (
@@ -438,10 +567,15 @@ class access_controller {
      *
      * @return bool
      */
-    public function can_view_preferences() {
+    public function can_view_preferences(): bool {
         if (isguestuser($this->userid) || $this->userdeleted) {
             return false;
         }
+
+        if ($this->is_user_access_prevented()) {
+            return false;
+        }
+
         return (
             $this->iscurrentuser ||
             // TOTARA: TL-6675 gave the ability for others to edit a users preference.
@@ -456,7 +590,7 @@ class access_controller {
      *
      * @return bool
      */
-    public function can_view_customfields() {
+    public function can_view_customfields(): bool {
         return (
             $this->iscurrentuser ||
             $this->can_view_profile()
@@ -470,7 +604,7 @@ class access_controller {
      *
      * @return bool
      */
-    public function can_view_interests() {
+    public function can_view_interests(): bool {
         return (
             $this->iscurrentuser ||
             $this->can_view_profile()
@@ -482,7 +616,7 @@ class access_controller {
      *
      * @return bool
      */
-    public function can_manage_files() {
+    public function can_manage_files(): bool {
         if (isguestuser($this->userid) || $this->userdeleted) {
             return false;
         }
@@ -498,7 +632,7 @@ class access_controller {
      * @param stdClass $course
      * @return bool
      */
-    private function are_course_groups_visible_to_user(stdClass $course) {
+    private function are_course_groups_visible_to_user(stdClass $course): bool {
         if (!isset($this->resolutioncache[__METHOD__])) {
             $this->resolutioncache[__METHOD__] = groups_user_groups_visible($course, $this->userid);
         }
@@ -510,7 +644,7 @@ class access_controller {
      *
      * @return bool
      */
-    private function can_view_hidden_fields() {
+    private function can_view_hidden_fields(): bool {
         if (isset($this->resolutioncache[__METHOD__])) {
             return $this->resolutioncache[__METHOD__];
         }
@@ -523,8 +657,7 @@ class access_controller {
             return true;
         }
         foreach ($this->get_enrolled_courses() as $course) {
-            $coursecontext = context_course::instance($course->id);
-            if (has_capability('moodle/course:viewhiddenuserfields', $coursecontext)) {
+            if (has_capability('moodle/course:viewhiddenuserfields', context_course::instance($course->id))) {
                 if (!$this->are_course_groups_visible_to_user($course)) {
                     // Not a member of the same group.
                     continue;
@@ -541,10 +674,33 @@ class access_controller {
      *
      * @return bool
      */
-    private function do_users_share_courses() {
+    private function do_users_share_courses(): bool {
         global $USER;
         if (!isset($this->resolutioncache[__METHOD__])) {
-            $this->resolutioncache[__METHOD__] = enrol_sharing_course($this->userid, $USER->id);
+            $this->resolutioncache[__METHOD__] = (bool)enrol_sharing_course($this->userid, $USER->id);
+        }
+        return $this->resolutioncache[__METHOD__];
+    }
+
+    /**
+     * Returns true if target course specified and target user is enrolled in it.
+     *
+     * NOTE: suspended state is checked for current user only unless they have moodle/course:view capability.
+     *
+     * @return bool
+     */
+    private function is_enrolled(): bool {
+        global $USER;
+        if (!isset($this->resolutioncache[__METHOD__])) {
+            if ($this->courseid) {
+                if ($this->userid == $USER->id and !is_viewing($this->context_course)) {
+                    $this->resolutioncache[__METHOD__] = is_enrolled($this->context_course, $this->userid, '', true);
+                } else {
+                    $this->resolutioncache[__METHOD__] = is_enrolled($this->context_course, $this->userid, '', false);
+                }
+            } else {
+                $this->resolutioncache[__METHOD__] = false;
+            }
         }
         return $this->resolutioncache[__METHOD__];
     }
@@ -554,12 +710,15 @@ class access_controller {
      *
      * @return array|stdClass[]
      */
-    private function get_enrolled_courses() {
+    private function get_enrolled_courses(): array {
         if (!$this->enrolled_courses) {
             $this->enrolled_courses = [];
-            if ($this->course) {
-                if (is_enrolled(context_course::instance($this->course->id), $this->userid)) {
-                    $this->enrolled_courses = [$this->course];
+            if ($this->courseid) {
+                if ($this->is_enrolled()) {
+                    $course = $this->get_course();
+                    if ($course) {
+                        $this->enrolled_courses = [$course];
+                    }
                 }
             } else {
                 $this->enrolled_courses = enrol_get_all_users_courses($this->userid);
@@ -628,7 +787,7 @@ class access_controller {
      *
      * @return bool
      */
-    private function has_coursecontact_role() {
+    private function has_coursecontact_role(): bool {
         if (!isset($this->resolutioncache[__METHOD__])) {
             $this->resolutioncache[__METHOD__] = has_coursecontact_role($this->userid);
         }
@@ -641,12 +800,11 @@ class access_controller {
      *
      * @return bool
      */
-    private function has_course_email_capability() {
+    private function has_course_email_capability(): bool {
         if (!isset($this->resolutioncache[__METHOD__])) {
             $this->resolutioncache[__METHOD__] = false;
             foreach ($this->get_enrolled_courses() as $course) {
-                $coursecontext = context_course::instance($course->id);
-                if (!has_capability('moodle/course:useremail', $coursecontext)) {
+                if (!has_capability('moodle/course:useremail', context_course::instance($course->id))) {
                     continue;
                 }
                 if (!$this->are_course_groups_visible_to_user($course)) {
@@ -663,7 +821,7 @@ class access_controller {
     /**
      * Returns true if the current user and the target user share a job relation.
      */
-    private function has_job_relationship() {
+    private function has_job_relationship(): bool {
         global $USER;
         if ($this->iscurrentuser) {
             return true;
@@ -675,12 +833,11 @@ class access_controller {
     }
 
     /**
-     * Returns true if the current user has the view all details capability on either the tracked user,
-     * the tracked course, or if no tracked course then any course the tracked user is enrolled within.
+     * Returns true if the current user has the view all details capability in the tracked user context.
      *
      * @return bool
      */
-    private function has_view_all_details_capability() {
+    private function has_view_all_details_capability(): bool {
         if (!isset($this->resolutioncache[__METHOD__])) {
             $this->resolutioncache[__METHOD__] = false;
             if (!$this->context_user) {
@@ -691,17 +848,34 @@ class access_controller {
                 $this->resolutioncache[__METHOD__] = true;
                 return true;
             }
-            foreach ($this->get_enrolled_courses() as $course) {
-                $coursecontext = context_course::instance($course->id);
-                if (!has_capability('moodle/user:viewalldetails', $coursecontext)) {
-                    continue;
+        }
+        return $this->resolutioncache[__METHOD__];
+    }
+
+    /**
+     * Returns true if user is prohibited from accessing user or course context due to tenant restrictions.
+     *
+     * @return bool
+     */
+    private function is_user_access_prevented(): bool {
+        global $USER;
+
+        if (!isset($this->resolutioncache[__METHOD__])) {
+            if (!$this->context_user) {
+                if (!empty($USER->tenantid)) {
+                    return true;
                 }
-                if (!$this->are_course_groups_visible_to_user($course)) {
-                    // Not a member of the same group.
-                    continue;
-                }
+                return false;
+            }
+            if ($this->context_user->is_user_access_prevented()) {
                 $this->resolutioncache[__METHOD__] = true;
-                break;
+            } else if ($this->courseid) {
+                if ($this->context_course->is_user_access_prevented()) {
+                    $this->resolutioncache[__METHOD__] = true;
+                }
+            }
+            if (!isset($this->resolutioncache[__METHOD__])) {
+                $this->resolutioncache[__METHOD__] = false;
             }
         }
         return $this->resolutioncache[__METHOD__];
@@ -715,7 +889,7 @@ class access_controller {
      *
      * @return bool
      */
-    private function has_view_details_capability() {
+    private function has_view_details_capability(): bool {
         if (!isset($this->resolutioncache[__METHOD__])) {
             $this->resolutioncache[__METHOD__] = false;
             if (!$this->context_user) {
@@ -727,8 +901,7 @@ class access_controller {
                 return true;
             }
             foreach ($this->get_enrolled_courses() as $course) {
-                $coursecontext = context_course::instance($course->id);
-                if (!has_any_capability(['moodle/user:viewdetails', 'moodle/user:viewalldetails'], $coursecontext)) {
+                if (!has_any_capability(['moodle/user:viewdetails'], context_course::instance($course->id))) {
                     continue;
                 }
                 if (!$this->are_course_groups_visible_to_user($course)) {
@@ -747,7 +920,7 @@ class access_controller {
      * the tracked course, or if no tracked course then any course the tracked user is enrolled within.
      * @return bool
      */
-    private function has_view_fullnames_capability() {
+    private function has_view_fullnames_capability(): bool {
         if (!isset($this->resolutioncache[__METHOD__])) {
             $this->resolutioncache[__METHOD__] = false;
             if (!$this->context_user) {
@@ -758,8 +931,7 @@ class access_controller {
                 return true;
             }
             foreach ($this->get_enrolled_courses() as $course) {
-                $coursecontext = context_course::instance($course->id);
-                if (!has_capability('moodle/site:viewfullnames', $coursecontext)) {
+                if (!has_capability('moodle/site:viewfullnames', context_course::instance($course->id))) {
                     continue;
                 }
                 if (!$this->are_course_groups_visible_to_user($course)) {
@@ -781,7 +953,7 @@ class access_controller {
      *
      * @return bool
      */
-    private static function is_current_user_an_admin() {
+    private static function is_current_user_an_admin(): bool {
         global $USER;
         return is_siteadmin($USER);
     }
@@ -794,7 +966,7 @@ class access_controller {
      *     New users must enrol in at least one course before they can add a profile description."
      * @return bool
      */
-    private function resolve_profiles_for_enrolled_users_only() {
+    private function resolve_profiles_for_enrolled_users_only(): bool {
         global $CFG, $DB;
         if (!isset($this->resolutioncache[__METHOD__])) {
             if (empty($CFG->profilesforenrolledusersonly)) {

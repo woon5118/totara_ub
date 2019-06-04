@@ -59,6 +59,8 @@ class rb_source_cohort extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_cohort');
         $this->usedcomponents[] = 'totara_cohort';
 
+        $this->cacheable = false; // There is absolutely no reason to ever cache list of audiences!
+
         parent::__construct();
     }
 

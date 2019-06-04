@@ -33,7 +33,8 @@ $capabilities = array(
             'coursecreator' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
     // Create new certifications.
@@ -43,6 +44,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
     // Delete certifications.
@@ -53,6 +55,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'totara/certification:createcertification'
     ),
@@ -64,6 +67,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
     // Ability to edit the certification details tab.
@@ -74,6 +78,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_PROGRAM,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'totara/certification:configurecertification'
     ),

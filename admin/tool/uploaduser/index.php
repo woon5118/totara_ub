@@ -174,6 +174,7 @@ if ($formdata = $mform2->is_cancelled()) {
     $noemailduplicates = empty($CFG->allowaccountssameemail) ? 1 : $formdata->uunoemailduplicates;
     $standardusernames = $formdata->uustandardusernames;
     $resetpasswords    = isset($formdata->uuforcepasswordchange) ? $formdata->uuforcepasswordchange : UU_PWRESET_NONE;
+    $tenantid = empty($formdata->tenantid) ? null : $formdata->tenantid;
 
     // verification moved to two places: after upload and into form2
     $usersnew      = 0;
@@ -858,6 +859,8 @@ if ($formdata = $mform2->is_cancelled()) {
                 $upt->track('password', '-', 'normal', false);
             }
 
+            $user->tenantid = $tenantid;
+
             $user->id = user_create_user($user, false, false);
             $upt->track('username', html_writer::link(new moodle_url('/user/profile.php', array('id'=>$user->id)), s($user->username)), 'normal', false);
 
@@ -1159,6 +1162,14 @@ if ($formdata = $mform2->is_cancelled()) {
             }
         }
         $validation[$user->username] = core_user::validate($user);
+
+        if ($CFG->tenantsenabled) {
+            $tid = $DB->get_field('user', 'tenantid', ['id' => $user->id, 'deleted' => 0]);
+            if ($tid) {
+                $tenant = core\record\tenant::fetch($tid);
+                $upt->track('tenant', format_string($tenant->name));
+            }
+        }
     }
     $upt->close(); // close table
     if (!empty($validation)) {

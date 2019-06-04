@@ -72,7 +72,7 @@ $PAGE->set_course($course);
 
 // do not require change own password cap if change forced
 if (!get_user_preferences('auth_forcepasswordchange', false)) {
-    require_capability('moodle/user:changeownpassword', $systemcontext);
+    require_capability('moodle/user:changeownpassword', context_user::instance($USER->id));
 }
 
 // do not allow "Logged in as" users to change any passwords

@@ -56,12 +56,19 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_main_install() {
     global $CFG, $DB, $SITE, $OUTPUT;
 
+    // Totara: start using tenant db structures.
+    set_config('tenantready', '1');
+
     // Make sure system context exists
     $syscontext = context_system::instance(0, MUST_EXIST, false);
     if ($syscontext->id != SYSCONTEXTID) {
         throw new moodle_exception('generalexceptionmessage', 'error', '', 'Unexpected new system context id!');
     }
 
+    // Totara: add foreign keys with circular references that could not be installed automatically.
+    $table = new xmldb_table('tenant');
+    $key = new xmldb_key('cohortid', XMLDB_KEY_FOREIGN_UNIQUE, array('cohortid'), 'cohort', array('id'), 'restrict');
+    $DB->get_manager()->add_key($table, $key);
 
     // Create site course
     if ($DB->record_exists('course', array())) {

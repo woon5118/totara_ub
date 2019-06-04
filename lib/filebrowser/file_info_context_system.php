@@ -104,6 +104,9 @@ class file_info_context_system extends file_info {
         $course_cats = $DB->get_records('course_categories', array('parent'=>0), 'sortorder', 'id,visible');
         foreach ($course_cats as $category) {
             $context = context_coursecat::instance($category->id);
+            if ($context->is_user_access_prevented()) {
+                continue;
+            }
             if (!$category->visible and !has_capability('moodle/category:viewhiddencategories', $context)) {
                 continue;
             }
@@ -148,6 +151,10 @@ class file_info_context_system extends file_info {
         foreach ($records as $record) {
             context_helper::preload_from_record($record);
             $context = context::instance_by_id($record->id);
+            if ($context->is_user_access_prevented()) {
+                $hiddencontexts[] = $record->id;
+                continue;
+            }
             if (!has_capability('moodle/category:viewhiddencategories', $context)) {
                 $hiddencontexts[] = $record->id;
             }

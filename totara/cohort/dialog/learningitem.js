@@ -54,6 +54,10 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
             }
         }
 
+        if (typeof this.config.contextid === 'undefined') {
+            this.config.contextid = 0;
+        }
+
         // check jQuery dependency is available
         if (typeof $ === 'undefined') {
             throw new Error('M.totara_cohortlearning.init()-> jQuery dependency required for this module.');
@@ -79,7 +83,7 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
                 buttons: cbuttons,
                 title: '<h2>' + M.util.get_string('assign'+assgnstring+'learningcourse', 'totara_cohort') + '</h2>'
             },
-            url+'browselearning.php?cohortid=' + this.config.cohortid  + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_COURSE,
+            url+'browselearning.php?cohortid=' + this.config.cohortid  + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_COURSE + '&contextid=' + this.config.contextid,
             chandler
         );
 

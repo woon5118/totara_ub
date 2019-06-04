@@ -135,7 +135,7 @@ class totara_dialog_content_courses extends totara_dialog_content {
      * @access  public
      */
     public function load_categories() {
-        global $DB;
+        global $DB, $PAGE, $CFG;
 
         // If category 0, make fake object
         if (!$this->categoryid) {
@@ -151,6 +151,15 @@ class totara_dialog_content_courses extends totara_dialog_content {
 
         // Load child categories
         $categories = coursecat::get($parent->id)->get_children();
+        if ($CFG->tenantsenabled and $PAGE->context->tenantid) {
+            // Remove categories from other tenants, it does not make sense to add cohort there.
+            foreach ($categories as $k => $cat) {
+                $catcontext = context_coursecat::instance($cat->id);
+                if ($catcontext->tenantid and $catcontext->tenantid != $PAGE->context->tenantid) {
+                    unset($categories[$k]);
+                }
+            }
+        }
 
         $category_ids = array();
         foreach ($categories as $cat) {

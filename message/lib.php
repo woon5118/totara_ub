@@ -595,7 +595,7 @@ function message_can_delete_message($message, $userid) {
 
     // Let's check if the user is allowed to delete this message.
     if (has_capability('moodle/site:deleteanymessage', $systemcontext) ||
-        ((has_capability('moodle/site:deleteownmessage', $systemcontext) &&
+        ((has_capability('moodle/site:deleteownmessage', context_user::instance($USER->id)) &&
             $USER->id == $message->$userdeleting))) {
         return true;
     }
@@ -1211,7 +1211,8 @@ function message_output_fragment_processor_settings($args = []) {
 function core_message_can_edit_message_profile($user) {
     global $USER;
     if ($user->id == $USER->id) {
-        return has_capability('moodle/user:editownmessageprofile', context_system::instance());
+        $personalcontext = context_user::instance($user->id);
+        return has_capability('moodle/user:editownmessageprofile', $personalcontext);
     } else {
         $personalcontext = context_user::instance($user->id);
         if (!has_capability('moodle/user:editmessageprofile', $personalcontext)) {

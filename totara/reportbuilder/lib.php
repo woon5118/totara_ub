@@ -371,7 +371,7 @@ class reportbuilder {
      * @param bool $checkaccess true mans verify that report can be access by current user or the user specified in reportfor
      */
     public function __construct($report, $config = null, $checkaccess = true) {
-        global $DB;
+        global $DB, $CFG;
 
         if (!is_object($report)) {
             debugging("From Totara 12, report constructor must not be called directly, use reportbuilder::create() instead.", DEBUG_DEVELOPER);
@@ -442,7 +442,11 @@ class reportbuilder {
         // Use config settings.
         $this->reportfor = $config->get_reportfor();
         $this->_sid = empty($config->get_sid()) && !$this->has_searched() ? $this->get_user_default_search() : $config->get_sid();
-        $this->cacheignore = $config->get_nocache();
+        if (empty($CFG->enablereportcaching)) {
+            $this->cacheignore = true;
+        } else {
+            $this->cacheignore = $config->get_nocache();
+        }
         $this->globalrestrictionset = $config->get_global_restriction_set();
 
         // Assign a unique identifier for this report.
@@ -659,6 +663,11 @@ class reportbuilder {
      */
     public function get_caching_problems() {
         global $CFG;
+
+        if (!empty($CFG->tenantsenabled)) {
+            // Caching is not compatible.
+            return [];
+        }
 
         if (empty($CFG->enablereportcaching)) {
             $enablelink = new moodle_url("/".$CFG->admin."/settings.php", array('section' => 'optionalsubsystems'));

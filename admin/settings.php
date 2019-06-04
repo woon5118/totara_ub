@@ -160,7 +160,7 @@ if (empty($SITE->fullname)) {
 
     // Totara: add quickaccess menu controls.
     $systemcontext = context_system::instance();
-    $caneditquickaccess = has_capability('totara/core:editownquickaccessmenu', $systemcontext);
+    $caneditquickaccess = has_capability('totara/core:editownquickaccessmenu', context_user::instance($USER->id));
 
     if ($caneditquickaccess) {
         // Is this part in the admin menu already?

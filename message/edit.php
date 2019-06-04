@@ -56,7 +56,7 @@ $PAGE->set_pagelayout('admin');
 // check access control
 if ($user->id == $USER->id) {
     //editing own message profile
-    require_capability('moodle/user:editownmessageprofile', $systemcontext);
+    require_capability('moodle/user:editownmessageprofile', $personalcontext);
 } else {
     // teachers, parents, etc.
     require_capability('moodle/user:editmessageprofile', $personalcontext);

@@ -356,15 +356,15 @@ $capabilities = array(
         // Assign a position to yourself.
         'totara/hierarchy:assignselfposition' => array(
             'captype' => 'write',
-            'contextlevel' => CONTEXT_SYSTEM,
+            'contextlevel' => CONTEXT_USER,
             ),
 
         // Assign a position to a user.
         'totara/hierarchy:assignuserposition' => array(
             'captype' => 'write',
-            'contextlevel' => CONTEXT_SYSTEM,
+            'contextlevel' => CONTEXT_USER,
             'archetypes' => array(
-                'manager' => CAP_ALLOW
+                'manager' => CAP_ALLOW,
                 ),
             ),
 

@@ -36,36 +36,42 @@ $showall = optional_param('showall', 0, PARAM_BOOL);
 $format = optional_param('format', '', PARAM_TEXT); //export format
 $debug = optional_param('debug', 0, PARAM_INT); // Debug level for the report.
 
-require_login();
+require_login(null, false);
 
 if ($contextid) {
     $context = context::instance_by_id($contextid, MUST_EXIST);
 } else {
     $context = context_system::instance();
+    if (!empty($USER->tenantid) and !has_capability('moodle/cohort:view', $context)) {
+        $tenant = \core\record\tenant::fetch($USER->tenantid);
+        $context = context_coursecat::instance($tenant->categoryid);
+        $contextid = $context->id;
+    }
 }
+require_capability('moodle/cohort:view', $context);
+$PAGE->set_context($context);
+$syscontext = context_system::instance();
 
-$category = null;
-if ($context->contextlevel == CONTEXT_COURSECAT) {
+if ($context->contextlevel == CONTEXT_SYSTEM) {
+    admin_externalpage_setup('cohorts', '', ['showall' => $showall], '', array('pagelayout'=>'report'));
+
+} else if ($context->contextlevel == CONTEXT_COURSECAT) {
+    $showall = 0;
     $category = $DB->get_record('course_categories', array('id'=>$context->instanceid), '*', MUST_EXIST);
+    if (!empty($USER->tenantid) and !has_capability('moodle/cohort:view', $syscontext) and !empty($context->tenantid) and $category->parent == 0) {
+        admin_externalpage_setup('cohorts', '', null, '', array('pagelayout'=>'report'));
+    } else {
+        $PAGE->set_pagelayout('report');
+        $PAGE->set_url('/cohort/index.php', array('contextid' => $context->id));
+        $PAGE->set_title(get_string('cohorts', 'cohort'));
+        $PAGE->set_heading($COURSE->fullname);
+    }
+
+} else {
+    redirect(new moodle_url('/'));
 }
 
 $manager = has_capability('moodle/cohort:manage', $context);
-
-$strcohorts = get_string('cohorts', 'cohort');
-
-$PAGE->set_context($context);
-
-if ($category) {
-    $showall = 0;
-    $PAGE->set_pagelayout('report');
-    $PAGE->set_context($context);
-    $PAGE->set_url('/cohort/index.php', array('contextid' => $context->id));
-    $PAGE->set_title($strcohorts);
-    $PAGE->set_heading($COURSE->fullname);
-} else {
-    $params = array('contextid' => $context->id, 'showall' => $showall);
-    admin_externalpage_setup('cohorts', '', $params, '', array('pagelayout'=>'report'));
-}
 
 if ($showall) {
     $data = array('contextid' => null);
@@ -108,14 +114,6 @@ echo $OUTPUT->heading($heading);
 $baseurl = new moodle_url('/cohort/index.php', array('contextid' => $context->id, 'showall' => $showall));
 if ($editcontrols = cohort_edit_controls($context, $baseurl)) {
     echo $OUTPUT->render($editcontrols);
-}
-
-// check if report is cached and warn user
-if ($report->is_cached()) {
-    $cohorts = cohort_get_cohorts($context->id);
-    if ($cohorts['allcohorts'] != $fullcount) {
-        echo $output->cache_pending_notification($report->_id);
-    }
 }
 
 // Print saved search options and filters.

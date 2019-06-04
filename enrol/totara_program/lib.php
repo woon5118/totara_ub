@@ -235,6 +235,12 @@ class enrol_totara_program_plugin extends enrol_plugin {
             return false;
         }
 
+        // Enforce tenant restrictions.
+        $coursecontext = context_course::instance($instance->courseid);
+        if ($coursecontext->is_user_access_prevented()) {
+            return false;
+        }
+
         if ($course = $DB->get_record('course', array('id' => $instance->courseid))) {
             //because of use of constants and program class functions, best to leave the prog_can_enter_course function where it is
             require_once($CFG->dirroot . '/totara/program/lib.php');

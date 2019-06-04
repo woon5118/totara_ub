@@ -28,4 +28,3 @@ class block_totara_my_team_nav extends block_base {
     }
 
 }
-?>

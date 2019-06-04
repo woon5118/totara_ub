@@ -70,11 +70,13 @@ if (!$currentuser) {
 // Identifying the nodes.
 $groups = array();
 $orphans = array();
-foreach ($settings->children as $setting) {
-    if ($setting->has_children()) {
-        $groups[] = new preferences_group($setting->get_content(), $setting->children);
-    } else {
-        $orphans[] = $setting;
+if (!empty($settings->children)) {
+    foreach ($settings->children as $setting) {
+        if ($setting->has_children()) {
+            $groups[] = new preferences_group($setting->get_content(), $setting->children);
+        } else {
+            $orphans[] = $setting;
+        }
     }
 }
 if (!empty($orphans)) {

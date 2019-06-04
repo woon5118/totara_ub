@@ -638,5 +638,20 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019072900, 'totara', 'core');
     }
 
+    if ($oldversion < 2019073100) {
+        // Fix staff manager role to be compatible with profile changes,
+        // we want them to have access to all users details and allow them to access course profiles
+        // of managed users even if they themselves are not enrolled in those courses.
+        $systemcontext = \context_system::instance();
+        $roles = $DB->get_records('role', ['archetype' => 'staffmanager']);
+        foreach ($roles as $role) {
+            assign_capability('moodle/user:viewalldetails', CAP_ALLOW, $role->id, $systemcontext, true);
+            assign_capability('moodle/user:viewhiddendetails', CAP_ALLOW, $role->id, $systemcontext, true);
+            assign_capability('moodle/site:viewfullnames', CAP_ALLOW, $role->id, $systemcontext, true);
+            assign_capability('moodle/site:viewuseridentity', CAP_ALLOW, $role->id, $systemcontext, true);
+        }
+        upgrade_plugin_savepoint(true, 2019073100, 'totara', 'core');
+    }
+
     return true;
 }

@@ -174,6 +174,11 @@ class behat_data_generators extends behat_base {
             'datagenerator' => 'tag',
             'required' => array('name')
         ),
+        'tenants' => array(
+            'plugin' => 'totara_tenant',
+            'datagenerator' => 'tenant',
+            'required' => array('name', 'idnumber')
+        ),
     );
 
     /**
@@ -197,6 +202,13 @@ class behat_data_generators extends behat_base {
         }
 
         $this->datagenerator = testing_util::get_data_generator();
+
+        // Totara: add support for plugins
+        if (empty(self::$elements[$elementname]['plugin'])) {
+            $datagenerator = $this->datagenerator;
+        } else {
+            $datagenerator = $this->datagenerator->get_plugin_generator(self::$elements[$elementname]['plugin']);
+        }
 
         $elementdatagenerator = self::$elements[$elementname]['datagenerator'];
         $requiredfields = self::$elements[$elementname]['required'];
@@ -235,9 +247,9 @@ class behat_data_generators extends behat_base {
 
             // Creates element.
             $methodname = 'create_' . $elementdatagenerator;
-            if (method_exists($this->datagenerator, $methodname)) {
+            if (method_exists($datagenerator, $methodname)) {
                 // Using data generators directly.
-                $this->datagenerator->{$methodname}($elementdata);
+                $datagenerator->{$methodname}($elementdata);
 
             } else if (method_exists($this, 'process_' . $elementdatagenerator)) {
                 // Using an alternative to the direct data generator call.

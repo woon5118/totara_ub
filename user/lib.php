@@ -33,7 +33,8 @@
  * @return int id of the newly created user
  */
 function user_create_user($user, $updatepassword = true, $triggerevent = true) {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/cohort/lib.php');
 
     // Set the timecreate field to the current time.
     if (!is_object($user)) {
@@ -102,17 +103,27 @@ function user_create_user($user, $updatepassword = true, $triggerevent = true) {
     // Create USER context for this user.
     $usercontext = context_user::instance($newuserid);
 
+    // Get full database user row.
+    $newuser = $DB->get_record('user', array('id' => $newuserid));
+
     // Update user password if necessary.
     if (isset($userpassword)) {
-        // Get full database user row, in case auth is default.
-        $newuser = $DB->get_record('user', array('id' => $newuserid));
         $authplugin = get_auth_plugin($newuser->auth);
         $authplugin->user_update_password($newuser, $userpassword);
+        $newuser = $DB->get_record('user', array('id' => $newuserid));
     }
 
     // Trigger event If required.
     if ($triggerevent) {
-        \core\event\user_created::create_from_userid($newuserid)->trigger();
+        $event = \core\event\user_created::create_from_userid($newuserid);
+        $event->add_record_snapshot('user', $newuser);
+        $event->trigger();
+    }
+
+    // Totara: add tenant cohort membership for all tenant users.
+    if ($newuser->tenantid) {
+        $tenant = $DB->get_record('tenant', ['id' => $user->tenantid], '*', MUST_EXIST);
+        cohort_add_member($tenant->cohortid, $newuserid);
     }
 
     return $newuserid;
@@ -130,13 +141,20 @@ function user_create_user($user, $updatepassword = true, $triggerevent = true) {
 function user_update_user($user, $updatepassword = true, $triggerevent = true) {
     global $DB;
 
-    // Set the timecreate field to the current time.
     if (!is_object($user)) {
         $user = (object) $user;
     }
 
+    // Totara: prevent tenantid changes.
+    $olduser = $DB->get_record('user', ['id' => $user->id], '*', MUST_EXIST);
+    if (property_exists($user, 'tenantid')) {
+        if ($olduser->tenantid != $user->tenantid) {
+            throw new coding_exception('tenantid cannot be changed via user_update_user()');
+        }
+    }
+
     // Check username.
-    if (isset($user->username)) {
+    if (isset($user->username) and $user->username !== $olduser->username) { // Totara: previous username IS ok!
         if ($user->username !== core_text::strtolower($user->username)) {
             throw new moodle_exception('usernamelowercase');
         } else {
@@ -531,15 +549,8 @@ function user_get_user_details_courses($user) {
  * @return bool true if $USER can view user details.
  */
 function can_view_user_details_cap($user, $course = null) {
-    // Check $USER has the capability to view the user details at user context.
-    $usercontext = context_user::instance($user->id);
-    $result = has_capability('moodle/user:viewdetails', $usercontext);
-    // Otherwise can $USER see them at course context.
-    if (!$result && !empty($course)) {
-        $context = context_course::instance($course->id);
-        $result = has_capability('moodle/user:viewdetails', $context);
-    }
-    return $result;
+    // Totara: use standard API for profile accesss.
+    return user_can_view_profile($user, $course);
 }
 
 /**
@@ -1041,22 +1052,7 @@ function user_mygrades_url($userid = null, $courseid = SITEID) {
     return $url;
 }
 
-/**
- * Check if the current user has permission to view details of the supplied user.
- *
- * This function supports two modes:
- * If the optional $course param is omitted, then this function finds all shared courses and checks whether the current user has
- * permission in any of them, returning true if so.
- * If the $course param is provided, then this function checks permissions in ONLY that course.
- *
- * @param object $user The other user's details.
- * @param object $course if provided, only check permissions in this course.
- * @param context $usercontext The user context if available.
- * @return bool true for ability to view this user, else false.
- */
-function user_can_view_profile($user, $course = null, $usercontext = null) {
-    return (\core_user\access_controller::for($user, $course))->can_view_profile();
-}
+// Totara: user_can_view_profile() was moved to lib/moodlelib.php in order to eliminate unnecessary includes of this file.
 
 /**
  * Totara: Add my private files to my profile page,

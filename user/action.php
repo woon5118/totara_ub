@@ -69,7 +69,12 @@ if ($action === 'confirm') {
 }
 
 if ($action === 'delete') {
-    require_capability('moodle/user:delete', $context);
+    $usercontext = context_user::instance($user->id, IGNORE_MISSING);
+
+    // Totara: we support delete capability at user context levels.
+    if (!$usercontext or !has_capability('moodle/user:delete', $usercontext)) {
+        require_capability('moodle/user:delete', $context);
+    }
 
     if (is_siteadmin($user->id)) {
         redirect($returnurl, get_string('useradminodelete', 'error'), null, \core\notification::ERROR);

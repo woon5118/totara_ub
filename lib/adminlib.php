@@ -1708,7 +1708,7 @@ abstract class admin_setting {
     public $description;
     /** @var mixed Can be string or array of string */
     public $defaultsetting;
-    /** @var string */
+    /** @var callable|null */
     public $updatedcallback;
     /** @var mixed can be String or Null.  Null means main config table */
     public $plugin; // null means main config table
@@ -2013,7 +2013,7 @@ abstract class admin_setting {
 
     /**
      * Function called if setting updated - cleanup, cache reset, etc.
-     * @param string $functionname Sets the function name
+     * @param callable $functionname Sets the function name
      * @return void
      */
     public function set_updatedcallback($functionname) {

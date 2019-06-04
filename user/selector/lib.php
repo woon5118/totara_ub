@@ -64,6 +64,9 @@ abstract class user_selector_base {
     /** @var mixed This is used by get selected users */
     protected $validatinguserids = null;
 
+    /** @var bool if enabled results are restricted to tenant participants if $accesscontext->tenantid */
+    public $enabletenantrestrictions = false;
+
     /**  @var boolean Used to ensure we only output the search options for one user selector on
      * each page. */
     private static $searchoptionsoutput = false;
@@ -370,6 +373,7 @@ abstract class user_selector_base {
             'extrafields' => $this->extrafields,
             'multiselect' => $this->multiselect,
             'accesscontext' => $this->accesscontext,
+            'enabletenantrestrictions' => $this->enabletenantrestrictions,
         );
     }
 
@@ -456,8 +460,34 @@ abstract class user_selector_base {
      *      this uses ? style placeholders.
      */
     protected function search_sql($search, $u) {
-        return users_search_sql($search, $u, $this->searchanywhere, $this->extrafields,
+        global $CFG, $DB;
+
+        $sql = users_search_sql($search, $u, $this->searchanywhere, $this->extrafields,
                 $this->exclude, $this->validatinguserids);
+
+        if (!$this->enabletenantrestrictions) {
+            return $sql;
+        }
+
+        if (empty($CFG->tenantsenabled)) {
+            return $sql;
+        }
+
+        if ($u) {
+            $u .= '.';
+        }
+        if ($this->accesscontext->tenantid) {
+            $tenant = \core\record\tenant::fetch($this->accesscontext->tenantid);
+            // Unfortunately the u might be empty, we cannot use simple EXISTS here because $u.id might resolve to tp.id.
+            $tenantand = ' AND ' . $u . 'id IN (SELECT tp.userid FROM {cohort_members} tp WHERE tp.cohortid = ' . $tenant->cohortid . ')';
+            $sql[0] .= $tenantand;
+        } else {
+            if (!empty($CFG->tenantsisolated)) {
+                $sql[0] .= ' AND ' . $u . 'tenantid IS NULL';
+            }
+        }
+
+        return $sql;
     }
 
     /**

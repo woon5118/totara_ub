@@ -124,13 +124,15 @@ class totara_dialog_content_category extends totara_dialog_content {
     public function get_all_root_items() {
         global $DB;
 
-        if (has_capability('moodle/category:viewhiddencategories', context_system::instance())) {
-            $conditions = array('parent' => 0);
-        } else {
-            $conditions = array('parent' => 0, 'visible' => 1);
+        $cats = $DB->get_records('course_categories', ['parent' => 0], '', 'id, name, path');
+        foreach ($cats as $k => $cat) {
+            if (!coursecat::get($cat->id)->is_uservisible()) {
+                unset($cats[$k]);
+                continue;
+            }
         }
 
-        return $DB->get_records('course_categories', $conditions, '', 'id, name, path');
+        return $cats;
     }
 
     /**
@@ -141,13 +143,15 @@ class totara_dialog_content_category extends totara_dialog_content {
     public function get_subcategories_item($itemid) {
         global $DB;
 
-        if (has_capability('moodle/category:viewhiddencategories', context_system::instance())) {
-            $conditions = array('parent' => $itemid);
-        } else {
-            $conditions = array('parent' => $itemid, 'visible' => 1);
+        $cats = $DB->get_records('course_categories', ['parent' => $itemid], '', 'id, name, path');
+        foreach ($cats as $k => $cat) {
+            if (!coursecat::get($cat->id)->is_uservisible()) {
+                unset($cats[$k]);
+                continue;
+            }
         }
 
-        return $DB->get_records('course_categories', $conditions, 'id', 'id, name, path');
+        return $cats;
     }
 
     /**
@@ -163,6 +167,13 @@ class totara_dialog_content_category extends totara_dialog_content {
             SELECT DISTINCT parent
             FROM {course_categories}
             WHERE parent != 0");
+        foreach ($parents as $k => $parent) {
+            $cat = coursecat::get($parent->parent, IGNORE_MISSING);
+            if (!$cat or !$cat->is_uservisible()) {
+                unset($parents[$k]);
+                continue;
+            }
+        }
 
         return $parents;
     }

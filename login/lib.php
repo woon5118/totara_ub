@@ -62,13 +62,25 @@ function core_login_process_password_reset_request() {
             $user = $DB->get_record_select('user', $select, $params, '*', IGNORE_MULTIPLE);
         }
 
+        // Totara: do not allow resetting of password when their tenant is disabled.
+        if ($user->tenantid) {
+            if (!$CFG->tenantsenabled) {
+                $user = false;
+            } else {
+                $tenant = \core\record\tenant::fetch($user->tenantid);
+                if ($tenant->suspended) {
+                    $user = false;
+                }
+            }
+        }
+
         // Target user details have now been identified, or we know that there is no such account.
         // Send email address to account's email address if appropriate.
         $pwresetstatus = PWRESET_STATUS_NOEMAILSENT;
         if ($user and !empty($user->confirmed)) {
             $userauth = get_auth_plugin($user->auth);
             if (!$userauth->can_reset_password() or !is_enabled_auth($user->auth)
-              or !has_capability('moodle/user:changeownpassword', $systemcontext, $user->id)) {
+              or !has_capability('moodle/user:changeownpassword', context_user::instance($user->id), $user->id)) {
                 if (send_password_change_info($user)) {
                     $pwresetstatus = PWRESET_STATUS_OTHEREMAILSENT;
                 } else {

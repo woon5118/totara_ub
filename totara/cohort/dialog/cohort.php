@@ -84,16 +84,24 @@ $contextids = array_filter($context->get_parent_context_ids(true),
     function($a) {return has_capability("moodle/cohort:view", context::instance_by_id($a));});
 list($contextssql, $params) = $DB->get_in_or_equal($contextids);
 
-$sql = "SELECT *
-          FROM {cohort}
-         WHERE (contextid {$contextssql})";
+$tenantcontition = '';
+if ($CFG->tenantsenabled) {
+    if ($context->tenantid) {
+        $tenantcontition = " AND ctx.tenantid = {$context->tenantid}";
+    }
+}
+
+$sql = "SELECT c.*
+          FROM {cohort} c
+          JOIN {context} ctx ON ctx.id = c.contextid
+         WHERE (c.contextid {$contextssql} {$tenantcontition})";
 
 if ($selected) {
 // Add all current cohorts even if user would not be able to select them again - changed permissions or moved cohort.
-    $sql .= " OR (id {$selectedsql})";
+    $sql .= " OR (c.id {$selectedsql})";
     $params = array_merge($params, $selectedparams);
 }
-$sql .= " ORDER BY name ASC, idnumber ASC";
+$sql .= " ORDER BY c.name ASC, c.idnumber ASC";
 
 $items = $DB->get_records_sql($sql, $params, 0, TOTARA_DIALOG_MAXITEMS + 1);
 

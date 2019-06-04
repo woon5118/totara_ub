@@ -773,7 +773,7 @@ class core_accesslib_testcase extends advanced_testcase {
      */
     public function test_get_role_archetypes() {
         $archetypes = get_role_archetypes();
-        $this->assertCount(10, $archetypes); // there are 9+1 archetypes in standard totara install
+        $this->assertCount(12, $archetypes); // there are 9+1+2 archetypes in standard totara install
         foreach ($archetypes as $k=>$v) {
             $this->assertSame($k, $v);
         }
@@ -789,8 +789,8 @@ class core_accesslib_testcase extends advanced_testcase {
         $archetypes = get_role_archetypes();
         foreach ($archetypes as $archetype) {
             $roles = get_archetype_roles($archetype);
-            if ($archetype === 'assessor') {
-                // Totara: Not installed by default any more.
+            if ($archetype === 'assessor' or $archetype === 'tenantusermanager' or $archetype === 'tenantdomainmanager') {
+                // Totara: Not installed by default.
                 $this->assertCount(0, $roles);
                 continue;
             }

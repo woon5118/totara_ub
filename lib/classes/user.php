@@ -822,13 +822,16 @@ class core_user {
             return false;
         }
 
+        if (!$user->id or isguestuser($user)) {
+            return false;
+        }
+
+        $personalcontext = context_user::instance($user->id);
         if ($user->id == $USER->id) {
             // Editing own profile.
-            $systemcontext = context_system::instance();
-            return has_capability('moodle/user:editownprofile', $systemcontext);
+            return has_capability('moodle/user:editownprofile', $personalcontext);
         } else  {
             // Teachers, parents, etc.
-            $personalcontext = context_user::instance($user->id);
             if (!has_capability('moodle/user:editprofile', $personalcontext)) {
                 return false;
             }

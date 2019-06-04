@@ -264,6 +264,20 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
         $userid = $USER->id;
     }
 
+    if (is_siteadmin($userid)) {
+        // Admins can see all records no matter what the visibility.
+        return array('1=1', array());
+    }
+
+    $usercontext = false;
+    if ($userid) {
+        $usercontext = context_user::instance($userid, IGNORE_MISSING);
+        if (!$usercontext) {
+            // Most likely deleted users - they cannot access anything!
+            return array('1=0', array());
+        }
+    }
+
     // Initialize availability variables, needed for programs and certifications.
     $availabilitysql = '1=1';
     $availabilityparams = array();
@@ -290,11 +304,34 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
             break;
     }
 
-    if (is_siteadmin($userid)) {
-        // Admins can see all records no matter what the visibility.
-        return array('1=1', array());
+    if (!empty($CFG->tenantsenabled)) {
+        if ($separator !== '.') {
+            throw new coding_exception('RB caching is supposed to be force disabled when multitenancy is enabled');
+        }
+        // NOTE: rb caching is force turned off when multitenancy is enabled,
+        //       we do not have to care about missing ctx_tenantid here, yay!
+        $tenantwhere = '';
+        if (isguestuser($userid) or !$userid) {
+            $tenantwhere = "ctx{$separator}tenantid IS NULL";
+        } else {
+            if (!empty($usercontext->tenantid)) {
+                if (!empty($CFG->tenantsisolated)) {
+                    $tenantwhere = "ctx{$separator}tenantid = {$usercontext->tenantid}";
+                } else {
+                    $tenantwhere = "(ctx{$separator}tenantid = {$usercontext->tenantid} OR ctx{$separator}tenantid IS NULL)";
+                }
+            }
+        }
+        if ($tenantwhere !== '') {
+            if ($availabilitysql === '1=1') {
+                $availabilitysql = $tenantwhere;
+            } else {
+                $availabilitysql = "{$availabilitysql} AND {$tenantwhere}";
+            }
+        }
+    }
 
-    } else if (empty($CFG->audiencevisibility)) {
+    if (empty($CFG->audiencevisibility)) {
         if ($showhidden || has_capability($capability, $systemcontext, $userid)) {
             return array('1=1', array());
         } else {
@@ -312,7 +349,7 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
                                   $capparams);
 
             // Add availability sql.
-            if ($availabilitysql != '1=1') {
+            if ($availabilitysql !== '1=1') {
                 $sqlnormalvisible .= " AND {$availabilitysql} ";
                 $params = array_merge($params, $availabilityparams);
             }
@@ -330,7 +367,7 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
         $paramsnousers = array('tcvwaudvisnousers' => COHORT_VISIBLE_NOUSERS);
 
         // Add availability sql.
-        if ($availabilitysql != '1=1') {
+        if ($availabilitysql !== '1=1') {
             $sqlnousers .= " AND {$availabilitysql} ";
             $paramsnousers = array_merge($paramsnousers, $availabilityparams);
         }

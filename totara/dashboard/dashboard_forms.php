@@ -33,6 +33,7 @@ require_once('lib.php');
  */
 class totara_dashboard_edit_form extends moodleform {
     public function definition() {
+        global $DB, $CFG;
         $mform = & $this->_form;
         $dashboard = $this->_customdata['dashboard'];
 
@@ -48,6 +49,23 @@ class totara_dashboard_edit_form extends moodleform {
 
         $mform->addElement('checkbox', 'locked', get_string('locked', 'totara_dashboard'));
         $mform->addHelpButton('locked', 'locked', 'totara_dashboard');
+
+        if ($dashboard->id) {
+            if ($dashboard->tenantid) {
+                $tenantname = $DB->get_field('tenant', 'name', ['id' => $dashboard->tenantid]);
+                $tenantname = format_string($tenantname);
+                $mform->addElement('static', 'tenantname', get_string('tenant', 'totara_tenant'), $tenantname);
+            }
+        } else {
+            if (!empty($CFG->tenantsenabled)) {
+                $tenants = $DB->get_records_menu('tenant', [], 'name ASC', 'id, name');
+                if ($tenants) {
+                    $tenants = array_map('format_string', $tenants);
+                    $tenants = ['' => get_string('no')] + $tenants;
+                    $mform->addElement('select', 'tenantid', get_string('tenant', 'totara_tenant'), $tenants);
+                }
+            }
+        }
 
         // Cohorts.
         $mform->addElement('header', 'assignedcohortshdr', get_string('assignedcohorts', 'totara_dashboard'));

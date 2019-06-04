@@ -76,6 +76,7 @@ $options = array('enrolid' => $enrolid, 'accesscontext' => $context);
 
 $potentialuserselector = new enrol_manual_potential_participant('addselect', $options);
 $potentialuserselector->viewfullnames = $viewfullnames;
+$potentialuserselector->enabletenantrestrictions = true;
 $currentuserselector = new enrol_manual_current_participant('removeselect', $options);
 $currentuserselector->viewfullnames = $viewfullnames;
 

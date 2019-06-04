@@ -40,7 +40,7 @@ final class quickaccessmenu extends \core\output\template {
         $groups = [];
 
         //Set up data constants
-        $canedit = has_capability('totara/core:editownquickaccessmenu', \context_system::instance());
+        $canedit = has_capability('totara/core:editownquickaccessmenu', \context_user::instance($USER->id));
 
         $data['can_edit'] = $canedit;
         $data['can_search'] = has_capability('moodle/site:config', \context_system::instance());
@@ -64,7 +64,7 @@ final class quickaccessmenu extends \core\output\template {
             foreach ($items as $item) {
                 $itemdata = [
                     'label' => $item->get_label(),
-                    'url' => $item->get_url()->out()
+                    'url' => $item->get_url()->out(false), // TODO: to be fixed by TL-21509
                 ];
 
                 $groups[$group]['items'][] = $itemdata;

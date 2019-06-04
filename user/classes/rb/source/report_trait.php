@@ -67,14 +67,26 @@ trait report_trait {
             $this->add_finalisation_method('finalise_core_user_trait');
         }
 
-        // join uses 'auser' as name because 'user' is a reserved keyword
+        if ($alias !== 'base') {
+            // join uses 'auser' as name because 'user' is a reserved keyword
+            $joinlist[] = new \rb_join(
+                $alias,
+                'LEFT',
+                '{user}',
+                "{$alias}.id = $join.$field",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                $join
+            );
+        }
+
+        // Add tenant join.
         $joinlist[] = new \rb_join(
-            $alias,
+            $alias. '_tenant',
             'LEFT',
-            '{user}',
-            "{$alias}.id = $join.$field",
+            '{tenant}',
+            "{$alias}_tenant.id = {$alias}.tenantid",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            $join
+            [$alias, $join]
         );
 
         return true;
@@ -102,8 +114,7 @@ trait report_trait {
         global $DB, $CFG;
 
         if ($join === 'base' and !isset($this->addeduserjoins['base'])) {
-            $this->addeduserjoins['base'] = array('join' => 'base');
-            $this->add_finalisation_method('finalise_core_user_trait');
+            $this->add_core_user_tables($this->joinlist, 'base', '', 'base');
         }
 
         if (!isset($this->addeduserjoins[$join])) {
@@ -347,14 +358,14 @@ trait report_trait {
             $groupname,
             'deleted',
             get_string('userstatus', 'totara_reportbuilder'),
-            "CASE WHEN $join.deleted = 0 AND $join.suspended = 0 AND $join.confirmed = 1 THEN 0
-                WHEN $join.deleted = 1 THEN 1
+            "CASE WHEN $join.deleted = 1 THEN 1
                 WHEN $join.suspended = 1 THEN 2
                 WHEN $join.confirmed = 0 THEN 3
+                WHEN {$join}_tenant.suspended = 1 THEN 4
                 ELSE 0
             END",
             array(
-                'joins' => $join,
+                'joins' => [$join, $join . '_tenant'],
                 'displayfunc' => 'user_status',
                 'addtypetoheading' => $addtypetoheading
             )
@@ -552,6 +563,28 @@ trait report_trait {
                 'addtypetoheading' => $addtypetoheading
             )
         );
+        $columnoptions[] = new \rb_column_option(
+            $groupname,
+            'tenant',
+            get_string('tenant', 'totara_tenant'),
+            $join . '_tenant.name',
+            array(
+                'joins' => $join . '_tenant',
+                'displayfunc' => 'tenant_name',
+                'extrafields' => ['tenantid' => $join . '_tenant.id', 'categoryid' => $join . '_tenant.categoryid'],
+                'addtypetoheading' => $addtypetoheading,
+            )
+        );
+        $columnoptions[] = new \rb_column_option(
+            $groupname,
+            'tenantmember',
+            get_string('tenantmember', 'totara_tenant'),
+            "CASE WHEN {$join}.tenantid IS NULL THEN 0 ELSE 1 END",
+            array(
+                'displayfunc' => 'yes_or_no',
+                'addtypetoheading' => $addtypetoheading,
+            )
+        );
         return true;
     }
 
@@ -651,18 +684,25 @@ trait report_trait {
             )
         );
 
+        $options = [
+            0 => get_string('activeuser', 'totara_reportbuilder'),
+            1 => get_string('deleteduser', 'totara_reportbuilder'),
+            2 => get_string('suspendeduser', 'totara_reportbuilder'),
+            3 => get_string('unconfirmeduser', 'totara_reportbuilder'),
+        ];
+        if (!empty($CFG->tenantsenabled)) {
+            $options[4] = get_string('tenantsuspended', 'totara_tenant');
+        }
         if ($this instanceof \rb_source_user) {
             // Deleted users are always excluded, we have a special deleted_users report now instead.
+            unset($options[1]);
             $filteroptions[] = new \rb_filter_option(
                 $groupname,
                 'deleted',
                 get_string('userstatus', 'totara_reportbuilder'),
                 'select',
                 array(
-                    'selectchoices' => array(0 => get_string('activeuser', 'totara_reportbuilder'),
-                        2 => get_string('suspendeduser', 'totara_reportbuilder'),
-                        3 => get_string('unconfirmeduser', 'totara_reportbuilder'),
-                    ),
+                    'selectchoices' => $options,
                     'attributes' => $select_width_options,
                     'simplemode' => true,
                     'addtypetoheading' => $addtypetoheading
@@ -675,11 +715,7 @@ trait report_trait {
                 get_string('userstatus', 'totara_reportbuilder'),
                 'select',
                 array(
-                    'selectchoices' => array(0 => get_string('activeuser', 'totara_reportbuilder'),
-                        1 => get_string('deleteduser', 'totara_reportbuilder'),
-                        2 => get_string('suspendeduser', 'totara_reportbuilder'),
-                        3 => get_string('unconfirmeduser', 'totara_reportbuilder'),
-                    ),
+                    'selectchoices' => $options,
                     'attributes' => $select_width_options,
                     'simplemode' => true,
                     'addtypetoheading' => $addtypetoheading
@@ -785,6 +821,26 @@ trait report_trait {
                 );
             }
         }
+
+        $filteroptions[] = new \rb_filter_option(
+            $groupname,
+            'tenant',
+            get_string('tenant', 'totara_tenant'),
+            'text',
+            array('addtypetoheading' => $addtypetoheading)
+        );
+
+        $filteroptions[] = new \rb_filter_option(
+            $groupname,
+            'tenantmember',
+            get_string('tenantmember', 'totara_tenant'),
+            'select',
+            array(
+                'selectchoices' => array(0 => get_string('no'), 1 => get_string('yes')),
+                'simplemode' => true,
+                'addtypetoheading' => $addtypetoheading
+            )
+        );
 
         return true;
     }

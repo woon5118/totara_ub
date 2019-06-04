@@ -22,7 +22,6 @@
  * @subpackage blocks_totara_stats
  */
 
-require_once($CFG->dirroot.'/blocks/totara_stats/locallib.php');
 
 class block_totara_stats extends block_base {
 
@@ -48,6 +47,7 @@ class block_totara_stats extends block_base {
 
     function get_content() {
         global $CFG, $USER;
+        require_once($CFG->dirroot.'/blocks/totara_stats/locallib.php');
 
         // Check if content is cached
         if($this->content !== NULL) {

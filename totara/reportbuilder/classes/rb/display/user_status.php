@@ -40,6 +40,9 @@ class user_status extends base {
             case 3:
                 $status = get_string('unconfirmeduser', 'totara_reportbuilder');
                 break;
+            case 4:
+                $status = get_string('tenantsuspended', 'totara_tenant');
+                break;
             default:
                 $status = get_string('activeuser', 'totara_reportbuilder');
         }

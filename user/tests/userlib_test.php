@@ -36,7 +36,7 @@ require_once($CFG->dirroot.'/user/lib.php');
  * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class core_userliblib_testcase extends advanced_testcase {
+class core_user_userlib_testcase extends advanced_testcase {
     /**
      * Test user_get_user_details_courses
      */
@@ -612,7 +612,7 @@ class core_userliblib_testcase extends advanced_testcase {
 
         // Even with cap, still guests should not be allowed in.
         $guestrole = $DB->get_records_menu('role', array('shortname' => 'guest'), 'id', 'archetype, id');
-        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $guestrole['guest'], context_system::instance()->id, true);
+        assign_capability('moodle/user:viewalldetails', CAP_ALLOW, $guestrole['guest'], context_system::instance()->id, true);
         reload_all_capabilities();
         foreach ($users as $user) {
             $this->assertFalse(user_can_view_profile($user));
@@ -661,7 +661,7 @@ class core_userliblib_testcase extends advanced_testcase {
         $this->setUser($user9);
         $user1context = context_user::instance($user1->id);
         $this->assertFalse(has_capability('moodle/user:viewdetails', $systemcontext));
-        $this->assertFalse(has_capability('moodle/user:viewdetails', $user1context));
+        $this->assertFalse(has_capability('moodle/user:viewalldetails', $user1context));
 
         // Confirm that user_can_view_profile() returns true for $user1 when called without $course param. It should find $course1.
         $this->assertTrue(user_can_view_profile($user1));

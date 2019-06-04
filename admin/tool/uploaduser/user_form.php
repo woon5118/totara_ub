@@ -74,7 +74,7 @@ class admin_uploaduser_form1 extends moodleform {
  */
 class admin_uploaduser_form2 extends moodleform {
     function definition () {
-        global $CFG, $USER;
+        global $CFG, $USER, $DB;
 
         $mform   = $this->_form;
         $columns = $this->_customdata['columns'];
@@ -205,6 +205,22 @@ class admin_uploaduser_form2 extends moodleform {
 
         // default values
         $mform->addElement('header', 'defaultheader', get_string('defaultvalues', 'tool_uploaduser'));
+
+        if ($CFG->tenantsenabled) {
+            $tenants = $DB->get_records_menu('tenant', [], 'name ASC', 'id,name');
+            foreach ($tenants as $tenantid => $tenantname) {
+                $tenantcontext = \context_tenant::instance($tenantid);
+                if (!has_capability('totara/tenant:usercreate', $tenantcontext)) {
+                    unset($tenants[$tenantid]);
+                    continue;
+                }
+                $tenants[$tenantid] = format_string($tenantname);
+            }
+            if ($tenants) {
+                $tenants = [0 => get_string('no')] + $tenants;
+                $mform->addElement('select', 'tenantid', get_string('tenant', 'totara_tenant'), $tenants);
+            }
+        }
 
         $mform->addElement('text', 'username', get_string('uuusernametemplate', 'tool_uploaduser'), 'size="20"');
         $mform->setType('username', PARAM_RAW); // No cleaning here. The process verifies it later.

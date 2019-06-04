@@ -61,6 +61,10 @@ class file_info_context_coursecat extends file_info {
     public function get_file_info($component, $filearea, $itemid, $filepath, $filename) {
         global $DB;
 
+        if ($this->context->is_user_access_prevented()) {
+            return null;
+        }
+
         if (!$this->category->visible and !has_capability('moodle/category:viewhiddencategories', $this->context)) {
             if (empty($component)) {
                 // we can not list the category contents, so try parent, or top system
@@ -96,6 +100,10 @@ class file_info_context_coursecat extends file_info {
      */
     protected function get_area_coursecat_description($itemid, $filepath, $filename) {
         global $CFG;
+
+        if ($this->context->is_user_access_prevented()) {
+            return null;
+        }
 
         if (!$this->category->visible and !has_capability('moodle/category:viewhiddencategories', $this->context)) {
             return null;
@@ -169,6 +177,9 @@ class file_info_context_coursecat extends file_info {
         $course_cats = $DB->get_records('course_categories', array('parent'=>$this->category->id), 'sortorder', 'id,visible');
         foreach ($course_cats as $category) {
             $context = context_coursecat::instance($category->id);
+            if ($context->is_user_access_prevented()) {
+                continue;
+            }
             if (!$category->visible and !has_capability('moodle/category:viewhiddencategories', $context)) {
                 continue;
             }
@@ -238,6 +249,9 @@ class file_info_context_coursecat extends file_info {
                 array('categoryid' => $this->category->id, 'catlevel' => CONTEXT_COURSECAT));
         foreach ($rs as $record) {
             $context = context::instance_by_id($record->contextid);
+            if ($context->is_user_access_prevented()) {
+                continue;
+            }
             if (!$record->visible and !has_capability('moodle/category:viewhiddencategories', $context)) {
                 continue;
             }

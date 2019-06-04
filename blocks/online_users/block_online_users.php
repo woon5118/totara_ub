@@ -103,8 +103,8 @@ class block_online_users extends block_base {
             //Accessibility: Don't want 'Alt' text for the user picture; DO want it for the envelope/message link (existing lang string).
             //Accessibility: Converted <div> to <ul>, inherit existing classes & styles.
             $this->content->text .= "<ul class='list'>\n";
-            if (isloggedin() && has_capability('moodle/site:sendmessage', $this->page->context)
-                           && !empty($CFG->messaging) && !isguestuser()) {
+            if (isloggedin() && !empty($CFG->messaging) && !isguestuser()
+                && has_capability('moodle/site:sendmessage', context_user::instance($USER->id))) {
                 $canshowicon = true;
             } else {
                 $canshowicon = false;
@@ -119,8 +119,15 @@ class block_online_users extends block_base {
 
                 } else {
                     $this->content->text .= '<div class="user">';
-                    $this->content->text .= '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$this->page->course->id.'" title="'.$timeago.'">';
-                    $this->content->text .= $OUTPUT->user_picture($user, array('size'=>16, 'alttext'=>false, 'link'=>false)) .$user->fullname.'</a></div>';
+                    $profileurl = user_get_profile_url($user, $this->page->course->id);
+                    if ($profileurl) {
+                        $this->content->text .= '<a href="' . $profileurl . '" title="' . $timeago . '">';
+                    }
+                    $this->content->text .= $OUTPUT->user_picture($user, array('size'=>16, 'alttext'=>false, 'link'=>false)) .$user->fullname;
+                    if ($profileurl) {
+                        $this->content->text .= '</a>';
+                    }
+                    $this->content->text .= '</div>';
                 }
                 if ($canshowicon and ($USER->id != $user->id) and !isguestuser($user)) {  // Only when logged in and messaging active etc
                     $anchortagcontents = $OUTPUT->flex_icon('comment', array('alt' => get_string('messageselectadd')));

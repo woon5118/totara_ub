@@ -178,7 +178,7 @@ trait report_schedule_trait {
             "(SELECT $concat $from)",
             [
                 'displayfunc' => 'report_schedule_systemusers',
-                'capability' => ['moodle/user:viewdetails'],
+                'capability' => ['moodle/user:viewalldetails'],
                 'iscompound' => true,
                 'issubquery' => true,
             ]

@@ -4013,7 +4013,27 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
     $component = clean_param(array_shift($args), PARAM_COMPONENT);
     $filearea  = clean_param(array_shift($args), PARAM_AREA);
 
+    /** @var context $context */
     list($context, $course, $cm) = get_context_info_array($contextid);
+
+    // Totara: enforce tenant separation.
+    if ($context->is_user_access_prevented()) {
+        $ignorerestriction = false;
+
+        // The only exception is profile images of participants in the same tenant.
+        if (!empty($USER->tenantid) and $component === 'user' and $filearea === 'icon') {
+            if ($context->contextlevel == CONTEXT_USER and !$context->tenantid) {
+                $tenant = core\record\tenant::fetch($USER->tenantid);
+                if ($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $context->instanceid])) {
+                    $ignorerestriction = true;
+                }
+            }
+        }
+
+        if (!$ignorerestriction) {
+            send_file_not_found();
+        }
+    }
 
     $fs = get_file_storage();
 
@@ -4340,40 +4360,11 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
 
         } else if ($filearea === 'profile' and $context->contextlevel == CONTEXT_USER) {
 
-            if ($CFG->forcelogin) {
-                require_login();
-            }
-
             $userid = $context->instanceid;
+            $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
 
-            if ($USER->id == $userid) {
-                // always can access own
-
-            } else if (!empty($CFG->forceloginforprofiles)) {
-                require_login();
-
-                if (isguestuser()) {
-                    send_file_not_found();
-                }
-
-                // we allow access to site profile of all course contacts (usually teachers)
-                if (!has_coursecontact_role($userid) && !has_capability('moodle/user:viewdetails', $context)) {
-                    send_file_not_found();
-                }
-
-                $canview = false;
-                if (has_capability('moodle/user:viewdetails', $context)) {
-                    $canview = true;
-                } else {
-                    $courses = enrol_get_my_courses();
-                }
-
-                while (!$canview && count($courses) > 0) {
-                    $course = array_shift($courses);
-                    if (has_capability('moodle/user:viewdetails', context_course::instance($course->id))) {
-                        $canview = true;
-                    }
-                }
+            if (!user_can_view_profile($user)) {
+                send_file_not_found();
             }
 
             $filename = array_pop($args);
@@ -4389,29 +4380,11 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
             $userid = (int)array_shift($args);
             $usercontext = context_user::instance($userid);
 
-            if ($CFG->forcelogin) {
-                require_login();
-            }
+            $course = $DB->get_record('course', ['id' => $context->instanceid], '*', MUST_EXIST);
+            $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
 
-            if (!empty($CFG->forceloginforprofiles)) {
-                require_login();
-                if (isguestuser()) {
-                    print_error('noguest');
-                }
-
-                //TODO: review this logic of user profile access prevention
-                if (!has_coursecontact_role($userid) and !has_capability('moodle/user:viewdetails', $usercontext)) {
-                    print_error('usernotavailable');
-                }
-                if (!has_capability('moodle/user:viewdetails', $context) && !has_capability('moodle/user:viewdetails', $usercontext)) {
-                    print_error('cannotviewprofile');
-                }
-                if (!is_enrolled($context, $userid)) {
-                    print_error('notenrolledprofile');
-                }
-                if (groups_get_course_groupmode($course) == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
-                    print_error('groupnotamember');
-                }
+            if (!user_can_view_profile($user, $course)) {
+                send_file_not_found();
             }
 
             $filename = array_pop($args);
@@ -4458,6 +4431,10 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
             if ($CFG->forcelogin) {
                 // no login necessary - unless login forced everywhere
                 require_login();
+            }
+
+            if ($context->is_user_access_prevented()) {
+                send_file_not_found();
             }
 
             // Check if user can view this category.

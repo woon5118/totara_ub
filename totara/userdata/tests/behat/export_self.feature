@@ -21,6 +21,7 @@ Feature: Own user data exporting
       | totara/userdata:viewexports | Allow      | datamanager | System       |           |
       | totara/userdata:viewinfo    | Allow      | datamanager | System       |           |
       | moodle/user:update          | Allow      | datamanager | System       |           |
+      | moodle/user:viewalldetails  | Allow      | datamanager | System       |           |
       | totara/userdata:exportself  | Allow      | exporter    | System       |           |
 
   Scenario: Export own user data

@@ -23,6 +23,7 @@ Feature: Manual user data purging
       | totara/userdata:viewinfo    | Allow      | datamanager| System       |           |
       | totara/core:seedeletedusers | Allow      | datamanager| System       |           |
       | moodle/user:update          | Allow      | datamanager| System       |           |
+      | moodle/user:viewalldetails  | Allow      | datamanager| System       |           |
 
   Scenario: Purge user data manually
     Given I log in as "manager"

@@ -14,6 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+/** @var admin_root $ADMIN */
+/** @var context_system $systemcontext */
+
 /**
  * This file defines settingpages and externalpages under the "courses" category
  *
@@ -21,6 +25,37 @@
  * @copyright 2002 onwards Martin Dougiamas (http://dougiamas.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+$coursemgmtadded = false;
+if (has_any_capability(['moodle/category:manage', 'moodle/course:create'], $systemcontext)) {
+    $ADMIN->add('courses',
+        new admin_externalpage('coursemgmt', new lang_string('coursemgmt', 'admin'),
+            $CFG->wwwroot . '/course/management.php',
+            ['moodle/category:manage', 'moodle/course:create']
+        )
+    );
+    $coursemgmtadded = true;
+} else if (!empty($USER->tenantid)) {
+    $tenant = core\record\tenant::fetch($USER->tenantid);
+    $categorycontext = context_coursecat::instance($tenant->categoryid);
+    if (has_any_capability(['moodle/category:manage', 'moodle/course:create'], $categorycontext)) {
+        $ADMIN->add('courses',
+            new admin_externalpage('tenantcategory', new lang_string('coursemgmt', 'admin'),
+                $CFG->wwwroot . '/course/management.php',
+                ['moodle/category:manage', 'moodle/course:create'], false, $categorycontext
+            )
+        );
+        $coursemgmtadded = true;
+    }
+}
+if (!$coursemgmtadded and coursecat::has_capability_on_any('moodle/category:viewhiddencategories')) {
+    $ADMIN->add('courses',
+        new admin_externalpage('coursecategories', new lang_string('coursemgmt', 'admin'),
+            $CFG->wwwroot . '/course/categories.php',
+            'moodle/block:view' // We need ANY capability that all users have in system context for this hack.
+        )
+    );
+}
 
 $capabilities = array(
     'moodle/backup:backupcourse',
@@ -35,12 +70,6 @@ $capabilities = array(
 );
 if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     // Speedup for non-admins, add all caps used on this page.
-    $ADMIN->add('courses',
-        new admin_externalpage('coursemgmt', new lang_string('coursemgmt', 'admin'),
-            $CFG->wwwroot . '/course/management.php',
-            array('moodle/category:manage', 'moodle/course:create')
-        )
-    );
     $ADMIN->add('courses',
         new admin_externalpage('restorecourse', new lang_string('restorecourse', 'admin'),
             new moodle_url('/backup/restorefile.php', array('contextid' => context_system::instance()->id)),

@@ -1465,9 +1465,7 @@ class core_user_external extends external_api {
         $currentuser = $USER->id == $user->id;
         $usercontext = context_user::instance($user->id);
 
-        if (!$currentuser and
-                !has_capability('moodle/user:viewdetails', $coursecontext) and
-                !has_capability('moodle/user:viewdetails', $usercontext)) {
+        if (!user_can_view_profile($user, $course)) {
             throw new moodle_exception('cannotviewprofile');
         }
 
@@ -1551,7 +1549,8 @@ class core_user_external extends external_api {
 
         if (empty($params['userid']) or $params['userid'] == $USER->id) {
             $user = $USER;
-            require_capability('moodle/user:editownprofile', $context);
+            $personalcontext = context_user::instance($user->id);
+            require_capability('moodle/user:editownprofile', $personalcontext);
         } else {
             $user = core_user::get_user($params['userid'], '*', MUST_EXIST);
             core_user::require_active_user($user);

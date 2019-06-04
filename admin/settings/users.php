@@ -1,8 +1,30 @@
 <?php
 
+defined('MOODLE_INTERNAL') || die();
+/** @var admin_root $ADMIN */
+/** @var context_system $systemcontext */
+
 // This file defines settingpages and externalpages under the "users" category
 
 // Totara: Removed 'accounts' and 'roles' categories.
+
+if (has_capability('moodle/user:viewalldetails', $systemcontext)) {
+    $ADMIN->add('users', new admin_externalpage('editusers', new lang_string('manageusers','admin'),
+        "$CFG->wwwroot/$CFG->admin/user.php", 'moodle/user:viewalldetails'));
+} else if (!empty($USER->tenantid)) {
+    $tenantcontext = context_tenant::instance($USER->tenantid);
+    $tenant = core\record\tenant::fetch($USER->tenantid);
+    if (has_capability('totara/tenant:view', $tenantcontext) and has_capability('moodle/user:viewalldetails', $tenantcontext)) {
+        $ADMIN->add('users', new admin_externalpage('tenantusers', new lang_string('manageusers','admin'),
+            "$CFG->wwwroot/totara/tenant/participants.php?id=$tenant->id", 'moodle/user:viewalldetails', false, $tenantcontext));
+    } else {
+        $categorycontext = context_coursecat::instance($tenant->categoryid);
+        if (has_capability('totara/tenant:viewparticipants', $categorycontext)) {
+            $ADMIN->add('users', new admin_externalpage('tenantusers', new lang_string('manageusers','admin'),
+                "$CFG->wwwroot/totara/tenant/participants.php?id=$tenant->id", 'totara/tenant:viewparticipants', false, $categorycontext));
+        }
+    }
+}
 
 if ($hassiteconfig
  or has_capability('moodle/user:create', $systemcontext)
@@ -14,8 +36,7 @@ if ($hassiteconfig
  or has_capability('moodle/cohort:view', $systemcontext)) { // speedup for non-admins, add all caps used on this page
 
 
-    // Totara: stuff under the "Users" subcategory
-    $ADMIN->add('users', new admin_externalpage('editusers', new lang_string('manageusers','admin'), "$CFG->wwwroot/$CFG->admin/user.php", array('moodle/user:update', 'moodle/user:delete')));
+// Totara: stuff under the "Users" subcategory
     $ADMIN->add('users', new admin_externalpage('userbulk', new lang_string('userbulk','admin'), "$CFG->wwwroot/$CFG->admin/user/user_bulk.php", array('moodle/user:update', 'moodle/user:delete')));
 
     // "User default preferences" settingpage.
@@ -116,6 +137,8 @@ if ($hassiteconfig
                         $userroles[$role->id] = $rolename;
                         break;
                     case 'frontpage':
+                    case 'tenantusermanager':
+                    case 'tenantdomainmanager':
                         break;
                     default:
                         $creatornewroles[$role->id] = $rolename;

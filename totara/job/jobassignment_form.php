@@ -195,7 +195,7 @@ class job_assignment_form extends moodleform {
                     $testuser = new stdClass();
                     $testuser->id = $appraiserid;
                     $testuser->deleted = false;
-                    $showlink = user_can_view_profile($testuser, null, $usercontext);
+                    $showlink = user_can_view_profile($testuser, null);
                 } else {
                     $showlink = false;
                 }
@@ -245,7 +245,7 @@ class job_assignment_form extends moodleform {
                 $testuser = new stdClass();
                 $testuser->id = $managerid;
                 $testuser->deleted = false;
-                $showlink = user_can_view_profile($testuser, null, $usercontext);
+                $showlink = user_can_view_profile($testuser, null);
             } else {
                 $showlink = false;
             }
@@ -332,7 +332,7 @@ class job_assignment_form extends moodleform {
                     $testuser = new stdClass();
                     $testuser->id = $tempmanagerid;
                     $testuser->deleted = false;
-                    $showlink = user_can_view_profile($testuser, null, $usercontext);
+                    $showlink = user_can_view_profile($testuser, null);
                 } else {
                     $showlink = false;
                 }

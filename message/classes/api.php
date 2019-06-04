@@ -177,13 +177,40 @@ class api {
         $excludeusers = array($userid, $CFG->siteguest);
         list($exclude, $excludeparams) = $DB->get_in_or_equal($excludeusers, SQL_PARAMS_NAMED, 'param', false);
 
+        // Totara: enforce tenant restrictions.
+        $usercontext = \context_user::instance($userid);
+        $tenantjoin = "";
+        $tenantvisible = "";
+        if ($CFG->tenantsenabled and $CFG->tenantsisolated) {
+            if ($usercontext->tenantid) {
+                $tenant = \core\record\tenant::fetch($usercontext->tenantid);
+                $tenantjoin = 'JOIN "ttr_cohort_members" tcm ON tcm.userid = u.id AND tcm.cohortid = ' . $tenant->cohortid;
+            } else {
+                $sql = 'SELECT t.cohortid
+                          FROM "ttr_tenant" t
+                          JOIN "ttr_cohort_members" tm ON tm.cohortid = t.cohortid
+                         WHERE tm.userid = :userid';
+                $myparticipations = $DB->get_fieldset_sql($sql, ['userid' => $userid]);
+                if (!$myparticipations) {
+                    $tenantvisible = 'AND u.tenantid IS NULL';
+                } else {
+                    $cohortids = implode(',', $myparticipations);
+                    $tenantvisible = 'AND (u.tenantid IS NULL OR (
+                        EXISTS (SELECT 1 FROM "ttr_cohort_members" tcm WHERE tcm.userid = u.id AND tcm.cohortid IN (' . $cohortids. '))
+                    ))';
+                }
+            }
+        }
+
         // Ok, let's search for contacts first.
         $contacts = array();
         $sql = "SELECT $ufields, mc.blocked
                   FROM {user} u
                   JOIN {message_contacts} mc
                     ON u.id = mc.contactid
+           $tenantjoin
                  WHERE mc.userid = :userid
+                   $tenantvisible
                    AND u.deleted = 0
                    AND u.confirmed = 1
                    AND " . $DB->sql_like($fullname, ':search', false) . "
@@ -219,7 +246,9 @@ class api {
         $noncontacts = array();
         $sql = "SELECT $ufields
                   FROM {user} u
+           $tenantjoin
                  WHERE u.deleted = 0
+                   $tenantvisible
                    AND u.confirmed = 1
                    AND " . $DB->sql_like($fullname, ':search', false) . "
                    AND u.id $exclude
@@ -690,7 +719,7 @@ class api {
 
         // Let's check if the user is allowed to delete this conversation.
         if (has_capability('moodle/site:deleteanymessage', $systemcontext) ||
-            ((has_capability('moodle/site:deleteownmessage', $systemcontext) &&
+            ((has_capability('moodle/site:deleteownmessage', \context_user::instance($USER->id)) &&
                 $USER->id == $userid))) {
             return true;
         }
@@ -877,14 +906,28 @@ class api {
      * @return bool true if user is permitted, false otherwise.
      */
     public static function can_post_message($recipient, $sender = null) {
-        global $USER;
+        global $USER, $CFG, $DB;
 
         if (is_null($sender)) {
             // The message is from the logged in user, unless otherwise specified.
             $sender = $USER;
         }
+        if (empty($recipient->id) or isguestuser($recipient)) {
+            return false;
+        }
+        if ($recipient->id == $sender->id) {
+            return false;
+        }
 
-        if (!has_capability('moodle/site:sendmessage', \context_system::instance(), $sender)) {
+        $recipientcontext = \context_user::instance($recipient->id, IGNORE_MISSING);
+        if (!$recipientcontext) {
+            return false;
+        }
+        $sendercontext = \context_user::instance($sender->id, IGNORE_MISSING);
+        if (!$sendercontext) {
+            return false;
+        }
+        if (!has_capability('moodle/site:sendmessage', $sendercontext, $sender)) {
             return false;
         }
 
@@ -901,6 +944,26 @@ class api {
         // The recipient has specifically blocked this sender.
         if (self::is_user_blocked($recipient->id, $senderid)) {
             return false;
+        }
+
+        // Totara: enforce tenant separation - admins are exception.
+        if ($CFG->tenantsenabled and $CFG->tenantsisolated and !is_siteadmin($sender->id) and !is_siteadmin($recipient->id)) {
+            if ($sendercontext->tenantid and $recipientcontext->tenantid) {
+                if ($sendercontext->tenantid != $recipientcontext->tenantid) {
+                    return false;
+                }
+            }
+            if ($sendercontext->tenantid) {
+                $tenant = \core\record\tenant::fetch($sendercontext->tenantid);
+                if (!$DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $recipient->id])) {
+                    return false;
+                }
+            } else if ($recipientcontext->tenantid) {
+                $tenant = \core\record\tenant::fetch($recipientcontext->tenantid);
+                if (!$DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $sender->id])) {
+                    return false;
+                }
+            }
         }
 
         return true;
