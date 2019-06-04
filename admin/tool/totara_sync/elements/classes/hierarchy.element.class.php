@@ -492,18 +492,23 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             $items = $DB->get_records($elname, array(), '', 'id, idnumber, parentid');
             foreach ($items as $item) {
                 if (!isset($nodes[$item->idnumber])) {
-                    $nodes[$item->idnumber] = ($item->parentid == 0) ? 0 : $items[$item->parentid]->idnumber;
+                    $nodes[$item->idnumber] = ($item->parentid == 0) ? '' : $items[$item->parentid]->idnumber;
                 }
             }
+            unset($items);
         }
 
         // Start eliminating nodes from the valid trees
         // Start at the top so get all the root nodes (no parentid)
-        $top_nodes_1 = array_keys($nodes, '');
-        $top_nodes_2 = array_keys($nodes, '0');
+        $top_nodes_1 = array_keys($nodes, '', true);
+        $top_nodes_2 = array_keys($nodes, '0', true);
+        $top_nodes_3 = array_keys($nodes, 0, true);
+        $top_nodes_4 = array_keys($nodes, null, true);
 
         // Merge top level nodes into one array
-        $goodnodes = array_merge($top_nodes_1, $top_nodes_2);
+        $goodnodes = array_merge($top_nodes_1, $top_nodes_2, $top_nodes_3, $top_nodes_4);
+
+        unset($top_nodes_1, $top_nodes_2, $top_nodes_3, $top_nodes_4);
 
         while (!empty($goodnodes)) {
             $newgoodnodes = array();
