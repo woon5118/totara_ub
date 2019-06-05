@@ -66,7 +66,7 @@ if ($eventdata && isset($eventdata->action)) {
 }
 
 $from     = totara_get_sender_from_user_by_id($msg->useridfrom);
-$fromname = fullname($from) . " ({$from->email})";
+$fromname = fullname($from) . " (" . clean_string($from->email) . ")";
 $subject  = format_string($msg->subject);
 
 if ($isfacetoface && !$DB->record_exists('facetoface_sessions', array('id' => $eventdata->data['session']->id))) {

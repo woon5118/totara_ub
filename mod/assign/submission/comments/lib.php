@@ -163,7 +163,8 @@ function assignsubmission_comments_comment_display($comments, $options) {
                     $commenter->alternatename = '';
                     $commenter->picture = 0;
                     $commenter->id = $guestuser->id;
-                    $commenter->email = $guestuser->email;
+                    // TOTARA - Escape potential XSS in user email.
+                    $commenter->email = clean_string($guestuser->email);
                     $commenter->imagealt = $guestuser->imagealt;
 
                     // Temporarily store blind-marking information for use in later comments if necessary.

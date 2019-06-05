@@ -344,7 +344,8 @@ function print_user_entry($user, $keywords, $count) {
         $profile_set = array('city'=>true, 'country'=>true, 'email'=>true);
         foreach ($profile_set as $key=>$value) {
             if (isset($user->$key)){
-                $html .= '<li>'.$user->$key.'</li>';
+                // TOTARA - Escape potential XSS in user email.
+                $html .= '<li>'.clean_string($user->$key).'</li>';
             }
         }
         $html .= "</ul>";

@@ -39,7 +39,7 @@
             if ($user->maildisplay == 0) { // 0 = don't display my email to anyone.
                 echo '<td>' . get_string('emaildisplayhidden') . '</td><td>';
             } else {
-                echo '<td>'.$user->email.'</td><td>';
+                echo '<td>'.clean_string($user->email).'</td><td>';
             }
             if (empty($user->email)) {
                 $error = get_string('emailuserhasnone');

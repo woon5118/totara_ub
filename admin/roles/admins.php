@@ -44,7 +44,8 @@ $potentialadmisselector->set_extra_fields(array('username'));
 if (optional_param('add', false, PARAM_BOOL) and confirm_sesskey()) {
     if ($userstoadd = $potentialadmisselector->get_selected_users()) {
         $user = reset($userstoadd);
-        $username = fullname($user) . " ($user->username, $user->email)";
+        // TOTARA - Escape potential XSS in user email.
+        $username = fullname($user) . " ($user->username, " . clean_string($user->email) . ")";
         echo $OUTPUT->header();
         $yesurl = new moodle_url('/admin/roles/admins.php', array('confirmadd'=>$user->id, 'sesskey'=>sesskey()));
         echo $OUTPUT->confirm(get_string('confirmaddadmin', 'core_role', $username), $yesurl, $PAGE->url);
@@ -58,7 +59,8 @@ if (optional_param('add', false, PARAM_BOOL) and confirm_sesskey()) {
         if ($USER->id == $user->id) {
             // Can not remove self.
         } else {
-            $username = fullname($user) . " ($user->username, $user->email)";
+            // TOTARA - Escape potential XSS in user email.
+            $username = fullname($user) . " ($user->username, " . clean_string($user->email) . ")";
             echo $OUTPUT->header();
             $yesurl = new moodle_url('/admin/roles/admins.php', array('confirmdel'=>$user->id, 'sesskey'=>sesskey()));
             echo $OUTPUT->confirm(get_string('confirmdeladmin', 'core_role', $username), $yesurl, $PAGE->url);

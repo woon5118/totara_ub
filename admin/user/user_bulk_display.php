@@ -66,8 +66,10 @@ foreach($users as $user) {
     $table->data[] = array (
         '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.SITEID.'">'.$user->fullname.'</a>',
 //        $user->username,
-        $user->email,
-        $user->city,
+        // TOTARA - Escape potential XSS in user email.
+        clean_string($user->email),
+        // TOTARA - Escape potential XSS in the extra identity fields.
+        s($user->city),
         $user->country,
         $user->lastaccess ? format_time(time() - $user->lastaccess) : $strnever
     );

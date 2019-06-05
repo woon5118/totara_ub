@@ -63,7 +63,7 @@ if ($msg->useridfrom == 0) {
 } else {
     $from = $DB->get_record('user', array('id' => $msg->useridfrom));
 }
-$fromname = fullname($from) . " ({$from->email})";
+$fromname = fullname($from) . " (" . clean_string($from->email) . ")";
 
 $tab = new html_table();
 $tab->attributes['class'] = 'fullwidth invisiblepadded';

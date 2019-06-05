@@ -141,7 +141,7 @@ class participant_details implements \renderable {
                     in_array('email', $extrafields) or ($user->id == $USER->id)) {
             $userdata->email = array(
                 'label' => get_string('email') . get_string('labelsep', 'langconfig'),
-                'link' => html_writer::link("mailto:$user->email", $user->email)
+                'link' => html_writer::link("mailto:$user->email", clean_string($user->email))
             );
         }
 

@@ -114,7 +114,7 @@ foreach ($ids as $msgid => $msg) {
     $type_alt = $display['text'];
 
     $from     = totara_get_sender_from_user_by_id($msg->useridfrom);
-    $fromname = fullname($from) . " ({$from->email})";
+    $fromname = fullname($from) . " (" . clean_string($from->email) . ")";
 
     $icon = $OUTPUT->pix_icon('/msgicons/'.$metadata->icon, format_string($msg->subject), 'totara_core', array('class'=>'msgicon', 'title' => format_string($msg->subject)));
     $cells = array();

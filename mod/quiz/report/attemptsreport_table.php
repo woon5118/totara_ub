@@ -145,6 +145,11 @@ abstract class quiz_attempts_report_table extends table_sql {
                 get_string('reviewattempt', 'quiz'), array('class' => 'reviewlink'));
     }
 
+    // TOTARA - Escape potential XSS in user email.
+    public function col_email($row) {
+        return clean_string($row->email);
+    }
+
     // TOTARA - Escape potential XSS in extra identity fields.
     public function col_address($row) {
         return s($row->address);

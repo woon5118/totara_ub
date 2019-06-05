@@ -88,8 +88,9 @@ class core_webservice_renderer extends plugin_renderer_base {
         foreach ($users as $user) {
             $modifiedauthoriseduserurl = new moodle_url('/' . $CFG->admin . '/webservice/service_user_settings.php',
                             array('userid' => $user->id, 'serviceid' => $serviceid));
+            // TOTARA - Escape potential XSS in user email.
             $html .= html_writer::tag('a', $user->firstname . " "
-                            . $user->lastname . ", " . $user->email,
+                            . $user->lastname . ", " . clean_string($user->email),
                             array('href' => $modifiedauthoriseduserurl));
             //add missing capabilities
             if (!empty($user->missingcapabilities)) {

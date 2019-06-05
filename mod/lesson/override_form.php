@@ -151,7 +151,8 @@ class lesson_override_form extends moodleform {
                     if (empty($invalidusers[$id]) || (!empty($override) &&
                             $id == $override->userid)) {
                         if ($canviewemail) {
-                            $userchoices[$id] = fullname($user) . ', ' . $user->email;
+                            // TOTARA - Escape potential XSS in user email.
+                            $userchoices[$id] = fullname($user) . ', ' . clean_string($user->email);
                         } else {
                             $userchoices[$id] = fullname($user);
                         }

@@ -1456,7 +1456,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             foreach ($users as $user) {
                 $row = [fullname($user)];
                 if ($showemail) {
-                    $row[] = $user->email;
+                    $row[] = clean_string($user->email);
                 }
                 if ($showidnumber) {
                     $row[] = s($user->idnumber);

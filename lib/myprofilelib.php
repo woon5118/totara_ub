@@ -182,8 +182,9 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
                                              or has_capability('moodle/course:useremail', $courseorusercontext)
                                              or has_capability('moodle/site:viewuseridentity', $courseorusercontext)
                                              or ($user->maildisplay == 2 and enrol_sharing_course($user, $USER)))) {
+        // TOTARA - Escape potential XSS in user email.
         $node = new core_user\output\myprofile\node('contact', 'email', get_string('email'), null, null,
-            obfuscate_mailto($user->email, ''));
+            obfuscate_mailto(clean_string($user->email), ''));
         $tree->add_node($node);
     }
 

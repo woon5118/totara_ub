@@ -136,7 +136,7 @@ class mod_forum_renderer extends plugin_renderer_base {
             foreach ($users as $user) {
                 $subscriber = $this->output->user_picture($user, array('courseid'=>$course->id)) . fullname($user);
                 if ($canviewemail) {
-                    $subscriber .= ' (' . $user->email . ')';
+                    $subscriber .= ' (' . clean_string($user->email) . ')';
                 }
                 $subscribers[] = $subscriber;
             }

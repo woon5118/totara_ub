@@ -655,7 +655,8 @@ class api {
                 $data->country = $userfields['country'];
             }
             if (isset($userfields['email'])) {
-                $data->email = $userfields['email'];
+                // TOTARA - Escape potential XSS in user email.
+                $data->email = clean_string($userfields['email']);
             }
             if (isset($userfields['lastaccess'])) {
                 $data->isonline = helper::is_online($userfields['lastaccess']);

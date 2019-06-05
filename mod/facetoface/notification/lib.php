@@ -1892,7 +1892,11 @@ function facetoface_message_substitutions_userfields($msg, $user) {
     foreach ($fields as $field) {
         // Replace.
         if (isset($placeholders[$field])) {
-            $msg = str_replace($placeholders[$field], $user->$field, $msg);
+            if ($field == 'description') {
+                $msg = str_replace($placeholders[$field], $user->$field, $msg);
+            } else {
+                $msg = str_replace($placeholders[$field], clean_string($user->$field), $msg);
+            }
         }
         // Legacy.
         $msg = str_replace(get_string('placeholder:'.$field, 'mod_facetoface'), $user->$field, $msg);
