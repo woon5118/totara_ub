@@ -206,6 +206,10 @@ class sqlsrv_native_moodle_database extends moodle_database {
         // Totara: add database communication encryption support
         if (!empty($this->dboptions['encrypt'])) {
             $options['encrypt'] = true;
+            // Check if we're supporting unsigned certs
+            if (isset($this->dboptions['trustservercertificate'])) {
+                $options['TrustServerCertificate'] = (bool)$this->dboptions['trustservercertificate'];
+            }
         }
 
         $this->sqlsrv = sqlsrv_connect($dbhost, $options);

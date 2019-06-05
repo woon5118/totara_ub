@@ -98,6 +98,7 @@ $CFG->dboptions = array(
 //
 // MS SQL Server specific options:
 //    $CFG->dboptions['encrypt'] = true;
+//    $CFG->dboptions['trustservercertificate'] = true;
 // More information at:
 //  * https://docs.microsoft.com/en-gb/sql/connect/php/connection-options?view=sql-server-2017
 
