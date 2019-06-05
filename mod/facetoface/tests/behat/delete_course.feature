@@ -20,40 +20,29 @@ Feature: Delete a course with a seminar
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
       | student2 | C1     | student        |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | course   | sessionattendance |
+      | Test seminar name | C1       | 1                 |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface         | details |
+      | Test seminar name  | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start               | finish              |
+      | event 1      | 2025-01-01 11:00:00 | 2025-01-01 12:00:00 |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails |
+      | student1 | event 1      |
+      | student2 | event 1      |
+
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                | Test seminar name                              |
-      | Description         | Test seminar description                       |
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I follow "Edit settings"
+    And I expand all fieldsets
+    And I set the following fields to these values:
       | Completion tracking | Show activity as complete when conditions are met |
       | Require grade       | 1                                                 |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | 2025 |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | 2025 |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I press "OK"
-    And I press "Save changes"
-    When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press "Add"
-    And I wait "1" seconds
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I press "Continue"
-    And I press "Confirm"
-    Then I wait until "Sam1 Student1" "text" exists
+    And I press "Save and display"
     And I log out
 
     And I log in as "admin"

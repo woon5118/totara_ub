@@ -121,10 +121,8 @@ Feature: Seminar timezones in reports
     And I set the field "Source" to "Seminar Sign-ups"
     And I press "Create report"
     And I switch to "Columns" tab
-    And I add the "Event Finish Time" column to the report
-    And I add the "Event Start Time" column to the report
-    #And I add the "Event Finish Time" column to the report
-    And I add the "Session Start (linked to activity)" column to the report
+    And I add the "Session Finish Date/Time" column to the report
+    And I add the "Session Start Date/Time (linked to activity)" column to the report
 
     When I navigate to my "F2F sessions" report
     Then I should see "1 January 2020" in the "First User" "table_row"
