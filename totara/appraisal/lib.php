@@ -2734,7 +2734,7 @@ class appraisal_stage {
             );
             $event->trigger();
 
-            if ($this->is_all_roles_complete($roleassignment->subjectid)) {
+            if ($this->is_all_roles_complete($roleassignment->subjectid, true)) {
                 // Mark this stage as complete for this user.
                 $this->complete_for_user($roleassignment->subjectid);
             }
@@ -2745,10 +2745,16 @@ class appraisal_stage {
      * Check if all involved roles are complete for this user and stage.
      *
      * @param $subjectid
+     * @param bool $check_unfilled_roles  when false: method will also return true if there are currently no roles involved.
      * @return bool
      */
-    public function is_all_roles_complete($subjectid) {
+    public function is_all_roles_complete($subjectid, $check_unfilled_roles = false) {
         $rolescompletion = $this->get_mandatory_completion($subjectid);
+        if (empty($rolescompletion) && $check_unfilled_roles) {
+            // No valid roles for this stage. Check if it was completed before by a role that got removed.
+            return $this->has_completion_by_unfilled_role($subjectid);
+        }
+
         $complete = true;
         foreach ($rolescompletion as $rolecompletion) {
             if (!isset($rolecompletion->timecompleted)) {
@@ -2757,6 +2763,32 @@ class appraisal_stage {
             }
         }
         return $complete;
+    }
+
+    /**
+     * Checks if at least one role that is unassigned by now has completed this stage before,
+     * This can be the case for example when a manager is unassigned from a learner or a manager account is deleted.
+     *
+     * @param $subjectid
+     * @return bool
+     */
+    public function has_completion_by_unfilled_role($subjectid) {
+        global $DB;
+
+        $sql = 'SELECT ara.appraisalrole, ara.userid, ara.activepageid, asd.timecompleted,
+                       asd.usercompleted, asd.realusercompleted
+                  FROM {appraisal_role_assignment} ara
+                  JOIN {appraisal_user_assignment} aua
+                    ON ara.appraisaluserassignmentid = aua.id
+             LEFT JOIN (SELECT * FROM {appraisal_stage_data}
+                         WHERE appraisalstageid = ?) asd
+                    ON ara.id = asd.appraisalroleassignmentid
+                 WHERE aua.userid = ?
+                   AND aua.appraisalid = ?
+                   AND asd.timecompleted > 0
+                   AND ara.userid = 0
+              ORDER BY ara.appraisalrole';
+        return $DB->record_exists_sql($sql, [$this->id, $subjectid, $this->appraisalid]);
     }
 
     /**
@@ -2826,7 +2858,7 @@ class appraisal_stage {
         if (!empty($nextstageid)) {
             // Check if the next stage is complete.
             $nextstage = new appraisal_stage($nextstageid);
-            if ($nextstage->is_all_roles_complete($subjectid)) {
+            if ($nextstage->is_all_roles_complete($subjectid, true)) {
                 $nextstage->complete_for_user($subjectid);
             }
         } else {

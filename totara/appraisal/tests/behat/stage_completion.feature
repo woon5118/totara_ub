@@ -41,8 +41,8 @@ Feature: Test appraisal stage completion with missing roles
       | appraisal   | stage      | name      |
       | Appraisal1  | App1_Stage | App1_Page |
     And the following "questions" exist in "totara_appraisal" plugin:
-      | appraisal   | stage      | page      | name     | type          | default | roles   | ExtraInfo |
-      | Appraisal1  | App1_Stage | App1_Page | App1-Q1  | text          | 2       | manager |           |
+      | appraisal   | stage      | page      | name     | type          | default | roles           | ExtraInfo |
+      | Appraisal1  | App1_Stage | App1_Page | App1-Q1  | text          | 2       | learner,manager |           |
     And the following "assignments" exist in "totara_appraisal" plugin:
       | appraisal   | type     | id     |
       | Appraisal1  | audience | AppAud |

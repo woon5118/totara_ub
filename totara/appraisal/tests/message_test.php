@@ -97,7 +97,10 @@ class appraisal_message_test extends appraisal_testcase {
         $this->assertEquals(appraisal_message::EVENT_APPRAISAL_ACTIVATION, $msgtest->type);
         $this->assertEquals(0, $msgtest->delta);
         $this->assertEquals(0, $msgtest->deltaperiod);
-        $this->assertEquals($roles, $msgtest->roles);
+        $msgtestroles = $msgtest->roles;
+        sort($roles);
+        sort($msgtestroles);
+        $this->assertEquals($roles, $msgtestroles);
         $this->assertEquals(0, $msgtest->stageiscompleted);
         foreach ($roles as $role) {
             $content = $msgtest->get_message($role);

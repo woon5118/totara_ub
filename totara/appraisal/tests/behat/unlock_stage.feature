@@ -35,7 +35,7 @@ Feature: Test unlocking an appraisal stage for a role
     And the following "questions" exist in "totara_appraisal" plugin:
       | appraisal   | stage       | page       | name     | type          | default | roles           | ExtraInfo |
       | Appraisal1  | App1_Stage1 | App1_Page1 | App1-Q1  | text          | 2       | learner,manager |           |
-      | Appraisal1  | App1_Stage2 | App1_Page2 | App1-Q2  | text          | 2       | manager,manager |           |
+      | Appraisal1  | App1_Stage2 | App1_Page2 | App1-Q2  | text          | 2       | learner,manager |           |
     And the following "assignments" exist in "totara_appraisal" plugin:
       | appraisal   | type     | id     |
       | Appraisal1  | audience | AppAud |
