@@ -140,7 +140,7 @@ trait report_trait {
                 'joins' => $join,
                 'displayfunc' => 'user_link',
                 'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
-                'extrafields' => array_merge(array('id' => "$join.id"), $allnamefields),
+                'extrafields' => array_merge(array('id' => "$join.id", 'deleted' => "{$join}.deleted"), $allnamefields),
                 'addtypetoheading' => $addtypetoheading
             )
         );

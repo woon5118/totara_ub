@@ -33,7 +33,13 @@ namespace totara_reportbuilder\rb\display;
 class user_link extends base {
 
     /**
-     * Handles the display
+     * Handles the display. Rules are pretty simple:
+     * + Don't show link in the spreadsheet.
+     * + Don't show link if actor cannot view target user profile in specific context
+     * + Show link with course id if the actor can view with course context
+     * + Show link with course id if the actor is viewing actor's self profile.
+     * + Show link without course id if the the course is a SITE.
+     * + Show link without course id if the actor is viewing self's profile but not enrolled
      *
      * @param string $value
      * @param string $format
@@ -43,6 +49,8 @@ class user_link extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        global $USER, $PAGE, $DB;
+
         // Extra fields expected are fields from totara_get_all_user_name_fields_join() and totara_get_all_user_name_fields_join()
         $extrafields = self::get_extrafields_row($row, $column);
         $isexport = ($format !== 'html');
@@ -53,33 +61,58 @@ class user_link extends base {
             $fullname = fullname($extrafields);
         }
 
-        // Don't show links in spreadsheet.
-        if ($isexport) {
+        if (empty($fullname)) {
+            return '';
+        }
+
+        $userid = $extrafields->id;
+        if ($isexport || $userid == 0) {
             return $fullname;
         }
 
-        if ($extrafields->id == 0) {
-            // No user id means no link, most likely the fullname is empty anyway.
+        if (isset($extrafields->deleted)) {
+            $isdeleted = $extrafields->deleted;
+        } else {
+            // Grab one if needed.
+            debugging(
+                "For the performance speed, please include the field 'deleted' in your report builder SQL",
+                DEBUG_DEVELOPER
+            );
+
+            $isdeleted = $DB->get_field('user', 'deleted', ['id' => $userid], MUST_EXIST);
+        }
+
+        if ($isdeleted) {
+            // If the user is deleted, don't show link.
             return $fullname;
         }
+
+        $url = new \moodle_url("/user/view.php", ["id" => $userid]);
+        if (CLI_SCRIPT && !PHPUNIT_TEST) {
+            // It is CLI_SCRIPT, most likely that the course is not being set for $PAGE, and neither the $PAGE itself.
+            return \html_writer::link($url, $fullname);
+        }
+
+        $course = $PAGE->course;
+
         // A hacky way to detect whether we are displaying the user name link within a course context or not.
         // TL-18965 reported with inconsistency link for username that it goes to system context instead of course
         // context even though the embedded report was view within course.
-        $params = array('id' => $extrafields->id);
-        if (!CLI_SCRIPT) {
-            global $PAGE;
-            // Only adding the course id if user the course is not one of the SITE course
-            if ($PAGE->course->id != SITEID) {
-                $params['course'] = $PAGE->course->id;
-            }
-        }
-
-        $url = new \moodle_url('/user/view.php', $params);
-        if ($fullname === '') {
-            return '';
-        } else {
+        if ($course->id == SITEID) {
             return \html_writer::link($url, $fullname);
         }
+
+        // Only adding the course id if user the course is not one of the SITE course
+        $context = \context_course::instance($course->id);
+        if (is_enrolled($context, $userid) || is_viewing($context, $userid)) {
+            $url->param('course', $course->id);
+            return \html_writer::link($url, $fullname);
+        } else if ($userid == $USER->id) {
+            return \html_writer::link($url, $fullname);
+        }
+
+        // The current actor is not able to view the profile of target user within course.
+        return $fullname;
     }
 
     /**
