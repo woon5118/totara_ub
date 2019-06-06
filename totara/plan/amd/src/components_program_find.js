@@ -34,35 +34,53 @@ define(['core/config', 'core/str', 'totara_plan/component'], function(cfg, str, 
 
             component.init({plan_id: planId, page: page, component_name: componentName});
 
-            const handler = new component.totaraDialog_handler_preRequisite();
-            handler.baseurl = url;
+            /*
+            * Make a wrapper function to avoid the race condition between bundle.js and totaraDialog.
+            * The dialoginits array executes callbacks in the order that they were added,
+            * and component.init add it's callback before this callback (to handle the totaraDialog_handler_preRequisite).
+            */
+            const uniqueId = 'initialise_program_find_dialog';
+            var initialiseProgramFindDialog = function() {
 
-            const buttonsObj = {};
+                const handler = new component.totaraDialog_handler_preRequisite();
+                handler.baseurl = url;
 
-            const requiredStrs = [
-                {key: 'save', component: 'totara_core'},
-                {key: 'cancel', component: 'moodle'},
-                {key: 'addprograms', component: 'totara_plan'},
-            ];
-            str.get_strings(requiredStrs).done(function(strings) {
-                buttonsObj[strings[0]] = function() {
-                    handler._save(saveurl);
-                };
-                buttonsObj[strings[1]] = function() {
-                    handler._cancel();
-                };
-                // eslint-disable-next-line no-undef
-                totaraDialogs.evidence = new totaraDialog(
-                    'assignprograms',
-                    'show-program-dialog',
-                    {
-                        buttons: buttonsObj,
-                        title: '<h2>' + strings[2] + '</h2>'
-                    },
-                    url + 'find.php?id=' + planId,
-                    handler
-                );
-            });
+                const buttonsObj = {};
+
+                const requiredStrs = [
+                    {key: 'save', component: 'totara_core'},
+                    {key: 'cancel', component: 'moodle'},
+                    {key: 'addprograms', component: 'totara_plan'},
+                ];
+                str.get_strings(requiredStrs).done(function(strings) {
+                    buttonsObj[strings[0]] = function() {
+                        handler._save(saveurl);
+                    };
+                    buttonsObj[strings[1]] = function() {
+                        handler._cancel();
+                    };
+                    // eslint-disable-next-line no-undef
+                    totaraDialogs.evidence = new totaraDialog(
+                        'assignprograms',
+                        'show-program-dialog',
+                        {
+                            buttons: buttonsObj,
+                            title: '<h2>' + strings[2] + '</h2>'
+                        },
+                        url + 'find.php?id=' + planId,
+                        handler
+                    );
+                    M.util.js_complete(uniqueId);
+                });
+            };
+
+            M.util.js_pending(uniqueId);
+            if (window.dialogsInited) {
+                initialiseProgramFindDialog();
+            } else {
+                window.dialoginits = window.dialoginits || [];
+                window.dialoginits.push(initialiseProgramFindDialog);
+            }
 
         }
     };

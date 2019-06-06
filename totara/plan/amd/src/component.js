@@ -56,21 +56,35 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
                 var baseurl = '';
             };
 
-            component.totaraDialog_handler_preRequisite.prototype = new totaraDialog_handler_treeview_multiselect();
+            // Make a wrapper function to avoid the race condition between bundle.js and totaraDialog.
+            const uniqueId = 'initialise_component_totara_dialog';
+            var initialiseComponentTotaraDialog = function() {
 
-            /**
-             * Add a row to a table on the calling page
-             * Also hides the dialog and any no item notice
-             *
-             * @param string    HTML response
-             * @return void
-             */
-            component.totaraDialog_handler_preRequisite.prototype._update = function(response) {
-                // Hide dialog.
-                this._dialog.hide();
-                // Update table
-                component.totara_totara_plan_update(response);
+                component.totaraDialog_handler_preRequisite.prototype = new totaraDialog_handler_treeview_multiselect();
+
+                /**
+                * Add a row to a table on the calling page
+                * Also hides the dialog and any no item notice
+                *
+                * @param {response} response HTML response
+                */
+                component.totaraDialog_handler_preRequisite.prototype._update = function(response) {
+                    // Hide dialog.
+                    this._dialog.hide();
+                    // Update table
+                    component.totara_totara_plan_update(response);
+                };
+
+                M.util.js_complete(uniqueId);
             };
+
+            M.util.js_pending(uniqueId);
+            if (window.dialogsInited) {
+                initialiseComponentTotaraDialog();
+            } else {
+                window.dialoginits = window.dialoginits || [];
+                window.dialoginits.push(initialiseComponentTotaraDialog);
+            }
         },
 
         /**

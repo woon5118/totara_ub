@@ -34,9 +34,15 @@ define(['jquery', 'core/str', 'totara_plan/component', 'core/config', 'core/noti
          * @param {string} componentName the component_name
          */
         init: function(planId, page, componentName) {
+            component.init({plan_id: planId, page: page, component_name: componentName});
+
+            /*
+            * Make a wrapper function to avoid the race condition between bundle.js and totaraDialog.
+            * The dialoginits array executes callbacks in the order that they were added,
+            * and component.init add it's callback before this callback (to handle the totaraDialog_handler_preRequisite).
+            */
             const uniqueId = 'initialise_competency_find_dialog';
             var initialiseCompetencyFindDialog = function() {
-                component.init({plan_id: planId, page: page, component_name: componentName});
 
                 var TotaraDialogHandlerCompetency = function() {
                     this.baseUrl = '';
