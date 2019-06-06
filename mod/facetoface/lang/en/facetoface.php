@@ -648,6 +648,7 @@ $string['error:userbookedsessionconflictmultidayselfsignup'] = 'You are already 
 $string['error:userdeleted'] = 'Can not add deleted user {$a} to the seminar.';
 $string['error:userimportuseridnotanint'] = 'Cannot add user with user id {$a} because it is not an integer';
 $string['error:usernamenotfound'] = 'No users were found with the following usernames: {$a}';
+$string['error:usernotfound'] = '(not found)';
 $string['error:usersuspended'] = 'Can not add suspended user {$a} to the seminar.';
 $string['error:xinvalidjaidnumber'] = 'Job assignment with idnumber {$a->idnumber} not found for user {$a->user}';
 $string['eventapprovalrequiredviewed'] = 'Approval required viewed';
@@ -708,6 +709,7 @@ $string['exportuserprofilefields_desc'] = 'Include these user profile fields in 
 $string['exportxls'] = 'XLS (Microsoft Excel)';
 $string['exportods'] = 'ODS (OpenDocument)';
 $string['exportcsv'] = 'CSV';
+$string['exportcsvforupload'] = 'CSV export for Upload';
 
 $string['external'] = 'Allow room conflicts';
 $string['f2f-waitlist-actions'] = 'Actions';
@@ -793,6 +795,7 @@ $string['icaldescription'] = 'This calendar event is for the "{$a->name}" semina
 $string['icallocationstringdelimiter'] = ',';
 $string['ignoreapprovalwhenaddingattendees'] = 'Book users without requiring approval';
 $string['import'] = 'Import';
+$string['importexportattendancelegend'] = 'Import/Export attendance';
 $string['individuals'] = 'Individuals';
 $string['info'] = 'Info';
 $string['inprogress'] = 'In progress';
@@ -820,7 +823,7 @@ $string['managerreserve'] = 'Allow manager reservations';
 $string['managerreserve_help'] = 'Managers are able to make reservations or bookings on behalf of their team members';
 $string['managerreserveheader'] = 'Manager reservations';
 $string['managesessions'] = 'View and manage sessions';
-$string['mark_selected_as'] = 'Bulk action: Mark as ';
+$string['mark_selected_as'] = 'and mark as';
 $string['maxbookings'] = 'Maximum bookings';
 $string['maxbookings_help'] = '**Maximum bookings** is the number of seats available in an event.
 
@@ -1113,7 +1116,7 @@ $string['selectjobassignmentsignup'] = 'Select job assignment on signup';
 $string['selectnone'] = 'Select none';
 $string['selectnoneop'] = 'None';
 $string['selectnotsetop'] = 'Not Set';
-$string['selectlearner'] = 'Select learners: ';
+$string['selectlearner'] = 'Select learners';
 $string['selectmanager'] = 'Select manager';
 $string['selectoptionbefore'] = ' Please choose an option (All, Set or Not set) before selecting this option';
 $string['selectroom'] = 'Select room';
@@ -1167,14 +1170,14 @@ $string['uploadattendance_help'] = 'Preparing a file for upload: Use .CSV text f
 
 All rows must have the following columns:
 
-* **\'username\'** OR **\'idnumber\'** OR **\'email\'** (use only one)
+* **\'username\'** OR **\'idnumber\'** OR **\'email\'** OR **\'signupid\'** (use only one)
 * **\'eventattendance\'** - one of the following codes:
  * 4 - Fully attended
  * 3 - Partially attended
  * 2 - Unable to attend
  * 1 - No show
 
-Optional column: **\'eventgrade\'** - a number between 0 - 100 (or leave empty to skip)';
+Optional column: **\'eventgrade\'** - a number between 0 - 100';
 $string['uploadattendancestep'] = 'Upload event attendance and grades (step {$a} of 2)';
 $string['uploadattendanceresults'] = 'Upload event attendance and grades results';
 $string['uploadattendancereview'] = 'Review and confirm changes ({$a} records)';

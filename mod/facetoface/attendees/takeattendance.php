@@ -28,6 +28,8 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
+require_once($CFG->libdir.'/odslib.class.php');
+require_once($CFG->libdir.'/excellib.class.php');
 
 use mod_facetoface\signup_helper;
 use mod_facetoface\attendance\{attendance_helper, factory};

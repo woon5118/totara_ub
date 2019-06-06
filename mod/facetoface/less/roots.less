@@ -336,7 +336,8 @@ select.menuf2f-select {
                 @table-thin-border-color: mix(@table-border-color, @totara_style-color_neutral_7, 80%);
                 border-top: 1px solid @table-thin-border-color;
                 // Add a thick border between events
-                &.firstsession, &.waitlisted {
+                &.firstsession,
+                &.waitlisted {
                     border-top: 2px solid @table-border-color;
                 }
             }
@@ -351,7 +352,9 @@ select.menuf2f-select {
             margin: 0;
             padding: 0;
 
-            &__event, &__booking, &__user {
+            &__event,
+            &__booking,
+            &__user {
                 white-space: nowrap;
             }
             &__user {
@@ -426,7 +429,7 @@ select.menuf2f-select {
     a.mod_facetoface__sessionlist__action__reserve__link,
     a.mod_facetoface__sessionlist__attendance--saved__link,
     a.mod_facetoface__sessionlist__attendance--open__link {
-        &, &:link {
+        &:link {
             .force-link-color();
         }
         // Workaround for Firefox 66 / Chrome 72 link color bug, visible on seminar events dashboard.
@@ -440,7 +443,7 @@ select.menuf2f-select {
 .f2f-inline-box {
     display: inline-block;
     vertical-align: middle;
-    margin-right: 9px;
+    margin-right: 5px;
 }
 
 .custom-facetoface-selection {
@@ -465,6 +468,13 @@ form.f2f-attendance-form {
 
 .f2f-takeattendance-bulk-action-box {
     margin-bottom: 16px;
+    display: flex;
+    padding: @totara_style-spacing_small;
+    border: 1px #e6e6e6 solid;
+    border-radius: 2px;
+    input[name="saveattendance"] {
+        margin: 0 0 5px 5px;
+    }
 }
 
 div.mod-facetoface__export-options {
@@ -516,6 +526,23 @@ a.mod_facetoface__action_goback {
     }
 }
 
-a.mod_facetoface__action_uploadattendance {
-    margin: 0 0 3px 5px;
+.path-mod-facetoface {
+    form.import_export {
+        padding-top: @totara_style-spacing_large;
+        div.fitem > fieldset {
+            text-align: center;
+        }
+        div.fitem > fieldset {
+            a.mod_facetoface__action_uploadattendance,
+            a.mod_facetoface__action_csvexportupload,
+            select[name="f2f-export-actions"] {
+                margin: 0 10px 3px 0px;
+            }
+        }
+    }
+    table.userstoupload {
+        span.usernotfound {
+            margin-left: @totara_style-size_4;
+        }
+    }
 }

@@ -39,6 +39,11 @@ $cm = $seminar->get_coursemodule();
 $context = $seminar->get_contextmodule($cm->id);
 
 $list = new bulk_list($listid);
+$returnurl = $list->get_returnurl();
+if ($seminarevent->get_id() != $list->get_seminareventid()) {
+    $list->clean();
+    redirect($returnurl, get_string('updateattendeesunsuccessful', 'mod_facetoface'), null, \core\notification::ERROR);
+}
 $params = ['s' => $seminarevent->get_id(), 'sd' => $sd, 'listid' => $list->get_list_id()];
 $currenturl = new moodle_url('/mod/facetoface/attendees/list/import_attendance_confirm.php', $params);
 
@@ -56,12 +61,12 @@ $PAGE->set_title($seminar->get_name() . ': ' . $pagetitle);
 // Selected users.
 $userlist = $list->get_user_ids();
 if (empty($userlist)) {
-    redirect($list->get_returnurl(), get_string('updateattendeesunsuccessful', 'mod_facetoface'), null, \core\notification::ERROR);
+    $list->clean();
+    redirect($returnurl, get_string('updateattendeesunsuccessful', 'mod_facetoface'), null, \core\notification::ERROR);
 }
 
 $mform = new import_attendance_confirm(null, $params);
 if ($mform->is_cancelled()) {
-    $returnurl = $list->get_returnurl();
     $mform->cancel($list);
     redirect($returnurl);
 }

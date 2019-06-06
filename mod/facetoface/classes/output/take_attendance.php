@@ -26,7 +26,9 @@ namespace mod_facetoface\output;
 defined('MOODLE_INTERNAL') || die();
 
 use core\output\template;
+use mod_facetoface\attendance\attendance_helper;
 use mod_facetoface\seminar_event;
+use mod_facetoface\seminar_session;
 use mod_facetoface\signup\state\not_set;
 
 /**
@@ -66,11 +68,16 @@ class take_attendance extends template {
                                   take_attendance_session_picker $sessionpicker = null): take_attendance {
         global $USER;
 
+
         $uploadattendanceurl = new \moodle_url(
             '/mod/facetoface/attendees/list/import_attendance.php',
             ['s' => $seminarevent->get_id(), 'sd' => $sessiondateid]
         );
-
+        $csvexportforuploadurl = new \moodle_url(
+            '/mod/facetoface/attendees/takeattendance.php',
+            ['s' => $seminarevent->get_id(), 'sd' => $sessiondateid, 'onlycontent' => '1', 'download' => 'csvforupload']
+        );
+        $exports = self::get_exports();
         $data = [
             'url' => $url->out(),
             'sessionid' => $seminarevent->get_id(),
@@ -90,21 +97,9 @@ class take_attendance extends template {
             'tablecontent' => $tablecontent,
             'sessionpicker' => null,
             'bulkaction' => $bulkaction->get_template_data(),
-            'exports' => [
-                [
-                    'value' => 'exportcsv',
-                    'label' => get_string('exportcsv', 'mod_facetoface')
-                ],
-                [
-                    'value' => 'exportxls',
-                    'label' => get_string('exportxls', 'mod_facetoface'),
-                ],
-                [
-                    'value' => 'exportods',
-                    'label' => get_string('exportods', 'mod_facetoface'),
-                ]
-            ],
+            'exports' => $exports,
             'notsetcode' => not_set::get_code(),
+            'csvexportforuploadurl' => $csvexportforuploadurl->out(),
             'uploadattendanceurl' => $uploadattendanceurl->out(),
             'disableupload' => !$seminarevent->is_attendance_open(),
             'showupload' => !(bool)$sessiondateid
@@ -122,5 +117,27 @@ class take_attendance extends template {
         }
 
         return new static($data);
+    }
+
+    /**
+     * Get an export list.
+     * @return array $exports
+     */
+    private static function get_exports(): array {
+        $exports = [
+            [
+                'value' => 'exportcsv',
+                'label' => get_string('exportcsv', 'mod_facetoface')
+            ],
+            [
+                'value' => 'exportxls',
+                'label' => get_string('exportxls', 'mod_facetoface'),
+            ],
+            [
+                'value' => 'exportods',
+                'label' => get_string('exportods', 'mod_facetoface'),
+            ]
+        ];
+        return $exports;
     }
 }

@@ -70,6 +70,12 @@ abstract class content_generator {
     protected $statusoptions;
 
     /**
+     * Determine whether we are going to disable the actions in taking attendance at event/session level or not.
+     * @var bool $disabled
+     */
+    protected $disabled = false;
+
+    /**
      * content_generator constructor.
      *
      * @param seminar_event        $seminarevent
@@ -93,10 +99,10 @@ abstract class content_generator {
     /**
      * @param event_attendee[] $data
      * @param moodle_url $url
-     *
+     * @param bool $disabled
      * @return totara_table
      */
-    abstract public function generate_allowed_action_content(array $data, moodle_url $url): totara_table;
+    abstract public function generate_allowed_action_content(array $data, moodle_url $url, bool $disabled = false): totara_table;
 
     /**
      * The keys of returning array should be specified as below:
@@ -104,10 +110,11 @@ abstract class content_generator {
      * + headers: string[]
      *
      * @param event_attendee[] $data
+     * @param $format export format string csv|excel|ods|etc
      *
      * @return array    Array<string, array>
      */
-    abstract public function generate_downloadable_content(array $data): array;
+    abstract public function generate_downloadable_content(array $data, string $format): array;
 
     /**
      * Lazy loading the seminar_session_list here, as if it is not set, we should set it.
@@ -133,16 +140,20 @@ abstract class content_generator {
     protected function create_checkbox(event_attendee $attendee): string {
         $checkoptionid = 'check_submissionid_' . $attendee->submissionid;
 
+        $attributes = [
+            'class' => 'selectedcheckboxes',
+            'data-selectid' => 'menusubmissionid_' . $attendee->submissionid,
+            'aria-label' => get_string('takeattendance_tick', 'mod_facetoface', clean_string(fullname($attendee)))
+        ];
+        if ($this->disabled) {
+            $attributes['disabled'] = 'disabled';
+        }
         return html_writer::checkbox(
             $checkoptionid,
             $attendee->statuscode,
             false,
             '',
-            [
-                'class' => 'selectedcheckboxes',
-                'data-selectid' => 'menusubmissionid_' . $attendee->submissionid,
-                'aria-label' => get_string('takeattendance_tick', 'mod_facetoface', clean_string(fullname($attendee))),
-            ]
+            $attributes
         );
     }
 
@@ -157,7 +168,7 @@ abstract class content_generator {
         global $OUTPUT;
 
         return $OUTPUT->render(
-            take_attendance_status_picker::create($attendee, $this->statusoptions, false)
+            take_attendance_status_picker::create($attendee, $this->statusoptions, $this->disabled)
         );
     }
 

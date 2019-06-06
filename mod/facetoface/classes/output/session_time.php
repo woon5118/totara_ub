@@ -27,6 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 
 use core\output\template;
 use mod_facetoface\seminar_session;
+use MoodleExcelFormat;
+use MoodleExcelWorkbook;
+use MoodleOdsFormat;
 
 /**
  * Provide functions to format session times.
@@ -66,6 +69,13 @@ class session_time {
         return $formattedsession;
     }
 
+    /**
+     * Returns self::format in string lang format
+     * @param int $start date/time
+     * @param int $end date/time
+     * @param string $timezone date/time
+     * @return string
+     */
     public static function to_string(int $start, int $end, string $timezone): string {
 
         $sessionobj = static::format($start, $end, $timezone);
@@ -87,6 +97,13 @@ class session_time {
         return $timestring;
     }
 
+    /**
+     * Returns seminar event sing-up period
+     * @param $startdate date/time
+     * @param $finishdate date/time
+     * @param int $timezone date/time
+     * @return string
+     */
     public static function signup_period($startdate, $finishdate, $timezone = 99): string {
 
         $returntext    = '';
@@ -178,5 +195,98 @@ class session_time {
      */
     private static function wrap_eventtime(string $time): string {
         return \html_writer::tag('time', clean_string($time), ['class' => 'mod_facetoface__sessionlist__eventtime']);
+    }
+
+    /**
+     * Displays/Exports the session date and time with timezone or without timezone if timezone display is disabled.
+     *
+     * @uses \mod_facetoface\export_helper::download_xls
+     * @uses \mod_facetoface\export_helper::download_ods
+     * @uses \mod_facetoface\rb\display\local_event_date
+     *
+     * @param $value - timestamp
+     * @param string $format - export format
+     * @param int $timezone 99 - force 99 for reportbuilder local_session_date() display
+     * @param bool $sessiontimezone true|false - force false for reportbuilder local_session_date() display
+     * @return array|string
+     */
+    public static function format_datetime($value, string $format, int $timezone = 99, bool $sessiontimezone = true) {
+
+        if (empty($value)) {
+            return '';
+        }
+
+        if (!is_numeric($value) || $value == 0 || $value == -1) {
+            return '';
+        }
+
+        switch ($format) {
+            case 'excel':
+            case 'xls':
+                $date = static::export_excel($value, MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATETIME);
+                break;
+            case 'ods':
+                $date = static::export_ods($value, 22);
+                break;
+            // Modify this to reflect special format requirements if necessary
+            case 'csv':
+            case 'pdflandscape':
+            case 'pdfportrait':
+            case 'html':
+            default:
+                $displaytimezones = (bool)(int)get_config(null, 'facetoface_displaysessiontimezones') && $sessiontimezone;
+
+                if (empty($timezone) || (int)$timezone == 99 || !$displaytimezones) {
+                    $targettz = \core_date::get_user_timezone();
+                } else {
+                    $targettz = \core_date::normalise_timezone($timezone);
+                }
+
+                if ($displaytimezones) {
+                    $date = userdate($value, get_string('strftimedatetime', 'langconfig'), $targettz) . ' ';
+                    $tzstring = \core_date::get_localised_timezone($targettz);
+                    $date .= $tzstring;
+                } else {
+                    $date = userdate($value, get_string('strftimedatetime', 'langconfig'), $targettz);
+                }
+                break;
+        }
+        return $date;
+    }
+
+    /**
+     * Return MS Excel export value
+     * @param int $value - timestamp
+     * @param int $excelformat 14|15|16|17|22 : it is not dynamic yet, default is 22
+        * $numbers[14] = 'm/d/yyyy';
+        * $numbers[15] = 'd-mmm-yy';
+        * $numbers[16] = 'd-mmm';
+        * $numbers[17] = 'mmm-yy';
+        * $numbers[22] = 'm/d/yyyy h:mm';
+     * @return array
+     */
+    private static function export_excel(int $value, int $excelformat = MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATETIME): array {
+
+        $dateformat = new MoodleExcelFormat();
+        $dateformat->set_num_format($excelformat);
+        return ['date', $value, $dateformat];
+    }
+
+    /**
+     * Return ODS export value
+     * @param int $value
+     * @param int $odsformat 14|15|16|17|22 : it is not dynamic yet, default is 22
+        * $numbers[14] = 'mm-dd-yy';
+        * $numbers[15] = 'd-mmm-yy';
+        * $numbers[16] = 'd-mmm';
+        * $numbers[17] = 'mmm-yy';
+        * $numbers[22] = 'm/d/yy h:mm';
+     * @return array
+     */
+    private static function export_ods(int $value, int $odsformat = 22): array {
+
+        $dateformat = new MoodleOdsFormat();
+        $dateformat->set_num_format($odsformat);
+        return ['date', $value, $dateformat];
     }
 }

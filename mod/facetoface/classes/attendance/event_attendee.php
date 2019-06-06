@@ -51,6 +51,8 @@ final class event_attendee extends \stdClass {
 
     /** @var int {facetoface_signups}.id */
     public $submissionid = 0;
+    /** @var int {facetoface_signups}.id */
+    public $signupid = 0;
     /** @var int {facetoface_signups}.bookedby */
     public $bookedby;
     /** @var int {facetoface}.id */
@@ -83,6 +85,13 @@ final class event_attendee extends \stdClass {
     public $firstnamephonetic = '';
     /** @var string {user}.lastnamephonetic */
     public $lastnamephonetic = '';
+
+    /** @var int {facetoface_sessions_dates}.timestart */
+    public $timestart = 0;
+    /** @var int {facetoface_sessions_dates}.timefinish */
+    public $timefinish = 0;
+    /** @var int {facetoface_sessions_dates}.sessiontimezone */
+    public $sessiontimezone = 0;
 
     /**
      * Map data object to class instance.

@@ -29,10 +29,7 @@ use mod_facetoface\output\{
     take_attendance,
     take_attendance_bulk_action
 };
-use mod_facetoface\{
-    seminar_event,
-    seminar_session_list
-};
+use mod_facetoface\{seminar_event, seminar_session, seminar_session_list};
 use moodle_url;
 use context;
 use stdClass;
@@ -100,6 +97,11 @@ final class take_attendance_tracking implements attendance_tracking {
      */
     private $sessions;
 
+    /**
+     * Determine whether we are going to disable the actions in taking attendance at event level or not.
+     * @var bool $disabled
+     */
+    private $disabled = false;
     /**
      * take_attendance_tracking constructor.
      * @param seminar_event         $seminarevent
@@ -169,18 +171,14 @@ final class take_attendance_tracking implements attendance_tracking {
     }
 
     /**
-     * Determine whether we are going to disable the bulk action in taking attendance at event level or not.
+     * Determine whether we are going to disable the actions in taking attendance at event level or not.
      *
      * @return bool
      */
     private function is_disable_bulk_action(): bool {
         if ($this->options['selected-sessiondate-id'] > 0) {
-            // If there is a session date selected, then we should probably let it enabled, because
-            // session attendance tracking will have a different check on whether attendance is
-            // open or not.
-            return false;
+            return $this->seminarevent->is_session_open($this->options['selected-sessiondate-id']);
         }
-
         // Disabled will happen when seminar_event is not open for attendance.
         return !$this->seminarevent->is_attendance_open();
     }
@@ -211,13 +209,14 @@ final class take_attendance_tracking implements attendance_tracking {
             'class' => 'f2f-attendance-form'
         ];
 
+        $this->disabled = $this->is_disable_bulk_action();
         $content = $OUTPUT->render(
             take_attendance::create(
                 $this->seminarevent,
                 $this->url,
                 $this->do_create_tablecontent(),
                 $formparams,
-                take_attendance_bulk_action::create($this->is_disable_bulk_action()),
+                take_attendance_bulk_action::create($this->disabled),
                 $this->options['selected-sessiondate-id'],
                 $this->create_session_picker()
             )
@@ -241,7 +240,7 @@ final class take_attendance_tracking implements attendance_tracking {
             $content = new event_content($this->seminarevent, $this->action, $this->sessions);
         }
 
-        $content->generate_allowed_action_content($this->rows, $this->url);
+        $content->generate_allowed_action_content($this->rows, $this->url, $this->disabled);
 
         $tablecontent = ob_get_contents();
         ob_end_clean();

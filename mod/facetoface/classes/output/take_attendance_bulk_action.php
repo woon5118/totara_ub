@@ -50,7 +50,7 @@ class take_attendance_bulk_action extends template {
      */
     public static function create(bool $disabled): take_attendance_bulk_action {
         $data = [
-            'bulkselection' => self::create_bulkselection(),
+            'bulkselection' => self::create_bulkselection($disabled),
             'bulkaction' => self::create_bulkaction($disabled),
             'attendeesselector' => [
                 [
@@ -76,7 +76,8 @@ class take_attendance_bulk_action extends template {
     }
 
     /**
-     * @param bool $disabled
+     * Creating the bulk action with a list of status codes
+     * @param bool $disabled default false
      * @return array
      */
     protected static function create_bulkaction(bool $disabled = false): array {
@@ -115,14 +116,15 @@ class take_attendance_bulk_action extends template {
 
     /**
      * Creating the bulk selection, for example it will bulk check all learner's checkboxes.
-     *
+     * @param bool $disabled default false
      * @return array
      */
-    protected static function create_bulkselection(): array {
+    protected static function create_bulkselection(bool $disabled = false): array {
         global $F2F_SELECT_OPTIONS;
         return [
             'name' => 'bulk_select',
             'options' => self::build_options($F2F_SELECT_OPTIONS, MDL_F2F_SELECT_NONE),
+            'disabled' => $disabled,
         ];
     }
 }

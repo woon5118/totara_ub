@@ -102,8 +102,10 @@ class import_attendance extends \moodleform {
 
         $listid  = $list->get_list_id();
         $scrtype = $list->get_srctype();
-        $requiredfields = ['eventattendance'];
-        $optionalfields = ['eventgrade'];
+        $optionalfields = [];
+        if ((bool)$seminarevent->get_seminar()->get_eventgradingmanual()) {
+            $optionalfields = ['eventgrade'];
+        }
 
         // Large files are likely to take their time and memory. Let PHP know
         // that we'll take longer, and that the process should be recycled soon
@@ -134,7 +136,7 @@ class import_attendance extends \moodleform {
         if (empty($errors)) {
             // Validate user identification fields.
             foreach ($headers as $header) {
-                if (in_array($header, ['idnumber', 'username', 'email'])) {
+                if (in_array($header, ['idnumber', 'username', 'email', 'signupid'])) {
                     if ($idfield != '') {
                         $errors[] = get_string('error:csvtoomanyidfields', 'mod_facetoface');
                         break;
@@ -147,16 +149,11 @@ class import_attendance extends \moodleform {
             }
         }
         // Check that all required fields are provided.
+        $requiredfields = [$idfield, 'eventattendance'];
         if (empty($errors)) {
             $notfound = array_diff($requiredfields, $headers);
             if (!empty($notfound)) {
                 $errors[] = get_string('error:csvnorequiredcf', 'mod_facetoface', implode('\', \'', $notfound));
-            }
-        }
-        // Check that no extra fields are provided.
-        if (empty($errors)) {
-            if (count($headers) > 3) {
-                $errors[] = get_string('error:csvtoomanyfields', 'mod_facetoface');
             }
         }
         // Convert headers to field names required for data storing.
@@ -167,10 +164,10 @@ class import_attendance extends \moodleform {
             }
         }
         // Prepare add users information.
-        $addusers = [];
+        $rawdata = [];
+        $errordata = [];
         if (empty($errors)) {
             $iter = 0;
-            $dataerror = [];
             $inconsistentlines = [];
             $helper = new \mod_facetoface\attendance\attendance_helper();
             $attendees = $helper->get_attendees($seminarevent->get_id());
@@ -188,21 +185,18 @@ class import_attendance extends \moodleform {
                 foreach ($attendees as $id => $user) {
                     if (isset($user->{$idfield}) && $user->{$idfield} == $data[$idfield]) {
                         $userfound = true;
-                        $addusers[$user->id] = $data;
+                        $rawdata[$user->id] = $data;
                         break;
                     }
                 }
                 if (!$userfound) {
-                    $dataerror[] = $data;
+                    $errordata[] = $data;
                     continue;
                 }
             }
 
             if (!empty($inconsistentlines)) {
                 $errors[] = get_string('error:csvinconsistentrows', 'mod_facetoface', implode(', ', $inconsistentlines));
-            }
-            if (!empty($dataerror)) {
-                $list->set_validaton_results($dataerror);
             }
         }
 
@@ -212,12 +206,45 @@ class import_attendance extends \moodleform {
                 \core\notification::error($error);
             }
         } else {
-            $list->set_all_user_data($addusers);
+            if (!array_diff($optionalfields, $headers)) {
+                $requiredfields = array_merge($requiredfields, $optionalfields);
+            }
+
+            if (!empty($errordata)) {
+                $csvdata = static::filter_data($errordata, $requiredfields);
+                $list->set_validaton_results($csvdata);
+            }
+            $csvdata = static::filter_data($rawdata, $requiredfields);
+            $list->set_all_user_data($csvdata);
             $cir->cleanup();
             redirect(new \moodle_url(
                 '/mod/facetoface/attendees/list/import_attendance_confirm.php',
                 ['s' => $seminarevent->get_id(), 'sd' => $formdata->sd, 'listid' => $listid]
             ));
         }
+    }
+
+    /**
+     * Collect required csv data only.
+     * @param array $rawdata
+     * @param array $requiredfields
+     * @return array
+     */
+    private static function filter_data(array $rawdata, array $requiredfields): array {
+        $csvdata = [];
+        array_walk(
+            $rawdata,
+            function ($data, $keyid) use (&$csvdata, $requiredfields) {
+                $arrayreindexed = [];
+                array_walk(
+                    $requiredfields,
+                    function ($field) use (&$arrayreindexed, $data) {
+                        $arrayreindexed[$field] = $data[$field];
+                    }
+                );
+                $csvdata[$keyid] = $arrayreindexed;
+            }
+        );
+        return $csvdata;
     }
 }

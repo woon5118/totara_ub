@@ -93,9 +93,18 @@ final class export_helper {
         $numfields = count($fields);
 
         foreach ($datarows as $record) {
-            for($col=0; $col<$numfields; $col++) {
+            for ($col = 0; $col < $numfields; $col++) {
                 if (isset($record[$col])) {
-                    $worksheet[0]->write($row, $col, html_entity_decode($record[$col], ENT_COMPAT, 'UTF-8'));
+                    $value = $record[$col];
+                    if (is_array($value)) {
+                        if (method_exists($worksheet[0], 'write_' . $value[0])) {
+                            $worksheet[0]->{'write_' . $value[0]}($row, $col, $value[1], $value[2]);
+                        } else {
+                            $worksheet[0]->write($row, $col, html_entity_decode($value[1], ENT_COMPAT, 'UTF-8'));
+                        }
+                    } else {
+                        $worksheet[0]->write($row, $col, html_entity_decode($value, ENT_COMPAT, 'UTF-8'));
+                    }
                 }
             }
             $row++;
@@ -143,8 +152,17 @@ final class export_helper {
         $numfields = count($fields);
 
         foreach ($datarows as $record) {
-            for ($col=0; $col<$numfields; $col++) {
-                $worksheet[0]->write($row, $col, html_entity_decode($record[$col], ENT_COMPAT, 'UTF-8'));
+            for ($col = 0; $col < $numfields; $col++) {
+                $value = $record[$col];
+                if (is_array($value)) {
+                    if (method_exists($worksheet[0], 'write_' . $value[0])) {
+                        $worksheet[0]->{'write_' . $value[0]}($row, $col, $value[1], $value[2]);
+                    } else {
+                        $worksheet[0]->write($row, $col, html_entity_decode($value[1], ENT_COMPAT, 'UTF-8'));
+                    }
+                } else {
+                    $worksheet[0]->write($row, $col, html_entity_decode($value, ENT_COMPAT, 'UTF-8'));
+                }
             }
             $row++;
         }

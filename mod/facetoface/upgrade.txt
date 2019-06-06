@@ -3,6 +3,25 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* mod_facetoface\form\import_attendance form is accepting a 'signupid' field from 'CSV Take attendance' export and ignores not required fields
+* mod_facetoface\attendance\event_content::generate_downloadable_content() has been updated
+  * to respect the showuseridentity config
+  * added 'signupid' field for case if manager requires to re-import CSV file
+  * added export format value as a second parameter
+* mod_facetoface\attendance\event_content::generate_allowed_action_content() has been updated to accept 'disabled' as 3rd param
+* mod_facetoface\attendance\take_attendance_tracking::is_disable_bulk_action() has been updated and returns value depending if seminar session is over or not
+* mod_facetoface\attendance\session_content::create_attendance_status() has been updated and returns value depending if seminar session is over or not
+* mod_facetoface\attendance\session_content::generate_allowed_action_content() has been updated to accept 'disabled' as 3rd param
+* mod_facetoface\attendance\session_content::generate_downloadable_content() has been updated
+  * to respect the showuseridentity config and added session start and end date/time
+  * returns data including session start date and finish date
+  * added export format value as a second parameter
+  mod_facetoface\attendance\content_generator::generate_downloadable_content() has been updated to support export format value as a second parameter
+* mod_facetoface\rb\display\local_event_date::display() has been updated to use mod_facetoface\output\session_time::format_datetime() to display and export date/time
+* mod_facetoface\export_helper::download_ods() has been updated to support mod_facetoface\output\session_time::format_datetime() array output
+* mod_facetoface\export_helper::download_xls() has been updated to support mod_facetoface\output\session_time::format_datetime() array output
+* mod_facetoface\bulk_list::__construct() has been updated to support seminar event id
+* mod_facetoface\output\take_attendance::create has been updated to support CSV export for Upload event attendance
 * output\event_grade_input::create() has been updated to respect the course grade_decimalpoints config
 * take_attendance mustache has been updated:
   * to disable the 'Upload attendance' button when an event is upcoming or in progress

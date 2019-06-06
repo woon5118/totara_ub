@@ -92,16 +92,14 @@ final class attendance_helper {
             u.deleted,
             u.suspended,
             su.id AS submissionid,
+            su.id AS signupid,
             {%extra_select%}
             f.id AS facetofaceid,
             f.course AS course
             FROM {facetoface} f
-            INNER JOIN {facetoface_sessions} s
-            ON s.facetoface = f.id
-            INNER JOIN {facetoface_signups} su
-            ON su.sessionid = s.id
-            INNER JOIN {user} u
-            ON u.id = su.userid
+            INNER JOIN {facetoface_sessions} s ON s.facetoface = f.id
+            INNER JOIN {facetoface_signups} su ON su.sessionid = s.id
+            INNER JOIN {user} u ON u.id = su.userid
             {%extra_join%}
         ";
     }
@@ -199,7 +197,7 @@ final class attendance_helper {
         $sql = str_replace(
             ['{%extra_select%}', '{%extra_join%}'],
             [
-                ' sds.attendancecode as statuscode, ',
+                ' sds.attendancecode as statuscode, sd.sessiontimezone, sd.timestart, sd.timefinish, ',
                 " INNER JOIN {facetoface_sessions_dates} sd ON sd.sessionid = s.id
                   LEFT JOIN {facetoface_signups_dates_status} sds ON sds.signupid = su.id
                     AND sds.sessiondateid = sd.id

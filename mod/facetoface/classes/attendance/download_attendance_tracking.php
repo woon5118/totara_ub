@@ -93,7 +93,7 @@ final class download_attendance_tracking implements attendance_tracking {
         $helper = new attendance_helper();
         $rows = $helper->get_attendees($this->seminarevent->get_id(), $this->sessiondateid);
 
-        $contents = $generator->generate_downloadable_content($rows);
+        $contents = $generator->generate_downloadable_content($rows, $this->download);
         if (!isset($contents['headers']) || !isset($contents['rows'])) {
             throw new coding_exception(
                 "Expecting function load_downloadable_content to return an array" .
@@ -118,6 +118,7 @@ final class download_attendance_tracking implements attendance_tracking {
                 export_helper::download_xls($headers, $rows, $exportfilename);
                 break;
             case 'csv':
+            case 'csvforupload':
                 export_helper::download_csv($headers, $rows, $exportfilename);
                 break;
             default:

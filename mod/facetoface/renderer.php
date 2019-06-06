@@ -2325,13 +2325,15 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         }
         $table->head[] = '';
         $table->attributes = ['class' => 'generaltable userstoupload fullwidth'];
-
+        $context = \context_course::instance($courseid);
         if (count($users) > 0) {
             foreach ($users as $user) {
                 $error = '';
                 $row = [];
-                $userurl = new \moodle_url('/user/view.php', ['id' => $user->id, 'course' => $courseid]);
-
+                $userurl = new \moodle_url('/user/view.php', ['id' => $user->id]);
+                if ($courseid != SITEID && is_enrolled($context, $user->id)) {
+                    $userurl->param('course', $courseid);
+                }
                 // User full name column.
                 $row[] = \html_writer::link($userurl, fullname($user));
 
@@ -2347,9 +2349,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 // Event grade column.
                 if (isset($data['eventgrade'])) {
                     $value = trim($data['eventgrade']);
-                    if (empty($value)) {
-                        $row[] = '';
-                    } else if (is_numeric($value) && $value >= 0 && $value <= 100) {
+                    if (is_numeric($value) && $value >= 0 && $value <= 100) {
                         $row[] = \mod_facetoface\grade_helper::format($value, $courseid);
                     } else {
                         $row[] = $error = get_string('error:invalidvalue', 'mod_facetoface');
@@ -2362,21 +2362,25 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     $row[] = $OUTPUT->flex_icon('check', ['classes' => 'ft-size-100 ft-state-success', 'alt' => get_string('success')]);
                 }
 
-                $row = new html_table_row($row);
-                $table->data[] = $row;
+                $table->data[] = new html_table_row($row);
             }
         }
 
         $data = $list->get_validation_results();
         if (!empty($data)) {
             foreach ($data as $entry) {
-                $row = $entry;
+                $row = [];
+                foreach ($entry as $key => $value) {
+                    $row[] = s($value);
+                }
+                reset($row);
+                $row[array_key_first($row)] = current($row) .
+                    \html_writer::span(get_string('error:usernotfound', 'mod_facetoface'), 'usernotfound');
                 $row[] = $OUTPUT->flex_icon('warning', [
                     'classes' => 'ft-size-100',
                     'alt' => get_string('userdoesnotexist', 'totara_core')
                 ]);
-                $row = new html_table_row($row);
-                $table->data[] = $row;
+                $table->data[] = new html_table_row($row);
             }
         }
         $total = count($users) + count($data);

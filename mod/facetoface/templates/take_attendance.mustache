@@ -45,9 +45,10 @@
     * exports -> value: Export type
     * exports -> label: Public string for export type
     * notsetcode: code for state not_set, which the front-end needs
+    * csvexportforuploadurl: CSV export for Upload
     * uploadattendanceurl: Upload event attendace and grades
     * disableupload: Disable Upload event button for upcoming/in-progress event attendance
-    * showupload: Hide Upload event button if it is session attendance
+    * showupload: Show Upload and CSV export for Upload for event only
 
     Example context (json):
         There is no example for this template
@@ -77,36 +78,70 @@
         <div class="hide" id="noticeupdate"> </div>
 
         {{{ tablecontent }}}
-
-            <div>
-                {{#showupload}}
-                    <a href="{{#disableupload}}#{{/disableupload}}{{^disableupload}}{{{uploadattendanceurl}}}{{/disableupload}}"
-                       role="button" {{#disableupload}}aria-disabled="true"{{/disableupload}}
-                       class="btn btn-default mod_facetoface__action_uploadattendance {{#disableupload}}disabled{{/disableupload}}">
-                        {{#str}} uploadattendance, mod_facetoface {{/str}}
-                    </a>
-                {{/showupload}}
-
-                <input type="submit" name="saveattendance"
-                       value="{{#str}} saveattendance, mod_facetoface {{/str}}"
-                       id="f2f-save-taking-attendance"
-                       class="btn btn-primary" />
-
-                <input type="submit" name="cancelform"
-                       value="{{#str}} cancelattendance, mod_facetoface {{/str}}">
-            </div>
     </form>
+<!-- TODO: do not remove until clear decision for DES-95
+    <form autocomplete="off" accept-charset="utf-8" id="mform501" class="mform import_export">
+        <fieldset class="clearfix collapsible" id="id_import_export">
+            <legend class="ftoggler">
+                <a href="#" class="fheader" role="button" aria-controls="id_import_export" aria-expanded="true">
+                    Activity completion
+                </a>
+            </legend>
 
-    <div class="action last mod-facetoface__export-options">
-        <label for="menuf2f-export-actions" class="sr-only">
-            {{#str}} attendeeactions, mod_facetoface {{/str}}
-        </label>
+            <div class="fcontainer clearfix">
+                <div id="fgroup_id_import_export" class="fitem fitem_fgroup">
+                    <fieldset class="fgroup" data-fieldtype="group">
 
-        <select name="f2f-export-actions" id="menuf2f-export-actions">
-            <option value=""> {{#str}} selectexport, mod_facetoface {{/str}} </option>
-            {{#exports}}
-                <option value="{{value}}"> {{label}} </option>
-            {{/exports}}
-        </select>
-    </div>
+                        <a href="#"
+                           role="button"
+                           class="btn btn-default btn-primary">
+                            Submit seminar completion
+                        </a>
+
+                    </fieldset>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+-->
+    <form autocomplete="off" accept-charset="utf-8" id="mform500" class="mform import_export">
+        <fieldset class="clearfix collapsible" id="id_import_export">
+            {{#showupload}}
+                <legend class="ftoggler">
+                    <a href="#" class="fheader" role="button" aria-controls="id_import_export" aria-expanded="true">
+                        {{#str}} importexportattendancelegend, mod_facetoface {{/str}}
+                    </a>
+                </legend>
+            {{/showupload}}
+
+            <div id="fgroup_id_import_export" class="fcontainer clearfix fitem fitem_fgroup">
+                <fieldset class="fgroup" data-fieldtype="group">
+
+                    {{#showupload}}
+                        <a href="{{#disableupload}}#{{/disableupload}}{{^disableupload}}{{{uploadattendanceurl}}}{{/disableupload}}"
+                           role="button" {{#disableupload}}aria-disabled="true"{{/disableupload}}
+                           class="btn btn-default mod_facetoface__action_uploadattendance {{#disableupload}}disabled{{/disableupload}}">
+                            {{#str}} uploadattendance, mod_facetoface {{/str}}
+                        </a>
+
+                        <a href="{{{csvexportforuploadurl}}}"
+                           role="button" class="btn btn-default mod_facetoface__action_csvexportupload">
+                            {{#str}} exportcsvforupload, mod_facetoface {{/str}}
+                        </a>
+                    {{/showupload}}
+
+                    <label class="accesshide sr-only" for="menuf2f-export-actions">
+                        {{#str}} attendeeactions, mod_facetoface {{/str}}
+                    </label>
+                    <select name="f2f-export-actions" id="menuf2f-export-actions">
+                        <option value=""> {{#str}} selectexport, mod_facetoface {{/str}} </option>
+                        {{#exports}}
+                            <option value="{{value}}"> {{label}} </option>
+                        {{/exports}}
+                    </select>
+
+                </fieldset>
+            </div>
+        </fieldset>
+    </form>
 </div>

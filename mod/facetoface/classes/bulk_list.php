@@ -42,8 +42,9 @@ class bulk_list {
      * @param string $listid List identifier
      * @param \moodle_url $returnurl only for first step of list needed for navigation
      * @param string $srctype specifies type of action that this list is being used for, e.g. 'add', 'addfile' etc
+     * @param int $seminareventid
      */
-    public function __construct($listid, \moodle_url $returnurl = null, $srctype = '') {
+    public function __construct($listid, \moodle_url $returnurl = null, $srctype = '', int $seminareventid = 0) {
         global $SESSION;
         $this->listid = $listid;
 
@@ -53,6 +54,7 @@ class bulk_list {
                 print_error(get_string('error:invaliduserid', 'facetoface'));
             }
             $SESSION->mod_facetoface_attendeeslist[$this->listid] = array(
+                'seminareventid' => $seminareventid,
                 'userdata' => array(),
                 'hasdata' => false, // When true list has additional data.
                 'returnurl' => clone($returnurl),
@@ -211,5 +213,14 @@ class bulk_list {
      */
     public function get_list_id() {
         return $this->listid;
+    }
+
+    /**
+     * Get current seminar event id
+     * @return int
+     */
+    public function get_seminareventid(): int {
+        global $SESSION;
+        return (int)$SESSION->mod_facetoface_attendeeslist[$this->listid]['seminareventid'];
     }
 }

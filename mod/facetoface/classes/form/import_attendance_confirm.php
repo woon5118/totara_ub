@@ -96,15 +96,13 @@ class import_attendance_confirm  extends \moodleform {
                 $seminarevent->to_record(),
                 $context
             )->trigger();
-            // All good we can clean temp data.
-            $this->cancel($list);
             $url  = new \moodle_url('/mod/facetoface/attendees/takeattendance.php', $params);
             \core\notification::success(get_string('updateattendeessuccessful', 'mod_facetoface'));
         } else {
-            $params['listid'] = $list->get_list_id();
-            $url = new \moodle_url('/mod/facetoface/attendees/list/import_attendance_confirm.php', $params);
+            $url = $list->get_returnurl();
             \core\notification::error(get_string('error:takeattendance', 'mod_facetoface'));
         }
+        $this->cancel($list);
         redirect($url);
     }
 }

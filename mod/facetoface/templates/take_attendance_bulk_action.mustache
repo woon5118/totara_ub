@@ -59,7 +59,9 @@
                 {{#str}} selectlearner, mod_facetoface {{/str}}
             </label>
 
-            <select name="{{name}}" id="menu{{name}}" class="f2f-inline-box">
+            <select name="{{name}}" id="menu{{name}}" class="f2f-inline-box"
+                {{#disabled}} disabled {{/disabled}}>
+
                 {{#options}}
                     <option value="{{value}}">
                         {{option_label}}
@@ -70,7 +72,7 @@
     {{/bulkselection}}
 
     {{#bulkaction}}
-        <div class="acetoface-bulk-actions-picker">
+        <div class="facetoface-bulk-actions-picker">
             <label for="menu{{name}}" class="f2f-inline-box custom-facetoface-label">
                 {{#str}}mark_selected_as, mod_facetoface{{/str}}
             </label>
@@ -88,6 +90,10 @@
                     </option>
                 {{/options}}
             </select>
+            <input type="submit" name="saveattendance"
+                   value="{{#str}} saveattendance, mod_facetoface {{/str}}"
+                   id="f2f-save-taking-attendance"
+                   class="btn btn-primary" {{#disabled}}disabled{{/disabled}}/>
 
             <span id="selectoptionbefore" class="hide error">
                 {{#str}} selectoptionbefore, mod_facetoface {{/str}}

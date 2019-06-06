@@ -24,6 +24,9 @@
 namespace mod_facetoface\attendance;
 defined('MOODLE_INTERNAL') || die();
 
+use mod_facetoface\output\take_attendance_status_picker;
+use mod_facetoface\seminar_session;
+use mod_facetoface\signup\state\state;
 use moodle_url;
 use totara_table;
 use mod_facetoface\signup\state\not_set;
@@ -40,16 +43,14 @@ use html_writer;
  * @package mod_facetoface\attendance
  */
 final class session_content extends content_generator {
+
     /**
-     * Creating the table for either editable content or readonly content.
-     * For editable content, it include the checkbox at the very first column. Where as readonly
-     * content, that column should not be included at all.
+     * Creating the table for readonly content.
      *
-     * @param bool $iseditable
      * @param moodle_url $url
      * @return totara_table
      */
-    private function do_create_table(bool $iseditable, moodle_url $url): totara_table {
+    private function do_create_table(moodle_url $url): totara_table {
         $table = new totara_table('event-take-attendance');
         $actionurl = clone $url;
         $actionurl->params(
@@ -69,14 +70,7 @@ final class session_content extends content_generator {
             get_string('learner'),
             get_string('sessionattendanceheader', 'mod_facetoface'),
         ];
-
         $columns = ['checkbox', 'name', 'attendance'];
-        if (!$iseditable) {
-            // If it is not able to edit the content, there is no point to display the checkbox
-            // here before the learner name.
-            array_shift($headers);
-            array_shift($columns);
-        }
 
         $table->define_columns($columns);
         $table->define_headers($headers);
@@ -89,10 +83,17 @@ final class session_content extends content_generator {
      *
      * @param event_attendee[] $rows
      * @param moodle_url       $url
+     * @param bool $disabled
      * @return totara_table
      */
-    public function generate_allowed_action_content(array $rows, moodle_url $url): totara_table {
-        $table = $this->do_create_table(true, $url);
+    public function generate_allowed_action_content(array $rows, moodle_url $url, bool $disabled = false): totara_table {
+
+        $this->disabled = $disabled;
+        $table = $this->do_create_table($url);
+
+        $seminar = $this->seminarevent->get_seminar();
+        $courseid = $seminar->get_course();
+        $context = \context_course::instance($courseid);
 
         foreach ($rows as $row) {
             $data = [];
@@ -108,16 +109,12 @@ final class session_content extends content_generator {
             $this->reset_attendee_statuscode($attendee);
 
             $data[] = $this->create_checkbox($attendee);
-            $data[] = html_writer::link(
-                new moodle_url(
-                    '/user/view.php',
-                    [
-                        'id' => $attendee->id,
-                        'course' => $attendee->course,
-                    ]
-                ),
-                fullname($attendee)
-            );
+
+            $url = new moodle_url('/user/view.php', ['id' => $attendee->id]);
+            if ($courseid != SITEID && is_enrolled($context, $attendee->id)) {
+                $url->param('course', $courseid);
+            }
+            $data[] = html_writer::link($url, fullname($attendee));
 
             // Attendance's status of the single attendee
             $data[] = $this->create_attendance_status($attendee);
@@ -129,16 +126,41 @@ final class session_content extends content_generator {
     }
 
     /**
-     * @param event_attendee[] $rows
-     * @return array Array<string, array>
-     *
      * @inheritdoc
+     * @param event_attendee[] $rows
+     * @param $format export format string csv|excel|ods|etc
+     * @return array Array<string, array>
      */
-    public function generate_downloadable_content(array $rows): array {
-        $headers = [
-            get_string('learner'),
-            get_string('sessionattendanceheader', 'mod_facetoface')
-        ];
+    public function generate_downloadable_content(array $rows, string $format): array {
+
+        if ($format == 'csvforupload') {
+            return $this->generate_export_for_upload($rows, $format);
+        }
+        return $this->generate_export_content($rows, $format);
+    }
+
+    /**
+     * Generate export content
+     * @param event_attendee[] $rows
+     * @param $format export format string csv|excel|ods|etc
+     * @return array Array<string, array>
+     */
+    private function generate_export_content(array $rows, string $format): array {
+        global $PAGE;
+
+        $headers = [];
+        $showemail = in_array('email', get_extra_user_fields($PAGE->context));
+        $showidnumber = in_array('idnumber', get_extra_user_fields($PAGE->context));
+        if ($showemail) {
+            $headers[] = get_string('email');
+        }
+        if ($showidnumber) {
+            $headers[] = get_string('idnumber');
+        }
+        $headers[] = get_string('learner');
+        $headers[] = get_string('attendancetime_start', 'mod_facetoface');
+        $headers[] = get_string('attendancetime_end', 'mod_facetoface');
+        $headers[] = get_string('sessionattendanceheader', 'mod_facetoface');
 
         $definition = [
             'headers' => $headers,
@@ -158,14 +180,73 @@ final class session_content extends content_generator {
             }
 
             $this->reset_attendee_statuscode($attendee);
+
+            if ($showemail) {
+                $data[] = $attendee->email;
+            }
+            if ($showidnumber) {
+                $data[] = $attendee->idnumber;
+            }
+
             $data[] = fullname($attendee);
+            $data[] = \mod_facetoface\output\session_time::format_datetime($attendee->timestart, $format);
+            $data[] = \mod_facetoface\output\session_time::format_datetime($attendee->timefinish, $format);
 
             $attendancestatus = not_set::get_code();
             if (isset($this->statusoptions[$attendee->statuscode])) {
                 $attendancestatus = $this->statusoptions[$attendee->statuscode];
             }
-
             $data[] = $attendancestatus;
+
+            $exportrows[] = $data;
+        }
+
+        $definition['rows'] = $exportrows;
+        return $definition;
+    }
+
+    /**
+     * Generate export CSV content for Upload event attendance
+     * @param event_attendee[] $rows
+     * @param $format export format string csv|excel|ods|etc
+     * @return array Array<string, array>
+     */
+    private function generate_export_for_upload(array $rows, string $format): array {
+
+        $definition = [
+            'headers' => ['signupid', get_string('learner'), 'eventattendance'],
+            'rows'    => [],
+        ];
+
+        if (empty($rows)) {
+            return $definition;
+        }
+
+        $statecsvcodes = [];
+        $states = state::get_all_states();
+        foreach ($states as $state) {
+            $statecsvcodes[$state::get_code()] = $state::get_csv_code();
+        }
+
+        $exportrows = [];
+
+        foreach ($rows as $attendee) {
+            $data = [];
+            if (!$attendee->id) {
+                continue;
+            }
+
+            $this->reset_attendee_statuscode($attendee);
+
+            $data[] = $attendee->signupid;
+            $data[] = fullname($attendee);
+
+            $attendancestatus = not_set::get_code();
+            if (isset($this->statusoptions[$attendee->statuscode])) {
+                $attendancestatus = $statecsvcodes[$attendee->statuscode];
+            }
+            $data[] = $attendancestatus;
+
             $exportrows[] = $data;
         }
 

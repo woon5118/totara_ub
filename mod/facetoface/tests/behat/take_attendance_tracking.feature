@@ -39,7 +39,7 @@ Feature: Take attendance tracking general
     And I follow "Attendee"
     When I follow "Take attendance"
     Then I should see "2 session(s) (1 upcoming; 1 over)"
-    And the "Bulk action: Mark as" "select" should be disabled
+    And the "and mark as" "select" should be disabled
     And the "bolo bala's attendance" "select" should be disabled
     And the "kian bomba's attendance" "select" should be disabled
     And the "loc nguyen's attendance" "select" should be disabled

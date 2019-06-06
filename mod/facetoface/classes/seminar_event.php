@@ -1004,6 +1004,18 @@ final class seminar_event implements seminar_iterator_item {
     }
 
     /**
+     * Checking whether the session is open for taking attendance or not.
+     * @param int $sessiondateid
+     * @return bool
+     */
+    public function is_session_open(int $sessiondateid): bool {
+        $sessions = $this->get_sessions();
+        // Check those session dates that is valid or not.
+        /** @var seminar_session|null $session */
+        return !$sessions->get($sessiondateid)->is_attendance_open();
+    }
+
+    /**
      * Extended logic for seminar events to handle the case where attendance is open for a session, but not for
      * the event itself.
      *

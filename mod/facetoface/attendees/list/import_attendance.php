@@ -36,10 +36,17 @@ $listid = optional_param('listid', null, PARAM_INT);
 $seminarevent = new seminar_event($s);
 $returnurl  = new moodle_url('/mod/facetoface/attendees/takeattendance.php', ['s' => $s, 'sd' => $sd]);
 
-if (!$seminarevent->is_attendance_open() || (bool)$sd) {
-     \core\notification::error(get_string('error:takeattendance', 'mod_facetoface'));
-     redirect($returnurl);
+$msg = get_string('error:takeattendance', 'mod_facetoface');
+if (!$seminarevent->is_attendance_open()) {
+    $msg .= ' - ' . get_string('eventinprogress', 'mod_facetoface');
+    redirect($returnurl, $msg, null, \core\notification::ERROR);
 }
+// Dirty hack?! Not yet ready to process.
+if ((bool)$sd) {
+    redirect($returnurl, $msg, null, \core\notification::ERROR);
+}
+unset($msg);
+
 $srctype = 'importattendance';
 $listid = $listid ?: \csv_import_reader::get_new_iid($srctype);
 
@@ -61,7 +68,7 @@ $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($seminar->get_name() . ': ' . $pagetitle);
 
-$list = new bulk_list($listid, $currenturl, $srctype);
+$list = new bulk_list($listid, $currenturl, $srctype, $seminarevent->get_id());
 $mform = new import_attendance(null, $params);
 if ($mform->is_cancelled()) {
     $mform->cancel($list);

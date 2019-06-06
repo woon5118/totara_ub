@@ -30,8 +30,6 @@ use stdClass;
 use rb_column;
 use rb_column_option;
 use reportbuilder;
-use MoodleExcelFormat;
-use MoodleOdsFormat;
 
 /**
  * Since seminar session/event date is a bit more complicated than the other date time related
@@ -51,23 +49,9 @@ class local_event_date extends base {
      * @return string|array
      */
     public static function display($value, $format, stdClass $row, rb_column $column, reportbuilder $report) {
-        if (empty($value)) {
-            return '';
-        }
-
-        if ($format === 'excel') {
-            $dateformat = new MoodleExcelFormat();
-            $dateformat->set_num_format(22);
-            return array('date', $value, $dateformat);
-        } else if ($format === 'ods') {
-            $dateformat = new MoodleOdsFormat();
-            $dateformat->set_num_format(22);
-            return array('date', $value, $dateformat);
-        }
-
-        $timezone = \core_date::get_user_timezone();
-        $date = userdate($value, get_string('strftimedatetime', 'langconfig'), $timezone);
-        return $date;
+        $timezone = 99;
+        $sessiontimezone = false;
+        return \mod_facetoface\output\session_time::format_datetime($value, $format, $timezone, $sessiontimezone);
     }
 
     /**
