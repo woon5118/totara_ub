@@ -397,7 +397,7 @@ class sql implements \ArrayAccess {
      * @return boolean true on success or false on failure.
      */
     public function offsetExists($offset) {
-        return ($offset === 0 or $offset === 1 or $offset === 'sql' or $offset === 'params');
+        return ($offset === 0 or $offset === '0' or $offset === 1 or $offset === '1' or $offset === 'sql' or $offset === 'params');
     }
 
     /**
@@ -406,10 +406,10 @@ class sql implements \ArrayAccess {
      * @return mixed Can return all value types.
      */
     public function offsetGet($offset) {
-        if ($offset === 0 or $offset === 'sql') {
+        if ($offset === '0' or $offset === 0 or $offset === 'sql') {
             return $this->get_sql();
         }
-        if ($offset === 1 or $offset === 'params') {
+        if ($offset === '1' or $offset === 1 or $offset === 'params') {
             return $this->get_params();
         }
         return null;
