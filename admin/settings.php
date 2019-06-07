@@ -27,7 +27,7 @@ $PAGE->navigation->clear_cache();
 navigation_node::require_admin_tree();
 
 $adminroot = admin_get_root(); // need all settings
-$settingspage = $adminroot->locate($section, true);
+$settingspage = $adminroot->locate($section);
 
 if (empty($settingspage) or !($settingspage instanceof admin_settingpage)) {
     if (moodle_needs_upgrading()) {

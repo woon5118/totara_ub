@@ -534,8 +534,8 @@ if ($hassiteconfig) { // Totara: do not load the settings when we do not need th
         $temp->add(new admin_setting_heading('searchengineheading', new lang_string('searchengine', 'admin'), ''));
         $temp->add(new admin_setting_configselect('searchengine',
             new lang_string('selectsearchengine', 'admin'), '', 'solr', $engines));
-        $ADMIN->add('searchplugins', $temp);
     }
+    $ADMIN->add('searchplugins', $temp); // Totara: add temp page to make it appears in the navigation as well in different area.
     $ADMIN->add('searchplugins', new admin_externalpage('searchareas', new lang_string('searchareas', 'admin'),
         new moodle_url('/admin/searchareas.php')));
 
