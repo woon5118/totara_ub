@@ -61,27 +61,18 @@ final class general implements \core_string_placeholders {
             $a = (array)$a;
         }
 
-        // Normalise the replacements from tree structure to flat array.
+        // Record just the single-level properties and ignore arrays and (non-lang_string) objects.
         $replacements = [];
 
-        $recursive = function (array $a, array $parents) use (&$recursive, &$replacements, $clean) {
-            foreach ($a as $k => $v) {
-                if (!is_array($v) and (!is_object($v) or ($v instanceof lang_string))) {
-                    $v = (string)$v;
-                    if ($clean) {
-                        $v = clean_string($v);
-                    }
-                    if ($parents) {
-                        $k = implode('->', $parents) . '->' . $k;
-                    }
-                    $replacements[$k] = $v;
-                    continue;
+        foreach ($a as $k => $v) {
+            if (!is_array($v) and (!is_object($v) or ($v instanceof lang_string))) {
+                $v = (string)$v;
+                if ($clean) {
+                    $v = clean_string($v);
                 }
-                $v = (array)$v;
-                call_user_func($recursive, $v, array_merge($parents, [$k]));
+                $replacements[$k] = $v;
             }
-        };
-        call_user_func($recursive, $a, []);
+        }
 
         $this->replacements = $replacements;
     }

@@ -61,14 +61,12 @@ class core_string_placeholders_general_testcase extends advanced_testcase {
         $xa = [
             'name' => 'Pokus',
             'guest' => new lang_string('guest', 'core'),
-            'user1' => (object)['fullname' => new lang_string('administrator'), 'firstname' => 'X'],
-            'user2' => ['fullname' => 'A&B'],
         ];
         $this->overrideLangString('edit', 'core', $string);
 
         $a = new general($xa);
         $result = $a->replace($string);
-        $this->assertSame('Hello Pokus Guest from Administrator and A&B, {$a->missing}, {$a}, {$a->user->missing}, {$a->user1->missing}', $result);
+        $this->assertSame('Hello Pokus Guest from {$a->user1->fullname} and {$a->user2->fullname}, {$a->missing}, {$a}, {$a->user->missing}, {$a->user1->missing}', $result);
 
         $result2 = get_string('edit', 'core', $a);
         $this->assertSame($result, $result2);
@@ -92,7 +90,7 @@ class core_string_placeholders_general_testcase extends advanced_testcase {
 
         $a = new general($xa, true);
         $result = $a->replace($string);
-        $this->assertSame('Hello Pokus Guest from Administrator and A&#38;B, {$a->missing}, {$a}, {$a->user->missing}, {$a->user1->missing}', $result);
+        $this->assertSame('Hello Pokus Guest from {$a->user1->fullname} and {$a->user2->fullname}, {$a->missing}, {$a}, {$a->user->missing}, {$a->user1->missing}', $result);
 
         $result2 = get_string('edit', 'core', $a);
         $this->assertSame($result, $result2);
