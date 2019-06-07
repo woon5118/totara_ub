@@ -136,7 +136,8 @@ switch ($action) {
 
         $column = $DB->get_record_sql($sql, $params);
 
-        $graphseries = $DB->get_field('report_builder_graph', 'series', array('reportid' => $reportid));
+        $sql = "SELECT series FROM {report_builder_graph} WHERE reportid = :reportid AND type !=''";
+        $graphseries = $DB->get_field_sql($sql, array('reportid' => $reportid));
         if ($graphseries) {
             $source = implode('-', array($column->type, $column->value));
             $datasources = json_decode($graphseries, true);

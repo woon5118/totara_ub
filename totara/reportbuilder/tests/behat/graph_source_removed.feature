@@ -35,3 +35,11 @@ Feature: Graph source columns in the report builder
     And I switch to "Columns" tab
     When I delete the "User's Courses Started Count" column from the report
     Then I should see "This column is the data source for Graph construction. Please delete the column first under Graph tab."
+
+    When I switch to "Graph" tab
+    And I set the following fields to these values:
+      | Graph type   | |
+    And I press "Save changes"
+    And I switch to "Columns" tab
+    And I delete the "User's Courses Started Count" column from the report
+    Then I should not see "This column is the data source for Graph construction. Please delete the column first under Graph tab."
