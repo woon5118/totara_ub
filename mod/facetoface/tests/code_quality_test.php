@@ -43,6 +43,12 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
         trainer_helper::class,
     ];
 
+    /** @var string[] */
+    private $whitelist_crlf = [
+        'pix',
+        'tests/fixtures',
+    ];
+
     /**
      * Inspect the docblock of a class and return either 'OK' or errors
      *
@@ -252,15 +258,19 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      * @return void
      */
     public function scan_for_crlf(string $directory, array &$errors): void {
+        global $CFG;
+        $root = str_replace(DIRECTORY_SEPARATOR, '/', $CFG->dirroot) . '/mod/facetoface/';
+        $relpath = str_replace(DIRECTORY_SEPARATOR, '/', $directory);
+        if (strpos($relpath, $root) === 0) {
+            $relpath = substr($relpath, strlen($root));
+        }
+        if (in_array($relpath, $this->whitelist_crlf)) {
+            return;
+        }
         $handle = opendir($directory);
         while (false !== ($file = readdir($handle))) {
             // Ignore all dotfiles, including ..
             if (substr($file,0,1) == '.') {
-                continue;
-            }
-            // Ignore media files, add other extensions here as necessary.
-            // TODO: more generic solution in TL-21072
-            if (in_array(substr($file,-4), ['.gif', '.jpg', '.png', '.svg', '.mbz'])) {
                 continue;
             }
             $file_name = $directory.DIRECTORY_SEPARATOR.$file;
@@ -314,7 +324,7 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
         $this->resetAfterTest();
         global $CFG;
 
-        $source_directory = implode(DIRECTORY_SEPARATOR, [$CFG->dirroot, 'mod', 'facetoface']);
+        $source_directory = $CFG->dirroot . '/mod/facetoface';
         $errors = array();
         $this->scan_for_crlf($source_directory, $errors);
 
