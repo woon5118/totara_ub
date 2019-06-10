@@ -2810,8 +2810,7 @@ class recurring_course_set extends course_set {
         // Display the course name
         if (is_object($this->course)) {
             if (isset($this->course->fullname)) {
-                $courseoptions = $DB->get_records_select_menu('course', 'id <> ?', array(SITEID), 'fullname ASC', 'id,fullname');
-                $hascourseoptions = count($courseoptions) > 0;
+                $hascourseoptions = $DB->record_exists_select('course', 'id <> ?', array(SITEID));
 
                 $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
                 $templatehtml .= html_writer::start_tag('div', array('class' => 'fitemtitle'));
@@ -2824,11 +2823,20 @@ class recurring_course_set extends course_set {
                 }
                 $templatehtml .= html_writer::end_tag('div');
 
-                // Add the 'Select course' drop down list.
+                // Display the recurring course with dialog link to change.
                 $templatehtml .= html_writer::start_tag('div', array('class' => 'courseselector felement'));
                 if ($hascourseoptions) {
                     if ($updateform) {
-                        $mform->addElement('select',  $prefix.'courseid', '', $courseoptions);
+                        $mform->addElement('hidden',  $prefix.'courseid');
+                        $mform->setType($prefix.'courseid', PARAM_INT);
+
+                        $coursename = html_writer::span(format_string($this->course->fullname), '', array('id' => 'recurringcoursename'));
+
+                        $iconlink = $OUTPUT->action_icon('#', new pix_icon('i/edit', get_string('changecourse', 'totara_program')),
+                            null, array('id' => 'amendrecurringcourselink', 'data-program-courseset-prefix' => $prefix));
+
+                        $templatehtml .= html_writer::div($coursename . $iconlink);
+
                         $template_values['%'.$prefix.'courseid%'] = array('name' => $prefix.'courseid', 'value' => null);
                     }
                     $templatehtml .= '%'.$prefix.'courseid%'."\n";

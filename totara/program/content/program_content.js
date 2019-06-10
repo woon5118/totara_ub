@@ -21,6 +21,9 @@
  * @package totara
  * @subpackage program
  */
+
+ /* global $, totaraDialog, totaraDialogs */
+
 M.totara_programcontent = M.totara_programcontent || {
 
     Y: null,
@@ -307,6 +310,59 @@ M.totara_programcontent = M.totara_programcontent || {
 
         };
 
+        // Define the dialog and handler for adding amending a recurring course.
+        var totaraDialog_amendrecurringcourse = function() {
+            var prefix = document.querySelector('input[name="' + 'setprefixes_ce"]').value;
+
+            // Setup the handler.
+            var handler = new totaraDialog_handler_treeview_singleselect(prefix + 'courseid', 'recurringcoursename');
+
+            // Adapt the handler's save function.
+            handler.external_function = function() {
+                // Retrieve the course id.
+                var courseid = document.getElementById('treeview_selected_val_amendrecurringcourse').value;
+                if (courseid === "0") {
+                    require(['core/notification', 'core/str'], function (notificationLib, strLib) {
+                        strLib.get_string('error:recur_nocourse', 'totara_program').done(function(string) {
+                            notificationLib.alert('', string);
+                        });
+                    });
+                    return false;
+                }
+
+                // Retrieve the course name.
+                var coursename = $('#treeview_selected_text_amendrecurringcourse').text();
+                $('#recurringcoursename').html(coursename);
+
+                document.querySelector('input[name="' + this.coursesetprefix + 'courseid"]').value = courseid;
+                document.querySelector('input[name="' + 'contentchanged"]').value = 1;
+
+                this._dialog.hide();
+                return true;
+            };
+
+            var buttonsObj = {};
+            buttonsObj[M.util.get_string('ok', 'totara_program')] = function() {
+                handler._save();
+            };
+            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() {
+                handler._cancel();
+            };
+
+            // Call the parent dialog object.
+            totaraDialog.call(
+                this,
+                'amendrecurringcourse',
+                'unused', // buttonid unused
+                {
+                    buttons: buttonsObj,
+                    title: '<h2>' + M.util.get_string('changecourse', 'totara_program') + module.config.display_selected_amendrecurringcourse + '</h2>'
+                },
+                M.cfg.wwwroot + '/totara/program/content/find_course.php?id=' + module.config.id,
+                handler
+            );
+        };
+
         // Define the dialog and handler for adding/removing courses from a multi course set
         // Create handler for the add/remove courses dialog
         totaraDialog_handler_amendmulticourse = function(contenturl) {
@@ -467,6 +523,14 @@ M.totara_programcontent = M.totara_programcontent || {
             return module.addContent(suf);
         });
 
+        // Dialog to change recurring course.
+        $('#amendrecurringcourselink').click(function() {
+            var e = $(this);
+            var prefix = e.data('program-courseset-prefix');
+            M.totara_programcontent.amendRecurringCourse(prefix);
+            return false;
+        });
+
         // Add a function to launch the save changes dialog
         $('input[name="savechanges"]').click(function() {
             return module.handleSaveChanges();
@@ -478,6 +542,7 @@ M.totara_programcontent = M.totara_programcontent || {
         totaraDialogs['addmulticourse'] = new totaraDialog_addmulticourse();
         totaraDialogs['addcompetency'] = new totaraDialog_addcompetency();
         totaraDialogs['addrecurringcourse'] = new totaraDialog_addrecurringcourse();
+        totaraDialogs['amendrecurringcourse'] = new totaraDialog_amendrecurringcourse();
         totaraDialogs['amendcourses'] = new totaraDialog_amendmulticourse();
         totaraDialogs['savechanges'] = new totaraDialog_savechanges();
 
@@ -681,6 +746,17 @@ M.totara_programcontent = M.totara_programcontent || {
         mydialog.open();
 
         return false;
+    },
+
+    /**
+     * Change the recurring course
+     *
+     * @param {string} coursesetprefix
+     */
+    amendRecurringCourse: function(coursesetprefix) {
+        var mydialog = totaraDialogs['amendrecurringcourse'];
+        mydialog.handler.coursesetprefix = coursesetprefix;
+        mydialog.open();
     },
 
     /**

@@ -213,15 +213,17 @@ if ($iscertif) {
 
 //Javascript includes
 $PAGE->requires->strings_for_js(array('addcourseset', 'addcourses', 'cancel', 'ok', 'addcompetency',
-                'addcourse', 'addcourses', 'editcontent', 'saveallchanges', 'confirmcontentchanges',
+                'addcourse', 'addcourses', 'changecourse', 'editcontent', 'saveallchanges', 'confirmcontentchanges',
                 'youhaveunsavedchanges', 'youhaveunsavedchanges', 'or', 'and', 'affectedusercount',
                 'tosavecontent', 'error:courses_nocourses', 'error:recur_nocourse', 'error:nocompetency'),
             'totara_program');
 $selected_addrecurringcourse = json_encode(dialog_display_currently_selected(get_string('selected', 'totara_hierarchy'), 'addrecurringcourse'));
+$selected_amendrecurringcourse = json_encode(dialog_display_currently_selected(get_string('selected', 'totara_hierarchy'), 'amendrecurringcourse'));
 $selected_addcompetency = json_encode(dialog_display_currently_selected(get_string('selected', 'totara_hierarchy'), 'addcompetency'));
 $args = array('args'=> '{"id":'.$program->id.','.
                         '"display_selected_addcompetency":'.$selected_addcompetency.','.
                         '"display_selected_addrecurringcourse":'.$selected_addrecurringcourse.','.
+                        '"display_selected_amendrecurringcourse":'.$selected_amendrecurringcourse.','.
                         '"COMPLETIONTYPE_ANY":"'.COMPLETIONTYPE_ANY.'",'.
                         '"COMPLETIONTYPE_SOME":"'.COMPLETIONTYPE_SOME.'",'.
                         '"COMPLETIONTYPE_OPTIONAL":"'.COMPLETIONTYPE_OPTIONAL.'",'.
