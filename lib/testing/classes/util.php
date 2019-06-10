@@ -328,11 +328,31 @@ abstract class testing_util {
 
         // Totara: drop the snapshot stuff first.
         $DB->get_manager()->snapshot_drop();
+        $dbfamily = $DB->get_dbfamily();
+        $prefix = $DB->get_prefix();
 
         $dotsonline = 0;
+        if ($dbfamily === 'mssql') {
+            // Totara: MS SQL does not have DROP with CASCADE, so delete all foreign keys first.
+            $sql = "SELECT constraint_name
+                      FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+                     WHERE table_name = :name AND constraint_name LIKE :fk ESCAPE '\\'";
+            $params = ['fk' => str_replace('_', '\\_', $prefix) . '%' . '\\_fk'];
+            foreach ($tables as $tablename) {
+                $params['name'] = $prefix.$tablename;
+                $fks = $DB->get_fieldset_sql($sql, $params);
+                foreach ($fks as $fk) {
+                    $DB->change_database_structure("ALTER TABLE \"{$prefix}{$tablename}\" DROP CONSTRAINT {$fk}");
+                }
+            }
+        }
         foreach ($tables as $tablename) {
-            $table = new xmldb_table($tablename);
-            $DB->get_manager()->drop_table($table);
+            // Totara: do not use DDL here, we need to get rid of circular foreign keys and potentially other stuff.
+            if ($dbfamily === 'mssql') {
+                $DB->change_database_structure("DROP TABLE \"{$prefix}{$tablename}\"", [$tablename]);
+            } else {
+                $DB->change_database_structure("DROP TABLE \"{$prefix}{$tablename}\" CASCADE", [$tablename]);
+            }
 
             if ($dotsonline == 60) {
                 if ($displayprogress) {
