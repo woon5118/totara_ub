@@ -53,6 +53,19 @@ class manager {
     protected static $logintokenkey = 'core_auth_login';
 
     /**
+     * Is current user session active?
+     *
+     * NOTE: if session is not active then changes in $SESSION
+     *       will not be carried over to the next request.
+     *
+     * @since Totara 13, 12.7, 11.16, 10.22
+     * @return bool
+     */
+    public static function is_session_active() {
+        return !empty(self::$sessionactive);
+    }
+
+    /**
      * Start user session.
      *
      * Note: This is intended to be called only from lib/setup.php!
