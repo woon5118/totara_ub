@@ -84,6 +84,7 @@ information provided here is intended especially for developers.
 * Extended modal_cancel template to support different text for the cancel button
 * Updated login.mustache, adding calls to prevent duplicate form submissions
 * Added delay-rendering functions to core/action_menu template and actionmenu.js
+* Upgraded scssphp to v1.0.2, This involves renaming classes from Leafo => ScssPhp as the repo has changed.
 
 === 12.0 ===
 
