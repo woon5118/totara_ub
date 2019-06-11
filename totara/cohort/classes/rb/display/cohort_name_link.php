@@ -48,6 +48,10 @@ class cohort_name_link extends base {
             return '';
         }
 
+        if ($format !== 'html') {
+            return $value;
+        }
+
         $extrafields = self::get_extrafields_row($row, $column);
 
         return \html_writer::link(new \moodle_url('/cohort/view.php', array('id' => $extrafields->cohort_id)), format_string($value));
