@@ -599,5 +599,12 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019051700, 'totara', 'core');
     }
 
+    if ($oldversion < 2019061300) {
+        // Delete any orphaned course completions records that may exist as a result of course deletion race condition.
+        $DB->execute('DELETE FROM {course_completions} WHERE course NOT IN (SELECT id FROM {course})');
+
+        upgrade_plugin_savepoint(true, 2019061300, 'totara', 'core');
+    }
+
     return true;
 }

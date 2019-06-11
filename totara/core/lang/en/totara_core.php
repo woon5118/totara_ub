@@ -146,6 +146,8 @@ $string['datepickerlongyearregexphp'] = '@^(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[
 $string['dailyat'] = 'Daily at';
 $string['debugstatus'] = 'Debug status';
 $string['delete'] = 'Delete';
+$string['deletecompletionorphanstask'] = 'Cleanup orphaned course completion data';
+$string['deletecoursestask'] = 'Course delete task';
 $string['deleted'] = 'Deleted';
 $string['deleteusercheckfull'] = 'Are you absolutely sure you want to completely delete {$a} ?<br />All associated data, including but not limited to the following, will be deleted and is not recoverable:
 <ul>

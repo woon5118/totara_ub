@@ -62,4 +62,13 @@ $tasks = array(
         'dayofweek' => '*',
         'month' => '*'
     ),
+    array(
+        'classname' => 'totara_core\task\completion_orphans_task',
+        'blocking' => 0,
+        'minute' => '54',
+        'hour' => '1',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
 );

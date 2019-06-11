@@ -1909,10 +1909,12 @@ class completion_info {
                 cc.rpl
             FROM
                 {course_completions} cc
-            LEFT JOIN
+            JOIN {user} u
+             ON (u.id  = cc.userid AND u.deleted = 0)
+            JOIN
                 {course} c
              ON cc.course = c.id
-            LEFT JOIN
+            JOIN
                 {context} ctx
              ON ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE . "
             WHERE
