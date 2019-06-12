@@ -49,6 +49,7 @@ function transformForm(event) {
     var reffieldsField    = document.getElementById('reffields');
     var ondeleteField     = document.getElementById('menuondelete');
     var onupdateField     = document.getElementById('menuonupdate');
+    var deferredinstallField = document.getElementById('menudeferredinstall');
 
     // Initially, enable everything
     typeField.disabled = false;
@@ -57,6 +58,7 @@ function transformForm(event) {
     reffieldsField.disabled = false;
     ondeleteField.disabled = false;
     onupdateField.disabled = false;
+    deferredinstallField.disabled = false;
 
     // Based on type, disable some items
     switch (typeField.value) {
@@ -70,6 +72,8 @@ function transformForm(event) {
             ondeleteField.value = '';
             onupdateField.disabled = true;
             onupdateField.value = '';
+            deferredinstallField.disabled = true;
+            deferredinstallField.value = '0';
             break;
         case '3':  // XMLDB_KEY_FOREIGN
         case '5':  // XMLDB_KEY_FOREIGN_UNIQUE

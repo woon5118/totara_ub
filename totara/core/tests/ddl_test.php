@@ -1344,6 +1344,79 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $dbman->drop_table(new xmldb_table('test_sessions'));
     }
 
+    public function test_foreign_keys_deferred_install() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $dbman->install_from_xmldb_file(__DIR__ . '/fixtures/xmldb_foreign_keys_deferred_install.xml');
+        $this->assertTrue($dbman->table_exists('test_two'));
+
+        $table1 = new xmldb_table('test_one');
+        $table1->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table1->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table1->add_field('twoid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table1->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table1->add_key('twoid', XMLDB_KEY_FOREIGN, ['twoid'], 'test_two', ['id'], 'restrict');
+
+        $table2 = new xmldb_table('test_two');
+        $table2->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table2->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $this->assertTrue($dbman->table_exists($table1));
+        $this->assertTrue($dbman->table_exists($table2));
+
+        $this->assertfalse($dbman->key_exists($table1, $table1->getKey('twoid')));
+
+        $dbman->add_key($table1, $table1->getKey('twoid'));
+
+        $this->assertTrue($dbman->key_exists($table1, $table1->getKey('twoid')));
+
+        $oneid1 = $DB->insert_record('test_one', ['name' => 'a']);
+        $oneid2 = $DB->insert_record('test_one', ['name' => 'b']);
+        $oneid3 = $DB->insert_record('test_one', ['name' => 'b']);
+
+        $twoid1 = $DB->insert_record('test_two', ['name' => 'x', 'oneid' => $oneid1]);
+        $DB->set_field('test_one', 'twoid', $twoid1, ['id' => $oneid1]);
+        $twoid2 = $DB->insert_record('test_two', ['name' => 'y', 'oneid' => $oneid2]);
+        $DB->set_field('test_one', 'twoid', $twoid2, ['id' => $oneid2]);
+        $twoid3 = $DB->insert_record('test_two', ['name' => 'z', 'oneid' => $oneid3]);
+        $DB->set_field('test_one', 'twoid', $twoid3, ['id' => $oneid3]);
+
+        $DB->delete_records('test_one', ['id' => $oneid1]);
+        $DB->set_field('test_one', 'twoid', null, ['id' => $oneid2]);
+        $DB->delete_records('test_two', ['id' => $twoid2]);
+
+        $this->assertSame(2, $DB->count_records('test_one'));
+        $this->assertSame(2, $DB->count_records('test_two'));
+
+        $this->assertTrue($DB->record_exists('test_one', ['id' => $oneid2]));
+        $this->assertNull($DB->get_field('test_one', 'twoid', ['id' => $oneid2]));
+        $this->assertEquals($twoid3, $DB->get_field('test_one', 'twoid', ['id' => $oneid3]));
+
+        $this->assertTrue($DB->record_exists('test_one', ['id' => $oneid3]));
+        $this->assertEquals($oneid1, $DB->get_field('test_two', 'oneid', ['id' => $twoid1]));
+        $this->assertEquals($oneid3, $DB->get_field('test_two', 'oneid', ['id' => $twoid3]));
+
+        try {
+            $DB->delete_records('test_two', ['id' => $twoid3]);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(dml_write_exception::class, $ex);
+        }
+
+        $this->assertSame(2, $DB->count_records('test_one'));
+        $this->assertSame(2, $DB->count_records('test_two'));
+
+        // The dropping of all tables in PHPUNIT and Behat init works by using DELETE with CASCADE or dropping all keys first in MS SQL.
+        $dbman->drop_key($table1, $table1->getKey('twoid'));
+        $dbman->drop_table($table2);
+        $dbman->drop_table($table1);
+
+        $this->assertFalse($dbman->table_exists($table1));
+        $this->assertFalse($dbman->table_exists($table2));
+    }
+
     public function test_change_field_type() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();

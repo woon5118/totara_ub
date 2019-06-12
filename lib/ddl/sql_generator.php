@@ -307,6 +307,10 @@ abstract class sql_generator {
         // Add the keys, separated by commas
         if ($xmldb_keys = $xmldb_table->getKeys()) {
             foreach ($xmldb_keys as $xmldb_key) {
+                if ($xmldb_key->isDeferredInstall()) {
+                    // Totara: developer will add key from db/install.php
+                    continue;
+                }
                 if ($keytext = $this->getKeySQL($xmldb_table, $xmldb_key)) {
                     $table .= "\nCONSTRAINT " . $keytext . ',';
                 }
@@ -352,6 +356,10 @@ abstract class sql_generator {
         // Also, add the indexes needed from keys, based on configuration (each one, one statement)
         if ($xmldb_keys = $xmldb_table->getKeys()) {
             foreach ($xmldb_keys as $xmldb_key) {
+                if ($xmldb_key->isDeferredInstall()) {
+                    // Totara: developer will add key from db/install.php
+                    continue;
+                }
                 // Totara: always create an index together for these keys.
                 if ($xmldb_key->getType() == XMLDB_KEY_UNIQUE || $xmldb_key->getType() == XMLDB_KEY_FOREIGN || $xmldb_key->getType() == XMLDB_KEY_FOREIGN_UNIQUE) {
                     // Create the interim index

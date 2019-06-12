@@ -127,6 +127,7 @@
       <xs:attribute name="COMMENT"   type="xs:string"  use="optional" />
       <xs:attribute name="ONDELETE"  type="keyOnDelete" use="optional" />
       <xs:attribute name="ONUPDATE"  type="keyOnUpdate" use="optional" />
+      <xs:attribute name="DEFERREDINSTALL" type="trueFalse"   use="optional" />
       <!-- TODO: Moodle 2.6 - Drop ignored PREVIOUS/NEXT attributes -->
       <xs:attribute name="PREVIOUS"  type="xs:NMTOKEN" use="optional" />
       <xs:attribute name="NEXT"      type="xs:NMTOKEN" use="optional" />

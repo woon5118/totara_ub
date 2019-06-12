@@ -98,6 +98,7 @@ class edit_key_save extends XMLDBAction {
         $fields = str_replace(' ', '', trim(strtolower($fields)));
         $ondelete = null;
         $onupdate = null;
+        $deferredinstall = false;
 
         if ($type == XMLDB_KEY_FOREIGN ||
             $type == XMLDB_KEY_FOREIGN_UNIQUE) {
@@ -112,6 +113,7 @@ class edit_key_save extends XMLDBAction {
             if (!$onupdate) {
                 $onupdate = null;
             }
+            $deferredinstall = (bool)optional_param('deferredinstall', null, PARAM_BOOL);
         }
 
         $editeddir = $XMLDB->editeddirs[$dirpath];
@@ -253,6 +255,7 @@ class edit_key_save extends XMLDBAction {
                 $tempkey->setRefFields($reffieldsarr);
                 $tempkey->setOnDelete($ondelete);
                 $tempkey->setOnUpdate($onupdate);
+                $tempkey->setDeferredInstall($deferredinstall);
             }
             // Prepare the output
             $o = '<p>' .implode(', ', $errors) . '</p>
@@ -292,6 +295,7 @@ class edit_key_save extends XMLDBAction {
                 $key->setRefFields($reffieldsarr);
                 $key->setOnDelete($ondelete);
                 $key->setOnUpdate($onupdate);
+                $key->setDeferredInstall($deferredinstall);
             }
 
             // If the hash has changed from the old one, change the version

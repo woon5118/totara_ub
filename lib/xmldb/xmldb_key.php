@@ -67,6 +67,19 @@ class xmldb_key extends xmldb_object {
     protected $onupdate = null;
 
     /**
+     * Intended for keys that cannot be installed automatically,
+     * if true only key indexes are created and developer then
+     * needs to add key manually in db/install.php.
+     *
+     * NOTE: upgrades are not affected, this affects installation from install.xml file only
+     *
+     * @since Totara 13
+     *
+     * @var bool
+     */
+    protected $deferredinstall = false;
+
+    /**
      * Creates one new xmldb_key
      * @param string $name
      * @param string $type XMLDB_KEY_[PRIMARY|UNIQUE|FOREIGN|FOREIGN_UNIQUE]
@@ -181,6 +194,18 @@ class xmldb_key extends xmldb_object {
     }
 
     /**
+     * If true then keys is not installed when processing install.xml file,
+     * dev needs to create it manually from db/install.php
+     *
+     * @since Totara 13
+     *
+     * @param bool $defer
+     */
+    public function setDeferredInstall(bool $defer) {
+        $this->deferredinstall = $defer;
+    }
+
+    /**
      * Get the key fields
      * @return array
      */
@@ -224,6 +249,18 @@ class xmldb_key extends xmldb_object {
      */
     public function getOnUpdate() {
         return $this->onupdate;
+    }
+
+    /**
+     * Is the keys installation deferred when installing plugin
+     * tables from install.xml?
+     *
+     * @since Totara 13
+     *
+     * @return bool
+     */
+    public function isDeferredInstall() {
+        return $this->deferredinstall;
     }
 
     /**
@@ -452,6 +489,21 @@ class xmldb_key extends xmldb_object {
                 }
             }
         }
+        if (isset($xmlarr['@']['DEFERREDINSTALL'])) {
+            $deferredinstall = trim($xmlarr['@']['DEFERREDINSTALL']);
+            if ($this->type == XMLDB_KEY_FOREIGN || $this->type == XMLDB_KEY_FOREIGN_UNIQUE) {
+                $this->deferredinstall = ($deferredinstall === 'true');
+            } else {
+                $this->deferredinstall = false;
+                if ($deferredinstall !== '') {
+                    if ($result) {
+                        $this->errormsg = 'DEFERREDINSTALL can be used with foreign keys only';
+                        $this->debug($this->errormsg);
+                        $result = false;
+                    }
+                }
+            }
+        }
 
         // Set some attributes
         if ($result) {
@@ -560,6 +612,9 @@ class xmldb_key extends xmldb_object {
             if ($this->onupdate) {
                 $o.= ' ONUPDATE="' . $this->onupdate . '"';
             }
+            if ($this->deferredinstall) {
+                $o.= ' DEFERREDINSTALL="true"';
+            }
         }
         if ($this->comment) {
             $o.= ' COMMENT="' . htmlspecialchars($this->comment) . '"';
@@ -647,6 +702,7 @@ class xmldb_key extends xmldb_object {
             } else if ($this->onupdate) {
                 $result .= ", null, '{$this->onupdate}'";
             }
+            // NOTE: deferredinstall is not relevant here
         }
         // Return result
         return $result;
@@ -671,6 +727,9 @@ class xmldb_key extends xmldb_object {
             }
             if ($this->onupdate) {
                 $o .= ' on update ' . $this->onupdate;
+            }
+            if ($this->deferredinstall) {
+                $o .= ' deferred installation';
             }
         }
 

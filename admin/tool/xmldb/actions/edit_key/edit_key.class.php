@@ -149,6 +149,11 @@ class edit_key extends XMLDBAction {
         $onupdateselect = html_writer::select($onupdateoptions, 'onupdate', (string)$key->getOnUpdate(), false);
         $o.= '      <tr valign="top"><td><label for="menuonupdate" accesskey="u">On update:</label></td>';
         $o.= '        <td colspan="2">' . $onupdateselect . '</td></tr>';
+        // Totara: xmldb_key deferredinstall field
+        $deferredinstalloptions = array (0 => $this->str['no'], 1 => $this->str['yes']);
+        $deferredinstallselect = html_writer::select($deferredinstalloptions, 'deferredinstall', (int)$key->isDeferredInstall(), false);
+        $o.= '      <tr valign="top"><td><label for="menudeferredinstall" accesskey="d">Deferred installation:</label></td>';
+        $o.= '        <td colspan="2">' . $deferredinstallselect . '</td></tr>';
         // Change button
         $o.= '      <tr valign="top"><td>&nbsp;</td><td colspan="2"><input type="submit" value="' .$this->str['change'] . '" /></td></tr>';
         $o.= '    </table>';
