@@ -245,7 +245,7 @@ class job_assignment {
         $this->sortorder = $record->sortorder;
         $this->positionassignmentdate = $record->positionassignmentdate;
 
-        if (isset($record->fullname) && $record->fullname !== "") {
+        if (isset($record->fullname) && trim($record->fullname) !== "") {
             $this->fullname = $record->fullname;
         } else {
             $this->fullname = null;
@@ -556,7 +556,7 @@ class job_assignment {
             return null;
 
         } else if ($name === 'fullname') {
-            if (!isset($this->fullname) || $this->fullname === "") {
+            if (!isset($this->fullname) || trim($this->fullname) === "") {
                 return get_string('jobassignmentdefaultfullname', 'totara_job', $this->idnumber);
             } else {
                 return $this->fullname;
