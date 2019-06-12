@@ -2786,8 +2786,7 @@ class appraisal_stage {
                  WHERE aua.userid = ?
                    AND aua.appraisalid = ?
                    AND asd.timecompleted > 0
-                   AND ara.userid = 0
-              ORDER BY ara.appraisalrole';
+                   AND ara.userid = 0';
         return $DB->record_exists_sql($sql, [$this->id, $subjectid, $this->appraisalid]);
     }
 
