@@ -169,7 +169,9 @@ class notification {
         global $SESSION;
 
         if (!\core\session\manager::is_session_active()) {
-            error_log('Invalid use of \core\notification detected - session is not active: ' . $object->message);
+            if (!PHPUNIT_TEST) {
+                error_log('Invalid use of \core\notification detected - session is not active: ' . $object->message);
+            }
             if (!isset($SESSION)) {
                 // Totara: This only hides errors, the data will not be carried over to the next page!
                 $SESSION = new stdClass();
