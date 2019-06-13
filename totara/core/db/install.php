@@ -164,6 +164,17 @@ function xmldb_totara_core_install() {
         $dbman->add_field($table, $field);
     }
 
+    // Add extra foreign keys from TL-15995
+    $table = new xmldb_table('user_info_data');
+    $key = new xmldb_key('userinfodata_fie_ix', XMLDB_KEY_FOREIGN, array('fieldid'), 'user_info_field', array('id'));
+    if (!$dbman->key_exists($table, $key)) {
+        $dbman->add_key($table, $key);
+    }
+    $key = new xmldb_key('userinfodata_use_ix', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+    if (!$dbman->key_exists($table, $key)) {
+        $dbman->add_key($table, $key);
+    }
+
     rebuild_course_cache($SITE->id, true);
 
     // readd totara specific course completion changes for anyone

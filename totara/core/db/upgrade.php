@@ -201,34 +201,6 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017112701, 'totara', 'core');
     }
 
-    if ($oldversion < 2017112702) {
-        // Update the indexes on the user_info_data table.
-        $table = new xmldb_table('user_info_data');
-
-        // Define new index to be added.
-        $index = new xmldb_index('userinfodata_fie_ix', XMLDB_INDEX_NOTUNIQUE, array('fieldid'));
-        // Conditionally launch to add index.
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
-        }
-
-        upgrade_plugin_savepoint(true, 2017112702, 'totara', 'core');
-    }
-
-    if ($oldversion < 2017112703) {
-        // Update the indexes on the user_info_data table.
-        $table = new xmldb_table('user_info_data');
-
-        // Define new index to be added.
-        $index = new xmldb_index('userinfodata_use_ix', XMLDB_INDEX_NOTUNIQUE, array('userid'));
-        // Conditionally launch to add index.
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
-        }
-
-        upgrade_plugin_savepoint(true, 2017112703, 'totara', 'core');
-    }
-
     if ($oldversion < 2017122201) {
         // Enable registration, only wa to disable it is via config.php,
         // admins will be asked to select the site type during upgrade
@@ -604,6 +576,36 @@ function xmldb_totara_core_upgrade($oldversion) {
         $DB->execute('DELETE FROM {course_completions} WHERE course NOT IN (SELECT id FROM {course})');
 
         upgrade_plugin_savepoint(true, 2019061300, 'totara', 'core');
+    }
+
+    if ($oldversion < 2019061301) {
+
+        // Define key userinfodata_fie_ix (foreign) to be added to user_info_data.
+        $table = new xmldb_table('user_info_data');
+        $key = new xmldb_key('userinfodata_fie_ix', XMLDB_KEY_FOREIGN, array('fieldid'), 'user_info_field', array('id'));
+
+        // Launch add key userinfodata_fie_ix.
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2019061301, 'totara', 'core');
+    }
+
+    if ($oldversion < 2019061302) {
+
+        // Define key userinfodata_use_ix (foreign) to be added to user_info_data.
+        $table = new xmldb_table('user_info_data');
+        $key = new xmldb_key('userinfodata_use_ix', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+
+        // Launch add key userinfodata_use_ix.
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2019061302, 'totara', 'core');
     }
 
     return true;
