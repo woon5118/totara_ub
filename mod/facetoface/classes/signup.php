@@ -386,6 +386,8 @@ final class signup implements seminar_iterator_item {
      * @return array
      */
     public function get_failures(string ...$newstates): array {
+        $newstates = state::validate_state_classes($newstates);
+
         $results = [];
         $currentstate = $this->get_state();
 

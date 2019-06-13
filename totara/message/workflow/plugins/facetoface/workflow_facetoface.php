@@ -14,7 +14,7 @@ defined('MOODLE_INTERNAL') || die();
 // We need some constants.
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 
-use \mod_facetoface\signup\state\{booked, requestadmin, declined};
+use \mod_facetoface\signup\state\{booked, requestedadmin, waitlisted, declined};
 
 /**
 * Extend the base plugin class
@@ -45,11 +45,11 @@ class totara_message_workflow_facetoface extends totara_message_workflow_plugin_
             return false;
         }
         $signup = \mod_facetoface\signup::create($userid, $seminarevent);
-        if ($signup->can_switch(booked::class, waitlist::class, requestedadmin::class)) {
-            $signup->switch_state(booked::class, waitlist::class, requestedadmin::class);
+        if ($signup->can_switch(booked::class, waitlisted::class, requestedadmin::class)) {
+            $signup->switch_state(booked::class, waitlisted::class, requestedadmin::class);
             \core\notification::success(get_string('attendancerequestsupdated', 'mod_facetoface'));
         } else {
-            $errors = $signup->get_failures(booked::class, waitlist::class, requestedadmin::class);
+            $errors = $signup->get_failures(booked::class, waitlisted::class, requestedadmin::class);
             \core\notification::error(current($errors));
             return false;
         }

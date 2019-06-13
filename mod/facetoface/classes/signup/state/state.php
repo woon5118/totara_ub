@@ -105,13 +105,11 @@ abstract class state {
      * @throws signup_exception If not possbile to move
      */
     final public function switch_to(string ...$desiredstateclasses) : state {
+        $desiredstateclasses = self::validate_state_classes($desiredstateclasses);
+
         // Iteratively search for desired state
         $map = $this->get_map();
         foreach ($desiredstateclasses as $desiredstateclass) {
-            if (! class_exists($desiredstateclass)) {
-                error_log("The desired state class '$desiredstateclass' is not found");
-                break;
-            }
             if ($desiredstateclass == not_set::class) {
                 // We never should switch to not_set class.
                 throw new signup_exception("New booking status cannot be 'not set'");
@@ -128,6 +126,27 @@ abstract class state {
         }
         $fromclassname = get_class($this);
         throw new signup_exception("Cannot move from {$fromclassname} to any of requested states");
+    }
+
+    /**
+     * Display an error message if one or more $desiredstateclasses are not found.
+     *
+     * @param string[] $desiredstateclasses array of state classes to check
+     * @return string[] array of valid state classes ready to use
+     */
+    final public static function validate_state_classes(array $desiredstateclasses): array {
+        $validstateclasses = [];
+
+        // Ensure that all $desiredstateclasses are correctly imported
+        foreach ($desiredstateclasses as $desiredstateclass) {
+            if (class_exists($desiredstateclass)) {
+                $validstateclasses[] = $desiredstateclass;
+            } else {
+                debugging("A desired state class '$desiredstateclass' does not exist.");
+            }
+        }
+
+        return $validstateclasses;
     }
 
     /**

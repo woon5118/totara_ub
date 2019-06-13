@@ -43,6 +43,7 @@ use \mod_facetoface\signup\state\{
     waitlisted,
     booked,
     requested,
+    requestedadmin,
     user_cancelled,
     fully_attended
 };
