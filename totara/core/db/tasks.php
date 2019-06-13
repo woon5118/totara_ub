@@ -71,4 +71,13 @@ $tasks = array(
         'dayofweek' => '*',
         'month' => '*'
     ),
+    array(
+        'classname' => 'totara_core\task\analyze_table_task',
+        'blocking' => 0,
+        'minute' => '11',
+        'hour' => '2',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
 );

@@ -1100,6 +1100,54 @@ $CFG->directorypermissions = 02777;
 //      $CFG->catalog_enable_alpha_sorting_with_multiple_languages = true;
 //
 //=========================================================================
+// 16. ANALYZE TABLE SETTINGS
+//=========================================================================
+// Totara used to periodically ask the database management system to analyse the context and context_map tables,
+// ensuring that statistics for the tables are up to date.
+// Having accurate statistics can have a significant performance impact on a site,
+// particularly if courses, activities and users are being created, moved or deleted often.
+// Unfortunately, there are known issues with some database systems
+// when analysing tables for a heavily loaded database.
+// Totara tries to ensure that table statistics are up to date in a safe way for your site,
+// based upon the database system you are using.
+//
+// PostgreSQL:
+// Analyze table is called after every change to context as well as updates to the context_map table.
+// There are no known issues with this approach in this database system, and it will result in
+// the best possible outcome as statistics for the tables are always up to date.
+//
+// MySQL, MariaDB and MSSQL:
+// There is a known performance problem within these database systems which can have significant impact
+// when the system is heavily loaded.
+// As such a scheduled task that runs only once per day has been introduced.
+// Sites using these database systems may want to tweak when table analysis happens to best suit
+// how those sites are used.
+// It is possible to control when to analyse tables through the analyze_context_table_after_build setting.
+//
+// Setting it to true will execute analyze table command after changes to the context table as well as
+// updates to the context_map table.
+// Setting it to false will prevent this and it will be done late at night by totara_core\task\analyze_table_task
+// to mitigate performance degradation.
+// It is better to revisit the scheduled tasks setting to let the task run at off-peak times on your site.
+//
+// The default for this setting is true for PostgreSQL, false for MySQL, MariaDB and MSSQL.
+//
+// $CFG->analyze_context_table_after_build = true;                  // this is "analyze", not "analyse"
+//
+//
+// The context_map table is exceptionally large, and changes to a single context record can lead to
+// a significant number of updates for the context_map table.
+// The following setting controls how often table statistics are updated when updating the context_map table.
+//
+// By default it will update context_map table statistics when more than 1000 updates have occured.
+// If set to a positive integer, it will update statistics after the number of updates is more than the value.
+// Setting it to 0 will cause it to update statistics after every update.
+//
+// Note: table statistics will not be updated if $CFG->analyze_context_table_after_build has been set to false.
+//
+// $CFG->analyze_context_table_inserted_count_threshold = 1000;     // this is "analyze", not "analyse"
+//
+//=========================================================================
 // ALL DONE!  To continue installation, visit your main page with a browser
 //=========================================================================
 

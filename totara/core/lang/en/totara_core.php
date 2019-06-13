@@ -36,6 +36,7 @@ $string['alreadyselected'] = '(already selected)';
 $string['alttext'] = 'Logo alternative text';
 $string['alttextdesc'] = 'The text that is displayed when an image can\'t be. This text is also read by a screen reader.';
 $string['ampersand'] = 'and';
+$string['analyzetabletask'] = 'Execute analyze table command to analyse context and context_map tables';
 $string['archivecompletionrecords'] = 'Archive completion records';
 $string['assessments'] = 'Assessments';
 $string['assessmenttype'] = 'Assessment Type';

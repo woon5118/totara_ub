@@ -360,11 +360,15 @@ EXISTS (
     public static function build_context_map($verbose = false) {
         global $DB;
 
+        list($afterbuild, $countthreshold) = self::get_analyze_context_table_configs();
+
         // NOTE: it is very unlikely there are any extra entries,
         //       so performance for fast detection only, deleting itself can be slow.
 
-        // We want context stats to be in top shape because it will be used heavily in joins.
-        self::analyze_table('context');
+        if ($afterbuild) {
+            // We want context stats to be in top shape because it will be used heavily in joins.
+            self::analyze_table('context');
+        }
 
         // Make sure only existing contexts are referenced,
         // this may happen if context deletion is interrupted.
@@ -428,8 +432,12 @@ EXISTS (
     public static function add_missing_map_entries($verbose = false) {
         global $DB;
 
+        list($afterbuild, $countthreshold) = self::get_analyze_context_table_configs();
+
         // Make sure context_map is in the best shape to get lots of additions.
-        self::analyze_table('context_map');
+        if ($afterbuild) {
+            self::analyze_table('context_map');
+        }
 
         $syscontextid = SYSCONTEXTID;
         $maxdepth = (int)$DB->get_field_sql("SELECT MAX(depth) FROM {context}");
@@ -482,7 +490,9 @@ EXISTS (
         $temptable->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $dbman->create_temp_table($temptable);
 
+        $lastupdate = false;
         foreach ($sqls as $depth => $sql) {
+            $lastupdate = false;
             $depthstart = time();
             if ($verbose) {
                 echo str_pad(userdate(time(), '%H:%M:%S'), 10) . "Checking context depth $depth\n";
@@ -509,12 +519,61 @@ EXISTS (
             $trans->allow_commit();
 
             // Force stats update after any large number of inserts.
-            if ($insertedcount > 1000) {
+            if ($afterbuild && $insertedcount > $countthreshold) {
                 self::analyze_table('context_map');
+                $lastupdate = true;
             }
         }
 
+        // Force stats update if it is stale.
+        if ($afterbuild && !$lastupdate) {
+            self::analyze_table('context_map');
+        }
         $dbman->drop_table($temptable);
+    }
+
+    /**
+     * Get the configutation values of $CFG->analyze_context_table_xxx.
+     * Refer to config-dist.php for more information.
+     *
+     * @return array consisting of [ after_build, inserted_count_threshold ]
+     */
+    public static function get_analyze_context_table_configs() {
+        global $CFG;
+        $afterbuild = $CFG->analyze_context_table_after_build ?? self::get_default_analyze_context_table_after_build();
+        $countthreshold = 1000; // The default threshold was introduced in TL-6630.
+        if ($afterbuild) {
+            $countthreshold = $CFG->analyze_context_table_inserted_count_threshold ?? $countthreshold;
+            if ($countthreshold < 0) {
+                $countthreshold = 0;    // Fix up wrong configuration.
+            }
+        }
+        return array($afterbuild, $countthreshold);
+    }
+
+    /**
+     * Get the default value to be $CFG->analyze_context_table_after_build.
+     *
+     * @return bool
+     */
+    private static function get_default_analyze_context_table_after_build() {
+        global $DB;
+
+        $dbfamily = $DB->get_dbfamily();
+
+        if ($dbfamily === 'postgres') {
+            // PostgreSQL
+            return true;
+        } else if ($dbfamily === 'mysql') {
+            // MySQL & MariaDB
+            return false;
+        } else if ($dbfamily === 'mssql') {
+            // MSSQL
+            return false;
+        } else {
+            // Just return false for unsupported database families; analyze_table() will throw an exception
+            return false;
+        }
     }
 
     /**
@@ -523,7 +582,7 @@ EXISTS (
      *
      * @param string $tablename
      */
-    private static function analyze_table($tablename) {
+    public static function analyze_table($tablename) {
         global $DB;
 
         $dbfamily = $DB->get_dbfamily();
