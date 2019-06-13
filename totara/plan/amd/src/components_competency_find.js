@@ -118,8 +118,8 @@ define(['jquery', 'core/str', 'totara_plan/component', 'core/config', 'core/noti
                 };
 
                 const url = cfg.wwwroot + '/totara/plan/components/competency/';
-                const continueurl = url + 'confirm.php?id=' + planId + '&update=';
-                const saveurl = url + 'update.php?id=' + planId + '&update=';
+                const continueurl = url + 'confirm.php?sesskey=' + cfg.sesskey + '&id=' + planId + '&update=';
+                const saveurl = url + 'update.php?sesskey='+ cfg.sesskey + '&id=' + planId + '&update=';
                 const continueskipurl = saveurl + 'id=' + planId + '&update=';
                 const continuesaveurl = url + 'update.php?';
 

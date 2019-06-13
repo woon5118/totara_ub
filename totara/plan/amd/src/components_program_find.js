@@ -30,7 +30,7 @@ define(['core/config', 'core/str', 'totara_plan/component'], function(cfg, str, 
          */
         init: function(planId, page, componentName) {
             const url = cfg.wwwroot + '/totara/plan/components/program/';
-            const saveurl = url + 'update.php?id=' + planId + '&update=';
+            const saveurl = url + 'update.php?sesskey=' + cfg.sesskey + '&id=' + planId + '&update=';
 
             component.init({plan_id: planId, page: page, component_name: componentName});
 
