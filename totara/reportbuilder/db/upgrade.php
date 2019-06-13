@@ -581,5 +581,20 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019040100, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2019061300) {
+
+        // Define key repobuilsche_usermodified_fk (foreign) to be added to report_builder_schedule.
+        $table = new xmldb_table('report_builder_schedule');
+        $key = new xmldb_key('repobuilsche_usermodified_fk', XMLDB_KEY_FOREIGN, array('usermodified'), 'user', array('id'));
+
+        // Launch add key repobuilsche_usermodified_fk.
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2019061300, 'totara', 'reportbuilder');
+    }
+
     return true;
 }
