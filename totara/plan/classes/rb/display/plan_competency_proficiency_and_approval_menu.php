@@ -104,7 +104,8 @@ class plan_competency_proficiency_and_approval_menu extends base {
                 $action = "var response; ".
                     "response = \$.get(".
                     "'{$CFG->wwwroot}/totara/plan/components/competency/update-competency-setting.php".
-                    "?competencyid={$competencyid}".
+                    "?sesskey=" . sesskey() .
+                    "&competencyid={$competencyid}" .
                     "&planid={$planid}".
                     "&prof=' + $(this).val()".
                     "); ";
