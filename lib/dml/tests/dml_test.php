@@ -5366,6 +5366,9 @@ class core_dml_testcase extends database_driver_testcase {
         } catch (ddl_change_structure_exception $e) {
             // Can't test for specific message because it is DB specific.
             $this->assertEquals('ddlexecuteerror', $e->errorcode);
+            if ($DB->get_dbfamily() !== 'postgres') {
+                $this->assertDebuggingCalled('Transactions are not compatible with DDL operations in MySQL and MS SQL Server');
+            }
         }
         $DB->insert_record($tablename, (object)array('course'=>2));
         $this->assertEquals(2, $DB->count_records($tablename));
@@ -5452,7 +5455,9 @@ class core_dml_testcase extends database_driver_testcase {
 
         $DB->delete_records($tablename);
 
-        // Rollback from nested level.
+        // Rollback from nested level - in Totara we do proper nested rollbacks via savepoints
+        $this->assertFalse($DB->is_transaction_started());
+
         $transaction1 = $DB->start_delegated_transaction();
         $data = (object)array('course'=>3);
         $DB->insert_record($tablename, $data);
@@ -5461,26 +5466,23 @@ class core_dml_testcase extends database_driver_testcase {
         $DB->insert_record($tablename, $data);
         try {
             $transaction2->rollback(new Exception('test'));
-            $this->fail('transaction rollback must rethrow exception');
+            $this->fail('transaction rollback must rethrow exception if given');
         } catch (Exception $e) {
             $this->assertEquals(get_class($e), 'Exception');
             $this->assertEquals('test', $e->getMessage());
         }
-        $this->assertEquals(2, $DB->count_records($tablename)); // Not rolled back yet.
-        try {
-            $transaction1->allow_commit();
-            $this->fail('Exception expected!');
-        } catch (moodle_exception $e) {
-            $this->assertInstanceOf('dml_transaction_exception', $e);
-            $this->assertEquals('Database transaction error (Tried to commit transaction after lower level rollback)', $e->getMessage());
-        }
-        $this->assertEquals(2, $DB->count_records($tablename)); // Not rolled back yet.
-        // The forced rollback is done from the default_exception handler and similar places,
-        // let's do it manually here.
+        $this->assertEquals(1, $DB->count_records($tablename));
+
+        $transaction3 = $DB->start_delegated_transaction();
+        $data = (object)array('course'=>4);
+        $DB->insert_record($tablename, $data);
+        $transaction3->rollback();
+        $this->assertEquals(1, $DB->count_records($tablename));
         $this->assertTrue($DB->is_transaction_started());
-        $DB->force_transaction_rollback();
+
+        $transaction1->allow_commit();
+        $this->assertEquals(1, $DB->count_records($tablename));
         $this->assertFalse($DB->is_transaction_started());
-        $this->assertEquals(0, $DB->count_records($tablename)); // Finally rolled back.
 
         $DB->delete_records($tablename);
 
@@ -5604,14 +5606,14 @@ class core_dml_testcase extends database_driver_testcase {
             $this->fail('wrong order of commits must throw exception');
         } catch (moodle_exception $e) {
             $this->assertInstanceOf('dml_transaction_exception', $e);
-            $this->assertEquals('Database transaction error (Invalid transaction commit attempt)', $e->getMessage());
+            $this->assertEquals('Database transaction error (Invalid transaction commit attempt, nested transactions are still pending)', $e->getMessage());
         }
         try {
             $transaction2->allow_commit();
             $this->fail('first wrong commit forces rollback');
         } catch (moodle_exception $e) {
             $this->assertInstanceOf('dml_transaction_exception', $e);
-            $this->assertEquals('Database transaction error (Tried to commit transaction after lower level rollback)', $e->getMessage());
+            $this->assertEquals('Database transaction error (All transactions are scheduled for forced rollback due to previous transaction error)', $e->getMessage());
         }
         // This is done in default exception handler usually.
         $this->assertTrue($DB->is_transaction_started());
@@ -5627,20 +5629,15 @@ class core_dml_testcase extends database_driver_testcase {
         $transaction2 = $DB->start_delegated_transaction();
         $data = (object)array('course'=>4);
         $DB->insert_record($tablename, $data);
-        try {
-            // This first rollback should prevent all other rollbacks.
-            $transaction1->rollback(new Exception('test'));
-            $this->fail('Exception expected!');
-        } catch (Exception $e) {
-            $this->assertEquals(get_class($e), 'Exception');
-            $this->assertEquals('test', $e->getMessage());
-        }
+        // Totara: top level rollback should rollback everything and dispose events.
+        $transaction1->rollback();
+        $this->assertFalse($DB->is_transaction_started());
         try {
             $transaction2->rollback(new Exception('test'));
             $this->fail('Exception expected!');
-        } catch (Exception $e) {
-            $this->assertEquals(get_class($e), 'Exception');
-            $this->assertEquals('test', $e->getMessage());
+        } catch (moodle_exception $e) {
+            $this->assertEquals(get_class($e), 'dml_transaction_exception');
+            $this->assertEquals('Database transaction error (Transactions already disposed)', $e->getMessage());
         }
         try {
             $transaction1->rollback(new Exception('test'));
@@ -5650,7 +5647,7 @@ class core_dml_testcase extends database_driver_testcase {
             $this->assertEquals('Database transaction error (Transactions already disposed)', $e->getMessage());
         }
         // This is done in default exception handler usually.
-        $this->assertTrue($DB->is_transaction_started());
+        $this->assertFalse($DB->is_transaction_started());
         $DB->force_transaction_rollback();
         $DB->delete_records($tablename);
 
@@ -5658,7 +5655,7 @@ class core_dml_testcase extends database_driver_testcase {
         $transaction1 = $DB->start_delegated_transaction();
         $data = (object)array('course'=>3);
         $DB->insert_record($tablename, $data);
-        $transaction2 = new moodle_transaction($DB);
+        $transaction2 = new moodle_transaction($DB, 'xxx');
         try {
             $transaction2->allow_commit();
             $this->fail('foreign transaction must fail');
@@ -5671,7 +5668,7 @@ class core_dml_testcase extends database_driver_testcase {
             $this->fail('first wrong commit forces rollback');
         } catch (moodle_exception $e) {
             $this->assertInstanceOf('dml_transaction_exception', $e);
-            $this->assertEquals('Database transaction error (Tried to commit transaction after lower level rollback)', $e->getMessage());
+            $this->assertEquals('Database transaction error (All transactions are scheduled for forced rollback due to previous transaction error)', $e->getMessage());
         }
         $DB->force_transaction_rollback();
         $DB->delete_records($tablename);

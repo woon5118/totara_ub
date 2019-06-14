@@ -31,20 +31,24 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2009 Petr Skoda (http://skodak.org)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class moodle_transaction {
+final class moodle_transaction {
     /** @var array The debug_backtrace() returned array.*/
     private $start_backtrace;
     /**@var moodle_database The moodle_database instance.*/
     private $database = null;
+    /** @var string name of transaction */
+    private $name;
 
     /**
      * Delegated transaction constructor,
      * can be called only from moodle_database class.
      * Unfortunately PHP's protected keyword is useless.
+     * @internal
      * @param moodle_database $database
      */
-    public function __construct($database) {
+    public function __construct(moodle_database $database, string $name) {
         $this->database = $database;
+        $this->name = $name;
         $this->start_backtrace = debug_backtrace();
         array_shift($this->start_backtrace);
     }
@@ -55,6 +59,16 @@ class moodle_transaction {
      */
     public function get_backtrace() {
         return $this->start_backtrace;
+    }
+
+    /**
+     * Name of transaction.
+     *
+     * @since Totara 13
+     * @return string
+     */
+    public function get_name() {
+        return $this->name;
     }
 
     /**
@@ -76,12 +90,14 @@ class moodle_transaction {
     }
 
     /**
-     * Commit delegated transaction.
+     * Commit transaction if outermost,
+     * release savepoint for nested transactions.
+     *
      * The real database commit SQL is executed
      * only after committing all delegated transactions.
      *
-     * Incorrect order of nested commits or rollback
-     * at any level is resulting in rollback of SQL transaction.
+     * Incorrect order of nested commits at any level
+     * results in forced rollback of all transactions.
      *
      * @return void
      */
@@ -93,12 +109,17 @@ class moodle_transaction {
     }
 
     /**
-     * Rollback all current delegated transactions.
+     * Rollback transaction if outermost,
+     * rollback to savepoint for nested transactions.
      *
-     * @param Exception|Throwable $e mandatory exception/throwable
+     * Outer rollback invalidates all its nested transactions,
+     * invalid rollback call results in forced rollback of all transactions.
+     *
+     * @param Throwable|null $e optional exception/throwable
+     * @throws Throwable if $e provided it is rethrown after successful rollback
      * @return void
      */
-    public function rollback($e) {
+    public function rollback(Throwable $e = null) {
         if ($this->is_disposed()) {
             throw new dml_transaction_exception('Transactions already disposed', $this);
         }

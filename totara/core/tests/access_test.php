@@ -120,6 +120,8 @@ class totara_core_access_testcase extends advanced_testcase {
         $this->assertEquals($prevmap, $newmap);
 
         // Make sure the building can be run inside db transaction.
+        $this->assertDebuggingNotCalled();
+
         $this->assertFalse($DB->is_transaction_started());
         $trans = $DB->start_delegated_transaction();
         totara_core\access::build_context_map();
@@ -129,6 +131,12 @@ class totara_core_access_testcase extends advanced_testcase {
         $trans->allow_commit();
         $newmap = $DB->get_records('context_map', array(), 'id ASC');;
         $this->assertEquals($prevmap, $newmap);
+
+        $debuggings = $this->getDebuggingMessages();
+        foreach ($debuggings as $debuggin) {
+            $this->assertSame('Transactions are not compatible with DDL operations in MySQL and MS SQL Server', $debuggin->message);
+        }
+        $this->resetDebugging();
     }
 
     public function test_get_has_capability_sql() {

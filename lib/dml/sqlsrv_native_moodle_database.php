@@ -50,7 +50,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
      */
     protected $supportsoffsetfetch;
 
-    /** @var array list of open recordsets */
+    /** @var sqlsrv_native_moodle_recordset[] list of open recordsets */
     protected $recordsets = array();
 
     /** @var array cached server information */
@@ -781,6 +781,9 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @throws ddl_change_structure_exception A DDL specific exception is thrown for any errors.
      */
     public function change_database_structure($sql, $tablenames = null) {
+        if ($this->is_transaction_started()) {
+            debugging('Transactions are not compatible with DDL operations in MySQL and MS SQL Server', DEBUG_DEVELOPER);
+        }
         $this->get_manager(); // Includes DDL exceptions classes ;-)
         $sqls = (array)$sql;
 
@@ -1619,16 +1622,22 @@ class sqlsrv_native_moodle_database extends moodle_database {
     }
 
     /**
+     * Recordsets do not work well with transactions in SQL Server,
+     * let's prefetch the recordsets to memory to work around these problems.
+     */
+    protected function fetch_all_recordsets() {
+        foreach ($this->recordsets as $rs) {
+            $rs->transaction_starts();
+        }
+    }
+
+    /**
      * Driver specific start of real database transaction,
      * this can not be used directly in code.
      * @return void
      */
     protected function begin_transaction() {
-        // Recordsets do not work well with transactions in SQL Server,
-        // let's prefetch the recordsets to memory to work around these problems.
-        foreach ($this->recordsets as $rs) {
-            $rs->transaction_starts();
-        }
+        $this->fetch_all_recordsets();
 
         $this->query_start('native sqlsrv_begin_transaction', NULL, SQL_QUERY_AUX);
         $result = sqlsrv_begin_transaction($this->sqlsrv);
@@ -1641,6 +1650,8 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @return void
      */
     protected function commit_transaction() {
+        $this->fetch_all_recordsets();
+
         $this->query_start('native sqlsrv_commit', NULL, SQL_QUERY_AUX);
         $result = sqlsrv_commit($this->sqlsrv);
         $this->query_end($result);
@@ -1652,8 +1663,44 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @return void
      */
     protected function rollback_transaction() {
-        $this->query_start('native sqlsrv_rollback', NULL, SQL_QUERY_AUX);
+        $this->fetch_all_recordsets();
+
+        $this->query_start('native sqlsrv_rollback', null, SQL_QUERY_AUX);
         $result = sqlsrv_rollback($this->sqlsrv);
+        $this->query_end($result);
+    }
+
+    /**
+     * Creates new database savepoint.
+     * @param string $name
+     */
+    protected function create_savepoint(string $name) {
+        $this->fetch_all_recordsets();
+
+        $sql = "SAVE TRANSACTION {$name}";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = sqlsrv_query($this->sqlsrv, $sql);
+        $this->query_end($result);
+    }
+
+    /**
+     * Release savepoint, rollback will not be possible any more.
+     * @param string $name
+     */
+    protected function release_savepoint(string $name) {
+        $this->fetch_all_recordsets();
+    }
+
+    /**
+     * Rolls back current transaction back to given savepoint.
+     * @param string $name
+     */
+    protected function rollback_savepoint(string $name) {
+        $this->fetch_all_recordsets();
+
+        $sql = "ROLLBACK TRANSACTION {$name}";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = sqlsrv_query($this->sqlsrv, $sql);
         $this->query_end($result);
     }
 

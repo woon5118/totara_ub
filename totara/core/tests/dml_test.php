@@ -2233,4 +2233,204 @@ ORDER BY tt1.groupid";
 
         $dbman->drop_table($table);
     }
+
+    public function test_nested_transactions() {
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_temp_table($table);
+
+        // Test nested commits.
+
+        $DB->insert_record('test_table', ['name' => 'zero']);
+        $this->assertFalse($DB->is_transaction_started());
+        $this->assertSame(['zero'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+
+        $trans1 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'one']);
+        $this->assertSame(['zero', 'one'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans2 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'two']);
+        $this->assertSame(['zero', 'one', 'two'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans3 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'three']);
+        $this->assertSame(['zero', 'one', 'two', 'three'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans3->allow_commit();
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans2->allow_commit();
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans1->allow_commit();
+        $this->assertFalse($DB->is_transaction_started());
+
+        $DB->delete_records('test_table', []);
+        $this->assertSame([], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        unset($trans1);
+        unset($trans2);
+        unset($trans3);
+
+        // Test rollbacks in nested - in Totara we can recover from rollback of nested transactions.
+
+        $DB->insert_record('test_table', ['name' => 'zero']);
+        $this->assertFalse($DB->is_transaction_started());
+        $this->assertSame(['zero'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+
+        $trans1 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'one']);
+        $this->assertSame(['zero', 'one'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans2 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'two']);
+        $this->assertSame(['zero', 'one', 'two'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans2->rollback();
+        $this->assertSame(['zero', 'one'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans1->allow_commit();
+        $this->assertSame(['zero', 'one'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertFalse($DB->is_transaction_started());
+
+        $DB->delete_records('test_table', []);
+        $this->assertSame([], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        unset($trans1);
+        unset($trans2);
+
+        // Test that rollback may skip levels.
+
+        $DB->insert_record('test_table', ['name' => 'zero']);
+        $this->assertFalse($DB->is_transaction_started());
+        $this->assertSame(['zero'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+
+        $trans1 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'one']);
+        $this->assertSame(['zero', 'one'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans2 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'two']);
+        $this->assertSame(['zero', 'one', 'two'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans3 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'three']);
+        $this->assertSame(['zero', 'one', 'two', 'three'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans2->rollback();
+        $this->assertTrue($DB->is_transaction_started());
+        $this->assertSame(['zero', 'one'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+        $this->assertTrue($trans3->is_disposed());
+
+        $trans1->allow_commit();
+        $this->assertSame(['zero', 'one'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertFalse($DB->is_transaction_started());
+
+        $DB->delete_records('test_table', []);
+        $this->assertSame([], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        unset($trans1);
+        unset($trans2);
+        unset($trans3);
+
+        // Test rollback everything.
+
+        $DB->insert_record('test_table', ['name' => 'zero']);
+        $this->assertFalse($DB->is_transaction_started());
+        $this->assertSame(['zero'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+
+        $trans1 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'one']);
+        $this->assertSame(['zero', 'one'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans2 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'two']);
+        $this->assertSame(['zero', 'one', 'two'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans3 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'three']);
+        $this->assertSame(['zero', 'one', 'two', 'three'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans1->rollback();
+        $this->assertSame(['zero'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertFalse($DB->is_transaction_started());
+        $this->assertTrue($trans3->is_disposed());
+        $this->assertTrue($trans2->is_disposed());
+        $this->assertTrue($trans1->is_disposed());
+
+        $DB->delete_records('test_table', []);
+        $this->assertSame([], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        unset($trans1);
+        unset($trans2);
+        unset($trans3);
+
+        // Test incorrect commit order forces rollback of the whole transaction.
+
+        $DB->insert_record('test_table', ['name' => 'zero']);
+        $this->assertFalse($DB->is_transaction_started());
+        $this->assertSame(['zero'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+
+        $trans1 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'one']);
+        $this->assertSame(['zero', 'one'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans2 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'two']);
+        $this->assertSame(['zero', 'one', 'two'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        $trans3 = $DB->start_delegated_transaction();
+        $DB->insert_record('test_table', ['name' => 'three']);
+        $this->assertSame(['zero', 'one', 'two', 'three'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertTrue($DB->is_transaction_started());
+
+        try {
+            $trans2->allow_commit();
+            $this->fail('Exception expected after incorrect commit');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_transaction_exception::class, $e);
+            $this->assertSame('Database transaction error (Invalid nested transaction commit attempt, other nested transactions are still pending)', $e->getMessage());
+        }
+        $this->assertTrue($DB->is_transaction_started());
+        $this->assertSame(['zero', 'one', 'two', 'three'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+
+        try {
+            $trans3->allow_commit();
+            $this->fail('Exception expected after incorrect commit');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_transaction_exception::class, $e);
+            $this->assertSame('Database transaction error (All transactions are scheduled for forced rollback due to previous transaction error)', $e->getMessage());
+        }
+
+        try {
+            $trans1->rollback();
+            $this->fail('Exception expected after incorrect commit');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_transaction_exception::class, $e);
+            $this->assertSame('Database transaction error (All transactions are scheduled for forced rollback due to previous transaction error)', $e->getMessage());
+        }
+        $this->assertTrue($DB->is_transaction_started());
+
+        $this->assertSame(['zero', 'one', 'two', 'three'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $DB->force_transaction_rollback();
+        $this->assertSame(['zero'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
+        $this->assertFalse($DB->is_transaction_started());
+    }
 }

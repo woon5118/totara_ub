@@ -99,5 +99,12 @@ class totara_program_recurring_courses_testcase extends reportcache_advanced_tes
                 $DB->get_field('course_completions', 'timeenrolled', array('userid' => $user->id, 'course' => $newcourseid))
             );
         }
+
+        // TODO: TL-21284 do not rely on transactions
+        $debuggings = $this->getDebuggingMessages();
+        foreach ($debuggings as $debuggin) {
+            $this->assertSame('Transactions are not compatible with DDL operations in MySQL and MS SQL Server', $debuggin->message);
+        }
+        $this->resetDebugging();
     }
 }

@@ -113,6 +113,10 @@ abstract class database_driver_testcase extends base_testcase {
     }
 
     protected function tearDown() {
+        // Totara: undo any transaction leftovers.
+        if ($this->tdb->is_transaction_started()) {
+            $this->tdb->force_transaction_rollback();
+        }
         // delete all test tables
         $dbman = $this->tdb->get_manager();
         $tables = $this->tdb->get_tables(false);

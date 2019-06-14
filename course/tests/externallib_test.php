@@ -163,9 +163,19 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
 
          // Call without required capability
         $this->unassignUserCapability('moodle/category:manage', $contextid, $roleid);
-        $this->expectException('required_capability_exception');
-        $createdsubcats = core_course_external::delete_categories(
+        try {
+            $createdsubcats = core_course_external::delete_categories(
                 array(array('id' => $category3->id)));
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(required_capability_exception::class, $ex);
+        }
+
+        // Totara: TL-21285 hack around debugging messages for now.
+        $debuggings = $this->getDebuggingMessages();
+        foreach ($debuggings as $debuggin) {
+            $this->assertSame('Transactions are not compatible with DDL operations in MySQL and MS SQL Server', $debuggin->message);
+        }
+        $this->resetDebugging();
     }
 
     /**
@@ -357,8 +367,18 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
 
         // Call without required capability.
         $this->unassignUserCapability('moodle/category:manage', $contextid, $roleid);
-        $this->expectException('required_capability_exception');
-        core_course_external::update_categories($categories);
+        try {
+            core_course_external::update_categories($categories);
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(required_capability_exception::class, $ex);
+        }
+
+        // Totara: TL-21285 hack around debugging messages for now.
+        $debuggings = $this->getDebuggingMessages();
+        foreach ($debuggings as $debuggin) {
+            $this->assertSame('Transactions are not compatible with DDL operations in MySQL and MS SQL Server', $debuggin->message);
+        }
+        $this->resetDebugging();
     }
 
       /**

@@ -42,10 +42,11 @@ class mysqli_native_moodle_database extends moodle_database {
     /** @var mysqli $mysqli */
     protected $mysqli = null;
 
-    private $transactions_supported = null;
-
     /** @var array cached server information */
     protected $serverinfo = null;
+
+    /** @var bool flag indicating that transaction was auto-committed after DDL change */
+    protected $autocommitted = false;
 
     /**
      * Attempt to create the database
@@ -1043,6 +1044,10 @@ class mysqli_native_moodle_database extends moodle_database {
      * @throws ddl_change_structure_exception A DDL specific exception is thrown for any errors.
      */
     public function change_database_structure($sql, $tablenames = null) {
+        if ($this->is_transaction_started()) {
+            debugging('Transactions are not compatible with DDL operations in MySQL and MS SQL Server', DEBUG_DEVELOPER);
+            $this->autocommitted = true;
+        }
         $this->get_manager(); // Includes DDL exceptions classes ;-)
         if (is_array($sql)) {
             $sql = implode("\n;\n", $sql);
@@ -1957,36 +1962,13 @@ class mysqli_native_moodle_database extends moodle_database {
 
     /**
      * Are transactions supported?
-     * It is not responsible to run productions servers
-     * on databases without transaction support ;-)
      *
-     * MyISAM does not support support transactions.
-     *
-     * You can override this via the dbtransactions option.
+     * Totara: transaction support is required!
      *
      * @return bool
      */
     protected function transactions_supported() {
-        if (!is_null($this->transactions_supported)) {
-            return $this->transactions_supported;
-        }
-
-        // this is all just guessing, might be better to just specify it in config.php
-        if (isset($this->dboptions['dbtransactions'])) {
-            $this->transactions_supported = $this->dboptions['dbtransactions'];
-            return $this->transactions_supported;
-        }
-
-        $this->transactions_supported = false;
-
-        $engine = $this->get_dbengine();
-
-        // Only will accept transactions if using compatible storage engine (more engines can be added easily BDB, Falcon...)
-        if (in_array($engine, array('InnoDB', 'INNOBASE', 'BDB', 'XtraDB', 'Aria', 'Falcon'))) {
-            $this->transactions_supported = true;
-        }
-
-        return $this->transactions_supported;
+        return true;
     }
 
     /**
@@ -1995,10 +1977,6 @@ class mysqli_native_moodle_database extends moodle_database {
      * @return void
      */
     protected function begin_transaction() {
-        if (!$this->transactions_supported()) {
-            return;
-        }
-
         $sql = "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED";
         $this->query_start($sql, NULL, SQL_QUERY_AUX);
         $result = $this->mysqli->query($sql);
@@ -2016,14 +1994,11 @@ class mysqli_native_moodle_database extends moodle_database {
      * @return void
      */
     protected function commit_transaction() {
-        if (!$this->transactions_supported()) {
-            return;
-        }
-
         $sql = "COMMIT";
         $this->query_start($sql, NULL, SQL_QUERY_AUX);
         $result = $this->mysqli->query($sql);
         $this->query_end($result);
+        $this->autocommitted = false;
     }
 
     /**
@@ -2032,16 +2007,49 @@ class mysqli_native_moodle_database extends moodle_database {
      * @return void
      */
     protected function rollback_transaction() {
-        if (!$this->transactions_supported()) {
-            return;
-        }
-
         $sql = "ROLLBACK";
         $this->query_start($sql, NULL, SQL_QUERY_AUX);
         $result = $this->mysqli->query($sql);
         $this->query_end($result);
+        // If this was true then we are in trouble, but clear the flag anyway.
+        $this->autocommitted = false;
+    }
 
-        return true;
+    /**
+     * Creates new database savepoint.
+     * @param string $name
+     */
+    protected function create_savepoint(string $name) {
+        $sql = "SAVEPOINT {$name}";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = $this->mysqli->query($sql);
+        $this->query_end($result);
+    }
+
+    /**
+     * Release savepoint, rollback will not be possible any more.
+     * @param string $name
+     */
+    protected function release_savepoint(string $name) {
+        if ($this->autocommitted) {
+            // We cannot rollback, so let's pretend we can at least commit.
+            return;
+        }
+        $sql = "RELEASE SAVEPOINT {$name}";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = $this->mysqli->query($sql);
+        $this->query_end($result);
+    }
+
+    /**
+     * Rolls back current transaction back to given savepoint.
+     * @param string $name
+     */
+    protected function rollback_savepoint(string $name) {
+        $sql = "ROLLBACK TO SAVEPOINT {$name}";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = $this->mysqli->query($sql);
+        $this->query_end($result);
     }
 
     /**

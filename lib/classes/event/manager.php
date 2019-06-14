@@ -16,8 +16,6 @@
 
 namespace core\event;
 
-use totara_job\job_event_handler;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -41,6 +39,12 @@ class manager {
 
     /** @var array buffer for events that were not sent to external observers when DB transaction in progress */
     protected static $extbuffer = array();
+
+    /** @var array Totara buffers tracking of nested transaction events */
+    protected static $trans_buffers = [];
+
+    /** @var string Totara transaction name */
+    protected static $trans_name;
 
     /** @var bool evert dispatching already in progress - prevents nesting */
     protected static $dispatching = false;
@@ -81,9 +85,48 @@ class manager {
     /**
      * Notification from DML layer.
      * @internal to be used from DML layer only.
+     * @param string $name
      */
-    public static function database_transaction_commited() {
-        if (self::$dispatching or empty(self::$extbuffer)) {
+    public static function database_transaction_began(string $name) {
+        self::$trans_buffers[$name] = [];
+        self::$trans_name = $name;
+    }
+
+    /**
+     * Notification from DML layer.
+     * @internal to be used from DML layer only.
+     * @param string $name
+     */
+    public static function database_transaction_commited(string $name) {
+        if ($name !== self::$trans_name or !isset(self::$trans_buffers[$name])) {
+            debugging('Invalid transaction commit order detected', DEBUG_DEVELOPER);
+            return;
+        }
+
+        $lastkey = array_key_last(self::$trans_buffers);
+        if ($lastkey !== $name) {
+            debugging('Invalid transaction commit order detected', DEBUG_DEVELOPER);
+            return;
+        }
+
+        if (count(self::$trans_buffers) > 1) {
+            $lastbuffer = self::$trans_buffers[$name];
+            unset(self::$trans_buffers[$name]);
+            $prevname = array_key_last(self::$trans_buffers);
+            self::$trans_buffers[$prevname] = array_merge(self::$trans_buffers[$prevname], $lastbuffer);
+            self::$trans_name = $prevname;
+            return;
+        }
+
+        // Move all transaction events to the extbuffer to get it processed.
+        $events = reset(self::$trans_buffers);
+        self::$extbuffer = array_merge(self::$extbuffer, $events);
+        self::$trans_buffers = [];
+        self::$trans_name = null;
+
+        if (self::$dispatching) {
+            // The dispatching is already running,
+            // it will process the new events in self::$extbuffer before it terminates.
             return;
         }
 
@@ -95,29 +138,45 @@ class manager {
     /**
      * Notification from DML layer.
      * @internal to be used from DML layer only.
+     * @param string|null $name null means discard the whole buffer
      */
-    public static function database_transaction_rolledback() {
-        self::$extbuffer = array();
+    public static function database_transaction_rolledback(?string $name) {
+        if ($name === null) {
+            self::$trans_buffers = [];
+            self::$trans_name = null;
+            return;
+        }
+
+        if (!isset(self::$trans_buffers[$name])) {
+            debugging('Invalid transaction rollback order detected', DEBUG_DEVELOPER);
+            return;
+        }
+
+        while (true) {
+            $lastname = array_key_last(self::$trans_buffers);
+            unset(self::$trans_buffers[$lastname]);
+            if ($lastname === $name) {
+                break;
+            }
+        }
+
+        self::$trans_name = array_key_last(self::$trans_buffers);
     }
 
     protected static function process_buffers() {
-        global $DB, $CFG;
+        global $CFG;
         self::init_all_observers();
 
-        while (self::$buffer or self::$extbuffer) {
+        while (true) { // Terminated by 'return;' if after no more events to process.
 
             $fromextbuffer = false;
             $addedtoextbuffer = false;
 
-            if (self::$extbuffer and !$DB->is_transaction_started()) {
+            if (self::$extbuffer) {
+                $event = array_shift(self::$extbuffer);
                 $fromextbuffer = true;
-                $event = reset(self::$extbuffer);
-                unset(self::$extbuffer[key(self::$extbuffer)]);
-
             } else if (self::$buffer) {
-                $event = reset(self::$buffer);
-                unset(self::$buffer[key(self::$buffer)]);
-
+                $event = array_shift(self::$buffer);
             } else {
                 return;
             }
@@ -135,14 +194,10 @@ class manager {
                             continue;
                         }
                     } else {
-                        if ($DB->is_transaction_started()) {
-                            if ($fromextbuffer) {
-                                // Weird!
-                                continue;
-                            }
+                        if (!$fromextbuffer and self::$trans_name !== null) {
                             // Do not notify external observers while in DB transaction.
                             if (!$addedtoextbuffer) {
-                                self::$extbuffer[] = $event;
+                                self::$trans_buffers[self::$trans_name][] = $event;
                                 $addedtoextbuffer = true;
                             }
                             continue;

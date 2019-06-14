@@ -45,6 +45,12 @@ class manager {
     /** @var array buffer of pending messages */
     protected static $buffer = array();
 
+    /** @var array Totara buffers tracking of nested transaction messages */
+    protected static $trans_buffers = [];
+
+    /** @var string Totara transaction name */
+    protected static $trans_name;
+
     /**
      * Do the message sending.
      *
@@ -120,7 +126,7 @@ class manager {
         // We cannot communicate with external systems in DB transactions,
         // buffer the messages if necessary.
 
-        if ($DB->is_transaction_started()) {
+        if (self::$trans_name !== null) {
             // We need to clone all objects so that devs may not modify it from outside later.
             $eventdata = clone($eventdata);
             $eventdata->userto = clone($eventdata->userto);
@@ -130,7 +136,7 @@ class manager {
             unset($eventdata->userto->description);
             unset($eventdata->userfrom->description);
 
-            self::$buffer[] = array($eventdata, $savemessage, $processorlist);
+            self::$trans_buffers[self::$trans_name][] = array($eventdata, $savemessage, $processorlist);
             return $savemessage->id;
         }
 
@@ -181,29 +187,86 @@ class manager {
 
     /**
      * Notification from DML layer.
-     *
-     * Note: to be used from DML layer only.
+     * @internal to be used from DML layer only.
+     * @param string $name
      */
-    public static function database_transaction_commited() {
-        if (!self::$buffer) {
-            return;
-        }
-        self::process_buffer();
+    public static function database_transaction_began(string $name) {
+        self::$trans_buffers[$name] = [];
+        self::$trans_name = $name;
     }
 
     /**
      * Notification from DML layer.
      *
      * Note: to be used from DML layer only.
+     * @param string $name
      */
-    public static function database_transaction_rolledback() {
-        self::$buffer = array();
+    public static function database_transaction_commited(string $name) {
+        if ($name !== self::$trans_name or !isset(self::$trans_buffers[$name])) {
+            debugging('Invalid transaction commit order detected', DEBUG_DEVELOPER);
+            return;
+        }
+
+        $lastkey = array_key_last(self::$trans_buffers);
+        if ($lastkey !== $name) {
+            debugging('Invalid transaction commit order detected', DEBUG_DEVELOPER);
+            return;
+        }
+
+        if (count(self::$trans_buffers) > 1) {
+            $lastbuffer = self::$trans_buffers[$name];
+            unset(self::$trans_buffers[$name]);
+            $prevname = array_key_last(self::$trans_buffers);
+            self::$trans_buffers[$prevname] = array_merge(self::$trans_buffers[$prevname], $lastbuffer);
+            self::$trans_name = $prevname;
+            return;
+        }
+
+        // Move all transaction events to the buffer to get it processed.
+        $events = reset(self::$trans_buffers);
+        self::$buffer = array_merge(self::$buffer, $events);
+        self::$trans_buffers = [];
+        self::$trans_name = null;
+
+        self::process_buffer();
+    }
+
+    /**
+     * Notification from DML layer.
+     * Note: to be used from DML layer only.
+     *
+     * @param string|null $name null means discard the whole buffer
+     */
+    public static function database_transaction_rolledback(?string $name) {
+        if ($name === null) {
+            self::$trans_buffers = [];
+            self::$trans_name = null;
+            return;
+        }
+
+        if (!isset(self::$trans_buffers[$name])) {
+            debugging('Invalid transaction rollback order detected', DEBUG_DEVELOPER);
+            return;
+        }
+
+        while (true) {
+            $lastname = array_key_last(self::$trans_buffers);
+            unset(self::$trans_buffers[$lastname]);
+            if ($lastname === $name) {
+                break;
+            }
+        }
+
+        self::$trans_name = array_key_last(self::$trans_buffers);
     }
 
     /**
      * Sent out any buffered messages if necessary.
      */
     protected static function process_buffer() {
+        if (!self::$buffer) {
+            return;
+        }
         // Reset the buffer first in case we get exception from processor.
         $messages = self::$buffer;
         self::$buffer = array();

@@ -520,6 +520,48 @@ class core_event_testcase extends advanced_testcase {
         $this->assertCount(1, \core_tests\event\unittest_observer::$event);
     }
 
+    /**
+     * Since Totara 13 we support partial rollback of nested transactions.
+     */
+    public function test_rollback_nested() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $observers = array(
+            array(
+                'eventname'   => '\core_tests\event\unittest_executed',
+                'callback'    => '\core_tests\event\unittest_observer::external_observer',
+                'internal'    => 0,
+            ),
+        );
+
+        \core\event\manager::phpunit_replace_observers($observers);
+        \core_tests\event\unittest_observer::reset();
+
+        $this->assertCount(0, \core_tests\event\unittest_observer::$event);
+
+        $transaction1 = $DB->start_delegated_transaction();
+        \core_tests\event\unittest_executed::create(array('context'=>\context_system::instance(), 'other'=>array('sample'=>2, 'xx'=>10)))->trigger();
+        $this->assertCount(0, \core_tests\event\unittest_observer::$event);
+        $this->assertTrue($DB->is_transaction_started());
+
+        $transaction2 = $DB->start_delegated_transaction();
+        \core_tests\event\unittest_executed::create(array('context'=>\context_system::instance(), 'other'=>array('sample'=>3, 'xx'=>10)))->trigger();
+        $this->assertCount(0, \core_tests\event\unittest_observer::$event);
+        $this->assertTrue($DB->is_transaction_started());
+
+        $transaction2->rollback();
+        $this->assertCount(0, \core_tests\event\unittest_observer::$event);
+        $this->assertTrue($DB->is_transaction_started());
+
+        $transaction1->allow_commit();
+        $this->assertCount(1, \core_tests\event\unittest_observer::$event);
+        $this->assertSame(['external_observer-2'], \core_tests\event\unittest_observer::$info);
+
+        $this->assertFalse($DB->is_transaction_started());
+    }
+
     public function test_forced_rollback() {
         global $DB;
 

@@ -70,6 +70,50 @@ define('COHORT_VISIBLE_AUDIENCE', 1);
 define('COHORT_VISIBLE_ALL', 2);
 define('COHORT_VISIBLE_NOUSERS', 3);
 
+// == Add polyfills for methods from later PHP releases
+
+if (!function_exists('array_key_first')) {
+    /**
+     * Gets the first key of an array
+     *
+     * Get the first key of the given array without affecting the internal array pointer.
+     *
+     * @link https://secure.php.net/array_key_first
+     * @param array $array An array
+     * @return mixed Returns the first key of array if the array is not empty; NULL otherwise.
+     * @since 7.3
+     */
+    function array_key_first(array $array) {
+        foreach ($array as $key => $unused) {
+            return $key;
+        }
+        return null;
+    }
+}
+
+if (!function_exists('array_key_last')) {
+    /**
+     * Gets the last key of an array
+     *
+     * Get the last key of the given array without affecting the internal array pointer.
+     *
+     * @link https://secure.php.net/array_key_last
+     * @param array $array An array
+     * @return mixed Returns the last key of array if the array is not empty; NULL otherwise.
+     * @since 7.3
+     */
+    function array_key_last(array $array) {
+        $return = null;
+        foreach ($array as $key => $unused) {
+            $return = $key;
+        }
+        return $return;
+    }
+}
+
+
+// == End of polyfills section.
+
 /**
  * Returns true or false depending on whether or not this course is visible to a user.
  *

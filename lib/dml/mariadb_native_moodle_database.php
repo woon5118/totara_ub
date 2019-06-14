@@ -137,9 +137,7 @@ class mariadb_native_moodle_database extends mysqli_native_moodle_database {
      * @return bool
      */
     protected function transactions_supported() {
-        if ($this->external) {
-            return parent::transactions_supported();
-        }
+        // Totara: developers should not use transactions in external databases, but we do not prevent it any more.
         return true;
     }
 

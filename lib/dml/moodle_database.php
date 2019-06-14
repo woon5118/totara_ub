@@ -118,7 +118,7 @@ abstract class moodle_database {
     /** @var bool True if the db is used for db sessions. */
     protected $used_for_db_sessions = false;
 
-    /** @var array Array containing open transactions. */
+    /** @var moodle_transaction[] Array containing open transactions. */
     private $transactions = array();
     /** @var bool Flag used to force rollback of all current transactions. */
     private $force_rollback = false;
@@ -3188,11 +3188,25 @@ abstract class moodle_database {
      *
      * @return moodle_transaction
      */
-    public function start_delegated_transaction() {
-        $transaction = new moodle_transaction($this);
-        $this->transactions[] = $transaction;
-        if (count($this->transactions) == 1) {
+    final public function start_delegated_transaction() {
+        static $i = 0;
+
+        if ($this->force_rollback) {
+            throw new dml_transaction_exception('All transactions are scheduled for forced rollback due to previous transaction error', null);
+        }
+
+        $i++;
+        $name = 'dml_transaction_' . $i;
+        $transaction = new moodle_transaction($this, $name);
+        $this->transactions[$name] = $transaction;
+        if (count($this->transactions) === 1) {
             $this->begin_transaction();
+        } else {
+            $this->create_savepoint($name);
+        }
+        if (!$this->external) {
+            \core\event\manager::database_transaction_began($name);
+            \core\message\manager::database_transaction_began($name);
         }
         return $transaction;
     }
@@ -3205,6 +3219,14 @@ abstract class moodle_database {
     protected abstract function begin_transaction();
 
     /**
+     * Creates new database savepoint.
+     * @param string $name
+     */
+    protected function create_savepoint(string $name) {
+        throw new coding_exception('Database driver does not support savepoints');
+    }
+
+    /**
      * Indicates delegated transaction finished successfully.
      * The real database transaction is committed only if
      * all delegated transactions committed.
@@ -3212,36 +3234,55 @@ abstract class moodle_database {
      * @return void
      * @throws dml_transaction_exception Creates and throws transaction related exceptions.
      */
-    public function commit_delegated_transaction(moodle_transaction $transaction) {
+    final public function commit_delegated_transaction(moodle_transaction $transaction) {
         if ($transaction->is_disposed()) {
             throw new dml_transaction_exception('Transactions already disposed', $transaction);
         }
         // mark as disposed so that it can not be used again
         $transaction->dispose();
 
-        if (empty($this->transactions)) {
-            throw new dml_transaction_exception('Transaction not started', $transaction);
-        }
-
         if ($this->force_rollback) {
-            throw new dml_transaction_exception('Tried to commit transaction after lower level rollback', $transaction);
+            throw new dml_transaction_exception('All transactions are scheduled for forced rollback due to previous transaction error', $transaction);
         }
 
-        if ($transaction !== $this->transactions[count($this->transactions) - 1]) {
-            // one incorrect commit at any level rollbacks everything
-            $this->force_rollback = true;
+        $name = $transaction->get_name();
+        if (!isset($this->transactions[$name])) {
+            if ($this->transactions) {
+                $this->force_rollback = true;
+            }
             throw new dml_transaction_exception('Invalid transaction commit attempt', $transaction);
         }
 
-        if (count($this->transactions) == 1) {
-            // only commit the top most level
+        $maintransaction = array_key_first($this->transactions);
+        if ($name === $maintransaction) {
+            if (count($this->transactions) > 1) {
+                // One incorrect commit at any level rollbacks everything.
+                $this->force_rollback = true;
+                throw new dml_transaction_exception('Invalid transaction commit attempt, nested transactions are still pending', $transaction);
+            }
+            // This is the real commit of the whole transaction.
             $this->commit_transaction();
+            unset($this->transactions[$name]);
+            if (!$this->external) {
+                \core\event\manager::database_transaction_commited($name);
+                \core\message\manager::database_transaction_commited($name);
+            }
+            return;
         }
-        array_pop($this->transactions);
 
-        if (empty($this->transactions)) {
-            \core\event\manager::database_transaction_commited();
-            \core\message\manager::database_transaction_commited();
+        $lastname = array_key_last($this->transactions);
+        if ($name !== $lastname) {
+            // one incorrect commit at any level rollbacks everything
+            $this->force_rollback = true;
+            throw new dml_transaction_exception('Invalid nested transaction commit attempt, other nested transactions are still pending', $transaction);
+        }
+
+        $this->release_savepoint($name);
+        unset($this->transactions[$name]);
+
+        if (!$this->external) {
+            \core\event\manager::database_transaction_commited($name);
+            \core\message\manager::database_transaction_commited($name);
         }
     }
 
@@ -3253,6 +3294,14 @@ abstract class moodle_database {
     protected abstract function commit_transaction();
 
     /**
+     * Release savepoint, rollback will not be possible any more.
+     * @param string $name
+     */
+    protected function release_savepoint(string $name) {
+        throw new coding_exception('Database driver does not support savepoints');
+    }
+
+    /**
      * Call when delegated transaction failed, this rolls back
      * all delegated transactions up to the top most level.
      *
@@ -3261,41 +3310,62 @@ abstract class moodle_database {
      * automatically if exceptions not caught.
      *
      * @param moodle_transaction $transaction An instance of a moodle_transaction.
-     * @param Exception|Throwable $e The related exception/throwable to this transaction rollback.
-     * @return void This does not return, instead the exception passed in will be rethrown.
+     * @param Throwable $e The related exception/throwable to this transaction rollback.
+     * @return void if $e is provided it is rethrown after rollback
      */
-    public function rollback_delegated_transaction(moodle_transaction $transaction, $e) {
-        if (!($e instanceof Exception) && !($e instanceof Throwable)) {
-            // PHP7 - we catch Throwables in phpunit but can't use that as the type hint in PHP5.
-            $e = new \coding_exception("Must be given an Exception or Throwable object!");
-        }
+    final public function rollback_delegated_transaction(moodle_transaction $transaction, Throwable $e = null) {
         if ($transaction->is_disposed()) {
             throw new dml_transaction_exception('Transactions already disposed', $transaction);
         }
         // mark as disposed so that it can not be used again
         $transaction->dispose();
 
-        // one rollback at any level rollbacks everything
-        $this->force_rollback = true;
+        if ($this->force_rollback) {
+            throw new dml_transaction_exception('All transactions are scheduled for forced rollback due to previous transaction error', $transaction);
+        }
 
-        if (empty($this->transactions) or $transaction !== $this->transactions[count($this->transactions) - 1]) {
-            // this may or may not be a coding problem, better just rethrow the exception,
-            // because we do not want to loose the original $e
+        $name = $transaction->get_name();
+        if (!isset($this->transactions[$name])) {
+            if ($this->transactions) {
+                $this->force_rollback = true;
+            }
+            throw new dml_transaction_exception('Transaction cannot be rolled back most likely due to incorrect order of rollbacks', $transaction);
+        }
+
+        while ($this->transactions) {
+            $transaction = array_pop($this->transactions);
+            $subname = $transaction->get_name();
+            if ($subname === $name) {
+                break;
+            }
+            // This must be a sub transaction, roll it back - we allow forcing rollback from outer transactions.
+            $transaction->dispose();
+            $this->rollback_savepoint($subname);
+            unset($this->transactions[$subname]);
+            if (!$this->external) {
+                \core\event\manager::database_transaction_rolledback($subname);
+                \core\message\manager::database_transaction_rolledback($subname);
+            }
+        }
+
+        unset($this->transactions[$name]);
+        if ($this->transactions) {
+            $this->rollback_savepoint($name);
+            if (!$this->external) {
+                \core\event\manager::database_transaction_rolledback($name);
+                \core\message\manager::database_transaction_rolledback($name);
+            }
+        } else {
+            $this->rollback_transaction();
+            if (!$this->external) {
+                \core\event\manager::database_transaction_rolledback(null);
+                \core\message\manager::database_transaction_rolledback(null);
+            }
+        }
+
+        if ($e) {
             throw $e;
         }
-
-        if (count($this->transactions) == 1) {
-            // only rollback the top most level
-            $this->rollback_transaction();
-        }
-        array_pop($this->transactions);
-        if (empty($this->transactions)) {
-            // finally top most level rolled back
-            $this->force_rollback = false;
-            \core\event\manager::database_transaction_rolledback();
-            \core\message\manager::database_transaction_rolledback();
-        }
-        throw $e;
     }
 
     /**
@@ -3304,6 +3374,14 @@ abstract class moodle_database {
      * @return void
      */
     protected abstract function rollback_transaction();
+
+    /**
+     * Rolls back current transaction back to given savepoint.
+     * @param string $name
+     */
+    protected function rollback_savepoint(string $name) {
+        throw new coding_exception('Database driver does not support savepoints');
+    }
 
     /**
      * Force rollback of all delegated transaction.
@@ -3327,8 +3405,10 @@ abstract class moodle_database {
         $this->transactions = array();
         $this->force_rollback = false;
 
-        \core\event\manager::database_transaction_rolledback();
-        \core\message\manager::database_transaction_rolledback();
+        if (!$this->external) {
+            \core\event\manager::database_transaction_rolledback(null);
+            \core\message\manager::database_transaction_rolledback(null);
+        }
     }
 
     /**

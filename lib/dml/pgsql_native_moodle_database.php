@@ -685,6 +685,8 @@ class pgsql_native_moodle_database extends moodle_database {
      * @throws ddl_change_structure_exception A DDL specific exception is thrown for any errors.
      */
     public function change_database_structure($sql, $tablenames = null) {
+        // Totara: do not trigger debugging('Transactions are not compatible with DDL operations in MySQL and MS SQL Server', DEBUG_DEVELOPER); here,
+        //         because we do not want to break custom code that is designed for PostgreSQL servers only.
         $this->get_manager(); // Includes DDL exceptions classes ;-)
         if (is_array($sql)) {
             $sql = implode("\n;\n", $sql);
@@ -1476,6 +1478,63 @@ class pgsql_native_moodle_database extends moodle_database {
         $result = pg_query($this->pgsql, $sql);
         $this->query_end($result);
 
+        pg_free_result($result);
+    }
+
+    /**
+     * Creates new database savepoint.
+     * @param string $name
+     */
+    protected function create_savepoint(string $name) {
+        $sql = "RELEASE SAVEPOINT moodle_pg_savepoint; SAVEPOINT {$name}; SAVEPOINT moodle_pg_savepoint";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = pg_query($this->pgsql, $sql);
+        try {
+            $this->savepointpresent = false;
+            $this->query_end($result);
+            $this->savepointpresent = true;
+        } catch (Throwable $e) {
+            $this->savepointpresent = true;
+            throw $e;
+        }
+        pg_free_result($result);
+    }
+
+    /**
+     * Release savepoint, rollback will not be possible any more.
+     * @param string $name
+     */
+    protected function release_savepoint(string $name) {
+        $sql = "RELEASE SAVEPOINT moodle_pg_savepoint; RELEASE SAVEPOINT {$name}; SAVEPOINT moodle_pg_savepoint";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = pg_query($this->pgsql, $sql);
+        try {
+            $this->savepointpresent = false;
+            $this->query_end($result);
+            $this->savepointpresent = true;
+        } catch (Throwable $e) {
+            $this->savepointpresent = true;
+            throw $e;
+        }
+        pg_free_result($result);
+    }
+
+    /**
+     * Rolls back current transaction back to given savepoint.
+     * @param string $name
+     */
+    protected function rollback_savepoint(string $name) {
+        $sql = "RELEASE SAVEPOINT moodle_pg_savepoint; ROLLBACK TO SAVEPOINT {$name}; SAVEPOINT moodle_pg_savepoint";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = pg_query($this->pgsql, $sql);
+        try {
+            $this->savepointpresent = false;
+            $this->query_end($result);
+            $this->savepointpresent = true;
+        } catch (Throwable $e) {
+            $this->savepointpresent = true;
+            throw $e;
+        }
         pg_free_result($result);
     }
 

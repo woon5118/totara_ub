@@ -817,6 +817,76 @@ class core_messagelib_testcase extends advanced_testcase {
         $this->assertEquals(1, $mailsink->count());
     }
 
+    /**
+     * Since Totara 13 we support partial rollback of nested transactions.
+     */
+    public function test_rollback_nested() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        $message = new \core\message\message();
+        $message->courseid          = 1;
+        $message->component         = 'moodle';
+        $message->name              = 'instantmessage';
+        $message->userfrom          = $user1;
+        $message->userto            = $user2;
+        $message->subject           = 'message subject 1';
+        $message->fullmessage       = 'message body';
+        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->fullmessagehtml   = '<p>message body</p>';
+        $message->smallmessage      = 'small message';
+        $message->notification      = '0';
+
+        $mailsink = $this->redirectEmails();
+
+        // Sending outside of a transaction is fine.
+        message_send($message);
+        $this->assertEquals(1, $mailsink->count());
+
+        $transaction1 = $DB->start_delegated_transaction();
+
+        $mailsink->clear();
+        message_send($message);
+        $this->assertEquals(0, $mailsink->count());
+
+        $transaction2 = $DB->start_delegated_transaction();
+
+        $message = new \core\message\message();
+        $message->courseid          = 1;
+        $message->component         = 'moodle';
+        $message->name              = 'instantmessage';
+        $message->userfrom          = $user1;
+        $message->userto            = $user3;
+        $message->subject           = 'message subject 1';
+        $message->fullmessage       = 'message body';
+        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->fullmessagehtml   = '<p>message body</p>';
+        $message->smallmessage      = 'small message';
+        $message->notification      = '0';
+
+        $mailsink->clear();
+        message_send($message);
+        $this->assertEquals(0, $mailsink->count());
+
+        $transaction2->rollback();
+        $this->assertEquals(0, $mailsink->count());
+
+        $this->assertTrue($DB->is_transaction_started());
+
+        $transaction1->allow_commit();
+        $this->assertDebuggingNotCalled();
+        $messages = $mailsink->get_messages();
+        $this->assertCount(1, $messages);
+        $this->assertSame($user2->email, $messages[0]->to);
+
+        $this->assertFalse($DB->is_transaction_started());
+    }
+
     public function test_forced_rollback() {
         global $DB;
 
