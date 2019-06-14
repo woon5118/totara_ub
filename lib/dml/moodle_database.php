@@ -3417,6 +3417,40 @@ abstract class moodle_database {
     }
 
     /**
+     * Totara:
+     * This is a shortcut version to use a transaction. Pass a closure which is automatically wrapped in a transaction.
+     * Any exception thrown in the Closure will fail the transaction and the transaction get's rolled back.
+     * The return value of the Closure will be passed back.
+     *
+     * Example:
+     *
+     * $result = $DB->transaction(function () use ($DB) {
+     *      // Do something
+     *     $DB->delete_record(...);
+     *
+     *     // Optional return value
+     *     return $result;
+     * });
+     *
+     * @since Totara 13
+     * @param Closure $closure
+     * @return mixed returns the result of the Closure
+     */
+    final public function transaction(Closure $closure) {
+        $transaction = $this->start_delegated_transaction();
+        try {
+            $result = $closure();
+            $transaction->allow_commit();
+            return $result;
+        } catch (Throwable $exception) {
+            $transaction->rollback();
+            // We always rethrow the exception,
+            // it's up to the developers to decide whether they want to catch it or not
+            throw $exception;
+        }
+    }
+
+    /**
      * Is session lock supported in this driver?
      * @return bool
      */

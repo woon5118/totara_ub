@@ -2433,4 +2433,163 @@ ORDER BY tt1.groupid";
         $this->assertSame(['zero'], $DB->get_fieldset_sql('SELECT name FROM "ttr_test_table" ORDER BY id ASC'));
         $this->assertFalse($DB->is_transaction_started());
     }
+
+    public function test_transaction_using_closure() {
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        // Test no return value ends up in null
+        $result = $DB->transaction(function () {
+            // don't return anything
+        });
+        $this->assertNull($result);
+        $this->assertFalse($DB->is_transaction_started());
+
+        // Create a temp table
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_temp_table($table);
+
+        // Successful
+        $result = $DB->transaction(function () use ($DB) {
+            $record = new stdClass();
+            $record->name = "test record";
+            $DB->insert_record('test_table', $record);
+
+            return "test record";
+        });
+        // The return of the closure got passed back
+        $this->assertEquals("test record", $result);
+        $this->assertFalse($DB->is_transaction_started());
+
+        // Check that record was actually inserted
+        $record = $DB->get_record('test_table', ['name' => 'test record']);
+        $this->assertNotEmpty($record);
+
+        // Transaction fails and rethrow exception
+        try {
+            $DB->transaction(function () use ($DB) {
+                $record = new stdClass();
+                $record->name = "test record 2";
+                $DB->insert_record('test_table', $record);
+
+                throw new Exception('the transaction failed.');
+            });
+            $this->fail('Expected transaction to fail');
+        } catch (Exception $e) {
+            $this->assertEquals('the transaction failed.', $e->getMessage());
+        }
+        $this->assertFalse($DB->is_transaction_started());
+
+        // Record was not created as transaction was rolled back
+        $record = $DB->get_record('test_table', ['name' => 'test record 2']);
+        $this->assertEmpty($record);
+
+        $dbman->drop_table($table);
+    }
+
+    public function test_nested_transaction_using_closure() {
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_temp_table($table);
+
+        // Testing nested transaction with commit
+
+        // Starting outer transaction
+        $transaction = $DB->start_delegated_transaction();
+
+        $id = $DB->transaction(function () use ($DB) {
+            $record = new stdClass();
+            $record->name = "test record 3";
+            return $DB->insert_record('test_table', $record);
+        });
+
+        // Check that record was inserted, not fully committed though
+        $record = $DB->get_record('test_table', ['id' => $id]);
+        $this->assertNotEmpty($record);
+
+        $transaction->allow_commit();
+
+        // Commit of nested transaction was successful
+        $record = $DB->get_record('test_table', ['id' => $id]);
+        $this->assertNotEmpty($record);
+        $this->assertFalse($DB->is_transaction_started());
+
+        // Testing nested transactions with rollback of outer transdaction
+
+        // Starting outer transaction
+        $transaction = $DB->start_delegated_transaction();
+
+        $id = $DB->transaction(function () use ($DB) {
+            $record = new stdClass();
+            $record->name = "test record 3";
+            return $DB->insert_record('test_table', $record);
+        });
+
+        // Check that record was inserted, not fully committed though
+        $record = $DB->get_record('test_table', ['id' => $id]);
+        $this->assertNotEmpty($record);
+        $this->assertTrue($DB->is_transaction_started());
+
+        $transaction->rollback();
+        $this->assertFalse($DB->is_transaction_started());
+
+        // Rollback of nested transaction was successful
+        $record = $DB->get_record('test_table', ['id' => $id]);
+        $this->assertEmpty($record);
+
+        // Testing deeper nested transactions with exception thrown in nested one
+
+        // Starting outer transaction
+        try {
+            $transaction = $DB->start_delegated_transaction();
+
+            $record = new stdClass();
+            $record->name = "test record 4";
+            $DB->insert_record('test_table', $record);
+
+            // First nested transaction
+            $DB->transaction(function () use ($DB) {
+                $record = new stdClass();
+                $record->name = "test record 5";
+                $DB->insert_record('test_table', $record);
+
+                // Second nested transaction
+                return $DB->transaction(function () use ($DB) {
+                    $record = new stdClass();
+                    $record->name = "test record 6";
+                    $DB->insert_record('test_table', $record);
+
+                    throw new Exception('nested transaction failed');
+                });
+            });
+
+            // This should not be reached
+            $this->fail('Expected transaction to be failed.');
+        } catch (Exception $e) {
+            $this->assertRegExp('/nested transaction failed/', $e);
+        }
+
+        // The main transaction is still open and can be committed
+        $this->assertTrue($DB->is_transaction_started());
+        $transaction->allow_commit();
+        $this->assertFalse($DB->is_transaction_started());
+
+        // Outer one got committed
+        $this->assertNotEmpty($DB->get_record('test_table', ['name' => 'test record 4']));
+
+        // Check that nested closure transactions got rolled back
+        $this->assertEmpty($DB->get_record('test_table', ['name' => 'test record 5']));
+        $this->assertEmpty($DB->get_record('test_table', ['name' => 'test record 6']));
+
+        $dbman->drop_table($table);
+    }
+
 }
