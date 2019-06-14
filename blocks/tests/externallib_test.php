@@ -29,6 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
+require_once($CFG->dirroot . '/blocks/course_progress_report/block_course_progress_report.php');
 
 /**
  * External block functions unit tests
@@ -147,4 +150,23 @@ class core_block_externallib_testcase extends externallib_advanced_testcase {
 
     }
 
+    /**
+     * Test that a block containing an embedded report can be successfully loaded
+     * immediately after being enabled.
+     */
+    public function test_embedded_report_block() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Enable the course progress report block.
+        $DB->set_field('block', 'visible', '1', array('name' => 'course_progress_report'));
+        core_plugin_manager::reset_caches();
+        reportbuilder::generate_embedded_reports();
+
+        // Check that report is available.
+        $reportrecord = $DB->get_record('report_builder', array('shortname' => 'course_progress'), '*', IGNORE_MISSING);
+        $this->assertNotFalse($reportrecord);
+    }
 }
