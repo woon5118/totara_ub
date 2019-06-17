@@ -371,13 +371,6 @@ class program_edit_form extends moodleform {
             $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
             $mform->closeHeaderBefore('buttonar');
         }
-
-        $hook = new \totara_program\hook\program_edit_form_definition_complete($this, $program->id, $action);
-        if ($iscertif) {
-            $hook->set_certification();
-        }
-
-        $hook->execute();
     }
 
     function validation($data, $files) {

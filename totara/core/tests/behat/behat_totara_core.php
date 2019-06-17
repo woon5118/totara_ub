@@ -687,7 +687,7 @@ class behat_totara_core extends behat_base {
                 );
                 break;
             default:
-                throw new Exception("The specified catalog default view '{$catalogtype}' does not exist.'");
+                throw new Exception("The specified catalog type '{$catalogtype}' does not exist.'");
         }
     }
 

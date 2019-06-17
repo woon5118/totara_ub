@@ -1,7 +1,7 @@
 @totara @totara_catalog @javascript @totara_core_menu
-Feature: Admin can set catalog default view in Advanced features
+Feature: Admin can set catalog type in Advanced features
   As an administrator
-  I need to be able to set the catalog default view
+  I need to be able to set the catalog type
   In order to choose the catalog that best fits my needs
 
   Background:
@@ -10,7 +10,7 @@ Feature: Admin can set catalog default view in Advanced features
 
   Scenario: Switching between catalogs adjusts top navigation and site admin menu
     When I set the following administration settings values:
-      | catalogtype | moodle |
+      | Catalogue type   | moodle |
     And I navigate to "Courses" node in site administration
     Then I should not see "Configure catalogue"
     And I should see "Courses" in the totara menu
@@ -20,7 +20,7 @@ Feature: Admin can set catalog default view in Advanced features
     Then I should see the "moodle" catalog page
 
     When I set the following administration settings values:
-      | catalogtype | enhanced |
+      | Catalogue type   | enhanced |
     And I navigate to "Courses" node in site administration
     Then I should not see "Configure catalogue"
     And I should see "Courses" in the totara menu
@@ -30,7 +30,7 @@ Feature: Admin can set catalog default view in Advanced features
     Then I should see the "enhanced" catalog page
 
     When I set the following administration settings values:
-      | catalogtype | totara |
+      | Catalogue type   | totara |
     And I navigate to "Courses" node in site administration
     Then I should see "Configure catalogue"
     When I start watching to see if a new page loads
@@ -40,13 +40,13 @@ Feature: Admin can set catalog default view in Advanced features
 
   Scenario Outline: Disabled totara catalog page shows info message and link to current catalog
     Given I set the following administration settings values:
-      | catalogtype | <Catalog type> |
+      | Catalogue type   | <Catalogue type> |
     When I am on totara catalog page
     Then I should see "The page you are looking for is no longer active. All courses can be found under Find Learning."
     When I click on "Find Learning" "link" in the ".alert-message" "css_element"
-    Then I should see the "<Catalog type>" catalog page
+    Then I should see the "<Catalogue type>" catalog page
 
     Examples:
-      | Catalog type |
-      | moodle       |
-      | enhanced     |
+      | Catalogue type |
+      | moodle         |
+      | enhanced       |

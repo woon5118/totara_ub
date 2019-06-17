@@ -53,9 +53,6 @@ class filter_handler {
     /** @var filter */
     private $fulltextsearchfilter = null;
 
-    /** @var filter */
-    private $likesearchfilter = null;
-
     /** @var filter[] */
     private $categoryfilters = null;
 
@@ -115,10 +112,7 @@ class filter_handler {
             foreach ($categoryfilters as $categoryfilter) {
                 $this->register_filter($categoryfilter);
             }
-
             $this->register_filter($this->get_full_text_search_filter());
-            $this->register_filter($this->get_legacy_search_filter());
-
             $learningtypefilters = $this->get_learning_type_filters();
             foreach ($learningtypefilters as $learningtypefilter) {
                 $this->register_filter($learningtypefilter);
@@ -143,7 +137,6 @@ class filter_handler {
             }
 
             $this->activefilters[] = $this->get_full_text_search_filter();
-            $this->activefilters[] = $this->get_legacy_search_filter();
         }
 
         return $this->activefilters;
@@ -260,7 +253,7 @@ class filter_handler {
     }
 
     /**
-     * Get the full text search filter.
+     * Get the full text search filter
      *
      * @return filter
      */
@@ -271,20 +264,6 @@ class filter_handler {
 
         return $this->fulltextsearchfilter;
     }
-
-    /**
-     * Get the legacy search filter.
-     *
-     * @return filter
-     */
-    public function get_legacy_search_filter() {
-        if (is_null($this->likesearchfilter)) {
-            $this->likesearchfilter = legacy_search_filter::create();
-        }
-
-        return $this->likesearchfilter;
-    }
-
 
     /**
      * Gets the learning types fitler.

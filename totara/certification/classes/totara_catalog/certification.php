@@ -99,7 +99,7 @@ class certification extends provider {
                 ],
                 'fts'      => [
                     'high'   => ['fullname', 'shortname'],
-                    'medium' => ['summary_fts', 'ftstags', 'search_metadata'],
+                    'medium' => ['summary_fts', 'ftstags'],
                     'low'    => array_merge(
                         customfield_dataholder_factory::get_fts_dataholder_keys('prog', 'certification', $this),
                         ['idnumber', 'course_fullnames', 'course_shortnames', 'course_category_hierarchy']

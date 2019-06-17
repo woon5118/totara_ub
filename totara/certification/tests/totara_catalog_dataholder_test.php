@@ -40,14 +40,14 @@ class totara_certification_totara_catalog_dataholder_testcase extends \advanced_
      */
     protected function setUp() {
         $this->resetAfterTest();
-
+        
         // setup a specific certification with different long name and id
         $cert = array(
             'fullname' => 'Test Fullname 101',
             'shortname' => 'Test Shortname 101',
             'idnumber' => 'Test IDNumber 101'
         );
-
+        
         $program_generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
         $program_generator->create_certification($cert);
     }
@@ -66,16 +66,16 @@ class totara_certification_totara_catalog_dataholder_testcase extends \advanced_
         ];
         $config = config::instance();
         $config->update($item_config);
-
+        
         $items = $this->get_items($config);
         $text_placeholders = $items[0]->get_template_data()["text_placeholders"];
-
+        
         $this->assertObjectHasAttribute('label', $text_placeholders[0]);
         $this->assertObjectHasAttribute('data', $text_placeholders[0]);
         $this->assertEquals('Learning type', $text_placeholders[0]->label);
         $this->assertEquals('Certifications', $text_placeholders[0]->data);
     }
-
+    
     /**
      * Test that fullname data is correct.
      */
@@ -90,16 +90,16 @@ class totara_certification_totara_catalog_dataholder_testcase extends \advanced_
         ];
         $config = config::instance();
         $config->update($item_config);
-
+        
         $items = $this->get_items($config);
         $text_placeholders = $items[0]->get_template_data()["text_placeholders"];
-
+        
         $this->assertObjectHasAttribute('label', $text_placeholders[0]);
         $this->assertObjectHasAttribute('data', $text_placeholders[0]);
         $this->assertEquals('Full name', $text_placeholders[0]->label);
         $this->assertEquals('Test Fullname 101', $text_placeholders[0]->data);
     }
-
+    
     /**
      * Test that shortname data is correct.
      */
@@ -114,16 +114,16 @@ class totara_certification_totara_catalog_dataholder_testcase extends \advanced_
         ];
         $config = config::instance();
         $config->update($item_config);
-
+        
         $items = $this->get_items($config);
         $text_placeholders = $items[0]->get_template_data()["text_placeholders"];
-
+        
         $this->assertObjectHasAttribute('label', $text_placeholders[0]);
         $this->assertObjectHasAttribute('data', $text_placeholders[0]);
         $this->assertEquals('Short name', $text_placeholders[0]->label);
         $this->assertEquals('Test Shortname 101', $text_placeholders[0]->data);
     }
-
+    
     /**
      * Test that idnumber data is correct.
      */
@@ -138,10 +138,10 @@ class totara_certification_totara_catalog_dataholder_testcase extends \advanced_
         ];
         $config = config::instance();
         $config->update($item_config);
-
+        
         $items = $this->get_items($config);
         $text_placeholders = $items[0]->get_template_data()["text_placeholders"];
-
+        
         $this->assertObjectHasAttribute('label', $text_placeholders[0]);
         $this->assertObjectHasAttribute('data', $text_placeholders[0]);
         $this->assertEquals('ID', $text_placeholders[0]->label);
@@ -150,7 +150,7 @@ class totara_certification_totara_catalog_dataholder_testcase extends \advanced_
 
     /**
      * Get catalog items.
-     *
+     * 
      * @param config $config
      * @return item_narrow[]
      */
@@ -159,7 +159,7 @@ class totara_certification_totara_catalog_dataholder_testcase extends \advanced_
         $page = $catalog->get_page_of_objects($config->get_value('items_per_load'), 0, 20, '');
         return $this->get_item_templates($page->objects, 'narrow');
     }
-
+    
     /**
      * Fetch all catalog items with their data holders.
      *

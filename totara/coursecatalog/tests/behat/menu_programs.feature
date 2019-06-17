@@ -8,7 +8,7 @@ Feature: Test Programs menu item
     Given I am on a totara site
     And I log in as "admin"
     And I set the following administration settings values:
-      | catalogtype | enhanced |
+      | Catalogue type     | enhanced |
 
   Scenario: Make sure Programs is available in totara menu
     When I navigate to "Main menu" node in "Site administration > Navigation"

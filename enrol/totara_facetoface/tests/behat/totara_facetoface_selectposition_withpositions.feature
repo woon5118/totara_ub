@@ -39,7 +39,7 @@ Feature: Users can enrol themself in courses with selected position where semina
       | student1 | POS002   | jobassignment2 |
 
     And I set the following administration settings values:
-      | catalogtype | enhanced |
+      | Catalogue type | enhanced |
     And I press "Save changes"
 
     And I log out

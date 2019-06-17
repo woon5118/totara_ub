@@ -9,7 +9,7 @@ Feature: Test menu correctly highlights the course catalog page when enhanced ca
     Given I am on a totara site
     And I log in as "admin"
     And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Catalogue default view" to "moodle"
+    And I set the field "Catalogue type" to "moodle"
     And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Navigation"
     And I press "Add new menu item"

@@ -129,19 +129,6 @@ $CFG->dboptions = array(
 //    $CFG->dboptions['ftslanguage'] = 'utf8mb4_0900_as_ci';
 //    $CFG->dboptions['ftslanguage'] = 'utf8mb4_de_pb_0900_ai_ci';
 //
-// MySQL has a plugin NGRAM to support the full-text parser, which make the search easier. Totara full-text index
-// will not enable NGRAM parser by default. However, it can be turned on/off via config, and the config will be used
-// if the database MySQL is used for storage.
-//    $CFG->dboptions['ftsngram'] = false;
-//    $CFG->dboptions['ftsngram'] = true;
-//    $CFG->dboptions['ftsngram'] = 0;
-//    $CFG->dboptions['ftsngram'] = 1;
-//
-// NOTE: After changing the availability of NGRAM once Totara had been installed, then you will need to run the
-// following scripts in the listed order:
-//    1. admin/cli/fts_rebuild_indexes.php
-//    2. admin/cli/fts_repopulate_tables.php
-//
 // NOTE: MySQL does not support Japanese and other languages with very short
 //       words without spaces in between, enable the following setting to get
 //       a basic experimental support of these languages.
@@ -155,23 +142,6 @@ $CFG->dboptions = array(
 //    $CFG->dboptions['ftslanguage'] = 'Japanese';
 //    $CFG->dboptions['ftslanguage'] = 1028; // Traditional Chinese
 //    $CFG->dboptions['ftslanguage'] = 2052; // Simplified Chinese
-//
-// PostgreSQL and MS SQL have built in support for accent sensitive full text searches.
-// PostgreSQL provides this by means of an extension called unaccent which is not created by default.
-// MS SQL accent sensitivity is on by default and to turn it off the fulltext catalog will need to
-// be rebuilt.
-//
-// To change accent sensitive fulltext searches for either PostgreSQL or MS SQL you can set the
-// following setting according to your requirement:
-//    $CFG->dboptions['ftsaccentsensitivity'] = true;
-//    $CFG->dboptions['ftsaccentsensitivity'] = false;
-//    $CFG->dboptions['ftsaccentsensitivity'] = 1;
-//    $CFG->dboptions['ftsaccentsensitivity'] = 0;
-//    $CFG->dboptions['ftsaccentsensitivity'] = 'dbdefault';
-//
-// NOTE: After changing the accent sensitivity setting you need to run the following scripts in the listed order:
-//    1. admin/cli/fts_rebuild_indexes.php
-//    2. admin/cli/fts_repopulate_tables.php
 //
 
 

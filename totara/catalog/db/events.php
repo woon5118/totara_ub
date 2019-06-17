@@ -31,12 +31,4 @@ $observers = array(
         'eventname' => '\core\event\admin_settings_changed',
         'callback'  => 'totara_catalog\observer\settings_observer::changed',
     ),
-    array(
-        'eventname' => '\core\event\course_deleted',
-        'callback' => '\totara_catalog\observer\course_search_metadata_observer::remove_search_metadata'
-    ),
-    array(
-        'eventname' => '\totara_program\event\program_deleted',
-        'callback' => '\totara_catalog\observer\program_search_metadata_observer::remove_search_metadata'
-    )
 );

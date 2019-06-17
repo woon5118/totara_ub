@@ -60,9 +60,9 @@ class totara_catalog_dataholder_testcase extends advanced_testcase {
         $provider_classes = \core_component::get_namespace_classes('totara_catalog', 'totara_catalog\provider');
         $this->assertCount(3, $provider_classes);
         $expected_factory_counts = [
-            'core_course\totara_catalog\course' => 20,
-            'totara_certification\totara_catalog\certification' => 17,
-            'totara_program\totara_catalog\program' => 16,
+            'core_course\totara_catalog\course' => 19,
+            'totara_certification\totara_catalog\certification' => 16,
+            'totara_program\totara_catalog\program' => 15,
         ];
         foreach ($provider_classes as $provider_class) {
             $namespace = substr($provider_class, strpos($provider_class, 'totara_catalog')) . '\\dataholder_factory';

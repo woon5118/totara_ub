@@ -16,7 +16,7 @@ Feature: Filter courses by multicheck filters on sidebar
       | Course Beta 1  | B1        |
     And I log in as "admin"
     And I set the following administration settings values:
-      | catalogtype | enhanced |
+      | Catalogue type | enhanced |
     And I click on "Courses" in the totara menu
     And I am on "Course Alpha 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:

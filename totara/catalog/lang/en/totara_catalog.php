@@ -43,16 +43,10 @@ $string['catalog_heading'] = 'Find learning';
 $string['catalog_old'] = 'Category';
 $string['catalog_totara'] = 'Grid';
 $string['catalog_title'] = 'Catalogue';
-$string['cataloglegacysearch'] = 'Use legacy search engine in Catalog';
-$string['catalogtype'] = 'Catalogue default view';
+$string['catalogtype'] = 'Catalogue type';
 $string['category'] = 'Category';
 $string['changes_saved'] = 'Changes have been saved. {$a->link}';
 $string['changes_saved_delayed_processing'] = 'Changes have been saved and will appear as soon as the processing is complete.';
-$string['configcataloglegacysearch'] = 'By default, Totara catalogue uses full-text search, which means that only entire words will be matched against the database and yield results (although partial-word matches are possible when using an asterisk for wildcard search).
-
-<strong>Turn on this setting to revert to the behaviour of earlier versions</strong>, where substring and ‘like’ searches are enabled, and all partial matches of the search term are included in results. This means there may be different results for the same search term, depending on which search algorithm is being used.
-
-To learn more about Totara search engines, and to make sure your databases are search-optimised, read the documentation or speak to your Totara partner.';
 $string['configcatalogtype'] = 'Enabling the Grid Catalogue requires time to process. You will be notified when the process is complete.';
 $string['configcoursesperpagetotaracatenabled'] = 'Grid catalogue is enabled. You can change the number of records displayed on the catalogue page.';
 $string['configurecatalog'] = 'Configure catalogue';
@@ -92,11 +86,6 @@ $string['filters'] = 'Filters';
 $string['filtershide'] = 'Hide filters';
 $string['filtersshow'] = 'Show filters';
 $string['fts_search_input'] = 'Search';
-$string['fts_search_hint'] = 'Search';
-$string['fts_search_hint_help'] = 'Only exact matches of search terms will provide results. 
-For partial word search, add an asterisk (\*) after the search term, i.e. search term ‘flo\*’ will match ‘flood’, ‘flower’, ‘florence’.';
-$string['fts_search_hint_legacy_help'] = 'Search results include any partial matches, i.e. search term ‘flo’ will match ‘flood’ and ‘cauliflower’.';
-$string['fts_search_hint_legacy'] = 'Search';
 $string['full_name'] = 'Full name';
 $string['general'] = 'General';
 $string['hero_data'] = 'Hero data';
@@ -151,11 +140,6 @@ $string['sort_score'] = 'Relevance';
 $string['sort_text'] = 'Alphabetical';
 $string['sort_time'] = 'Latest';
 $string['source'] = 'Source';
-$string['searchmetadata'] = 'Search metadata';
-$string['searchterms'] = 'Search terms (single words, space-separated)';
-$string['searchterms_course_help'] = 'Add relevant search terms (other than course name and description) to help learners find this learning in catalogue search. This metadata is invisible to the learners. You can add loosely related terms and common spelling variations, e.g. effective search terms for a course named ‘The history of cars’ include ‘auto’, ‘automobile’ and ‘ottomobile’.';
-$string['searchterms_program_help'] = 'Add relevant search terms (other than program name and description) to help learners find this learning in catalogue search. This metadata is invisible to the learners. You can add loosely related terms and common spelling variations, e.g. effective search terms for a program named ‘The history of cars’ include ‘auto’, ‘automobile’ and ‘ottomobile’.';
-$string['searchterms_certification_help'] = 'Add relevant search terms (other than certification name and description) to help learners find this learning in catalogue search. This metadata is invisible to the learners. You can add loosely related terms and common spelling variations, e.g. effective search terms for a certification named ‘The history of cars’ include ‘auto’, ‘automobile’ and ‘ottomobile’.';
 $string['templates'] = 'Templates';
 $string['text'] = 'Text';
 $string['tile_and_list'] = 'Tile and list';

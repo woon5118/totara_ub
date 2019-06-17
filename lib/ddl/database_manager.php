@@ -1287,17 +1287,4 @@ class database_manager {
     public function snapshot_drop() {
         $this->generator->snapshot_drop();
     }
-
-    /**
-     * Change DB to enable/disable accent sensitive searches.
-     *
-     * @since Totara 13
-     * @param bool $switch If accent sensitivity should be enabled/disabled.
-     */
-    public function fts_change_accent_sensitivity(bool $switch) {
-        $sqlarr = $this->generator->get_fts_change_accent_sensitivity_sql($switch);
-        if (!empty($sqlarr)) {
-            $this->execute_sql_arr($sqlarr);
-        }
-    }
 }

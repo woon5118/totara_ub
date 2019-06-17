@@ -8,7 +8,7 @@ Feature: Users can auto-enrol themself via course catalog in courses where self 
     Given I am on a totara site
     And I log in as "admin"
     And I set the following administration settings values:
-      | catalogtype | enhanced |
+      | Catalogue type | enhanced |
     And I press "Save changes"
     And I log out
     And the following "users" exist:

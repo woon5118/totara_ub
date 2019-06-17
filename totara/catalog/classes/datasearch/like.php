@@ -28,10 +28,10 @@ defined('MOODLE_INTERNAL') || die();
 class like extends filter {
 
     /** @var string */
-    protected $likeprefix = '';
+    private $likeprefix = '';
 
     /** @var string */
-    protected $likesuffix = '';
+    private $likesuffix = '';
 
     /**
      * @param string $prefix Added to the start of the selected values, e.g. '%'.

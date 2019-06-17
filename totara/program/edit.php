@@ -251,13 +251,6 @@ if ($data = $detailsform->get_data()) {
             core_tag_tag::set_item_tags('totara_program', 'prog', $program->id, $programcontext, $data->tags);
         }
 
-        $hook = new \totara_program\hook\program_edit_form_save_changes($data, $program->id);
-        if (!empty($program->certifid)) {
-            $hook->set_certification();
-        }
-
-        $hook->execute();
-
         $other = array('certifid' => empty($program->certifid) ? 0 : $program->certifid);
         $dataevent = array('id' => $program->id, 'other' => $other);
         $event = \totara_program\event\program_updated::create_from_data($dataevent)->trigger();

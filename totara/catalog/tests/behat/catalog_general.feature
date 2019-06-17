@@ -9,7 +9,7 @@ Feature: Test file for catalog
       | Cat1a | cat1     | cat1a    |
       | Cat1b | cat1     | cat1b    |
     And the following "courses" exist:
-      | fullname                  | shortname | category | visible  |
+      | fullname                  | shortname | category | visible |
       | Hello Kim Sa Rang         | course101 | 0        | 1        |
       | Wave Park Min Young       | course102 | cat2     | 0        |
       | Bye Bye Park Shin Hye     | course103 | cat1     | 1        |
@@ -49,8 +49,7 @@ Feature: Test file for catalog
     And I set the field with xpath "//*[@id='catalog_fts_input']" to "Rang"
     When I click on "Search" "button" in the "#region-main" "css_element"
     Then I should see "Relevance"
-    And I should see "Hello Kim Sa Rang"
-    And I should see "Kim Sa Rang's Journey to the Middle Earth"
+    And I should see "2 items"
     When I set the field with xpath "//*[@id='catalog_fts_input']" to ""
     And I click on "Search" "button" in the "#region-main" "css_element"
     Then I should not see "Relevance"
@@ -60,6 +59,7 @@ Feature: Test file for catalog
     When I click on "Find Learning" in the totara menu
     And I set the field with xpath "//*[@id='catalog_fts_input']" to "Smørrebrød Motörhead"
     And I click on "Search" "button" in the "#region-main" "css_element"
+    Then I should see "1 item"
     And I should see "Motörhead with Smørrebrød"
 
   # Browsing

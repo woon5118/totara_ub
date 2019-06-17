@@ -752,24 +752,4 @@ class postgres_sql_generator extends sql_generator {
 
         $this->mdb->change_database_structure($sqls);
     }
-
-    /**
-     * Get statement to switch FTS accent sensitivity.
-     *
-     * @param bool $switch If accent sensitivity should be enabled/disabled.
-     * @return array
-     */
-    public function get_fts_change_accent_sensitivity_sql(bool $switch): array {
-        $sqls = [];
-
-        // First confirm if accent sensitivity is not already on the correct setting.
-        if ($switch === $this->mdb->is_fts_accent_sensitive()) {
-            return $sqls;
-        }
-
-        // Drop extension if accent sensitivity required otherwise create it.
-        $sqls[] = $switch ? 'DROP EXTENSION UNACCENT' : 'CREATE EXTENSION UNACCENT';
-
-        return $sqls;
-    }
 }

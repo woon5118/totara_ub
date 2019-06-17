@@ -103,7 +103,6 @@ abstract class filter {
 
     /**
      * @param mixed $data
-     * @return void
      */
     final public function set_current_data($data) {
         $this->currentdata = $this->validate_current_data($data);
@@ -270,8 +269,6 @@ abstract class filter {
                     $joinons[] = $source->additionalcriteria;
                 }
 
-                list($where, $params) = $this->make_compare($source);
-
                 $join = "{$this->jointype} {$source->table} {$source->alias}";
 
                 if (!empty($joinons)) {
@@ -282,6 +279,8 @@ abstract class filter {
                         $joinons
                     );
                 }
+
+                list($where, $params) = $this->make_compare($source);
             }
 
             $params = array_merge($params, $source->additionalparams);
@@ -301,11 +300,11 @@ abstract class filter {
                     $selectfields[] = "{$joinfield} AS {$basefield}";
                 }
 
-                list($sourcewhere, $sourceparams) = $this->make_compare($source);
-
                 $select = "SELECT " . implode(", ", $selectfields) . "
                               FROM {$source->table} {$source->alias}
                               ";
+
+                list($sourcewhere, $sourceparams) = $this->make_compare($source);
 
                 if (!empty($source->additionalcriteria)) {
                     if (empty($sourcewhere)) {

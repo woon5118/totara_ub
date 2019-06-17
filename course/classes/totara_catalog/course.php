@@ -89,8 +89,7 @@ class course extends provider {
                     ],
                     'medium' => [
                         'summary_fts',
-                        'ftstags',
-                        'search_metadata'
+                        'ftstags'
                     ],
                     'low'    => array_merge(
                         customfield_dataholder_factory::get_fts_dataholder_keys('course', 'course', $this),

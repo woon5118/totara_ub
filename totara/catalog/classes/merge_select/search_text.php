@@ -32,12 +32,6 @@ class search_text extends merge_select {
     /** @var string */
     protected $showplaceholder = true;
 
-    /** @var string */
-    protected $hintidentifier = '';
-
-    /** @var string */
-    protected $hintcomponent = '';
-
     /**
      * Hide the placeholder text, which is displayed inside the search box before anything has been entered.
      *
@@ -60,33 +54,13 @@ class search_text extends merge_select {
         return true;
     }
 
-    /**
-     * Set hint identifier.
-     *
-     * @param string $hintidentifier
-     */
-    public function set_hintidentifier(string $hintidentifier) {
-        $this->hintidentifier = $hintidentifier;
-    }
-
-    /**
-     * Set hint component.
-     *
-     * @param string $hintcomponent
-     */
-    public function set_hintcomponent(string $hintcomponent) {
-        $this->hintcomponent = $hintcomponent;
-    }
-
     public function get_template() {
         return select_search_text::create(
             $this->key,
             $this->title,
             $this->titlehidden,
             $this->get_data(),
-            $this->showplaceholder,
-            $this->hintidentifier,
-            $this->hintcomponent
+            $this->showplaceholder
         );
     }
 }

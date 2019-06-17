@@ -1747,16 +1747,10 @@ class sqlsrv_native_moodle_database extends moodle_database {
         $searchjoin = array();
         $score = array();
 
-        $defaulttb = 'FREETEXTTABLE';
-        if ($this->get_fts_mode($searchtext) === self::SEARCH_MODE_BOOLEAN) {
-            $searchtext = "\"{$searchtext}\"";
-            $defaulttb = "CONTAINSTABLE";
-        }
-
         foreach ($searchfields as $field => $weight) {
             $paramname = $this->get_unique_param('fts');
             $params[$paramname] = $searchtext;
-            $searchjoin[] = "LEFT JOIN {$defaulttb}({{$table}},{$field},:{$paramname},LANGUAGE $language) AS join_{$field} ON basesearch.id = join_{$field}.[KEY]";
+            $searchjoin[] = "LEFT JOIN FREETEXTTABLE({{$table}},{$field},:{$paramname},LANGUAGE $language) AS join_{$field} ON basesearch.id = join_{$field}.[KEY]";
             $score[] = "COALESCE(join_{$field}.RANK,0)*{$weight}";
         }
 
@@ -1811,17 +1805,5 @@ class sqlsrv_native_moodle_database extends moodle_database {
      */
     public function recommends_counted_recordset(): bool {
         return false;
-    }
-
-    /**
-     * Check if accent sensitivity is currently active or not.
-     *
-     * @since Totara 13
-     * @return bool
-     */
-    public function is_fts_accent_sensitive(): bool {
-        $sql = "SELECT fulltextcatalogproperty(:catalog, 'AccentSensitivity')";
-        $params = ['catalog' => $this->get_prefix() . 'search_catalog'];
-        return !empty($this->get_field_sql($sql, $params));
     }
 }

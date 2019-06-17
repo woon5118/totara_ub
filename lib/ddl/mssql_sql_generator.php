@@ -1149,38 +1149,4 @@ class mssql_sql_generator extends sql_generator {
 
         $this->mdb->change_database_structure($sqls);
     }
-
-    /**
-     * Returns false as MSSQL testing showed that for the queries tested 2 queries was faster than a counted recordset.
-     *
-     * Overridden despite the value matching the default as we know based upon performance testing that false is the correct result.
-     * For results on performance testing of paginated results see parent class.
-     *
-     * @return bool
-     */
-    public function recommends_counted_recordset(): bool {
-        return false;
-    }
-
-    /**
-     * Get statement to switch FTS accent sensitivity.
-     *
-     * @param bool $switch If accent sensitivity should be enabled/disabled.
-     * @return array
-     */
-    public function get_fts_change_accent_sensitivity_sql(bool $switch): array {
-        $sqls = [];
-
-        // First confirm if accent sensitivity is not already on the correct setting.
-        if ($switch === $this->mdb->is_fts_accent_sensitive()) {
-            return $sqls;
-        }
-
-        // Rebuild catalog with accent_sensitivity on/off.
-        $onoff = $switch ? 'ON' : 'OFF';
-        $sqls[] = 'ALTER FULLTEXT CATALOG ' . $this->mdb->get_prefix() . 'search_catalog'
-            . ' REBUILD WITH ACCENT_SENSITIVITY = ' . $onoff;
-
-        return $sqls;
-    }
 }

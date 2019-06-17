@@ -79,7 +79,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
     # Configure visibility to normal vis.
     Given I set the following administration settings values:
       | audiencevisibility | 0      |
-      | catalogtype        | moodle |
+      | Catalogue type     | moodle |
     And I log out
 
     # Seeing the program catalog as sys manager.
@@ -176,7 +176,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
   # Configure visibility to normal vis.
     Given I set the following administration settings values:
       | audiencevisibility | 0        |
-      | catalogtype        | enhanced |
+      | Catalogue type     | enhanced |
     And I log out
 
   # Seeing the enhanced catalog as sys manager.
@@ -257,7 +257,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
     # Configure visibility audience visibility.
     Given I set the following administration settings values:
       | audiencevisibility | 1        |
-      | catalogtype        | enhanced |
+      | Catalogue type     | enhanced |
     And I log out
 
     # Seeing the enhanced catalog as sys manager.
@@ -311,7 +311,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
     # Configure visibility to normal vis.
     Given I set the following administration settings values:
       | audiencevisibility | 0      |
-      | catalogtype        | moodle |
+      | Catalogue type     | moodle |
     And I log out
 
     # Seeing the certification catalog as sys manager.
@@ -408,7 +408,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
 # Configure visibility to normal vis.
     Given I set the following administration settings values:
       | audiencevisibility | 0        |
-      | catalogtype        | enhanced |
+      | Catalogue type     | enhanced |
     And I log out
 
 # Seeing the enhanced catalog as sys manager.
@@ -489,7 +489,7 @@ Feature: Check that searching for hidden programs when toggling course catalog w
     # Configure visibility audience visibility.
     Given I set the following administration settings values:
       | audiencevisibility | 1        |
-      | catalogtype        | enhanced |
+      | Catalogue type     | enhanced |
     And I log out
 
     # Seeing the enhanced catalog as sys manager.
