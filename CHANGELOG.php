@@ -3,6 +3,377 @@
 
 Totara Learn Changelog
 
+Release Evergreen (19th June 2019):
+===================================
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-21080       Prevented automatic completion of appraisal stages without any populated roles
+
+                   Before this patch, completion of an appraisal stage could lead to automatic
+                   completion of the following stage if that contained only unpopulated
+                   appraisal roles.
+                   With this patch automatic completion of subsequent stages only happens
+                   when all populated roles have completed the stage and at least one role
+                   (populated or not) has completed the stage.
+                   This fixes a change in behaviour introduced in TL-19824.
+
+                   This patch does not change affected appraisals on upgrade. For affected
+                   appraisals, completed stages can be manually reset using the stage editing
+                   tool in the appraisal administration's "assignments" tab.
+
+Security issues:
+
+    TL-21071       MDL-64708: Removed an open redirect within the audience upload form
+    TL-21243       Added sesskey checks to prevent CSRF in several Learning Plan dialogs
+
+API changes:
+
+    TL-14412   +   Deprecated custom notification handling
+
+                   The following functions have been deprecated as part of this:
+                    * Function: totara_get_notifications()
+                      Alternative: \core\notification::fetch()
+                    * Function: Function: totara_set_notification()
+                      Alternative: redirect or \core\notification::*()
+                    * Function: totara_convert_notification_to_legacy_array() (no alternative)
+                    * Function: totara_queue_append() (no alternative)
+                    * Function: totara_queue_shift() (no alternative)
+                    * Method: \core\notification::add_totara_legacy() (no alternative)
+
+    TL-20362   +   Converted M.totara_plan_course_find from a YUI module to an AMD module
+    TL-20363   +   Converted M.totara_plan_program_find from a YUI module to an AMD module
+    TL-20364   +   Converted M.totara_plan_competency_find from a YUI module to an AMD module
+    TL-20749   +   New "ttr_tablename" syntax is allowed in SQL queries in addition to current {tablename}
+
+                   As well as using
+
+                   {tablename}
+
+                   in an SQL query it is now also possible to use "ttr_tablename".
+                   This enables SQL queries to be written that can be processed by code
+                   parsers and IDEs.
+                   Developers may want to consider using ttr_ as your default database prefix
+                   from now on.
+
+    TL-20765   +   Added a new SQL class to improve handling of raw SQL in DML API
+    TL-20819   +   Added a new interface for placeholder objects used within get_string() calls
+
+                   Developers can now pass objects which implement core_string_placeholders
+                   to the third parameter of get_string. The replace function which these
+                   objects provide will be used to perform string placeholder substitution.
+                   This allows more powerful and complex placeholder systems to be
+                   implemented, in a consistent and reusable way. All values which could
+                   previously be passed as the third parameter of get_string are still
+                   supported.
+
+    TL-20864   +   Upgraded jQuery to 3.4.1
+
+                   jQuery changelog can be found at
+                   https://blog.jquery.com/2019/04/10/jquery-3-4-0-released/
+
+    TL-21024   +   Added support for enforced foreign key consistency
+
+                   Onupdate and ondelete referential integrity actions can now be added to
+                   foreign key relations.
+                   By default foreign keys are not enforced in any way.
+                   During definition of a foreign key using the XMLDB editor you can now
+                   choose to enforce referential integrity through set actions.
+                   The following actions are available:
+                    * 'restrict' blocks violation of foreign keys
+                    * 'cascade' propagates deletes
+                    * 'setnull' changes value to NULL
+
+    TL-21040   +   Converted report_loglive YUI module to AMD module
+
+                   This removes the original YUI module
+
+    TL-21176   +   Upgraded chart.js library to version 2.8.0
+    TL-21177   +   Added 'core/popover:destroy' event to the popover component
+
+Performance improvements:
+
+    TL-20772       Optimised SQL base query to include userid in the rb_source_dp_course report source
+
+                   To improve report performance, if userid is supplied to the report page of
+                   the "Record of Learning: Courses" report source, it is now included in the
+                   base SQL query.
+
+                   As a side effect, this patch also improves aggregation support for
+                   the "Record of Learning: Courses" report source.
+
+                   Previously this report source contained several required columns in order
+                   to ensure user visibility was correctly applied. These required columns led
+                   to aggregation within the report not working. Thanks to improvements made
+                   in Totara 12 this could be refactored so that the required columns are no
+                   longer necessary. Visibility is still calculated accurately and aggregation
+                   is now working for this report source.
+
+                   Please note that the "Record of Learning: Courses" report source no longer
+                   supports caching.
+
+New features:
+
+    TL-18605   +   New framework for Web APIs based on GraphQL and new Ajax API
+    TL-20421   +   Seminar event attendance and grades can now be imported via CSV
+
+                   With this feature, accessible from the seminar event 'Take attendance'
+                   page, trainers are able to upload a CSV file with attendance information
+                   for each event attendee. If event manual grading is enabled, the CSV file
+                   may also include grades.
+
+Improvements:
+
+    TL-5660    +   Uploading completion records no longer creates evidence for unrecognised records by default
+
+                   Previously, when uploading course or certification completion data using a
+                   CSV file, an evidence record would be created for any row in the file that
+                   did not match up exactly with an existing course or certification. The
+                   default was to create generic evidence, but other 'Default evidence types'
+                   were selectable.
+
+                   The new default 'Default evidence type' setting is 'Do not create
+                   evidence'. This will cause unmatched rows to be marked as errors instead of
+                   being used to create evidence records.
+
+                   To recreate the old behaviour, set 'Create generic evidence' as the
+                   'Default evidence type' for the import.
+
+    TL-20422   +   Moved seminar event and session details to a separate tab
+
+                   Details of a seminar event and its associated sessions, including room and
+                   asset information, has been shown to trainers at the top of each seminar
+                   management tab ('Attendees', 'Cancellations', 'Take attendance', et
+                   cetera). This information was the same from tab to tab, and pushed unique
+                   information and functionality down the page.
+
+                   Seminar event and session information has been moved to its own tab, 'Event
+                   details', and removed from all other seminar management tabs.
+
+    TL-20423   +   Replaced seminar 'Go back' links with 'View all events' buttons
+
+                   In order to simplify seminar management and improve usability for trainers,
+                   the 'Go back' links at the bottom of all seminar management screens have
+                   been replaced with buttons that read 'View all events'.
+
+    TL-20476   +   Created new seminar setting 'Passing grade' and added 'Require passing grade' seminar activity completion option
+
+                   Seminar activity completion options have been enhanced to bring seminar in
+                   line with other Totara activities like assignment and quiz. Previously,
+                   seminar only had a 'Learner must receive a grade to complete this
+                   activity' option. This has been replaced by a 'Require grade' option with
+                   two choices: 'Yes, any grade' and 'Yes, passing grade'.
+
+                   If 'Yes, passing grade' is chosen, a passing grade must be set for the
+                   seminar. The default passing grade can be set globally. Setting the passing
+                   grade higher than 0 enables the use of pass/fail marks on the activity
+                   completion report.
+
+                   In order to provide backward compatibility with previous seminar activity
+                   completion options, the upgrade will set 'Require grade' to 'Yes, any
+                   grade' and 'Passing grade' to '0' on any seminar where 'Learner must
+                   receive a grade to complete this activity' is enabled. This has the effect
+                   of exactly reproducing the previous behaviour.
+
+                   In addition, this patch has fixed two other minor issues:
+                    * the facetoface_signups_status.createdby database field was not being
+                      updated when taking attendance
+                    * archived sign-up data entries were not being excluded from the
+                      computation of a seminar grade
+
+    TL-20512       Improved the accessibility of the seminar take attendance form
+
+                   Attached a human-readable aria-label text to form elements.
+
+                   Removed hidden, non-human readable <label> from event attendance dropdown
+                   box.
+
+    TL-20546   +   Added 'Event grade' column to 'Seminar Signup' report source
+    TL-20575       Added an event for Program and Certification user completion state change via the completion editor
+
+                   An event will now log the old and new completion state when changed for a
+                   user using the completion editor for a Program or Certification together
+                   with the user who made the change
+
+    TL-20891   +   Improved the consistency of sanitisation for the user identity fields
+    TL-20892   +   Improved layout of OAuth2 service providers on the login page
+    TL-20918   +   Implemented new DML function set_fields and set_fields_select to update multiple fields in a table
+    TL-21036   +   Implemented a CSV for spreadsheets export for Report Builder
+
+                   This new CSV export format is designed for use with spreadsheets.
+
+                   It produces a CSV file that is close to RFC4180 but that has an escape
+                   character in front of any data that may be interpreted by the spreadsheet
+                   application.
+
+                   We recommend that users use this export format if they have to export to
+                   CSV but intend to open the .csv file in a spreadsheet application as it
+                   protects them against CSV injection attacks.
+
+                   This export format is not enabled by default. Those wanting to use it must
+                   enable it within the "Export Options" setting for Report Builder.
+
+    TL-21115   +   Added new database settings for encryption of database communication
+
+                   Full details on how to configure SSL communication with your database can
+                   be found in config-dist.php after upgrade.
+
+    TL-21155   +   Seminar session attendance tracking is now off by default
+
+Bug fixes:
+
+    TL-16324   +   Fixed global search navigation when Solr is enabled and configured
+
+                   Prior to this patch the "Manage global search" page would only be shown in
+                   the site administration structure when you were on certain pages.
+                   It is now shown consistently when intended.
+
+    TL-20034       Added a new scheduled task to purge orphaned course completion records
+
+                   On large course datasets it was possible for a background cron job to start
+                   running before an interactive course delete action had completed. This
+                   could result in data integrity issues, e.g. the system having course
+                   completion data for a course that no longer exists. A scheduled task has
+                   been added to clean up any orphaned course completion data that might
+                   exist, by default this task will run once a day at 1:54 am.
+
+    TL-20327   +   Fixed race condition when totara dialogs are not initialised when adding components to a learning plan
+    TL-20533       Changed the seminar 'Allow Manager reservations' functionality to allow suspended users to be enrolled into seminar events
+    TL-20716       Seminar session date time columns within report builder sources are now accurately described
+
+                   Language strings used to describe the session start and finish date/time
+                   columns within seminar report sources have been improved.
+
+    TL-20804   +   Seminar 'Add users' step 2 now respects the showuseridentify config setting
+
+                   Previously, user full name, email address,  username and ID number were
+                   displayed in step 2 of the 'Add user' workflow without respecting the
+                   'showuseridentity' config setting. Now ID number and username are no longer
+                   shown, and display of email address respects the "showuseridentity" config
+                   setting.
+
+    TL-20885       Ensured email address validation within HR Import is used when the 'Allow duplicate emails' setting is enabled
+
+                   Prior to this patch, if 'Allow duplicate emails' was set, email address
+                   validation was inadvertently being ignored, making it possible for an
+                   invalid email address to be set for imported users.
+
+                   This patch ensures the email address is validated correctly, but cannot fix
+                   any existing invalid email addresses. If you have been using this setting,
+                   it is recommended to manually check any imported user email addresses.
+
+    TL-20925       Fixed a PHP warning that was encountered when redirecting with a message before the session had been started
+    TL-20927       Fixed the alignment of the name column within the grader report when the browser is zoomed
+    TL-20987   +   Fixed double encoding of user identity fields in the history grader report
+
+                   Any customisations made using the /grade/report/history/users_ajax.php file
+                   should check the output of user identity fields after upgrade to ensure
+                   proper sanitisation is happening on output.
+
+    TL-21054       Fixed alias name preventing seminar sessions report from correctly applying content filters
+
+                   A bug has been fixed in the seminar sessions report builder source that was
+                   causing a system error when trying to join content filters.
+
+    TL-21069       Fixed duplicate 'Event under minimum bookings' notifications after mod_facetoface upgrade
+
+                   The seminar notification for events that do not achieve a minimum number of
+                   bookings was implemented in a way that caused it to be sent again (and
+                   again) for past seminar events whenever mod_facetoface was upgraded.
+
+                   The 'Event under minimum bookings' notification has been reimplemented as a
+                   real seminar notification, with an editable template and the ability to
+                   customise it at the activity level. This means outgoing instances of this
+                   notification will be tracked to prevent duplicates.
+
+                   Any seminar events that have not started yet, and that are eligible to
+                   receive an 'Event under minimum bookings' notification, may receive one
+                   final duplicate notification after upgrade to this release.
+
+    TL-21090       The "Booked by" column within the seminar sign-in sheet report source no longer produces a fatal error
+    TL-21096       Fixed incorrect classname checks in set_totara_menu_selected()
+    TL-21099       The menu of choices custom field filter in report builder now correctly handles "Any value"
+    TL-21117   +   Fixed a bug that generated the wrong page URL for seminar session 'Take attendance' page
+    TL-21175       Added the ability to fix out of order competency scale values
+
+                   Previously when a competency scale was assigned to a framework, and users
+                   had achieved values from that scale, it was not possible to correct any
+                   ordering issues involving proficient values being below non-proficient
+                   values.
+
+                   Warnings are now shown when proficient values are out of order, and it is
+                   possible to change the proficiency settings of these scales to correct this
+                   situation.
+
+    TL-21181       Fixed an HR Import Hierarchy circular reference sanity check timeout issue when assigning parents
+    TL-21183       Fixed non-escaped characters being used in an SQL like statement during message provider upgrade
+
+                   Prior to this patch, if a developer created a customisation that renamed or
+                   deleted a message provider in a plugin, and the key of another message
+                   provider in the same plugin began with the same key being removed, then,
+                   during upgrade, the default message preference for the other message
+                   provider was being deleted. This could have led to an exception when
+                   messages based on the other message provider were being sent. Now, only the
+                   correct record is being deleted.
+
+    TL-21184       Fixed the display of the feedback activity long text answer text box
+    TL-21189       Made the user 'full name link' report builder column take active enrolment into account
+
+                   Prior to this patch, when a user was no longer enrolled in a course, but
+                   the records were still stored within the course, report builder would
+                   include the course ID in the user's full name link. Unfortunately, if the
+                   link was clicked, a fatal error would be produced as the user was no longer
+                   enrolled in the course.
+
+                   With this patch, if the viewer is not able to view a user's profile within
+                   the course, then there will be no link produced for that user's full name
+                   in reports.
+
+    TL-21208       Deleting report builder columns used by disabled graphs is no longer prevented
+
+                   Before this change, if a column was used in a graph then, even if the graph
+                   was later disabled, the column could not be deleted until it had been
+                   removed from the graph. This resulted in having to re-activate the graph
+                   just to remove the column from the data source field.
+
+                   This change has updated the check to determine whether the affected graph
+                   is enabled, only preventing deletion of the column when it is.
+
+    TL-21223       The audience name report builder column no longer outputs HTML when exporting to another format
+
+                   Previously the audience name column would always export an HTML link, even
+                   when exporting to CSV or Excel.
+                   This has been fixed so that the HTML link is only output when producing the
+                   report for the web.
+
+    TL-21238       Added validation of seminar signup state classes to ensure that only valid classes are used
+
+                   Seminar signup state transitions rely on the correct PHP classes being
+                   loaded at runtime. A validation routine has been added to ensure that unit
+                   tests will fail, and developers will receive debugging messages, if a
+                   non-existent state class is used in seminar code.
+
+    TL-21239       Fixed a bug within Atto editor where text alignment could not be changed within IE11 or Edge
+
+                   Previously the alignment of text within the Atto editor would fail to
+                   change alignment in IE11 or Edge, if the text had already been aligned by
+                   another user in a different browser (such as Firefox or Chrome).
+                   This has now been fixed so that IE11 and Edge users can change the
+                   alignment of text previously aligned in Firefox or Chrome.
+
+    TL-21242       Fixed a bug preventing the modification of job assignments if the assignment name contained a space
+    TL-21252   +   Added database table keys skipped during upgrade and migration
+    TL-21258       The course progress block now creates the embedded report it requires if it does not already exist
+
+Contributions:
+
+    * Ayman Al Kurdi at iLearn - TL-20772
+    * Georgi Dimitrov at LearnChamp - TL-21090
+    * Russell England at Kineo - TL-21183
+
+
 Release Evergreen (22nd May 2019):
 ==================================
 
