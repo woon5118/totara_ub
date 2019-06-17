@@ -687,8 +687,8 @@ class facetoface_notification extends data_object {
             $notice = new facetoface_notification($notificationparams);
 
             // Check notification hasn't already need sent.
-            $notificationhistory = $DB->get_record('facetoface_notification_sent', array('notificationid' => $notice->id, 'sessionid' => $session->id, 'userid' => $recipient->id));
-            if ($notificationhistory != null) {
+            $notificationhistory = $DB->get_records('facetoface_notification_sent', array('notificationid' => $notice->id, 'sessionid' => $session->id, 'userid' => $recipient->id));
+            if (count($notificationhistory)) {
                 // Notification has already  been sent.
                 continue;
             }

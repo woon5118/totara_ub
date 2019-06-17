@@ -32,14 +32,15 @@ Feature: Minimum Seminar bookings
       | user    | role          | contextlevel | reference |
       | creator | coursecreator | System       |           |
       | siteman | manager       | System       |           |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name          | course   |
+      | test activity | C1 |
     And I log in as "admin"
-    And I set the following administration settings values:
-      | Default minimum bookings | 5 |
 
   Scenario: Confirm default minimum bookings is set correctly
-    Given I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | name | test activity |
+    When I set the following administration settings values:
+      | Default minimum bookings | 5 |
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     When I follow "Add event"
     Then the field "Minimum bookings" matches value "5"
@@ -64,43 +65,26 @@ Feature: Minimum Seminar bookings
     Then the field "Minimum bookings" matches value "2"
 
   Scenario Outline: Confirm notifications are sent out once cutoff has been reached
+    Given the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface    | details | mincapacity | sendcapacityemail | cutoff |
+      | test activity | event 1 | 5           | 1                 | 172800 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start     | finish    |
+      | event 1      | +1 day    | +3 days   |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user      | eventdetails |
+      | student1  | event 1      |
+      | trainer1  | event 1      |
+      | teacher1  | event 1      |
     Given I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "Editing Trainer" "text" in the "#admin-facetoface_session_rolesnotify" "css_element"
     And I click on "<notification to>" "checkbox" in the "#admin-facetoface_session_rolesnotify" "css_element"
     And I press "Save changes"
-    Given I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | name | test activity |
+    Given I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Edit session" "link" in the "Select room" "table_row"
-    And I fill seminar session with relative date in form data:
-      | timestart[day]       | +1 |
-      | timestart[month]     | 0  |
-      | timestart[year]      | 0  |
-      | timestart[hour]      | 0  |
-      | timestart[minute]    | 0  |
-      | timefinish[day]      | +3 |
-      | timefinish[month]    | 0  |
-      | timefinish[year]     | 0  |
-      | timefinish[hour]     | 0  |
-      | timefinish[minute]   | 0  |
-    And I click on "OK" "button"
-    And I wait "1" seconds
-    And I click on "Save changes" "button"
     And I should see "All events in test activity"
-    And I use magic to set Seminar "test activity" to send capacity notification two days ahead
-    And I click on "Attendees" "link"
-    And I set the field "f2f-actions" to "Add users"
-    And I click on "Student One, student1@example.com" "option"
-    And I click on "Trainer One, trainer1@example.com" "option"
-    And I click on "Teacher One, teacher1@example.com" "option"
-    And I press exact "add"
-    And I click on "Continue" "button"
-    And I click on "Confirm" "button"
-    And I should see "Bulk add attendees success"
     And I run the scheduled task "mod_facetoface\task\send_notifications_task"
-
+    And I run all adhoc tasks
     # Confirm that the alert was sent.
     And I log out
     And I log in as "student1"
