@@ -3479,7 +3479,7 @@ abstract class moodle_database {
 
         // With \p{L} we will be able to match pretty much most of the characters in most of the language,
         // including alphabeticals.
-        if (preg_match('/^[\p{L}0-9\-_]+\*$/u', $searchtext)) {
+        if (preg_match('/^[\p{L}\d-_]+\*$/u', $searchtext)) {
             $default = self::SEARCH_MODE_BOOLEAN;
         }
 
