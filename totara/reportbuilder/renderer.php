@@ -380,7 +380,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
 
         $out = '';
         if ($report->embedded){
-            $out .= $this->output->notification(get_string('clonereportaccesswarning', 'totara_reportbuilder'), 'notifynotice');
+            $out .= $this->output->notification(get_string('clonereportaccesswarning', 'totara_reportbuilder'), \core\output\notification::NOTIFY_WARNING);
         }
 
         $info = new stdClass();
