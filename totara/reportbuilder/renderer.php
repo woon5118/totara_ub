@@ -780,7 +780,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             }
 
             $row = array();
-            $row[] = format_string($search->name);
+            $row[] = $search->name;
             $row[] = ($search->ispublic) ? get_string('shared', 'totara_reportbuilder') :
                 get_string('private', 'totara_reportbuilder');
             $row[] = $default;

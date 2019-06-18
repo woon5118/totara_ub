@@ -180,12 +180,17 @@ $params = array('userid' => $USER->id, 'reportid' => $id);
 $searches = $DB->get_records_select('report_builder_saved', $sql, $params);
 
 if (!empty($searches)) {
-    foreach ($searches as $key => $search) {
-        // Can the user edit/delete the saved search.
-        $searches[$key]->canedit = ($mrcapability || $search->userid == $USER->id);
-        // Can the user set the report default.
-        $searches[$key]->cansetreportdefault = ($mrcapability && $search->ispublic);
-    }
+    // Order the items by name. This can't be done in the sql above due to multi lang potentially being used.
+    // We also need to add canedit and cansetreportdefault properties.
+    array_walk($searches, function(&$item) {
+        global $mrcapability, $USER;
+
+        $item->name = format_string($item->name);
+        $item->canedit = ($mrcapability || $item->userid == $USER->id);
+        $item->cansetreportdefault = ($mrcapability && $item->ispublic);
+    });
+
+    \core_collator::asort_objects_by_property($searches, 'name');
 
     echo $output->saved_searches_table($searches, $report);
 } else {

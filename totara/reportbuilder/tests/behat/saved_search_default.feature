@@ -392,3 +392,36 @@ Feature: Test that saved search defaults in report builder works correctly
     And I press "Close"
     Then I should not see "View a saved search"
     And I should not see "Manage your saved searches"
+
+  Scenario: Saved searches should appear alphabetically in the manage search dialog
+    Given I log in as "admin"
+    When I click on "Reports" in the totara menu
+    And I follow "Custom user report 1"
+    Then I should see "Custom user report 1"
+
+    # Create some saved searches.
+    When I set the field "user-fullname" to "Paul"
+    And I press "id_submitgroupstandard_addfilter"
+    And I press "Save this search"
+    And I set the field "Search Name" to "Paul"
+    And I press "Save changes"
+    Then the "sid" select box should contain "Paul"
+
+    When I set the field "user-fullname" to "Adam"
+    And I press "id_submitgroupstandard_addfilter"
+    And I press "Save this search"
+    And I set the field "Search Name" to "Adam"
+    And I press "Save changes"
+    Then the "sid" select box should contain "Adam"
+
+    When I set the field "user-fullname" to "Stuart"
+    And I press "id_submitgroupstandard_addfilter"
+    And I press "Save this search"
+    And I set the field "Search Name" to "Stuart"
+    And I press "Save changes"
+    Then the "sid" select box should contain "Stuart"
+
+    # Ensure the saved search names are ordered alphabetically.
+    When I follow "Manage your saved searches"
+    Then "Adam" "text" should appear before "Paul" "text"
+    And "Paul" "text" should appear before "Stuart" "text"
