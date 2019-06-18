@@ -174,7 +174,7 @@ class rb_source_comp_status_history extends rb_base_source {
                 array('defaultheading' => get_string('compusermodifiedheading', 'rb_source_comp_status_history'),
                       'joins' => 'usermodified',
                       'displayfunc' => 'user_link',
-                      'extrafields' => array_merge(array('id' => 'usermodified.id'),
+                      'extrafields' => array_merge(array('id' => 'usermodified.id', 'deleted' => 'usermodified.deleted'),
                                                    $allnamefields)
                 )
             )
