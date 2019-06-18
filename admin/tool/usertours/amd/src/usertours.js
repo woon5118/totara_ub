@@ -71,7 +71,9 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
                 ])[0],
                 templates.render('tool_usertours/tourstep', {})
             ).then(function(response, template) {
-                return usertours.startBootstrapTour(tourId, template[0], response.tourconfig);
+                if (response.showtour == true) {
+                    return usertours.startBootstrapTour(tourId, template[0], response.tourconfig);
+                }
             }).always(function() {
                 M.util.js_complete('admin_usertour_fetchTour' + tourId);
 
