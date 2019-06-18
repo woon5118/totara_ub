@@ -1049,7 +1049,11 @@ function scorm_pluginfile($course, $cm, $context, $filearea, $args, $forcedownlo
             return false;
         }
 
-        $file->send_relative_file($relativepath);
+        // Totara: we need to allow XSS, there is no way around it here.
+        $options['allowxss'] = '1';
+        $options['forcedownload'] = false;
+
+        $file->send_relative_file($relativepath, $options);
     } else {
         return false;
     }

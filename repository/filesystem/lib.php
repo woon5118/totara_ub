@@ -777,10 +777,14 @@ class repository_filesystem extends repository {
     /**
      *  Gets a file relative to this file in the repository and sends it to the browser.
      *
+     * TOTARA:
+     *   - Added the options array in Totara 13
+     *
      * @param stored_file $mainfile The main file we are trying to access relative files for.
      * @param string $relativepath the relative path to the file we are trying to access.
+     * @param array $options Options for the send_file function.
      */
-    public function send_relative_file(stored_file $mainfile, $relativepath) {
+    public function send_relative_file(stored_file $mainfile, $relativepath, array $options = []) {
         global $CFG;
         // Check if this repository is allowed to use relative linking.
         $allowlinks = $this->supports_relative_file();
@@ -796,7 +800,13 @@ class repository_filesystem extends repository {
 
             // Sanity check to make sure this path is inside this repository and the file exists.
             if (strpos($fullrelativefilepath, realpath($this->get_rootpath())) === 0 && file_exists($fullrelativefilepath)) {
-                send_file($fullrelativefilepath, basename($relativepath), null, 0);
+
+                // TOTARA: add support for options, and for setting force download.
+                $forcedownload = false;
+                if (isset($options['forcedownload'])) {
+                    $forcedownload = (bool)$options['forcedownload'];
+                }
+                send_file($fullrelativefilepath, basename($relativepath), null, 0, false, $forcedownload, '', false, $options);
             }
         }
         send_file_not_found();

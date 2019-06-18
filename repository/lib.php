@@ -2804,11 +2804,14 @@ abstract class repository implements cacheable_object {
      *
      * Repositories that overwrite this must be very careful - see filesystem repository for example.
      *
+     * TOTARA:
+     *   - Added the $options array in Totara 13
+     *
      * @param stored_file $mainfile The main file we are trying to access relative files for.
      * @param string $relativepath the relative path to the file we are trying to access.
-     *
+     * @param array $options Options for the send_file function.
      */
-    public function send_relative_file(stored_file $mainfile, $relativepath) {
+    public function send_relative_file(stored_file $mainfile, $relativepath, array $options = []) {
         // This repository hasn't implemented this so send_file_not_found.
         send_file_not_found();
     }

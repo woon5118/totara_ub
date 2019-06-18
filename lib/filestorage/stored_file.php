@@ -1088,12 +1088,16 @@ class stored_file {
      * Gets a file relative to this file in the repository and sends it to the browser.
      * Checks the function repository::supports_relative_file() to make sure it can be used.
      *
+     * TOTARA:
+     *   - Added the options array in Totara 13
+     *
      * @param string $relativepath the relative path to the file we are trying to access
+     * @param array $options Options for the send_file function.
      */
-    public function send_relative_file($relativepath) {
+    public function send_relative_file($relativepath, array $options = []) {
         if ($this->repository && $this->repository->supports_relative_file()) {
             $relativepath = clean_param($relativepath, PARAM_PATH);
-            $this->repository->send_relative_file($this, $relativepath);
+            $this->repository->send_relative_file($this, $relativepath, $options);
         } else {
             send_file_not_found();
         }
