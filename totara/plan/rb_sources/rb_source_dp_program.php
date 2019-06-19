@@ -371,10 +371,11 @@ class rb_source_dp_program extends rb_base_source {
      */
     public function rb_display_prog_date($date, $row) {
         debugging('rb_source_dp_program::rb_display_prog_date has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
-        if ($date == -1) {
-            return '';
+
+        if (is_numeric($date) && $date != 0 && $date != -1) {
+            return userdate($date, get_string('strfdateshortmonth', 'langconfig'));
         } else {
-            return $this->rb_display_nice_date($date, $row);
+            return '';
         }
     }
 

@@ -707,7 +707,8 @@ trait base_deprecated_t12_trait {
             if (empty($item) || $item === '-') {
                 $items[$key] = '-';
             } else {
-                $items[$key] = $this->rb_display_nice_date($item, $row);
+                $items[$key] = is_numeric($item) && $item != 0 && $item != -1 ?
+                    userdate($item, get_string('strfdateshortmonth', 'langconfig')) : '';
             }
         }
         return implode($items, "\n");
