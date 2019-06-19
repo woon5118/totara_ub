@@ -166,7 +166,7 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="cohortid" TYPE="foreign" FIELDS="cohortid" REFTABLE="cohort" REFFIELDS="id"/>
-        <KEY NAME="plantemplateid" TYPE="foreign" FIELDS="plantemplateid" REFTABLE="db_template" REFFIELDS="id"/>
+        <KEY NAME="plantemplateid" TYPE="foreign" FIELDS="plantemplateid" REFTABLE="dp_template" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>

@@ -27,6 +27,41 @@ defined('MOODLE_INTERNAL') || die();
  * Various tests to confirm all db/install.xml files defined correctly.
  */
 class totara_core_install_xmls_testcase extends advanced_testcase {
+    public function test_foreign_key_references_exist() {
+        global $DB;
+        $dbmanager = $DB->get_manager();
+
+        $schema = $dbmanager->get_install_xml_schema();
+
+        /** @var xmldb_table[] $tables */
+        $tables = [];
+        foreach ($schema->getTables() as $table) {
+            $tables[$table->getName()] = $table;
+        }
+
+        foreach ($tables as $table) {
+            $tablename = $table->getName();
+            $keys = $table->getKeys();
+            foreach ($keys as $key) {
+                if ($key->getType() != XMLDB_KEY_FOREIGN and $key->getType() != XMLDB_KEY_FOREIGN_UNIQUE) {
+                    continue;
+                }
+                $keyname = $key->getName();
+                $reftable = $key->getRefTable();
+                $reffields = $key->getRefFields();
+
+                $this->assertArrayHasKey($reftable, $tables, "'$tablename' table key '$keyname' references non-existent table '$reftable'");
+                $existingfields = [];
+                foreach ($tables[$reftable]->getFields() as $f) {
+                    $existingfields[$f->getName()] = $f->getName();
+                }
+                foreach ($reffields as $reffield) {
+                    $this->assertArrayHasKey($reffield, $existingfields, "'$tablename' table key '$keyname' references non-existent field '$reffield' from table '$reftable'");
+                }
+            }
+        }
+    }
+
     public function test_key_index_duplicates() {
         global $DB;
         $dbmanager = $DB->get_manager();
