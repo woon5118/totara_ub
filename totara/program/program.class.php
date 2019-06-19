@@ -882,7 +882,9 @@ class program {
                 $pc->userid = $userid;
                 $pc->coursesetid = 0;
                 $pc->status = STATUS_PROGRAM_INCOMPLETE;
-                $pc->timestarted = $now;
+                $pc->timecreated = $now;
+                $pc->timestarted = 0;
+                $pc->timecompleted = 0;
                 $pc->timedue = $assigndata['timedue'];
                 $prog_completions[] = $pc;
 
@@ -1276,11 +1278,11 @@ class program {
      * @param array $completionsettings Contains the field values for the record
      * @return bool|int
      *
-     * @deprecated since Totara 10. See TL-9072. Instead use prog_set_status_complete, certif_set_status_xxx.
+     * @deprecated since Totara 13. Instead use prog_set_status_complete, certif_set_state_certified, certif_set_state_windowopen
+     *             or certif_set_state_expired.
      */
     public function update_program_complete($userid, $completionsettings) {
-        debugging('program::update_program_complete has been deprecated since Totara 10.',
-            DEBUG_DEVELOPER);
+        debugging('program::update_program_complete has been deprecated since Totara 13.', DEBUG_DEVELOPER);
 
         global $CFG, $DB;
 

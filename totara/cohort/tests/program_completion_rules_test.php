@@ -195,6 +195,7 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
                 $progcompletion = prog_load_completion($programid, $userid);
                 $progcompletion->status = STATUS_PROGRAM_COMPLETE;
                 $progcompletion->timestarted = $timestarted[$userid];
+                $progcompletion->timecreated = $timecreated[$userid];
                 $progcompletion->timecompleted = $timecompleted[$userid];
                 prog_write_completion($progcompletion);
             }
@@ -208,6 +209,7 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
                 $progcompletion->status = STATUS_PROGRAM_COMPLETE;
                 $progcompletion->timestarted = $timestarted[$userid];
                 $progcompletion->timecompleted = $timecompleted[$userid];
+                $progcompletion->timecreated = $timecreated[$userid];
                 prog_write_completion($progcompletion);
             } else {
                 $progcompletion = prog_load_completion($program->id, $userid);
@@ -267,6 +269,8 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
         global $DB;
         $this->resetAfterTest(true);
         $this->setAdminUser();
+
+        $now = time();
 
         // Process listofids.
         $listofids = array();

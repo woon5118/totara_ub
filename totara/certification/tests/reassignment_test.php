@@ -28,7 +28,9 @@ global $CFG;
 
 require_once($CFG->dirroot . '/lib/moodlelib.php');
 require_once($CFG->dirroot . '/totara/certification/lib.php');
-require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
+
+// Create MONTHSEC value
+const MONTHSECS = YEARSECS / 12;
 
 /**
  * Certification module PHPUnit archive test class
@@ -36,22 +38,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
  * To test, run this from the command line from the $CFG->dirroot
  * vendor/bin/phpunit --verbose totara_certification_reassignments_testcase totara/certification/tests/reassignment_test.php
  */
-class totara_certification_reassignments_testcase extends reportcache_advanced_testcase {
-
-    protected $monthsecs;
-    protected $program;
-    protected $courses;
-    protected $users;
-    protected $task;
-
-    protected function tearDown() {
-        $this->monthsecs = null;
-        $this->program = null;
-        $this->courses = null;
-        $this->users = null;
-        $this->task = null;
-        parent::tearDown();
-    }
+class totara_certification_reassignment_testcase extends advanced_testcase {
 
     /**
      * Setup.
@@ -59,79 +46,90 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
     public function setUp() {
         parent::setup();
 
-        $this->resetAfterTest(true);
-
         // Turn off programs. This is to test that it doesn't interfere with certification completion.
         set_config('enableprograms', TOTARA_DISABLEFEATURE);
+    }
 
-        $this->task = new \totara_certification\task\update_certification_task();
+    private function get_certification_data() {
+        $data = new stdClass();
 
-        $this->monthsecs = 4 * WEEKSECS;
+        $data->task = new \totara_certification\task\update_certification_task();
 
         // Create a certification.
         $certdata = array(
             'cert_activeperiod' => '6 Months',
             'cert_windowperiod' => '2 Months',
         );
-        $this->program = $this->getDataGenerator()->create_certification($certdata);
 
-        $course1 = $this->getDataGenerator()->create_course(array('fullname' => 'course1'));
-        $this->courses[1] = $course1;
-        $course2 = $this->getDataGenerator()->create_course(array('fullname' => 'course2'));
-        $this->courses[2] = $course2;
-        $course3 = $this->getDataGenerator()->create_course(array('fullname' => 'course3'));
-        $this->courses[3] = $course3;
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
 
-        $this->getDataGenerator()->add_courseset_program($this->program->id, array($course1->id, $course2->id, $course3->id), CERTIFPATH_CERT);
-        $this->getDataGenerator()->add_courseset_program($this->program->id, array($course3->id), CERTIFPATH_RECERT);
+        $programid = $program_generator->create_certification($certdata);
+        $data->program = new \program($programid);
+
+        $course1 = $generator->create_course(['fullname' => 'course1']);
+        $data->courses[1] = $course1;
+        $course2 = $generator->create_course(['fullname' => 'course2']);
+        $data->courses[2] = $course2;
+        $course3 = $generator->create_course(['fullname' => 'course3']);
+        $data->courses[3] = $course3;
+
+        $program_generator->add_courses_and_courseset_to_program($data->program, [[$course1, $course2, $course3]], CERTIFPATH_CERT);
+        $program_generator->add_courses_and_courseset_to_program($data->program, [[$course3]], CERTIFPATH_RECERT);
 
         // Create some test users and store them in an array.
         // User 1 is our guinea pig.
-        $user1 = $this->getDataGenerator()->create_user(array('fullname' => 'user1'));
-        $this->users[1] = $user1;
+        $user1 = $generator->create_user(['fullname' => 'user1']);
+        $data->users[1] = $user1;
 
         // User 2 is assigned but left alone.
-        $user2 = $this->getDataGenerator()->create_user(array('fullname' => 'user2'));
-        $this->users[2] = $user2;
+        $user2 = $generator->create_user(['fullname' => 'user2']);
+        $data->users[2] = $user2;
 
         // User 3 is not assigned.
-        $user3 = $this->getDataGenerator()->create_user(array('fullname' => 'user3'));
-        $this->users[3] = $user3;
+        $user3 = $generator->create_user(['fullname' => 'user3']);
+        $data->users[3] = $user3;
+
+        return $data;
     }
 
-    private function setup_certified_state($completetime) {
+    private function setup_certified_state(\stdClass $data, int $completetime) {
         global $DB;
 
-        $windowtime = $completetime + (4 * $this->monthsecs);
-        $expiretime = $completetime + (6 * $this->monthsecs);
+        $windowtime = $completetime + (4 * MONTHSECS);
+        $expiretime = $completetime + (6 * MONTHSECS);
+
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
 
         // Assign the program to users.
-        $this->getDataGenerator()->assign_program($this->program->id, array($this->users[1]->id, $this->users[2]->id));
+        $program_generator->assign_program($data->program->id, [$data->users[1]->id, $data->users[2]->id]);
 
         // Complete the courses in the certification path.
-        $completion = new completion_completion(array('userid' => $this->users[1]->id, 'course' => $this->courses[1]->id));
+        $completion = new completion_completion(array('userid' => $data->users[1]->id, 'course' => $data->courses[1]->id));
         $completion->mark_complete($completetime);
 
-        $certcomprec = $DB->get_record('course_completions', array('course' => $this->courses[1]->id, 'userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('course_completions', array('course' => $data->courses[1]->id, 'userid' => $data->users[1]->id));
         $this->assertEquals($completetime, $certcomprec->timecompleted);
 
-        $completion = new completion_completion(array('userid' => $this->users[1]->id, 'course' => $this->courses[2]->id));
+        $completion = new completion_completion(array('userid' => $data->users[1]->id, 'course' => $data->courses[2]->id));
         $completion->mark_complete($completetime);
 
-        $certcomprec = $DB->get_record('course_completions', array('course' => $this->courses[2]->id, 'userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('course_completions', array('course' => $data->courses[2]->id, 'userid' => $data->users[1]->id));
         $this->assertEquals($completetime, $certcomprec->timecompleted);
 
-        $completion = new completion_completion(array('userid' => $this->users[1]->id, 'course' => $this->courses[3]->id));
+        $completion = new completion_completion(array('userid' => $data->users[1]->id, 'course' => $data->courses[3]->id));
         $completion->mark_complete($completetime);
 
-        $certcomprec = $DB->get_record('course_completions', array('course' => $this->courses[3]->id, 'userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('course_completions', array('course' => $data->courses[3]->id, 'userid' => $data->users[1]->id));
         $this->assertEquals($completetime, $certcomprec->timecompleted);
 
         // Get the completion record for user 1 and update the times.
-        list($certcompletion, $progcompletion) = certif_load_completion($this->program->id, $this->users[1]->id);
+        list($certcompletion, $progcompletion) = certif_load_completion($data->program->id, $data->users[1]->id);
         $certcompletion->timecompleted = $completetime;
         $certcompletion->timewindowopens = $windowtime;
         $certcompletion->timeexpires = $expiretime;
+        $certcompletion->baselinetimeexpires = $expiretime;
         $progcompletion->timedue = $expiretime;
         $errors = certif_get_completion_errors($certcompletion, $progcompletion);
         $this->assertEquals(array(), $errors);
@@ -146,35 +144,38 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
      */
     public function test_restoration_certified_prewindow() {
         global $DB, $CFG;
-        $this->resetAfterTest(true);
 
-        $progid = $this->program->id;
-        $times = $this->setup_certified_state(time() - $this->monthsecs); // Setup with completion 1 month ago.
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
+        $data = $this->get_certification_data();
+
+        $progid = $data->program->id;
+        $times = $this->setup_certified_state($data, time() - MONTHSECS); // Setup with completion 1 month ago.
 
         // Unassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check that the unassignment has created the expected history record.
-        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certhistrec->timecompleted);
         $this->assertEquals($times['window'], $certhistrec->timewindowopens);
         $this->assertEquals($times['expire'], $certhistrec->timeexpires);
         $this->assertEquals(1, $certhistrec->unassigned);
 
-        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals(false, $certcomprec);
 
          // Reassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[1]->id, $this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[1]->id, $data->users[2]->id]);
 
         // Run the certificationtrue task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check the restored certification completion record.
-        $certcomprec = $DB->get_record('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certcomprec->timecompleted);
         $this->assertEquals($times['window'], $certcomprec->timewindowopens);
         $this->assertEquals($times['expire'], $certcomprec->timeexpires);
@@ -182,12 +183,12 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals(CERTIFRENEWALSTATUS_NOTDUE, $certcomprec->renewalstatus); // Check the window has not opened.
 
         // Check the history record no longer exists, it will be created when the window opens.
-        $this->assertFalse($DB->record_exists('certif_completion_history', array('userid' => $this->users[1]->id)));
+        $this->assertFalse($DB->record_exists('certif_completion_history', array('userid' => $data->users[1]->id)));
 
         // Check the course completions are still there and still marked as complete.
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id));
         $this->assertEquals(3, count($comprecs));
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(3, count($comprecs));
     }
 
@@ -197,48 +198,51 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
      */
     public function test_restoration_certified_postwindow() {
         global $DB, $CFG;
-        $this->resetAfterTest(true);
 
-        $progid = $this->program->id;
-        $times = $this->setup_certified_state(time() - (5 * $this->monthsecs)); // Setup with completion 5 months ago.
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
+        $data = $this->get_certification_data();
+
+        $progid = $data->program->id;
+        $times = $this->setup_certified_state($data, time() - (5 * MONTHSECS)); // Setup with completion 5 months ago.
 
         // Unassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check that the unassignment has created the expected history record.
-        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certhistrec->timecompleted);
         $this->assertEquals($times['window'], $certhistrec->timewindowopens);
         $this->assertEquals($times['expire'], $certhistrec->timeexpires);
         $this->assertEquals(1, $certhistrec->unassigned);
 
-        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals(false, $certcomprec);
 
          // Reassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[1]->id, $this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[1]->id, $data->users[2]->id]);
 
         // Check the restored certification completion record.
-        $certcomprec = $DB->get_record('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certcomprec->timecompleted);
         $this->assertEquals($times['window'], $certcomprec->timewindowopens);
         $this->assertEquals($times['expire'], $certcomprec->timeexpires);
 
         // Check the history record no longer exists, it will be created when the window opens.
-        $this->assertFalse($DB->record_exists('certif_completion_history', array('userid' => $this->users[1]->id)));
+        $this->assertFalse($DB->record_exists('certif_completion_history', array('userid' => $data->users[1]->id)));
 
         // Check the course completions are still there and still marked as complete.
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(3, count($comprecs));
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check the restored certification completion record.
-        $certcomprec = $DB->get_record('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certcomprec->timecompleted);
         $this->assertEquals($times['window'], $certcomprec->timewindowopens);
         $this->assertEquals($times['expire'], $certcomprec->timeexpires);
@@ -246,22 +250,22 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals(CERTIFRENEWALSTATUS_DUE, $certcomprec->renewalstatus); // Check the window has opened.
 
         // Check the new history record has been created and is not marked as unassigned.
-        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certhistrec->timecompleted);
         $this->assertEquals($times['window'], $certhistrec->timewindowopens);
         $this->assertEquals($times['expire'], $certhistrec->timeexpires);
         $this->assertEquals(0, $certhistrec->unassigned);
 
         // Check the primary-path-only course completions are still there and marked as complete, the other is gone.
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id));
         $this->assertEquals(0, count($comprecs));
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(0, count($comprecs));
 
         // Only the recert path course was archived.
-        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $this->users[1]->id));
+        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals(3, count($comphistrecs));
-        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(3, count($comphistrecs));
     }
 
@@ -271,51 +275,55 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
      */
     public function test_restoration_certified_expired() {
         global $DB, $CFG;
-        $this->resetAfterTest(true);
 
-        $progid = $this->program->id;
-        $times = $this->setup_certified_state(time() - (7 * $this->monthsecs)); // Setup with completion 7 months ago.
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
+        $data = $this->get_certification_data();
+
+        $progid = $data->program->id;
+        $times = $this->setup_certified_state($data, time() - (7 * MONTHSECS)); // Setup with completion 7 months ago.
 
         // Unassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check that the unassignment has created the expected history record.
-        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certhistrec->timecompleted);
         $this->assertEquals($times['window'], $certhistrec->timewindowopens);
         $this->assertEquals($times['expire'], $certhistrec->timeexpires);
         $this->assertEquals(1, $certhistrec->unassigned);
 
-        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals(false, $certcomprec);
 
         // Reassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[1]->id, $this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[1]->id, $data->users[2]->id]);
 
-        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals($certcomprec, true);
 
         // Check the restored certification completion record.
-        $certcomprec = $DB->get_record('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certcomprec->timecompleted);
         $this->assertEquals($times['window'], $certcomprec->timewindowopens);
         $this->assertEquals($times['expire'], $certcomprec->timeexpires);
 
         // Check the history record no longer exists, it will be created when the window opens.
-        $this->assertFalse($DB->record_exists('certif_completion_history', array('userid' => $this->users[1]->id)));
+        $this->assertFalse($DB->record_exists('certif_completion_history', array('userid' => $data->users[1]->id)));
 
         // Check the course completions are still there and still marked as complete.
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(3, count($comprecs));
 
         // Run the certification task.
-        $this->task->execute();
+        // Restoring certified status so after the task is run the completion
+        // record should be reset for next certification time
+        $data->task->execute();
 
-        // Check the restored certification completion record.
-        $certcomprec = $DB->get_record('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals(0, $certcomprec->timecompleted);
         $this->assertEquals(0, $certcomprec->timewindowopens);
         $this->assertEquals(0, $certcomprec->timeexpires);
@@ -323,55 +331,56 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals(CERTIFRENEWALSTATUS_EXPIRED, $certcomprec->renewalstatus); // Check the window has expired.
 
         // Check the history record is still there but no longer marked as unassigned.
-        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certhistrec->timecompleted);
         $this->assertEquals($times['window'], $certhistrec->timewindowopens);
         $this->assertEquals($times['expire'], $certhistrec->timeexpires);
         $this->assertEquals(0, $certhistrec->unassigned);
 
         // Check all the courses have been archived - course 3 during window open (tested above) and courses 1 and 2 during expiry.
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id));
         $this->assertEquals(0, count($comprecs));
 
-        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $this->users[1]->id));
+        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals(3, count($comphistrecs));
-        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(3, count($comphistrecs));
     }
 
-    private function setup_recertified_state($recompletetime) {
+    private function setup_recertified_state(\stdClass $data, int $recompletetime) {
         global $DB;
 
         // Set up the initial completions.
-        $times = $this->setup_certified_state($recompletetime - (5 * $this->monthsecs));
+        $times = $this->setup_certified_state($data, $recompletetime - (5 * MONTHSECS));
 
         // Run the window opening to move things around without triggering expiry.
         recertify_window_opens_stage();
 
         $completetime = $recompletetime;
-        $windowtime = $completetime + (4 * $this->monthsecs);
-        $expiretime = $completetime + (6 * $this->monthsecs);
+        $windowtime = $completetime + (4 * MONTHSECS);
+        $expiretime = $completetime + (6 * MONTHSECS);
 
         // Check that the recert path course was reset.
-        $comprec = $DB->record_exists('course_completions', array('course' => $this->courses[1]->id, 'userid' => $this->users[1]->id));
+        $comprec = $DB->record_exists('course_completions', array('course' => $data->courses[1]->id, 'userid' => $data->users[1]->id));
         $this->assertEquals(false, $comprec);
-        $comprec = $DB->record_exists('course_completions', array('course' => $this->courses[2]->id, 'userid' => $this->users[1]->id));
+        $comprec = $DB->record_exists('course_completions', array('course' => $data->courses[2]->id, 'userid' => $data->users[1]->id));
         $this->assertEquals(false, $comprec);
-        $comprec = $DB->record_exists('course_completions', array('course' => $this->courses[3]->id, 'userid' => $this->users[1]->id));
+        $comprec = $DB->record_exists('course_completions', array('course' => $data->courses[3]->id, 'userid' => $data->users[1]->id));
         $this->assertEquals(false, $comprec);
 
         // Complete the courses in the recertification path.
-        $completion = new completion_completion(array('userid' => $this->users[1]->id, 'course' => $this->courses[3]->id));
+        $completion = new completion_completion(array('userid' => $data->users[1]->id, 'course' => $data->courses[3]->id));
         $completion->mark_complete($completetime);
 
-        $comprec = $DB->get_record('course_completions', array('course' => $this->courses[3]->id, 'userid' => $this->users[1]->id));
+        $comprec = $DB->get_record('course_completions', array('course' => $data->courses[3]->id, 'userid' => $data->users[1]->id));
         $this->assertEquals($completetime, $comprec->timecompleted);
 
         // Get the completion record for user 1 and update the times.
-        list($certcompletion, $progcompletion) = certif_load_completion($this->program->id, $this->users[1]->id);
+        list($certcompletion, $progcompletion) = certif_load_completion($data->program->id, $data->users[1]->id);
         $certcompletion->timecompleted = $completetime;
         $certcompletion->timewindowopens = $windowtime;
         $certcompletion->timeexpires = $expiretime;
+        $certcompletion->baselinetimeexpires = $expiretime;
         $progcompletion->timedue = $expiretime;
         $errors = certif_get_completion_errors($certcompletion, $progcompletion);
         $this->assertEquals(array(), $errors);
@@ -398,19 +407,22 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
      */
     public function test_restoration_recertified_prewindow() {
         global $DB, $CFG;
-        $this->resetAfterTest(true);
 
-        $progid = $this->program->id;
-        $times = $this->setup_recertified_state(time() - (3 * $this->monthsecs)); // Setup with recertification 3 months ago.
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
+        $data = $this->get_certification_data();
+
+        $progid = $data->program->id;
+        $times = $this->setup_recertified_state($data, time() - (3 * MONTHSECS)); // Setup with recertification 3 months ago.
 
         // Unassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check that the unassignment has created the expected history record.
-        $certhistrecs = $DB->get_records('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistrecs = $DB->get_records('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals(2, count($certhistrecs));
 
         $certhistrecnew = null;
@@ -436,17 +448,17 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals($times['oldexpire'], $certhistrecold->timeexpires);
         $this->assertEquals(0, $certhistrecold->unassigned);
 
-        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals(false, $certcomprec);
 
          // Reassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[1]->id, $this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[1]->id, $data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check the restored certification completion record.
-        $certcomprec = $DB->get_record('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certcomprec->timecompleted);
         $this->assertEquals($times['window'], $certcomprec->timewindowopens);
         $this->assertEquals($times['expire'], $certcomprec->timeexpires);
@@ -455,14 +467,14 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals(CERTIFRENEWALSTATUS_NOTDUE, $certcomprec->renewalstatus); // Check the window has not opened.
 
         // Check the history record no longer exists, it will be created when the window opens.
-        $this->assertFalse($DB->record_exists('certif_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete'])));
+        $this->assertFalse($DB->record_exists('certif_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete'])));
 
         // Check the course completions are still there and still marked as complete.
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id));
         $this->assertEquals(1, count($comprecs));
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(1, count($comprecs));
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id, 'timecompleted' => $times['oldcomplete']));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['oldcomplete']));
         $this->assertEquals(0, count($comprecs));
     }
 
@@ -472,19 +484,22 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
      */
     public function test_restoration_recertified_postwindow() {
         global $DB, $CFG;
-        $this->resetAfterTest(true);
 
-        $progid = $this->program->id;
-        $times = $this->setup_recertified_state(time() - (5 * $this->monthsecs)); // Setup with recertification 5 months ago.
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
+        $data = $this->get_certification_data();
+
+        $progid = $data->program->id;
+        $times = $this->setup_recertified_state($data, time() - (5 * MONTHSECS)); // Setup with recertification 5 months ago.
 
         // Unassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check that the unassignment has created the expected history record.
-        $certhistrecs = $DB->get_records('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistrecs = $DB->get_records('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals(2, count($certhistrecs));
 
         $certhistrecnew = null;
@@ -510,17 +525,17 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals($times['oldexpire'], $certhistrecold->timeexpires);
         $this->assertEquals(0, $certhistrecold->unassigned);
 
-        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals(false, $certcomprec);
 
          // Reassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[1]->id, $this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[1]->id, $data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check the restored certification completion record.
-        $certcomprec = $DB->get_record('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals($times['complete'], $certcomprec->timecompleted);
         $this->assertEquals($times['window'], $certcomprec->timewindowopens);
         $this->assertEquals($times['expire'], $certcomprec->timeexpires);
@@ -529,24 +544,24 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals(CERTIFRENEWALSTATUS_DUE, $certcomprec->renewalstatus); // Check the window has opened.
 
         // Check the history record is still there but no longer marked as unassigned.
-        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals($times['complete'], $certhistrec->timecompleted);
         $this->assertEquals($times['window'], $certhistrec->timewindowopens);
         $this->assertEquals($times['expire'], $certhistrec->timeexpires);
         $this->assertEquals(0, $certhistrec->unassigned);
 
         // Check the primary-path-only course completions are still there and marked as complete, the other is gone.
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id));
         $this->assertEquals(0, count($comprecs));
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id, 'timecompleted' => $times['oldcomplete']));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['oldcomplete']));
         $this->assertEquals(0, count($comprecs));
 
         // Course 3 was archived with the new completion time.
-        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(1, count($comphistrecs));
 
         // Course 3 was archived with the old completion time (from first window open).
-        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['oldcomplete']));
+        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['oldcomplete']));
         $this->assertEquals(3, count($comphistrecs));
     }
 
@@ -556,19 +571,22 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
      */
     public function test_restoration_recertified_expired() {
         global $DB, $CFG;
-        $this->resetAfterTest(true);
 
-        $progid = $this->program->id;
-        $times = $this->setup_recertified_state(time() - (7 * $this->monthsecs)); // Setup with recertification 7 months ago.
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
+        $data = $this->get_certification_data();
+
+        $progid = $data->program->id;
+        $times = $this->setup_recertified_state($data, time() - (7 * MONTHSECS)); // Setup with recertification 7 months ago.
 
         // Unassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check that the unassignment has created the expected history record.
-        $certhistrecs = $DB->get_records('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistrecs = $DB->get_records('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals(2, count($certhistrecs));
 
         $certhistrecnew = null;
@@ -594,17 +612,17 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals($times['oldexpire'], $certhistrecold->timeexpires);
         $this->assertEquals(0, $certhistrecold->unassigned);
 
-        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals(false, $certcomprec);
 
          // Reassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[1]->id, $this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[1]->id, $data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check the restored certification completion record.
-        $certcomprec = $DB->get_record('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals(0, $certcomprec->timecompleted); // Zero'd out on expiry.
         $this->assertEquals(0, $certcomprec->timewindowopens); // Zero'd out on expiry.
         $this->assertEquals(0, $certcomprec->timeexpires); // Zero'd out on expiry.
@@ -613,33 +631,33 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals(CERTIFRENEWALSTATUS_EXPIRED, $certcomprec->renewalstatus); // Check the window has opened.
 
         // There should still be 2 history records.
-        $certhistcount = $DB->count_records('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistcount = $DB->count_records('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals(2, $certhistcount);
 
         // Check the history record is still there but no longer marked as unassigned.
-        $certhistrec1 = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $certhistrec1 = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals($times['complete'], $certhistrec1->timecompleted);
         $this->assertEquals($times['window'], $certhistrec1->timewindowopens);
         $this->assertEquals($times['expire'], $certhistrec1->timeexpires);
         $this->assertEquals(0, $certhistrec1->unassigned);
 
         // Check the history record is still there but no longer marked as unassigned.
-        $certhistrec2 = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['oldcomplete']));
+        $certhistrec2 = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['oldcomplete']));
         $this->assertEquals($times['oldcomplete'], $certhistrec2->timecompleted);
         $this->assertEquals($times['oldwindow'], $certhistrec2->timewindowopens);
         $this->assertEquals($times['oldexpire'], $certhistrec2->timeexpires);
         $this->assertEquals(0, $certhistrec2->unassigned);
 
         // Check the course completions are still there and still marked as complete.
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id));
         $this->assertEquals(0, count($comprecs));
 
         // Course 3 was archived with latest completion time.
-        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(1, count($comphistrecs));
 
         // Course 3 was archived with previous completion time on first window open, courses 1 and 2 were archived just now, but had old completion date.
-        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['oldcomplete']));
+        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['oldcomplete']));
         $this->assertEquals(3, count($comphistrecs));
     }
 
@@ -649,55 +667,58 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
      */
     public function test_restoration_expired_expired() {
         global $DB, $CFG;
-        $this->resetAfterTest(true);
 
-        $progid = $this->program->id;
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
+        $data = $this->get_certification_data();
 
-        $times = $this->setup_recertified_state(time() - (7 * $this->monthsecs)); // Setup with recertification 7 months ago.
+        $progid = $data->program->id;
+
+        $times = $this->setup_recertified_state($data, time() - (7 * MONTHSECS)); // Setup with recertification 7 months ago.
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Unassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check that the unassignment has created the expected history record.
-        $certhistrecs = $DB->get_records('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistrecs = $DB->get_records('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals(3, count($certhistrecs)); // There are 3, one for the cert, one for the recert, and one expired one created for unassignment.
 
         // Check all three.
-        $certhistrec1 = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => 0));
+        $certhistrec1 = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => 0));
         $this->assertEquals(0, $certhistrec1->timecompleted);
         $this->assertEquals(0, $certhistrec1->timewindowopens);
         $this->assertEquals(0, $certhistrec1->timeexpires);
         $this->assertEquals(1, $certhistrec1->unassigned);
 
-        $certhistrec2 = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $certhistrec2 = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals($times['complete'], $certhistrec2->timecompleted);
         $this->assertEquals($times['window'], $certhistrec2->timewindowopens);
         $this->assertEquals($times['expire'], $certhistrec2->timeexpires);
         $this->assertEquals(0, $certhistrec2->unassigned);
 
-        $certhistrec3 = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['oldcomplete']));
+        $certhistrec3 = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['oldcomplete']));
         $this->assertEquals($times['oldcomplete'], $certhistrec3->timecompleted);
         $this->assertEquals($times['oldwindow'], $certhistrec3->timewindowopens);
         $this->assertEquals($times['oldexpire'], $certhistrec3->timeexpires);
         $this->assertEquals(0, $certhistrec3->unassigned);
 
-        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals(false, $certcomprec);
 
-         // Reassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[1]->id, $this->users[2]->id));
+        // Reassign.
+        $program_generator->assign_program($progid, [$data->users[1]->id, $data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check the restored certification completion record.
-        $certcomprec = $DB->get_record('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->get_record('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals(0, $certcomprec->timecompleted); // Zero'd out on expiry.
         $this->assertEquals(0, $certcomprec->timewindowopens); // Zero'd out on expiry.
         $this->assertEquals(0, $certcomprec->timeexpires); // Zero'd out on expiry.
@@ -705,27 +726,29 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals(CERTIFSTATUS_EXPIRED, $certcomprec->status); // Check they have expired.
         $this->assertEquals(CERTIFRENEWALSTATUS_EXPIRED, $certcomprec->renewalstatus); // Check the window has expired.
 
-        // Check the history record was deleted.
-        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => 0));
+        // Check the history record was deleted and the other 2 records are not.
+        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => 0));
         $this->assertEquals($certhistrec, false);
+        $this->assertCount(2, $DB->get_records('certif_completion_history'));
 
         // Check the course completions are still there and still marked as complete.
-        $comprecs = $DB->get_records('course_completions', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(0, count($comprecs));
 
         // Course 3 was archived with latest completion time.
-        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['complete']));
+        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(1, count($comphistrecs));
 
         // Course 3 was archived with previous completion time on first window open, courses 1 and 2 were archived just now, but had old completion date.
-        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $this->users[1]->id, 'timecompleted' => $times['oldcomplete']));
+        $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['oldcomplete']));
         $this->assertEquals(3, count($comphistrecs));
 
         // Quick test that a new history record is created if we remove the user again.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[2]->id));
-        $this->task->execute();
-        $postrecord = $DB->get_record('certif_completion_history', array('timecompleted' => 0, 'userid' => $this->users[1]->id));
-        $this->assertGreaterThan($prerecord->timemodified, $postrecord->timemodified);
+        $prerecord = $DB->get_record('certif_completion', array('timecompleted' => 0, 'userid' => $data->users[1]->id));
+        $program_generator->assign_program($progid, [$data->users[2]->id]);
+        $data->task->execute();
+        $postrecord = $DB->get_record('certif_completion_history', array('timecompleted' => 0, 'userid' => $data->users[1]->id));
+        $this->assertGreaterThanOrEqual($prerecord->timemodified, $postrecord->timemodified);
         $this->assertEquals(1, $postrecord->unassigned);
     }
 
@@ -734,44 +757,47 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
      */
     public function test_restoration_exceptions_timeallowance() {
         global $DB, $CFG;
-        $this->resetAfterTest(true);
 
         // Set the restoration setting.
         $CFG->restorecertifenrolments = 1;
 
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
+        $data = $this->get_certification_data();
+
         $now = time();
-        $progid = $this->program->id;
-        $times = $this->setup_certified_state($now - (7 * $this->monthsecs)); // Setup with completion 7 months ago.
+        $progid = $data->program->id;
+        $times = $this->setup_certified_state($data, $now - (7 * MONTHSECS)); // Setup with completion 7 months ago.
 
         // Unassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[2]->id]);
 
         // Run the certification task.
-        $this->task->execute();
+        $data->task->execute();
 
         // Check that the unassignment has created the expected history record.
-        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $this->users[1]->id));
+        $certhistrec = $DB->get_record('certif_completion_history', array('userid' => $data->users[1]->id));
         $this->assertEquals($certhistrec->timecompleted, $times['complete']);
         $this->assertEquals($certhistrec->timewindowopens, $times['window']);
         $this->assertEquals($certhistrec->timeexpires, $times['expire']);
         $this->assertEquals($certhistrec->unassigned, 1);
 
-        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $this->users[1]->id));
+        $certcomprec = $DB->record_exists('certif_completion', array('userid' => $data->users[1]->id));
         $this->assertEquals($certcomprec, false);
 
         // Reassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[1]->id, $this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[1]->id, $data->users[2]->id]);
 
         // Check that user 1 does not have a time allowance exception.
-        $userassignment = $DB->get_record('prog_user_assignment', array('userid' => $this->users[1]->id));
+        $userassignment = $DB->get_record('prog_user_assignment', array('userid' => $data->users[1]->id));
         $this->assertEquals($userassignment->exceptionstatus, 0);
 
         $exceptions = $DB->get_records('prog_exception');
         $this->assertEmpty($exceptions);
 
         // Check the timedue = now-1month.
-        $compl = $DB->get_record('prog_completion', array('userid' => $this->users[1]->id, 'programid' => $progid, 'coursesetid' => 0));
-        $this->assertEquals($compl->timedue, $now - $this->monthsecs);
+        $compl = $DB->get_record('prog_completion', array('userid' => $data->users[1]->id, 'programid' => $progid, 'coursesetid' => 0));
+        $this->assertEquals($compl->timedue, $now - MONTHSECS);
     }
 
     /**
@@ -780,37 +806,41 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
      */
     public function test_restoration_exceptions_dupcourse() {
         global $DB, $CFG;
-        $this->resetAfterTest(true);
 
         // Set the restoration setting.
         $CFG->restorecertifenrolments = 1;
 
+        $generator = $this->getDataGenerator();
+        $program_generator = $generator->get_plugin_generator('totara_program');
+        $data = $this->get_certification_data();
+
         $now = time();
-        $progid = $this->program->id;
-        $times = $this->setup_certified_state($now - (3 * $this->monthsecs)); // Setup with completion 3 months ago.
+        $progid = $data->program->id;
+        $times = $this->setup_certified_state($data, $now - (3 * MONTHSECS)); // Setup with completion 3 months ago.
 
         // Duplicate the certification.
         $certdata = array(
             'cert_activeperiod' => '6 Months',
             'cert_windowperiod' => '2 Months',
         );
-        $dupcert = $this->getDataGenerator()->create_certification($certdata);
+        $certid = $program_generator->create_certification($certdata);
+        $dupcert = new \program($certid);
 
-        $this->getDataGenerator()->add_courseset_program($dupcert->id, array($this->courses[1]->id, $this->courses[2]->id), CERTIFPATH_CERT);
-        $this->getDataGenerator()->add_courseset_program($dupcert->id, array($this->courses[3]->id), CERTIFPATH_RECERT);
+        $program_generator->add_courses_and_courseset_to_program($dupcert, [[$data->courses[1], $data->courses[2]]], CERTIFPATH_CERT);
+        $program_generator->add_courses_and_courseset_to_program($dupcert, [[$data->courses[3]]], CERTIFPATH_RECERT);
 
 
         // Unassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[2]->id]);
 
         // Assign user 1 to the dupcert.
-        $this->getDataGenerator()->assign_program($dupcert->id, array($this->users[1]->id));
+        $program_generator->assign_program($dupcert->id, [$data->users[1]->id]);
 
         // Reassign.
-        $this->getDataGenerator()->assign_program($progid, array($this->users[1]->id, $this->users[2]->id));
+        $program_generator->assign_program($progid, [$data->users[1]->id, $data->users[2]->id]);
 
         // Check that user 1 has a duplicate course exception.
-        $userassignment = $DB->get_record('prog_user_assignment', array('userid' => $this->users[1]->id, 'programid' => $progid));
+        $userassignment = $DB->get_record('prog_user_assignment', array('userid' => $data->users[1]->id, 'programid' => $progid));
         $this->assertEquals($userassignment->exceptionstatus, 1);
 
         $exceptions = $DB->get_records('prog_exception');
@@ -819,6 +849,6 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $exception = array_shift($exceptions);
         $this->assertEquals($exception->exceptiontype, \totara_program\exception\manager::EXCEPTIONTYPE_DUPLICATE_COURSE);
         $this->assertEquals($exception->programid, $progid);
-        $this->assertEquals($exception->userid, $this->users[1]->id);
+        $this->assertEquals($exception->userid, $data->users[1]->id);
     }
 }

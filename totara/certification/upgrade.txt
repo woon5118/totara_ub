@@ -7,15 +7,13 @@ information provided here is intended for developers.
   completely separate - you should use the functions specific to the object you are manipulating.
 * The event \core\event\course_in_progress was added.
 * The following functions were added:
-  * prog_create_completion
-  * prog_set_status_complete
   * certif_set_state_certified
   * certif_set_state_windowopen
   * certif_set_state_expired
   * certif_set_in_progress
 * The following were deprecated:
-  * program::update_program_complete has been deprecated. Instead use prog_set_status_complete or certif_set_status_xxx.
   * certification_event_handler::completed has been deprecated. Instead call certif_set_state_certified directly.
+  * certification_event_handler::certification_updated has been deprecated. Instead call \totara_certification\observer::certification_updated.
   * inprogress_certification_stage has been deprecated. Instead trigger a \core\event\course_in_progress event.
   * complete_certification_stage has been deprecated. Instead call certif_set_state_certified directly.
   * write_certif_completion has been deprecated. Instead, use certif_set_state_certified, certif_set_state_windowopen,
@@ -23,9 +21,9 @@ information provided here is intended for developers.
   * set_course_renewalstatus has been deprecated. Renewalstatus is updated as part of certif_create_completion and the
     certif_set_state_xxx functions.
   * reset_certifcomponent_completions has been deprecated. This functionality is included in certif_set_state_windowopen.
-Special note: certif_create_completion was changed to create the prog_completion record. You should always allow this
-function to create the prog_completion record for a user assignment in a certification. Use prog_create_completion to
-create the prog_completion record only for a normal program.
+* certif_create_completion was changed to create the prog_completion record. You should always allow this
+  function to create the prog_completion record for a user assignment in a certification. Use prog_create_completion to
+  create the prog_completion record only for a normal program.
 
 === 12.0 ===
 

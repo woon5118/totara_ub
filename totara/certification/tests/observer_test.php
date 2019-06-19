@@ -121,13 +121,13 @@ class totara_certification_observer_testcase extends reportcache_advanced_testca
         $status1 = $DB->get_field('certif_completion', 'status', array('userid' => $this->users[1]->id, 'certifid' => $this->certif1->certifid));
         $this->assertEquals(CERTIFSTATUS_INPROGRESS, $status1);
 
-        // Check that has had no effect on user 2, then start the recert course and make sure that has no effect as well.
+        // Check that has had no effect on user 2, then start the recert course and make sure that the cert is marked as in progress.
         $status2 = $DB->get_field('certif_completion', 'status', array('userid' => $this->users[2]->id, 'certifid' => $this->certif1->certifid));
         $this->assertEquals(CERTIFSTATUS_ASSIGNED, $status2);
         $completion = new completion_completion(array('userid' => $this->users[2]->id, 'course' => $this->course3->id));
         $completion->mark_inprogress($past);
         $status3 = $DB->get_field('certif_completion', 'status', array('userid' => $this->users[2]->id, 'certifid' => $this->certif1->certifid));
-        $this->assertEquals(CERTIFSTATUS_ASSIGNED, $status3);
+        $this->assertEquals(CERTIFSTATUS_INPROGRESS, $status3);
 
         // Check that starting user 3 in cert 1 doesn't effect his status in cert 2.
         $status4 = $DB->get_field('certif_completion', 'status', array('userid' => $this->users[3]->id, 'certifid' => $this->certif1->certifid));

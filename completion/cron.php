@@ -209,11 +209,13 @@ function completion_cron_criteria() {
 
 /**
  * Aggregate each user's criteria completions
+ *
+ * @param int userid
  */
-function completion_cron_completions($userid = 0) {
+function completion_cron_completions(int $userid = 0) {
     global $DB;
 
-    if (debugging()) {
+    if (debugging() && !PHPUNIT_TEST) {
         mtrace('Aggregating completions');
     }
 
@@ -239,7 +241,7 @@ function completion_cron_completions($userid = 0) {
         AND crc.reaggregate > 0
         AND crc.reaggregate < :timestarted
     ';
-    $params = array('timestarted' => $timestarted);
+    $params = ['timestarted' => $timestarted];
 
     if ($userid) {
         $sql .= "AND crc.userid = :userid";
@@ -265,7 +267,7 @@ function completion_cron_completions($userid = 0) {
         unset($completion, $record);
     }
 
-    if (debugging()) {
+    if (debugging() && !PHPUNIT_TEST) {
         mtrace('Finished aggregating completions');
     }
 

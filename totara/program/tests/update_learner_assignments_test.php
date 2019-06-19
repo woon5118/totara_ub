@@ -2712,10 +2712,10 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $this->assertEquals(0, $progcompletion1->coursesetid);
         $this->assertEquals(STATUS_PROGRAM_COMPLETE, $progcompletion0->status);
         $this->assertEquals(STATUS_PROGRAM_COMPLETE, $progcompletion1->status);
-        $this->assertGreaterThanOrEqual($timebefore, $progcompletion0->timestarted);
-        $this->assertGreaterThanOrEqual($timebefore, $progcompletion1->timestarted);
-        $this->assertLessThanOrEqual($timeafter, $progcompletion0->timestarted);
-        $this->assertLessThanOrEqual($timeafter, $progcompletion1->timestarted);
+        $this->assertGreaterThanOrEqual($timebefore, $progcompletion0->timecreated);
+        $this->assertGreaterThanOrEqual($timebefore, $progcompletion1->timecreated);
+        $this->assertLessThanOrEqual($timeafter, $progcompletion0->timecreated);
+        $this->assertLessThanOrEqual($timeafter, $progcompletion1->timecreated);
         $this->assertEquals(-1, $progcompletion0->timedue);
         $this->assertEquals(-1, $progcompletion1->timedue);
         $this->assertGreaterThanOrEqual($timebefore, $progcompletion0->timecompleted);

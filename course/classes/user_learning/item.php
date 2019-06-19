@@ -28,6 +28,8 @@ use totara_core\user_learning\item_base;
 use \totara_core\user_learning\item_has_progress;
 use \totara_core\user_learning\designation_primary;
 
+require_once($CFG->libdir . '/completionlib.php');
+
 class item extends item_base implements item_has_progress {
 
     use designation_primary;

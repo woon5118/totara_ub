@@ -1649,11 +1649,15 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $progcompletion->timecompleted = time();
         prog_write_completion($progcompletion);
 
+        $updatecompletiondebugging = 'program::update_program_complete has been deprecated since Totara 13.';
+
         // Mark the other user as started.
         $program->update_program_complete($user_incomplete->id, [
             'status' => STATUS_PROGRAM_INCOMPLETE,
             'timestarted' => time()
         ]);
+
+        $this->assertDebuggingCalled($updatecompletiondebugging);
 
         $completedebugging = '$program->is_program_complete() is deprecated, use the lib function prog_is_complete() instead';
         $incompletedebugging = '$program->is_program_inprogress() is deprecated, use the lib function prog_is_inprogress() instead';

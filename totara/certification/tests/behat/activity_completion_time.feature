@@ -135,7 +135,4 @@ Feature: Certification completion date is based on course completion time
       | Certification completion state | Certified, before window opens |
     When I run the scheduled task "\totara_certification\task\update_certification_task"
     Then the following fields match these values:
-      | Certification completion state | Certified, before window opens |
-    When I run the scheduled task "\totara_certification\task\update_certification_task"
-    Then the following fields match these values:
       | Certification completion state | Certified, window is open |

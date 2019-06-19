@@ -1050,7 +1050,7 @@ function completion_status_aggregate($method, $data, &$state) {
  * @param   integer     $userid         User ID default 0 indicates update all users
  * @return  bool
  */
-function completion_start_user_bulk($courseid = 0, $userid = 0) {
+function completion_start_user_bulk($courseid = 0, int $userid = 0) {
     global $CFG, $DB;
 
     if (empty($CFG->enablecompletion)) {
@@ -1068,7 +1068,7 @@ function completion_start_user_bulk($courseid = 0, $userid = 0) {
     $nowstring = \core_completion\helper::format_log_date($now);
 
     if ($userid) {
-        $usersql = "AND ui.userid = :userid";
+        $usersql = "AND ue.userid = :userid";
     } else {
         $usersql = "";
     }
@@ -1179,7 +1179,7 @@ function completion_start_user_bulk($courseid = 0, $userid = 0) {
     if ($courseid) {
         $params['courseid'] = $courseid;
     }
-    if ($courseid) {
+    if ($userid) {
         $params['userid'] = $userid;
     }
 

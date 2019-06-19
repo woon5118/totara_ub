@@ -3,7 +3,13 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Refactored several core program and certification functions. Most program and certification functions are now
+  completely separate - you should use the functions specific to the object you are manipulating.
+* The following functions were added:
+  * prog_set_status_complete
 * Removed deprecated methods:
+  * program::update_program_complete has been deprecated. Instead use prog_set_status_complete, certif_set_state_certified
+    certif_set_state_windowopen or certif_set_state_expired.
   * program::is_required_learning()
   * program::display_progress()
 * Class program_utilities has been moved into its own autoloaded class \totara_program\utils.

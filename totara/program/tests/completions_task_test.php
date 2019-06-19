@@ -294,7 +294,7 @@ class totara_program_completions_task_testcase extends advanced_testcase {
         $this->verify_program_completion_state($program_two, $users, ['u10', 'u12', 'u14'], ['u9', 'u13']);
 
         // Force the position back to incomplete for all assigned users.
-        $DB->execute('UPDATE {prog_completion} SET status = :status, timecompleted = 0', ['status' => STATUS_PROGRAM_INCOMPLETE]);
+        $DB->execute('UPDATE {prog_completion} SET status = :status, timecompleted = 0, timestarted = 0', ['status' => STATUS_PROGRAM_INCOMPLETE]);
 
         $this->verify_program_completion_state($program_one, $users, [], []);
         $this->verify_program_completion_state($program_two, $users, [], []);

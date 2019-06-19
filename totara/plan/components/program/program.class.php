@@ -418,7 +418,7 @@ class dp_program_component extends dp_base_component {
                     if ($prog_plan = $DB->get_record('dp_plan_program_assign', array('id' => $record->id))) {
                         $program = new program($prog_plan->programid);
                         prog_create_completion($prog_plan->programid, $this->plan->userid);
-                        $duedate = empty($record->duedate) ? COMPLETION_TIME_NOT_SET : $record->duedate;
+                        $duedate = empty($record->duedate) || $record->duedate === '-1' ? COMPLETION_TIME_NOT_SET : $record->duedate;
                         $program->set_timedue($this->plan->userid, $duedate);
                     }
                 }
@@ -608,35 +608,23 @@ class dp_program_component extends dp_base_component {
         // Load fullname of item
         $item->fullname = $DB->get_field('prog', 'fullname', array('id' => $itemid));
 
-        // TODO Check if TL-9453 is still fixed (this merge needs more work)
-        $existingprogcompletion = prog_load_completion($item->programid, $this->plan->userid, false);
-        $completionsettings = array();
-        if ($existingprogcompletion) {
-            // Prog completion already exists, so just update the timedue field if required, otherwise do nothing.
-            if ($existingprogcompletion->timedue <= 0 && $this->get_setting('duedatemode') == DP_DUEDATES_REQUIRED) {
-                // We need a due date and there is none there already, so use plan end date.
-                $item->duedate = $this->plan->enddate;
-                $completionsettings['timedue'] = empty($item->duedate) ? COMPLETION_TIME_NOT_SET : $item->duedate;
-            } else {
-                // There is already a due date, or we don't need any at all, so just get the date from the existing record.
-                $item->duedate = $existingprogcompletion->timedue <= 0 ? 0 : $existingprogcompletion->timedue;
-/*=======
         // Create the program completion record if it doesn't exist, then load it.
         prog_create_completion($item->programid, $this->plan->userid);
         $progcompletion = prog_load_completion($item->programid, $this->plan->userid);
 
-        // Update the timedue field if required.
-        if ($progcompletion->timedue <= 0 && $this->get_setting('duedatemode') == DP_DUEDATES_REQUIRED) {
-            // We need a due date and there is none there already, so use plan end date.
-            $item->duedate = $this->plan->enddate;
-            if (!empty($item->duedate)) {
+        $required = $this->get_setting('duedatemode') == DP_DUEDATES_REQUIRED;
+
+        // Set the timedue field for the new item
+        if ($progcompletion->timedue > 0) {
+            // If we have an existing prog duedate then use it
+            $item->duedate = $progcompletion->timedue;
+        } else if ($required) {
+            // Otherwise use the plan duedate
+            if (!empty($this->plan->enddate)) {
+                $item->duedate = $this->plan->enddate;
                 $program = new program($item->programid);
                 $program->set_timedue($this->plan->userid, $item->duedate);
->>>>>>> bdb5e88a3d8... TL-9072 certifications: Refactor certification completion*/
             }
-        } else {
-            // There is already a due date, or we don't need any at all, so just get the date from the program completion.
-            $item->duedate = $progcompletion->timedue;
         }
 
         $item->id = $DB->insert_record('dp_plan_program_assign', $item);
@@ -687,7 +675,7 @@ class dp_program_component extends dp_base_component {
             $PAGE->requires->string_for_js('cancel', 'moodle');
             $PAGE->requires->string_for_js('continue', 'moodle');
             $PAGE->requires->string_for_js('addprograms', 'totara_plan');
-            
+
             $jsparams = [$this->plan->id, $paginated, $component_name];
             $PAGE->requires->js_call_amd('totara_plan/components_program_find', 'init', $jsparams);
         }

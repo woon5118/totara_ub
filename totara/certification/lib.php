@@ -22,9 +22,7 @@
  * @subpackage certification
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');
-}
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/totara/program/program_assignments.class.php'); // For assignment category literals.
 require_once($CFG->dirroot.'/totara/program/program.class.php'); // For program status constants.
@@ -141,98 +139,14 @@ class certification_event_handler {
     }
 
     /**
-     * User is unassigned to a program event handler
-     * Delete certification completion record
-     *
-     * @param \totara_program\event\program_unassigned $event
-     */
-    public static function unassigned(\totara_program\event\program_unassigned $event) {
-        global $DB;
-
-        $programid = $event->objectid;
-        $userid = $event->userid;
-        $prog = $DB->get_record('prog', array('id' => $programid));
-
-        if ($prog->certifid) {
-            $params = array('certifid' => $prog->certifid, 'userid' => $userid);
-            if ($completionrecord = $DB->get_record('certif_completion', $params)) {
-                $description = 'Unassigned';
-                if (!in_array($completionrecord->status, array(CERTIFSTATUS_UNSET, CERTIFSTATUS_ASSIGNED))) {
-                    copy_certif_completion_to_hist($prog->certifid, $userid, true);
-                    $description .= ', current completion moved to history';
-                } else {
-                    $description .= ', current completion removed (not archived due to no progress)';
-                }
-
-                $DB->delete_records('certif_completion', $params);
-
-                prog_log_completion(
-                    $event->objectid,
-                    $event->userid,
-                    $description
-                );
-            }
-        }
-    }
-
-    /**
-     * Course in progress event handler.
-     *
-     * Checks if the course belongs to a certification which the user belongs to and marks the
-     * certification in progress (using certif_set_in_progress) if it is.
-     *
-     * @param \core\event\course_in_progress $event
-     */
-    public static function course_inprogress(\core\event\course_in_progress $event) {
-        global $DB;
-
-        $userid = $event->relateduserid;
-
-        $certificationids = find_certif_from_course($event->objectid);
-
-        if (!count($certificationids)) {
-            return;
-        }
-
-        // Could be multiple certification records so find the one this user is doing.
-        list($insql, $params) = $DB->get_in_or_equal(array_keys($certificationids), SQL_PARAMS_NAMED);
-        $sql = "SELECT cfc.id, cfc.status, cfc.renewalstatus, cfc.certifid, p.id AS programid
-                  FROM {certif_completion} cfc
-                  JOIN {prog} p ON p.certifid = cfc.certifid
-                 WHERE cfc.certifid $insql AND cfc.userid = :userid";
-        $params['userid'] = $userid;
-        $certcompletions = $DB->get_records_sql($sql, $params);
-
-        // If 0 then this course & user is not in an assigned certification.
-        if (empty($certcompletions)) {
-            return;
-        }
-
-        // The user could be assigned to more than one certification containing this course, which would be bad
-        // on its own, but doesn't actually affect our ability to set the status to in progress.
-        $message = 'Certification set to in progress due to course progress';
-        foreach ($certcompletions as $certcompletion) {
-            // This function could be called when the user is in various states within the certification. For example,
-            // if a certification has optional content, the user could be certified while the course is incomplete. Only
-            // set to in progress if the user is in one of the states in the certification where they can make progress.
-            if ($certcompletion->status < CERTIFSTATUS_INPROGRESS
-                || $certcompletion->status == CERTIFSTATUS_EXPIRED
-                || $certcompletion->status == CERTIFSTATUS_COMPLETED && $certcompletion->renewalstatus == CERTIFRENEWALSTATUS_DUE) {
-                certif_set_in_progress($certcompletion->programid, $userid, $message);
-            }
-        }
-    }
-
-    /**
      * Program completion event handler
      *
      * @param \totara_program\event\program_completed $event
      *
-     * @deprecated since Totara 13. See TL-9072.
+     * @deprecated since Totara 13
      */
     public static function completed(\totara_program\event\program_completed $event) {
-        debugging('certification_event_handler::completed has been deprecated since Totara 13.',
-            DEBUG_DEVELOPER);
+        debugging('certification_event_handler::completed has been deprecated since Totara 13.', DEBUG_DEVELOPER);
 
         global $DB;
 
@@ -247,37 +161,16 @@ class certification_event_handler {
      * Handler triggered when certification settings are changed, creates log which will show up on all users' transaction logs.
      *
      * @param \totara_certification\event\certification_updated $event
+     *
+     * @deprecated since Totara 13
      */
     public static function certification_updated(\totara_certification\event\certification_updated $event) {
         global $DB;
 
-        // Write to the certification completion log. Don't provide userid, so that it shows on all users' transaction lists.
-        $cert = $DB->get_record('certif', array('id' => $event->get_instance()->certifid));
-        $minimumactiveperiod = '';
-        $recertification = '';
-        switch ($cert->recertifydatetype) {
-            case CERTIFRECERT_COMPLETION:
-                $recertification = 'Use certification completion date';
-                break;
-            case CERTIFRECERT_EXPIRY:
-                $recertification = 'Use certification expiry date';
-                break;
-            case CERTIFRECERT_FIXED:
-                $recertification = 'Use fixed expiry date';
-                $minimumactiveperiod = '<li>Minimum active period: ' . $cert->minimumactiveperiod . '</li>';
-                break;
-        }
-        $description = 'Certification settings changed<br>' .
-            '<ul><li>Recertification date: ' . $recertification . '</li>' .
-            '<li>Active period: ' . $cert->activeperiod . '</li>' .
-            $minimumactiveperiod .
-            '<li>Window period: ' . $cert->windowperiod . '</li></ul>';
+        debugging('certification_event_handler::certification_updated has been deprecated since Totara 13. Use
+                   totara_certification_observer::certification_updated instead', DEBUG_DEVELOPER);
 
-        prog_log_completion(
-            $event->objectid,
-            null,
-            $description
-        );
+        \totara_certification\observer::certification_updated($event);
     }
 }
 
@@ -292,11 +185,10 @@ class certification_event_handler {
  * @param int $userid
  * @return boolean (false if not a course&user)
  *
- * @deprecated since Totara 13. Instead trigger a \core\event\course_in_progress event. See TL-9072.
+ * @deprecated since Totara 13. Instead trigger a \core\event\course_in_progress event
  */
 function inprogress_certification_stage($courseid, $userid) {
-    debugging('inprogress_certification_stage has been deprecated since Totara 13.',
-        DEBUG_DEVELOPER);
+    debugging('inprogress_certification_stage has been deprecated since Totara 13.', DEBUG_DEVELOPER);
 
     global $DB;
 
@@ -353,11 +245,10 @@ function inprogress_certification_stage($courseid, $userid) {
  * @param integer userid
  * @return boolean
  *
- * @deprecated since Totara 13. See TL-9072.
+ * @deprecated since Totara 13
  */
 function complete_certification_stage($certificationid, $userid) {
-    debugging('complete_certification_stage has been deprecated since Totara 10.',
-        DEBUG_DEVELOPER);
+    debugging('complete_certification_stage has been deprecated since Totara 13.', DEBUG_DEVELOPER);
 
     global $DB;
 
@@ -385,7 +276,9 @@ function complete_certification_stage($certificationid, $userid) {
  * @return int Count of certification completion records which were opened
  */
 function recertify_window_opens_stage() {
-    global $DB;
+    global $DB, $CFG;
+
+    require_once($CFG->dirroot . '/completion/cron.php');
 
     // Find all users who are certified, are due to recertify, but their window hasn't yet opened.
     $sql = "SELECT cc.id AS uniqueid, cc.userid, p.id AS progid
@@ -398,8 +291,10 @@ function recertify_window_opens_stage() {
                AND u.deleted = 0
                AND u.suspended = 0";
 
+    $now = time();
+
     $params = [
-        'now' => time(),
+        'now' => $now,
         'completed' => CERTIFSTATUS_COMPLETED,
         'notdue' => CERTIFRENEWALSTATUS_NOTDUE
     ];
@@ -598,13 +493,12 @@ function certif_get_content_completion_time($certificationid, $userid, $path = n
  * @param integer $certificationpath
  * @param integer $renewalstatus
  *
- * @deprecated since Totara 13. See TL-9072. Instead, use certif_set_state_certified, certif_set_state_windowopen,
+ * @deprecated since Totara 13. Instead, use certif_set_state_certified, certif_set_state_windowopen,
  *              certif_set_state_expired or certif_set_in_progress.
  */
 function write_certif_completion($certificationid, $userid, $certificationpath = CERTIFPATH_CERT,
                                                             $renewalstatus = CERTIFRENEWALSTATUS_NOTDUE) {
-    debugging('write_certif_completion has been deprecated since Totara 13.',
-        DEBUG_DEVELOPER);
+    debugging('write_certif_completion has been deprecated since Totara 13.', DEBUG_DEVELOPER);
 
     global $DB;
 
@@ -853,17 +747,9 @@ function certif_create_completion($programid, $userid, $message = '') {
                 $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
                 $progcompletion->timecompleted = 0;
                 // Keep the timedue if the prog_completion already exists.
-                // -----------------------------
-                // TODO CHECK THIS SECTION
                 if ($createprogcompletion) {
                     $progcompletion->timedue = COMPLETION_TIME_NOT_SET;
                 }
-                if (!$progisincomplete) {
-                    $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
-                    $progcompletion->timecompleted = 0;
-                    // Don't change timedue in case it is already set.
-                }
-                // ---------------------------
                 break;
             case CERTIFCOMPLETIONSTATE_CERTIFIED:
                 $progcompletion->status = STATUS_PROGRAM_COMPLETE;
@@ -904,19 +790,10 @@ function certif_create_completion($programid, $userid, $message = '') {
 
         $message .= 'Restored certif_completion history into current';
 
-/*        // Manually process the records, rather than using certif_write_completion, to avoid validation problems.
-        if ($createprogcompletion) {
-            $DB->insert_record('prog_completion', $progcompletion);
-            $message .= ' and created new prog_completion';
-        } else {
-            $DB->update_record('prog_completion', $progcompletion);
-            $message .= ' for existing prog_completion';
-        }*/
         if ($createprogcompletion) {
             // Use certif_write_completion to create both records.
             // We want to restore the record to the state it was in before, regardless of problems. To do that, we calculate
             // the problem key for the data (if it has problems) and tell certif_write_completion to ignore it.
-            // TODO: see if we need to use the above code to create
             $errors = certif_get_completion_errors($newcompletion, $progcompletion);
             $problemkey = certif_get_completion_error_problemkey($errors);
             certif_write_completion($newcompletion, $progcompletion,
@@ -930,11 +807,8 @@ function certif_create_completion($programid, $userid, $message = '') {
             $DB->insert_record('certif_completion', $newcompletion);
 
             // Log it manually.
-            certif_write_completion_log($programid, $userid,
-                $message . ' for existing prog_completion');
+            certif_write_completion_log($programid, $userid, $message . ' for existing prog_completion');
         }
-
-        //$DB->insert_record('certif_completion', $newcompletion);
 
         // Wipe all the user's unassigned flags since they're assigned now.
         $sql = "UPDATE {certif_completion_history}
@@ -945,11 +819,10 @@ function certif_create_completion($programid, $userid, $message = '') {
         $DB->execute($sql, $params);
 
         // Delete the history record if it will be made again in the future. Done last, in case the previous step fails somehow.
-        if ($historystate != CERTIFCOMPLETIONSTATE_WINDOWOPEN && $historystate != CERTIFCOMPLETIONSTATE_EXPIRED) {
+        if ($historystate != CERTIFCOMPLETIONSTATE_WINDOWOPEN) {
             // The history record will be created when the window opens, so delete the existing history record.
             certif_delete_completion_history($historyid, 'Deleted certification completion history record during reassignment');
         }
-
     } else {
         // There is no history record suitable for reassignment, so set it up as a first-time assignment.
 
@@ -966,34 +839,10 @@ function certif_create_completion($programid, $userid, $message = '') {
         $certcompletion->baselinetimeexpires = 0;
         $certcompletion->timemodified = $now;
 
-        /*if (!$createprogcompletion) {
-            // Change the existing prog_completion record to match the new certif_completion record.
-            $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
-            $progcompletion->timecompleted = 0;
-            // Don't change timedue in case it is already set.
-        }
-
-        $message .= 'Created new certif_completion';
-
-        // Manually process the records, rather than using certif_write_completion, to avoid validation problems.
-        if ($createprogcompletion) {
-            $DB->insert_record('prog_completion', $progcompletion);
-            $message .= ' and new prog_completion';
-        } else {
-            $DB->update_record('prog_completion', $progcompletion);
-            $message .= ' for existing prog_completion';
-        }
-        $DB->insert_record('certif_completion', $certcompletion);
-
-        // Log it manually.
-        certif_write_completion_log($programid, $userid, $message);*/
-
         if ($createprogcompletion) {
             // Both records need to be created, so use certif_write_completion. That function will check the validity
             // of the records, which should not find any problems.
-            // TODO: Check if we need to manually insert record to avoid validation issues (see above)
-            certif_write_completion($certcompletion, $progcompletion,
-                'Created certif_completion and prog_completion records');
+            certif_write_completion($certcompletion, $progcompletion, 'Created certif_completion and prog_completion records');
 
         } else {
             // The prog_completion already exists, so create the new certif_completion. We can't use certif_write_completion
@@ -1030,12 +879,11 @@ function certif_create_completion($programid, $userid, $message = '') {
  * @param integer $userid
  * @param integer $renewalstatus
  *
- * @deprecated since Totara 13. See TL-9072. Renewalstatus is updated as part of certif_create_completion and the
+ * @deprecated since Totara 13. Renewalstatus is updated as part of certif_create_completion and the
  *             certif_set_state_xxx functions.
  */
 function set_course_renewalstatus($courseids, $userid, $renewalstatus) {
-    debugging('set_course_renewalstatus has been deprecated since Totara 13.',
-        DEBUG_DEVELOPER);
+    debugging('set_course_renewalstatus has been deprecated since Totara 13.', DEBUG_DEVELOPER);
 
     global $DB;
 
@@ -1634,11 +1482,10 @@ function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", 
  * @param StdClass $certifcompletion
  * @param array $courses
  *
- * @deprecated since Totara 13. See TL-9072. This functionality is included in certif_set_state_windowopen.
+ * @deprecated since Totara 13. This functionality is included in certif_set_state_windowopen.
  */
 function reset_certifcomponent_completions($certifcompletion, $courses=null) {
-    debugging('reset_certifcomponent_completions has been deprecated since Totara 13.',
-        DEBUG_DEVELOPER);
+    debugging('reset_certifcomponent_completions has been deprecated since Totara 13.', DEBUG_DEVELOPER);
 
     global $DB;
 
@@ -1718,7 +1565,7 @@ function reset_certifcomponent_completions($certifcompletion, $courses=null) {
  * @param string $message If provided, will override the default program completion log message.
  * @return bool true if the records were successfully updated
  */
-function certif_set_state_certified($programid, $userid, $message = '') {
+function certif_set_state_certified(int $programid, int $userid, string $message = '') :bool {
     global $DB;
 
     list($certcompletion, $progcompletion) = certif_load_completion($programid, $userid);
@@ -1734,7 +1581,7 @@ function certif_set_state_certified($programid, $userid, $message = '') {
     }
 
     // State can only be changed to certified from these specific states.
-    $validfromstates = array(CERTIFCOMPLETIONSTATE_ASSIGNED, CERTIFCOMPLETIONSTATE_WINDOWOPEN, CERTIFCOMPLETIONSTATE_EXPIRED);
+    $validfromstates = [CERTIFCOMPLETIONSTATE_ASSIGNED, CERTIFCOMPLETIONSTATE_WINDOWOPEN, CERTIFCOMPLETIONSTATE_EXPIRED];
     $currentstate = certif_get_completion_state($certcompletion);
     if (!in_array($currentstate, $validfromstates)) {
         certif_write_completion_log($programid, $userid,
@@ -1752,7 +1599,7 @@ function certif_set_state_certified($programid, $userid, $message = '') {
     }
 
     // Calculate the base time.
-    $certification = $DB->get_record('certif', array('id' => $certcompletion->certifid));
+    $certification = $DB->get_record('certif', ['id' => $certcompletion->certifid]);
     $base = get_certiftimebase($certification->recertifydatetype, $certcompletion->timeexpires,
         $lastcompleted, $progcompletion->timedue, $certification->activeperiod, $certification->minimumactiveperiod,
         $certification->windowperiod);
@@ -1764,6 +1611,7 @@ function certif_set_state_certified($programid, $userid, $message = '') {
     $certcompletion->timecompleted = $lastcompleted;
     $certcompletion->timeexpires = get_timeexpires($base, $certification->activeperiod);
     $certcompletion->timewindowopens = get_timewindowopens($certcompletion->timeexpires, $certification->windowperiod);
+    $certcompletion->baselinetimeexpires = $certcompletion->timeexpires;
     $certcompletion->timemodified = $now;
 
     $jobassignment = \totara_job\job_assignment::get_first($userid, false);
@@ -1780,18 +1628,20 @@ function certif_set_state_certified($programid, $userid, $message = '') {
     }
 
     // Save the change (performs data validation and logging).
-    certif_write_completion($certcompletion, $progcompletion, $message);
+    $result = certif_write_completion($certcompletion, $progcompletion, $message);
+
+    totara_program\progress\program_progress_cache::mark_program_cache_stale($programid);
 
     // Trigger an event to notify any listeners that this certification has been completed.
     $event = \totara_program\event\program_completed::create(
-        array(
+        [
             'objectid' => $programid,
             'context' => context_program::instance($programid),
             'userid' => $userid,
-            'other' => array(
+            'other' => [
                 'certifid' => $certification->id,
-            ),
-        )
+            ],
+        ]
     );
     $event->trigger();
 
@@ -1816,7 +1666,7 @@ function certif_set_state_certified($programid, $userid, $message = '') {
  * @param string $logmessage If provided, will override the default program completion log message.
  * @return bool true if the records were successfully updated
  */
-function certif_set_state_windowopen($programid, $userid, $logmessage = '') {
+function certif_set_state_windowopen(int $programid, int $userid, string $logmessage = '') :bool {
     global $DB;
 
     list($certcompletion, $progcompletion) = certif_load_completion($programid, $userid);
@@ -1842,18 +1692,18 @@ function certif_set_state_windowopen($programid, $userid, $logmessage = '') {
 
     copy_certif_completion_to_hist($certcompletion->certifid, $userid);
 
-    // Delete course set group completion records for the recertification path.
+    // Delete course set group completion records.
     $sql = "DELETE FROM {prog_completion}
              WHERE programid = :programid1
                AND userid = :userid
                AND coursesetid IN (SELECT pc2.id
                                      FROM {prog_courseset} pc2
                                     WHERE pc2.programid = :programid2)";
-    $params = array(
+    $params = [
         'programid1' => $programid,
         'programid2' => $programid,
         'userid' => $userid,
-    );
+    ];
     $DB->execute($sql, $params);
 
     // Create a new course set group completion record for the first course set group.
@@ -1902,7 +1752,7 @@ function certif_set_state_windowopen($programid, $userid, $logmessage = '') {
     $messagesmanager = prog_messages_manager::get_program_messages_manager($programid);
     $messages = $messagesmanager->get_messages();
 
-    $user = $DB->get_record('user', array('id' => $userid));
+    $user = $DB->get_record('user', ['id' => $userid]);
     foreach ($messages as $message) {
         if ($message->messagetype == MESSAGETYPE_RECERT_WINDOWOPEN) {
             // This function checks prog_messagelog for existing record. If it exists, the message is not sent.
@@ -1926,7 +1776,7 @@ function certif_set_state_windowopen($programid, $userid, $logmessage = '') {
  * @param string $logmessage If provided, will override the default program completion log message.
  * @return bool true if the records were successfully updated
  */
-function certif_set_state_expired($programid, $userid, $logmessage = '') {
+function certif_set_state_expired(int $programid, int $userid, string $logmessage = '') :bool {
     global $DB;
 
     list($certcompletion, $progcompletion) = certif_load_completion($programid, $userid);
@@ -1960,6 +1810,7 @@ function certif_set_state_expired($programid, $userid, $logmessage = '') {
     $certcompletion->timecompleted = 0;
     $certcompletion->timewindowopens = 0;
     $certcompletion->timeexpires = 0;
+    $certcompletion->baselinetimeexpires = 0;
     $certcompletion->timemodified = $now;
 
     // Save the change (performs data validation and logging).
@@ -1995,7 +1846,7 @@ function certif_set_state_expired($programid, $userid, $logmessage = '') {
  * @param string $message If provided, will override the default program completion log message.
  * @return bool true if the records were successfully updated
  */
-function certif_set_in_progress($programid, $userid, $message = '') {
+function certif_set_in_progress(int $programid, int $userid, string $message = '') :bool {
     list($certcompletion, $progcompletion) = certif_load_completion($programid, $userid);
 
     // Check to see if we can skip the change, if it's already marked "in progress".
@@ -2042,7 +1893,7 @@ function certif_set_in_progress($programid, $userid, $message = '') {
  * @param int $userid User ID of the user.
  * @param int $archivedate The moment at which archiving was supposed to have occurred.
  */
-function certif_archive_courses_completion($courseids, $userid, $archivedate) {
+function certif_archive_courses_completion(array $courseids, int $userid, int $archivedate) {
     foreach ($courseids as $courseid) {
         // Call course/lib.php functions.
         archive_course_completion($userid, $courseid);
@@ -3763,12 +3614,7 @@ function certif_write_completion_history_log($chid, $message = '', $changeuserid
 
     $description = certif_calculate_completion_history_description($certcomplhistory, $message);
 
-    prog_log_completion(
-        $certcomplhistory->programid,
-        $certcomplhistory->userid,
-        $description,
-        $changeuserid
-    );
+    prog_log_completion($certcomplhistory->programid, $certcomplhistory->userid, $description, $changeuserid);
 }
 
 /**

@@ -22,14 +22,12 @@
  * @subpackage program
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/coursecatlib.php');
-require_once($CFG->libdir . '/datalib.php');
-require_once($CFG->libdir . '/ddllib.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/totara/program/program.class.php');
-require_once($CFG->dirroot . '/totara/certification/lib.php'); // For the constants
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
-require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 
 /**
  * Can logged in user view user's required learning
@@ -1305,6 +1303,7 @@ function prog_process_extensions($extensionslist, $reasonfordecision = array()) 
  *     This argument is ignored if no program was provided.
  */
 function prog_update_completion($userid, program $program = null, $courseid = null, $useriscomplete = null) {
+
     if (!$program) {
         // Well they can't possibly have completed it.
         $useriscomplete = null; // As noted this is ignored.
@@ -1395,7 +1394,7 @@ function prog_update_completion($userid, program $program = null, $courseid = nu
  * @param string $message If provided, will override the default program completion log message.
  * @return bool true if the record was successfully updated
  */
-function prog_set_status_complete($programid, $userid, $message = '') {
+function prog_set_status_complete(int $programid, int $userid, string $message = '') :bool {
     global $DB;
 
     $progcompletion = prog_load_completion($programid, $userid);
@@ -3001,6 +3000,8 @@ function prog_write_completion($progcompletion, $message = '', $ignoreproblemkey
             $DB->update_record('prog_completion', $progcompletion);
         }
 
+        totara_program\progress\program_progress_cache::mark_program_cache_stale($progcompletion->programid);
+
         prog_write_completion_log($progcompletion->programid, $progcompletion->userid, $message);
 
         return true;
@@ -3828,8 +3829,7 @@ function prog_create_completion($programid, $userid, $data = array(), $message =
     }
 
     // Check that this is not a certification.
-    $program = $DB->get_record('prog', array('id' => $programid));
-    if (!empty($program->certifid)) {
+    if ($DB->record_exists_select('prog', 'id = :progid AND certifid IS NOT NULL', ['progid' => $programid])) {
         throw new coding_exception('Tried to create a prog_completion record for a certification using prog_create_completion');
     }
 
@@ -3838,7 +3838,7 @@ function prog_create_completion($programid, $userid, $data = array(), $message =
     $progcompletion->userid = $userid;
     $progcompletion->coursesetid = 0;
     $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
-    $progcompletion->timestarted = 0;
+    $progcompletion->timestarted = $now;
     $progcompletion->timecreated = $now;
     $progcompletion->timedue = COMPLETION_TIME_NOT_SET;
     $progcompletion->timecompleted = 0;
