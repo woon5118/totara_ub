@@ -47,6 +47,7 @@ class seminar_watcher {
             $context = \context_module::instance($cm->id);
             if (!is_enrolled($context)) {
                 $hook->signuplink = '/enrol/totara_facetoface/signup.php';
+                $hook->signuptsandcslink = '/enrol/totara_facetoface/ajax/signup_tsandcs.php';
             }
         }
     }

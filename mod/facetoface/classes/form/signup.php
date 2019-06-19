@@ -33,6 +33,18 @@ use mod_facetoface\signup_helper;
 defined('MOODLE_INTERNAL') || die();
 
 class signup extends \moodleform {
+
+    /**
+     * Default terms and conditions sign-up link
+     */
+    const DEFAULT_SIGNUP_TSANDCS_LINK = '/mod/facetoface/attendees/ajax/signup_tsandcs.php';
+
+    /**
+     * This link will be changed if mod_facetoface\hook\alternative_signup_link hook is called.
+     * @var $signuptsandcslink string
+     */
+    protected $signuptsandcslink = self::DEFAULT_SIGNUP_TSANDCS_LINK;
+
     function definition() {
         global $USER;
         $mform =& $this->_form;
@@ -68,7 +80,7 @@ class signup extends \moodleform {
         if ($approvaltype == \mod_facetoface\seminar::APPROVAL_SELF) {
             global $PAGE;
 
-            $url = new \moodle_url('/mod/facetoface/attendees/ajax/signup_tsandcs.php', array('s' => $seminarevent->get_id()));
+            $url = new \moodle_url($this->get_signup_tsandcs_link($seminarevent), array('s' => $seminarevent->get_id()));
             $tandcurl = \html_writer::link($url, get_string('approvalterms', 'mod_facetoface'), array("class"=>"tsandcs ajax-action"));
 
             $PAGE->requires->strings_for_js(array('approvalterms', 'close'), 'mod_facetoface');
@@ -309,5 +321,26 @@ class signup extends \moodleform {
         }
 
         return $errors;
+    }
+
+    /**
+     * Get signup_tsandcs link URL.
+     * This link is processed through mod_facetoface\\hook\\alternative_signup_link
+     * to allow additional plugins to set different page.
+     * @param seminar_event $seminarevent
+     * @param string $link
+     * @return string
+     */
+    private function get_signup_tsandcs_link(seminar_event $seminarevent): string {
+        // look for hooks unless set_signup_link() is called
+        if ($this->signuptsandcslink === self::DEFAULT_SIGNUP_TSANDCS_LINK) {
+            // Start hook code
+            $signuptsandcsurl = $this->signuptsandcslink;
+            $hook = new \mod_facetoface\hook\alternative_signup_link($seminarevent, '', $signuptsandcsurl);
+            $hook->execute();
+            // End hook code
+            return $hook->signuptsandcslink;
+        }
+        return $this->signuptsandcslink;
     }
 }

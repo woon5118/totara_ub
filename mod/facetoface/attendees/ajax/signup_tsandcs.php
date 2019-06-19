@@ -33,12 +33,14 @@ $seminar = (new \mod_facetoface\seminar_event($s))->get_seminar();
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
+$PAGE->set_context($context);
+
 if ($seminar->get_approvaltype() != \mod_facetoface\seminar::APPROVAL_SELF) {
     // This should not happen unless there is a concurrent change of settings.
     print_error('error');
 }
 
-require_login($seminar->get_course(), true, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:view', $context);
 
 $mform = new \mod_facetoface\form\signup_tsandcs(null, array('tsandcs' => $seminar->get_approvalterms(), 's' => $s));

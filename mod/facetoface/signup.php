@@ -37,60 +37,82 @@ $course = $DB->get_record('course', ['id' => $seminar->get_course()], '*', MUST_
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
-$signup = signup::create($USER->id, $seminarevent);
-
+$returnurl = new moodle_url('/course/view.php', ['id' => $course->id]);
 if (isguestuser()) {
-    redirect(new moodle_url('/course/view.php', ['id' => $course->id]),
-        get_string('error:cannotsignuptoeventasguest', 'mod_facetoface'));
+    redirect(
+        $returnurl,
+        get_string('error:cannotsignuptoeventasguest', 'mod_facetoface'),
+        null,
+        \core\notification::ERROR
+    );
 }
 
 if (!empty($seminarevent->get_cancelledstatus())) {
-    redirect(new moodle_url('/course/view.php', ['id' => $course->id]),
-        get_string('error:cannotsignupforacancelledevent', 'mod_facetoface'));
+    redirect(
+        $returnurl,
+        get_string('error:cannotsignupforacancelledevent', 'mod_facetoface'),
+        null,
+        \core\notification::ERROR
+    );
 }
 
 if ($CFG->enableavailability) {
     if (!get_fast_modinfo($cm->course)->get_cm($cm->id)->available) {
-        redirect(new moodle_url('/course/view.php', ['id' => $course->id]));
-        die;
+        redirect(
+            $returnurl,
+            get_string('notavailablecourse', 'moodle', $seminar->get_name()),
+            null,
+            \core\notification::ERROR
+        );
+    }
+}
+
+if ($backtoallsessions) {
+    $returnurl = new moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]);
+}
+// This is not strictly required for signup (more correctly it is checked in actor_has_role), but leaving it for early
+// indication of the issue.
+$helper = new trainer_helper($seminarevent);
+$trainerroles = trainer_helper::get_trainer_roles(context_course::instance($course->id));
+$trainers     = $helper->get_trainers();
+if ($seminar->get_approvaltype() == seminar::APPROVAL_ROLE) {
+    if (empty($trainerroles) || empty($trainers)) {
+        redirect(
+            $returnurl,
+            get_string('error:missingrequiredrole', 'mod_facetoface'),
+            null,
+            \core\notification::ERROR
+        );
     }
 }
 
 require_login($course, false, $cm);
 require_capability('mod/facetoface:view', $context);
 
-if ($backtoallsessions) {
-    $returnurl = new moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]);
-} else {
-    $returnurl = new moodle_url('/course/view.php', ['id' => $course->id]);
+$signup = signup::create($USER->id, $seminarevent);
+// Choose header depending on resulting state: waitlist or booked.
+$currentstate = $signup->get_state();
+$heading = get_string('signupfor', 'mod_facetoface', $seminar->get_name());
+if ($currentstate instanceof signup\state\booked ||
+    $currentstate instanceof signup\state\requested ||
+    $currentstate instanceof signup\state\waitlisted) {
+    $heading = $seminar->get_name();
+}
+if (!$currentstate->can_switch(signup\state\booked::class) &&
+    $currentstate->can_switch(signup\state\waitlisted::class)) {
+    $heading = get_string('waitlistfor', 'mod_facetoface', $seminar->get_name());
 }
 
-// This is not strictly required for signup (more correctly it is checked in actor_has_role), but leaving it for early
-// indication of the issue.
-$helper = new trainer_helper($seminarevent);
-
-$trainerroles = trainer_helper::get_trainer_roles(context_course::instance($course->id));
-$trainers     = $helper->get_trainers();
-if ($seminar->get_approvaltype() == seminar::APPROVAL_ROLE) {
-    if (empty($trainerroles) || empty($trainers)) {
-        \core\notification::error(get_string('error:missingrequiredrole', 'mod_facetoface'));
-        redirect($returnurl);
-    }
-}
-
-$PAGE->set_cm($cm);
-$PAGE->set_url('/mod/facetoface/signup.php', ['s' => $s, 'backtoallsessions' => $backtoallsessions]);
-$PAGE->set_title(format_string($seminar->get_name()));
-$PAGE->set_heading($course->fullname);
-
-$params = [
-    'signup' => $signup,
-    'backtoallsessions' => $backtoallsessions,
+$baseurlparam = [
+    's' => $seminarevent->get_id(),
+    'backtoallsessions' => $backtoallsessions
 ];
-$mform = new \mod_facetoface\form\signup(null, $params, 'post', '', ['name' => 'signupform']);
+$PAGE->set_context($context);
+$PAGE->set_cm($cm);
+$PAGE->set_url(new moodle_url('/mod/facetoface/signup.php', $baseurlparam));
+$PAGE->set_title($heading);
 
 local_js([TOTARA_JS_DIALOG, TOTARA_JS_TREEVIEW]);
-
 $PAGE->requires->strings_for_js(['selectmanager'], 'mod_facetoface');
 $jsmodule = [
         'name' => 'facetoface_managerselect',
@@ -106,12 +128,22 @@ $args = [
 ];
 $PAGE->requires->js_init_call('M.facetoface_managerselect.init', $args, false, $jsmodule);
 
+$params = [
+    'signup' => $signup,
+    'backtoallsessions' => $backtoallsessions,
+];
+$mform = new \mod_facetoface\form\signup(null, $params, 'post', '', ['name' => 'signupform']);
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
 if ($fromform = $mform->get_data()) {
     if (empty($fromform->submitbutton)) {
-        print_error('error:unknownbuttonclicked', 'mod_facetoface', $returnurl);
+        redirect(
+            $returnurl,
+            get_string('error:unknownbuttonclicked', 'mod_facetoface'),
+            null,
+            \core\notification::ERROR
+        );
     }
 
     $signup->set_notificationtype($fromform->notificationtype);
@@ -153,35 +185,20 @@ if ($fromform = $mform->get_data()) {
         $failures = signup_helper::get_failures($signup);
         reset($failures);
         $message = current($failures);
-
         $notificationtype = \core\notification::ERROR;
     }
 
-    \core\notification::add($message, $notificationtype);
-    redirect($returnurl);
+    redirect($returnurl, $message, null, $notificationtype);
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->box_start();
-
-// Choose header depending on resulting state: waitlist or booked.
-$currentstate = $signup->get_state();
-$heading = get_string('signupfor', 'mod_facetoface', $seminar->get_name());
-if ($currentstate instanceof signup\state\booked ||
-    $currentstate instanceof signup\state\requested ||
-    $currentstate instanceof signup\state\waitlisted) {
-    $heading = $seminar->get_name();
-}
-if (!$currentstate->can_switch(signup\state\booked::class) &&
-    $currentstate->can_switch(signup\state\waitlisted::class)) {
-    $heading = get_string('waitlistfor', 'mod_facetoface', $seminar->get_name());
-}
-echo $OUTPUT->heading(format_string($heading));
+echo $OUTPUT->heading($heading);
 
 /**
  * @var mod_facetoface_renderer $seminarrenderer
  */
 $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
+$seminarrenderer->setcontext($context);
 $signedup = !$signup->get_state()->is_not_happening();
 $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
 echo $seminarrenderer->render_seminar_event($seminarevent, $viewattendees, false, $signedup);
@@ -192,14 +209,15 @@ if ($currentstate->can_switch(signup\state\user_cancelled::class)) {
     if ($currentstate instanceof signup\state\waitlisted) {
         $canceltext = get_string('cancelwaitlist', 'mod_facetoface');
     }
-    $cancelurl = new moodle_url('cancelsignup.php', ['s' => $seminarevent->get_id(), 'backtoallsessions' => $backtoallsessions]);
+    $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', $baseurlparam);
     echo html_writer::link($cancelurl, $canceltext, ['title' => $canceltext]);
     echo ' &ndash; ';
 }
 
 if ($viewattendees) {
-    $viewurl = new moodle_url('attendees/view.php', ['s' => $seminarevent->get_id(), 'backtoallsessions' => $backtoallsessions]);
-    echo html_writer::link($viewurl, get_string('seeattendees', 'mod_facetoface'), ['title' => get_string('seeattendees', 'mod_facetoface')]);
+    $viewurl = new moodle_url('/mod/facetoface/attendees/view.php', $baseurlparam);
+    $seeattendees = get_string('seeattendees', 'mod_facetoface');
+    echo html_writer::link($viewurl, $seeattendees, ['title' => $seeattendees]);
 }
 
 if (signup_helper::can_signup($signup)) {
@@ -211,10 +229,5 @@ if (signup_helper::can_signup($signup)) {
     // Display message only if user is not signed up:
     echo $seminarrenderer->render_signup_failures(signup_helper::get_failures($signup));
 }
-
-$f2f_renderer = $PAGE->get_renderer('mod_facetoface');
-$f2f_renderer->setcontext($context);
-echo $f2f_renderer->render_action_bar_on_tabpage($returnurl);
-
-echo $OUTPUT->box_end();
-echo $OUTPUT->footer($course);
+echo $seminarrenderer->render_action_bar_on_tabpage($returnurl);
+echo $OUTPUT->footer();

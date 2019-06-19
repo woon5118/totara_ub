@@ -198,6 +198,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
         if (!$force) {
             $mform->addElement('html', html_writer::start_tag('tr') . html_writer::start_tag('td', array('class' => 'session-select')));
             $mform->addElement('radio', "sid[{$seminar->get_id()}]", '', '', 0);
+            $mform->setType("sid[{$seminar->get_id()}]", PARAM_INT);
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td', array('class' => 'session-dates')));
             $mform->addElement('html', get_string('donotsignup', 'enrol_totara_facetoface'));
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
@@ -210,6 +211,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
 
             $mform->addElement('html', html_writer::start_tag('td', array('class' => 'session-select')));
             $mform->addElement('radio', "sid[{$seminar->get_id()}]", '', '', $sid);
+            $mform->setType("sid[{$seminar->get_id()}]", PARAM_INT);
             $mform->addElement('html', html_writer::end_tag('td'));
 
             // Dates/times.
@@ -283,7 +285,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
                 $mform->addElement('checkbox', $elementid, $tandcurl);
             }
 
-            mod_facetoface_signup_form::add_jobassignment_selector($mform, new seminar($seminar->get_id()));
+            \mod_facetoface\form\signup::add_jobassignment_selector($mform, new seminar($seminar->get_id()));
 
             $mform->addElement('html', html_writer::end_tag('td'));
 

@@ -167,3 +167,39 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I am on "Course 1" course homepage
     And I click on "Sign-up" "link_or_button"
     Then I should see "Your request was sent to your manager for approval."
+
+  Scenario: Auto enrol using seminar direct with Learner accepts terms and conditions
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                                 | Test seminar name 1        |
+      | Description                          | Test seminar description 1 |
+      | Learner accepts terms and conditions | 1                          |
+    And I follow "Test seminar name 1"
+    And I follow "Add event"
+    And I press "Save changes"
+
+    And I am on "Course 1" course homepage
+    When I add "Seminar direct enrolment" enrolment method with:
+      | Custom instance name | Test student enrolment |
+    And I click on "Disable" "link" in the "Program" "table_row"
+    And I log out
+
+    And I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I should see "Sign-up"
+    When I click on "Sign-up" "link_or_button"
+    Then I should see "Self authorisation"
+    And I should see "By checking this box, I confirm that I have read and agreed to the Terms and conditions (opens a new window)."
+
+    When I click on "Sign-up" "link_or_button"
+    Then I should see "Required"
+
+    When I click on "Terms and conditions" "link"
+    Then I should see "By checking the box you confirm that permission to sign up to this seminar activity has been granted by your manager."
+    And I should see "Falsely claiming that approval has been granted can result in non-admittance and disciplinary action."
+    When I click on "Close" "button"
+    And I click on "authorisation" "checkbox"
+    And I click on "Sign-up" "link_or_button"
+    Then I should see "Test seminar name 1: Your request was accepted."
+    And I should see "You will receive a booking confirmation email shortly."

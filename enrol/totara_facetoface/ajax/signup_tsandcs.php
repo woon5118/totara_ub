@@ -27,10 +27,13 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 $s = required_param('s', PARAM_INT); // Facetoface session ID.
 
 $seminar = (new \mod_facetoface\seminar_event($s))->get_seminar();
+$course = $DB->get_record('course', array('id' => $seminar->get_course()));
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
-if ($facetoface->approvaltype != \mod_facetoface\seminar::APPROVAL_SELF) {
+$PAGE->set_context($context);
+
+if ($seminar->get_approvaltype() != \mod_facetoface\seminar::APPROVAL_SELF) {
     // This should not happen unless there is a concurrent change of settings.
     print_error('error');
 }
@@ -39,10 +42,9 @@ if ($facetoface->approvaltype != \mod_facetoface\seminar::APPROVAL_SELF) {
 // This is only true if they are not enrolled AND there is a direct enrolment instance in the course.
 // If they can access the course then we check there access normally using require_login with the course and cm.
 // Otherwise we require them to login but not the course and try a direct enrolment access.
-$course = $DB->get_record('course', array('id' => $seminar->get_course()));
 if (can_access_course($course)) {
     // User is already enrolled, let them view the text again.
-    require_login($course, true, $cm);
+    require_login($course, false, $cm);
     require_capability('mod/facetoface:view', $context);
 
 } else {

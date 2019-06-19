@@ -43,13 +43,20 @@ class alternative_signup_link extends \totara_core\hook\base {
     public $signuplink;
 
     /**
+     * @var string for terms and conditions
+     */
+    public $signuptsandcslink;
+
+    /**
      * The constructor.
      *
      * @param seminar_event $seminarevent
      * @param string $signuplink
+     * @param string $signuplinktc
      */
-    public function __construct(seminar_event $seminarevent, string $signuplink) {
+    public function __construct(seminar_event $seminarevent, string $signuplink = '', string $signuptsandcslink = '') {
         $this->seminarevent = $seminarevent;
         $this->signuplink = $signuplink;
+        $this->signuptsandcslink = $signuptsandcslink;
     }
 }
