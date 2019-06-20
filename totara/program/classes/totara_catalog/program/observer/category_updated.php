@@ -26,7 +26,9 @@ namespace totara_program\totara_catalog\program\observer;
 
 defined('MOODLE_INTERNAL') || die();
 
+use core\task\manager as task_manager;
 use totara_catalog\observer\object_update_observer;
+use totara_catalog\task\provider_active_task;
 
 class category_updated extends object_update_observer {
 
@@ -40,38 +42,10 @@ class category_updated extends object_update_observer {
      * init all program update objects based on change category id
      */
     protected function init_change_objects(): void {
-        global $DB;
-
-        $pathconcat = $DB->sql_concat('path_categories.path', ":course_category_hierarchy_p");
-        $targetconcat = $DB->sql_concat('target_category.path', ":course_category_hierarchy_t");
-        $like = $DB->sql_like($targetconcat, $pathconcat);
-
-        $sql = "SELECT prog.id
-                  FROM {prog} prog
-                 WHERE prog.category IN (
-	                    SELECT target_category.id AS categoryid
-                          FROM {course_categories} target_category
-                          JOIN {course_categories} path_categories
-                            ON {$like} AND path_categories.id = :path_cat_id
-                         GROUP BY target_category.id
-                    ) AND " . $this->get_object_condition();
-        $params = [
-            'course_category_hierarchy_p' => '/%',
-            'course_category_hierarchy_t' => '/',
-            'path_cat_id'                 => $this->event->objectid,
-        ];
-        $affectedprograms = $DB->get_records_sql($sql, $params);
-
-        foreach ($affectedprograms as $affectedprogram) {
-            if (!$this->is_applicable_change($affectedprogram->id)) {
-                return;
-            }
-
-            $data = new \stdClass();
-            $data->objectid = $affectedprogram->id;
-            $data->contextid = $this->event->contextid;
-            $this->register_for_update($data);
-        }
+        $adhoctask = new provider_active_task();
+        $adhoctask->set_custom_data(array('objecttype' => $this->get_objecttype()));
+        $adhoctask->set_component('totara_catalog');
+        task_manager::queue_adhoc_task($adhoctask);
     }
 
     /**

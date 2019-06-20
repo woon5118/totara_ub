@@ -109,4 +109,13 @@ abstract class object_update_observer {
             catalog_storage::delete_records($this->objecttype, $this->deleteobjectids);
         }
     }
+
+    /**
+     * Child classes may need to know what object type they are representing.
+     *
+     * @return string $objecttype
+     */
+    protected function get_objecttype() {
+        return $this->objecttype;
+    }
 }

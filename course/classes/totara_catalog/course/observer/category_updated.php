@@ -27,6 +27,8 @@ namespace core_course\totara_catalog\course\observer;
 defined('MOODLE_INTERNAL') || die();
 
 use totara_catalog\observer\object_update_observer;
+use core\task\manager as task_manager;
+use totara_catalog\task\provider_active_task;
 
 /**
  * update catalog data for all courses in the updated category id
@@ -44,32 +46,9 @@ class category_updated extends object_update_observer {
      * init all course update objects for updated category id
      */
     protected function init_change_objects(): void {
-        global $DB;
-        $pathconcat = $DB->sql_concat('path_categories.path', ":course_category_hierarchy_p");
-        $targetconcat = $DB->sql_concat('target_category.path', ":course_category_hierarchy_t");
-        $like = $DB->sql_like($targetconcat, $pathconcat);
-
-        $sql = "SELECT course.id
-                  FROM {course} course
-                 WHERE course.category IN (
-                        SELECT target_category.id AS categoryid
-                          FROM {course_categories} target_category
-                          JOIN {course_categories} path_categories
-                            ON {$like} AND path_categories.id = :path_cat_id
-                         GROUP BY target_category.id
-                    ) ";
-        $params = [
-            'course_category_hierarchy_p' => '/%',
-            'course_category_hierarchy_t' => '/',
-            'path_cat_id'                 => $this->event->objectid,
-        ];
-        $changecourses = $DB->get_records_sql($sql, $params);
-
-        foreach ($changecourses as $course) {
-            $data = new \stdClass();
-            $data->objectid = $course->id;
-            $data->contextid = $this->event->contextid;
-            $this->register_for_update($data);
-        }
+        $adhoctask = new provider_active_task();
+        $adhoctask->set_custom_data(array('objecttype' => $this->get_objecttype()));
+        $adhoctask->set_component('totara_catalog');
+        task_manager::queue_adhoc_task($adhoctask);
     }
 }
