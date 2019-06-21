@@ -102,8 +102,10 @@ final class approver {
 
     /**
      * Find potential managers for a user.
+     * @param string|null $selected         String of the user's id sequence.
+     * @return array
      */
-    public static function find_managers() {
+    public static function find_managers(string $selected = null) {
         global $DB;
 
         // Get guest user for exclusion purposes.

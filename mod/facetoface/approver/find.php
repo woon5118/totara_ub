@@ -40,7 +40,7 @@ $PAGE->set_context($context);
 require_capability('moodle/course:manageactivities', $context);
 \mod_facetoface\approver::require_active_admin();
 
-list($disable_items, $select_items, $availableusers) = \mod_facetoface\approver::find_managers();
+[$disable_items, $select_items, $availableusers] = \mod_facetoface\approver::find_managers($selected);
 
 // Limit results to 1 more than the maximum number that might be displayed.
 // there is no point returning any more as we will never show them.
