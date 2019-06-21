@@ -3224,6 +3224,10 @@ class restore_course_completion_structure_step extends restore_structure_step {
                 \core_completion\helper::log_course_completion($data->course, $data->userid,
                     "Created completion in restore_course_completion_structure_step->process_course_completions");
             }
+            if (!empty($params['reaggregate'])) {
+                \core_completion\helper::log_course_reaggregation($data->course, $data->userid,
+                    "Completion reaggregation scheduled in restore_course_completion_structure_step->process_course_completions");
+            }
             $transaction->allow_commit();
             // Remove any existing cache.
             $cache = cache::make('core', 'coursecompletion');
