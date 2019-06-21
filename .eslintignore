@@ -19,7 +19,7 @@ lib/adodb/
 lib/bennu/
 lib/evalmath/
 lib/lessphp/
-lib/phpexcel/
+lib/phpspreadsheet/
 lib/google/
 lib/htmlpurifier/
 lib/jabber/
