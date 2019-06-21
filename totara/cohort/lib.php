@@ -277,7 +277,7 @@ function totara_cohort_delete_association($cohortid, $assid, $instancetype, $val
             if (!empty($record)) {
                 $transaction = $DB->start_delegated_transaction();
 
-                prog_exceptions_manager::delete_exceptions_by_assignment($assid);
+                \totara_program\exception\manager::delete_exceptions_by_assignment($assid);
                 $DB->delete_records('prog_assignment', array('id' => $assid));
 
                 $transaction->allow_commit();

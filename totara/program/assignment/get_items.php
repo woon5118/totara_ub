@@ -30,7 +30,7 @@ $catid = required_param('catid', PARAM_INT); // Id of the category, as specified
 $progid = required_param('progid', PARAM_INT); // Id of the program record
 
 // Check capabilities
-require_capability('totara/program:configureassignments', program_get_context($progid));
+require_capability('totara/program:configureassignments', context_program::instance($progid));
 
 // Categories
 $categories = array(

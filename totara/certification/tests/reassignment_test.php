@@ -800,7 +800,7 @@ class totara_certification_reassignments_testcase extends reportcache_advanced_t
         $this->assertEquals(count($exceptions), 1);
 
         $exception = array_shift($exceptions);
-        $this->assertEquals($exception->exceptiontype, EXCEPTIONTYPE_DUPLICATE_COURSE);
+        $this->assertEquals($exception->exceptiontype, \totara_program\exception\manager::EXCEPTIONTYPE_DUPLICATE_COURSE);
         $this->assertEquals($exception->programid, $progid);
         $this->assertEquals($exception->userid, $this->users[1]->id);
     }

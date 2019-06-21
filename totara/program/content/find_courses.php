@@ -33,7 +33,7 @@ $id = required_param('id', PARAM_INT); // Program id
 $selected_courseids = optional_param('selectedcourseids', '', PARAM_SEQUENCE);
 $categoryid = optional_param('parentid', 'cat0', PARAM_ALPHANUM); // Category id
 
-require_capability('totara/program:configurecontent', program_get_context($id));
+require_capability('totara/program:configurecontent', context_program::instance($id));
 
 // Strip cat from begining of categoryid
 $categoryid = (int) substr($categoryid, 3);

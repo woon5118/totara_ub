@@ -49,7 +49,7 @@ if (totara_feature_disabled('competencies')) {
     die();
 }
 
-require_capability('totara/program:configurecontent', program_get_context($id));
+require_capability('totara/program:configurecontent', context_program::instance($id));
 
 ///
 /// Setup dialog

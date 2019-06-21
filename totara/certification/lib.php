@@ -1261,7 +1261,7 @@ function certif_get_certifications_search($searchterms, $sort='fullname ASC', $p
         }
 
         if ($certification->visible || has_capability('totara/certification:viewhiddencertifications',
-                                                                    program_get_context($certification->pid))) {
+                                                      context_program::instance($certification->pid))) {
             // Don't exit this loop till the end
             // we need to count all the visible courses
             // to update $totalcount.

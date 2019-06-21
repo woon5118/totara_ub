@@ -26,26 +26,43 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+/** @deprecated since Totara 13 */
 define('EXCEPTIONTYPE_TIME_ALLOWANCE', 1);
+/** @deprecated since Totara 13 */
 define('EXCEPTIONTYPE_ALREADY_ASSIGNED', 2);
+/** @deprecated since Totara 13 */
 define('EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN', 4);
+/** @deprecated since Totara 13 */
 define('EXCEPTIONTYPE_UNKNOWN', 5);
+/** @deprecated since Totara 13 */
 define('EXCEPTIONTYPE_DUPLICATE_COURSE', 6);
 
+/** @deprecated since Totara 13 */
 define('SELECTIONTYPE_NONE', 0);
+/** @deprecated since Totara 13 */
 define('SELECTIONTYPE_ALL', -1);
+/** @deprecated since Totara 13 */
 define('SELECTIONTYPE_TIME_ALLOWANCE', 1);
+/** @deprecated since Totara 13 */
 define('SELECTIONTYPE_ALREADY_ASSIGNED', 2);
+/** @deprecated since Totara 13 */
 define('SELECTIONTYPE_COMPLETION_TIME_UNKNOWN', 4);
+/** @deprecated since Totara 13 */
 define('SELECTIONTYPE_DUPLICATE_COURSE', 5);
 
+/** @deprecated since Totara 13 */
 define('SELECTIONACTION_NONE', 0);
+/** @deprecated since Totara 13 */
 define('SELECTIONACTION_AUTO_TIME_ALLOWANCE', 1);
+/** @deprecated since Totara 13 */
 define('SELECTIONACTION_OVERRIDE_EXCEPTION', 2);
+/** @deprecated since Totara 13 */
 define('SELECTIONACTION_DISMISS_EXCEPTION', 3);
 
+/** @deprecated since Totara 13 */
 define('RESULTS_PER_PAGE', 50);
 
+/** @deprecated since Totara 13 */
 class prog_exceptions_manager {
 
     protected $programid;
@@ -56,6 +73,8 @@ class prog_exceptions_manager {
     private $exception_actions;
 
     function __construct($programid) {
+        debugging(__CLASS__ . ' has been deprecated. Use an equivalent \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         $this->programid = $programid;
         $this->selectedexceptions = array();
 
@@ -84,6 +103,8 @@ class prog_exceptions_manager {
     }
 
     public function get_selected_exceptions() {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         return $this->selectedexceptions;
     }
 
@@ -97,6 +118,8 @@ class prog_exceptions_manager {
      * @return <type>
      */
     public function raise_exception($exceptiontype, $userid, $assignmentid, $timeraised=null) {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         if (prog_exception::exception_exists($this->programid, $exceptiontype, $userid)) {
             // Return true if this exception has already been raised
             return true;
@@ -112,6 +135,8 @@ class prog_exceptions_manager {
      * @return bool
      */
     public function override_dismissed_exception($userid) {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         global $DB;
 
         $assignparams = array('programid' => $this->programid, 'userid' => $userid);
@@ -163,6 +188,8 @@ class prog_exceptions_manager {
      * @param <type> $exceptionid
      */
     public function delete_exception($exceptionid) {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         return prog_exception::delete_exception($exceptionid);
     }
 
@@ -176,6 +203,8 @@ class prog_exceptions_manager {
      * @return bool Success status
      */
     public static function delete_exceptions_by_assignment($assignmentid, $userid=0) {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         global $DB;
 
         $transaction = $DB->start_delegated_transaction();
@@ -207,18 +236,24 @@ class prog_exceptions_manager {
      * @return true
      */
     public function delete() {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         global $DB;
 
         return $DB->delete_records('prog_exception', array('programid' => $this->programid));
     }
 
     public function handle_exceptions($action, $formdata) {
+        debugging(__METHOD__ . ' has been deprecated and should no longer be used.', DEBUG_DEVELOPER);
+
         foreach ($this->selectedexceptions as $selectedexception) {
             return $this->handle_exception($selectedexception->id, $action);
         }
     }
 
     public function count_exceptions() {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         global $DB;
 
         $sql = "SELECT COUNT(ex.id)
@@ -230,6 +265,8 @@ class prog_exceptions_manager {
     }
 
     public function handle_exception($exceptionid, $action) {
+        debugging(__METHOD__ . ' has been deprecated and should no longer be used', DEBUG_DEVELOPER);
+
         global $DB;
         if (!$exception = $DB->get_record('prog_exception', array('id' => $exceptionid))) {
             throw new ProgramExceptionException(get_string('exceptionnotfound', 'totara_program'));
@@ -253,6 +290,7 @@ class prog_exceptions_manager {
      * @return bool
      */
     public function set_selections($selectiontype, $searchterm='') {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
 
         if ($selectiontype == SELECTIONTYPE_ALL) {
             $this->selectedexceptions = $this->search_exceptions('all', $searchterm);
@@ -285,6 +323,8 @@ class prog_exceptions_manager {
     }
 
     public function search_exceptions($page='all', $searchterm='', $exceptiontype='', $count=false) {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         global $DB;
 
         $usernamefields = get_all_user_name_fields(true, 'us', null, 'user_');
@@ -328,6 +368,8 @@ class prog_exceptions_manager {
     }
 
     public function print_exceptions_form($programid, $exceptions, $selectedexceptions=null, $selectiontype=SELECTIONTYPE_NONE) {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         global $PAGE;
         $numexceptions = count($exceptions);
         $numselectedexceptions = count($selectedexceptions);
@@ -376,6 +418,8 @@ class prog_exceptions_manager {
      * @return array|string
      */
     public function get_handled_actions($returntype='array') {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         global $CFG;
 
         // Build a list of exceptions and their handled actions
@@ -404,6 +448,8 @@ class prog_exceptions_manager {
      * @return array|string
      */
     public function get_handled_actions_for_selection($returntype='array', $selectedexceptions=null) {
+        debugging(__METHOD__ . ' has been deprecated. Use equivalent from \totara_program\exception\manager class', DEBUG_DEVELOPER);
+
         global $CFG;
 
         if ($selectedexceptions == null) {
@@ -450,6 +496,7 @@ class prog_exceptions_manager {
 
 }
 
+/** @deprecated since Totara 13 */
 class ProgramExceptionException extends Exception {
 
 }

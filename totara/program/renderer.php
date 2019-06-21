@@ -26,6 +26,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+use \totara_program\exception\manager as exception_manager;
+
 require_once($CFG->dirroot . '/course/renderer.php');
 require_once($CFG->libdir.'/totaratablelib.php');
 
@@ -429,18 +431,14 @@ class totara_program_renderer extends plugin_renderer_base {
     }
 
     public function get_exceptiontype_selector($selectiontype) {
-        global $CFG;
-
-        require_once($CFG->dirroot . '/totara/program/program_exceptions.class.php');
-
         $out = '';
         $options = array();
-        $options[SELECTIONTYPE_NONE] = get_string('select', 'totara_program');
-        $options[SELECTIONTYPE_ALL] = get_string('alllearners', 'totara_program');
-        $options[SELECTIONTYPE_TIME_ALLOWANCE] = get_string('timeallowance', 'totara_program');
-        $options[SELECTIONTYPE_ALREADY_ASSIGNED] = get_string('exceptiontypealreadyassigned', 'totara_program');
-        $options[SELECTIONTYPE_COMPLETION_TIME_UNKNOWN] = get_string('completiontimeunknown', 'totara_program');
-        $options[SELECTIONTYPE_DUPLICATE_COURSE] = get_string('exceptiontypeduplicatecourse', 'totara_program');
+        $options[exception_manager::SELECTIONTYPE_NONE] = get_string('select', 'totara_program');
+        $options[exception_manager::SELECTIONTYPE_ALL] = get_string('alllearners', 'totara_program');
+        $options[exception_manager::SELECTIONTYPE_TIME_ALLOWANCE] = get_string('timeallowance', 'totara_program');
+        $options[exception_manager::SELECTIONTYPE_ALREADY_ASSIGNED] = get_string('exceptiontypealreadyassigned', 'totara_program');
+        $options[exception_manager::SELECTIONTYPE_COMPLETION_TIME_UNKNOWN] = get_string('completiontimeunknown', 'totara_program');
+        $options[exception_manager::SELECTIONTYPE_DUPLICATE_COURSE] = get_string('exceptiontypeduplicatecourse', 'totara_program');
         $out .= html_writer::start_tag('div');
         $out .= html_writer::select($options, 'selectiontype', $selectiontype, null, array('id' => 'selectiontype'));
         $out .= html_writer::end_tag('div');
@@ -449,16 +447,12 @@ class totara_program_renderer extends plugin_renderer_base {
     }
 
     public function get_exceptionaction_selector() {
-        global $CFG;
-
-        require_once($CFG->dirroot . '/totara/program/program_exceptions.class.php');
-
         $out = '';
         $options = array();
-        $options[SELECTIONACTION_NONE] = get_string('action', 'totara_program');
-        $options[SELECTIONACTION_AUTO_TIME_ALLOWANCE] = get_string('exceptionactionsetduedate', 'totara_program');
-        $options[SELECTIONACTION_OVERRIDE_EXCEPTION] = get_string('exceptionactionassign', 'totara_program');
-        $options[SELECTIONACTION_DISMISS_EXCEPTION] = get_string('exceptionactiondonotassign', 'totara_program');
+        $options[exception_manager::SELECTIONACTION_NONE] = get_string('action', 'totara_program');
+        $options[exception_manager::SELECTIONACTION_AUTO_TIME_ALLOWANCE] = get_string('exceptionactionsetduedate', 'totara_program');
+        $options[exception_manager::SELECTIONACTION_OVERRIDE_EXCEPTION] = get_string('exceptionactionassign', 'totara_program');
+        $options[exception_manager::SELECTIONACTION_DISMISS_EXCEPTION] = get_string('exceptionactiondonotassign', 'totara_program');
         $out .= html_writer::start_tag('div');
         $out .= html_writer::select($options, 'selectionaction', null, null, array('id' => 'selectionaction'));
         $out .= html_writer::end_tag('div');

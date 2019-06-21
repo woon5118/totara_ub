@@ -9,6 +9,19 @@ information provided here is intended especially for developers.
 * Class program_utilities has been moved into its own autoloaded class \totara_program\utils.
 * TIME_SELECTOR_* globals have been deprecated. Please use \totara_program\utils::TIME_SELECTOR_* constants.
 * $TIMEALLOWANCESTRINGS global variable has been deprecated. Please use \totara_program\utils::$timeallowancestrings.
+* Function program_get_context() has been deprecated. Please call context_program::instance instead.
+* EXCEPTIONTYPE_* globals have been deprecated. Please use \totara_program\exception\manager::EXCEPTIONTYPE_* constants.
+* SELECTIONTYPE_* globals have been deprecated. Please use \totara_program\exception\manager::SELECTIONTYPE_* constants.
+* SELECTIONACTION_* globals have been deprecated. Please use \totara_program\exception\manager::SELECTIONACTION_* constants.
+* RESULTS_PER_PAGE global has been deprecated. Please use \totara_program\exception\manager::RESULTS_PER_PAGE constant.
+* Deprecated the following classes and replaced with their autoloaded equivalents:
+  * prog_exceptions_manager, please use \totara_program\exception\manager instead.
+  * prog_exception, please use \totara_program\exception\base instead.
+  * time_allowance_exception, please use \totara_program\exception\time_allowance instead.
+  * already_assigned_exception, please use \totara_program\exception\already_assigned instead.
+  * duplicate_course_exception, please use \totara_program\exception\duplicate_course instead.
+  * completion_time_unknown_exception, please use \totara_program\exception\completion_time_unknown instead.
+  * unknown_exception, please use \totara_program\exception\unknown instead.
 
 === 12.8 ===
 

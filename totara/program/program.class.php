@@ -26,13 +26,13 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+use \totara_program\exception\manager as exception_manager;
+
 require_once($CFG->dirroot . '/totara/program/program_content.class.php');
 require_once($CFG->dirroot . '/totara/program/program_courseset.class.php');
 require_once($CFG->dirroot . '/totara/program/program_assignments.class.php');
 require_once($CFG->dirroot . '/totara/program/program_messages.class.php');
 require_once($CFG->dirroot . '/totara/program/program_message.class.php');
-require_once($CFG->dirroot . '/totara/program/program_exceptions.class.php');
-require_once($CFG->dirroot . '/totara/program/program_exception.class.php');
 require_once($CFG->dirroot . '/totara/program/program_user_assignment.class.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 
@@ -99,11 +99,12 @@ $TIMEALLOWANCESTRINGS = array(
 /**
  * Quick and light function for returning a program context
  *
- * @access  public
+ * @deprecated  since Totara 13
  * @param   $int    integer     Program id
  * @return  object  context instance
  */
 function program_get_context($id) {
+    debugging(__METHOD__ . ' has been deprecated. Call context_program::instance instead', DEBUG_DEVELOPER);
     // Quickly get context from program id
     return context_program::instance($id);
 }
@@ -186,7 +187,7 @@ class program {
         $this->assignments = new prog_assignments($id);
 
         $this->messagesmanager = prog_messages_manager::get_program_messages_manager($id);
-        $this->exceptionsmanager = new prog_exceptions_manager($id);
+        $this->exceptionsmanager = new exception_manager($id);
 
         $this->context = context_program::instance($this->id);
         $this->studentroleid = $CFG->learnerroleid;
@@ -2088,21 +2089,21 @@ class program {
      */
     public function update_exceptions($userid, $assignment, $timedue) {
         // Changes are being made so old exceptions are no longer relevant.
-        prog_exceptions_manager::delete_exceptions_by_assignment($assignment->id, $userid);
+        exception_manager::delete_exceptions_by_assignment($assignment->id, $userid);
         $now = time();
 
         if ($this->assigned_to_users_non_required_learning($userid)) {
-            $this->exceptionsmanager->raise_exception(EXCEPTIONTYPE_ALREADY_ASSIGNED, $userid, $assignment->id, $now);
+            $this->exceptionsmanager->raise_exception(exception_manager::EXCEPTIONTYPE_ALREADY_ASSIGNED, $userid, $assignment->id, $now);
             return true;
         }
 
         if ($this->duplicate_course($userid)) {
-            $this->exceptionsmanager->raise_exception(EXCEPTIONTYPE_DUPLICATE_COURSE, $userid, $assignment->id, $now);
+            $this->exceptionsmanager->raise_exception(exception_manager::EXCEPTIONTYPE_DUPLICATE_COURSE, $userid, $assignment->id, $now);
             return true;
         }
 
         if ($timedue == COMPLETION_TIME_UNKNOWN) {
-            $this->exceptionsmanager->raise_exception(EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN, $userid, $assignment->id, $now);
+            $this->exceptionsmanager->raise_exception(exception_manager::EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN, $userid, $assignment->id, $now);
             return true;
         }
 
@@ -2115,7 +2116,7 @@ class program {
             $time_until_duedate = $timedue - $now;
 
             if ($time_until_duedate < $total_time_allowed) {
-                $this->exceptionsmanager->raise_exception(EXCEPTIONTYPE_TIME_ALLOWANCE, $userid, $assignment->id, $now);
+                $this->exceptionsmanager->raise_exception(exception_manager::EXCEPTIONTYPE_TIME_ALLOWANCE, $userid, $assignment->id, $now);
                 return true;
             }
         }

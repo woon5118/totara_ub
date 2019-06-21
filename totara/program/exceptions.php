@@ -26,6 +26,8 @@
  * Program exceptions page
  */
 
+use \totara_program\exception\manager;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once('lib.php');
@@ -68,7 +70,7 @@ $currenturl = qualified_me();
 $currenturl_noquerystring = strip_querystring($currenturl);
 $viewurl = $currenturl_noquerystring."?id={$id}&action=view";
 
-$selectiontype = isset($_SESSION['exceptions_selectiontype']) ? $_SESSION['exceptions_selectiontype'] : SELECTIONTYPE_NONE;
+$selectiontype = isset($_SESSION['exceptions_selectiontype']) ? $_SESSION['exceptions_selectiontype'] : manager::SELECTIONTYPE_NONE;
 $manually_added_exceptions = isset($_SESSION['exceptions_added']) ? $_SESSION['exceptions_added'] : array();
 $manually_removed_exceptions = isset($_SESSION['exceptions_removed']) ? $_SESSION['exceptions_removed'] : array();
 
@@ -117,7 +119,7 @@ echo $renderer->print_search($id, $searchterm, $foundexceptionscount);
 
 $programexceptionsmanager->print_exceptions_form($id, $programexceptions, $selected_exceptions, $selectiontype);
 
-$pagingbar = new paging_bar($foundexceptionscount, $page, RESULTS_PER_PAGE, $baseurl);
+$pagingbar = new paging_bar($foundexceptionscount, $page, manager::RESULTS_PER_PAGE, $baseurl);
 echo $OUTPUT->render($pagingbar);
 
 echo $OUTPUT->container_end();
@@ -128,19 +130,19 @@ $handledActions = $programexceptionsmanager->get_handled_actions_for_selection('
 $PAGE->requires->string_for_js('confirmresolution', 'totara_program');
 $PAGE->requires->strings_for_js(array('ok', 'cancel'), 'moodle');
 $args = array('args'=> '{"id":'.$id.','.
-                        '"selected_exceptions_count":'.count($selected_exceptions).','.
-                        '"handle_actions":'.$handledActions.','.
-                        '"search_term":"'.$searchterm.'",'.
-                        '"EXCEPTIONTYPE_TIME_ALLOWANCE":'.EXCEPTIONTYPE_TIME_ALLOWANCE.','.
-                        '"EXCEPTIONTYPE_ALREADY_ASSIGNED":'.EXCEPTIONTYPE_ALREADY_ASSIGNED.','.
-                        '"EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN":'.EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN.','.
-                        '"EXCEPTIONTYPE_DUPLICATE_COURSE":'.EXCEPTIONTYPE_DUPLICATE_COURSE.','.
-                        '"SELECTIONTYPE_ALL":'.SELECTIONTYPE_ALL.','.
-                        '"SELECTIONTYPE_NONE":'.SELECTIONTYPE_NONE.','.
-                        '"SELECTIONTYPE_TIME_ALLOWANCE":'.SELECTIONTYPE_TIME_ALLOWANCE.','.
-                        '"SELECTIONTYPE_ALREADY_ASSIGNED":'.SELECTIONTYPE_ALREADY_ASSIGNED.','.
-                        '"SELECTIONTYPE_COMPLETION_TIME_UNKNOWN":'.SELECTIONTYPE_COMPLETION_TIME_UNKNOWN.','.
-                        '"SELECTIONTYPE_DUPLICATE_COURSE":'.SELECTIONTYPE_DUPLICATE_COURSE.'}');
+                        '"selected_exceptions_count":' . count($selected_exceptions) . ',' .
+                        '"handle_actions":' . $handledActions . ',' .
+                        '"search_term":"' . $searchterm . '",' .
+                        '"EXCEPTIONTYPE_TIME_ALLOWANCE":' . manager::EXCEPTIONTYPE_TIME_ALLOWANCE . ',' .
+                        '"EXCEPTIONTYPE_ALREADY_ASSIGNED":' . manager::EXCEPTIONTYPE_ALREADY_ASSIGNED . ',' .
+                        '"EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN":' . manager::EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN . ',' .
+                        '"EXCEPTIONTYPE_DUPLICATE_COURSE":' . manager::EXCEPTIONTYPE_DUPLICATE_COURSE . ',' .
+                        '"SELECTIONTYPE_ALL":' . manager::SELECTIONTYPE_ALL . ',' .
+                        '"SELECTIONTYPE_NONE":' . manager::SELECTIONTYPE_NONE . ',' .
+                        '"SELECTIONTYPE_TIME_ALLOWANCE":' . manager::SELECTIONTYPE_TIME_ALLOWANCE . ',' .
+                        '"SELECTIONTYPE_ALREADY_ASSIGNED":' . manager::SELECTIONTYPE_ALREADY_ASSIGNED . ',' .
+                        '"SELECTIONTYPE_COMPLETION_TIME_UNKNOWN":' . manager::SELECTIONTYPE_COMPLETION_TIME_UNKNOWN . ',' .
+                        '"SELECTIONTYPE_DUPLICATE_COURSE":' . manager::SELECTIONTYPE_DUPLICATE_COURSE . '}');
 $jsmodule = array(
      'name' => 'totara_programexceptions',
      'fullpath' => '/totara/program/exceptions.js',

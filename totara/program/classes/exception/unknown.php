@@ -21,20 +21,35 @@
  * @package totara_program
  */
 
-/**
- * This assists with autoloading when a class or its namespace has been renamed.
- * See lib/db/renamedclasses.php for further information on this type of file.
- */
+namespace totara_program\exception;
 
-defined('MOODLE_INTERNAL') || die();
+class unknown extends base {
 
-$renamedclasses = [
-    'program_utilities' => \totara_program\utils::class,
-    'prog_exceptions_manager' => \totara_program\exception\manager::class,
-    'prog_exception' => \totara_program\exception\base::class,
-    'time_allowance_exception' => \totara_program\exception\time_allowance::class,
-    'already_assigned_exception' => \totara_program\exception\already_assigned::class,
-    'duplicate_course_exception' => \totara_program\exception\duplicate_course::class,
-    'completion_time_unknown_exception' => \totara_program\exception\completion_time_unknown::class,
-    'unknown_exception' => \totara_program\exception\unknown::class
-];
+    public function __construct(int $programid, $exceptionob = null) {
+        parent::__construct($programid, $exceptionob);
+        $this->exceptiontype = manager::EXCEPTIONTYPE_UNKNOWN;
+    }
+
+    public function handles(int $action): bool {
+        switch ($action) {
+            case manager::SELECTIONACTION_DISMISS_EXCEPTION:
+                return true;
+                break;
+            default:
+                return false;
+                break;
+        }
+    }
+
+    public function handle(int $action = null) {
+        if (!$this->handles($action)) {
+            return true;
+        }
+
+        switch ($action) {
+            default:
+                return parent::handle($action);
+                break;
+        }
+    }
+}

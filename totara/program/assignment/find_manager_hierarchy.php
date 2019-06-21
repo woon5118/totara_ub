@@ -31,7 +31,7 @@ require_login();
 
 // Get program id and check capabilities.
 $programid = required_param('programid', PARAM_INT);
-require_capability('totara/program:configureassignments', program_get_context($programid));
+require_capability('totara/program:configureassignments', context_program::instance($programid));
 
 // Parent id
 $parentid = optional_param('parentid', 0, PARAM_INT);

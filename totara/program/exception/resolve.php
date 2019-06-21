@@ -23,9 +23,10 @@
  * @subpackage program
  */
 
+use \totara_program\exception\manager;
+
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
-
 
 $programid = required_param('id', PARAM_INT);
 $action = required_param('action', PARAM_INT);
@@ -34,11 +35,11 @@ $searchterm = optional_param('search', '', PARAM_TEXT);
 $certifid = $DB->get_field('prog', 'certifid', array('id' => $programid));
 $progorcert = empty($certifid) ? 'program' : 'certification';
 
-$selectiontype = isset($_SESSION['exceptions_selectiontype']) ? $_SESSION['exceptions_selectiontype'] : SELECTIONTYPE_NONE;
+$selectiontype = isset($_SESSION['exceptions_selectiontype']) ? $_SESSION['exceptions_selectiontype'] : manager::SELECTIONTYPE_NONE;
 $manually_added_exceptions = isset($_SESSION['exceptions_added']) ? $_SESSION['exceptions_added'] : array();
 $manually_removed_exceptions = isset($_SESSION['exceptions_removed']) ? $_SESSION['exceptions_removed'] : array();
 
-$exceptions_manager = new prog_exceptions_manager($programid);
+$exceptions_manager = new manager($programid);
 $exceptions_manager->set_selections($selectiontype, $searchterm);
 $selected_exceptions = $exceptions_manager->get_selected_exceptions();
 

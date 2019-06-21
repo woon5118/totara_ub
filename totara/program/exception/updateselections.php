@@ -30,12 +30,12 @@ $programid = required_param('id', PARAM_INT);
 $action = required_param('action', PARAM_TEXT);
 $searchterm = optional_param('search', '', PARAM_TEXT);
 
-$exceptions_manager = new prog_exceptions_manager($programid);
+$exceptions_manager = new \totara_program\exception\manager($programid);
 
 switch ($action) {
     case 'selectmultiple':
 
-        $selectiontype = optional_param('selectiontype', SELECTIONTYPE_NONE, PARAM_INT);
+        $selectiontype = optional_param('selectiontype', \totara_program\exception\manager::SELECTIONTYPE_NONE, PARAM_INT);
 
         $exceptions_manager->set_selections($selectiontype, $searchterm);
         $selected_exceptions = $exceptions_manager->get_selected_exceptions();

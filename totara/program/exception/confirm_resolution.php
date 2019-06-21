@@ -29,17 +29,17 @@ $selectedexceptioncount = required_param('selectedexceptioncount', PARAM_INT);
 
 $html = html_writer::start_tag('div');
 $html .= html_writer::start_tag('div');
-if ($action == SELECTIONACTION_NONE) {
+if ($action == \totara_program\exception\manager::SELECTIONACTION_NONE) {
     echo get_string('pleaseselectoption', 'totara_program');
     die();
 }
-else if ($action == SELECTIONACTION_AUTO_TIME_ALLOWANCE) {
+else if ($action == \totara_program\exception\manager::SELECTIONACTION_AUTO_TIME_ALLOWANCE) {
     $html .= get_string('choseautomaticallydetermine', 'totara_program');
 }
-else if ($action == SELECTIONACTION_OVERRIDE_EXCEPTION) {
+else if ($action == \totara_program\exception\manager::SELECTIONACTION_OVERRIDE_EXCEPTION) {
     $html .= get_string('choseoverrideexception', 'totara_program');
 }
-else if ($action == SELECTIONACTION_DISMISS_EXCEPTION) {
+else if ($action == \totara_program\exception\manager::SELECTIONACTION_DISMISS_EXCEPTION) {
     $html .= get_string('exceptionchosennotassign', 'totara_program');
 }
 $html .= html_writer::end_tag('div');

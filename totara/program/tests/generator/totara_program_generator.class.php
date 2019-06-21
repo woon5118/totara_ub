@@ -126,7 +126,7 @@ class totara_program_generator extends component_generator_base {
             $program->update_learner_assignments(true);
             // Randomly resolve some exceptions and assign program anyway.
             if ($exceptions && mt_rand(0,1)) {
-                $exceptions_manager = new prog_exceptions_manager($prog->id);
+                $exceptions_manager = new \totara_program\exception\manager($prog->id);
                 $exceptions_manager->set_selections(-1, '');
                 $selected_exceptions = $exceptions_manager->get_selected_exceptions();
                 echo "\nRESOLVING EXCEPTIONS";

@@ -818,6 +818,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $program = $this->program_generator->create_program($detail);
         $context = program_get_context($program->id);
 
+        $this->assertDebuggingCalled();
         $this->assertInstanceOf('context_program', $context);
         $this->assertEquals(CONTEXT_PROGRAM, $context->contextlevel);
         $this->assertEquals($program->id, $context->instanceid);
@@ -940,7 +941,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $program = $this->program_generator->create_program($detail);
         $manager = $program->get_exceptionsmanager();
         // Check it is what we expect it to be.
-        $this->assertInstanceOf('prog_exceptions_manager', $manager);
+        $this->assertInstanceOf(\totara_program\exception\manager::class, $manager);
         // Check there are no exceptions (no assignments so it has to be the case).
         $this->assertSame(0, $manager->count_exceptions());
     }

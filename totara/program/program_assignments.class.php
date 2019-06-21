@@ -564,7 +564,7 @@ abstract class prog_assignment_category {
             $assignments_to_delete = $DB->get_records_select('prog_assignment', $where, $params);
             foreach ($assignments_to_delete as $assignment_to_delete) {
                 // delete any exceptions related to this assignment
-                prog_exceptions_manager::delete_exceptions_by_assignment($assignment_to_delete->id);
+                \totara_program\exception\manager::delete_exceptions_by_assignment($assignment_to_delete->id);
 
                 // delete any future user assignments related to this assignment
                 $DB->delete_records('prog_future_user_assignment', array('assignmentid' => $assignment_to_delete->id, 'programid' => $data->id));

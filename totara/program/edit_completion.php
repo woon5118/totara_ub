@@ -73,7 +73,7 @@ if ($dismissedexceptions = $program->check_user_for_dismissed_exceptions($userid
 
     if ($resetexception) {
         // Remove the exception status on the user assignment.
-        $exmanager = new prog_exceptions_manager($id);
+        $exmanager = new \totara_program\exception\manager($id);
         $exmanager->override_dismissed_exception($userid);
 
         $urlparams = array('id' => $id, 'userid' => $userid);

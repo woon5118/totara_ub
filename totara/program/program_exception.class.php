@@ -26,11 +26,12 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-
+/** @deprecated since Totara 13 */
 abstract class prog_exception {
     public $id, $programid, $exceptiontype, $userid, $timeraised;
 
     public function __construct($programid, $exceptionob=null) {
+        debugging(__CLASS__ . ' has been deprecated. Use an equivalent \totara_program\exception\base class', DEBUG_DEVELOPER);
 
         if (is_object($exceptionob)) {
             $this->id = $exceptionob->id;
@@ -251,9 +252,12 @@ abstract class prog_exception {
     }
 }
 
+/** @deprecated since Totara 13 */
 class time_allowance_exception extends prog_exception {
 
     public function __construct($programid, $exceptionob=null) {
+        debugging(__CLASS__ . ' has been deprecated. Use an equivalent \totara_program\exception\time_allowance class', DEBUG_DEVELOPER);
+
         parent::__construct($programid, $exceptionob);
         $this->exceptiontype = EXCEPTIONTYPE_TIME_ALLOWANCE;
     }
@@ -283,9 +287,12 @@ class time_allowance_exception extends prog_exception {
     }
 }
 
+/** @deprecated since Totara 13 */
 class already_assigned_exception extends prog_exception {
 
     public function __construct($programid, $exceptionob=null) {
+        debugging(__CLASS__ . ' has been deprecated. Use an equivalent \totara_program\exception\already_assigned class', DEBUG_DEVELOPER);
+
         parent::__construct($programid, $exceptionob);
         $this->exceptiontype = EXCEPTIONTYPE_ALREADY_ASSIGNED;
     }
@@ -313,9 +320,12 @@ class already_assigned_exception extends prog_exception {
 
 }
 
+/** @deprecated since Totara 13 */
 class duplicate_course_exception extends prog_exception {
 
     public function __construct($programid, $exceptionob=null) {
+        debugging(__CLASS__ . ' has been deprecated. Use an equivalent \totara_program\exception\duplicate_course class', DEBUG_DEVELOPER);
+
         parent::__construct($programid, $exceptionob);
         $this->exceptiontype = EXCEPTIONTYPE_DUPLICATE_COURSE;
     }
@@ -343,8 +353,11 @@ class duplicate_course_exception extends prog_exception {
 
 }
 
+/** @deprecated since Totara 13 */
 class completion_time_unknown_exception extends prog_exception {
     public function __construct($programid, $exceptionob=null) {
+        debugging(__CLASS__ . ' has been deprecated. Use an equivalent \totara_program\exception\completion_time_unknown class', DEBUG_DEVELOPER);
+
         parent::__construct($programid, $exceptionob);
         $this->exceptiontype = EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN;
     }
@@ -370,8 +383,11 @@ class completion_time_unknown_exception extends prog_exception {
     }
 }
 
+/** @deprecated since Totara 13 */
 class unknown_exception extends prog_exception {
     public function __construct($programid, $exceptionob=null) {
+        debugging(__CLASS__ . ' has been deprecated. Use an equivalent \totara_program\exception\unknown class', DEBUG_DEVELOPER);
+
         parent::__construct($programid, $exceptionob);
         $this->exceptiontype = EXCEPTIONTYPE_UNKNOWN;
     }
