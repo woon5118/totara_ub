@@ -832,3 +832,100 @@ function totara_core_upgrade_course_images() {
         $fs->delete_area_files($ctx->id, 'course', 'images', $itemid);
     }
 }
+
+/**
+ * Upgrade to remove the invalid tags from system. Steps explaination of upgrading:
+ * + Load the whole list of tag_instances
+ * + Then start looking into each tag instance and checking if it is invalid with name or not (record with special
+ * + characters encoded).
+ * + Checking that if there are any original record for this invalid record
+ * + If there is, then start the cleaning process. Luckily that the tag component itself does auto-clean up.
+ *
+ * @return void
+ */
+function totara_core_core_tag_upgrade_tags() {
+    global $DB;
+
+    $taginstances = $DB->get_records_sql(
+        "SELECT ti.*
+         FROM {tag_instance} ti
+         INNER JOIN {tag} t ON t.id = ti.tagid
+         WHERE t.isstandard = 0"
+    );
+
+    $tagstobedeleted = [];
+
+    foreach ($taginstances as $taginstance) {
+        // Current tag that is being used for instance mapping.
+        $tag = $DB->get_record('tag', ['id' => $taginstance->tagid]);
+        $name = $tag->name;
+
+        // Detect whether tag name changes.
+        $name_changed = false;
+
+        while ($name !== htmlspecialchars_decode($name)) {
+            // We only want it to go back to the very first decoded value (skipping the middle encoded value).
+            $name = htmlspecialchars_decode($name);
+            $name = clean_param($name, PARAM_TAG);
+            $name_changed = true;
+        }
+
+        // If name didn't get encoded, then we don't need to do anything.
+        if (!$name_changed) {
+            continue;
+        }
+
+        $sql = "
+            SELECT t.id FROM {tag} t
+            INNER JOIN {tag_coll} tc ON tc.id = t.tagcollid
+            INNER JOIN {tag_area} ta ON ta.tagcollid = tc.id
+            WHERE t.name = :name
+            AND ta.component = :component
+            AND ta.itemtype = :type
+        ";
+
+        // Tag component does not allow us to have more than one tags that share a same name in a collection.
+        // Therefore, it should have only one tag with specific '$name' and being a part of
+        // '$component' and '$type'.
+        $previoustag = $DB->get_record_sql(
+            $sql,
+            [
+                'name' => $name,
+                'component' => $taginstance->component,
+                'type' => $taginstance->itemtype
+            ]
+        );
+
+        if ($previoustag) {
+            if ($taginstance->tagid !== $previoustag->id) {
+                // Previous record is being existed, we need to update this invalid into the previous one.
+                $taginstance->tagid = $previoustag->id;
+                $DB->update_record('tag_instance', $taginstance);
+
+                if (!isset($tagstobedeleted[$tag->id])) {
+                    $tagstobedeleted[$tag->id] = $tag->id;
+                }
+            }
+        } else {
+            // No standard tag matches this one, update this non-standard tag.
+            $rawname = $tag->rawname;
+            while ($rawname !== htmlspecialchars_decode($rawname)) {
+                // We only want it to go back to the very first decoded value (skipping the middle encoded value).
+                $rawname = htmlspecialchars_decode($rawname);
+                $rawname = clean_param($rawname, PARAM_TAG);
+            }
+            $tag->name = $name;
+            $tag->rawname = $rawname;
+            $DB->update_record('tag', $tag);
+        }
+    }
+
+    foreach ($tagstobedeleted as $tagid) {
+        if ($DB->record_exists('tag_instance', ['tagid' => $tagid])) {
+            // There are other instances that using these to-be-deleted tags
+            continue;
+        }
+
+        $DB->delete_records('tag', ['id' => $tagid]);
+    }
+}

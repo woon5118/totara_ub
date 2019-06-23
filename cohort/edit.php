@@ -46,7 +46,8 @@ if ($id) {
         redirect($url, get_string('error:badcohortid','totara_cohort'), null, \core\notification::ERROR);
     }
     if ($usetags) {
-        $cohort->tags = core_tag_tag::get_item_tags_array('core', 'cohort', $cohort->id);
+        $cohort->tags = core_tag_tag::get_item_tags_array('core', 'cohort', $cohort->id,
+            \core_tag_tag::BOTH_STANDARD_AND_NOT, 0, false); // Totara: Do not encode the special characters.
     }
     $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
 } else {

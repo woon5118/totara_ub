@@ -134,7 +134,8 @@ useredit_load_preferences($user);
 profile_load_data($user);
 
 // User interests.
-$user->interests = core_tag_tag::get_item_tags_array('core', 'user', $id);
+$user->interests = core_tag_tag::get_item_tags_array('core', 'user', $id,
+    core_tag_tag::BOTH_STANDARD_AND_NOT, 0, false); // Totara: Do not encoded the special characters
 
 if ($user->id !== -1) {
     $usercontext = context_user::instance($user->id);

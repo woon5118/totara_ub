@@ -68,7 +68,8 @@ if (isguestuser($user)) {
 }
 
 // User interests separated by commas.
-$user->interests = core_tag_tag::get_item_tags_array('core', 'user', $user->id);
+$user->interests = core_tag_tag::get_item_tags_array('core', 'user', $user->id,
+    core_tag_tag::BOTH_STANDARD_AND_NOT, 0, false); // Totara: do not encode the special characters.
 
 // Remote users cannot be edited. We have to perform the strict
 // user_not_fully_set_up() check, otherwise the remote user could end up in

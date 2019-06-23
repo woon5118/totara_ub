@@ -163,7 +163,14 @@ if ($overviewfilesoptions) {
     file_prepare_standard_filemanager($program, 'overviewfiles', $overviewfilesoptions, $programcontext, 'totara_program', 'overviewfiles', 0);
 }
 
-$program->tags = core_tag_tag::get_item_tags_array('totara_program', 'prog', $program->id);
+$program->tags = core_tag_tag::get_item_tags_array(
+    'totara_program',
+    'prog',
+    $program->id,
+    core_tag_tag::BOTH_STANDARD_AND_NOT,
+    0,
+    false
+);
 
 $detailsform = new program_edit_form($currenturl,
                 array('program' => $program, 'overviewfiles' => $overviewfiles, 'action' => $action, 'category' => $progcategory,

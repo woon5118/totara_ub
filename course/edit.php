@@ -102,7 +102,8 @@ if (!empty($course)) {
     }
 
     // Populate course tags.
-    $course->tags = core_tag_tag::get_item_tags_array('core', 'course', $course->id);
+    $course->tags = core_tag_tag::get_item_tags_array('core', 'course', $course->id,
+        core_tag_tag::BOTH_STANDARD_AND_NOT, 0, false); // Totara: Do not encode the special characters.
 
 } else {
     // Editor should respect category context if course context is not set.

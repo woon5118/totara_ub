@@ -608,5 +608,12 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019061302, 'totara', 'core');
     }
 
+    if ($oldversion < 2019062100) {
+        // Removing the duplicated tags, if there are any.
+        totara_core_core_tag_upgrade_tags();
+
+        upgrade_plugin_savepoint(true, 2019062100, 'totara', 'core');
+    }
+
     return true;
 }
