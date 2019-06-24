@@ -1025,7 +1025,8 @@ class mssql_sql_generator extends sql_generator {
                       nextid INTEGER NOT NULL,
                       records INTEGER NOT NULL,
                       modifications INTEGER NOT NULL,
-                      columnlist TEXT NOT NULL
+                      columnlist TEXT NOT NULL,
+                      foreignkeyspresent INTEGER NOT NULL
                     )";
         $sqls[] = "CREATE UNIQUE INDEX ss_tables_{$prefix}_idx ON ss_tables_{$prefix} (tablename)";
         $this->mdb->change_database_structure($sqls, null);
@@ -1033,6 +1034,11 @@ class mssql_sql_generator extends sql_generator {
         $sqls = array();
         $tables = $this->mdb->get_tables(false);
         foreach ($tables as $tablename => $unused) {
+            $sql = "SELECT constraint_name
+                      FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+                     WHERE table_name = :name AND constraint_name LIKE :fk ESCAPE '\\'";
+            $params = ['fk' => str_replace('_', '\\_', $prefix) . '%' . '\\_fk', 'name' => $prefix.$tablename];
+            $foreignkeyspresent = (int)$this->mdb->record_exists_sql($sql, $params);
             $records = $this->mdb->count_records($tablename, array());
             $identity = $this->mdb->get_identity_info($tablename);
             if (!$identity) {
@@ -1042,8 +1048,8 @@ class mssql_sql_generator extends sql_generator {
             }
             $columns = $this->mdb->get_records_sql("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{$prefix}{$tablename}'");
             $columnlist = implode(',', array_keys($columns));
-            $sql = "INSERT INTO ss_tables_{$prefix} (tablename, nextid, records, modifications,columnlist) VALUES (?, ?, ?, 0, ?)";
-            $this->mdb->execute($sql, array($prefix.$tablename, $nextid, $records, $columnlist));
+            $sql = "INSERT INTO ss_tables_{$prefix} (tablename, nextid, records, modifications,columnlist,foreignkeyspresent) VALUES (?, ?, ?, 0, ?, ?)";
+            $this->mdb->execute($sql, array($prefix.$tablename, $nextid, $records, $columnlist, $foreignkeyspresent));
 
             $sqls[] = "IF OBJECT_ID ('ss_t_{$prefix}{$tablename}', 'U') IS NOT NULL DROP TABLE ss_t_{$prefix}{$tablename}";
             if ($records > 0) {
@@ -1081,14 +1087,27 @@ class mssql_sql_generator extends sql_generator {
         // Reset modified tables.
         $infos = $this->mdb->get_records_sql("SELECT * FROM ss_tables_{$prefix} WHERE modifications = 1");
         foreach ($infos as $info) {
-            $sqls[] = "TRUNCATE TABLE {$info->tablename}";
-            if ($info->nextid > 0) {
-                $sqls[] = "DBCC CHECKIDENT ('{$info->tablename}', RESEED, {$info->nextid})";
+            if ($info->foreignkeyspresent) {
+                $sqls[] = "ALTER TABLE {$info->tablename} NOCHECK CONSTRAINT ALL";
             }
+        }
+        foreach ($infos as $info) {
+            // Foreign keys are not ignored as requested in TRUNCATE TABLE, so use slower DELETE here and change ID reseeding.
+            $sqls[] = "DELETE FROM {$info->tablename}";
+            if ($info->nextid > 0) {
+                $seed = $info->nextid - 1;
+                $sqls[] = "DBCC CHECKIDENT ('{$info->tablename}', RESEED, {$seed})";
+            }
+
             if ($info->records > 0) {
                 $sqls[] = "SET IDENTITY_INSERT {$info->tablename} ON";
                 $sqls[] = "INSERT INTO {$info->tablename} ({$info->columnlist}) SELECT {$info->columnlist} FROM ss_t_{$info->tablename}";
                 $sqls[] = "SET IDENTITY_INSERT {$info->tablename} OFF";
+            }
+        }
+        foreach ($infos as $info) {
+            if ($info->foreignkeyspresent) {
+                $sqls[] = "ALTER TABLE {$info->tablename} WITH CHECK CHECK CONSTRAINT ALL";
             }
         }
         $sqls[] = "UPDATE ss_tables_{$prefix} SET modifications = 0 WHERE modifications = 1";
@@ -1101,6 +1120,14 @@ class mssql_sql_generator extends sql_generator {
           LEFT JOIN ss_tables_{$prefix} ss ON ss.tablename = sch.table_name
               WHERE sch.table_name LIKE '{$escapedprefix}%' ESCAPE '\\' AND sch.table_type = 'BASE TABLE' AND ss.tablename IS NULL");
         foreach ($rs as $info) {
+            $sql = "SELECT constraint_name
+                      FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+                     WHERE table_name = :name AND constraint_name LIKE :fk ESCAPE '\\'";
+            $params = ['fk' => str_replace('_', '\\_', $prefix) . '%' . '\\_fk', 'name' => $info->table_name];
+            $fks = $this->mdb->get_fieldset_sql($sql, $params);
+            foreach ($fks as $fk) {
+                array_unshift($sqls, "ALTER TABLE \"{$info->table_name}\" DROP CONSTRAINT {$fk}"); // Key removal must be done first.
+            }
             $sqls[] = "DROP TABLE {$info->table_name}";
         }
         $rs->close();

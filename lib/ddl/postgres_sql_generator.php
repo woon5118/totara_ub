@@ -672,6 +672,31 @@ class postgres_sql_generator extends sql_generator {
     }
 
     /**
+     * Given one correct xmldb_key, returns its specs.
+     *
+     * @param xmldb_table $xmldb_table The table related to $xmldb_key.
+     * @param xmldb_key $xmldb_key The xmldb_key's specifications requested.
+     * @return string SQL statement about the xmldb_key.
+     */
+    public function getKeySQL($xmldb_table, $xmldb_key) {
+        $key = parent::getKeySQL($xmldb_table, $xmldb_key);
+        if (!$key) {
+            return $key;
+        }
+
+        // Totara: we want to be able to defer key checks in transactions.
+
+        $key = str_replace('ON DELETE RESTRICT', 'ON DELETE NO ACTION', $key);
+        $key = str_replace('ON UPDATE RESTRICT', 'ON UPDATE NO ACTION', $key);
+
+        if (strpos($key, 'ON DELETE') !== false or strpos($key, 'ON UPDATE') !== false) {
+            $key .= ' DEFERRABLE INITIALLY IMMEDIATE';
+        }
+
+        return $key;
+    }
+
+    /**
      * Store full database snapshot.
      */
     public function snapshot_create() {
@@ -707,6 +732,7 @@ class postgres_sql_generator extends sql_generator {
             $sqls[] = "DROP TABLE IF EXISTS {$prefix}{$temptable}";
         }
 
+        $sqls[] = "SET CONSTRAINTS ALL DEFERRED";
         $sqls[] = "select ss_reset_{$prefix}()";
 
         $this->mdb->change_database_structure($sqls);

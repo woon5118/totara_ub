@@ -1229,13 +1229,15 @@ class mysql_sql_generator extends sql_generator {
         foreach ($rs as $info) {
             if (!isset($this->snapshottables[$info->name])) {
                 // Delete extra tables.
-                $sqls[] = "DROP TABLE {$info->name}";
+                $sqls[] = "DROP TABLE {$info->name} CASCADE";
                 continue;
             }
         }
         $rs->close();
 
         if ($sqls) {
+            array_unshift($sqls, 'SET FOREIGN_KEY_CHECKS=0');
+            $sqls[] = 'SET FOREIGN_KEY_CHECKS=1';
             $this->mdb->change_database_structure($sqls);
         }
     }
