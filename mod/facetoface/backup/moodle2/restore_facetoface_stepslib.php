@@ -614,4 +614,23 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
     protected function after_execute() {
         $this->add_related_files('mod_facetoface', 'intro', null);
     }
+
+    /**
+     * Hook to execute facetoface calendar entries upgrade after restore.
+     */
+    protected function after_restore() {
+        // The current module must exist.
+        $pluginmanager = core_plugin_manager::instance();
+        $plugininfo = $pluginmanager->get_plugin_info('mod_facetoface');
+        // Check that the facetoface module is installed.
+        if ($plugininfo && $plugininfo->is_installed_and_upgraded()) {
+            // Get the id and type of this facetoface.
+            $seminarid = $this->get_task()->get_activityid();
+            $seminar = new \mod_facetoface\seminar($seminarid);
+            $seminarevents = \mod_facetoface\seminar_event_list::from_seminar($seminar);
+            foreach ($seminarevents as $seminarevent) {
+                \mod_facetoface\calendar::update_entries($seminarevent);
+            }
+        }
+    }
 }

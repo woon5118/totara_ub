@@ -51,11 +51,12 @@ class seminar_calendar_dynamic_content {
         //    this is literally processing random id's at present.
         //
 
-        try {
-            $seminarevent = new seminar_event($hook->event->uuid);
-        } catch (\dml_exception $e) {
-            return;
+        /** @var \mod_facetoface\seminar_event $seminarevent */
+        $seminarevent = seminar_event::seek($hook->event->uuid);
+        if (!$seminarevent->exists()) {
+            debugging("Seminar event with id {$hook->event->uuid} is missing for calendar event", DEBUG_DEVELOPER);
         }
+
         $content = '';
         $class = 'pull-right';
 

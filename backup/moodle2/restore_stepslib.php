@@ -2887,9 +2887,17 @@ class restore_calendarevents_structure_step extends restore_structure_step {
     }
 
     public function process_calendarevents($data) {
-        global $DB, $SITE, $USER;
 
         $data = (object)$data;
+        if ($data->modulename == 'facetoface') {
+            /** @uses restore_facetoface_activity_structure_step::after_restore() */
+            // Totara: The reason is that $data->uuid is {facetoface_sessions}.id backup old id saved during backup/"recycle bin"
+            // process and currently there is no way to update it with new {facetoface_sessions}.id
+            return;
+        }
+
+        global $DB, $SITE, $USER;
+
         $oldid = $data->id;
         $restorefiles = true; // We'll restore the files
         // Find the userid and the groupid associated with the event.
