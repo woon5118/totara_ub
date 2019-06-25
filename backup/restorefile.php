@@ -32,6 +32,11 @@ $contextid = required_param('contextid', PARAM_INT);
 list($context, $course, $cm) = get_context_info_array($contextid);
 require_login($course, false, $cm);
 
+// Totara: added ability to redirect user away from this page if the course is not a legit course.
+if ($course) {
+    $hook = new \totara_core\hook\backup_restore_file_view($course);
+    $hook->execute();
+}
 $syscontext = context_system::instance();
 $usercontext = context_user::instance($USER->id);
 if (!has_capability('moodle/backup:downloadfile', $context)) {

@@ -31,6 +31,9 @@ require_once($CFG->dirroot."/question/category_class.php");
 list($thispageurl, $contexts, $cmid, $cm, $module, $pagevars) =
         question_edit_setup('categories', '/question/category.php');
 
+// Totara: Added a hook to prevent view on question's category for certain containers.
+$hook = new \core_question\hook\category_view($COURSE);
+$hook->execute();
 // Get values from form for actions on this page.
 $param = new stdClass();
 $param->moveup = optional_param('moveup', 0, PARAM_INT);

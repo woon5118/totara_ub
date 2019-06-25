@@ -35,6 +35,9 @@ $PAGE->set_pagelayout('admin');
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourseid');
 }
+// Totara: Added a hook to prevent viewing on grade settings page for certain containers.
+$hook = new \core_grades\hook\settings_view($course);
+$hook->execute();
 require_login($course);
 $context = context_course::instance($course->id);
 

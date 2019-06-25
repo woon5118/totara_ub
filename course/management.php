@@ -68,6 +68,16 @@ if ($courseid) {
     $course = new course_in_list($record);
     $category = coursecat::get($course->category);
     $categoryid = $category->id;
+
+    if ($category->issystem) {
+        // Totara: enable the ability to redirect undesired course category view
+        $hook = new \core_course\hook\course_category_management_view($categoryid);
+        $hook->execute();
+
+        // It is from the system, so user should not be able to manage it.
+        throw new \coding_exception("Category not found");
+    }
+
     $context = context_coursecat::instance($category->id);
     $url->param('categoryid', $categoryid);
     $url->param('courseid', $course->id);
@@ -76,6 +86,16 @@ if ($courseid) {
     $courseid = null;
     $course = null;
     $category = coursecat::get($categoryid);
+
+    if ($category->issystem) {
+        // Totara: enable the ability to redirect undesired course category view
+        $hook = new \core_course\hook\course_category_management_view($categoryid);
+        $hook->execute();
+
+        // It is from the system, so user should not be able to manage it.
+        throw new \coding_exception("Category not found");
+    }
+
     $context = context_coursecat::instance($category->id);
     $url->param('categoryid', $category->id);
 

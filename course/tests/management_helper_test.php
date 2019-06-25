@@ -1318,13 +1318,12 @@ class core_course_management_helper_test extends advanced_testcase {
     }
 
     public function test_prime_category_caches() {
-        global $CFG, $DB;
+        global $CFG;
 
         $default = coursecat::get($CFG->defaultrequestcategory)->id;
         $sortbit = serialize(['sortorder' => 1]);
 
         $cache = cache::make('core', 'coursecat');
-        self::assertSame(1, $DB->count_records('course_categories'));
         self::assertFalse($cache->has('l-'. $default. '--'. $sortbit));
         self::assertFalse($cache->has('lcnt-'.$default.'-'));
 

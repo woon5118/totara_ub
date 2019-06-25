@@ -29,6 +29,10 @@ $courseid   = required_param('courseid', PARAM_INT);
 $type   = required_param('type', PARAM_COMPONENT);
 $instanceid = optional_param('id', 0, PARAM_INT);
 $return = optional_param('returnurl', 0, PARAM_LOCALURL);
+
+$hook = new \totara_core\hook\edit_enrol_instances($courseid);
+$hook->execute();
+
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $context = context_course::instance($course->id, MUST_EXIST);
 

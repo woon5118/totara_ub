@@ -53,6 +53,9 @@ $PAGE->set_pagelayout('admin');
 $id = $courseid;
 $cm = null;
 $course = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
+// Totara: Added ability to allow plugins to redirect away from this page.
+$hook = new \totara_core\hook\backup_view($course);
+$hook->execute();
 $type = backup::TYPE_1COURSE;
 if (!is_null($sectionid)) {
     $section = $DB->get_record('course_sections', array('course'=>$course->id, 'id'=>$sectionid), '*', MUST_EXIST);

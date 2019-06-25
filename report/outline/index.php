@@ -29,6 +29,9 @@ require_once($CFG->dirroot.'/report/outline/locallib.php');
 $id = required_param('id',PARAM_INT);       // course id
 
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
+// Totara: Added a hook to prevent viewing outline page for certain course as container
+$hook = new \report_outline\hook\index_view($course);
+$hook->execute();
 
 $PAGE->set_url('/report/outline/index.php', array('id'=>$id));
 $PAGE->set_pagelayout('report');

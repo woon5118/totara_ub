@@ -1326,6 +1326,11 @@ class core_plugin_manager {
             ),
 
             // Totara
+            'container' => array(
+                'course', 'site'
+            ),
+
+            // Totara
             'contentmarketplace' => array(
                 'goone'
             ),
@@ -1377,7 +1382,7 @@ class core_plugin_manager {
             'format' => array(
                 'singleactivity', 'social', 'topics', 'weeks'
                 // Totara
-                , 'demo'
+                , 'demo', 'none'
             ),
 
             'gradeexport' => array(

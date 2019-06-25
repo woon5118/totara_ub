@@ -120,6 +120,9 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $temp->add(new admin_setting_heading('courseformathdr', new lang_string('type_format', 'plugin'), ''));
 
     $courseformats = get_sorted_course_formats(true);
+    $hook = new \core_course\hook\format\legacy_course_format_supported($courseformats);
+    $hook->execute();
+    $courseformats = $hook->get_formats();
     $formcourseformats = array();
     foreach ($courseformats as $courseformat) {
         $formcourseformats[$courseformat] = new lang_string('pluginname', "format_$courseformat");

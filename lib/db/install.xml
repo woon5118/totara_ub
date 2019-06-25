@@ -105,6 +105,7 @@
         <FIELD NAME="cacherev" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Incrementing revision for validating the course content cache"/>
         <FIELD NAME="coursetype" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Totara course type from totara_core"/>
         <FIELD NAME="icon" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Totara course icon from totara_core"/>
+        <FIELD NAME="containertype" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The type of the course, what its purpose is for."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -135,6 +136,7 @@
         <FIELD NAME="theme" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Theme for the category"/>
         <FIELD NAME="programcount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Totara program count from totara_program"/>
         <FIELD NAME="certifcount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Totara certification count from totara_program"/>
+        <FIELD NAME="issystem" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A flag to tell whether this category is able to managed by the user or not."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

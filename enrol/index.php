@@ -28,6 +28,10 @@ require_once("$CFG->libdir/formslib.php");
 $id = required_param('id', PARAM_INT);
 $returnurl = optional_param('returnurl', 0, PARAM_LOCALURL);
 
+// Totara: Add the ability to redirect user out of here if this $id is a non-course.
+$hook = new \totara_core\hook\enrol_index_page($id);
+$hook->execute();
+
 if (!isloggedin()) {
     $referer = get_local_referer();
     if (empty($referer)) {

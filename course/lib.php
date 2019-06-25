@@ -586,24 +586,17 @@ function get_array_of_activities($courseid) {
  * @param bool $plural if true returns the plural forms of the names
  * @return array where key is the module name (component name without 'mod_') and
  *     the value is the human-readable string. Array sorted alphabetically by value
+ *
+ * @deprecated since Totara 13.0
  */
 function get_module_types_names($plural = false) {
-    static $modnames = null;
-    global $DB, $CFG;
-    if ($modnames === null) {
-        $modnames = array(0 => array(), 1 => array());
-        if ($allmods = $DB->get_records("modules")) {
-            foreach ($allmods as $mod) {
-                if (file_exists("$CFG->dirroot/mod/$mod->name/lib.php") && $mod->visible) {
-                    $modnames[0][$mod->name] = get_string("modulename", "$mod->name");
-                    $modnames[1][$mod->name] = get_string("modulenameplural", "$mod->name");
-                }
-            }
-            core_collator::asort($modnames[0]);
-            core_collator::asort($modnames[1]);
-        }
-    }
-    return $modnames[(int)$plural];
+//    debugging(
+//        "The function 'get_module_types_names' has been deprecated, please use " .
+//        "\container_course\course::get_module_types_supported instead",
+//        DEBUG_DEVELOPER
+//    );
+
+    return \container_course\course::get_module_types_supported($plural);
 }
 
 /**
@@ -865,15 +858,25 @@ function can_edit_in_category($categoryid = 0) {
 
 /// MODULE FUNCTIONS /////////////////////////////////////////////////////////////////
 
+/**
+ * @param $mod
+ * @return bool|int
+ * @deprecated since Totara 13.0
+ */
 function add_course_module($mod) {
-    global $DB;
+//    debugging(
+//        "The function add_course_module has been deprecated, please use ",
+//        "\container_course\module\course_module::create",
+//        DEBUG_DEVELOPER
+//    );
 
-    $mod->added = time();
+    $module = \container_course\module\course_module::create($mod);
+
+    // For backward compatibility, we need to update the original data.
     unset($mod->id);
+    $mod->added = $module->get_time_added();
 
-    $cmid = $DB->insert_record("course_modules", $mod);
-    rebuild_course_cache($mod->course, true);
-    return $cmid;
+    return $module->get_id();
 }
 
 /**
@@ -912,7 +915,7 @@ function course_add_section($courseorid, int $position, bool $triggerevent = tru
     $cw->timemodified = time();
     $cw->id = $DB->insert_record("course_sections", $cw);
 
-    rebuild_course_cache($course->id, true);
+    \core_container\cache_helper::rebuild_container_cache($course->id, true);
 
     $cw = $DB->get_record('course_sections', ['id' => $cw->id]);
 
@@ -935,36 +938,20 @@ function course_add_section($courseorid, int $position, bool $triggerevent = tru
  *        new section. All existing sections at this or bigger position will be shifted down.
  * @param bool $skipcheckignored no cheating here
  * @return stdClass created section object
+ *
+ * @deprecated since Totara 13.0
  */
 function course_create_section($courseorid, $position = 0, $skipcheckignored = false) {
-    global $DB;
-
-    // Always load fresh copy of course from DB, do NOT rely on any kind of caches here!
     $courseid = is_object($courseorid) ? $courseorid->id : $courseorid;
-    $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
 
-    // Find the highest section among existing sections.
-    $lastsection = (int)$DB->get_field('course_sections', 'MAX(section)', ['course' => $course->id]);
+//    debugging(
+//        "The function 'course_create_section' has been deprecated, ".
+//        "please use \container_course\section\course_section::create instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    $cw = course_add_section($courseid, $lastsection + 1, false);
-    if (!$cw) {
-        throw new coding_exception('Unknown error creating new section');
-    }
-
-    // Now move it to the specified position if position already occupied.
-    if ($position > 0 && $position <= $lastsection) {
-        if (!move_section_to($course, $cw->section, $position, true)) {
-            debugging("Error moving new section to position '$position'", DEBUG_DEVELOPER);
-        }
-        $cw = $DB->get_record('course_sections', ['id' => $cw->id], '*', MUST_EXIST);
-    }
-
-    $event = core\event\course_section_created::create_from_section($cw);
-    $event->add_record_snapshot('course_sections', $cw);
-    $event->add_record_snapshot('course', $course);
-    $event->trigger();
-
-    return $cw;
+    $section = \container_course\section\course_section::create($courseid, $position);
+    return $section->to_record();
 }
 
 /**
@@ -1005,9 +992,10 @@ function course_create_sections_if_missing($courseorid, $sections) {
  *     before which the module needs to be included. Null for inserting in the
  *     end of the section
  * @return int The course_sections ID where the module is inserted
+ *
+ * @deprecated since Totara 13.0
  */
 function course_add_cm_to_section($courseorid, $cmid, $sectionnum, $beforemod = null) {
-    global $DB, $COURSE;
     if (is_object($beforemod)) {
         $beforemod = $beforemod->id;
     }
@@ -1016,34 +1004,22 @@ function course_add_cm_to_section($courseorid, $cmid, $sectionnum, $beforemod = 
     } else {
         $courseid = $courseorid;
     }
-    // Do not try to use modinfo here, there is no guarantee it is valid!
-    $section = $DB->get_record('course_sections',
-            array('course' => $courseid, 'section' => $sectionnum), '*', IGNORE_MISSING);
-    if (!$section) {
-        // This function call requires modinfo.
-        course_create_sections_if_missing($courseorid, $sectionnum);
-        $section = $DB->get_record('course_sections',
-                array('course' => $courseid, 'section' => $sectionnum), '*', MUST_EXIST);
+
+//    debugging(
+//        "The function 'course_add_cm_to_section' has been deprecated, please use " .
+//        "\container_course\module\course_module::add_to_section",
+//        DEBUG_DEVELOPER
+//    );
+
+    $container = \core_container\factory::from_id($courseid);
+    $module = $container->get_module($cmid, false);
+
+    if (null == $module) {
+        return null;
     }
 
-    $modarray = explode(",", trim($section->sequence));
-    if (empty($section->sequence)) {
-        $newsequence = "$cmid";
-    } else if ($beforemod && ($key = array_keys($modarray, $beforemod))) {
-        $insertarray = array($cmid, $beforemod);
-        array_splice($modarray, $key[0], 1, $insertarray);
-        $newsequence = implode(",", $modarray);
-    } else {
-        $newsequence = "$section->sequence,$cmid";
-    }
-    $DB->set_field("course_sections", "sequence", $newsequence, array("id" => $section->id));
-    $DB->set_field('course_modules', 'section', $section->id, array('id' => $cmid));
-    if (is_object($courseorid)) {
-        rebuild_course_cache($courseorid->id, true);
-    } else {
-        rebuild_course_cache($courseorid, true);
-    }
-    return $section->id;     // Return course_sections ID that was used.
+    $module->add_to_section($sectionnum, $beforemod);
+    return $container->get_section($sectionnum)->get_id();
 }
 
 /**
@@ -1055,25 +1031,36 @@ function course_add_cm_to_section($courseorid, $cmid, $sectionnum, $beforemod = 
  * @param int $id course module ID.
  * @param int $groupmode the new groupmode value.
  * @return bool True if the $groupmode was updated.
+ *
+ * @deprecated since Totara 13.0
  */
 function set_coursemodule_groupmode($id, $groupmode) {
-    global $DB;
-    $cm = $DB->get_record('course_modules', array('id' => $id), 'id,course,groupmode', MUST_EXIST);
-    if ($cm->groupmode != $groupmode) {
-        $DB->set_field('course_modules', 'groupmode', $groupmode, array('id' => $cm->id));
-        rebuild_course_cache($cm->course, true);
-    }
-    return ($cm->groupmode != $groupmode);
+//    debugging(
+//        "The function 'set_coursemodule_idnumber' has been deprecated please use " .
+//        "\container_course\module\course_module::update_group_mode instead",
+//        DEBUG_DEVELOPER
+//    );
+
+    $module = \container_course\module\course_module::from_id($id);
+    return $module->update_group_mode($groupmode);
 }
 
+/**
+ * @param $id
+ * @param $idnumber
+ * @return bool
+ *
+ * @deprecated since Totara 13.0
+ */
 function set_coursemodule_idnumber($id, $idnumber) {
-    global $DB;
-    $cm = $DB->get_record('course_modules', array('id' => $id), 'id,course,idnumber', MUST_EXIST);
-    if ($cm->idnumber != $idnumber) {
-        $DB->set_field('course_modules', 'idnumber', $idnumber, array('id' => $cm->id));
-        rebuild_course_cache($cm->course, true);
-    }
-    return ($cm->idnumber != $idnumber);
+//    debugging(
+//        "The function 'set_coursemodule_idnumber' has been deprecated please use " .
+//        "\container_course\module\course_module::update_id_number instead",
+//        DEBUG_DEVELOPER
+//    );
+
+    $module = \container_course\module\course_module::from_id($id);
+    return $module->update_id_number($idnumber);
 }
 
 /**
@@ -1089,69 +1076,24 @@ function set_coursemodule_idnumber($id, $idnumber) {
  * @param int $id of the module
  * @param int $visible state of the module
  * @return bool false when the module was not found, true otherwise
+ *
+ * @deprecated since Totara 13.0
  */
 function set_coursemodule_visible($id, $visible) {
-    global $DB, $CFG;
-    require_once($CFG->libdir.'/gradelib.php');
-    require_once($CFG->dirroot.'/calendar/lib.php');
-
     // Trigger developer's attention when using the previously removed argument.
     if (func_num_args() > 2) {
         debugging('Wrong number of arguments passed to set_coursemodule_visible(), $prevstateoverrides
             has been removed.', DEBUG_DEVELOPER);
     }
 
-    if (!$cm = $DB->get_record('course_modules', array('id'=>$id))) {
-        return false;
-    }
+//    debugging(
+//        "The function 'set_coursemodule_visible' has been deprecated, please use " .
+//        "\container_course\module\course_module::update_visible instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    // Create events and propagate visibility to associated grade items if the value has changed.
-    // Only do this if it's changed to avoid accidently overwriting manual showing/hiding of student grades.
-    if ($cm->visible == $visible) {
-        return true;
-    }
-
-    if (!$modulename = $DB->get_field('modules', 'name', array('id'=>$cm->module))) {
-        return false;
-    }
-    if ($events = $DB->get_records('event', array('instance'=>$cm->instance, 'modulename'=>$modulename))) {
-        foreach($events as $event) {
-            if ($visible) {
-                $event = new calendar_event($event);
-                $event->toggle_visibility(true);
-            } else {
-                $event = new calendar_event($event);
-                $event->toggle_visibility(false);
-            }
-        }
-    }
-
-    // Updating visible and visibleold to keep them in sync. Only changing a section visibility will
-    // affect visibleold to allow for an original visibility restore. See set_section_visible().
-    $cminfo = new stdClass();
-    $cminfo->id = $id;
-    $cminfo->visible = $visible;
-    $cminfo->visibleold = $visible;
-    $DB->update_record('course_modules', $cminfo);
-
-    // Hide the associated grade items so the teacher doesn't also have to go to the gradebook and hide them there.
-    // Note that this must be done after updating the row in course_modules, in case
-    // the modules grade_item_update function needs to access $cm->visible.
-    if (plugin_supports('mod', $modulename, FEATURE_CONTROLS_GRADE_VISIBILITY) &&
-            component_callback_exists('mod_' . $modulename, 'grade_item_update')) {
-        $instance = $DB->get_record($modulename, array('id' => $cm->instance), '*', MUST_EXIST);
-        component_callback('mod_' . $modulename, 'grade_item_update', array($instance));
-    } else {
-        $grade_items = grade_item::fetch_all(array('itemtype'=>'mod', 'itemmodule'=>$modulename, 'iteminstance'=>$cm->instance, 'courseid'=>$cm->course));
-        if ($grade_items) {
-            foreach ($grade_items as $grade_item) {
-                $grade_item->set_hidden(!$visible);
-            }
-        }
-    }
-
-    rebuild_course_cache($cm->course, true);
-    return true;
+    $module = \container_course\module\course_module::from_id($id);
+    return $module->update_visible($visible);
 }
 
 /**
@@ -1160,48 +1102,16 @@ function set_coursemodule_visible($id, $visible) {
  * @param int $id course module id
  * @param string $name new value for a name
  * @return bool whether a change was made
+ * @deprecated since Totara 13.0
  */
 function set_coursemodule_name($id, $name) {
-    global $CFG, $DB;
-    require_once($CFG->libdir . '/gradelib.php');
-
-    $cm = get_coursemodule_from_id('', $id, 0, false, MUST_EXIST);
-
-    $module = new \stdClass();
-    $module->id = $cm->instance;
-
-    // Escape strings as they would be by mform.
-    if (!empty($CFG->formatstringstriptags)) {
-        $module->name = clean_param($name, PARAM_TEXT);
-    } else {
-        $module->name = clean_param($name, PARAM_CLEANHTML);
-    }
-    if ($module->name === $cm->name || strval($module->name) === '') {
-        return false;
-    }
-    if (\core_text::strlen($module->name) > 255) {
-        throw new \moodle_exception('maximumchars', 'moodle', '', 255);
-    }
-
-    $module->timemodified = time();
-    $DB->update_record($cm->modname, $module);
-    $cm->name = $module->name;
-    \core\event\course_module_updated::create_from_cm($cm)->trigger();
-    rebuild_course_cache($cm->course, true);
-
-    // Attempt to update the grade item if relevant.
-    $grademodule = $DB->get_record($cm->modname, array('id' => $cm->instance));
-    $grademodule->cmidnumber = $cm->idnumber;
-    $grademodule->modname = $cm->modname;
-    grade_update_mod_grades($grademodule);
-
-    // Update calendar events with the new name.
-    $refresheventsfunction = $cm->modname . '_refresh_events';
-    if (function_exists($refresheventsfunction)) {
-        call_user_func($refresheventsfunction, $cm->course);
-    }
-
-    return true;
+//    debugging(
+//        "The function 'set_coursemodule_name' has been deprecated, please use " .
+//        "\container_course\module\course_module::update_name instead",
+//        DEBUG_DEVELOPER
+//    );
+    $module = \container_course\module\course_module::from_id($id);
+    return $module->update_name($name);
 }
 
 /**
@@ -1214,145 +1124,18 @@ function set_coursemodule_name($id, $name) {
  * @param bool $async whether or not to try to delete the module using an adhoc task. Async also depends on a plugin hook.
  * @throws moodle_exception
  * @since Moodle 2.5
+ *
+ * @deprecated since Totara 13.0
  */
 function course_delete_module($cmid, $async = false) {
-    // Check the 'course_module_background_deletion_recommended' hook first.
-    // Only use asynchronous deletion if at least one plugin returns true and if async deletion has been requested.
-    // Both are checked because plugins should not be allowed to dictate the deletion behaviour, only support/decline it.
-    // It's up to plugins to handle things like whether or not they are enabled.
-    if ($async && $pluginsfunction = get_plugins_with_function('course_module_background_deletion_recommended')) {
-        foreach ($pluginsfunction as $plugintype => $plugins) {
-            foreach ($plugins as $pluginfunction) {
-                if ($pluginfunction()) {
-                    return course_module_flag_for_async_deletion($cmid);
-                }
-            }
-        }
-    }
+//    debugging(
+//        "The function 'course_delete_module' has been deprecated, please use ",
+//        "\container_course\module\course_module::delete instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    global $CFG, $DB;
-
-    require_once($CFG->libdir.'/gradelib.php');
-    require_once($CFG->libdir.'/questionlib.php');
-    require_once($CFG->dirroot.'/blog/lib.php');
-    require_once($CFG->dirroot.'/calendar/lib.php');
-
-    // Get the course module.
-    if (!$cm = $DB->get_record('course_modules', array('id' => $cmid))) {
-        return true;
-    }
-
-    // Get the module context.
-    $modcontext = context_module::instance($cm->id);
-
-    // Get the course module name.
-    $modulename = $DB->get_field('modules', 'name', array('id' => $cm->module), MUST_EXIST);
-
-    // Get the file location of the delete_instance function for this module.
-    $modlib = "$CFG->dirroot/mod/$modulename/lib.php";
-
-    // Include the file required to call the delete_instance function for this module.
-    if (file_exists($modlib)) {
-        require_once($modlib);
-    } else {
-        throw new moodle_exception('cannotdeletemodulemissinglib', '', '', null,
-            "Cannot delete this module as the file mod/$modulename/lib.php is missing.");
-    }
-
-    $deleteinstancefunction = $modulename . '_delete_instance';
-
-    // Ensure the delete_instance function exists for this module.
-    if (!function_exists($deleteinstancefunction)) {
-        throw new moodle_exception('cannotdeletemodulemissingfunc', '', '', null,
-            "Cannot delete this module as the function {$modulename}_delete_instance is missing in mod/$modulename/lib.php.");
-    }
-
-    // Allow plugins to use this course module before we completely delete it.
-    if ($pluginsfunction = get_plugins_with_function('pre_course_module_delete')) {
-        foreach ($pluginsfunction as $plugintype => $plugins) {
-            foreach ($plugins as $pluginfunction) {
-                $pluginfunction($cm);
-            }
-        }
-    }
-
-    // Delete activity context questions and question categories.
-    question_delete_activity($cm);
-
-    // Call the delete_instance function, if it returns false throw an exception.
-    // Totara: If instance = 0, skip this step as there is no module instance.
-    if ($cm->instance != 0 && !$deleteinstancefunction($cm->instance)) {
-        throw new moodle_exception('cannotdeletemoduleinstance', '', '', null,
-            "Cannot delete the module $modulename (instance).");
-    }
-
-    // Remove all module files in case modules forget to do that.
-    $fs = get_file_storage();
-    $fs->delete_area_files($modcontext->id);
-
-    // Delete events from calendar.
-    if ($events = $DB->get_records('event', array('instance' => $cm->instance, 'modulename' => $modulename))) {
-        $coursecontext = context_course::instance($cm->course);
-        foreach($events as $event) {
-            $event->context = $coursecontext;
-            $calendarevent = calendar_event::load($event);
-            $calendarevent->delete();
-        }
-    }
-
-    // Delete grade items, outcome items and grades attached to modules.
-    if ($grade_items = grade_item::fetch_all(array('itemtype' => 'mod', 'itemmodule' => $modulename,
-                                                   'iteminstance' => $cm->instance, 'courseid' => $cm->course))) {
-        foreach ($grade_items as $grade_item) {
-            $grade_item->delete('moddelete');
-        }
-    }
-
-    // Delete associated blogs and blog tag instances.
-    blog_remove_associations_for_module($modcontext->id);
-
-    // Delete completion and availability data; it is better to do this even if the
-    // features are not turned on, in case they were turned on previously (these will be
-    // very quick on an empty table).
-    $DB->delete_records('course_modules_completion', array('coursemoduleid' => $cm->id));
-    $DB->delete_records('course_completion_criteria', array('moduleinstance' => $cm->id,
-                                                            'course' => $cm->course,
-                                                            'criteriatype' => COMPLETION_CRITERIA_TYPE_ACTIVITY));
-
-    // Delete all tag instances associated with the instance of this module.
-    core_tag_tag::delete_instances('mod_' . $modulename, null, $modcontext->id);
-    core_tag_tag::remove_all_item_tags('core', 'course_modules', $cm->id);
-
-    // TOTARA: We removed Moodle's competency and learning plan code.
-    // Notify the competency subsystem.
-    // \core_competency\api::hook_course_module_deleted($cm);
-
-    // Delete the context.
-    context_helper::delete_instance(CONTEXT_MODULE, $cm->id);
-
-    // Delete the module from the course_modules table.
-    $DB->delete_records('course_modules', array('id' => $cm->id));
-
-    // Delete module from that section.
-    // Totara: If instance = 0, skip this step as there is no module instance.
-    if ($cm->instance != 0 && !delete_mod_from_section($cm->id, $cm->section)) {
-        throw new moodle_exception('cannotdeletemodulefromsection', '', '', null,
-            "Cannot delete the module $modulename (instance) from section.");
-    }
-
-    // Trigger event for course module delete action.
-    $event = \core\event\course_module_deleted::create(array(
-        'courseid' => $cm->course,
-        'context'  => $modcontext,
-        'objectid' => $cm->id,
-        'other'    => array(
-            'modulename' => $modulename,
-            'instanceid'   => $cm->instance,
-        )
-    ));
-    $event->add_record_snapshot('course_modules', $cm);
-    $event->trigger();
-    rebuild_course_cache($cm->course, true);
+    $module = \container_course\module\course_module::from_id($cmid);
+    $module->delete($async);
 }
 
 /**
@@ -1364,61 +1147,18 @@ function course_delete_module($cmid, $async = false) {
  * @param int $cmid the course module id.
  * @return bool whether the module was successfully scheduled for deletion.
  * @throws \moodle_exception
+ *
+ * @deprecated since Totara 13.0
  */
 function course_module_flag_for_async_deletion($cmid) {
-    global $CFG, $DB, $USER;
-    require_once($CFG->libdir.'/gradelib.php');
-    require_once($CFG->libdir.'/questionlib.php');
-    require_once($CFG->dirroot.'/blog/lib.php');
-    require_once($CFG->dirroot.'/calendar/lib.php');
+//    debugging(
+//        "The function 'course_module_flag_for_async_deletion' has been deprecated, please use " .
+//        "\container_course\module\course_module::async_delete instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    // Get the course module.
-    if (!$cm = $DB->get_record('course_modules', array('id' => $cmid))) {
-        return true;
-    }
-
-    // We need to be reasonably certain the deletion is going to succeed before we background the process.
-    // Make the necessary delete_instance checks, etc. before proceeding further. Throw exceptions if required.
-
-    // Get the course module name.
-    $modulename = $DB->get_field('modules', 'name', array('id' => $cm->module), MUST_EXIST);
-
-    // Get the file location of the delete_instance function for this module.
-    $modlib = "$CFG->dirroot/mod/$modulename/lib.php";
-
-    // Include the file required to call the delete_instance function for this module.
-    if (file_exists($modlib)) {
-        require_once($modlib);
-    } else {
-        throw new \moodle_exception('cannotdeletemodulemissinglib', '', '', null,
-            "Cannot delete this module as the file mod/$modulename/lib.php is missing.");
-    }
-
-    $deleteinstancefunction = $modulename . '_delete_instance';
-
-    // Ensure the delete_instance function exists for this module.
-    if (!function_exists($deleteinstancefunction)) {
-        throw new \moodle_exception('cannotdeletemodulemissingfunc', '', '', null,
-            "Cannot delete this module as the function {$modulename}_delete_instance is missing in mod/$modulename/lib.php.");
-    }
-
-    // We are going to defer the deletion as we can't be sure how long the module's pre_delete code will run for.
-    $cm->deletioninprogress = '1';
-    $DB->update_record('course_modules', $cm);
-
-    // Create an adhoc task for the deletion of the course module. The task takes an array of course modules for removal.
-    $removaltask = new \core_course\task\course_delete_modules();
-    $removaltask->set_custom_data(array(
-        'cms' => array($cm),
-        'userid' => $USER->id,
-        'realuserid' => \core\session\manager::get_realuser()->id
-    ));
-
-    // Queue the task for the next run.
-    \core\task\manager::queue_adhoc_task($removaltask);
-
-    // Reset the course cache to hide the module.
-    rebuild_course_cache($cm->course, true);
+    $module = \container_course\module\course_module::from_id($cmid);
+    return $module->async_delete();
 }
 
 /**
@@ -1457,25 +1197,22 @@ function course_module_instance_pending_deletion($courseid, $modulename, $instan
     return isset($instances[$instanceid]) && $instances[$instanceid]->deletioninprogress;
 }
 
+/**
+ * @param $modid
+ * @param $sectionid
+ *
+ * @return bool
+ * @deprecated since Totara 13.0
+ */
 function delete_mod_from_section($modid, $sectionid) {
-    global $DB;
+//    debugging(
+//        "The function 'delete_mod_from_section' has been deprecated, please use " .
+//        "\container_course\section\course_section::remove_module instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    if ($section = $DB->get_record("course_sections", array("id"=>$sectionid)) ) {
-
-        $modarray = explode(",", $section->sequence);
-
-        if ($key = array_keys ($modarray, $modid)) {
-            array_splice($modarray, $key[0], 1);
-            $newsequence = implode(",", $modarray);
-            $DB->set_field("course_sections", "sequence", $newsequence, array("id"=>$section->id));
-            rebuild_course_cache($section->course, true);
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-    return false;
+    $section = \container_course\section\course_section::from_id($sectionid);
+    return $section->remove_module($modid);
 }
 
 /**
@@ -1510,7 +1247,7 @@ function move_section_to($course, $section, $destination, $ignorenumsections = f
 
     // Get all sections for this course and re-order them (2 of them should now share the same section number)
     if (!$sections = $DB->get_records_menu('course_sections', array('course' => $course->id),
-            'section ASC, id ASC', 'id, section')) {
+        'section ASC, id ASC', 'id, section')) {
         return false;
     }
 
@@ -1645,14 +1382,15 @@ function course_delete_section_async($section, $forcedeleteifnotempty = true) {
     // Flag those modules having no existing deletion flag. Some modules may have been scheduled for deletion manually, and we don't
     // want to create additional adhoc deletion tasks for these. Moving them to section 0 will suffice.
     $affectedmods = $DB->get_records_select('course_modules', 'course = ? AND section = ? AND deletioninprogress <> ?',
-                                            [$section->course, $section->id, 1], '', 'id');
+        [$section->course, $section->id, 1], '', 'id');
     $DB->set_field('course_modules', 'deletioninprogress', '1', ['course' => $section->course, 'section' => $section->id]);
 
     // Move all modules to section 0.
     $modules = $DB->get_records('course_modules', ['section' => $section->id], '');
     $sectionzero = $DB->get_record('course_sections', ['course' => $section->course, 'section' => '0']);
     foreach ($modules as $mod) {
-        moveto_module($mod, $sectionzero);
+        $module = \container_course\module\course_module::from_record($mod);
+        $module->move_to_section($sectionzero->section);
     }
 
     // Create and queue an adhoc task for the deletion of the modules.
@@ -1686,7 +1424,7 @@ function course_delete_section_async($section, $forcedeleteifnotempty = true) {
         $event->add_record_snapshot('course_sections', $section);
         $event->trigger();
     }
-    rebuild_course_cache($section->course, true);
+    \core_container\cache_helper::rebuild_container_cache($section->course, true);
 
     return $result;
 }
@@ -1741,13 +1479,14 @@ function course_update_section($course, $section, $data) {
     if ($changevisibility && !empty($section->sequence)) {
         $modules = explode(',', $section->sequence);
         foreach ($modules as $moduleid) {
+            $module = \container_course\module\course_module::from_id($moduleid);
             if ($cm = get_coursemodule_from_id(null, $moduleid, $courseid)) {
                 if ($data['visible']) {
                     // As we unhide the section, we use the previously saved visibility stored in visibleold.
-                    set_coursemodule_visible($moduleid, $cm->visibleold);
+                    $module->update_visible($cm->visibleold);
                 } else {
                     // We hide the section, so we hide the module but we store the original state in visibleold.
-                    set_coursemodule_visible($moduleid, 0);
+                    $module->update_visible(0);
                     $DB->set_field('course_modules', 'visibleold', $cm->visible, array('id' => $moduleid));
                 }
                 \core\event\course_module_updated::create_from_cm($cm)->trigger();
@@ -1874,37 +1613,23 @@ function reorder_sections($sections, $origin_position, $target_position) {
  *     before which the module needs to be included. Null for inserting in the
  *     end of the section
  * @return int new value for module visibility (0 or 1)
+ * @deprecated since Totara 13.0
  */
 function moveto_module($mod, $section, $beforemod=NULL) {
-    global $OUTPUT, $DB;
+//    debugging(
+//        "The function 'moveto_module' has been deprecated, please use " .
+//        "\container_course\module\course_module::move_to_section instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    // Current module visibility state - return value of this function.
-    $modvisible = $mod->visible;
-
-    // Remove original module from original section.
-    if (! delete_mod_from_section($mod->id, $mod->section)) {
-        echo $OUTPUT->notification("Could not delete module from existing section");
+    if (is_object($beforemod)) {
+        $beforemod = $beforemod->id;
     }
 
-    // If moving to a hidden section then hide module.
-    if ($mod->section != $section->id) {
-        if (!$section->visible && $mod->visible) {
-            // Module was visible but must become hidden after moving to hidden section.
-            $modvisible = 0;
-            set_coursemodule_visible($mod->id, 0);
-            // Set visibleold to 1 so module will be visible when section is made visible.
-            $DB->set_field('course_modules', 'visibleold', 1, array('id' => $mod->id));
-        }
-        if ($section->visible && !$mod->visible) {
-            // Hidden module was moved to the visible section, restore the module visibility from visibleold.
-            set_coursemodule_visible($mod->id, $mod->visibleold);
-            $modvisible = $mod->visibleold;
-        }
-    }
+    $module = \container_course\module\course_module::from_id($mod->id);
+    $module->move_to_section($section->section, $beforemod);
 
-    // Add the module into the new section.
-    course_add_cm_to_section($section->course, $mod->id, $section->section, $beforemod);
-    return $modvisible;
+    return $module->get_visible();
 }
 
 /**
@@ -2153,30 +1878,23 @@ function course_format_name ($course,$max=100) {
  * @param object $course the course settings. Only $course->id is used.
  * @param string $modname the module name. E.g. 'forum' or 'quiz'.
  * @return bool whether the current user is allowed to add this type of module to this course.
+ *
+ * @deprecated since Totara 13.0
  */
 function course_allowed_module($course, $modname) {
+//    debugging(
+//        "The function course_allowed_module has been deprecated, please use " .
+//        "\container_course\course::is_module_allowed instead",
+//        DEBUG_DEVELOPER
+//    );
+
     if (is_numeric($modname)) {
         throw new coding_exception('Function course_allowed_module no longer
                 supports numeric module ids. Please update your code to pass the module name.');
     }
 
-    $capability = 'mod/' . $modname . ':addinstance';
-    if (!get_capability_info($capability)) {
-        // Debug warning that the capability does not exist, but no more than once per page.
-        static $warned = array();
-        $archetype = plugin_supports('mod', $modname, FEATURE_MOD_ARCHETYPE, MOD_ARCHETYPE_OTHER);
-        if (!isset($warned[$modname]) && $archetype !== MOD_ARCHETYPE_SYSTEM) {
-            debugging('The module ' . $modname . ' does not define the standard capability ' .
-                    $capability , DEBUG_DEVELOPER);
-            $warned[$modname] = 1;
-        }
-
-        // If the capability does not exist, the module can always be added.
-        return true;
-    }
-
-    $coursecontext = context_course::instance($course->id);
-    return has_capability($capability, $coursecontext);
+    $container = \core_container\factory::from_record($course);
+    return $container->is_module_allowed($modname);
 }
 
 /**
@@ -2416,111 +2134,20 @@ function course_overviewfiles_options($course) {
  * @param array $editoroptions course description editor options
  * @param object $data  - all the data needed for an entry in the 'course' table
  * @return stdClass new course record with extra format properties
+ * @deprecated since Totara 13.0
  */
 function create_course($data, $editoroptions = NULL) {
-    global $DB, $CFG;
+//    debugging(
+//        "The function create_course has been deprecated, please use " .
+//        "\container_course\course_helper::create_course instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    //check the categoryid - must be given for all new courses
-    $category = $DB->get_record('course_categories', array('id'=>$data->category), '*', MUST_EXIST);
+    $container = \container_course\course_helper::create_course($data, $editoroptions);
 
-    // Check if the shortname already exists.
-    if (!empty($data->shortname)) {
-        if ($DB->record_exists('course', array('shortname' => $data->shortname))) {
-            throw new moodle_exception('shortnametaken', '', '', $data->shortname);
-        }
-    }
-
-    // Check if the idnumber already exists.
-    if (!empty($data->idnumber)) {
-        if ($DB->record_exists('course', array('idnumber' => $data->idnumber))) {
-            throw new moodle_exception('courseidnumbertaken', '', '', $data->idnumber);
-        }
-    }
-
-    if ($errorcode = course_validate_dates((array)$data)) {
-        throw new moodle_exception($errorcode);
-    }
-
-    // Check if timecreated is given.
-    $data->timecreated  = !empty($data->timecreated) ? $data->timecreated : time();
-    $data->timemodified = $data->timecreated;
-
-    // place at beginning of any category
-    $data->sortorder = 0;
-
-    if ($editoroptions) {
-        // summary text is updated later, we need context to store the files first
-        $data->summary = '';
-        $data->summary_format = FORMAT_HTML;
-    }
-
-    if (!isset($data->visible)) {
-        // data not from form, add missing visibility info
-        $data->visible = $category->visible;
-    }
-    $data->visibleold = $data->visible;
-
-    $newcourseid = $DB->insert_record('course', $data);
-    $context = context_course::instance($newcourseid, MUST_EXIST);
-
-    if ($editoroptions) {
-        // Save the files used in the summary editor and store
-        $data = file_postupdate_standard_editor($data, 'summary', $editoroptions, $context, 'course', 'summary', 0);
-        $DB->set_field('course', 'summary', $data->summary, array('id'=>$newcourseid));
-        $DB->set_field('course', 'summaryformat', $data->summary_format, array('id'=>$newcourseid));
-    }
-    if ($overviewfilesoptions = course_overviewfiles_options($newcourseid)) {
-        // Save the course overviewfiles
-        $data = file_postupdate_standard_filemanager($data, 'overviewfiles', $overviewfilesoptions, $context, 'course', 'overviewfiles', 0);
-    }
-
-    // update course format options
-    course_get_format($newcourseid)->update_course_format_options($data);
-
-    $course = course_get_format($newcourseid)->get_course();
-
-    fix_course_sortorder();
-    // purge appropriate caches in case fix_course_sortorder() did not change anything
-    cache_helper::purge_by_event('changesincourse');
-
-    // Totara: Save the custom fields.
-    $data->id = $course->id;
-    customfield_save_data($data, 'course', 'course');
-
-    // Trigger a course created event.
-    $event = \core\event\course_created::create(array(
-        'objectid' => $course->id,
-        'context' => context_course::instance($course->id),
-        'other' => array('shortname' => $course->shortname,
-            'fullname' => $course->fullname)
-    ));
-
-    $event->trigger();
-
-    // Setup the blocks
-    blocks_add_default_course_blocks($course);
-
-    // Create default section and initial sections if specified (unless they've already been created earlier).
-    // We do not want to call course_create_sections_if_missing() because to avoid creating course cache.
-    $numsections = isset($data->numsections) ? $data->numsections : 0;
-    $existingsections = $DB->get_fieldset_sql('SELECT section from {course_sections} WHERE course = ?', [$newcourseid]);
-    $newsections = array_diff(range(0, $numsections), $existingsections);
-    foreach ($newsections as $sectionnum) {
-        course_add_section($newcourseid, $sectionnum);
-    }
-
-    // Save any custom role names.
-    save_local_role_names($course->id, (array)$data);
-
-    // set up enrolments
-    enrol_course_updated(true, $course, $data);
-
-    // Update course tags.
-    if (isset($data->tags)) {
-        core_tag_tag::set_item_tags('core', 'course', $course->id, context_course::instance($course->id), $data->tags);
-    }
-
-    return $course;
+    // For backward compatibility. the course_format injected more data to course record
+    $course = course_get_format($container->id)->get_course();
+    return clone $course;
 }
 
 /**
@@ -2532,149 +2159,17 @@ function create_course($data, $editoroptions = NULL) {
  * @param object $data  - all the data needed for an entry in the 'course' table
  * @param array $editoroptions course description editor options
  * @return void
+ *
+ * @deprecated since Totara 13.0
  */
 function update_course($data, $editoroptions = NULL) {
-    global $DB, $CFG;
+//    debugging(
+//        "The function 'update_course' has been deprecated, please use " .
+//        "\container_course\course_helper::update_course instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    $data->timemodified = time();
-
-    // Prevent changes on front page course.
-    if ($data->id == SITEID) {
-        throw new moodle_exception('invalidcourse', 'error');
-    }
-
-    $oldcourse = course_get_format($data->id)->get_course();
-    $context   = context_course::instance($oldcourse->id);
-
-    if ($editoroptions) {
-        $data = file_postupdate_standard_editor($data, 'summary', $editoroptions, $context, 'course', 'summary', 0);
-    }
-    if ($overviewfilesoptions = course_overviewfiles_options($data->id)) {
-        $data = file_postupdate_standard_filemanager($data, 'overviewfiles', $overviewfilesoptions, $context, 'course', 'overviewfiles', 0);
-    }
-
-    // Check we don't have a duplicate shortname.
-    if (!empty($data->shortname) && $oldcourse->shortname != $data->shortname) {
-        if ($DB->record_exists_sql('SELECT id from {course} WHERE shortname = ? AND id <> ?', array($data->shortname, $data->id))) {
-            throw new moodle_exception('shortnametaken', '', '', $data->shortname);
-        }
-    }
-
-    // Check we don't have a duplicate idnumber.
-    if (!empty($data->idnumber) && $oldcourse->idnumber != $data->idnumber) {
-        if ($DB->record_exists_sql('SELECT id from {course} WHERE idnumber = ? AND id <> ?', array($data->idnumber, $data->id))) {
-            throw new moodle_exception('courseidnumbertaken', '', '', $data->idnumber);
-        }
-    }
-
-    if ($errorcode = course_validate_dates((array)$data)) {
-        throw new moodle_exception($errorcode);
-    }
-
-    if (!isset($data->category) or empty($data->category)) {
-        // prevent nulls and 0 in category field
-        unset($data->category);
-    }
-    $changesincoursecat = $movecat = (isset($data->category) and $oldcourse->category != $data->category);
-
-    if (!isset($data->visible)) {
-        // data not from form, add missing visibility info
-        $data->visible = $oldcourse->visible;
-    }
-
-    if ($data->visible != $oldcourse->visible) {
-        // reset the visibleold flag when manually hiding/unhiding course
-        $data->visibleold = $data->visible;
-        $changesincoursecat = true;
-    } else {
-        if ($movecat) {
-            $newcategory = $DB->get_record('course_categories', array('id'=>$data->category));
-            if (empty($newcategory->visible)) {
-                // make sure when moving into hidden category the course is hidden automatically
-                $data->visible = 0;
-            }
-        }
-    }
-
-    // Set newsitems to 0 if format does not support announcements.
-    if (isset($data->format)) {
-        $newcourseformat = course_get_format((object)['format' => $data->format]);
-        if (!$newcourseformat->supports_news()) {
-            $data->newsitems = 0;
-        }
-    }
-
-    // Update with the new data
-    $trans = $DB->start_delegated_transaction();
-    $DB->update_record('course', $data);
-    if ($movecat) {
-        $newparent = context_coursecat::instance($data->category);
-        $context->update_moved($newparent);
-    }
-    $trans->allow_commit();
-
-    // make sure the modinfo cache is reset
-    rebuild_course_cache($data->id);
-
-    // update course format options with full course data
-    course_get_format($data->id)->update_course_format_options($data, $oldcourse);
-
-    $course = $DB->get_record('course', array('id'=>$data->id));
-
-    $fixcoursesortorder = $movecat || (isset($data->sortorder) && ($oldcourse->sortorder != $data->sortorder));
-    if ($fixcoursesortorder) {
-        fix_course_sortorder();
-    }
-
-    // purge appropriate caches in case fix_course_sortorder() did not change anything
-    cache_helper::purge_by_event('changesincourse');
-    if ($changesincoursecat) {
-        cache_helper::purge_by_event('changesincoursecat');
-    }
-
-    // Test for and remove blocks which aren't appropriate anymore
-    blocks_remove_inappropriate($course);
-
-    // Save any custom role names.
-    save_local_role_names($course->id, $data);
-
-    // update enrol settings
-    enrol_course_updated(false, $course, $data);
-
-    // Totara: Update the custom fields.
-    customfield_save_data($data, 'course', 'course');
-
-    // TOTARA performance improvement - invalidate static caching of course information.
-    global $CFG;
-    require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
-    require_once($CFG->dirroot . '/completion/criteria/completion_criteria_course.php');
-    require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
-    completion_criteria_activity::invalidatecache();
-    completion_criteria_course::invalidatecache();
-
-    // Update course tags.
-    if (isset($data->tags)) {
-        core_tag_tag::set_item_tags('core', 'course', $course->id, context_course::instance($course->id), $data->tags);
-    }
-
-    // Trigger a course updated event.
-    $event = \core\event\course_updated::create(array(
-        'objectid' => $course->id,
-        'context' => context_course::instance($course->id),
-        'other' => array('shortname' => $course->shortname,
-                         'fullname' => $course->fullname)
-    ));
-
-    $event->set_legacy_logdata(array($course->id, 'course', 'update', 'edit.php?id=' . $course->id, $course->id));
-    $event->trigger();
-
-    if ($oldcourse->format !== $course->format) {
-        // Remove all options stored for the previous format
-        // We assume that new course format migrated everything it needed watching trigger
-        // 'course_updated' and in method format_XXX::update_course_format_options()
-        $DB->delete_records('course_format_options',
-                array('courseid' => $course->id, 'format' => $oldcourse->format));
-    }
+    \container_course\course_helper::update_course($data->id, $data, $editoroptions);
 }
 
 /**

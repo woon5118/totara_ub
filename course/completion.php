@@ -50,6 +50,11 @@ if ($id) {
 
     $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
     require_login($course);
+
+    // Totara: added ability to redirect away from this page if the course is not a legacy course.
+    $hook = new \core_completion\hook\course_completion($course);
+    $hook->execute();
+
     $coursecontext = context_course::instance($course->id);
     require_capability('moodle/course:update', $coursecontext);
 

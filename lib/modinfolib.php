@@ -2304,69 +2304,13 @@ function get_course_and_cm_from_instance($instanceorid, $modulename, $courseorid
  *     Recommended to set to true to avoid unnecessary multiple rebuilding.
  */
 function rebuild_course_cache($courseid=0, $clearonly=false) {
-    global $COURSE, $SITE, $DB, $CFG;
+//    debugging(
+//        "The function 'rebuild_course_cache' has been deprecated, please use ".
+//        "\core_container\cache_helper::rebuild_container_cache instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    // Function rebuild_course_cache() can not be called during upgrade unless it's clear only.
-    if (!$clearonly && !upgrade_ensure_not_running(true)) {
-        $clearonly = true;
-    }
-
-    // Destroy navigation caches
-    navigation_cache::destroy_volatile_caches();
-
-    if (class_exists('format_base')) {
-        // if file containing class is not loaded, there is no cache there anyway
-        format_base::reset_course_cache($courseid);
-    }
-
-    $cachecoursemodinfo = cache::make('core', 'coursemodinfo');
-    if (empty($courseid)) {
-        // Clearing caches for all courses.
-        increment_revision_number('course', 'cacherev', '');
-        $cachecoursemodinfo->purge();
-        course_modinfo::clear_instance_cache();
-        // Update global values too.
-        $sitecacherev = $DB->get_field('course', 'cacherev', array('id' => SITEID));
-        $SITE->cachrev = $sitecacherev;
-        if ($COURSE->id == SITEID) {
-            $COURSE->cacherev = $sitecacherev;
-        } else {
-            $COURSE->cacherev = $DB->get_field('course', 'cacherev', array('id' => $COURSE->id));
-        }
-    } else {
-        // Clearing cache for one course, make sure it is deleted from user request cache as well.
-        increment_revision_number('course', 'cacherev', 'id = :id', array('id' => $courseid));
-        $cachecoursemodinfo->delete($courseid);
-        course_modinfo::clear_instance_cache($courseid);
-        // Update global values too.
-        if ($courseid == $COURSE->id || $courseid == $SITE->id) {
-            $cacherev = $DB->get_field('course', 'cacherev', array('id' => $courseid));
-            if ($courseid == $COURSE->id) {
-                $COURSE->cacherev = $cacherev;
-            }
-            if ($courseid == $SITE->id) {
-                $SITE->cachrev = $cacherev;
-            }
-        }
-    }
-
-    if ($clearonly) {
-        return;
-    }
-
-    if ($courseid) {
-        $select = array('id'=>$courseid);
-    } else {
-        $select = array();
-        core_php_time_limit::raise();  // this could take a while!   MDL-10954
-    }
-
-    $rs = $DB->get_recordset("course", $select,'','id,'.join(',', course_modinfo::$cachedfields));
-    // Rebuild cache for each course.
-    foreach ($rs as $course) {
-        course_modinfo::build_course_cache($course);
-    }
-    $rs->close();
+    \core_container\cache_helper::rebuild_container_cache($courseid, $clearonly);
 }
 
 

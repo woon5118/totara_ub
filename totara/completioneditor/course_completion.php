@@ -46,6 +46,9 @@ if (!$courseid) {
     exit;
 }
 
+$hook = new \core_completion\hook\completion_editor($courseid);
+$hook->execute();
+
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 require_login($course);
 

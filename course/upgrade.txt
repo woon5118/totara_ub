@@ -12,6 +12,25 @@ information provided here is intended especially for developers.
  * core_course_management_renderer::category_listitem() has been updated to delay-render action menu items
  * core_course\management\helper::get_category_listitem_actions() added a second argument $onlyfastactions
  * core_course_renderer::course_section_cm_completion has been updated changing the self completion icon to a checkbox
+ * Function get_module_types_names has been deprecated and will be removed in the future, please use container_course\course::get_module_types_supported instead
+ * Function add_course_module has been deprecated and will be removed in the future, please use container_course\module\course_module::create instead
+ * Function course_create_section has been deprecated and will be removed in the future, please use container_course\section\course_section::create instead
+ * Function course_add_cm_to_section has been deprecated and will be removed in the future, please use container_course\module\course_module::add_to_section instead
+ * Function set_coursemodule_groupmode has been deprecated and will be removed in the future, please use container_course\module\course_module::update_group_mode instead
+ * Function set_coursemodule_idnumber has been deprecated and will be removed in the future, please use container_course\module\course_module::update_id_number instead
+ * Function set_coursemodule_visible has been deprecated and will be removed in the future, please use container_course\module\course_module::update_visible instead
+ * Function set_coursemodule_name has been deprecated and will be removed in the future, please use container_course\module\course_module::update_name instead
+ * Function course_delete_module has been deprecated and will be removed in the future, please use container_course\module\course_module::delete instead
+ * Function course_module_flag_for_async_deletion has been deprecated and will be removed in the future, please use container_course\module\course_module::async_delete instead
+ * Function delete_mod_from_section has been deprecated and will be removed in the future, please use container_course\section\course_section::remove_module instead
+ * Function moveto_module has been deprecated and will be removed in the future, please use container_course\module\course_module::move_to_section instead
+ * Function course_allowed_module has been deprecated and will be removed in the future, please use container_course\course::is_module_allowed instead
+ * Function create_course has been deprecated and will be removed in the future, please use container_course\course_helper::create_course instead
+ * Function update_course has been deprecated and will be removed in the future, please use container_course\course_helper::update_course instead
+ * Function add_moduleinfo has been deprecated and will be removed in the future, please use container_course\course::add_module instead
+ * Function update_moduleinfo has been deprecated and will be removed in the future, please use container_course\module\course_module::update instead
+ * Function include_modulelib has been deprecated and will be removed in the future, please use core_container\module\helper::include_modulelib instead
+ * Function set_moduleinfo_defaults has been deprecated and will be removed in the future, please \container_course\module\course_module::set_moduleinfo_defaults instead
 
 === 12.0 ===
 

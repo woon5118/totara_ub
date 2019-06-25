@@ -169,7 +169,7 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
         $this->program_generator->assign_program($this->program4->id, $enrolledusers);
 
         // Set category.
-        $this->category = coursecat::get(1); // Miscellaneous category.
+        $this->category = coursecat::get(container_course\course::get_default_category_id()); // Miscellaneous category.
 
         // Assign audience1 and audience2 to program2.
         totara_cohort_add_association($this->audience1->id, $this->program2->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
@@ -358,7 +358,7 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
             } else {
                 /** @var totara_program_renderer $programrenderer */
                 $programrenderer = $PAGE->get_renderer('totara_program');
-                $content = $programrenderer->program_category(0, 'program');
+                $content = $programrenderer->program_category($this->category->id, 'program');
             }
 
             // Check how many programs the user can see.

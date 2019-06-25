@@ -31,6 +31,10 @@ $courseid = required_param('id', PARAM_INT);
 $userid   = optional_param('userid', $USER->id, PARAM_INT);
 $userview = optional_param('userview', 0, PARAM_INT);
 
+// Totara: added ability to redirect user out of this page if the course is not a legacy course.
+$hook = new \gradereport_user\hook\index_view($courseid);
+$hook->execute();
+
 $PAGE->set_url(new moodle_url('/grade/report/user/index.php', array('id'=>$courseid)));
 
 if ($userview == 0) {

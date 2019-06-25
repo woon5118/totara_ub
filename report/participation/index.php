@@ -39,6 +39,10 @@ $page       = optional_param('page', 0, PARAM_INT);                     // which
 $perpage    = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT);  // how many per page
 $currentgroup = optional_param('group', null, PARAM_INT); // Get the active group.
 
+// Totara: Added a hook to prevent view on report_participation for certain containers.
+$hook = new \report_participation\hook\index_view($id);
+$hook->execute();
+
 $url = new moodle_url('/report/participation/index.php', array('id'=>$id));
 if ($roleid !== 0) $url->param('roleid');
 if ($instanceid !== 0) $url->param('instanceid');

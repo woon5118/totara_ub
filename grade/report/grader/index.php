@@ -43,6 +43,9 @@ $toggle_type   = optional_param('toggle_type', 0, PARAM_ALPHANUM);
 $graderreportsifirst  = optional_param('sifirst', null, PARAM_NOTAGS);
 $graderreportsilast   = optional_param('silast', null, PARAM_NOTAGS);
 
+// Totara: added ability to redirect user out of this page if the course is not a legacy course.
+$hook = new \gradereport_grader\hook\index_view($courseid);
+$hook->execute();
 // The report object is recreated each time, save search information to SESSION object for future use.
 if (isset($graderreportsifirst)) {
     $SESSION->gradereport['filterfirstname'] = $graderreportsifirst;

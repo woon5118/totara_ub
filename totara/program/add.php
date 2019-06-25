@@ -78,6 +78,12 @@ if ($categoryid) { // Creating new program in this category.
     if (!$category = $DB->get_record('course_categories', array('id' => $categoryid))) {
         print_error('Category ID was incorrect');
     }
+
+    if ($category->issystem) {
+        debugging("Programs cannot be added to the system category.", DEBUG_DEVELOPER);
+        print_error('Category ID was incorrect');
+    }
+
     if (!$iscertif) {
         require_capability('totara/program:createprogram', $catcontext);
     } else {

@@ -53,7 +53,12 @@ if ($selected) {
 }
 
 raise_memory_limit(MEMORY_HUGE);
-$items = $DB->get_records_select('course', "category > 0", array(), 'fullname ASC, idnumber ASC');
+$items = $DB->get_records_select(
+    'course',
+    "category > 0 AND (containertype IS NULL OR containertype = ?)",
+    [\container_course\course::get_type()],
+    'fullname ASC, idnumber ASC'
+);
 
 // Don't let them remove the currently selected ones.
 $unremovable = $selected;

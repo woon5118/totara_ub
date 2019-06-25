@@ -40,138 +40,32 @@ require_once($CFG->dirroot.'/course/lib.php');
  * @param object $course the course of the module
  * @param object $mform this is required by an existing hack to deal with files during MODULENAME_add_instance()
  * @return object the updated module info
+ *
+ * @deprecated since Totara 13.0
  */
 function add_moduleinfo($moduleinfo, $course, $mform = null) {
-    global $DB, $CFG;
+//    debugging(
+//        "The function 'add_moduleinfo' has been deprecated, please use " .
+//        "\container_course\course::add_module instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    // Attempt to include module library before we make any changes to DB.
-    include_modulelib($moduleinfo->modulename);
+    $container = \core_container\factory::from_record($course);
+    $module = $container->add_module($moduleinfo, $mform);
 
-    $moduleinfo->course = $course->id;
-    $moduleinfo = set_moduleinfo_defaults($moduleinfo);
+    // For backward compatibility. We need to update the source of truth.
+    // Update whatever from the database, and whatever had been add additionally to the module.
+    $record = $module->to_record();
 
-    if (!empty($course->groupmodeforce) or !isset($moduleinfo->groupmode)) {
-        $moduleinfo->groupmode = 0; // Do not set groupmode.
+    $properties = get_object_vars($record);
+
+    // This is for backwards compatibility where the 'section' should be pointing to the
+    // section number not the section id.
+    $properties['section'] = $module->get_section()->get_section_number();
+
+    foreach ($properties as $property => $value) {
+        $moduleinfo->{$property} = $value;
     }
-
-    // First add course_module record because we need the context.
-    $newcm = new stdClass();
-    $newcm->course           = $course->id;
-    $newcm->module           = $moduleinfo->module;
-    $newcm->instance         = 0; // Not known yet, will be updated later (this is similar to restore code).
-    $newcm->visible          = $moduleinfo->visible;
-    $newcm->visibleold       = $moduleinfo->visible;
-    if (isset($moduleinfo->visibleoncoursepage)) {
-        $newcm->visibleoncoursepage = $moduleinfo->visibleoncoursepage;
-    }
-    if (isset($moduleinfo->cmidnumber)) {
-        $newcm->idnumber         = $moduleinfo->cmidnumber;
-    }
-    $newcm->groupmode        = $moduleinfo->groupmode;
-    $newcm->groupingid       = $moduleinfo->groupingid;
-    $completion = new completion_info($course);
-    if ($completion->is_enabled()) {
-        $newcm->completion                = $moduleinfo->completion;
-        $newcm->completiongradeitemnumber = $moduleinfo->completiongradeitemnumber;
-        $newcm->completionview            = $moduleinfo->completionview;
-        $newcm->completionexpected        = $moduleinfo->completionexpected;
-    }
-    if(!empty($CFG->enableavailability)) {
-        // This code is used both when submitting the form, which uses a long
-        // name to avoid clashes, and by unit test code which uses the real
-        // name in the table.
-        $newcm->availability = null;
-        if (property_exists($moduleinfo, 'availabilityconditionsjson')) {
-            if ($moduleinfo->availabilityconditionsjson !== '') {
-                $newcm->availability = $moduleinfo->availabilityconditionsjson;
-            }
-        } else if (property_exists($moduleinfo, 'availability')) {
-            $newcm->availability = $moduleinfo->availability;
-        }
-        // If there is any availability data, verify it.
-        if ($newcm->availability) {
-            $tree = new \core_availability\tree(json_decode($newcm->availability));
-            // Save time and database space by setting null if the only data
-            // is an empty tree.
-            if ($tree->is_empty()) {
-                $newcm->availability = null;
-            }
-        }
-    }
-    if (isset($moduleinfo->showdescription)) {
-        $newcm->showdescription = $moduleinfo->showdescription;
-    } else {
-        $newcm->showdescription = 0;
-    }
-
-    // From this point we make database changes, so start transaction.
-    $transaction = $DB->start_delegated_transaction();
-
-    if (!$moduleinfo->coursemodule = add_course_module($newcm)) {
-        print_error('cannotaddcoursemodule');
-    }
-
-    if (plugin_supports('mod', $moduleinfo->modulename, FEATURE_MOD_INTRO, true) &&
-            isset($moduleinfo->introeditor)) {
-        $introeditor = $moduleinfo->introeditor;
-        unset($moduleinfo->introeditor);
-        $moduleinfo->intro       = $introeditor['text'];
-        $moduleinfo->introformat = $introeditor['format'];
-    }
-
-    $addinstancefunction    = $moduleinfo->modulename."_add_instance";
-    try {
-        $returnfromfunc = $addinstancefunction($moduleinfo, $mform);
-    } catch (moodle_exception $e) {
-        $returnfromfunc = $e;
-    }
-    if (!$returnfromfunc or !is_number($returnfromfunc)) {
-        // Undo everything we can. This is not necessary for databases which
-        // support transactions, but improves consistency for other databases.
-        context_helper::delete_instance(CONTEXT_MODULE, $moduleinfo->coursemodule);
-        $DB->delete_records('course_modules', array('id'=>$moduleinfo->coursemodule));
-
-        if ($returnfromfunc instanceof moodle_exception) {
-            throw $returnfromfunc;
-        } else if (!is_number($returnfromfunc)) {
-            print_error('invalidfunction', '', course_get_url($course, $moduleinfo->section));
-        } else {
-            print_error('cannotaddnewmodule', '', course_get_url($course, $moduleinfo->section), $moduleinfo->modulename);
-        }
-    }
-
-    $moduleinfo->instance = $returnfromfunc;
-
-    $DB->set_field('course_modules', 'instance', $returnfromfunc, array('id'=>$moduleinfo->coursemodule));
-
-    // Update embedded links and save files.
-    $modcontext = context_module::instance($moduleinfo->coursemodule);
-    if (!empty($introeditor)) {
-        $moduleinfo->intro = file_save_draft_area_files($introeditor['itemid'], $modcontext->id,
-                                                      'mod_'.$moduleinfo->modulename, 'intro', 0,
-                                                      array('subdirs'=>true), $introeditor['text']);
-        $DB->set_field($moduleinfo->modulename, 'intro', $moduleinfo->intro, array('id'=>$moduleinfo->instance));
-    }
-
-    // Add module tags.
-    if (core_tag_tag::is_enabled('core', 'course_modules') && isset($moduleinfo->tags)) {
-        core_tag_tag::set_item_tags('core', 'course_modules', $moduleinfo->coursemodule, $modcontext, $moduleinfo->tags);
-    }
-
-    // Course_modules and course_sections each contain a reference to each other.
-    // So we have to update one of them twice.
-    $sectionid = course_add_cm_to_section($course, $moduleinfo->coursemodule, $moduleinfo->section);
-
-    // Trigger event based on the action we did.
-    // Api create_from_cm expects modname and id property, and we don't want to modify $moduleinfo since we are returning it.
-    $eventdata = clone $moduleinfo;
-    $eventdata->modname = $eventdata->modulename;
-    $eventdata->id = $eventdata->coursemodule;
-    $event = \core\event\course_module_created::create_from_cm($eventdata, $modcontext);
-    $event->trigger();
-
-    $moduleinfo = edit_module_post_actions($moduleinfo, $course);
-    $transaction->allow_commit();
 
     return $moduleinfo;
 }
@@ -359,56 +253,25 @@ function edit_module_post_actions($moduleinfo, $course) {
  *
  * @param object $moduleinfo the current known data of the module
  * @return object the completed module info
+ *
+ * @deprecated since Totara 13.0
  */
 function set_moduleinfo_defaults($moduleinfo) {
+//    debugging(
+//        "The function 'set_moduleinfo_defaults' has been deprecated, please use " .
+//        "\container_course\module\course_module_helper::set_moduleinfo_defaults instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    if (empty($moduleinfo->coursemodule)) {
-        // Add.
-        $cm = null;
-        $moduleinfo->instance     = '';
-        $moduleinfo->coursemodule = '';
-    } else {
-        // Update.
-        $cm = get_coursemodule_from_id('', $moduleinfo->coursemodule, 0, false, MUST_EXIST);
-        $moduleinfo->instance     = $cm->instance;
-        $moduleinfo->coursemodule = $cm->id;
-    }
-    // For safety.
-    $moduleinfo->modulename = clean_param($moduleinfo->modulename, PARAM_PLUGIN);
+    $updated = \container_course\module\course_module_helper::set_moduleinfo_defaults($moduleinfo);
 
-    if (!isset($moduleinfo->groupingid)) {
-        $moduleinfo->groupingid = 0;
-    }
+    // For backward compatibility. We need to update the source of truth.
+    $properties = get_object_vars($updated);
 
-    if (!isset($moduleinfo->name)) { // Label.
-        $moduleinfo->name = $moduleinfo->modulename;
-    }
-
-    if (!isset($moduleinfo->completion)) {
-        $moduleinfo->completion = COMPLETION_DISABLED;
-    }
-    if (!isset($moduleinfo->completionview)) {
-        $moduleinfo->completionview = COMPLETION_VIEW_NOT_REQUIRED;
-    }
-    if (!isset($moduleinfo->completionexpected)) {
-        $moduleinfo->completionexpected = 0;
-    }
-
-    // Convert the 'use grade' checkbox into a grade-item number: 0 if checked, null if not.
-    // TOTARA CHANGE: to allow restricted access on completion+passgrade requirements.
-    $completionusegrade = isset($moduleinfo->completionusegrade) && $moduleinfo->completionusegrade;
-    $completionpass = isset($moduleinfo->completionpass) && $moduleinfo->completionpass;
-    if ($completionusegrade || $completionpass) {
-        $moduleinfo->completiongradeitemnumber = 0;
-    } else {
-        $moduleinfo->completiongradeitemnumber = null;
-    }
-
-    if (!isset($moduleinfo->conditiongradegroup)) {
-        $moduleinfo->conditiongradegroup = array();
-    }
-    if (!isset($moduleinfo->conditionfieldgroup)) {
-        $moduleinfo->conditionfieldgroup = array();
+    foreach ($properties as $property => $value) {
+        if (property_exists($moduleinfo, $property)) {
+            $moduleinfo->{$property} = $value;
+        }
     }
 
     return $moduleinfo;
@@ -479,162 +342,36 @@ function can_update_moduleinfo($cm) {
  * @param object $course course of the module
  * @param object $mform - the mform is required by some specific module in the function MODULE_update_instance(). This is due to a hack in this function.
  * @return array list of course module and module info.
+ *
+ * @deprecated since Totara 13.0
  */
 function update_moduleinfo($cm, $moduleinfo, $course, $mform = null) {
-    global $DB, $CFG;
+//    debugging(
+//        "The function 'update_moduleinfo' has been deprecated, please use " .
+//        "\container_course\module\course_module::update instead",
+//        DEBUG_DEVELOPER
+//    );
 
-    $data = new stdClass();
-    if ($mform) {
-        $data = $mform->get_data();
+    $container = \core_container\factory::from_record($course);
+    $module = $container->get_module($cm->id);
+
+    $module->update($moduleinfo, $mform);
+
+    // For backward compatibility. We need to update the source of truth.
+    // Update the source of truth for coursemodule
+    $newcm = $module->get_cm_record();
+    $properties = get_object_vars($newcm);
+    foreach ($properties as $property => $value) {
+        $cm->{$property} = $value;
     }
 
-    // Attempt to include module library before we make any changes to DB.
-    include_modulelib($moduleinfo->modulename);
-
-    $moduleinfo->course = $course->id;
-    $moduleinfo = set_moduleinfo_defaults($moduleinfo);
-
-    if (!empty($course->groupmodeforce) or !isset($moduleinfo->groupmode)) {
-        $moduleinfo->groupmode = $cm->groupmode; // Keep original.
+    // Update the source of truth for moduleinfo
+    $properties = get_object_vars($module->to_record());
+    foreach ($properties as $property => $value) {
+        $moduleinfo->{$property} = $value;
     }
 
-    // Update course module first.
-    $cm->groupmode = $moduleinfo->groupmode;
-    if (isset($moduleinfo->groupingid)) {
-        $cm->groupingid = $moduleinfo->groupingid;
-    }
-
-    $completion = new completion_info($course);
-    if ($completion->is_enabled()) {
-        // Completion settings that would affect users who have already completed
-        // the activity may be locked; if so, these should not be updated.
-        if (!empty($moduleinfo->completionunlocked)) {
-            $cm->completion = $moduleinfo->completion;
-            $cm->completiongradeitemnumber = $moduleinfo->completiongradeitemnumber;
-            $cm->completionview = $moduleinfo->completionview;
-
-            if (!empty($moduleinfo->completionunlockednoreset)) {
-                // TOTARA - Trigger module_completion_unlocked event here.
-                \totara_core\event\module_completion_unlocked::create_from_module($moduleinfo)->trigger();
-            }
-        }
-        // The expected date does not affect users who have completed the activity,
-        // so it is safe to update it regardless of the lock status.
-        $cm->completionexpected = $moduleinfo->completionexpected;
-    }
-    if (!empty($CFG->enableavailability)) {
-        // This code is used both when submitting the form, which uses a long
-        // name to avoid clashes, and by unit test code which uses the real
-        // name in the table.
-        if (property_exists($moduleinfo, 'availabilityconditionsjson')) {
-            if ($moduleinfo->availabilityconditionsjson !== '') {
-                $cm->availability = $moduleinfo->availabilityconditionsjson;
-            } else {
-                $cm->availability = null;
-            }
-        } else if (property_exists($moduleinfo, 'availability')) {
-            $cm->availability = $moduleinfo->availability;
-        }
-        // If there is any availability data, verify it.
-        if ($cm->availability) {
-            $tree = new \core_availability\tree(json_decode($cm->availability));
-            // Save time and database space by setting null if the only data
-            // is an empty tree.
-            if ($tree->is_empty()) {
-                $cm->availability = null;
-            }
-        }
-    }
-    if (isset($moduleinfo->showdescription)) {
-        $cm->showdescription = $moduleinfo->showdescription;
-    } else {
-        $cm->showdescription = 0;
-    }
-
-    $DB->update_record('course_modules', $cm);
-
-    // TOTARA performance improvement - invalidate static caching of course information.
-    require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
-    require_once($CFG->dirroot . '/completion/criteria/completion_criteria_course.php');
-    require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
-    completion_criteria_activity::invalidatecache();
-    completion_criteria_course::invalidatecache();
-
-    $modcontext = context_module::instance($moduleinfo->coursemodule);
-
-    // Update embedded links and save files.
-    if (plugin_supports('mod', $moduleinfo->modulename, FEATURE_MOD_INTRO, true)) {
-        $moduleinfo->intro = file_save_draft_area_files($moduleinfo->introeditor['itemid'], $modcontext->id,
-                                                      'mod_'.$moduleinfo->modulename, 'intro', 0,
-                                                      array('subdirs'=>true), $moduleinfo->introeditor['text']);
-        $moduleinfo->introformat = $moduleinfo->introeditor['format'];
-        unset($moduleinfo->introeditor);
-    }
-    // Get the a copy of the grade_item before it is modified incase we need to scale the grades.
-    $oldgradeitem = null;
-    $newgradeitem = null;
-    if (!empty($data->grade_rescalegrades) && $data->grade_rescalegrades == 'yes') {
-        // Fetch the grade item before it is updated.
-        $oldgradeitem = grade_item::fetch(array('itemtype' => 'mod',
-                                                'itemmodule' => $moduleinfo->modulename,
-                                                'iteminstance' => $moduleinfo->instance,
-                                                'itemnumber' => 0,
-                                                'courseid' => $moduleinfo->course));
-    }
-
-    $updateinstancefunction = $moduleinfo->modulename."_update_instance";
-    if (!$updateinstancefunction($moduleinfo, $mform)) {
-        print_error('cannotupdatemod', '', course_get_url($course, $cm->section), $moduleinfo->modulename);
-    }
-
-    // This needs to happen AFTER the grademin/grademax have already been updated.
-    if (!empty($data->grade_rescalegrades) && $data->grade_rescalegrades == 'yes') {
-        // Get the grade_item after the update call the activity to scale the grades.
-        $newgradeitem = grade_item::fetch(array('itemtype' => 'mod',
-                                                'itemmodule' => $moduleinfo->modulename,
-                                                'iteminstance' => $moduleinfo->instance,
-                                                'itemnumber' => 0,
-                                                'courseid' => $moduleinfo->course));
-        if ($newgradeitem && $oldgradeitem->gradetype == GRADE_TYPE_VALUE && $newgradeitem->gradetype == GRADE_TYPE_VALUE) {
-            $params = array(
-                $course,
-                $cm,
-                $oldgradeitem->grademin,
-                $oldgradeitem->grademax,
-                $newgradeitem->grademin,
-                $newgradeitem->grademax
-            );
-            if (!component_callback('mod_' . $moduleinfo->modulename, 'rescale_activity_grades', $params)) {
-                print_error('cannotreprocessgrades', '', course_get_url($course, $cm->section), $moduleinfo->modulename);
-            }
-        }
-    }
-
-    // Make sure visibility is set correctly (in particular in calendar).
-    if (has_capability('moodle/course:activityvisibility', $modcontext)) {
-        set_coursemodule_visible($moduleinfo->coursemodule, $moduleinfo->visible);
-    }
-
-    if (isset($moduleinfo->cmidnumber)) { // Label.
-        // Set cm idnumber - uniqueness is already verified by form validation.
-        set_coursemodule_idnumber($moduleinfo->coursemodule, $moduleinfo->cmidnumber);
-    }
-
-    // Update module tags.
-    if (core_tag_tag::is_enabled('core', 'course_modules') && isset($moduleinfo->tags)) {
-        core_tag_tag::set_item_tags('core', 'course_modules', $moduleinfo->coursemodule, $modcontext, $moduleinfo->tags);
-    }
-
-    // Now that module is fully updated, also update completion data if required.
-    // TOTARA - the function below allows for unlock completion with delete.
-    totara_core_update_module_completion_data($cm, $moduleinfo, $course, $completion);
-
-    $cm->name = $moduleinfo->name;
-    \core\event\course_module_updated::create_from_cm($cm, $modcontext)->trigger();
-
-    $moduleinfo = edit_module_post_actions($moduleinfo, $course);
-
-    return array($cm, $moduleinfo);
+    return [$cm, $moduleinfo];
 }
 
 /**
@@ -642,15 +379,17 @@ function update_moduleinfo($cm, $moduleinfo, $course, $mform = null) {
  *
  * @param string $modulename module name of the lib to include
  * @throws moodle_exception if lib.php file for the module does not exist
+ *
+ * @deprecated since Totara 13.0
  */
 function include_modulelib($modulename) {
-    global $CFG;
-    $modlib = "$CFG->dirroot/mod/$modulename/lib.php";
-    if (file_exists($modlib)) {
-        include_once($modlib);
-    } else {
-        throw new moodle_exception('modulemissingcode', '', '', $modlib);
-    }
+//    debugging(
+//        "The function 'include_modulelib' has been deprecated, please use " .
+//        "\core_container\module\helper::include_modulelib instead",
+//        DEBUG_DEVELOPER
+//    );
+
+    \core_container\module\helper::include_modulelib($modulename);
 }
 
 /**
@@ -664,7 +403,7 @@ function include_modulelib($modulename) {
 function get_moduleinfo_data($cm, $course) {
     global $CFG;
 
-    list($cm, $context, $module, $data, $cw) = can_update_moduleinfo($cm);
+    [$cm, $context, $module, $data, $cw] = can_update_moduleinfo($cm);
 
     $data->coursemodule       = $cm->id;
     $data->section            = $cw->section;  // The section number itself - relative!!! (section column in course_sections)
@@ -756,7 +495,7 @@ function get_moduleinfo_data($cm, $course) {
 function prepare_new_moduleinfo_data($course, $modulename, $section) {
     global $CFG;
 
-    list($module, $context, $cw) = can_add_moduleinfo($course, $modulename, $section);
+    [$module, $context, $cw] = can_add_moduleinfo($course, $modulename, $section);
 
     $cm = null;
 

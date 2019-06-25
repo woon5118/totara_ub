@@ -32,6 +32,9 @@ require_once($CFG->dirroot . '/question/format.php');
 list($thispageurl, $contexts, $cmid, $cm, $module, $pagevars) =
         question_edit_setup('export', '/question/export.php');
 
+// Totara: Added a hook to prevent view on export page for certain containers.
+$hook = new \core_question\hook\export_view($COURSE);
+$hook->execute();
 // get display strings
 $strexportquestions = get_string('exportquestions', 'question');
 

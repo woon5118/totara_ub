@@ -103,8 +103,15 @@ class block_last_course_accessed extends block_base {
                 FROM {course} c
                 LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)
                 LEFT JOIN {course_completions} cc ON c.id = cc.course AND cc.userid = :userid
-                WHERE c.id = :courseid";
-        $params = array('courseid' => $courseid, 'userid' => $USER->id, 'contextlevel' => CONTEXT_COURSE);
+                WHERE c.id = :courseid AND (c.containertype IS NULL OR c.containertype = :container_type)";
+
+        // Added support for container.
+        $params = array(
+            'courseid' => $courseid,
+            'userid' => $USER->id,
+            'contextlevel' => CONTEXT_COURSE,
+            'container_type' => \container_course\course::get_type()
+        );
 
         $course = $DB->get_record_sql($sql, $params);
         if (!$course) {

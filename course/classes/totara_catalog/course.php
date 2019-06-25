@@ -25,6 +25,7 @@ namespace core_course\totara_catalog;
 
 defined('MOODLE_INTERNAL') || die();
 
+use container_course\course as container_course;
 use core_course\workflow_manager\coursecreate;
 use totara_catalog\provider;
 use totara_contentmarketplace\workflow_manager\exploremarketplace;
@@ -120,9 +121,17 @@ class course extends provider {
                   JOIN {context} con
                     ON con.instanceid = c.id
                  WHERE c.id <> :sitecourseid
+                   AND (c.containertype IS NULL OR c.containertype = :containertype)
                    AND con.contextlevel = :coursecontextlevel";
 
-        return [$sql, ['sitecourseid' => SITEID, 'coursecontextlevel' => CONTEXT_COURSE]];
+        return [
+            $sql,
+            [
+                'sitecourseid' => SITEID,
+                'coursecontextlevel' => CONTEXT_COURSE,
+                'containertype' => container_course::get_type()
+            ]
+        ];
     }
 
     public function get_manage_link(int $objectid) {

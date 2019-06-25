@@ -5289,61 +5289,37 @@ function set_login_session_preferences() {
  * @return bool true if all the removals succeeded. false if there were any failures. If this
  *             method returns false, some of the removals will probably have succeeded, and others
  *             failed, but you have no way of knowing which.
+ *
+ * @deprecated since Totara 13.0
  */
 function delete_course($courseorid, $showfeedback = true) {
     global $DB;
 
+//    debugging(
+//        "The function delete_course has been deprecated, please use " .
+//        "\\container_course\\course::delete instead",
+//        DEBUG_DEVELOPER
+//    );
+
     if (is_object($courseorid)) {
-        $courseid = $courseorid->id;
-        $course   = $courseorid;
+        /** @var \container_course\course $course */
+        $course = \core_container\factory::from_record($courseorid);
     } else {
         $courseid = $courseorid;
-        if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+        if (!$record = $DB->get_record('course', array('id' => $courseid))) {
             return false;
         }
-    }
-    $context = context_course::instance($courseid);
 
-    // Frontpage course can not be deleted!!
-    if ($courseid == SITEID) {
+        /** @var \container_course\course $course */
+        $course = \core_container\factory::from_record($record);
+    }
+
+    if ($course->get_id() == SITEID) {
         return false;
     }
 
-    // Allow plugins to use this course before we completely delete it.
-    if ($pluginsfunction = get_plugins_with_function('pre_course_delete')) {
-        foreach ($pluginsfunction as $plugintype => $plugins) {
-            foreach ($plugins as $pluginfunction) {
-                $pluginfunction($course);
-            }
-        }
-    }
-
-    // Make the course completely empty.
-    remove_course_contents($courseid, $showfeedback);
-
-    // Delete the course and related context instance.
-    context_helper::delete_instance(CONTEXT_COURSE, $courseid);
-
-    $DB->delete_records("course", array("id" => $courseid));
-    $DB->delete_records("course_format_options", array("courseid" => $courseid));
-
-    // Reset all course related caches here.
-    if (class_exists('format_base', false)) {
-        format_base::reset_course_cache($courseid);
-    }
-
-    // Trigger a course deleted event.
-    $event = \core\event\course_deleted::create(array(
-        'objectid' => $course->id,
-        'context' => $context,
-        'other' => array(
-            'shortname' => $course->shortname,
-            'fullname' => $course->fullname,
-            'idnumber' => $course->idnumber
-            )
-    ));
-    $event->add_record_snapshot('course', $course);
-    $event->trigger();
+    $course->show_feedback_on_delete($showfeedback);
+    $course->delete();
 
     return true;
 }

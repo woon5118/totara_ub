@@ -25,6 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use totara_cohort\userdata\set_membership;
 use totara_userdata\userdata\target_user;
+use container_course\course;
 
 /**
  * Class totara_cohort_userdata_set_membership_testcase
@@ -66,7 +67,9 @@ class totara_cohort_userdata_set_membership_testcase extends advanced_testcase {
 
         // Do it again using a category context.
         // The first category will the Miscellaneous category which is on a site by default.
-        $miscellaneous_context = context_coursecat::instance($DB->get_field('course_categories', 'id', []));
+        $miscellaneous_context = context_coursecat::instance(
+            $DB->get_field('course_categories', 'id', ['id' => course::get_default_category_id()])
+        );
 
         $export = set_membership::execute_export(
             new target_user($user),

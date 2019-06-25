@@ -60,6 +60,8 @@ if (!empty($add)) {
     $course = $DB->get_record('course', array('id'=>$course), '*', MUST_EXIST);
     require_login($course);
 
+    $hook = new \totara_core\hook\mod_add($course);
+    $hook->execute();
     // There is no page for this in the navigation. The closest we'll have is the course section.
     // If the course section isn't displayed on the navigation this will fall back to the course which
     // will be the closest match we have.
@@ -108,6 +110,9 @@ if (!empty($add)) {
     // require_login
     require_login($course, false, $cm); // needed to setup proper $COURSE
 
+    // Totara: allow the plugins to redirect away from this page if the course is not a legacy course
+    $hook = new \totara_core\hook\mod_update($course->id);
+    $hook->execute();
     list($cm, $context, $module, $data, $cw) = get_moduleinfo_data($cm, $course);
     $data->return = $return;
     $data->sr = $sectionreturn;

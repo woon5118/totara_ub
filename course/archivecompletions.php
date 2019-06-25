@@ -32,6 +32,10 @@ require_once($CFG->dirroot . '/completion/completion_completion.php');
 $id = required_param('id', PARAM_INT); // course id
 $archive = optional_param('archive', '', PARAM_ALPHANUM); // archive confirmation hash
 
+// Totara: allow the plugins to redirect away if course is not a legacy course.
+$hook = new \core_completion\hook\course_archive_completion($id);
+$hook->execute();
+
 $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 $coursecontext = context_course::instance($course->id);
 require_login($course);

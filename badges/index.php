@@ -65,6 +65,10 @@ $err = '';
 $urlparams = array('sort' => $sortby, 'dir' => $sorthow, 'page' => $page);
 
 if ($course = $DB->get_record('course', array('id' => $courseid))) {
+    // Totara: allow the plugins to redirect from this page, if the course is not a legit course.
+    $hook = new \core_badges\hook\index_view($course);
+    $hook->execute();
+
     $urlparams['type'] = $type;
     $urlparams['id'] = $course->id;
 } else {

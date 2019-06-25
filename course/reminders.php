@@ -20,6 +20,9 @@ if ($courseid) {
         print_error('error:courseidincorrect', 'totara_core');
     }
 
+    // Totara: Added a hook to prevent view on page course reminders for certain containers.
+    $hook = new \core_course\hook\reminders_view($course);
+    $hook->execute();
     $coursecontext = context_course::instance($course->id);
 
     require_login($course->id);

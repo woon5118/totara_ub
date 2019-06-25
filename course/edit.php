@@ -59,6 +59,9 @@ if ($id) {
         print_error('cannoteditsiteform');
     }
 
+    // Totara: if this is a non-course, then it should be navigated out of the page.
+    $hook = new \core_course\hook\course_edit_view($id);
+    $hook->execute();
     // Login to the course and retrieve also all fields defined by course format.
     $course = get_course($id);
     require_login($course);
@@ -74,6 +77,15 @@ if ($id) {
     $course = null;
     require_login();
     $category = $DB->get_record('course_categories', array('id'=>$categoryid), '*', MUST_EXIST);
+
+    if ($category->issystem) {
+        // Totara: navigate the page to different creation page when the category's id is for non-course.
+        $hook = new \core_course\hook\course_create_view($categoryid);
+        $hook->execute();
+
+        // It is from the system, so user should not be able to manage it.
+        throw new \coding_exception("Category not found");
+    }
     $catcontext = context_coursecat::instance($category->id);
     require_capability('moodle/course:create', $catcontext);
     $PAGE->set_context($catcontext);

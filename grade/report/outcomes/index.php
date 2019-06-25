@@ -34,6 +34,10 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourseid');
 }
 
+// Totara: added ability to redirect user out of this page if the course is not a legacy course.
+$hook = new \gradereport_outcomes\hook\index_view($courseid);
+$hook->execute();
+
 require_login($course);
 $context = context_course::instance($course->id);
 

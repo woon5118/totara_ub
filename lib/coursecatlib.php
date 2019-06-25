@@ -42,7 +42,7 @@ defined('MOODLE_INTERNAL') || die();
  * @property-read int $depth
  * @property-read string $path
  * @property-read string $theme
- *
+ * @property-read int $issystem
  * @package    core
  * @subpackage course
  * @copyright  2013 Marina Glancy
@@ -70,6 +70,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         'depth' => array('dh', 1),
         'path' => array('ph', null),
         'theme' => null, // Not cached.
+        'issystem' => null, // Not cached
     );
 
     /** @var int */
@@ -125,6 +126,12 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
 
     /** @var bool */
     protected $hasmanagecapability = null;
+
+    /**
+     * Totara: A flag to see whether the category is managed by the system or not.
+     * @var int
+     */
+    protected $issystem = false;
 
     /**
      * Magic setter method, we do not want anybody to modify properties from the outside
@@ -424,6 +431,12 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
 
         $newcategory->sortorder = 0;
         $newcategory->timemodified = time();
+
+        // Totara: Add ability define the course_categories
+        $newcategory->issystem = 0;
+        if (isset($data->issystem)) {
+            $newcategory->issystem = $data->issystem;
+        }
 
         $newcategory->id = $DB->insert_record('course_categories', $newcategory);
 
@@ -980,6 +993,9 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      *
      * Not all fields are retrieved. Records are ready for preloading context
      *
+     * Totara: note that this API will only search for course containers, it will exclude all
+     * the non-courses out of the result list.
+     *
      * @param string $whereclause
      * @param array $params
      * @param array $options may indicate that summary and/or coursecontacts need to be retrieved
@@ -1016,6 +1032,10 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                 $params = array_merge($params, $visibilityparams);
             }
         }
+
+        // Totara: Added where clause to only look for course.
+        $whereclause .= " AND (c.containertype IS NULL OR c.containertype = :containertype)";
+        $params['containertype'] = \container_course\course::get_type();
 
         $sql = "SELECT ". join(',', $fields). ", $ctxselect
                 FROM {course} c
@@ -1152,6 +1172,9 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      *             Only cached fields may be used for sorting!
      *    - offset
      *    - limit - maximum number of children to return, 0 or null for no limit
+     *    - is_system - Whether we are fetching the category that is maintain by the system or not.
+     *                  By default, it is fetching the categories that is maintain-able by the user.
+     *                  The value for this flag is either TRUE or FALSE.
      * @return coursecat[] Array of coursecat objects indexed by category id
      */
     public function get_children($options = array()) {
@@ -1173,6 +1196,16 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $offset = (int)$options['offset'];
         }
 
+        // Totara: Added support to fetch different types of course categories
+        $where_system = 'cc.issystem = :is_system';
+        $where_system_param = [
+            'is_system' => 0
+        ];
+
+        if (array_key_exists('is_system', $options) && $options['is_system']) {
+            $where_system_param['is_system'] = $options['is_system'];
+        }
+
         // First retrieve list of user-visible and sorted children ids from cache.
         $sortedids = $coursecatcache->get('c'. $this->id. ':'.  serialize($sortfields));
         if ($sortedids === false) {
@@ -1191,10 +1224,12 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                 // We need to retrieve and sort all children. Good thing that it is done only on first request.
                 if ($invisibleids = $this->get_not_visible_children_ids()) {
                     list($sql, $params) = $DB->get_in_or_equal($invisibleids, SQL_PARAMS_NAMED, 'id', false);
-                    $records = self::get_records('cc.parent = :parent AND cc.id '. $sql,
-                            array('parent' => $this->id) + $params);
+                    // Totara: Added support for course categories type.
+                    $records = self::get_records('cc.parent = :parent AND cc.id '. $sql . " AND " . $where_system,
+                            array('parent' => $this->id) + $params + $where_system_param);
                 } else {
-                    $records = self::get_records('cc.parent = :parent', array('parent' => $this->id));
+                    // Totara: Added support for course categories type.
+                    $records = self::get_records('cc.parent = :parent AND ' . $where_system, array('parent' => $this->id) + $where_system_param);
                 }
                 self::sort_records($records, $sortfields);
                 $sortedids = array_keys($records);
@@ -1217,7 +1252,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             }
         } else {
             list($sql, $params) = $DB->get_in_or_equal($sortedids, SQL_PARAMS_NAMED, 'id');
-            $records = self::get_records('cc.id '. $sql, array('parent' => $this->id) + $params);
+            $records = self::get_records('cc.id '. $sql . " AND " . $where_system, array('parent' => $this->id) + $params + $where_system_param);
         }
 
         $rv = array();
@@ -2491,6 +2526,9 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      *
      * See also {@link make_categories_options()}
      *
+     * Totara: Note that this function only fetch all the categories that are available to be maintain
+     * by the user only.
+     *
      * @param string/array $requiredcapability if given, only categories where the current
      *      user has this capability will be returned. Can also be an array of capabilities,
      *      in which case they are all required.
@@ -2525,6 +2563,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $sql = "SELECT cc.id, cc.sortorder, cc.name, cc.visible, cc.parent, cc.path, $ctxselect
                     FROM {course_categories} cc
                     JOIN {context} ctx ON cc.id = ctx.instanceid AND ctx.contextlevel = :contextcoursecat
+                    WHERE cc.issystem = 0
                     ORDER BY cc.sortorder";
             $rs = $DB->get_recordset_sql($sql, array('contextcoursecat' => CONTEXT_COURSECAT));
             $baselist = array();

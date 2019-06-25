@@ -36,6 +36,9 @@ if (!$course = $DB->get_record('course', array('id'=>$id))) {
     print_error("invalidcourseid");
 }
 
+// Totara: Added a hook to prevent the reset view for certain containers
+$hook = new \core_course\hook\reset_view($course);
+$hook->execute();
 $PAGE->set_url('/course/reset.php', array('id'=>$id));
 $PAGE->set_pagelayout('admin');
 

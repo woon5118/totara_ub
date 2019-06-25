@@ -163,6 +163,12 @@ class course_edit_form extends moodleform {
         $mform->addElement('header', 'courseformathdr', get_string('type_format', 'plugin'));
 
         $courseformats = get_sorted_course_formats(true);
+
+        // Totara: Filtering out those format that are not supported by the legacy course.
+        $hook = new \core_course\hook\format\legacy_course_format_supported($courseformats);
+        $hook->execute();
+        $courseformats = $hook->get_formats();
+
         $formcourseformats = array();
         foreach ($courseformats as $courseformat) {
             $formcourseformats[$courseformat] = get_string('pluginname', "format_$courseformat");

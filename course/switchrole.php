@@ -57,6 +57,10 @@ if (!$course = $DB->get_record('course', array('id'=>$id))) {
     redirect(new moodle_url('/'));
 }
 
+// Totara: Added a hook to prevent view on switch role page for certain containers.
+$hook = new \core_course\hook\switchrole_view($course);
+$hook->execute();
+
 $context = context_course::instance($course->id);
 
 require_login($course);

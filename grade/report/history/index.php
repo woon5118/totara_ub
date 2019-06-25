@@ -36,6 +36,10 @@ $PAGE->set_pagelayout('report');
 $url = new moodle_url('/grade/report/history/index.php', array('id' => $courseid, 'showreport' => 1));
 $PAGE->set_url($url);
 
+// Totara: added ability to redirect user out of this page if the course is not a legacy course.
+$hook = new \gradereport_history\hook\index_view($courseid);
+$hook->execute();
+
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 require_login($course);
 $context = context_course::instance($course->id);

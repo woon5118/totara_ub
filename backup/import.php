@@ -46,6 +46,10 @@ $restoretarget = optional_param('target', backup::TARGET_CURRENT_ADDING, PARAM_I
 $course = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
 $context = context_course::instance($courseid);
 
+// Totara: added ability to allow plugins to redirect away from this page.
+$hook = new \totara_core\hook\backup_import_view($course);
+$hook->execute();
+
 // Must pass login
 require_login($course);
 // Must hold restoretargetimport in the current course

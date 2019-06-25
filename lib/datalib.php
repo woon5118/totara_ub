@@ -766,6 +766,9 @@ function get_courses_page($categoryid="all", $sort="c.sortorder ASC", $fields="c
  *
  * Note that all courses will be returned if no search criteria are provided.
  *
+ * Totara: note that this function will only return the course containers record, other non-courses
+ * will not be included in here.
+ *
  * @global object
  * @global object
  * @param array $searchterms An array of search criteria
@@ -854,12 +857,15 @@ function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$total
     $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
     $params['contextlevel'] = CONTEXT_COURSE;
 
+    // Totara: Added ability to exclude non-courses from the result list.
     $sql = "SELECT c.* $ccselect
             FROM {course} c
             $ccjoin
             WHERE $searchcond AND c.id <> ".SITEID." $visibilitysql
+            AND (c.containertype IS NULL OR c.containertype = :containertype)
             ORDER BY $sort";
 
+    $params['containertype'] = \container_course\course::get_type();
     $rs = $DB->get_recordset_sql($sql, $params);
     foreach($rs as $course) {
         // Preload contexts only for hidden courses or courses we need to return.

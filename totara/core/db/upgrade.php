@@ -1141,5 +1141,31 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020060200, 'totara', 'core');
     }
 
+    if ($oldversion < 2020062601) {
+        // Define field containertype to be added to course.
+        $table = new xmldb_table('course');
+        $field = new xmldb_field('containertype', XMLDB_TYPE_CHAR, '255', null, false, null, null, 'icon');
+
+        // Conditionally launch add field containertype.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2020062601, 'totara', 'core');
+    }
+
+    if ($oldversion < 2020062602) {
+        // Define field type to be added to course_categories.
+        $table = new xmldb_table('course_categories');
+        $field = new xmldb_field('issystem', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'certifcount');
+
+        // Conditionally launch add field type.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2020062602, 'totara', 'core');
+    }
+
     return true;
 }

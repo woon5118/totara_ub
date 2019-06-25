@@ -142,8 +142,9 @@ class restore_controller extends base_controller {
             // Load plan
             $this->load_plan();
 
-            // Perform all initial security checks and apply (2nd param) them to settings automatically
-            restore_check::check_security($this, true);
+            // Totara: Allow container-specific security checks.
+            $container_restore_helper = \core_container\factory::get_restore_helper($this->courseid);
+            $container_restore_helper->check_security($this);
 
             if ($this->interactive == backup::INTERACTIVE_YES) {
                 $this->set_status(backup::STATUS_SETTING_UI);

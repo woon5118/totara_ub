@@ -2447,7 +2447,11 @@ class restore_fix_restorer_access_step extends restore_execution_step {
             return;
         }
 
-        if (empty($CFG->restorernewroleid)) {
+        // Totara: Allow container-specific role to be assigned to the restorer.
+        $container_restore_helper = \core_container\factory::get_restore_helper($this->get_courseid());
+        $restorer_new_role_id = $container_restore_helper->get_restorer_new_role_id();
+
+        if (empty($restorer_new_role_id)) {
             // Bad luck, no fallback role for restorers specified
             return;
         }
@@ -2461,7 +2465,7 @@ class restore_fix_restorer_access_step extends restore_execution_step {
         }
 
         // Try to add role only - we do not need enrolment if user has moodle/course:view or is already enrolled
-        role_assign($CFG->restorernewroleid, $userid, $context);
+        role_assign($restorer_new_role_id, $userid, $context);
 
         if (is_enrolled($context, $userid, 'moodle/course:update', true) or is_viewing($context, $userid, 'moodle/course:update')) {
             // Extra role is enough, yay!

@@ -449,6 +449,7 @@ class behat_util extends testing_util {
         theme_reset_all_caches();
 
         \totara_catalog\cache_handler::reset_all_caches();
+        \core_container\factory::reset();
 
         self::close_email_sink();
     }

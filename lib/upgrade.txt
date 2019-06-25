@@ -129,6 +129,7 @@ information provided here is intended especially for developers.
 * Added new function crop_resize_image_from_image which can be used to resize the image from original image content.
 * Added \core\hook\requirejs_config_generated that can be used to manipulate RequireJS config after it has
   been generated. Allowing plugins to introduce shims and other common constructs if required.
+* Function delete_course has been deprecated and will be removed in the future, please use \container_course\course::delete instead
 
 === 12.0 ===
 

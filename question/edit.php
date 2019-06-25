@@ -36,6 +36,9 @@ if (($lastchanged = optional_param('lastchanged', 0, PARAM_INT)) !== 0) {
 }
 $PAGE->set_url($url);
 
+// Totara: Added a hook to prevent the question bank view page for certain containers.
+$hook = new \core_question\hook\edit_view($COURSE);
+$hook->execute();
 $questionbank = new core_question\bank\view($contexts, $thispageurl, $COURSE, $cm);
 $questionbank->process_actions();
 

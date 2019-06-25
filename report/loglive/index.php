@@ -38,6 +38,9 @@ if (empty($id)) {
     $coursename = format_string($SITE->fullname, true, array('context' => $context));
 } else {
     $course = get_course($id);
+    // Totara: Added a hook to prevent viewing loglive page for certain course as container
+    $hook = new \report_loglive\hook\index_view($course);
+    $hook->execute();
     require_login($course);
     $context = context_course::instance($course->id);
     $coursename = format_string($course->fullname, true, array('context' => $context));

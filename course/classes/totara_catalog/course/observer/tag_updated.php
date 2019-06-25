@@ -26,6 +26,7 @@ namespace core_course\totara_catalog\course\observer;
 
 defined('MOODLE_INTERNAL') || die();
 
+use container_course\course;
 use totara_catalog\observer\object_update_observer;
 
 /**
@@ -46,12 +47,20 @@ class tag_updated extends object_update_observer {
         global $DB;
         $data = new \stdClass();
 
-        $eventdata = $DB->get_records(
-            'tag_instance',
-            ['itemtype' => 'course', 'tagid' => $this->event->objectid],
-            '',
-            'id, itemid, contextid'
-        );
+        $sql = '
+            SELECT ti.id, ti.itemid, ti.contextid
+            FROM "ttr_tag_instance" ti
+            INNER JOIN "ttr_course" c ON c.id = ti.itemid
+                AND ti.itemtype = :item_type
+            WHERE ti.tagid = :object_id
+                AND (c.containertype IS NULL OR c.containertype = :container_type)
+        ';
+
+        $eventdata = $DB->get_records_sql($sql, [
+            'item_type' => 'course',
+            'object_id' => $this->event->objectid,
+            'container_type' => course::get_type()
+        ]);
 
         foreach ($eventdata as $updatetag) {
             $data->objectid = $updatetag->itemid;

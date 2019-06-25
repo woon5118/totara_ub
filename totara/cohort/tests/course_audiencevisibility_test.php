@@ -76,6 +76,9 @@ class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase
     /** @var stdClass $audience2 */
     private $audience2 = null;
 
+    /** @var coursecat  */
+    private $category = null;
+
     protected function tearDown(): void {
         $this->user1 = null;
         $this->user2 = null;
@@ -95,6 +98,7 @@ class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase
         $this->course6 = null;
         $this->audience1 = null;
         $this->audience2 = null;
+        $this->category = null;
         parent::tearDown();
     }
 
@@ -206,6 +210,8 @@ class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase
         $params = array('cohortid' => $this->audience2->id, 'instanceid' => $this->course4->id,
                             'instancetype' => COHORT_ASSN_ITEMTYPE_COURSE);
         $this->assertTrue($DB->record_exists('cohort_visibility', $params));
+
+        $this->category = coursecat::get(\container_course\course::get_default_category_id());
     }
 
     /**
@@ -274,7 +280,7 @@ class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase
             } else {
                 /** @var core_course_renderer $courserenderer */
                 $courserenderer = $PAGE->get_renderer('core', 'course');
-                $content = $courserenderer->course_category(0);
+                $content = $courserenderer->course_category($this->category->id);
             }
 
             // Courses visible to the user.

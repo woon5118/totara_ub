@@ -45,6 +45,15 @@ $site = get_site();
 $category = null;
 if ($categoryid) {
     $category = coursecat::get($categoryid);
+    if ($category->issystem) {
+        // Totara: provide the ability to navigate away base on the category.
+        $hook = new \core_course\hook\course_category_index_view($categoryid);
+        $hook->execute();
+
+        // It is from the system, so user should not be able to manage it.
+        throw new \coding_exception("Category not found");
+    }
+
     $PAGE->set_category_by_id($categoryid);
     $PAGE->set_url(new moodle_url('/course/index.php', array('categoryid' => $categoryid)));
     $PAGE->set_pagetype('course-index-category');

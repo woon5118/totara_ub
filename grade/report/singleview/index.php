@@ -32,6 +32,9 @@ require_once($CFG->dirroot.'/grade/report/singleview/lib.php');
 $courseid = required_param('id', PARAM_INT);
 $groupid  = optional_param('group', null, PARAM_INT);
 
+// Totara: added ability to redirect user out of this page if the course is not a legacy course.
+$hook = new \gradereport_singleview\hook\index_view($courseid);
+$hook->execute();
 // Making this work with profile reports.
 $userid   = optional_param('userid', null, PARAM_INT);
 

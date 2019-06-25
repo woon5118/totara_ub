@@ -26,6 +26,7 @@ namespace core_course\totara_catalog\course\observer;
 
 defined('MOODLE_INTERNAL') || die();
 
+use container_course\course;
 use totara_catalog\observer\object_update_observer;
 
 /**
@@ -43,12 +44,22 @@ class tag_removed extends object_update_observer {
      * init all course update objects for removed tag id
      */
     protected function init_change_objects(): void {
-
+        global $DB;
         $data = new \stdClass();
 
         $eventdata = $this->event->get_data();
 
         if ($eventdata['other']['itemtype'] == 'course') {
+            $object_id = $eventdata['other']['itemid'];
+
+            // The `itemid` in this case is pointing to the course's id. However, within PHPUnit evironment,
+            // sometimes the 'itemid' is being given randomly which is not even existing in the system.
+            $course = $DB->get_record('course', ['id' => $object_id], 'id, containertype');
+
+            if ($course && course::get_type() === $course->containertype) {
+                return;
+            }
+
             $data->objectid = $eventdata['other']['itemid'];
             $data->contextid = $this->event->contextid;
             $this->register_for_update($data);

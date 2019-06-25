@@ -177,7 +177,7 @@ class totara_cohort_certification_audiencevisibility_testcase extends advanced_t
         $this->program_generator->assign_program($this->certif4->id, $enrolledusers);
 
         // Set category.
-        $this->category = coursecat::get(1); // Miscellaneous category.
+        $this->category = coursecat::get(\container_course\course::get_default_category_id()); // Miscellaneous category.
 
         // Assign audience1 and audience2 to program2.
         totara_cohort_add_association($this->audience1->id, $this->certif2->id, COHORT_ASSN_ITEMTYPE_CERTIF, COHORT_ASSN_VALUE_VISIBLE);
@@ -369,7 +369,7 @@ class totara_cohort_certification_audiencevisibility_testcase extends advanced_t
             } else {
                 /** @var totara_program_renderer $programrenderer */
                 $programrenderer = $PAGE->get_renderer('totara_program');
-                $content = $programrenderer->program_category(0, 'certification');
+                $content = $programrenderer->program_category($this->category->id, 'certification');
             }
 
             // Check how many certifications the user can see.

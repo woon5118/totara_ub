@@ -32,6 +32,10 @@ require_once($CFG->dirroot . '/question/format.php');
 list($thispageurl, $contexts, $cmid, $cm, $module, $pagevars) =
         question_edit_setup('import', '/question/import.php');
 
+// Totara: Added a hook to prevent view on import page for certain containers.
+$hook = new \core_question\hook\import_view($COURSE);
+$hook->execute();
+
 // get display strings
 $txt = new stdClass();
 $txt->importerror = get_string('importerror', 'question');

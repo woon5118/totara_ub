@@ -44,6 +44,9 @@ $title = get_string('create', 'badges');
 
 if (($type == BADGE_TYPE_COURSE) && ($course = $DB->get_record('course', array('id' => $courseid)))) {
     require_login($course);
+    // Totara: allow the plugins to redirect away from this page if the course is not a legit course.
+    $hook = new \core_badges\hook\new_badge_view($course);
+    $hook->execute();
     $coursecontext = context_course::instance($course->id);
     $PAGE->set_context($coursecontext);
     $PAGE->set_pagelayout('incourse');

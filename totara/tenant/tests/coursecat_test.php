@@ -23,6 +23,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use container_course\course;
+
 /**
  * Tests covering multitenancy related changes in course category related code.
  */
@@ -392,7 +394,7 @@ class totara_tenant_coursecat_testcase extends advanced_testcase {
         $admin = get_admin();
         $guest = guest_user();
 
-        $misccat = $DB->get_record('course_categories', []);
+        $misccat = $DB->get_record('course_categories', ['id' => course::get_default_category_id()]);
 
         $user0_1 = $this->getDataGenerator()->create_user(['tenantid' => null]);
         $user0_2 = $this->getDataGenerator()->create_user(['tenantid' => null]);
@@ -564,7 +566,7 @@ class totara_tenant_coursecat_testcase extends advanced_testcase {
         $admin = get_admin();
         $guest = guest_user();
 
-        $misccat = $DB->get_record('course_categories', []);
+        $misccat = $DB->get_record('course_categories', ['id' => course::get_default_category_id()]);
 
         $user0_1 = $this->getDataGenerator()->create_user(['tenantid' => null]);
         $category0_1 = $this->getDataGenerator()->create_category();

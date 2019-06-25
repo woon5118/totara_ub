@@ -1210,7 +1210,7 @@ class global_navigation extends navigation_node {
      */
     public function initialise() {
         global $CFG, $SITE, $USER;
-        require_once($CFG->dirroot.'/totara/dashboard/lib.php');
+        require_once("{$CFG->dirroot}/totara/dashboard/lib.php");
 
         // Check if it has already been initialised
         if ($this->initialised || during_initial_install()) {
@@ -1240,6 +1240,22 @@ class global_navigation extends navigation_node {
             $this->rootnodes['home'] = $this->add(get_string('home'), new moodle_url('/', array('redirect' => 0)), self::TYPE_SETTING, null, 'home');
         }
         $this->rootnodes['site'] = $this->add_course($SITE);
+
+        // Totara: Someone wants to override the navigation. We give them a chance to change the world :) !
+        $hook = new \totara_core\hook\navigation\global_navigation_initialise($this);
+        $hook->execute();
+
+        if (!$hook->is_override()) {
+            // Not overriding, fallback to legacy  initialise.
+            $this->legacy_initialise();
+        }
+
+        return true;
+    }
+
+    private function legacy_initialise() {
+        global $CFG, $SITE, $USER;
+
         $this->rootnodes['myprofile'] = $this->add(get_string('profile'), null, self::TYPE_USER, null, 'myprofile');
         $this->rootnodes['currentcourse'] = $this->add(get_string('currentcourse'), null, self::TYPE_ROOTNODE, null, 'currentcourse');
         $this->rootnodes['mycourses'] = $this->add(get_string('mycourses'), null, self::TYPE_ROOTNODE, null, 'mycourses');
@@ -1455,7 +1471,6 @@ class global_navigation extends navigation_node {
                 $this->children->add($child);
             }
         }
-        return true;
     }
 
     /**
@@ -2225,7 +2240,7 @@ class global_navigation extends navigation_node {
      * @param bool $forceforcontext probably force something to be loaded somewhere (ask SamH if not sure what this means)
      * @return bool
      */
-    protected function load_for_user($user=null, $forceforcontext=false) {
+    public function load_for_user($user=null, $forceforcontext=false) {
         global $DB, $CFG, $USER, $SITE;
 
         if ($user === null) {
@@ -3035,6 +3050,33 @@ class global_navigation extends navigation_node {
             }
         }
     }
+
+    /**
+     * Getter for moodle_page.
+     *
+     * @return \moodle_page
+     */
+    public function get_page(): \moodle_page {
+        return $this->page;
+    }
+
+    /**
+     * Adding a navigation node to a root node.
+     *
+     * @param string          $name
+     * @param navigation_node $node
+     *
+     * @return navigation_node
+     */
+    public function add_rootnode(string $name, \navigation_node $node): \navigation_node {
+        if (array_key_exists($name, $this->rootnodes)) {
+            debugging("A root node for key '{$name}' is already existing", DEBUG_DEVELOPER);
+            return $node;
+        }
+
+        $this->rootnodes[$name] = $node;
+        return $node;
+    }
 }
 
 /**
@@ -3084,12 +3126,24 @@ class global_navigation_for_ajax extends global_navigation {
      * @return array An array of the expandable nodes
      */
     public function initialise() {
-        global $DB, $SITE;
-
         if ($this->initialised || during_initial_install()) {
             return $this->expandable;
         }
         $this->initialised = true;
+
+        // Totara: We give chance to people to override the global navigation for ajax.
+        $hook = new \totara_core\hook\navigation\global_navigation_for_ajax_intialise($this);
+        $hook->execute();
+
+        if (!$hook->is_override()) {
+            $this->legacy_initialise();
+        }
+
+        return $this->expandable;
+    }
+
+    protected function legacy_initialise() {
+        global $DB, $SITE;
 
         $this->rootnodes = array();
         $this->rootnodes['site']    = $this->add_course($SITE);
@@ -3160,7 +3214,6 @@ class global_navigation_for_ajax extends global_navigation {
                 break;
             default:
                 throw new Exception('Unknown type');
-                return $this->expandable;
         }
 
         if ($this->page->context->contextlevel == CONTEXT_COURSE && $this->page->context->instanceid != $SITE->id) {
@@ -3168,7 +3221,6 @@ class global_navigation_for_ajax extends global_navigation {
         }
 
         $this->find_expandable($this->expandable);
-        return $this->expandable;
     }
 
     /**
@@ -3769,13 +3821,27 @@ class settings_navigation extends navigation_node {
      *
      */
     public function initialise() {
-        global $DB, $SESSION, $SITE;
-
         if (during_initial_install()) {
             return false;
         } else if ($this->initialised) {
             return true;
         }
+
+        // Totara: We want to give the chance to people who want to change the world :) !
+        $hook = new \totara_core\hook\navigation\settings_navigation_initialise($this);
+        $hook->execute();
+
+        if (!$hook->is_override()) {
+            $this->legacy_initialise();
+        }
+
+        $this->initialised = true;
+        return true;
+    }
+
+    protected function legacy_initialise() {
+        global $SESSION, $SITE;
+
         $this->id = 'settingsnav';
         $this->context = $this->page->context;
 
@@ -3872,7 +3938,6 @@ class settings_navigation extends navigation_node {
                 $node->remove();
             }
         }
-        $this->initialised = true;
     }
     /**
      * Override the parent function so that we can add preceeding hr's and set a

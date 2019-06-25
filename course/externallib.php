@@ -126,7 +126,19 @@ class core_course_external extends external_api {
         }
 
         //retrieve the course
-        $course = $DB->get_record('course', array('id' => $params['courseid']), '*', MUST_EXIST);
+        // Totara: Only fetching a course rather than anything else.
+        $course_sql = '
+            SELECT * FROM "ttr_course" c 
+            WHERE c.id = :course_id 
+                AND (c.containertype IS NULL OR c.containertype = :container_type)
+        ';
+
+        $db_parameters = [
+            'course_id' => $params['courseid'],
+            'container_type' => \container_course\course::get_type()
+        ];
+
+        $course = $DB->get_record_sql($course_sql, $db_parameters, MUST_EXIST);
 
         if ($course->id != SITEID) {
             // Check course format exist.
@@ -419,9 +431,21 @@ class core_course_external extends external_api {
         //retrieve courses
         if (!array_key_exists('ids', $params['options'])
                 or empty($params['options']['ids'])) {
-            $courses = $DB->get_records('course');
+            // Totara: Added the ability to fetch only courses and excluding non-courses.
+            $courses = $DB->get_records_sql(
+                'SELECT * FROM "ttr_course" c WHERE (c.containertype IS NULL OR c.containertype = :type)',
+                ['type' => \container_course\course::get_type()]
+            );
         } else {
-            $courses = $DB->get_records_list('course', 'id', $params['options']['ids']);
+            // Totara: Added the ability to fetch only courses and excluding non-courses.
+            [$courses_in_sql, $courses_parameters] = $DB->get_in_or_equal($params['options']['ids'], SQL_PARAMS_NAMED);
+            $courses_parameters['type'] = \container_course\course::get_type();
+
+            $courses_sql = 'SELECT * FROM "ttr_course" c 
+                    WHERE (c.containertype IS NULL OR c.containertype = :type) 
+                      AND c.id ' . $courses_in_sql;
+
+            $courses = $DB->get_records_sql($courses_sql, $courses_parameters);
         }
 
         //create return value

@@ -108,6 +108,9 @@ $PAGE->set_pagelayout('report');
 $course = null;
 if ($id) {
     $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
+    // Totara: Added a hook to prevent viewing logs for certain container.
+    $hook = new \report_log\hook\index_view($course);
+    $hook->execute();
     require_login($course);
     $context = context_course::instance($course->id);
 } else {

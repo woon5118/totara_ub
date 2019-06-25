@@ -35,6 +35,9 @@ $page       = optional_param('page', 0, PARAM_INT);
 
 require_login();
 
+// Totara: allows the plugins to redirect away from this page if the course is not a legacy course
+$hook = new \core_badges\hook\view($courseid);
+$hook->execute();
 if (empty($CFG->enablebadges)) {
     print_error('badgesdisabled', 'badges');
 }

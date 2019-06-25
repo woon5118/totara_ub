@@ -38,6 +38,9 @@ if (!$id) {
     print_error('needcourseid');
 }
 
+// Totara: Added a hook to prevent on viewing competency page for certain containers.
+$hook = new \core_course\hook\competency_view($id);
+$hook->execute();
 // Check if Competencies are enabled.
 competency::check_feature_enabled();
 

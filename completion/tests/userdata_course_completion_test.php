@@ -21,6 +21,8 @@
  * @package core_completion
  */
 
+use container_course\course;
+
 /**
  * Class core_completion_userdata_course_completion_testcase
  *
@@ -64,7 +66,9 @@ class core_completion_userdata_course_completion_testcase extends advanced_testc
         );
 
         // Do it again inside a context. The first category will the Miscellaneous category which on a site by default.
-        $miscellaneous_context = context_coursecat::instance($DB->get_field('course_categories', 'id', []));
+        $miscellaneous_context = context_coursecat::instance(
+            $DB->get_field('course_categories', 'id', ['id' => course::get_default_category_id()])
+        );
 
         $export = \core_completion\userdata\course_completion::execute_export(
                 new \totara_userdata\userdata\target_user($user),

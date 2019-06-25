@@ -44,6 +44,10 @@ $returnurl = $CFG->wwwroot.'/group/index.php?id='.$courseid;
 
 $course = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
 
+// Totara: Added ability to let plugin redirect away from this page.
+$hook = new \totara_core\hook\group_index($course);
+$hook->execute();
+
 $url = new moodle_url('/group/index.php', array('id'=>$courseid));
 navigation_node::override_active_url($url);
 if ($userid) {

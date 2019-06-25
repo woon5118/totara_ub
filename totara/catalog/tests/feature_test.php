@@ -24,6 +24,7 @@
 use totara_catalog\datasearch\filter;
 use totara_catalog\feature;
 use totara_catalog\local\category_feature;
+use container_course\course;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -193,9 +194,9 @@ class totara_catalog_feature_testcase extends advanced_testcase {
 
         // Check get_options() method.
         $options = $feature->get_options();
-        $this->assertCount(5, $options);
+        $this->assertCount($DB->count_records('course_categories'), $options);
 
-        $misc_default_cat = $DB->get_record('course_categories', ['name' => 'Miscellaneous']);
+        $misc_default_cat = $DB->get_record('course_categories', ['id' => course::get_default_category_id()]);
         $context_misc = context_coursecat::instance($misc_default_cat->id);
         $context_c1 = context_coursecat::instance($c1->id);
         $context_c2 = context_coursecat::instance($c2->id);

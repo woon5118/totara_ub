@@ -132,8 +132,9 @@ class backup_controller extends base_controller {
         // Apply all default settings (based on type/format/mode)
         $this->apply_defaults();
 
-        // Perform all initial security checks and apply (2nd param) them to settings automatically
-        backup_check::check_security($this, true);
+        // Totara: Allow container-specific security checks.
+        $container_backup_helper = \core_container\factory::get_backup_helper($this->courseid);
+        $container_backup_helper->check_security($this);
 
         // Set status based on interactivity
         if ($this->interactive == backup::INTERACTIVE_YES) {

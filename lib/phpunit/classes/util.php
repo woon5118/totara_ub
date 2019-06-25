@@ -334,6 +334,10 @@ class phpunit_util extends testing_util {
             self::$lastdbwrites = $DB->perf_get_writes();
         }
 
+        // Reset the container factory's cache.
+        \core_container\factory::reset();
+        \core_container\factory::reset_containers_map();
+
         if ($warnings) {
             $warnings = implode("\n", $warnings);
             trigger_error($warnings, E_USER_WARNING);

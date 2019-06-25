@@ -32,6 +32,10 @@ $action          = optional_param('action', 0, PARAM_ALPHA);
 $eid             = optional_param('eid', 0, PARAM_ALPHANUM);
 $weightsadjusted = optional_param('weightsadjusted', 0, PARAM_INT);
 
+// Totara: Added hook to prevent view on edit_tree view page for certain containers.
+$hook = new \core_grades\hook\edit_tree_view($courseid);
+$hook->execute();
+
 $url = new moodle_url('/grade/edit/tree/index.php', array('id' => $courseid));
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');

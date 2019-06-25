@@ -25,6 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use totara_cohort\userdata\dynamic_membership;
 use totara_userdata\userdata\target_user;
+use container_course\course;
 
 /**
  * Class totara_cohort_userdata_dynamic_membership_testcase
@@ -69,7 +70,9 @@ class totara_cohort_userdata_dynamic_membership_testcase extends advanced_testca
 
         // Do it again using a category context.
         // The first category will the Miscellaneous category which is on a site by default.
-        $miscellaneous_context = context_coursecat::instance($DB->get_field('course_categories', 'id', []));
+        $miscellaneous_context = context_coursecat::instance(
+            $DB->get_field('course_categories', 'id', ['id' => course::get_default_category_id()])
+        );
 
         $export = dynamic_membership::execute_export(
             new target_user($user),

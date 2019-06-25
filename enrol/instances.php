@@ -30,6 +30,9 @@ $instanceid = optional_param('instance', 0, PARAM_INT);
 $confirm    = optional_param('confirm', 0, PARAM_BOOL);
 $confirm2   = optional_param('confirm2', 0, PARAM_BOOL);
 
+// Totara: added ability to redirect user from this page if the course is the legacy course.
+$hook = new \totara_core\hook\configure_enrol_instances($id);
+$hook->execute();
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
 $context = context_course::instance($course->id, MUST_EXIST);
 
@@ -273,7 +276,13 @@ echo html_writer::table($table);
 
 // access security is in each plugin
 $candidates = array();
-foreach (enrol_get_plugins(true) as $name=>$plugin) {
+$plugins = enrol_get_plugins(true);
+
+$hook = new \totara_core\hook\enrol_plugins($course, $plugins);
+$hook->execute();
+$plugins = $hook->get_enrol_plugins();
+
+foreach ($plugins as $name=>$plugin) {
     if ($plugin->use_standard_editing_ui()) {
         if ($plugin->can_add_instance($course->id)) {
             // Standard add/edit UI.

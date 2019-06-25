@@ -7,6 +7,9 @@ information provided here is intended especially for developers.
   core_backup_renderer::course_selector_current(), and core_backup_renderer::course_selector_existing.
 * Deprecated restore_ui::cleanup() has been removed
 * Constant backup::MODE_HUB has been deprecated
+* Allow backup permissions check to be overridden by the course container API
+  in backup_controller::__construct and restore_controller::__construct
+* Allow restorer course role to be overridden by the course container API
 
 === 11 ===
 

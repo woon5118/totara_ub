@@ -35,6 +35,11 @@ $PAGE->set_url(new moodle_url('/grade/report/overview/index.php', array('id' => 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourseid');
 }
+
+// Totara: added ability to redirect user out of this page if the course is not a legacy course.
+$hook = new \gradereport_overview\hook\index_view($courseid);
+$hook->execute();
+
 require_login(null, false);
 $PAGE->set_course($course);
 
