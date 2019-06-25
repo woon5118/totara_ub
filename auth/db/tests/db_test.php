@@ -27,7 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-class auth_db_testcase extends advanced_testcase {
+class auth_db_db_testcase extends advanced_testcase {
     /** @var string Original error log */
     protected $oldlog;
 
@@ -397,8 +397,6 @@ class auth_db_testcase extends advanced_testcase {
         require_once($CFG->libdir.'/adodb/drivers/adodb-odbc.inc.php');
         require_once($CFG->libdir.'/adodb/drivers/adodb-db2ora.inc.php');
 
-        $this->resetAfterTest(false);
-
         $sql = "select * from table WHERE column=:1 AND anothercolumn > :0";
         $arr = array('b', 1);
         list($sqlout, $arrout) = _colonscope($sql,$arr);
@@ -412,8 +410,6 @@ class auth_db_testcase extends advanced_testcase {
     public function test_clean_data() {
         global $DB;
 
-        $this->resetAfterTest(false);
-        $this->preventResetByRollback();
         $this->init_auth_database();
         $auth = get_auth_plugin('db');
         $auth->db_init();

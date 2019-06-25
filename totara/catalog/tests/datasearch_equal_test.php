@@ -81,7 +81,7 @@ class totara_catalog_datasearch_equal_testcase extends advanced_testcase {
         $this->assertEquals(true, $filter->is_active());
     }
 
-    public function test_make_compare_data_provider() {
+    public function provider_compare_data() {
         return [
             [null, false],
             [123, true],
@@ -91,7 +91,7 @@ class totara_catalog_datasearch_equal_testcase extends advanced_testcase {
     }
 
     /**
-     * @dataProvider test_make_compare_data_provider
+     * @dataProvider provider_compare_data
      *
      * @param $data
      * @param $isactive

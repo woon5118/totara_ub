@@ -50,8 +50,6 @@ class mustache_string_helper_testcase extends advanced_testcase {
 
     /**
      * Test the get_mustache method returns what we require.
-     *
-     * @return array
      */
     public function test_get_mustache() {
         list($mustache, $loader, $renderer, $page) = $this->get_mustache();
@@ -62,18 +60,14 @@ class mustache_string_helper_testcase extends advanced_testcase {
         return [$mustache, $loader, $renderer, $page];
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_valid_usage($data) {
+    public function test_valid_usage() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // Identifier only.
         $loader->setTemplate('test', '{{#str}}viewallcourses{{/str}}');
@@ -195,18 +189,14 @@ class mustache_string_helper_testcase extends advanced_testcase {
         );
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_legacy_usage($data) {
+    public function test_legacy_usage() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // Identifier + component + variable $a
         $loader->setTemplate('test', '{{#str}}added,core,{{var}}{{/str}}');
@@ -296,18 +286,14 @@ class mustache_string_helper_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('Invalid $a identifier for string helper must be a string identifier.');
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_excess_arguments($data) {
+    public function test_excess_arguments() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // One additional argument.
         $loader->setTemplate('test', '{{#str}}added,core,delete,core,mystery{{/str}}');
@@ -326,18 +312,14 @@ class mustache_string_helper_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('Unexpected number of arguments, 2 too many');
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_non_conforming_a_string_identifier($data) {
+    public function test_non_conforming_a_string_identifier() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         $loader->setTemplate('test', '{{#str}}added,core,test case{{/str}}');
         $this->assertEquals(
@@ -347,18 +329,14 @@ class mustache_string_helper_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('Invalid $a identifier for string helper must be a string identifier.');
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_non_conforming_a_string_component($data) {
+    public function test_non_conforming_a_string_component() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         $loader->setTemplate('test', '{{#str}}added,core,delete,test case{{/str}}');
         $this->assertEquals(

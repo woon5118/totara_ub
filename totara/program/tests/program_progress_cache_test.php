@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
 /**
  * Tests program progress information functions
  */
-class totara_program_progress_cache_testcase extends reportcache_advanced_testcase {
+class totara_program_program_progress_cache_testcase extends reportcache_advanced_testcase {
 
     /**
      * Setup data used in test functions
@@ -62,8 +62,6 @@ class totara_program_progress_cache_testcase extends reportcache_advanced_testca
 
 
     public function test_add_to_cache() {
-        $this->resetAfterTest(false);
-
         $that = $this->setup_common();
 
         $progid = 1;
@@ -167,13 +165,8 @@ class totara_program_progress_cache_testcase extends reportcache_advanced_testca
             $userdata = $that->usercache->get($userkey);
             $this->assertTrue(in_array($key, $userdata));
         }
-    }
 
-    /**
-     * @depends test_add_to_cache
-     */
-    public function test_add_to_second_program() {
-        $this->resetAfterTest(false);
+        // add to second program
 
         $that = $this->setup_common();
 
@@ -228,14 +221,8 @@ class totara_program_progress_cache_testcase extends reportcache_advanced_testca
                 $this->assertFalse(in_array($key2, $userdata));
             }
         }
-    }
 
-
-    /**
-     * @depends test_add_to_second_program
-     */
-    public function test_mark_progressinfo_stale() {
-        $this->resetAfterTest(true);
+        // mark progressinfo stale
 
         $that = $this->setup_common();
 

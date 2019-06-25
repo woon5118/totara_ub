@@ -50,8 +50,6 @@ class mustache_esc_helper_testcase extends advanced_testcase {
 
     /**
      * Test the get_mustache method returns what we require.
-     *
-     * @return array
      */
     public function test_get_mustache() {
         list($mustache, $loader, $renderer, $page) = $this->get_mustache();
@@ -59,21 +57,16 @@ class mustache_esc_helper_testcase extends advanced_testcase {
         self::assertInstanceOf(Mustache_Loader_ArrayLoader::class, $loader);
         self::assertInstanceOf(core_renderer::class, $renderer);
         self::assertInstanceOf(moodle_page::class, $page);
-        return [$mustache, $loader, $renderer, $page];
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_valid_usage(array $data) {
+    public function test_valid_usage() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // Plain text
         $loader->setTemplate('test', '{{#esc}}test{{/esc}}');
@@ -159,18 +152,14 @@ class mustache_esc_helper_testcase extends advanced_testcase {
         );
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_mixed_content_not_allowed(array $data) {
+    public function test_mixed_content_not_allowed() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // Following text.
         $loader->setTemplate('test', "{{#esc}}{{foo}}Bar{{/esc}}");
@@ -189,18 +178,14 @@ class mustache_esc_helper_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('Escaped content contains unexpected mustache processing queues. It will be lost.');
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_multiple_vars_not_allowed(array $data) {
+    public function test_multiple_vars_not_allowed() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // Multiple variables
         $loader->setTemplate('test', "{{#esc}}{{foo}}{{bar}}{{/esc}}");
@@ -211,18 +196,15 @@ class mustache_esc_helper_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('Escaped content contains unexpected mustache processing queues. It will be lost.');
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_helpers_not_allowed(array $data) {
+    public function test_helpers_not_allowed() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
+
         // Single variable complex string
         $loader->setTemplate('test', "{{#esc}}{{#str}}delete{{/str}}{{/esc}}");
         $this->assertEquals(
@@ -232,18 +214,15 @@ class mustache_esc_helper_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('Escaped content contains unexpected mustache processing queues. It will be lost.');
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_recursive_vars_not_allowed(array $data) {
+    public function test_recursive_vars_not_allowed() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
+
         $loader->setTemplate('test', "{{#esc}}{{foo}}{{/esc}}");
         $this->assertEquals(
             '[[bar]]',
@@ -252,18 +231,15 @@ class mustache_esc_helper_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('Mustache processing quotes converted to square brackets for safety.');
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_pattern_mismatch(array $data) {
+    public function test_pattern_mismatch() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
+
         $loader->setTemplate('test', "{{#esc}}{{{{foo}}}}{{/esc}}");
         $this->assertEquals(
             '',

@@ -33,8 +33,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class advanced_testcase extends base_testcase {
-    /** @var bool automatically reset everything? null means log changes */
-    private $resetAfterTest;
+    /** @var bool Totara: always reset after each test, use basic_testcase if you want logging of unexpected state changes */
+    private $resetAfterTest = true;
 
     /** @var int timestamp used for current time asserts */
     private $currenttimestart;
@@ -211,13 +211,19 @@ abstract class advanced_testcase extends base_testcase {
     }
 
     /**
-     * Reset everything after current test.
-     * @param bool $reset true means reset state back, false means keep all data for the next test,
-     *      null means reset state and show warnings if anything changed
+     * Totara: Do not use, advanced testcase always resets state after each test,
+     * this is required for parallel test execution. Also tests should not be
+     * used as data provider because they would be executed repeatedly.
+     *
+     * @deprecated since Totara 13, 12.8, 11.17
+     *
+     * @param bool $reset
      * @return void
      */
     public function resetAfterTest($reset = true) {
-        $this->resetAfterTest = $reset;
+        if (!$reset) {
+            debugging('Do not use resetAfterTest(false) any more, reset is mandatory after every test now', DEBUG_DEVELOPER);
+        }
     }
 
     /**

@@ -193,7 +193,6 @@ class totara_hierarchy_getitems_testcase extends advanced_testcase {
             $output = $org->get_items_excluding_children($testcase);
             $this->assertEquals($testcase, $output);
         }
-        $this->resetAfterTest(false);
     }
 
     function test_cases_with_duplicates() {
@@ -212,7 +211,6 @@ class totara_hierarchy_getitems_testcase extends advanced_testcase {
             $output = $org->get_items_excluding_children($testcase);
             $this->assertEquals(array_unique($testcase), $output);
         }
-        $this->resetAfterTest(false);
     }
 
 
@@ -236,7 +234,6 @@ class totara_hierarchy_getitems_testcase extends advanced_testcase {
             $output = $org->get_items_excluding_children($testcase['before']);
             $this->assertEquals($testcase['after'], $output);
         }
-        $this->resetAfterTest(false);
     }
 
     function test_cases_with_duplicates_and_children() {
@@ -259,6 +256,5 @@ class totara_hierarchy_getitems_testcase extends advanced_testcase {
             $output = $org->get_items_excluding_children($testcase['before']);
             $this->assertEquals($testcase['after'], $output);
         }
-        $this->resetAfterTest(false);
     }
 }

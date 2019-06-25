@@ -52,8 +52,6 @@ class mustache_flex_icon_helper_testcase extends advanced_testcase {
 
     /**
      * Test the get_mustache method returns what we require.
-     *
-     * @return array
      */
     public function test_get_mustache() {
         list($mustache, $loader, $renderer, $page) = $this->get_mustache();
@@ -61,16 +59,12 @@ class mustache_flex_icon_helper_testcase extends advanced_testcase {
         self::assertInstanceOf(Mustache_Loader_ArrayLoader::class, $loader);
         self::assertInstanceOf(core_renderer::class, $renderer);
         self::assertInstanceOf(moodle_page::class, $page);
-        return [$mustache, $loader, $renderer, $page];
     }
 
     /**
      * It should generate the same output as rendering the renderable without customdata.
-     *
-     * @depends test_get_mustache
-     * @param array $data
      */
-    public function test_valid_usage($data) {
+    public function test_valid_usage() {
 
         /**
          * @var Mustache_Engine $mustache
@@ -78,7 +72,7 @@ class mustache_flex_icon_helper_testcase extends advanced_testcase {
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // Identifier only.
         $loader->setTemplate('test', '{{#flex_icon}}permissions-check{{/flex_icon}}');
@@ -165,18 +159,14 @@ class mustache_flex_icon_helper_testcase extends advanced_testcase {
         );
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_deprecated_usage($data) {
+    public function test_deprecated_usage() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // Static identifier + JSON encoded classes.
         $loader->setTemplate('test', '{{#flex_icon}}permissions-check, {"classes": "ft-state-success ft-size-700"}{{/flex_icon}}');
@@ -243,11 +233,8 @@ class mustache_flex_icon_helper_testcase extends advanced_testcase {
 
     /**
      * It should throw an exception if helper JSON cannot be parsed.
-     *
-     * @depends test_get_mustache
-     * @param array $data
      */
-    public function test_invalid_usage(array $data) {
+    public function test_invalid_usage() {
 
         /**
          * @var Mustache_Engine $mustache
@@ -255,7 +242,7 @@ class mustache_flex_icon_helper_testcase extends advanced_testcase {
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // Variable identifier with variable alt
         $loader->setTemplate('test', '{{#flex_icon}}{{test_icon}}, {{alt}}{{/flex_icon}}');

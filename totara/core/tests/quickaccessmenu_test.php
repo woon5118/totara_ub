@@ -353,8 +353,6 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
     }
 
     public function test_menu_manipulation_add() {
-        $this->resetAfterTest(false);
-
         $roleid = $this->getDataGenerator()->create_role();
         $user = $this->getDataGenerator()->create_user();
         $capabilities = [
@@ -414,19 +412,42 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         }
         sort($actual);
         self::assertSame('assignroles,defineroles,roledefaults,toolcapability', join(',', $actual));
-
-        return $user;
     }
 
-    /**
-     * @depends test_menu_manipulation_add
-     *
-     * @param \stdClass $user
-     *
-     * @return \stdClass
-     */
-    public function test_menu_manipulation_change_group(\stdClass $user) {
-        $this->resetAfterTest(false);
+    public function test_menu_manipulation_change_group() {
+        $roleid = $this->getDataGenerator()->create_role();
+        $user = $this->getDataGenerator()->create_user();
+        $capabilities = [
+            'moodle/role:assign',
+            'moodle/role:manage',
+            'totara/core:manageprofilefields',
+            'moodle/restore:restorefile',
+        ];
+        foreach ($capabilities as $cap) {
+            role_change_permission($roleid, context_system::instance(), $cap, CAP_ALLOW);
+        }
+        $this->getDataGenerator()->role_assign($roleid, $user->id);
+
+        $this->setUser($user);
+        $admin = admin_get_root(true, false); // Force the admin tree to reload.
+
+        self::assertMenuStructure([], $user);
+
+        $visible = $this->recurse_visible_admin_nodes($admin);
+        sort($visible);
+
+        self::assertNotEmpty($visible);
+
+        $possibilities = helper::get_addable_items($user->id);
+        $actual = [];
+        foreach ($possibilities as $item) {
+            $actual[] = $item->get_key();
+        }
+        sort($actual);
+
+        self::assertTrue(helper::add_item($user->id, 'restorecourse', group::get(group::LEARN)));
+        self::assertTrue(helper::add_item($user->id, 'checkpermissions', group::get(group::CONFIGURATION)));
+        self::assertTrue(helper::add_item($user->id, 'profilefields', group::get(group::PLATFORM)));
 
         self::assertTrue(helper::change_item_group($user->id, 'profilefields', group::get(group::LEARN)));
 
@@ -513,19 +534,42 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'restorecourse' => 'Restore course',
             ],
         ], $user);
-
-        return $user;
     }
 
-    /**
-     * @depends test_menu_manipulation_change_group
-     *
-     * @param \stdClass $user
-     *
-     * @return \stdClass
-     */
-    public function test_menu_manipulation_change_order(\stdClass $user) {
-        $this->resetAfterTest(false);
+    public function test_menu_manipulation_change_order() {
+        $roleid = $this->getDataGenerator()->create_role();
+        $user = $this->getDataGenerator()->create_user();
+        $capabilities = [
+            'moodle/role:assign',
+            'moodle/role:manage',
+            'totara/core:manageprofilefields',
+            'moodle/restore:restorefile',
+        ];
+        foreach ($capabilities as $cap) {
+            role_change_permission($roleid, context_system::instance(), $cap, CAP_ALLOW);
+        }
+        $this->getDataGenerator()->role_assign($roleid, $user->id);
+
+        $this->setUser($user);
+        $admin = admin_get_root(true, false); // Force the admin tree to reload.
+
+        self::assertMenuStructure([], $user);
+
+        $visible = $this->recurse_visible_admin_nodes($admin);
+        sort($visible);
+
+        self::assertNotEmpty($visible);
+
+        $possibilities = helper::get_addable_items($user->id);
+        $actual = [];
+        foreach ($possibilities as $item) {
+            $actual[] = $item->get_key();
+        }
+        sort($actual);
+
+        self::assertTrue(helper::add_item($user->id, 'checkpermissions', group::get(group::PLATFORM)));
+        self::assertTrue(helper::add_item($user->id, 'profilefields', group::get(group::PLATFORM)));
+        self::assertTrue(helper::add_item($user->id, 'restorecourse', group::get(group::PLATFORM)));
 
         $method = new ReflectionMethod(helper::class, 'move_item_to_bottom');
         $method->setAccessible(true);
@@ -616,17 +660,42 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         $result = $method->invoke(null, $user->id, 'green');
         self::assertFalse($result);
         self::assertDebuggingCalled('Unknown menu item key green');
-
-        return $user;
     }
 
-    /**
-     * @depends test_menu_manipulation_change_order
-     * @param \stdClass $user
-     * @return \stdClass
-     */
-    public function test_menu_manipulation_rename_item(\stdClass $user) {
-        $this->resetAfterTest(false);
+    public function test_menu_manipulation_rename_item() {
+        $roleid = $this->getDataGenerator()->create_role();
+        $user = $this->getDataGenerator()->create_user();
+        $capabilities = [
+            'moodle/role:assign',
+            'moodle/role:manage',
+            'totara/core:manageprofilefields',
+            'moodle/restore:restorefile',
+        ];
+        foreach ($capabilities as $cap) {
+            role_change_permission($roleid, context_system::instance(), $cap, CAP_ALLOW);
+        }
+        $this->getDataGenerator()->role_assign($roleid, $user->id);
+
+        $this->setUser($user);
+        $admin = admin_get_root(true, false); // Force the admin tree to reload.
+
+        self::assertMenuStructure([], $user);
+
+        $visible = $this->recurse_visible_admin_nodes($admin);
+        sort($visible);
+
+        self::assertNotEmpty($visible);
+
+        $possibilities = helper::get_addable_items($user->id);
+        $actual = [];
+        foreach ($possibilities as $item) {
+            $actual[] = $item->get_key();
+        }
+        sort($actual);
+
+        self::assertTrue(helper::add_item($user->id, 'restorecourse', group::get(group::PLATFORM)));
+        self::assertTrue(helper::add_item($user->id, 'profilefields', group::get(group::PLATFORM)));
+        self::assertTrue(helper::add_item($user->id, 'checkpermissions', group::get(group::PLATFORM)));
 
         self::assertMenuStructure([
             group::PLATFORM => [
@@ -698,23 +767,50 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         // Rename an unknown item.
         self::assertFalse(helper::rename_item($user->id, 'green', 'A green item'));
         self::assertDebuggingCalled('Invalid item key specified green');
-
-        return $user;
     }
 
-    /**
-     * @depends test_menu_manipulation_rename_item
-     * @param \stdClass $user
-     */
-    public function test_menu_manipulation_remove_item(\stdClass $user) {
-        $this->resetAfterTest(true);
+    public function test_menu_manipulation_remove_item() {
+        $roleid = $this->getDataGenerator()->create_role();
+        $user = $this->getDataGenerator()->create_user();
+        $capabilities = [
+            'moodle/role:assign',
+            'moodle/role:manage',
+            'totara/core:manageprofilefields',
+            'moodle/restore:restorefile',
+        ];
+        foreach ($capabilities as $cap) {
+            role_change_permission($roleid, context_system::instance(), $cap, CAP_ALLOW);
+        }
+        $this->getDataGenerator()->role_assign($roleid, $user->id);
+
+        $this->setUser($user);
+        $admin = admin_get_root(true, false); // Force the admin tree to reload.
+
+        self::assertMenuStructure([], $user);
+
+        $visible = $this->recurse_visible_admin_nodes($admin);
+        sort($visible);
+
+        self::assertNotEmpty($visible);
+
+        $possibilities = helper::get_addable_items($user->id);
+        $actual = [];
+        foreach ($possibilities as $item) {
+            $actual[] = $item->get_key();
+        }
+        sort($actual);
+
+        self::assertTrue(helper::add_item($user->id, 'restorecourse', group::get(group::PLATFORM)));
+        self::assertTrue(helper::add_item($user->id, 'profilefields', group::get(group::PLATFORM)));
+        self::assertTrue(helper::add_item($user->id, 'checkpermissions', group::get(group::PLATFORM)));
+        self::assertTrue(helper::add_item($user->id, 'roledefaults', group::get(group::PLATFORM)));
 
         self::assertMenuStructure([
             group::PLATFORM => [
                 'restorecourse' => 'Restore course',
                 'profilefields' => 'User profile fields',
                 'checkpermissions' => 'Check system permissions',
-                'roledefaults' => 'My role defaults item',
+                'roledefaults' => 'Default role settings',
             ],
         ], $user);
 
@@ -725,7 +821,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
             group::PLATFORM => [
                 'restorecourse' => 'Restore course',
                 'checkpermissions' => 'Check system permissions',
-                'roledefaults' => 'My role defaults item',
+                'roledefaults' => 'Default role settings',
             ],
         ], $user);
 

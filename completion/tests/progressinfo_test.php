@@ -193,8 +193,6 @@ class core_completion_progressinfo_testcase extends externallib_advanced_testcas
     public function test_course_completion_criteria_progress_calculation() {
         global $DB;
 
-        $this->resetAfterTest(false);
-
         $generator = $this->getDataGenerator();
         /** @var core_completion_generator $comp_generator */
         $comp_generator = $generator->get_plugin_generator('core_completion');
@@ -395,15 +393,8 @@ class core_completion_progressinfo_testcase extends externallib_advanced_testcas
         self::assertTrue($completion->is_complete());
         self::assertSame(100, $completion->get_percentagecomplete());
         self::assertSame(100, $completion->get_progressinfo()->get_percentagecomplete());
-    }
 
-    /**
-     * @depends test_course_completion_criteria_progress_calculation
-     */
-    public function test_advanced_all_course_completion_criteria_progress_calculation() {
-        global $DB;
-
-        $this->resetAfterTest(false);
+        // test advanced all course completion criteria progress calculation
 
         $generator = $this->getDataGenerator();
         /** @var core_completion_generator $comp_generator */
@@ -553,16 +544,8 @@ class core_completion_progressinfo_testcase extends externallib_advanced_testcas
         self::assertTrue($completion->is_complete());
         self::assertSame(100, $completion->get_percentagecomplete());
         self::assertSame(100, $completion->get_progressinfo()->get_percentagecomplete());
-    }
 
-    /**
-     * @depends test_course_completion_criteria_progress_calculation
-     * @depends test_advanced_all_course_completion_criteria_progress_calculation
-     */
-    public function test_advanced_any_course_completion_criteria_progress_calculation() {
-        global $DB;
-
-        $this->resetAfterTest();
+        // test advanced any course completion criteria progress calculation
 
         $generator = $this->getDataGenerator();
         /** @var core_completion_generator $comp_generator */

@@ -3934,15 +3934,9 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
     /**
      * Creates a certif_completion record for the user and certification we are testing on,
      * as well as for a different user and another again for a different certification.
-     *
-     * Checks we only copy the certif_completion record that we specified the user and certification for.
-     *
-     * @return stdClass containing the data in the original certif_completion record that we
-     *    are copying to history.
      */
-    public function test_copy_certif_completion_to_hist_selects_correct_user_cert() {
+    public function create_certif_completion() {
         global $DB;
-        $this->resetAfterTest(false);
 
         /* @var totara_program_generator $programgenerator */
         $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
@@ -3961,17 +3955,33 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $originalcompletion->baselinetimeexpires = 1500;
         $originalcompletion->timecompleted = 500;
         $originalcompletion->timemodified = time();
-        $DB->insert_record('certif_completion', $originalcompletion);
+        $originalcompletion->id = $DB->insert_record('certif_completion', $originalcompletion);
 
         $cert2_user1 = clone $originalcompletion;
+        unset($cert2_user1->id);
         $cert2_user1->certifid = $certification2->certifid;
         $DB->insert_record('certif_completion', $cert2_user1);
 
         $cert1_user2 = clone $originalcompletion;
+        unset($cert1_user2->id);
         $cert1_user2->userid = $this->getDataGenerator()->create_user()->id;
         $DB->insert_record('certif_completion', $cert1_user2);
 
         copy_certif_completion_to_hist($originalcompletion->certifid, $originalcompletion->userid);
+
+        return $originalcompletion;
+    }
+
+    /**
+     * Creates a certif_completion record for the user and certification we are testing on,
+     * as well as for a different user and another again for a different certification.
+     *
+     * Checks we only copy the certif_completion record that we specified the user and certification for.
+     */
+    public function test_copy_certif_completion_to_hist_selects_correct_user_cert() {
+        global $DB;
+
+        $originalcompletion = $this->create_certif_completion();
 
         $this->assertEquals(1, $DB->count_records('certif_completion_history'));
         $this->assertTrue($DB->record_exists('certif_completion_history',
@@ -3980,20 +3990,17 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         // The certif_completion record that gets copied is not deleted by copy_certif_completion_to_hist().
         $this->assertTrue($DB->record_exists('certif_completion',
             array('certifid' => $originalcompletion->certifid, 'userid' => $originalcompletion->userid)));
-
-        return $originalcompletion;
     }
 
     /**
      * Try copying the same certif_completion record to history as we did in the last test.
      *
      * The history record should NOT be duplicated.
-     *
-     * @depends test_copy_certif_completion_to_hist_selects_correct_user_cert
      */
-    public function test_copy_certif_completion_to_hist_no_change_with_duplicate($originalcompletion) {
+    public function test_copy_certif_completion_to_hist_no_change_with_duplicate() {
         global $DB;
-        $this->resetAfterTest(false);
+
+        $originalcompletion = $this->create_certif_completion();
 
         copy_certif_completion_to_hist($originalcompletion->certifid, $originalcompletion->userid);
         $this->assertEquals(1, $DB->count_records('certif_completion_history'));
@@ -4003,12 +4010,11 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
      * Change the timewindowopens value in the certif_completion record.
      *
      * This should not create a new record but simply update the existing history record.
-     *
-     * @depends test_copy_certif_completion_to_hist_selects_correct_user_cert
      */
-    public function test_copy_certif_completion_to_hist_only_windowopen_is_different($originalcompletion) {
+    public function test_copy_certif_completion_to_hist_only_windowopen_is_different() {
         global $DB;
-        $this->resetAfterTest(false);
+
+        $originalcompletion = $this->create_certif_completion();
 
         $differentwindowopen = $originalcompletion->timewindowopens + 100;
 
@@ -4027,13 +4033,11 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
      * Change the timecompleted value in the certif_completion record.
      *
      * Copying this creates a new history record and leaves the other as is.
-     *
-     * @depends test_copy_certif_completion_to_hist_selects_correct_user_cert
-     * @return int The new timecompleted value
      */
-    public function test_copy_certif_completion_to_hist_only_timecompleted_is_different($originalcompletion) {
+    public function test_copy_certif_completion_to_hist_only_timecompleted_is_different() {
         global $DB;
-        $this->resetAfterTest(false);
+
+        $originalcompletion = $this->create_certif_completion();
 
         $differenttimecompleted = $originalcompletion->timecompleted + 100;
 
@@ -4057,13 +4061,18 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
      * Now change the timeexpires as well.
      *
      * The 2 existing history records should remain unchanged. A third is created to contain the different expiry date.
-     *
-     * @depends test_copy_certif_completion_to_hist_selects_correct_user_cert
-     * @depends test_copy_certif_completion_to_hist_only_timecompleted_is_different
      */
-    public function test_copy_certif_completion_to_hist_only_timeexpires_is_different($originalcompletion, $differenttimecompleted) {
+    public function test_copy_certif_completion_to_hist_only_timeexpires_is_different() {
         global $DB;
-        $this->resetAfterTest(true);
+
+        $originalcompletion = $this->create_certif_completion();
+
+        $differenttimecompleted = $originalcompletion->timecompleted + 100;
+
+        $DB->set_field('certif_completion', 'timecompleted', $differenttimecompleted,
+            array('certifid' => $originalcompletion->certifid, 'userid' => $originalcompletion->userid));
+
+        copy_certif_completion_to_hist($originalcompletion->certifid, $originalcompletion->userid);
 
         $differenttimeexpires = $originalcompletion->timeexpires + 100;
 
@@ -4086,12 +4095,9 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
     /**
      * With no existing completion data, write a valid history record.
      *
-     * @return stdClass with data of original history record that is written to the db.
-     *   The id is excluded as we're interested in the effects of using the matching data not the record itself.
      */
     public function test_certif_write_completion_history_creates_history_record() {
         global $DB;
-        $this->resetAfterTest(false);
 
         /* @var totara_program_generator $programgenerator */
         $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
@@ -4114,19 +4120,33 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(0, $DB->count_records('certif_completion'));
         $this->assertEquals(1, $DB->count_records('certif_completion_history'));
         $this->assertTrue($DB->record_exists('certif_completion_history', (array) $originalhistory));
-
-        return $originalhistory;
     }
 
     /**
      * Try to repeat writing the same history data from the last test. This is considered a duplicate
      * and is not allowed.
-     *
-     * @depends test_certif_write_completion_history_creates_history_record
      */
-    public function test_certif_write_completion_history_duplicate($originalhistory) {
+    public function test_certif_write_completion_history_duplicate() {
         global $DB;
-        $this->resetAfterTest(false);
+
+        /* @var totara_program_generator $programgenerator */
+        $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $certification1 = new program($programgenerator->create_certification());
+
+        $originalhistory = new stdClass();
+        $originalhistory->certifid = $certification1->certifid;
+        $originalhistory->userid = $this->getDataGenerator()->create_user()->id;
+        $originalhistory->certifpath = CERTIFPATH_RECERT;
+        $originalhistory->status = CERTIFSTATUS_COMPLETED;
+        $originalhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $originalhistory->timewindowopens = 1000;
+        $originalhistory->timeexpires = 1500;
+        $originalhistory->baselinetimeexpires = 1500;
+        $originalhistory->timecompleted = 500;
+        $originalhistory->timemodified = time();
+        $originalhistory->unassigned = 0;
+
+        $this->assertTrue(certif_write_completion_history($originalhistory));
 
         try {
             certif_write_completion_history($originalhistory);
@@ -4140,12 +4160,28 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
     /**
      * The only change made in from the original data is the timewindowopens. This is still considered a duplicate
      * and is not allowed.
-     *
-     * @depends test_certif_write_completion_history_creates_history_record
      */
-    public function test_certif_write_completion_history_different_timewindowopens($originalhistory) {
+    public function test_certif_write_completion_history_different_timewindowopens() {
         global $DB;
-        $this->resetAfterTest(false);
+
+        /* @var totara_program_generator $programgenerator */
+        $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $certification1 = new program($programgenerator->create_certification());
+
+        $originalhistory = new stdClass();
+        $originalhistory->certifid = $certification1->certifid;
+        $originalhistory->userid = $this->getDataGenerator()->create_user()->id;
+        $originalhistory->certifpath = CERTIFPATH_RECERT;
+        $originalhistory->status = CERTIFSTATUS_COMPLETED;
+        $originalhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $originalhistory->timewindowopens = 1000;
+        $originalhistory->timeexpires = 1500;
+        $originalhistory->baselinetimeexpires = 1500;
+        $originalhistory->timecompleted = 500;
+        $originalhistory->timemodified = time();
+        $originalhistory->unassigned = 0;
+
+        $this->assertTrue(certif_write_completion_history($originalhistory));
 
         $timewindowopenshistory = clone $originalhistory;
         $timewindowopenshistory->timewindowopens = $originalhistory->timewindowopens + 100;
@@ -4162,12 +4198,28 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
     /**
      * Change only the timecompleted value from the original data. This is now considered a unique record
      * and is inserted alongside the original record.
-     *
-     * @depends test_certif_write_completion_history_creates_history_record
      */
-    public function test_certif_write_completion_history_different_timecompleted($originalhistory) {
+    public function test_certif_write_completion_history_different_timecompleted() {
         global $DB;
-        $this->resetAfterTest(false);
+
+        /* @var totara_program_generator $programgenerator */
+        $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $certification1 = new program($programgenerator->create_certification());
+
+        $originalhistory = new stdClass();
+        $originalhistory->certifid = $certification1->certifid;
+        $originalhistory->userid = $this->getDataGenerator()->create_user()->id;
+        $originalhistory->certifpath = CERTIFPATH_RECERT;
+        $originalhistory->status = CERTIFSTATUS_COMPLETED;
+        $originalhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $originalhistory->timewindowopens = 1000;
+        $originalhistory->timeexpires = 1500;
+        $originalhistory->baselinetimeexpires = 1500;
+        $originalhistory->timecompleted = 500;
+        $originalhistory->timemodified = time();
+        $originalhistory->unassigned = 0;
+
+        $this->assertTrue(certif_write_completion_history($originalhistory));
 
         $timecompletedhistory = clone $originalhistory;
         $timecompletedhistory->timecompleted = $originalhistory->timecompleted + 100;
@@ -4175,20 +4227,37 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(2, $DB->count_records('certif_completion_history'));
         $this->assertTrue($DB->record_exists('certif_completion_history', (array) $originalhistory));
         $this->assertTrue($DB->record_exists('certif_completion_history', (array) $timecompletedhistory));
-
-        return $timecompletedhistory;
     }
 
     /**
      * Change the timeexpires from the original data. This is considered unique and is inserted alongside
      * the two records that already exist.
-     *
-     * @depends test_certif_write_completion_history_creates_history_record
-     * @depends test_certif_write_completion_history_different_timecompleted
      */
-    public function test_certif_write_completion_history_different_timeexpires($originalhistory, $timecompletedhistory) {
+    public function test_certif_write_completion_history_different_timeexpires() {
         global $DB;
-        $this->resetAfterTest(true);
+
+        /* @var totara_program_generator $programgenerator */
+        $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $certification1 = new program($programgenerator->create_certification());
+
+        $originalhistory = new stdClass();
+        $originalhistory->certifid = $certification1->certifid;
+        $originalhistory->userid = $this->getDataGenerator()->create_user()->id;
+        $originalhistory->certifpath = CERTIFPATH_RECERT;
+        $originalhistory->status = CERTIFSTATUS_COMPLETED;
+        $originalhistory->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $originalhistory->timewindowopens = 1000;
+        $originalhistory->timeexpires = 1500;
+        $originalhistory->baselinetimeexpires = 1500;
+        $originalhistory->timecompleted = 500;
+        $originalhistory->timemodified = time();
+        $originalhistory->unassigned = 0;
+
+        $this->assertTrue(certif_write_completion_history($originalhistory));
+
+        $timecompletedhistory = clone $originalhistory;
+        $timecompletedhistory->timecompleted = $originalhistory->timecompleted + 100;
+        certif_write_completion_history($timecompletedhistory);
 
         $timeexpireshistory = clone $originalhistory;
         $timeexpireshistory->timeexpires = $originalhistory->timeexpires + 100;

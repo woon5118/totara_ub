@@ -50,8 +50,6 @@ class mustache_pix_helper_testcase extends advanced_testcase {
 
     /**
      * Test the get_mustache method returns what we require.
-     *
-     * @return array
      */
     public function test_get_mustache() {
         list($mustache, $loader, $renderer, $page) = $this->get_mustache();
@@ -59,14 +57,9 @@ class mustache_pix_helper_testcase extends advanced_testcase {
         self::assertInstanceOf(Mustache_Loader_ArrayLoader::class, $loader);
         self::assertInstanceOf(core_renderer::class, $renderer);
         self::assertInstanceOf(moodle_page::class, $page);
-        return [$mustache, $loader, $renderer, $page];
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_valid_usage($data) {
+    public function test_valid_usage() {
 
         /**
          * @var Mustache_Engine $mustache
@@ -74,7 +67,7 @@ class mustache_pix_helper_testcase extends advanced_testcase {
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // Identifier only.
         $loader->setTemplate('test', '{{#pix}}movehere{{/pix}}');
@@ -147,11 +140,7 @@ class mustache_pix_helper_testcase extends advanced_testcase {
         );
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_legacy_usage($data) {
+    public function test_legacy_usage() {
 
         /**
          * @var Mustache_Engine $mustache
@@ -159,7 +148,7 @@ class mustache_pix_helper_testcase extends advanced_testcase {
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         // Alt which contains just some plain text.
         $loader->setTemplate('test', '{{#pix}}movehere,core,This is a test{{/pix}}');
@@ -302,18 +291,14 @@ class mustache_pix_helper_testcase extends advanced_testcase {
         }
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_non_conforming_a_string_identifier($data) {
+    public function test_non_conforming_a_string_identifier() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         $loader->setTemplate('test', '{{#pix}}movehere,core,test case{{/pix}}');
         $this->assertEquals(
@@ -323,18 +308,14 @@ class mustache_pix_helper_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('Legacy pix icon helper API in use, please use the pix icon template instead.');
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_non_conforming_a_string_component($data) {
+    public function test_non_conforming_a_string_component() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         $loader->setTemplate('test', '{{#pix}}movehere,core,delete,test case{{/pix}}');
         $this->assertEquals(

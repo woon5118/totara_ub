@@ -30,7 +30,10 @@ class totara_reportbuilder_rb_base_source_testcase extends advanced_testcase {
 
     use \totara_reportbuilder\phpunit\report_testing;
 
-    public function test_get_report_source() {
+    /**
+     * @return phpunit_test_report_source
+     */
+    public function get_test_report_source() {
         global $CFG;
 
         require_once($CFG->dirroot . '/totara/reportbuilder/tests/fixtures/phpunit_test_report_source.php');
@@ -41,10 +44,9 @@ class totara_reportbuilder_rb_base_source_testcase extends advanced_testcase {
         return $source;
     }
 
-    /**
-     * @depends test_get_report_source
-     */
-    public function test_get_all_advanced_column_options(rb_base_source $source) {
+    public function test_get_all_advanced_column_options() {
+        $source = $this->get_test_report_source();
+
         $options = $source->get_all_advanced_column_options();
         self::assertIsArray($options);
         self::assertCount(3, $options);
@@ -70,10 +72,9 @@ class totara_reportbuilder_rb_base_source_testcase extends advanced_testcase {
         }
     }
 
-    /**
-     * @depends test_get_report_source
-     */
-    public function test_get_allowed_advanced_column_options(rb_base_source $source) {
+    public function test_get_allowed_advanced_column_options() {
+        $source = $this->get_test_report_source();
+
         $options = $source->get_allowed_advanced_column_options();
 
         self::assertIsArray($options);
@@ -89,10 +90,8 @@ class totara_reportbuilder_rb_base_source_testcase extends advanced_testcase {
         }
     }
 
-    /**
-     * @depends test_get_report_source
-     */
-    public function test_global_restrictions_supported(phpunit_test_report_source $source) {
+    public function test_global_restrictions_supported() {
+        $source = $this->get_test_report_source();
         self::assertNull($source->global_restrictions_supported());
     }
 

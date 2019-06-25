@@ -521,8 +521,6 @@ class core_weblib_testcase extends advanced_testcase {
     }
 
     public function test_null_progres_trace() {
-        $this->resetAfterTest(false);
-
         $trace = new null_progress_trace();
         $trace->output('do');
         $trace->output('re', 1);
@@ -534,8 +532,6 @@ class core_weblib_testcase extends advanced_testcase {
     }
 
     public function test_text_progres_trace() {
-        $this->resetAfterTest(false);
-
         $trace = new text_progress_trace();
         $trace->output('do');
         $trace->output('re', 1);
@@ -545,8 +541,6 @@ class core_weblib_testcase extends advanced_testcase {
     }
 
     public function test_html_progres_trace() {
-        $this->resetAfterTest(false);
-
         $trace = new html_progress_trace();
         $trace->output('do');
         $trace->output('re', 1);
@@ -556,8 +550,6 @@ class core_weblib_testcase extends advanced_testcase {
     }
 
     public function test_html_list_progress_trace() {
-        $this->resetAfterTest(false);
-
         $trace = new html_list_progress_trace();
         $trace->output('do');
         $trace->output('re', 1);
@@ -567,8 +559,6 @@ class core_weblib_testcase extends advanced_testcase {
     }
 
     public function test_progres_trace_buffer() {
-        $this->resetAfterTest(false);
-
         $trace = new progress_trace_buffer(new html_progress_trace());
         ob_start();
         $trace->output('do');
@@ -593,8 +583,6 @@ class core_weblib_testcase extends advanced_testcase {
     }
 
     public function test_combined_progres_trace() {
-        $this->resetAfterTest(false);
-
         $trace1 = new progress_trace_buffer(new html_progress_trace(), false);
         $trace2 = new progress_trace_buffer(new text_progress_trace(), false);
 

@@ -88,8 +88,6 @@ class mustache_userdate_helper_testcase extends advanced_testcase {
 
     /**
      * Test the get_mustache method returns what we require.
-     *
-     * @return array
      */
     public function test_get_mustache() {
         list($mustache, $loader, $renderer, $page) = $this->get_mustache();
@@ -97,21 +95,16 @@ class mustache_userdate_helper_testcase extends advanced_testcase {
         self::assertInstanceOf(Mustache_Loader_ArrayLoader::class, $loader);
         self::assertInstanceOf(core_renderer::class, $renderer);
         self::assertInstanceOf(moodle_page::class, $page);
-        return [$mustache, $loader, $renderer, $page];
     }
 
-    /**
-     * @depends test_get_mustache
-     * @param array $data
-     */
-    public function test_valid_usage($data) {
+    public function test_valid_usage() {
         /**
          * @var Mustache_Engine $mustache
          * @var Mustache_Loader_ArrayLoader $loader
          * @var core_renderer $renderer
          * @var moodle_page $page
          */
-        list($mustache, $loader, $renderer, $page) = $data;
+        list($mustache, $loader, $renderer, $page) = $this->get_mustache();
 
         $loader->setTemplate('test', '{{#userdate}}1293876000,%d %B %Y{{/userdate}}');
         $this->assertEquals('1 January 2011', $mustache->render('test'));

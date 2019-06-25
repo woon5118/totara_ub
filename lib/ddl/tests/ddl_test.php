@@ -2189,7 +2189,7 @@ class core_ddl_testcase extends database_driver_testcase {
      *
      * @return array The type-value pair fixture.
      */
-    public function test_get_enc_quoted_provider() {
+    public function provider_enc_quoted() {
         return array(
             // Reserved: some examples from SQL-92.
             [true, 'from'],
@@ -2203,7 +2203,7 @@ class core_ddl_testcase extends database_driver_testcase {
     /**
      * This is a test for sql_generator::getEncQuoted().
      *
-     * @dataProvider test_get_enc_quoted_provider
+     * @dataProvider provider_enc_quoted
      * @param string $reserved Whether the column name is reserved or not.
      * @param string $columnname The column name to be quoted, according to the value of $reserved.
      **/

@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* System state is now reverted after every PHPUnit test, this was required for compatiblity with parallel test execution,
+  all tests that used $this->resetAfterTest(false) should be updated.
 * The jQuery.extend function has had a security patch applied
 * Deprecated registration_cron_task has been removed
 * Deprecated course publishing has been removed
