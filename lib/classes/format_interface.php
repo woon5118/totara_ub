@@ -17,22 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Petr Skoda <petr.skoda@totaralearning.com>
- * @package totara_webapi
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package core
  */
 
-use core\webapi\execution_context;
+namespace core;
 
-class totara_webapi_execution_context_testcase extends advanced_testcase {
-    public function test_create() {
-        $ec = execution_context::create('ajax', 'core_lang_strings_nosession');
-        $this->assertInstanceOf(execution_context::class, $ec);
-        $this->assertSame('core_lang_strings_nosession', $ec->get_operationname());
-        $this->assertSame('ajax', $ec->get_type());
+defined('MOODLE_INTERNAL') || die();
 
-        $devec = execution_context::create('dev', null);
-        $this->assertInstanceOf(execution_context::class, $devec);
-        $this->assertSame(null, $devec->get_operationname());
-        $this->assertSame('dev', $devec->get_type());
-    }
+/**
+ * This class defines all basic formats related to strings/text
+ */
+interface format_interface {
+
+    /**
+     * returns true if the format given is defined
+     *
+     * @param string $format
+     * @return bool
+     */
+    public static function is_defined(string $format): bool;
+
+    /**
+     * Returns all available formats of this format class
+     *
+     * @return array
+     */
+    public static function get_available(): array;
+
 }
