@@ -28,31 +28,35 @@ defined('MOODLE_INTERNAL') || die();
 final class seminar_session_helper {
 
     /**
-     * Return Event session status.
-     * @param $session object
-     * @param $date null|\stdClass
-     * @return bool|string
+     * Return Event session status as a localised string.
+     * @param \stdClass $session    {facetoface_sessions} database record
+     * @param \stdClass|null $date  {facetoface_sessions_dates} database record
+     * @return string               Non-empty string if success
+     *                              Empty string if the event is waitlisted or the function fails
      */
-    public static function get_status(\stdClass $session, $date):? string {
+    public static function get_status(\stdClass $session, ?\stdClass $date): string {
 
         $timenow = time();
+        // NOTE: Use the following syntax if a seminar_event instance is required
+        // $seminarevent = (new seminar_event())->from_record($session, false);
+        $seminarsession = $date !== null ? (new seminar_session())->from_record($date, false) : null;
         if (!empty($session->cancelledstatus)) {
             $status = 'cancelled';
         } else if ($date === null) {
             // Empty for wait-listed events.
             return '';
-        } else if ($date->timefinish < $timenow) {
+        } else if ($seminarsession->is_over($timenow)) {
             $status = 'over';
-        } else if ($date->timestart <= $timenow && $timenow <= $date->timefinish) {
+        } else if ($seminarsession->is_start($timenow) && !$seminarsession->is_over($timenow)) {
             $status = 'inprogress';
-        } else if ($date->timestart > $timenow) {
+        } else if (!$seminarsession->is_start($timenow)) {
             $status = 'upcoming';
         } else {
             debugging(
                 "Logically impossible session times (start={$date->timestart} end={$date->timefinish} now={$timenow})",
                 DEBUG_DEVELOPER
             );
-            return false;
+            return '';
         }
         return get_string('sessionstatus:' . $status, 'mod_facetoface');
     }

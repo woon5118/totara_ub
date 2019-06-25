@@ -107,11 +107,12 @@ final class seminar_session implements seminar_iterator_item {
      * Map data object to class instance.
      *
      * @param \stdClass $object
+     * @param boolean $strict Set false to ignore bogus properties
      * @return seminar_session
      */
-    public function from_record(\stdClass $object): seminar_session {
+    public function from_record(\stdClass $object, bool $strict = true): seminar_session {
 
-        return $this->map_object($object);
+        return $this->map_object($object, $strict);
     }
 
     /**

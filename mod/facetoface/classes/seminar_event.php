@@ -360,13 +360,30 @@ final class seminar_event implements seminar_iterator_item {
     }
 
     /**
-     * Map object to class instance.
+     * Map object to only class instance, not session dates list.
      *
      * @param \stdClass $object
+     * @param boolean $strict Set false to ignore bogus properties
      * @return seminar_event
      */
-    public function from_record(\stdClass $object): seminar_event {
-        return $this->map_object($object);
+    public function from_record(\stdClass $object, bool $strict = true): seminar_event {
+        $this->sessions = null;
+        return $this->map_object($object, $strict);
+    }
+
+    /**
+     * Map object to class instance and session dates list.
+     *
+     * @param \stdClass $object that can optionally contain sessiondates
+     * @param boolean $strict Set false to ignore bogus properties
+     * @return seminar_event
+     */
+    public function from_record_with_dates(\stdClass $object, bool $strict = true): seminar_event {
+        $this->from_record($object, $strict);
+        if (isset($object->sessiondates)) {
+            $this->sessions = seminar_session_list::from_records($object->sessiondates, $strict);
+        }
+        return $this;
     }
 
     /**
@@ -517,7 +534,7 @@ final class seminar_event implements seminar_iterator_item {
      * @return bool
      */
     public function is_sessions(): bool {
-        return $this->get_sessions()->count() > 0;
+        return !$this->get_sessions()->is_empty();
     }
 
     /**

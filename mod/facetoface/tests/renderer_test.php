@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 use mod_facetoface\seminar;
 use mod_facetoface\seminar_event;
+use mod_facetoface\seminar_event_helper;
 use mod_facetoface\seminar_session;
 use mod_facetoface\seminar_session_list;
 use mod_facetoface\signup;
@@ -82,9 +83,8 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      */
     public function test_get_regdates_tooltip_info($registrationtimestart, $registrationtimefinish, $displaytimezones) {
         $this->resetAfterTest(true);
-        global $PAGE;
 
-        $renderer = $PAGE->get_renderer('mod_facetoface');
+        $renderer = $this->create_f2f_renderer();
 
         // Create reflection class in order to test the private method.
         $reflection = new \ReflectionClass(get_class($renderer));
@@ -93,12 +93,12 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
         $timezone = core_date::get_user_timezone();
 
-        $session = new stdClass();
-        $session->registrationtimestart = $registrationtimestart;
-        $session->registrationtimefinish = $registrationtimefinish;
+        $seminarevent = new seminar_event();
+        $seminarevent->set_registrationtimestart($registrationtimestart ?? 0);
+        $seminarevent->set_registrationtimefinish($registrationtimefinish ?? 0);
 
         // Run the method and get the output.
-        $actualoutput = $method->invokeArgs($renderer, array($session, $displaytimezones));
+        $actualoutput = $method->invokeArgs($renderer, array($seminarevent, $displaytimezones));
 
         // Create expected output string.
         $startdatestring = userdate($registrationtimestart, get_string('strftimedate', 'langconfig'), $timezone);
@@ -139,12 +139,8 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      */
     public function test_get_regdates_tooltip_info_via_print_session_list_table($registrationtimestart, $registrationtimefinish, $displaytimezones) {
         $this->resetAfterTest(true);
-        global $PAGE;
 
-        /** @var mod_facetoface_renderer $renderer */
-        $renderer = $PAGE->get_renderer('mod_facetoface');
-        // We need to set the url as this is queried during the run of print_session_list_table.
-        $PAGE->set_url('/mod/facetoface/view.php');
+        $renderer = $this->create_f2f_renderer();
 
         $course = $this->data_generator->create_course();
 
@@ -167,8 +163,40 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
         $sessionid = $this->facetoface_generator->add_session($sessiondata);
         $seminarevent = new seminar_event($sessionid);
+
+        // 1. Test with seminar_event::to_record()
         $session = $seminarevent->to_record();
         $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
+
+        // First of all with minimal set to true. Meaning get_regdates_tooltip_info is called.
+        $returnedoutput = $renderer->print_session_list_table([ $session ], false, false, $displaytimezones, array(), null, true);
+
+        // The Sign-up period open date will always been first in the string, so we can check that it will indeed
+        // be part of a a title attribute.
+        if (isset($registrationtimestart)) {
+            $this->assertContains('title="Sign-up period opens:', $returnedoutput);
+        } else {
+            $this->assertNotContains('title="Sign-up period opens:', $returnedoutput);
+        }
+
+        // Currently, text like in the strings below only appears in the Sign-up period tooltip. If other elements start
+        // using the same text, then the below assertions may be less useful.
+        if (isset($registrationtimefinish)) {
+            $this->assertContains('Sign-up period closes:', $returnedoutput);
+        } else {
+            $this->assertNotContains('Sign-up period closes:', $returnedoutput);
+        }
+
+        // Now with minimal set to false, meaning other fixed strings are used for the tooltip instead of get_regdates_tooltip_info.
+        $returnedoutput = $renderer->print_session_list_table(array($session), false, false, $displaytimezones, array(), null, false);
+
+        // We shouldn't get the detailed output that comes from get_regdates_tooltip_info as this information
+        // is given in another column.
+        $this->assertFalse(strpos($returnedoutput, 'title="Sign-up period opens:'));
+        $this->assertFalse(strpos($returnedoutput, 'Sign-up period closes:'));
+
+        // 2. Test with seminar_event_helper::get_sessiondata()
+        $session = seminar_event_helper::get_sessiondata($seminarevent, null, true);
 
         // First of all with minimal set to true. Meaning get_regdates_tooltip_info is called.
         $returnedoutput = $renderer->print_session_list_table([ $session ], false, false, $displaytimezones, array(), null, true);
@@ -304,7 +332,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
     }
 
     /**
-     * Create f2f renderer, set system context and initialise page.
+     * Instantiate the mod_facetoface_renderer, set system context and initialise page.
      *
      * @return \mod_facetoface_renderer
      */
@@ -339,10 +367,10 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      */
     protected function prepare_date($timestart, $timeend, $roomid) {
         $sessiondate = new stdClass();
-        $sessiondate->timestart = (string)$timestart;
-        $sessiondate->timefinish = (string)$timeend;
+        $sessiondate->timestart = is_numeric($timestart) ? (string)(int)$timestart : strtotime($timestart);
+        $sessiondate->timefinish = is_numeric($timeend) ? (string)(int)$timeend : strtotime($timeend);
         $sessiondate->sessiontimezone = '99';
-        $sessiondate->roomid = (string)$roomid;
+        $sessiondate->roomid = (string)(int)$roomid;
         return $sessiondate;
     }
 
@@ -754,5 +782,71 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, seminar::ATTENDANCE_TIME_ANY);
         $cells = $this->get_table_cells($outhtml, $cols);
         $this->assertSame($expections[2], $cells[6]->nodeValue);
+    }
+
+    /**
+     * Ensure that print_session_list_table() renders the list using the given $sessions parameter.
+     */
+    public function test_print_session_list_table_with_crafted_records() {
+        global $DB;
+        /** @var \moodle_database $DB */
+        $this->resetAfterTest(true);
+
+        $course = $this->getDataGenerator()->create_course();
+        $f2f = $this->facetoface_generator->create_instance(['course' => $course->id]);
+        $room1 = $this->facetoface_generator->add_custom_room([ 'name' => 'Chamber', 'allowconflicts' => 1 ]);
+        $room2 = $this->facetoface_generator->add_custom_room([ 'name' => 'Arena', 'allowconflicts' => 1 ]);
+
+        // Create a bunch of sessions
+        $date1 = $this->prepare_date('1 Dec last year', '1 Jan next year', $room1->id);
+        $date2 = $this->prepare_date('1 Feb next year', '1 Feb next year +1 hour', $room1->id);
+        $date3 = $this->prepare_date('1 Mar next year', '1 Mar next year +1 hour', $room1->id);
+        $date4 = $this->prepare_date('1 Apr next year', '1 Apr next year +1 hour', $room1->id);
+        $date5 = $this->prepare_date('1 Aug last year', '1 Aug last year +1 hour', $room1->id);
+        $date6 = $this->prepare_date('1 Sep last year', '1 Sep last year +1 hour', $room1->id);
+        $session1id = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => [$date1, $date2, $date3], 'capacity' => 10 ]);
+        $session2id = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => [], 'capacity' => 10 ]);
+        $session3id = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => [$date4], 'capacity' => 10 ]);
+        $session4id = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => [$date5], 'capacity' => 10 ]);
+        $session5id = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => [$date6], 'capacity' => 10 ]);
+
+        // Make the session list in the order of [ future, far_past, ongoing, waitlisted, past ]
+        $sessions = [];
+        $sessions[$session3id] = seminar_event_helper::get_sessiondata(new seminar_event($session3id), null);
+        $sessions[$session4id] = seminar_event_helper::get_sessiondata(new seminar_event($session4id), null);
+        $sessions[$session1id] = seminar_event_helper::get_sessiondata(new seminar_event($session1id), null, true);
+        $sessions[$session2id] = seminar_event_helper::get_sessiondata(new seminar_event($session2id), null);
+        $sessions[$session5id] = seminar_event_helper::get_sessiondata(new seminar_event($session5id), null);
+
+        // .. and shuffle session dates of the ongoing event as [ $date2, $date3, $date1 ]
+        $firstid = array_key_first($sessions[$session1id]->sessiondates);
+        $firstrecord = array_shift($sessions[$session1id]->sessiondates);
+        $sessions[$session1id]->sessiondates[$firstid] = $firstrecord;
+
+        // .. and change the room of one event to Arena
+        $DB->set_field('facetoface_sessions_dates', 'roomid', $room2->id, ['id' => $firstid]);
+
+        $renderer = $this->create_f2f_renderer();
+        $html = $renderer->print_session_list_table($sessions, false, true, false, array(), null, true, false, false, 0, false, false);
+
+        // .. then the database contains Arena while our $sessions don't
+        $this->assertContains('Chamber', $html);
+        $this->assertNotContains('Arena', $html);
+
+        $doc = self::new_domdocument($html);
+        $tables = $doc->getElementsByTagName('table');
+        $this->assertCount(1, $tables);
+        $rows = $tables[0]->getElementsByTagName('tbody')[0]->getElementsByTagName('tr');
+        $this->assertCount(7, $rows);
+
+        /** @var DOMNode[] $rows */
+        // .. and the list is sorted by custom order
+        $this->assertContains('April', $rows[0]->nodeValue);
+        $this->assertContains('August', $rows[1]->nodeValue);
+        $this->assertContains('February', $rows[2]->nodeValue);
+        $this->assertContains('March', $rows[3]->nodeValue);
+        $this->assertContains('December', $rows[4]->nodeValue);
+        $this->assertContains('Wait-listed', $rows[5]->nodeValue);
+        $this->assertContains('September', $rows[6]->nodeValue);
     }
 }

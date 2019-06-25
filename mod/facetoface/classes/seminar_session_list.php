@@ -93,11 +93,22 @@ final class seminar_session_list implements \Iterator, \Countable {
      */
     public static function from_seminar_event(seminar_event $seminarevent): seminar_session_list {
         global $DB;
-        $list = new seminar_session_list();
         $sessionrecords = $DB->get_records('facetoface_sessions_dates', ['sessionid' => $seminarevent->get_id()], 'timestart DESC');
+        return self::from_records($sessionrecords);
+    }
+
+    /**
+     * Create list of seminar sessions from an array of objects
+     *
+     * @param \stdClass[] $sessionrecords
+     * @param boolean $strict Set false to ignore bogus properties
+     * @return seminar_session_list
+     */
+    public static function from_records(array $sessionrecords, bool $strict = true): seminar_session_list {
+        $list = new seminar_session_list();
         foreach ($sessionrecords as $sessionrecord) {
             $session = new seminar_session();
-            $list->add($session->from_record($sessionrecord));
+            $list->add($session->from_record($sessionrecord, $strict));
         }
         return $list;
     }
@@ -368,13 +379,13 @@ final class seminar_session_list implements \Iterator, \Countable {
         $sql = "
             SELECT d.*
             FROM {facetoface_sessions_dates} d
-            INNER JOIN {facetoface_sessions} s 
+            INNER JOIN {facetoface_sessions} s
             ON s.id = d.sessionid
 
-            LEFT JOIN {facetoface_signups} su 
+            LEFT JOIN {facetoface_signups} su
             ON su.sessionid = s.id AND su.userid = :userid1
 
-            LEFT JOIN {facetoface_signups_status} ss 
+            LEFT JOIN {facetoface_signups_status} ss
             ON ss.signupid = su.id AND ss.superceded <> 1
 
             LEFT JOIN {facetoface_session_roles} sr

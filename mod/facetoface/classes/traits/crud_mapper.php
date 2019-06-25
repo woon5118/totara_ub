@@ -63,12 +63,12 @@ trait crud_mapper {
         $this->crud_load();
     }
 
-    protected function map_object(\stdClass $object) {
+    protected function map_object(\stdClass $object, bool $strict = true) : self {
 
         foreach ((array)$object as $property => $value) {
             if (property_exists($this, $property)) {
                 $this->{$property} = $value;
-            } else {
+            } else if ($strict) {
                 debugging("Provided object does not have {$property} field", DEBUG_DEVELOPER);
             }
         }

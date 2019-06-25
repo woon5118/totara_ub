@@ -48,7 +48,10 @@ information provided here is intended especially for developers.
   * get_room_details_html() now links room name instead of linking the separate string "(Room details)" or "View details"
   * session_resgistrationperiod_table_cell() now uses \mod_facetoface\output\session_time::signup_period() to generate its registration string
   * event_status_table_cell() has been updated to use \mod_facetoface\seminar_event_helper::booking_status()
+  * event_status_table_cell() has been updated to adhere to the $session record instead of fetching the database record
   * session_status_table_cell() has been updated to use \mod_facetoface\seminar_session_helper::get_status()
+  * session_status_table_cell() has been updated to adhere to the $session record instead of fetching the database record
+  * attendance_tracking_table_cell() has been updated to adhere to the $session record instead of fetching the database record
   * print_session_list() has been updated to use \mod_facetoface\seminar_event_helper::get_sessiondata()
   * render_seminar_event() has been updated:
       * Changed the $class default value from 'f2f' to 'mod_facetoface__event_details'
@@ -139,6 +142,7 @@ information provided here is intended especially for developers.
       * mod_facetoface__sessionlist__action__reserve for reserve links
       * The "More info" text has been changed to "Event info"
     * The "Event status" table column now reports three different kinds of status separately, grouping by <ul>/<li>
+    * The function renders the session list table using the data supplied by the $sessions parameter as much as possible
   * Added two new overridable functions for session/event status - session_status_table_cell() and event_status_table_cell()
   * attendance_tracking_table_cell() has been updated to use seminar_session::get_attendance_taking_status()
   * event_status_table_cell() has been updated to use seminar_event_helper::event_status()

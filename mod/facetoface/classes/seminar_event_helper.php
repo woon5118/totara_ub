@@ -256,28 +256,28 @@ final class seminar_event_helper {
 
         $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
         $timenow = time();
-        $seminarevent = new \mod_facetoface\seminar_event($session->id);
+        $seminarevent = (new seminar_event())->from_record_with_dates($session, false);
 
         $status = get_string('bookingopen', 'mod_facetoface');
-        if (!empty($session->cancelledstatus)) {
+        if ($seminarevent->get_cancelledstatus()) {
             $status = get_string('bookingsessioncancelled', 'mod_facetoface');
-        } else if (!empty($session->sessiondates) && $seminarevent->is_started($timenow) && $seminarevent->is_progress($timenow)) {
+        } else if ($seminarevent->is_started($timenow) && $seminarevent->is_progress($timenow)) {
             $status = get_string('sessioninprogress', 'mod_facetoface');
-        } else if (!empty($session->sessiondates) && $seminarevent->is_started($timenow)) {
+        } else if ($seminarevent->is_started($timenow)) {
             $status = get_string('sessionover', 'mod_facetoface');
         } else if ($isbookedsession) {
             $state = \mod_facetoface\signup\state\state::from_code($session->bookedsession->statuscode);
             $status = $state::get_string();
-        } else if ($signupcount >= $session->capacity) {
+        } else if ($signupcount >= $seminarevent->get_capacity()) {
             $status = get_string('bookingfull', 'mod_facetoface');
-        } else if (!empty($session->registrationtimestart) && $session->registrationtimestart > $timenow) {
+        } else if (!empty($seminarevent->get_registrationtimestart()) && $seminarevent->get_registrationtimestart() > $timenow) {
             $status = get_string('registrationnotopen', 'mod_facetoface');
-        } else if (!empty($session->registrationtimefinish) && $timenow > $session->registrationtimefinish) {
+        } else if (!empty($seminarevent->get_registrationtimefinish()) && $timenow > $seminarevent->get_registrationtimefinish()) {
             $status = get_string('registrationclosed', 'mod_facetoface');
         }
 
         if ($CFG->enableavailability) {
-            $cm = get_coursemodule_from_instance('facetoface', $session->facetoface);
+            $cm = get_coursemodule_from_instance('facetoface', $seminarevent->get_facetoface());
             if (!get_fast_modinfo($cm->course)->get_cm($cm->id)->available) {
                 $status = get_string('bookingrestricted', 'mod_facetoface');
             }
@@ -296,13 +296,13 @@ final class seminar_event_helper {
 
         $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
         $timenow = time();
-        $seminarevent = new \mod_facetoface\seminar_event($session->id);
+        $seminarevent = (new seminar_event())->from_record_with_dates($session, false);
         $sessionover = $seminarevent->is_over();
-        $cancelled = !empty($session->cancelledstatus);
+        $cancelled = (bool)$seminarevent->get_cancelledstatus();
 
         if ($cancelled) {
             $event_status = get_string('sessioncancelled', 'mod_facetoface');
-        } else if (empty($session->sessiondates)) {
+        } else if (!$seminarevent->is_sessions()) {
             $event_status = get_string('wait-listed', 'mod_facetoface');
         } else if ($seminarevent->is_over($timenow)) {
             $event_status = get_string('sessionover', 'mod_facetoface');
@@ -321,15 +321,15 @@ final class seminar_event_helper {
             } else {
                 $event_booking_status = get_string('bookingopen', 'mod_facetoface');
             }
-            if ($signupcount >= $session->capacity) {
+            if ($signupcount >= $seminarevent->get_capacity()) {
                 $event_booking_status = get_string('bookingfull', 'mod_facetoface');
-            } else if (!empty($session->registrationtimestart) && $session->registrationtimestart > $timenow) {
+            } else if (!empty($seminarevent->get_registrationtimestart()) && $seminarevent->get_registrationtimestart() > $timenow) {
                 $event_booking_status = get_string('registrationnotopen', 'mod_facetoface');
-            } else if (!empty($session->registrationtimefinish) && $timenow > $session->registrationtimefinish) {
+            } else if (!empty($seminarevent->get_registrationtimefinish()) && $timenow > $seminarevent->get_registrationtimefinish()) {
                 $event_booking_status = get_string('registrationclosed', 'mod_facetoface');
             }
             if ($CFG->enableavailability) {
-                $cm = get_coursemodule_from_instance('facetoface', $session->facetoface);
+                $cm = get_coursemodule_from_instance('facetoface', $seminarevent->get_facetoface());
                 if (!get_fast_modinfo($cm->course)->get_cm($cm->id)->available) {
                     $event_booking_status = get_string('bookingrestricted', 'mod_facetoface');
                 }
