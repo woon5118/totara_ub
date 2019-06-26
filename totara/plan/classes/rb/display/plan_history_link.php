@@ -45,15 +45,20 @@ class plan_history_link extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $OUTPUT;
 
-        $extrafields = self::get_extrafields_row($row, $column);
-
         if (!$value) {
             return 0;
         }
 
-        $description = \html_writer::span(get_string('viewpreviouscompletions', 'rb_source_dp_certification', $extrafields->fullname), 'sr-only');
-        return $OUTPUT->action_link(new \moodle_url('/totara/plan/record/certifications.php',
-            array('certifid' => $extrafields->certifid, 'userid' => $extrafields->userid, 'history' => 1)), $value . $description);
+        $isexport = ($format !== 'html');
+        if ($isexport) {
+            return $value;
+        } else {
+            $extrafields = self::get_extrafields_row($row, $column);
+
+            $description = \html_writer::span(get_string('viewpreviouscompletions', 'rb_source_dp_certification', $extrafields->fullname), 'sr-only');
+            return $OUTPUT->action_link(new \moodle_url('/totara/plan/record/certifications.php',
+                array('certifid' => $extrafields->certifid, 'userid' => $extrafields->userid, 'history' => 1)), $value . $description);
+        }
     }
 
     /**
