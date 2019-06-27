@@ -181,7 +181,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     FROM {facetoface_signups_status} status
                     JOIN (SELECT signupid, max(timecreated) as approvaltime
                             FROM {facetoface_signups_status}
-                           WHERE statuscode IN (" . waitlisted::get_code() . ", " . booked::get_code() . ") 
+                           WHERE statuscode IN (" . waitlisted::get_code() . ", " . booked::get_code() . ")
                         GROUP BY signupid) lastapproval
                       ON status.signupid = lastapproval.signupid
                      AND status.timecreated = lastapproval.approvaltime
@@ -478,12 +478,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('cancellationdate', 'rb_source_facetoface_sessions'),
                 'cancellationstatus.timecreated',
                 array(
-                    'joins' => array('cancellationstatus', 'sessions','sessiondate'),
+                    'joins' => array('cancellationstatus', 'sessions'),
                     'displayfunc' => 'event_date',
                     'dbdatatype' => 'timestamp',
-                    'extrafields' => array(
-                        'timezone' => 'sessiondate.sessiontimezone'
-                    ),
                 )
             ),
             new rb_column_option(

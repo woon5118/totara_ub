@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar_event, seminar_session, signup};
+use mod_facetoface\{seminar_event, seminar_session, signup, signup_helper};
 use mod_facetoface\signup\state\{attendance_state, not_set, booked};
 
 class mod_facetoface_view_distinct_attendees_testcase extends advanced_testcase {
@@ -46,7 +46,7 @@ class mod_facetoface_view_distinct_attendees_testcase extends advanced_testcase 
 
     /**
      * When viewing the embedded report, there is number of records are duplicated multiple times,. Therefore this test suite is
-     * assuring that the records are not going to be dupliated anymore, unless there is something else different.
+     * assuring that the records are not going to be duplicated anymore, unless there is something else different.
      *
      * @return void
      */
@@ -132,6 +132,52 @@ class mod_facetoface_view_distinct_attendees_testcase extends advanced_testcase 
         unset($reporthtml);
         unset($debughtml);
 
+        [$reporthtml, $debughtml] = $renderer->report_html($report, false);
+        foreach ($users as $user) {
+            $name = fullname($user);
+
+            // Expecting each user to have 2 record rows here, because each row contains a distinct data here, therefore the report
+            // should be able to show that to the viewer.
+            $this->assertEquals(2, substr_count($reporthtml, $name));
+        }
+
+        // Cancel users and do the same test to cancellations report.
+        foreach ($users as $user) {
+            $signup = signup::create($user->id, $e);
+            signup_helper::user_cancel($signup);
+        }
+
+        $cfg = new rb_config();
+        $cfg->set_embeddata(
+            [
+                'sessionid' => $e->get_id()
+            ]
+        );
+
+        $report = reportbuilder::create_embedded('facetoface_cancellations', $cfg);
+
+        // Adding a new columns here, so that it allows the report to duplicate the records, because the data between
+        // records are tweaked to be different.
+        foreach ($report->columnoptions as $columnoption) {
+            if ('date' !== $columnoption->type) {
+                continue;
+            }
+
+            $value = $columnoption->value;
+            if (!in_array($value, ['datefinish', 'sessiondate'])) {
+                continue;
+            }
+
+            $report->columns[] = $report->src->new_column_from_option(
+                $columnoption->type,
+                $columnoption->value,
+                $columnoption->transform,
+                $columnoption->aggregate
+            );
+        }
+
+        unset($reporthtml);
+        unset($debughtml);
         [$reporthtml, $debughtml] = $renderer->report_html($report, false);
         foreach ($users as $user) {
             $name = fullname($user);
