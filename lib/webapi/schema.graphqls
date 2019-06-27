@@ -131,7 +131,6 @@ enum core_date_format {
     DAYDATETIME
     TIME
     TIMESHORT
-    TIMELONG
     DATE
     DATESHORT
     DATELONG

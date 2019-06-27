@@ -122,7 +122,40 @@ class execution_context {
             return $date->format(\DateTime::ISO8601);
         }
 
-        return userdate($timestamp, get_string('strftime' . strtolower($format), 'langconfig'));
+        switch ($format) {
+            case 'TIME':
+                $string = 'strftimetime';
+                break;
+            case 'TIMESHORT':
+                $string = 'strftimeshort';
+                break;
+            case 'DATE':
+                $string = 'strftimedate';
+                break;
+            case 'DATESHORT':
+                $string = 'strftimedateshort';
+                break;
+            case 'DATELONG':
+                $string = 'strftimedatefulllong';
+                break;
+            case 'DATETIME':
+                $string = 'strftimedatetime';
+                break;
+            case 'DATETIMESHORT':
+                $string = 'strftimedatetimeshort';
+                break;
+            case 'DATETIMELONG':
+                $string = 'strftimedatetimelong';
+                break;
+            case 'DATETIMESECONDS':
+                $string = 'strftimedateseconds';
+                break;
+            case 'DAYDATETIME':
+            default:
+                $string = 'strftimedaydatetime';
+        }
+
+        return userdate($timestamp, get_string($string, 'langconfig'));
     }
 
     /**
