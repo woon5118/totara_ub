@@ -43,6 +43,7 @@ information provided here is intended especially for developers.
     - Function: totara_queue_shift() (no alternative)
     - Method: \core\notification::add_totara_legacy() (no alternative)
     - Method: \totara_core_renderer::totara_notifications() (alternative method: \core_renderer::course_content_header_notifications())
+* Deprecated function totara_print_scheduled_reports().
 
 === 12.0 ===
 

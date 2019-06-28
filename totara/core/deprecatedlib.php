@@ -208,3 +208,38 @@ function totara_queue_shift($key, $all = false) {
     // Otherwise pop oldest item from queue
     return array_shift($SESSION->totara_queue[$key]);
 }
+
+/**
+ * Returns markup for displaying saved scheduled reports
+ *
+ * Optionally without the options column and add/delete form
+ * Optionally with an additional sql WHERE clause
+ * @deprecated since Totara 13.0
+ * @access public
+ * @param boolean $showoptions SHow icons to edit and delete scheduled reports.
+ * @param boolean $showaddform Show a simple form to allow reports to be scheduled.
+ * @param array $sqlclause In the form array($where, $params)
+ */
+function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $sqlclause=array()) {
+    global $CFG, $PAGE;
+
+    debugging('totara_print_scheduled_reports() has been deprecated.', DEBUG_DEVELOPER);
+
+    require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+    require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
+    require_once($CFG->dirroot . '/calendar/lib.php');
+    require_once($CFG->dirroot . '/totara/reportbuilder/scheduled_forms.php');
+
+    $scheduledreports = get_my_scheduled_reports_list();
+
+    // If we want the form generate the content so it can be used into the templated.
+    if ($showaddform) {
+        $mform = new scheduled_reports_add_form($CFG->wwwroot . '/totara/reportbuilder/scheduled.php', array());
+        $addform = $mform->render();
+    } else {
+        $addform = '';
+    }
+
+    $renderer = $PAGE->get_renderer('totara_core');
+    echo $renderer->scheduled_reports($scheduledreports, $showoptions, $addform);
+}
