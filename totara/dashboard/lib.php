@@ -687,5 +687,9 @@ function totara_dashboard_page_type_list($pagetype, $parentcontext, $currentcont
     if (strpos($pagetype, 'totara-dashboard-') === 0) {
         $result[$pagetype] = get_string('pagetype-this-dashboard', 'totara_dashboard');
     }
+
+    // Allow block to be changed back to 'Any page'
+    $result['*'] = get_string('page-x', 'pagetype');
+
     return $result;
 }
