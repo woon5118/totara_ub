@@ -2434,6 +2434,78 @@ ORDER BY tt1.groupid";
         $this->assertFalse($DB->is_transaction_started());
     }
 
+    /**
+     * Similar to core_dml_testcase::test_transaction_ignore_error_trouble()
+     * but with db logging enabled.
+     */
+    public function test_transaction_ignore_error_trouble_logged() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $this->override_dboption('logall', false);
+        $this->override_dboption('logerrors', true);
+
+        $tablename = 'test_table';
+        $table = new xmldb_table($tablename);
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_index('course', XMLDB_INDEX_UNIQUE, array('course'));
+        $dbman->create_table($table);
+
+        $DB->delete_records('log_queries', []);
+
+        // Test error on insert - we expect ignored errors to be logged.
+
+        $transaction = $DB->start_delegated_transaction();
+        $this->assertEquals(0, $DB->count_records($tablename));
+        $DB->insert_record($tablename, (object)array('course'=>1));
+        $this->assertEquals(1, $DB->count_records($tablename));
+        $this->assertCount(0, $DB->get_records('log_queries', []));
+        try {
+            $DB->insert_record($tablename, (object)array('course'=>1));
+            $this->fail('Exception expected!');
+        } catch (dml_write_exception $e) {
+            // Can't test for specific message because it is DB specific.
+            $this->assertEquals('dmlwriteexception', $e->errorcode);
+        }
+        $this->assertCount(1, $DB->get_records('log_queries', []));
+        $DB->insert_record($tablename, (object)array('course'=>2));
+        $this->assertEquals(2, $DB->count_records($tablename));
+
+        $transaction->allow_commit();
+        $this->assertEquals(2, $DB->count_records($tablename));
+        $this->assertFalse($DB->is_transaction_started());
+        $this->assertCount(1, $DB->get_records('log_queries', []));
+
+        // Error not logged after rollback - there is no easy way to work around this because we log into the same database.
+
+        $DB->delete_records('log_queries', []);
+        $DB->delete_records($tablename, []);
+
+        $transaction = $DB->start_delegated_transaction();
+        $this->assertEquals(0, $DB->count_records($tablename));
+        $DB->insert_record($tablename, (object)array('course'=>1));
+        $this->assertEquals(1, $DB->count_records($tablename));
+        $this->assertCount(0, $DB->get_records('log_queries', []));
+        try {
+            $DB->insert_record($tablename, (object)array('course'=>1));
+            $this->fail('Exception expected!');
+        } catch (dml_write_exception $e) {
+            // Can't test for specific message because it is DB specific.
+            $this->assertEquals('dmlwriteexception', $e->errorcode);
+        }
+        $this->assertCount(1, $DB->get_records('log_queries', []));
+        $DB->insert_record($tablename, (object)array('course'=>2));
+        $this->assertEquals(2, $DB->count_records($tablename));
+
+        $transaction->rollback();
+        $this->assertCount(0, $DB->get_records('log_queries', []));
+        $this->assertCount(0, $DB->get_records($tablename, []));
+
+        $dbman->drop_table($table);
+    }
+
     public function test_transaction_using_closure() {
         $DB = $this->tdb;
         $dbman = $this->tdb->get_manager();

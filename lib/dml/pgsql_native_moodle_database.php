@@ -249,22 +249,25 @@ class pgsql_native_moodle_database extends moodle_database {
     protected function query_end($result) {
         // reset original debug level
         error_reporting($this->last_error_reporting);
-        try {
-            parent::query_end($result);
-            if ($this->savepointpresent and $this->last_type != SQL_QUERY_AUX and $this->last_type != SQL_QUERY_SELECT) {
-                $res = @pg_query($this->pgsql, "RELEASE SAVEPOINT moodle_pg_savepoint; SAVEPOINT moodle_pg_savepoint");
-                if ($res) {
-                    pg_free_result($res);
-                }
-            }
-        } catch (Exception $e) {
+
+        if ($result === false) {
+            // Totara: for consistency with other DBs we return to pre-error savepoint, we need to do this before db logging in parent method.
             if ($this->savepointpresent) {
                 $res = @pg_query($this->pgsql, "ROLLBACK TO SAVEPOINT moodle_pg_savepoint; SAVEPOINT moodle_pg_savepoint");
                 if ($res) {
                     pg_free_result($res);
                 }
             }
-            throw $e;
+            parent::query_end($result); // always throws exception
+            return;
+        }
+
+        parent::query_end($result);
+        if ($this->savepointpresent and $this->last_type != SQL_QUERY_AUX and $this->last_type != SQL_QUERY_SELECT) {
+            $res = @pg_query($this->pgsql, "RELEASE SAVEPOINT moodle_pg_savepoint; SAVEPOINT moodle_pg_savepoint");
+            if ($res) {
+                pg_free_result($res);
+            }
         }
     }
 
