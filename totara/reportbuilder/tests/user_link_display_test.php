@@ -147,8 +147,7 @@ class totara_reportbuilder_user_link_display_testcase extends advanced_testcase 
 
             $this->assertNotEmpty($value);
             $this->assertNotContains("course={$course->id}", $value);
-            // Expecting no link here, when user is not able to view it.
-            $this->assertEquals("{$user->firstname} {$user->lastname}", $value);
+            $this->assertContains("id={$user->id}", $value);
         }
     }
 }

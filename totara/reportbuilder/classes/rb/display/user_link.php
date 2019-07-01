@@ -108,7 +108,30 @@ class user_link extends base {
             $url->param('course', $course->id);
             return \html_writer::link($url, $fullname);
         } else if ($userid == $USER->id) {
+            // If the user is self, throw the profile url
             return \html_writer::link($url, $fullname);
+        } else {
+            $usercontext = \context_user::instance($userid);
+            $capabilities = [
+                'moodle/user:viewdetails',
+                'moodle/user:viewalldetails'
+            ];
+
+            if (has_any_capability($capabilities, $usercontext)) {
+                // User has capability to view other's full detail within site profile.
+                return \html_writer::link($url, $fullname);
+            } else {
+                // Last resource of checking. Well, it should never get to here at all, but who knows ¯\_(ツ)_/¯
+                $userobj = new \stdClass();
+                $userobj->id = $userid;
+                $userobj->deleted = $isdeleted;
+
+                if (user_can_view_profile($userobj)) {
+                    // Yep, the current actor is able to view the target user, but could be in any course context,
+                    // and it will be redirected to user profile page.
+                    return \html_writer::link($url, $fullname);
+                }
+            }
         }
 
         // The current actor is not able to view the profile of target user within course.
