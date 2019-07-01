@@ -58,16 +58,24 @@ class totara_program_totara_catalog_dataformatter_test extends dataformatter_tes
         $program_generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
         $program = $program_generator->create_program();
 
+        // Get url object for default image.
         $test_params = [
             'programid' => $program->id,
             'alt' => 'test_alt_text',
         ];
         $result = $df->get_formatted_value($test_params, $context);
         $this->assertInstanceOf(stdClass::class, $result);
-        // Check that we get a url back that includes default icon in its path.
-        $this->assertContains($CFG->wwwroot, $result->url);
-        $this->assertContains('/program/defaultimage', $result->url);
-        $this->assertSame('test_alt_text', $result->alt);
+
+        // Convert object to array so that we may read the protected attributes.
+        $result = (array) $result;
+        $result['url'] = (array) $result['url'];
+        $prefix = chr(0) . '*' . chr(0);
+
+        // Check that we get a theme-independent default icon reference.
+        $this->assertContains($result['url'][$prefix . 'host'], $CFG->wwwroot);
+        $this->assertContains('moodle/theme/image.php', $result['url'][$prefix . 'path']);
+        $this->assertContains('defaultimage', $result['url'][$prefix . 'slashargument']);
+        $this->assertSame('test_alt_text', $result['alt']);
 
         $this->assert_exceptions($df, $test_params);
     }

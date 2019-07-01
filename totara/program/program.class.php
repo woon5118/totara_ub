@@ -2463,7 +2463,7 @@ class program {
      * @return string
      */
     public function get_image() {
-        global $CFG;
+        global $CFG, $OUTPUT;
         $fs = get_file_storage();
         $files = array_values(
             $fs->get_area_files(
@@ -2492,9 +2492,9 @@ class program {
         // There have not being any files uploaded so return the default default image.
         if (empty($files)) {
             if ($this->is_certif()) {
-                return $CFG->wwwroot . '/totara/certification/defaultimage.svg';
+                return $OUTPUT->image_url('defaultimage', 'totara_certification');
             } else {
-                return $CFG->wwwroot . '/totara/program/defaultimage.svg';
+                return $OUTPUT->image_url('defaultimage', 'totara_program');
             }
         }
         $files = array_values(array_filter($files, function($file) {

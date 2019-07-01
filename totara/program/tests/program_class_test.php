@@ -2172,8 +2172,17 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $usercontext = context_user::instance($USER->id);
         $program = $this->program_generator->create_program();
 
-        // Check that the default default is the image.
-        $this->assertEquals($CFG->wwwroot . '/totara/program/defaultimage.svg', $program->get_image());
+        // Check that the default is the theme-independent default image.
+        $result = $program->get_image();
+
+        // Convert object to array so that we may read the protected attributes.
+        $result = (array) $result;
+        $prefix = chr(0) . '*' . chr(0);
+
+        // Check that we get a theme-independent default icon reference.
+        $this->assertContains($result[$prefix . 'host'], $CFG->wwwroot);
+        $this->assertContains('moodle/theme/image.php', $result[$prefix . 'path']);
+        $this->assertContains('defaultimage', $result[$prefix . 'slashargument']);
 
         // Upload a default.
         $draftfile = core_files_external::upload(
@@ -2238,7 +2247,17 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $usercontext = context_user::instance($USER->id);
         $certification = $this->getDataGenerator()->create_certification();
 
-        $this->assertEquals($CFG->wwwroot . '/totara/certification/defaultimage.svg', $certification->get_image());
+        // Check that the default is the theme-independent default image.
+        $result = $certification->get_image();
+
+        // Convert object to array so that we may read the protected attributes.
+        $result = (array) $result;
+        $prefix = chr(0) . '*' . chr(0);
+
+        // Check that we get a theme-independent default icon reference.
+        $this->assertContains($result[$prefix . 'host'], $CFG->wwwroot);
+        $this->assertContains('moodle/theme/image.php', $result[$prefix . 'path']);
+        $this->assertContains('defaultimage', $result[$prefix . 'slashargument']);
 
         $draftfile = core_files_external::upload(
             $usercontext->id,
