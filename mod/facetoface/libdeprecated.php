@@ -172,7 +172,7 @@ function facetoface_approval_settings($facetoface) {
     }
 
     if (isset($facetoface->approval_termsandconds)) {
-        $facetoface->approvalterms = s($facetoface->approval_termsandconds);
+        $facetoface->approvalterms = $facetoface->approval_termsandconds;
     }
 }
 
@@ -2781,7 +2781,7 @@ function facetoface_cancel_session($session, $fromform) {
     \mod_facetoface\calendar::remove_all_entries($seminarevent);
 
     // Change all user sign-up statuses, the only exceptions are previously cancelled users and declined users.
-    $sql = "SELECT DISTINCT s.userid, s.id as signupid, ss.statuscode as signupstatus 
+    $sql = "SELECT DISTINCT s.userid, s.id as signupid, ss.statuscode as signupstatus
               FROM {facetoface_signups} s
               JOIN {facetoface_signups_status} ss ON ss.signupid = s.id
              WHERE s.sessionid = :sessionid AND

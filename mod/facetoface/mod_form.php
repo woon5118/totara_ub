@@ -548,7 +548,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
         }
 
         if (isset($data->approval_termsandconds)) {
-            $data->approvalterms = s($data->approval_termsandconds);
+            $data->approvalterms = $data->approval_termsandconds;
         }
 
         // Fix settings.
@@ -652,7 +652,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
                     $defaultvalues['approvaloptions'] = 'approval_admin';
                     break;
             }
-            $defaultvalues['approval_termsandconds'] = s($defaultvalues['approvalterms']);
+            $defaultvalues['approval_termsandconds'] = $defaultvalues['approvalterms'];
 
             // Convert interest flags to option.
             $defaultvalues['declareinterest'] = ($defaultvalues['interestonlyiffull'] == 1) ? 2 : $defaultvalues['declareinterest'];
