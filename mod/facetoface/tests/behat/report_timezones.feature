@@ -128,11 +128,15 @@ Feature: Seminar timezones in reports
 
     When I navigate to my "F2F sessions" report
     Then I should see "1 January 2020" in the "First User" "table_row"
-    And I should see "6:15 PM Europe/Prague" in the "First User" "table_row"
-    And I should see "8:45 PM Europe/Prague" in the "First User" "table_row"
+    And I should see "6:15 PM" in the "First User" "table_row"
+    And I should see "Timezone: Europe/Prague" in the "6:15 PM" "table_row"
+    And I should see "8:45 PM" in the "First User" "table_row"
+    And I should see "Timezone: Europe/Prague" in the "8:45 PM" "table_row"
     And I should see "4 February 2021" in the "Second User" "table_row"
-    And I should see "1:00 AM Australia/Perth" in the "Second User" "table_row"
-    And I should see "2:30 AM Australia/Perth" in the "Second User" "table_row"
+    And I should see "1:00 AM" in the "Second User" "table_row"
+    And I should see "Timezone: Australia/Perth" in the "1:00 AM" "table_row"
+    And I should see "2:30 AM" in the "Second User" "table_row"
+    And I should see "Timezone: Australia/Perth" in the "2:30 AM" "table_row"
     And I should not see "2 January 2020"
 
     When I am on homepage
@@ -213,7 +217,7 @@ Feature: Seminar timezones in reports
     And I set the field "Source" to "Seminar Sessions"
     And I press "Create report"
     And I switch to "Columns" tab
-    And I add the "Session Start Date/Time (linked to attendees page)" column to the report
+    And I add the "Session Start Date/Time (linked to activity)" column to the report
     And I add the "Session Start Date/Time" column to the report
 
     When I navigate to my "F2F summary" report

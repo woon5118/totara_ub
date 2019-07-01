@@ -238,28 +238,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $usernamefieldsbooked  = totara_get_all_user_name_fields_join('bookedby');
         $columnoptions = array(
             new rb_column_option(
-                'session',                  // Type.
-                'capacity',                 // Value.
-                get_string('sesscapacity', 'rb_source_facetoface_sessions'),    // Name.
-                'sessions.capacity',        // Field.
-                array(
-                    'joins' => 'sessions',
-                    'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer'
-                )
-            ),
-            new rb_column_option(
-                'session',
-                'numattendees',
-                get_string('numattendees', 'rb_source_facetoface_sessions'),
-                'attendees.number',
-                array(
-                    'joins' => 'attendees',
-                    'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer'
-                )
-            ),
-            new rb_column_option(
                 'session',
                 'details',
                 get_string('sessdetails', 'rb_source_facetoface_sessions'),
@@ -280,7 +258,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'session',
-                'signupperiod',
+                'signupperiod', // Sign-up Date/Time Period
                 get_string('signupperiod', 'rb_source_facetoface_sessions'),
                 'sessions.registrationtimestart',
                 array(
@@ -296,7 +274,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'session',
-                'signupstartdate',
+                'signupstartdate', // Sign-up Start Date/Time
                 get_string('signupstartdate', 'rb_source_facetoface_sessions'),
                 'sessions.registrationtimestart',
                 array(
@@ -309,7 +287,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'session',
-                'signupenddate',
+                'signupenddate', // Sign-up End Date/Time
                 get_string('signupenddate', 'rb_source_facetoface_sessions'),
                 'sessions.registrationtimefinish',
                 array(
@@ -375,106 +353,15 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 array(
                     'joins' => 'creator',
                     'displayfunc' => 'f2f_user_link',
-                    'extrafields' => array_merge(array('id' => 'creator.id'), $usernamefieldscreator),
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'sessiondate',
-                get_string('sessstartdatetime', 'rb_source_facetoface_sessions'),
-                'sessiondate.timestart',
-                array(
-                    'extrafields' => array(
-                        'timezone' => 'sessiondate.sessiontimezone'),
-                    'joins' =>'sessiondate',
-                    'displayfunc' => 'event_date',
-                    'dbdatatype' => 'timestamp'
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'sessiondate_link',
-                get_string('sessstartdatetimelink', 'rb_source_facetoface_sessions'),
-                'sessiondate.timestart',
-                array(
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'event_date_link',
-                    'defaultheading' => get_string('sessstartdatetime', 'rb_source_facetoface_sessions'),
-                    'extrafields' => array(
-                        'session_id' => 'base.sessionid',
-                        'timezone' => 'sessiondate.sessiontimezone'),
-                    'dbdatatype' => 'timestamp'
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'datefinish',
-                get_string('sessfinishdatetime', 'rb_source_facetoface_sessions'),
-                'sessiondate.timefinish',
-                array(
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'event_date',
-                    'dbdatatype' => 'timestamp',
-                    'extrafields' => array(
-                        'timezone' => 'sessiondate.sessiontimezone'
-                    )
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'timestart',
-                get_string('sessstarttime', 'rb_source_facetoface_sessions'),
-                'sessiondate.timestart',
-                array(
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'event_time',
-                    'dbdatatype' => 'timestamp',
-                    'extrafields' => array(
-                        'timezone' => 'sessiondate.sessiontimezone'
-                    )
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'timefinish',
-                get_string('sessfinishtime', 'rb_source_facetoface_sessions'),
-                'sessiondate.timefinish',
-                array(
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'event_time',
-                    'dbdatatype' => 'timestamp',
-                    'extrafields' => array(
-                        'timezone' => 'sessiondate.sessiontimezone'
-                    )
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'localsessionstartdate',
-                get_string('localsessstartdate', 'rb_source_facetoface_sessions'),
-                'sessiondate.timestart',
-                array(
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'local_event_date',
-                    'defaultheading' => get_string('sessstartdatetime', 'rb_source_facetoface_sessions'),
-                    'dbdatatype' => 'timestamp'
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'localsessionfinishdate',
-                get_string('localsessfinishdate', 'rb_source_facetoface_sessions'),
-                'sessiondate.timefinish',
-                array(
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'local_event_date',
-                    'defaultheading' => get_string('sessfinishdatetime', 'rb_source_facetoface_sessions'),
-                    'dbdatatype' => 'timestamp'
+                    'extrafields' => array_merge(
+                        ['id' => 'creator.id', 'deleted' => 'creator.deleted'],
+                        $usernamefieldscreator
+                    ),
                 )
             ),
             new rb_column_option(
                 'session',
-                'cancellationdate',
+                'cancellationdate', // Cancellation Date/Time
                 get_string('cancellationdate', 'rb_source_facetoface_sessions'),
                 'cancellationstatus.timecreated',
                 array(
@@ -491,7 +378,10 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 array(
                     'joins' => 'bookedby',
                     'displayfunc' => 'f2f_user_link',
-                    'extrafields' => array_merge(array('id' => 'bookedby.id'), $usernamefieldsbooked),
+                    'extrafields' => array_merge(
+                        ['id' => 'bookedby.id', 'deleted' => 'bookedby.deleted'],
+                        $usernamefieldsbooked
+                    ),
                 )
             ),
             new rb_column_option(
@@ -515,8 +405,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 ),
             new rb_column_option(
                 'status',
-                'timecreated',
-                get_string('timeofsignup', 'rb_source_facetoface_sessions'),
+                'timecreated', // Date/Time of sign-up
+                get_string('datetimeofsignup', 'rb_source_facetoface_sessions'),
                 '(SELECT MAX(timecreated)
                     FROM {facetoface_signups_status}
                     WHERE signupid = base.id AND statuscode IN ('.booked::get_code().', '.waitlisted::get_code().'))',
@@ -544,7 +434,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'approver',
                 'approvaltime',
-                get_string('approvertime', 'mod_facetoface'),
+                get_string('approverdatetime', 'mod_facetoface'),
                 'approver.approvaltime',
                 array(
                     'joins' => 'approver',
@@ -638,6 +528,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         }
 
         // include some standard columns
+        $this->add_session_common_to_columns($columnoptions, 'sessiondate');
         $this->add_core_user_columns($columnoptions);
         $this->add_core_course_columns($columnoptions);
         $this->add_core_course_category_columns($columnoptions);
@@ -654,12 +545,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     protected function define_filteroptions() {
         $filteroptions = array(
             new rb_filter_option(
-                'facetoface',
-                'name',
-                get_string('ftfname', 'rb_source_facetoface_sessions'),
-                'text'
-            ),
-            new rb_filter_option(
                 'status',
                 'statuscode',
                 get_string('status', 'rb_source_facetoface_sessions'),
@@ -668,12 +553,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     'selectfunc' => 'session_status_list',
                     'attributes' => rb_filter_option::select_width_limiter(),
                 )
-            ),
-            new rb_filter_option(
-                'date',
-                'sessiondate',
-                get_string('sessdate', 'rb_source_facetoface_sessions'),
-                'date'
             ),
             new rb_filter_option(
                 'date',
@@ -791,12 +670,12 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         }
 
         // include some standard filters
+        $this->add_session_common_to_filters($filteroptions);
         $this->add_core_user_filters($filteroptions);
         $this->add_core_course_filters($filteroptions);
         $this->add_core_course_category_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');
         $this->add_core_tag_filters('core', 'course', $filteroptions);
-
         // add session role fields to filters
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
 
@@ -876,7 +755,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             array(
                 'type' => 'date',
-                'value' => 'sessiondate',
+                'value' => 'sessionstartdate',
             ),
             array(
                 'type' => 'session',
@@ -911,7 +790,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             array(
                 'type' => 'date',
-                'value' => 'sessiondate',
+                'value' => 'sessionstartdate',
                 'advanced' => 1,
             ),
         );

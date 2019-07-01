@@ -162,8 +162,10 @@ Feature: Seminar event cancellation learner views
     And I click on "Bookings" "link"
     Then I should see "Course 1" in the "Test Seminar" "table_row"
     And I should see "10 February 2025" in the "Test Seminar" "table_row"
-    And I should see "9:00 AM Pacific/Auckland" in the "Test Seminar" "table_row"
-    And I should see "3:00 PM Pacific/Auckland" in the "Test Seminar" "table_row"
+    And I should see "9:00 AM" in the "Test Seminar" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "9:00 AM" "table_row"
+    And I should see "3:00 PM" in the "Test Seminar" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "3:00 PM" "table_row"
     And I should see "Event Cancelled" in the "Test Seminar" "table_row"
 
 
@@ -201,8 +203,10 @@ Feature: Seminar event cancellation learner views
     And I click on "Past Bookings" "link"
     Then I should see "Course 1" in the "Test Seminar" "table_row"
     And I should see "10 April 2015" in the "Test Seminar" "table_row"
-    And I should see "9:00 AM Pacific/Auckland" in the "Test Seminar" "table_row"
-    And I should see "2:00 PM Pacific/Auckland" in the "Test Seminar" "table_row"
+    And I should see "9:00 AM" in the "Test Seminar" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "9:00 AM" "table_row"
+    And I should see "2:00 PM" in the "Test Seminar" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "2:00 PM" "table_row"
     And I should see "Event Cancelled" in the "Test Seminar" "table_row"
 
 
@@ -243,5 +247,7 @@ Feature: Seminar event cancellation learner views
     Then I should not see "Course 1" in the "Test Seminar" "table_row"
     And I should not see "10 February 2025" in the "Test Seminar" "table_row"
     And I should not see "9:00 AM Pacific/Auckland" in the "Test Seminar" "table_row"
+    And I should not see "Timezone: Pacific/Auckland" in the "9:00 AM" "table_row"
     And I should not see "3:00 PM Pacific/Auckland" in the "Test Seminar" "table_row"
+    And I should not see "Timezone: Pacific/Auckland" in the "3:00 PM" "table_row"
     And I should not see "Event Cancelled" in the "Test Seminar" "table_row"

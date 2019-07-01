@@ -54,7 +54,6 @@ class mod_facetoface_view_distinct_attendees_testcase extends advanced_testcase 
         global $PAGE;
         $PAGE->set_url('/');
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         $e = $this->create_seminar_event();
@@ -117,7 +116,7 @@ class mod_facetoface_view_distinct_attendees_testcase extends advanced_testcase 
             }
 
             $value = $columnoption->value;
-            if (!in_array($value, ['datefinish', 'sessiondate'])) {
+            if (!in_array($value, ['datefinish', 'sessionstartdate'])) {
                 continue;
             }
 

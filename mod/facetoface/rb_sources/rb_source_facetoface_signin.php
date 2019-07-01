@@ -181,20 +181,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $columnoptions = array(
             new rb_column_option(
                 'session',
-                'capacity',
-                get_string('sesscapacity', 'rb_source_facetoface_signin'),
-                'sessions.capacity',
-                array('joins' => 'sessions', 'dbdatatype' => 'integer', 'displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'session',
-                'numattendees',
-                get_string('numattendees', 'rb_source_facetoface_signin'),
-                'attendees.number',
-                array('joins' => 'attendees', 'dbdatatype' => 'integer', 'displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'session',
                 'details',
                 get_string('sessdetails', 'rb_source_facetoface_signin'),
                 'sessions.details',
@@ -245,90 +231,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 )
             ),
             new rb_column_option(
-                'date',
-                'sessiondate',
-                get_string('sessstartdatetime', 'rb_source_facetoface_signin'),
-                'sessiondate.timestart',
-                array(
-                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
-                    'joins' =>'sessiondate',
-                    'displayfunc' => 'event_date',
-                    'dbdatatype' => 'timestamp'
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'localsessionstartdate',
-                get_string('localsessstartdate', 'rb_source_facetoface_signin'),
-                'sessiondate.timefinish',
-                array(
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'local_event_date',
-                    'dbdatatype' => 'timestamp',
-                    'defaultheading' => get_string('sessstartdatetime', 'rb_source_facetoface_signin')
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'sessiondate_link',
-                get_string('sessstartdatetimelink', 'rb_source_facetoface_signin'),
-                'sessiondate.timestart',
-                array(
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'event_date_link',
-                    'defaultheading' => get_string('sessstartdatetime', 'rb_source_facetoface_signin'),
-                    'extrafields' => array('session_id' => 'base.sessionid', 'timezone' => 'sessiondate.sessiontimezone'),
-                    'dbdatatype' => 'timestamp'
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'datefinish',
-                get_string('sessfinishdatetime', 'rb_source_facetoface_signin'),
-                'sessiondate.timefinish',
-                array(
-                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'event_date',
-                    'dbdatatype' => 'timestamp')
-            ),
-            new rb_column_option(
-                'date',
-                'localsessionfinishdate',
-                get_string('localsessfinishdate', 'rb_source_facetoface_signin'),
-                'sessiondate.timefinish',
-                array(
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'local_event_date',
-                    'dbdatatype' => 'timestamp',
-                    'defaultheading' => get_string('sessfinishdatetime', 'rb_source_facetoface_signin')
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'timestart',
-                get_string('sessstart', 'rb_source_facetoface_signin'),
-                'sessiondate.timestart',
-                array(
-                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'event_time',
-                    'dbdatatype' => 'timestamp'
-                )
-            ),
-            new rb_column_option(
-                'date',
-                'timefinish',
-                get_string('sessfinish', 'rb_source_facetoface_signin'),
-                'sessiondate.timefinish',
-                array(
-                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
-                    'joins' => 'sessiondate',
-                    'displayfunc' => 'event_time',
-                    'dbdatatype' => 'timestamp'
-                )
-            ),
-            new rb_column_option(
                 'session',
                 'bookedby',
                 get_string('bookedby', 'rb_source_facetoface_signin'),
@@ -336,7 +238,10 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 array(
                     'joins' => 'bookedby',
                     'displayfunc' => 'f2f_booked_by_link',
-                    'extrafields' => array_merge(array('id' => 'bookedby.id'), $usernamefieldsbooked)
+                    'extrafields' => array_merge(
+                        ['id' => 'bookedby.id', 'deleted' => 'bookedby.deleted'],
+                        $usernamefieldsbooked
+                    )
                 )
             ),
             new rb_column_option(
@@ -391,6 +296,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         }
 
         // Include some standard columns.
+        $this->add_session_common_to_columns($columnoptions, 'sessiondate');
         $this->add_rooms_fields_to_columns($columnoptions, 'room');
         $this->add_core_user_columns($columnoptions);
         $this->add_core_course_columns($columnoptions);
@@ -411,12 +317,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
     protected function define_filteroptions() {
         $filteroptions = array(
             new rb_filter_option(
-                'facetoface',
-                'name',
-                get_string('f2fname', 'rb_source_facetoface_signin'),
-                'text'
-            ),
-            new rb_filter_option(
                 'status',
                 'statuscode',
                 get_string('status', 'rb_source_facetoface_signin'),
@@ -425,12 +325,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                     'selectfunc' => 'session_status_list',
                     'attributes' => rb_filter_option::select_width_limiter(),
                 )
-            ),
-            new rb_filter_option(
-                'date',
-                'sessiondate',
-                get_string('sessdate', 'rb_source_facetoface_signin'),
-                'date'
             ),
             new rb_filter_option(
                 'date',
@@ -502,6 +396,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         }
 
         // Include some standard filters.
+        $this->add_session_common_to_filters($filteroptions);
         $this->add_rooms_fields_to_filters($filteroptions);
         $this->add_core_user_filters($filteroptions);
         $this->add_core_course_filters($filteroptions);
@@ -639,7 +534,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             ),
             array(
                 'type' => 'date',
-                'value' => 'sessiondate',
+                'value' => 'sessionstartdate',
                 'advanced' => 1,
             ),
         );

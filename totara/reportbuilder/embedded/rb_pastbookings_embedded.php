@@ -52,7 +52,7 @@ class rb_pastbookings_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'date',
-                'value' => 'sessiondate',
+                'value' => 'sessionstartdate',
                 'heading' => get_string('sessdate', 'rb_source_facetoface_sessions'),
             ),
             array(

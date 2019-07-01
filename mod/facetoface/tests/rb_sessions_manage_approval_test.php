@@ -71,7 +71,7 @@ class mod_facetoface_rb_sessions_manage_approval_testcase extends advanced_testc
             $defaultcolumns = $src->defaultcolumns;
             $this->assertContains(['type' => 'user', 'value' => 'namelink'], $defaultcolumns);
             $this->assertContains(['type' => 'course', 'value' => 'courselink'], $defaultcolumns);
-            $this->assertContains(['type' => 'date', 'value' => 'sessiondate'], $defaultcolumns);
+            $this->assertContains(['type' => 'date', 'value' => 'sessionstartdate'], $defaultcolumns);
             $this->assertContains(['type' => 'session', 'value' => 'approvallink'], $defaultcolumns);
         }
     }

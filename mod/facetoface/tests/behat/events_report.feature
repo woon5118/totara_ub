@@ -105,8 +105,10 @@ Feature: Check the seminar events and sessions reports display correctly
     # Check the events start and finish date display correctly.
     When I navigate to "Events report" node in "Site administration > Seminars"
     Then the following should exist in the "facetoface_events" table:
-      | Seminar Name      | Course Name | Event Start Date/Time                  | Event Finish Date/Time                |
-      | Test seminar name | Course 1    | 1 January 2020, 3:00 AM Europe/London  | 1 January 2020, 4:00 AM Europe/London |
+      | Seminar Name      | Course Name | Event Start Date/Time   | Event Finish Date/Time  |
+      | Test seminar name | Course 1    | 1 January 2020, 3:00 AM | 1 January 2020, 4:00 AM |
+    And I should see "Timezone: Europe/London" in the "1 January 2020, 3:00 AM" "table_row"
+    And I should see "Timezone: Europe/London" in the "1 January 2020, 4:00 AM" "table_row"
 
     # Set admin users timezone to Pacific/Auckland.
     When I follow "Profile" in the user menu
@@ -118,8 +120,10 @@ Feature: Check the seminar events and sessions reports display correctly
     # Check the events start and finish date display correctly.
     When I navigate to "Events report" node in "Site administration > Seminars"
     Then the following should exist in the "facetoface_events" table:
-      | Seminar Name      | Course Name | Event Start Date/Time                     | Event Finish Date/Time                   |
-      | Test seminar name | Course 1    | 1 January 2020, 4:00 PM Pacific/Auckland  | 1 January 2020, 5:00 PM Pacific/Auckland |
+      | Seminar Name      | Course Name | Event Start Date/Time   | Event Finish Date/Time  |
+      | Test seminar name | Course 1    | 1 January 2020, 4:00 PM | 1 January 2020, 5:00 PM |
+    And I should see "Timezone: Pacific/Auckland" in the "1 January 2020, 4:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "1 January 2020, 5:00 PM" "table_row"
 
     # Set the sessions display timezone to America/Toronto.
     When I follow "Course 1"
@@ -134,5 +138,7 @@ Feature: Check the seminar events and sessions reports display correctly
     # Check the events start and finish date display correctly.
     When I navigate to "Events report" node in "Site administration > Seminars"
     Then the following should exist in the "facetoface_events" table:
-      | Seminar Name      | Course Name | Event Start Date/Time                         | Event Finish Date/Time                     |
-      | Test seminar name | Course 1    | 31 December 2019, 10:00 PM America/Toronto    | 31 December 2019, 11:00 PM America/Toronto |
+      | Seminar Name      | Course Name | Event Start Date/Time      | Event Finish Date/Time     |
+      | Test seminar name | Course 1    | 31 December 2019, 10:00 PM | 31 December 2019, 11:00 PM |
+    And I should see "Timezone: America/Toronto" in the "31 December 2019, 10:00 PM" "table_row"
+    And I should see "Timezone: America/Toronto" in the "31 December 2019, 11:00 PM" "table_row"

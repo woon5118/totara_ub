@@ -41,7 +41,7 @@ class event_dates_period extends \totara_reportbuilder\rb\display\base {
     public static function display($startdate, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         // Finishdate and timezone are expected as extra fields.
         $extra = self::get_extrafields_row($row, $column);
-        return \mod_facetoface\output\session_time::signup_period($startdate, $extra->finishdate, $extra->timezone);
+        return \mod_facetoface\output\session_time::signup_period($startdate, $extra->finishdate, $extra->timezone, $format);
     }
 
     /**

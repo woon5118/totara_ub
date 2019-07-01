@@ -328,22 +328,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                     'displayfunc' => 'integer'
                 )
             ),
-            new rb_column_option(
-                'date',
-                'sessiondate_link',
-                get_string('sessdatetimelink', 'rb_source_facetoface_summary'),
-                'base.timestart',
-                array(
-                    'joins' => 'sessions',
-                    'extrafields' => array(
-                        'session_id' => 'sessions.id',
-                        'timezone' => 'base.sessiontimezone',
-                    ),
-                    'defaultheading' => get_string('sessdatetime', 'rb_source_facetoface_summary'),
-                    'displayfunc' => 'event_date_link',
-                    'dbdatatype' => 'timestamp'
-                )
-            )
         );
 
         if (!get_config(null, 'facetoface_hidecost')) {
@@ -410,7 +394,10 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             array(
                 'joins' => 'modifiedby',
                 'displayfunc' => 'f2f_user_link',
-                'extrafields' => array_merge(array('id' => 'modifiedby.id'), $usernamefieldscreator),
+                'extrafields' => array_merge(
+                    ['id' => 'modifiedby.id', 'deleted' => 'modifiedby.deleted'],
+                    $usernamefieldscreator
+                ),
             )
         );
 
@@ -431,18 +418,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
 
     protected function define_filteroptions() {
         $filteroptions = array(
-            new rb_filter_option(
-                'facetoface',
-                'name',
-                get_string('ftfname', 'rb_source_facetoface_sessions'),
-                'text'
-            ),
-            new rb_filter_option(
-                'date',
-                'sessionstartdate',
-                get_string('sessdate', 'rb_source_facetoface_sessions'),
-                'date'
-            ),
             new rb_filter_option(
                 'session',
                 'signupstartdate',
@@ -511,6 +486,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             )
         );
 
+        $this->add_session_common_to_filters($filteroptions);
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
         $this->add_facetoface_currentuserstatus_to_filters($filteroptions);
 

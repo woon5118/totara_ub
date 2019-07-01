@@ -43,10 +43,8 @@ class f2f_booked_by_link extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        $extrafields = self::get_extrafields_row($row, $column);
 
-        $user = fullname($extrafields);
-        return f2f_user_link::display($user, $format, $row, $column, $report);
+        return f2f_user_link::display($value, $format, $row, $column, $report);
     }
 
     /**

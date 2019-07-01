@@ -41,32 +41,10 @@ class event_date extends \totara_reportbuilder\rb\display\base {
      * @return string
      */
     public static function display($date, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $CFG;
-
-        if (empty($date)) {
-            return '';
-        }
-
-        if (!is_numeric($date) || $date == 0 || $date == -1) {
-            return '';
-        }
 
         $extra = self::get_extrafields_row($row, $column);
-
-        if (empty($extra->timezone) || (int)$extra->timezone == 99 || empty($CFG->facetoface_displaysessiontimezones)) {
-            $targetTZ = \core_date::get_user_timezone();
-        } else {
-            $targetTZ = \core_date::normalise_timezone($extra->timezone);
-        }
-
-        if (!empty($CFG->facetoface_displaysessiontimezones)) {
-            $date = userdate($date, get_string('strftimedatetime', 'langconfig'), $targetTZ) . ' ';
-            $tzstring = \core_date::get_localised_timezone($targetTZ);
-            return $date . $tzstring;
-        } else {
-            $date = userdate($date, get_string('strftimedatetime', 'langconfig'), $targetTZ);
-            return $date;
-        }
+        $timezone = $extra->timezone ?? 99;
+        return \mod_facetoface\output\session_time::format_datetime($date, $format, $timezone);
     }
 
     /**

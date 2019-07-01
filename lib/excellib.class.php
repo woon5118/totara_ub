@@ -53,6 +53,7 @@ class MoodleExcelWorkbook {
     */
     const NUMBER_FORMAT_STANDARD_DATE = 14;
     const NUMBER_FORMAT_STANDARD_DATETIME = 22;
+    const NUMBER_FORMAT_STANDARD_TIME = 24;
 
     /**
      * Constructs one Moodle Workbook.
@@ -859,6 +860,7 @@ class MoodleExcelFormat {
         $numbers[16] = 'd-mmm';
         $numbers[17] = 'mmm-yy';
         $numbers[22] = 'm/d/yyyy h:mm';
+        $numbers[24] = 'h:mm';
         $numbers[49] = '@';
 
         if ($num_format !== 0 and in_array($num_format, $numbers)) {

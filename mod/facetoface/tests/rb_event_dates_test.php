@@ -30,7 +30,6 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         set_config('facetoface_displaysessiontimezones', 0);
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         // Create report.
@@ -61,7 +60,6 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         set_config('facetoface_displaysessiontimezones', 1);
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         // Create report.
@@ -84,20 +82,20 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         $row->$extrafieldrow = 'Pacific/Auckland';
         $display = \mod_facetoface\rb\display\event_time::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('4:25 PM Pacific/Auckland', $display);
+        $this->assertEquals('4:25 PM<span class="mod_facetoface__sessionlist__timezone">Timezone: Pacific/Auckland</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_time::display('1514345115', $format, $row, $column, $report);
-        $this->assertEquals('4:25 PM Pacific/Auckland', $display);
+        $this->assertEquals('4:25 PM<span class="mod_facetoface__sessionlist__timezone">Timezone: Pacific/Auckland</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_time::display('blah', $format, $row, $column, $report);
         $this->assertEquals('', $display);
 
         $row->$extrafieldrow = 'Australia/Perth';
         $display = \mod_facetoface\rb\display\event_time::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('11:25 AM Australia/Perth', $display);
+        $this->assertEquals('11:25 AM<span class="mod_facetoface__sessionlist__timezone">Timezone: Australia/Perth</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_time::display('1514345115', $format, $row, $column, $report);
-        $this->assertEquals('11:25 AM Australia/Perth', $display);
+        $this->assertEquals('11:25 AM<span class="mod_facetoface__sessionlist__timezone">Timezone: Australia/Perth</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_time::display('blah', $format, $row, $column, $report);
         $this->assertEquals('', $display);
@@ -111,7 +109,6 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         set_config('facetoface_displaysessiontimezones', 1);
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         // Create report.
@@ -134,20 +131,20 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         $row->$extrafieldrow = 'Pacific/Auckland';
         $display = \mod_facetoface\rb\display\event_date::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('27 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $this->assertEquals('27 December 2017, 4:25 PM<span class="mod_facetoface__sessionlist__timezone">Timezone: Pacific/Auckland</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_date::display('1514345115', $format, $row, $column, $report);
-        $this->assertEquals('27 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $this->assertEquals('27 December 2017, 4:25 PM<span class="mod_facetoface__sessionlist__timezone">Timezone: Pacific/Auckland</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_date::display('blah', $format, $row, $column, $report);
         $this->assertEquals('', $display);
 
         $row->$extrafieldrow = 'Australia/Perth';
         $display = \mod_facetoface\rb\display\event_date::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth', $display);
+        $this->assertEquals('27 December 2017, 11:25 AM<span class="mod_facetoface__sessionlist__timezone">Timezone: Australia/Perth</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_date::display('1514345115', $format, $row, $column, $report);
-        $this->assertEquals('27 December 2017, 11:25 AM Australia/Perth', $display);
+        $this->assertEquals('27 December 2017, 11:25 AM<span class="mod_facetoface__sessionlist__timezone">Timezone: Australia/Perth</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_date::display('blah', $format, $row, $column, $report);
         $this->assertEquals('', $display);
@@ -161,7 +158,6 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
 
         set_config('facetoface_displaysessiontimezones', 0);
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         // Create report.
@@ -238,18 +234,18 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
         $row->$extrafieldrow = 'Pacific/Auckland';
         $display = \mod_facetoface\rb\display\event_dates_period::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('27 December 2017, 4:25 PM to 28 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $this->assertEquals('27 December 2017, 4:25 PM to 28 December 2017, 4:25 PM<span class="mod_facetoface__sessionlist__timezone">Timezone: Pacific/Auckland</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_dates_period::display('blah', $format, $row, $column, $report);
-        $this->assertEquals('Before 28 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $this->assertEquals('Before 28 December 2017, 4:25 PM<span class="mod_facetoface__sessionlist__timezone">Timezone: Pacific/Auckland</span>', $display);
 
         $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
         $row->$extrafieldrow = 'Australia/Perth';
         $display = \mod_facetoface\rb\display\event_dates_period::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('27 December 2017, 11:25 AM to 28 December 2017, 11:25 AM Australia/Perth', $display);
+        $this->assertEquals('27 December 2017, 11:25 AM to 28 December 2017, 11:25 AM<span class="mod_facetoface__sessionlist__timezone">Timezone: Australia/Perth</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_dates_period::display('blah', $format, $row, $column, $report);
-        $this->assertEquals('Before 28 December 2017, 11:25 AM Australia/Perth', $display);
+        $this->assertEquals('Before 28 December 2017, 11:25 AM<span class="mod_facetoface__sessionlist__timezone">Timezone: Australia/Perth</span>', $display);
 
         // Reset.
         $CFG->forcetimezone = '99';
@@ -273,7 +269,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
         $row->$extrafieldrow = 'Pacific/Auckland';
         $display = \mod_facetoface\rb\display\event_dates_period::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('After 27 December 2017, 4:25 PM Pacific/Auckland', $display);
+        $this->assertEquals('After 27 December 2017, 4:25 PM<span class="mod_facetoface__sessionlist__timezone">Timezone: Pacific/Auckland</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_dates_period::display('blah', $format, $row, $column, $report);
         $this->assertEquals('', $display);
@@ -281,7 +277,7 @@ class mod_facetoface_rb_event_dates_testcase extends advanced_testcase {
         $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'timezone');
         $row->$extrafieldrow = 'Australia/Perth';
         $display = \mod_facetoface\rb\display\event_dates_period::display(1514345115, $format, $row, $column, $report);
-        $this->assertEquals('After 27 December 2017, 11:25 AM Australia/Perth', $display);
+        $this->assertEquals('After 27 December 2017, 11:25 AM<span class="mod_facetoface__sessionlist__timezone">Timezone: Australia/Perth</span>', $display);
 
         $display = \mod_facetoface\rb\display\event_dates_period::display('blah', $format, $row, $column, $report);
         $this->assertEquals('', $display);

@@ -123,6 +123,41 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                 'displayfunc' => 'integer'
             )
         );
+
+        $columnoptions[] = new rb_column_option(
+            'date',
+            'sessiondate_link',
+            get_string('sessdatetimelink', 'rb_source_facetoface_summary'),
+            "{$sessiondatejoin}.timestart",
+            [
+                'joins' => [$sessiondatejoin],
+                'extrafields' => [
+                    'session_id' => 'sessions.id',
+                    'timezone' => "{$sessiondatejoin}.sessiontimezone",
+                ],
+                'defaultheading' => get_string('sessdatetime', 'rb_source_facetoface_summary'),
+                'displayfunc' => 'event_date_link',
+                'dbdatatype' => 'timestamp'
+            ]
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'date',
+            'sessiondatefinish_link',
+            get_string('sessionfinishdatetimelink', 'mod_facetoface'),
+            "{$sessiondatejoin}.timefinish",
+            [
+                'joins' => [$sessiondatejoin],
+                'extrafields' => [
+                    'session_id' => 'sessions.id',
+                    'timezone' => "{$sessiondatejoin}.sessiontimezone",
+                ],
+                'defaultheading' => get_string('sessionfinishdatetime', 'mod_facetoface'),
+                'displayfunc' => 'event_date_link',
+                'dbdatatype' => 'timestamp'
+            ]
+        );
+
         $columnoptions[] = new rb_column_option(
             'date',
             'sessionstartdate',
@@ -176,6 +211,58 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         );
 
         $columnoptions[] = new rb_column_option(
+            'date',
+            'datesessionstart', // Session Start Date
+            get_string('sessiondatestart', 'mod_facetoface'),
+            "{$sessiondatejoin}.timestart",
+            [
+                'joins' => [$sessiondatejoin],
+                'extrafields' => ['timezone' => "{$sessiondatejoin}.sessiontimezone"],
+                'displayfunc' => 'session_date',
+                'dbdatatype' => 'timestamp'
+            ]
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'date',
+            'datesessionfinish', // Session Finish Date
+            get_string('sessionfinishdate', 'mod_facetoface'),
+            "{$sessiondatejoin}.timefinish",
+            [
+                'joins' => [$sessiondatejoin],
+                'extrafields' => ['timezone' => "{$sessiondatejoin}.sessiontimezone"],
+                'displayfunc' => 'session_date',
+                'dbdatatype' => 'timestamp'
+            ]
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'date',
+            'timestart', // Session Start Time
+            get_string('sessstarttime', 'rb_source_facetoface_sessions'),
+            "{$sessiondatejoin}.timestart",
+            [
+                'joins' => [$sessiondatejoin],
+                'displayfunc' => 'event_time',
+                'dbdatatype' => 'timestamp',
+                'extrafields' => ['timezone' => "{$sessiondatejoin}.sessiontimezone"]
+            ]
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'date',
+            'timefinish', // Session Finish Time
+            get_string('sessfinishtime', 'rb_source_facetoface_sessions'),
+            "{$sessiondatejoin}.timefinish",
+            [
+                'joins' => [$sessiondatejoin],
+                'displayfunc' => 'event_time',
+                'dbdatatype' => 'timestamp',
+                'extrafields' => ['timezone' => "{$sessiondatejoin}.sessiontimezone"]
+            ]
+        );
+
+        $columnoptions[] = new rb_column_option(
             'session',
             'numattendees',
             get_string('numattendees', 'rb_source_facetoface_sessions'),
@@ -201,6 +288,26 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                     'session' => 'sessions.id'
                 )
             )
+        );
+    }
+
+    /**
+     * Add common facetoface session filters
+     * @param array $filteroptions
+     */
+    public function add_session_common_to_filters(&$filteroptions) {
+
+        $filteroptions[] = new rb_filter_option(
+            'facetoface',
+            'name',
+            get_string('ftfname', 'rb_source_facetoface_sessions'),
+            'text'
+        );
+        $filteroptions[] = new rb_filter_option(
+            'date',
+            'sessionstartdate',
+            get_string('sessdate', 'rb_source_facetoface_sessions'),
+            'date'
         );
     }
 
@@ -314,7 +421,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         );
     }
 
-    /*
+    /**
      * Adds any facetoface session roles to the $joinlist array
      *
      * @param array &$joinlist Array of current join options
@@ -370,7 +477,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         }
     }
 
-    /*
+    /**
      * Adds any session role fields to the $columnoptions array
      *
      * @param array &$columnoptions Array of current column options

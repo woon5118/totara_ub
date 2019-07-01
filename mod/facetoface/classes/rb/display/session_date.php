@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2016 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Player <simon.player@totaralearning.com>
+ * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
  * @package mod_facetoface
  */
 
 namespace mod_facetoface\rb\display;
-
 /**
- * Display Seminar event session date/time including timezone.
+ * Display Seminar event session date including timezone.
  *
  * @package mod_facetoface
  */
-class event_date_link extends \totara_reportbuilder\rb\display\base {
-
+class session_date extends \totara_reportbuilder\rb\display\base {
     /**
-     * Displays the session date and time with timezone.
+     * Displays the session date and time with timezone or without timezone if timezone display is disabled.
      *
      * @param string $date UTC timestamp.
      * @param string $format
@@ -41,17 +39,10 @@ class event_date_link extends \totara_reportbuilder\rb\display\base {
      * @return string
      */
     public static function display($date, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $OUTPUT;
 
-        $date = \mod_facetoface\rb\display\event_date::display($date, $format, $row, $column, $report);
-        if (empty($date)) {
-            return '';
-        }
-        if ($format != 'html') {
-            return $date;
-        }
         $extra = self::get_extrafields_row($row, $column);
-        return $OUTPUT->action_link(new \moodle_url('/mod/facetoface/attendees/view.php', ['s' => $extra->session_id]), $date);
+        $timezone = $extra->timezone ?? 99;
+        return \mod_facetoface\output\session_time::format_date($date, $format, $timezone);
     }
 
     /**

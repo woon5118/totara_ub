@@ -102,9 +102,10 @@ class session_time {
      * @param $startdate date/time
      * @param $finishdate date/time
      * @param int $timezone date/time
+     * @param string $format - export format
      * @return string
      */
-    public static function signup_period($startdate, $finishdate, $timezone = 99): string {
+    public static function signup_period($startdate, $finishdate, $timezone = 99, string $format = 'html'): string {
 
         $returntext    = '';
         $startdatestr  = null;
@@ -132,7 +133,8 @@ class session_time {
         }
 
         if (!empty($returntext) && $displaytimezones) {
-            $returntext .= ' ' . \core_date::get_localised_timezone($targettz);
+            $tzstring = \core_date::get_localised_timezone($targettz);
+            $returntext .= 'html' == $format ? self::wrap_timezone($tzstring) : ' ' .$tzstring;
         }
         return $returntext;
     }
@@ -183,8 +185,7 @@ class session_time {
         }
 
         if ($sessionobj->timezone) {
-            $timezonestring = clean_string(get_string('timezoneformat', 'mod_facetoface', $sessionobj->timezone));
-            $html .= \html_writer::tag('span', $timezonestring, ['class' => 'mod_facetoface__sessionlist__timezone']);
+            $html .= self::wrap_timezone($sessionobj->timezone);
         }
         return $html;
     }
@@ -198,19 +199,30 @@ class session_time {
     }
 
     /**
+     * @param string $timezone
+     * @return string
+     */
+    private static function wrap_timezone(string $timezone): string {
+        $timezonestring = clean_string(get_string('timezoneformat', 'mod_facetoface', $timezone));
+        return \html_writer::tag('span', $timezonestring, ['class' => 'mod_facetoface__sessionlist__timezone']);
+    }
+
+    /**
      * Displays/Exports the session date and time with timezone or without timezone if timezone display is disabled.
      *
      * @uses \mod_facetoface\export_helper::download_xls
      * @uses \mod_facetoface\export_helper::download_ods
      * @uses \mod_facetoface\rb\display\local_event_date
+     * @uses \mod_facetoface\rb\display\event_date
+     * @uses \mod_facetoface\rb\display\event_date_link
      *
      * @param $value - timestamp
      * @param string $format - export format
-     * @param int $timezone 99 - force 99 for reportbuilder local_session_date() display
+     * @param int|string $timezone 99 - force 99 for reportbuilder local_session_date() display
      * @param bool $sessiontimezone true|false - force false for reportbuilder local_session_date() display
      * @return array|string
      */
-    public static function format_datetime($value, string $format, int $timezone = 99, bool $sessiontimezone = true) {
+    public static function format_datetime($value, string $format, $timezone = 99, bool $sessiontimezone = true) {
 
         if (empty($value)) {
             return '';
@@ -220,6 +232,7 @@ class session_time {
             return '';
         }
 
+        // Modify this to reflect special format requirements if necessary
         switch ($format) {
             case 'excel':
             case 'xls':
@@ -228,12 +241,8 @@ class session_time {
             case 'ods':
                 $date = static::export_ods($value, 22);
                 break;
-            // Modify this to reflect special format requirements if necessary
-            case 'csv':
-            case 'pdflandscape':
-            case 'pdfportrait':
-            case 'html':
             default:
+                // Html/csv/pdflandscape/pdfportrait/etc
                 $displaytimezones = (bool)(int)get_config(null, 'facetoface_displaysessiontimezones') && $sessiontimezone;
 
                 if (empty($timezone) || (int)$timezone == 99 || !$displaytimezones) {
@@ -242,12 +251,114 @@ class session_time {
                     $targettz = \core_date::normalise_timezone($timezone);
                 }
 
+                $date = userdate($value, get_string('strftimedatetime', 'langconfig'), $targettz);
                 if ($displaytimezones) {
-                    $date = userdate($value, get_string('strftimedatetime', 'langconfig'), $targettz) . ' ';
                     $tzstring = \core_date::get_localised_timezone($targettz);
-                    $date .= $tzstring;
+                    $date .= 'html' == $format ? self::wrap_timezone($tzstring) : ' ' . $tzstring;
+                }
+                break;
+        }
+        return $date;
+    }
+
+    /**
+     * Displays/Exports the session time with timezone or without timezone if timezone display is disabled.
+     *
+     * @uses \mod_facetoface\export_helper::download_xls
+     * @uses \mod_facetoface\export_helper::download_ods
+     * @uses \mod_facetoface\rb\display\event_time
+     *
+     * @param $value - timestamp
+     * @param string $format - export format
+     * @param int|string $timezone 99 - force 99 for reportbuilder local_session_date() display
+     * @param bool $sessiontimezone true|false - force false for reportbuilder local_session_date() display
+     * @return array|string
+     */
+    public static function format_time($value, string $format, $timezone = 99, bool $sessiontimezone = true) {
+
+        if (empty($value)) {
+            return '';
+        }
+
+        if (!is_numeric($value) || $value == 0 || $value == -1) {
+            return '';
+        }
+
+        // Modify this to reflect special format requirements if necessary
+        switch ($format) {
+            case 'excel':
+            case 'xls':
+                $date = static::export_excel($value, MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_TIME);
+                break;
+            case 'ods':
+                $date = static::export_ods($value, 24);
+                break;
+            default:
+                // Html/csv/pdflandscape/pdfportrait/etc
+                $displaytimezones = (bool)(int)get_config(null, 'facetoface_displaysessiontimezones') && $sessiontimezone;
+
+                if (empty($timezone) || (int)$timezone == 99 || !$displaytimezones) {
+                    $targettz = \core_date::get_user_timezone();
                 } else {
-                    $date = userdate($value, get_string('strftimedatetime', 'langconfig'), $targettz);
+                    $targettz = \core_date::normalise_timezone($timezone);
+                }
+
+                $date = userdate($value, get_string('strftimetime', 'langconfig'), $targettz);
+                if ($displaytimezones) {
+                    $tzstring = \core_date::get_localised_timezone($targettz);
+                    $date .= 'html' == $format ? self::wrap_timezone($tzstring) : ' ' . $tzstring;
+                }
+                break;
+        }
+        return $date;
+    }
+
+    /**
+     * Displays/Exports the session date with timezone or without timezone if timezone display is disabled.
+     *
+     * @uses \mod_facetoface\export_helper::download_xls
+     * @uses \mod_facetoface\export_helper::download_ods
+     * @uses \mod_facetoface\rb\display\session_date
+     *
+     * @param $value - timestamp
+     * @param string $format - export format
+     * @param int|string $timezone 99 - force 99 for reportbuilder local_session_date() display
+     * @param bool $sessiontimezone true|false - force false for reportbuilder local_session_date() display
+     * @return array|string
+     */
+    public static function format_date($value, string $format, $timezone = 99, bool $sessiontimezone = true) {
+
+        if (empty($value)) {
+            return '';
+        }
+
+        if (!is_numeric($value) || $value == 0 || $value == -1) {
+            return '';
+        }
+
+        // Modify this to reflect special format requirements if necessary
+        switch ($format) {
+            case 'excel':
+            case 'xls':
+                $date = static::export_excel($value, MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATE);
+                break;
+            case 'ods':
+                $date = static::export_ods($value, 26);
+                break;
+            default:
+                // Html/csv/pdflandscape/pdfportrait/etc
+                $displaytimezones = (bool)(int)get_config(null, 'facetoface_displaysessiontimezones') && $sessiontimezone;
+
+                if (empty($timezone) || (int)$timezone == 99 || !$displaytimezones) {
+                    $targettz = \core_date::get_user_timezone();
+                } else {
+                    $targettz = \core_date::normalise_timezone($timezone);
+                }
+
+                $date = userdate($value, get_string('strftimedate', 'langconfig'), $targettz);
+                if ($displaytimezones) {
+                    $tzstring = \core_date::get_localised_timezone($targettz);
+                    $date .= 'html' == $format ? self::wrap_timezone($tzstring) : ' ' . $tzstring;
                 }
                 break;
         }
@@ -257,12 +368,13 @@ class session_time {
     /**
      * Return MS Excel export value
      * @param int $value - timestamp
-     * @param int $excelformat 14|15|16|17|22 : it is not dynamic yet, default is 22
+     * @param int $excelformat 14|15|16|17|22|24
         * $numbers[14] = 'm/d/yyyy';
         * $numbers[15] = 'd-mmm-yy';
         * $numbers[16] = 'd-mmm';
         * $numbers[17] = 'mmm-yy';
         * $numbers[22] = 'm/d/yyyy h:mm';
+        * $numbers[24] = 'h:mm';
      * @return array
      */
     private static function export_excel(int $value, int $excelformat = MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATETIME): array {
@@ -275,18 +387,23 @@ class session_time {
     /**
      * Return ODS export value
      * @param int $value
-     * @param int $odsformat 14|15|16|17|22 : it is not dynamic yet, default is 22
+     * @param int $odsformat 14|15|16|17|22|24|26
         * $numbers[14] = 'mm-dd-yy';
         * $numbers[15] = 'd-mmm-yy';
         * $numbers[16] = 'd-mmm';
         * $numbers[17] = 'mmm-yy';
         * $numbers[22] = 'm/d/yy h:mm';
+        * $numbers[24] = 'h:mm';
+        * $numbers[26] = 'm/d/yy';
      * @return array
      */
     private static function export_ods(int $value, int $odsformat = 22): array {
 
         $dateformat = new MoodleOdsFormat();
         $dateformat->set_num_format($odsformat);
+        if ($odsformat == 24) {
+            return ['time', $value, $dateformat];
+        }
         return ['date', $value, $dateformat];
     }
 }

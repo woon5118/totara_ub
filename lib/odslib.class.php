@@ -264,6 +264,27 @@ class MoodleODSWorksheet {
     }
 
     /**
+     * Write one time somewhere in the worksheet.
+     *
+     * @param integer $row    Zero indexed row
+     * @param integer $col    Zero indexed column
+     * @param string  $time    The url to write
+     * @param mixed   $format The XF format for the cell
+     */
+    public function write_time($row, $col, $date, $format = null) {
+        if (!isset($this->data[$row][$col])) {
+            $this->data[$row][$col] = new MoodleODSCell();
+        }
+        if (is_array($format)) {
+            $format = new MoodleODSFormat($format);
+        }
+        $this->data[$row][$col]->value = $date;
+        $this->data[$row][$col]->type = 'time';
+        $this->data[$row][$col]->format = $format;
+        $this->data[$row][$col]->formula = null;
+    }
+
+    /**
      * Write one formula somewhere in the worksheet.
      *
      * @param integer $row    Zero indexed row
@@ -764,6 +785,8 @@ class MoodleODSFormat {
         $numbers[16] = 'd-mmm';
         $numbers[17] = 'mmm-yy';
         $numbers[22] = 'm/d/yy h:mm';
+        $numbers[24] = 'h:mm';
+        $numbers[26] = 'm/d/yy';
         $numbers[49] = '@';
 
         if ($num_format !== 0 and in_array($num_format, $numbers)) {
@@ -1222,6 +1245,11 @@ class MoodleODSWriter {
                             $buffer .= '<table:table-cell office:value-type="date" office:date-value="' . strftime('%Y-%m-%dT%H:%M:%S', $cell->value) . '"'.$extra.'>'
                                      . $pretext . strftime('%Y-%m-%dT%H:%M:%S', $cell->value) . $posttext
                                      . '</table:table-cell>'."\n";
+                        } else if ($cell->type == 'time') {
+                            $timevalue  = 'PT' . strftime('%H', $cell->value) . 'H' . strftime('%M', $cell->value) . 'M' . '00S';
+                            $buffer .= '<table:table-cell office:value-type="time" office:time-value="' . $timevalue . '"'.$extra.'>'
+                                . $pretext . strftime('%H:%M', $cell->value) . $posttext
+                                . '</table:table-cell>'."\n";
                         } else if ($cell->type == 'float') {
                             $buffer .= '<table:table-cell office:value-type="float" office:value="' . htmlspecialchars($cell->value, ENT_QUOTES, 'utf-8') . '"'.$extra.'>'
                                      . $pretext . htmlspecialchars($cell->value, ENT_QUOTES, 'utf-8') . $posttext
@@ -1535,6 +1563,19 @@ class MoodleODSWriter {
             <number:minutes number:style="long"/>
             <number:text></number:text>
             <number:am-pm/>
+        </number:date-style>
+        <number:time-style style:name="NUM24">
+            <number:hours number:style="long"/>
+            <number:text>:</number:text>
+            <number:minutes number:style="long"/>
+        </number:time-style>
+        <number:date-style style:name="NUM26" number:automatic-order="true"
+                           number:format-source="language">
+            <number:month/>
+            <number:text>/</number:text>
+            <number:day/>
+            <number:text>/</number:text>
+            <number:year/>
         </number:date-style>
         <number:text-style style:name="NUM49">
             <number:text-content/>

@@ -381,7 +381,10 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             array(
                 'joins' => 'modifiedby',
                 'displayfunc' => 'f2f_user_link',
-                'extrafields' => array_merge(array('id' => 'modifiedby.id'), $usernamefieldscreator),
+                'extrafields' => array_merge(
+                    ['id' => 'modifiedby.id', 'deleted' => 'modifiedby.deleted'],
+                    $usernamefieldscreator
+                ),
             )
         );
 
