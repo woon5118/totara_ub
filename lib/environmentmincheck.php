@@ -34,9 +34,9 @@
  */
 
 // Check that PHP is of a sufficient version as soon as possible
-if (version_compare(phpversion(), '7.1.8', '<')) {
+if (version_compare(phpversion(), '7.2.10', '<')) {
     $phpversion = phpversion();
-    echo("Totara requires at least PHP 7.1.8 (currently using version $phpversion). Please upgrade your server software.\n");
+    echo("Totara requires at least PHP 7.2.10 (currently using version $phpversion). Please upgrade your server software.\n");
     exit(1);
 }
 

@@ -371,10 +371,10 @@ if (file_exists("$CFG->dataroot/climaintenance.html")) {
 }
 
 // Sometimes people use different PHP binary for web and CLI, make 100% sure they have the supported PHP version.
-if (version_compare(PHP_VERSION, '7.1.8') < 0) {
+if (version_compare(PHP_VERSION, '7.2.10') < 0) {
     $phpversion = PHP_VERSION;
     // Do NOT localise - lang strings would not work here and we CAN NOT move it to later place.
-    echo "Totara 11 or later requires at least PHP 7.1.8 (currently using version $phpversion).\n";
+    echo "Totara 13 or later requires at least PHP 7.2.10 (currently using version $phpversion).\n";
     echo "Some servers may have multiple PHP versions installed, are you using the correct executable?\n";
     exit(1);
 }

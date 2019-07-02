@@ -92,7 +92,7 @@ $string['pathsunsecuredataroot'] = 'Dataroot location is not secure';
 $string['pathswrongadmindir'] = 'Admin directory does not exist';
 $string['phpextension'] = '{$a} PHP extension';
 $string['phpversion'] = 'PHP version';
-$string['phpversionhelp'] = '<p>Totara requires a PHP version of at least 7.1.8.</p>
+$string['phpversionhelp'] = '<p>Totara requires a PHP version of at least 7.2.10.</p>
 <p>You are currently running version {$a}.</p>
 <p>You must upgrade PHP or move to a host with a newer version of PHP.</p>';
 $string['welcomep10'] = '{$a->installername} ({$a->installerversion})';

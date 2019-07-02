@@ -150,10 +150,10 @@ define('PHPUNIT_TEST', false);
 define('IGNORE_COMPONENT_CACHE', true);
 
 // Check that PHP is of a sufficient version
-if (version_compare(phpversion(), "7.1.8") < 0) {
+if (version_compare(phpversion(), "7.2.10") < 0) {
     $phpversion = phpversion();
     // do NOT localise - lang strings would not work here and we CAN NOT move it after installib
-    fwrite(STDERR, "Totara 11 or later requires at least PHP 7.1.8 (currently using version $phpversion).\n");
+    fwrite(STDERR, "Totara 13 or later requires at least PHP 7.2.10 (currently using version $phpversion).\n");
     fwrite(STDERR, "Please upgrade your server software or install older Moodle version.\n");
     exit(1);
 }
