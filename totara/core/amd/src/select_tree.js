@@ -40,6 +40,7 @@ define([], function() {
         this.keyboardClass = 'tw-selectTree__keyboard';
         this.repositionClass = 'tw-selectTree__reposition';
         this.widget = '';
+        this.visibility = false;
     }
 
     SelectTree.prototype = {
@@ -133,29 +134,9 @@ define([], function() {
                 }
             };
 
-            // Safari doesn't focus on <a> and doesn't support focus events correctly so add a click event for it
-            if (document.body.classList.contains('safari')) {
-                document.addEventListener('click', clickclear);
-                document.addEventListener('touchstart', clickclear);
-            } else {
-                // If lose focus on tree, close it
-                this.widget.addEventListener('focusout', function(e) {
-                    var tree = that.widget.querySelector('[data-tw-selectTree-tree]');
-
-                    if (!e.target || tree.classList.contains(that.hideClass)) {
-                        return;
-                    }
-
-                    if (!e.relatedTarget || !e.relatedTarget.closest('[data-tw-selectTree-tree]')) {
-                        if (e.relatedTarget
-                            && that.widget.contains(e.relatedTarget)
-                            && e.relatedTarget.hasAttribute('data-tw-selectTree-trigger')) {
-                            return;
-                        }
-                        that.toggleTree();
-                    }
-                });
-            }
+            // Add a click event for focus events not correctly and Safari doesn't focus on <a>
+            document.addEventListener('click', clickclear);
+            document.addEventListener('touchstart', clickclear);
 
             this.widget.addEventListener('keydown', function(e) {
                 if (!e.target) {
@@ -186,6 +167,35 @@ define([], function() {
                 that.widget.classList.add(that.keyboardClass);
 
                 switch (e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        e.target.click();
+                        nodeList[activeNodeIndex].getElementsByClassName('tw-selectTree__list_row_link')[0].focus();
+                    break;
+                    case 'Tab':
+                        if (activeNodeIndex === nodeList.length - 1 && that.visibility) {
+                            that.toggleTree();
+                            return;
+                        }
+
+                        var selectLastElement = true;
+
+                        // Find next visible node
+                        for (var t = activeNodeIndex + 1; t < nodeList.length; ++t) {
+                            var nodeT = nodeList[t].getElementsByClassName('tw-selectTree__list_row_link')[0];
+                            if (nodeT && nodeT.offsetHeight !== 0) {
+                                e.preventDefault();
+                                selectLastElement = false;
+                                nodeT.focus();
+                                return;
+                            }
+                        }
+
+                        // Close the select tree if it's visiable
+                        if (selectLastElement && that.visibility) {
+                            that.toggleTree();
+                        }
+                    break;
                     case 'ArrowUp':
                     case 'Up':
                         e.preventDefault();
@@ -424,6 +434,9 @@ define([], function() {
         *
         */
         toggleTree: function() {
+            // visibility should be changed in the fucntion toggleTree only
+            this.visibility = !this.visibility;
+
             var tree = this.widget.querySelector('[data-tw-selectTree-tree]'),
                 triggerNode = this.widget.querySelector('[data-tw-selectTree-trigger]');
 
