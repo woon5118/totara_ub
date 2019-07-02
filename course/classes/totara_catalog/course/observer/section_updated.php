@@ -44,9 +44,12 @@ class section_updated extends object_update_observer {
      * init course update object for updated or added section
      */
     protected function init_change_objects(): void {
-        $data = new \stdClass();
-        $data->objectid = $this->event->courseid;
-        $data->contextid = $this->event->contextid;
-        $this->register_for_update($data);
+
+        if ($this->event->courseid != SITEID) {
+            $data = new \stdClass();
+            $data->objectid = $this->event->courseid;
+            $data->contextid = $this->event->contextid;
+            $this->register_for_update($data);
+        }
     }
 }

@@ -27,6 +27,7 @@ namespace core_course\totara_catalog\course;
 use core\event\course_deleted;
 use core_course\totara_catalog\course as course_provider;
 use core\event\course_created;
+use \totara_catalog\task\provider_active_task;
 
 /**
  * @group totara_catalog
@@ -38,15 +39,19 @@ class core_course_totara_catalog_course_object_update_observer_testcase extends 
      */
     private $course = null;
 
+    private $provider_active_task = null;
+
     protected function setUp() {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest();
         $this->course = $this->getDataGenerator()->create_course();
+        $this->provider_active_task = new provider_active_task();
     }
 
     protected function tearDown() {
         $this->course = null;
+        $this->provider_active_task = null;
         parent::tearDown();
     }
 
@@ -163,5 +168,37 @@ class core_course_totara_catalog_course_object_update_observer_testcase extends 
         }
 
         return $observers;
+    }
+
+    /**
+     * Ensure that a section update on SITEID course does not trigger catalog update event.
+     *
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
+    public function test_update_course_section() {
+        global $DB;
+
+        // Check count after activation of course provider.
+        $this->provider_active_task->set_custom_data(['objecttype' => 'course_section']);
+        $this->provider_active_task->execute();
+
+        // With no other courses present we should have empty catalog table.
+        $catalog_recs = $DB->count_records('catalog', ['objectid' => SITEID, 'objecttype' => 'course']);
+        $this->assertEquals(0, $catalog_recs);
+
+        // Create SITEID course_section and then update it.
+        $course = $DB->get_record('course', array('id' => SITEID), '*', MUST_EXIST);
+        $section = course_create_section($course, 0);
+        $data = [
+            'id' => $section->id,
+            'summary' => '<p>Hello world</p>',
+        ];
+        course_update_section($course, $section, $data);
+
+        // Re-check count after refresh of course provider.
+        $this->provider_active_task->execute();
+        $catalog_recs = $DB->count_records('catalog', ['objectid' => SITEID, 'objecttype' => 'course']);
+        $this->assertEquals(0, $catalog_recs);
     }
 }

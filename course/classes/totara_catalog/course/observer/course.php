@@ -45,9 +45,11 @@ class course extends object_update_observer {
      */
     protected function init_change_objects(): void {
 
-        $data = new \stdClass();
-        $data->objectid = $this->event->objectid;
-        $data->contextid = $this->event->contextid;
-        $this->register_for_update($data);
+        if ($this->event->objectid != SITEID) {
+            $data = new \stdClass();
+            $data->objectid = $this->event->objectid;
+            $data->contextid = $this->event->contextid;
+            $this->register_for_update($data);
+        }
     }
 }
