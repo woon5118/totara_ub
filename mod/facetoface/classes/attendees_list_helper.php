@@ -667,4 +667,37 @@ final class attendees_list_helper {
 
         return $users;
     }
+
+    /**
+     * Returns a users name for selection in a seminar.
+     *
+     * This function allows for viewing user identity information as configured for the site.
+     *
+     * Taken from \user_selector_base::output_user
+     * At some point this needs to be converted to a proper user selector.
+     *
+     * @param object $user
+     * @param array|null $extrafields Extra fields to display next to the users name, if null the user identity fields are used.
+     * @param bool $fullnameoverride Passed through to the fullname function as the override arg.
+     * @return string
+     */
+    public static function output_user_for_selection($user, array $extrafields = null, $fullnameoverride = false) {
+
+        $out = fullname($user, $fullnameoverride);
+        if ($extrafields) {
+            $displayfields = array();
+            foreach ($extrafields as $field) {
+                if (!empty($user->{$field})) {
+                    // TOTARA - Escape potential XSS in extra identity fields.
+                    $displayfields[] = s($user->{$field});
+                }
+            }
+            // This little bit of hardcoding is pretty bad, but its consistent with how Seminar was working and as this
+            // change was made right before release we wanted to keep it consistent.
+            if (!empty($displayfields)) {
+                $out .= ', ' . implode(', ', $displayfields);
+            }
+        }
+        return $out;
+    }
 }

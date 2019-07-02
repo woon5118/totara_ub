@@ -56,6 +56,17 @@ class attendees_message extends \moodleform {
 
         $json_users = array();
         $attendees = array();
+
+        // Show email and ID number if they are part of the user identity setting and the current user has the capability to see them.
+        $extrafields = array();
+        $context = $this->_customdata['context'];
+        $userfields = get_extra_user_fields($context);
+        if (in_array('email', $userfields)) {
+            array_push($extrafields, 'email');
+        }
+        if (in_array('idnumber', $userfields)) {
+            array_push($extrafields, 'idnumber');
+        }
         foreach ($statuses as $status) {
             // Get count of users with this status. We cannot send any messages to deleted user anyway, so no point
             // to include them here.
@@ -66,7 +77,16 @@ class attendees_message extends \moodleform {
             }
 
             $users = $helper->get_attendees_with_codes([$status], false);
-            $json_users[$status] = $users;
+            // Get user minimal information and pass it to the json.
+            // Do not pass the $users array to the json as it contains sensible data that can be exposed.
+            $recipients = array();
+            foreach ($users as $user) {
+                $recipient = new \stdClass();
+                $recipient->id = $user->id;
+                $recipient->displayname = \mod_facetoface\attendees_list_helper::output_user_for_selection($user, $extrafields);
+                $recipients[] = $recipient;
+            }
+            $json_users[$status] = $recipients;
             $attendees = array_merge($attendees, $users);
 
             /** @var string|\mod_facetoface\signup\state\state $state */

@@ -107,7 +107,7 @@ final class recipients_list_helper {
         $usernamefields = self::get_all_user_name_fields();
         if ($this->recipients) {
             list($insql, $params) = $DB->get_in_or_equal($this->recipients);
-            $sql = "SELECT id, email, $usernamefields FROM {user} WHERE id $insql";
+            $sql = "SELECT id, email, idnumber, $usernamefields FROM {user} WHERE id $insql";
             $this->existingrecipients = $DB->get_records_sql($sql, $params);
         }
 
@@ -131,7 +131,7 @@ final class recipients_list_helper {
         global $DB;
 
         $usernamefields = self::get_all_user_name_fields();
-        $sql  = "SELECT id, email, $usernamefields
+        $sql  = "SELECT id, email, idnumber, $usernamefields
                    FROM {user}
                   WHERE id IN
                   (

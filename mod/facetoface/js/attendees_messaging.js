@@ -95,9 +95,9 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
             $("fieldset#id_recipientgroupsheader input:checked").each(function() {
                 // Get status code
                 var status = $(this).attr('id').substring(('id_recipient_group_').length);
-                for (user in recipient_groups[status]) {
+                for (var user in recipient_groups[status]) {
                     user = recipient_groups[status][user];
-                    recipients.append('<option value="'+user.id+'">'+user.firstname+' '+user.lastname+', '+user.email+'</option>');
+                    recipients.append('<option value="'+user.id+'">'+user.displayname+'</option>');
                     recipients_hidden.val(recipients_hidden.val()+','+user.id);
                 }
             });

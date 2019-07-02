@@ -16,11 +16,19 @@
                            getElementById('assignform').addselect.selectedIndex=-1;">
 
           <?php
+            $extrafields = array();
+            $userfields = get_extra_user_fields($PAGE->context);
+            if (in_array('email', $userfields)) {
+                array_push($extrafields, 'email');
+            }
+            if (in_array('idnumber', $userfields)) {
+                array_push($extrafields, 'idnumber');
+            }
             $existingusers = $recipient_helper->get_existing_recipients();
             if ($existingusers) {
                 foreach ($existingusers as $existinguser) {
-                    $fullname = fullname($existinguser, true);
-                    echo "<option value=\"{$existinguser->id}\">{$fullname}, {$existinguser->email}</option>\n";
+                    $fullname = \mod_facetoface\attendees_list_helper::output_user_for_selection($existinguser, $extrafields);
+                    echo "<option value=\"{$existinguser->id}\">{$fullname}</option>\n";
                 }
             } else {
                 echo '<option/>'; // empty select breaks xhtml strict
@@ -47,8 +55,8 @@
             $availableusers = $recipient_helper->get_potential_recipients();
             if ($availableusers) {
                 foreach ($availableusers as $user) {
-                    $fullname = fullname($user, true);
-                    echo "<option value=\"{$user->id}\">{$fullname}, {$user->email}</option>\n";
+                    $fullname = \mod_facetoface\attendees_list_helper::output_user_for_selection($user, $extrafields);
+                    echo "<option value=\"{$user->id}\">{$fullname}</option>\n";
                 }
             } else {
                 echo '<option/>'; // empty select breaks xhtml strict

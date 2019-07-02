@@ -52,15 +52,16 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
             if (!empty($attendees) && $action === 'add') {
                 foreach ($attendees as $attendee) {
                     if (!array_key_exists($attendee->id, $userstoadd)) {
-                        echo "<option disabled value=\"$attendee->id\">".facetoface_output_user_for_selection($attendee, $extrafields, true)."</option>\n";
+                        echo "<option disabled value=\"$attendee->id\">".mod_facetoface\attendees_list_helper::output_user_for_selection($attendee, $extrafields, true)."</option>\n";
                     }
                 }
             }
             if (!empty($userstoadd)) {
                 foreach ($userstoadd as $newuser) {
-                    $fullname = facetoface_output_user_for_selection($newuser, $extrafields, true);
+                    $fullname = mod_facetoface\attendees_list_helper::output_user_for_selection($newuser, $extrafields, true);
                     if ($seminarevent->is_sessions() && ($newuser->statuscode > \mod_facetoface\signup\state\booked::get_code())) {
-                        $status = get_string('status_'.$MDL_F2F_STATUS[$newuser->statuscode], 'facetoface');
+                        $state = \mod_facetoface\signup\state\state::from_code($newuser->statuscode);
+                        $status = $state::get_string();
                         echo "<option value=\"$newuser->id\">".$fullname." - ". $status."</option>\n";
                     } else {
                         echo "<option value=\"$newuser->id\">".$fullname."</option>\n";
@@ -93,9 +94,10 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
                         echo "<optgroup label=\"$strsearchresults (" . $usercount . ")\">\n";
                         foreach ($availableusers as $user) {
                             $idx++;
-                            $fullname = facetoface_output_user_for_selection($user, $extrafields, true);
+                            $fullname = mod_facetoface\attendees_list_helper::output_user_for_selection($user, $extrafields, true);
                             if ($seminarevent->is_sessions() && ($user->statuscode == \mod_facetoface\signup\state\waitlisted::get_code())) {
-                                $status = get_string('status_'.$MDL_F2F_STATUS[$user->statuscode], 'facetoface');
+                                $state = \mod_facetoface\signup\state\state::from_code($user->statuscode);
+                                $status = $state::get_string();
                                 echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname." - ". $status."</option>\n";
                             } else {
                                 echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname."</option>\n";
@@ -118,9 +120,10 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
                     if (is_array($availableusers) || $availableusers->valid()) {
                         foreach ($availableusers as $user) {
                             $idx++;
-                            $fullname = facetoface_output_user_for_selection($user, $extrafields, true);
+                            $fullname = mod_facetoface\attendees_list_helper::output_user_for_selection($user, $extrafields, true);
                             if ($seminarevent->is_sessions() && ($user->statuscode == \mod_facetoface\signup\state\waitlisted::get_code())) {
-                                $status = get_string('status_'.$MDL_F2F_STATUS[$user->statuscode], 'facetoface');
+                                $state = \mod_facetoface\signup\state\state::from_code($user->statuscode);
+                                $status = $state::get_string();
                                 echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname." - ". $status."</option>\n";
                             } else {
                                 echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname."</option>\n";
@@ -169,36 +172,3 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
 
 </form>
 
-<?php
-/**
- * Returns a users name for selection in a seminar.
- *
- * This function allows for viewing user identity information as configured for the site.
- *
- * Taken from \user_selector_base::output_user
- * At some point this needs to be converted to a proper user selector.
- *
- * @param stdClass $user
- * @param array|null $extrafields Extra fields to display next to the users name, if null the user identity fields are used.
- * @param bool $fullnameoverride Passed through to the fullname function as the override arg.
- * @return string
- */
-function facetoface_output_user_for_selection(stdClass $user, array $extrafields = null, $fullnameoverride = false) {
-
-    $out = fullname($user, $fullnameoverride);
-    if ($extrafields) {
-        $displayfields = array();
-        foreach ($extrafields as $field) {
-            if (!empty($user->{$field})) {
-                // TOTARA - Escape potential XSS in extra identity fields.
-                $displayfields[] = s($user->{$field});
-            }
-        }
-        // This little bit of hardcoding is pretty bad, but its consistent with how Seminar was working and as this
-        // change was made right before release we wanted to keep it consistent.
-        if (!empty($displayfields)) {
-            $out .= ', ' . implode(', ', $displayfields);
-        }
-    }
-    return $out;
-}
