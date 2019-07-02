@@ -44,12 +44,13 @@ class course_icon_link extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $CFG, $OUTPUT;
         require_once($CFG->dirroot . '/cohort/lib.php');
+        $value = format_string::display($value, $format, $row, $column, $report);
 
         $extrafields = self::get_extrafields_row($row, $column);
         $isexport = ($format !== 'html');
 
         if ($isexport) {
-            return format_string($value);
+            return $value;
         }
 
         $courseid = $extrafields->course_id;

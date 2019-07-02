@@ -59,7 +59,9 @@ class appraisal_multichoice_multi extends base {
             $result[] = \rb_source_appraisal_detail::$appraisalmultichoicenamecache[$report->src->appraisalid][$id];
         }
 
-        return format_string(implode(', ', $result));
+        $result = implode(', ', $result);
+        $result = \totara_reportbuilder\rb\display\format_string::display($result, $format, $row, $column, $report);
+        return $result;
     }
 
     /**

@@ -45,7 +45,7 @@ class opensesame_course_title extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $OUTPUT;
 
-        $value = format_string($value);
+        $value = \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
 
         $isexport = ($format !== 'html');
 

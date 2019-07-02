@@ -80,7 +80,7 @@ class hierarchy_nice_path extends base {
             $parentid = $path;
         }
 
-        $displaypath = format_string($displaypath);
+        $displaypath = \totara_reportbuilder\rb\display\format_string::display($displaypath, $format, $row, $column, $report);
 
         return $displaypath;
     }

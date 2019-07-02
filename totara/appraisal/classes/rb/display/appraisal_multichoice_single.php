@@ -52,7 +52,9 @@ class appraisal_multichoice_single extends base {
             $report->src->populate_multichoice_name_cache();
         }
 
-        return format_string(\rb_source_appraisal_detail::$appraisalmultichoicenamecache[$report->src->appraisalid][$value]);
+        $result = \rb_source_appraisal_detail::$appraisalmultichoicenamecache[$report->src->appraisalid][$value];
+        $result = \totara_reportbuilder\rb\display\format_string::display($result, $format, $row, $column, $report);
+        return $result;
     }
 
     /**

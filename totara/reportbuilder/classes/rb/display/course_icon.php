@@ -43,13 +43,14 @@ class course_icon extends base {
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $extrafields = self::get_extrafields_row($row, $column);
+        $coursename = format_string::display($extrafields->course_name, $format, $row, $column, $report);
+
         $isexport = ($format !== 'html');
 
         if ($isexport) {
-            return format_string($extrafields->course_name);
+            return $coursename;
         }
 
-        $coursename = format_string($extrafields->course_name);
         $courseicon = \html_writer::empty_tag('img', array('src' => totara_get_icon($extrafields->course_id, TOTARA_ICON_TYPE_COURSE),
             'class' => 'course_icon', 'alt' => $coursename));
 

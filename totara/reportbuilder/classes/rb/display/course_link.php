@@ -48,7 +48,7 @@ class course_link extends base {
         $extrafields = self::get_extrafields_row($row, $column);
         $isexport = ($format !== 'html');
 
-        $value = format_string($value);
+        $value = format_string::display($value, $format, $row, $column, $report);
 
         if ($isexport) {
             return $value;

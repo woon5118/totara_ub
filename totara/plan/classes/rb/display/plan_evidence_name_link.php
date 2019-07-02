@@ -46,7 +46,7 @@ class plan_evidence_name_link extends base {
         $isexport = ($format !== 'html');
         $extrafields = self::get_extrafields_row($row, $column);
 
-        $value = format_string($value);
+        $value = \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
 
         if ($isexport) {
             return $value;

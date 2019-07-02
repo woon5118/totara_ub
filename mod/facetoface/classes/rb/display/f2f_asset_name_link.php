@@ -48,7 +48,7 @@ class f2f_asset_name_link extends base {
             return '';
         }
 
-        $value = format_string($value);
+        $value = \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
 
         $isexport = ($format !== 'html');
 

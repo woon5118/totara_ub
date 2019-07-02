@@ -47,11 +47,7 @@ class formatstring extends base {
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         debugging('totara_reportbuilder\rb\display\formatstring::display has been deprecated since Totara 12.0. Use totara_reportbuilder\rb\display\format_string::display', DEBUG_DEVELOPER);
-        $value = format_string($value, true, array('context' => \context_system::instance()));
-        if ($format === 'html') {
-            return $value;
-        }
-        return \core_text::entities_to_utf8($value);
+        return \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {

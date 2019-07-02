@@ -44,11 +44,12 @@ class f2f_job_assignment_edit extends base {
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $OUTPUT;
+        $value = \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
 
         $isexport = ($format !== 'html');
 
         if ($isexport) {
-            return format_string($value);
+            return $value;
         }
 
         $extrafields = self::get_extrafields_row($row, $column);

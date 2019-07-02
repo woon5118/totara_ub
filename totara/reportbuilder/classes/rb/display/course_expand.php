@@ -44,12 +44,13 @@ class course_expand extends base {
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $OUTPUT;
+        $value = format_string::display($value, $format, $row, $column, $report);
 
         $extrafields = self::get_extrafields_row($row, $column);
         $isexport = ($format !== 'html');
 
         if ($isexport) {
-            return format_string($value);
+            return $value;
         }
 
         $attr = array('class' => totara_get_style_visibility($extrafields, 'course_visible', 'course_audiencevisible'));
@@ -69,7 +70,7 @@ class course_expand extends base {
         $infoicon = $OUTPUT->flex_icon('info-circle', ['classes' => 'ft-state-info']);
 
         // Create the result.
-        $link = \html_writer::link($alturl, format_string($value), array('class' => $class_link));
+        $link = \html_writer::link($alturl, $value, array('class' => $class_link));
         return \html_writer::div($infoicon . $link, 'rb-display-expand', $attr);
     }
 

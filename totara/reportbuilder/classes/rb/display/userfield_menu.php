@@ -37,17 +37,8 @@ class userfield_menu extends base {
             return get_string('hiddencellvalue', 'totara_reportbuilder');
         }
 
-        if (is_null($value) or $value === '') {
-            return '';
-        }
-
-        $displaytext = format_string($value);
-
-        if ($format !== 'html') {
-            $displaytext = static::to_plaintext($displaytext, false);
-        }
-
-        return $displaytext;
+        $value = format_string::display($value, $format, $row, $column, $report);
+        return $value;
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {

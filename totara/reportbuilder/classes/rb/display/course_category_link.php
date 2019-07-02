@@ -42,15 +42,17 @@ class course_category_link extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        $value = format_string::display($value, $format, $row, $column, $report);
+
         $extrafields = self::get_extrafields_row($row, $column);
         $isexport = ($format !== 'html');
 
         if ($isexport) {
-            return format_string($value);
+            return $value;
         }
 
         $catid = $extrafields->cat_id;
-        $category = format_string($value);
+        $category = $value;
         if ($catid == 0 || !$catid) {
             return '';
         }

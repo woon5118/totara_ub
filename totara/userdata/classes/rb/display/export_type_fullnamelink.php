@@ -44,7 +44,7 @@ final class export_type_fullnamelink extends base {
             return '';
         }
 
-        $fullname = format_string($value);
+        $fullname = \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
 
         if ($format !== 'html') {
             return $fullname;

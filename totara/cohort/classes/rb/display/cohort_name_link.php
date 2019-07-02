@@ -48,13 +48,15 @@ class cohort_name_link extends base {
             return '';
         }
 
+        $value = \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
+
         if ($format !== 'html') {
             return $value;
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
 
-        return \html_writer::link(new \moodle_url('/cohort/view.php', array('id' => $extrafields->cohort_id)), format_string($value));
+        return \html_writer::link(new \moodle_url('/cohort/view.php', array('id' => $extrafields->cohort_id)), $value);
     }
 
     /**

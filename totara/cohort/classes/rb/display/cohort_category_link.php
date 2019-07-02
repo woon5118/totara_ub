@@ -46,7 +46,7 @@ class cohort_category_link extends base {
         $extrafields = self::get_extrafields_row($row, $column);
         $isexport = ($format !== 'html');
 
-        $categoryname = format_string($value);
+        $categoryname = \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
 
         $contextid = $extrafields->context_id;
         $context = \context::instance_by_id($contextid, IGNORE_MISSING);

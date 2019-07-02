@@ -32,6 +32,9 @@ namespace totara_reportbuilder\rb\display;
  */
 class format_string extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        if (is_null($value) or $value === '') {
+            return '';
+        }
         $value = format_string($value, true, array('context' => \context_system::instance()));
         if ($format === 'html') {
             return $value;

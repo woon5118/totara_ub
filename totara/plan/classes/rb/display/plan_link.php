@@ -49,7 +49,7 @@ class plan_link extends base {
             return '';
         }
 
-        $value = format_string($value);
+        $value = \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
 
         $extrafields = self::get_extrafields_row($row, $column);
         $isexport = ($format !== 'html');

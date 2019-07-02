@@ -48,6 +48,12 @@ class cohort_association_name_icon_link extends base {
             return '';
         }
 
+        $value = \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
+
+        if ($format !== 'html') {
+            return $value;
+        }
+
         $extrafields = self::get_extrafields_row($row, $column);
 
         if ($extrafields->type == COHORT_ASSN_ITEMTYPE_COURSE) {
@@ -56,7 +62,7 @@ class cohort_association_name_icon_link extends base {
             $url = new \moodle_url('/totara/program/view.php', array('id' => $extrafields->insid));
         }
 
-        return \html_writer::link($url, format_string($value));
+        return \html_writer::link($url, $value);
     }
 
     /**

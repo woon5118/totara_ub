@@ -50,7 +50,7 @@ class assign_scale_values extends base {
 
         // If there are scale values, format them nicely.
         $v = str_replace(',', ', ', $value);
-        $v = format_string($v);
+        $v = \totara_reportbuilder\rb\display\format_string::display($v, $format, $row, $column, $report);
 
         return $v;
     }
