@@ -149,6 +149,10 @@ $string['check_riskxss_details'] = '<p>RISK_XSS denotes all dangerous capabiliti
 <p>Please verify the following list of users and make sure that you trust them completely on this server:</p><p>{$a}</p>';
 $string['check_riskxss_name'] = 'XSS trusted users';
 $string['check_riskxss_warning'] = 'RISK_XSS - found {$a} users that have to be trusted.';
+$string['check_scormsessionkeepalive_details'] = '<p>If enabled user session is kept alive in SCORM player.</p>';
+$string['check_scormsessionkeepalive_name'] = 'SCROM session keep alive';
+$string['check_scormsessionkeepalive_ok'] = 'Standard session timeout is enforced in SCORM player.';
+$string['check_scormsessionkeepalive_warning'] = 'Keeping user session alive in SCORM player may be considered to be a small security issue.';
 $string['check_unsecuredataroot_details'] = '<p>The dataroot directory must not be accessible via web. The best way to make sure the directory is not accessible is to use a directory outside the public web directory.</p>
 <p>If you move the directory, you need to update the <code>$CFG->dataroot</code> setting in <code>config.php</code> accordingly.</p>';
 $string['check_unsecuredataroot_error'] = 'Your dataroot directory <code>{$a}</code> is in the wrong location and is exposed to the web!';

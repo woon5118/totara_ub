@@ -184,6 +184,11 @@ $PAGE->requires->data_for_js('scormplayerdata', Array('launch' => false,
 $PAGE->requires->js('/mod/scorm/request.js', true);
 $PAGE->requires->js('/lib/cookies.js', true);
 
+if (get_config('scorm', 'sessionkeepalive')) {
+    // Totara: try to prevent session timeouts in idle open windows.
+    core\session\manager::keepalive('networkdropped', 'mod_scorm', $CFG->sessiontimeout / 10);
+}
+
 if (file_exists($CFG->dirroot.'/mod/scorm/datamodels/'.$scorm->version.'.js')) {
     $PAGE->requires->js('/mod/scorm/datamodels/'.$scorm->version.'.js', true);
 } else {
