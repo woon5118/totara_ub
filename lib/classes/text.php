@@ -523,48 +523,27 @@ class core_text {
     }
 
     /**
-     * Returns HTML entity transliteration table.
-     * @return array with (html entity => utf-8) elements
-     */
-    protected static function get_entities_table() {
-        static $trans_tbl = null;
-
-        // Generate/create $trans_tbl
-        if (!isset($trans_tbl)) {
-            // Totara: we want as many entities as possible here.
-            $trans_tbl = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            $trans_tbl = array_flip($trans_tbl);
-        }
-
-        return $trans_tbl;
-    }
-
-    /**
-     * Converts all the numeric entities &#nnnn; or &#xnnn; to UTF-8
-     * Original from laurynas dot butkus at gmail at:
-     * http://php.net/manual/en/function.html-entity-decode.php#75153
-     * with some custom mods to provide more functionality
+     * Converts all the named and numeric entities &#nnnn; or &#xnnn; to UTF-8
      *
      * @param string $str input string
      * @param boolean $htmlent convert also html entities (defaults to true)
      * @return string encoded UTF-8 string
      */
     public static function entities_to_utf8($str, $htmlent=true) {
-        $callback1 = function($matches) {return core_text::code2utf8(hexdec($matches[1]));};
-        $callback2 = function($matches) {return core_text::code2utf8($matches[1]);};
+        $str = (string)$str;
 
-        $result = (string)$str;
-        $result = preg_replace_callback('/&#x([0-9a-f]+);/i', $callback1, $result);
-        $result = preg_replace_callback('/&#([0-9]+);/', $callback2, $result);
+        if (!$htmlent) {
+            $callback1 = function($matches) {return core_text::code2utf8(hexdec($matches[1]));};
+            $callback2 = function($matches) {return core_text::code2utf8($matches[1]);};
 
-        // Replace literal entities (if desired)
-        if ($htmlent) {
-            $trans_tbl = self::get_entities_table();
-            // It should be safe to search for ascii strings and replace them with utf-8 here.
-            $result = strtr($result, $trans_tbl);
+            $result = (string)$str;
+            $result = preg_replace_callback('/&#x([0-9a-f]+);/i', $callback1, $result);
+            $result = preg_replace_callback('/&#([0-9]+);/', $callback2, $result);
+            return $result;
         }
-        // Return utf8-ised string
-        return $result;
+
+        // Totara: use built-in function for better performance.
+        return html_entity_decode($str, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     /**

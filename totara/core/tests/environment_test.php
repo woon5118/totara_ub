@@ -29,11 +29,11 @@ defined('MOODLE_INTERNAL') || die();
 class totara_core_environment_testcase extends advanced_testcase {
     public function test_default_charset() {
         $this->assertSame('UTF-8', ini_get('default_charset'));
+        $this->assertTrue(extension_loaded('iconv'));
         $this->assertSame('', ini_get('input_encoding'));
         $this->assertSame('', ini_get('output_encoding'));
         $this->assertSame('', ini_get('internal_encoding'));
-        if (extension_loaded('mbstring')) {
-            $this->assertSame('neutral', ini_get('mbstring.language'));
-        }
+        $this->assertTrue(extension_loaded('mbstring'));
+        $this->assertSame('neutral', ini_get('mbstring.language'));
     }
 }
