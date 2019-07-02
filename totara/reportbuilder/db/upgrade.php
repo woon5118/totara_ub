@@ -596,5 +596,19 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019061300, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2019070300) {
+        // Remove Fusion export setting.
+        $expplugins = get_config('reportbuilder', 'exportoptions');
+        $expplugins = explode(',', $expplugins);
+        $expplugins = array_map('trim', $expplugins);
+        foreach ($expplugins as $k => $v) {
+            if ($v === 'fusion') {
+                unset($expplugins[$k]);
+            }
+        }
+        set_config('exportoptions', implode(',', $expplugins), 'reportbuilder');
+        upgrade_plugin_savepoint(true, 2019070300, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

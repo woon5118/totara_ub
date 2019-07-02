@@ -172,7 +172,6 @@ abstract class tabexport_writer {
             '1' => 'excel',         // REPORT_BUILDER_EXPORT_EXCEL
             '2' => 'csv',           // REPORT_BUILDER_EXPORT_CSV
             '4' => 'ods',           // REPORT_BUILDER_EXPORT_ODS
-            '8' => 'fusion',        // REPORT_BUILDER_EXPORT_FUSION
             '16' => 'pdfportrait',  // REPORT_BUILDER_EXPORT_PDF_PORTRAIT
             '32' => 'pdflandscape', // REPORT_BUILDER_EXPORT_PDF_LANDSCAPE
         );

@@ -1141,6 +1141,7 @@ class core_plugin_manager {
         $plugins = array(
             // Totara 13 removals.
             'block_community',
+            'gradeexport_fusion',
 
             // Moodle merge 3.3 removals.
             'block_myoverview', 'repository_onedrive',
@@ -1326,8 +1327,6 @@ class core_plugin_manager {
 
             'gradeexport' => array(
                 'ods', 'txt', 'xls', 'xml'
-                // Totara:
-                , 'fusion'
             ),
 
             'gradeimport' => array(

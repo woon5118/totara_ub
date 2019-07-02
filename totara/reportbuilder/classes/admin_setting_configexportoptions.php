@@ -68,9 +68,6 @@ class totara_reportbuilder_admin_setting_configexportoptions extends admin_setti
             }
         }
 
-        // Fusion is a special Reportbuilder hack.
-        $this->choices['fusion'] = new lang_string('exportfusion', 'totara_reportbuilder');
-
         return true;
     }
 }

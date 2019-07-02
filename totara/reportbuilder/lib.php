@@ -4443,10 +4443,6 @@ class reportbuilder {
         ignore_user_abort(false);
 
         $format = \totara_core\tabexport_writer::normalise_format($format);
-        if ($format === 'fusion') {
-            $this->download_fusion(); // Redirect.
-            die;
-        }
 
         $formats = \totara_core\tabexport_writer::get_export_classes();
         if (!isset($formats[$format])) {
@@ -5177,20 +5173,6 @@ class reportbuilder {
         } else {
             return '';
         }
-    }
-
-    /* Download current table to Google Fusion
-     * @param array $fields Array of column headings
-     * @param string $query SQL query to run to get results
-     * @param integer $count Number of filtered records in query
-     * @param array $restrictions Array of strings containing info
-     *                            about the content of the report
-     * @return Returns never
-     */
-    function download_fusion() {
-        $jump = new moodle_url('/totara/reportbuilder/fusionexporter.php', array('id' => $this->_id, 'sid' => $this->_sid));
-        redirect($jump->out());
-        die;
     }
 
     /**
@@ -6208,7 +6190,7 @@ function reportbuilder_send_scheduled_report($sched) {
     }
 
     $format = \totara_core\tabexport_writer::normalise_format($sched->format);
-    $options = reportbuilder_get_export_options(null, false);
+    $options = reportbuilder_get_export_options(null);
     $formats = \totara_core\tabexport_writer::get_export_classes();
     if (!isset($formats[$format]) or !isset($options[$format])) {
         mtrace("Error: Scheduled report {$sched->id} uses unknown or disabled format '{$sched->format}'");
@@ -6887,11 +6869,12 @@ function reportbuilder_rename_data($table, $source, $oldtype, $oldvalue, $newtyp
 /**
  * Returns available export options for reportbuilder.
  *
+ * NOTE: there was a second parameter $includefusion = false, it was removed in Totara 13
+ *
  * @param string $currentoption optional option that is displayed even if not enabled in settings
- * @param bool $includefusion
  * @return array (export format => localised name of export option)
  */
-function reportbuilder_get_export_options($currentoption = null, $includefusion = false) {
+function reportbuilder_get_export_options($currentoption = null) {
     $exportoptions = get_config('reportbuilder', 'exportoptions');
     $exportoptions = !empty($exportoptions) ? explode(',', $exportoptions) : array();
 
@@ -6910,11 +6893,6 @@ function reportbuilder_get_export_options($currentoption = null, $includefusion 
             continue;
         }
         $select[$type] = $name;
-    }
-
-    // Fusion is not a real plugin yet.
-    if ($includefusion and isset($enabled['fusion'])) {
-        $select['fusion'] = get_string('exportfusion', 'totara_reportbuilder');
     }
 
     // Add current option,

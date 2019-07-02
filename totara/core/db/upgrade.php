@@ -70,11 +70,6 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017040900, 'totara', 'core');
     }
 
-    if ($oldversion < 2017041904) {
-        totara_core_upgrade_delete_moodle_plugins();
-        upgrade_plugin_savepoint(true, 2017041904, 'totara', 'core');
-    }
-
     // Set default scheduled tasks correctly.
     if ($oldversion < 2017042801) {
 
@@ -613,6 +608,26 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_core_core_tag_upgrade_tags();
 
         upgrade_plugin_savepoint(true, 2019062100, 'totara', 'core');
+    }
+
+    if ($oldversion < 2019070300) {
+        // Remove Fusion option from gradebook exports.
+        if (!empty($CFG->gradeexport)) {
+            $expplugins = explode(',', $CFG->gradeexport);
+            $expplugins = array_map('trim', $expplugins);
+            foreach ($expplugins as $k => $v) {
+                if ($v === 'fusion') {
+                    unset($expplugins[$k]);
+                }
+            }
+            set_config('gradeexport', implode(',', $expplugins));
+        }
+        upgrade_plugin_savepoint(true, 2019070300, 'totara', 'core');
+    }
+
+    if ($oldversion < 2019070301) {
+        totara_core_upgrade_delete_moodle_plugins();
+        upgrade_plugin_savepoint(true, 2019070301, 'totara', 'core');
     }
 
     return true;

@@ -49,13 +49,6 @@ M.totara_reportbuilder_export = M.totara_reportbuilder_export || {
 
     opentab: function(event) {
 
-        if ($("#id_format").val() == 'fusion') {
-            event.stopPropagation();
-            var url = $("#rb_export_form").attr('action');
-            url += '?sesskey' + M.cfg.sesskey + '&format=fusion&export=Export';
-            window.open(url, '_blank');
-            return false;
-        }
         return true;
     }
 }

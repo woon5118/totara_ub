@@ -337,6 +337,7 @@ function totara_core_upgrade_delete_moodle_plugins() {
     $deleteplugins = array(
         // Totara 13 removals.
         'block_community',
+        'gradeexport_fusion',
 
         // Moodle 3.3 removals.
         'repository_onedrive',

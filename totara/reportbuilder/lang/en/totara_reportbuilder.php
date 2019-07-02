@@ -319,7 +319,6 @@ $string['error:filter_not_deleted'] = 'There was a problem deleting that filter'
 $string['error:filter_not_moved'] = 'There was a problem moving that filter';
 $string['error:filteroptiontypexandvalueynotfoundinz'] = 'Filter option with type "{$a->type}" and value "{$a->value}" not found in source "{$a->source}"';
 $string['error:filters_not_updated'] = 'There was a problem updating the filters';
-$string['error:fusion_oauthnotsupported'] = 'Fusion export via OAuth is not currently supported.';
 $string['error:globalrestrictionrequired'] = 'You must select at least one restriction.';
 $string['error:graphdeleteseries'] = 'This column is the data source for Graph construction. Please delete the column first under Graph tab.';
 $string['error:graphisnotvalid'] = 'The report graph settings are invalid, please review.';
@@ -368,7 +367,6 @@ $string['exportfilesystempath'] = 'File export path';
 $string['exportfilesystempath_help'] = 'Absolute file system path to a writeable directory where reports can be exported and stored.
 
 **Warning!** Make sure to configure a correct system path if you are going to export reports to file system.';
-$string['exportfusion'] = 'Export to Google Fusion';
 $string['exportods'] = 'Export in ODS format';
 $string['exportoptions'] = 'Format export options';
 $string['exportpdf_landscape'] = 'Export in PDF (Landscape) format';
