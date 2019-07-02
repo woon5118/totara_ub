@@ -490,6 +490,11 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     $declareinterest_url = new moodle_url('/mod/facetoface/interest.php', array('f' => $facetoface->id));
     $declareinterest_link = html_writer::link($declareinterest_url, s($declareinterest_label), array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $declareinterest_label));
 
+    $intro = '';
+    if ($coursemodule->showdescription) {
+        $intro = format_module_intro('facetoface', $facetoface, $coursemodule->id);
+    }
+
     if ($seminar->has_unarchived_signups()) {
         // Get user signed up for the instance.
         $signups = signup_list::user_active_signups_within_seminar($USER->id, $seminar->get_id())->to_array();
@@ -605,6 +610,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         if ($declareinterest_enable) {
             $output .= $declareinterest_link;
         }
+        $output = html_writer::tag('div', $output, ['class' => 'no-overflow']);
     } else {
         // If user does not have signed-up, then start querying the list of seminar_events, and displaying it on screen.
         $query = new query($seminar);
@@ -654,16 +660,13 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 if (($iseditor || ($coursemodule->visible && $coursemodule->available)) && $declareinterest_enable) {
                     $output .= $declareinterest_link;
                 }
+                $output = html_writer::tag('div', $output, ['class' => 'no-overflow']);
             } else {
                 // Show only name if session display is set to zero.
-                $content = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
-                $coursemodule->set_content($content, true);
-                return;
+                $output = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
             }
         } else if (has_capability('mod/facetoface:viewemptyactivities', $contextmodule)) {
-            $content = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
-            $coursemodule->set_content($content, true);
-            return;
+            $output = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname'));
         } else {
             // Nothing to display to this user.
             $coursemodule->set_content('');
@@ -671,7 +674,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         }
     }
 
-    $coursemodule->set_content('<div class="no-overflow">' . $output . '</div>', true);
+    $coursemodule->set_content($intro . $output, true);
 }
 
 /**
@@ -933,6 +936,7 @@ function facetoface_supports($feature) {
         case FEATURE_ARCHIVE_COMPLETION:      return true;
         case FEATURE_COMPLETION_HAS_RULES:    return true;
         case FEATURE_COMPLETION_TIME_IN_TIMECOMPLETED: return true;
+        case FEATURE_SHOW_DESCRIPTION:        return true;
 
         default: return null;
     }

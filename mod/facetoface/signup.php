@@ -194,6 +194,9 @@ if ($fromform = $mform->get_data()) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading($heading);
 
+echo format_module_intro('facetoface', $seminar->get_properties(), $cm->id);
+echo html_writer::empty_tag('hr');
+
 /**
  * @var mod_facetoface_renderer $seminarrenderer
  */

@@ -128,6 +128,9 @@ $heading = get_string($strheading, 'facetoface', $seminar->get_name());
 echo $OUTPUT->box_start();
 echo $OUTPUT->heading($heading);
 
+echo format_module_intro('facetoface', $seminar->get_properties(), $cm->id);
+echo html_writer::empty_tag('hr');
+
 $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
 echo $seminarrenderer->render_seminar_event($seminarevent, $viewattendees);
 $mform->display();
