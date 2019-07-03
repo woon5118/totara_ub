@@ -29,6 +29,7 @@ default:
                 - '--disable-background-throttling'
               prefs:
                 credentials_enable_service: false
+              w3c: false
     Moodle\BehatExtension:
       moodledirroot: /Should/Change/To/Totara/dirroot
       steps_definitions: {  }
@@ -46,3 +47,4 @@ headless:
                 - '--headless'
               prefs:
                 credentials_enable_service: false
+              w3c: false
