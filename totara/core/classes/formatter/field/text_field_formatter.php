@@ -166,7 +166,7 @@ class text_field_formatter extends base {
         $pluginfile_url_options = $this->options['pluginfile_url_options'];
 
         // We need all those options to rewrite the file urls
-        $expected_options = ['context', 'component', 'filearea', 'itemid'];
+        $expected_options = ['context', 'component', 'filearea'];
         foreach ($expected_options as $option) {
             if (empty($pluginfile_url_options[$option])) {
                 throw new coding_exception('You must provide the pluginfile url options via set_pluginfile_url_options()');

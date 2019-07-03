@@ -69,6 +69,26 @@ class totara_core_text_field_formatter_testcase extends advanced_testcase {
         $this->assertRegExp("/@@PLUGINFILE@@\\//", $result);
     }
 
+    public function test_html_format_replace_urls_without_item_and_pluginfile() {
+        global $CFG;
+
+        $context = context_system::instance();
+        $formatter = new text_field_formatter(format::FORMAT_HTML, $context);
+        $formatter->set_pluginfile_url_options($context, 'component', 'filearea');
+
+        $value = '<span class="myhtml">@@PLUGINFILE@@/</span>';
+
+        $result = $formatter->format($value);
+
+        $url = "{$CFG->wwwroot}/pluginfile.php/{$context->id}/component/filearea/";
+
+        // url should have been replaced
+        // Tags should be there
+        $this->assertRegExp("/<span class/", $result);
+        $this->assertRegExp('/'.preg_quote($url, '/').'/', $result);
+        $this->assertNotRegExp("/@@PLUGINFILE@@\\//", $result);
+    }
+
     public function test_html_format_different_text_format() {
         $context = context_system::instance();
         $formatter = new text_field_formatter(format::FORMAT_HTML, $context);
