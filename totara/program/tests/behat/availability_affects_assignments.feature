@@ -334,5 +334,5 @@ Feature: Availability of programs affects assignments
     And I should see "direct team" in the "fn_001 ln_001 - ja1" "table_row"
     And the "Include all below" "field" should be disabled
     And I should see "No due date" in the "fn_001 ln_001 - ja1" "table_row"
-    And I should see "View dates" in the "fn_001 ln_001 - ja1" "table_row"
+    And I should not see "View dates" in the "fn_001 ln_001 - ja1" "table_row"
     And I should not see "2" in the "fn_001 ln_001 - ja1" "table_row"
