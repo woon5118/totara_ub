@@ -34,17 +34,23 @@ final class room_helper {
      *      @var int {facetoface_room}.capacity
      *      @var int {facetoface_room}.allowconflicts
      *      @var string {facetoface_room}.description
-     *      @var int {facetoface_room}.custom
+     *      @var bool {facetoface_room}.custom (optional)
      *      @var int {facetoface_room}.hidden
      * @return room
      */
     public static function save($data) {
         global $TEXTAREA_OPTIONS;
 
+        $custom = $data->custom ?? false; // $data->custom is not always passed
         if ($data->id) {
             $room = new room($data->id);
+            if (!$custom && $room->get_custom()) {
+                $room->publish();
+            } else {
+                // NOTE: Do nothing if the room is already published because we can't unpublish it
+            }
         } else {
-            if (isset($data->custom) && $data->custom == 1) {
+            if ($custom) {
                 $room = room::create_custom_room();
             } else {
                 $room = new room();

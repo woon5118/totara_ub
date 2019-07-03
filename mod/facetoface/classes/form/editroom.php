@@ -139,7 +139,7 @@ class editroom extends \moodleform {
             'roomcapacity' => $room->get_capacity(),
             'allowconflicts' => $room->get_allowconflicts(),
             'description_editor' => ['text' => $room->get_description()],
-            'notcustom' => $room->get_custom(),
+            'notcustom' => $room->get_custom() ? 0 : 1,
             'description' => $room->get_description(),
             'descriptionformat' => FORMAT_HTML,
         ];

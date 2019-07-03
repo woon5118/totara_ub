@@ -70,7 +70,7 @@ $customdata = ['room' => $room, 'seminar' => $seminar, 'event' => $event, 'edito
 $form = new \mod_facetoface\form\editroom(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
 
 if ($data = $form->get_data()) {
-    $data->custom = $room->get_custom();
+    $data->custom = empty($data->notcustom);
     $room = \mod_facetoface\room_helper::save($data);
     echo json_encode(array('id' => $room->get_id(), 'name' => $room->get_name(), 'custom' => $room->get_custom()));
 } else {
