@@ -47,6 +47,7 @@ information provided here is intended especially for developers.
 * Added a new protected function moodle_database::get_fts_mode() which is used to detect what mode to be used for full-text search query.
 * Added a new public function moodle_database::is_fts_accent_sensitive() to check whether accent sensitive is enabled for the database or not.
 * Modified the implementation of moodle_database::build_fts_subquery() in child level, which it is now accept search text with asterisk at the end of string to mark the search query as wild card search.
+* Deprecated format_date() and format_text() functions in webapi execution_context introduced in Evergreen release in favour of newly introduced \totara_core\formatter\field\date_field_formatter and \totara_core\formatter\field\text_field_formatter classes.
 
 === 12.0 ===
 

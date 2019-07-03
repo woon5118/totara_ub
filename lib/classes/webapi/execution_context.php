@@ -23,6 +23,9 @@
 
 namespace core\webapi;
 
+use core\date_format;
+use totara_core\formatter\field\date_field_formatter;
+
 /**
  * GraphQL execution context.
  */
@@ -98,4 +101,47 @@ class execution_context {
         return $this->operationname;
     }
 
+    // === Utility functions for resolvers ===
+
+    /**
+     * Format timestamp for core_date scalar fields using current user timezone.
+     *
+     * @deprecated
+     * @param int|null $timestamp unix timestamp
+     * @param array $args field arguments
+     * @return string|null
+     */
+    public function format_core_date(?int $timestamp, array $args) {
+        debugging('format_core_date() in execution_context is deprecated, please use the new \totara_core\formatter\field\date_field_formatter class', DEBUG_DEVELOPER);
+
+        $format = $args['format'] ?? date_format::FORMAT_TIMESTAMP;
+
+        $formatter = new date_field_formatter($format, \context_system::instance());
+        return $formatter->format($timestamp);
+    }
+
+    /**
+     * Format text to HTML and link files to pluginfile.php script if all options specified.
+     *
+     * @deprecated
+     * @param string $text
+     * @param string $format
+     * @param array $options - includes 'context', 'component' and 'filearea' for pluginfile.php relinking
+     * @return string
+     */
+    public function format_text(?string $text, $format = FORMAT_HTML, array $options = []) {
+        debugging('format_text() in execution_context is deprecated, please use the new \totara_core\formatter\field\text_field_formatter class', DEBUG_DEVELOPER);
+
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+
+        if ($text === null) {
+            return null;
+        }
+        if (!empty($options['context']) and !empty($options['component']) and !empty($options['filearea'])) {
+            $itemid = isset($options['itemid']) ? $options['itemid'] : null;
+            $text = file_rewrite_pluginfile_urls($text, 'pluginfile.php', $options['context']->id, $options['component'], $options['filearea'], $itemid);
+        }
+        return format_text($text, $format, $options);
+    }
 }
