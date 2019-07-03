@@ -67,12 +67,16 @@ abstract class base implements field_formatter_interface {
      * The format will be validated by validate_format(), make sure you override this
      * in the child classes
      *
-     * @param mixed $value
-     * @return mixed
+     * @param mixed|null $value null values will be returned as null
+     * @return mixed|null
      */
     public function format($value) {
         if (!$this->validate_format()) {
             throw new coding_exception('Invalid format given');
+        }
+
+        if (is_null($value)) {
+            return null;
         }
 
         if (!is_null($this->format)) {

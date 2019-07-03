@@ -170,4 +170,18 @@ class totara_core_text_field_formatter_testcase extends advanced_testcase {
         $formatter->format($value);
     }
 
+    public function test_null_value() {
+        $formatter = new text_field_formatter(format::FORMAT_HTML, context_system::instance());
+        $value = $formatter->format(null);
+        $this->assertNull($value);
+
+        $formatter = new text_field_formatter(format::FORMAT_PLAIN, context_system::instance());
+        $value = $formatter->format(null);
+        $this->assertNull($value);
+
+        $formatter = new text_field_formatter(format::FORMAT_RAW, context_system::instance());
+        $value = $formatter->format(null);
+        $this->assertNull($value);
+    }
+
 }

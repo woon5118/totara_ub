@@ -64,4 +64,15 @@ class totara_core_date_field_formatter_testcase extends basic_testcase {
         $formatter->format(time());
     }
 
+    public function test_null_value() {
+        $formats = date_format::get_available();
+        $context = context_system::instance();
+
+        foreach ($formats as $format) {
+            $formatter = new date_field_formatter($format, $context);
+            $result = $formatter->format(null);
+            $this->assertNull($result, "Wrong format for $format format");
+        }
+    }
+
 }

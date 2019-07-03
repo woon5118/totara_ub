@@ -117,4 +117,18 @@ class totara_core_string_field_formatter_testcase extends basic_testcase {
         $formatter->format($value);
     }
 
+    public function test_null_value() {
+        $formatter = new string_field_formatter(format::FORMAT_HTML, context_system::instance());
+        $value = $formatter->format(null);
+        $this->assertNull($value);
+
+        $formatter = new string_field_formatter(format::FORMAT_PLAIN, context_system::instance());
+        $value = $formatter->format(null);
+        $this->assertNull($value);
+
+        $formatter = new string_field_formatter(format::FORMAT_RAW, context_system::instance());
+        $value = $formatter->format(null);
+        $this->assertNull($value);
+    }
+
 }
