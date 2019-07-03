@@ -23,6 +23,8 @@
  * @subpackage program
  */
 
+use \totara_program\exception\manager;
+
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 
@@ -30,12 +32,12 @@ $programid = required_param('id', PARAM_INT);
 $action = required_param('action', PARAM_TEXT);
 $searchterm = optional_param('search', '', PARAM_TEXT);
 
-$exceptions_manager = new \totara_program\exception\manager($programid);
+$exceptions_manager = new manager($programid);
 
 switch ($action) {
     case 'selectmultiple':
 
-        $selectiontype = optional_param('selectiontype', \totara_program\exception\manager::SELECTIONTYPE_NONE, PARAM_INT);
+        $selectiontype = optional_param('selectiontype', manager::SELECTIONTYPE_NONE, PARAM_INT);
 
         $exceptions_manager->set_selections($selectiontype, $searchterm);
         $selected_exceptions = $exceptions_manager->get_selected_exceptions();
@@ -70,7 +72,7 @@ switch ($action) {
             die();
         }
 
-        $selectiontype = isset($_SESSION['exceptions_selectiontype']) ? $_SESSION['exceptions_selectiontype'] : SELECTIONTYPE_NONE;
+        $selectiontype = isset($_SESSION['exceptions_selectiontype']) ? $_SESSION['exceptions_selectiontype'] : manager::SELECTIONTYPE_NONE;
         $manually_added_exceptions = isset($_SESSION['exceptions_added']) ? $_SESSION['exceptions_added'] : array();
         $manually_removed_exceptions = isset($_SESSION['exceptions_removed']) ? $_SESSION['exceptions_removed'] : array();
 
