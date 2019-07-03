@@ -6301,7 +6301,7 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     }
 
     $context['body'] = $messagetext;
-    $mail->Subject = $renderer->render_from_template('core/email_subject', $context);
+    $mail->Subject = core_text::entities_to_utf8($renderer->render_from_template('core/email_subject', $context));
     $mail->FromName = $renderer->render_from_template('core/email_fromname', $context);
     $messagetext = $renderer->render_from_template('core/email_text', $context);
 
