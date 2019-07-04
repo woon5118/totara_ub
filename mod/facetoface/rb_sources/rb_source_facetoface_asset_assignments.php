@@ -81,13 +81,8 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source {
     }
 
     protected function define_columnoptions() {
-        global $CFG;
-        $columnoptions = array();
 
-        $intimezone = '';
-        if (!empty($CFG->facetoface_displaysessiontimezones)) {
-            $intimezone = '_in_timezone';
-        }
+        $columnoptions = array();
 
         $this->add_core_course_columns($columnoptions);
         $this->add_facetoface_common_to_columns($columnoptions);

@@ -350,10 +350,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             array(
                 'joins' => 'sessiondate',
                 'displayfunc' => 'event_date',
-                'dbdatatype' => 'timestamp',
-                'extrafields' => array(
-                    'timezone' => 'sessiondate.sessiontimezone'
-                )
+                'dbdatatype' => 'timestamp'
             )
         );
 
@@ -365,10 +362,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             array(
                 'joins' => 'sessiondate',
                 'displayfunc' => 'event_date',
-                'dbdatatype' => 'timestamp',
-                'extrafields' => array(
-                    'timezone' => 'sessiondate.sessiontimezone'
-                )
+                'dbdatatype' => 'timestamp'
             )
         );
 

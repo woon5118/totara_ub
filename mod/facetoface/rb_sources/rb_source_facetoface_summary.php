@@ -287,7 +287,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                     'displayfunc' => 'event_dates_period',
                     'extrafields' => array(
                         'finishdate' => 'sessions.registrationtimefinish',
-                        'timezone' => 'base.sessiontimezone'
                     ),
                 )
             ),
@@ -300,7 +299,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                     'joins' => array('sessions'),
                     'dbdatatype' => 'timestamp',
                     'displayfunc' => 'event_date',
-                    'extrafields' => array('timezone' => 'base.sessiontimezone'),
                     'outputformat' => 'text'
                 )
             ),
@@ -313,7 +311,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                     'joins' => array('sessions'),
                     'dbdatatype' => 'timestamp',
                     'displayfunc' => 'event_date',
-                    'extrafields' => array('timezone' => 'base.sessiontimezone'),
                     'outputformat' => 'text'
                 )
             ),
@@ -366,9 +363,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 'joins' => 'sessions',
                 'displayfunc' => 'event_date',
                 'dbdatatype' => 'timestamp',
-                'extrafields' => array(
-                    'timezone' => 'base.sessiontimezone',
-                ),
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -380,9 +374,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 'joins' => 'sessions',
                 'displayfunc' => 'event_date',
                 'dbdatatype' => 'timestamp',
-                'extrafields' => array(
-                    'timezone' => 'base.sessiontimezone',
-                ),
             )
         );
         $columnoptions[] = new rb_column_option(

@@ -262,13 +262,12 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('signupperiod', 'rb_source_facetoface_sessions'),
                 'sessions.registrationtimestart',
                 array(
-                    'joins' => array('sessions','sessiondate'),
+                    'joins' => array('sessions'),
                     'outputformat' => 'text',
                     'dbdatatype' => 'timestamp',
                     'displayfunc' => 'event_dates_period',
                     'extrafields' => array(
                         'finishdate' => 'sessions.registrationtimefinish',
-                        'timezone' => 'sessiondate.sessiontimezone'
                     )
                 )
             ),
@@ -278,10 +277,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('signupstartdate', 'rb_source_facetoface_sessions'),
                 'sessions.registrationtimestart',
                 array(
-                    'joins' => array('sessions','sessiondate'),
+                    'joins' => array('sessions'),
                     'dbdatatype' => 'timestamp',
                     'displayfunc' => 'event_date',
-                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'outputformat' => 'text'
                 )
             ),
@@ -291,10 +289,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('signupenddate', 'rb_source_facetoface_sessions'),
                 'sessions.registrationtimefinish',
                 array(
-                    'joins' => array('sessions','sessiondate'),
+                    'joins' => array('sessions'),
                     'dbdatatype' => 'timestamp',
                     'displayfunc' => 'event_date',
-                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'outputformat' => 'text'
                 )
             ),
@@ -365,9 +362,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('cancellationdate', 'rb_source_facetoface_sessions'),
                 'cancellationstatus.timecreated',
                 array(
-                    'joins' => array('cancellationstatus', 'sessions'),
+                    'joins' => 'cancellationstatus',
                     'displayfunc' => 'event_date',
-                    'dbdatatype' => 'timestamp',
+                    'dbdatatype' => 'timestamp'
                 )
             ),
             new rb_column_option(
@@ -439,10 +436,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 array(
                     'joins' => 'approver',
                     'displayfunc' => 'event_date',
-                    'dbdatatype' => 'timestamp',
-                    'extrafields' => array(
-                        'timezone' => 'sessiondate.sessiontimezone'
-                    )
+                    'dbdatatype' => 'timestamp'
                 )
             ),
             new rb_column_option(

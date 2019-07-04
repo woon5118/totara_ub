@@ -138,7 +138,8 @@ class rb_source_facetoface_interest extends rb_base_source {
                 get_string('declareinterestreportdate', 'rb_source_facetoface_interest'),
                 'base.timedeclared',
                 array(
-                    'displayfunc' => 'nice_date', // Do not mess with timezones here.
+                    'displayfunc' => 'event_date',
+                    'dbdatatype' => 'timestamp'
                 )
             ),
             new rb_column_option(
