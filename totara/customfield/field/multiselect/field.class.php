@@ -211,6 +211,12 @@ class customfield_multiselect extends customfield_base {
 
     public function edit_validate_field($itemnew, $prefix, $tableprefix) {
         global $DB;
+
+        // Check if the field is part of the form
+        if (!isset($itemnew->{$this->inputname})) {
+            return array();
+        }
+
         if ($this->is_hidden()) {
             return array();
         }
