@@ -50,6 +50,10 @@ class org_name_link extends base {
 
         $value = \totara_reportbuilder\rb\display\format_string::display($value, $format, $row, $column, $report);
 
+        if ($format !== 'html') {
+            return $value;
+        }
+
         $extrafields = self::get_extrafields_row($row, $column);
 
         $url = new \moodle_url('/totara/hierarchy/item/view.php', array('prefix' => 'organisation', 'id' => $extrafields->orgid));
