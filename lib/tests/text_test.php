@@ -93,9 +93,9 @@ class core_text_testcase extends advanced_testcase {
         $this->assertSame('Zlutoucky konicek', core_text::convert($utf8, 'utf-8', 'ascii'));
         $this->assertSame($utf8, core_text::convert($utf8.chr(130), 'utf-8', 'utf-8'));
         $utf8 = "Der eine stößt den Speer zum Mann";
-        $this->assertSame('Der eine stoesst den Speer zum Mann', core_text::convert($utf8, 'utf-8', 'ascii'));
+        $this->assertSame('Der eine stosst den Speer zum Mann', core_text::convert($utf8, 'utf-8', 'ascii'));
         $iso1 = core_text::convert($utf8, 'utf-8', 'iso-8859-1');
-        $this->assertSame('Der eine stoesst den Speer zum Mann', core_text::convert($iso1, 'iso-8859-1', 'ascii'));
+        $this->assertSame('Der eine stosst den Speer zum Mann', core_text::convert($iso1, 'iso-8859-1', 'ascii'));
     }
 
     /**
@@ -261,7 +261,7 @@ class core_text_testcase extends advanced_testcase {
         $str = pack("H*", "bcf2cce5d6d0cec4"); // GB18030
         $this->assertSame($str, core_text::strtolower($str, 'GB18030'));
 
-        // Typo3 has problems with integers.
+        // Totara: Make sure integers are converted to strings.
         $str = 1309528800;
         $this->assertSame((string)$str, core_text::strtolower($str));
     }

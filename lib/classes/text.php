@@ -32,15 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * become necessary. The name of the methods is exactly the
  * same than their PHP originals.
  *
- * A big part of this class acts as a wrapper over the Typo3 charset library,
- * really a cool group of utilities to handle texts and encoding conversion.
- *
- * Take a look to its own copyright and license details.
- *
- * IMPORTANT Note: Typo3 libraries always expect lowercase charsets to use 100%
- * its capabilities so, don't forget to make the conversion
- * from every wrapper function!
- *
  * @package   core
  * @category  string
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
@@ -54,68 +45,102 @@ class core_text {
     protected static $noncharacters;
 
     /**
-     * Return t3lib helper class, which is used for conversion between charsets
+     * Totara: list of encoding mappings, copied from Typo3
      *
-     * @param bool $reset
-     * @return t3lib_cs
+     * @var string[]
      */
-    protected static function typo3($reset = false) {
-        static $typo3cs = null;
-
-        if ($reset) {
-            $typo3cs = null;
-            return null;
-        }
-
-        if (isset($typo3cs)) {
-            return $typo3cs;
-        }
-
-        global $CFG;
-
-        // Required files
-        require_once($CFG->libdir.'/typo3/class.t3lib_cs.php');
-        require_once($CFG->libdir.'/typo3/class.t3lib_div.php');
-        require_once($CFG->libdir.'/typo3/interface.t3lib_singleton.php');
-        require_once($CFG->libdir.'/typo3/class.t3lib_l10n_locales.php');
-
-        // do not use mbstring or recode because it may return invalid results in some corner cases
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['t3lib_cs_convMethod'] = 'iconv';
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['t3lib_cs_utils'] = 'iconv';
-
-        // Tell Typo3 we are curl enabled always (mandatory since 2.0)
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['curlUse'] = '1';
-
-        // And this directory must exist to allow Typo to cache conversion
-        // tables when using internal functions
-        make_temp_directory('typo3temp/cs');
-
-        // Make sure typo is using our dir permissions
-        $GLOBALS['TYPO3_CONF_VARS']['BE']['folderCreateMask'] = decoct($CFG->directorypermissions);
-
-        // Default mask for Typo
-        $GLOBALS['TYPO3_CONF_VARS']['BE']['fileCreateMask'] = decoct($CFG->filepermissions);
-
-        // This full path constants must be defined too, transforming backslashes
-        // to forward slashed because Typo3 requires it.
-        if (!defined('PATH_t3lib')) {
-            define('PATH_t3lib', str_replace('\\','/',$CFG->libdir.'/typo3/'));
-            define('PATH_typo3', str_replace('\\','/',$CFG->libdir.'/typo3/'));
-            define('PATH_site', str_replace('\\','/',$CFG->tempdir.'/'));
-            define('TYPO3_OS', stristr(PHP_OS,'win')&&!stristr(PHP_OS,'darwin')?'WIN':'');
-        }
-
-        $typo3cs = new t3lib_cs();
-
-        return $typo3cs;
-    }
+    protected static $synonyms = [
+        'us' => 'ascii',
+        'us-ascii' => 'ascii',
+        'cp819' => 'iso-8859-1',
+        'ibm819' => 'iso-8859-1',
+        'iso-ir-100' => 'iso-8859-1',
+        'iso-ir-101' => 'iso-8859-2',
+        'iso-ir-109' => 'iso-8859-3',
+        'iso-ir-110' => 'iso-8859-4',
+        'iso-ir-144' => 'iso-8859-5',
+        'iso-ir-127' => 'iso-8859-6',
+        'iso-ir-126' => 'iso-8859-7',
+        'iso-ir-138' => 'iso-8859-8',
+        'iso-ir-148' => 'iso-8859-9',
+        'iso-ir-157' => 'iso-8859-10',
+        'iso-ir-179' => 'iso-8859-13',
+        'iso-ir-199' => 'iso-8859-14',
+        'iso-ir-203' => 'iso-8859-15',
+        'csisolatin1' => 'iso-8859-1',
+        'csisolatin2' => 'iso-8859-2',
+        'csisolatin3' => 'iso-8859-3',
+        'csisolatin5' => 'iso-8859-9',
+        'csisolatin8' => 'iso-8859-14',
+        'csisolatin9' => 'iso-8859-15',
+        'csisolatingreek' => 'iso-8859-7',
+        'iso-celtic' => 'iso-8859-14',
+        'latin1' => 'iso-8859-1',
+        'latin2' => 'iso-8859-2',
+        'latin3' => 'iso-8859-3',
+        'latin5' => 'iso-8859-9',
+        'latin6' => 'iso-8859-10',
+        'latin8' => 'iso-8859-14',
+        'latin9' => 'iso-8859-15',
+        'l1' => 'iso-8859-1',
+        'l2' => 'iso-8859-2',
+        'l3' => 'iso-8859-3',
+        'l5' => 'iso-8859-9',
+        'l6' => 'iso-8859-10',
+        'l8' => 'iso-8859-14',
+        'l9' => 'iso-8859-15',
+        'cyrillic' => 'iso-8859-5',
+        'arabic' => 'iso-8859-6',
+        'tis-620' => 'iso-8859-11',
+        'win874' => 'windows-874',
+        'win1250' => 'windows-1250',
+        'win1251' => 'windows-1251',
+        'win1252' => 'windows-1252',
+        'win1253' => 'windows-1253',
+        'win1254' => 'windows-1254',
+        'win1255' => 'windows-1255',
+        'win1256' => 'windows-1256',
+        'win1257' => 'windows-1257',
+        'win1258' => 'windows-1258',
+        'cp1250' => 'windows-1250',
+        'cp1251' => 'windows-1251',
+        'cp1252' => 'windows-1252',
+        'ms-ee' => 'windows-1250',
+        'ms-ansi' => 'windows-1252',
+        'ms-greek' => 'windows-1253',
+        'ms-turk' => 'windows-1254',
+        'winbaltrim' => 'windows-1257',
+        'koi-8ru' => 'koi-8r',
+        'koi8r' => 'koi-8r',
+        'cp878' => 'koi-8r',
+        'mac' => 'macroman',
+        'macintosh' => 'macroman',
+        'euc-cn' => 'gb2312',
+        'x-euc-cn' => 'gb2312',
+        'euccn' => 'gb2312',
+        'cp936' => 'gb2312',
+        'big-5' => 'big5',
+        'cp950' => 'big5',
+        'eucjp' => 'euc-jp',
+        'sjis' => 'shift_jis',
+        'shift-jis' => 'shift_jis',
+        'cp932' => 'shift_jis',
+        'cp949' => 'euc-kr',
+        'utf7' => 'utf-7',
+        'utf8' => 'utf-8',
+        'utf16' => 'utf-16',
+        'utf32' => 'utf-32',
+        'ucs2' => 'ucs-2',
+        'ucs4' => 'ucs-4',
+    ];
 
     /**
      * Reset internal textlib caches.
-     * @static
+     * @deprecated since Totara 13
      */
     public static function reset_caches() {
-        self::typo3(true);
+        // Totara: keep this method for compatibility with Moodle,
+        //         debugging message is not necessary here and there is no need to remove usage.
     }
 
     /**
@@ -125,48 +150,32 @@ class core_text {
      *
      * @static
      * @param string $charset raw charset name
-     * @return string normalised lowercase charset name
+     * @return string normalised lowercase charset name, utf-8 if no charset specified
      */
     public static function parse_charset($charset) {
-        $charset = strtolower($charset);
-
-        // shortcuts so that we do not have to load typo3 on every page
-
-        if ($charset === 'utf8' or $charset === 'utf-8') {
+        if ($charset === 'utf8' or $charset === 'utf-8' or $charset === 'UTF8' or $charset === 'UTF-8') {
             return 'utf-8';
+        }
+
+        $charset = trim(strtolower($charset));
+        if ($charset === '') {
+            // Fallback to utf-8.
+            return 'utf-8';
+        }
+
+        if (isset(self::$synonyms[$charset])) {
+            return self::$synonyms[$charset];
         }
 
         if (preg_match('/^(cp|win|windows)-?(12[0-9]{2})$/', $charset, $matches)) {
             return 'windows-'.$matches[2];
         }
 
-        if (preg_match('/^iso-8859-[0-9]+$/', $charset, $matches)) {
-            return $charset;
-        }
-
-        if ($charset === 'euc-jp') {
-            return 'euc-jp';
-        }
-        if ($charset === 'iso-2022-jp') {
-            return 'iso-2022-jp';
-        }
-        if ($charset === 'shift-jis' or $charset === 'shift_jis') {
-            return 'shift_jis';
-        }
-        if ($charset === 'gb2312') {
-            return 'gb2312';
-        }
-        if ($charset === 'gb18030') {
-            return 'gb18030';
-        }
-
-        // fallback to typo3
-        return self::typo3()->parse_charset($charset);
+        return $charset;
     }
 
     /**
-     * Converts the text between different encodings. It uses iconv extension with //TRANSLIT parameter,
-     * falls back to typo3. If both source and target are utf-8 it tries to fix invalid characters only.
+     * Converts the text between different encodings. It uses iconv extension with //IGNORE parameter.
      *
      * @param string $text
      * @param string $fromCS source encoding
@@ -174,14 +183,13 @@ class core_text {
      * @return string|bool converted string or false on error
      */
     public static function convert($text, $fromCS, $toCS='utf-8') {
-        $fromCS = self::parse_charset($fromCS);
-        $toCS   = self::parse_charset($toCS);
-
         $text = (string)$text; // we can work only with strings
-
         if ($text === '') {
             return '';
         }
+
+        $fromCS = self::parse_charset($fromCS);
+        $toCS   = self::parse_charset($toCS);
 
         if ($fromCS === 'utf-8') {
             $text = fix_utf8($text);
@@ -195,22 +203,17 @@ class core_text {
             $text = self::specialtoascii($text, $fromCS);
         }
 
-        // Prevent any error notices, do not use //IGNORE so that we get
-        // consistent result from Typo3 if iconv fails.
-        $result = @iconv($fromCS, $toCS.'//TRANSLIT', $text);
-
-        if ($result === false or $result === '') {
-            // note: iconv is prone to return empty string when invalid char encountered, or false if encoding unsupported
-            $oldlevel = error_reporting(E_PARSE);
-            $result = self::typo3()->conv((string)$text, $fromCS, $toCS);
-            error_reporting($oldlevel);
+        // Totara: rely on iconv to do the conversion and fall back to mb_string if it fails.
+        $result = iconv($fromCS, $toCS.'//IGNORE', $text); // Do not hide any errors here!
+        if ($result !== false) {
+            return $result;
         }
 
-        return $result;
+        return mb_convert_encoding($text, $toCS, $fromCS);
     }
 
     /**
-     * Multibyte safe substr() function, uses mbstring or iconv for UTF-8, falls back to typo3.
+     * Multibyte safe substr() function, uses mbstring or iconv.
      *
      * @param string $text string to truncate
      * @param int $start negative value means from end
@@ -222,35 +225,18 @@ class core_text {
         $charset = self::parse_charset($charset);
 
         if ($charset === 'utf-8') {
-            if (function_exists('mb_substr')) {
-                // this is much faster than iconv - see MDL-31142
-                if ($len === null) {
-                    $oldcharset = mb_internal_encoding();
-                    mb_internal_encoding('UTF-8');
-                    $result = mb_substr($text, $start);
-                    mb_internal_encoding($oldcharset);
-                    return $result;
-                } else {
-                    return mb_substr($text, $start, $len, 'UTF-8');
-                }
-
-            } else {
-                if ($len === null) {
-                    $len = iconv_strlen($text, 'UTF-8');
-                }
-                return iconv_substr($text, $start, $len, 'UTF-8');
+            if ($len === null) {
+                // just in case some weird code messed this up.
+                mb_internal_encoding('UTF-8');
+                return mb_substr($text, $start);
             }
+            return mb_substr($text, $start, $len, 'UTF-8');
         }
 
-        $oldlevel = error_reporting(E_PARSE);
         if ($len === null) {
-            $result = self::typo3()->substr($charset, (string)$text, $start);
-        } else {
-            $result = self::typo3()->substr($charset, (string)$text, $start, $len);
+            $len = iconv_strlen($text, $charset);
         }
-        error_reporting($oldlevel);
-
-        return $result;
+        return iconv_substr($text, $start, $len, $charset);
     }
 
     /**
@@ -258,7 +244,7 @@ class core_text {
      * UTF-8 only!
      *
      * Many of the other charsets we test for (like ISO-2022-JP and EUC-JP) are not supported
-     * by typo3, and will give invalid results, so we are supporting UTF-8 only.
+     * and will give invalid results, so we are supporting UTF-8 only.
      *
      * @param string $string String to truncate
      * @param int $bytes Maximum length of bytes in the result
@@ -266,15 +252,7 @@ class core_text {
      * @since Moodle 3.1
      */
     public static function str_max_bytes($string, $bytes) {
-        if (function_exists('mb_strcut')) {
-            return mb_strcut($string, 0, $bytes, 'UTF-8');
-        }
-
-        $oldlevel = error_reporting(E_PARSE);
-        $result = self::typo3()->strtrunc('utf-8', $string, $bytes);
-        error_reporting($oldlevel);
-
-        return $result;
+        return mb_strcut($string, 0, $bytes, 'UTF-8');
     }
 
     /**
@@ -288,27 +266,11 @@ class core_text {
      * @since Moodle 2.4.6, 2.5.2, 2.6
      */
     public static function strrchr($haystack, $needle, $part = false) {
-
-        if (function_exists('mb_strrchr')) {
-            return mb_strrchr($haystack, $needle, $part, 'UTF-8');
-        }
-
-        $pos = self::strrpos($haystack, $needle);
-        if ($pos === false) {
-            return false;
-        }
-
-        $length = null;
-        if ($part) {
-            $length = $pos;
-            $pos = 0;
-        }
-
-        return self::substr($haystack, $pos, $length, 'utf-8');
+        return mb_strrchr($haystack, $needle, $part, 'UTF-8');
     }
 
     /**
-     * Multibyte safe strlen() function, uses mbstring or iconv for UTF-8, falls back to typo3.
+     * Multibyte safe strlen() function, uses mbstring or iconv.
      *
      * @param string $text input string
      * @param string $charset encoding of the text
@@ -318,22 +280,14 @@ class core_text {
         $charset = self::parse_charset($charset);
 
         if ($charset === 'utf-8') {
-            if (function_exists('mb_strlen')) {
-                return mb_strlen($text, 'UTF-8');
-            } else {
-                return iconv_strlen($text, 'UTF-8');
-            }
+            return mb_strlen($text, 'UTF-8');
         }
 
-        $oldlevel = error_reporting(E_PARSE);
-        $result = self::typo3()->strlen($charset, (string)$text);
-        error_reporting($oldlevel);
-
-        return $result;
+        return iconv_strlen($text, $charset);
     }
 
     /**
-     * Multibyte safe strtolower() function, uses mbstring, falls back to typo3.
+     * Multibyte safe strtolower() function, uses mbstring.
      *
      * @param string $text input string
      * @param string $charset encoding of the text (may not work for all encodings)
@@ -342,19 +296,17 @@ class core_text {
     public static function strtolower($text, $charset='utf-8') {
         $charset = self::parse_charset($charset);
 
-        if ($charset === 'utf-8' and function_exists('mb_strtolower')) {
+        if ($charset === 'utf-8') {
             return mb_strtolower($text, 'UTF-8');
         }
 
-        $oldlevel = error_reporting(E_PARSE);
-        $result = self::typo3()->conv_case($charset, (string)$text, 'toLower');
-        error_reporting($oldlevel);
-
-        return $result;
+        $text = self::convert($text, $charset);
+        $result = mb_strtolower($text, 'UTF-8');
+        return self::convert($result, 'UTF-8', $charset);
     }
 
     /**
-     * Multibyte safe strtoupper() function, uses mbstring, falls back to typo3.
+     * Multibyte safe strtoupper() function, uses mbstring.
      *
      * @param string $text input string
      * @param string $charset encoding of the text (may not work for all encodings)
@@ -363,15 +315,13 @@ class core_text {
     public static function strtoupper($text, $charset='utf-8') {
         $charset = self::parse_charset($charset);
 
-        if ($charset === 'utf-8' and function_exists('mb_strtoupper')) {
+        if ($charset === 'utf-8') {
             return mb_strtoupper($text, 'UTF-8');
         }
 
-        $oldlevel = error_reporting(E_PARSE);
-        $result = self::typo3()->conv_case($charset, (string)$text, 'toUpper');
-        error_reporting($oldlevel);
-
-        return $result;
+        $text = self::convert($text, $charset);
+        $result = mb_strtoupper($text, 'UTF-8');
+        return self::convert($result, 'UTF-8', $charset);
     }
 
     /**
@@ -384,11 +334,7 @@ class core_text {
      * @return int the numeric position of the first occurrence of needle in haystack.
      */
     public static function strpos($haystack, $needle, $offset=0) {
-        if (function_exists('mb_strpos')) {
-            return mb_strpos($haystack, $needle, $offset, 'UTF-8');
-        } else {
-            return iconv_strpos($haystack, $needle, $offset, 'UTF-8');
-        }
+        return mb_strpos($haystack, $needle, $offset, 'UTF-8');
     }
 
     /**
@@ -400,11 +346,7 @@ class core_text {
      * @return int the numeric position of the last occurrence of needle in haystack
      */
     public static function strrpos($haystack, $needle) {
-        if (function_exists('mb_strrpos')) {
-            return mb_strrpos($haystack, $needle, null, 'UTF-8');
-        } else {
-            return iconv_strrpos($haystack, $needle, 'UTF-8');
-        }
+        return mb_strrpos($haystack, $needle, null, 'UTF-8');
     }
 
     /**
@@ -429,10 +371,35 @@ class core_text {
      */
     public static function specialtoascii($text, $charset='utf-8') {
         $charset = self::parse_charset($charset);
-        $oldlevel = error_reporting(E_PARSE);
-        $result = self::typo3()->specCharsToASCII($charset, (string)$text);
-        error_reporting($oldlevel);
-        return $result;
+        if ($charset !== 'utf-8') {
+            $text = self::convert($text, $charset, 'utf-8');
+        }
+
+        // Everybody should have intl installed!
+        if (class_exists('Transliterator')) {
+            $transliterator = Transliterator::createFromRules(':: Any-Latin; :: Latin-ASCII; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;', Transliterator::FORWARD);
+            $result = $transliterator->transliterate($text);
+            if ($result !== false) {
+                if ($charset === 'utf-8') {
+                    return $result;
+                }
+                return self::convert($result, 'UTF-8', $charset);
+            }
+        }
+
+        if ('glibc' === ICONV_IMPL) {
+            $result = iconv('UTF-8', 'ASCII//TRANSLIT', $text);
+        } else {
+            $result = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $text);
+        }
+        if ($result === false) {
+            $result = $text;
+        }
+
+        if ($charset === 'utf-8') {
+            return $result;
+        }
+        return self::convert($result, 'UTF-8', $charset);
     }
 
     /**
@@ -539,7 +506,8 @@ class core_text {
             $result = (string)$str;
             $result = preg_replace_callback('/&#x([0-9a-f]+);/i', $callback1, $result);
             $result = preg_replace_callback('/&#([0-9]+);/', $callback2, $result);
-            return $result;
+
+            return fix_utf8($result);
         }
 
         // Totara: use built-in function for better performance.
@@ -559,13 +527,23 @@ class core_text {
             $str = self::entities_to_utf8($str, true);
         }
 
-        // Avoid some notices from Typo3 code
-        $oldlevel = error_reporting(E_PARSE);
-        $result = self::typo3()->utf8_to_entities((string)$str);
-        error_reporting($oldlevel);
+        $chars = preg_split('//u', $str, -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($chars as &$char) {
+            $ord = mb_ord($char, 'UTF-8');
+            if ($ord > 127) {
+                if ($dec) {
+                    $char = '&#' . $ord . ';';
+                } else {
+                    $char = '&#x' . dechex($ord) . ';';
+                }
+            }
+        }
+        $result = implode('', $chars);
 
         if ($dec) {
-            $callback = function($matches) {return '&#'.(hexdec($matches[1])).';';};
+            $callback = function ($matches) {
+                return '&#' . (hexdec($matches[1])) . ';';
+            };
             $result = preg_replace_callback('/&#x([0-9a-f]+);/i', $callback, $result);
         }
 
@@ -634,7 +612,7 @@ class core_text {
         $nixenc = strtoupper(get_string('oldcharset', 'langconfig'));
         $encodings[$nixenc] = $nixenc;
 
-        foreach (self::typo3()->synonyms as $enc) {
+        foreach (self::$synonyms as $enc) {
             $enc = strtoupper($enc);
             $encodings[$enc] = $enc;
         }
@@ -701,31 +679,6 @@ class core_text {
      * @return string
      */
     public static function strtotitle($text) {
-        if (empty($text)) {
-            return $text;
-        }
-
-        if (function_exists('mb_convert_case')) {
-            return mb_convert_case($text, MB_CASE_TITLE, 'UTF-8');
-        }
-
-        $text = self::strtolower($text);
-        $words = explode(' ', $text);
-        foreach ($words as $i=>$word) {
-            $length = self::strlen($word);
-            if (!$length) {
-                continue;
-
-            } else if ($length == 1) {
-                $words[$i] = self::strtoupper($word);
-
-            } else {
-                $letter = self::substr($word, 0, 1);
-                $letter = self::strtoupper($letter);
-                $rest   = self::substr($word, 1);
-                $words[$i] = $letter.$rest;
-            }
-        }
-        return implode(' ', $words);
+        return mb_convert_case($text, MB_CASE_TITLE, 'UTF-8');
     }
 }

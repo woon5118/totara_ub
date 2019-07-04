@@ -134,13 +134,6 @@
     <licenseversion>3</licenseversion>
   </library>
   <library>
-    <location>typo3</location>
-    <name>Typo3</name>
-    <license>GPL</license>
-    <version>4.7.19</version>
-    <licenseversion>2.0+</licenseversion>
-  </library>
-  <library>
     <location>yuilib</location>
     <name>YUI</name>
     <license>BSD</license>

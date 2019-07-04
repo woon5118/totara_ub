@@ -27,6 +27,20 @@ defined('MOODLE_INTERNAL') || die();
  * Tests changes and additions in core_text class
  */
 class totara_core_core_text_testcase extends advanced_testcase {
+    public function test_parse_charset() {
+        $this->assertSame('utf-8', core_text::parse_charset('utf-8'));
+        $this->assertSame('utf-8', core_text::parse_charset('utf8'));
+        $this->assertSame('utf-8', core_text::parse_charset('Utf8'));
+        $this->assertSame('utf-8', core_text::parse_charset(' UTF8 '));
+        $this->assertSame('utf-8', core_text::parse_charset(' UTF-8 '));
+        $this->assertSame('windows-1250', core_text::parse_charset('WINDOWS-1250'));
+        $this->assertSame('windows-1250', core_text::parse_charset('CP1250'));
+        $this->assertSame('iso-8859-1', core_text::parse_charset('latin1'));
+
+        $this->assertSame('utf-8', core_text::parse_charset(' '));
+        $this->assertSame('abscdef', core_text::parse_charset('abscdef'));
+    }
+
     public function test_entities_to_utf8() {
         $entities = file_get_contents(__DIR__ . '/fixtures/all_html_entities.txt');
 
@@ -44,5 +58,9 @@ class totara_core_core_text_testcase extends advanced_testcase {
         $this->assertSame($utf8text, core_text::entities_to_utf8($numeric, false));
 
         $this->assertSame('', core_text::entities_to_utf8(null));
+    }
+
+    public function test_specialtoascii() {
+        $this->assertSame('Zlutoucky konicek Strasschen osibka yan', core_text::specialtoascii('Žluťoučký koníček Strässchen ошибка 言'));
     }
 }
