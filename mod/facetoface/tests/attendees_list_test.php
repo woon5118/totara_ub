@@ -67,10 +67,24 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
         $s->set_timefinish(time() - 3600);
         $s->save();
 
+        // Use statically defined names to avoid collision.
+        $usernames = [
+            [ 'Jacob', 'Smith' ],
+            [ 'Eliška', 'Novák' ],
+            [ 'Даниил', 'Морозова' ],
+            [ '秀英', '李' ],
+            [ 'さくら', '佐藤' ],
+        ];
+
         $gen = $this->getDataGenerator();
-        $current = null;
+        $users = [];
         for ($i = 0; $i < 5; $i++) {
-            $user = $gen->create_user();
+            $user = $gen->create_user([
+                'firstname' => $usernames[$i][0],
+                'lastname' => $usernames[$i][1],
+                'middlename' => '',
+                'alternatename' => ''
+            ]);
             $gen->enrol_user($user->id, $e->get_seminar()->get_course());
 
             $signup = signup::create($user->id, $e);
@@ -78,13 +92,11 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
 
             $signup->switch_state(booked::class);
 
-            if (null == $current) {
-                // We just need one user here, so that we can start deleting this user later on within this test suite.
-                $current = $user;
-            }
+            $users[] = $user;
         }
 
-        delete_user($current);
+        // Delete user #0
+        delete_user($users[0]);
 
         $trainer = $gen->create_user();
         $gen->enrol_user($trainer->id, $e->get_seminar()->get_course(), 'editingteacher');
@@ -107,10 +119,15 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
         $output = $PAGE->get_renderer('totara_reportbuilder');
         [$reporthtml, $debughtml] = $output->report_html($report, 0);
 
-        // As this $current user had been deleted earlier, therefore, we are expecting this user to not be included in the
+        // As user #0 had been deleted earlier, therefore, we are expecting this user to not be included in the
         // embedded report builder.
-        $name = fullname($current);
-        $this->assertNotContains($name, $reporthtml);
+        $this->assertNotContains(fullname($users[0]), $reporthtml);
+
+        // User #1 .. #4 must be included
+        $this->assertContains(fullname($users[1]), $reporthtml);
+        $this->assertContains(fullname($users[2]), $reporthtml);
+        $this->assertContains(fullname($users[3]), $reporthtml);
+        $this->assertContains(fullname($users[4]), $reporthtml);
     }
 
     /**
@@ -131,13 +148,26 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
         $s->set_timefinish(time() - 3600);
         $s->save();
 
+        // Use statically defined names to avoid collision.
+        $usernames = [
+            [ 'Jacob', 'Smith' ],
+            [ 'Eliška', 'Novák' ],
+            [ 'Даниил', 'Морозова' ],
+            [ '秀英', '李' ],
+            [ 'さくら', '佐藤' ],
+        ];
+
         $gen = $this->getDataGenerator();
 
-        // The user's record to be deleted here
-        $current = null;
+        $users = [];
 
         for ($i = 0; $i < 5; $i++) {
-            $user = $gen->create_user();
+            $user = $gen->create_user([
+                'firstname' => $usernames[$i][0],
+                'lastname' => $usernames[$i][1],
+                'middlename' => '',
+                'alternatename' => ''
+            ]);
             $gen->enrol_user($user->id, $e->get_seminar()->get_course());
 
             $signup = signup::create($user->id, $e);
@@ -145,9 +175,7 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
 
             $signup->switch_state(booked::class);
 
-            if (null == $current) {
-                $current = $user;
-            }
+            $users[] = $user;
         }
 
         // Start preparing the new permission for the role editingteacher. So that our trainer is able to see the deleted users
@@ -168,7 +196,8 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
 
         $DB->insert_record('role_capabilities', $cap);
 
-        delete_user($current);
+        // Delete user #0
+        delete_user($users[0]);
         $trainer = $gen->create_user();
         $gen->enrol_user($trainer->id, $e->get_seminar()->get_course(), 'editingteacher');
         $this->setUser($trainer);
@@ -190,7 +219,11 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
         $output = $PAGE->get_renderer('totara_reportbuilder');
         [$reporthtml, $debughtml] = $output->report_html($report, 0);
 
-        $name = fullname($current);
-        $this->assertContains($name, $reporthtml);
+        // All users must be included
+        $this->assertContains(fullname($users[0]), $reporthtml);
+        $this->assertContains(fullname($users[1]), $reporthtml);
+        $this->assertContains(fullname($users[2]), $reporthtml);
+        $this->assertContains(fullname($users[3]), $reporthtml);
+        $this->assertContains(fullname($users[4]), $reporthtml);
     }
 }
