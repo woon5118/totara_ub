@@ -139,7 +139,7 @@ class manager {
      * @param   string  $action     The action to perform.
      */
     public function execute($action) {
-        admin_externalpage_setup('tool_usertours/tours');
+        admin_externalpage_setup('toolusertours');
         // Add the main content.
         switch($action) {
             case self::ACTION_NEWTOUR:
