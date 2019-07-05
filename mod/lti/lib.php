@@ -73,6 +73,7 @@ function lti_supports($feature) {
         case FEATURE_GRADE_OUTCOMES:
         case FEATURE_BACKUP_MOODLE2:
         case FEATURE_SHOW_DESCRIPTION:
+        case FEATURE_ARCHIVE_COMPLETION:
             return true;
 
         default:
@@ -620,4 +621,59 @@ function lti_check_updates_since(cm_info $cm, $from, $filter = array()) {
     }
 
     return $updates;
+}
+
+/**
+ * Archive's users completion records for the LTI module.
+ *
+ * @param int $userid
+ * @param int $courseid
+ * @param int $windowopens The time the window opens, so we can act differently for historic uploads
+ *
+ * @return bool
+ */
+function lti_archive_completion(int $userid, int $courseid, int $windowopens = null): bool {
+    global $DB, $CFG;
+
+    require_once($CFG->libdir . '/completionlib.php');
+
+    $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+    $completion = new completion_info($course);
+
+    $sql = "SELECT ls.id AS submissionid,
+                   lti.id AS ltiid
+            FROM {lti_submission} ls
+            INNER JOIN {lti} lti
+                ON lti.id = ls.ltiid AND lti.course = :courseid
+            WHERE ls.userid = :userid";
+    $params = ['userid' => $userid, 'courseid' => $courseid];
+
+    if ($submissions = $DB->get_records_sql($sql, $params)) {
+        // Create the reset grade.
+        $grade = new stdClass();
+        $grade->userid = $userid;
+        $grade->rawgrade = null;
+
+        foreach ($submissions as $submission) {
+            $cm = get_coursemodule_from_instance('lti', $submission->ltiid, $course->id);
+
+            // Delete LTI submission records.
+            $DB->delete_records('lti_submission', ['userid' => $userid, 'ltiid' => $submission->ltiid]);
+
+            // Reset grades.
+            $lti = $DB->get_record('lti', ['id' => $submission->ltiid]);
+            $lti->cmidnumber = $cm->id;
+            lti_grade_item_update($lti, $grade);
+
+            // Reset viewed.
+            $completion->set_module_viewed_reset($cm, $userid);
+
+            // Reset completion, in case viewed is not a required condition.
+            $completion->update_state($cm, COMPLETION_INCOMPLETE, $userid);
+        }
+
+        $completion->invalidatecache($courseid, $userid, true);
+    }
+
+    return true;
 }
