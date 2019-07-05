@@ -149,8 +149,9 @@ final class session_content extends content_generator {
         global $PAGE;
 
         $headers = [];
-        $showemail = in_array('email', get_extra_user_fields($PAGE->context));
-        $showidnumber = in_array('idnumber', get_extra_user_fields($PAGE->context));
+        $useridentity = get_extra_user_fields($PAGE->context);
+        $showemail = in_array('email', $useridentity);
+        $showidnumber = in_array('idnumber', $useridentity);
         if ($showemail) {
             $headers[] = get_string('email');
         }

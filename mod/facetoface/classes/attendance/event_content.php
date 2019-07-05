@@ -196,7 +196,12 @@ final class event_content extends content_generator {
         global $PAGE;
 
         $headers = [];
-        $showidnumber = in_array('idnumber', get_extra_user_fields($PAGE->context));
+        $useridentity = get_extra_user_fields($PAGE->context);
+        $showemail = in_array('email', $useridentity);
+        $showidnumber = in_array('idnumber', $useridentity);
+        if ($showemail) {
+            $headers[] = get_string('email');
+        }
         if ($showidnumber) {
             $headers[] = get_string('bulkaddsourceidnumber', 'mod_facetoface');
         }
@@ -240,6 +245,9 @@ final class event_content extends content_generator {
 
             $this->reset_attendee_statuscode($attendee);
 
+            if ($showemail) {
+                $data[] = $attendee->email;
+            }
             if ($showidnumber) {
                 $data[] = $attendee->idnumber;
             }
@@ -249,7 +257,7 @@ final class event_content extends content_generator {
             if ($issessionattendance) {
                 $stat = isset($stats[$attendee->id]) ? $stats[$attendee->id] : [];
                 foreach ($this->statusoptions as $code => $label) {
-                    $data[] = isset($stat[$code]) ? (int) $stat[$code] : 0;
+                    $data[] = isset($stat[$code]) ? (int)$stat[$code] : 0;
                 }
             }
 
@@ -260,7 +268,7 @@ final class event_content extends content_generator {
             $data[] = $attendancestatus;
 
             if ($eventgrade) {
-                $data[] = $attendee->get_grade() !== null ? (string) $attendee->get_grade() : '';
+                $data[] = $attendee->get_grade() !== null ? (string)$attendee->get_grade() : '';
             }
 
             $exportrows[] = $data;
