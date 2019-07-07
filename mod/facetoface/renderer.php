@@ -1820,6 +1820,29 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Edit event button action html output.
+     * @param \mod_facetoface\seminar_event $seminarevent
+     * @return string
+     */
+    public function render_editevent_button(seminar_event $seminarevent): string {
+
+        $editevents = has_capability('mod/facetoface:editevents', $this->getcontext());
+
+        if (!$editevents || !$seminarevent->exists()) {
+            return '';
+        }
+
+        $url = new moodle_url('/mod/facetoface/events/edit.php', ['s' => $seminarevent->get_id(), 'backtoevent' => 1]);
+        $attrs = ['role' => 'button', 'class' => 'btn btn-default'];
+        $link = html_writer::link($url, get_string('editsession', 'mod_facetoface'), $attrs);
+        $output = html_writer::div(
+            $link,
+            'mod_facetoface__action mod_facetoface__action-editevent mod_facetoface__action--far'
+        );
+        return $output;
+    }
+
+    /**
      * Filter bar html output.
      *
      * @param \mod_facetoface\seminar $seminar

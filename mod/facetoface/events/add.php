@@ -31,6 +31,7 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 $f  = required_param('f', PARAM_INT);  // facetoface Module ID
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
 $cntdates = optional_param('cntdates', 0, PARAM_INT); // Number of events to set.
+$backtoevent = optional_param('backtoevent', 0, PARAM_BOOL);
 $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 $savewithconflicts = optional_param('savewithconflicts', 0, PARAM_BOOL); // Save with conflicts.
 
@@ -95,7 +96,7 @@ list($sessiondata, $editoroptions, $defaulttimezone, $nbdays) = \mod_facetoface\
 $mform = new \mod_facetoface\form\event(
     null,
     compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm',
-        'sessiondata', 'backtoallsessions', 'savewithconflicts'),
+        'sessiondata', 'backtoallsessions', 'savewithconflicts', 'backtoevent'),
     'post',
     '',
     array('id' => 'mform_seminar_event')

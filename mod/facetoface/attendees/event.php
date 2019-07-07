@@ -56,20 +56,20 @@ if (!in_array($action, $allowed_actions)) {
     redirect($seminarurl);
 }
 
-$title = format_string($seminar->get_name());
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
-$PAGE->set_title($title . ': ' . get_string('eventdetails', 'mod_facetoface'));
+$PAGE->set_title($seminar->get_name() . ': ' . get_string('eventdetails', 'mod_facetoface'));
 
 // Print page content.
 echo $OUTPUT->header();
-echo $OUTPUT->heading($title);
+echo $OUTPUT->heading($seminar->get_name());
 
 require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed include tabs
 
 /** @var mod_facetoface_renderer $renderer */
 $renderer = $PAGE->get_renderer('mod_facetoface');
 $renderer->setcontext($context);
+echo $renderer->render_editevent_button($seminarevent);
 echo $renderer->render_seminar_event($seminarevent, true, false, true);
 echo $renderer->render_action_bar_on_tabpage($seminarurl);
 echo $OUTPUT->footer();

@@ -33,6 +33,7 @@ $f  = optional_param('f', 0, PARAM_INT);  // facetoface Module ID
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
 $c = optional_param('c', 0, PARAM_INT); // copy session
 $cntdates = optional_param('cntdates', 0, PARAM_INT); // Number of events to set.
+$backtoevent = optional_param('backtoevent', 0, PARAM_BOOL);
 $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 $savewithconflicts = optional_param('savewithconflicts', 0, PARAM_BOOL); // Save with conflicts.
 
@@ -67,7 +68,13 @@ local_js(array(
     TOTARA_JS_DIALOG,
     TOTARA_JS_TREEVIEW
 ));
-$PAGE->set_url('/mod/facetoface/events/edit.php', array('f' => $f, 'backtoallsessions' => $backtoallsessions));
+$baseurl = new moodle_url('/mod/facetoface/events/edit.php', ['s' => $s]);
+if ($backtoevent) {
+    $baseurl->param('backtoevent', 1);
+} else {
+    $baseurl->param('backtoallsessions', $backtoallsessions);
+}
+$PAGE->set_url($baseurl);
 $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
 $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
 $PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
@@ -88,7 +95,9 @@ $jsmodule = array(
     'requires' => array('json', 'totara_core'));
 $PAGE->requires->js_init_call('M.totara_f2f_room.init', array($jsconfig), false, $jsmodule);
 
-if ($backtoallsessions) {
+if ($backtoevent) {
+    $returnurl = new moodle_url('/mod/facetoface/attendees/event.php', ['s' => $seminarevent->get_id()]);
+} else if ($backtoallsessions) {
     $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
 } else {
     $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
@@ -103,7 +112,7 @@ list($sessiondata, $editoroptions, $defaulttimezone, $nbdays) = \mod_facetoface\
 $mform = new \mod_facetoface\form\event(
     null,
     compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm',
-        'sessiondata', 'backtoallsessions', 'savewithconflicts'),
+        'sessiondata', 'backtoallsessions', 'savewithconflicts', 'backtoevent'),
     'post',
     '',
     array('id' => 'mform_seminar_event')

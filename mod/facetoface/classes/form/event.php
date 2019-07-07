@@ -66,6 +66,7 @@ class event extends \moodleform {
     Protected $has_date_changed;
 
     function definition() {
+
         $mform =& $this->_form;
         $this->session = (isset($this->_customdata['session'])) ? $this->_customdata['session'] : false;
         $this->facetoface = $this->_customdata['facetoface'];
@@ -88,6 +89,8 @@ class event extends \moodleform {
         $mform->setType('c', PARAM_INT);
         $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
         $mform->setType('backtoallsessions', PARAM_BOOL);
+        $mform->addElement('hidden', 'backtoevent', $this->_customdata['backtoevent']);
+        $mform->setType('backtoevent', PARAM_BOOL);
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
