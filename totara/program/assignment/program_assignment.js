@@ -403,7 +403,7 @@ M.totara_programassignment = M.totara_programassignment || {
                     bodyContent  : result,
                     width        : 900,
                     centered     : true,
-                    modal        : false,
+                    modal        : true,
                     render       : true
                 });
                 M.totara_programassignment.datesDialogue.show();

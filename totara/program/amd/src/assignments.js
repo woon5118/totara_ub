@@ -562,7 +562,7 @@ define(['core/ajax', 'core/templates', 'core/config', 'core/notification', 'core
                 bodyContent: result,
                 width: 900,
                 centered: true,
-                modal: false,
+                modal: true,
                 render: true
             }).show();
             M.util.js_complete('totara_program--assignments-view-duedates');
