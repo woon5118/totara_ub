@@ -413,19 +413,19 @@ function xmldb_facetoface_upgrade($oldversion) {
         $default = array(
             "trainerconfirm" => array(
                 "old" =>  "Seminar trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]",
-                "new" => "Seminar trainer confirmation: [facetofacename], [eventperiod]"
+                "new" => "Seminar trainer confirmation: [seminarname], [eventperiod]"
             ),
             "rolerequest" => array(
                 "old" => "Seminar booking role request: [facetofacename], [starttime]-[finishtime], [sessiondate]",
-                "new" => "Seminar booking role request: [facetofacename], [eventperiod]",
+                "new" => "Seminar booking role request: [seminarname], [eventperiod]",
             ),
             "request" => array(
                 "old" => "Seminar booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]",
-                "new" => "Seminar booking request: [facetofacename], [eventperiod]"
+                "new" => "Seminar booking request: [seminarname], [eventperiod]"
             ),
             "adminrequest" => array(
                 "old" => "Seminar booking admin request: [facetofacename], [starttime]-[finishtime], [sessiondate]",
-                "new" => "Seminar booking admin request: [facetofacename], [eventperiod]"
+                "new" => "Seminar booking admin request: [seminarname], [eventperiod]"
             )
         );
 

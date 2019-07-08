@@ -1483,16 +1483,18 @@ function facetoface_notification_session_dates(\stdClass $session) {
  * @return  string
  */
 function facetoface_message_substitutions($msg, $coursename, $facetofacename, $user, $data, $sessionid, $approvalrole = null) {
-    global $CFG, $DB;
+    global $DB;
 
     if (empty($msg)) {
         return '';
     }
-
+    $seminarintro = '';
     // Instantiate \mod_facetoface\signup to get cost.
     // If session has been deleted, this will fail with a missing record exception.
     try {
         $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+        $seminar = $seminarevent->get_seminar();
+        $seminarintro = $seminar->get_intro();
         $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
         $cost = $signup->get_cost();
 
@@ -1565,6 +1567,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     // Replace placeholders with values
     $msg = str_replace('[coursename]', $coursename, $msg);
     $msg = str_replace('[facetofacename]', $facetofacename, $msg);
+    $msg = str_replace('[seminarname]', $facetofacename, $msg);
     $msg = str_replace('[firstname]', $user->firstname, $msg);
     $msg = str_replace('[lastname]', $user->lastname, $msg);
     $msg = str_replace('[cost]', $cost, $msg);
@@ -1584,6 +1587,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     // Legacy.
     $msg = str_replace(get_string('placeholder:coursename', 'facetoface'), $coursename, $msg);
     $msg = str_replace(get_string('placeholder:facetofacename', 'facetoface'), $facetofacename, $msg);
+    $msg = str_replace(get_string('placeholder:seminarname', 'facetoface'), $facetofacename, $msg);
     $msg = str_replace(get_string('placeholder:firstname', 'facetoface'), $user->firstname, $msg);
     $msg = str_replace(get_string('placeholder:lastname', 'facetoface'), $user->lastname, $msg);
     $msg = str_replace(get_string('placeholder:cost', 'facetoface'), $cost, $msg);
@@ -1643,17 +1647,26 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = facetoface_notification_substitute_deprecated_placeholders($msg, $data, $roomlist, $roomcf);
 
     $details = '';
-    if (!empty($data->details)) {
+    $seminardescription = '';
+    if (!empty($data->details) || !empty($seminarintro)) {
         if ($cm = get_coursemodule_from_instance('facetoface', $data->facetoface, $data->course)) {
             $context = context_module::instance($cm->id);
-            $data->details = file_rewrite_pluginfile_urls($data->details, 'pluginfile.php', $context->id, 'mod_facetoface', 'session', $data->id);
-            $details = format_text($data->details, FORMAT_HTML);
+            if (!empty($data->details)) {
+                $data->details = file_rewrite_pluginfile_urls($data->details, 'pluginfile.php', $context->id, 'mod_facetoface', 'session', $data->id);
+                $details = format_text($data->details, FORMAT_HTML);
+            }
+            if (!empty($seminarintro)) {
+                $seminarintro = file_rewrite_pluginfile_urls($seminarintro, 'pluginfile.php', $context->id, 'mod_facetoface', 'intro', null);
+                $seminardescription = format_text($seminarintro, FORMAT_HTML);
+            }
         }
     }
     // Replace.
     $msg = str_replace('[details]', $details, $msg);
+    $msg = str_replace('[seminardescription]', $seminardescription, $msg);
     // Legacy.
     $msg = str_replace(get_string('placeholder:details', 'facetoface'), $details, $msg);
+    $msg = str_replace(get_string('placeholder:seminardescription', 'mod_facetoface'), $seminardescription, $msg);
 
     // Replace more meta data
     $attendees_url = new moodle_url('/mod/facetoface/attendees/approvalrequired.php', array('s' => $data->id));

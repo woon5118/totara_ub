@@ -60,8 +60,8 @@ Feature: Edit seminar notification templates
     Then I should not see "Click here to restore missing default notifications"
     When I click on "Edit" "link" in the "Seminar registration closed" "table_row"
     Then the following fields match these values:
-      | Template | Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate] |
-      | Title    | Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate] |
+      | Template | Seminar registration closed: [seminarname], [starttime]-[finishtime], [sessiondate] |
+      | Title    | Seminar registration closed: [seminarname], [starttime]-[finishtime], [sessiondate] |
     And I should see "The registration period for the following session has been closed:"
     When I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Seminar registration closed" "table_row"
@@ -90,8 +90,8 @@ Feature: Edit seminar notification templates
     And I navigate to "Notifications" node in "Seminar administration"
     And I click on "Edit" "link" in the "Seminar registration closed" "table_row"
     Then the following fields match these values:
-      | Template | Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate] |
-      | Title    | Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate] |
+      | Template | Seminar registration closed: [seminarname], [starttime]-[finishtime], [sessiondate] |
+      | Title    | Seminar registration closed: [seminarname], [starttime]-[finishtime], [sessiondate] |
     And I should see "The registration period for the following session has been closed:"
     When I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Seminar registration closed" "table_row"
@@ -106,6 +106,6 @@ Feature: Edit seminar notification templates
     And I click on "Edit" "link" in the "Seminar registration closed" "table_row"
     Then the following fields match these values:
       | Template | A customised title                                                                          |
-      | Title    | Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate] |
+      | Title    | Seminar registration closed: [seminarname], [starttime]-[finishtime], [sessiondate] |
     And I should see "The registration period for the following session has been closed:"
     And I should not see "A customised body"

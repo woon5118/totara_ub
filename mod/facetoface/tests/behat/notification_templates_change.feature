@@ -31,13 +31,13 @@ Feature: Test notification templates update all activities
     And I should see "Inactive" in the "TL-9052 booking cancellation" "table_row"
     And I should not see "Seminar booking cancellation"
 
-    And I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    And I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     And I set the following fields to these values:
-      | Title  | TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate] |
+      | Title  | TL-9052 booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate] |
       | Update all activities | 1             |
     When I click on "Save changes" "button"
-    Then I should see "TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
-    And I should not see "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
+    Then I should see "TL-9052 booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
+    And I should not see "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
 
     # Check F2F activity notification now.
     And I am on "Course 1" course homepage
@@ -47,8 +47,8 @@ Feature: Test notification templates update all activities
     And I should not see "Inactive" in the "TL-9052 booking cancellation" "table_row"
     And I should not see "Seminar booking cancellation"
 
-    And I should see "TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
-    And I should not see "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
+    And I should see "TL-9052 booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
+    And I should not see "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
 
   @javascript
   Scenario: Changing default notification templates not using Update all activities will not affect any F2F activities notifications
@@ -64,12 +64,12 @@ Feature: Test notification templates update all activities
     And I should see "Inactive" in the "TL-9052 booking cancellation" "table_row"
     And I should not see "Seminar booking cancellation"
 
-    And I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    And I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     And I set the following fields to these values:
-      | Title  | TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate] |
+      | Title  | TL-9052 booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate] |
     When I click on "Save changes" "button"
-    Then I should see "TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
-    And I should not see "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
+    Then I should see "TL-9052 booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
+    And I should not see "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
 
     # Check F2F activity notification now.
     And I am on "Course 1" course homepage
@@ -79,8 +79,8 @@ Feature: Test notification templates update all activities
     And I should see "Active" in the "Seminar booking cancellation" "table_row"
     And I should not see "TL-9052 booking cancellation"
 
-    And I should see "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
-    And I should not see "TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
+    And I should see "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
+    And I should not see "TL-9052 booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
 
   @javascript
   Scenario: Changing default notification templates not using Update all activities will affect all new F2F activities notifications
@@ -96,14 +96,14 @@ Feature: Test notification templates update all activities
     And I should see "Inactive" in the "TL-9052 booking cancellation" "table_row"
     And I should not see "Seminar booking cancellation"
 
-    And I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    And I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     And I set the following fields to these values:
-      | Title  | TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate] |
+      | Title  | TL-9052 booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate] |
     When I click on "Save changes" "button"
-    Then I should see "TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
-    And I should not see "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
+    Then I should see "TL-9052 booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
+    And I should not see "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
 
-    And I click on "Edit" "link" in the "Waitlisting advice for [facetofacename]" "table_row"
+    And I click on "Edit" "link" in the "Waitlisting advice for [seminarname]" "table_row"
     And I set the following fields to these values:
       | Manager copy prefix | *** [firstname] [lastname]'s session waitlisted is copied below **** |
     And I click on "Save changes" "button"
@@ -118,8 +118,8 @@ Feature: Test notification templates update all activities
     And I should see "Inactive" in the "TL-9052 booking cancellation" "table_row"
     And I should not see "Seminar booking cancellation"
 
-    And I should see "TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
-    And I should not see "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
+    And I should see "TL-9052 booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
+    And I should not see "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]"
 
-    When I click on "Edit" "link" in the "Waitlisting advice for [facetofacename]" "table_row"
+    When I click on "Edit" "link" in the "Waitlisting advice for [seminarname]" "table_row"
     Then I should see "*** [firstname] [lastname]'s session waitlisted is copied below ****"

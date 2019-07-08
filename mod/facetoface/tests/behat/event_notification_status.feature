@@ -43,7 +43,7 @@ Feature: Seminar event notification must not be available for user after it has 
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I navigate to "Notifications" node in "Seminar administration"
-    And I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    And I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     And I set the field "Status" to "<signup_enabled>"
     And I press "Save"
     And I am on "Course 1" course homepage

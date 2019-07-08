@@ -19,18 +19,18 @@ Feature: Test notification templates according TL-10404
   Scenario: Changing default Manager Copy value not using Update all activities will not affect all F2F activities notifications
     Given I log in as "admin"
     And I navigate to "Notification templates" node in "Site administration > Seminars"
-    When I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    When I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     Then the field "ccmanager" matches value "1"
     And I set the following fields to these values:
       | ccmanager | 0 |
     And I click on "Save changes" "button"
-    When I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    When I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     Then the field "ccmanager" matches value "0"
     And I click on "Courses" in the totara menu
     And I follow "Course 10404"
     And I follow "Seminar TL-10404"
     And I navigate to "Notifications" node in "Seminar administration"
-    When I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    When I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     Then the field "ccmanager" matches value "1"
 
   @javascript
@@ -40,11 +40,11 @@ Feature: Test notification templates according TL-10404
     And I follow "Course 10404"
     And I follow "Seminar TL-10404"
     And I navigate to "Notifications" node in "Seminar administration"
-    When I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    When I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     Then the field "ccmanager" matches value "1"
 
     And I navigate to "Notification templates" node in "Site administration > Seminars"
-    When I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    When I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     Then the field "ccmanager" matches value "1"
     And I set the following fields to these values:
       | ccmanager             | 0 |
@@ -54,7 +54,7 @@ Feature: Test notification templates according TL-10404
     And I follow "Course 10404"
     And I follow "Seminar TL-10404"
     And I navigate to "Notifications" node in "Seminar administration"
-    When I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    When I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     Then the field "ccmanager" matches value "0"
 
 
@@ -62,7 +62,7 @@ Feature: Test notification templates according TL-10404
   Scenario: Changing default Manager Copy value not using Update all activities will affect all new F2F activities notifications
     Given I log in as "admin"
     And I navigate to "Notification templates" node in "Site administration > Seminars"
-    When I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    When I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     Then the field "ccmanager" matches value "1"
     And I set the following fields to these values:
       | ccmanager | 0 |
@@ -73,5 +73,5 @@ Feature: Test notification templates according TL-10404
       | Name | Seminar TL-10404A |
     And I follow "Seminar TL-10404A"
     When I navigate to "Notifications" node in "Seminar administration"
-    When I click on "Edit" "link" in the "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]" "table_row"
+    When I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     Then the field "ccmanager" matches value "0"

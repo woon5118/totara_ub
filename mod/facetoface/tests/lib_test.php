@@ -2536,7 +2536,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $seminarevent = new seminar_event($sessionid);
 
         // set up a notification that uses all current placeholders
-        $legacyfields = array('coursename', 'facetofacename', 'firstname', 'lastname', 'cost',
+        $legacyfields = array('coursename', 'facetofacename', 'seminarname', 'seminardescription', 'firstname', 'lastname', 'cost',
             'sessiondate', 'startdate', 'finishdate', 'starttime', 'finishtime', 'lateststartdate', 'latestfinishdate', 'lateststarttime',
             'latestfinishtime', 'duration');
 
@@ -2611,6 +2611,10 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertContains('coursename '.$course1->fullname, $fullmessagehtml);
         $this->assertContains('facetofacename '.$facetoface->name, $fullmessage);
         $this->assertContains('facetofacename '.$facetoface->name, $fullmessagehtml);
+        $this->assertContains('seminarname '.$facetoface->name, $fullmessage);
+        $this->assertContains('seminarname '.$facetoface->name, $fullmessagehtml);
+        $this->assertContains('seminardescription '.$facetoface->intro, $fullmessage);
+        $this->assertContains('seminardescription '.$facetoface->intro, $fullmessagehtml);
         $this->assertContains('firstname '.$user1->firstname, $fullmessage);
         $this->assertContains('firstname '.$user1->firstname, $fullmessagehtml);
         $this->assertContains('lastname '.$user1->lastname, $fullmessage);
@@ -3069,7 +3073,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertEquals($messages[0]->useridto, $teacher1->id);
 
         // Check they got the right message.
-        $this->assertEquals(str_replace('[facetofacename]', format_string($facetoface1->name), get_string('setting:defaultundercapacitysubjectdefault', 'facetoface')), $messages[0]->subject);
+        $this->assertEquals(str_replace('[seminarname]', format_string($facetoface1->name), get_string('setting:defaultundercapacitysubjectdefault', 'facetoface')), $messages[0]->subject);
     }
 
     // Face-to-face minimum bookings specification.
