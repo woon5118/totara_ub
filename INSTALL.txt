@@ -15,7 +15,7 @@ Before installing Totara you should have a server with:
   * If your database is MSSQL, your database user must have the permissions: ALTER SETTINGS(SERVER), full text search must be enabled.
 * A domain name that resolves to your server, use of SSL/TLS is strongly recommended
 
-Supported desktop browsers: recent Google Chrome, recent Firefox, recent Safari 11, Microsoft Internet Explorer 11, recent Microsoft Edge
+Supported desktop browsers: recent Google Chrome, recent Firefox, recent Safari, Microsoft Internet Explorer 11, recent Microsoft Edge
 
 NOTE: Support for IE 11 and EdgeHTML based MS Edge may be reevaluated after release of new Chromium based Microsoft Edge.
 
