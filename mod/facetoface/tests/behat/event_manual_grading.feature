@@ -20,8 +20,8 @@ Feature: Event manual grading
      | user4    | course1  | student |
      | user5    | course1  | student |
     And the following "seminars" exist in "mod_facetoface" plugin:
-      | name      | course  | sessionattendance | attendancetime | eventgradingmanual | eventgradingmethod |
-      | seminar 1 | course1 | 1                 | 2              | 1                  | 2                  |
+      | name      | course  | attendancetime | eventgradingmanual | eventgradingmethod |
+      | seminar 1 | course1 | 2              | 1                  | 2                  |
     And the following "seminar events" exist in "mod_facetoface" plugin:
       | facetoface | details |
       | seminar 1  | event 1 |

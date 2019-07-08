@@ -132,7 +132,18 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
         return $users;
     }
 
-    public function test_advanced_filter() {
+    public function data_provider_advanced_filter(): array {
+        return [
+            [ seminar::SESSION_ATTENDANCE_END ],
+            [ seminar::SESSION_ATTENDANCE_START ],
+            [ seminar::SESSION_ATTENDANCE_UNRESTRICTED ],
+        ];
+    }
+
+    /**
+     * @dataProvider data_provider_advanced_filter
+     */
+    public function test_advanced_filter(int $sessionattendance) {
         global $DB;
         /** @var \moodle_database $DB */
 
@@ -162,7 +173,7 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
         seminar_event_helper::merge_sessions($seminarevent, [ $this->prepare_date($now - DAYSECS * 2, $now - DAYSECS, $room->id) ]);
 
         // No session attendance tracking, no attendance filter
-        $this->seminar->set_sessionattendance(0)->save();
+        $this->seminar->set_sessionattendance(seminar::SESSION_ATTENDANCE_DISABLED)->save();
         $filter->set_param_value(query_advanced_filter::ALL);
         $this->assertFalse($filter->is_visible($this->seminar, $this->context, $admin->id));
         $this->assertFalse($filter->is_visible($this->seminar, $this->context, $student->id));
@@ -174,7 +185,7 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
         $this->assertFalse($filter->is_visible($this->seminar, $this->context, $student->id));
 
         // With seminar events, yes attendance filter for admin
-        $this->seminar->set_sessionattendance(1)->save();
+        $this->seminar->set_sessionattendance($sessionattendance)->save();
         $filter->set_param_value(query_advanced_filter::ALL);
         $this->assertTrue($filter->is_visible($this->seminar, $this->context, $admin->id));
         $this->assertFalse($filter->is_visible($this->seminar, $this->context, $student->id));

@@ -230,9 +230,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * Test the method get_signup_link in an ordinary situation.
      */
     public function test_get_signup_link_default() {
-        $this->resetAfterTest(true);
-
-        [ $seminarid, $sessionid, $roomid ] = $this->create_seminar_session_and_room(null, false, false, 0);
+        [ $seminarid, $sessionid, $roomid ] = $this->create_seminar_session_and_room(null, false, 0, 0);
         $seminarevent = new seminar_event($sessionid);
 
         $renderer = $this->create_f2f_renderer();
@@ -260,7 +258,6 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * If the plugin is missing, the whole test will be skipped.
      */
     public function test_get_signup_link_with_enrol_plugin() {
-        $this->resetAfterTest(true);
         global $DB;
         /** @var moodle_database $DB */
 
@@ -275,7 +272,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $enabled['totara_facetoface'] = true;
         set_config('enrol_plugins_enabled', implode(',', array_keys($enabled)));
 
-        [ $seminarid, $session1id, $roomid ] = $this->create_seminar_session_and_room(null, false, false, 0);
+        [ $seminarid, $session1id, $roomid ] = $this->create_seminar_session_and_room(null, false, 0, 0);
         $seminar = new seminar($seminarid);
         $seminarevent1 = new seminar_event($session1id);
         $course = $DB->get_record('course', array('id' => $seminar->get_course()));
@@ -405,17 +402,17 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      *
      * @param integer|null $startdate
      * @param boolean $cancelled
-     * @param boolean|int $sessionattendance
+     * @param integer $sessionattendance
      * @param integer $attendancetime \mod_facetoface\seminar::ATTENDANCE_TIME_xxx
      * @return array [ seminar_id, session_id, room_id ]
      */
-    private function create_seminar_session_and_room($startdate, bool $cancelled, $sessionattendance, int $attendancetime) : array {
+    private function create_seminar_session_and_room($startdate, bool $cancelled, int $sessionattendance, int $attendancetime) : array {
         $course = $this->getDataGenerator()->create_course();
         $room = $this->facetoface_generator->add_site_wide_room([ 'name' => 'Chamber', 'allowconflicts' => 1 ]);
         $f2f = $this->facetoface_generator->create_instance(
             [
                 'course' => $course->id,
-                'sessionattendance' => $sessionattendance ? 1 : 0,
+                'sessionattendance' => $sessionattendance,
                 'attendancetime' => $attendancetime
             ]
         );
@@ -511,10 +508,14 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
     public function data_provider_for_session_list_table_waitlisted() {
         return [
             // NOTE: The HTML output is actually "<ul><li>Wait-listed</li><li>Booking open</li></ul>"
-            [ false, false, 7, [ '0 / 1', 'Wait-listedBooking open', '', '', '', '' ] ],
-            [ false, true, 8, [ '0 / 1', 'Wait-listedBooking open', '', '', '', '', '' ] ],
-            [ true, false, 7, [ '0 / 1', 'Cancelled', '', '', '', 'Cancelled' ] ],
-            [ true, true, 8, [ '0 / 1', 'Cancelled', '', '', '', 'Cancelled', '' ] ],
+            [ false, seminar::SESSION_ATTENDANCE_DISABLED, 7, [ '0 / 1', 'Wait-listedBooking open', '', '', '', '' ] ],
+            [ false, seminar::SESSION_ATTENDANCE_END, 8, [ '0 / 1', 'Wait-listedBooking open', '', '', '', '', '' ] ],
+            [ false, seminar::SESSION_ATTENDANCE_START, 8, [ '0 / 1', 'Wait-listedBooking open', '', '', '', '', '' ] ],
+            [ false, seminar::SESSION_ATTENDANCE_UNRESTRICTED, 8, [ '0 / 1', 'Wait-listedBooking open', '', '', '', '', '' ] ],
+            [ true, seminar::SESSION_ATTENDANCE_DISABLED, 7, [ '0 / 1', 'Cancelled', '', '', '', 'Cancelled' ] ],
+            [ true, seminar::SESSION_ATTENDANCE_END, 8, [ '0 / 1', 'Cancelled', '', '', '', 'Cancelled', '' ] ],
+            [ true, seminar::SESSION_ATTENDANCE_START, 8, [ '0 / 1', 'Cancelled', '', '', '', 'Cancelled', '' ] ],
+            [ true, seminar::SESSION_ATTENDANCE_UNRESTRICTED, 8, [ '0 / 1', 'Cancelled', '', '', '', 'Cancelled', '' ] ],
         ];
     }
 
@@ -523,13 +524,11 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      *
      * @dataProvider data_provider_for_session_list_table_waitlisted
      */
-    public function test_session_list_table_waitlisted(bool $cancelled, bool $sessionattendance, int $cols, array $expections) {
-        $this->resetAfterTest(true);
-
+    public function test_session_list_table_waitlisted(bool $cancelled, int $sessionattendance, int $cols, array $expections) {
         $course = $this->getDataGenerator()->create_course();
         $f2f = $this->facetoface_generator->create_instance([
             'course' => $course->id,
-            'sessionattendance' => (int)$sessionattendance,
+            'sessionattendance' => $sessionattendance,
         ]);
         $sessionid = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => [], 'capacity' => 1, 'cancelledstatus' => (int)$cancelled]);
 
@@ -559,19 +558,35 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
     public function data_provider_for_session_list_table_room_sessionstatus() {
         $yes = true;
         $no_ = false;
+        $dis = seminar::SESSION_ATTENDANCE_DISABLED;
+        $end = seminar::SESSION_ATTENDANCE_END;
+        $sta = seminar::SESSION_ATTENDANCE_START;
+        $any = seminar::SESSION_ATTENDANCE_UNRESTRICTED;
         return [
-            [ $no_, $no_, 7, -DAYSECS, [ 'Chamber', 'Session over' ], 'Past event' ],
-            [ $no_, $no_, 7, -MINSECS, [ 'Chamber', 'Session in progress' ], 'In progress' ],
-            [ $no_, $no_, 7, +DAYSECS, [ 'Chamber', 'Upcoming' ], 'Future event' ],
-            [ $no_, $yes, 8, -DAYSECS, [ 'Chamber', 'Session over' ], 'Past event' ],
-            [ $no_, $yes, 8, -MINSECS, [ 'Chamber', 'Session in progress' ], 'In progress' ],
-            [ $no_, $yes, 8, +DAYSECS, [ 'Chamber', 'Upcoming' ], 'Future event' ],
-            [ $yes, $no_, 7, -DAYSECS, [ 'Chamber', 'Cancelled' ], 'Past event' ],
-            [ $yes, $no_, 7, -MINSECS, [ 'Chamber', 'Cancelled' ], 'In progress' ],
-            [ $yes, $no_, 7, +DAYSECS, [ 'Chamber', 'Cancelled' ], 'Future event' ],
-            [ $yes, $yes, 8, -DAYSECS, [ 'Chamber', 'Cancelled' ], 'Past event' ],
-            [ $yes, $yes, 8, -MINSECS, [ 'Chamber', 'Cancelled' ], 'In progress' ],
-            [ $yes, $yes, 8, +DAYSECS, [ 'Chamber', 'Cancelled' ], 'Future event' ],
+            [ $no_, $dis, 7, -DAYSECS, [ 'Chamber', 'Session over' ], 'Past event' ],
+            [ $no_, $dis, 7, -MINSECS, [ 'Chamber', 'Session in progress' ], 'In progress' ],
+            [ $no_, $dis, 7, +DAYSECS, [ 'Chamber', 'Upcoming' ], 'Future event' ],
+            [ $no_, $end, 8, -DAYSECS, [ 'Chamber', 'Session over' ], 'Past event' ],
+            [ $no_, $end, 8, -MINSECS, [ 'Chamber', 'Session in progress' ], 'In progress' ],
+            [ $no_, $end, 8, +DAYSECS, [ 'Chamber', 'Upcoming' ], 'Future event' ],
+            [ $no_, $sta, 8, -DAYSECS, [ 'Chamber', 'Session over' ], 'Past event' ],
+            [ $no_, $sta, 8, -MINSECS, [ 'Chamber', 'Session in progress' ], 'In progress' ],
+            [ $no_, $sta, 8, +DAYSECS, [ 'Chamber', 'Upcoming' ], 'Future event' ],
+            [ $no_, $any, 8, -DAYSECS, [ 'Chamber', 'Session over' ], 'Past event' ],
+            [ $no_, $any, 8, -MINSECS, [ 'Chamber', 'Session in progress' ], 'In progress' ],
+            [ $no_, $any, 8, +DAYSECS, [ 'Chamber', 'Upcoming' ], 'Future event' ],
+            [ $yes, $dis, 7, -DAYSECS, [ 'Chamber', 'Cancelled' ], 'Past event' ],
+            [ $yes, $dis, 7, -MINSECS, [ 'Chamber', 'Cancelled' ], 'In progress' ],
+            [ $yes, $dis, 7, +DAYSECS, [ 'Chamber', 'Cancelled' ], 'Future event' ],
+            [ $yes, $end, 8, -DAYSECS, [ 'Chamber', 'Cancelled' ], 'Past event' ],
+            [ $yes, $end, 8, -MINSECS, [ 'Chamber', 'Cancelled' ], 'In progress' ],
+            [ $yes, $end, 8, +DAYSECS, [ 'Chamber', 'Cancelled' ], 'Future event' ],
+            [ $yes, $sta, 8, -DAYSECS, [ 'Chamber', 'Cancelled' ], 'Past event' ],
+            [ $yes, $sta, 8, -MINSECS, [ 'Chamber', 'Cancelled' ], 'In progress' ],
+            [ $yes, $sta, 8, +DAYSECS, [ 'Chamber', 'Cancelled' ], 'Future event' ],
+            [ $yes, $any, 8, -DAYSECS, [ 'Chamber', 'Cancelled' ], 'Past event' ],
+            [ $yes, $any, 8, -MINSECS, [ 'Chamber', 'Cancelled' ], 'In progress' ],
+            [ $yes, $any, 8, +DAYSECS, [ 'Chamber', 'Cancelled' ], 'Future event' ],
         ];
     }
 
@@ -580,14 +595,12 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      *
      * @dataProvider data_provider_for_session_list_table_room_sessionstatus
      */
-    public function test_session_list_table_room_sessionstatus(bool $cancelled, bool $sessionattendance, int $cols, int $timestart, array $expections, string $tag) {
-        $this->resetAfterTest(true);
-
+    public function test_session_list_table_room_sessionstatus(bool $cancelled, int $sessionattendance, int $cols, int $timestart, array $expections, string $tag) {
         $now = time();
         $course = $this->getDataGenerator()->create_course();
         $f2f = $this->facetoface_generator->create_instance([
             'course' => $course->id,
-            'sessionattendance' => (int)$sessionattendance,
+            'sessionattendance' => $sessionattendance,
         ]);
         $room = $this->facetoface_generator->add_site_wide_room([ 'name' => 'Chamber', 'allowconflicts' => 1 ]);
         $date = $this->prepare_date($now + $timestart, $now + $timestart + HOURSECS, $room->id);
@@ -638,16 +651,12 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * @dataProvider data_provider_for_session_list_table_attendance_tracking_not_saved
      */
     public function test_session_list_table_attendance_tracking_not_saved(bool $cancelled, bool $signupuser, int $timestart, array $expections, string $tag) {
-        $this->resetAfterTest(true);
-
-        $sessionattendance = true;
         $cols = 8;
 
         $now = time();
         $course = $this->getDataGenerator()->create_course();
         $f2f = $this->facetoface_generator->create_instance([
             'course' => $course->id,
-            'sessionattendance' => (int)$sessionattendance,
         ]);
         $room = $this->facetoface_generator->add_site_wide_room([ 'name' => 'Chamber', 'allowconflicts' => 1 ]);
 
@@ -680,15 +689,15 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
         $renderer = $this->create_f2f_renderer();
 
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, seminar::ATTENDANCE_TIME_END);
+        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_END);
         $cells = $this->get_table_cells($outhtml, $cols);
         $this->assertSame($expections[0], $cells[6]->nodeValue);
 
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, seminar::ATTENDANCE_TIME_START);
+        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_START);
         $cells = $this->get_table_cells($outhtml, $cols);
         $this->assertSame($expections[1], $cells[6]->nodeValue);
 
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, seminar::ATTENDANCE_TIME_ANY);
+        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_UNRESTRICTED);
         $cells = $this->get_table_cells($outhtml, $cols);
         $this->assertSame($expections[2], $cells[6]->nodeValue);
     }
@@ -728,17 +737,13 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * @dataProvider data_provider_for_session_list_table_attendance_tracking_saved
      */
     public function test_session_list_table_attendance_tracking_saved(bool $cancelled, int $attendancecode, int $timestart, array $expections, string $tag) {
-        $this->resetAfterTest(true);
-
-        $sessionattendance = true;
         $cols = 8;
 
         $now = time();
         $course = $this->getDataGenerator()->create_course();
         $f2f = $this->facetoface_generator->create_instance([
             'course' => $course->id,
-            'sessionattendance' => (int)$sessionattendance,
-            'attendancetime' => seminar::ATTENDANCE_TIME_ANY,
+            'sessionattendance' => seminar::SESSION_ATTENDANCE_UNRESTRICTED
         ]);
         $room = $this->facetoface_generator->add_site_wide_room([ 'name' => 'Chamber', 'allowconflicts' => 1 ]);
 
@@ -771,15 +776,15 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
         $renderer = $this->create_f2f_renderer();
 
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, seminar::ATTENDANCE_TIME_END);
+        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_END);
         $cells = $this->get_table_cells($outhtml, $cols);
         $this->assertSame($expections[0], $cells[6]->nodeValue);
 
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, seminar::ATTENDANCE_TIME_START);
+        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_START);
         $cells = $this->get_table_cells($outhtml, $cols);
         $this->assertSame($expections[1], $cells[6]->nodeValue);
 
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, seminar::ATTENDANCE_TIME_ANY);
+        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_UNRESTRICTED);
         $cells = $this->get_table_cells($outhtml, $cols);
         $this->assertSame($expections[2], $cells[6]->nodeValue);
     }

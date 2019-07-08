@@ -28,6 +28,7 @@
  */
 
 use totara_job\job_assignment;
+use mod_facetoface\seminar;
 use mod_facetoface\signup;
 use mod_facetoface\signup_helper;
 use mod_facetoface\seminar_event;
@@ -84,6 +85,13 @@ class mod_facetoface_generator extends testing_module_generator {
             throw new coding_exception('module generator requires $record->course');
         }
 
+        if (!in_array($record->sessionattendance ?? 0, seminar::SESSION_ATTENDANCE_VALID_VALUES)) {
+            debugging('$record->sessionattendance is not a valid value.', DEBUG_DEVELOPER);
+        }
+        if (!in_array($record->attendancetime ?? 0, seminar::EVENT_ATTENDANCE_VALID_VALUES)) {
+            debugging('$record->attendancetime is not a valid value.', DEBUG_DEVELOPER);
+        }
+
         $defaults = array();
         $defaults['intro'] = 'Test facetoface ' . $i;
         $defaults['introformat'] = FORMAT_MOODLE;
@@ -107,11 +115,11 @@ class mod_facetoface_generator extends testing_module_generator {
         $defaults['maxmanagerreserves'] = 1;
         $defaults['reservecanceldays'] = 1;
         $defaults['reservedays'] = 2;
-        $defaults['sessionattendance'] = 1;
-        $defaults['attendancetime'] = \mod_facetoface\seminar::ATTENDANCE_TIME_END;
+        $defaults['sessionattendance'] = seminar::SESSION_ATTENDANCE_DEFAULT;
+        $defaults['attendancetime'] = seminar::EVENT_ATTENDANCE_DEFAULT;
         $defaults['eventgradingmanual'] = 0;
-        $defaults['eventgradingmethod'] = \mod_facetoface\seminar::GRADING_METHOD_GRADEHIGHEST;
-        $defaults['completionpass'] = \mod_facetoface\seminar::COMPLETION_PASS_DISABLED;
+        $defaults['eventgradingmethod'] = seminar::GRADING_METHOD_GRADEHIGHEST;
+        $defaults['completionpass'] = seminar::COMPLETION_PASS_DISABLED;
         foreach ($defaults as $field => $value) {
             if (!isset($record->$field)) {
                 $record->$field = $value;

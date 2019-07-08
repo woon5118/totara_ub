@@ -133,6 +133,7 @@ final class query implements event_query {
               fsd.sessionid,
               COUNT(fsd.id) AS cntdates,
               MIN(fsd.timestart) AS mintimestart,
+              MAX(fsd.timestart) AS maxtimestart,
               MIN(fsd.timefinish) AS mintimefinish,
               MAX(fsd.timefinish) AS maxtimefinish
             FROM {facetoface_sessions_dates} fsd

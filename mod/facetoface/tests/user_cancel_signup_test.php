@@ -42,8 +42,7 @@ class mod_facetoface_user_cancel_signup_testcase extends advanced_testcase {
         $f2f = $f2fgen->create_instance(['course' => $course->id]);
 
         $s = new seminar($f2f->id);
-        $s->set_attendancetime(seminar::ATTENDANCE_TIME_ANY);
-        $s->set_sessionattendance(1);
+        $s->set_attendancetime(seminar::EVENT_ATTENDANCE_UNRESTRICTED);
         $s->save();
 
         $e = new seminar_event();

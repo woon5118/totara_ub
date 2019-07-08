@@ -108,7 +108,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
         );
         $this->assertEquals(
             $statuses['upcoming'],
-            !$event->is_started($time),
+            !$event->is_first_started($time),
             "Expecting 'upcoming' to be a value of {$statuses['upcoming']} but received differently"
         );
         $this->assertEquals(
@@ -126,7 +126,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
         $time = time();
         return [
             [
-                seminar::ATTENDANCE_TIME_END,
+                seminar::EVENT_ATTENDANCE_LAST_SESSION_END,
                 $time,
                 [
                     [
@@ -141,7 +141,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 false
             ],
             [
-                seminar::ATTENDANCE_TIME_START,
+                seminar::EVENT_ATTENDANCE_FIRST_SESSION_START,
                 $time,
                 [
                     [
@@ -156,7 +156,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 true
             ],
             [
-                seminar::ATTENDANCE_TIME_START,
+                seminar::EVENT_ATTENDANCE_FIRST_SESSION_START,
                 $time,
                 [
                     [
@@ -167,7 +167,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 false
             ],
             [
-                seminar::ATTENDANCE_TIME_END,
+                seminar::EVENT_ATTENDANCE_LAST_SESSION_END,
                 $time + (3600 * 11),
                 [
                     [
@@ -182,7 +182,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 true
             ],
             // this is a wait-listed event, and attendance should be opened
-            [seminar::ATTENDANCE_TIME_ANY, $time - (3600 * 24), [], false],
+            [seminar::EVENT_ATTENDANCE_UNRESTRICTED, $time - (3600 * 24), [], false],
         ];
     }
 
@@ -191,12 +191,12 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
      * current time.
      *
      * @dataProvider provide_data_for_attendance
-     * @param int $attendancetime
+     * @param int $eventattendance
      * @param int $time
      * @param array $sessions
      * @param bool $expected
      */
-    public function test_is_attendance_open(int $attendancetime, int $time,
+    public function test_is_attendance_open(int $eventattendance, int $time,
                                                    array $sessions, bool $expected): void {
         $this->resetAfterTest(true);
 
@@ -205,8 +205,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
 
         $s = new seminar();
         $s->set_course($course->id);
-        $s->set_sessionattendance(1);
-        $s->set_attendancetime($attendancetime);
+        $s->set_attendancetime($eventattendance);
         $s->save();
 
         $event = new seminar_event();
@@ -237,8 +236,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
 
         $s = new seminar();
         $s->set_course($course->id);
-        $s->set_sessionattendance(1);
-        $s->set_attendancetime(seminar::ATTENDANCE_TIME_ANY);
+        $s->set_attendancetime(seminar::EVENT_ATTENDANCE_UNRESTRICTED);
         $s->save();
 
         $event = new seminar_event();

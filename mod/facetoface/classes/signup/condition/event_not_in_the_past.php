@@ -37,7 +37,7 @@ class event_not_in_the_past extends condition {
      */
     public function pass() : bool {
         $seminarevent = $this->signup->get_seminar_event();
-        if (!$seminarevent->is_started() || !$seminarevent->is_sessions()) {
+        if (!$seminarevent->is_first_started() || !$seminarevent->is_sessions()) {
             return true;
         }
         $cansignuppast = new \mod_facetoface\signup\restriction\actor_can_signuppastevents($this->signup);

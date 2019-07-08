@@ -15,8 +15,8 @@ Feature: Take attendance tracking general
       | bolobala  | course1 | student |
       | kian      | course1 | student |
     And the following "seminars" exist in "mod_facetoface" plugin:
-      | name      | course  | sessionattendance | eventgradingmanual |
-      | seminar 1 | course1 | 1                 | 1                  |
+      | name      | course  | attendancetime | sessionattendance | eventgradingmanual |
+      | seminar 1 | course1 | 0              | 4                 | 1                  |
     And the following "seminar events" exist in "mod_facetoface" plugin:
       | facetoface | details |
       | seminar 1  | event 1 |
@@ -58,7 +58,8 @@ Feature: Take attendance tracking general
     And I set the field "Take attendance:" to "1"
     And I set the field "bolo bala's attendance" to "Partially attended"
     When I click on "Save attendance" "button"
-    Then the following fields match these values:
+    Then I should see "Successfully updated attendance"
+    And the following fields match these values:
       | bolo bala's attendance  | Partially attended |
       | kian bomba's attendance | Not set            |
       | loc nguyen's attendance | Not set            |
@@ -75,13 +76,14 @@ Feature: Take attendance tracking general
     Given I am on "course1" course homepage
     And I follow "seminar 1"
     And I follow "Edit settings"
-    And I set the field "Mark attendance at" to "2"
+    And I set the field "Event attendance" to "2"
     And I click on "Save and display" "button"
     And I follow "Attendee"
     And I follow "Take attendance"
     And I set the field "bolo bala's attendance" to "Partially attended"
     When I click on "Save attendance" "button"
-    Then the following fields match these values:
+    Then I should see "Successfully updated attendance"
+    And the following fields match these values:
       | bolo bala's attendance  | Partially attended |
       | kian bomba's attendance | Not set            |
       | loc nguyen's attendance | Not set            |
@@ -91,7 +93,7 @@ Feature: Take attendance tracking general
     And I follow "seminar 1"
     And I follow "Edit settings"
     And I set the following fields to these values:
-      | Mark attendance at          | 2 |
+      | Event attendance            | 2 |
       | Session attendance tracking | 0 |
     And I click on "Save and display" "button"
     And I follow "Attendee"
@@ -106,7 +108,8 @@ Feature: Take attendance tracking general
     And I click on "All" "option"
     And I click on "Fully attended" "option" in the "#menubulkattendanceop" "css_element"
     When I click on "Save attendance" "button"
-    Then the following fields match these values:
+    Then I should see "Successfully updated attendance"
+    And the following fields match these values:
       | bolo bala's attendance  | Fully attended |
       | kian bomba's attendance | Fully attended |
       | loc nguyen's attendance | Fully attended |

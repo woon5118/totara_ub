@@ -37,7 +37,7 @@ class event_in_the_future extends condition {
      */
     public function pass() : bool {
         $seminarevent = $this->signup->get_seminar_event();
-        if (!$seminarevent->is_started()) {
+        if (!$seminarevent->is_first_started()) {
             return true;
         }
         return false;

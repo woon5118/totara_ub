@@ -30,7 +30,8 @@ use mod_facetoface\attendance\attendance_helper;
 class mod_facetoface_retrieve_attendance_testcase extends advanced_testcase {
     /**
      * Create seminar_event with seminar setting as below:
-     * + sessionattendance => 1
+     * + attendancetime => END
+     * + sessionattendance => END
      * @return seminar_event
      */
     private function create_seminar_event(): seminar_event {
@@ -42,7 +43,8 @@ class mod_facetoface_retrieve_attendance_testcase extends advanced_testcase {
         $f2f = $f2fgen->create_instance(['course' => $course->id]);
 
         $s = new seminar($f2f->id);
-        $s->set_sessionattendance(1);
+        $s->set_attendancetime(seminar::EVENT_ATTENDANCE_LAST_SESSION_END);
+        $s->set_sessionattendance(seminar::SESSION_ATTENDANCE_END);
         $s->save();
 
         $e = new seminar_event();

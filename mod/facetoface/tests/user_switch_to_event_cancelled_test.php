@@ -42,8 +42,7 @@ class mod_facetoface_user_switch_to_event_cancelled_testcase extends advanced_te
         $f2f = $f2fgen->create_instance(['course' => $course->id]);
 
         $s = new seminar($f2f->id);
-        $s->set_sessionattendance(1);
-        $s->set_attendancetime(seminar::ATTENDANCE_TIME_ANY);
+        $s->set_attendancetime(seminar::EVENT_ATTENDANCE_UNRESTRICTED);
         $s->save();
 
         $event = new seminar_event();

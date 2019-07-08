@@ -218,7 +218,7 @@ final class seminar_event_helper {
         $sessiondata->mintimestart = $seminarevent->get_mintimestart();
         $sessiondata->maxtimefinish = $seminarevent->get_maxtimefinish();
         $sessiondata->sessiondates = $sessions->to_records();
-        $sessiondata->isstarted = $seminarevent->is_started($timenow);
+        $sessiondata->isstarted = $seminarevent->is_first_started($timenow);
         $sessiondata->isprogress = $seminarevent->is_progress($timenow);
         $sessiondata->cntdates = count($sessiondata->sessiondates);
 
@@ -262,9 +262,9 @@ final class seminar_event_helper {
         $status = get_string('bookingopen', 'mod_facetoface');
         if ($seminarevent->get_cancelledstatus()) {
             $status = get_string('bookingsessioncancelled', 'mod_facetoface');
-        } else if ($seminarevent->is_started($timenow) && $seminarevent->is_progress($timenow)) {
+        } else if ($seminarevent->is_first_started($timenow) && $seminarevent->is_progress($timenow)) {
             $status = get_string('sessioninprogress', 'mod_facetoface');
-        } else if ($seminarevent->is_started($timenow)) {
+        } else if ($seminarevent->is_first_started($timenow)) {
             $status = get_string('sessionover', 'mod_facetoface');
         } else if ($isbookedsession) {
             $state = \mod_facetoface\signup\state\state::from_code($session->bookedsession->statuscode);
@@ -317,7 +317,7 @@ final class seminar_event_helper {
             // Don't display event booking status on a cancelled event.
             $event_booking_status = '';
         } else {
-            if ($seminarevent->is_started($timenow)) {
+            if ($seminarevent->is_first_started($timenow)) {
                 $event_booking_status = '';
             } else {
                 $event_booking_status = get_string('bookingopen', 'mod_facetoface');

@@ -51,7 +51,7 @@ Feature: Verify various conditions of the seminar event dashboard
 
     And the following "seminars" exist in "mod_facetoface" plugin:
       | name      | course  | multiplesessions | sessionattendance | attendancetime |
-      | Seminar 1 | C1      | 1                | 1                 | 1              |
+      | Seminar 1 | C1      | 1                | 5                 | 1              |
 
     And the following "global rooms" exist in "mod_facetoface" plugin:
       | name   |

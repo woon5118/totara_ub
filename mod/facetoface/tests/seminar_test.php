@@ -299,4 +299,50 @@ class mod_facetoface_seminar_testcase extends \advanced_testcase {
 
     }
 
+    public function data_provider_fix_up_session_attendance_time_with() {
+        return [
+            [ seminar::ATTENDANCE_TIME_END, 0, seminar::SESSION_ATTENDANCE_DISABLED ],
+            [ seminar::ATTENDANCE_TIME_START, 0, seminar::SESSION_ATTENDANCE_DISABLED ],
+            [ seminar::ATTENDANCE_TIME_ANY, 0, seminar::SESSION_ATTENDANCE_DISABLED ],
+            [ seminar::ATTENDANCE_TIME_END, 1, seminar::SESSION_ATTENDANCE_END ],
+            [ seminar::ATTENDANCE_TIME_START, 1, seminar::SESSION_ATTENDANCE_START ],
+            [ seminar::ATTENDANCE_TIME_ANY, 1, seminar::SESSION_ATTENDANCE_UNRESTRICTED ],
+            [ 0, seminar::SESSION_ATTENDANCE_UNRESTRICTED, seminar::SESSION_ATTENDANCE_UNRESTRICTED ],
+            [ 0, seminar::SESSION_ATTENDANCE_END, seminar::SESSION_ATTENDANCE_END ],
+            [ 0, seminar::SESSION_ATTENDANCE_START, seminar::SESSION_ATTENDANCE_START ],
+            // If sessionattendance is a non-numeric string, it will be translated as disabled.
+            [ 0, '', seminar::SESSION_ATTENDANCE_DISABLED ],
+            [ 0, 'foo', seminar::SESSION_ATTENDANCE_DISABLED ],
+        ];
+    }
+
+    /**
+     * @dataProvider data_provider_fix_up_session_attendance_time_with
+     */
+    public function test_fix_up_session_attendance_time_with(int $eventattendance, $sessionattendance, int $expectedsessionattendance) {
+        $truesessionattendance = seminar::fix_up_session_attendance_time_with($eventattendance, $sessionattendance);
+        $this->assertDebuggingNotCalled();
+        $this->assertSame($expectedsessionattendance, $truesessionattendance);
+
+        $truesessionattendance = seminar::fix_up_session_attendance_time_with($eventattendance, (string)$sessionattendance);
+        $this->assertDebuggingNotCalled();
+        $this->assertSame($expectedsessionattendance, $truesessionattendance);
+    }
+
+    public function data_provider_fix_up_session_attendance_time_with_invalid() {
+        return [
+            [ 0, 4.2195 ],
+            [ 0, 42 ],
+            [ 42, 1 ],
+        ];
+    }
+
+    /**
+     * @dataProvider data_provider_fix_up_session_attendance_time_with_invalid
+     */
+    public function test_fix_up_session_attendance_time_with_invalid(int $eventattendance, $sessionattendance) {
+        $truesessionattendance = seminar::fix_up_session_attendance_time_with($eventattendance, $sessionattendance);
+        $this->assertDebuggingCalled();
+        $this->assertSame(seminar::SESSION_ATTENDANCE_DISABLED, $truesessionattendance);
+    }
 }

@@ -147,14 +147,16 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
     }
 
     /**
-     * Create a seminar event and add a session to the event.
+     * Create a seminar event and add a session or two to the event.
      *
      * @param \mod_facetoface\seminar $seminar
      * @param integer $timediff
      * @param integer $duration
+     * @param integer $timediff2
+     * @param integer $duration2
      * @return \mod_facetoface\seminar_event
      */
-    private function create_event_and_session(seminar $seminar, int $timediff, int $duration) {
+    private function create_event_and_sessions(seminar $seminar, int $timediff, int $duration, int $timediff2 = 0, int $duration2 = 0) {
         $seminarevent = new seminar_event();
         $seminarevent->set_facetoface($seminar->get_id());
         $seminarevent->save();
@@ -166,30 +168,41 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
             ->set_timefinish($timestart + $duration)
             ->save();
 
+        if ($timediff2 && $duration2) {
+            $timestart = time() + $timediff2;
+            $sessiondate = new seminar_session();
+            $sessiondate->set_sessionid($seminarevent->get_id())
+                ->set_timestart($timestart)
+                ->set_timefinish($timestart + $duration2)
+                ->save();
+        }
+
         return $seminarevent;
     }
 
     /**
-     * Data provider - [ human_readable_text, expect, attendancetime, session_duration, time_difference ]
+     * Data provider - [ human_readable_text, expect, eventattendance, session_duration, time_difference ]
      *
      * @return array
      */
-    public function data_provider_name_expect_attendancetime_duration_timediff() {
+    public function data_provider_name_expect_eventattendance_duration_timediff() {
         $before_attendance_start = mod_facetoface\signup\condition\event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START + 300;
         $after_attendance_start = mod_facetoface\signup\condition\event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START - 300;
         $dataset = [
-            [ 'case' => 'Far past', /*                          */'expects' => [ true, true, true ], /*  */'duration' => HOURSECS, /**/'timediff' => -YEARSECS ],
-            [ 'case' => 'Just ended', /*                        */'expects' => [ true, true, true ], /*  */'duration' => DAYSECS - 10, 'timediff' => -DAYSECS ],
-            [ 'case' => 'Just started', /*                      */'expects' => [ false, true, true ], /* */'duration' => HOURSECS, /**/'timediff' => -1 ],
-            [ 'case' => 'Starts within attendance unlock period', 'expects' => [ false, true, true ], /* */'duration' => HOURSECS, /**/'timediff' => $after_attendance_start ],
-            [ 'case' => 'Starts before attendance unlock period', 'expects' => [ false, false, true ], /**/'duration' => HOURSECS, /**/'timediff' => $before_attendance_start ],
-            [ 'case' => 'Far future', /*                        */'expects' => [ false, false, true ], /**/'duration' => HOURSECS, /**/'timediff' => YEARSECS ],
+            [ 'case' => 'Far past', /*               */'expects' => [ true, true, true, true ], /*   */'duration' => HOURSECS, /**/'timediff' => -YEARSECS ],
+            [ 'case' => 'Just ended', /*             */'expects' => [ true, true, true, true ], /*   */'duration' => DAYSECS - 10, 'timediff' => -DAYSECS ],
+            [ 'case' => 'Just started', /*           */'expects' => [ false, true, true, true ], /*  */'duration' => HOURSECS, /**/'timediff' => -1 ],
+            [ 'case' => 'Starts within unlock period', 'expects' => [ false, true, true, true ], /*  */'duration' => HOURSECS, /**/'timediff' => $after_attendance_start ],
+            [ 'case' => 'Starts before unlock period', 'expects' => [ false, false, true, false ], /**/'duration' => HOURSECS, /**/'timediff' => $before_attendance_start ],
+            [ 'case' => 'Far future', /*             */'expects' => [ false, false, true, false ], /**/'duration' => HOURSECS, /**/'timediff' => YEARSECS ],
         ];
         $data = [];
         foreach ($dataset as $e) {
-            // add seminar::ATTENDANCE_TIME_xxx
-            for ($i = 0; $i <= 2; $i++) {
-                $data[] = [ $e['case'], $e['expects'][$i], $i, $e['duration'], $e['timediff'] ];
+            // add seminar::EVENT_ATTENDANCE_xxx
+            $i = 0;
+            foreach (seminar::EVENT_ATTENDANCE_VALID_VALUES as $eventattendance) {
+                $data[] = [ $e['case'], $e['expects'][$i], $eventattendance, $e['duration'], $e['timediff'] ];
+                $i++;
             }
         }
         return $data;
@@ -198,23 +211,50 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
     /**
      * Test event_taking_attendance::pass.
      *
-     * @dataProvider data_provider_name_expect_attendancetime_duration_timediff
+     * @dataProvider data_provider_name_expect_eventattendance_duration_timediff
      */
-    public function test_attendance_states_when_attendance_tracking_is_enabled(string $name, bool $expect, int $attendancetime, int $duration, int $timediff) {
-        // some sanity checks
-        $this->assertSame(0, seminar::ATTENDANCE_TIME_END);
-        $this->assertSame(1, seminar::ATTENDANCE_TIME_START);
-        $this->assertSame(2, seminar::ATTENDANCE_TIME_ANY);
+    public function test_attendance_states_when_event_attendance_tracking_is_enabled(string $name, bool $expect, int $eventattendance, int $duration, int $timediff) {
+        $strings = [
+            seminar::EVENT_ATTENDANCE_LAST_SESSION_END => 'LAST/END',
+            seminar::EVENT_ATTENDANCE_FIRST_SESSION_START => 'FIRST/START',
+            seminar::EVENT_ATTENDANCE_LAST_SESSION_START => 'LAST/START',
+            seminar::EVENT_ATTENDANCE_UNRESTRICTED => 'ANY'
+        ];
 
         $generator = $this->getDataGenerator();
-
-        $seminar = new seminar();
-        $seminar->set_sessionattendance(1)->set_attendancetime($attendancetime)->save();
-        $event = $this->create_event_and_session($seminar, $timediff, $duration);
         $user = $generator->create_user();
+
+        // Test with one session to see first/start and last/start are the same results.
+        $seminar = new seminar();
+        $seminar->set_attendancetime($eventattendance)->save();
+        $event = $this->create_event_and_sessions($seminar, $timediff, $duration);
         $signup = signup::create($user->id, $event)->save();
         $condition = new event_taking_attendance($signup);
-        $this->assertSame($expect, $condition->pass(), $name . ' [' . [ 'END', 'START', 'ANY' ][$attendancetime] . ']');
+        $this->assertSame($expect, $condition->pass(), $name . ' [' . $strings[$eventattendance] . ']');
+    }
+
+    public function test_attendance_states_when_event_attendance_tracking_is_enabled2() {
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
+
+        // Test with two sessions to see first/start and last/start are the same results.
+        $seminar = new seminar();
+        $seminar->save();
+        $event = $this->create_event_and_sessions($seminar, -DAYSECS * 2, HOURSECS, -HOURSECS, HOURSECS * 2);
+        $signup = signup::create($user->id, $event)->save();
+        $condition = new event_taking_attendance($signup);
+
+        $seminar->set_attendancetime(seminar::EVENT_ATTENDANCE_LAST_SESSION_END)->save();
+        $this->assertFalse($condition->pass(), 'LAST/END');
+
+        $seminar->set_attendancetime(seminar::EVENT_ATTENDANCE_FIRST_SESSION_START)->save();
+        $this->assertTrue($condition->pass(), 'FIRST/START');
+
+        $seminar->set_attendancetime(seminar::EVENT_ATTENDANCE_LAST_SESSION_START)->save();
+        $this->assertTrue($condition->pass(), 'LAST/START');
+
+        $seminar->set_attendancetime(seminar::EVENT_ATTENDANCE_UNRESTRICTED)->save();
+        $this->assertTrue($condition->pass(), 'ANY');
     }
 
     /**

@@ -181,7 +181,7 @@ class event_handler {
         $signup = $event->get_signup();
         $seminarevent = $signup->get_seminar_event();
 
-        if ($seminarevent->is_started()) {
+        if ($seminarevent->is_first_started()) {
             return;
         }
 

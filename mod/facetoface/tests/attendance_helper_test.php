@@ -23,15 +23,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar_event, seminar, seminar_session, signup, session_status};
+use mod_facetoface\{seminar_event, seminar, seminar_session, signup, session_status, signup\condition\event_taking_attendance};
 use mod_facetoface\signup\state\{booked, fully_attended, not_set, partially_attended};
 use mod_facetoface\attendance\attendance_helper;
 
 class mod_facetoface_attendance_helper_testcase extends advanced_testcase {
     /**
      * Create the seminar event with seminar setting as follow:
-     * + sessionattendance => 1
-     * + attendancetime => ANY
+     * + sessionattendance => ANY
      * @return seminar_event
      */
     private function get_seminar_event(): seminar_event {
@@ -42,8 +41,7 @@ class mod_facetoface_attendance_helper_testcase extends advanced_testcase {
         $f2f = $f2fgen->create_instance(['course' => $course->id]);
 
         $s = new seminar($f2f->id);
-        $s->set_sessionattendance(1);
-        $s->set_attendancetime(seminar::ATTENDANCE_TIME_ANY);
+        $s->set_sessionattendance(seminar::SESSION_ATTENDANCE_UNRESTRICTED);
         $s->save();
 
         $event = new seminar_event();
@@ -216,6 +214,68 @@ class mod_facetoface_attendance_helper_testcase extends advanced_testcase {
         // deleted before this retrieving process. Therefore, we should only expecting 4 records here, because the current actor
         // does not have the ability to view the deleted records.
         $this->assertCount(4, $records);
+    }
+
+    /**
+     * @return array of [ sessionattendance, [ past, present, near future, far future ] ]
+     */
+    public function data_provider_process_session_attendance(): array {
+        return [
+            [ seminar::SESSION_ATTENDANCE_DISABLED, [ false, false, false, false ] ],
+            [ seminar::SESSION_ATTENDANCE_END, [ true, false, false, false ] ],
+            [ seminar::SESSION_ATTENDANCE_START, [ true, true, true, false ] ],
+            [ seminar::SESSION_ATTENDANCE_UNRESTRICTED, [ true, true, true, true ] ],
+        ];
+    }
+
+    /**
+     * Test attendance_helper::process_session_attendance() with seminar::sessionattendance combinations.
+     * @dataProvider data_provider_process_session_attendance
+     */
+    public function test_process_session_attendance(int $sessionattendance, array $expects): void {
+        $this->setAdminUser();
+        $gen = $this->getDataGenerator();
+        $event = $this->get_seminar_event();
+
+        $time = time();
+
+        $seminar = $event->get_seminar();
+        $user = $gen->create_user();
+        $gen->enrol_user($user->id, $seminar->get_course());
+
+        $seminar->set_sessionattendance($sessionattendance)->save();
+
+        $session = new seminar_session();
+        $session->set_timestart($time - DAYSECS)
+                ->set_timefinish($time - DAYSECS + HOURSECS)
+                ->set_sessionid($event->get_id())
+                ->save();
+
+        $signup = signup::create($user->id, $event);
+        $signup->save();
+        $signup->switch_state(booked::class);
+        $attendance = [ $signup->get_id() => fully_attended::get_code() ];
+
+        $result = attendance_helper::process_session_attendance($attendance, $session->get_id());
+        $this->assertSame($expects[0], $result, 'past');
+
+        $session->set_timestart($time - HOURSECS)
+                ->set_timefinish($time + HOURSECS)
+                ->save();
+        $result = attendance_helper::process_session_attendance($attendance, $session->get_id());
+        $this->assertSame($expects[1], $result, 'present');
+
+        $session->set_timestart($time + event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START / 2)
+                ->set_timefinish($time + event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START + HOURSECS)
+                ->save();
+        $result = attendance_helper::process_session_attendance($attendance, $session->get_id());
+        $this->assertSame($expects[2], $result, 'near future');
+
+        $session->set_timestart($time + DAYSECS)
+                ->set_timefinish($time + DAYSECS + HOURSECS)
+                ->save();
+        $result = attendance_helper::process_session_attendance($attendance, $session->get_id());
+        $this->assertSame($expects[3], $result, 'far future');
     }
 
     /**

@@ -128,7 +128,7 @@ foreach ($facetofaces as $facetoface) {
 
     /** @var seminar_event $seminarevent */
     foreach ($seminarevents as $seminarevent) {
-        if ($seminarevent->is_started()) {
+        if ($seminarevent->is_first_started()) {
             // Skipping those events that had already started.
             continue;
         }

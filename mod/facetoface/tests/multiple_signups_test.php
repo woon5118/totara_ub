@@ -179,7 +179,7 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
         $DB->update_record('facetoface_sessions_dates', $date11);
 
         $seminarevent11->clear_sessions();
-        $this->assertTrue($seminarevent11->is_started());
+        $this->assertTrue($seminarevent11->is_first_started());
 
         $date21 = $DB->get_record('facetoface_sessions_dates', ['sessionid' => $seminarevent21->get_id()]);
         $date21->timestart = $now - DAYSECS;
@@ -187,7 +187,7 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
         $DB->update_record('facetoface_sessions_dates', $date21);
 
         $seminarevent21->clear_sessions();
-        $this->assertTrue($seminarevent21->is_started());
+        $this->assertTrue($seminarevent21->is_first_started());
 
         // Do some pre-task checks.
         $this->assertEquals(2, signup_list::signups_by_statuscode_for_event($seminarevent11->get_id(), waitlisted::get_code())->count());
@@ -328,7 +328,7 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
 
         // Reloading, before assertion.
         $seminarevent->clear_sessions();
-        $this->assertTrue($seminarevent->is_started());
+        $this->assertTrue($seminarevent->is_first_started());
 
         $fully = [];
         $partly = [];

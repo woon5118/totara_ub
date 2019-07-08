@@ -485,7 +485,7 @@ class notice_sender {
             $notifymanager = false;
         }
 
-        if ($notifymanager || $notifyuser || $seminarevent->is_started()) {
+        if ($notifymanager || $notifyuser || $seminarevent->is_first_started()) {
             return static::send_notice($seminarevent, $recipientid, $params, $icalattachmenttype, $icalattachmentmethod,
                 $fromuser, $olddates, $notifyuser, $notifymanager);
         }

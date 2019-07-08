@@ -241,14 +241,6 @@ function xmldb_facetoface_install() {
     );
     $DB->insert_record('config_plugins', $configparams);
 
-    // Turn on Session attendance tracking by default
-    $configparams = array(
-        'plugin' => 'facetoface',
-        'name' => 'sessionattendance',
-        'value' => '1',
-    );
-    $DB->insert_record('config_plugins', $configparams);
-
     facetoface_create_room_customfields();
 }
 

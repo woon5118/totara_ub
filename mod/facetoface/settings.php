@@ -177,28 +177,31 @@ $ADMIN->add('modfacetofacefolder', $settings);
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading('facetoface/attendancetrackingheader', new lang_string('attendancetrackingheader', 'facetoface'), ''));
 
-    $settings->add(
-        new admin_setting_configcheckbox(
-            'facetoface/sessionattendance',
-            new lang_string('sessionattendance', 'facetoface'),
-            new lang_string('sessionattendance_help', 'facetoface'),
-            0
-        )
-    );
+    $options = [];
+    $options[\mod_facetoface\seminar::EVENT_ATTENDANCE_LAST_SESSION_START] = new lang_string('eventattendancetime:laststart', 'mod_facetoface');
+    $options[\mod_facetoface\seminar::EVENT_ATTENDANCE_LAST_SESSION_END] = new lang_string('eventattendancetime:lastend', 'mod_facetoface');
+    $options[\mod_facetoface\seminar::EVENT_ATTENDANCE_FIRST_SESSION_START] = new lang_string('eventattendancetime:firststart', 'mod_facetoface');
+    $options[\mod_facetoface\seminar::EVENT_ATTENDANCE_UNRESTRICTED] = new lang_string('eventattendancetime:any', 'mod_facetoface');
+    $settings->add(new admin_setting_configselect(
+        'facetoface/attendancetime',
+        new lang_string('eventattendancetime', 'mod_facetoface'),
+        new lang_string('eventattendancetime_help', 'mod_facetoface'),
+        \mod_facetoface\seminar::EVENT_ATTENDANCE_DEFAULT,
+        $options
+    ));
 
     $options = [];
-    $options[\mod_facetoface\seminar::ATTENDANCE_TIME_END] = new lang_string('attendancetime_end', 'facetoface');
-    $options[\mod_facetoface\seminar::ATTENDANCE_TIME_START] = new lang_string('attendancetime_start', 'facetoface');
-    $options[\mod_facetoface\seminar::ATTENDANCE_TIME_ANY] = new lang_string('attendancetime_any', 'facetoface');
-    $settings->add(
-        new admin_setting_configselect(
-            'facetoface/attendancetime',
-            new lang_string('attendancetime', 'facetoface'),
-            new lang_string('attendancetime_help', 'facetoface'),
-            \mod_facetoface\seminar::ATTENDANCE_TIME_END,
-            $options
-        )
-    );
+    $options[\mod_facetoface\seminar::SESSION_ATTENDANCE_DISABLED] = new lang_string('sessionattendancetime:disabled', 'mod_facetoface');
+    $options[\mod_facetoface\seminar::SESSION_ATTENDANCE_START] = new lang_string('sessionattendancetime:start', 'mod_facetoface');
+    $options[\mod_facetoface\seminar::SESSION_ATTENDANCE_END] = new lang_string('sessionattendancetime:end', 'mod_facetoface');
+    $options[\mod_facetoface\seminar::SESSION_ATTENDANCE_UNRESTRICTED] = new lang_string('sessionattendancetime:any', 'mod_facetoface');
+    $settings->add(new admin_setting_configselect(
+        'facetoface/sessionattendance',
+        new lang_string('sessionattendancetime', 'mod_facetoface'),
+        new lang_string('sessionattendancetime_help', 'mod_facetoface'),
+        \mod_facetoface\seminar::SESSION_ATTENDANCE_DEFAULT,
+        $options
+    ));
 
     $settings->add(
         new admin_setting_configcheckbox(

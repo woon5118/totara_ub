@@ -101,73 +101,73 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
             [
                 ['start' => $time + 3600, 'finish' => $time + (3600 * 3)],
                 $time,
-                ['sessionattendance' => 1, 'attendancetime' => seminar::ATTENDANCE_TIME_ANY],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_UNRESTRICTED],
                 true,
             ],
             [
                 ['start' => $time + 3600, 'finish' => $time + (3600 * 3)],
                 $time,
-                ['sessionattendance' => 1, 'attendancetime' => seminar::ATTENDANCE_TIME_END],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_END],
                 false
             ],
             [
                 ['start' => $time + 295, 'finish' => $time + (3600 * 3)],
                 $time,
-                ['sessionattendance' => 1, 'attendancetime' => seminar::ATTENDANCE_TIME_START],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_START],
                 true
             ],
             [
                 ['start' => $time + 3600, 'finish' => $time + (3600 * 3)],
                 $time + (3600 * 4),
-                ['sessionattendance' => 1, 'attendancetime' => seminar::ATTENDANCE_TIME_END],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_END],
                 true
             ],
             [
                 ['start' => $time + 3600, 'finish' => $time + (3600 * 3)],
                 $time,
-                ['sessionattendance' => 1, 'attendancetime' => seminar::ATTENDANCE_TIME_END],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_END],
                 false
             ],
             [
                 [],
                 $time,
-                ['sessionattendance' => 1, 'attendancetime' => seminar::ATTENDANCE_TIME_START],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_START],
                 false
             ],
             [
                 [],
                 $time,
-                ['sessionattendance' => 1, 'attendancetime' => seminar::ATTENDANCE_TIME_ANY],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_UNRESTRICTED],
                 false
             ],
             [
                 [],
                 $time,
-                ['sessionattendance' => 1, 'attendancetime' => seminar::ATTENDANCE_TIME_END],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_END],
                 false
             ],
             [
                 ['start' => $time + 3600, 'finish' => $time + (3600 * 2)],
                 $time,
-                ['sessionattendance' => 0, 'attendancetime' => seminar::ATTENDANCE_TIME_END],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_DISABLED],
                 false
             ],
             [
                 ['start' => $time + 3600, 'finish' => $time + (3600 * 2)],
                 $time,
-                ['sessionattendance' => 0, 'attendancetime' => seminar::ATTENDANCE_TIME_END],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_DISABLED],
                 false
             ],
             [
                 ['start' => $time + 3600, 'finish' => $time + (3600 * 2)],
                 $time,
-                ['sessionattendance' => 0, 'attendancetime' => seminar::ATTENDANCE_TIME_START],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_DISABLED],
                 false
             ],
             [
                 ['start' => $time + 3600, 'finish' => $time + (3600 * 2)],
                 $time,
-                ['sessionattendance' => 0, 'attendancetime' => seminar::ATTENDANCE_TIME_ANY],
+                ['sessionattendance' => seminar::SESSION_ATTENDANCE_DISABLED],
                 false
             ],
         ];
@@ -189,7 +189,6 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
         $event = $this->create_event();
 
         $seminar = $event->get_seminar();
-        $seminar->set_attendancetime($seminarsetting['attendancetime']);
         $seminar->set_sessionattendance($seminarsetting['sessionattendance']);
         $seminar->save();
 
@@ -212,13 +211,11 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
      * @return void
      */
     public function test_open_attendance_when_event_is_cancelled(): void {
-        $this->resetAfterTest();
-
         $event = $this->create_event();
 
         $seminar = $event->get_seminar();
-        $seminar->set_sessionattendance(true);
-        $seminar->set_attendancetime(seminar::ATTENDANCE_TIME_ANY);
+        $seminar->set_sessionattendance(seminar::EVENT_ATTENDANCE_UNRESTRICTED);
+        $seminar->set_attendancetime(seminar::SESSION_ATTENDANCE_UNRESTRICTED);
         $seminar->save();
 
         $session = new seminar_session();
@@ -296,73 +293,73 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
         return [
             [
                 -YEARSECS,
-                seminar::ATTENDANCE_TIME_END,
+                seminar::SESSION_ATTENDANCE_END,
                 [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Over (end)'
             ],
             [
                 -YEARSECS,
-                seminar::ATTENDANCE_TIME_START,
+                seminar::SESSION_ATTENDANCE_START,
                 [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Over (start)'
             ],
             [
                 -YEARSECS,
-                seminar::ATTENDANCE_TIME_ANY,
+                seminar::SESSION_ATTENDANCE_UNRESTRICTED,
                 [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Over (any)'
             ],
             [
                 -MINSECS,
-                seminar::ATTENDANCE_TIME_END,
+                seminar::SESSION_ATTENDANCE_END,
                 [ [], [ $not_end__, $not_end__ ], [ $not_end__, $not_end__ ] ],
                 'Ongoing (end)'
             ],
             [
                 -MINSECS,
-                seminar::ATTENDANCE_TIME_START,
+                seminar::SESSION_ATTENDANCE_START,
                 [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Ongoing (start)'
             ],
             [
                 -MINSECS,
-                seminar::ATTENDANCE_TIME_ANY,
+                seminar::SESSION_ATTENDANCE_UNRESTRICTED,
                 [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Ongoing (any)'
             ],
             [
                 $near_future,
-                seminar::ATTENDANCE_TIME_END,
+                seminar::SESSION_ATTENDANCE_END,
                 [ [], [ $not_end__, $not_end__ ], [ $not_end__, $not_end__ ] ],
                 'Almost open (end)'
             ],
             [
                 $near_future,
-                seminar::ATTENDANCE_TIME_START,
+                seminar::SESSION_ATTENDANCE_START,
                 [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Almost open (start)'
             ],
             [
                 $near_future,
-                seminar::ATTENDANCE_TIME_ANY,
+                seminar::SESSION_ATTENDANCE_UNRESTRICTED,
                 [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Almost open (any)'
             ],
             [
                 YEARSECS,
-                seminar::ATTENDANCE_TIME_END,
+                seminar::SESSION_ATTENDANCE_END,
                 [ [], [ $not_end__, $not_end__ ], [ $not_end__, $not_end__ ] ],
                 'Upcoming (end)'
             ],
             [
                 YEARSECS,
-                seminar::ATTENDANCE_TIME_START,
+                seminar::SESSION_ATTENDANCE_START,
                 [ [], [ $not_start, $not_start ], [ $not_start, $not_start ] ],
                 'Upcoming (start)'
             ],
             [
                 YEARSECS,
-                seminar::ATTENDANCE_TIME_ANY,
+                seminar::SESSION_ATTENDANCE_UNRESTRICTED,
                 [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Upcoming (any)'
             ],
@@ -371,14 +368,12 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
 
     /**
      * @param integer   $timestart
-     * @param integer   $attendancetime
+     * @param integer   $sessionattendance
      * @param array     $expections
      * @param string    $tag
      * @dataProvider data_provider_for_get_attendance_taking_status_sane_cases
      */
-    public function test_get_attendance_taking_status_sane_cases(int $timestart, int $attendancetime, array $expections, string $tag) {
-        $this->resetAfterTest();
-
+    public function test_get_attendance_taking_status_sane_cases(int $timestart, int $sessionattendance, array $expections, string $tag) {
         $now = time();
 
         $facetoface_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
@@ -387,7 +382,7 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
         $seminar = new seminar($f2f->id);
 
         // Turn on session attendance tracking
-        $seminar->set_sessionattendance(1)->set_attendancetime($attendancetime)->save();
+        $seminar->set_sessionattendance($sessionattendance)->save();
 
         // Set up three seminar events as follows:
         // Event  Sign-up  Attendance
@@ -468,8 +463,6 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
     }
 
     public function test_get_attendance_taking_status_insane_cases() {
-        $this->resetAfterTest();
-
         $now = time();
 
         $facetoface_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
@@ -494,15 +487,6 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
             $this->fail('coding_exception expected');
         } catch (\coding_exception $e) {
         }
-
-        // seminar::sessionattendance is validated prior to argument validation
-        $seminar->set_sessionattendance(0)->save();
-        $this->resetDebugging();
-        $this->assertSame(attendance_taking_status::NOTAVAILABLE, $seminarsession->get_attendance_taking_status(42));
-        $this->assertDebuggingNotCalled();
-
-        // Turn on session attendance tracking
-        $seminar->set_sessionattendance(1)->save();
 
         // Bogus first argument results in debugging()
         $this->resetDebugging();
@@ -530,12 +514,7 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
         // Delete it
         $seminarsession->set_timestart(1)->set_timefinish(2)->save();
         $seminarsession->delete();
-        try {
-            $status = $seminarsession->get_attendance_taking_status(seminar::ATTENDANCE_TIME_ANY, $now, true);
-            // The seminar_session::get_attendance_taking_status() expects to return UNKNOWN, but the code path is never executed so far
-            // $this->assertSame(attendance_taking_status::UNKNOWN, $status);
-            $this->fail('coding_exception expected');
-        } catch (\coding_exception $e) {
-        }
+        $status = $seminarsession->get_attendance_taking_status(seminar::ATTENDANCE_TIME_ANY, $now, true);
+        $this->assertSame(attendance_taking_status::UNKNOWN, $status);
     }
 }

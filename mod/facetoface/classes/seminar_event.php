@@ -126,11 +126,6 @@ final class seminar_event implements seminar_iterator_item {
     private $cancelledstatus = 0;
 
     /**
-     * Related seminar instance
-     * @var seminar
-     */
-    private $seminar = null;
-    /**
      * @var string facetoface_sessions table name
      */
     const DBTABLE = 'facetoface_sessions';
@@ -184,9 +179,9 @@ final class seminar_event implements seminar_iterator_item {
      * @return bool
      */
     public function cancel(): bool {
-        global $USER, $DB;
+        global $DB;
 
-        if ($this->is_started()) {
+        if ($this->is_first_started()) {
             // Events can not be cancelled after they have started.
             return false;
         }
@@ -441,22 +436,29 @@ final class seminar_event implements seminar_iterator_item {
      * @return seminar
      */
     public function get_seminar(): seminar {
-        $this->seminar = null;
-        if (empty($this->facetoface)) {
+        if (empty($this->get_facetoface())) {
             throw new \coding_exception("Cannot get seminar from unassociated event");
         }
-        if (empty($this->seminar) || $this->seminar->get_id() != $this->get_facetoface()) {
-            $this->seminar = new seminar($this->get_facetoface());
-        }
-        return $this->seminar;
+        return new seminar($this->get_facetoface());
     }
 
     /**
      * Has this seminar event started at certain point of time
      * @param int $time
      * @return bool
+     * @deprecated Totara 13 use `is_first_started()` instead
      */
     public function is_started(int $time = 0): bool {
+        debugging('The method ' . __METHOD__ . '() has been deprecated. Please use seminar_event::is_first_started() instead.', DEBUG_DEVELOPER);
+        return $this->is_first_started($time);
+    }
+
+    /**
+     * Has the first session of this seminar event started at certain point of time
+     * @param int $time
+     * @return bool
+     */
+    public function is_first_started(int $time = 0): bool {
         $time = $time ? $time : time();
         $sessions = $this->get_sessions();
 
@@ -472,6 +474,29 @@ final class seminar_event implements seminar_iterator_item {
         }
 
         return $mintimestart < $time;
+    }
+
+    /**
+     * Has the last session of this seminar event started at certain point of time
+     * @param int $time
+     * @return bool
+     */
+    public function is_last_started(int $time = 0): bool {
+        $time = $time ? $time : time();
+        $sessions = $this->get_sessions();
+
+        // Check that a date has actually been set.
+        if (!$sessions->count()) {
+            return false;
+        }
+
+        $maxtimestart = $this->get_maxtimestart();
+        if (empty($maxtimestart)) {
+            // There are no sessions so it can't have started.
+            return false;
+        }
+
+        return $maxtimestart < $time;
     }
 
     /**
@@ -501,6 +526,24 @@ final class seminar_event implements seminar_iterator_item {
         }
 
         return $mintimestart;
+    }
+
+    /**
+     * Get the latest start time from associated sessions.
+     * @return int
+     */
+    public function get_maxtimestart(): int {
+        $maxtimestart = 0;
+        /** @var seminar_session[] $sessions */
+        $sessions = $this->get_sessions();
+        foreach ($sessions as $session) {
+            // Check for maximum time start.
+            if ($session->get_timestart() > $maxtimestart) {
+                $maxtimestart = $session->get_timestart();
+            }
+        }
+
+        return $maxtimestart;
     }
 
     /**
@@ -998,25 +1041,33 @@ final class seminar_event implements seminar_iterator_item {
         }
 
         $seminar = $this->get_seminar();
-        $at = $seminar->get_attendancetime();
+        $eventattendance = $seminar->get_attendancetime();
 
-        switch ($at) {
-            case seminar::ATTENDANCE_TIME_START:
+        switch ($eventattendance) {
+            case seminar::EVENT_ATTENDANCE_FIRST_SESSION_START:
                 // For checking attendance at time start, which apply that number of minutes
                 // before start.
                 $time += event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
-                return $this->is_started($time);
-            case seminar::ATTENDANCE_TIME_END:
+                return $this->is_first_started($time);
+
+            case seminar::EVENT_ATTENDANCE_LAST_SESSION_START:
+                // For checking attendance at time start, which apply that number of minutes
+                // before start.
+                $time += event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
+                return $this->is_last_started($time);
+
+            case seminar::EVENT_ATTENDANCE_LAST_SESSION_END:
                 return $this->is_over($time);
-            case seminar::ATTENDANCE_TIME_ANY:
-                if ($this->get_sessions()->is_empty()) {
+
+            case seminar::EVENT_ATTENDANCE_UNRESTRICTED:
+                if (!$this->is_sessions()) {
                     // It is a wait-listed event, so attendance is not open.
                     return false;
                 }
                 return true;
         }
 
-        debugging("Attendance time code was invalid: {$at}", DEBUG_DEVELOPER);
+        debugging("The event attendance time {$eventattendance} is not valid.", DEBUG_DEVELOPER);
         return false;
     }
 
@@ -1036,25 +1087,50 @@ final class seminar_event implements seminar_iterator_item {
      * Extended logic for seminar events to handle the case where attendance is open for a session, but not for
      * the event itself.
      *
-     * @param int $time
+     * @param int $time Unix timestamp or 0 to use the current time
+     * @param int|null $sessionattendance One of seminar::SESSION_ATTENDANCE_xxx, or null to load the seminar setting
      * @return bool
      */
-    public function is_any_attendance_open(int $time = 0): bool {
+    public function is_any_attendance_open(int $time = 0, int $sessionattendance = null): bool {
         if (0 >= $time) {
             $time = time();
         }
-        $seminar = $this->get_seminar();
-        $at = $seminar->get_attendancetime();
-        $sa = $seminar->get_sessionattendance();
-        // If session attendance tracking is on, and attendance time is at end, then attendance is open for
-        // sessions at the end of the first session.
-        if ($sa && $at == seminar::ATTENDANCE_TIME_END) {
-            $list = $this->get_sessions();
-            $first = $list->get_first();
-            return $first->is_attendance_open($time);
-        } else {
-            return $this->is_attendance_open($time);
+        if ($sessionattendance === null) {
+            $seminar = $this->get_seminar();
+            $sessionattendance = $seminar->get_sessionattendance();
         }
+
+        switch ($sessionattendance) {
+            case seminar::SESSION_ATTENDANCE_UNRESTRICTED:
+                if ($this->is_sessions()) {
+                    return true;
+                }
+                break;
+
+            case seminar::SESSION_ATTENDANCE_START:
+                if ($this->is_first_started($time + event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START)) {
+                    return true;
+                }
+                break;
+
+            case seminar::SESSION_ATTENDANCE_END:
+                if ($this->get_sessions()->is_anything_over($time)) {
+                    return true;
+                }
+                break;
+
+            case 1:
+                debugging("An old sessionattendance has been detected. Please upgrade the website!");
+                // Recursively call itself to deal with outdated $sessionattendance
+                if (!isset($seminar)) {
+                    $seminar = $this->get_seminar();
+                }
+                $sessionattendance = $seminar->fix_up_session_attendance_time($sessionattendance);
+                return $this->is_any_attendance_open($time, $sessionattendance);
+        }
+
+        // No session attendance is open; Try event attendance.
+        return $this->is_attendance_open($time);
     }
 
     /**

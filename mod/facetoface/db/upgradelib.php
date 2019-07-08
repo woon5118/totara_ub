@@ -165,7 +165,8 @@ function facetoface_upgradelib_requestedrole_state_for_role_approval() {
 }
 
 /**
- * Rewrite grades if they are 0.0000 and their signup state is either fully/partially attended
+ * Rewrite grades if they are 0.0000 and their signup state is either fully/partially attended.
+ * Note that we decided in TL-20775, to not provide fixup for a system upgrading from Evergreen-20190322.
  */
 function facetoface_upgradelib_fixup_seminar_grades() {
     global $DB;
@@ -177,8 +178,47 @@ function facetoface_upgradelib_fixup_seminar_grades() {
     // grade_fully: 100
     // grade_partially: 50
 
-    // TODO: need more complicated solution to the system upgraded from Evergreen-20190322
     $DB->execute('UPDATE {facetoface_signups_status} SET grade = NULL WHERE statuscode <= 70');
     $DB->execute('UPDATE {facetoface_signups_status} SET grade = 50 WHERE statuscode = 90 AND grade = 0');
     $DB->execute('UPDATE {facetoface_signups_status} SET grade = 100 WHERE statuscode = 100 AND grade = 0');
+}
+
+/**
+ * Do what seminar::fix_up_session_attendance_time() do.
+ */
+function facetoface_upgradelib_fixup_seminar_sessionattendance() {
+    global $DB;
+    /** @var \moodle_database $DB */
+
+    if (get_config('facetoface', 'sessionattendance') == 1) {
+        switch (get_config('facetoface', 'attendancetime')) {
+            case 0:
+                // ATTENDANCE_TIME_END -> SESSION_ATTENDANCE_END
+                set_config('sessionattendance', 4, 'facetoface');
+                break;
+            case 1:
+                // ATTENDANCE_TIME_START -> SESSION_ATTENDANCE_START
+                set_config('sessionattendance', 5, 'facetoface');
+                break;
+            case 2:
+                // ATTENDANCE_TIME_ANY -> SESSION_ATTENDANCE_UNRESTRICTED
+                set_config('sessionattendance', 2, 'facetoface');
+                break;
+            default:
+                // SESSION_ATTENDANCE_DISABLED
+                set_config('sessionattendance', 0, 'facetoface');
+                break;
+        }
+    }
+
+    // ATTENDANCE_TIME_END -> SESSION_ATTENDANCE_END
+    $DB->execute('UPDATE {facetoface} SET sessionattendance = 4 WHERE sessionattendance = 1 AND attendancetime = 0');
+    // ATTENDANCE_TIME_START -> SESSION_ATTENDANCE_START
+    $DB->execute('UPDATE {facetoface} SET sessionattendance = 5 WHERE sessionattendance = 1 AND attendancetime = 1');
+    // ATTENDANCE_TIME_ANY -> SESSION_ATTENDANCE_UNRESTRICTED
+    $DB->execute('UPDATE {facetoface} SET sessionattendance = 2 WHERE sessionattendance = 1 AND attendancetime = 2');
+
+    // Disable session attendance tracking if previous event attendance time is none of defined ATTENDANCE_TIME_xxx values
+    [ $sql, $params ] = $DB->get_in_or_equal([0, 1, 2], SQL_PARAMS_QM, 'param', false);
+    $DB->execute('UPDATE {facetoface} SET sessionattendance = 0 WHERE sessionattendance = 1 AND attendancetime ' . $sql, $params);
 }

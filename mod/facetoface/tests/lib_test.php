@@ -1559,11 +1559,11 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         // Test for Valid case.
         $seminarevent = new seminar_event($sess0->id);
-        $this->assertTrue($seminarevent->is_started($timenow), $this->msgtrue);
+        $this->assertTrue($seminarevent->is_first_started($timenow), $this->msgtrue);
 
         // Test for invalid case.
         $seminarevent = new seminar_event($sess1->id);
-        $this->assertFalse($seminarevent->is_started($timenow), $this->msgfalse);
+        $this->assertFalse($seminarevent->is_first_started($timenow), $this->msgfalse);
     }
 
     function test_facetoface_is_session_in_progress() {
@@ -3791,6 +3791,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         $f2fdata = new stdClass();
         $f2fdata->course = $course->id;
+        $f2fdata->attendancetime = seminar::EVENT_ATTENDANCE_LAST_SESSION_END; // TL-21487 changed the default value.
         $f2foptions = array(
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
             'completionstatusrequired' => json_encode(array(\mod_facetoface\signup\state\fully_attended::get_code()))

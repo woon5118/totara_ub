@@ -45,26 +45,12 @@ final class seminar_session_list implements \Iterator, \Countable {
     public const SORT_DESC = '1';
 
     /**
-     * Keep track of those session's id that are already over.
-     * @var seminar_session[]
-     */
-    private $overs = [];
-
-    /**
-     * Keep track of those session's id that are upcoming.
-     * @var seminar_session[]
-     */
-    private $upcoming = [];
-
-    /**
      * Reloading the trackers of those session(s) that either are over and upcoming.
      * This is for test purpose and also ability to re-calculate the sessions
      * @return seminar_session_list
      */
     public function reload(): seminar_session_list {
-        $this->overs = [];
-        $this->upcoming = [];
-
+        debugging('The method ' . __METHOD__ . '() has been deprecated and should not be called anymore.', DEBUG_DEVELOPER);
         return $this;
     }
 
@@ -76,14 +62,6 @@ final class seminar_session_list implements \Iterator, \Countable {
     public function add(seminar_session $item): void {
         $id = $item->get_id();
         $this->items[$id] = $item;
-
-        $time = time();
-
-        if ($item->is_upcoming($time)) {
-            $this->upcoming[$id] = $item;
-        } else if ($item->is_over($time)) {
-            $this->overs[$id] = $item;
-        }
     }
 
     /**
@@ -140,22 +118,20 @@ final class seminar_session_list implements \Iterator, \Countable {
      * @return seminar_session[]
      */
     public function get_over(int $time = 0): array {
-        if (empty($this->overs)) {
-            if (0 >= $time) {
-                $time = time();
-            }
+        if (0 >= $time) {
+            $time = time();
+        }
 
-            $this->overs = [];
+        $overs = [];
 
-            /** @var seminar_session $session */
-            foreach ($this->items as $session) {
-                if ($session->is_over($time)) {
-                    $this->overs[] = $session;
-                }
+        /** @var seminar_session $session */
+        foreach ($this->items as $session) {
+            if ($session->is_over($time)) {
+                $overs[] = $session;
             }
         }
 
-        return $this->overs;
+        return $overs;
     }
 
     /**
@@ -165,26 +141,24 @@ final class seminar_session_list implements \Iterator, \Countable {
      * @return seminar_session[]
      */
     public function get_upcoming(int $time = 0): array {
-        if (empty($this->upcoming)) {
-            if (0 >= $time) {
-                $time = time();
-            }
+        if (0 >= $time) {
+            $time = time();
+        }
 
-            $this->upcoming = [];
+        $upcoming = [];
 
-            /** @var seminar_session $session */
-            foreach ($this->items as $session) {
-                if ($session->is_upcoming($time)) {
-                    $this->upcoming[] = $session;
-                }
+        /** @var seminar_session $session */
+        foreach ($this->items as $session) {
+            if ($session->is_upcoming($time)) {
+                $upcoming[] = $session;
             }
         }
 
-        return $this->upcoming;
+        return $upcoming;
     }
 
     /**
-     * Return true if all the sessions are over.
+     * Return true if ALL the sessions are over.
      *
      * If there are no sessions, then it is most likely to be a waitlist event.
      *
@@ -193,7 +167,7 @@ final class seminar_session_list implements \Iterator, \Countable {
      */
     public function is_everything_over(int $time = 0): bool {
         if ($this->is_empty()) {
-            // Waitlisted event.
+            // Wait-listed event.
             return false;
         }
 
@@ -201,16 +175,31 @@ final class seminar_session_list implements \Iterator, \Countable {
     }
 
     /**
+     * Return true if ANY session is over.
+     *
+     * If there are no sessions, then it is most likely to be a waitlist event.
+     *
+     * @param int $time
+     * @return bool
+     */
+    public function is_anything_over(int $time = 0): bool {
+        if ($this->is_empty()) {
+            // Wait-listed event.
+            return false;
+        }
+
+        return $this->count_over($time) > 0;
+    }
+
+    /**
      * Get the session status summary string.
      *
-     * If $reload is true, then it will recalculate the session data before generating the summary.
-     *
-     * @param bool $reload
+     * @param bool|null $reload Deprecated. Do NOT set this parameter anymore.
      * @return string
      */
-    public function get_summary(bool $reload = false): string {
-        if ($reload) {
-            $this->reload();
+    public function get_summary(bool $reload = null): string {
+        if ($reload === true || $reload === false) {
+            debugging('Setting $reload has been deprecated and should not be done anymore.', DEBUG_DEVELOPER);
         }
 
         $time = time();
@@ -226,21 +215,33 @@ final class seminar_session_list implements \Iterator, \Countable {
     /**
      * Return the last session of an event.
      *
-     * @return seminar_session
+     * @return seminar_session|null
      */
-    public function get_last(): seminar_session {
-        $this->sort('timefinish', seminar_session_list::SORT_DESC);
-        return reset($this->items);
+    public function get_last(): ?seminar_session {
+        $found = null;
+        /** @var seminar_session $item */
+        foreach ($this->items as $id => $item) {
+            if (!$found || $item->get_timefinish() > $found->get_timefinish()) {
+                $found = $item;
+            }
+        }
+        return $found;
     }
 
     /**
      * Return the first session of an event.
      *
-     * @return seminar_session
+     * @return seminar_session|null
      */
-    public function get_first(): seminar_session {
-        $this->sort('timefinish', seminar_session_list::SORT_ASC);
-        return reset($this->items);
+    public function get_first(): ?seminar_session {
+        $found = null;
+        /** @var seminar_session $item */
+        foreach ($this->items as $id => $item) {
+            if (!$found || $item->get_timefinish() < $found->get_timefinish()) {
+                $found = $item;
+            }
+        }
+        return $found;
     }
 
     /**

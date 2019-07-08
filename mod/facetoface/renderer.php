@@ -118,8 +118,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param bool $minimal - setting this to true will hide customfields, session status, attendance tracking and registration dates
      * in a tooltip when hovering over the signup link rather than in a column.
      * @param bool $returntoallsessions Returns the user to view all sessions after they signup/cancel.
-     * @param bool|int $attendancetracking - true to display the attendance tracking column
-     * @param int $attendancetime - one of seminar::ATTENDANCE_TIME_xxx
+     * @param bool|int $sessionattendance - one of seminar::SESSION_ATTENDANCE_xxx
+     * @param int $eventattendance - one of seminar::EVENT_ATTENDANCE_xxx
      * @param bool $viewsignupperiod - true to display the "Sign-up period" table column
      * @param bool $viewactions - true to display the "Actions" table column
      * @return string containing html for this table.
@@ -127,7 +127,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      */
     public function print_session_list_table(array $sessions, bool $viewattendees, bool $editevents, bool $displaytimezones, array $reserveinfo = array(),
                                              string $currenturl = null, bool $minimal = false, bool $returntoallsessions = true,
-                                             $attendancetracking = false, int $attendancetime = seminar::ATTENDANCE_TIME_END,
+                                             $sessionattendance = seminar::SESSION_ATTENDANCE_DISABLED,
+                                             int $eventattendance = seminar::EVENT_ATTENDANCE_LAST_SESSION_END,
                                              bool $viewsignupperiod = true, bool $viewactions = true): string {
         $output = '';
 
@@ -136,6 +137,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             return $output;
         }
 
+        $sessionattendance = seminar::fix_up_session_attendance_time_with($eventattendance, $sessionattendance);
+        $attendancetracking = $sessionattendance != seminar::SESSION_ATTENDANCE_DISABLED;
         if ($this->context === null || !has_capability('mod/facetoface:takeattendance', $this->context)) {
             // overwrite $attendancetracking if a user does not have permission to take attendance
             $attendancetracking = false;
@@ -199,7 +202,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $helper = new attendees_helper($seminarevent);
 
             $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
-            $sessionstarted = $seminarevent->is_started();
+            $sessionstarted = $seminarevent->is_first_started();
 
             if ($seminarevent->get_cancelledstatus()) {
                 $statuscodes = [event_cancelled::get_code()];
@@ -326,7 +329,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                             $sessionrow[] = $this->attendance_tracking_table_cell(
                                 $session,
                                 $daterecord,
-                                $attendancetime
+                                $sessionattendance
                             );
                         }
                     }
@@ -612,7 +615,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      *
      * @param \stdClass $session
      * @param \stdClass $date
-     * @param int $attendancetime one of seminar::ATTENDANCE_TIME_xxx
+     * @param int $attendancetime one of seminar::SESSION_ATTENDANCE_xxx
      * @return \mod_facetoface\output\attendance_tracking_table_cell
      * @throws coding_exception
      */
@@ -762,7 +765,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         if ($editevents) {
             if (!$seminarevent->get_cancelledstatus()) {
                 $editbuttons .= $this->output->action_icon(new moodle_url('/mod/facetoface/events/edit.php', array('s' => $seminarevent->get_id(), 'backtoallsessions' => $bas)), new pix_icon('t/edit', get_string('editsession', 'mod_facetoface')));
-                if (!$seminarevent->is_started($timenow)) {
+                if (!$seminarevent->is_first_started($timenow)) {
                     $editbuttons .= $this->output->action_icon(new moodle_url('/mod/facetoface/events/cancel.php', array('s' => $seminarevent->get_id(), 'backtoallsessions' => $bas)), new pix_icon('t/block', get_string('cancelsession', 'mod_facetoface')));
                 }
             }
@@ -878,7 +881,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         }
 
         $currentime = time();
-        if ($seminarevent->is_started($currentime) || $seminarevent->is_over($currentime)) {
+        if ($seminarevent->is_first_started($currentime) || $seminarevent->is_over($currentime)) {
             return $reservelink;
         }
 
@@ -942,7 +945,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         global $USER;
         $signuplink = '';
 
-        $sessionstarted = $seminarevent->is_started();
+        $sessionstarted = $seminarevent->is_first_started();
 
         $timenow = time();
         // Registration status.

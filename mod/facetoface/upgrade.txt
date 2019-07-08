@@ -8,6 +8,10 @@ information provided here is intended especially for developers.
 * 'teacher' and 'editingteacher' roles got the 'mod/facetoface:viewallsessions' capability
 * [facetofacename] notification placeholder is changed to [seminarname]
 * new [seminardescription] notification placeholder is added to support seminar notifications
+* seminar::ATTENDANCE_TIME_xxx have been deprecated; please use EVENT_ATTENDANCE_xxx and/or SESSION_ATTENDANCE_xxx instead
+* seminar_event::is_started() has been deprecated; please use seminar_event::is_first_started() instead
+* seminar_session_list::reload() has been deprecated; please remove any calls to the method
+* the $reload parameter of seminar_session_list::get_summary() has been deprecated; please do not set the parameter
 * mod_facetoface\form\import_attendance form is accepting a 'signupid' field from 'CSV Take attendance' export and ignores not required fields
 * mod_facetoface\attendance\event_content::generate_downloadable_content() has been updated
   * to respect the showuseridentity config
@@ -129,7 +133,7 @@ information provided here is intended especially for developers.
     * Added an optional parameter for filtering by event time, to the function
   * In print_session_list_table() function
     * Table columns have been reordered, please refer to lib/renderer_test.php
-    * Added optional arguments: $attendancetracking, $attendancetime, $hidesignupperiod, $hideactions
+    * Added optional arguments: $sessionattendance, $eventattendance, $viewsignupperiod, $viewactions
     * The summary text of a session event list table no longer says 'past events'
     * Added a session status column to the session event list table
     * Added an attendance tracking column to the session event list table; the column will be hidden if attendance tracking is off

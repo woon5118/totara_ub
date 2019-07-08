@@ -211,6 +211,13 @@ final class signup_helper {
             throw new \coding_exception('Strayed signups found in $grades: ' . implode(', ', $diff_keys));
         }
 
+        // Validation: All the sessionid of the signup of $attendance must be $seminarevent->id
+        foreach ($attendance as $signupid => $statuscode) {
+            if ((new signup($signupid))->get_sessionid() != $seminarevent->get_id()) {
+                return false;
+            }
+        }
+
         foreach ($attendance as $signupid => $statuscode) {
             $grade = $grades[$signupid] ?? null;
             $signup = new signup($signupid);
@@ -438,7 +445,7 @@ final class signup_helper {
      * @param seminar_event $seminarevent
      */
     public static function update_attendees(seminar_event $seminarevent): void {
-        if ($seminarevent->is_started()) {
+        if ($seminarevent->is_first_started()) {
             return;
         }
 

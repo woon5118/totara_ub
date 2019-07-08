@@ -86,6 +86,10 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
             $data->approvaladmins = implode(',', $admins);
         }
 
+        if (isset($data->sessionattendance)) {
+            $data->sessionattendance = seminar::fix_up_session_attendance_time_with($data->attendancetime, $data->sessionattendance);
+        }
+
         // insert the facetoface record
         $newitemid = $DB->insert_record('facetoface', $data);
         $this->apply_activity_instance($newitemid);
@@ -254,7 +258,6 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
                 $totarabuild = (int) $matches[1]; // The date of Totara build at the time of the backup.
             }
             // recalculate only for backups made with Totara 12 before TL-20720, and Totara 13 before TL-20400
-            // TODO: need more complicated solution to backups made after TL-20400 and before TL-20720
             if (($totaramajor == 12 && $f2fversion < 2018112207)
                     || ($totaramajor == 13 && $f2fversion < 2019030100)
                     // T13 Evergreen

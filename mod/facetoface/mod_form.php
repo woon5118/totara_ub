@@ -109,18 +109,23 @@ class mod_facetoface_mod_form extends moodleform_mod {
             $mform->disabledIf('cancellationscutoffdefault[timeunit]', 'allowcancellationsdefault', 'notchecked', 2);
         }
 
-        $mform->addElement('checkbox', 'sessionattendance', get_string('sessionattendance', 'facetoface'));
-        $mform->addHelpButton('sessionattendance', 'sessionattendance', 'facetoface');
-        $mform->setType('sessionattendance', PARAM_BOOL);
-        $mform->setDefault('sessionattendance', get_config('facetoface', 'sessionattendance'));
+        $options = [];
+        $options[\mod_facetoface\seminar::EVENT_ATTENDANCE_LAST_SESSION_START] = new lang_string('eventattendancetime:laststart', 'mod_facetoface');
+        $options[\mod_facetoface\seminar::EVENT_ATTENDANCE_LAST_SESSION_END] = new lang_string('eventattendancetime:lastend', 'mod_facetoface');
+        $options[\mod_facetoface\seminar::EVENT_ATTENDANCE_FIRST_SESSION_START] = new lang_string('eventattendancetime:firststart', 'mod_facetoface');
+        $options[\mod_facetoface\seminar::EVENT_ATTENDANCE_UNRESTRICTED] = new lang_string('eventattendancetime:any', 'mod_facetoface');
+        $mform->addElement('select', 'attendancetime', get_string('eventattendancetime', 'mod_facetoface'), $options);
+        $mform->addHelpButton('attendancetime', 'eventattendancetime', 'mod_facetoface');
+        $mform->setDefault('attendancetime', get_config('facetoface', 'attendancetime'));
 
         $options = [];
-        $options[\mod_facetoface\seminar::ATTENDANCE_TIME_END] = new lang_string('attendancetime_end', 'facetoface');
-        $options[\mod_facetoface\seminar::ATTENDANCE_TIME_START] = new lang_string('attendancetime_start', 'facetoface');
-        $options[\mod_facetoface\seminar::ATTENDANCE_TIME_ANY] = new lang_string('attendancetime_any', 'facetoface');
-        $mform->addElement('select', 'attendancetime', get_string('attendancetime', 'facetoface'), $options);
-        $mform->addHelpButton('attendancetime', 'attendancetime', 'facetoface');
-        $mform->setDefault('attendancetime', get_config('facetoface', 'attendancetime'));
+        $options[\mod_facetoface\seminar::SESSION_ATTENDANCE_DISABLED] = new lang_string('sessionattendancetime:disabled', 'mod_facetoface');
+        $options[\mod_facetoface\seminar::SESSION_ATTENDANCE_START] = new lang_string('sessionattendancetime:start', 'mod_facetoface');
+        $options[\mod_facetoface\seminar::SESSION_ATTENDANCE_END] = new lang_string('sessionattendancetime:end', 'mod_facetoface');
+        $options[\mod_facetoface\seminar::SESSION_ATTENDANCE_UNRESTRICTED] = new lang_string('sessionattendancetime:any', 'mod_facetoface');
+        $mform->addElement('select', 'sessionattendance', get_string('sessionattendancetime', 'mod_facetoface'), $options);
+        $mform->addHelpButton('sessionattendance', 'sessionattendancetime', 'mod_facetoface');
+        $mform->setDefault('sessionattendance', get_config('facetoface', 'sessionattendance'));
 
         $mform->addElement('header', 'gradesheader', get_string('gradesheader', 'facetoface'));
 

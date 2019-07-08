@@ -379,4 +379,56 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $this->assertSame($expectedgrade_first, $first_grade);
         $this->assertSame($expectedgrade_last, $last_grade);
     }
+
+    /**
+     * @return array of [ , attendancetime ]
+     */
+    public function data_obsolete_attendance_values() {
+        return [
+            [ 0, seminar::ATTENDANCE_TIME_END, seminar::SESSION_ATTENDANCE_DISABLED ],
+            [ 0, seminar::ATTENDANCE_TIME_START, seminar::SESSION_ATTENDANCE_DISABLED ],
+            [ 0, seminar::ATTENDANCE_TIME_ANY, seminar::SESSION_ATTENDANCE_DISABLED ],
+            [ 0, 42, seminar::SESSION_ATTENDANCE_DISABLED ],
+            [ 1, seminar::ATTENDANCE_TIME_END, seminar::SESSION_ATTENDANCE_END ],
+            [ 1, seminar::ATTENDANCE_TIME_START, seminar::SESSION_ATTENDANCE_START ],
+            [ 1, seminar::ATTENDANCE_TIME_ANY, seminar::SESSION_ATTENDANCE_UNRESTRICTED ],
+            [ 1, 42, seminar::SESSION_ATTENDANCE_DISABLED ],
+            // The shim takes effect only if sessionattendance is 0 or 1.
+            [ 42, seminar::ATTENDANCE_TIME_END, 42 ],
+            [ 42, seminar::ATTENDANCE_TIME_START, 42 ],
+            [ 42, seminar::ATTENDANCE_TIME_ANY, 42 ],
+            [ 42, 42, 42 ],
+        ];
+    }
+
+    /**
+     * @param int $sessionattendance
+     * @param int $attendancetime
+     * @dataProvider data_obsolete_attendance_values
+     */
+    public function test_facetoface_upgradelib_fixup_seminar_sessionattendance(int $sessionattendance, int $attendancetime, int $newsessionattendance) {
+        $gen = $this->getDataGenerator();
+        $course = $gen->create_course();
+
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $this->assertDebuggingNotCalled();
+        $f2f = $f2fgen->create_instance(['course' => $course->id, 'sessionattendance' => $sessionattendance, 'attendancetime' => $attendancetime]);
+        $this->resetDebugging(); // Just swallow gracious debugging messages here
+
+        set_config('sessionattendance', $sessionattendance, 'facetoface');
+        set_config('attendancetime', $attendancetime, 'facetoface');
+
+        facetoface_upgradelib_fixup_seminar_sessionattendance();
+
+        $seminar = new seminar($f2f->id);
+        $this->assertSame($newsessionattendance, $seminar->get_sessionattendance());
+
+        $globalsessionattendance = get_config('facetoface', 'sessionattendance');
+        $globalattendancetime = get_config('facetoface', 'attendancetime');
+        $this->assertNotFalse($globalsessionattendance);
+        $this->assertNotFalse($globalattendancetime);
+        $this->assertEquals($newsessionattendance, $globalsessionattendance);
+        $this->assertEquals($attendancetime, $globalattendancetime);
+    }
 }

@@ -1177,7 +1177,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
 
             $session->signupcount = $helper->count_attendees_with_codes($statuscodes);
 
-            if (!empty($session->sessiondates) && $seminarevent->is_started($timenow)) {
+            if (!empty($session->sessiondates) && $seminarevent->is_first_started($timenow)) {
                 continue;
             }
 

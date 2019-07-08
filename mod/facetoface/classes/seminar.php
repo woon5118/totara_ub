@@ -44,12 +44,64 @@ final class seminar implements seminar_iterator_item {
     const APPROVAL_MANAGER = 4;
     const APPROVAL_ADMIN = 8;
 
-    /**
-     * Attendance field values
-     */
+    /** @deprecated use EVENT_ATTENDANCE_LAST_SESSION_END instead */
     const ATTENDANCE_TIME_END = 0;
+    /** @deprecated use EVENT_ATTENDANCE_FIRST_SESSION instead */
     const ATTENDANCE_TIME_START = 1;
+    /** @deprecated use EVENT_ATTENDANCE_UNRESTRICTED instead */
     const ATTENDANCE_TIME_ANY = 2;
+
+    /** Event attendance - end of last session */
+    const EVENT_ATTENDANCE_LAST_SESSION_END = 0;
+
+    /** Event attendance - beginning of first session */
+    const EVENT_ATTENDANCE_FIRST_SESSION_START = 1;
+
+    /** Event attendance - unrestricted (any time) */
+    const EVENT_ATTENDANCE_UNRESTRICTED = 2;
+
+    /** Event attendance - beginning of last session */
+    const EVENT_ATTENDANCE_LAST_SESSION_START = 3;
+
+    // NOTE: 4 and 5 are reserved to avoid mix-up between session/event attendance.
+
+    /** Default attendancetime (event attendance) */
+    const EVENT_ATTENDANCE_DEFAULT = self::EVENT_ATTENDANCE_LAST_SESSION_START;
+
+    /** Array of valid event attendance values */
+    const EVENT_ATTENDANCE_VALID_VALUES = [
+        self::EVENT_ATTENDANCE_LAST_SESSION_END,
+        self::EVENT_ATTENDANCE_FIRST_SESSION_START,
+        self::EVENT_ATTENDANCE_UNRESTRICTED,
+        self::EVENT_ATTENDANCE_LAST_SESSION_START
+    ];
+
+    /** Session attendance - disabled */
+    const SESSION_ATTENDANCE_DISABLED = 0;
+
+    // NOTE: 1 is reserved for shim.
+
+    /** Session attendance - unrestricted (any time) */
+    const SESSION_ATTENDANCE_UNRESTRICTED = 2;
+
+    // NOTE: 3 is reserved to avoid mix-up between session/event attendance.
+
+    /** Session attendance - end of session */
+    const SESSION_ATTENDANCE_END = 4;
+
+    /** Session attendance - beginning of session */
+    const SESSION_ATTENDANCE_START = 5;
+
+    /** Default sessionattendance (session attendance) */
+    const SESSION_ATTENDANCE_DEFAULT = self::SESSION_ATTENDANCE_DISABLED;
+
+    /** Array of valid session attendance values */
+    const SESSION_ATTENDANCE_VALID_VALUES = [
+        self::SESSION_ATTENDANCE_DISABLED,
+        self::SESSION_ATTENDANCE_UNRESTRICTED,
+        self::SESSION_ATTENDANCE_START,
+        self::SESSION_ATTENDANCE_END
+    ];
 
     /**
      * Event grading method field values
@@ -218,11 +270,11 @@ final class seminar implements seminar_iterator_item {
     /**
      * @var int {facetoface}.sessionattendance
      */
-    private $sessionattendance = 1;
+    private $sessionattendance = self::SESSION_ATTENDANCE_DEFAULT;
     /**
      * @var int {facetoface}.attendancetime
      */
-    private $attendancetime = self::ATTENDANCE_TIME_END;
+    private $attendancetime = self::EVENT_ATTENDANCE_DEFAULT;
     /**
      * @var int {facetoface}.eventgradingmanual
      */
@@ -367,6 +419,12 @@ final class seminar implements seminar_iterator_item {
      */
     public function map_instance(\stdClass $object): seminar {
 
+        if (isset($object->sessionattendance) && !in_array($object->sessionattendance, self::SESSION_ATTENDANCE_VALID_VALUES)) {
+            debugging("The session attendance value {$object->sessionattendance} is not valid.");
+        }
+        if (isset($object->attendancetime) && !in_array($object->attendancetime, self::EVENT_ATTENDANCE_VALID_VALUES)) {
+            debugging("The event attendance value {$object->attendancetime} is not valid.");
+        }
         return $this->map_object($object);
     }
 
@@ -1005,43 +1063,49 @@ final class seminar implements seminar_iterator_item {
     }
 
     /**
-     * @return int
+     * @return int SESSION_ATTENDANCE_xxx
      */
     public function get_sessionattendance(): int {
         return (int)$this->sessionattendance;
     }
     /**
-     * @param int $sessionattendance
+     * @param int $sessionattendance SESSION_ATTENDANCE_xxx
      * @return seminar
      */
     public function set_sessionattendance(int $sessionattendance): seminar {
+        if (!in_array($sessionattendance, self::SESSION_ATTENDANCE_VALID_VALUES)) {
+            debugging("The session attendance value {$sessionattendance} is not valid.");
+        }
         $this->sessionattendance = $sessionattendance;
         return $this;
     }
 
     /**
-     * @return int
+     * @return int EVENT_ATTENDANCE_xxx
      */
     public function get_attendancetime(): int {
         return (int)$this->attendancetime;
     }
     /**
-     * @param int $attendancetime
+     * @param int $attendancetime EVENT_ATTENDANCE_xxx
      * @return seminar
      */
     public function set_attendancetime(int $attendancetime): seminar {
+        if (!in_array($attendancetime, self::EVENT_ATTENDANCE_VALID_VALUES)) {
+            debugging("The event attendance value {$attendancetime} is not valid.");
+        }
         $this->attendancetime = $attendancetime;
         return $this;
     }
 
     /**
-     * @return int
+     * @return int 0 or 1
      */
     public function get_eventgradingmanual(): int {
         return (int)$this->eventgradingmanual;
     }
     /**
-     * @param int $eventgradingmanual
+     * @param int $eventgradingmanual 0 or 1
      * @return seminar
      */
     public function set_eventgradingmanual(int $eventgradingmanual) : seminar {
@@ -1050,13 +1114,13 @@ final class seminar implements seminar_iterator_item {
     }
 
     /**
-     * @return int
+     * @return int GRADING_METHOD_xxx
      */
     public function get_eventgradingmethod(): int {
         return (int)$this->eventgradingmethod;
     }
     /**
-     * @param int $eventgradingmethod
+     * @param int $eventgradingmethod GRADING_METHOD_xxx
      * @return seminar
      */
     public function set_eventgradingmethod(int $eventgradingmethod) : seminar {
@@ -1065,13 +1129,13 @@ final class seminar implements seminar_iterator_item {
     }
 
     /**
-     * @return int
+     * @return int COMPLETION_PASS_xxx
      */
     public function get_completionpass(): int {
         return (int)$this->completionpass;
     }
     /**
-     * @param int $completionpass
+     * @param int $completionpass COMPLETION_PASS_xxx
      * @return seminar
      */
     public function set_completionpass(int $completionpass) : seminar {
@@ -1141,5 +1205,50 @@ final class seminar implements seminar_iterator_item {
         }
 
         return false;
+    }
+
+    /**
+     * Fix up session attendance time value to keep backward compatibility.
+     * $sessionattendance used to be a boolean value. (0 or 1)
+     * If it is 1 (true), then we need to use EVENT attendance time as session attendance time.
+     *
+     * @param integer $eventattendance
+     * @param boolean|integer $sessionattendance
+     * @return integer the up-to-date $sessionattendance
+     */
+    public static function fix_up_session_attendance_time_with(int $eventattendance, $sessionattendance): int {
+        if ($sessionattendance == 0) {  // 0 or false
+            return self::SESSION_ATTENDANCE_DISABLED;
+        }
+        if ($sessionattendance == 1) {  // 1 or true
+            switch ($eventattendance) {
+                case self::EVENT_ATTENDANCE_LAST_SESSION_END:
+                    return self::SESSION_ATTENDANCE_END;
+                case self::EVENT_ATTENDANCE_FIRST_SESSION_START:
+                    return self::SESSION_ATTENDANCE_START;
+                case self::EVENT_ATTENDANCE_UNRESTRICTED:
+                    return self::SESSION_ATTENDANCE_UNRESTRICTED;
+                default:
+                    // EVENT_ATTENDANCE_LAST_SESSION_START is unknown at that time
+                    debugging("Unrecognisable event attendance time: {$eventattendance}");
+                    return self::SESSION_ATTENDANCE_DISABLED;
+            }
+        }
+        if (!in_array($sessionattendance, self::SESSION_ATTENDANCE_VALID_VALUES)) {
+            debugging("The session attendance time {$sessionattendance} is not valid.", DEBUG_DEVELOPER);
+            return self::SESSION_ATTENDANCE_DISABLED;
+        }
+        return (int)$sessionattendance;
+    }
+
+    /**
+     * Fix up session attendance time value to keep backward compatibility that no one cares.
+     *
+     * @see seminar::fix_up_session_attendance_time_with for more information.
+     * @param boolean|integer $sessionattendance
+     * @return integer the up-to-date $sessionattendance
+     */
+    public function fix_up_session_attendance_time($sessionattendance): int {
+        return self::fix_up_session_attendance_time_with($this->get_attendancetime(), $sessionattendance);
     }
 }

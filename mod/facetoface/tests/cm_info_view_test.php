@@ -104,7 +104,7 @@ class mod_facetoface_cm_info_view_testcase extends advanced_testcase {
         $mapsessioncourse->setValue($generator, array($event->id => $course));
 
         $seminarevent = new \mod_facetoface\seminar_event($event->id);
-        if ($seminarevent->is_started(time())) {
+        if ($seminarevent->is_first_started()) {
             throw new Exception("The session had started, therefore, cannot sign up the user");
         }
         $seminarevent = new \mod_facetoface\seminar_event($event->id);

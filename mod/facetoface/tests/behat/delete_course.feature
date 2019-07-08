@@ -21,8 +21,8 @@ Feature: Delete a course with a seminar
       | student1 | C1     | student        |
       | student2 | C1     | student        |
     And the following "seminars" exist in "mod_facetoface" plugin:
-      | name              | course   | sessionattendance |
-      | Test seminar name | C1       | 1                 |
+      | name              | course |
+      | Test seminar name | C1     |
     And the following "seminar events" exist in "mod_facetoface" plugin:
       | facetoface         | details |
       | Test seminar name  | event 1 |

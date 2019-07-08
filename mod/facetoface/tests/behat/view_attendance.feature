@@ -12,7 +12,7 @@ Feature: Viewing take attendance page with multiple seminar sessions
       | bomba | c101   | student |
     And the following "seminars" exist in "mod_facetoface" plugin:
       | name      | course | sessionattendance |
-      | seminar1  | c101   | 1                 |
+      | seminar1  | c101   | 4                 |
     And the following "seminar events" exist in "mod_facetoface" plugin:
       | facetoface | details  |
       | seminar1   | event101 |

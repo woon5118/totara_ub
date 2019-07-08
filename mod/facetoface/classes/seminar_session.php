@@ -361,16 +361,23 @@ final class seminar_session implements seminar_iterator_item {
     /**
      * Return attendance_taking_status.
      *
-     * @param integer|null  $attendancetime One of seminar::ATTENDANCE_TIME_xxx, or null to load the seminar setting
+     * @param integer|null  $sessionattendance One of seminar::SESSION_ATTENDANCE_xxx, or null to load the seminar setting
      * @param integer       $time           The current timestamp
      * @param boolean       $checksaved     Set true to see if all attendees are taken or not
      * @return integer  One of attendance_taking_status constants
      */
-    public function get_attendance_taking_status(int $attendancetime = null, int $time = 0, bool $checksaved = true): int {
+    public function get_attendance_taking_status(int $sessionattendance = null, int $time = 0, bool $checksaved = true): int {
         $seminarevent = $this->get_seminar_event();
-        $seminar = $seminarevent->get_seminar();
-        if (!$seminar->get_sessionattendance()) {
-            $f2f = $seminarevent->get_facetoface();
+        if (null === $sessionattendance) {
+            $seminar = $seminarevent->get_seminar();
+            $sessionattendance = $seminar->get_sessionattendance();
+            if ($sessionattendance == 1) {
+                // Print debugging message and apply shim.
+                debugging("An old sessionattendance has been detected. Please upgrade the website!!");
+                $sessionattendance = $seminar->fix_up_session_attendance_time($sessionattendance);
+            }
+        }
+        if (seminar::SESSION_ATTENDANCE_DISABLED == $sessionattendance) {
             return attendance_taking_status::NOTAVAILABLE;
         }
         if (0 != $seminarevent->get_cancelledstatus()) {
@@ -382,11 +389,8 @@ final class seminar_session implements seminar_iterator_item {
             $time = time();
         }
 
-        if ($attendancetime === null) {
-            $attendancetime = $seminar->get_attendancetime();
-        }
-        switch ($attendancetime) {
-            case seminar::ATTENDANCE_TIME_ANY:
+        switch ($sessionattendance) {
+            case seminar::SESSION_ATTENDANCE_UNRESTRICTED:
                 if ($seminarevent->get_sessions()->is_empty()) {
                     // Wait listed event should not open attendance for session.
                     // This seems to be a nonsense check here, as it is in a session level and it
@@ -404,8 +408,8 @@ final class seminar_session implements seminar_iterator_item {
                 }
                 break;
 
-            case seminar::ATTENDANCE_TIME_START:
-                // For attendance time start, it need to allow actor to mark attendnace number of
+            case seminar::SESSION_ATTENDANCE_START:
+                // For attendance time start, it need to allow actor to mark attendance number of
                 // minutes before the actual start time.
                 $time += event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
                 if (!$this->is_start($time)) {
@@ -413,14 +417,14 @@ final class seminar_session implements seminar_iterator_item {
                 }
                 break;
 
-            case seminar::ATTENDANCE_TIME_END:
+            case seminar::SESSION_ATTENDANCE_END:
                 if (!$this->is_over($time)) {
                     return attendance_taking_status::CLOSED_UNTILEND;
                 }
                 break;
 
             default:
-                debugging("The attendance time {$attendancetime} is not defined.", DEBUG_DEVELOPER);
+                debugging("The session attendance time {$sessionattendance} is not valid.", DEBUG_DEVELOPER);
                 return attendance_taking_status::UNKNOWN;
         }
 

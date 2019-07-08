@@ -631,5 +631,19 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019072500, 'facetoface');
     }
 
+    if ($oldversion < 2019080600) {
+        // Changing the default of field attendancetime on table facetoface to 3.
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('attendancetime', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '3', 'sessionattendance');
+
+        // Launch change of default for field attendancetime.
+        $dbman->change_field_default($table, $field);
+
+        facetoface_upgradelib_fixup_seminar_sessionattendance();
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2019080600, 'facetoface');
+    }
+
     return true;
 }

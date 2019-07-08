@@ -3,6 +3,11 @@ addmanageremailinstruction,mod_facetoface
 addnewnotice,mod_facetoface
 addnewnoticelink,mod_facetoface
 approvaloptionsheader,mod_facetoface
+attendancetime,mod_facetoface
+attendancetime_any,mod_facetoface
+attendancetime_end,mod_facetoface
+attendancetime_help,mod_facetoface
+attendancetime_start,mod_facetoface
 attendanceinstructions,mod_facetoface
 bulkaddattendeesfromfile,mod_facetoface
 bulkaddattendeesfrominput,mod_facetoface
@@ -62,6 +67,8 @@ selectedpositionname,mod_facetoface
 selectedpositiontype,mod_facetoface
 selectposition,mod_facetoface
 selectpositiononsignup,mod_facetoface
+sessionattendance,mod_facetoface
+sessionattendance_help,mod_facetoface
 sessiondatetimeknown,mod_facetoface
 sessiondatetimeknown_help,mod_facetoface
 setting:addchangemanageremail,mod_facetoface

@@ -334,7 +334,7 @@ function facetoface_update_instance($facetoface, $mform = null) {
                 $state = $signup->get_state();
                 if ($state->can_switch(signup\state\booked::class, signup\state\waitlisted::class)) {
                     $signup->switch_state(signup\state\booked::class, signup\state\waitlisted::class);
-                } else if (!$seminarevent->is_started()) {
+                } else if (!$seminarevent->is_first_started()) {
                     // Requested state for "Manager approval" and "Role approval" will not change state,
                     // however it needs messages to be resent:
                     if ($facetoface->approvaltype == seminar::APPROVAL_MANAGER) {

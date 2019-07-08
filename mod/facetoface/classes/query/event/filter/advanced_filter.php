@@ -95,8 +95,9 @@ final class advanced_filter extends filter {
             FROM {facetoface_sessions_dates} sd
             WHERE sd.sessionid = s.id
         )';
-        $sql_at_start = 'f2f.attendancetime = :at_start_af AND m.mintimestart <= :timeopen_af';
-        $sql_at_end = 'f2f.attendancetime = :at_end_af AND m.mintimefinish < :timenow_af';
+        $sql_at_fstart = 'f2f.attendancetime = :at_fstart_af AND m.mintimestart <= :timeopen1_af';
+        $sql_at_lend = 'f2f.attendancetime = :at_lend_af AND m.mintimefinish < :timenow_af';
+        $sql_at_lstart = 'f2f.attendancetime = :at_lstart_af AND m.maxtimestart <= :timeopen2_af';
 
         $sql .= " AND EXISTS (
             SELECT f2f.id
@@ -104,12 +105,14 @@ final class advanced_filter extends filter {
             WHERE f2f.id = s.facetoface
             AND f2f.sessionattendance != 0
             AND s.cancelledstatus = 0
-            AND (({$sql_at_any}) OR ({$sql_at_start}) OR ({$sql_at_end}))
+            AND (({$sql_at_any}) OR ({$sql_at_fstart}) OR ({$sql_at_lend}) OR ({$sql_at_lstart}))
         )";
-        $params['at_any_af'] = seminar::ATTENDANCE_TIME_ANY;
-        $params['at_start_af'] = seminar::ATTENDANCE_TIME_START;
-        $params['at_end_af'] = seminar::ATTENDANCE_TIME_END;
-        $params['timeopen_af'] = $time + event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
+        $params['at_any_af'] = seminar::EVENT_ATTENDANCE_UNRESTRICTED;
+        $params['at_fstart_af'] = seminar::EVENT_ATTENDANCE_FIRST_SESSION_START;
+        $params['at_lend_af'] = seminar::EVENT_ATTENDANCE_LAST_SESSION_END;
+        $params['at_lstart_af'] = seminar::EVENT_ATTENDANCE_LAST_SESSION_START;
+        $params['timeopen1_af'] = $time + event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
+        $params['timeopen2_af'] = $time + event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
         $params['timenow_af'] = $time;
 
         if ($this->value == self::ATTENDANCE_OPEN) {

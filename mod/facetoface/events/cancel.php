@@ -48,7 +48,7 @@ if ($backtoallsessions) {
     $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
 }
 
-if ($seminarevent->is_started()) {
+if ($seminarevent->is_first_started()) {
     // How did they get here? There should not be any link in UI to this page.
     redirect($returnurl);
 }

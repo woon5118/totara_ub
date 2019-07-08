@@ -27,9 +27,12 @@ use mod_facetoface\seminar_event;
 use mod_facetoface\seminar_session;
 use mod_facetoface\signup_helper;
 use mod_facetoface\signup;
+use mod_facetoface\signup_status;
 use mod_facetoface\signup\state\booked;
 use mod_facetoface\signup\state\partially_attended;
 use mod_facetoface\signup\state\fully_attended;
+use mod_facetoface\signup\state\unable_to_attend;
+use mod_facetoface\signup\state\no_show;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -160,5 +163,96 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
             $this->fail('Must fail when first argument is neither seminar nor stdClass');
         } catch (\coding_exception $e) {
         }
+    }
+
+    public function test_process_attendance() {
+        global $CFG;
+        require_once($CFG->dirroot . '/lib/gradelib.php');
+
+        $gen = $this->getDataGenerator();
+        $course = $gen->create_course();
+
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $f2f = $f2fgen->create_instance(['course' => $course->id]);
+
+        $seminar = (new seminar($f2f->id))
+            ->set_sessionattendance(0)
+            ->set_multisignupfully(true)
+            ->set_multisignuppartly(true)
+            ->set_multiplesessions(1)
+            ->set_multisignupmaximum(2)
+            ->set_eventgradingmethod(0)
+            ->set_eventgradingmanual(1)
+            ->save();
+
+        $user1 = $gen->create_user();
+        $user2 = $gen->create_user();
+        $gen->enrol_user($user1->id, $course->id);
+        $gen->enrol_user($user2->id, $course->id);
+
+        $now = time();
+        $event1 = new seminar_event();
+        $event1->set_facetoface($f2f->id)->save();
+        $session1 = new seminar_session();
+        $session1->set_timestart($now + DAYSECS)->set_timefinish($now + DAYSECS + HOURSECS)->set_sessionid($event1->get_id())->save();
+
+        $event2 = new seminar_event();
+        $event2->set_facetoface($f2f->id)->save();
+        $session2 = new seminar_session();
+        $session2->set_timestart($now + DAYSECS * 2)->set_timefinish($now + DAYSECS * 2 + HOURSECS)->set_sessionid($event2->get_id())->save();
+
+        $signup11 = (signup::create($user1->id, $event1))->save()->switch_state(booked::class);
+        $signup21 = (signup::create($user2->id, $event1))->save()->switch_state(booked::class);
+        $signup21->delete();
+
+        $session1->set_timestart($now - DAYSECS * 2)->set_timefinish($now - DAYSECS * 2 + HOURSECS)->save();
+
+        // Attendance
+        $result = signup_helper::process_attendance($event1, [ $signup11->get_id() => fully_attended::get_code() ]);
+        $this->assertTrue($result);
+        $this->assertInstanceOf(fully_attended::class, $signup11->get_state());
+
+        $signup12 = (signup::create($user1->id, $event2))->save()->switch_state(booked::class);
+        $session2->set_timestart($now - DAYSECS)->set_timefinish($now - DAYSECS + HOURSECS)->save();
+
+        // Wrong event: silently fails so far
+        $result = signup_helper::process_attendance($event2, [ $signup11->get_id() => partially_attended::get_code() ]);
+        $this->assertFalse($result);
+        $this->assertInstanceOf(fully_attended::class, $signup11->get_state());
+
+        // Attendance
+        $result = signup_helper::process_attendance($event2, [ $signup12->get_id() => partially_attended::get_code() ]);
+        $this->assertTrue($result);
+        $this->assertInstanceOf(fully_attended::class, $signup11->get_state());
+        $this->assertInstanceOf(partially_attended::class, $signup12->get_state());
+
+        // Wrong event: silently fails so far
+        $result = signup_helper::process_attendance($event1, [ $signup12->get_id() => unable_to_attend::get_code() ]);
+        $this->assertFalse($result);
+        $this->assertInstanceOf(fully_attended::class, $signup11->get_state());
+        $this->assertInstanceOf(partially_attended::class, $signup12->get_state());
+
+        // Ghost signup: silently fails so far
+        $result = signup_helper::process_attendance($event1, [ $signup21->get_id() => fully_attended::get_code() ]);
+        $this->assertFalse($result);
+
+        // Ghost signup & wrong event: silently fails so far
+        $result = signup_helper::process_attendance($event2, [ $signup21->get_id() => fully_attended::get_code() ]);
+        $this->assertFalse($result);
+
+        // Attendance & event grade
+        $result = signup_helper::process_attendance($event1, [ $signup11->get_id() => no_show::get_code() ], [ $signup11->get_id() => 42]);
+        $this->assertTrue($result);
+        $grade = signup_status::from_current($signup11)->get_grade();
+        $this->assertSame(42., grade_floatval($grade));
+
+        // Attendance & wrong event grade: throws coding_exception
+        try {
+            signup_helper::process_attendance($event2, [ $signup12->get_id() => no_show::get_code() ], [ $signup11->get_id() => 42]);
+            $this->fail('coding_exception expected');
+        } catch (\coding_exception $ex) {
+        }
+        $grade = signup_status::from_current($signup11)->get_grade();
+        $this->assertSame(42., grade_floatval($grade));
     }
 }
