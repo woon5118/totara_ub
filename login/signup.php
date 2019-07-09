@@ -28,6 +28,10 @@ require('../config.php');
 require_once($CFG->dirroot . '/user/editlib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
+// Confirm pre-signup requirements and redirects user if necessary.
+$hook = new \totara_core\hook\presignup_redirect();
+$hook->execute();
+
 // Try to prevent searching for sites that allow sign-up.
 if (!isset($CFG->additionalhtmlhead)) {
     $CFG->additionalhtmlhead = '';

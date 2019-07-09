@@ -100,6 +100,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $expected->managerjaid = 0;
         $expected->managerfreetext = 'managerfreetext';
         $expected->profilefields = json_encode(['profile_field_fake' => $data->profile_field_fake]);
+        $expected->extradata = '';
         $this->assertSame((array)$expected, (array)$record);
 
         // Test with partial details and no freetext.
@@ -131,6 +132,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $expected->organisationid = 0;
         $expected->managerjaid = 0;
         $expected->profilefields = json_encode([]);
+        $expected->extradata = '';
         $this->assertSame((array)$expected, (array)$record);
 
         // Test freetext empty to null conversions.
@@ -169,6 +171,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $expected->managerjaid = 0;
         $expected->managerfreetext = null;
         $expected->profilefields = json_encode([]);
+        $expected->extradata = '';
 
         $this->assertSame((array)$expected, (array)$record);
 
