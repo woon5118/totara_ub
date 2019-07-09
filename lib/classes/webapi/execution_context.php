@@ -24,7 +24,9 @@
 namespace core\webapi;
 
 use core\date_format;
+use core\format;
 use totara_core\formatter\field\date_field_formatter;
+use totara_core\formatter\field\text_field_formatter;
 
 /**
  * GraphQL execution context.
@@ -132,16 +134,19 @@ class execution_context {
     public function format_text(?string $text, $format = FORMAT_HTML, array $options = []) {
         debugging('format_text() in execution_context is deprecated, please use the new \totara_core\formatter\field\text_field_formatter class', DEBUG_DEVELOPER);
 
-        global $CFG;
-        require_once($CFG->libdir . '/filelib.php');
+        $context = $options['context'] ?? \context_system::instance();
 
-        if ($text === null) {
-            return null;
+        $formatter = new text_field_formatter(format::FORMAT_HTML, $context);
+        $formatter->set_text_format($format)
+            ->set_additional_options($options);
+
+        if (!empty($options['context']) && !empty($options['component']) && !empty($options['filearea'])) {
+            $itemid = $options['itemid'] ?? null;
+            $formatter->set_pluginfile_url_options($options['context'], $options['component'], $options['filearea'], $itemid);
+        } else {
+            $formatter->disabled_pluginfile_url_rewrite();
         }
-        if (!empty($options['context']) and !empty($options['component']) and !empty($options['filearea'])) {
-            $itemid = isset($options['itemid']) ? $options['itemid'] : null;
-            $text = file_rewrite_pluginfile_urls($text, 'pluginfile.php', $options['context']->id, $options['component'], $options['filearea'], $itemid);
-        }
-        return format_text($text, $format, $options);
+
+        return $formatter->format($text);
     }
 }

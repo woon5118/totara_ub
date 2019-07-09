@@ -50,6 +50,14 @@ use core\format;
 class text_field_formatter extends base {
 
     /**
+     * By default pluginfile urls are rewritten automatically.
+     * You need to set the options for it using set_pluginfile_url_options()
+     *
+     * @var bool
+     */
+    protected $pluginfile_url_rewrite_enabled = true;
+
+    /**
      * Existing options and their defaults
      * @var array
      */
@@ -67,7 +75,7 @@ class text_field_formatter extends base {
             'filearea' => null,
             'itemid' => null,
             'options' => null
-        ]
+        ],
     ];
 
     protected function validate_format(): bool {
@@ -130,6 +138,29 @@ class text_field_formatter extends base {
     }
 
     /**
+     * Disable the pluginfile_url rewrite, making it possible to use the formatter without specifying the pluginfile_url_options
+     * This is useful if you do not have a specific filearea for the field you are formatting
+     *
+     * @return $this
+     */
+    public function disabled_pluginfile_url_rewrite() {
+        $this->pluginfile_url_rewrite_enabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Enable the pluginfile_url rewrite. This is the default behaviour resulting in having to specify the pluginfile_url_options.
+     *
+     * @return $this
+     */
+    public function enable_pluginfile_url_rewrite() {
+        $this->pluginfile_url_rewrite_enabled = true;
+
+        return $this;
+    }
+
+    /**
      * Leave it as it is
      *
      * @param string $value
@@ -146,7 +177,9 @@ class text_field_formatter extends base {
      * @return string
      */
     protected function format_html(string $value): string {
-        $value = $this->rewrite_urls($value);
+        if ($this->pluginfile_url_rewrite_enabled === true) {
+            $value = $this->rewrite_urls($value);
+        }
 
         // Set the default format of the text according to given format
         $text_format = $this->options['text_format'] ?? FORMAT_HTML;

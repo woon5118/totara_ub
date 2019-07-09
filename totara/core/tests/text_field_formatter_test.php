@@ -157,6 +157,24 @@ class totara_core_text_field_formatter_testcase extends advanced_testcase {
         $formatter->format($value);
     }
 
+    public function test_toggle_pluginfile_url_rewrite() {
+        $context = context_system::instance();
+        $formatter = new text_field_formatter(format::FORMAT_HTML, $context);
+        $formatter->disabled_pluginfile_url_rewrite();
+
+        $value = '<span class="myhtml">test</span>';
+
+        $result = $formatter->format($value);
+        $this->assertRegExp("/<span class/", $result);
+
+        $formatter->enable_pluginfile_url_rewrite();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessageRegExp('/You must provide the pluginfile url options via set_pluginfile_url_options()/');
+
+        $formatter->format($value);
+    }
+
     public function test_unknown_format() {
         $context = context_system::instance();
         $formatter = new text_field_formatter('foo', $context);
