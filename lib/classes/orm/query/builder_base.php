@@ -52,7 +52,7 @@ abstract class builder_base {
     public const AS_REGEX = self::TABLE_REGEX;
 
     /** @var string Regex to check aggregate function sanity */
-    public const AGG_REGEX = '/^(avg|count|min|max|sum)\((.*)\)$/';
+    public const AGG_REGEX = '/^(avg|count|min|max|sum)\((.*)\)$/i';
 
     /** @var string Regex to check field sanity */
     public const FIELD_REGEX = '/^(?:' . self::BASE_REGEX . '|\*)$/';

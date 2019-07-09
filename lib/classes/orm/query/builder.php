@@ -1320,14 +1320,40 @@ final class builder extends builder_base implements interacts_with_query, intera
     public function update($attributes) {
         $this->restrict(__FUNCTION__, ['joins', 'unions', 'offset', 'limit', 'orders', 'group_by', 'selects', 'having']);
 
+        $record = (array) $attributes;
+
+        if (isset($record['id'])) {
+            throw new \coding_exception('You cannot supply an id here. To update a single record please use \core\orm\query\builder::update_record() instead');
+        }
+
         $use_alias = $this->is_alias_used();
         $this->do_not_use_alias();
 
         $query_builder = where::from_builder($this);
 
-        self::get_db()->set_fields_select($this->get_table(),  (array)$attributes, ...$query_builder->build());
+        self::get_db()->set_fields_select($this->get_table(),  $record, ...$query_builder->build());
 
         $this->use_alias($use_alias);
+
+        return $this;
+    }
+
+    /**
+     * Update a single record based on the supplied id attribute
+     *
+     * @param stdClass|array $record Record array\object, must contain id of the record updated
+     * @return $this
+     */
+    public function update_record($record) {
+        $this->restrict(__FUNCTION__, ['joins', 'unions', 'offset', 'limit', 'orders', 'group_by', 'selects', 'having', 'where']);
+
+        $attributes = (array) $record;
+
+        if (!isset($attributes['id'])) {
+            throw new \coding_exception('Id is required to update a single record. Please use \core\orm\query\builder::update() instead');
+        }
+
+        self::get_db()->update_record($this->get_table(),  $attributes);
 
         return $this;
     }
@@ -1382,10 +1408,11 @@ final class builder extends builder_base implements interacts_with_query, intera
             throw new record_not_found_exception($this->get_table(), $query['sql'], $query['params']);
         }
 
-        $value = array_shift($result);
+        $value = reset($result) ?: null;
 
         if (!is_null($value)) {
-            $value = $this->should_return_array() ? $value[$column] : $value->{$column};
+            $value = (array) $value;
+            $value = reset($value);
         }
 
         return $value;

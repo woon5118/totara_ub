@@ -158,6 +158,14 @@ interface interacts_with_database {
     public function update($attributes);
 
     /**
+     * Update a single record based on the supplied id attribute
+     *
+     * @param stdClass|array $record Record array\object, must contain id of the record updated
+     * @return $this
+     */
+    public function update_record($record);
+
+    /**
      * Retrieve a value of a single column
      *
      * @param string|field $column Column name to select

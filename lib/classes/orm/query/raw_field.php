@@ -282,8 +282,8 @@ class raw_field {
         $field = $this->get_field_as_is();
 
         // Let's account for as:
-        if (strpos($field, ' as ')) {
-            $bits = explode(' as ', $field);
+        if (stripos($field, ' as ')) {
+            $bits = preg_split('/ as /i', $field);
 
             if (count($bits) > 2) {
                 return false;

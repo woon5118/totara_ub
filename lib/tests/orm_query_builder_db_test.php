@@ -270,6 +270,28 @@ class core_orm_query_builder_db_testcase extends advanced_testcase {
             ->value('price')
         );
 
+        $this->assertEquals(4900, $this->new_builder($this->table_goods)
+            ->results_as_objects()
+            ->value('MAX(price)')
+        );
+
+        $this->assertEquals(4900, $this->new_builder($this->table_goods)
+            ->value('MAX(price) as X')
+        );
+
+        $this->assertEquals(1350, $this->new_builder($this->table_goods)
+            ->value('min(price) AS x')
+        );
+
+        $this->assertEquals(19148, $this->new_builder($this->table_goods)
+            ->results_as_objects()
+            ->value('SUM(price)')
+        );
+
+        $this->assertEquals(9, $this->new_builder($this->table_goods)
+            ->value('cOuNt(id) As IDDDDCccooounnttt')
+        );
+
         $this->assertEquals('Apple iPhone 6', $this->new_builder($this->table_goods)
             ->where('description', 'New sleek iPhone')
             ->value(new field('name'))
@@ -813,6 +835,16 @@ class core_orm_query_builder_db_testcase extends advanced_testcase {
             'An overpriced phone',
             'An overpriced phone'
         ], $builder->get()->pluck('description'));
+
+        // Test that you can't try to get id in the attributes array, that's to prevent false expectations
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('You cannot supply an id here. To update a single record please use \core\orm\query\builder::update_record() instead');
+
+        $this->new_builder($this->table_cats)
+            ->update([
+                'id' => $apple_cat->id,
+                'description' => 'New description',
+            ]);
     }
 
     public function test_it_updates_record() {
@@ -846,6 +878,51 @@ class core_orm_query_builder_db_testcase extends advanced_testcase {
             'created_at' => $original->created_at,
             'updated_at' => $updated,
         ], $record);
+    }
+
+    public function test_it_updates_a_single_record() {
+
+        $original_record = $this->new_builder($this->table_goods)->order_by('id')->results_as_arrays()->first();
+        $record = $original_record;
+
+        $record['price'] += 1;
+
+        $this->new_builder($this->table_goods)
+            ->update_record($record);
+
+        $this->assertEquals($record['price'], $this->new_builder($this->table_goods)
+            ->where('id', $original_record['id'])
+            ->value('price')
+        );
+
+        // Now let's try again, but pass price as object
+        $record['price'] += 1;
+
+        $this->new_builder($this->table_goods)
+            ->update_record((object) $record);
+
+        $this->assertEquals($record['price'], $this->new_builder($this->table_goods)
+            ->where('id', $original_record['id'])
+            ->value('price')
+        );
+
+        // Let's check for exceptions
+        try {
+            $this->new_builder($this->table_goods)
+                ->update_record(['price' => 5]);
+            $this->fail('Exception should have been thrown');
+        } catch (coding_exception $exception) {
+            $this->assertContains('Id is required to update a single record. Please use \core\orm\query\builder::update() instead', $exception->getMessage());
+        }
+
+        // And now as object, just in case
+        try {
+            $this->new_builder($this->table_goods)
+                ->update_record((object) ['price' => 5]);
+            $this->fail('Exception should have been thrown');
+        } catch (coding_exception $exception) {
+            $this->assertContains('Id is required to update a single record. Please use \core\orm\query\builder::update() instead', $exception->getMessage());
+        }
     }
 
     public function test_it_deletes_records() {
