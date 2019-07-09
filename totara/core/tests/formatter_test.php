@@ -32,8 +32,6 @@ defined('MOODLE_INTERNAL') || die();
 class totara_core_formatter_testcase extends advanced_testcase {
 
     public function test_format() {
-        $this->resetAfterTest();
-
         // Enable the multilang filter and set it to apply to headings and content.
         filter_set_global_state('multilang', TEXTFILTER_ON);
         filter_set_applies_to_strings('multilang', true);
@@ -240,6 +238,27 @@ class totara_core_formatter_testcase extends advanced_testcase {
         $this->expectExceptionMessageRegExp('/Format method not found!/');
 
         $formatter->format('multilangstring');
+    }
+
+    public function test_null_format() {
+        $data = [
+            'multilangstring' => '<span lang="en" class="multilang">Summer</span>'.
+                '<span lang="de" class="multilang">Sommer</span>',
+            'customfunctionfield' => 'thisiscustom'
+        ];
+
+        $formatter = $this->get_formatter($data);
+
+        // Custom function name does not care about the format so null is possible
+        $value = $formatter->format('customfunctionfield', null);
+        $this->assertEquals($data['customfunctionfield'], $value);
+
+        // This one does not work with a null value
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessageRegExp('/Invalid format given/');
+
+        $value = $formatter->format('multilangstring', null);
+        $this->assertEquals('Summer', $value);
     }
 
     protected function get_formatter($data): formatter {
