@@ -43,7 +43,7 @@ class totara_catalog_wildcard_search_testcase extends advanced_testcase {
         $course1 = $gen->create_course(
             [
                 'shortname' => 'this is shortname',
-                'fullname' => 'this is a fullname',
+                'fullname' => 'this is an actsman',
                 'summary' => 'bolobala balabolo lpth p'
             ],
             ['createsections' => true]
@@ -69,7 +69,7 @@ class totara_catalog_wildcard_search_testcase extends advanced_testcase {
                 'course' => $course1->id
             ],
             [
-                'value' => 'fu*',
+                'value' => 'ac*',
                 'count' => 1,
                 'course' => $course1->id
             ],
@@ -143,7 +143,7 @@ class totara_catalog_wildcard_search_testcase extends advanced_testcase {
         $proggen = $gen->get_plugin_generator('totara_program');
         $prog1 = $proggen->create_program(
             [
-                'fullname' => 'This is fullname',
+                'fullname' => 'This is actsman',
                 'shortname' => 'This is shortname',
             ]
         );
@@ -159,7 +159,7 @@ class totara_catalog_wildcard_search_testcase extends advanced_testcase {
 
         $terms = [
             [
-                'value' => 'fu*',
+                'value' => 'ac*',
                 'prog' => $prog1->id,
                 'count' => 1
             ],
@@ -221,7 +221,7 @@ class totara_catalog_wildcard_search_testcase extends advanced_testcase {
      * result of inserting records for php only. Therefore, we need to assure that the processes of fts
      * population are completely done, so that we can start performing test.
      *
-     * @see https://docs.microsoft.com/en-us/sql/t-sql/functions/fulltextcatalogproperty-transact-sql?view=sql-server-2017
+     * @see https://docs.microsoft.com/en-us/sql/t-sql/functions/objectpropertyex-transact-sql?view=sql-server-2017
      * @return bool
      */
     private function check_index_process_completed(): bool {
@@ -229,28 +229,27 @@ class totara_catalog_wildcard_search_testcase extends advanced_testcase {
         if ('mssql' === $DB->get_dbvendor()) {
             $running = true;
             $attempted = 0;
+            $sql = "SELECT OBJECTPROPERTYEX(OBJECT_ID(N'{$DB->get_prefix()}catalog'), N'TableFullTextPopulateStatus') as status;";
 
             while ($running) {
-                // By default, we added {prefix}search_catalog for fulltext catalog.
-                // 9 = Change tracking
-                $sql = "
-                    SELECT 1
-                    FROM sys.fulltext_catalogs cat 
-                    WHERE cat.name = '{$DB->get_prefix()}search_catalog'
-                    AND FULLTEXTCATALOGPROPERTY(cat.name, 'PopulateStatus') = 9
-                ";
-
-                $running = $DB->record_exists_sql($sql);
-                if ($running) {
-                    // Giving it a several attemped, if it is exceeding 10, then the MsSQL is having trouble.
-                    if (10 < $attempted) {
-                        return false;
-                    }
-
-                    $attempted += 1;
-
-                    // Giving it a second to refresh the status. MsSQL is slow, we all know that.
-                    sleep(1);
+                $fts_indexing = $DB->get_record_sql($sql);
+                switch ($fts_indexing->status) {
+                    case '0':
+                        // Idle, we're good to go.
+                        $running = false;
+                        break;
+                    case '5':
+                    case '6':
+                        // Throttled, paused, or broken.
+                        static::fail("FTS index cannot be completed due to an MSSQL error: TableFullTextPopulateStatus=" . $fts_indexing->status);
+                        break;
+                    default:
+                        // Still running - Give it a several attempts,  if it exceeds 10 then MsSQL is having trouble.
+                        if (10 < $attempted) {
+                            return false;
+                        }
+                        sleep(1);
+                        $attempted += 1;
                 }
             }
         }
