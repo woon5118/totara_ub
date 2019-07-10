@@ -2286,6 +2286,110 @@ class totara_certification_certification_completion_testcase extends reportcache
         $this->assertEquals(($this->numtestusers - 1) * ($this->numtestcerts - 1) + 3, count($certcompletions));
     }
 
+    public function test_certif_write_completion_validation_failure() {
+        global $DB;
+
+        $now = time();
+
+        /* @var totara_program_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $prog = $generator->legacy_create_certification();
+
+        $certcompletion = new stdClass();
+        $certcompletion->status = CERTIFSTATUS_COMPLETED;
+        $certcompletion->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $certcompletion->certifpath = CERTIFPATH_RECERT;
+        $certcompletion->timecompleted = 1001;
+        $certcompletion->timewindowopens = 1002;
+        $certcompletion->timeexpires = 1003;
+        $certcompletion->baselinetimeexpires = 1003;
+        $certcompletion->timemodified = $now;
+        $certcompletion->certifid = $prog->certifid;
+        $certcompletion->userid = 654;
+
+        $progcompletion = new stdClass();
+        $progcompletion->timedue = 1003;
+        $progcompletion->timecompleted = 1001;
+        $progcompletion->organisationid = 13;
+        $progcompletion->positionid = 14;
+        $progcompletion->programid = $prog->id;
+        $progcompletion->userid = 654;
+        $progcompletion->status = STATUS_PROGRAM_INCOMPLETE; // Invalid due to timecompleted.
+
+        $this->assertFalse(certif_write_completion($certcompletion, $progcompletion, 'test message'));
+
+        $last_description = $DB->get_field_sql(
+            'SELECT description FROM {prog_completion_log} ORDER BY id DESC',
+            [],
+            MUST_EXIST
+        );
+        $expected = "An attempt was made to write changes, but the data was invalid. Errors were encountered:<br>error:statecertified-progstatusincorrect<br>Message of caller was:<br>test message";
+        $this->assertEquals($expected, $last_description);
+    }
+
+    public function test_certif_write_completion_history_validation_failure() {
+        global $DB;
+
+        /* @var totara_program_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $prog = $generator->legacy_create_certification();
+
+        $completionhistory = (object)array(
+            'id' => 0,
+            'certifid' => $prog->certifid,
+            'userid' => 234,
+            'status' => CERTIFSTATUS_COMPLETED,
+            'renewalstatus' => CERTIFRENEWALSTATUS_EXPIRED, // Can't be completed and expired at the same time.
+            'certifpath' => CERTIFPATH_RECERT,
+            'timecompleted' => 1001,
+            'timewindowopens' => 1002,
+            'timeexpires' => 1003,
+            'baselinetimeexpires' => 1003,
+            'unassigned' => 0);
+        $this->assertFalse(certif_write_completion_history($completionhistory, 'test message'));
+
+        $last_description = $DB->get_field_sql(
+            'SELECT description FROM {prog_completion_log} ORDER BY id DESC',
+            [],
+            MUST_EXIST
+        );
+        $expected = "Tried to write completion history but errors were encountered:<br>error:statecertified-renewalstatusincorrect<br>Message of caller was:<br>test message";
+        $this->assertEquals($expected, $last_description);
+    }
+
+    public function test_certif_write_completion_history_insert_and_update() {
+        global $DB;
+
+        /* @var totara_program_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $prog = $generator->legacy_create_certification();
+
+        $completionhistory = (object)array(
+            'id' => 0,
+            'certifid' => $prog->certifid,
+            'userid' => 234,
+            'status' => CERTIFSTATUS_COMPLETED,
+            'renewalstatus' => CERTIFRENEWALSTATUS_NOTDUE,
+            'certifpath' => CERTIFPATH_RECERT,
+            'timecompleted' => 1001,
+            'timewindowopens' => 1002,
+            'timeexpires' => 1003,
+            'baselinetimeexpires' => 1003,
+            'unassigned' => 0,
+            'timemodified' => time());
+        $this->assertTrue(certif_write_completion_history($completionhistory));
+
+        $last_description = $DB->get_field_sql('SELECT description FROM {prog_completion_log} ORDER BY id DESC LIMIT 1', [], MUST_EXIST);
+        $this->assertStringStartsWith('Completion history created', $last_description);
+
+        $completionhistory->id = $DB->get_field_sql('SELECT MAX(id) FROM {certif_completion_history}', [], MUST_EXIST);
+        $completionhistory->renewalstatus = CERTIFRENEWALSTATUS_DUE;
+        $this->assertTrue(certif_write_completion_history($completionhistory));
+
+        $last_description = $DB->get_field_sql('SELECT description FROM {prog_completion_log} ORDER BY id DESC LIMIT 1', [], MUST_EXIST);
+        $this->assertStringStartsWith('Completion history updated', $last_description);
+    }
+
     /**
      * Test that certif_write_history_completion causes exceptions when expected (for faults that are caused by bad code).
      *

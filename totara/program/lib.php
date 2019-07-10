@@ -2968,8 +2968,13 @@ function prog_write_completion($progcompletion, $message = '', $ignoreproblemkey
         return true;
     } else {
         // Some error was detected, and it wasn't specified in $ignoreproblemkey.
-        prog_log_completion($progcompletion->programid, $progcompletion->userid,
-            'An attempt was made to write changes, but the data was invalid. Message of caller was:<br>' . $message);
+        $errors_string = implode(', ', array_keys($errors));
+        prog_log_completion(
+            $progcompletion->programid,
+            $progcompletion->userid,
+            'An attempt was made to write changes, but the data was invalid. Errors were encountered:<br>' . $errors_string .
+            '<br>Message of caller was:<br>' . $message
+        );
         return false;
     }
 }

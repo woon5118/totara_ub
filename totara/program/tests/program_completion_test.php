@@ -399,6 +399,35 @@ class totara_program_program_completion_testcase extends reportcache_advanced_te
         $this->assertEquals(($this->numtestusers - 1) * ($this->numtestprogs - 1) + 3, count($progcompletions));
     }
 
+    public function test_prog_write_completion_validation_failure() {
+        global $DB;
+
+        $now = time();
+
+        /* @var totara_program_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $prog = $generator->create_program();
+
+        $progcompletion = new stdClass();
+        $progcompletion->timedue = 1003;
+        $progcompletion->timecompleted = 1001;
+        $progcompletion->organisationid = 13;
+        $progcompletion->positionid = 14;
+        $progcompletion->programid = $prog->id;
+        $progcompletion->userid = 654;
+        $progcompletion->status = STATUS_PROGRAM_INCOMPLETE; // Invalid due to timecompleted.
+
+        $this->assertFalse(prog_write_completion($progcompletion, 'test message'));
+
+        $last_description = $DB->get_field_sql(
+            'SELECT description FROM {prog_completion_log} ORDER BY id DESC',
+            [],
+            MUST_EXIST
+        );
+        $expected = "An attempt was made to write changes, but the data was invalid. Errors were encountered:<br>error:stateincomplete-timecompletednotempty<br>Message of caller was:<br>test message";
+        $this->assertEquals($expected, $last_description);
+    }
+
     /**
      * Test that prog_write_courseset_completion causes exceptions when expected (for faults that are caused by bad code).
      */

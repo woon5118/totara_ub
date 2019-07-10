@@ -2792,8 +2792,13 @@ function certif_write_completion($certcompletion, $progcompletion, $message = ''
         return true;
     } else {
         // Some error was detected, and it wasn't specified in $ignoreproblemkey.
-        prog_log_completion($progcompletion->programid, $progcompletion->userid,
-            'An attempt was made to write changes, but the data was invalid. Message of caller was:<br>' . $message);
+        $errors_string = implode(', ', array_keys($errors));
+        prog_log_completion(
+            $progcompletion->programid,
+            $progcompletion->userid,
+            'An attempt was made to write changes, but the data was invalid. Errors were encountered:<br>' . $errors_string .
+            '<br>Message of caller was:<br>' . $message
+        );
         return false;
     }
 }
@@ -2838,6 +2843,9 @@ function certif_write_completion_history($certcomplhistory, $message = '') {
         if (!$DB->record_exists_sql($sql, $params)) {
             print_error(get_string('error:updatinginvalidcompletionhistoryrecord', 'totara_certification'));
         };
+        if (empty($message)) {
+            $message = "Completion history updated";
+        }
     }
 
     $state = certif_get_completion_state($certcomplhistory);
@@ -2856,6 +2864,17 @@ function certif_write_completion_history($certcomplhistory, $message = '') {
 
         return true;
     } else {
+        // Some error was detected.
+        $prog = $DB->get_record('prog', ['certifid' => $certcomplhistory->certifid], 'id');
+        if (!empty($prog)) {
+            $errors_string = implode(', ', array_keys($errors));
+            prog_log_completion(
+                $prog->id,
+                $certcomplhistory->userid,
+                'Tried to write completion history but errors were encountered:<br>' . $errors_string .
+                '<br>Message of caller was:<br>' . $message
+            );
+        }
         return false;
     }
 }
