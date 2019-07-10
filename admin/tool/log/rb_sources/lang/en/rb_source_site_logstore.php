@@ -55,3 +55,9 @@ $string['date'] = 'The date';
 $string['type_logstore_standard_log'] = 'Log';
 $string['type_realuser'] = 'Real user';
 $string['type_relateduser'] = 'Related user';
+
+// Templates.
+$string['template:admin_site_logstore:label'] = 'Administrator';
+$string['template:admin_site_logstore:numberoflogentries'] = 'Number of Log Entries';
+$string['template:admin_site_logstore:summary'] = 'This report allows administrators to track site activity over time';
+$string['template:admin_site_logstore:title'] = 'Admin site activity overview';

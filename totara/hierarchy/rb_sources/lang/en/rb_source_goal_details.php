@@ -42,3 +42,15 @@ $string['sourcetitle'] = 'Goal Status';
 $string['type_goal'] = 'Goal';
 $string['type_goal_type'] = 'Company Goal Type';
 $string['user'] = 'The user';
+
+// Templates.
+$string['template:leaner_goal_details:label'] = 'Learner';
+$string['template:leaner_goal_details:numberofgoals'] = 'Number of Goals';
+$string['template:leaner_goal_details:status'] = 'Status';
+$string['template:leaner_goal_details:summary'] = 'This report gives the logged in user an overview of their own goal status';
+$string['template:leaner_goal_details:title'] = 'Learner goal status overview';
+$string['template:manager_goal_details:label'] = 'Manager';
+$string['template:manager_goal_details:numberofgoals'] = 'Number of Goals';
+$string['template:manager_goal_details:status'] = 'Status';
+$string['template:manager_goal_details:summary'] = 'This report gives managers an overview of their own team goal status';
+$string['template:manager_goal_details:title'] = 'Manager goal status overview';

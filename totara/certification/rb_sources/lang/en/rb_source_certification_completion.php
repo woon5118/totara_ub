@@ -44,3 +44,15 @@ $string['status:windowopen'] = 'Expires {$a}';
 $string['status:assignedwithoutduedate'] = 'Assigned';
 $string['status:certified'] = 'Window opens {$a}';
 $string['status:notavailable'] = 'N/A';
+
+// Templates.
+$string['template:learner_certification_completion:label'] = 'Learner';
+$string['template:learner_certification_completion:numberofcertifications'] = 'Number of Certifications';
+$string['template:learner_certification_completion:summary'] = 'This report gives the logged in user an overview of their own certification completion status';
+$string['template:learner_certification_completion:status'] = 'Status';
+$string['template:learner_certification_completion:title'] = 'Learner certification completion status overview';
+$string['template:manager_certification_completion:label'] = 'Manager';
+$string['template:manager_certification_completion:numberofcertifications'] = 'Number of Certifications';
+$string['template:manager_certification_completion:summary'] = 'This report gives managers an overview of their own team certification completion status';
+$string['template:manager_certification_completion:status'] = 'Status';
+$string['template:manager_certification_completion:title'] = 'Manager certification completion status overview';

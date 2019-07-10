@@ -71,3 +71,16 @@ $string['completiondate'] = 'The completion date';
 
 // column types for this source, as strings
 $string['type_course_completion'] = 'Course Completion';
+
+// Templates.
+$string['template:leaner_course_completion:title'] = 'Learner course completion status overview';
+$string['template:leaner_course_completion:label'] = 'Learner';
+$string['template:leaner_course_completion:summary'] = 'This report gives the logged in user an overview of their own course completion status';
+$string['template:leaner_course_completion:status'] = 'Status';
+$string['template:leaner_course_completion:numberofcourses'] = 'Number of Courses';
+
+$string['template:manager_course_completion:title'] = 'Manager course completion status overview';
+$string['template:manager_course_completion:label'] = 'Manager';
+$string['template:manager_course_completion:summary'] = 'This report gives managers an overview of their own team course completion status.';
+$string['template:manager_course_completion:status'] = 'Status';
+$string['template:manager_course_completion:numberofcourses'] = 'Number of Courses';

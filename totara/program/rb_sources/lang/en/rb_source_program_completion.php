@@ -54,3 +54,15 @@ $string['programcompletionprogressnumeric'] = 'Progress';
 $string['programcompletionprogresspercentage'] = 'Progress (%)';
 
 $string['type_progcompletion'] = 'Program Completion';
+
+// Templates.
+$string['template:learner_program_completion:label'] = 'Learner';
+$string['template:learner_program_completion:numberofprograms'] = 'Number of Programs';
+$string['template:learner_program_completion:status'] = 'Status';
+$string['template:learner_program_completion:summary'] = 'This report gives the logged in user an overview of their own program completion status';
+$string['template:learner_program_completion:title'] = 'Learner program completion status overview';
+$string['template:manager_program_completion:label'] = 'Manager';
+$string['template:manager_program_completion:numberofprograms'] = 'Number of Programs';
+$string['template:manager_program_completion:status'] = 'Status';
+$string['template:manager_program_completion:summary'] = 'This report gives managers an overview of their own team program completion status';
+$string['template:manager_program_completion:title'] = 'Manager program completion status overview';
