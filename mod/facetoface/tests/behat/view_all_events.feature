@@ -148,3 +148,11 @@ Feature: Check previous and upcomings sections are right populated
     And I should not see "1 January 1999"
     And I should not see "In progress"
     And I log out
+
+  Scenario: Check Event details are displayed accordingly for editingteacher role
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I follow "Attendees"
+    When I follow "Event details"
+    Then I should see "In progress"

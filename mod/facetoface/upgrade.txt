@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* 'teacher' and 'editingteacher' roles got the 'mod/facetoface:viewallsessions' capability
 * mod_facetoface\form\import_attendance form is accepting a 'signupid' field from 'CSV Take attendance' export and ignores not required fields
 * mod_facetoface\attendance\event_content::generate_downloadable_content() has been updated
   * to respect the showuseridentity config
