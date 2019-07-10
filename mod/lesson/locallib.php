@@ -3010,7 +3010,7 @@ class lesson extends lesson_base {
 
                     if (!$reviewmode && !$this->properties->retake) {
                         $this->add_message(get_string("numberofcorrectanswers", "lesson", $gradeinfo->earned), 'notify');
-                        if ($this->properties->grade != GRADE_TYPE_NONE) {
+                        if ($this->properties->grade >= 0) {
                             $a = new stdClass;
                             $a->grade = number_format($gradeinfo->grade * $this->properties->grade / 100, 1);
                             $a->total = $this->properties->grade;
@@ -3444,11 +3444,16 @@ class lesson extends lesson_base {
                     } else {
                         $data->displayscorewithoutessays = $a;
                     }
-                    if ($this->properties->grade != GRADE_TYPE_NONE) {
+
+                    if ($this->properties->grade >= 0) {
+                        // Normal grade value
                         $a = new stdClass;
                         $a->grade = number_format($gradeinfo->grade * $this->properties->grade / 100, 1);
                         $a->total = $this->properties->grade;
                         $data->yourcurrentgradeisoutof = $a;
+                    } else {
+                        // Don't display for scale
+                        $data->yourcurrentgradeisoutof = false;
                     }
 
                     $grade = new stdClass();
