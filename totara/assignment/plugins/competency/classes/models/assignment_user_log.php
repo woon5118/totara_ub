@@ -23,9 +23,14 @@
 
 namespace tassign_competency\models;
 
+use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency_assignment_user_log;
 
 class assignment_user_log {
+    /**
+     * @var string
+     */
+    protected $assignment_type;
 
     /**
      * @var int
@@ -37,9 +42,16 @@ class assignment_user_log {
      */
     private $user_id;
 
-    public function __construct(int $assignment_id, int $user_id) {
+    /**
+     * @var int
+     */
+    private $competency_id;
+
+    public function __construct(int $assignment_id, int $user_id, ?int $competency_id = null, ?string $assignment_type = null) {
         $this->assignment_id = $assignment_id;
         $this->user_id = $user_id;
+        $this->competency_id = $competency_id;
+        $this->assignment_type = $assignment_type;
     }
 
     /**
@@ -62,6 +74,7 @@ class assignment_user_log {
      */
     public function log_assign() {
         $this->log(competency_assignment_user_log::ACTION_ASSIGNED);
+        $this->log_tracking_start();
     }
 
     /**
@@ -70,6 +83,7 @@ class assignment_user_log {
      */
     public function log_unassign_user_group() {
         $this->log(competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP);
+        $this->log_tracking_end();
     }
 
     /**
@@ -78,6 +92,34 @@ class assignment_user_log {
      */
     public function log_archive() {
         $this->log(competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED);
+        $this->log_tracking_end();
+    }
+
+    /**
+     * Log tracking start if the given assignment is the first active one
+     */
+    public function log_tracking_start() {
+        // We ignore the continuous tracking assignment
+        if (!is_null($this->competency_id) && $this->assignment_type !== assignment::TYPE_SYSTEM) {
+            $assignment_user = new assignment_user($this->user_id);
+            $assignments = $assignment_user->get_active_assignments($this->competency_id);
+            // If the current assignment is the only one, tracking just got started
+            if ($assignments->count() === 1 && $assignments->first()->id == $this->assignment_id) {
+                $this->log(competency_assignment_user_log::ACTION_TRACKING_START);
+            }
+        }
+    }
+
+    /**
+     * Log tracking end if there are no active assignments left
+     */
+    public function log_tracking_end() {
+        if (!is_null($this->competency_id)) {
+            $assignment_user = new assignment_user($this->user_id);
+            if (!$assignment_user->has_active_assignments($this->competency_id)) {
+                $this->log(competency_assignment_user_log::ACTION_TRACKING_END);
+            }
+        }
     }
 
 }

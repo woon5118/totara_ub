@@ -34,16 +34,17 @@ abstract class assignment_user extends base {
      * Create instance of event.
      *
      * @param competency_assignment_user $assignment_user
+     * @param string $assignment_type
      * @return self
-     * @throws \coding_exception
      */
-    public static function create_from_assignment_user(competency_assignment_user $assignment_user) {
+    public static function create_from_assignment_user(competency_assignment_user $assignment_user, ?string $assignment_type = null) {
         $data = [
             'objectid' => $assignment_user->id,
             'relateduserid' => $assignment_user->user_id,
             'other' => [
                 'assignment_id' => $assignment_user->assignment_id,
                 'competency_id' => $assignment_user->competency_id,
+                'type' => $assignment_type ?? null,
             ],
             'context' => \context_system::instance()
         ];

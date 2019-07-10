@@ -22,9 +22,12 @@
  * @category test
  */
 
+use tassign_competency\entities\assignment;
+use tassign_competency\entities\competency_assignment_user;
+use tassign_competency\entities\competency_assignment_user_log;
+use tassign_competency\expand_task;
 use tassign_competency\models\assignment_actions;
 use tassign_competency\models\assignment_user_log;
-use tassign_competency\entities;
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
@@ -35,32 +38,15 @@ class tassign_competency_user_log_testcase extends tassign_competency_assignment
 
     public function test_log() {
         $log = new assignment_user_log(1, 2);
-        $log->log_assign();
 
-        $this->assertTrue(entities\competency_assignment_user_log::repository()
-            ->where('assignment_id', 1)
-            ->where('user_id', 2)
-            ->where('action', entities\competency_assignment_user_log::ACTION_ASSIGNED)
-            ->exists()
-        );
+        $log->log_assign();
+        $this->assert_log_entry_exists(2, 1, competency_assignment_user_log::ACTION_ASSIGNED);
 
         $log->log_unassign_user_group();
-
-        $this->assertTrue(entities\competency_assignment_user_log::repository()
-            ->where('assignment_id', 1)
-            ->where('user_id', 2)
-            ->where('action', entities\competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP)
-            ->exists()
-        );
+        $this->assert_log_entry_exists(2, 1, competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP);
 
         $log->log_archive();
-
-        $this->assertTrue(entities\competency_assignment_user_log::repository()
-            ->where('assignment_id', 1)
-            ->where('user_id', 2)
-            ->where('action', entities\competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED)
-            ->exists()
-        );
+        $this->assert_log_entry_exists(2, 1, competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED);
     }
 
     public function test_log_actions() {
@@ -68,74 +54,43 @@ class tassign_competency_user_log_testcase extends tassign_competency_assignment
 
         $model = new assignment_actions();
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_DRAFT;
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_DRAFT;
         $assignment1->save();
 
-        $assignment2 = new entities\assignment($assignments[1]);
-        $assignment2->status = entities\assignment::STATUS_ACTIVE;
+        $assignment2 = new assignment($assignments[1]);
+        $assignment2->status = assignment::STATUS_ACTIVE;
         $assignment2->save();
 
-        // ACTIVATE
         $model->activate($assignment1->id);
+        $this->assert_has_log_entry_amount(0, $assignment1->id);
+
         $this->expand();
 
-        // Expand should create one log record
-        $this->assertEquals(1, entities\competency_assignment_user_log::repository()
-            ->where('assignment_id', $assignment1->id)
-            ->count()
-        );
-        $this->assertEquals(1, entities\competency_assignment_user_log::repository()
-            ->where('assignment_id', $assignment2->id)
-            ->count()
-        );
+        $this->assert_has_log_entry_amount(2, $assignment1->id);
+        $this->assert_log_entry_exists($assignment1->user_group_id, $assignment1->id, competency_assignment_user_log::ACTION_ASSIGNED);
+        $this->assert_log_entry_exists($assignment1->user_group_id, $assignment1->id, competency_assignment_user_log::ACTION_TRACKING_START);
 
-        /** @var entities\competency_assignment_user_log $log */
-        $log = entities\competency_assignment_user_log::repository()
-            ->where('assignment_id', $assignment1->id)
-            ->order_by('id', 'desc')
-            ->first();
-
-        $this->assertNotEmpty($log);
-        $this->assertEquals($assignment1->id, $log->assignment_id);
-        $this->assertEquals($assignment1->user_group_id, $log->user_id);
-        $this->assertEquals(entities\competency_assignment_user_log::ACTION_ASSIGNED, $log->action);
-        $this->assertGreaterThan(0, $log->created_at);
+        $this->assert_has_log_entry_amount(2, $assignment2->id);
+        $this->assert_log_entry_exists($assignment2->user_group_id, $assignment2->id, competency_assignment_user_log::ACTION_ASSIGNED);
+        $this->assert_log_entry_exists($assignment2->user_group_id, $assignment2->id, competency_assignment_user_log::ACTION_TRACKING_START);
 
         // ARCHIVE
         $model->archive($assignment1->id);
 
-        // Archive should create another log entry
-        $this->assertEquals(3, entities\competency_assignment_user_log::repository()->count());
+        $this->assert_has_log_entry_amount(4, $assignment1->id);
+        $this->assert_log_entry_exists($assignment1->user_group_id, $assignment1->id, competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED);
+        $this->assert_log_entry_exists($assignment1->user_group_id, $assignment1->id, competency_assignment_user_log::ACTION_TRACKING_END);
 
-        /** @var entities\competency_assignment_user_log $log */
-        $log = entities\competency_assignment_user_log::repository()
-            ->where('assignment_id', $assignment1->id)
-            ->order_by('id', 'desc')
-            ->first();
-
-        $this->assertNotEmpty($log);
-        $this->assertEquals($assignment1->id, $log->assignment_id);
-        $this->assertEquals($assignment1->user_group_id, $log->user_id);
-        $this->assertEquals(entities\competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED, $log->action);
-        $this->assertGreaterThan(0, $log->created_at);
-
-        // DELETE
         $model->delete($assignment1->id);
 
-        // Records for assignment should be gone
-        $this->assertEquals(0, entities\competency_assignment_user::repository()
-            ->where('assignment_id', $assignment1->id)
-            ->count()
-        );
-        $this->assertEquals(0, entities\competency_assignment_user_log::repository()
-            ->where('assignment_id', $assignment1->id)
-            ->count()
-        );
+        // Records and logs for assignment should be gone after delete
+        $this->assertEquals(0, competency_assignment_user::repository() ->where('assignment_id', $assignment1->id) ->count());
+        $this->assert_has_log_entry_amount(0, $assignment1->id);
 
         // Control record should still be there
-        $this->assertEquals(1, entities\competency_assignment_user::repository()->count());
-        $this->assertEquals(1, entities\competency_assignment_user_log::repository()->count());
+        $this->assertEquals(1, competency_assignment_user::repository()->count());
+        $this->assert_has_log_entry_amount(2, $assignment2->id);
     }
 
     public function test_log_user_added_to_user_group() {
@@ -146,90 +101,114 @@ class tassign_competency_user_log_testcase extends tassign_competency_assignment
         $pos = $hierarchy_generator->create_pos(['frameworkid' => $fw->id, 'fullname' => 'Position 1']);
         $user = $this->generator()->create_user();
 
-        $job_data = [
-            'userid' => $user->id,
-            'idnumber' => 'dev1',
-            'fullname' => 'Developer',
-            'positionid' => $pos->id
-        ];
-        job_assignment::create($job_data);
-
-        $record = $this->generator()->create_position_assignment(
-            $competencies[0]->id,
-            $pos->id,
-            ['status' => entities\assignment::STATUS_ACTIVE]
-        );
-        $assignment = new entities\assignment($record);
-
-        $this->assertEquals(0, entities\competency_assignment_user_log::repository()->count());
+        $assignment = $this->create_position_assignment($user->id, $pos->id, $competencies[0]->id);
+        $this->assert_has_log_entry_amount(0, $assignment->id);
 
         $this->expand();
 
-        $this->assertEquals(1, entities\competency_assignment_user::repository()->count());
-        $this->assertEquals(1, entities\competency_assignment_user_log::repository()->count());
+        // User table should now be filled
+        $this->assertEquals(1, competency_assignment_user::repository()->count());
+        $this->assert_has_log_entry_amount(2, $assignment->id);
+        $this->assert_log_entry_exists($user->id, $assignment->id, competency_assignment_user_log::ACTION_ASSIGNED);
+        $this->assert_log_entry_exists($user->id, $assignment->id, competency_assignment_user_log::ACTION_TRACKING_START);
 
-        /** @var entities\competency_assignment_user_log $log */
-        $log = entities\competency_assignment_user_log::repository()->one();
-
-        $this->assertNotEmpty($log);
-        $this->assertEquals($assignment->id, $log->assignment_id);
-        $this->assertEquals($user->id, $log->user_id);
-        $this->assertEquals(entities\competency_assignment_user_log::ACTION_ASSIGNED, $log->action);
-        $this->assertGreaterThan(0, $log->created_at);
-
-        $job_assignment = job_assignment::get_first($user->id);
-        job_assignment::delete($job_assignment);
+        $this->delete_job_assignment($user->id);
 
         $this->expand();
 
-        // User got unassigned
-        $this->assertEquals(0, entities\competency_assignment_user::repository()
-            ->join(entities\assignment::TABLE, 'assignment_id', 'id')
-            ->where(entities\assignment::TABLE.'.type', entities\assignment::TYPE_ADMIN)
-            ->count()
-        );
-        $this->assertEquals(2, entities\competency_assignment_user_log::repository()
-            ->where('assignment_id', $assignment->id)
-            ->count()
-        );
+        // Check that User got unassigned, means the record in the user table should be gone
+        $this->assertEquals(0, competency_assignment_user::repository()->where('assignment_id', $assignment->id)->count());
 
-        /** @var entities\competency_assignment_user_log $log */
-        $log = entities\competency_assignment_user_log::repository()
-            ->where('assignment_id', $assignment->id)
-            ->order_by('id', 'desc')
+        $this->assert_has_log_entry_amount(3, $assignment->id);
+        $this->assert_log_entry_exists($user->id, $assignment->id, competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP);
+
+        // User still has an active assignment (system assignment due to continuous tracking)
+        // Let's archive the existing system assignment to really end the tracking
+        $new_assignment = assignment::repository()
+            ->join(['totara_assignment_competency_users', 'ass_user'], 'id', 'assignment_id')
+            ->where('ass_user.user_id', $user->id)
+            ->where('type', assignment::TYPE_SYSTEM)
+            ->order_by('id')
             ->first();
+        $this->assertNotEmpty($new_assignment);
 
-        $this->assertNotEmpty($log);
-        $this->assertEquals($assignment->id, $log->assignment_id);
-        $this->assertEquals($user->id, $log->user_id);
-        $this->assertEquals(entities\competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP, $log->action);
-        $this->assertGreaterThan(0, $log->created_at);
+        $this->assert_has_log_entry_amount(1, $new_assignment->id);
+        $this->assert_log_entry_exists($user->id, $new_assignment->id, competency_assignment_user_log::ACTION_ASSIGNED);
+
+        (new assignment_actions())->archive($new_assignment->id);
+
+        $this->assert_has_log_entry_amount(3, $new_assignment->id);
+        $this->assert_log_entry_exists($user->id, $new_assignment->id, competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED);
+        $this->assert_log_entry_exists($user->id, $new_assignment->id, competency_assignment_user_log::ACTION_TRACKING_END);
     }
 
     public function test_log_draft() {
         ['assignments' => $assignments] = $this->generate_assignments();
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_DRAFT;
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_DRAFT;
         $assignment1->save();
 
         // Expand and check that there are the expected records in the assignment user table
         $this->expand();
-        $this->assertEquals(0, entities\competency_assignment_user::repository()->count());
-        $this->assertEquals(0, entities\competency_assignment_user_log::repository()->count());
+        $this->assertEquals(0, competency_assignment_user::repository()->count());
+        $this->assertEquals(0, competency_assignment_user_log::repository()->count());
 
         $model = new assignment_actions();
         $model->delete($assignment1->id);
 
-        $this->assertEquals(0, entities\competency_assignment_user::repository()->count());
-        $this->assertEquals(0, entities\competency_assignment_user_log::repository()->count());
+        $this->assertEquals(0, competency_assignment_user::repository()->count());
+        $this->assertEquals(0, competency_assignment_user_log::repository()->count());
+    }
+
+    private function create_position_assignment(int $user_id, int $pos_id, int $comp_id): assignment {
+        $job_data = [
+            'userid' => $user_id,
+            'idnumber' => 'dev1',
+            'fullname' => 'Developer',
+            'positionid' => $pos_id
+        ];
+        job_assignment::create($job_data);
+
+        $record = $this->generator()->create_position_assignment(
+            $comp_id,
+            $pos_id,
+            ['status' => assignment::STATUS_ACTIVE]
+        );
+        return new assignment($record);
+    }
+
+    private function delete_job_assignment(int $user_id) {
+        $job_assignment = job_assignment::get_first($user_id);
+        job_assignment::delete($job_assignment);
+    }
+
+    private function assert_has_log_entry_amount(int $expected, int $assignment_id) {
+        $this->assertEquals(
+            $expected,
+            competency_assignment_user_log::repository()
+                ->where('assignment_id', $assignment_id)
+                ->count(),
+            "Log does not contain the expected amount of log entries for assignment $assignment_id"
+        );
+    }
+
+    private function assert_log_entry_exists(int $user_id, int $assignment_id, int $action) {
+        $this->assertTrue(
+            competency_assignment_user_log::repository()
+                ->where('user_id', $user_id)
+                ->where('assignment_id', $assignment_id)
+                ->where('action', $action)
+                ->where('created_at', '>', 0)
+                ->exists(),
+            "Log entry with action $action for assignment $assignment_id and user $user_id does not exist"
+        );
     }
 
     private function expand() {
         // We need the expanded users for the logging to work
-        $expand_task = new \tassign_competency\expand_task($GLOBALS['DB']);
+        $expand_task = new expand_task($GLOBALS['DB']);
         $expand_task->expand_all();
     }
-
 
 }

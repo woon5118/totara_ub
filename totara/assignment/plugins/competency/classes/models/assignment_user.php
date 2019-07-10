@@ -53,11 +53,8 @@ class assignment_user {
     public function create_system_assignment(int $competency_id) {
         global $DB;
 
-        // Check if there are any active assignments
-        $has_active_assignments = (bool) $this->get_active_assignments($competency_id)->count();
-
         // If the user does not have any active assignments for this competency anymore
-        if (!$has_active_assignments) {
+        if (!$this->has_active_assignments($competency_id)) {
             // Only for non deleted users we create a new assignment
             $user = new user($this->user_id);
             if (!$user->deleted) {
@@ -79,7 +76,17 @@ class assignment_user {
     }
 
     /**
-     * Get all active assignments for given competency
+     * Check if the user has any active assignments for a competency
+     *
+     * @param int|null $competency_id
+     * @return bool
+     */
+    public function has_active_assignments(int $competency_id): bool {
+        return count($this->get_active_assignments($competency_id)) > 0;
+    }
+
+    /**
+     * Check if the user has any active assignments for a competency
      *
      * @param int|null $competency_id
      * @return collection

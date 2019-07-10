@@ -45,10 +45,12 @@ class user_log {
     public static function log(assignment_user $event) {
         $data = $event->get_data();
         $assignment_id = $data['other']['assignment_id'] ?? null;
+        $competency_id = $data['other']['competency_id'] ?? null;
+        $assignment_type = $data['other']['type'] ?? null;
         $user_id = $data['relateduserid'];
 
         if ($assignment_id && $user_id) {
-            $log = new models\assignment_user_log($assignment_id, $user_id);
+            $log = new models\assignment_user_log($assignment_id, $user_id, $competency_id, $assignment_type);
             switch (get_class($event)) {
                 case assignment_user_archived::class:
                     // Log this action

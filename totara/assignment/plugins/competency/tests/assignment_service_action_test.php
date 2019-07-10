@@ -337,7 +337,7 @@ class tassign_competency_assignment_action_service_testcase extends advanced_tes
         $result = $res['data'] ?? null;
 
         $this->assertWebserviceSuccess($res);
-        $this->assertEquals([$assignment1->id, $assignment3->id], $result);
+        $this->assertEqualsCanonicalizing([$assignment1->id, $assignment3->id], $result);
 
         // assignments are gone
         $this->assertEmpty(entities\assignment::repository()->find($assignment1->id));

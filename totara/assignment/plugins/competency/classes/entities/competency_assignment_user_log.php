@@ -53,10 +53,14 @@ class competency_assignment_user_log extends entity {
     public const ACTION_ASSIGNED = 1;
     public const ACTION_UNASSIGNED_USER_GROUP = 2;
     public const ACTION_UNASSIGNED_ARCHIVED = 3;
+    public const ACTION_TRACKING_START = 4;
+    public const ACTION_TRACKING_END = 5;
 
     public const ACTION_ASSIGNED_NAME = 'assigned';
     public const ACTION_UNASSIGNED_USER_GROUP_NAME = 'unassigned_usergroup';
     public const ACTION_UNASSIGNED_ARCHIVED_NAME = 'unassigned_archived';
+    public const ACTION_TRACKING_START_NAME = 'tracking_started';
+    public const ACTION_TRACKING_END_NAME = 'tracking_ended';
 
     /**
      * Returns a textual representation for the action number
@@ -73,6 +77,12 @@ class competency_assignment_user_log extends entity {
                 break;
             case self::ACTION_UNASSIGNED_ARCHIVED:
                 $name = self::ACTION_UNASSIGNED_ARCHIVED_NAME;
+                break;
+            case self::ACTION_TRACKING_START:
+                $name = self::ACTION_TRACKING_START_NAME;
+                break;
+            case self::ACTION_TRACKING_END:
+                $name = self::ACTION_TRACKING_END_NAME;
                 break;
             default:
                 throw new \coding_exception('Unknown action name for assignment user log action \''.$this->action.'\'');

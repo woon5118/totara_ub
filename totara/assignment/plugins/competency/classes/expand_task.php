@@ -131,7 +131,7 @@ class expand_task {
             // If the entry does not exist yet, create it now otherwise just ignore it
             if (!isset($current_entries[$identifier])) {
                 $competency_user->save();
-                assignment_user_assigned::create_from_assignment_user($competency_user)->trigger();
+                assignment_user_assigned::create_from_assignment_user($competency_user, $assignment->type)->trigger();
             }
             unset($competency_user);
         }

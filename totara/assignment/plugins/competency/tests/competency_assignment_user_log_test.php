@@ -43,6 +43,14 @@ class tassign_competency_competency_assignment_user_log_testcase extends advance
         $log->action = competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED;
         $this->assertEquals(competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED_NAME, $log->action_name);
 
+        $log = new competency_assignment_user_log();
+        $log->action = competency_assignment_user_log::ACTION_TRACKING_START;
+        $this->assertEquals(competency_assignment_user_log::ACTION_TRACKING_START_NAME, $log->action_name);
+
+        $log = new competency_assignment_user_log();
+        $log->action = competency_assignment_user_log::ACTION_TRACKING_END;
+        $this->assertEquals(competency_assignment_user_log::ACTION_TRACKING_END_NAME, $log->action_name);
+
         $log->action = 'unknown_status';
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Unknown action name for assignment user log action \'unknown_status\'');

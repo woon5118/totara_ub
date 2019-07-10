@@ -23,6 +23,8 @@
  */
 
 use tassign_competency\entities;
+use tassign_competency\expand_task;
+use tassign_competency\models\assignment_user;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -30,7 +32,6 @@ class tassign_competency_competency_assignment_user_testcase extends advanced_te
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 
@@ -49,7 +50,7 @@ class tassign_competency_competency_assignment_user_testcase extends advanced_te
         $assignment3->status = entities\assignment::STATUS_ACTIVE;
         $assignment3->save();
 
-        $task = new \tassign_competency\expand_task($GLOBALS['DB']);
+        $task = new expand_task($GLOBALS['DB']);
         $task->expand_all();
         $this->assertEquals(3, entities\competency_assignment_user::repository()->count());
 
@@ -71,6 +72,33 @@ class tassign_competency_competency_assignment_user_testcase extends advanced_te
                 ->where('assignment_id', $assignment3->id)
                 ->count()
         );
+    }
+
+    public function test_active_assignments() {
+        ['assignments' => $assignments] = $this->generate_assignments();
+
+        $assignment1 = new entities\assignment($assignments[0]);
+        $assignment1->status = entities\assignment::STATUS_ACTIVE;
+        $assignment1->save();
+
+        $user_id = $assignment1->user_group_id;
+
+        $assignment_user = new assignment_user($user_id);
+        $this->assertFalse($assignment_user->has_active_assignments($assignment1->competency_id));
+
+        $this->expand();
+
+        $this->assertTrue($assignment_user->has_active_assignments($assignment1->competency_id));
+
+        $gen = $this->generator();
+        $cohort = $gen->create_cohort();
+        $assignment2 = $gen->create_cohort_assignment($assignment1->competency_id, $cohort->id, ['status' => entities\assignment::STATUS_ACTIVE]);
+        cohort_add_member($cohort->id, $user_id);
+
+        $expand_task = new expand_task($GLOBALS['DB']);
+        $expand_task->expand_all();
+
+        $this->assertTrue($assignment_user->has_active_assignments($assignment1->competency_id));
     }
 
     /**
@@ -122,6 +150,11 @@ class tassign_competency_competency_assignment_user_testcase extends advanced_te
         $data['assignments'][] = $gen->create_user_assignment($three->id);
 
         return $data;
+    }
+
+    private function expand() {
+        $expand_task = new expand_task($GLOBALS['DB']);
+        $expand_task->expand_all();
     }
 
     /**
