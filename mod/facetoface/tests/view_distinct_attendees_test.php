@@ -116,7 +116,7 @@ class mod_facetoface_view_distinct_attendees_testcase extends advanced_testcase 
             }
 
             $value = $columnoption->value;
-            if (!in_array($value, ['datefinish', 'sessionstartdate'])) {
+            if (!in_array($value, ['sessionfinishdate', 'sessionstartdate'])) {
                 continue;
             }
 
@@ -163,7 +163,7 @@ class mod_facetoface_view_distinct_attendees_testcase extends advanced_testcase 
             }
 
             $value = $columnoption->value;
-            if (!in_array($value, ['datefinish', 'sessiondate'])) {
+            if (!in_array($value, ['sessionfinishdate', 'sessionstartdate'])) {
                 continue;
             }
 
