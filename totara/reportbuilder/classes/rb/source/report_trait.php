@@ -292,16 +292,6 @@ trait report_trait {
      * Add report filters.
      */
     protected function add_report_filters() {
-        global $CFG;
-
-        require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
-        // Get list of sources. Need the static var to avoid recursion as get_source_list() instanitates each source.
-        // Can be fixed by making it possible to get source name without instantiating source object.
-        static $sourcelist;
-        if (is_null($sourcelist)) {
-            $sourcelist = [];
-            $sourcelist = \reportbuilder::get_source_list();
-        }
 
         /** @var report_trait|\rb_base_source $this */
         $this->filteroptions[] = new \rb_filter_option(
@@ -336,7 +326,7 @@ trait report_trait {
             get_string('reportsource', 'totara_reportbuilder'),
             'select',
             [
-                'selectchoices' => $sourcelist,
+                'selectfunc' => 'totara_reportbuilder_source_list',
                 'simplemode' => true,
             ]
         );
@@ -390,5 +380,15 @@ trait report_trait {
         );
 
         return true;
+    }
+
+    /**
+     * Generate options for the report builder source list filter.
+     * @return array
+     */
+    public function rb_filter_totara_reportbuilder_source_list() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+        return \reportbuilder::get_source_list();
     }
 }
