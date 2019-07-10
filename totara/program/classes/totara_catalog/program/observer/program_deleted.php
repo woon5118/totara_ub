@@ -40,6 +40,9 @@ class program_deleted extends object_update_observer {
      * init program remove object based on deletd program
      */
     protected function init_change_objects(): void {
+        // This conditional is left here as a reminder that we may, at some future time,
+        // require distinguished behaviours between programs and certifications, i.e.
+        // program_deleted::is_applicable_change(), or certification_deleted::is_applicable_change().
         if ($this->is_applicable_change($this->event->objectid)) {
             $this->register_for_delete($this->event->objectid);
         }
@@ -52,12 +55,8 @@ class program_deleted extends object_update_observer {
      * @return bool
      */
     protected function is_applicable_change(int $objectid): bool {
-        $data = $this->event->get_data();
-
-        if (isset($data['other']['certifid']) && $data['other']['certifid'] == 0) {
-            return true;
-        }
-
-        return false;
+        // The logic that was previously here always returned true, because $data['other']['certifid']
+        // is always explicitly set to 0 by program::delete() for program objects.
+        return true;
     }
 }

@@ -21,6 +21,8 @@
  * @package totara_catalog
  */
 
+use totara_certification\totara_catalog\certification as certification_provider;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -139,6 +141,57 @@ class totara_catalog_object_update_observer_testcase extends advanced_testcase {
         $this->assertEquals(
             0,
             $DB->count_records('catalog', ['objectid' => $course->id, 'objecttype' => 'course'])
+        );
+    }
+
+    public function test_certification_with_register_for_delete() {
+        global $DB;
+
+        $this->provider = new certification_provider();
+        $program_generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $programid = $program_generator->create_certification();
+        $certification = new program($programid);
+
+        // Create certification created event.
+        $event = \totara_program\event\program_created::create(
+            [
+                'objectid' => $certification->id,
+                'context'  => \context_program::instance($certification->id),
+                'other'    => [
+                    'certifid' => $certification->certifid,
+                ],
+            ]
+        );
+
+        // Get the observer.
+        $observer = new totara_certification\totara_catalog\certification\observer\certification_deleted('certification', $event);
+
+        // Check that certification is in the catalog.
+        $this->assertEquals(
+            1,
+            $DB->count_records('catalog', ['objectid' => $certification->id, 'objecttype' => 'certification'])
+        );
+
+        // Delete the certification.
+        $certification->delete();
+
+        // Process the observer.
+        $observer->process();
+
+        // Check that certification records have been deleted and certification is removed from the catalog.
+        $this->assertEquals(
+            0,
+            $DB->count_records('certif', ['id' => $certification->certifid])
+        );
+
+        $this->assertEquals(
+            0,
+            $DB->count_records('prog', ['id' => $certification->id])
+        );
+
+        $this->assertEquals(
+            0,
+            $DB->count_records('catalog', ['objectid' => $certification->id, 'objecttype' => 'certification'])
         );
     }
 }

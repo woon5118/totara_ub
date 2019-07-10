@@ -63,5 +63,12 @@ function xmldb_totara_catalog_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019061800, 'totara', 'catalog');
     }
 
+    if ($oldversion < 2019061801) {
+        $sql = 'delete from {catalog} where id in (select c.id from {catalog} c left join {prog} p on c.objectid = p.id where c.objecttype=\'certification\' and p.id is null)';
+        $DB->execute($sql);
+
+        upgrade_plugin_savepoint(true, 2019061801, 'totara', 'catalog');
+    }
+
     return true;
 }

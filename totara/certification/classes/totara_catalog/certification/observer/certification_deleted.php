@@ -34,10 +34,9 @@ class certification_deleted extends program_deleted {
      * Override parent class to work with certifications.
      */
     protected function is_applicable_change(int $objectid): bool {
-        global $DB;
-
-        $certifid = $DB->get_field('prog', 'certifid', ['id' => $objectid]);
-
-        return !empty($certifid);
+        // The logic that was previously here always returned false, because the {prog} record
+        // it referred to had already been deleted by the time this event was created.  This
+        // lead to orphaned certification records being left in the {catalog} table.
+        return true;
     }
 }
