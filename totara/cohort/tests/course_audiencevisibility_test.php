@@ -336,6 +336,51 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
         }
     }
 
+    public function test_check_access_audience_visibility() {
+        global $CFG;
+
+        // Set audiencevisibility setting.
+        set_config('audiencevisibility', 1);
+        self::assertEquals($CFG->audiencevisibility, 1);
+
+        $testcases = [
+            ['user' => 'user1', 'visible' => ['course1', 'course2'], 'hidden' => ['course3', 'course4']],
+            ['user' => 'user2', 'visible' => ['course1', 'course2', 'course3'], 'hidden' => ['course4']],
+            ['user' => 'user3', 'visible' => ['course1'], 'hidden' => ['course2', 'course3', 'course4']],
+            ['user' => 'user4', 'visible' => ['course1'], 'hidden' => ['course2', 'course3', 'course4']],
+            ['user' => 'user5', 'visible' => ['course1', 'course3'], 'hidden' => ['course2', 'course4']],
+            ['user' => 'user6', 'visible' => ['course1', 'course3'], 'hidden' => ['course2', 'course4']],
+            ['user' => 'user7', 'visible' => ['course1'], 'hidden' => ['course2', 'course3', 'course4']],
+            ['user' => 'user8', 'visible' => ['course1', 'course2', 'course3', 'course4'], 'hidden' => []],
+            ['user' => 'user9', 'visible' => ['course1', 'course2', 'course3', 'course4'], 'hidden' => []],
+            ['user' => 'user10', 'visible' => ['course1', 'course3'], 'hidden' => ['course2', 'course4']],
+        ];
+
+        foreach ($testcases as $test) {
+            // Courses visible to the user.
+            foreach ($test['visible'] as $course) {
+                // Pass course id.
+                $visible = check_access_audience_visibility('course', $this->{$course}->id, $this->{$test['user']}->id);
+                self::assertTrue($visible);
+
+                // Pass course object.
+                $visible = check_access_audience_visibility('course', $this->{$course}, $this->{$test['user']}->id);
+                self::assertTrue($visible);
+            }
+
+            // Courses not visible to the user.
+            foreach ($test['hidden'] as $course) {
+                // Pass course id.
+                $visible = check_access_audience_visibility('course', $this->{$course}->id, $this->{$test['user']}->id);
+                self::assertFalse($visible);
+
+                // Pass course object.
+                $visible = check_access_audience_visibility('course', $this->{$course}, $this->{$test['user']}->id);
+                self::assertFalse($visible);
+            }
+        }
+    }
+
     /**
      * Determine visibility of a course based on the content.
      * @param bool $audiencevisibility

@@ -1946,7 +1946,7 @@ function check_access_audience_visibility($type, $instance, $userid = null) {
 
     // Checking the learning component object or ID.
     if (is_numeric($instance)) {
-        $object = $DB->get_record($table, array('id' => $instance), MUST_EXIST);
+        $object = $DB->get_record($table, array('id' => $instance), '*', MUST_EXIST);
     } else if (is_object($instance) and isset($instance->id)) {
         $object = $instance;
     } else {
