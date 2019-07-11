@@ -37,16 +37,9 @@
     flex-wrap: wrap;
 
     &__item {
-        flex-grow: 1;
+        flex-basis: 100%;
+        min-width: 0;
         padding: @grid-spacing_x_small;
-
-        &--single-column {
-            width: 100%;
-        }
-
-        &--multi-column {
-            width: 240px;
-        }
     }
 }
 
@@ -55,8 +48,6 @@
         &__item {
             &--multi-column {
                 flex-basis: 50%;
-                flex-grow: 0;
-                min-width: 50%;
             }
         }
     }
@@ -73,11 +64,8 @@
             }
 
             &--multi-column {
-                flex-basis: initial;
-                max-width: 250px;
-                min-width: 238px;
+                flex-basis: 50%;
                 padding: @grid-spacing_small;
-                width: 50%;
             }
         }
     }
@@ -87,8 +75,7 @@
     .tw-grid {
         &__item {
             &--multi-column {
-                min-width: 240px;
-                width: 33%;
+                flex-basis: 33%;
             }
         }
     }
@@ -98,8 +85,7 @@
     .tw-grid {
         &__item {
             &--multi-column {
-                min-width: 244px;
-                width: 25%;
+                flex-basis: 25%;
             }
         }
     }
@@ -110,8 +96,7 @@
     .tw-grid {
         &__item {
             &--multi-column {
-                max-width: initial;
-                width: 20%;
+                flex-basis: 20%;
             }
         }
     }
