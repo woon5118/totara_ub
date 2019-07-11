@@ -259,7 +259,7 @@ select.menuf2f-select {
                 &__select {
                     // Avoid min-width here
                     // Otherwise the <select> element could cover the whole screen width if a room name is very loooong!
-                    max-width: 15em;
+                    width: 15em; // IE11 does not support max-width for <select>
                     text-overflow: ellipsis;
                 }
             }
