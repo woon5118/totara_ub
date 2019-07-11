@@ -55,10 +55,13 @@ class assignment extends entity {
     const STATUS_NAME_ACTIVE = 'active';
     const STATUS_NAME_ARCHIVED = 'archived';
 
-    const TYPE_AUTO = 'auto';
+    // assigned by admin users via the interface
     const TYPE_ADMIN = 'admin';
+    // assigned by the user themselves
     const TYPE_SELF = 'self';
+    // assigend by other users, like managers, for a user
     const TYPE_OTHER = 'other';
+    // assigned automatically by the system due to the continuous tracking functionality
     const TYPE_SYSTEM = 'system';
 
     public const TABLE = 'totara_assignment_competencies';
