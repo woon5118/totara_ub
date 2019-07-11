@@ -1537,6 +1537,10 @@ class core_plugin_manager {
                 'csv', 'csv_excel', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',
             ),
 
+            'tassign' => array(
+                'competency'
+            ),
+
             'webservice' => array(
                 'rest', 'soap', 'xmlrpc'
             ),

@@ -27,6 +27,8 @@
  * Main Class definition and library functions for report builder
  */
 
+global $CFG;
+
 use totara_core\advanced_feature;
 
 require_once($CFG->dirroot . '/calendar/lib.php');

@@ -60,6 +60,13 @@ $icons = array(
                         ),
                 ),
         ),
+    'activate' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-arrow-circle-o-right',
+                ),
+        ),
     'alarm' =>
         array(
             'data' =>
@@ -1468,6 +1475,13 @@ $icons = array(
                     'classes' => 'fa-outdent',
                 ),
         ),
+    'parent-node' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-sitemap',
+                ),
+        ),
     'package' =>
         array(
             'data' =>
@@ -1676,6 +1690,14 @@ $icons = array(
                     'classes' => 'fa-refresh',
                 ),
         ),
+    'remove' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-trash-o',
+
+                ),
+            ),
     'repeat' =>
         array(
             'data' =>

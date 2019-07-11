@@ -472,16 +472,19 @@ class position extends hierarchy {
 
         $ids = array_keys($children);
 
-        [$ids_sql, $ids_params] = sql_sequence('positionid', $ids);
+        [$ids_sql, $ids_params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+
+        // Count the number of competency assignments for the framework and its descendants
+        $data['comp_assignments'] = $DB->count_records_select('totara_assignment_competencies', "user_group_type = 'position' AND user_group_id {$ids_sql}", $ids_params);
 
         // Number of job assignment records with matching organisation.
-        $data['job_assignment'] = $DB->count_records_select('job_assignment', $ids_sql, $ids_params);
+        $data['job_assignment'] = $DB->count_records_select('job_assignment', "positionid {$ids_sql}", $ids_params);
 
         // Number of assigned competencies.
-        $data['assigned_comps'] = $DB->count_records_select('pos_competencies', $ids_sql, $ids_params);
+        $data['assigned_comps'] = $DB->count_records_select('pos_competencies', "positionid {$ids_sql}", $ids_params);
 
         // Number of related goals.
-        $data['related_goals'] = $DB->count_records_select('goal_grp_pos', ...sql_sequence('posid', $ids));
+        $data['related_goals'] = $DB->count_records_select('goal_grp_pos', "posid {$ids_sql}", $ids_params);
 
         return $data;
     }
@@ -503,20 +506,24 @@ class position extends hierarchy {
         if (!empty($children)) {
             $ids = array_keys($children);
 
-            [$ids_sql, $ids_params] = sql_sequence('positionid', $ids);
+            [$ids_sql, $ids_params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+
+            // Count the number of competency assignments for the framework and its descendants
+            $data['comp_assignments'] = $DB->count_records_select('totara_assignment_competencies', "user_group_type = 'position' AND user_group_id {$ids_sql}", $ids_params);
 
             // Number of job assignment records with matching organisation.
-            $data['job_assignment'] = $DB->count_records_select('job_assignment', $ids_sql, $ids_params);
+            $data['job_assignment'] = $DB->count_records_select('job_assignment', "positionid {$ids_sql}", $ids_params);
 
             // Number of assigned competencies.
-            $data['assigned_comps'] = $DB->count_records_select('pos_competencies', $ids_sql, $ids_params);
+            $data['assigned_comps'] = $DB->count_records_select('pos_competencies', "positionid {$ids_sql}", $ids_params);
 
             // Number of related goals.
-            $data['related_goals'] = $DB->count_records_select('goal_grp_pos', ...sql_sequence('posid', $ids));
+            $data['related_goals'] = $DB->count_records_select('goal_grp_pos', "posid {$ids_sql}", $ids_params);
         } else {
             $data['job_assignment'] = 0;
             $data['assigned_comps'] = 0;
             $data['related_goals'] = 0;
+            $data['comp_assignments'] = 0;
         }
 
         return $data;
@@ -537,6 +544,7 @@ class position extends hierarchy {
             'job_assignment' => get_string('delete_position_related_job_assignments', 'totara_hierarchy', $data['job_assignment']),
             'assigned_comps' => get_string('delete_position_linked_competencies', 'totara_hierarchy', $data['assigned_comps']),
             'related_goals' => get_string('delete_position_linked_goals', 'totara_hierarchy', $data['related_goals']),
+            'comp_assignments' => get_string('delete_position_archive_assignments', 'totara_hierarchy', $data['comp_assignments']),
         ]);
     }
 
@@ -554,6 +562,7 @@ class position extends hierarchy {
             'job_assignment' => get_string('delete_position_related_job_assignments', 'totara_hierarchy', $data['job_assignment']),
             'assigned_comps' => get_string('delete_position_linked_competencies', 'totara_hierarchy', $data['assigned_comps']),
             'related_goals' => get_string('delete_position_linked_goals', 'totara_hierarchy', $data['related_goals']),
+            'comp_assignments' => get_string('delete_position_archive_assignments', 'totara_hierarchy', $data['comp_assignments']),
         ]);
     }
 

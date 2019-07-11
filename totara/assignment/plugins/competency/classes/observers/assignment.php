@@ -1,0 +1,105 @@
+<?php
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package tassign_competency
+ */
+
+namespace tassign_competency\observers;
+
+use tassign_competency\event\assignment_activated;
+use tassign_competency\event\assignment_archived;
+use tassign_competency\event\assignment_created;
+use tassign_competency\event\assignment_deleted;
+use tassign_competency\entities;
+use tassign_competency\task\expand_assignment_task;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Event observer
+ */
+class assignment {
+
+    /**
+     * Triggered via assignment_created event.
+     *
+     * @param assignment_created $event
+     * @return bool true on success
+     */
+    public static function created(assignment_created $event) {
+        $data = $event->get_data();
+        if (!empty($data['objectid']) && isset($data['other']['status'])) {
+            if ($data['other']['status'] == entities\assignment::STATUS_ACTIVE) {
+                // trigger expand task for the created assignments
+                expand_assignment_task::schedule_for_assignment($data['objectid']);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Triggered via assignment_archived event.
+     *
+     * @param assignment_archived $event
+     * @return bool true on success
+     */
+    public static function archived(assignment_archived $event) {
+        $data = $event->get_data();
+        $assignment_id = $data['objectid'];
+        $type = $data['other']['type'] ?? null;
+
+        // TODO delete users here or in the archive action?
+
+        return true;
+    }
+
+    /**
+     * Triggered via assignment_activated event.
+     *
+     * @param assignment_activated $event
+     * @return bool true on success
+     */
+    public static function activated(assignment_activated $event) {
+        $data = $event->get_data();
+        $assignment_id = $data['objectid'];
+
+        // trigger expand task for the activated assignment
+        expand_assignment_task::schedule_for_assignment($assignment_id);
+
+        return true;
+    }
+
+    /**
+     * Triggered via assignment_deleted event.
+     *
+     * @param assignment_deleted $event
+     * @return bool true on success
+     */
+    public static function deleted(assignment_deleted $event) {
+        $data = $event->get_data();
+        $assignment_id = $data['objectid'];
+
+        // TODO delete users here or in the delete action?
+
+        return true;
+    }
+
+}

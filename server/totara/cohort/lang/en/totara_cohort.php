@@ -635,6 +635,7 @@ $string['saved'] = 'Settings saved';
 $string['savinglearning'] = 'Saving learning...';
 $string['savingrule'] = 'Saving...';
 $string['scope'] = 'Scope';
+$string['selectcohorts'] = 'Select audiences';
 $string['selectfromcohort'] = 'Select members from audience';
 $string['separatemultiplebycommas'] = 'Separate multiple values by commas';
 $string['set'] = 'Set';

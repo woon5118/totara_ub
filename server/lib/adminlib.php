@@ -104,6 +104,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
 /// Add libraries
 require_once($CFG->libdir.'/ddllib.php');
 require_once($CFG->libdir.'/xmlize.php');

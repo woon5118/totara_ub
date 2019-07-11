@@ -962,6 +962,10 @@ class competency extends hierarchy {
             // number of comp_criteria records
             $data['evidence'] = $DB->count_records_select('comp_criteria', $idssql, $idsparams);
 
+            // Count competency assignments
+            [$in_sql, $in_params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+            $data['assignments'] = $DB->count_records_select('totara_assignment_competencies', "competency_id {$in_sql}", $in_params);
+
             // number of comp_relations records
             [$ids1sql, $ids1params] = sql_sequence('id1', $ids);
             [$ids2sql, $ids2params] = sql_sequence('id2', $ids);
@@ -1011,6 +1015,10 @@ class competency extends hierarchy {
         [$ids2sql, $ids2params] = sql_sequence('id2', $ids);
         $data['related'] = $DB->count_records_select('comp_relations', "{$ids1sql} OR {$ids2sql}", array_merge($ids1params, $ids2params));
 
+        // Count the number of assignments of a competency and its descendants
+        [$in_sql, $in_params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+        $data['assignments'] = $DB->count_records_select('totara_assignment_competencies', "competency_id {$in_sql}", $in_params);
+
         return $data;
     }
 
@@ -1027,6 +1035,7 @@ class competency extends hierarchy {
 
         return array_merge($messages, [
             'user_achievement' => get_string('delete_competency_user_achievements', 'totara_hierarchy', $data['user_achievement']),
+            'assignments' => get_string('delete_competency_assignments', 'totara_hierarchy', $data['assignments']),
             'evidence' => get_string('delete_competency_evidence_items', 'totara_hierarchy', $data['evidence']),
             'related' => get_string('delete_competency_related_links', 'totara_hierarchy', $data['related']),
         ]);
@@ -1069,6 +1078,7 @@ class competency extends hierarchy {
 
         return array_merge(parent::prepare_framework_delete_message($framework), [
             'user_achievement' => get_string('delete_competency_user_achievements', 'totara_hierarchy', $data['user_achievement']),
+            'assignments' => get_string('delete_competency_assignments', 'totara_hierarchy', $data['assignments']),
             'evidence' => get_string('delete_competency_evidence_items', 'totara_hierarchy', $data['evidence']),
             'related' => get_string('delete_competency_related_links', 'totara_hierarchy', $data['related']),
         ]);

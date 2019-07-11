@@ -23,6 +23,8 @@
 
 // This file defines settingpages and externalpages under the "hierarchies" category
 
+/** @var $ADMIN admin_root */
+
     // Positions.
 use totara_core\advanced_feature;
 
@@ -45,21 +47,34 @@ $ADMIN->add('positions', new admin_externalpage('positionmanage', get_string('po
             "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=organisation",
             array('totara/hierarchy:createorganisationtype', 'totara/hierarchy:updateorganisationtype', 'totara/hierarchy:deleteorganisationtype')));
 
+    // To make sure the competency pages come before the assignment pages in the menu
+    // check if the assignment page is already there as the settings could have been parsed
+    // in a different order.
+    // Unfortunately there does not seem to be a better way to sort it than this.
+    if ($ADMIN->locate('competency_assignment')) {
+        $before = 'competency_assignment';
+    } else if ($ADMIN->locate('hierarchy_competency_settings')) {
+        $before = 'hierarchy_competency_settings';
+    } else {
+        $before = null;
+    }
 
     // Competencies.
     $ADMIN->add('competencies', new admin_externalpage('competencymanage', get_string('competencymanage', 'totara_hierarchy'),
         "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=competency",
         array('totara/hierarchy:viewcompetencyscale', 'totara/hierarchy:viewcompetencyframeworks'),
         advanced_feature::is_disabled('competencies')
-    ));
+    ), $before);
 
     $ADMIN->add('competencies', new admin_externalpage('competencytypemanage', get_string('managecompetencytypes', 'totara_hierarchy'),
         "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=competency",
         array('totara/hierarchy:createcompetencytype', 'totara/hierarchy:updatecompetencytype', 'totara/hierarchy:deletecompetencytype'),
         advanced_feature::is_disabled('competencies')
-    ));
+    ), $before);
 
-    // Goals.
+    \hierarchy_competency\admin_settings::load_or_create_settings_page($ADMIN);
+
+// Goals.
     $ADMIN->add('goals', new admin_externalpage('goalmanage', get_string('goalmanage', 'totara_hierarchy'),
             "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=goal",
             array('totara/hierarchy:creategoalframeworks', 'totara/hierarchy:updategoalframeworks', 'totara/hierarchy:deletegoalframeworks',

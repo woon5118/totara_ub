@@ -171,6 +171,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'manageappraisals' => 'Appraisals',
                 'managefeedback360' => '360° Feedback',
                 'goalmanage' => 'Goals',
+                'competency_assignment' => 'Competency assignments',
             ],
             group::CONFIGURATION => [
                 'themesettings' => 'Appearance',
@@ -226,6 +227,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'manageappraisals' => 'Appraisals',
                 'managefeedback360' => '360° Feedback',
                 'goalmanage' => 'Goals',
+                'competency_assignment' => 'Competency assignments'
             ],
             group::CONFIGURATION => [
                 'totarasyncsettings' => 'HR Import',
@@ -1117,6 +1119,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'manageappraisals'   => 'Appraisals',
                 'managefeedback360'  => '360° Feedback',
                 'goalmanage'         => 'Goals',
+                'competency_assignment' => 'Competency assignments'
             ],
             group::CONFIGURATION => [
               'totarasyncsettings' => 'HR Import',
@@ -1152,6 +1155,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'manageappraisals'   => 'Appraisals',
                 'managefeedback360'  => '360° Feedback',
                 'goalmanage'         => 'Goals',
+                'competency_assignment' => 'Competency assignments',
             ],
             group::CONFIGURATION => [
                 'totarasyncsettings' => 'HR Import',
@@ -1195,6 +1199,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'manageappraisals'   => 'Appraisals',
                 'managefeedback360'  => '360° Feedback',
                 'goalmanage'         => 'Goals',
+                'competency_assignment' => 'Competency assignments'
             ],
             group::CONFIGURATION => [
                 'totarasyncsettings' => 'HR Import',
@@ -1227,6 +1232,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'manageappraisals'   => 'Appraisals',
                 'managefeedback360'  => '360° Feedback',
                 'goalmanage'         => 'Goals',
+                'competency_assignment' => 'Competency assignments'
             ],
             group::CONFIGURATION => [
                 'totarasyncsettings' => 'HR Import',
