@@ -42,7 +42,8 @@ class cancelsession extends \moodleform {
         customfield_load_data($session, 'facetofacesessioncancel', 'facetoface_sessioncancel');
         customfield_definition($mform, $session, 'facetofacesessioncancel', 0, 'facetoface_sessioncancel');
 
-        $mform->addElement('html', get_string('cancelsessionconfirm', 'facetoface')); // Instructions.
+        $html = \html_writer::div(get_string('cancelsessionconfirm', 'mod_facetoface'), 'eventcancellationtext');
+        $mform->addElement('html', $html); // Instructions.
 
         // We don't use add_action_buttons here because we want to set the cancel button label to No.
         $buttonarray = array();

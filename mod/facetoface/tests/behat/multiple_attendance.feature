@@ -53,7 +53,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "OK"
 
     And I click on "Select room" "link"
-    And I click on "Create new room" "link"
+    And I click on "Create" "link"
     And I set the following fields to these values:
       | Name             | later session   |
       | id_roomcapacity  | 10              |
@@ -84,7 +84,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I press "OK"
 
     And I click on "Select room" "link" in the ".lastrow" "css_element"
-    And I click on "Create new room" "link"
+    And I click on "Create" "link"
     And I set the following fields to these values:
       | Name             | earlier session |
       | id_roomcapacity  | 10              |

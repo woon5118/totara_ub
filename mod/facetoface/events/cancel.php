@@ -25,27 +25,32 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 use \mod_facetoface\seminar_event;
+use \core\output\notification;
 
 $s = required_param('s', PARAM_INT); // facetoface session ID
 $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
-$seminarevent = new \mod_facetoface\seminar_event($s);
+$seminarevent = new seminar_event($s);
 $seminar = $seminarevent->get_seminar();
-$course = $DB->get_record('course', ['id' => $seminar->get_course()]);
 $cm = $seminar->get_coursemodule();
-$context =  context_module::instance($cm->id);
+$context =  $seminar->get_contextmodule($cm->id);
 
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:editevents', $context);
 
-$PAGE->set_url('/mod/facetoface/events/cancel.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions));
-$PAGE->set_title($seminar->get_name());
-$PAGE->set_heading($course->fullname);
+$pagetitle = get_string('cancelingsession', 'mod_facetoface', $seminar->get_name());
+$baseurl = new moodle_url('/mod/facetoface/events/cancel.php', ['s' => $s, 'backtoallsessions' => $backtoallsessions]);
+
+$PAGE->set_cm($cm);
+$PAGE->set_url($baseurl);
+$PAGE->set_context($context);
+$PAGE->set_title($pagetitle);
+$PAGE->set_pagelayout('standard');
 
 if ($backtoallsessions) {
     $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $seminarevent->get_facetoface()));
 } else {
-    $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
+    $returnurl = new moodle_url('/course/view.php', ['id' => $seminar->get_course()]);
 }
 
 if ($seminarevent->is_first_started()) {
@@ -54,13 +59,16 @@ if ($seminarevent->is_first_started()) {
 }
 if ($seminarevent->get_cancelledstatus() != 0) {
     // How did they get here? There should not be any link in UI to this page.
-    redirect($returnurl);
+    redirect($returnurl, get_string('error:cannoteditcancelledevent', 'mod_facetoface'), null, notification::NOTIFY_ERROR);
 }
 
-$mform = new \mod_facetoface\form\cancelsession(null, [
-    'backtoallsessions' => $backtoallsessions,
-    'seminarevent' => $seminarevent
-]);
+$mform = new \mod_facetoface\form\cancelsession(
+    null,
+    ['backtoallsessions' => $backtoallsessions, 'seminarevent' => $seminarevent],
+    'post',
+    '',
+    ['class' => 'mform_seminarevent_cancellation']
+);
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
@@ -69,34 +77,24 @@ if ($fromform = $mform->get_data()) {
     // This may take a long time...
     ignore_user_abort(true);
 
-    $seminarevent = new seminar_event($s);
     if ($seminarevent->cancel()) {
         // Save the custom fields.
         if ($fromform) {
             $fromform->id = $seminarevent->get_id();
             customfield_save_data($fromform, 'facetofacesessioncancel', 'facetoface_sessioncancel');
         }
-    } else {
-        print_error('error:couldnotcancelsession', 'facetoface', $returnurl);
+        redirect($returnurl, get_string('bookingsessioncancelled', 'mod_facetoface'), null, notification::NOTIFY_SUCCESS);
     }
-
-    $message = get_string('bookingsessioncancelled', 'facetoface');
-    \core\notification::success($message);
-    redirect($returnurl);
+    redirect($returnurl, get_string('error:couldnotcancelsession', 'mod_facetoface'), null, notification::NOTIFY_ERROR);
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->box_start();
-echo $OUTPUT->heading(get_string('cancelingsession', 'facetoface', $seminar->get_name()));
+echo $OUTPUT->heading($pagetitle);
 
-/**
- * @var mod_facetoface_renderer $seminarrenderer
- */
+/** @var mod_facetoface_renderer $seminarrenderer */
 $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
 echo $seminarrenderer->render_seminar_event($seminarevent, true);
 
-
 $mform->display();
 
-echo $OUTPUT->box_end();
 echo $OUTPUT->footer();

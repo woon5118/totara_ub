@@ -41,8 +41,8 @@ class asset_edit extends \moodleform {
         $asset = $this->_customdata['asset'];
         /** @var \mod_facetoface\seminar $seminar */
         $seminar = empty($this->_customdata['seminar']) ? null : $this->_customdata['seminar'];
-        /** @var \mod_facetoface\seminar_event $event */
-        $event = empty($this->_customdata['event']) ? null : $this->_customdata['event'];
+        /** @var \mod_facetoface\seminar_event $seminarevent */
+        $seminarevent = empty($this->_customdata['seminarevent']) ? null : $this->_customdata['seminarevent'];
         $editoroptions = $this->_customdata['editoroptions'];
 
         $modconfig = has_capability('totara/core:modconfig', \context_system::instance());
@@ -54,8 +54,8 @@ class asset_edit extends \moodleform {
             $mform->addElement('hidden', 'f', $seminar->get_id());
             $mform->setType('f', PARAM_INT);
         }
-        if (!empty($event)) {
-            $mform->addElement('hidden', 's', $event->get_id());
+        if (!empty($seminarevent)) {
+            $mform->addElement('hidden', 's', $seminarevent->get_id());
             $mform->setType('s', PARAM_INT);
         }
 
@@ -63,18 +63,18 @@ class asset_edit extends \moodleform {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
 
-
         $mform->addElement('advcheckbox', 'allowconflicts', get_string('allowassetconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'allowassetconflicts', 'mod_facetoface');
-
-        $mform->addElement('editor', 'description_editor', get_string('assetdescription', 'facetoface'), null, $this->_customdata['editoroptions']);
-
-        customfield_definition($mform, (object)['id' => $asset->get_id()], 'facetofaceasset', 0, 'facetoface_asset');
+        $mform->setType('allowconflicts', PARAM_INT);
 
         if ($modconfig and !empty($seminar) and $asset->get_custom()) {
             $mform->addElement('advcheckbox', 'notcustom', get_string('publishreuse', 'mod_facetoface'));
             // Disable if does not seem to work in dialog forms, back luck.
         }
+
+        $mform->addElement('editor', 'description_editor', get_string('assetdescription', 'facetoface'), null, $this->_customdata['editoroptions']);
+
+        customfield_definition($mform, (object)['id' => $asset->get_id()], 'facetofaceasset', 0, 'facetoface_asset');
 
         if ($asset->exists()) {
             $mform->addElement('header', 'versions', get_string('versioncontrol', 'mod_facetoface'));

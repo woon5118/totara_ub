@@ -21,6 +21,8 @@
  * @package mod_facetoface
  */
 
+use mod_facetoface\asset_list;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -108,34 +110,78 @@ class mod_facetoface_asset_search_testcase extends advanced_testcase {
      * @return void
      */
     public function test_search_asset_with_distinct_record() {
-        global $USER;
+        global $USER, $CFG;
 
-        $this->resetAfterTest(true);
+        require_once($CFG->dirroot . '/mod/facetoface/dialogs/seminar_dialog_content.php');
+
         $this->setAdminUser();
 
         list($course, $f2f) = $this->create_course_with_seminar();
         $session = $this->create_session_with_assets($USER, $f2f);
 
-        $dialog = new totara_dialog_content();
-        $dialog->searchtype = 'facetoface_asset';
-        $dialog->proxy_dom_data(['id', 'name', 'custom']);
-        $dialog->lang_file = 'facetoface';
-        $dialog->customdata = array(
-            'facetofaceid' => $f2f->id,
-            'timestart' => time(),
-            'timefinish' => time(),
-            'sessionid' => $session->id,
-            'selected' => 0,
-            'offset' => 0
-        );
+        $selected = 0;
+        $offset = 0;
+        $timestart = time();
+        $timefinish = time();
+        $seminarevent = new \mod_facetoface\seminar_event($session->id);
 
-        $dialog->urlparams = array(
+        $assetslist = asset_list::get_available(0, 0, $seminarevent);
+        $availableassets = asset_list::get_available($timestart, $timefinish, $seminarevent);
+        $selectedids = explode(',', $selected);
+        $allassets = [];
+        $selectedassets = [];
+        $unavailableassets = [];
+        foreach ($assetslist as $assetid => $asset) {
+
+            $dialogdata = (object)[
+                'id' => $assetid,
+                'fullname' => $asset->get_name(),
+                'custom' => $asset->get_custom(),
+            ];
+
+            customfield_load_data($dialogdata, "facetofaceasset", "facetoface_asset");
+            if (!$availableassets->contains($assetid) && $seminarevent->get_cancelledstatus() == 0) {
+                $unavailableassets[$assetid] = $assetid;
+                $dialogdata->fullname .= get_string('assetalreadybooked', 'mod_facetoface');
+            }
+
+            if ($dialogdata->custom && $seminarevent->get_cancelledstatus() == 0) {
+                $dialogdata->fullname .= ' (' . get_string('facetoface', 'mod_facetoface') . ': ' . format_string($f2f->name) . ')';
+            }
+
+            if (in_array($assetid, $selectedids)) {
+                $selectedassets[$assetid] = $dialogdata;
+            }
+
+            $allassets[$assetid] = $dialogdata;
+        }
+
+        $params = [
             'facetofaceid' => $f2f->id,
             'sessionid' => $session->id,
-            'timestart' =>  time(),
-            'timefinish' => time(),
-            'offset' => 0,
-        );
+            'timestart' =>  $timestart,
+            'timefinish' => $timefinish,
+            'selected' => $selected,
+            'offset' => $offset,
+        ];
+
+        $dialog = new \seminar_dialog_content();
+        $dialog->baseurl = '/mod/facetoface/asset/ajax/sessionassets.php';
+        $dialog->proxy_dom_data(array('id', 'custom', 'fullname'));
+        $dialog->type = \totara_dialog_content::TYPE_CHOICE_MULTI;
+        $dialog->items = $allassets;
+        $dialog->disabled_items = $unavailableassets;
+        $dialog->selected_items = $selectedassets;
+        $dialog->selected_title = 'itemstoadd';
+        $dialog->lang_file = 'mod_facetoface';
+        $dialog->createid = 'show-editcustomasset' . $offset . '-dialog';
+        $dialog->customdata = $params;
+        $dialog->search_code = '/mod/facetoface/dialogs/search.php';
+        $dialog->searchtype = 'facetoface_asset';
+        $dialog->string_nothingtodisplay = 'error:nopredefinedassets';
+        // Additional url parameters needed for pagination in the search tab.
+        $dialog->urlparams = $params;
+
         $_POST = [
             'query' => 'asset',
             'page' => 0

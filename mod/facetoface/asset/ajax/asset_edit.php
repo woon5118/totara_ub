@@ -74,7 +74,7 @@ send_headers('text/html; charset=utf-8', false);
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/facetoface/asset/ajax/asset_edit.php');
 
-$customdata = ['asset' => $asset, 'seminar' => $seminar, 'event' => $seminarevent, 'editoroptions' => $TEXTAREA_OPTIONS];
+$customdata = ['asset' => $asset, 'seminar' => $seminar, 'seminarevent' => $seminarevent, 'editoroptions' => $TEXTAREA_OPTIONS];
 $form = new \mod_facetoface\form\asset_edit(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
 
 if ($data = $form->get_data()) {

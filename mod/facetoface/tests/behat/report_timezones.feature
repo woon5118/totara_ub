@@ -47,7 +47,7 @@ Feature: Seminar timezones in reports
     And I press "OK"
 
     And I click on "Select room" "link"
-    And I click on "Create new room" "link"
+    And I click on "Create" "link"
     And I set the following fields to these values:
       | Name             | Room 1          |
       | id_roomcapacity  | 10              |
@@ -82,7 +82,7 @@ Feature: Seminar timezones in reports
     And I press "OK"
 
     And I click on "Select room" "link"
-    And I click on "Create new room" "link"
+    And I click on "Create" "link"
     And I set the following fields to these values:
       | Name             | Room 2          |
       | id_roomcapacity  | 10              |

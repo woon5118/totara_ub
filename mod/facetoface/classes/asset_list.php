@@ -85,6 +85,7 @@ final class asset_list implements \Iterator {
                       FROM {facetoface_asset} fa
                       JOIN {facetoface_asset_dates} fad ON fad.assetid = fa.id
                       JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
+                      JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid AND fs.cancelledstatus = 0
                      WHERE fa.allowconflicts = 0 AND fsd.sessionid <> :sessionid
                        AND (fsd.timestart < :timefinish AND fsd.timefinish > :timestart)";
 

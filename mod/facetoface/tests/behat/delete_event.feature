@@ -26,7 +26,7 @@ Feature: Test deletion of a Seminar event
     And I follow "Test seminar name"
     And I follow "Add event"
     And I click on "Select assets" "link"
-    And I click on "Create new asset" "link"
+    And I click on "Create" "link"
     And I set the following fields to these values:
       | Asset name        | Projector       |
       | Asset description | A 3D projector  |
@@ -55,7 +55,7 @@ Feature: Test deletion of a Seminar event
     And I follow "Test seminar name"
     And I follow "Add event"
     And I click on "Select room" "link"
-    And I click on "Create new room" "link"
+    And I click on "Create" "link"
     And I set the following fields to these values:
       | Name         | Room 1          |
       | Building     | That house      |

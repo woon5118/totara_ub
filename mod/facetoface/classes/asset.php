@@ -326,7 +326,7 @@ final class asset implements seminar_iterator_item {
         $sql = "SELECT 'x'
               FROM {facetoface_asset_dates} fad
               JOIN {facetoface_sessions_dates} fsd ON (fsd.id = fad.sessionsdateid)
-              JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
+              JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid AND fs.cancelledstatus = 0)
              WHERE fad.assetid = :assetid AND fs.id <> :sessionid
                    AND :timefinish > fsd.timestart AND :timestart < fsd.timefinish";
         return !$DB->record_exists_sql($sql, $params);
@@ -345,6 +345,7 @@ final class asset implements seminar_iterator_item {
               JOIN {facetoface_asset_dates} fad ON (fad.sessionsdateid = fsd.id)
               JOIN {facetoface_asset_dates} fad2 ON (fad2.assetid = fad.assetid)
               JOIN {facetoface_sessions_dates} fsd2 ON (fsd2.id = fad2.sessionsdateid AND fsd2.id <> fsd.id)
+              JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid AND fs.cancelledstatus = 0
              WHERE fad.assetid = :assetid AND
                    ((fsd.timestart >= fsd2.timestart AND fsd.timestart < fsd2.timefinish)
                     OR (fsd.timefinish > fsd2.timestart AND fsd.timefinish <= fsd2.timefinish))";

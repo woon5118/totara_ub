@@ -25,9 +25,8 @@ define('AJAX_SCRIPT', true);
 
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/totara/core/dialogs/dialog_content.class.php');
+require_once($CFG->dirroot . '/mod/facetoface/dialogs/seminar_dialog_content.php');
 
-use mod_facetoface\asset;
 use mod_facetoface\asset_list;
 use mod_facetoface\seminar;
 use mod_facetoface\seminar_event;
@@ -40,54 +39,41 @@ $offset = optional_param('offset', 0, PARAM_INT);
 $search = optional_param('search', 0, PARAM_INT);
 $selected = required_param('selected', PARAM_SEQUENCE);
 
+if (empty($timestart) || empty($timefinish)) {
+    print_error('notimeslotsspecified', 'mod_facetoface');
+}
+
 $seminar = new seminar($facetofaceid);
 if (!$seminar->exists()) {
     print_error('error:incorrectfacetofaceid', 'facetoface');
 }
 
-if (!$course = $DB->get_record('course', array('id' => $seminar->get_course()))) {
-    print_error('error:coursemisconfigured', 'facetoface');
-}
-
-if (!$cm = get_coursemodule_from_instance('facetoface', $seminar->get_id(), $course->id)) {
-    print_error('error:incorrectcoursemoduleid', 'facetoface');
-}
-
-if ($sessionid) {
-    $seminarevent = new seminar_event($sessionid);
-    if ($seminarevent->get_id() == 0) {
-        print_error('error:incorrectcoursemodulesession', 'facetoface');
-    }
-    if ($seminarevent->get_facetoface() != $seminar->get_id()) {
-        print_error('error:incorrectcoursemodulesession', 'facetoface');
-    }
-} else {
-    $seminarevent = new seminar_event();
+$seminarevent = new seminar_event($sessionid);
+if (!$seminarevent->exists()) {
+    // If it doesn't exist we'll need to set the facetofaceid for the event.
     $seminarevent->set_facetoface($seminar->get_id());
+} else if ($seminarevent->get_facetoface() != $seminar->get_id()) {
+    // If the event and seminar don't match up something is wrong.
+    print_error('error:incorrectcoursemodulesession', 'mod_facetoface');
 }
 
-$context = context_module::instance($cm->id);
+$cm = $seminar->get_coursemodule();
+$context = $seminar->get_contextmodule($cm->id);
 
-require_login($course, false, $cm);
+ajax_require_login($seminar->get_course( ), false, $cm);
 require_sesskey();
 require_capability('mod/facetoface:editevents', $context);
 
-$PAGE->set_context($context);
-$PAGE->set_url('/mod/facetoface/asset/ajax/sessionassets.php', array(
-    'facetofaceid' => $facetofaceid,
-    'sessionid' => $sessionid,
+$params = [
+    'facetofaceid' => $seminar->get_id(),
+    'sessionid' => $seminarevent->get_id(),
     'timestart' => $timestart,
-    'timefinish' => $timefinish
-));
-
-$PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
-$PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
-$PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
-    'createnewasset', 'editasset', 'createnewroom', 'editroom'), 'facetoface');
-
-if (empty($timestart) || empty($timefinish)) {
-    print_error('notimeslotsspecified', 'facetoface');
-}
+    'timefinish' => $timefinish,
+    'selected' => $selected,
+    'offset' => $offset
+];
+$PAGE->set_context($context);
+$PAGE->set_url('/mod/facetoface/asset/ajax/sessionassets.php', $params);
 
 // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
 send_headers('text/html; charset=utf-8', false);
@@ -108,13 +94,13 @@ foreach ($assetslist as $assetid => $asset) {
     ];
 
     customfield_load_data($dialogdata, "facetofaceasset", "facetoface_asset");
-    if (!$availableassets->contains($assetid)) {
+    if (!$availableassets->contains($assetid) && $seminarevent->get_cancelledstatus() == 0) {
         $unavailableassets[$assetid] = $assetid;
-        $dialogdata->fullname .= get_string('assetalreadybooked', 'facetoface');
+        $dialogdata->fullname .= get_string('assetalreadybooked', 'mod_facetoface');
     }
 
-    if ($dialogdata->custom) {
-        $dialogdata->fullname .= ' (' . get_string('facetoface', 'facetoface') . ': ' . format_string($seminar->get_name()) . ')';
+    if ($dialogdata->custom && $seminarevent->get_cancelledstatus() == 0) {
+        $dialogdata->fullname .= ' (' . get_string('facetoface', 'mod_facetoface') . ': ' . format_string($seminar->get_name()) . ')';
     }
 
     if (in_array($assetid, $selectedids)) {
@@ -125,29 +111,21 @@ foreach ($assetslist as $assetid => $asset) {
 }
 
 // Display page.
-$dialog = new totara_dialog_content();
-$dialog->searchtype = 'facetoface_asset';
-$dialog->proxy_dom_data(array('id', 'custom'));
-$dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
+$dialog = new \seminar_dialog_content();
+$dialog->baseurl = '/mod/facetoface/asset/ajax/sessionassets.php';
+$dialog->proxy_dom_data(array('id', 'custom', 'fullname'));
+$dialog->type = \totara_dialog_content::TYPE_CHOICE_MULTI;
 $dialog->items = $allassets;
 $dialog->disabled_items = $unavailableassets;
 $dialog->selected_items = $selectedassets;
 $dialog->selected_title = 'itemstoadd';
-$dialog->lang_file = 'facetoface';
-$dialog->customdata['facetofaceid'] = $facetofaceid;
-$dialog->customdata['timestart'] = $timestart;
-$dialog->customdata['timefinish'] = $timefinish;
-$dialog->customdata['sessionid'] = $sessionid;
-$dialog->customdata['selected'] = $selected;
-$dialog->customdata['offset'] = $offset;
+$dialog->lang_file = 'mod_facetoface';
+$dialog->createid = 'show-editcustomasset' . $offset . '-dialog';
+$dialog->customdata = $params;
+$dialog->search_code = '/mod/facetoface/dialogs/search.php';
+$dialog->searchtype = 'facetoface_asset';
 $dialog->string_nothingtodisplay = 'error:nopredefinedassets';
+// Additional url parameters needed for pagination in the search tab.
+$dialog->urlparams = $params;
 
 echo $dialog->generate_markup();
-
-// May be it's better to dynamically generate create new asset link during dialog every_load.
-// This will allow to remove offset parameter from url.
-if (!$search) {
-    $addassetlinkhtml =  html_writer::link('#', get_string('createnewasset', 'facetoface'),
-        array('id' => 'show-editcustomasset' . $offset . '-dialog'));
-    echo html_writer::div($addassetlinkhtml, 'dialog-nobind dialog-footer');
-}

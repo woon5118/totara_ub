@@ -90,18 +90,18 @@ final class room_list implements \Iterator {
     /**
      * Get the room record for the specified session
      *
-     * @param int $eventid
+     * @param int $seminareventid
      * @return room_list
      */
-    public static function get_event_rooms(int $eventid) : room_list {
+    public static function get_event_rooms(int $seminareventid): room_list {
         $sql = "SELECT DISTINCT fr.*
                   FROM {facetoface_room} fr
                   JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = fr.id)
                   JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
-                 WHERE fs.id = :eventid
+                 WHERE fs.id = :seminareventid
               ORDER BY fr.name ASC, fr.id ASC";
 
-        return new room_list($sql, ['eventid' => $eventid]);
+        return new room_list($sql, ['seminareventid' => $seminareventid]);
     }
 
     /**

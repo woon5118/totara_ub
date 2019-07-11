@@ -188,13 +188,10 @@ final class seminar_event implements seminar_iterator_item {
             return false;
         }
 
-        if ($this->cancelledstatus != 0) {
+        if ($this->get_cancelledstatus() != 0) {
             // Event is already cancelled, can not cancel twice.
             return false;
         }
-
-        $notifylearners = [];
-        $notifytrainers = [];
 
         // Wrap necessary DB updates in a transaction.
         $trans = $DB->start_delegated_transaction();
@@ -203,37 +200,21 @@ final class seminar_event implements seminar_iterator_item {
         $this->save();
 
         // Remove entries from the calendars.
-        \mod_facetoface\calendar::remove_all_entries($this);
+        calendar::remove_all_entries($this);
 
         // Change all user sign-up statuses, the only exceptions are previously cancelled users and declined users.
+        $notifylearners = [];
         /** @var signup[] $signups */
         $signups = signup_list::from_conditions(['sessionid' => $this->get_id()]);
         foreach ($signups as $signup) {
             if ($signup->can_switch(\mod_facetoface\signup\state\event_cancelled::class)) {
                 $signup->switch_state(\mod_facetoface\signup\state\event_cancelled::class);
-
                 // Add them to the affected learners list for later notifications.
                 $notifylearners[$signup->get_userid()] = $signup;
             }
         }
-
         // All necessary DB updates are finished, let's commit.
         $trans->allow_commit();
-
-        $cm = get_coursemodule_from_instance('facetoface', $this->get_facetoface());
-        $context = context_module::instance($cm->id);
-        \mod_facetoface\event\session_cancelled::create_from_session($this->to_record(), $context)->trigger();
-
-        // Notify trainers assigned to the session too.
-        $sql = "SELECT DISTINCT sr.userid
-                  FROM {facetoface_session_roles} sr
-                  JOIN {user} u ON (u.id = sr.userid)
-                 WHERE sr.sessionid = :sessionid AND u.deleted = 0";
-        $trainers = $DB->get_recordset_sql($sql, array('sessionid' => $this->get_id()));
-        foreach ($trainers as $trainer) {
-            $notifytrainers[$trainer->userid] = $trainer;
-        }
-        $trainers->close();
 
         // Notify affected users.
         foreach ($notifylearners as $id => $user) {
@@ -243,13 +224,14 @@ final class seminar_event implements seminar_iterator_item {
             notice_sender::event_cancellation($id, $this, $invite);
         }
 
-        // Notify affected trainers.
-        foreach ($notifytrainers as $id => $trainer) {
-            notice_sender::event_cancellation($id, $this);
+        // Notify affected trainers assigned to the session.
+        $notifytrainers = role_list::get_distinct_users_from_seminarevent($this);
+        foreach ($notifytrainers as $role) {
+            notice_sender::event_cancellation($role->get_userid(), $this);
         }
 
         // Notify managers who had reservations.
-        \mod_facetoface\notice_sender::reservation_cancelled($this);
+        notice_sender::reservation_cancelled($this);
 
         // Start cleaning up the custom rooms, custom assets here at the very end of this cancellation task, because we would want
         // the information of custom rooms and custom assets to be included in the email sending to users which should have happened
@@ -261,10 +243,11 @@ final class seminar_event implements seminar_iterator_item {
             // Unlink rooms, orphaned custom rooms are deleted from cleanup task.
             $session->set_roomid(0);
             $session->save();
-
-            // Unlink assets, orphaned custom assets are deleted from cleanup task.
-            $DB->delete_records('facetoface_asset_dates', ['sessionsdateid' => $session->get_id()]);
         }
+
+        $cm = get_coursemodule_from_instance('facetoface', $this->get_facetoface());
+        $context = context_module::instance($cm->id);
+        \mod_facetoface\event\session_cancelled::create_from_session($this->to_record(), $context)->trigger();
 
         return true;
     }

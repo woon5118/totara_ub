@@ -25,7 +25,7 @@ Feature: Manage custom rooms by admin and non-admin user
 
     # Create a custom room
     When I click on "Select room" "link"
-    And I click on "Create new room" "link"
+    And I click on "Create" "link"
     Then I should see "Create new room" in the "Create new room" "totaradialogue"
     And the field "Publish for reuse by other events" matches value "0"
     When I set the following fields to these values:
@@ -91,7 +91,7 @@ Feature: Manage custom rooms by admin and non-admin user
 
     # Create a site-wide room
     When I click on "Select room" "link"
-    And I click on "Create new room" "link"
+    And I click on "Create" "link"
     Then I should see "Create new room" in the "Create new room" "totaradialogue"
     And the field "Publish for reuse by other events" matches value "0"
     When I set the following fields to these values:
@@ -119,7 +119,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I follow "Test seminar name"
     And I click on "//a[contains(.,'Add event') or contains(.,'Add a new event')]" "xpath_element"
     When I click on "Select room" "link"
-    And I click on "Create new room" "link"
+    And I click on "Create" "link"
     Then I should see "Create new room" in the "Create new room" "totaradialogue"
     And I should not see "Publish for reuse"
     When I set the following fields to these values:

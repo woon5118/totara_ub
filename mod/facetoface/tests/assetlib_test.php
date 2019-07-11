@@ -1196,7 +1196,7 @@ class mod_facetoface_assetlib_testcase extends advanced_testcase {
         $seminarevent->cancel();
         $dateids = $DB->get_fieldset_select('facetoface_sessions_dates', 'id', "sessionid = :sessionid", array('sessionid' => $sessionid2_1));
         foreach ($dateids as $did) {
-            $this->assertFalse($DB->record_exists('facetoface_asset_dates', array('sessionsdateid' => $did)));
+            $this->assertTrue($DB->record_exists('facetoface_asset_dates', array('sessionsdateid' => $did)));
         }
     }
 

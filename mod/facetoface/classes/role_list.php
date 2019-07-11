@@ -55,4 +55,26 @@ final class role_list implements \Iterator {
     public function add(role $item): void {
         $this->items[$item->get_id()] = $item;
     }
+
+    /**
+     * Get seminar roles for current seminar event.
+     * @param seminar_event $seminarevent
+     * @return role_list
+     */
+    public static function get_distinct_users_from_seminarevent(seminar_event $seminarevent): role_list {
+        global $DB;
+
+        $list = new static();
+
+        $sql = "SELECT DISTINCT fsr.*
+                  FROM {facetoface_session_roles} fsr
+            INNER JOIN {user} u ON u.id = fsr.userid
+                 WHERE fsr.sessionid = :sessionid AND u.deleted = 0";
+        $sessionroles = $DB->get_recordset_sql($sql, ['sessionid' => $seminarevent->get_id()]);
+        foreach ($sessionroles as $sessionrole) {
+            $role = new role();
+            $list->add($role->from_record($sessionrole));
+        }
+        return $list;
+    }
 }

@@ -487,52 +487,6 @@ switch ($searchtype) {
         break;
 
     /**
-     * Facetoface asset search
-     */
-    case 'facetoface_asset':
-        $sessionid = $this->customdata['sessionid'];
-
-        $formdata['hidden']['facetofaceid'] = $this->customdata['facetofaceid'];
-        $formdata['hidden']['sessionid'] = $sessionid;
-        $formdata['hidden']['timestart'] = $this->customdata['timestart'];
-        $formdata['hidden']['timefinish'] = $this->customdata['timefinish'];
-        $formdata['hidden']['selected'] = $this->customdata['selected'];
-        $formdata['hidden']['offset'] = $this->customdata['offset'];
-
-        // Generate search SQL.
-        $keywords = totara_search_parse_keywords($query);
-        $fields = array('a.name');
-        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
-
-        // Custom assets for session id.
-        $sqlsess = '';
-        $joinsess = '';
-        if ($sessionid) {
-            $joinsess = 'LEFT JOIN {facetoface_asset_dates} fad ON (a.id = fad.assetid)
-                LEFT JOIN {facetoface_sessions_dates} fsd ON (fad.sessionsdateid = fsd.id)';
-            $sqlsess = 'OR a.custom > 0 AND fsd.id = ?';
-            $params = array_merge($params, array($sessionid));
-        }
-        $search_info->id = 'DISTINCT a.id';
-        $search_info->fullname = 'a.name';
-        $search_info->sql = "
-            FROM {facetoface_asset} a
-            {$joinsess}
-            WHERE
-            {$searchsql}
-            AND (a.custom = 0 {$sqlsess})
-            AND a.hidden = 0
-        ";
-
-        $search_info->order = " ORDER BY a.name ASC";
-        $search_info->params = $params;
-        $search_info->extrafields = "a.name, a.custom";
-        $search_info->name = 'a.name';
-        $search_info->custom = 'a.custom';
-        $search_info->datakeys = array('id', 'name', 'custom');
-        break;
-
-    /**
      * Facetoface room search
      */
     case 'facetoface_room':

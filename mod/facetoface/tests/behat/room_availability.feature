@@ -356,7 +356,7 @@ Feature: Seminar room availability
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select room" "link"
-    And I click on "Create new room" "link" in the "Choose a room" "totaradialogue"
+    And I click on "Create" "link" in the "Choose a room" "totaradialogue"
     And I set the following fields to these values:
       | Name                         | Zimmer 1 |
       | roomcapacity                 | 30       |
@@ -411,7 +411,7 @@ Feature: Seminar room availability
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Create new room" "link" in the "Choose a room" "totaradialogue"
+    And I click on "Create" "link" in the "Choose a room" "totaradialogue"
     And I set the following fields to these values:
       | Name                         | Zimmer 2 |
       | roomcapacity                 | 40       |
@@ -569,7 +569,7 @@ Feature: Seminar room availability
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select room" "link"
-    And I click on "Create new room" "link" in the "Choose a room" "totaradialogue"
+    And I click on "Create" "link" in the "Choose a room" "totaradialogue"
     And I set the following fields to these values:
       | Name                         | Zimmer 1 |
       | roomcapacity                 | 40       |

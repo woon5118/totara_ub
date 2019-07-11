@@ -2285,7 +2285,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                             $asset->get_id()
                         );
                         $description = format_text($description, FORMAT_HTML);
-                        $assetoutput .= html_writer::tag('li', s($asset->get_name()) . $description, ['class' => 'roomdescription']);
+                        $url = new moodle_url('/mod/facetoface/reports/assets.php', ['assetid' => $asset->get_id()]);
+                        $link = html_writer::link($url, s($asset->get_name()));
+                        $assetoutput .= html_writer::tag('li', $link . $description, ['class' => 'roomdescription']);
                     }
                     $assetoutput .= html_writer::end_tag('ul');
                     $output .= html_writer::tag('dd', $assetoutput);

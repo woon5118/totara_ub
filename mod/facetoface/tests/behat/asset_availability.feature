@@ -21,18 +21,18 @@ Feature: Seminar asset availability
     And I navigate to "Assets" node in "Site administration > Seminars"
     And I press "Add a new asset"
     And I set the following fields to these values:
-      | Asset name                    | Asset 1         |
-      | Allow asset booking conflicts | 0               |
+      | Asset name              | Asset 1         |
+      | Allow booking conflicts | 0               |
     And I press "Add an asset"
     And I press "Add a new asset"
     And I set the following fields to these values:
-      | Asset name                    | Asset 2         |
-      | Allow asset booking conflicts | 1               |
+      | Asset name              | Asset 2         |
+      | Allow booking conflicts | 1               |
     And I press "Add an asset"
     And I press "Add a new asset"
     And I set the following fields to these values:
-      | Asset name                    | Asset 3         |
-      | Allow asset booking conflicts | 0               |
+      | Asset name              | Asset 3         |
+      | Allow booking conflicts | 0               |
     And I press "Add an asset"
     And I click on "Hide from users when choosing an asset on the Add/Edit event page" "link" in the "Asset 3" "table_row"
     And I am on "Course 1" course homepage with editing mode on
@@ -370,10 +370,10 @@ Feature: Seminar asset availability
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select asset" "link"
-    And I click on "Create new asset" "link" in the "Choose assets" "totaradialogue"
+    And I click on "Create" "link" in the "Choose assets" "totaradialogue"
     And I set the following fields to these values:
-      | Asset name                    | Etwas 1 |
-      | Allow asset booking conflicts | 0       |
+      | Asset name              | Etwas 1 |
+      | Allow booking conflicts | 0       |
     And I click on "OK" "button" in the "Create new asset" "totaradialogue"
 
     When  I press "Add a new session"
@@ -424,10 +424,10 @@ Feature: Seminar asset availability
     And I should see "Asset 1"
     And I should see "Asset 2"
     And I should not see "Asset 3"
-    And I click on "Create new asset" "link" in the "Choose assets" "totaradialogue"
+    And I click on "Create" "link" in the "Choose assets" "totaradialogue"
     And I set the following fields to these values:
-      | Asset name                    | Etwas 2 |
-      | Allow asset booking conflicts | 0       |
+      | Asset name              | Etwas 2 |
+      | Allow booking conflicts | 0       |
     And I click on "OK" "button" in the "Create new asset" "totaradialogue"
     And I click on "Delete" "link" in the "Etwas 2" "table_row"
     And I press "Save changes"
@@ -529,7 +529,7 @@ Feature: Seminar asset availability
     When I navigate to "Assets" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Asset 2" "table_row"
     And I set the following fields to these values:
-      | Allow asset booking conflicts | 0               |
+      | Allow booking conflicts | 0 |
     And I press "Save changes"
     Then I should see "Asset has conflicting usage"
     And I press "Cancel"
@@ -554,7 +554,7 @@ Feature: Seminar asset availability
     And I navigate to "Assets" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Asset 2" "table_row"
     And I set the following fields to these values:
-      | Allow asset booking conflicts | 0               |
+      | Allow booking conflicts | 0 |
     And I press "Save changes"
     Then I should not see "Asset has conflicting usage"
 
@@ -579,10 +579,10 @@ Feature: Seminar asset availability
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select asset" "link"
-    And I click on "Create new asset" "link" in the "Choose assets" "totaradialogue"
+    And I click on "Create" "link" in the "Choose assets" "totaradialogue"
     And I set the following fields to these values:
-      | Asset name                    | Etwas 1 |
-      | Allow asset booking conflicts | 1       |
+      | Asset name              | Etwas 1 |
+      | Allow booking conflicts | 1       |
     And I click on "OK" "button" in the "Create new asset" "totaradialogue"
     And I press "Save changes"
     And I follow "Add event"
@@ -609,7 +609,7 @@ Feature: Seminar asset availability
     When I click on "Edit event" "link" in the "0 / 50" "table_row"
     And I click on "Edit asset" "link" in the "Etwas 1" "table_row"
     And I set the following fields to these values:
-      | Allow asset booking conflicts | 0 |
+      | Allow booking conflicts | 0 |
     And I click on "OK" "button" in the "Edit asset" "totaradialogue"
     Then I should see "Asset has conflicting usage" in the "Edit asset" "totaradialogue"
     And I click on "Cancel" "button" in the "Edit asset" "totaradialogue"
@@ -630,7 +630,7 @@ Feature: Seminar asset availability
     When I click on "Edit event" "link" in the "0 / 50" "table_row"
     And I click on "Edit asset" "link" in the "Etwas 1" "table_row"
     And I set the following fields to these values:
-      | Allow asset booking conflicts | 0 |
+      | Allow booking conflicts | 0 |
     And I click on "OK" "button" in the "Edit asset" "totaradialogue"
     Then I should not see "Asset has conflicting usage"
     And I press "Save changes"
