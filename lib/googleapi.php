@@ -33,6 +33,7 @@ require_once($CFG->libdir.'/oauthlib.php');
  * Docs for this can be found here:
  * {@link http://code.google.com/apis/documents/docs/2.0/developers_guide_protocol.html}
  *
+ * @deprecated since Totara 13
  * @package    core
  * @subpackage lib
  * @copyright Dan Poltawski <talktodan@gmail.com>
@@ -217,6 +218,7 @@ class google_docs {
  * Docs for this can be found here:
  * {@link http://code.google.com/apis/picasaweb/developers_guide_protocol.html}
  *
+ * @deprecated since Totara 13
  * @package   core
  * @copyright Dan Poltawski <talktodan@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -420,6 +422,7 @@ class google_picasa {
 /**
  * OAuth 2.0 client for Google Services
  *
+ * @deprecated since Totara 13
  * @package   core
  * @copyright 2012 Dan Poltawski
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

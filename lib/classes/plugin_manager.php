@@ -1142,6 +1142,8 @@ class core_plugin_manager {
             // Totara 13 removals.
             'block_community',
             'gradeexport_fusion',
+            'repository_picasa',
+            'portfolio_picasa',
 
             // Moodle merge 3.3 removals.
             'block_myoverview', 'repository_onedrive',
@@ -1383,7 +1385,7 @@ class core_plugin_manager {
             ),
 
             'portfolio' => array(
-                'boxnet', 'download', 'flickr', 'googledocs', 'mahara', 'picasa'
+                'boxnet', 'download', 'flickr', 'googledocs', 'mahara'
             ),
 
             'profilefield' => array(
@@ -1431,7 +1433,7 @@ class core_plugin_manager {
             'repository' => array(
                 'areafiles', 'boxnet', 'coursefiles', 'dropbox', 'equella', 'filesystem',
                 'flickr', 'flickr_public', 'googledocs', 'local', 'merlot',
-                'picasa', 'recent', 'skydrive', 's3', 'upload', 'url', 'user', 'webdav',
+                'recent', 'skydrive', 's3', 'upload', 'url', 'user', 'webdav',
                 'wikimedia', 'youtube'
                 // Totara:
                 , 'opensesame',

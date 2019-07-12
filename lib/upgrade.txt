@@ -3,6 +3,10 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Deprecated all no longer used classes in lib/googleapi.php file:
+  - google_docs
+  - google_picasa
+  - google_oauth
 * System state is now reverted after every PHPUnit test, this was required for compatiblity with parallel test execution,
   all tests that used $this->resetAfterTest(false) should be updated.
 * The jQuery.extend function has had a security patch applied

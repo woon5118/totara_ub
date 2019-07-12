@@ -338,6 +338,8 @@ function totara_core_upgrade_delete_moodle_plugins() {
         // Totara 13 removals.
         'block_community',
         'gradeexport_fusion',
+        'repository_picasa',
+        'portfolio_picasa',
 
         // Moodle 3.3 removals.
         'repository_onedrive',

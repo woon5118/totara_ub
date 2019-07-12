@@ -85,7 +85,7 @@ class totara_core_userdata_portfolios_testcase extends advanced_testcase {
 
         // Create user config :
         //   - user1 in each portfolio
-        //   - user2 in googledocs and picasa
+        //   - user2 in googledocs
         //   - user3 in none
         foreach ($data->plugins as $plugin) {
             $row = (object)[
@@ -96,7 +96,7 @@ class totara_core_userdata_portfolios_testcase extends advanced_testcase {
             ];
             $DB->insert_record('portfolio_instance_user', $row);
 
-            if ($plugin == 'googledocs' || $plugin == 'picasa') {
+            if ($plugin == 'googledocs') {
                 $row = (object)[
                     'instance' => $data->portfolios[$plugin]->id,
                     'userid' => $data->users[1]->id,
@@ -110,11 +110,11 @@ class totara_core_userdata_portfolios_testcase extends advanced_testcase {
         $rows = $DB->get_records('portfolio_instance_user', ['userid' => $data->users[0]->id]);
         $this->assertEquals(count($data->plugins), count($rows));
         $rows = $DB->get_records('portfolio_instance_user', ['userid' => $data->users[1]->id]);
-        $this->assertEquals(2, count($rows));
+        $this->assertEquals(1, count($rows));
 
         // Create logs :
         //   - user1 1 in each portfolio
-        //   - user2 2 in googledocs and picasa
+        //   - user2 2 in googledocs
         //   - user3 in none
         // Defaulting all to a glossary entry
         // Using simple sequence for tempdataid
@@ -133,7 +133,7 @@ class totara_core_userdata_portfolios_testcase extends advanced_testcase {
             ];
             $DB->insert_record('portfolio_log', $row);
 
-            if ($plugin == 'googledocs' || $plugin == 'picasa') {
+            if ($plugin == 'googledocs') {
                 $row->time = time() - 60;
                 $row->userid = $data->users[1]->id;
                 $row->tempdataid = $i + count($data->plugins);
@@ -147,10 +147,10 @@ class totara_core_userdata_portfolios_testcase extends advanced_testcase {
         $rows = $DB->get_records('portfolio_log', ['userid' => $data->users[0]->id]);
         $this->assertEquals(count($data->plugins), count($rows));
         $rows = $DB->get_records('portfolio_log', ['userid' => $data->users[1]->id]);
-        $this->assertEquals(4, count($rows));
+        $this->assertEquals(2, count($rows));
 
         // Create tempdata
-        //   - user1 1 in googledocs and picase
+        //   - user1 1 in googledocs
         //   - user2 1 in each plugin
         //   - user3 in none
         foreach ($data->plugins as $i => $plugin) {
@@ -162,14 +162,14 @@ class totara_core_userdata_portfolios_testcase extends advanced_testcase {
             ];
             $DB->insert_record('portfolio_tempdata', $row);
 
-            if ($plugin == 'googledocs' || $plugin == 'picasa') {
+            if ($plugin == 'googledocs') {
                 $row->userid = $data->users[0]->id;
                 $DB->insert_record('portfolio_tempdata', $row);
             }
         }
 
         $rows = $DB->get_records('portfolio_tempdata', ['userid' => $data->users[0]->id]);
-        $this->assertEquals(2, count($rows));
+        $this->assertEquals(1, count($rows));
         $rows = $DB->get_records('portfolio_tempdata', ['userid' => $data->users[1]->id]);
         $this->assertEquals(count($data->plugins), count($rows));
 
@@ -214,8 +214,8 @@ class totara_core_userdata_portfolios_testcase extends advanced_testcase {
             context_system::instance()
         );
         $this->assertEmpty($export->files);
-        $this->assertEquals(2, count($export->data['instances']));
-        $this->assertEquals(4, count($export->data['log']));
+        $this->assertEquals(1, count($export->data['instances']));
+        $this->assertEquals(2, count($export->data['log']));
 
         $export = portfolios::execute_export(
             new target_user($data->users[2]),
@@ -242,7 +242,7 @@ class totara_core_userdata_portfolios_testcase extends advanced_testcase {
             new target_user($data->users[1]),
             context_system::instance()
         );
-        $this->assertEquals(2 + 4, $count); // Instances + logs
+        $this->assertEquals(1 + 2, $count); // Instances + logs
 
         $count = portfolios::execute_count(
             new target_user($data->users[2]),
@@ -274,7 +274,7 @@ class totara_core_userdata_portfolios_testcase extends advanced_testcase {
         $this->assertEquals(0, $DB->count_records('portfolio_log', ['userid' => $data->users[1]->id]));
         $this->assertEquals(0, $DB->count_records('portfolio_log', ['userid' => $data->users[2]->id]));
 
-        $this->assertEquals(2, $DB->count_records('portfolio_tempdata', ['userid' => $data->users[0]->id]));
+        $this->assertEquals(1, $DB->count_records('portfolio_tempdata', ['userid' => $data->users[0]->id]));
         $this->assertEquals(0, $DB->count_records('portfolio_tempdata', ['userid' => $data->users[1]->id]));
         $this->assertEquals(0, $DB->count_records('portfolio_tempdata', ['userid' => $data->users[2]->id]));
     }

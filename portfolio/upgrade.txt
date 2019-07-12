@@ -1,6 +1,11 @@
 This files describes API changes in /portfolio/ portfolio system,
 information provided here is intended especially for developers.
 
+=== 13 ===
+
+* Plugin portfolio_picasa has been removed due to Google Picasa Web Albums Data API being disabled
+  and no longer available
+
 === 10 ===
 
 * The following functions, previously used (exclusively) by upgrade steps are not available
