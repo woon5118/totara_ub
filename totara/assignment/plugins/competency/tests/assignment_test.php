@@ -92,8 +92,30 @@ class tassign_competency_assignment_testcase extends advanced_testcase {
     }
 
     public function test_filter_by_user_group() {
+        /** @var tassign_competency_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+
+        $fw = $generator->hierarchy_generator()->create_comp_frame([]);
+        $type = $generator->hierarchy_generator()->create_comp_type(['idnumber' => 'type1']);
+
+        $comp1 = $generator->create_competency([
+            'shortname' => 'acc',
+            'fullname' => 'Accounting',
+            'description' => 'Counting profits',
+            'idnumber' => 'accc',
+            'typeid' => $type,
+        ], $fw->id);
+
+        $comp2 = $generator->create_competency([
+            'shortname' => 'acc2',
+            'fullname' => 'Accounting 2',
+            'description' => 'Counting profits 2',
+            'idnumber' => 'accc2',
+            'typeid' => $type,
+        ], $fw->id);
+
         $assignment1 = new assignment();
-        $assignment1->competency_id = 1;
+        $assignment1->competency_id = $comp1->id;
         $assignment1->type = assignment::TYPE_ADMIN;
         $assignment1->user_group_type = \totara_assignment\user_groups::USER;
         $assignment1->user_group_id = 1;
@@ -102,7 +124,7 @@ class tassign_competency_assignment_testcase extends advanced_testcase {
         $assignment1->save();
 
         $assignment2 = new assignment();
-        $assignment2->competency_id = 2;
+        $assignment2->competency_id = $comp2->id;
         $assignment2->type = assignment::TYPE_ADMIN;
         $assignment2->user_group_type = \totara_assignment\user_groups::ORGANISATION;
         $assignment2->user_group_id = 2;

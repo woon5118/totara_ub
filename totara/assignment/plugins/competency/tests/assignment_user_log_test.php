@@ -37,16 +37,21 @@ require_once(__DIR__.'/assignment_actions_testcase.php');
 class tassign_competency_user_log_testcase extends tassign_competency_assignment_actions_testcase {
 
     public function test_log() {
-        $log = new assignment_user_log(1, 2);
+        ['assignments' => $assignments] = $this->generate_assignments();
+
+        $assignment_id = $assignments[0]->id;
+        $user_id = $assignments[0]->user_group_id;
+
+        $log = new assignment_user_log($assignment_id, $user_id);
 
         $log->log_assign();
-        $this->assert_log_entry_exists(2, 1, competency_assignment_user_log::ACTION_ASSIGNED);
+        $this->assert_log_entry_exists($user_id, $assignment_id, competency_assignment_user_log::ACTION_ASSIGNED);
 
         $log->log_unassign_user_group();
-        $this->assert_log_entry_exists(2, 1, competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP);
+        $this->assert_log_entry_exists($user_id, $assignment_id, competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP);
 
         $log->log_archive();
-        $this->assert_log_entry_exists(2, 1, competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED);
+        $this->assert_log_entry_exists($user_id, $assignment_id, competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED);
     }
 
     public function test_log_actions() {
