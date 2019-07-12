@@ -2379,15 +2379,17 @@ class totara_certification_certification_completion_testcase extends reportcache
             'timemodified' => time());
         $this->assertTrue(certif_write_completion_history($completionhistory));
 
-        $last_description = $DB->get_field_sql('SELECT description FROM {prog_completion_log} ORDER BY id DESC LIMIT 1', [], MUST_EXIST);
-        $this->assertStringStartsWith('Completion history created', $last_description);
+        $result = $DB->get_records('prog_completion_log', [], 'id DESC', 'description', 0, 1);
+        $result = reset($result);
+        $this->assertStringStartsWith('Completion history created', $result->description);
 
         $completionhistory->id = $DB->get_field_sql('SELECT MAX(id) FROM {certif_completion_history}', [], MUST_EXIST);
         $completionhistory->renewalstatus = CERTIFRENEWALSTATUS_DUE;
         $this->assertTrue(certif_write_completion_history($completionhistory));
 
-        $last_description = $DB->get_field_sql('SELECT description FROM {prog_completion_log} ORDER BY id DESC LIMIT 1', [], MUST_EXIST);
-        $this->assertStringStartsWith('Completion history updated', $last_description);
+        $result = $DB->get_records('prog_completion_log', [], 'id DESC', 'description', 0, 1);
+        $result = reset($result);
+        $this->assertStringStartsWith('Completion history updated', $result->description);
     }
 
     /**
