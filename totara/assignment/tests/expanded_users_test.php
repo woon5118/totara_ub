@@ -36,8 +36,6 @@ class totara_assignment_expanded_users_testcase extends expanded_users_testcase 
      * is quite heavy and performance costs would outweigh the readability costs here
      */
     public function test_expanded_users() {
-        $this->resetAfterTest();
-
         $data = $this->generate_data();
 
         // None
@@ -215,8 +213,6 @@ class totara_assignment_expanded_users_testcase extends expanded_users_testcase 
     }
 
     public function test_expanded_users_filtered_by_name() {
-        $this->resetAfterTest();
-
         $data = $this->generate_data();
 
         // Combination of all

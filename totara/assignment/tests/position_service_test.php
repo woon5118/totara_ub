@@ -33,7 +33,6 @@ class totara_assignment_position_service_testcase extends advanced_testcase {
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 
@@ -477,8 +476,6 @@ class totara_assignment_position_service_testcase extends advanced_testcase {
      * Create a few positions with knows names to test search
      */
     protected function generate_positions() {
-        $this->resetAfterTest();
-
         $data = [
             'pos' => [],
             'fws' => [],
@@ -553,8 +550,6 @@ class totara_assignment_position_service_testcase extends advanced_testcase {
      * @return \stdClass[]
      */
     protected function generate_n_positions(int $n = 50) {
-        $this->resetAfterTest();
-
         $fw = $this->create_position_framework();
 
         $i = 1;

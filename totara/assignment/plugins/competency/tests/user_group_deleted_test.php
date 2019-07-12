@@ -405,8 +405,6 @@ class tassign_competency_user_group_deleted_testcase extends advanced_testcase {
      * Create a few competencies with knows names to test search
      */
     protected function generate_competencies() {
-        $this->resetAfterTest();
-
         $comps = [];
 
         $fw = $this->generator()->hierarchy_generator()->create_comp_frame([]);

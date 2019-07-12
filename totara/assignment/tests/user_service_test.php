@@ -30,7 +30,6 @@ class totara_assignment_user_service_testcase extends advanced_testcase {
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 
@@ -215,8 +214,6 @@ class totara_assignment_user_service_testcase extends advanced_testcase {
      * Create a few users with knows names to test search
      */
     protected function generate_users(): array {
-        $this->resetAfterTest();
-
         $gen = $this->getDataGenerator();
 
         $users = [];

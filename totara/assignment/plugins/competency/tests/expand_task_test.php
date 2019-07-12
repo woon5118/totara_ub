@@ -47,7 +47,6 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest(true);
         $this->db = $GLOBALS['DB'];
         $this->setAdminUser();
     }

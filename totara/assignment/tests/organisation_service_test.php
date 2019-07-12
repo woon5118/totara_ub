@@ -30,7 +30,6 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 
@@ -489,8 +488,6 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
      * @return \stdClass[]
      */
     protected function generate_organisations() {
-        $this->resetAfterTest();
-
         $data = [
             'orgs' => [],
             'fws' => [],
@@ -566,8 +563,6 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
      * @return \stdClass[]
      */
     protected function generate_n_organisations(int $n = 50) {
-        $this->resetAfterTest();
-
         $fw = $this->create_organisation_framework();
 
         $i = 1;

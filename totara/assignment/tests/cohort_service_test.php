@@ -30,7 +30,6 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 
@@ -284,8 +283,6 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
      * Create a few audiences with knows names to test search
      */
     protected function generate_cohorts() {
-        $this->resetAfterTest();
-
         $gen = $this->getDataGenerator();
 
         $cohorts = [];
@@ -343,8 +340,6 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
      * @return \stdClass[]
      */
     protected function generate_n_cohorts(int $n = 50) {
-        $this->resetAfterTest();
-
         $i = 1;
 
         $items = [];

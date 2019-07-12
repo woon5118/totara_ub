@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 class tassign_competency_assignment_testcase extends advanced_testcase {
 
     public function test_filters() {
-        $this->resetAfterTest();
 
         /** @var tassign_competency_generator $gen */
         $gen = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
@@ -93,8 +92,6 @@ class tassign_competency_assignment_testcase extends advanced_testcase {
     }
 
     public function test_filter_by_user_group() {
-        $this->resetAfterTest();
-
         $assignment1 = new assignment();
         $assignment1->competency_id = 1;
         $assignment1->type = assignment::TYPE_ADMIN;

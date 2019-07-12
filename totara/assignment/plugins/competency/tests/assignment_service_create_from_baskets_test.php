@@ -38,7 +38,6 @@ class tassign_competency_assignment_service_create_from_baskets_testcase extends
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 

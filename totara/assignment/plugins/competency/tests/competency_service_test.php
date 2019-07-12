@@ -36,7 +36,6 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 
@@ -777,8 +776,6 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
      * Create a few competencies with knows names to test search
      */
     protected function generate_competencies() {
-        $this->resetAfterTest();
-
         $data = [
             'comps' => [],
             'fws' => [],
@@ -929,8 +926,6 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
      * @return \stdClass[]
      */
     protected function generate_n_competencies(int $n = 50) {
-        $this->resetAfterTest();
-
         $fw = $this->generator()->hierarchy_generator()->create_comp_frame([]);
 
         $i = 1;

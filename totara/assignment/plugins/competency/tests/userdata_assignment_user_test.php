@@ -37,7 +37,6 @@ class tassign_competency_userdata_assignment_user_testcase extends advanced_test
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 
@@ -52,8 +51,6 @@ class tassign_competency_userdata_assignment_user_testcase extends advanced_test
      * within the system.
      */
     public function test_with_no_data() {
-        $this->resetAfterTest(true);
-
         $user = $this->getDataGenerator()->create_user();
 
         $export = assignment_user::execute_export(
@@ -78,8 +75,6 @@ class tassign_competency_userdata_assignment_user_testcase extends advanced_test
     }
 
     public function test_count_assignments() {
-        $this->resetAfterTest(true);
-
         $user1 = $this->generator()->create_user();
         $user2 = $this->generator()->create_user();
 
@@ -111,8 +106,6 @@ class tassign_competency_userdata_assignment_user_testcase extends advanced_test
     }
 
     public function test_purge_assignments() {
-        $this->resetAfterTest(true);
-
         $user1 = $this->generator()->create_user();
         $user2 = $this->generator()->create_user();
 
@@ -191,8 +184,6 @@ class tassign_competency_userdata_assignment_user_testcase extends advanced_test
     }
 
     public function test_export_assignments() {
-        $this->resetAfterTest(true);
-
         $user1 = $this->generator()->create_user();
         $user2 = $this->generator()->create_user();
 

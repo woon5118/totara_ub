@@ -28,7 +28,6 @@ abstract class tassign_competency_assignment_actions_testcase extends advanced_t
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 

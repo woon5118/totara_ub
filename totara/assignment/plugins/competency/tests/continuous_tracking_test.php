@@ -35,7 +35,6 @@ class tassign_competency_continuous_tracking_testcase extends advanced_testcase 
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 

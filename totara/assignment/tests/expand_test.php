@@ -32,8 +32,6 @@ defined('MOODLE_INTERNAL') || die();
 class totara_assignment_expand_testcase extends advanced_testcase {
 
     public function test_cohort_expansion() {
-        $this->resetAfterTest();
-
         $generator = $this->getDataGenerator();
 
         $cohort1 = $generator->create_cohort();
@@ -61,8 +59,6 @@ class totara_assignment_expand_testcase extends advanced_testcase {
     }
 
     public function test_position_expansion() {
-        $this->resetAfterTest();
-
         $generator = $this->getDataGenerator();
         /** @var totara_hierarchy_generator $hierarchy_generator */
         $hierarchy_generator = $generator->get_plugin_generator('totara_hierarchy');
@@ -113,8 +109,6 @@ class totara_assignment_expand_testcase extends advanced_testcase {
     }
 
     public function test_organisation_expansion() {
-        $this->resetAfterTest();
-
         $generator = $this->getDataGenerator();
         /** @var totara_hierarchy_generator $hierarchy_generator */
         $hierarchy_generator = $generator->get_plugin_generator('totara_hierarchy');

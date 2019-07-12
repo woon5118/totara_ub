@@ -36,7 +36,6 @@ class totara_assignment_expanded_users_service_testcase extends expanded_users_t
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         $this->setAdminUser();
     }
 

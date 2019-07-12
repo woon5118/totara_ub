@@ -42,7 +42,6 @@ class tassign_competency_competency_crumbtrail_testcase extends advanced_testcas
 
     protected function setUp() {
         parent::setUp();
-        $this->resetAfterTest(true);
         $this->db = $GLOBALS['DB'];
     }
 

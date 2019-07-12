@@ -29,7 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 class totara_assignment_user_testcase extends advanced_testcase {
 
     public function test_logged_in_users() {
-        $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
