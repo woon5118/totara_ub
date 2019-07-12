@@ -45,7 +45,8 @@ use \mod_facetoface\signup\state\{
     requested,
     requestedadmin,
     user_cancelled,
-    fully_attended
+    fully_attended,
+    partially_attended
 };
 use mod_facetoface\query\event\filter\{room_filter, event_time_filter};
 use mod_facetoface\query\event\sortorder\{past_sortorder, future_sortorder};
@@ -4768,5 +4769,203 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertNotNull($signup212->get_signup_status());
         $this->assertNotNull($signup223->get_signup_status());
         $this->assertNotNull($signup224->get_signup_status());
+    }
+
+    /**
+     * @return array of [ $students, $course, $facetoface, $seminarevent, $signups ]
+     */
+    private function prepare_attendance(): array {
+        global $DB;
+
+        $gen = $this->getDataGenerator();
+        $students = [
+            $gen->create_user(),
+            $gen->create_user(),
+        ];
+        $course = $gen->create_course();
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        $gen->enrol_user($students[0]->id, $course->id, $studentrole->id);
+        $gen->enrol_user($students[1]->id, $course->id, $studentrole->id);
+
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $f2f = $f2fgen->create_instance(['name' => 'my seminar', 'course' => $course->id, 'attendancetime' => 2]);
+        $f2fsid = $f2fgen->add_session([
+            'facetoface' => $f2f->id,
+            'sessiondates' => [
+                (object)[
+                    'timestart' => time() + DAYSECS,
+                    'timefinish' => time() + DAYSECS + 60,
+                    'sessiontimezone' => 'Pacific/Auckland'
+                ]
+            ]
+        ]);
+
+        $seminarevent = new seminar_event($f2fsid);
+        $signups = [
+            signup_helper::signup(signup::create($students[0]->id, $seminarevent)),
+            signup_helper::signup(signup::create($students[1]->id, $seminarevent)),
+        ];
+
+        return [$students, $course, $f2f, $seminarevent, $signups];
+    }
+
+    /**
+     * @return array of [ $students, $course, $facetoface, $seminarevent, $signups ]
+     */
+    private function prepare_attendance_and_grade(): array {
+        [$students, $course, $f2f, $seminarevent, $signups] = $this->prepare_attendance();
+
+        // Take event attendance to grade activity
+        $processed = signup_helper::process_attendance($seminarevent, [$signups[0]->get_id() => fully_attended::get_code()]);
+        $this->assertTrue($processed);
+        $processed = signup_helper::process_attendance($seminarevent, [$signups[1]->get_id() => partially_attended::get_code()]);
+        $this->assertTrue($processed);
+
+        $grade_grades = grade_get_grades($course->id, 'mod', 'facetoface', $f2f->id, [$students[0]->id, $students[1]->id]);
+        $this->assertCount(1, $grade_grades->items);
+        $this->assertArrayHasKey($students[0]->id, $grade_grades->items[0]->grades);
+        $this->assertArrayHasKey($students[1]->id, $grade_grades->items[0]->grades);
+        $this->assertSame(100., grade_floatval($grade_grades->items[0]->grades[$students[0]->id]->grade));
+        $this->assertSame(50.0, grade_floatval($grade_grades->items[0]->grades[$students[1]->id]->grade));
+
+        $result = facetoface_grade_item_update($f2f, (object)[
+            'userid' => $students[0]->id,
+            'rawgrade' => 42
+        ]);
+        $this->assertTrue($result);
+
+        $grade_grades = grade_get_grades($course->id, 'mod', 'facetoface', $f2f->id, [$students[0]->id, $students[1]->id]);
+        $this->assertCount(1, $grade_grades->items);
+        $this->assertArrayHasKey($students[0]->id, $grade_grades->items[0]->grades);
+        $this->assertArrayHasKey($students[1]->id, $grade_grades->items[0]->grades);
+        $this->assertSame(42., grade_floatval($grade_grades->items[0]->grades[$students[0]->id]->grade));
+        $this->assertSame(50., grade_floatval($grade_grades->items[0]->grades[$students[1]->id]->grade));
+
+        return [$students, $course, $f2f, $seminarevent, $signups];
+    }
+
+    /**
+     * Ensure facetoface_update_grades() with userid updates only the grade of the user.
+     */
+    public function test_facetoface_update_grades_with_facetoface_and_user() {
+        [$students, $course, $f2f, $seminarevent, $signups] = $this->prepare_attendance_and_grade();
+
+        $result = facetoface_update_grades($f2f, $students[1]->id);
+        $this->assertTrue($result);
+
+        // Make sure the grade of $students[0] is not touched
+        $grade_grades = grade_get_grades($course->id, 'mod', 'facetoface', $f2f->id, [$students[0]->id, $students[1]->id]);
+        $this->assertCount(1, $grade_grades->items);
+        $this->assertArrayHasKey($students[0]->id, $grade_grades->items[0]->grades);
+        $this->assertArrayHasKey($students[1]->id, $grade_grades->items[0]->grades);
+        $this->assertSame(42., grade_floatval($grade_grades->items[0]->grades[$students[0]->id]->grade));
+        $this->assertSame(50., grade_floatval($grade_grades->items[0]->grades[$students[1]->id]->grade));
+
+        $result = facetoface_update_grades($f2f, $students[0]->id);
+        $this->assertTrue($result);
+
+        // Make sure the grade of $students[0] is updated
+        $grade_grades = grade_get_grades($course->id, 'mod', 'facetoface', $f2f->id, [$students[0]->id, $students[1]->id]);
+        $this->assertCount(1, $grade_grades->items);
+        $this->assertArrayHasKey($students[0]->id, $grade_grades->items[0]->grades);
+        $this->assertArrayHasKey($students[1]->id, $grade_grades->items[0]->grades);
+        $this->assertSame(100., grade_floatval($grade_grades->items[0]->grades[$students[0]->id]->grade));
+        $this->assertSame(50.0, grade_floatval($grade_grades->items[0]->grades[$students[1]->id]->grade));
+    }
+
+    /**
+     * Ensure facetoface_update_grades() without userid does not update any grades.
+     */
+    public function test_facetoface_update_grades_with_facetoface() {
+        [$students, $course, $f2f, $seminarevent, $signups] = $this->prepare_attendance_and_grade();
+
+        $result = facetoface_update_grades($f2f);
+        $this->assertTrue($result);
+
+        $grade_grades = grade_get_grades($course->id, 'mod', 'facetoface', $f2f->id, [$students[0]->id, $students[1]->id]);
+        $this->assertCount(1, $grade_grades->items);
+        $this->assertArrayHasKey($students[0]->id, $grade_grades->items[0]->grades);
+        $this->assertArrayHasKey($students[1]->id, $grade_grades->items[0]->grades);
+        $this->assertSame(42., grade_floatval($grade_grades->items[0]->grades[$students[0]->id]->grade));  // no changes
+        $this->assertSame(50., grade_floatval($grade_grades->items[0]->grades[$students[1]->id]->grade));
+    }
+
+    /**
+     * Ensure facetoface_grade_item_update('reset') sets all grades to NULL.
+     */
+    public function test_facetoface_grade_item_update_reset() {
+        [$students, $course, $f2f, $seminarevent, $signups] = $this->prepare_attendance_and_grade();
+
+        $result = facetoface_grade_item_update($f2f, 'reset');
+        $this->assertTrue($result);
+
+        $grade_grades = grade_get_grades($course->id, 'mod', 'facetoface', $f2f->id, [$students[0]->id, $students[1]->id]);
+        $this->assertCount(1, $grade_grades->items);
+        $this->assertArrayHasKey($students[0]->id, $grade_grades->items[0]->grades);
+        $this->assertArrayHasKey($students[1]->id, $grade_grades->items[0]->grades);
+        $this->assertNull(grade_floatval($grade_grades->items[0]->grades[$students[0]->id]->grade));
+        $this->assertNull(grade_floatval($grade_grades->items[0]->grades[$students[1]->id]->grade));
+    }
+
+    /**
+     * @return array of [ completionpass, completionstatusrequired, type, expected, tag ]
+     */
+    public function data_provider_facetoface_get_completion_state(): array {
+        $partially = partially_attended::get_code();
+        return [
+            [ seminar::COMPLETION_PASS_DISABLED, null, COMPLETION_OR, [ false, false ], 'cp:-, cs:-, tp:|' ],
+            [ seminar::COMPLETION_PASS_DISABLED, null, COMPLETION_AND, [ true, true ], 'cp:-, cs:-, tp:&' ],
+            [ seminar::COMPLETION_PASS_DISABLED, $partially, COMPLETION_OR, [ false, true ], 'cp:-, cs:-, tp:|' ],
+            [ seminar::COMPLETION_PASS_DISABLED, $partially, COMPLETION_AND, [ false, true ], 'cp:-, cs:-, tp:&' ],
+            [ seminar::COMPLETION_PASS_ANY, null, COMPLETION_OR, [ true, true ], 'cp:A, cs:-, tp:|' ],
+            [ seminar::COMPLETION_PASS_ANY, null, COMPLETION_AND, [ true, true ], 'cp:A, cs:-, tp:&' ],
+            [ seminar::COMPLETION_PASS_ANY, $partially, COMPLETION_OR, [ true, true ], 'cp:A, cs:P, tp:|' ],
+            [ seminar::COMPLETION_PASS_ANY, $partially, COMPLETION_AND, [ false, true ], 'cp:A, cs:P, tp:&' ],
+            [ seminar::COMPLETION_PASS_GRADEPASS, null, COMPLETION_OR, [ true, false ], 'cp:P, cs:-, tp:|' ],
+            [ seminar::COMPLETION_PASS_GRADEPASS, null, COMPLETION_AND, [ true, false ], 'cp:P, cs:-, tp:&' ],
+            [ seminar::COMPLETION_PASS_GRADEPASS, $partially, COMPLETION_OR, [ true, true ], 'cp:P, cs:P, tp:|' ],
+            [ seminar::COMPLETION_PASS_GRADEPASS, $partially, COMPLETION_AND, [ false, false ], 'cp:P, cs:P, tp:&' ],
+        ];
+    }
+
+    /**
+     * Test facetoface_get_completion_state() with various combinations of activity completion criteria.
+     * @param integer $completionpass seminar::COMPLETION_PASS_xxx
+     * @param integer|null $completionstatusrequired the code of one of graded states
+     * @param boolean $type COMPLETION_AND or COMPLETION_OR
+     * @param array $expects of [ student0, student1 ]
+     * @param string $tag
+     * @dataProvider data_provider_facetoface_get_completion_state
+     */
+    public function test_facetoface_get_completion_state(int $completionpass, ?int $completionstatusrequired, bool $type, array $expects, string $tag) {
+        global $DB;
+        /** @var \moodle_database $DB */
+
+        [$students, $course, $f2f, $seminarevent, $signups] = $this->prepare_attendance();
+
+        // Set activity completion criteria
+        $f2f->completionpass = $completionpass;
+        $f2f->completionstatusrequired = $completionstatusrequired === null ? '' : json_encode([$completionstatusrequired => 1]);
+        $DB->update_record('facetoface', $f2f);
+
+        // Set passing grade to 100
+        $gradeitem = grade_item::fetch(['courseid' => $course->id, 'iteminstance' => $f2f->id]);
+        $this->assertNotFalse($gradeitem);
+        $gradeitem->gradepass = 100;
+        $gradeitem->update();
+
+        // Take event attendance to give them their activity grade
+        $processed = signup_helper::process_attendance($seminarevent, [$signups[0]->get_id() => fully_attended::get_code()]);
+        $this->assertTrue($processed);
+        $processed = signup_helper::process_attendance($seminarevent, [$signups[1]->get_id() => partially_attended::get_code()]);
+        $this->assertTrue($processed);
+
+        // Calculate completion state
+        $cm = get_coursemodule_from_instance('facetoface', $f2f->id, $course->id, false, MUST_EXIST);
+        $result = facetoface_get_completion_state($course, $cm, $students[0]->id, $type);
+        $this->assertSame($expects[0], $result);
+        $result = facetoface_get_completion_state($course, $cm, $students[1]->id, $type);
+        $this->assertSame($expects[1], $result);
     }
 }

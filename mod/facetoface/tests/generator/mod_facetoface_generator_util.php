@@ -284,7 +284,8 @@ final class mod_facetoface_generator_util {
      * @return int
      */
     public static function create_signups_for_behat(array $record): int {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/mod/facetoface/lib.php'); // for MDL_F2F_BOTH
 
         $keys = array('user', 'eventdetails');
         foreach ($keys as $key) {
