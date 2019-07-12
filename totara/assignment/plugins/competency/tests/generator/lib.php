@@ -155,6 +155,7 @@ class tassign_competency_generator extends component_generator_base {
             'created_by' => $this->logged_user(),
             'created_at' => time(),
             'updated_at' => time(),
+            'archived_at' => null
         ], $attributes);
 
         return (object) array_merge(['id' => $this->db()->insert_record('totara_assignment_competencies', (object) $attributes)], $attributes);

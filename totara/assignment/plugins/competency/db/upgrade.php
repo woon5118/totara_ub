@@ -157,6 +157,21 @@ function xmldb_tassign_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019071201, 'tassign', 'competency');
     }
 
+    if ($oldversion < 2019071201) {
+        // Define field archived_at to be added to totara_assignment_competencies.
+        $table = new xmldb_table('totara_assignment_competencies');
+        $field = new xmldb_field('archived_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'updated_at');
+
+        // Conditionally launch add field archived_at.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019071201, 'tassign', 'competency');
+    }
+
+
 
     return true;
 }

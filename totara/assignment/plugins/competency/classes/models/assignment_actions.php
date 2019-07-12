@@ -99,11 +99,13 @@ class assignment_actions {
             }
 
             // Update all assignments set status to archived
+            $timestamp = time();
             assignment::repository()
                 ->where('id', $affected_assignment_ids)
                 ->update([
                     'status' => assignment::STATUS_ARCHIVED,
-                    'updated_at' => time()
+                    'updated_at' => $timestamp,
+                    'archived_at' => $timestamp
                 ]);
 
             // Delete all user records for those assignments
@@ -366,6 +368,7 @@ class assignment_actions {
                             $assignment->created_by = $user->id;
                             $assignment->created_at = time();
                             $assignment->updated_at = time();
+                            $assignment->archived_at = null;
                             $assignment->save();
 
                             $assignments->append($assignment);

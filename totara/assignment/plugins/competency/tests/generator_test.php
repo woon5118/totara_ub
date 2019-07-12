@@ -73,6 +73,7 @@ class tassign_competency_generator_testcase extends advanced_testcase {
             'created_by' => $this->generator()->create_user()->id,
             'created_at' => time() - 1000,
             'updated_at' => time() - 500,
+            'archived_at' => time() - 500,
             'type' => 'self'
         ];
 

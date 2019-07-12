@@ -241,6 +241,7 @@ class tassign_competency_userdata_assignment_user_testcase extends advanced_test
                     'created_by',
                     'created_at',
                     'updated_at',
+                    'archived_at',
                     'user_group_name',
                     'idnumber',
                     'competency_name',

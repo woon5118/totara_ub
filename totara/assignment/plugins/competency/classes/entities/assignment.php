@@ -38,6 +38,7 @@ use core\orm\entity\entity;
  * @property int $created_by ID of the created user
  * @property int $created_at Created at timestamp
  * @property int $updated_at Updated at timestamp
+ * @property int $archived_at Archived at timestamp
  *
  * @property-read string $status_name Textual representation of status int
  *

@@ -23,6 +23,10 @@
  */
 
 use tassign_competency\entities;
+use tassign_competency\entities\assignment;
+use tassign_competency\entities\competency_assignment_user;
+use tassign_competency\expand_task;
+use tassign_competency\models\assignment_actions;
 use totara_job\job_assignment;
 use core\orm\query\table;
 
@@ -35,21 +39,21 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
     public function test_archiving_draft() {
         ['assignments' => $assignments] = $this->generate_assignments();
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_DRAFT;
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_DRAFT;
         $assignment1->save();
 
-        $assignment2 = new entities\assignment($assignments[1]);
-        $assignment2->status = entities\assignment::STATUS_DRAFT;
+        $assignment2 = new assignment($assignments[1]);
+        $assignment2->status = assignment::STATUS_DRAFT;
         $assignment2->save();
 
-        $assignment3 = new entities\assignment($assignments[2]);
-        $assignment3->status = entities\assignment::STATUS_ACTIVE;
+        $assignment3 = new assignment($assignments[2]);
+        $assignment3->status = assignment::STATUS_ACTIVE;
         $assignment3->save();
 
         $this->expand();
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new assignment_actions();
         $affected_ids = $model->archive([$assignment1->id, $assignment2->id]);
         $this->assertEmpty($affected_ids);
 
@@ -58,55 +62,58 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
         $assignment3->refresh();
 
         // None got archived
-        $this->assertEquals(entities\assignment::STATUS_DRAFT, $assignment1->status);
-        $this->assertEquals(entities\assignment::STATUS_DRAFT, $assignment2->status);
-        $this->assertEquals(entities\assignment::STATUS_ACTIVE, $assignment3->status);
+        $this->assertEquals(assignment::STATUS_DRAFT, $assignment1->status);
+        $this->assertEquals(assignment::STATUS_DRAFT, $assignment2->status);
+        $this->assertEquals(assignment::STATUS_ACTIVE, $assignment3->status);
     }
 
     public function test_archiving_single() {
         ['assignments' => $assignments] = $this->generate_assignments();
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_ACTIVE;
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_ACTIVE;
         $assignment1->save();
 
-        $assignment2 = new entities\assignment($assignments[1]);
-        $assignment2->status = entities\assignment::STATUS_ACTIVE;
+        $assignment2 = new assignment($assignments[1]);
+        $assignment2->status = assignment::STATUS_ACTIVE;
         $assignment2->save();
 
         $this->expand();
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new assignment_actions();
         $affected_ids = $model->archive($assignment1->id);
         $this->assertEquals([$assignment1->id], $affected_ids);
 
         $assignment1->refresh();
         $assignment2->refresh();
 
-        $this->assertEquals(entities\assignment::STATUS_ARCHIVED, $assignment1->status);
+        $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment1->status);
+        $this->assertGreaterThan(0, $assignment1->updated_at);
+        $this->assertEquals($assignment1->updated_at, $assignment1->archived_at);
         // this one is untouched
-        $this->assertEquals(entities\assignment::STATUS_ACTIVE, $assignment2->status);
+        $this->assertEquals(assignment::STATUS_ACTIVE, $assignment2->status);
+        $this->assertEquals(0, $assignment2->archived_at);
     }
 
     public function test_archiving_active() {
         ['assignments' => $assignments] = $this->generate_assignments();
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_ACTIVE;
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_ACTIVE;
         $assignment1->save();
 
-        $assignment2 = new entities\assignment($assignments[1]);
-        $assignment2->status = entities\assignment::STATUS_ACTIVE;
+        $assignment2 = new assignment($assignments[1]);
+        $assignment2->status = assignment::STATUS_ACTIVE;
         $assignment2->save();
 
-        $assignment3 = new entities\assignment($assignments[2]);
-        $assignment3->status = entities\assignment::STATUS_ACTIVE;
+        $assignment3 = new assignment($assignments[2]);
+        $assignment3->status = assignment::STATUS_ACTIVE;
         $assignment3->save();
 
         $this->expand();
-        $this->assertEquals(3, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(3, competency_assignment_user::repository()->count());
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new assignment_actions();
         $affected_ids = $model->archive([$assignment1->id, $assignment2->id]);
         $this->assertEquals([$assignment1->id, $assignment2->id], $affected_ids);
 
@@ -114,13 +121,18 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
         $assignment2->refresh();
         $assignment3->refresh();
 
-        $this->assertEquals(entities\assignment::STATUS_ARCHIVED, $assignment1->status);
-        $this->assertEquals(entities\assignment::STATUS_ARCHIVED, $assignment2->status);
+        $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment1->status);
+        $this->assertGreaterThan(0, $assignment1->updated_at);
+        $this->assertEquals($assignment1->updated_at, $assignment1->archived_at);
+        $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment2->status);
+        $this->assertGreaterThan(0, $assignment2->updated_at);
+        $this->assertEquals($assignment2->updated_at, $assignment2->archived_at);
         // this one is untouched
-        $this->assertEquals(entities\assignment::STATUS_ACTIVE, $assignment3->status);
+        $this->assertEquals(assignment::STATUS_ACTIVE, $assignment3->status);
+        $this->assertEquals(0, $assignment3->archived_at);
 
         // archived user records where cleaned up
-        $this->assertEquals(1, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(1, competency_assignment_user::repository()->count());
     }
 
     public function test_archiving_active_with_continued_tracking() {
@@ -133,7 +145,7 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
         $user2 = $gen->create_user();
         $user3 = $gen->create_user();
 
-        $status = ['status' => entities\assignment::STATUS_ACTIVE];
+        $status = ['status' => assignment::STATUS_ACTIVE];
 
         $fw = $hierarchy_generator->create_pos_frame(['fullname' => 'Pos Framework']);
         $pos = $hierarchy_generator->create_pos(['frameworkid' => $fw->id, 'fullname' => 'Position 1']);
@@ -164,33 +176,33 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
 
         cohort_add_member($cohort->id, $user3->id);
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_ACTIVE;
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_ACTIVE;
         $assignment1->save();
 
-        $assignment2 = new entities\assignment($assignments[1]);
-        $assignment2->status = entities\assignment::STATUS_ACTIVE;
+        $assignment2 = new assignment($assignments[1]);
+        $assignment2->status = assignment::STATUS_ACTIVE;
         $assignment2->save();
 
-        $assignment3 = new entities\assignment($assignments[2]);
-        $assignment3->status = entities\assignment::STATUS_ACTIVE;
+        $assignment3 = new assignment($assignments[2]);
+        $assignment3->status = assignment::STATUS_ACTIVE;
         $assignment3->save();
 
         $this->expand();
-        $this->assertEquals(6, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(6, competency_assignment_user::repository()->count());
 
         $expected_ids = [$assignment1->id, $pos_assignment->id, $org_assignment->id, $coh_assignment->id];
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new assignment_actions();
         $affected_ids = $model->archive($expected_ids, true);
         sort($expected_ids);
         sort($affected_ids);
         $this->assertEquals($expected_ids, $affected_ids);
 
         // One user assignment is gone and for the other group ones new system assignments should have been created
-        $this->assertEquals(5, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(5, competency_assignment_user::repository()->count());
         // Make sure we have the expected assignments
-        $this->assertEquals(2, entities\competency_assignment_user::repository()
+        $this->assertEquals(2, competency_assignment_user::repository()
             ->where(
                 'assignment_id',
                 [$assignment2->id, $assignment3->id]
@@ -200,9 +212,9 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
         // New system assignments should have been created
         $this->assertEquals(
             3,
-            entities\competency_assignment_user::repository()
-                ->join((new table(entities\assignment::TABLE))->as('ass'), 'assignment_id', 'id')
-                ->where('ass.type', entities\assignment::TYPE_SYSTEM)
+            competency_assignment_user::repository()
+                ->join((new table(assignment::TABLE))->as('ass'), 'assignment_id', 'id')
+                ->where('ass.type', assignment::TYPE_SYSTEM)
                 ->where('user_id', [$user1->id, $user2->id, $user3->id])
                 ->count()
         );
@@ -218,7 +230,7 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
         $user2 = $gen->create_user();
         $user3 = $gen->create_user();
 
-        $status = ['status' => entities\assignment::STATUS_ACTIVE];
+        $status = ['status' => assignment::STATUS_ACTIVE];
 
         $fw = $hierarchy_generator->create_pos_frame(['fullname' => 'Pos Framework']);
         $pos = $hierarchy_generator->create_pos(['frameworkid' => $fw->id, 'fullname' => 'Position 1']);
@@ -249,34 +261,34 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
 
         cohort_add_member($cohort->id, $user3->id);
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_ACTIVE;
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_ACTIVE;
         $assignment1->save();
 
-        $assignment2 = new entities\assignment($assignments[1]);
-        $assignment2->status = entities\assignment::STATUS_ACTIVE;
+        $assignment2 = new assignment($assignments[1]);
+        $assignment2->status = assignment::STATUS_ACTIVE;
         $assignment2->save();
 
-        $assignment3 = new entities\assignment($assignments[2]);
-        $assignment3->status = entities\assignment::STATUS_ACTIVE;
+        $assignment3 = new assignment($assignments[2]);
+        $assignment3->status = assignment::STATUS_ACTIVE;
         $assignment3->save();
 
         $this->expand();
-        $this->assertEquals(6, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(6, competency_assignment_user::repository()->count());
 
         $expected_ids = [$assignment1->id, $pos_assignment->id, $org_assignment->id, $coh_assignment->id];
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new assignment_actions();
         $affected_ids = $model->archive($expected_ids, false);
         sort($expected_ids);
         sort($affected_ids);
         $this->assertEquals($expected_ids, $affected_ids);
 
         // User should be gone
-        $this->assertEquals(2, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(2, competency_assignment_user::repository()->count());
         // No new system assignments should have been created
-        $this->assertEquals(0,  entities\assignment::repository()
-                ->where('type', entities\assignment::TYPE_SYSTEM)
+        $this->assertEquals(0,  assignment::repository()
+                ->where('type', assignment::TYPE_SYSTEM)
                 ->count()
         );
     }
@@ -284,19 +296,23 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
     public function test_archiving_mix() {
         ['assignments' => $assignments] = $this->generate_assignments();
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_DRAFT;
+        $archived_at = time();
+
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_DRAFT;
         $assignment1->save();
 
-        $assignment2 = new entities\assignment($assignments[1]);
-        $assignment2->status = entities\assignment::STATUS_ACTIVE;
+        $assignment2 = new assignment($assignments[1]);
+        $assignment2->status = assignment::STATUS_ACTIVE;
         $assignment2->save();
 
-        $assignment3 = new entities\assignment($assignments[2]);
-        $assignment3->status = entities\assignment::STATUS_ARCHIVED;
-        $assignment3->save();
+        $assignment3 = new assignment($assignments[2]);
+        $assignment3->status = assignment::STATUS_ARCHIVED;
+        $assignment3->archived_at = $archived_at;
+        $assignment3->updated_at = $archived_at;
+        $assignment3->do_not_update_timestamps()->save();
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new assignment_actions();
         $affected_ids = $model->archive([$assignment1->id, $assignment2->id, $assignment3->id]);
         $this->assertEquals([$assignment2->id], $affected_ids);
 
@@ -304,27 +320,38 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
         $assignment2->refresh();
         $assignment3->refresh();
 
-        $this->assertEquals(entities\assignment::STATUS_DRAFT, $assignment1->status);
-        $this->assertEquals(entities\assignment::STATUS_ARCHIVED, $assignment2->status);
-        $this->assertEquals(entities\assignment::STATUS_ARCHIVED, $assignment3->status);
+        $this->assertEquals(assignment::STATUS_DRAFT, $assignment1->status);
+        $this->assertEquals(0, (int)$assignment1->archived_at);
+        $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment2->status);
+        $this->assertGreaterThan(0, (int)$assignment2->updated_at);
+        $this->assertEquals((int)$assignment2->updated_at, (int)$assignment2->archived_at);
+        $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment3->status);
+        $this->assertEquals((int)$archived_at, (int)$assignment3->updated_at);
+        $this->assertEquals((int)$assignment3->updated_at, (int)$assignment3->archived_at);
     }
 
     public function test_archiving_archived() {
         ['assignments' => $assignments] = $this->generate_assignments();
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_ARCHIVED;
-        $assignment1->save();
+        $old_archived_at = time() - 20;
 
-        $assignment2 = new entities\assignment($assignments[1]);
-        $assignment2->status = entities\assignment::STATUS_ARCHIVED;
-        $assignment2->save();
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_ARCHIVED;
+        $assignment1->archived_at = $old_archived_at;
+        $assignment1->updated_at = $old_archived_at;
+        $assignment1->do_not_update_timestamps()->save();
 
-        $assignment3 = new entities\assignment($assignments[2]);
-        $assignment3->status = entities\assignment::STATUS_ACTIVE;
+        $assignment2 = new assignment($assignments[1]);
+        $assignment2->status = assignment::STATUS_ARCHIVED;
+        $assignment2->archived_at = $old_archived_at;
+        $assignment2->updated_at = $old_archived_at;
+        $assignment2->do_not_update_timestamps()->save();
+
+        $assignment3 = new assignment($assignments[2]);
+        $assignment3->status = assignment::STATUS_ACTIVE;
         $assignment3->save();
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new assignment_actions();
         $affected_ids = $model->archive([$assignment1->id, $assignment2->id]);
         $this->assertEmpty($affected_ids);
 
@@ -332,15 +359,20 @@ class tassign_competency_actions_archive_testcase extends tassign_competency_ass
         $assignment2->refresh();
         $assignment3->refresh();
 
-        $this->assertEquals(entities\assignment::STATUS_ARCHIVED, $assignment1->status);
-        $this->assertEquals(entities\assignment::STATUS_ARCHIVED, $assignment2->status);
+        $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment1->status);
+        $this->assertEquals((int)$old_archived_at, (int)$assignment1->updated_at);
+        $this->assertEquals((int)$assignment1->updated_at, (int)$assignment1->archived_at);
+        $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment2->status);
+        $this->assertEquals((int)$old_archived_at, (int)$assignment2->updated_at);
+        $this->assertEquals((int)$assignment2->updated_at, (int)$assignment2->archived_at);
         // this one is untouched
-        $this->assertEquals(entities\assignment::STATUS_ACTIVE, $assignment3->status);
+        $this->assertEquals(assignment::STATUS_ACTIVE, $assignment3->status);
+        $this->assertEquals(0, (int)$assignment3->archived_at);
     }
 
     private function expand() {
         // We need the expanded users for the logging to work
-        $expand_task = new \tassign_competency\expand_task($GLOBALS['DB']);
+        $expand_task = new expand_task($GLOBALS['DB']);
         $expand_task->expand_all();
     }
 
