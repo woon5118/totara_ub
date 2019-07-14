@@ -48,13 +48,13 @@ class category_filters {
             ['contextid']
         );
         $paneldatafilter->add_source(
-            'catcontext.catcontextid',
+            'pdfcatcontext.catcontextid',
             "(SELECT objcontext.id AS objcontextid, catcontext.id AS catcontextid
                             FROM {context} objcontext
                             JOIN {context} catcontext ON objcontext.path LIKE CONCAT(catcontext.path, '/%')
                                                      AND catcontext.contextlevel = :cat_cgry_fil_clvl)",
-            'catcontext',
-            ['contextid' => 'catcontext.objcontextid'],
+            'pdfcatcontext',
+            ['contextid' => 'pdfcatcontext.objcontextid'],
             "",
             ['cat_cgry_fil_clvl' => CONTEXT_COURSECAT]
         );
@@ -81,12 +81,12 @@ class category_filters {
             ['contextid']
         );
         $browsedatafilter->add_source(
-            'catcontext.catcontextid',
+            'bdfcatcontext.catcontextid',
             "(SELECT objcontext.id AS objcontextid, catcontext.id AS catcontextid
                             FROM {context} objcontext
                             JOIN {context} catcontext ON objcontext.path LIKE CONCAT(catcontext.path, '/%'))",
-            'catcontext',
-            ['contextid' => 'catcontext.objcontextid']
+            'bdfcatcontext',
+            ['contextid' => 'bdfcatcontext.objcontextid']
         );
 
         $browseselector = new tree(
