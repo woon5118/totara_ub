@@ -246,13 +246,12 @@ function totara_load_program_settings($navinode, $context, $forceopen = false) {
     }
 
     // Add assign or override roles if allowed.
-    if (is_siteadmin()) {
-        if (has_capability('moodle/role:assign', $context)) {
-            $url = new moodle_url('/admin/roles/assign.php', array('contextid' => $context->id));
-            $permissionsnode->add(get_string('assignedroles', 'role'), $url, navigation_node::TYPE_SETTING, null,
-                    'roles', new pix_icon('t/assignroles', get_string('assignedroles', 'role')));
-        }
+    if (has_capability('moodle/role:assign', $context)) {
+        $url = new moodle_url('/admin/roles/assign.php', array('contextid' => $context->id));
+        $permissionsnode->add(get_string('assignedroles', 'role'), $url, navigation_node::TYPE_SETTING, null,
+            'roles', new pix_icon('t/assignroles', get_string('assignedroles', 'role')));
     }
+
     // Check role permissions.
     if (has_any_capability(array('moodle/role:assign', 'moodle/role:safeoverride', 'moodle/role:override', 'moodle/role:assign'), $context)) {
         $url = new moodle_url('/admin/roles/check.php', array('contextid' => $context->id));
