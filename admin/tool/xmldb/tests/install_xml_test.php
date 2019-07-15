@@ -49,7 +49,7 @@ class tool_xmldb_instal_xml_testcase extends advanced_testcase {
             // =========================================================
             // Of course the next test will pass ;)
 
-            $this->assertTrue(file_get_contents($file) === $xml, "XMLDB file '{$file}' is different to the generated version, please edit the file in XMLDB editor and save it.");
+            $this->assertSame(file_get_contents($file), $xml, "XMLDB file '{$file}' is different to the generated version, please edit the file in XMLDB editor and save it.");
         }
 
     }
