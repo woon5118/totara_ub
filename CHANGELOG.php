@@ -3,6 +3,486 @@
 
 Totara Learn Changelog
 
+Release Evergreen (17th July 2019):
+===================================
+
+Key:           + Evergreen only
+
+
+API changes:
+
+    TL-20548   +   'runTemplateJS()' now returns an ES6 promise
+
+                   The 'runTemplateJS' function in the core/templates AMD library now returns
+                   an ES6 Promise once all UI components have been initialised
+
+    TL-21193   +   Added Laravel-like Query Builder
+
+                   This patch introduces a query builder which abstracts querying the database
+                   on top of the DML layer. The query builder is inspired by Laravel’s
+                   Query Builder (found here: https://laravel.com/docs/master/queries) and provides a
+                   similar feature set. It provides a consistent fluent interface. Internally
+                   it uses the DML layer to execute queries so database compatibility and
+                   low-level query integrity is ensured. The query builder provides at least
+                   the same functionality as the DML layer. It should be possible to
+                   substitute existing DML actions with it, as well as cover more complex
+                   cases which are only possible via raw SQL queries at the moment.
+
+                   Full documentation is available here:
+                   https://help.totaralearning.com/display/DEV/Query+builder
+
+    TL-21222   +   Added support for deferring the creation of foreign keys
+
+                   This improvement extends TL-21024 which added support for enforcing foreign
+                   key relationships within install.xml.
+
+                   It is now possible to mark a foreign key relationship as deferred within
+                   install.xml, causing the system to skip the creation of the foreign key
+                   during installation. The developer is then responsible for creating the
+                   foreign key at the right time within an install.php file.
+
+    TL-21230   +   Added a new transaction function in DML which accepts a Closure
+
+                   The new 'transaction()' method accepts a Closure which is automatically
+                   wrapped in a transaction. This is an alternative syntax to the traditional
+                   transaction handling.
+
+    TL-21240   +   Extracted class 'program_utilities' into its own autoloaded class '\totara_program\utils'
+    TL-21256   +   Nested transactions can be safely rolled back
+
+                   Previously transaction rollbacks were not supposed to be used from
+                   non-system code and they were not allowed at all in nested transactions.
+
+                   Rollback of individual nested transactions is now fully supported, and it
+                   is also not required to supply an exception when rolling back nested or
+                   main transactions.
+
+    TL-21288   +   Relative file serving now facilitates file serving options including 'allowxss'
+    TL-21327   +   Extracted program exceptions code into autoloaded classes \totara_program\exception\*
+    TL-21368   +   Implemented a generic formatter to format fields of objects
+
+                   A formatter can be implemented for an existing object, for example a record
+                   from the database. It defines a map using field names for the keys and
+                   field format functions for the values. The formatter will get the value
+                   from the object, run it through the format function defined in the map and
+                   return the formatted value. Currently we support a text (using
+                   format_text()), a string (using format_string()) and a date formatter.
+                   Custom field formatters can easily be implemented extending the base field
+                   formatter.
+
+                   The existing helper functions format_text() and format_date()
+                   in \core\webapi\execution_context were deprecated in favour of the new
+                   field formatters \totara_core\formatter\field\text_field_formatter
+                   and \totara_core\formatter\field\date_field_formatter.
+
+                   Full documentation can be found here:
+                   https://help.totaralearning.com/display/DEV/Formatters
+
+    TL-21370       Method resetAfterTest() in PHPUnit tests has been deprecated
+
+                   Since the introduction of parallel PHPUnit testing the order of test
+                   execution is no longer defined, which means that tests cannot rely on state
+                   (database and file system) to be carried over from one test into another.
+
+                   Existing PHPUnit tests need to be updated to prepare data at the beginning
+                   of each test method separately.
+
+Performance improvements:
+
+    TL-21541       The source filter for report builder sources has been optimised
+
+                   Previously the options for this filter were loaded, even when not needed.
+                   This was an expensive operation, often done needlessly. The options are now
+                   only loaded when absolutely needed.
+
+Improvements:
+
+    TL-17691       Added site policies to the self-registration process
+
+                   To comply with GDPR policies, when self-registration is enabled, new users
+                   are now required to accept mandatory site policies before being able to
+                   request a new account, as apposed to the users only viewing the site
+                   policies after registering and logging in.
+
+    TL-17745       Improved the program assignments user interface to better handle a large number of assignments
+
+                   The previous user interface for program assignments would load every
+                   assignment onto a single page, and in some situations where a very large
+                   number of assignments were added to a single program or certification the
+                   page would time out on load. The page now has a search, and filter, and
+                   prevents too many records being loaded at the same time.
+
+    TL-18678   +   Improved course selector form element for changing a 'Recurring Course' in programs content
+
+                   Prior to this change all courses were loaded into a single dropdown, which
+                   could lead to performance issues on sites with a large number of courses.
+                   This dropdown has now been replaced with the standard course selector
+                   dialog already used in selecting courses for program course sets.
+
+    TL-19799   +   Nonfunctional Google Fusion export options were removed
+    TL-20418   +   Added seminar attendance 'CSV export for Upload' feature
+
+                   Following on the ability to upload seminar attendance in the last release,
+                   it is now possible to download a seminar attendance report that is already
+                   correctly formatted for upload.
+
+                   Trainers can use the new 'CSV export for Upload' to mark event attendance,
+                   and optionally grade if manual event grading is enabled, in bulk. The file
+                   can then be uploaded with no further changes to column layout or header
+                   names.
+
+    TL-20425   +   Updated seminar event dashboard and course view
+
+                   This patch contains several improvements to the seminar event dashboard and
+                   the course activity view, including:
+                    * Added 'Previous events time period' options to be able to display only
+                      past events in the specific time period
+                    * Redesigned the filter bar with tool-tips and icon
+                    * Added new filters: booking status, attendance tracking status
+                    * Reverted the change in TL-19928 (February 2019 release); the seminar
+                      event dashboard is now back to two tables: one is for upcoming or ongoing
+                      events, the other is for past or cancelled events
+                    * Redesigned session list table
+                    * Rearranged table columns
+                    * Broke down event status into three types: event time, event booking
+                      status, and user booking status
+
+    TL-20760       Added support for search metadata within Courses, Programs, and Certifications.
+
+                   New text field added to Courses, Programs, and Certifications settings
+                   where search keywords can be added. These keywords will not be displayed
+                   anywhere on pages but will be used in Full Text Search.
+
+                   By default these fields are empty.
+
+    TL-20761       Added wildcard support for full text search in catalog
+
+                   When asterisk "*" is placed as a last character of a single keyword in
+                   catalog it will return all partial matches starting with the given
+                   keyword.  Asterisk can be placed only in the end of keyword search (this
+                   is limitations of wildcard support in databases) and at this stage only
+                   single keywords are supported (no whitespaces).
+
+    TL-20834       Enabled unaccented Full Text Search in catalog
+
+                   PostgreSQL and MS SQL have built in support for accent insensitive full
+                   text searches.
+
+                   By default, database configuration is used (typically accent sensitivity is
+                   on).
+
+                   To change accent sensitivity of full test searches for either PostgreSQL or
+                   MS SQL you can set the
+                   following options in config.php:
+                   $CFG->dboptions['ftsaccentsensitivity'] = true; // Accent sensitive search
+                   $CFG->dboptions['ftsaccentsensitivity'] = false; // Accent insensitive
+                   search
+
+                   After changing the accent sensitivity setting you need to run the following
+                   scripts in the listed order:
+                   php admin/cli/fts_rebuild_indexes.php
+                   php admin/cli/fts_repopulate_tables.php
+
+    TL-20886       Added ngram support for MySQL full text search
+
+                   Added support of ngram in MySQL. ngram is a Full Text parser that mainly
+                   designed to support Chinese, Japanese, and Korean (CJK) langauges. The
+                   ngram parser tokenises a words into a contiguous sequence of n-characters.
+                   More information about ngram can be found in MySQL documentation.
+
+                   While it is designed more for CJK languages, it is also useful to parse
+                   text on languages that use words concatenation, like German or Swedish.
+                   However, it can produce large number of false-positive search results
+                   (albeit with lower rating), so doing proper testing after enabling is
+                   recommended.
+
+                   This support is not enabled by default. To enable ngram support, add option
+                   into your config.php:
+
+                   $CFG->dboptions['ftsngram'] = true;
+
+                   and run  FTS scripts to re-index content:
+
+                   php admin/cli/fts_rebuild_indexes.php
+                    php admin/cli/fts_repopulate_tables.php
+
+    TL-21056       Added a warning about incompatible column selection in the report builder
+
+                   In some cases, a combination of columns selected in a report source may
+                   have caused unexpected results or a broken report. This usually happened
+                   when a column that already relies on the aggregated data internally (e.g.
+                   'Course Short Name' in the 'Program Overview' report) was combined with
+                   columns aggregated via 'Aggregation or grouping' (e.g. count or comma
+                   separated values).
+
+                   Previously, using this type of combination on certain database types would
+                   have resulted in an error. This change adds a warning to inform users about
+                   the use of any incompatible columns at the time the report is being set up.
+
+    TL-21084   +   Improved seminar session Date/Time format and export for report builder
+
+                   New date columns added:
+                    * Session Start Date + Excel/ODS export
+                    * Session Finish Date + Excel/ODS export
+                    * Session Finish Date/Time (linked to activity) + Excel/ODS export
+
+                   Improved:
+                    * Session Start Date/Time added Excel/ODS export
+                    * Session Finish Date/Time added Excel/ODS export
+                    * Session Start Date/Time (linked to activity) added Excel/ODS export
+                    * Session Start Time added Excel/ODS export
+                    * Session Finish Time added Excel/ODS export
+                    * There is new format for date/time with timezone for report builder:
+                      '2 July 2019, 5 PM
+                      Timezone: Pacific/Auckland'
+                    * All Date/Time columns have a proper ODS/Excel export
+
+    TL-21197   +   SQLSRV SSL connections now support the 'TrustServerCertificate' option
+
+                   TL-21115 introduced the ability to force database connections over SSL.
+                   However, SQLSRV required a signed certificate and there was no way to force
+                   the TrustServerCertificate connection option through Totara.
+
+                   A new dboption 'trustservercertificate' has been added that is passed
+                   through to the 'TrustServerCertificate' option during connection.
+
+    TL-21247       Added configuration, a new CLI script and a scheduled task to execute the 'ANALYZE TABLE' query
+
+                   The new 'analyze_table_task' scheduled task is configured to run every late
+                   night.
+                    It is required that the task be configured to run at off-peak times on
+                   your site.
+
+    TL-21359       Fixed the Atto editor incorrectly applying formatting to previously selected text
+
+                   Fixed an intermittent problem with the Atto editor when formatting was
+                   applied to previously selected text instead of the currently selected text.
+                   The 'mouse select' functionality works reliably now.
+
+    TL-21422   +   Added a setting to display a seminar description on a course homepage
+    TL-21426       New SCORM setting has been added that implements session timeout prevention in SCORM player
+
+                   The new setting "Enable the SCORM player to keep the user session alive" is
+                   available under the Admin settings in the SCORM plugin. It can be used in
+                   order to prevent unwanted session timeouts during SCORM attempts.
+
+                   Due to the fact that it keeps user session alive while SCORM attempt is in
+                   progress, it may be considered a minor security concern and has been added
+                   to the Security overview report as such.
+
+    TL-21435   +   Removed typo3 library dependency from the core_text class
+    TL-21491   +   Added [seminarname] and [seminardescription] placeholders for Seminar notifications
+
+                   The [seminarname] placeholder has been added to replace the
+                   [facetofacename] placeholder, although the system will still support both
+                   [seminarname] and [facetofacename] placeholders. An optional placeholder,
+                   [seminardescription], has also been added.
+
+Bug fixes:
+
+    TL-18560       Fixed the 'Publish room for use in other sessions' checkbox in the edit custom room dialogue
+
+                   When creating or editing a seminar event, it is possible to create a custom
+                   room that can only be used by other events in the same seminar activity.
+                   The editing form for these rooms can include a checkbox (if you have
+                   sufficient permission) that allows them to be easily converted to sitewide
+                   rooms.
+
+                   This checkbox was always checked, and did not work as expected. This has
+                   been fixed.
+
+    TL-19054   +   Set notification type when cloning a Report Builder embedded report to a warning instead of an error
+    TL-19138       Fixed warning message when deleting a report builder saved search
+
+                   If a report builder saved search is deleted, any scheduled reports that use
+                   that saved search are also deleted. The warning message to confirm the
+                   deletion of the saved search now also correctly displays any scheduled
+                   reports that will also be deleted.
+
+    TL-19324       Fixed a bug within select tree where the drop-down would disappear when clicking the scrollbar
+
+                   Improved the select tree component functionality. The scrollbar within
+                   select tree components works reliably now.
+
+    TL-20143       Fixed un-reversable block visiblity change when editing dashboard
+
+                   When editing a dashboard it was possible to change the 'Administration'
+                   block (or any other block) to only be visible on that dashboard. Once the
+                   change was saved there was no way to change the block to display on 'Any
+                   page' again. This patch allows the setting to be changed back.
+
+    TL-20555       Removed Report Builder calls to a non-existent display function 'rb_display_nice_date()'
+
+                   This is only an issue for any 'custom' created report sources that are
+                   calling the 'rb_display_prog_date()' or 'rb_display_list_to_newline_date()'
+                   display functions directly.
+
+    TL-20960       Fixed the completion editor to schedule the recalculation of completion status if necessary
+
+                   When saving activity completion status in the completion editor, the
+                   reaggregate flag was set to schedule reaggregation of the associated course
+                   completion record only if:
+                    * completion criteria activity is modified in completion editor
+                    * and the flag has not been set since the last cron run
+
+                   Added a transaction log about 'reaggregation scheduled' if the conditions
+                   above are met.
+
+                   (If the reaggregate flag is set, then the next cron run will pick up the
+                   corresponding course completion record, recalculate the completion status
+                   and clear the flag.)
+
+    TL-20999   +   Fixed seminar grade input field to respect the course 'grade_decimalpoints' configuration
+    TL-21049   +   Fixed improperly removed seminar event roles
+
+                   Seminar refactoring in the previous release created a bug that led to
+                   improper deletion of seminar event roles. This, in turn, caused an error
+                   when attempting to update seminar events that had unassigned event roles.
+
+                   The bug has been fixed, and improperly deleted roles will be removed
+                   correctly on upgrade.
+
+    TL-21055       Fixed the encoding of special HTML characters in tags
+
+                   Prior to this patch, tag names were HTML-encoded before saving, with no
+                   provision made to prevent re-encoding. This meant that whenever a course
+                   (or program, or certification, or other tag-using component) was edited,
+                   any attached tags would be re-encoded and saved as new tags.
+
+                   This behaviour has been fixed. Upgrading to this release will fix any tags
+                   that have been encoded multiple times, merging them with their original,
+                   un-encoded selves as necessary.
+
+    TL-21074       Fixed logging when restoring a backup including course completion history
+
+                   Prior to the patch, when restoring the completion history, the restore step
+                   would log the course completion instead of its history (which was not its
+                   responsibility).
+
+                   With this patch, the completion history restore step now logs the
+                   completion history.
+
+    TL-21149   +   Images displayed in a static form field no longer cause horizontal scroll
+
+                   This will require CSS to be regenerated for themes that use LESS
+                   inheritance.
+
+    TL-21257       Prevented background controls from being active when viewing program assignments
+    TL-21261       Fixed the filtering of spaces in the 'Add a block' popover
+    TL-21275   +   Fixed recent regression with double encoded entities in report exports
+
+                   Replaced relevant report builder calls to format_string() with  calls to
+                   the report builder display class format_string which correctly encodes the
+                   string according to the output format.
+
+    TL-21277       Fixed compatibility of Behat integration with ChromeDriver 75 and later
+    TL-21290   +   Fixed Report Builder saved searches to be sorted alphabetically in the 'Manage your saved searches' dialog
+    TL-21293       Fixed an error with visibility checks in the fetch_and_start_tour() external function
+
+                   Prior to this patch an error was generated when the external function
+                   fetch_and_start_tour() was called and the tour should not be shown to the
+                   user.
+
+                   The check for whether the tour should be shown to the user or not is now
+                   correctly handled by the JavaScript.
+
+    TL-21295       Fixed bug where Grid catalogue course category updates ran interactively instead of as an adhoc task
+
+                   The category update tasks can take a long time to complete when run
+                   interactively on sites with many courses or programs.  The updates have
+                   been moved to run as adhoc tasks instead.
+
+    TL-21299       Fixed seminar direct enrolment Terms and Conditions link
+    TL-21324       Fixed adding approvers to seminar
+
+                   Prior to this patch, when a new approver was added to a seminar instance,
+                   the previously added approvers (if any) were removed and replaced with the
+                   new one.
+
+                   With this patch, the previously added approvers (if any) will remain
+                   without change.
+
+    TL-21328       Fixed exception thrown when user is not assigned to a program in their Learning Plan
+    TL-21365   +   Removed duplicate records from the cancelled attendees list for seminar events with multiple sessions
+    TL-21384       Fixed export value of the 'Previous completions' column in the 'Record of Learning: Certifications' report source
+
+                   HTML markup is no longer displayed in the export file for this column.
+
+    TL-21398       Fixed bug causing the front page course to be listed in the Grid course catalogue
+
+                   Previously, if the site summary on the front page course was edited, the
+                   front page would appear as a learning item in the Grid course catalogue.
+                   The front page course should never appear in the catalogue; this has now
+                   been fixed.
+
+    TL-21411       Default program and certification images are now overridable by theme
+    TL-21412   +   Fixed database query logging when ignoring errors in the database transactions
+    TL-21413       Fixed the user 'full name link' report builder column to take admin role into account
+
+                   Prior to this patch, the display function for the 'full name link' report
+                   builder columns did not provide a URL for viewing profile at site level.
+                   Even though, the actor was able to view the site level profile of another
+                   user.
+
+                   With this patch, a profile URL at site level will be produced, if the actor
+                   is able to view the site profile of another user.
+
+    TL-21419       Fixed rendering of password fields to ensure they are displayed as mandatory
+    TL-21454       Fixed export value of the 'Name' column in the 'Organisations' and 'Positions' report sources
+
+                   HTML markup is no longer displayed in the export file for these columns.
+
+    TL-21464       Fixed custom validation of multi-select custom fields to prevent forms incorrectly failing validation
+
+                   In some cases, validation of multi-select custom fields would try to apply
+                   validation to fields that didn't exist in the current form. This caused the
+                   form to fail validation without a warning, leading to unexpected behaviour
+                   when submitting forms.
+
+    TL-21467       Fixed an issue where the 'User tours' menu item could not be added to the administration drop-down menu
+    TL-21468       Added support for completion records archiving in LTI activity module
+    TL-21535       Removed display of invalid negative grades when scale grade is selected in the lesson module
+
+                   When the grading scale is used in the lesson module, the value stored in
+                   the grade column is the database ID of the scale. This was incorrectly
+                   being used to calculate the grade and displayed to the users, when in fact
+                   this grade should not have been calculated when using the scale grading
+                   option.
+
+    TL-21536   +   Updated the default capabilities of the Trainer and Editing Trainer roles to allow 'mod/facetoface:viewallsessions'
+
+                   Previously the Trainer and Editing Trainer roles were unable to view the
+                   seminar 'Event details' page without the 'mod/facetoface:viewallsessions'
+                   capability. These roles will now have the capability enabled by default for
+                   new installations. Sites upgrading to this release are recommended to
+                   manually enable the capability for the roles.
+
+    TL-21543       Ensured correct capability is checked when viewing 'Comments Monitoring' page
+
+                   Previously, viewing 'Comments Monitoring' page in the administration menu
+                   checked only the 'moodle/site:viewreports' capability, but accessing the
+                   page required an additional 'moodle/comment:delete' capability. This led to
+                   inconsistencies where users would see the page in their navigation, but
+                   would get an error when trying to access it.
+
+                   This behaviour has now been made consistent, and users with
+                   'moodle/site:viewreports' capability can access and view the page without
+                   needing to be able to delete the comments. Deleting comments still performs
+                   the 'moodle/comment:delete' capability check.
+
+    TL-21564       Fixed an issue with the parameters passed to the check_access_audience_visibility() function
+
+                   This was not replicable within core code. But if a call to
+                   check_access_audience_visibility() used an integer instead of an object,
+                   the function would try to fetch the expected record from the database using
+                   the integer as an id. That database call was incorrectly formatted
+                   resulting in an error, this has been fixed.
+
+Contributions:
+
+    * John Phoon at Kineo Pacific  - TL-21564
+
+
 Release Evergreen (19th June 2019):
 ===================================
 
