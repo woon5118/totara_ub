@@ -98,12 +98,12 @@ Feature: Seminar event cancellation notifications
     Given I log out
     And I log in as "learner3"
     And I am on "Course 1" course homepage
-    And I follow "Join waitlist"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Join waitlist"
+    And I log out
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_200: people notified of cancelled event with single future date.
-    When I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
@@ -115,7 +115,7 @@ Feature: Seminar event cancellation notifications
 
     When I click on "Cancel event" "link" in the "2 / 2" "table_row"
     Then I should see "Cancelling event in Test Seminar"
-    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - 3:00 PMTimezone: Pacific/Auckland"
     And I press "Yes"
     Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
@@ -187,7 +187,6 @@ Feature: Seminar event cancellation notifications
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_201: people notified of cancelled event with multiple future dates.
-    Given I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I click on "Edit event" "link" in the "10 February" "table_row"
@@ -299,7 +298,6 @@ Feature: Seminar event cancellation notifications
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_202: deleting a cancelled event does not resend cancellation messages.
-    When I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
@@ -310,7 +308,7 @@ Feature: Seminar event cancellation notifications
     And "Cancel event" "link" should exist in the "9:00 AM - 3:00 PM" "table_row"
     And I click on "Cancel event" "link" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Cancelling event in Test Seminar"
-    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - 3:00 PMTimezone: Pacific/Auckland"
     And I press "Yes"
     And I run all adhoc tasks
 
@@ -339,14 +337,14 @@ Feature: Seminar event cancellation notifications
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_203: manager with reservations notified of cancelled event.
-    When I log out
     And I log in as "manager4"
     And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Booking full" in the "9:00 AM - 3:00 PM" "table_row"
-    And I should see "Reserve spaces for team (0/1)" in the "9:00 AM - 3:00 PM" "table_row"
+    When I click on "Go to event" "link" in the "9:00 AM - 3:00 PM" "table_row"
+    Then I should see "Reserve spaces for team (0/1)"
 
     When I follow "Reserve spaces for team"
     And I set the field "reserve" to "1*"
@@ -368,7 +366,7 @@ Feature: Seminar event cancellation notifications
     Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Cancelled" in the "9:00 AM - 3:00 PM" "table_row"
-    And I should not see "Sign-up" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should not see "Go to event" in the "9:00 AM - 3:00 PM" "table_row"
 
     When I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
@@ -386,14 +384,14 @@ Feature: Seminar event cancellation notifications
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_204: manager with allocations notified of cancelled event.
-    When I log out
     And I log in as "manager4"
     And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Booking full" in the "9:00 AM - 3:00 PM" "table_row"
-    And I should see "Allocate spaces for team (0/1)" in the "9:00 AM - 3:00 PM" "table_row"
+    When I click on "Go to event" "link" in the "9:00 AM - 3:00 PM" "table_row"
+    Then I should see "Allocate spaces for team (0/1)"
 
     When I follow "Allocate spaces for team"
     And I set the field "Potential allocations" to "Learner Four"
@@ -430,7 +428,7 @@ Feature: Seminar event cancellation notifications
     Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Cancelled" in the "9:00 AM - 3:00 PM" "table_row"
-    And I should not see "Sign-up" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should not see "Go to event" in the "9:00 AM - 3:00 PM" "table_row"
 
     When I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"

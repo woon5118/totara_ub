@@ -90,13 +90,15 @@ Feature: Test expand course details in Reportbuilder
     And I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 1')]" "xpath_element"
     Then I should see "Seminar direct enrolment"
     And I should see "Cannot enrol (no seminar events in this course)"
-    And I should not see "Sign-up"
+    And I should not see "Go to event"
     And I should not see "Manual enrolments, Program"
 
     When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 2')]" "xpath_element"
     Then I should see "Seminar direct enrolment"
     And I should not see "Cannot enrol (no seminar events in this course)"
-    And I should see "Sign-up"
+    And I follow "Go to event"
+    And I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
+    And I press the "back" button in the browser
     And I should not see "Manual enrolments, Program"
 
     When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 3')]" "xpath_element"
@@ -124,13 +126,15 @@ Feature: Test expand course details in Reportbuilder
     And I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 1')]" "xpath_element"
     Then I should see "Seminar direct enrolment"
     And I should see "Cannot enrol (no seminar events in this course)"
-    And I should not see "Sign-up"
+    And I should not see "Go to event"
     And I should not see "Manual enrolments, Program"
 
     When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 2')]" "xpath_element"
     Then I should see "Seminar direct enrolment"
     And I should not see "Cannot enrol (no seminar events in this course)"
-    And I should see "Sign-up"
+    And I follow "Go to event"
+    And I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
+    And I press the "back" button in the browser
     And I should not see "Manual enrolments, Program"
 
     When I click on "//div[contains(@class, 'rb-display-expand') and contains (., 'Course 3')]" "xpath_element"

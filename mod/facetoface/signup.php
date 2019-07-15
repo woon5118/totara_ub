@@ -23,21 +23,18 @@
  * @package mod_facetoface
  */
 
-require(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+use mod_facetoface\{signup_helper, signup, seminar, trainer_helper, seminar_event_helper};
 
-use mod_facetoface\{signup_helper, signup, seminar, trainer_helper};
+// Direct access to this page will be transferred to eventinfo.php
+if (!defined('FACETOFACE_EVENTINFO_INTERNAL')) {
+    require(__DIR__ . '/../../config.php');
+    redirect(new \moodle_url('/mod/facetoface/eventinfo.php', [
+        's' => required_param('s', PARAM_INT)
+    ]));
+}
 
-$s = required_param('s', PARAM_INT); // {facetoface_sessions}.id
-$backtoallsessions = optional_param('backtoallsessions', 0, PARAM_BOOL);
+defined('MOODLE_INTERNAL') || die();
 
-$seminarevent = new \mod_facetoface\seminar_event($s);
-$seminar = $seminarevent->get_seminar();
-$course = $DB->get_record('course', ['id' => $seminar->get_course()], '*', MUST_EXIST);
-$cm = $seminar->get_coursemodule();
-$context = context_module::instance($cm->id);
-
-$returnurl = new moodle_url('/course/view.php', ['id' => $course->id]);
 if (isguestuser()) {
     redirect(
         $returnurl,
@@ -56,20 +53,15 @@ if (!empty($seminarevent->get_cancelledstatus())) {
     );
 }
 
-if ($CFG->enableavailability) {
-    if (!get_fast_modinfo($cm->course)->get_cm($cm->id)->available) {
-        redirect(
-            $returnurl,
-            get_string('notavailablecourse', 'moodle', $seminar->get_name()),
-            null,
-            \core\notification::ERROR
-        );
-    }
+if (!seminar_event_helper::is_available($seminarevent)) {
+    redirect(
+        $returnurl,
+        get_string('notavailablecourse', 'moodle', $seminar->get_name()),
+        null,
+        \core\notification::ERROR
+    );
 }
 
-if ($backtoallsessions) {
-    $returnurl = new moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]);
-}
 // This is not strictly required for signup (more correctly it is checked in actor_has_role), but leaving it for early
 // indication of the issue.
 $helper = new trainer_helper($seminarevent);
@@ -89,7 +81,6 @@ if ($seminar->get_approvaltype() == seminar::APPROVAL_ROLE) {
 require_login($course, false, $cm);
 require_capability('mod/facetoface:view', $context);
 
-$signup = signup::create($USER->id, $seminarevent);
 // Choose header depending on resulting state: waitlist or booked.
 $currentstate = $signup->get_state();
 $heading = get_string('signupfor', 'mod_facetoface', $seminar->get_name());
@@ -103,14 +94,8 @@ if (!$currentstate->can_switch(signup\state\booked::class) &&
     $heading = get_string('waitlistfor', 'mod_facetoface', $seminar->get_name());
 }
 
-$baseurlparam = [
-    's' => $seminarevent->get_id(),
-    'backtoallsessions' => $backtoallsessions
-];
-$PAGE->set_context($context);
-$PAGE->set_cm($cm);
-$PAGE->set_url(new moodle_url('/mod/facetoface/signup.php', $baseurlparam));
 $PAGE->set_title($heading);
+$PAGE->set_pagelayout('noblocks');
 
 local_js([TOTARA_JS_DIALOG, TOTARA_JS_TREEVIEW]);
 $PAGE->requires->strings_for_js(['selectmanager'], 'mod_facetoface');
@@ -130,11 +115,10 @@ $PAGE->requires->js_init_call('M.facetoface_managerselect.init', $args, false, $
 
 $params = [
     'signup' => $signup,
-    'backtoallsessions' => $backtoallsessions,
 ];
 $mform = new \mod_facetoface\form\signup(null, $params, 'post', '', ['name' => 'signupform']);
 if ($mform->is_cancelled()) {
-    redirect($returnurl);
+    redirect($pageurl);
 }
 if ($fromform = $mform->get_data()) {
     if (empty($fromform->submitbutton)) {
@@ -188,49 +172,5 @@ if ($fromform = $mform->get_data()) {
         $notificationtype = \core\notification::ERROR;
     }
 
-    redirect($returnurl, $message, null, $notificationtype);
+    redirect($pageurl, $message, null, $notificationtype);
 }
-
-echo $OUTPUT->header();
-echo $OUTPUT->heading($heading);
-
-echo format_module_intro('facetoface', $seminar->get_properties(), $cm->id);
-echo html_writer::empty_tag('hr');
-
-/**
- * @var mod_facetoface_renderer $seminarrenderer
- */
-$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-$seminarrenderer->setcontext($context);
-$signedup = !$signup->get_state()->is_not_happening();
-$viewattendees = has_capability('mod/facetoface:viewattendees', $context);
-echo $seminarrenderer->render_seminar_event($seminarevent, $viewattendees, false, $signedup);
-
-// Cancellation links
-if ($currentstate->can_switch(signup\state\user_cancelled::class)) {
-    $canceltext = get_string('cancelbooking', 'mod_facetoface');
-    if ($currentstate instanceof signup\state\waitlisted) {
-        $canceltext = get_string('cancelwaitlist', 'mod_facetoface');
-    }
-    $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', $baseurlparam);
-    echo html_writer::link($cancelurl, $canceltext, ['title' => $canceltext]);
-    echo ' &ndash; ';
-}
-
-if ($viewattendees) {
-    $viewurl = new moodle_url('/mod/facetoface/attendees/view.php', $baseurlparam);
-    $seeattendees = get_string('seeattendees', 'mod_facetoface');
-    echo html_writer::link($viewurl, $seeattendees, ['title' => $seeattendees]);
-}
-
-if (signup_helper::can_signup($signup)) {
-    $mform->display();
-} else if ($currentstate instanceof signup\state\not_set
-    || $currentstate instanceof signup\state\user_cancelled
-    || $currentstate instanceof signup\state\declined
-    ) {
-    // Display message only if user is not signed up:
-    echo $seminarrenderer->render_signup_failures(signup_helper::get_failures($signup));
-}
-echo $seminarrenderer->render_action_bar_on_tabpage($returnurl);
-echo $OUTPUT->footer();

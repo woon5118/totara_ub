@@ -27,14 +27,22 @@ use mod_facetoface\event\signup_status_updated;
 use mod_facetoface\seminar;
 use mod_facetoface\seminar_event;
 use mod_facetoface\seminar_session;
-use mod_facetoface\signup_helper;
 use mod_facetoface\signup;
 use mod_facetoface\signup_status;
+use mod_facetoface\signup_helper;
 use mod_facetoface\signup\state\booked;
-use mod_facetoface\signup\state\partially_attended;
+use mod_facetoface\signup\state\declined;
+use mod_facetoface\signup\state\event_cancelled;
 use mod_facetoface\signup\state\fully_attended;
-use mod_facetoface\signup\state\unable_to_attend;
 use mod_facetoface\signup\state\no_show;
+use mod_facetoface\signup\state\not_set;
+use mod_facetoface\signup\state\partially_attended;
+use mod_facetoface\signup\state\requested;
+use mod_facetoface\signup\state\requestedadmin;
+use mod_facetoface\signup\state\requestedrole;
+use mod_facetoface\signup\state\unable_to_attend;
+use mod_facetoface\signup\state\user_cancelled;
+use mod_facetoface\signup\state\waitlisted;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -362,5 +370,83 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
         }
         $grade = signup_status::from_current($signup11)->get_grade();
         $this->assertSame(42., grade_floatval($grade));
+    }
+
+    /**
+     * @return array of { state_class, expected, expected_attendance }
+     */
+    public function data_provider_is_booked_valid(): array {
+        return [
+            // These states are always displayed as-is.
+            [ booked::class, booked::get_string(), booked::get_string() ],
+            [ not_set::class, not_set::get_string(), not_set::get_string() ],
+            [ requested::class, requested::get_string(), requested::get_string() ],
+            [ requestedadmin::class, requestedadmin::get_string(), requestedadmin::get_string() ],
+            [ requestedrole::class, requestedrole::get_string(), requestedrole::get_string() ],
+            [ waitlisted::class, waitlisted::get_string(), waitlisted::get_string() ],
+
+            // Attendance states will be displayed as "Booked" if $attendancestatus is false.
+            [ fully_attended::class, booked::get_string(), fully_attended::get_string() ],
+            [ partially_attended::class, booked::get_string(), partially_attended::get_string() ],
+            [ no_show::class, booked::get_string(), no_show::get_string() ],
+            [ unable_to_attend::class, booked::get_string(), unable_to_attend::get_string() ],
+
+            // These states are not supposed to display in the dashboard.
+            [ declined::class, declined::get_string(), declined::get_string() ],
+            [ event_cancelled::class, event_cancelled::get_string(), event_cancelled::get_string() ],
+            [ user_cancelled::class, user_cancelled::get_string(), user_cancelled::get_string() ],
+        ];
+    }
+
+    /**
+     * @param string $state
+     * @param string $expected
+     * @param string $expected_at
+     * @dataProvider data_provider_is_booked_valid
+     */
+    public function test_get_user_booking_status_valid(string $state, string $expected, string $expected_at) {
+        $this->assertSame($expected, signup_helper::get_user_booking_status($state, false));
+        $this->assertSame($expected_at, signup_helper::get_user_booking_status($state, true));
+
+        $this->assertSame($expected, signup_helper::get_user_booking_status($state::get_code(), false));
+        $this->assertSame($expected_at, signup_helper::get_user_booking_status($state::get_code(), true));
+
+        $stateinstance = new $state(new signup()); // Instantiate a state class using an empty signup
+        $this->assertSame($expected, signup_helper::get_user_booking_status($stateinstance, false));
+        $this->assertSame($expected_at, signup_helper::get_user_booking_status($stateinstance, true));
+    }
+
+    /**
+     * @return array of { state, expected_exception }
+     */
+    public function data_provider_is_booked_invalid(): array {
+        return [
+            [ 'foo', '$state must be a state class string, a state class instance or status code' ],
+            [ 'mod_facetoface\\signup\\state\\he_who_must_not_be_named', '$state must be a state class string, a state class instance or status code' ],
+            [ 3.14159, '$state must be a state class string, a state class instance or status code' ],
+            [ -42, 'Cannot find booking state with code: -42' ],
+            [ new DateTime(), '$state must be a state class string, a state class instance or status code' ],
+        ];
+    }
+
+    /**
+     * @param mixed $state
+     * @param string $expected_ex
+     * @dataProvider data_provider_is_booked_invalid
+     */
+    public function test_get_user_booking_status_invalid($state, string $expected_ex) {
+        try {
+            signup_helper::get_user_booking_status($state, false);
+            $this->fail('coding_exception expected');
+        } catch (coding_exception $ex) {
+            $this->assertSame('Coding error detected, it must be fixed by a programmer: ' . $expected_ex, $ex->getMessage());
+        }
+
+        try {
+            signup_helper::get_user_booking_status($state, true);
+            $this->fail('coding_exception expected');
+        } catch (coding_exception $ex) {
+            $this->assertSame('Coding error detected, it must be fixed by a programmer: ' . $expected_ex, $ex->getMessage());
+        }
     }
 }

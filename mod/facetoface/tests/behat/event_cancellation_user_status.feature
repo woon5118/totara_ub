@@ -80,16 +80,14 @@ Feature: Seminar event cancellation status
 #    Users requesting approval
     Given I log in as "learner1"
     And I am on "Course 1" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I press "Request approval"
     And I log out
 
     Given I log in as "learner2"
     And I am on "Course 1" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I press "Request approval"
     And I log out
@@ -97,8 +95,7 @@ Feature: Seminar event cancellation status
 #   Learner Five requesting approval and immediately withdrawing his pending request
     Given I log in as "learner5"
     And I am on "Course 1" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I press "Request approval"
     And I should see "Your request was sent to your manager for approval."
@@ -107,6 +104,7 @@ Feature: Seminar event cancellation status
     And I should see "Withdraw pending request"
     And I click on "Withdraw pending request" "link"
     And I press "Confirm"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Request approval"
     And I log out
 
@@ -207,11 +205,13 @@ Feature: Seminar event cancellation status
     Given I log out
     When I log in as "learner3"
     And I am on "Course 1" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Sign-up"
     Then I should see "Your request was accepted"
-    And I should not see "Sign-up"
+    And I follow "View all events"
+    When I click on "Go to event" "link" in the "Upcoming" "table_row"
+    Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
+    And I should see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
     And I log out
 
     Given I log in as "manager1"
@@ -229,9 +229,10 @@ Feature: Seminar event cancellation status
 
     When I log in as "learner5"
     And I am on "Course 1" course homepage
-    And I should see "Cancel booking"
+    And I click on "Go to event" "link" in the "(Booked)" "table_row"
     And I follow "Cancel booking"
-    And I press "Yes"
+    And I wait "1" seconds
+    And I press "Cancel booking"
     Then I should see "Your booking has been cancelled."
     And I log out
 

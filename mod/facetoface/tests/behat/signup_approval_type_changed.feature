@@ -42,7 +42,7 @@ Feature: Seminar Manager signup approval changes
   Scenario: The waitlisted report should be correct when the approval type changes
     When I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should not see "Manager Approval"
 
     When I press "Sign-up"
@@ -51,7 +51,7 @@ Feature: Seminar Manager signup approval changes
     When I log out
     And I log in as "timmy"
     And I am on "Classroom Connect Course" course homepage
-    And I follow "Join waitlist"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should not see "Manager Approval"
     And I should see "This event is currently full. Upon successful sign-up, you will be placed on the event's waitlist."
 
@@ -68,7 +68,7 @@ Feature: Seminar Manager signup approval changes
 
     When I log in as "sammy"
     And I am on "Classroom Connect Course" course homepage
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Manager Approval"
     And I should see "This event is currently full. Upon successful sign-up, you will be placed on the event's waitlist."
     When I press "Request approval"

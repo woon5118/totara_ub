@@ -98,7 +98,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Course 1"
-    And I click on "Join waitlist" "link_or_button"
+    And I click on "Go to event" "link_or_button"
     And I click on "Join waitlist" "link_or_button"
     Then I should see "Your request was accepted"
     And I should see "Wait-listed"
@@ -187,8 +187,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
 
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I should see "Sign-up"
-    When I click on "Sign-up" "link_or_button"
+    When I click on "Go to event" "link_or_button"
     Then I should see "Self authorisation"
     And I should see "By checking this box, I confirm that I have read and agreed to the Terms and conditions (opens a new window)."
 

@@ -47,14 +47,14 @@ Feature: Seminar Manager approval of waiting list
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Sign-up"
     And I should see "Your request was accepted"
     And I log out
 
     When I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Join waitlist"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "This event is currently full. Upon successful sign-up, you will be placed on the event's waitlist."
     And I press "Join waitlist"
     And I should see "You have been placed on the waitlist for this event."
@@ -62,7 +62,7 @@ Feature: Seminar Manager approval of waiting list
 
     When I log in as "student3"
     And I am on "Course 1" course homepage
-    And I follow "Join waitlist"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "This event is currently full. Upon successful sign-up, you will be placed on the event's waitlist."
     And I press "Join waitlist"
     And I should see "You have been placed on the waitlist for this event."

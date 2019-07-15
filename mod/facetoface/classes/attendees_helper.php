@@ -151,6 +151,31 @@ final class attendees_helper {
     }
 
     /**
+     * Returns the number of sign-up users and reserved spaces.
+     *
+     * @param seminar_event $seminarevent
+     * @param boolean $includedeleted
+     * @return integer
+     */
+    public static function count_signups(seminar_event $seminarevent, bool $includedeleted = true): int {
+        $helper = new static($seminarevent);
+
+        // TODO: find out why the logic is different from reservations/allocate.php and reservations/reserve.php
+        if ($seminarevent->get_cancelledstatus()) {
+            $statuscodes = [event_cancelled::get_code()];
+        } else if ($seminarevent->is_sessions()) {
+            $statuscodes = attendance_state::get_all_attendance_code_with([booked::class]);
+        } else {
+            $statuscodes = [waitlisted::get_code()];
+        }
+
+        // Need to include reserved spaces here. If there is any.
+        $signupcount = $helper->count_attendees_with_codes($statuscodes, $includedeleted);
+        $signupcount += $helper->count_reserved_spaces();
+        return $signupcount;
+    }
+
+    /**
      * Given the list of status codes, this method will try to get the list of all attendees that had the status code
      * associated with.
      *

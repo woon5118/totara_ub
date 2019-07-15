@@ -83,7 +83,7 @@ Feature: Seminar event cancellation calendar views
     And I click on "Go to calendar" "link"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     Then I should see "Course 1"
-    And I should see "10:00 AM - 4:00 PM Australia/Perth"
+    And I should see "10:00 AM - 4:00 PMTimezone: Australia/Perth"
     And I should see "Teacher One"
 
     Given I log out
@@ -99,13 +99,14 @@ Feature: Seminar event cancellation calendar views
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
-    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should not see "Go to event"
     And ".mod_facetoface__sessionlist__action__links" "css_element" should not exist
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
     Then I should not see "Course 1"
-    And I should not see "10:00 AM - 4:00 PM Australia/Perth"
+    And I should not see "10:00 AM - 4:00 PM"
+    And I should not see "Timezone: Australia/Perth"
     And I should not see "Editing Trainer Teacher One"
     And I should see "There are no upcoming events"
 
@@ -117,7 +118,7 @@ Feature: Seminar event cancellation calendar views
     And I click on "Go to calendar" "link"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     Then I should see "Course 1"
-    And I should see "10:00 AM - 4:00 PM Australia/Perth"
+    And I should see "10:00 AM - 4:00 PMTimezone: Australia/Perth"
     And I should see "Teacher One"
 
     Given I log out
@@ -133,13 +134,14 @@ Feature: Seminar event cancellation calendar views
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
-    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should not see "Go to event"
     And ".mod_facetoface__sessionlist__action__links" "css_element" should exist
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
     Then I should not see "Course 1"
-    And I should not see "10:00 AM - 4:00 PM Australia/Perth"
+    And I should not see "10:00 AM - 4:00 PM"
+    And I should not see "Australia/Perth"
     And I should not see "You are booked for this Seminar event"
     And I should not see "Editing Trainer Teacher One"
 
@@ -159,12 +161,13 @@ Feature: Seminar event cancellation calendar views
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
-    And I should not see "Sign-up" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should not see "Go to event"
     And ".mod_facetoface__sessionlist__action__links" "css_element" should exist
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
     Then I should not see "Course 1"
-    And I should not see "10:00 AM - 4:00 PM Australia/Perth"
+    And I should not see "10:00 AM - 4:00 PM"
+    And I should not see "Australia/Perth"
     And I should not see "You are booked for this Seminar event"
     And I should not see "Editing Trainer Teacher One"

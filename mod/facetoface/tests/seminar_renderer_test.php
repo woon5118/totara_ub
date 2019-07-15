@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 
-use mod_facetoface\{seminar, signup, seminar_event, seminar_session, signup_list};
+use mod_facetoface\{seminar, signup, seminar_event, seminar_session, signup_list, render_event_info_option};
 use totara_job\job_assignment;
 use mod_facetoface\signup\state\booked;
 
@@ -103,6 +103,31 @@ class mod_facetoface_seminar_renderer_testcase extends advanced_testcase {
     }
 
     /**
+     * Instantiate the mod_facetoface_renderer.
+     *
+     * @return \mod_facetoface_renderer
+     */
+    private function create_f2f_renderer() : mod_facetoface_renderer {
+        global $PAGE;
+
+        $renderer = new mod_facetoface_renderer($PAGE, null);
+
+        return $renderer;
+    }
+
+    /**
+     * Create a DOMDocument without warnings and errors.
+     *
+     * @param string $html
+     * @return DOMDocument
+     */
+    private static function new_domdocument(string $html) : DOMDocument {
+        $doc = new DOMDocument();
+        $doc->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR); // requires PHP 7.2+, 7.1.4+, 7.0.18+
+        return $doc;
+    }
+
+    /**
      * @return array
      */
     public function provide_method_approvals_type(): array {
@@ -154,12 +179,15 @@ class mod_facetoface_seminar_renderer_testcase extends advanced_testcase {
 
         $this->getDataGenerator()->enrol_user($user->id, $f2f->get_course());
 
-        $modinfo = get_fast_modinfo($f2f->get_course());
-        $this->assertNotEmpty($modinfo->cms);
-
-        $cminfo = current($modinfo->cms);
-        facetoface_cm_info_view($cminfo);
-        $this->assertContains($displaytext, $cminfo->content);
+        // See the text of the submit button in the event page.
+        $renderer = $this->create_f2f_renderer();
+        $seminarevent = $f2f->get_events()->current();
+        $signup = signup::create($user->id, $seminarevent);
+        $content = $renderer->render_seminar_event_information($signup, new render_event_info_option());
+        $doc = $this->new_domdocument($content);
+        $button = $doc->getElementById('id_submitbutton');
+        $this->assertNotNull($button);
+        $this->assertContains($displaytext, $button->getAttribute('value'));
     }
 
     /**
@@ -186,10 +214,13 @@ class mod_facetoface_seminar_renderer_testcase extends advanced_testcase {
 
         $this->create_signups(2, $seminarevent, booked::class);
 
-        $modinfo = get_fast_modinfo($f2f->get_course());
-        $this->assertNotEmpty($modinfo->cms);
-        $cminfo = current($modinfo->cms);
-        facetoface_cm_info_view($cminfo);
-        $this->assertContains("Request approval", $cminfo->content);
+        // See the text of the submit button in the event page.
+        $renderer = $this->create_f2f_renderer();
+        $signup = signup::create($user->id, $seminarevent);
+        $content = $renderer->render_seminar_event_information($signup, new render_event_info_option());
+        $doc = $this->new_domdocument($content);
+        $button = $doc->getElementById('id_submitbutton');
+        $this->assertNotNull($button);
+        $this->assertSame("Request approval", $button->getAttribute('value'));
     }
 }

@@ -21,12 +21,12 @@ Feature: Export seminar attendees
     And the following "course enrolments" exist:
       | user     | course | role           |
       | student1 | C1     | student        |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | course |
+      | Test seminar name | C1     |
 
     And I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
+    And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add event"
     And I follow "show-selectdate0-dialog"
@@ -55,13 +55,14 @@ Feature: Export seminar attendees
     Given I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    When I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "Event info"
+    Then I should see "Your request was accepted"
+    And I follow "View all events"
 
-    When I follow "Event info"
+    When I click on "Go to event" "link" in the "(Booked)" "table_row"
     Then I should not see "Job assignment"
     And I log out
 
@@ -88,13 +89,14 @@ Feature: Export seminar attendees
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    When I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should not see "Select a job assignment"
 
     When I press "Sign-up"
-    Then I should see "Event info"
+    Then I should see "Your request was accepted"
+    And I follow "View all events"
 
-    When I follow "Event info"
+    When I click on "Go to event" "link" in the "(Booked)" "table_row"
     Then I should not see "Job assignment"
     And I log out
 
@@ -128,13 +130,14 @@ Feature: Export seminar attendees
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    When I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Select a job assignment"
 
     When I press "Sign-up"
-    Then I should see "Event info"
+    Then I should see "Your request was accepted"
+    And I follow "View all events"
 
-    When I follow "Event info"
+    When I click on "Go to event" "link" in the "(Booked)" "table_row"
     Then I should see "Job assignment"
     And I should see "job1"
     And I log out

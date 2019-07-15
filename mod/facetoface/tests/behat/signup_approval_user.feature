@@ -40,8 +40,7 @@ Feature: Seminar Signup User Approval
 
     And I log in as "student1"
     And I am on "Course 9360" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I press "Request approval"
     And I should see "Your request was sent to your manager for approval."

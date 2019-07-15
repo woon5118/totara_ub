@@ -64,9 +64,11 @@ Feature: Seminar availability based on activity completion
     And I follow "Course 1"
     Then I should see "Not available unless: The activity Certificate 1 is marked complete"
     And I should not see "Sign-up"
+    And I should not see "Go to event"
 
     When I click on "Not completed: Certificate 1. Select to mark as complete." "link"
-    Then I should see "Sign-up"
+    And I click on "Go to event" "link" in the "1 January 2020" "table_row"
+    Then I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
     And I log out
 
   Scenario: Join Waitlist link is not available until the completion restriction is met
@@ -83,9 +85,11 @@ Feature: Seminar availability based on activity completion
     And I follow "Course 1"
     Then I should see "Not available unless: The activity Certificate 1 is marked complete"
     And I should not see "Join waitlist"
+    And I should not see "Go to event"
 
     When I click on "Not completed: Certificate 1. Select to mark as complete." "link"
-    Then I should see "Join waitlist"
+    And I click on "Go to event" "link" in the "Wait-listed" "table_row"
+    Then I should see "Join waitlist" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
     And I log out
 
   Scenario: Signup link is only available for users that meets the user's profile restriction
@@ -106,13 +110,15 @@ Feature: Seminar availability based on activity completion
     When I log in as "student1"
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
-    Then I should see "Sign-up"
+    And I click on "Go to event" "link" in the "1 January 2020" "table_row"
+    Then I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
     And I log out
 
     When I log in as "student2"
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
     Then I should not see "Sign-up"
+    And I should not see "Go to event"
     And I log out
 
   Scenario: Join Waitlist link is only available for users that meets the user's profile restriction
@@ -136,11 +142,13 @@ Feature: Seminar availability based on activity completion
     When I log in as "student1"
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
-    And I should see "Join waitlist"
+    And I click on "Go to event" "link" in the "Wait-listed" "table_row"
+    Then I should see "Join waitlist" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
     And I log out
 
     When I log in as "student2"
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
-    And I should not see "Join waitlist"
+    Then I should not see "Join waitlist"
+    And I should not see "Go to event"
     And I log out

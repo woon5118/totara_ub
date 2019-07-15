@@ -104,6 +104,6 @@ Feature: Users can auto-enrol themselves in courses where enrolment via plugins 
     When I log in as "student3"
     And I click on "Courses" in the totara menu
     And I click on ".rb-display-expand" "css_element"
-    And I click on "Sign-up" "link" in the "1 January" "table_row"
+    And I click on "Go to event" "link" in the "1 January" "table_row"
     And I press "Sign-up"
     Then I should see "Topic 1"

@@ -41,7 +41,7 @@ class seminarevent_actionbar extends \core\output\template {
      *
      * @return seminarevent_actionbar_builder
      */
-    public static function builder(string $id): seminarevent_actionbar_builder {
+    public static function builder(string $id = ''): seminarevent_actionbar_builder {
         return new seminarevent_actionbar_builder($id);
     }
 }

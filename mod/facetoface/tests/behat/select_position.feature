@@ -52,8 +52,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Sign-up"
     Then I should see "Your request was accepted"
 
@@ -96,24 +95,23 @@ Feature: Add a seminar with select position
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I set the following fields to these values:
       | Select a job assignment | Unnamed job assignment (ID: 2) (Position2) |
     And I press "Sign-up"
-    When I click on "Event info" "link"
+    Then I should see "Your request was accepted"
+    And I follow "View all events"
+    When I click on "Go to event" "link" in the "(Booked)" "table_row"
     Then I should see "Job assignment"
     And I should see "Unnamed job assignment (ID: 2)"
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
     And I follow "Attendees"
     And I should see "Position2"
     And I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
     And I follow "Attendees"
     And I should see "Position2"
     And I click on ".attendee-edit-job-assignment" "css_element"
@@ -151,8 +149,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I follow "Event info"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "You must have a suitable job assignment to sign up for this seminar activity"
 
   @javascript
@@ -194,15 +191,13 @@ Feature: Add a seminar with select position
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I set the following fields to these values:
       | Select a job assignment | Unnamed job assignment (ID: 2) (Position2) |
     And I press "Sign-up"
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
     And I follow "Attendees"
     Then I should see "Position2"
     And I log out

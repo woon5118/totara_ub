@@ -642,7 +642,7 @@ final class reservations {
      * @param seminar_event $seminarevent
      * @param array $reserveinfo
      * @param int $capacityleft
-     * @return array - see facetoface_can_reserve_or_allocate for details
+     * @return array - see reservations::can_reserve_or_allocate for details
      */
     public static function limit_info_to_capacity_left(seminar_event $seminarevent, $reserveinfo, $capacityleft) {
         if (!empty($reserveinfo['reserve'])) {
@@ -659,7 +659,7 @@ final class reservations {
      *
      * @param seminar_event $seminarevent
      * @param array $reserveinfo
-     * @return array - see facetoface_can_reserve_or_allocate for details, but adds two new values:
+     * @return array - see reservations::can_reserve_or_allocate for details, but adds two new values:
      *                  'reservepastdeadline' - true if the deadline for adding new reservations has passed
      *                  'reservepastcancel' - true if all existing reservations should be cancelled
      */

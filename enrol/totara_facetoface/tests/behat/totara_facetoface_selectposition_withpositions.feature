@@ -62,11 +62,11 @@ Feature: Users can enrol themself in courses with selected position where semina
   sign in as user with two positions and check attendee list reflects this and the selected position can be updated
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I set the following fields to these values:
       | Select a job assignment | jobassignment2 (Position2) |
     And I press "Sign-up"
-    Then I should see "Topic 1"
+    Then I should see "Your request was accepted"
     And I log out
 
     And I log in as "teacher1"
@@ -79,7 +79,7 @@ Feature: Users can enrol themself in courses with selected position where semina
   sign in as user with two positions and check attendee list reflects this and the selected position can be updated
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I set the following fields to these values:
       | Select a job assignment | jobassignment2 (Position2) |
     And I press "Sign-up"

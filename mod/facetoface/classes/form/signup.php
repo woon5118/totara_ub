@@ -72,19 +72,16 @@ class signup extends \moodleform {
 
         $mform->addElement('hidden', 's', $seminarevent->get_id());
         $mform->setType('s', PARAM_INT);
-        $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
-        $mform->setType('backtoallsessions', PARAM_BOOL);
+        $mform->addElement('hidden', 'action', 'signup');
+        $mform->setType('action', PARAM_ALPHA);
 
-        $mform->addElement('static', 'approvalerrors');
+        $signupstr = signup_helper::expected_signup_state($signup)->get_action_label();
+        $mform->addElement('html', \html_writer::tag('h3', $signupstr));
+
         // Do nothing if approval is set to none or role.
         if ($approvaltype == \mod_facetoface\seminar::APPROVAL_SELF) {
-            global $PAGE;
-
             $url = new \moodle_url($this->get_signup_tsandcs_link($seminarevent), array('s' => $seminarevent->get_id()));
             $tandcurl = \html_writer::link($url, get_string('approvalterms', 'mod_facetoface'), array("class"=>"tsandcs ajax-action"));
-
-            $PAGE->requires->strings_for_js(array('approvalterms', 'close'), 'mod_facetoface');
-            $PAGE->requires->yui_module('moodle-mod_facetoface-signupform', 'M.mod_facetoface.signupform.init');
 
             $mform->addElement('checkbox', 'authorisation', get_string('selfauthorisation', 'mod_facetoface'),
                                get_string('selfauthorisationdesc', 'mod_facetoface', $tandcurl));
@@ -210,8 +207,17 @@ class signup extends \moodleform {
             );
         }
 
-        $signupstr = signup_helper::expected_signup_state($signup)->get_action_label();
-        $this->add_action_buttons(true, $signupstr);
+        $this->add_action_buttons(false, $signupstr);
+    }
+
+    function display() {
+        global $PAGE;
+
+        // Add required JavaScript.
+        $PAGE->requires->strings_for_js(array('approvalterms', 'close'), 'mod_facetoface');
+        $PAGE->requires->yui_module('moodle-mod_facetoface-signupform', 'M.mod_facetoface.signupform.init');
+
+        parent::display();
     }
 
     /**

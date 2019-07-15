@@ -249,11 +249,14 @@ final class seminar_event_helper {
      * @param seminar_event $seminarevent
      * @param signup|null $signup
      * @param boolean $sortbyascending Set true to sort sessions by past first
-     * @return \stdClass
+     * @param integer $timenow Current timestamp
+     * @return session_data
      */
-    public static function get_sessiondata(seminar_event $seminarevent, ?signup $signup, bool $sortbyascending = true): \stdClass {
+    public static function get_sessiondata(seminar_event $seminarevent, ?signup $signup, bool $sortbyascending = true, int $timenow = 0): session_data {
 
-        $timenow = time();
+        if ($timenow <= 0) {
+            $timenow = time();
+        }
         $statuscodes = attendance_state::get_all_attendance_code_with([
             requested::class,
             requestedrole::class,
@@ -265,7 +268,10 @@ final class seminar_event_helper {
         $sessions = $seminarevent->get_sessions();
         $sessions->sort('timestart', $sortbyascending ? seminar_session_list::SORT_ASC : seminar_session_list::SORT_DESC);
 
-        $sessiondata = $seminarevent->to_record();
+        $sessiondata = new session_data();
+        foreach ((array)$seminarevent->to_record() as $prop => $val) {
+            $sessiondata->{$prop} = $val;
+        }
         $sessiondata->mintimestart = $seminarevent->get_mintimestart();
         $sessiondata->maxtimefinish = $seminarevent->get_maxtimefinish();
         $sessiondata->sessiondates = $sessions->to_records();
@@ -295,6 +301,25 @@ final class seminar_event_helper {
         }
         $sessiondata->bookedsession = $bookedsession;
         return $sessiondata;
+    }
+
+    /**
+     * Check the availability of the course module.
+     *
+     * @param seminar_event $seminarevent
+     * @param integer $userid
+     * @return boolean
+     */
+    public static function is_available(seminar_event $seminarevent, int $userid = 0): bool {
+        global $CFG;
+
+        if ($CFG->enableavailability) {
+            $cm = get_coursemodule_from_instance('facetoface', $seminarevent->get_facetoface());
+            if (!get_fast_modinfo($cm->course, $userid)->get_cm($cm->id)->available) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -341,9 +366,10 @@ final class seminar_event_helper {
      * Return event status, event booking status and user booking status strings.
      * @param \stdClass $session
      * @param integer $signupcount
+     * @param boolean $attendancestatus Set false to hide attendance status from a user
      * @return array packs [ event_status, event_booking_status, user_booking_status ]
      */
-    public static function event_status(\stdClass $session, int $signupcount): array {
+    public static function event_status(\stdClass $session, int $signupcount, bool $attendancestatus = true): array {
         global $CFG;
 
         $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
@@ -391,8 +417,7 @@ final class seminar_event_helper {
         $user_booking_status = '';
         if (!$sessionover && !$cancelled && $isbookedsession) {
             // Display user booking status only on an upcoming and not-cancelled event.
-            $state = \mod_facetoface\signup\state\state::from_code($session->bookedsession->statuscode);
-            $user_booking_status = $state::get_string();
+            $user_booking_status = signup_helper::get_user_booking_status($session->bookedsession->statuscode, $attendancestatus);
         }
         return [ $event_status, $event_booking_status, $user_booking_status ];
     }

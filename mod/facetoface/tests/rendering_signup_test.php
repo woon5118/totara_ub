@@ -28,6 +28,19 @@ defined('MOODLE_INTERNAL') || die();
  */
 class mod_facetoface_rendering_signup_testcase extends advanced_testcase {
     /**
+     * Instantiate the mod_facetoface_renderer.
+     *
+     * @return \mod_facetoface_renderer
+     */
+    private function create_f2f_renderer() : mod_facetoface_renderer {
+        global $PAGE;
+
+        $renderer = new mod_facetoface_renderer($PAGE, null);
+
+        return $renderer;
+    }
+
+    /**
      * @return void
      */
     public function test_rendering_signup_with_deleted_jobassignment(): void {
@@ -78,8 +91,7 @@ class mod_facetoface_rendering_signup_testcase extends advanced_testcase {
         // to load self's record.
         $this->setUser($user);
 
-        /** @var mod_facetoface_renderer $renderer */
-        $renderer = $PAGE->get_renderer('mod_facetoface');
+        $renderer = $this->create_f2f_renderer();
         $rendered = $renderer->render_seminar_event($event, false);
 
         $this->assertContains(get_string('missingjobassignment', 'mod_facetoface'), $rendered);

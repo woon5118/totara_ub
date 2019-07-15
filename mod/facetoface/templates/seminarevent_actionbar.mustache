@@ -33,8 +33,9 @@
     * commandlinks: array containing buttons
     * commandlinks.name: name used for part of the css class name
     * commandlinks.primary: true to accent a button
-    * commandlinks.href: link url (MUST be escaped)
-    * commandlinks.text: link text
+    * commandlinks.href: link url
+    * commandlinks.text: link text in HTML
+    * commandlinks.icon: use icon instead of text
 
     Example content (json):
     {
@@ -60,6 +61,7 @@
 
 <div class="mod_facetoface__action{{#class}} mod_facetoface__action-{{.}}{{/class}}{{#align}} mod_facetoface__action--{{.}}{{/align}}"{{#id}} id="{{.}}"{{/id}}>
     {{#commandlinks}}
-        <a href="{{{href}}}" role="button" class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-default{{/primary}} mod_facetoface__action__{{name}}">{{{text}}}</a>
+        {{#icon}}<a href="{{href}}" class="mod_facetoface__action__{{name}}">{{#context}}{{> &&template }}{{/context}}</a>{{/icon}}
+        {{^icon}}<a href="{{href}}" role="button" class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-default{{/primary}} mod_facetoface__action__{{name}}">{{{text}}}</a>{{/icon}}
     {{/commandlinks}}
 </div>

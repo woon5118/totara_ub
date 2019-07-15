@@ -29,6 +29,7 @@ use \mod_facetoface\asset;
 
 $assetid = optional_param('assetid', 0, PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
+$popup = optional_param('popup', 0, PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
 
 require_login(0, false);
@@ -38,6 +39,9 @@ $PAGE->set_context($systemcontext);
 
 $baseurl = new moodle_url('/mod/facetoface/reports/assets.php', array('debug' => $debug));
 $PAGE->set_url($baseurl);
+if ($popup) {
+    $PAGE->set_pagelayout('popup');
+}
 
 if (!$assetid) {
     echo $OUTPUT->header();
@@ -97,11 +101,11 @@ if ($report) {
     $report->display_sidebar_search();
     echo $reporthtml;
 
-    if (!empty($backurl)) {
+    if (!$popup && !empty($backurl)) {
         echo $renderer->single_button($backurl, get_string('goback', 'facetoface'), 'get');
     }
 
-    if (has_capability('mod/facetoface:addinstance', $systemcontext)) {
+    if (!$popup && has_capability('mod/facetoface:addinstance', $systemcontext)) {
         echo $renderer->single_button(new moodle_url('/mod/facetoface/asset/manage.php'), get_string('backtoassets', 'facetoface'), 'get');
     }
 

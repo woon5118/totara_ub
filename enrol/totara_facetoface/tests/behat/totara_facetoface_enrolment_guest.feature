@@ -1,4 +1,4 @@
-@enrol @javascript @totara @enrol_totara_facetoface @mod @mod_facetoface @core_grades
+@enrol @javascript @totara @enrol_totara_facetoface @mod @mod_assign @mod_facetoface @core_grades
 Feature: Guest users enrol themselves in courses where seminar direct enrolment is allowed
   Background:
     Given I am on a totara site
@@ -38,7 +38,7 @@ Feature: Guest users enrol themselves in courses where seminar direct enrolment 
     When I log in as "user1"
     And I am on "Course 1" course homepage
     Then I should see "Wananga Whakamatautau"
-    When I click on "Sign-up" "link" in the "1 September" "table_row"
+    When I click on "Go to event" "link" in the "1 September" "table_row"
     And I press "Sign-up"
     Then I should see "Your" in the "#user-notifications" "css_element"
     When I navigate to "Grades" node in "Course administration"
@@ -75,7 +75,7 @@ Feature: Guest users enrol themselves in courses where seminar direct enrolment 
     When I log in as "user1"
     And I am on "Course 1" course homepage
     Then I should see "Wananga Whakamatautau"
-    When I click on "Sign-up" "link" in the "1 September" "table_row"
+    When I click on "Go to event" "link" in the "1 September" "table_row"
     And I press "Sign-up"
     Then I should see "Your" in the "#user-notifications" "css_element"
     When I navigate to "Grades" node in "Course administration"
@@ -103,7 +103,7 @@ Feature: Guest users enrol themselves in courses where seminar direct enrolment 
     And I am on "Course 1" course homepage
     Then I should see "Wananga Whakamatautau"
     And I navigate to "Enrolment options" node in "Course administration"
-    When I click on "Sign-up" "link" in the "1 September" "table_row"
+    When I click on "Go to event" "link" in the "1 September" "table_row"
     And I press "Sign-up"
     Then I should see "Your" in the "#user-notifications" "css_element"
     When I navigate to "Grades" node in "Course administration"

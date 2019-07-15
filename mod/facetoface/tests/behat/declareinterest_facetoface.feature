@@ -71,7 +71,7 @@ Feature: Manager approval and declare of interest
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I should not see "Declare interest"
-    And I follow "Sign-up"
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     And I should see "Your request was accepted"
     And I log out
@@ -96,7 +96,7 @@ Feature: Manager approval and declare of interest
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I should not see "Declare interest"
-    And I follow "Sign-up"
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     And I should see "Your request was accepted"
     And I log out

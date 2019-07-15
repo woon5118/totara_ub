@@ -70,7 +70,7 @@ class seminar_calendar_dynamic_content {
             if (!$seminar->has_unarchived_signups() || $seminar->get_multiplesessions()) {
 
                 $content = \html_writer::link(
-                    new \moodle_url('/mod/facetoface/signup.php',
+                    new \moodle_url('/mod/facetoface/eventinfo.php',
                         array('s' => $hook->event->uuid,
                             'returnurl' => $PAGE->url,
                         )

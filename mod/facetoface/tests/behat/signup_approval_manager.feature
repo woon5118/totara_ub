@@ -52,8 +52,7 @@ Feature: Seminar Signup Manager Approval
     When I log out
     When I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Event info"
-    And I follow "Event info"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I should see "This seminar requires manager approval. Users without a manager cannot join the seminar."
 
@@ -74,7 +73,7 @@ Feature: Seminar Signup Manager Approval
 
     And I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I follow "Request approval"
+    And I follow "Go to event"
     And I should see "Manager Approval"
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
@@ -110,8 +109,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
     And I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I press "Request approval"
     Then I should see "This seminar requires manager approval. Please select a manager to request approval"
@@ -139,8 +137,7 @@ Feature: Seminar Signup Manager Approval
     When I log out
     And I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
     And I press "Request approval"
@@ -169,7 +166,7 @@ Feature: Seminar Signup Manager Approval
     And I follow "View all events"
     Then I should see "Booked" in the "Upcoming" "table_row"
 
-    When I click on "Event info" "link"
+    When I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Manager's name"
     And I should see "Cassy Cas"
 
@@ -180,8 +177,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
     And I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
 
@@ -219,8 +215,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
     When I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
     And I press "Request approval"

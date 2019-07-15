@@ -34,12 +34,15 @@ final class seminar_session_helper {
      * Return Event session status as a localised string.
      * @param \stdClass $session    {facetoface_sessions} database record
      * @param \stdClass|null $date  {facetoface_sessions_dates} database record
+     * @param integer $timenow      The timestamp to calculate status
      * @return string               Non-empty string if success
      *                              Empty string if the event is waitlisted or the function fails
      */
-    public static function get_status(\stdClass $session, ?\stdClass $date): string {
+    public static function get_status(\stdClass $session, ?\stdClass $date, int $timenow = 0): string {
 
-        $timenow = time();
+        if ($timenow <= 0) {
+            $timenow = time();
+        }
         // NOTE: Use the following syntax if a seminar_event instance is required
         // $seminarevent = (new seminar_event())->from_record($session, false);
         $seminarsession = $date !== null ? (new seminar_session())->from_record($date, false) : null;

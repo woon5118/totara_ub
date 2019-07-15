@@ -224,7 +224,8 @@ Feature: Check attendees actions are performed by users with the right permissio
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    Then I should see "Cancel booking"
+    And I follow "Go to event"
+    Then I should see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
 
   Scenario: Check trainer actions on attendees page after removing send message capability
     Given the following "permission overrides" exist:

@@ -26,7 +26,7 @@
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-use mod_facetoface\{signup_helper, signup, seminar, trainer_helper};
+use mod_facetoface\{signup_helper, signup, seminar, trainer_helper, render_event_info_option};
 
 $s = required_param('s', PARAM_INT); // {facetoface_sessions}.id
 
@@ -95,6 +95,7 @@ if (!$currentstate->can_switch(signup\state\booked::class) &&
 }
 
 $PAGE->set_context($context);
+$PAGE->set_pagelayout('noblocks');
 $PAGE->set_cm($cm);
 $PAGE->set_url(new moodle_url('/enrol/totara_facetoface/signup.php', ['s' => $s]));
 $PAGE->set_title($heading);
@@ -114,6 +115,8 @@ $args = [
     'sesskey' => sesskey()
 ];
 $PAGE->requires->js_init_call('M.facetoface_managerselect.init', $args, false, $jsmodule);
+
+$returnurl = new moodle_url('/mod/facetoface/eventinfo.php', array('s' => $seminarevent->get_id()));
 
 $params = [
     'signup' => $signup,
@@ -151,7 +154,6 @@ if ($fromform = $mform->get_data()) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($heading);
 
 /**
  * @var mod_facetoface_renderer $seminarrenderer
@@ -160,18 +162,16 @@ $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
 $seminarrenderer->setcontext($context);
 $signedup = !$signup->get_state()->is_not_happening();
 $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
-echo $seminarrenderer->render_seminar_event($seminarevent, $viewattendees, false, $signedup);
 
-if (signup_helper::can_signup($signup)) {
-    $mform->display();
-} else if ($currentstate instanceof signup\state\not_set
-    || $currentstate instanceof signup\state\user_cancelled
-    || $currentstate instanceof signup\state\declined
-) {
-    // Display message only if user is not signed up:
-    echo $seminarrenderer->render_signup_failures(signup_helper::get_failures($signup));
-}
-$gobackstr = get_string('goback', 'mod_facetoface');
-echo html_writer::empty_tag('br');
-echo html_writer::link($returnurl, $gobackstr, ['title' => $gobackstr]);
+$option = (new render_event_info_option())
+    ->set_displaycapacity($viewattendees)
+    ->set_calendaroutput(false)
+    ->set_displaysignupinfo(!$signedup)
+    ->set_heading($heading)
+    ->set_backurl($returnurl->out(false))
+    ->set_backtoeventinfo(false)
+    ->set_backtoallsessions(true);
+
+echo $seminarrenderer->render_seminar_event_information($signup, $option, false);
+
 echo $OUTPUT->footer();

@@ -29,12 +29,13 @@ Feature: Seminar actions in upcoming block are correct
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    Then I should see "Sign-up" in the "Booking open" "table_row"
+    Then I should see "Go to event" in the "Booking open" "table_row"
     And I should see "Sign-up" in the "Upcoming events" "block"
 
-    And I click on "Sign-up" "link"
+    And I click on "Sign-up" "link" in the "Upcoming events" "block"
     And I press "Sign-up"
-    Then I should see "Booked" in the "Cancel booking" "table_row"
+    And I am on "Course 1" course homepage
+    Then I should see "Go to event" in the "(Booked)" "table_row"
     And I should see "Booked" in the "Upcoming events" "block"
     And I should not see "Sign-up" in the "Upcoming events" "block"
 
@@ -60,12 +61,13 @@ Feature: Seminar actions in upcoming block are correct
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    Then I should see "Join waitlist" in the "Booking open" "table_row"
+    Then I should see "Go to event" in the "Booking open" "table_row"
     And I should see "Join waitlist" in the "Upcoming events" "block"
 
-    And I click on "Join waitlist" "link"
+    And I click on "Join waitlist" "link" in the "Upcoming events" "block"
     And I press "Join waitlist"
-    Then I should see "(On waitlist)" in the "Cancel waitlist" "table_row"
+    And I am on "Course 1" course homepage
+    Then I should see "Go to event" in the "(On waitlist)" "table_row"
     And I should see "On waitlist" in the "Upcoming events" "block"
     And I should not see "Sign-up" in the "Upcoming events" "block"
     And I log out

@@ -67,17 +67,16 @@ Feature: Add - Remove manager reservations in Seminar
     Given I log in as "manager"
     And I am on "Course 1" course homepage
     And I click on "Test Seminar name" "link"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Allocate spaces for team (0/2)"
     And I should see "Reserve spaces for team (0/2)"
     And I click on "Allocate spaces for team" "link"
     And I set the field "Potential allocations" to "Sam1 Student1, Sam2 Student2"
     And I press "Add"
-    And I click on "Test Seminar name" "link"
     And I should see "Allocate spaces for team (2/2)"
     And I click on "Allocate spaces for team" "link"
     And I set the field "Current allocations" to "Sam2 Student2"
     And I press "Remove"
-    And I click on "Test Seminar name" "link"
     And I should see "Allocate spaces for team (1/2)"
     And I should see "Reserve spaces for team (1/1)"
 
@@ -85,6 +84,7 @@ Feature: Add - Remove manager reservations in Seminar
     Given I log in as "manager"
     And I am on "Course 1" course homepage
     And I click on "Test Seminar name" "link"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I click on "Reserve spaces for team" "link"
     And I select "2" from the "reserve" singleselect
     When I press "Update"
@@ -92,18 +92,16 @@ Feature: Add - Remove manager reservations in Seminar
 
     When I follow "Manage reservations"
     Then I should see "2" in the "Max Manager" "table_row"
-    And I press "View all events"
+    And I press "Go back"
 
     When I click on "Allocate spaces for team" "link"
     And I set the field "Potential allocations" to "Sam1 Student1,Sam2 Student2"
     And I press "Add"
-    And I click on "Test Seminar name" "link"
     Then I should see "Allocate spaces for team (2/2)"
 
     When I click on "Allocate spaces for team" "link"
     And I set the field "Current allocations" to "Sam2 Student2"
     And I press "Remove"
-    And I click on "Test Seminar name" "link"
     Then I should see "Allocate spaces for team (1/2)"
     And I should see "Reserve spaces for team (1/1)"
 
@@ -112,6 +110,7 @@ Feature: Add - Remove manager reservations in Seminar
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I click on "Test Seminar name" "link"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Reserve for another manager"
     And I click on "Reserve for another manager" "link"
     When I select "Torry Teamlead" from the "menumanagerid" singleselect

@@ -66,8 +66,7 @@ Feature: Seminar Signup Admin Approval
   Scenario: Student signs up with no manager assigned when admin approval is required
     When I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Event info"
-    And I follow "Event info"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager and Administrative approval"
     Then I should see "This seminar requires manager approval. Users without a manager cannot join the seminar."
 
@@ -79,8 +78,7 @@ Feature: Seminar Signup Admin Approval
     And I log out
     And I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager and Administrative approval"
     And I press "Request approval"
     Then I should see "This seminar requires manager approval. Please select a manager to request approval"
@@ -116,8 +114,7 @@ Feature: Seminar Signup Admin Approval
   Scenario: Student gets approved through both steps of the 2 stage approval
     When I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager and Administrative approval"
     And I press "Request approval"
     And I run all adhoc tasks
@@ -169,8 +166,7 @@ Feature: Seminar Signup Admin Approval
 
     And I log in as "sammy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager and Administrative approval"
     And I should see "Managers from all job assignements will be chosen if left empty"
     And I press "Request approval"
@@ -225,23 +221,26 @@ Feature: Seminar Signup Admin Approval
     When I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
-    Then I should see "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
+    Then I should see "Request approval" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
     And I log out
 
     # Check approve
     When I log in as "timmy"
     And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
-    Then I should see "Booked"
-    And I should see "Cancel booking"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
+    Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
+    And I should see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
     And I log out
 
     # Check haven't decided
     When I log in as "sammy"
     And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
-    Then I should see "Requested"
-    And I should see "Cancel booking"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
+    Then I should see "Requested" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
+    And I should see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
     And I log out
 
   Scenario: Multiple seminar event approvals and denials for the same user

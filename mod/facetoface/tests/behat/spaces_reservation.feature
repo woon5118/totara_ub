@@ -74,7 +74,7 @@ Feature: Reserve spaces for team in seminar
   Scenario: Wait listed users should be added to attendees list when reservations are deleted
     Given I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I follow "Reserve spaces for team"
     And I set the following fields to these values:
       | managerid | 3 |
@@ -86,29 +86,25 @@ Feature: Reserve spaces for team in seminar
 
     And I log in as "student3"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     And I log out
 
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     And I log out
 
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Join waitlist" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Join waitlist"
     And I log out
 
     Given I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    When I click on "Attendees" "link"
+    When I click on "Attendees" "link" in the "Upcoming" "table_row"
     Then I should see "Sam1 Student1"
     And I should see "Sam3 Student3"
     And I should not see "Sam2 Student2"
@@ -116,10 +112,11 @@ Feature: Reserve spaces for team in seminar
     Then I should see "Sam2 Student2"
 
     When I click on "View all events" "link"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I follow "Manage reservations"
     And I click on "Delete" "link"
     And I press "Continue"
-    When I click on "Attendees" "link"
+    When I follow "Manage attendees"
     Then I should see "Sam1 Student1"
     And I should see "Sam3 Student3"
     And I should see "Sam2 Student2"

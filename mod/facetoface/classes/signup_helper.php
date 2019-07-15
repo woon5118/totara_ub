@@ -24,6 +24,7 @@
 namespace mod_facetoface;
 
 use \stdClass;
+use \context_module;
 use mod_facetoface\signup_status;
 use mod_facetoface\exception\signup_exception;
 use mod_facetoface\signup\state\{
@@ -614,5 +615,198 @@ final class signup_helper {
         ]);
         $state = $signup->get_state();
         return $signup->exists() && in_array($state::get_code(), $statuscodes);
+    }
+
+    /**
+     * Get the user's booking status as a human-readable string.
+     *
+     * @param int|string|state $state The user's booking status as status code, a state class string or a state class instance
+     * @param boolean $attendancestatus Set false to hide attendance status from a user
+     * @return string
+     */
+    public static function get_user_booking_status($state, bool $attendancestatus = true): string {
+        if ($state instanceof state) {
+            $state = $state->get_code();
+        } else if (is_number($state)) {
+            $state = (int)$state;
+        } else {
+            if (!is_string($state) || strpos($state, 'mod_facetoface\\signup\\state\\') !== 0 || !class_exists($state)) {
+                throw new \coding_exception('$state must be a state class string, a state class instance or status code');
+            }
+            $state = $state::get_code();
+        }
+
+        // Optimise for most frequent scenarios.
+        if ($state == not_set::get_code()) {
+            return not_set::get_string();
+        } else if ($state == booked::get_code()) {
+            return booked::get_string();
+        } else if ($state == waitlisted::get_code()) {
+            return waitlisted::get_string();
+        }
+
+        if ($attendancestatus) {
+            $stateclass = state::from_code($state);
+            return $stateclass::get_string();
+        } else {
+            $stateclass = state::from_code($state);
+            $attendancestates = attendance_state::get_all_attendance_states();
+            if (in_array($stateclass, $attendancestates)) {
+                // Display "Booked" instead of attendance states such as "Fully attended"
+                return booked::get_string();
+            } else {
+                return $stateclass::get_string();
+            }
+        }
+    }
+
+    /**
+     * A simple function to check whether the sign-up is open for the user or not.
+     * Use signup_helper::can_signup() to check whether the user is able to sign up or not.
+     *
+     * @param seminar_event $seminarevent
+     * @param integer $signupcount by attendees_helper::count_signups()
+     * @param integer $userid
+     * @param integer $timenow
+     * @return boolean
+     */
+    public static function is_signup_open(seminar_event $seminarevent, int $signupcount, int $userid = 0, int $timenow = 0): bool {
+        global $CFG;
+        if ($timenow <= 0) {
+            $timenow = time();
+        }
+        if ($signupcount >= $seminarevent->get_capacity()) {
+            return false;
+        }
+        if (!empty($seminarevent->get_registrationtimestart()) && $seminarevent->get_registrationtimestart() > $timenow) {
+            return false;
+        }
+        if (!empty($seminarevent->get_registrationtimefinish()) && $timenow > $seminarevent->get_registrationtimefinish()) {
+            return false;
+        }
+        if ($seminarevent->is_first_started($timenow)) {
+            return false;
+        }
+        if (!seminar_event_helper::is_available($seminarevent, $userid)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if a user is able to sign up, cancel or see the event.
+     *
+     * @todo this function needs test coverage (phpunit or behat or both)
+     *
+     * @param seminar_event $seminarevent
+     * @param integer $userid
+     * @param integer $timenow
+     * @return boolean
+     */
+    public static function is_user_actionable(seminar_event $seminarevent, int $userid = 0, int $timenow = 0): bool {
+        global $CFG, $USER;
+
+        if ($userid == 0) {
+            $userid = $USER->id;
+        }
+        if ($timenow <= 0) {
+            $timenow = time();
+        }
+        $seminar = null;
+        $cm = null;
+
+        // The logic of this function is basically the compilation of:
+        // - mod_facetoface_renderer::session_options_signup_link
+        // - reservations::can_reserve_or_allocate
+
+        // Firstly, check the cancellation status.
+        if ($seminarevent->get_cancelledstatus()) {
+            return false;
+        }
+
+        // Secondly, check the availability.
+        if (!seminar_event_helper::is_available($seminarevent)) {
+            return false;
+        }
+
+        $sessionstarted = $seminarevent->is_first_started($timenow);
+
+        // Registration status.
+        if (!empty($seminarevent->get_registrationtimestart()) && $seminarevent->get_registrationtimestart() > $timenow) {
+            $registrationopen = false;
+        } else {
+            $registrationopen = true;
+        }
+
+        if (!empty($seminarevent->get_registrationtimefinish()) && $timenow > $seminarevent->get_registrationtimefinish()) {
+            $registrationclosed = true;
+        } else {
+            $registrationclosed = false;
+        }
+
+        $signup = signup::create($userid, $seminarevent);
+
+        // Check if the user is allowed to cancel his/her booking.
+        $allowcancellation = self::can_user_cancel($signup);
+
+        $actionable = false;
+        if (self::is_booked($signup)) {
+            // The session is booked where signup is exist and the state of signup is matching with the
+            // states above.
+            if (!$sessionstarted) {
+                // Techincally this case is not always actionable.
+                $actionable = true;
+            }
+            if ($allowcancellation) {
+                $actionable = true;
+            }
+        } else {
+            if (!$seminarevent->has_capacity() && !$seminarevent->get_allowoverbook()) {
+                // No sign-up link
+                $actionable = false;
+            } else if ($registrationopen && $registrationclosed == false) {
+                $seminar = $seminar ?? $seminarevent->get_seminar();
+                if (!$seminar->has_unarchived_signups() || $seminar->get_multiplesessions() == 1) {
+                    // Check the user's signup count do not exceed the maximum allowed signups.
+                    $maxsignups = $seminar->get_multisignup_maximum();
+                    $signups = signup_list::user_active_signups_within_seminar($userid, $seminar->get_id());
+                    if ($maxsignups == 0 || $signups->count() < $maxsignups) {
+                        // Ok to register.
+                        // NOTE: "$actionable = self::can_signup($signup)" is better than "$actionable = true" here.
+                        // However, that would break a dozen more behat tests.
+                        $actionable = true;
+                    }
+                } else {
+                    $actionable = false;
+                }
+            }
+        }
+
+        if (!$actionable) {
+            if ($sessionstarted && $allowcancellation) {
+                $actionable = true;
+            } else {
+                $actionable = self::can_signup($signup);
+            }
+        }
+
+        if (!$actionable) {
+            // Still non-actionable? Let's see if a user has a permission to manage reservations
+            if (!$seminarevent->is_over($timenow)) {
+                $seminar = $seminar ?? $seminarevent->get_seminar();
+                $cm = $cm ?? $seminar->get_coursemodule();
+                $context = context_module::instance($cm->id);
+                if ($userid != $USER->id && !has_capability('mod/facetoface:reserveother', $context, $userid)) {
+                    $actionable = false;
+                } else if ($seminar->get_managerreserve()) {
+                    $actionable = has_any_capability(['mod/facetoface:reservespace', 'mod/facetoface:managereservations'], $context, $userid);
+                }
+                // What about the 'Manage attendees' link?
+                // Although it's part of manager actions, the page can be visited via the 'Attendees' link in the event dashboard.
+                // Hence, we don't need to check 'mod/facetoface:viewattendees' here.
+            }
+        }
+
+        return $actionable;
     }
 }

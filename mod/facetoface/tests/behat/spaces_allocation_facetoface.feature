@@ -101,8 +101,8 @@ Feature: Allocate spaces for team in seminar
     Then the "Current allocations" select box should contain "Sam1 Student1"
     And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
-    And I click on the link "Allocate spaces for team" in row 1
-    Then the "Potential allocations" select box should contain "Sam1 Student1"
+    And I follow "Allocate spaces for team"
+    Then the "Available team members" select box should contain "Sam1 Student1"
     And I log out
 
   Scenario: Capacity should be unaffected if removing allocation and create reservations when removing allocations is set to Yes
@@ -112,17 +112,21 @@ Feature: Allocate spaces for team in seminar
     And I click on the link "Allocate spaces for team" in row 1
     And I set the field "Potential allocations" to "Sam1 Student1"
     When I press "Add"
-    Then I should see "1 / 3"
-    When I click on the link "Allocate spaces for team" in row 1
-    Then the "Current allocations" select box should contain "Sam1 Student1"
+    And I press "View all events"
+    Then I should see "1 / 3" in the "1 January 2020" "table_row"
+    And I press the "back" button in the browser
+    When I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should contain "Sam1 Student1"
     When I set the following fields to these values:
       | replaceallocations         | Yes  |
     And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
-    Then I should see "1 / 3"
-    But I click on the link "Allocate spaces for team" in row 1
-    And the "Current allocations" select box should not contain "Sam1 Student1"
-    And the "Potential allocations" select box should contain "Sam1 Student1"
+    And I press "View all events"
+    Then I should see "1 / 3" in the "1 January 2020" "table_row"
+    And I press the "back" button in the browser
+    But I follow "Allocate spaces for team"
+    And the "Allocated team members" select box should not contain "Sam1 Student1"
+    And the "Available team members" select box should contain "Sam1 Student1"
     And I log out
 
   Scenario: Capacity should be affected if removing allocation and create reservations when removing allocations is set to No
@@ -132,16 +136,20 @@ Feature: Allocate spaces for team in seminar
     And I click on the link "Allocate spaces for team" in row 1
     And I set the field "Potential allocations" to "Sam1 Student1"
     When I press "Add"
-    Then I should see "1 / 3"
-    When I click on the link "Allocate spaces for team" in row 1
-    Then the "Current allocations" select box should contain "Sam1 Student1"
+    And I press "View all events"
+    Then I should see "1 / 3" in the "1 January 2020" "table_row"
+    And I press the "back" button in the browser
+    When I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should contain "Sam1 Student1"
     When I set the following fields to these values:
       | replaceallocations         | No  |
     And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
-    Then I should see "0 / 3"
-    And I click on the link "Allocate spaces for team" in row 1
-    And the "Potential allocations" select box should contain "Sam1 Student1"
+    And I press "View all events"
+    Then I should see "0 / 3" in the "1 January 2020" "table_row"
+    And I press the "back" button in the browser
+    And I follow "Allocate spaces for team"
+    And the "Available team members" select box should contain "Sam1 Student1"
     And I log out
 
   Scenario: Manager cannot see users allocated from another managers
@@ -151,22 +159,21 @@ Feature: Allocate spaces for team in seminar
     And I click on the link "Allocate spaces for team" in row 1
     And I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
-    When I click on the link "Allocate spaces for team" in row 1
-    Then the "Current allocations" select box should contain "Sam1 Student1"
+    When I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should contain "Sam1 Student1"
     And I log out
 
     When I log in as "sitemanager2"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 1
-    Then the "Current allocations" select box should not contain "Sam1 Student1"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should not contain "Sam1 Student1"
     And I log out
 
   Scenario: Manager cannot deallocate self booked users even if he is their manager
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     And I should see "Your request was accepted"
     And I log out
@@ -178,8 +185,8 @@ Feature: Allocate spaces for team in seminar
     Then the "Current allocations" select box should contain "Sam1 Student1 (Self booked)"
     And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
-    And I click on the link "Allocate spaces for team" in row 1
-    Then the "Current allocations" select box should contain "Sam1 Student1 (Self booked)"
+    And I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should contain "Sam1 Student1 (Self booked)"
     And I log out
 
   Scenario: Manager cannot deallocate users in another activity even if he is their manager and he allocated the user
@@ -189,16 +196,16 @@ Feature: Allocate spaces for team in seminar
     And I click on the link "Allocate spaces for team" in row 1
     And I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
-    When I click on the link "Allocate spaces for team" in row 1
-    Then the "Current allocations" select box should contain "Sam1 Student1"
+    When I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should contain "Sam1 Student1"
 
     When I click on "Course 1" "link"
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 2
+    And I click on the link "Go to event" in row 2
+    And I follow "Allocate spaces for team"
     Then I should see "Sam1 Student1" in the "Other event(s) in this activity" "optgroup"
     And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
-    And I click on the link "Allocate spaces for team" in row 2
+    And I follow "Allocate spaces for team"
     But I should see "Sam1 Student1" in the "Other event(s) in this activity" "optgroup"
     And I log out
 
@@ -209,39 +216,38 @@ Feature: Allocate spaces for team in seminar
     And I click on the link "Allocate spaces for team" in row 1
     When I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
-    And I click on the link "Allocate spaces for team" in row 1
-    Then the "Current allocations" select box should contain "Sam1 Student1"
+    And I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should contain "Sam1 Student1"
 
     When I click on "Course 1" "link"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 2
     And I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
-    And I click on the link "Allocate spaces for team" in row 2
-    Then the "Current allocations" select box should contain "Sam1 Student1"
+    And I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should contain "Sam1 Student1"
     And I log out
 
   Scenario: Allocate and remove spaces for students when student has self-booked
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     And I should see "Your request was accepted"
     And I log out
 
     When I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 1
-    Then the "Current allocations" select box should contain "Sam1 Student1 (Self booked)"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should contain "Sam1 Student1 (Self booked)"
 
     When I click on "Course 1" "link"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 2
     And I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
-    And I click on the link "Allocate spaces for team" in row 2
+    And I follow "Allocate spaces for team"
     Then I should see "Sam1 Student1" in the "This event" "optgroup"
     And I should see "Sam1 Student1 (Self booked)" in the "Other event(s) in this activity" "optgroup"
 
@@ -250,7 +256,7 @@ Feature: Allocate spaces for team in seminar
     And I click on the link "Allocate spaces for team" in row 2
     And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
-    And I click on the link "Allocate spaces for team" in row 2
+    And I follow "Allocate spaces for team"
     Then I should not see "Sam1 Student1" in the "This event" "optgroup"
     And I should see "Sam1 Student1 (Self booked)" in the "Other event(s) in this activity" "optgroup"
 
@@ -278,14 +284,21 @@ Feature: Allocate spaces for team in seminar
 
     When I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
     Then I should see "In progress" in the "0 / 33" "table_row"
-    And I should not see "Allocate spaces for team" in the "0 / 33" "table_row"
-    And I should not see "Reserve spaces for team" in the "0 / 33" "table_row"
-    And I should not see "Manage reservations" in the "0 / 33" "table_row"
-    And I should see "Allocate spaces for team" in the "1 February" "table_row"
-    And I should see "Reserve spaces for team" in the "1 February" "table_row"
-    And I should see "Manage reservations" in the "1 February" "table_row"
-    And I should see "Allocate spaces for team" in the "2 February" "table_row"
-    And I should see "Reserve spaces for team" in the "2 February" "table_row"
-    And I should see "Manage reservations" in the "2 February" "table_row"
+
+    And I click on "Go to event" "link" in the "0 / 33" "table_row"
+    And I should not see "Allocate spaces for team"
+    And I should not see "Reserve spaces for team"
+    And I should not see "Manage reservations"
+
+    And I press the "back" button in the browser
+    And I click on "Go to event" "link" in the "1 February" "table_row"
+    And I should see "Allocate spaces for team"
+    And I should see "Reserve spaces for team"
+    And I should see "Manage reservations"
+
+    And I press the "back" button in the browser
+    And I click on "Go to event" "link" in the "2 February" "table_row"
+    And I should see "Allocate spaces for team"
+    And I should see "Reserve spaces for team"
+    And I should see "Manage reservations"

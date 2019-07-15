@@ -52,7 +52,7 @@ Feature: Seminar Signup Role Approval after creating an event
 
     When I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I follow "Event info"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "This seminar requires role approval. There are no users assigned to this role. Please contact the site administrator."
     And I log out
 
@@ -67,8 +67,7 @@ Feature: Seminar Signup Role Approval after creating an event
 
     When I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Editing Trainer"
 
     When I press "Request approval"

@@ -58,7 +58,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     Then I should see "Your request was accepted"
 
@@ -71,5 +71,5 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I log out
     And I log in as "student1"
     And I am on "Course 2" course homepage
-    And I click on the link "Event info" in row 1
+    And I click on the link "Go to event" in row 1
     Then I should see "You must have a suitable job assignment to sign up for this seminar activity."

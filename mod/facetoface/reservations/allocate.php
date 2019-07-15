@@ -38,6 +38,7 @@ require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 $sid = required_param('s', PARAM_INT);
 $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 $backtosession = optional_param('backtosession', null, PARAM_ALPHA);
+$backtoeventinfo = optional_param('backtoeventinfo', 0, PARAM_BOOL);
 $managerid = optional_param('managerid', null, PARAM_INT);
 
 $seminarevent = new \mod_facetoface\seminar_event($sid);
@@ -52,6 +53,9 @@ $helper = new attendees_helper($seminarevent);
 if ($backtosession) {
     $url->param('backtosession', $backtosession);
 }
+if ($backtoeventinfo) {
+    $url->param('backtoeventinfo', 1);
+}
 if ($managerid) {
     $url->param('managerid', $managerid);
 }
@@ -59,9 +63,22 @@ $PAGE->set_url($url);
 
 require_login($course, false, $cm);
 
-// Handle cancel.
 if ($backtoallsessions) {
-    $redir = new moodle_url('/mod/facetoface/view.php', array('id' => $cm->id));
+    $allsessionsurl = new moodle_url('/mod/facetoface/view.php', array('id' => $cm->id));
+} else {
+    $allsessionsurl = new moodle_url('/course/view.php', ['id' => $seminar->get_course()]);
+}
+if ($backtoeventinfo) {
+    $gobackurl = new moodle_url('/mod/facetoface/eventinfo.php', array('s' => $seminarevent->get_id(), 'backtoallsessions' => $backtoallsessions));
+} else {
+    $gobackurl = null;
+}
+
+// Handle cancel.
+if ($backtoeventinfo) {
+    $redir = $gobackurl;
+} else if ($backtoallsessions) {
+    $redir = $allsessionsurl;
 } else if ($backtosession) {
     $redir = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id(), 'backtoallsessions' => 1,
         'action' => $backtosession));
@@ -93,6 +110,7 @@ if (!$seminarevent->get_allowoverbook()) {
 }
 $reserveinfo = reservations::limit_info_by_session_date($seminarevent, $reserveinfo);
 
+/** @var mod_facetoface_renderer $output */
 $output = $PAGE->get_renderer('mod_facetoface');
 $output->setcontext($context);
 
@@ -199,14 +217,11 @@ $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 echo $output->header();
-
-echo $output->heading(format_string($seminar->get_name()));
-/**
- * @var mod_facetoface_renderer $seminarrenderer
- */
-$seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-echo $seminarrenderer->render_seminar_event($seminarevent, false);
+echo $output->heading($title, 2);
+echo $output->heading(format_string($seminar->get_name()), 3);
 echo $preform;
 echo $form;
+/** @var \stdClass $manager */
 echo $output->other_reservations($otherreservations, $manager);
+echo $output->render_action_bar_on_reservation_page($gobackurl, $allsessionsurl);
 echo $output->footer();

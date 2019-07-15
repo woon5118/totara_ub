@@ -35,20 +35,6 @@ Feature: Cancellation for session
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | +1               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | +1               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | +1               |
-      | timefinish[minute] | 0                |
-    And I press "OK"
     And I set the following fields to these values:
       | capacity           | 3                |
     And I click on "At any time" "radio"
@@ -58,13 +44,16 @@ Feature: Cancellation for session
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     Then I should see "Your request was accepted"
-    And I should see "Cancel booking"
-    When I click on the link "Cancel booking" in row 1
-    And I press "Yes"
-    And I should not see "Cancel booking"
+    And I follow "View all events"
+    When I click on the link "Go to event" in row 1
+    Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
+    And I click on "Cancel booking" "link" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
+    And I wait "1" seconds
+    And I press "Cancel booking"
+    Then I should see "Your booking has been cancelled"
     And I log out
 
     # Check that editing teacher can manage cancellation notes
@@ -100,20 +89,6 @@ Feature: Cancellation for session
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | +2               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | +2               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | +1               |
-      | timefinish[minute] | 0                |
-    And I press "OK"
     And I set the following fields to these values:
       | capacity           | 3                |
     And I click on "Never" "radio"
@@ -123,10 +98,13 @@ Feature: Cancellation for session
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     Then I should see "Your request was accepted"
-    And I should not see "Cancel booking"
+    And I follow "View all events"
+    When I click on the link "Go to event" in row 1
+    Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
+    And I should not see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
     And I log out
 
   @javascript
@@ -135,20 +113,6 @@ Feature: Cancellation for session
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | +3               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | +3               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | +1               |
-      | timefinish[minute] | 0                |
-    And I press "OK"
     And I set the following fields to these values:
       | capacity           | 3                |
     And I click on "Until specified period" "radio"
@@ -158,10 +122,13 @@ Feature: Cancellation for session
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     Then I should see "Your request was accepted"
-    And I should see "Cancel booking"
+    And I follow "View all events"
+    When I click on the link "Go to event" in row 1
+    Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
+    And I should see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
     And I log out
 
     And I log in as "teacher1"
@@ -191,9 +158,9 @@ Feature: Cancellation for session
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should not see "Cancel booking"
-    And I follow "Event info"
-    Then I should not see "Cancel booking"
+    And I click on the link "Go to event" in row 1
+    Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
+    And I should not see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
     And I log out
 
   @javascript
@@ -202,20 +169,6 @@ Feature: Cancellation for session
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | +1               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | +1               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | +1               |
-      | timefinish[minute] | 0                |
-    And I press "OK"
     And I set the following fields to these values:
       | capacity           | 3                |
     And I click on "At any time" "radio"
@@ -230,11 +183,14 @@ Feature: Cancellation for session
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     Then I should see "Your request was accepted"
-    And I should see "Cancel booking"
-    When I click on the link "Cancel booking" in row 1
-    And I press "Yes"
-    And I should not see "Cancel booking"
+    And I follow "View all events"
+    When I click on the link "Go to event" in row 1
+    Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
+    And I click on "Cancel booking" "link" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
+    And I wait "1" seconds
+    And I press "Cancel booking"
+    Then I should see "Your booking has been cancelled"
     And I log out

@@ -72,7 +72,7 @@ Feature: Test add/update/delete actions for Seminar direct enrolment method
     And I log out
     And I log in as "alice"
     And I am on "Course 10782" course homepage
-    And I click on the link "Sign-up" in row 1
+    And I click on the link "Go to event" in row 1
     When I press "Sign-up"
     Then I should see "Seminar 10782: Your request was accepted"
     And I log out

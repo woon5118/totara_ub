@@ -61,167 +61,6 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function data_provider_regdates_tooltip() {
-        $data = array(
-            array(1466015400, 1466425800, true),
-            array(1466015400, 1466425800, false),
-            array(null, 1466425800, true),
-            array(null, 1466425800, false),
-            array(1466015400, null, true),
-            array(1466015400, null, false),
-            array(null, null, true),
-            array(null, null, false),
-        );
-        return $data;
-    }
-
-    /**
-     * Tests the private method get_regdates_tooltip_info by creating a reflection class.
-     *
-     * @dataProvider data_provider_regdates_tooltip
-     * @throws coding_exception
-     */
-    public function test_get_regdates_tooltip_info($registrationtimestart, $registrationtimefinish, $displaytimezones) {
-
-        $renderer = $this->create_f2f_renderer();
-
-        // Create reflection class in order to test the private method.
-        $reflection = new \ReflectionClass(get_class($renderer));
-        $method = $reflection->getMethod('get_regdates_tooltip_info');
-        $method->setAccessible(true);
-
-        $timezone = core_date::get_user_timezone();
-
-        $seminarevent = new seminar_event();
-        $seminarevent->set_registrationtimestart($registrationtimestart ?? 0);
-        $seminarevent->set_registrationtimefinish($registrationtimefinish ?? 0);
-
-        // Run the method and get the output.
-        $actualoutput = $method->invokeArgs($renderer, array($seminarevent, $displaytimezones));
-
-        // Create expected output string.
-        $startdatestring = userdate($registrationtimestart, get_string('strftimedate', 'langconfig'), $timezone);
-        $starttimestring = userdate($registrationtimestart, get_string('strftimetime', 'langconfig'), $timezone);
-        $finishdatestring = userdate($registrationtimefinish, get_string('strftimedate', 'langconfig'), $timezone);
-        $finishtimestring = userdate($registrationtimefinish, get_string('strftimetime', 'langconfig'), $timezone);
-
-        // If there are no start or finish dates we will get an empty string.
-        $expectedoutput = '';
-        if (isset($registrationtimestart)) {
-            // The Sign-up period opens text is only show if there is a sign-up period start date.
-            $expectedoutput = "Sign-up period opens: " . $startdatestring . ", " . $starttimestring;
-            if ($displaytimezones) {
-                $expectedoutput .= " (time zone: " . $timezone . ")";
-            }
-
-            if ($registrationtimefinish) {
-                // There is only a new line if both start and finish dates are there.
-                $expectedoutput .= "\n";
-            }
-        }
-
-        if (isset($registrationtimefinish)) {
-            $expectedoutput .= "Sign-up period closes: " . $finishdatestring . ", " . $finishtimestring;
-            if ($displaytimezones) {
-                $expectedoutput .= " (time zone: " . $timezone . ")";
-            }
-        }
-
-        $this->assertEquals($expectedoutput, $actualoutput);
-    }
-
-    /**
-     * Tests the private method get_regdates_tooltip_info by testing the output of
-     * the public method print_session_list_table.
-     *
-     * @dataProvider data_provider_regdates_tooltip
-     */
-    public function test_get_regdates_tooltip_info_via_print_session_list_table($registrationtimestart, $registrationtimefinish, $displaytimezones) {
-
-        $renderer = $this->create_f2f_renderer();
-
-        $course = $this->data_generator->create_course();
-
-        $facetofacedata = new stdClass();
-        $facetofacedata->course = $course->id;
-        $facetoface = $this->facetoface_generator->create_instance($facetofacedata);
-        $sessiondata = new stdClass();
-        $sessiondata->facetoface = $facetoface->id;
-        $sessiondata->registrationtimestart = $registrationtimestart ? (time() - 1 * DAYSECS) : null;
-        $sessiondata->registrationtimefinish = $registrationtimefinish ? (time() + 2 * DAYSECS) : null;
-
-        // We need to ensure the session is in the future.
-        $sessiondate = new stdClass();
-        $sessiondate->timestart = time() + 2 * DAYSECS;
-        $sessiondate->timefinish = time() + 3 * DAYSECS;
-        $sessiondate->sessiontimezone = 'Pacific/Auckland';
-        $sessiondata->sessiondates = array($sessiondate);
-
-        $sessionid = $this->facetoface_generator->add_session($sessiondata);
-        $seminarevent = new seminar_event($sessionid);
-
-        // 1. Test with seminar_event::to_record()
-        $session = $seminarevent->to_record();
-        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
-
-        // First of all with minimal set to true. Meaning get_regdates_tooltip_info is called.
-        $returnedoutput = $renderer->print_session_list_table([ $session ], false, false, $displaytimezones, array(), null, true);
-
-        // The Sign-up period open date will always been first in the string, so we can check that it will indeed
-        // be part of a a title attribute.
-        if (isset($registrationtimestart)) {
-            $this->assertContains('title="Sign-up period opens:', $returnedoutput);
-        } else {
-            $this->assertNotContains('title="Sign-up period opens:', $returnedoutput);
-        }
-
-        // Currently, text like in the strings below only appears in the Sign-up period tooltip. If other elements start
-        // using the same text, then the below assertions may be less useful.
-        if (isset($registrationtimefinish)) {
-            $this->assertContains('Sign-up period closes:', $returnedoutput);
-        } else {
-            $this->assertNotContains('Sign-up period closes:', $returnedoutput);
-        }
-
-        // Now with minimal set to false, meaning other fixed strings are used for the tooltip instead of get_regdates_tooltip_info.
-        $returnedoutput = $renderer->print_session_list_table(array($session), false, false, $displaytimezones, array(), null, false);
-
-        // We shouldn't get the detailed output that comes from get_regdates_tooltip_info as this information
-        // is given in another column.
-        $this->assertFalse(strpos($returnedoutput, 'title="Sign-up period opens:'));
-        $this->assertFalse(strpos($returnedoutput, 'Sign-up period closes:'));
-
-        // 2. Test with seminar_event_helper::get_sessiondata()
-        $session = seminar_event_helper::get_sessiondata($seminarevent, null, true);
-
-        // First of all with minimal set to true. Meaning get_regdates_tooltip_info is called.
-        $returnedoutput = $renderer->print_session_list_table([ $session ], false, false, $displaytimezones, array(), null, true);
-
-        // The Sign-up period open date will always been first in the string, so we can check that it will indeed
-        // be part of a a title attribute.
-        if (isset($registrationtimestart)) {
-            $this->assertContains('title="Sign-up period opens:', $returnedoutput);
-        } else {
-            $this->assertNotContains('title="Sign-up period opens:', $returnedoutput);
-        }
-
-        // Currently, text like in the strings below only appears in the Sign-up period tooltip. If other elements start
-        // using the same text, then the below assertions may be less useful.
-        if (isset($registrationtimefinish)) {
-            $this->assertContains('Sign-up period closes:', $returnedoutput);
-        } else {
-            $this->assertNotContains('Sign-up period closes:', $returnedoutput);
-        }
-
-        // Now with minimal set to false, meaning other fixed strings are used for the tooltip instead of get_regdates_tooltip_info.
-        $returnedoutput = $renderer->print_session_list_table(array($session), false, false, $displaytimezones, array(), null, false);
-
-        // We shouldn't get the detailed output that comes from get_regdates_tooltip_info as this information
-        // is given in another column.
-        $this->assertFalse(strpos($returnedoutput, 'title="Sign-up period opens:'));
-        $this->assertFalse(strpos($returnedoutput, 'Sign-up period closes:'));
-    }
-
     /**
      * Test the method get_signup_link in an ordinary situation.
      */
@@ -231,7 +70,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
         $renderer = $this->create_f2f_renderer();
         // hard-coded url instead of \mod_facetoface_renderer::DEFAULT_SIGNUP_LINK, to catch possible regression
-        $expected = '/mod/facetoface/signup.php';
+        $expected = '/mod/facetoface/eventinfo.php';
 
         $link = $renderer->get_signup_link($seminarevent);
         $this->assertEquals($expected, $link);
@@ -254,7 +93,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * If the plugin is missing, the whole test will be skipped.
      */
     public function test_get_signup_link_with_enrol_plugin() {
-        global $DB;
+        global $DB, $CFG;
         /** @var moodle_database $DB */
 
         $plugin = enrol_get_plugin('totara_facetoface');
@@ -311,7 +150,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $plugin->enrol_user($inst, $user->id, $studentrole->id);
 
         // hard-coded url instead of \mod_facetoface_renderer::DEFAULT_SIGNUP_LINK, to catch possible regression
-        $expected = '/mod/facetoface/signup.php';
+        $expected = '/mod/facetoface/eventinfo.php';
 
         $link = $renderer1->get_signup_link($seminarevent1);
         $this->assertEquals($expected, $link);
@@ -322,6 +161,20 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $this->assertEquals($alter, $link);
         $link = $renderer2->get_signup_link($seminarevent2);
         $this->assertEquals($alter, $link);
+
+        // seminar_watcher hook should honour restricted access
+        // see TL-16472 for more info
+        $CFG->enableavailability = true;
+        $cm = $seminar->get_coursemodule();
+        $DB->set_field('course_modules', 'availability', '{"op":"&","c":[{"type":"date","d":"<","t":1}],"showc":[true]}', ['id' => $cm->id]);
+        rebuild_course_cache($course->id, true);
+
+        $modinfo = get_fast_modinfo($cm->course);
+        $cm = $modinfo->get_cm($cm->id);
+        $this->assertFalse($cm->available);
+
+        $link = $renderer1->get_signup_link($seminarevent1);
+        $this->assertSame('', $link);
     }
 
     /**
@@ -336,12 +189,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $this->setAdminUser();
         $sysctx = context_system::instance();
 
-        /** @var mod_facetoface_renderer $renderer */
-        $renderer = $PAGE->get_renderer('mod_facetoface');
-        // Stop testing if the default renderer is not used.
-        if (get_class($renderer) !== 'mod_facetoface_renderer') {
-            $this->markTestSkipped('The facetoface renderer has been overridden.');
-        }
+        $renderer = new mod_facetoface_renderer($PAGE, null);
         $renderer->setcontext($sysctx);
         $PAGE->set_context($sysctx);
         // We need to set the url as this is queried during the run of print_session_list_table.
@@ -456,20 +304,14 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
     }
 
     /**
-     * Create DOMDocument after silently fixing buggy html.
+     * Create a DOMDocument without warnings and errors.
      *
      * @param string $html
      * @return DOMDocument
      */
     private static function new_domdocument(string $html) : DOMDocument {
-        // Fix for incorrectly quoted html entities in the room links to suppress warnings until TL-20224 is resolved
-        $html = preg_replace('/\&(?=b(|=\d+)" id=)/', '&amp;', $html);
-        // Replace semantic tags with generic tags because DOMDocument does not understand them
-        $html = str_replace([ '<nav', '</nav' ], [ '<div', '</div' ], $html);
-        $html = str_replace([ '<time', '</time' ], [ '<span', '</span' ], $html);
-
         $doc = new DOMDocument();
-        $doc->loadHTML($html);
+        $doc->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR); // requires PHP 7.2+, 7.1.4+, 7.0.18+
         return $doc;
     }
 

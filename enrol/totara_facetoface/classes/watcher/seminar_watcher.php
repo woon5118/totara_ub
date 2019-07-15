@@ -42,6 +42,30 @@ class seminar_watcher {
         $seminar = $hook->seminarevent->get_seminar();
         // see if the current user can enrol on the course
         if (in_array($hook->seminarevent->get_id(), array_keys($enrol->get_enrolable_sessions($seminar->get_course())))) {
+            $showsignuplink = true;
+            if (!enrol_is_enabled('totara_facetoface') || $CFG->enableavailability) {
+                $cm = get_coursemodule_from_instance('facetoface', $hook->seminarevent->get_facetoface());
+                $modinfo = get_fast_modinfo($cm->course);
+                $cm = $modinfo->get_cm($cm->id);
+
+                // If Seminar enrolment plugin is not enabled check visibility of the activity.
+                if (!enrol_is_enabled('totara_facetoface')) {
+                    // Check visibility of activity (includes visible flag, conditional availability, etc) before adding Sign up link.
+                    $showsignuplink = $cm->uservisible;
+                }
+
+                if ($CFG->enableavailability) {
+                    // Check whether this activity is available for the user. However if it's available, but not visible
+                    // for some reason we're still not displaying a link.
+                    $showsignuplink &= $cm->available;
+                }
+            }
+            if (!$showsignuplink) {
+                $hook->signuplink = '';
+                $hook->signuptsandcslink = '';
+                return;
+            }
+
             // redirect to totara_facetoface *unless* the user has already enrolled on the course
             $cm = $seminar->get_coursemodule();
             $context = \context_module::instance($cm->id);

@@ -27,6 +27,8 @@ require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 $sid = required_param('s', PARAM_INT);
 $managerid = optional_param('managerid', 0, PARAM_INT);
 $confirm = optional_param('confirm', false, PARAM_BOOL);
+$backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
+$backtoeventinfo = optional_param('backtoeventinfo', 0, PARAM_BOOL);
 
 $seminarevent = new \mod_facetoface\seminar_event($sid);
 $seminar = $seminarevent->get_seminar();
@@ -47,7 +49,13 @@ if ($confirm) {
             $signups = \mod_facetoface\reservations::delete($seminarevent, $managerid);
             \mod_facetoface\signup_helper::update_attendees($seminarevent);
 
-            $url = new moodle_url('/mod/facetoface/view.php', ['f' => $seminarevent->get_facetoface()]);
+            if ($backtoeventinfo) {
+                $url = new moodle_url('/mod/facetoface/eventinfo.php', array('s' => $seminarevent->get_id(), 'backtoallsessions' => $backtoallsessions));
+            } else if ($backtoallsessions) {
+                $url = new moodle_url('/mod/facetoface/view.php', ['f' => $seminarevent->get_facetoface()]);
+            } else {
+                $url = new moodle_url('/course/view.php', ['id' => $seminar->get_course()]);
+            }
             \core\notification::success(get_string('managerreservationdeleted', 'mod_facetoface'));
             redirect($url);
         } catch (moodle_exception $e) {
@@ -63,8 +71,11 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('deletereservation', 'mod_facetoface'));
 
-$confirmurl = new moodle_url('/mod/facetoface/reservations/delete.php', ['s' => $sid, 'confirm' => true, 'managerid' => $managerid, 'sesskey' => sesskey()]);
-$cancelurl  = new moodle_url('/mod/facetoface/reservations/manage.php', ['s' => $sid]);
+$confirmurl = new moodle_url('/mod/facetoface/reservations/delete.php', [
+    's' => $sid, 'confirm' => true, 'managerid' => $managerid, 'sesskey' => sesskey(),
+    'backtoallsessions' => $backtoallsessions, 'backtoeventinfo' => $backtoeventinfo
+]);
+$cancelurl  = new moodle_url('/mod/facetoface/reservations/manage.php', ['s' => $sid, 'backtoallsessions' => $backtoallsessions, 'backtoeventinfo' => $backtoeventinfo]);
 
 $manager = $DB->get_record('user', ['id' => $managerid]);
 $managername = fullname($manager);

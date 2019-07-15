@@ -43,7 +43,7 @@ class seminarevent_filterbar_builder {
     private $method;
 
     /**
-     * @var \flex_icon
+     * @var \pix_icon|null
      */
     private $icon = null;
 
@@ -129,7 +129,7 @@ class seminarevent_filterbar_builder {
      */
     public function add_link(string $label, $url): seminarevent_filterbar_builder {
         if ($url instanceof \moodle_url) {
-            $url = $url->out();
+            $url = $url->out(false);
         }
         $this->links[] = [
             'label' => $label,

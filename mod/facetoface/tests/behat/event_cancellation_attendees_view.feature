@@ -64,14 +64,16 @@ Feature: Seminar event cancellation attendees view
     Given I log out
     And I log in as "learner3"
     And I am on "Course 1" course homepage
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Sign-up"
 
     Given I log out
     And I log in as "learner1"
     And I am on "Course 1" course homepage
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I follow "Cancel booking"
-    And I press "Yes"
+    And I wait "1" seconds
+    And I press "Cancel booking"
 
     Given I log out
     And I log in as "admin"

@@ -110,7 +110,7 @@ class multisignup_common extends condition {
         $enabled = $seminar->get_multiplesessions();
         if (empty($enabled)) {
             if (!empty($signups)) {
-                $failures['multisignup_common'] = get_string('state_multisignup_enabled_fail', 'mod_facetoface');
+                $failures['multisignup_common'] = get_string('state_multisignup_exceeded_fail', 'mod_facetoface');
             }
         } else {
             $allowedstates = $seminar->get_multisignup_states();
@@ -122,8 +122,8 @@ class multisignup_common extends condition {
                     // Check all previous signups are in a valid state.
                     $code = $oldstate::get_code();
                     if (empty($allowedstates[$code]) || !$oldstate instanceof $allowedstates[$code]) {
-                        $failures['multisignup_common'] = get_string('state_multisignup_enabled_fail', 'mod_facetoface'); // Make sure we have the initial string.
-                        $failures['multisignup_restriction'] = get_string('state_multisignup_restriction_fail', 'mod_facetoface');
+                        $failures['multisignup_common'] = get_string('state_multisignup_restricted_fail', 'mod_facetoface');
+                        break;
                     }
                 }
             }
@@ -131,12 +131,9 @@ class multisignup_common extends condition {
             // Check the user is within the allowable amount of signups.
             $maxsignups = $seminar->get_multisignup_maximum();
             if (!empty($maxsignups) && $signups->count() >= $maxsignups) {
-                $failures['multisignup_common'] = get_string('state_multisignup_enabled_fail', 'mod_facetoface'); // Make sure we have the initial string.
-                $failures['multisignup_limitation'] = get_string('state_multisignup_limitation_fail', 'mod_facetoface', $maxsignups);
+                // This might overwrite an existing $failures['multisignup_common'].
+                $failures['multisignup_common'] = get_string('state_multisignup_exceeded_fail', 'mod_facetoface');
             }
-
-            // Join the two failures together.
-            $failures = ['multiplesignup_common' => implode("", $failures)];
         }
 
         return $failures;

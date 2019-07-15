@@ -48,7 +48,7 @@ Feature: Seminar event notification must not be available for user after it has 
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    When I follow "Sign-up"
+    When I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I <visibility> "Receive confirmation by"
     When I press "Sign-up"
     Then I <visibility> "You will receive a booking confirmation email shortly."

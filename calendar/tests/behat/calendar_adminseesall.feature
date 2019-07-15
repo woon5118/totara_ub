@@ -67,6 +67,7 @@ Feature: Config setting calendar_adminseesall allows admin to view all events on
     # Confirm that signed-up event edit cog links correctly.
     When I click on "Seminar event" "link"
     And I press "Sign-up"
+    And I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
     And I click on "Edit event" "link"
     Then I should see "Test Seminar Two"

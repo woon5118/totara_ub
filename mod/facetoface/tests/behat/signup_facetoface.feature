@@ -73,7 +73,7 @@ Feature: Sign up to a seminar
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    When I follow "Sign-up"
+    When I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "English content"
     And I should not see "German"
     And I set the following fields to these values:
@@ -102,40 +102,35 @@ Feature: Sign up to a seminar
   Scenario: Sign up to a session and unable to sign up to a full session from the course page
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Sign-up"
     And I should see "Your request was accepted"
-    # Check the user is back on the course page.
-    And I should see "Course view page"
-    And I should not see "All events in Test seminar name"
+    # Check the user is still on the event page.
+    And I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I should not see "Sign-up"
+    And I should not see "Go to event"
 
   Scenario: Sign up to a session and unable to sign up to a full session for within the activity
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I should see "Test seminar name"
     And I follow "Test seminar name"
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Sign-up"
     And I should see "Your request was accepted"
-    # Check the user is back on the all events page.
-    And I should not see "Course view page"
-    And I should see "All events in Test seminar name"
+    # Check the user is still on the event page.
+    And I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I should not see "Sign-up"
+    And I should not see "Go to event"
 
   Scenario: Sign up with note and manage it by Editing Teacher
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I set the following fields to these values:
      | Requests for session organiser | My test |
     And I press "Sign-up"
@@ -155,8 +150,7 @@ Feature: Sign up to a seminar
       | Other sign-ups | report_f2f_sessions | facetoface_sessions |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I set the following fields to these values:
      | Requests for session organiser | My test |
     And I press "Sign-up"
@@ -371,8 +365,7 @@ Feature: Sign up to a seminar
 
     # As the user signup.
     When I am on "Course 1" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I set the following fields to these values:
       | customfield_signupcheckbox          | 1                  |
       | customfield_signupdatetime[enabled] | 1                  |
@@ -384,6 +377,9 @@ Feature: Sign up to a seminar
       | customfield_signupmulti[1]          | 1                  |
       | customfield_signupinput             | hi                 |
       | customfield_signupurl[url]          | http://example.org |
+
+    # Let the browser window scroll back to top, so the navigation bar would not cover the "Add" button.
+    And I click on "Back to top" "link"
 
     # Add a file to the file custom field.
     And I click on "//div[@id='fitem_id_customfield_signupfile_filemanager']//a[@title='Add...']" "xpath_element"
@@ -420,7 +416,9 @@ Feature: Sign up to a seminar
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
+    And I follow "Go to event"
     And I follow "Cancel booking"
+    And I wait "1" seconds
     And I set the following fields to these values:
       | User cancellation checkbox                    | 1                    |
       | customfield_usercancellationdatetime[enabled] | 1                    |
@@ -431,6 +429,10 @@ Feature: Sign up to a seminar
       | customfield_usercancellationmulti[1]          | 1                    |
       | User cancellation input                       | Monkey               |
       | customfield_usercancellationurl[url]          | http://totaralms.com |
+
+    # Let the browser window scroll back to top, so the navigation bar would not cover the "Add" button.
+    And I click on "Back to top" "link"
+
     # Add a file to the file custom field.
     And I click on "//div[@id='fitem_id_customfield_usercancellationfile_filemanager']//a[@title='Add...']" "xpath_element"
     And I click on "test.jpg" "link" in the "//div[@aria-hidden='false' and @class='moodle-dialogue-base']" "xpath_element"
@@ -443,7 +445,7 @@ Feature: Sign up to a seminar
     And I click on "Select this file" "button" in the "//div[@aria-hidden='false' and @class='moodle-dialogue-base']" "xpath_element"
     And I set the field "Describe this image for someone who cannot see it" to "Green leaves on customfield text area"
     And I click on "Save image" "button"
-    And I press "Yes"
+    And I press "Cancel booking"
     Then I should see "Your booking has been cancelled."
 
     When I log out

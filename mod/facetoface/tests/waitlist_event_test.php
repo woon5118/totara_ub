@@ -100,6 +100,55 @@ class mod_facetoface_waitlist_event_testcase extends advanced_testcase {
     }
 
     /**
+     * Instantiate the mod_facetoface_renderer, set system context and initialise page.
+     *
+     * @return \mod_facetoface_renderer
+     */
+    private function create_f2f_renderer() : mod_facetoface_renderer {
+        global $PAGE;
+
+        $renderer = new mod_facetoface_renderer($PAGE, null);
+
+        return $renderer;
+    }
+
+    /**
+     * Create a DOMDocument without warnings and errors.
+     *
+     * @param string $html
+     * @return DOMDocument
+     */
+    private static function new_domdocument(string $html) : DOMDocument {
+        $doc = new DOMDocument();
+        $doc->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR); // requires PHP 7.2+, 7.1.4+, 7.0.18+
+        return $doc;
+    }
+
+    /**
+     * Get the nodes of the table cells of the first row.
+     *
+     * @param string $html
+     * @return DOMNodeList
+     */
+    private function get_table_cells(string $html) : DOMNodeList {
+        $doc = self::new_domdocument($html);
+
+        $tables = $doc->getElementsByTagName('table');
+        $this->assertCount(1, $tables);
+
+        $hdrs = $tables[0]->getElementsByTagName('thead')[0]->getElementsByTagName('tr')[0]->getElementsByTagName('th');
+        $this->assertNotCount(0, $hdrs);
+
+        $rows = $tables[0]->getElementsByTagName('tbody')[0]->getElementsByTagName('tr');
+        $this->assertCount(1, $rows);
+
+        $cells = $rows[0]->getElementsByTagName('td');
+        $this->assertNotCount(0, $cells);
+
+        return $cells;
+    }
+
+    /**
      * Test suite of checking the whether the render is rendering correctly a wait-listed seminar event that has
      * a user as booked along side with the users that have wait-listed status. As a result, the test should only expects
      * one user as waitlisted,not two, even though the event is a wait-listed event
@@ -138,14 +187,14 @@ class mod_facetoface_waitlist_event_testcase extends advanced_testcase {
         next($users);
         $this->create_signup(current($users), $session, \mod_facetoface\signup\state\booked::class);
 
-        /** @var mod_facetoface_renderer $f2frenderer */
-        $f2frenderer = $PAGE->get_renderer("mod_facetoface");
+        $f2frenderer = $this->create_f2f_renderer();
         $rendered = $f2frenderer->print_session_list_table([$session], true, true, true, [], $CFG->wwwroot);
 
+        $cells = $this->get_table_cells($rendered);
         // As the test suite setup was 1 user with sign up status as booked and the other as waitlisted,
         // therefore, within this test, it is expected only `1 waitlisted` rendered
         $expected = "1 / 10 (1 Wait-listed)";
-        $this->assertContains($expected, $rendered);
+        $this->assertEquals($expected, $cells[0]->textContent);
     }
 
     /**
@@ -177,8 +226,7 @@ class mod_facetoface_waitlist_event_testcase extends advanced_testcase {
         $session = $DB->get_record("facetoface_sessions", ['id' => $sessionid]);
         $session->sessiondates = [];
 
-        /** @var mod_facetoface_renderer $f2frenderer */
-        $f2frenderer = $PAGE->get_renderer("mod_facetoface");
+        $f2frenderer = $this->create_f2f_renderer();
         $rendered = $f2frenderer->print_session_list_table([$session], true, true, true, [], $CFG->wwwroot);
 
         $expected = "(0 Wait-listed)";
@@ -188,12 +236,11 @@ class mod_facetoface_waitlist_event_testcase extends advanced_testcase {
             $this->create_signup($user, $session, \mod_facetoface\signup\state\waitlisted::class);
         }
 
-        /** @var mod_facetoface_renderer $f2frenderer */
-        $f2frenderer = $PAGE->get_renderer("mod_facetoface");
         $rendered = $f2frenderer->print_session_list_table([$session], true, true, true, [], $CFG->wwwroot);
 
+        $cells = $this->get_table_cells($rendered);
         $expected = "0 / 10 (2 Wait-listed)";
-        $this->assertContains($expected, $rendered);
+        $this->assertEquals($expected, $cells[0]->textContent);
     }
 
     /**
@@ -236,11 +283,11 @@ class mod_facetoface_waitlist_event_testcase extends advanced_testcase {
             $this->create_signup($user, $session, \mod_facetoface\signup\state\booked::class);
         }
 
-        /** @var mod_facetoface_renderer $f2frenderer */
-        $f2frenderer = $PAGE->get_renderer("mod_facetoface");
+        $f2frenderer = $this->create_f2f_renderer();
         $rendered = $f2frenderer->print_session_list_table([$session], true, true, true, [], $CFG->wwwroot);
 
+        $cells = $this->get_table_cells($rendered);
         $expected = "3 / 2 (Overbooked) (1 Wait-listed)";
-        $this->assertContains($expected, $rendered);
+        $this->assertEquals($expected, $cells[0]->textContent);
     }
 }

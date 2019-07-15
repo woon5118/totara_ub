@@ -26,11 +26,11 @@ Feature: Sign up status
       | user     | course | role    |
       | student1 | C1     | student |
       | student2 | C1     | student |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | course |
+      | Test seminar name | C1     |
     And I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
+    And I am on "Course 1" course homepage
     And I follow "View all events"
 
   Scenario: Check session with booking full status is changed when event is cancelled.
@@ -121,9 +121,9 @@ Feature: Sign up status
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I should see "Event info"
-    And I should not see "Cancel booking"
-    And I should not see "Sign-up"
+    And I follow "Go to event"
+    And I should see "Sign-up unavailable"
+    And I should see "Manager and Administrative approval"
 
   Scenario Outline: Event cancelled should be displayed in the status column regardless the signup period
     Given I follow "Add event"
@@ -148,7 +148,7 @@ Feature: Sign up status
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    Then I should see "<signupavailable>"
+    Then I <signupavailable> see "Go to event" in the "Wait-listed" "table_row"
 
     When I follow "View all events"
     Then I should see "<bookingstatus>"
@@ -177,10 +177,10 @@ Feature: Sign up status
 
     Examples:
       | periodopen | startyear | startzone        | periodclose | endyear | endzone         | signupavailable | bookingstatus    | signupperiodstartformat    | signupperiodendformat      | signupperiodzone |
-      | 1          | -2 year   | Australia/Perth  | 1           | -1 year | Australia/Perth | Wait-listed     | Booking closed   | 30 July %Y, 1:00 AM        | 30 July %Y, 1:00 AM        | Australia/Perth  |
-      | 1          | -2 year   | Australia/Perth  | 1           | +2 year | Australia/Perth | Join waitlist   | Booking open     | 30 July %Y, 1:00 AM        | 30 July %Y, 1:00 AM        | Australia/Perth  |
-      | 1          | +1 year   | Australia/Perth  | 1           | +2 year | Australia/Perth | Wait-listed     | Booking not open | 30 July %Y, 1:00 AM        | 30 July %Y, 1:00 AM        | Australia/Perth  |
-      | 1          | +1 year   | Pacific/Honolulu | 1           | +2 year | Pacific/Fiji    | Wait-listed     | Booking not open | 30 July %Y, 7:00 PM        | 29 July %Y, 9:00 PM        | Australia/Perth  |
-      | 0          | +1 year   | Australia/Perth  | 0           | +2 year | Australia/Perth | Join waitlist   | Booking open     | -                          | -                          | -                |
-      | 1          | +1 year   | Australia/Perth  | 0           | +2 year | Australia/Perth | Wait-listed     | Booking not open | After 30 July %Y, 1:00 AM  | -                          | Australia/Perth  |
-      | 0          | +1 year   | Australia/Perth  | 1           | +2 year | Australia/Perth | Join waitlist   | Booking open     | -                          | Before 30 July %Y, 1:00 AM | Australia/Perth  |
+      | 1          | -2 year   | Australia/Perth  | 1           | -1 year | Australia/Perth | should not      | Booking closed   | 30 July %Y, 1:00 AM        | 30 July %Y, 1:00 AM        | Australia/Perth  |
+      | 1          | -2 year   | Australia/Perth  | 1           | +2 year | Australia/Perth | should          | Booking open     | 30 July %Y, 1:00 AM        | 30 July %Y, 1:00 AM        | Australia/Perth  |
+      | 1          | +1 year   | Australia/Perth  | 1           | +2 year | Australia/Perth | should not      | Booking not open | 30 July %Y, 1:00 AM        | 30 July %Y, 1:00 AM        | Australia/Perth  |
+      | 1          | +1 year   | Pacific/Honolulu | 1           | +2 year | Pacific/Fiji    | should not      | Booking not open | 30 July %Y, 7:00 PM        | 29 July %Y, 9:00 PM        | Australia/Perth  |
+      | 0          | +1 year   | Australia/Perth  | 0           | +2 year | Australia/Perth | should          | Booking open     | -                          | -                          | -                |
+      | 1          | +1 year   | Australia/Perth  | 0           | +2 year | Australia/Perth | should not      | Booking not open | After 30 July %Y, 1:00 AM  | -                          | Australia/Perth  |
+      | 0          | +1 year   | Australia/Perth  | 1           | +2 year | Australia/Perth | should          | Booking open     | -                          | Before 30 July %Y, 1:00 AM | Australia/Perth  |

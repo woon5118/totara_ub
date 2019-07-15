@@ -37,12 +37,12 @@ class cancelsignup extends \moodleform {
             $strcancellationconfirm = 'waitlistcancellationconfirm';
         }
 
-        $mform->addElement('header', 'general', get_string($strheader, 'facetoface'));
+        $mform->addElement('html', \html_writer::tag('h3', get_string($strheader, 'mod_facetoface')));
 
         $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
-        $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
-        $mform->setType('backtoallsessions', PARAM_BOOL);
+        $mform->addElement('hidden', 'action', 'cancelsignup');
+        $mform->setType('action', PARAM_ALPHA);
 
         $mform->addElement('html', get_string($strcancellationconfirm, 'facetoface')); // Instructions.
 
@@ -58,8 +58,7 @@ class cancelsignup extends \moodleform {
         }
 
         $buttonarray=array();
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('yes'));
-        $buttonarray[] = &$mform->createElement('cancel', 'cancelbutton', get_string('no'));
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string($strheader, 'mod_facetoface'));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
     }
 }

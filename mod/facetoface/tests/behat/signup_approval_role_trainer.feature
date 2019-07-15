@@ -43,8 +43,7 @@ Feature: Seminar Signup Role Approval Trainer Role
   Scenario: Student gets approved through role approval
     When I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Trainer"
     And I should see "Benny Ben"
     And I press "Request approval"

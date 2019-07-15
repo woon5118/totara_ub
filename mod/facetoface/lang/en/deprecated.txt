@@ -63,6 +63,7 @@ noticetext,mod_facetoface
 notrequired,mod_facetoface
 position,mod_facetoface
 roommustbebookedtoexternalcalendar,mod_facetoface
+seeattendees,mod_facetoface
 selectedpositionassignment,mod_facetoface
 selectedpositionname,mod_facetoface
 selectedpositiontype,mod_facetoface
@@ -91,6 +92,9 @@ setting:sitenotices,mod_facetoface
 setting:sitenoticeshere,mod_facetoface
 sitenoticesheading,mod_facetoface
 state_eventhassession_fail,mod_facetoface
+state_multisignup_enabled_fail,mod_facetoface
+state_multisignup_limitation_fail,mod_facetoface
+state_multisignup_restriction_fail,mod_facetoface
 updateposition,mod_facetoface
 userpositionheading,mod_facetoface
 xhxm,mod_facetoface

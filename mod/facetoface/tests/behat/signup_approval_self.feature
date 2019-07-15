@@ -68,8 +68,7 @@ Feature: Seminar Signup Self Approval
     And I log out
     And I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Self authorisation"
 
     When I press "Sign-up"

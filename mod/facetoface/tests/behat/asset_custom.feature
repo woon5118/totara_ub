@@ -139,4 +139,5 @@ Feature: Manage custom assets by non-admin user
     And I click on "Asset 1" "link" in the "Choose assets" "totaradialogue"
     And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
-    And "Sign-up" "link" should exist in the "Upcoming" "table_row"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
+    Then I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"

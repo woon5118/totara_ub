@@ -6,6 +6,15 @@
 @mod_facetoface-warning: #ffffc0;
 @mod_facetoface-full: #b3dab6;
 
+@mod_facetoface-spacing-default: @totara_style-spacing_small;
+@mod_facetoface-spacing-large: @totara_style-spacing_large;
+@mod_facetoface-spacing-small: @totara_style-spacing_x_small;
+
+@mod_facetoface-navbar-font-size: @totara_style-size_14;
+@mod_facetoface-navbar-font-height: @totara_style-size_14;
+@mod_facetoface-navbar-height: @mod_facetoface-navbar-font-height * 2;
+@mod_facetoface-cancel-close-size: @totara_style-size_40;
+
 .f2fsessionlinks,
 .f2fsessionnotice {
     display: block;
@@ -203,6 +212,14 @@ select.menuf2f-select {
         &--center {
             justify-content: center;
         }
+
+        > a {
+            margin-right: @totara_style-spacing_small;
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
     }
 
     .flex-wrap-vertical-center() {
@@ -211,11 +228,21 @@ select.menuf2f-select {
         align-items: center;
     }
 
+    .no-list-style() {
+        &, & > li {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+    }
+
+    @border-colour: @totara_style-color_neutral_3;
+
     &__filter {
         .flex-wrap-vertical-center();
         padding: 0 @totara_style-spacing_small @totara_style-spacing_small @totara_style-spacing_small;
         margin: @totara_style-spacing_medium 0;
-        border: 1px #e6e6e6 solid;
+        border: 1px @border-colour solid;
         border-radius: @border-radius-default;
 
         .flex-icon {
@@ -256,7 +283,7 @@ select.menuf2f-select {
                 &__select {
                     // Avoid min-width here
                     // Otherwise the <select> element could cover the whole screen width if a room name is very loooong!
-                    width: 15em; // IE11 does not support max-width for <select>
+                    width: 15em; // IE11 works with max-width instead of width here
                     text-overflow: ellipsis;
                 }
             }
@@ -332,10 +359,26 @@ select.menuf2f-select {
             &__sessionrow {
                 @table-thin-border-color: mix(@table-border-color, @totara_style-color_neutral_7, 80%);
                 border-top: 1px solid @table-thin-border-color;
+
                 // Add a thick border between events
                 &.firstsession,
                 &.waitlisted {
                     border-top: 2px solid @table-border-color;
+                }
+
+                // Simulate highlight and dimmed_text of T12
+                &.userbooked {
+                    &:not(.over):not(.cancelled) {
+                        .highlight;
+                    }
+                }
+                &:not(.userbooked) {
+                    &.started,
+                    &.cancelled,
+                    &.fullybooked,
+                    &.closed {
+                        .text-muted;
+                    }
                 }
             }
         }
@@ -345,9 +388,7 @@ select.menuf2f-select {
         }
 
         &__event-status {
-            list-style: none;
-            margin: 0;
-            padding: 0;
+            .no-list-style();
 
             &__event,
             &__booking,
@@ -366,15 +407,8 @@ select.menuf2f-select {
 
         &__room {
             max-width: 15em;
-            &__link {
-                .force-link-color();
-            }
             > ul.roomlist {
-                margin: 0;
-                padding: 0;
-                > li.room {
-                    list-style-type: none;
-                }
+                .no-list-style();
             }
         }
 
@@ -390,25 +424,17 @@ select.menuf2f-select {
                 margin-bottom: @totara_style-spacing_x_small;
             }
             &__link {
-                .force-link-color();
                 display: block;
                 white-space: nowrap;
             }
             &__reserve {
                 display: block;
-                &__link {
-                    .force-link-color();
-                }
             }
         }
 
         &__attendance {
             &--open__link {
-                .force-link-color();
                 font-weight: bold;
-            }
-            &--saved__link {
-                .force-link-color();
             }
 
             &--none,
@@ -430,35 +456,400 @@ select.menuf2f-select {
         hr {
             margin: @totara_style-spacing_small 0;
         }
+        &__room, &__asset {
+            margin-bottom: @totara_style-spacing_small;
+        }
     }
 
     // Put "Add event" on the right side of <h3>Events</h3>
     &__action-dashboard,
-    &__action-editevent {
+    &__action-editevent,
+    &__action-eventinfo {
         float: right;
     }
     &__sessionlist {
         clear: right;
     }
-}
 
-.dimmed_text {
-    a.mod_facetoface__sessionlist__room__link,
-    a.mod_facetoface__sessionlist__action__link,
-    a.mod_facetoface__sessionlist__action__reserve__link,
-    a.mod_facetoface__sessionlist__attendance--saved__link,
-    a.mod_facetoface__sessionlist__attendance--open__link {
-        &:link {
-            .force-link-color();
+    &__capacity {
+        &__current {
+            font-weight: bold;
         }
-        // Workaround for Firefox 66 / Chrome 72 link color bug, visible on seminar events dashboard.
-        .force-link-color();
-        &:not(:focus) {
-            .force-link-color();
+    }
+
+    &__booking {
+        &__dates {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            &--waitlisted {
+                font-style: italic;
+            }
+        }
+
+        &__date {
+            margin: 0 0 @mod_facetoface-spacing-small;
+            padding: 0;
+        }
+
+        &__users {
+            margin: 0;
+            padding: 0;
+        }
+
+        &__user {
+            margin: 0 0 0 @mod_facetoface-spacing-default;
+            padding: 0;
+        }
+    }
+
+    .divider() {
+        border-bottom: 1px solid @border-colour;
+    }
+
+    &__action-reservation {
+        border-top: 1px solid @border-colour;
+        padding-top: @mod_facetoface-spacing-default;
+    }
+
+    &__navigation {
+        .divider();
+
+        background-color: @bg-default;
+        color: @color-default;
+        margin-left:  0px - ceil((@grid-gutter-width / 2));
+        margin-right: 0px - floor((@grid-gutter-width / 2));
+        padding-left:  ceil((@grid-gutter-width / 2));
+        padding-right: floor((@grid-gutter-width / 2));
+        position: relative; // For web browsers that don't support sticky position
+        position: sticky;
+        top: 0;
+        z-index: 100;
+
+        &__items {
+            display: flex;
+
+            a {
+                border-right: 1px solid @border-colour;
+                font-size: @mod_facetoface-navbar-font-size;
+                line-height: @mod_facetoface-navbar-font-height;
+                margin: ((@mod_facetoface-navbar-height - @mod_facetoface-navbar-font-height) / 2) 0;
+                padding: 0 @mod_facetoface-spacing-default;
+
+                &:first-child {
+                    padding-left: 0;
+                }
+                &:last-child {
+                    border-right: none;
+                }
+            }
+        }
+
+        &__top {
+            line-height: @mod_facetoface-navbar-height;
+            position: absolute;
+            right: floor((@grid-gutter-width / 2));
+            top: 0;
+        }
+    }
+
+    &__eventinfo {
+        display: flex;
+        margin-bottom: @mod_facetoface-spacing-default;
+
+        &__content {
+            flex: 1;
+            order: 0;
+
+            &__management {
+                .divider();
+
+                margin-bottom: 0;
+                margin-left: 0px - ceil((@grid-gutter-width / 2));
+                padding: @mod_facetoface-spacing-small ceil((@grid-gutter-width / 2));
+
+                &__items {
+                    margin: 0;
+                    padding: 0;
+                }
+
+                &__item {
+                    list-style: none;
+                    margin: .15rem;
+                    padding: 0;
+                }
+            }
+
+            .section_divider() {
+                .divider();
+                margin-bottom: @mod_facetoface-spacing-default;
+                padding-bottom: @mod_facetoface-spacing-default;
+            }
+
+            &__intro {
+                .section_divider();
+            }
+
+            &__eventdetail {
+                .section_divider();
+
+                &__heading {
+                    margin-top: 0;
+                    margin-bottom: 0;
+
+                    > a {
+                        &, &:hover, &:focus {
+                            color: inherit;
+                        }
+
+                        &::before {
+                            content: '';
+                            width: 0;
+                            height: 0;
+                            border-style: solid;
+                            display: inline-block;
+                        }
+
+                        &.f2f-collapsed::before {
+                            margin: 0 9px 0 7px;
+                            border-width: 8px 0 8px 8px;
+                            border-color: transparent currentColor transparent;
+                        }
+
+                        &.f2f-expanded::before {
+                            margin: 0 6px 4px 2px;
+                            border-width: 8px 8px 0;
+                            border-color: currentColor transparent transparent;
+                        }
+                    }
+                }
+
+                &__section {
+                    .section_divider();
+
+                    &:last-child {
+                        border-bottom: none;
+                        margin-bottom: 0;
+                        padding-bottom: 0;
+                    }
+
+                    > dl {
+                        margin-bottom: floor(@line-height-computed / 2);
+                        margin-top: floor(@line-height-computed / 2);
+
+                        > dt {
+                            margin-top: floor(@line-height-computed / 4);
+                        }
+                    }
+                }
+            }
+        }
+
+        .sidebar-panel-close() {
+            height: 0;
+            min-height: 0;
+            padding: 0;
+            transform: scaleY(0);
+            visibility: hidden;
+        }
+
+        .sidebar-panel-open() {
+            height: auto;
+            min-height: 200px; // DES-89
+            padding: @mod_facetoface-spacing-large;
+            transform: none;
+            visibility: visible;
+        }
+
+        &__sidebars {
+            width: 33%;
+            max-width: 480px;
+            min-width: 320px;
+            order: 1;
+            padding: @mod_facetoface-spacing-large @mod_facetoface-spacing-default 0;
+        }
+
+        &__sidebar {
+            background-color: @bg-default;
+            color: @color-default;
+
+            // Here comes the good-old clearfix
+            .clearfix();
+
+            &__panel {
+                .sidebar-panel-open();
+
+                border-radius: @border-radius-default;
+                box-shadow: 0 1px 5px rgba(0,0,0,.5);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                margin: 0;
+                position: relative;
+                transition: transform .4s;
+                transform-origin: top;
+                width: 100%;
+
+                // Cosmetic adjustments of Moodle form and its elements to fit in 320px
+                > .mform {
+                    .fdescription.required {
+                        margin-right: ~"calc(" @mod_facetoface-cancel-close-size ~" - " @mod_facetoface-spacing-large ~")";
+                    }
+
+                    #id_submitbutton {
+                        width: 100%;
+                    }
+
+                    .fitem {
+                        margin-bottom: 1em;
+
+                        .fitemtitle, .felement {
+                            float: none;
+                            width: auto;
+                        }
+
+                        .felement {
+                            padding-top: @totara_style-size_8;
+
+                            label {
+                                display: inline;
+                            }
+                        }
+
+                        .fdate_selector > .felement > span {
+                            white-space: nowrap; // nowrap between checkbox and label
+                        }
+
+                        &.fitem_fselect select,
+                        &.fitem_ftextarea textarea {
+                            max-width: 100%;
+                        }
+
+                        > fieldset {
+                            display: flex;
+                            flex-direction: column;
+
+                            > legend {
+                                margin-bottom: 0;
+                                width: auto;
+                            }
+                        }
+
+                        // NOTE: this is not `&__actionbuttons`
+                        &_actionbuttons > {
+                            margin-bottom: 0;
+
+                            div.felement {
+                                display: flex;
+                                justify-content: center;
+                                margin: 0;
+                            }
+                        }
+                    }
+
+                    .fgroup {
+                        display: flex;
+                    }
+                }
+            }
+
+            .with-heading() {
+                text-align: center;
+
+                h3 {
+                    line-height: 3em;
+                    margin: 0;
+                    padding: 0;
+                }
+            }
+
+            &__cancellation {
+                .with-heading();
+            }
+
+            &__cancellation-confirm {
+                .sidebar-panel-close();
+            }
+
+            &__signup-failure {
+                .with-heading();
+
+                background: mix(@bg, @bg-default);
+                color: @color-default;
+            }
+
+            &__cancellation-cancellation {  // NOTE: this is not a typo.
+                cursor: pointer;
+                font-size: @mod_facetoface-cancel-close-size;
+                line-height: 1;
+                padding: 0;
+                position: absolute;
+                top: 0;
+                right: @mod_facetoface-spacing-default;
+            }
+        }
+
+        &__cancellation {
+            display: none;
+
+            &__link {
+                .force-link-color();
+                cursor: pointer;
+                font: inherit;
+            }
+
+            &:checked {
+                & ~ .mod_facetoface__eventinfo__sidebar__cancellation {
+                    .sidebar-panel-close();
+                }
+                & ~ .mod_facetoface__eventinfo__sidebar__cancellation-confirm {
+                    .sidebar-panel-open();
+                }
+            }
         }
     }
 }
 
+@media only screen and (max-width: 767px) {
+    .mod_facetoface {
+        &__navigation {
+            padding-left:  ceil((@grid-gutter-width / 3));
+            padding-right: floor((@grid-gutter-width / 3));
+        }
+
+        &__eventinfo {
+            flex-direction: column;
+
+            &__content {
+                flex: auto; // IE11 needs this
+                order: 1;
+            }
+
+            &__sidebars {
+                margin-bottom: @mod_facetoface-spacing-large;
+                max-width: none;
+                min-width: auto;
+                order: 0;
+                padding-left: 0;
+                padding-right: 0;
+                width: auto;
+
+                > .mform {
+                    float: none;
+                    padding-bottom: @mod_facetoface-spacing-default;
+                }
+            }
+        }
+    }
+}
+
+#page-mod-facetoface-eventinfo {
+    // Remove the padding between the breadcrumbs and the navbar
+    #page-content {
+        padding-top: 0;
+    }
+}
 
 .f2f-inline-box {
     display: inline-block;

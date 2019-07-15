@@ -58,27 +58,27 @@ Feature: Take seminar attendance with job assignment on signup
     Given I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "Event info"
-
-    When I follow "Event info"
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "(Booked)" "table_row"
     Then I should not see "Job assignment"
+    And I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I log out
 
     Given I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "Event info"
-
-    When I follow "Event info"
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "(Booked)" "table_row"
     Then I should not see "Job assignment"
+    And I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I log out
 
     # Now change the event data to be in the past
@@ -115,27 +115,27 @@ Feature: Take seminar attendance with job assignment on signup
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "Event info"
-
-    When I follow "Event info"
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "(Booked)" "table_row"
     Then I should not see "Job assignment"
+    And I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I log out
 
     Given I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "Event info"
-
-    When I follow "Event info"
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "(Booked)" "table_row"
     Then I should not see "Job assignment"
+    And I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I log out
 
     # Now change the event data to be in the past
@@ -180,28 +180,28 @@ Feature: Take seminar attendance with job assignment on signup
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Select a job assignment"
 
     When I press "Sign-up"
-    Then I should see "Event info"
-
-    When I follow "Event info"
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "(Booked)" "table_row"
     Then I should see "Job assignment"
     And I should see "job1"
+    And I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I log out
 
     Given I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should not see "Job assignment"
 
     When I press "Sign-up"
-    Then I should see "Event info"
-
-    When I follow "Event info"
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "(Booked)" "table_row"
     Then I should not see "Job assignment"
+    And I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I log out
 
     # Now change the event data to be in the past

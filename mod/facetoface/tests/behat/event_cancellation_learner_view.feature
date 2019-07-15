@@ -127,11 +127,12 @@ Feature: Seminar event cancellation learner views
     Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Cancelled" in the "9:00 AM - 3:00 PM" "table_row"
-    And I should not see "Sign-up" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should not see "Go to event" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Timezone: Pacific/Auckland" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see date "10 Mar +2 years" formatted "%d %B %Y" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see "Booking open" in the "10:00 AM - 4:00 PM" "table_row"
-    And I should see "Sign-up" in the "10:00 AM - 4:00 PM" "table_row"
+    When I click on "Go to event" "link" in the "10:00 AM - 4:00 PM" "table_row"
+    Then I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
 
 
   # ----------------------------------------------------------------------------

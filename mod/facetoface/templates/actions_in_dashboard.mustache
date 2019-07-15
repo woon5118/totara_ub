@@ -1,0 +1,95 @@
+{{!
+   This file is part of Totara Learn
+
+   Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
+   @package mod_facetoface
+}}
+
+{{!
+
+    @template mod_facetoface/actions_in_dashboard
+
+    This template generates an actions table cell.
+
+    Context variables required for this template:
+    * noactions: set true to indicate there are no actions
+    * nonactionable: text to display if noactions == true
+    * viewevent: (optional)
+    * viewevent.link: url
+    * viewevent.text: text of the 'view event' button
+    * hasicons: set true if icons.length > 0
+    * icons: (optional)
+    * icons.link: url
+    * icons.icon: flex_icon or pix_icon template data
+    * haslinks: set true if links.length > 0
+    * links: (optional)
+    * links.link: url
+    * links.text: text of the link
+
+    Example content (json):
+    {
+        "noactions": false,
+        "nonactionable": "No actions",
+        "viewevent": {
+            "link": "...",
+            "text": "Go to event"
+        },
+        "hasicons": true,
+        "icons": [
+            {
+                "link": "...",
+                "icon": {
+                    "template": "core/flex_icon",
+                    "context": {
+                        "identifier" : "settings",
+                        "customdata": {
+                            "classes": "custom-class another-custom-class",
+                            "alt": "Edit event"
+                        }
+                    }
+                },
+            }
+        ],
+        "haslinks": true,
+        "links": [
+            {
+                "link": "...",
+                "text": "Attendees"
+            }
+        ]
+    }
+}}
+
+<div class="mod_facetoface__sessionlist__action{{#noactions}}--none{{/noactions}}">
+    {{#noactions}}{{nonactionable}}{{/noactions}}
+    {{#viewevent}}<a href="{{link}}" role="button" class="mod_facetoface__sessionlist__action__eventinfo btn btn-default btn-sm">{{text}}</a>{{/viewevent}}
+    {{#hasicons}}
+        <nav class="mod_facetoface__sessionlist__action__buttons">
+            {{#icons}}
+                <a href="{{link}}">{{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}</a>
+            {{/icons}}
+        </nav>
+    {{/hasicons}}
+    {{#haslinks}}
+        <nav class="mod_facetoface__sessionlist__action__links">
+            {{#links}}
+                <a href="{{link}}" class="mod_facetoface__sessionlist__action__link">{{text}}</a>
+            {{/links}}
+        </nav>
+    {{/haslinks}}
+</div>

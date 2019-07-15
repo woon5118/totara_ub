@@ -65,7 +65,7 @@ Feature: Seminar event cancellation rebooking
     Given I log out
     And I log in as "learner3"
     And I am on "Course 1" course homepage
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Sign-up"
 
     Given I log out
@@ -103,8 +103,8 @@ Feature: Seminar event cancellation rebooking
     And I press "Continue"
 
     When I follow "View results"
-    Then I should see "Existing sign-up(s) for this seminar" in the "Learner One" "table_row"
-    And I should see "Existing sign-up(s) for this seminar" in the "Learner Two" "table_row"
+    Then I should see "Learner sign-up limit for this seminar was reached" in the "Learner One" "table_row"
+    And I should see "Learner sign-up limit for this seminar was reached" in the "Learner Two" "table_row"
     And I press "Close"
 
     Given I log out
@@ -147,7 +147,7 @@ Feature: Seminar event cancellation rebooking
     Then I should see "19" in the "11 March" "table_row"
     And I should see "Cancelled" in the "10 February" "table_row"
 
-    When I click on "Sign-up" "link" in the "11 March" "table_row"
+    When I click on "Go to event" "link" in the "11 March" "table_row"
     And I press "Sign-up"
     Then I should see "Booked" in the "11 March" "table_row"
     Then I should see "18" in the "11 March" "table_row"
@@ -160,7 +160,7 @@ Feature: Seminar event cancellation rebooking
     Then I should see "18" in the "11 March" "table_row"
     And I should see "Cancelled" in the "10 February" "table_row"
 
-    When I click on "Sign-up" "link" in the "11 March" "table_row"
+    When I click on "Go to event" "link" in the "11 March" "table_row"
     And I press "Sign-up"
     Then I should see "Booked" in the "11 March" "table_row"
     Then I should see "17" in the "11 March" "table_row"
@@ -173,7 +173,7 @@ Feature: Seminar event cancellation rebooking
     Then I should see "17" in the "11 March" "table_row"
     And I should see "Cancelled" in the "10 February" "table_row"
 
-    When I click on "Sign-up" "link" in the "11 March" "table_row"
+    When I click on "Go to event" "link" in the "11 March" "table_row"
     And I press "Sign-up"
     Then I should see "Booked" in the "11 March" "table_row"
     Then I should see "16" in the "11 March" "table_row"

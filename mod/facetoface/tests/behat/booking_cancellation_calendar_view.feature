@@ -55,6 +55,7 @@ Feature: Seminar event booking cancellation calendar views
     When I follow "Seminar event"
     And I press "Sign-up"
     Then I should see "Your request was accepted"
+    And I am on "Course 1" course homepage
 
     When I click on "Go to calendar" "link"
     Then I should see "You are booked for this Seminar event" exactly "4" times
@@ -62,8 +63,10 @@ Feature: Seminar event booking cancellation calendar views
 
     When I follow "Seminar event"
     And I follow "Cancel booking"
-    And I press "Yes"
+    And I wait "1" seconds
+    And I press "Cancel booking"
     Then I should see "Your booking has been cancelled"
+    And I am on "Course 1" course homepage
 
     When I click on "Go to calendar" "link"
     Then I should see "Go to this Seminar event" exactly "2" times
@@ -101,6 +104,7 @@ Feature: Seminar event booking cancellation calendar views
     When I follow "Seminar event"
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval"
+    And I am on "Course 1" course homepage
 
     When I click on "Go to calendar" "link"
     Then I should see "You are booked for this Seminar event" exactly "1" times
@@ -108,8 +112,10 @@ Feature: Seminar event booking cancellation calendar views
 
     When I follow "Seminar event"
     And I follow "Cancel booking"
-    And I press "Yes"
+    And I wait "1" seconds
+    And I press "Cancel booking"
     Then I should see "Your booking has been cancelled"
+    And I am on "Course 1" course homepage
 
     When I click on "Go to calendar" "link"
     Then I should see "Go to this Seminar event" exactly "1" times
@@ -135,8 +141,10 @@ Feature: Seminar event booking cancellation calendar views
 
     When I follow "Seminar event"
     And I follow "Cancel booking"
-    And I press "Yes"
+    And I wait "1" seconds
+    And I press "Cancel booking"
     Then I should see "Your booking has been cancelled"
+    And I am on "Course 1" course homepage
 
     When I click on "Go to calendar" "link"
     Then I should see "Go to this Seminar event" exactly "1" times
@@ -187,6 +195,7 @@ Feature: Seminar event booking cancellation calendar views
     When I follow "Seminar event"
     And I press "Sign-up"
     Then I should see "Your request was accepted"
+    And I am on "Course 1" course homepage
 
     When I click on "Go to calendar" "link"
     Then I should see "You are booked for this Seminar event" exactly "2" times
@@ -194,7 +203,7 @@ Feature: Seminar event booking cancellation calendar views
 
     # Try to access the sign-up page of the second event
     When I click on "//div[contains(.,'10 hours')]/a[.='Seminar event']" "xpath_element"
-    Then I should see "Existing sign-up(s) for this seminar, are not in the required attendance state(s)"
+    Then I should see "Sign-up unavailable"
 
     And I log out
     And I log in as "teacher"
@@ -215,6 +224,7 @@ Feature: Seminar event booking cancellation calendar views
     When I click on "//div[contains(.,'10 hours')]/a[.='Seminar event']" "xpath_element"
     And I press "Sign-up"
     Then I should see "Your request was accepted"
+    And I am on "Course 1" course homepage
 
     When I click on "Go to calendar" "link"
     Then I should see "You are booked for this Seminar event" exactly "4" times
@@ -222,8 +232,10 @@ Feature: Seminar event booking cancellation calendar views
     # Withdraw from the second event
     When I click on "//div[contains(.,'10 hours')]/a[.='Seminar event']" "xpath_element"
     And I follow "Cancel booking"
-    And I press "Yes"
+    And I wait "1" seconds
+    And I press "Cancel booking"
     Then I should see "Your booking has been cancelled"
+    And I am on "Course 1" course homepage
 
     When I click on "Go to calendar" "link"
     Then I should see "You are booked for this Seminar event" exactly "2" times

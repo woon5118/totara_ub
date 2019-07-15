@@ -140,9 +140,10 @@ Feature: Check My bookings displays the right information for future and past ev
 
     # Sign-up for Seminar 1 and Seminar 2.
     When I am on "Course 1" course homepage
-    And I click on "Sign-up" "link" in the "115" "table_row"
+    And I click on "Go to event" "link" in the "115" "table_row"
     And I press "Sign-up"
-    And I click on "Sign-up" "link" in the "125" "table_row"
+    And I am on "Course 1" course homepage
+    And I click on "Go to event" "link" in the "125" "table_row"
     And I press "Sign-up"
 
     # Check my future bookings again.

@@ -15,11 +15,14 @@ Feature: Seminar sign-up periods display
     And the following "course enrolments" exist:
       | user     | course | role    |
       | student1 | C1     | student |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | course  | intro                           |
+      | Test seminar name | C1      | <p>Test seminar description</p> |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details |
+      | Test seminar name | event 1 |
     And I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
+    And I am on "Course 1" course homepage
     And I follow "View all events"
 
   Scenario Outline: Sign up students regardless of sign in period status

@@ -43,6 +43,7 @@ use mod_facetoface\signup\transition;
 
 // Other classes
 use mod_facetoface\event_dates;
+use mod_facetoface\render_event_info_option;
 use mod_facetoface\attendance\event_attendee;
 use mod_facetoface\attendance\attendance_helper;
 
@@ -92,6 +93,7 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
         event_dates::class,
         filter_list::class,
         render_session_option::class,
+        render_event_info_option::class,
         statement::class,
         crud_mapper::class,
 

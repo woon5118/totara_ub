@@ -58,8 +58,7 @@ Feature: Seminar Signup Role Approval
   Scenario: Student signs up a with no roles assigned
     When I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Editing Trainer"
     And I press "Request approval"
     Then I should see "Your request was sent for approval to the following user(s): Freddy Fred"
@@ -67,8 +66,7 @@ Feature: Seminar Signup Role Approval
   Scenario: Student gets approved through role approval
     When I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Editing Trainer"
     And I should see "Freddy Fred"
 

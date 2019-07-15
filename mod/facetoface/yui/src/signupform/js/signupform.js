@@ -38,6 +38,10 @@ M.mod_facetoface.signupform = {
         this.attachCustomClickEvents = function() {
             // Add handler to edit job assignment button.
             Y.all('a.ajax-action').each(function(node) {
+                if (node.getAttribute('data-f2f-signupform-attached')) {
+                    return;
+                }
+                node.setAttribute('data-f2f-signupform-attached', 'true');
                 node.on('click', function(e){
                     Y.io(node.getAttribute('href'), {
                         on: {success: M.mod_facetoface.signupform.loadConfirmForm}

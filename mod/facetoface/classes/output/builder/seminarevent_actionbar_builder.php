@@ -66,21 +66,31 @@ class seminarevent_actionbar_builder {
      *
      * @param string             $name
      * @param string|\moodle_url $url
-     * @param string             $text      label text
-     * @param bool               $primary   true to accent the element
+     * @param string|\pix_icon   $textoricon label text or icon
+     * @param bool               $primary    true to accent the element
      *
      * @return seminarevent_actionbar_builder
      */
-    public function add_commandlink(string $name, $url, string $text, bool $primary = false): seminarevent_actionbar_builder {
+    public function add_commandlink(string $name, $url, $textoricon, bool $primary = false): seminarevent_actionbar_builder {
         if ($url instanceof \moodle_url) {
-            $url = $url->out();
+            $url = $url->out(false);
         }
-        $this->commandlinks[$name] = [
+        $data = [
             'name' => $name,
             'href' => $url,
-            'text' => $text,
             'primary' => $primary,
         ];
+        if ($textoricon instanceof \pix_icon) {
+            global $OUTPUT;
+            $iconattr = array(
+                'template' => $textoricon->get_template(),
+                'context' => $textoricon->export_for_template($OUTPUT),
+            );
+            $data['icon'] = $iconattr;
+        } else {
+            $data['text'] = (string)$textoricon;
+        }
+        $this->commandlinks[$name] = $data;
         return $this;
     }
 

@@ -46,8 +46,9 @@ Feature: Displaying seminar's events with settings overlapping
     Given I am on a totara site
     And I log in as "bomba"
     And I am on "course1" course homepage
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     When I click on "Sign-up" "button"
+    And I am on "course1" course homepage
     Then I should see "(Booked)"
     And I should not see "Event in progress"
     And I should not see "In progress"

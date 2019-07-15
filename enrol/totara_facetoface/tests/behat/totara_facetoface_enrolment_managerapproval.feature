@@ -53,7 +53,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on the link "Request approval" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
     And I log out
@@ -71,6 +71,7 @@ Feature: Users are forced to get manager approval where required
     Then I should see "manager request already pending"
     And I follow "Withdraw pending request"
     And I press "Confirm"
+    And I click on "Go to event" "link" in the "1 January 2020" "table_row"
     Then I should see "Request approval"
     And I log out
 
@@ -84,7 +85,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on the link "Request approval" in row 1
+    And I click on the link "Go to event" in row 1
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
     And I log out

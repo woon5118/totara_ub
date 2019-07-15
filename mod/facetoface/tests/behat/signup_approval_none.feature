@@ -53,10 +53,11 @@ Feature: Seminar Signup No Approval
   Scenario: Student signs up and is instantly booked
     When I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I should see "Sign-up"
-    And I follow "Sign-up"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should not see "Approval"
     And I press "Sign-up"
     When I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
     Then I should see "Booked" in the "Upcoming" "table_row"
+    When I click on "Go to event" "link" in the "Booked" "table_row"
+    Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"

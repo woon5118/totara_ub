@@ -120,7 +120,7 @@ Feature: Check previous and upcomings sections are right populated
     And I should not see "1 January 1999"
 
     # Sign up for a session and make sure it is displayed in the course page.
-    And I click on "Sign-up" "link" in the "1 January 2037" "table_row"
+    And I click on "Go to event" "link" in the "1 January 2037" "table_row"
     And I press "Sign-up"
     When I follow "C1"
     Then I should see "Booked"
