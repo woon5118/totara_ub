@@ -126,9 +126,9 @@ function xmldb_tassign_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019021801, 'tassign', 'competency');
     }
 
-    if ($oldversion < 2019071200) {
+    if ($oldversion < 2019071201) {
         $table = new xmldb_table('totara_assignment_competencies');
-        $key = new xmldb_key('fk_competency_id', XMLDB_KEY_FOREIGN, array('competency_id'), 'comp', array('id'), 'cascade');
+        $key = new xmldb_key('fk_competency_id', XMLDB_KEY_FOREIGN, array('competency_id'), 'comp', array('id'));
         if ($dbman->key_exists($table, $key)) {
             $dbman->drop_key($table, $key);
         }
@@ -141,7 +141,7 @@ function xmldb_tassign_competency_upgrade($oldversion) {
         }
         $dbman->add_key($table, $key);
 
-        $key = new xmldb_key('fk_competency_id', XMLDB_KEY_FOREIGN, array('competency_id'), 'comp', array('id'), 'cascade');
+        $key = new xmldb_key('fk_competency_id', XMLDB_KEY_FOREIGN, array('competency_id'), 'comp', array('id'));
         if ($dbman->key_exists($table, $key)) {
             $dbman->drop_key($table, $key);
         }
@@ -154,7 +154,7 @@ function xmldb_tassign_competency_upgrade($oldversion) {
         }
         $dbman->add_key($table, $key);
 
-        upgrade_plugin_savepoint(true, 2019071200, 'tassign', 'competency');
+        upgrade_plugin_savepoint(true, 2019071201, 'tassign', 'competency');
     }
 
 
