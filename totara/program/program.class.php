@@ -2492,10 +2492,12 @@ class program {
         // There have not being any files uploaded so return the default default image.
         if (empty($files)) {
             if ($this->is_certif()) {
-                return $OUTPUT->image_url('defaultimage', 'totara_certification');
+                $component = 'totara_certification';
             } else {
-                return $OUTPUT->image_url('defaultimage', 'totara_program');
+                $component = 'totara_program';
             }
+            $url = $OUTPUT->image_url('defaultimage', $component);
+            return $url->out();
         }
         $files = array_values(array_filter($files, function($file) {
             return !$file->is_directory();

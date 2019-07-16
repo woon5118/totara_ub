@@ -68,13 +68,11 @@ class totara_program_totara_catalog_dataformatter_test extends dataformatter_tes
 
         // Convert object to array so that we may read the protected attributes.
         $result = (array) $result;
-        $result['url'] = (array) $result['url'];
-        $prefix = chr(0) . '*' . chr(0);
 
         // Check that we get a theme-independent default icon reference.
-        $this->assertContains($result['url'][$prefix . 'host'], $CFG->wwwroot);
-        $this->assertContains('moodle/theme/image.php', $result['url'][$prefix . 'path']);
-        $this->assertContains('defaultimage', $result['url'][$prefix . 'slashargument']);
+        $this->assertContains($CFG->wwwroot, $result['url']);
+        $this->assertContains('moodle/theme/image.php', $result['url']);
+        $this->assertContains('defaultimage', $result['url']);
         $this->assertSame('test_alt_text', $result['alt']);
 
         $this->assert_exceptions($df, $test_params);

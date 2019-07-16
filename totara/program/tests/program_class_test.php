@@ -2174,6 +2174,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
 
         // Check that the default is the theme-independent default image.
         $result = $program->get_image();
+        $result = new moodle_url($result);
 
         // Convert object to array so that we may read the protected attributes.
         $result = (array) $result;
@@ -2249,6 +2250,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
 
         // Check that the default is the theme-independent default image.
         $result = $certification->get_image();
+        $result = new moodle_url($result);
 
         // Convert object to array so that we may read the protected attributes.
         $result = (array) $result;
