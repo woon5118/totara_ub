@@ -1732,6 +1732,17 @@ class appraisal {
         $params = array($USER->id, $role);
         $aidchar    = $DB->sql_cast_2char('a.id');
         $useridchar = $DB->sql_cast_2char('aua.userid');
+
+        $join_user = '';
+        $used_name_fields_group_by = '';
+        $used_name_fields_order_by = '';
+        // Also order by user name fields when result can have more than one learner.
+        if ($role !== self::ROLE_LEARNER) {
+            $join_user = ' JOIN {user} u ON (u.id = aua.userid) ';
+            $used_name_fields_group_by = ', ' . totara_get_all_user_name_fields(true, 'u', null, null, true);
+            $used_name_fields_order_by = ', ' . $DB->sql_concat_join("' '", totara_get_all_user_name_fields_join('u', null, true));
+        }
+
         $sql = 'SELECT ' . $DB->sql_concat($aidchar, "'_'", $useridchar) . ' AS uniqueid,
                        a.id, aua.userid, a.name, a.timestarted, aua.status, MAX(ast.timedue) AS timedue, aua.timecompleted,
                        ara.id as roleassignmentid
@@ -1740,6 +1751,7 @@ class appraisal {
                     ON (aua.appraisalid = a.id)
                   JOIN {appraisal_role_assignment} ara
                     ON (ara.appraisaluserassignmentid = aua.id)
+                  ' . $join_user . '                    
                   LEFT JOIN {appraisal_stage} ast ON (ast.appraisalid = a.id)
                  WHERE ara.userid = ?
                    AND ara.appraisalrole = ?';
@@ -1753,7 +1765,10 @@ class appraisal {
             $params = array_merge($params, $paramstatus);
         }
         $sql .= ' GROUP BY a.id, aua.userid, a.name, a.timestarted, aua.status, aua.timecompleted, ara.id
-                  ORDER BY CASE WHEN aua.timecompleted IS NULL AND aua.status = ? THEN 0 ELSE 1 END, a.timestarted DESC';
+                  ' . $used_name_fields_group_by . '
+                  ORDER BY CASE WHEN aua.timecompleted IS NULL AND aua.status = ? THEN 0 ELSE 1 END, a.timestarted DESC
+                  ' . $used_name_fields_order_by;
+
         $params[] = self::STATUS_ACTIVE;
         $appraisals = $DB->get_records_sql($sql, $params);
         return $appraisals;
