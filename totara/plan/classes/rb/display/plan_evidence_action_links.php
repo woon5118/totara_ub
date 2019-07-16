@@ -49,16 +49,7 @@ class plan_evidence_action_links extends base {
 
         $out = '';
 
-        // Check user's permissions to edit this item
-        $usercontext = \context_user::instance($extrafields->userid);
-        $canaccess = has_capability('totara/plan:accessanyplan', $usercontext);
-        $canedit = has_capability('totara/plan:editsiteevidence', $usercontext);
-        if ($extrafields->readonly && !($canaccess || $canedit)) {
-            $out .= get_string('evidence_readonly', 'totara_plan');
-        } else if ($USER->id == $extrafields->userid ||
-            \totara_job\job_assignment::is_managing($USER->id, $extrafields->userid) ||
-            $canaccess || $canedit) {
-
+        if (can_create_or_edit_evidence($extrafields->userid, !empty($value), $extrafields->readonly)) {
             $out .= $OUTPUT->action_icon(
                 new \moodle_url('/totara/plan/record/evidence/edit.php',
                     array('id' => $value, 'userid' => $extrafields->userid)),
@@ -70,6 +61,8 @@ class plan_evidence_action_links extends base {
                 new \moodle_url('/totara/plan/record/evidence/edit.php',
                     array('id' => $value, 'userid' => $extrafields->userid, 'd' => '1')),
                 new \pix_icon('t/delete', get_string('delete')));
+        } else if ($extrafields->readonly) {
+            $out .= get_string('evidence_readonly', 'totara_plan');
         }
 
         return $out;
