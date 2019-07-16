@@ -52,7 +52,7 @@ $PAGE->set_totara_menu_selected($menuitem);
 
 $role = $ownplan ? 'learner' : 'manager';
 $can_manage = dp_can_manage_users_plans($userid);
-$can_create = dp_role_is_allowed_action($role, 'create');
+$can_create = has_capability('totara/plan:manageanyplan', \context_system::instance()) ? true : dp_role_is_allowed_action($role, 'create');
 
 if (!$can_manage || !$can_create) {
     print_error('error:nopermissions', 'totara_plan');

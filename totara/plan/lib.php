@@ -327,17 +327,30 @@ function dp_role_is_allowed_action($role, $action, $permission = 'allow') {
  * Return plans for a user with a specific status
  *
  * @access  public
- * @param   int     $userid     Owner of plans
- * @param   array   $statuses   Plan statuses
+ * @param   int     $userid         Owner of plans
+ * @param   array   $statuses       Plan statuses
+ * @param   bool    $checkcanview   Check if user can view the plan. Since Totara 12.9
  * @return  array
  */
-function dp_get_plans($userid, $statuses=array(DP_PLAN_STATUS_APPROVED)) {
+function dp_get_plans($userid, $statuses = array(DP_PLAN_STATUS_APPROVED), $checkcanview = false) {
     global $DB;
     list($insql, $inparams) = $DB->get_in_or_equal($statuses);
     $sql = "userid = ? AND status $insql";
     $params = array($userid);
     $params = array_merge($params, $inparams);
-    return $DB->get_records_select('dp_plan', $sql, $params, 'name');
+    $plans = $DB->get_records_select('dp_plan', $sql, $params, 'name');
+
+    // Remove any plans that can not be viewed.
+    if ($checkcanview) {
+        foreach ($plans as $key => $item) {
+            $plan = new development_plan($item->id);
+            if (!$plan->can_view()) {
+                unset($plans[$key]);
+            }
+        }
+    }
+
+    return $plans;
 }
 
 /**
@@ -813,34 +826,41 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
     $sort = $table->get_sql_sort();
     $sort = empty($sort) ? '' : ' ORDER BY '.$sort;
 
-    // Add table data
-    $plans = $DB->get_records_sql($select.$from.$where.$sort, $params, $table->get_page_start(), $table->get_page_size());
+    // Get the plan records.
+    $plansrecords = $DB->get_records_sql($select.$from.$where.$sort, $params, $table->get_page_start(), $table->get_page_size());
+    $plans = array();
+    foreach ($plansrecords as $plansrecord) {
+        $plan = new development_plan($plansrecord->id);
+        if ($plan->can_view()) {
+            $plans[] = $plan;
+        }
+    }
+
     if (empty($plans)) {
         return '';
     }
+
+    // Add table data.
     $rownumber = 0;
-    foreach ($plans as $p) {
-        $plan = new development_plan($p->id);
-        if ($plan->can_view()) {
-            $row = array();
-            $row[] = $plan->display_summary_widget();
-            if (in_array('enddate', $cols)) {
-                $row[] = $plan->display_enddate();
-            }
-            if (in_array('status', $cols)) {
-                $row[] = $plan->display_progress();
-            }
-            if (in_array('completed', $cols)) {
-                $row[] = $plan->display_completeddate();
-            }
-            if ($can_manage && $can_update) {
-                $row[] = $plan->display_actions();
-            }
-            if (++$rownumber >= $count) {
-                $table->add_data($row, 'last');
-            } else {
-                $table->add_data($row);
-            }
+    foreach ($plans as $plan) {
+        $row = array();
+        $row[] = $plan->display_summary_widget();
+        if (in_array('enddate', $cols)) {
+            $row[] = $plan->display_enddate();
+        }
+        if (in_array('status', $cols)) {
+            $row[] = $plan->display_progress();
+        }
+        if (in_array('completed', $cols)) {
+            $row[] = $plan->display_completeddate();
+        }
+        if ($can_manage && $can_update) {
+            $row[] = $plan->display_actions();
+        }
+        if (++$rownumber >= $count) {
+            $table->add_data($row, 'last');
+        } else {
+            $table->add_data($row);
         }
     }
     unset($plans);
@@ -899,7 +919,7 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     }
 
     // Display active plans
-    if ($enableplans && $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_APPROVED))) {
+    if ($enableplans && $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_APPROVED), true)) {
         if ($role == 'manager') {
             $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
             $out .= $OUTPUT->heading(get_string('activeplans', 'totara_plan'), 5);
@@ -919,7 +939,7 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     }
 
     // Display unapproved plans
-    if ($enableplans && $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_STATUS_PENDING))) {
+    if ($enableplans && $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_STATUS_PENDING), true)) {
         if ($role == 'manager') {
             $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
             $out .= $OUTPUT->heading(get_string('unapprovedplans', 'totara_plan'), 5);
@@ -940,7 +960,7 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     }
 
     // Display completed plans
-    if ($enableplans && $plans = dp_get_plans($userid, DP_PLAN_STATUS_COMPLETE)) {
+    if ($enableplans && $plans = dp_get_plans($userid, DP_PLAN_STATUS_COMPLETE, true)) {
         if ($role == 'manager') {
             $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
             $out .= $OUTPUT->heading(get_string('completedplans', 'totara_plan'), 5);
@@ -1124,13 +1144,21 @@ function dp_get_template_permission($templateid, $component, $action, $role) {
  * @param  string $action     the action to perform
  * @param  string $role       the user role
  * @param  int $permission    the permission value
- * @return array $templates an array if template ids
+ * @return array $templates an array of template ids
  */
 function dp_template_has_permission($component, $action, $role, $permission) {
     global $DB;
 
-    $sql = 'role = ? AND component = ? AND action = ? AND value = ?';
-    $params = array($role, $component, $action, $permission);
+    $sql = 'role = ? AND component = ? AND action = ?';
+    $params = array($role, $component, $action);
+
+    $canmanageanyplan = has_capability('totara/plan:manageanyplan', context_system::instance());
+
+    if (!$canmanageanyplan) {
+        $sql .= ' AND value = ?';
+        $params[] = $permission;
+    }
+
     $templates = $DB->get_records_select('dp_permissions', $sql, $params, 'id', 'templateid');
 
     return array_keys($templates);

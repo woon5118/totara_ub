@@ -36,10 +36,9 @@ $planuser = optional_param('userid', $USER->id, PARAM_INT); // show plans for th
 $role = ($planuser == $USER->id) ? 'learner' : 'manager';
 $can_access = dp_can_view_users_plans($planuser);
 $can_manage = dp_can_manage_users_plans($planuser);
-$can_view = dp_role_is_allowed_action($role, 'view');
-$can_create = dp_role_is_allowed_action($role, 'create');
+$can_create = has_capability('totara/plan:manageanyplan', \context_system::instance()) ? true : dp_role_is_allowed_action($role, 'create');
 
-if (!$can_access || !$can_view) {
+if (!$can_access) {
     print_error('error:nopermissions', 'totara_plan');
 }
 

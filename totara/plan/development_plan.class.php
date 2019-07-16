@@ -2040,6 +2040,10 @@ class development_plan {
      * @return bool
      */
     public final function can_view(): bool {
+        if (has_capability('totara/plan:accessanyplan', \context_system::instance())) {
+            return true;
+        }
+
         $can_access = dp_can_view_users_plans($this->userid);
         $can_view = ($this->get_setting('view')  == DP_PERMISSION_ALLOW);
         return ($can_access && $can_view);
