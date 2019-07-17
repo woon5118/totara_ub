@@ -109,7 +109,8 @@ final class attendees_list_helper {
             $cm = $seminar->get_coursemodule();
             $context = \context_module::instance($cm->id);
             foreach ($attendeestoadd as $attendee) {
-                if (!is_enrolled($context, $attendee)) {
+                // Look for active enrolments here, otherwise we could get errors trying to see if the user can signup.
+                if (!is_enrolled($context, $attendee, '', true)) {
                     $defaultlearnerrole = $DB->get_record('role', array('id' => $CFG->learnerroleid));
                     if (!enrol_try_internal_enrol($seminar->get_course(), $attendee->id, $defaultlearnerrole->id, time())) {
                         $errors[] = [
