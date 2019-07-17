@@ -78,9 +78,10 @@ final class graphql {
         $schemas = self::get_schema_file_contents();
 
         $schema = \GraphQL\Utils\BuildSchema::build(array_shift($schemas));
-        while ($schemas) {
-            $extension = array_shift($schemas);
-            $extension = \GraphQL\Language\Parser::parse($extension);
+
+        if (!empty($schemas)) {
+            $schemas = implode("\n", $schemas);
+            $extension = \GraphQL\Language\Parser::parse($schemas);
             $schema = \GraphQL\Utils\SchemaExtender::extend($schema, $extension);
         }
 
