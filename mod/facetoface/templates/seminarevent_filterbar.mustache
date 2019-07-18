@@ -144,7 +144,7 @@
         {{^disabled}}
             <div class="mod_facetoface__filter__item__{{class}}">
                 <label for="mod_facetoface__filter_{{formid}}__{{name}}" class="mod_facetoface__filter__item__{{class}}__label">{{{label}}}</label>
-                <select id="mod_facetoface__filter_{{formid}}__{{name}}" name="{{name}}" disabled class="mod_facetoface__filter__item__{{class}}__select" data-webkit-init-value="{{webkit_init_value}}"{{#show_tooltips}} data-show-tooltips="true"{{/show_tooltips}}>
+                <select id="mod_facetoface__filter_{{formid}}__{{name}}" name="{{name}}" disabled autocomplete="off" class="mod_facetoface__filter__item__{{class}}__select" data-webkit-init-value="{{webkit_init_value}}"{{#show_tooltips}} data-show-tooltips="true"{{/show_tooltips}}>
                     {{#options}}
                         <option value="{{value}}"{{#selected}} selected{{/selected}}>{{name}}</option>
                     {{/options}}

@@ -143,6 +143,7 @@ abstract class content_generator {
         $attributes = [
             'class' => 'selectedcheckboxes',
             'data-selectid' => 'menusubmissionid_' . $attendee->submissionid,
+            'autocomplete' => 'off',
             'aria-label' => get_string('takeattendance_tick', 'mod_facetoface', clean_string(fullname($attendee)))
         ];
         if ($this->disabled) {
