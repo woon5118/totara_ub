@@ -1773,7 +1773,7 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment
      */
     protected function render_image_icon(image_icon $icon) {
-        return $this->render_pix_icon($this, $icon);
+        return $this->render_pix_icon($icon);
     }
 
 
