@@ -251,7 +251,8 @@ class rb_source_certification_completion extends rb_base_source {
             get_string('isuserassigned', 'rb_source_program_completion'),
             '(SELECT CASE WHEN COUNT(pua.id) >= 1 THEN 1 ELSE 0 END
                 FROM {prog_user_assignment} pua
-               WHERE pua.programid = base.programid AND pua.userid = base.userid)',
+               WHERE pua.programid = base.programid AND pua.userid = base.userid
+               AND pua.exceptionstatus NOT IN (' . PROGRAM_EXCEPTION_DISMISSED . ', ' . PROGRAM_EXCEPTION_RAISED . '))',
             array(
                 'displayfunc' => 'yes_or_no',
                 'dbdatatype' => 'boolean',

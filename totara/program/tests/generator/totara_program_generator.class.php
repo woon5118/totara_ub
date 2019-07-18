@@ -366,7 +366,9 @@ class totara_program_generator extends component_generator_base {
     }
 
     /**
-     * Add courseset to program
+     * Add courseset to program.
+     * Note: this method require enough courses to exist in the database,
+     * otherwise it will end up in an infinite loop.
      *
      * @param int $programid id Program id
      * @param int $coursesetnum number of courseset
