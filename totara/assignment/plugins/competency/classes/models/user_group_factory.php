@@ -17,32 +17,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package tassign_competency
  */
 
-namespace tassign_competency\observers;
-
-use core\event;
-use tassign_competency\models\assignment_actions;
-use tassign_competency\models\assignment_user;
-use totara_assignment\user_groups;
-
-defined('MOODLE_INTERNAL') || die();
+namespace tassign_competency\models;
 
 /**
- * Event observer
+ * Factory to return an instance of a specific user group model identified by a type
  */
-class user_deleted {
+class user_group_factory {
 
-    public static function observe(event\user_deleted $event) {
-        $id = $event->get_data()['objectid'];
-        if (!empty($id)) {
-            // First delete all individual assignments for this user
-            assignment_actions::create()->delete_for_user_groups(user_groups::USER, $id, true);
-            // Then delete all other assignment record for this user
-            (new assignment_user($id))->delete();
+    /**
+     * @param string $type
+     * @param int $id
+     * @return user_group
+     * @throws \coding_exception
+     */
+    public static function create(string $type, int $id): user_group {
+        /** @var user_group $class_name */
+        $class_name = "\\tassign_competency\\models\\user_group\\{$type}";
+        if (class_exists($class_name) && is_subclass_of($class_name, user_group::class)) {
+            return $class_name::load_by_id($id);
         }
+        throw new \coding_exception('Unknown user group given!');
     }
 
 }

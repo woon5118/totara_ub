@@ -198,6 +198,14 @@ class tassign_competency_assignment_user_system_testcase extends tassign_compete
 
         ['position' => $pos, 'assignment' => $assignment] = $this->create_assignment_for_user($competencies, $user);
 
+        $this->expand();
+
+        $this->assertEquals(1, entities\competency_assignment_user::repository()
+            ->where('assignment_id', $assignment->id)
+            ->where('user_id', $user->id)
+            ->count()
+        );
+
         // Deleting the user should delete all assignment records right away
         // without the need to trigger the expand task
         delete_user($user);

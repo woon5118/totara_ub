@@ -24,24 +24,15 @@
 namespace tassign_competency\models;
 
 use core\event\base;
+use core\orm\collection;
+use core\orm\query\builder;
 use tassign_competency\assignment_create_exception;
 use tassign_competency\entities;
 use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency;
-use tassign_competency\entities\competency_assignment_user;
-use tassign_competency\event\assignment_activated;
-use tassign_competency\event\assignment_archived;
-use tassign_competency\event\assignment_created;
-use tassign_competency\event\assignment_deleted;
-use tassign_competency\event\assignment_user_archived;
+use tassign_competency\models\assignment as assignment_model;
 use tassign_competency\settings;
-use totara_assignment\entities\hierarchy_item;
-use totara_assignment\entities\user;
 use totara_assignment\filter\hierarchy_item_visible;
-use totara_assignment\user_groups;
-use core\orm\query\builder;
-use core\orm\collection;
-use core\orm\entity\entity;
 
 class assignment_actions {
 
@@ -68,63 +59,12 @@ class assignment_actions {
 
         /** @var base[] $events */
 
-        // Doing this in a transaction to ensure that the whole bulk update is
-        // either going through completely or throws an error
-        $events = builder::get_db()->transaction(function () use ($assignments, $continue_tracking, & $affected_assignment_ids) {
-            $system_assignments = [];
-            $events = [];
+        /** @var assignment $assignment */
+        foreach ($assignments as $assignment) {
+            $affected_assignment_ids[] = $assignment->id;
 
-            /** @var assignment $assignment */
-            foreach ($assignments as $assignment) {
-                $affected_assignment_ids[] = $assignment->id;
-
-                // Get all user records for this assignment
-                $assignment_users = competency_assignment_user::repository()
-                    ->where('assignment_id', $assignment->id)
-                    ->get_lazy();
-
-                /** @var competency_assignment_user $assignment_user */
-                foreach ($assignment_users as $assignment_user) {
-                    $events[] = assignment_user_archived::create_from_assignment_user($assignment_user);
-
-                    // if tracking should be continued create new system
-                    // assignments for each user before archiving them
-                    // We only ever create new tracking assignments for users in group assignments
-                    if ($continue_tracking && $assignment->user_group_type !== user_groups::USER) {
-                        $system_assignments[] = $assignment_user;
-                    }
-                }
-
-                $events[] = assignment_archived::create_from_assignment($assignment);
-            }
-
-            // Update all assignments set status to archived
-            $timestamp = time();
-            assignment::repository()
-                ->where('id', $affected_assignment_ids)
-                ->update([
-                    'status' => assignment::STATUS_ARCHIVED,
-                    'updated_at' => $timestamp,
-                    'archived_at' => $timestamp
-                ]);
-
-            // Delete all user records for those assignments
-            competency_assignment_user::repository()
-                ->where('assignment_id', $affected_assignment_ids)
-                ->delete();
-
-            // Create system assignments for continuous tracking
-            foreach ($system_assignments as $assignment_user) {
-                (new assignment_user($assignment_user->user_id))
-                    ->create_system_assignment($assignment_user->competency_id);
-            }
-
-            return $events;
-        });
-
-        // Trigger all events after all the queries
-        foreach ($events as $event) {
-            $event->trigger();
+            $model = assignment_model::load_by_entity($assignment);
+            $model->archive($continue_tracking);
         }
 
         return $affected_assignment_ids;
@@ -151,24 +91,12 @@ class assignment_actions {
             ->where('id', $ids)
             ->get_lazy();
 
-        $events = [];
         /** @var assignment $assignment */
         foreach ($assignments as $assignment) {
             $affected_assignment_ids[] = $assignment->id;
 
-            $events[] = assignment_activated::create_from_assignment($assignment);
-        }
-
-        // Update with one query and then trigger all events
-        assignment::repository()
-            ->where('id', $affected_assignment_ids)
-            ->update([
-                'status' => entities\assignment::STATUS_ACTIVE,
-                'updated_at' => time()
-            ]);
-
-        foreach ($events as $event) {
-            $event->trigger();
+            $model = assignment_model::load_by_entity($assignment);
+            $model->activate();
         }
 
         return $affected_assignment_ids;
@@ -231,23 +159,12 @@ class assignment_actions {
         foreach ($assignments as $assignment) {
             $affected_assignment_ids[] = $assignment->id;
 
-            // Create the event as long as we still have an id in the instance
-            $event = assignment_deleted::create_from_assignment($assignment);
-
-            builder::get_db()->transaction(function () use ($assignment) {
-                // Delete all related records for this assignment
-                competency_assignment_user::repository()
-                    ->where('assignment_id', $assignment->id)
-                    ->delete();
-
-                builder::table('totara_assignment_competencies_users_log')
-                    ->where('assignment_id', $assignment->id)
-                    ->delete();
-
-                $assignment->delete();
-            });
-
-            $event->trigger();
+            $model = assignment_model::load_by_entity($assignment);
+            if ($force) {
+                $model->force_delete();
+            } else {
+                $model->delete();
+            }
         }
 
         return $affected_assignment_ids;
@@ -279,8 +196,7 @@ class assignment_actions {
      * @param array $user_groups ['ug type' => [ids]]
      * @param string $type type of assignment, admin, system, etc.
      * @param int $status Assignment activation status 0 - draft, 1 - active
-     * @return collection
-     * @throws \coding_exception
+     * @return collection|assignment[]
      */
     public function create_from_competencies(array $competency_ids, array $user_groups, string $type, int $status = assignment::STATUS_DRAFT) {
         // Validate assignment status
@@ -307,108 +223,22 @@ class assignment_actions {
             throw new assignment_create_exception('Incorrect competency ids have been supplied');
         }
 
-        $assignments = builder::get_db()->transaction(
-            function () use ($competencies, $user_groups, $status, $type) {
-                $assignments = new collection();
-                /*** @var competency $competency */
-                foreach ($competencies as $competency) {
-                    foreach ($user_groups as $user_group_type => $ug_ids) {
-                        if (!in_array($user_group_type, user_groups::get_available_types(), true)) {
-                            throw new \coding_exception('Invalid user group has been passed');
-                        }
+        $assignments = new collection();
 
-                        $class = "\\totara_assignment\\entities\\{$user_group_type}";
-                        if (!class_exists($class)) {
-                            throw new \coding_exception('Invalid user group has been passed');
-                        }
-
-                        // Filter down the list of ids: Convert to int, unique and strip zeros
-                        $ids = self::sanitise_ids($ug_ids);
-
-                        /** @var entity $class */
-                        $repo = $class::repository()
-                            ->where('id', $ids);
-
-                        if (is_a($class, user::class)) {
-                            $repo->filter_by_not_deleted();
-                        } else if (is_a($class, hierarchy_item::class)) {
-                            $repo->set_filter((new hierarchy_item_visible())->set_value(true));
-                        }
-
-                        $loaded_user_groups = $repo->get();
-
-                        // Validating user groups
-                        $loaded_ug_ids = $loaded_user_groups->pluck('id');
-                        if ((count($loaded_ug_ids) != count($ug_ids)) || !empty(array_diff($loaded_ug_ids, $ug_ids))) {
-                            throw new assignment_create_exception('Incorrect user group ids have been supplied');
-                        }
-
-                        foreach ($loaded_user_groups as $group) {
-                            $user = user::logged_in();
-
-                            if ($this->has_existing_assignment(
-                                $type,
-                                $competency->id,
-                                $user_group_type,
-                                $group->id,
-                                $user->id
-                            )) {
-                                // do not create duplicates
-                                continue;
-                            }
-
-                            /** @var assignment $assignment */
-                            $assignment = new assignment();
-                            $assignment->type = $type;
-                            $assignment->competency_id = $competency->id;
-                            $assignment->user_group_type = $user_group_type;
-                            $assignment->user_group_id = $group->id;
-                            $assignment->optional = 0;
-                            $assignment->status = $status;
-                            $assignment->created_by = $user->id;
-                            $assignment->created_at = time();
-                            $assignment->updated_at = time();
-                            $assignment->archived_at = null;
-                            $assignment->save();
-
-                            $assignments->append($assignment);
-                        }
+        /*** @var competency $competency */
+        foreach ($competencies as $competency) {
+            foreach ($user_groups as $user_group_type => $ug_ids) {
+                foreach ($ug_ids as $user_group_id) {
+                    $assignment = assignment_model::create($competency->id, $type, $user_group_type, $user_group_id, $status);
+                    if ($assignment) {
+                        $assignments->append($assignment);
                     }
                 }
-                return $assignments;
             }
-        );
-
-        foreach ($assignments as $assignment) {
-            assignment_created::create_from_assignment($assignment)->trigger();
         }
 
         return $assignments;
     }
-
-    /**
-     * @param string $type
-     * @param int $competency_id
-     * @param string $user_group_type
-     * @param int $user_group_id
-     * @param int $user_id
-     * @return bool
-     */
-    private function has_existing_assignment(string $type, int $competency_id, string $user_group_type,
-                                                int $user_group_id, int $user_id): bool {
-        // Check for duplicate
-        $assignment = assignment::repository()
-            ->where('type', $type)
-            ->where('competency_id', $competency_id)
-            ->where('user_group_type', $user_group_type)
-            ->where('user_group_id', $user_group_id);
-        // There can be multiple other assignments from different creators
-        if ($type === assignment::TYPE_OTHER) {
-            $assignment->where('created_by', $user_id);
-        }
-        return $assignment->count() > 0;
-    }
-
 
     /**
      * Archive assignments for the given user group

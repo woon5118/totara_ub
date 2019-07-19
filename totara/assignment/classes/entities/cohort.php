@@ -49,6 +49,7 @@ use core\orm\entity\entity;
  * @property int $activecollectionid
  * @property int $draftcollectionid
  * @property bool $broken
+ * @property-read string $display_name
  *
  * @method static cohort_repository repository()
  *

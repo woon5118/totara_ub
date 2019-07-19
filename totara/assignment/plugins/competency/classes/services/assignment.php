@@ -23,16 +23,16 @@
 
 namespace tassign_competency\services;
 
+use core\orm\collection;
 use core\output\notification;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use tassign_competency\assignment_create_exception;
+use tassign_competency\baskets;
 use tassign_competency\entities;
 use tassign_competency\models;
-use tassign_competency\baskets;
-use totara_assignment\user_groups;
 use totara_core\basket\session_basket;
 
 defined('MOODLE_INTERNAL') || die();
@@ -114,8 +114,10 @@ class assignment extends \external_api {
                 break;
         }
 
-        return $repository->paginate($page)
-            ->transform(function (entities\assignment $assignment) {
+        $assignments = $repository->paginate($page);
+
+        return $assignments->transform(function (entities\assignment $assignment) {
+            $assignment = models\assignment::load_by_entity($assignment);
             return self::prepare_assignment_response($assignment);
         })->to_array();
     }
@@ -183,7 +185,7 @@ class assignment extends \external_api {
 
         $basket->delete();
 
-        return $assignments->map(function (entities\assignment $assignment) {
+        return $assignments->map(function (models\assignment $assignment) {
             return self::prepare_assignment_response($assignment);
         })->to_array();
     }
@@ -272,7 +274,7 @@ class assignment extends \external_api {
             $ug_basket->delete();
         }
 
-        $assignments->transform_to(function (entities\assignment $assignment) {
+        $assignments->transform_to(function (models\assignment $assignment) {
             return self::prepare_assignment_response($assignment);
         });
 
@@ -282,11 +284,11 @@ class assignment extends \external_api {
     }
 
     /**
-     * @param \core\orm\collection $assignments
+     * @param \totara_orm\collection $assignments
      * @param int $expected_assignments_count
      * @param int $status
      */
-    private static function create_notification(\core\orm\collection $assignments, int $expected_assignments_count, int $status) {
+    private static function create_notification(collection $assignments, int $expected_assignments_count, int $status) {
         $assignment_created = count($assignments);
         $skipped = abs($expected_assignments_count - $assignment_created);
 
@@ -296,7 +298,7 @@ class assignment extends \external_api {
 
         $string_data = ['created' => $assignment_created, 'skipped' => $skipped];
 
-        if ($assignments->count() > 0) {
+        if (count($assignments) > 0) {
             // If not all expected assignments where created (duplicates skipped) show different message
             if ($skipped > 0) {
                 $confirm_string = sprintf(
@@ -316,7 +318,7 @@ class assignment extends \external_api {
         }
         \core\notification::add(
             get_string($confirm_string, 'tassign_competency', (object)$string_data),
-            $assignments->count() ? notification::NOTIFY_SUCCESS : notification::NOTIFY_WARNING
+            count($assignments) ? notification::NOTIFY_SUCCESS : notification::NOTIFY_WARNING
         );
     }
 
@@ -424,99 +426,32 @@ class assignment extends \external_api {
     /**
      * Prepare assignment response
      *
-     * @param entities\assignment $assignment
+     * @param models\assignment $assignment
      * @return array
      */
-    protected static function prepare_assignment_response(entities\assignment $assignment): array {
+    protected static function prepare_assignment_response(models\assignment $assignment): array {
         global $PAGE;
         // As we use format_string make sure we have the page context set
         $PAGE->set_context(\context_system::instance());
 
-        // For all non user admin assignments use the appropriate group name
-        if ($assignment->type == entities\assignment::TYPE_ADMIN && $assignment->user_group_type != user_groups::USER) {
-            switch ($assignment->user_group_type) {
-                case user_groups::POSITION:
-                case user_groups::ORGANISATION:
-                    $type_name = get_string($assignment->user_group_type, 'totara_hierarchy');
-                    break;
-                case user_groups::COHORT:
-                    $type_name = get_string('cohort', 'totara_cohort');
-                    break;
-                default:
-                    $type_name = get_string('user', 'moodle');
-                    break;
-            }
-        } else {
-            $type_name = get_string('assignment_type:'.$assignment->type, 'tassign_competency');
-        }
-
         $response = [
-            'id' => $assignment->id,
-            'assignment_type_name' => $type_name,
-            'status_name' => get_string('status:'.$assignment->status_name, 'tassign_competency'),
-            'updated_at' => $assignment->updated_at,
-            'competency_id' => $assignment->competency_id,
-            'status' => $assignment->status,
-            'user_group_type' => $assignment->user_group_type,
-            'user_group_id' => $assignment->user_group_id,
+            'id' => $assignment->get_field('id'),
+            'assignment_type_name' => $assignment->get_type_name(),
+            'status_name' => $assignment->get_status_name(),
+            'updated_at' => $assignment->get_field('updated_at'),
+            'competency_id' => $assignment->get_field('competency_id'),
+            'status' => $assignment->get_field('status'),
+            'user_group_type' => $assignment->get_field('user_group_type'),
+            'user_group_id' => $assignment->get_field('user_group_id'),
         ];
 
-        if (isset($assignment->competency_name)) {
-            $response['competency_name'] = format_string($assignment->competency_name);
-        }
+        // TODO Previously we showed the competency name only in certain conditions, this will likely be replaced by GrpahQL
+        $response['competency_name'] = $assignment->get_competency()->display_name;
 
-        if (isset($assignment->user_group_name)) {
-            $response['user_group_name'] = self::get_user_group_name($assignment);
-        }
+        // TODO Previously we showed the user group name only in certain conditions, this will likely be replaced by GrpahQL
+        $response['user_group_name'] = $assignment->get_user_group_name();
 
         return $response;
-    }
-
-    /**
-     * Get the name of the user group which could be
-     *  - the full name of the user
-     *  - the position
-     *  - the organisation
-     *  - the audience
-     *
-     * or a deleted string when the user group already got deleted
-     *
-     * @param entities\assignment $assignment
-     * @return string
-     */
-    protected static function get_user_group_name(entities\assignment $assignment): string {
-        // if the user_group_name is 'deleted' then return appropriate deleted string
-        if ($assignment->user_group_name == 'deleted') {
-            $map = [
-                user_groups::USER => get_string('deleted_user', 'tassign_competency'),
-                user_groups::COHORT => get_string('deleted_audience', 'tassign_competency'),
-                user_groups::POSITION => get_string('deleted_position', 'tassign_competency'),
-                user_groups::ORGANISATION => get_string('deleted_organisation', 'tassign_competency'),
-            ];
-
-            return $map[$assignment->user_group_type];
-        }
-
-        $name = $assignment->user_group_name;
-
-        // For user we get the name via the fullname() function
-        if ($assignment->user_group_type == user_groups::USER) {
-            $user_name_fields = totara_get_all_user_name_fields();
-            $user = new \stdClass();
-            foreach ($user_name_fields as $field) {
-                $user->$field = isset($assignment->$field) ? $assignment->$field : '';
-            }
-            $name = fullname($user);
-        }
-
-        $name = format_string($name);
-
-        // Optional show the id number
-        if (!empty($assignment->idnumber)) {
-            $name .= ' ('.$assignment->idnumber.')';
-        }
-
-        return $name;
     }
 
 }

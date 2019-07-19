@@ -24,7 +24,7 @@
 namespace totara_assignment\entities;
 
 
-use core\orm\entity;
+use core\orm\entity\entity;
 
 /**
  * Hierarchy framework base entity

@@ -121,6 +121,7 @@ class assignment extends entity {
         return $name;
     }
 
+    // TODO This is now part of the model, existing code should be changed
     public function get_progress_name_attribute() {
         switch ($this->get_attributes_raw()['type'] ?? null) {
             case 'other':
@@ -139,6 +140,7 @@ class assignment extends entity {
         }
     }
 
+    // TODO This is part of the model, existing code should be changed
     protected function get_human_status_attribute() {
         switch ($this->status) {
             case assignment::STATUS_ACTIVE:

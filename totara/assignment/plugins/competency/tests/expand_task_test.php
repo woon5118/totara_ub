@@ -23,7 +23,8 @@
  */
 
 use tassign_competency\entities\assignment;
-use tassign_competency\entities\assignment_repository;
+use tassign_competency\expand_task;
+use tassign_competency\models\assignment as assignment_model;
 use totara_assignment\user_groups;
 use totara_job\job_assignment;
 
@@ -62,18 +63,18 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
         $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
         $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
 
-        $assignment = $test_data->active_ind->to_array()[0];
+        $assignment = $test_data->active_ind->all()[0];
 
-        $task = new \tassign_competency\expand_task($this->db);
-        $task->expand_single($assignment['id']);
+        $task = new expand_task($this->db);
+        $task->expand_single($assignment->get_id());
 
         // there should only be one row now
         $this->assertEquals(1, $this->db->count_records('totara_assignment_competency_users'));
 
         $this->assert_records_exist(
-            $assignment['id'],
+            $assignment->get_id(),
             [$test_data->user2->id],
-            [$assignment['competency_id']]
+            [$assignment->get_field('competency_id')]
         );
     }
 
@@ -83,7 +84,7 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
         $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
         $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
 
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_single(999);
 
         $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
@@ -95,20 +96,20 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
         $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
         $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
 
-        $assignment1 = $test_data->draft_ind->to_array()[0];
-        $assignment2 = $test_data->active_ind->to_array()[0];
-        $assignment3 = $test_data->archive_ind->to_array()[0];
+        $assignment1 = $test_data->draft_ind->all()[0];
+        $assignment2 = $test_data->active_ind->all()[0];
+        $assignment3 = $test_data->archive_ind->all()[0];
 
-        $task = new \tassign_competency\expand_task($this->db);
-        $task->expand_multiple([$assignment1['id'], $assignment2['id'], $assignment3['id']]);
+        $task = new expand_task($this->db);
+        $task->expand_multiple([$assignment1->get_field('id'), $assignment2->get_field('id'), $assignment3->get_field('id')]);
 
         // there should be one row now
         $this->assertEquals(1, $this->db->count_records('totara_assignment_competency_users'));
 
         $this->assert_records_exist(
-            $assignment2['id'],
+            $assignment2->get_field('id'),
             [$test_data->user2->id],
-            [$assignment2['competency_id']]
+            [$assignment2->get_field('competency_id')]
         );
     }
 
@@ -118,24 +119,24 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
         $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
         $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
 
-        $assignment1 = $test_data->draft_ind->to_array()[0];
-        $assignment2 = $test_data->active_ind->to_array()[0];
+        $assignment1 = $test_data->draft_ind->all()[0];
+        $assignment2 = $test_data->active_ind->all()[0];
 
-        $task = new \tassign_competency\expand_task($this->db);
-        $task->expand_multiple(["{$assignment1['id']}", $assignment2['id'], "dsds", "fssds"]);
+        $task = new expand_task($this->db);
+        $task->expand_multiple(["{$assignment1->get_field('id')}", $assignment2->get_field('id'), "dsds", "fssds"]);
 
         // there should be two rows now
         $this->assertEquals(1, $this->db->count_records('totara_assignment_competency_users'));
 
         $this->assert_records_exist(
-            $assignment2['id'],
+            $assignment2->get_field('id'),
             [$test_data->user2->id],
-            [$assignment2['competency_id']]
+            [$assignment2->get_field('competency_id')]
         );
     }
 
     public function test_expand_multiple_with_empty_array() {
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_multiple([]);
 
         $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
@@ -147,7 +148,7 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
         $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
         $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
 
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_all();
 
         // three active assignments for user user_group where expanded
@@ -155,30 +156,30 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         foreach ($test_data->draft_ind as $assignment) {
             $this->assert_records_dont_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user1->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
         foreach ($test_data->archive_ind as $assignment) {
             $this->assert_records_dont_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user3->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
         foreach ($test_data->active_ind as $assignment) {
             $this->assert_records_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user2->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
         foreach ($test_data->active_coh as $assignment) {
             $this->assert_records_dont_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user1->id, $test_data->user2->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
     }
@@ -191,7 +192,7 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         cohort_add_member($test_data->cohort2->id, $test_data->user2->id);
 
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_all();
 
         // adding the cohort member added three more records
@@ -199,21 +200,21 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         foreach ($test_data->active_coh as $assignment) {
             $this->assert_records_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user2->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
             // there's only one user in the cohort so far
             $this->assert_records_dont_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user1->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
 
         cohort_add_member($test_data->cohort2->id, $test_data->user1->id);
 
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_all();
 
         // adding the cohort member added three more records
@@ -221,17 +222,17 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         foreach ($test_data->active_ind as $assignment) {
             $this->assert_records_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user2->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
         foreach ($test_data->active_coh as $assignment) {
             // both users are now in the cohort and expanded
             $this->assert_records_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user1->id, $test_data->user2->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
     }
@@ -244,7 +245,7 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         cohort_add_member($test_data->cohort2->id, $test_data->user2->id);
 
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_all();
 
         // adding the cohort member added three more records
@@ -252,21 +253,21 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         foreach ($test_data->active_coh as $assignment) {
             $this->assert_records_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user2->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
             // there's only one user in the cohort so far
             $this->assert_records_dont_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user1->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
 
         cohort_remove_member($test_data->cohort2->id, $test_data->user2->id);
 
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_all();
 
         // the records for the user who was removed from the cohort should be gone now
@@ -274,9 +275,9 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         foreach ($test_data->active_coh as $assignment) {
             $this->assert_records_dont_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user2->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
     }
@@ -295,7 +296,7 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
         ];
         job_assignment::create($job_data);
 
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_all();
 
         // assigning the position added three more records
@@ -303,9 +304,9 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         foreach ($test_data->active_pos as $assignment) {
             $this->assert_records_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user3->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
 
@@ -317,7 +318,7 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
         ];
         job_assignment::create($job_data);
 
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_all();
 
         // assigning the position added three more records
@@ -325,9 +326,9 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         foreach ($test_data->active_pos as $assignment) {
             $this->assert_records_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user4->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
     }
@@ -346,7 +347,7 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
         ];
         job_assignment::create($job_data);
 
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_all();
 
         // assigning the organisation added three more records
@@ -354,9 +355,9 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         foreach ($test_data->active_org as $assignment) {
             $this->assert_records_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user3->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
 
@@ -368,7 +369,7 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
         ];
         job_assignment::create($job_data);
 
-        $task = new \tassign_competency\expand_task($this->db);
+        $task = new expand_task($this->db);
         $task->expand_all();
 
         // assigning the organisation added three more records
@@ -376,9 +377,9 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         foreach ($test_data->active_org as $assignment) {
             $this->assert_records_exist(
-                $assignment->id,
+                $assignment->get_field('id'),
                 [$test_data->user4->id],
-                [$assignment->competency_id]
+                [$assignment->get_field('competency_id')]
             );
         }
     }
@@ -401,17 +402,29 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
             public $org1;
             public $org2;
             public $org3;
+            /** @var array|assignment_model[] */
             public $draft_ind = [];
+            /** @var array|assignment_model[] */
             public $draft_coh = [];
+            /** @var array|assignment_model[] */
             public $draft_pos = [];
+            /** @var array|assignment_model[] */
             public $draft_org = [];
+            /** @var array|assignment_model[] */
             public $active_ind = [];
+            /** @var array|assignment_model[] */
             public $active_coh = [];
+            /** @var array|assignment_model[] */
             public $active_pos = [];
+            /** @var array|assignment_model[] */
             public $active_org = [];
+            /** @var array|assignment_model[] */
             public $archive_ind = [];
+            /** @var array|assignment_model[] */
             public $archive_coh = [];
+            /** @var array|assignment_model[] */
             public $archive_pos = [];
+            /** @var array|assignment_model[] */
             public $archive_org = [];
             public $active = [];
             public $comp1;
@@ -480,20 +493,16 @@ class tassign_competency_expand_task_testcase extends advanced_testcase {
 
         /** @var assignment $assignment */
         foreach ($test_data->archive_ind as $assignment) {
-            $assignment->status = assignment::STATUS_ARCHIVED;
-            $assignment->save();
+            $assignment->archive();
         }
         foreach ($test_data->archive_coh as $assignment) {
-            $assignment->status = assignment::STATUS_ARCHIVED;
-            $assignment->save();
+            $assignment->archive();
         }
         foreach ($test_data->archive_pos as $assignment) {
-            $assignment->status = assignment::STATUS_ARCHIVED;
-            $assignment->save();
+            $assignment->archive();
         }
         foreach ($test_data->archive_org as $assignment) {
-            $assignment->status = assignment::STATUS_ARCHIVED;
-            $assignment->save();
+            $assignment->archive();
         }
 
         return $test_data;
