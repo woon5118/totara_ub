@@ -1,0 +1,17 @@
+query totara_competency_competency_progress_for_user($user_id: core_id, $order: String, $filters: totara_competency_profile_assignment_filters) {
+    totara_competency_profile_competency_progress(user_id: $user_id, filters: $filters, order: $order) {
+        competency {
+            id
+            fullname
+        },
+        assignments {
+            progress_name
+        },
+        proficient,
+        my_value {
+            id,
+            name
+            proficient
+        }
+    }
+}

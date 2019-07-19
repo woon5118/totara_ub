@@ -24,7 +24,7 @@
 
 namespace tassign_competency\entities;
 
-use core\orm\entity\entity;
+use totara_assignment\entities\hierarchy_type;
 
 /**
  * @property string $shortname
@@ -37,7 +37,7 @@ use core\orm\entity\entity;
  *
  * Competency type entity
  */
-class competency_type extends entity {
+class competency_type extends hierarchy_type {
 
     public const TABLE = 'comp_type';
 

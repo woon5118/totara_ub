@@ -107,4 +107,8 @@ class user extends entity {
 
         return new static($USER, false);
     }
+
+    public function get_fullname_attribute() {
+        return "{$this->firstname} {$this->lastname}";
+    }
 }

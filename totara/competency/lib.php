@@ -1,0 +1,60 @@
+<?php
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+ * @package totara_competency
+ */
+
+use core_user\output\myprofile\tree;
+use core_user\output\myprofile\node;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * I ❤️ lib files.
+ */
+
+/**
+ * Add competency profile link to the user profile page
+ *
+ * @param tree $tree Tree object
+ * @param stdClass $user user object
+ * @param bool $this_user
+ * @param stdClass $course Course object
+ *
+ * @return bool
+ */
+function totara_competency_myprofile_navigation(tree $tree, $user, $this_user, $course) {
+
+    $can_view = $this_user ?
+        has_capability('totara/competency:view_own_profile', \context_system::instance()) :
+        has_capability('totara/competency:view_other_profile', \context_user::instance($user->id));
+
+    $can_view && $tree->add_node(
+        new node(
+            'miscellaneous',
+            'evidence',
+            get_string('competency_profile', 'totara_competency'),
+            null,
+            new moodle_url('/totara/competency/profile/index.php', $this_user ? [] : ['user_id' => $user->id])
+        )
+    );
+
+    return true;
+}

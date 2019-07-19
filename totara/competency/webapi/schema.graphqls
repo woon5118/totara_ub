@@ -3,6 +3,7 @@ type totara_competency_assignment {
     user_group_type: String
     user_group_id: core_id
     label: String
+    progress_name: String
 }
 
 type totara_competency_activity_log_row {
@@ -13,8 +14,138 @@ type totara_competency_activity_log_row {
     type: String
 }
 
+"""
+Competency profile progress
+"""
+type totara_competency_profile_progress {
+    user: core_user,
+    items: [totara_competency_profile_progress_per_assignments_group!]!,
+    latest_achievement: String,
+    filters: [totara_competency_profile_assignment_filter_option!]
+}
+
+"""
+Competency profile progress item per assignments grouped by assignment type, user group type and user group id
+"""
+type totara_competency_profile_progress_per_assignments_group {
+    key: String!,
+    name: String!,
+    overall_progress: Int!,
+    competencies: [totara_competency_profile_assignment_progress!]!
+}
+
+"""
+Competency profile competency progress type to get data relevant to building progress objects
+"""
+type totara_competency_profile_assignment_progress {
+    id: core_id!,
+    assignment_id: core_id!,
+    name: String!,
+    my_value: totara_competency_profile_scale_value_progress!,
+    min_value: totara_competency_profile_scale_value_progress!,
+}
+
+"""
+Competency profile scale_value progress type that includes extra details (the percentage towards competency progress)
+"""
+type totara_competency_profile_scale_value_progress {
+    id: core_id
+    name: String!,
+    percentage: Int!,
+    proficient: Boolean,
+}
+
+"""
+Competency profile assignment filter option
+"""
+type totara_competency_profile_assignment_filter_option {
+    name: String!,
+    user_group_type: String!,
+    user_group_id: Int!,
+    type: String!,
+    status: Int!,
+    status_name: String!
+}
+
+"""
+Competency profile user progress
+"""
+type totara_competency_profile_competency_progress {
+    id: Int!,
+    competency: totara_competency_competency!,
+    assignments: [totara_competency_assignment!]!,
+    proficient: Boolean!,
+    my_value: totara_competency_profile_scale_value_progress
+}
+
+"""
+Competency profile assignment filters
+"""
+input totara_competency_profile_assignment_filters {
+    user_group_type: String,
+    user_group_id: Int,
+    type: String,
+    status: Int,
+    proficient: Boolean,
+    search: String,
+}
+
 input totara_competency_activity_log_filters {
     assignment_id: core_id
+}
+
+"""
+Competency
+
+NOTE: The query is responsible for ensuring the user can see the competency.
+"""
+type totara_competency_competency {
+    id: Int!
+    fullname(format: core_format = HTML): String!
+    idnumber(format: core_format = HTML): String
+    shortname(format: core_format = HTML): String
+    display_name(format: core_format = HTML): String
+    description(format: core_format = HTML): String
+    timecreated(format: core_date_format = TIMESTAMP): core_date
+    timemodified(format: core_date_format = TIMESTAMP): core_date
+    frameworkid: Int
+    framework: totara_competency_competency_framework
+    path: String!
+    visible: Boolean!
+    parentid: Int
+    parent: totara_competency_competency
+    children: [totara_competency_competency]!
+    typeid: Int
+    type: totara_competency_competency_type
+}
+
+"""
+Competency type
+
+NOTE: The query is responsible for ensuring the user can see the position type
+"""
+type totara_competency_competency_type {
+    id: Int!
+    display_name(format: core_format = HTML): String
+    fullname(format: core_format = HTML): String!
+    idnumber(format: core_format = HTML): String
+    shortname(format: core_format = HTML): String
+    description(format: core_format = HTML): String
+}
+
+"""
+Competency framework
+
+NOTE: The query is responsible for ensuring the user can see the position framework
+"""
+type totara_competency_competency_framework {
+    id: Int!
+    display_name(format: core_format = HTML): String
+    fullname(format: core_format = HTML): String!
+    shortname(format: core_format = HTML): String
+    idnumber(format: core_format = HTML): String
+    description(format: core_format = HTML): String
+    competencies: [totara_competency_competency]
 }
 
 extend type Query {
@@ -23,6 +154,19 @@ extend type Query {
         user_id: core_id!,
         filters: totara_competency_activity_log_filters
     ) : [totara_competency_activity_log_row]
+
+    totara_competency_profile_progress(
+        user_id: core_id, filters: totara_competency_profile_assignment_filters
+    ): totara_competency_profile_progress
+
+    totara_competency_competency(
+        competencyid: param_integer!
+    ): totara_competency_competency!
+
+    totara_competency_profile_competency_progress(
+        user_id: core_id, order: String, filters: totara_competency_profile_assignment_filters,
+    ): [totara_competency_profile_competency_progress]
+}
 }
 
 

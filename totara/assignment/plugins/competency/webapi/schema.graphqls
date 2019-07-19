@@ -1,0 +1,58 @@
+"""
+Competency
+
+NOTE: The query is responsible for ensuring the user can see the competency.
+"""
+type tassign_competency_competency {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    idnumber: String
+    shortname(format: core_format = HTML) : String
+    description(format: core_format = HTML) : String
+    timecreated(format: core_date_format = TIMESTAMP) : core_date
+    timemodified(format: core_date_format = TIMESTAMP) : core_date
+#    frameworkid: core_id
+#    framework: tassign_competency_competency_framework
+#    path: String!
+#    visible: Boolean!
+#    parentid: core_id
+#    parent: tassign_competency_competency
+#    children: [tassign_competency_competency!]!
+#    typeid: core_id
+#    type: tassign_competency_competency_type
+}
+
+"""
+Competency type
+
+NOTE: The query is responsible for ensuring the user can see the position type
+"""
+type tassign_competency_competency_type {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    idnumber : String
+    shortname(format: core_format = HTML) : String
+    description(format: core_format = HTML) : String
+}
+
+"""
+Competency framework
+
+NOTE: The query is responsible for ensuring the user can see the position framework
+"""
+type tassign_competency_competency_framework {
+    id: core_id!
+    fullname(format: core_format = HTML) : String!
+    shortname(format: core_format = HTML) : String
+    idnumber : String
+    description(format: core_format = HTML) : String
+#    competencies: [tassign_competency_competency!]!
+}
+
+extend type Query {
+    """
+    Query to return details of one competency
+    """
+    tassign_competency_competency(competencyid: core_id!): tassign_competency_competency!
+
+}

@@ -31,9 +31,14 @@ use core\orm\entity\entity;
 /**
  * Class hierarchy item
  *
+ * @property int $typeid
+ * @property int $parentid
  * @property-read array $crumbtrail Totara sync flag
  * @property-read hierarchy_framework $framework Hierarchy item framework
  * @property-read string $display_name
+ * @property-read hierarchy_item $parent
+ * @property-read collection $children
+ * @property-read hierarchy_type $type
  *
  * @package tassign_competency\entities
  */
@@ -61,6 +66,11 @@ abstract class hierarchy_item extends entity {
      * @var array
      */
     protected $crumbtrail_cached = null;
+
+    /**
+     * @var hierarchy_type
+     */
+    protected $type = null;
 
     /**
      * If this is called this item will have a crumbtrail attribute loaded when to_array() is called
@@ -106,7 +116,7 @@ abstract class hierarchy_item extends entity {
      */
     protected function get_framework_attribute(): ?hierarchy_framework {
 
-        if (!$this->framework && $fw = $this->get_framework_class()) {
+        if (!$this->framework && $fw = self::get_framework_class()) {
             $this->framework = new $fw($this->frameworkid);
         }
 
@@ -123,4 +133,49 @@ abstract class hierarchy_item extends entity {
 
         return is_a($fw, hierarchy_framework::class, true) ? $fw : null;
     }
+
+    /**
+     * Get associated type entity
+     *
+     * @return hierarchy_type|null
+     */
+    public function get_type_attribute(): ?hierarchy_type {
+        if ($this->typeid && !$this->type && $type = self::get_type_class()) {
+            $this->type = new $type($this->typeid);
+        }
+
+        return $this->type;
+    }
+
+    /**
+     * Get framework entity class name
+     *
+     * @return string|null
+     */
+    public static function get_type_class(): ?string {
+        $fw = static::class . '_type';
+
+        return is_a($fw, hierarchy_type::class, true) ? $fw : null;
+    }
+
+    /**
+     * Returns all children of the current item
+     *
+     * @return collection|hierarchy_item[]
+     */
+    public function get_children_attribute(): collection {
+        return static::repository()
+            ->where('parentid', $this->id)
+            ->get();
+    }
+
+    /**
+     * Returns the parent item if there's any
+     *
+     * @return hierarchy_item|null
+     */
+    public function get_parent_attribute(): ?hierarchy_item {
+        return $this->parentid ? static::repository()->find($this->parentid) : null;
+    }
+
 }

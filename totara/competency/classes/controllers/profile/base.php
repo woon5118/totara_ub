@@ -1,0 +1,162 @@
+<?php
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+ * @package totara_competency
+ */
+
+namespace totara_competency\controllers\profile;
+
+use context;
+use context_system;
+use context_user;
+use moodle_exception;
+use moodle_url;
+use totara_assignment\entities\user;
+use totara_mvc\controller;
+use totara_mvc\view;
+
+
+/**
+ * Base competency profile controller encapsulating the functionality that we need to display competency profile pages
+ */
+abstract class base extends controller {
+
+    /**
+     * User id passed through the attribute
+     *
+     * @var user
+     */
+    protected $user = null;
+
+    protected function setup_context(): context {
+
+        // Let's make sure that we've tried to get user id off the query parameters
+        // and if not we get a user id off the logged in user.
+        $this->get_user()
+            ->must_be_logged_in();
+
+        return context_user::instance($this->user->id);
+    }
+
+    /**
+     * Authorize the user
+     *
+     * @return $this
+     */
+    protected function authorize() {
+        parent::authorize();
+
+        $this->is_for_current_user() ?
+            require_capability('totara/competency:view_own_profile', context_system::instance()) :
+            require_capability('totara/competency:view_other_profile', context_user::instance($this->user->id));
+
+        return $this;
+    }
+
+    /**
+     * Return whether we display profile for current user or not
+     *
+     * @return bool
+     */
+    protected function is_for_current_user() {
+        if (!$this->user) {
+            return false;
+        }
+
+        return $this->user->id === intval($this->currently_logged_in_user()->id);
+    }
+
+    /**
+     * Get request attributes
+     *
+     * @return $this
+     */
+    protected function get_user() {
+        // TODO this is ugly and should be civilized in the controller somewhere
+
+        if (is_null($this->user)) {
+            $id = $this->get_param('user_id', PARAM_INT, 0);
+
+            if ($id === 0) {
+                $id = $this->currently_logged_in_user()->id;
+            }
+            $this->user = new user($id);
+
+            if (!$this->user) {
+                throw new moodle_exception('Can not fetch user from the database');
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add navigation to the top of the page
+     *
+     * @param array $pages Pages to add
+     * @return $this
+     */
+    protected function add_navigation(...$pages) {
+        $this->page->navigation->extend_for_user((object)($this->user->to_array()));
+
+        if (!empty($pages)) {
+            $this->page->navbar->add(
+                get_string('competency_profile', 'totara_competency'),
+                $this->get_profile_url()
+            );
+
+            foreach ($pages as $page) {
+                if (!is_array($page)) {
+                    $page = [$page];
+                }
+
+                $this->page->navbar->add(...$page);
+            }
+        } else {
+            $this->page->navbar->add(get_string('competency_profile', 'totara_competency'));
+        }
+
+
+        return $this;
+    }
+
+    /**
+     * Ensure that we have logged in user
+     *
+     * @return $this
+     */
+    protected function must_be_logged_in() {
+        $user = $this->currently_logged_in_user();
+
+        if (intval($user->id ?? null) <= 0) {
+            throw new moodle_exception('A user must be logged in to get here');
+        }
+
+        return $this;
+    }
+
+    public function get_profile_url() {
+        return new moodle_url('/totara/competency/profile', $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]);
+    }
+
+    public function get_self_assignment_url() {
+        return new moodle_url('/totara/competency/profile/self-assign', $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]);
+    }
+}

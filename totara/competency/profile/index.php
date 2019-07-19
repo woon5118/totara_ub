@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
- * @subpackage competency
+ * @package totara_competency
  */
 
-defined('MOODLE_INTERNAL') || die();
+use totara_competency\controllers\profile\index;
 
-$plugin->version  = 2019071500;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'tassign_competency'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = [
-    'hierarchy_competency' => 2018120700,
-];
+require_once(__DIR__ . '/../../../config.php');
+
+(new index())->process();

@@ -35,6 +35,8 @@ use core\orm\entity\entity;
  * @property int $user_group_id ID of a linked user group
  * @property bool $optional Optional flag
  * @property int $status Assignment status eg (0 - draft, 1 - published, etc)
+ * @property-read string progress_name Assignment name
+ * @property-read string human_status Human readable assignment status
  * @property int $created_by ID of the created user
  * @property int $created_at Created at timestamp
  * @property int $updated_at Updated at timestamp
@@ -117,6 +119,38 @@ class assignment extends entity {
                 break;
         }
         return $name;
+    }
+
+    public function get_progress_name_attribute() {
+        switch ($this->get_attributes_raw()['type'] ?? null) {
+            case 'other':
+                return get_string('assignment_type:other', 'tassign_competency');
+            case 'system':
+                return get_string('assignment_type:system', 'tassign_competency');
+            case 'self':
+                return get_string('assignment_type:self', 'tassign_competency');
+            default:
+                if (!isset($this->user_group_name)) {
+                    debugging('You must fetch assignments with user group names in order to use this function', DEBUG_DEVELOPER);
+                    return '';
+                }
+
+                return $this->user_group_name;
+        }
+    }
+
+    protected function get_human_status_attribute() {
+        switch ($this->status) {
+            case assignment::STATUS_ACTIVE:
+                return get_string('status:active', 'tassign_competency');
+            case assignment::STATUS_ARCHIVED:
+                return get_string('status:archived', 'tassign_competency');
+            case assignment::STATUS_DRAFT:
+                return get_string('status:draft', 'tassign_competency');
+            default:
+                debugging('Unknown assignment status: ' . $this->status, DEBUG_DEVELOPER);
+                return 'Unknown';
+        }
     }
 
 }

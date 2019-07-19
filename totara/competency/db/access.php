@@ -17,44 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+ * @package totara_competency
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    // View competency assignments.
-    'tassign/competency:view' => [
+    // View own competency profile.
+    'totara/competency:view_own_profile' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
             'manager' => CAP_ALLOW
         ]
     ],
-    // Manage competency assignments.
-    'tassign/competency:manage' => [
-        'riskbitmask' => RISK_CONFIG,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-        ]
-    ],
-    'tassign/competency:assignself' => [
-        'riskbitmask' => RISK_PERSONAL,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'user' => CAP_ALLOW
-        ]
-    ],
-    'tassign/competency:assignother' => [
-        'riskbitmask' => RISK_PERSONAL,
-        'captype' => 'write',
+    'totara/competency:view_other_profile' => [
+        'captype' => 'read',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
-            'staffmanager' => CAP_ALLOW
+            'manager' => CAP_ALLOW
         ]
     ],
 ];

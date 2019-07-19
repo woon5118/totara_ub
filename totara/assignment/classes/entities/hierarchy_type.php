@@ -21,35 +21,44 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\entities;
+namespace totara_assignment\entities;
 
 
-use totara_assignment\entities\hierarchy_framework;
-use core\orm\collection;
+use core\orm\entity;
 
 /**
+ * Hierarchy framework base entity
+ *
+ * @property string $fullname
  * @property string $shortname
  * @property string $idnumber
  * @property string $description
- * @property int $sortorder
- * @property int $visible
- * @property int $hidecustomfields
- * @property int $timecreatedcat
+ * @property int $timecreated
  * @property int $timemodified
  * @property int $usermodified
- * @property string $fullname
- *
- * @method static competency_framework_repository repository()
  */
-class competency_framework extends hierarchy_framework {
+abstract class hierarchy_type extends entity {
 
-    public const TABLE = 'comp_framework';
+    const CREATED_TIMESTAMP = 'timecreated';
+    const UPDATED_TIMESTAMP = 'timemodified';
 
-    public function get_competencies_attribute(): collection {
-        return competency::repository()
-            ->where('frameworkid', $this->id)
-            ->order_by('sortthread')
-            ->get();
+    const SET_UPDATED_WHEN_CREATED = true;
+
+    /**
+     * Extra attributes to append
+     *
+     * @var array
+     */
+    protected $extra_attributes = [
+        'display_name'
+    ];
+
+    /**
+     * Return display name
+     *
+     * @return string
+     */
+    protected function get_display_name_attribute() {
+        return $this->fullname;
     }
-
 }
