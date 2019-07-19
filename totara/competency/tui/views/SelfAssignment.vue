@@ -43,7 +43,7 @@
               />
             </td>
             <td>{{ item.display_name }}</td>
-            <td v-if="item.assignments.length > 0">Assigned</td>
+            <td v-if="isAssigned(item)">Assigned</td>
             <td v-else>Unassigned</td>
           </tr>
         </tbody>
@@ -84,61 +84,65 @@ export default {
   mounted: function() {
     // TODO
     // Load the list via GraphQL
-    this.data = {
-      items: [
-        {
-          id: 1,
-          display_name: 'Comp 1',
-          assignments: [
-            {
-              type: 'position',
-              name: 'Nurse Assistant',
-            },
-          ],
-        },
-        {
-          id: 2,
-          display_name: 'Comp 2',
-          assignments: [
-            {
-              type: 'admin',
-              user_group_type: 'position',
-              name: 'Nurse Assistant',
-            },
-            {
-              type: 'admin',
-              user_group_type: 'audience',
-              name: 'My Audidence',
-            },
-            {
-              type: 'self',
-              user_group_type: 'user',
-              name: 'self',
-            },
-          ],
-        },
-        {
-          id: 3,
-          display_name: 'Comp 3',
-          assignments: [],
-        },
-        {
-          id: 4,
-          display_name: 'Comp 4',
-          assignments: [],
-        },
-      ],
-      page_info: {
-        next_cursor: null,
-      },
-      total_count: 4,
-    };
+    // this.data = {
+    //     items: [
+    //         {
+    //             id: 1,
+    //             display_name: 'Comp 1',
+    //             assignments: [
+    //                 {
+    //                     type: 'position',
+    //                     name: 'Nurse Assistant'
+    //                 }
+    //             ]
+    //         },
+    //         {
+    //             id: 2,
+    //             display_name: 'Comp 2',
+    //             assignments: [
+    //                 {
+    //                     type: 'admin',
+    //                     user_group_type: 'position',
+    //                     name: 'Nurse Assistant'
+    //                 },
+    //                 {
+    //                     type: 'admin',
+    //                     user_group_type: 'audience',
+    //                     name: 'My Audidence'
+    //                 },
+    //                 {
+    //                     type: 'self',
+    //                     user_group_type: 'user',
+    //                     name: 'self'
+    //                 }
+    //             ]
+    //         },
+    //         {
+    //             id: 3,
+    //             display_name: 'Comp 3',
+    //             assignments: []
+    //         },
+    //         {
+    //             id: 4,
+    //             display_name: 'Comp 4',
+    //             assignments: []
+    //         }
+    //     ],
+    //     page_info: {
+    //         next_cursor: null
+    //     },
+    //     total_count: 4
+    // };
 
-    // this.$webapi.query('totara_competency_progress_for_user', {'user_id': this.userId}).then(function(data) {
-    //     this.data = data.totara_competency_profile_progress;
-    //
-    //     console.log(this.data);
-    // }.bind(this));
+    this.$webapi
+      .query('totara_competency_self_assignable_competencies', {
+        user_id: this.userId,
+      })
+      .then(
+        function(data) {
+          this.data = data.totara_competency_self_assignable_competencies;
+        }.bind(this)
+      );
   },
 
   methods: {
@@ -168,10 +172,17 @@ export default {
     },
 
     isSelfAssigned: function(competency) {
-      let self = competency.assignments.find(function(assignment) {
-        return assignment.type === 'self';
-      });
-      return typeof self !== 'undefined';
+      if (competency.assignments) {
+        let self = competency.assignments.find(function(assignment) {
+          return assignment.type === 'self';
+        });
+        return typeof self !== 'undefined';
+      }
+      return false;
+    },
+
+    isAssigned: function(competency) {
+      return competency.assignments && competency.assignments.length > 0;
     },
   },
 };

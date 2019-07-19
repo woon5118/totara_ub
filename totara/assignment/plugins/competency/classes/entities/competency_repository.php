@@ -50,6 +50,34 @@ class competency_repository extends hierarchy_item_repository {
     }
 
     /**
+     * Filter by competencies which are only self assignable
+     *
+     * @return $this
+     */
+    public function filter_by_self_assignable() {
+        if (!$this->has_join('comp_assign_availability', 'availabilityself')) {
+            $this->join(['comp_assign_availability', 'availabilityself'], 'id', 'comp_id');
+            $this->where('availabilityself.availability', \totara_competency\entities\competency::ASSIGNMENT_CREATE_SELF);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Filter by competencies which are only other assignable
+     *
+     * @return $this
+     */
+    public function filter_by_other_assignable() {
+        if (!$this->has_join('comp_assign_availability', 'availabilityother')) {
+            $this->join(['comp_assign_availability', 'availabilityother'], 'id', 'comp_id');
+            $this->where('availabilityother.availability', \totara_competency\entities\competency::ASSIGNMENT_CREATE_OTHER);
+        }
+
+        return $this;
+    }
+
+    /**
      * Set order by column and direction
      *
      * @param string $column
