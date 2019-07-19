@@ -41,13 +41,13 @@ class competency implements type_resolver {
      * Resolves fields for an organisation
      *
      * @param string $field
-     * @param competency_entity $competency_framework
+     * @param competency_entity $competency
      * @param array $args
      * @param execution_context $ec
      * @return mixed
      */
-    public static function resolve(string $field, $competency_framework, array $args, execution_context $ec) {
-        if (!$competency_framework instanceof competency_entity) {
+    public static function resolve(string $field, $competency, array $args, execution_context $ec) {
+        if (!$competency instanceof competency_entity) {
             throw new \coding_exception('Accepting only entities.');
         }
 
@@ -57,7 +57,7 @@ class competency implements type_resolver {
             return null;
         }
 
-        $formatter = new competency_formatter($competency_framework, context_system::instance());
+        $formatter = new competency_formatter($competency, context_system::instance());
         return $formatter->format($field, $format);
     }
 

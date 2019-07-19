@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,42 +17,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
- * @package totara_hierarchy
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package tassign_competency
  */
 
-namespace totara_competency\webapi\resolver\type;
+namespace tassign_competency\webapi\resolver\type;
 
-use context_system;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use tassign_competency\entities\competency as competency_entity;
-use tassign_competency\entities\competency_type as competency_type_entity;
-use totara_competency\formatter\competency_type_formatter;
+use tassign_competency\formatter\assignment_formatter;
+use tassign_competency\models\assignment as assignment_model;
 
 /**
- * Organisation hierarchy type.
- *
  * Note: It is the responsibility of the query to ensure the user is permitted to see an organisation.
  */
-class competency_type implements type_resolver {
+class assignment implements type_resolver {
 
     /**
-     * Resolves fields for an organisation
-     *
      * @param string $field
-     * @param competency_entity $competency_type
+     * @param assignment $assignment
      * @param array $args
      * @param execution_context $ec
      * @return mixed
      */
-    public static function resolve(string $field, $competency_type, array $args, execution_context $ec) {
-        if (!$competency_type instanceof competency_type_entity) {
-            throw new \coding_exception('Accepting only entities.');
+    public static function resolve(string $field, $assignment, array $args, execution_context $ec) {
+        if (!$assignment instanceof assignment_model) {
+            throw new \coding_exception('Accepting only assignment models.');
         }
 
-        $formatter = new competency_type_formatter($competency_type, context_system::instance());
-        return $formatter->format($field, $args['format'] ?? null);
+        $format = $args['format'] ?? null;
+
+        $formatter = new assignment_formatter($assignment, \context_system::instance());
+        return $formatter->format($field, $format);
     }
 
 }

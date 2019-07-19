@@ -1,0 +1,6 @@
+query totara_competency_self_assignable_competencies {
+    totara_competency_self_assignable_competencies {
+        id
+        display_name
+    }
+}

@@ -1,4 +1,4 @@
-query totara_competency_competency($competencyid: param_integer!) {
+query totara_competency_competency($competencyid: core_id!) {
     totara_competency_competency(competencyid: $competencyid) {
         id
         display_name

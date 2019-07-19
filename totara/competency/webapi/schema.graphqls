@@ -73,7 +73,7 @@ Competency profile user progress
 type totara_competency_profile_competency_progress {
     id: Int!,
     competency: totara_competency_competency!,
-    assignments: [totara_competency_assignment!]!,
+    assignments: [tassign_competency_assignment!]!,
     proficient: Boolean!,
     my_value: totara_competency_profile_scale_value_progress
 }
@@ -100,7 +100,7 @@ Competency
 NOTE: The query is responsible for ensuring the user can see the competency.
 """
 type totara_competency_competency {
-    id: Int!
+    id: core_id!
     fullname(format: core_format = HTML): String!
     idnumber(format: core_format = HTML): String
     shortname(format: core_format = HTML): String
@@ -108,14 +108,14 @@ type totara_competency_competency {
     description(format: core_format = HTML): String
     timecreated(format: core_date_format = TIMESTAMP): core_date
     timemodified(format: core_date_format = TIMESTAMP): core_date
-    frameworkid: Int
+    frameworkid: core_id
     framework: totara_competency_competency_framework
     path: String!
     visible: Boolean!
-    parentid: Int
+    parentid: core_id
     parent: totara_competency_competency
     children: [totara_competency_competency]!
-    typeid: Int
+    typeid: core_id
     type: totara_competency_competency_type
 }
 
@@ -125,7 +125,7 @@ Competency type
 NOTE: The query is responsible for ensuring the user can see the position type
 """
 type totara_competency_competency_type {
-    id: Int!
+    id: core_id!
     display_name(format: core_format = HTML): String
     fullname(format: core_format = HTML): String!
     idnumber(format: core_format = HTML): String
@@ -139,7 +139,7 @@ Competency framework
 NOTE: The query is responsible for ensuring the user can see the position framework
 """
 type totara_competency_competency_framework {
-    id: Int!
+    id: core_id!
     display_name(format: core_format = HTML): String
     fullname(format: core_format = HTML): String!
     shortname(format: core_format = HTML): String
@@ -159,13 +159,15 @@ extend type Query {
         user_id: core_id, filters: totara_competency_profile_assignment_filters
     ): totara_competency_profile_progress
 
-    totara_competency_competency(
-        competencyid: param_integer!
-    ): totara_competency_competency!
-
     totara_competency_profile_competency_progress(
         user_id: core_id, order: String, filters: totara_competency_profile_assignment_filters,
     ): [totara_competency_profile_competency_progress]
+
+    totara_competency_competency(
+        competencyid: core_id!
+    ): totara_competency_competency!
+
+    totara_competency_self_assignable_competencies: [totara_competency_competency]!
 }
 }
 

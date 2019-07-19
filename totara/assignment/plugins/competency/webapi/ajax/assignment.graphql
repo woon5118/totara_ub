@@ -1,0 +1,6 @@
+query tassign_competency_assignment($assignmentid: core_id!) {
+    tassign_competency_assignment(assignmentid: $assignmentid) {
+        id
+        type
+    }
+}
