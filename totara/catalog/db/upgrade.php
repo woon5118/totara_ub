@@ -64,8 +64,12 @@ function xmldb_totara_catalog_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019061801) {
-        $sql = 'delete from {catalog} where id in (select c.id from {catalog} c left join {prog} p on c.objectid = p.id where c.objecttype=\'certification\' and p.id is null)';
-        $DB->execute($sql);
+        // Delete any orphaned certification records.
+        $ids = $DB->get_records_sql("select c.id from {catalog} c left join {prog} p on c.objectid = p.id where c.objecttype='certification' and p.id is null");
+        $batches = array_chunk($ids, $DB->get_max_in_params(), true);
+        foreach ($batches as $batch) {
+            $DB->delete_records_list('catalog', 'id', array_keys($batch));
+        }
 
         upgrade_plugin_savepoint(true, 2019061801, 'totara', 'catalog');
     }
