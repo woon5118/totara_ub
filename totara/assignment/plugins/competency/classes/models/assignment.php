@@ -326,6 +326,7 @@ class assignment {
      * Returns the associated competency entity
      *
      * TODO return model instead of entity?
+     *
      * @return competency
      */
     public function get_competency(): competency {
@@ -374,7 +375,7 @@ class assignment {
      * @return user_group
      */
     public function get_user_group(): user_group {
-        return user_group_factory::create($this->entity->user_group_type, $this->entity->user_group_id);
+        return user_group_factory::create($this->entity);
     }
 
     /**

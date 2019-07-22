@@ -27,8 +27,10 @@ use context_system;
 use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency as competency_entity;
 use totara_assignment\entities\user;
+use totara_competency\models\self_assignable_competency;
 
 /**
  * Query to return competencies available for self assignment.
@@ -44,6 +46,8 @@ class self_assignable_competencies implements query_resolver {
      */
     public static function resolve(array $args, execution_context $ec) {
         self::authorize($args);
+
+        $user_id = $args['user_id'];
 
         $is_self = $args['user_id'] == user::logged_in()->id;
 
@@ -65,10 +69,38 @@ class self_assignable_competencies implements query_resolver {
             $repo->filter_by_other_assignable();
         }
 
+        /** @var collection $competencies */
         $competencies = $repo
             ->set_filters($filters)
             ->order_by($order_by, $order_dir)
             ->get();
+
+        // TODO This should definitely be extracted somewhere
+        // Load all assignments for the competencies which belong to the user
+        $assignments = assignment::repository()
+            ->join(['totara_assignment_competency_users', 'ua'], 'id', 'assignment_id')
+            ->where('ua.user_id', $user_id)
+            ->where('status', assignment::STATUS_ACTIVE)
+            ->where('competency_id', $competencies->pluck('id'))
+            ->get();
+
+        /** @var collection|self_assignable_competency[] $competencies */
+        $competencies = $competencies ->transform(function ($item) {
+            return self_assignable_competency::load_by_entity($item);
+        });
+
+        // Now combine competencies and the user assignments
+        if ($assignments->count() > 0) {
+            foreach ($competencies as $competency) {
+                $user_assignments = $assignments->filter('competency_id', $competency->get_id());
+                if ($user_assignments->count() > 0) {
+                    $user_assignments->transform(function ($assignment_entity) {
+                        return \tassign_competency\models\assignment::load_by_entity($assignment_entity);
+                    });
+                    $competency->set_user_assignments($user_assignments);
+                }
+            }
+        }
 
         $result = [
             'items' => $competencies->all(),

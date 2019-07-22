@@ -197,6 +197,8 @@ class assignment_actions {
      * @param string $type type of assignment, admin, system, etc.
      * @param int $status Assignment activation status 0 - draft, 1 - active
      * @return collection|assignment[]
+     * @throws \coding_exception
+     * @throws assignment_create_exception
      */
     public function create_from_competencies(array $competency_ids, array $user_groups, string $type, int $status = assignment::STATUS_DRAFT) {
         // Validate assignment status

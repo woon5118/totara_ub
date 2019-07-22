@@ -17,6 +17,10 @@ query totara_competency_self_assignable_competencies(
         items {
             id
             display_name
+            user_assignments {
+                type
+                progress_name
+            }
         }
         total_count
         page_info {
