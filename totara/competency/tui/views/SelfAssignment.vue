@@ -82,58 +82,7 @@ export default {
   computed: {},
 
   mounted: function() {
-    // TODO
     // Load the list via GraphQL
-    // this.data = {
-    //     items: [
-    //         {
-    //             id: 1,
-    //             display_name: 'Comp 1',
-    //             assignments: [
-    //                 {
-    //                     type: 'position',
-    //                     name: 'Nurse Assistant'
-    //                 }
-    //             ]
-    //         },
-    //         {
-    //             id: 2,
-    //             display_name: 'Comp 2',
-    //             assignments: [
-    //                 {
-    //                     type: 'admin',
-    //                     user_group_type: 'position',
-    //                     name: 'Nurse Assistant'
-    //                 },
-    //                 {
-    //                     type: 'admin',
-    //                     user_group_type: 'audience',
-    //                     name: 'My Audidence'
-    //                 },
-    //                 {
-    //                     type: 'self',
-    //                     user_group_type: 'user',
-    //                     name: 'self'
-    //                 }
-    //             ]
-    //         },
-    //         {
-    //             id: 3,
-    //             display_name: 'Comp 3',
-    //             assignments: []
-    //         },
-    //         {
-    //             id: 4,
-    //             display_name: 'Comp 4',
-    //             assignments: []
-    //         }
-    //     ],
-    //     page_info: {
-    //         next_cursor: null
-    //     },
-    //     total_count: 4
-    // };
-
     this.$webapi
       .query('totara_competency_self_assignable_competencies', {
         user_id: this.userId,
