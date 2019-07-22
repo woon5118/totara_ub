@@ -203,6 +203,13 @@ $icons = array(
                     'classes' => 'fa-bars',
                 ),
         ),
+    'bar-chart' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-bar-chart',
+                ),
+        ),
     'blended' =>
         array(
             'data' =>

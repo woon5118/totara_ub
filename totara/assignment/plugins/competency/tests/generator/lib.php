@@ -21,6 +21,7 @@
  * @package tassign_competency
  */
 
+use tassign_competency\entities\assignment;
 use totara_assignment\user_groups;
 use totara_job\job_assignment;
 
@@ -45,6 +46,7 @@ class tassign_competency_generator extends component_generator_base {
 
         $attributes['competency_id'] = $competency_id;
         $attributes['user_group_id'] = $position_id;
+        $attributes['status'] = assignment::STATUS_ACTIVE;
         $attributes['user_group_type'] = user_groups::POSITION;
 
         return $this->create_assignment($attributes);
@@ -60,7 +62,7 @@ class tassign_competency_generator extends component_generator_base {
      */
     public function create_organisation_assignment(?int $competency_id = null, ?int $organisation_id = null, array $attributes = []) {
         if (is_null($organisation_id)) {
-            $organisation_id = $this->create_position()->id;
+            $organisation_id = $this->create_organisation()->id;
         }
 
         if (is_null($competency_id)) {
@@ -69,6 +71,7 @@ class tassign_competency_generator extends component_generator_base {
 
         $attributes['competency_id'] = $competency_id;
         $attributes['user_group_id'] = $organisation_id;
+        $attributes['status'] = assignment::STATUS_ACTIVE;
         $attributes['user_group_type'] = user_groups::ORGANISATION;
 
         return $this->create_assignment($attributes);
@@ -150,7 +153,7 @@ class tassign_competency_generator extends component_generator_base {
         // Applying default attributes, so we'd have a complete record to return
         $attributes = array_merge([
             'optional' => '0',
-            'type' => \tassign_competency\entities\assignment::TYPE_ADMIN,
+            'type' => assignment::TYPE_ADMIN,
             'status' => '0',
             'created_by' => $this->logged_user(),
             'created_at' => time(),
@@ -174,7 +177,7 @@ class tassign_competency_generator extends component_generator_base {
     /**
      * Alias to create a cohort (audience)
      *
-     * @param \stdClass|array|int $members Cohort members ids or user objects
+     * @param stdClass|array|int $members Cohort members ids or user objects
      * @param array $attributes Record attributes
      * @return stdClass
      */
@@ -224,7 +227,7 @@ class tassign_competency_generator extends component_generator_base {
     /**
      * Create an organisation + corresponding framework if needed and enrol users
      *
-     * @param \stdClass|array|int User id(s) or object(s) to add to the organisation
+     * @param stdClass|array|int User id(s) or object(s) to add to the organisation
      * @param array $attributes Record attributes
      * @param int|null $framework_id Framework ID, creates new if not supplied
      * @return stdClass
@@ -253,7 +256,7 @@ class tassign_competency_generator extends component_generator_base {
     /**
      * Create an organisation + corresponding framework if needed and enrol users
      *
-     * @param \stdClass|array|int User id(s) or object(s) to add to the position
+     * @param stdClass|array|int User id(s) or object(s) to add to the position
      * @param array $attributes Record attributes
      * @param int|null $framework_id Framework ID, creates new if not supplied
      * @return stdClass

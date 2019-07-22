@@ -74,6 +74,21 @@
     color: #a9a9a9;
 }
 
+.totara_competency-profile__input {
+    border: 1px #ccc solid;
+    border-radius: 4px;
+    padding: 6px 12px;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    height: 34px;
+}
+
+.totara_competency-profile__comp-list-left-filters {
+    > *:not(:last-child) {
+        margin-right: 1rem;
+    }
+}
+
 .totara_competency-profile-assignment-filters_label {
     line-height: 32px;
     margin-right: 10px;
