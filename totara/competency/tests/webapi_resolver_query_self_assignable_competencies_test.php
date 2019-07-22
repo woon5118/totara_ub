@@ -25,8 +25,10 @@
 use core\webapi\execution_context;
 use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency;
+use tassign_competency\expand_task;
 use totara_assignment\user_groups;
 use totara_competency\entities\competency as competency_entity;
+use totara_competency\models\self_assignable_competency;
 use totara_competency\webapi\resolver\query\self_assignable_competencies;
 use totara_job\job_assignment;
 
@@ -194,7 +196,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertCount(1, $result['items']);
         $this->assertEquals(1, $result['total_count']);
         $competency = $result['items'][0];
-        $this->assertEquals($comp1->id, $competency->id);
+        $this->assertEquals($comp1->id, $competency->get_id());
 
         // Activate self assignment for the second competency and check that it's in the result
         $this->activate_self_assignable($comp2->id);
@@ -204,7 +206,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertCount(2, $result['items']);
         $this->assertEquals(2, $result['total_count']);
         $expected_comp_ids = [$comp1->id, $comp2->id];
-        $actual_comp_is = array_column($result['items'], 'id');
+        $actual_comp_is = $this->get_fieldset_from_result('id', $result);
         $this->assertEqualsCanonicalizing($expected_comp_ids, $actual_comp_is);
 
         // Finally verify that the self assignment availability does not affect other users
@@ -272,7 +274,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertCount(1, $result['items']);
         $this->assertEquals(1, $result['total_count']);
         $competency = $result['items'][0];
-        $this->assertEquals($comp1->id, $competency->id);
+        $this->assertEquals($comp1->id, $competency->get_id());
 
         // Activate self assignment for the second competency and check that it's in the result
         $this->activate_other_assignable($comp2->id);
@@ -282,7 +284,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertCount(2, $result['items']);
         $this->assertEquals(2, $result['total_count']);
         $expected_comp_ids = [$comp1->id, $comp2->id];
-        $actual_comp_is = array_column($result['items'], 'id');
+        $actual_comp_is = $this->get_fieldset_from_result('id', $result);
         $this->assertEqualsCanonicalizing($expected_comp_ids, $actual_comp_is);
 
         // Now make sure that the other assignment does not affect self assignment
@@ -319,7 +321,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Planning',
             'Talking',
             'Typing',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
     }
 
     public function test_result_gets_ordered_by_framework_hierarchy_by_default() {
@@ -340,7 +342,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             ->get()
             ->pluck('id');
 
-        $actual_ids = array_column($result['items'], 'id');
+        $actual_ids = $this->get_fieldset_from_result('id', $result);
 
         $this->assertEquals($expected_ids, $actual_ids);
     }
@@ -367,7 +369,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             ->get()
             ->pluck('id');
 
-        $actual_ids = array_column($result['items'], 'id');
+        $actual_ids = $this->get_fieldset_from_result('id', $result);
         $this->assertEquals($expected_ids, $actual_ids);
 
         // add ascending order_dir
@@ -386,7 +388,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             ->get()
             ->pluck('id');
 
-        $actual_ids = array_column($result['items'], 'id');
+        $actual_ids = $this->get_fieldset_from_result('id', $result);
         $this->assertEquals($expected_ids, $actual_ids);
 
         // descending order_dir
@@ -405,7 +407,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             ->get()
             ->pluck('id');
 
-        $actual_ids = array_column($result['items'], 'id');
+        $actual_ids = $this->get_fieldset_from_result('id', $result);
         $this->assertEquals($expected_ids, $actual_ids);
     }
 
@@ -427,7 +429,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Designing interiors',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         $args = $this->get_args([
             'user_id' => $user1->id,
@@ -443,7 +445,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Baking skill-set',
             'Chef proficiency',
             'Cooking',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
     }
 
     public function test_can_be_filtered_by_framework() {
@@ -470,7 +472,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Leading',
             'Planning',
             'Talking',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
     }
 
     public function test_can_be_filtered_by_path() {
@@ -498,7 +500,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Planning',
             'Talking',
             'Typing',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
     }
 
     public function test_can_be_filtered_by_parent() {
@@ -525,7 +527,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Planning',
             'Talking',
             'Typing',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
     }
 
     public function test_can_be_filtered_by_status() {
@@ -554,7 +556,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Designing interiors',
             'Hacking',
             'Talking',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Filter by unassigned only
         $args = $this->get_args([
@@ -570,7 +572,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertEqualsCanonicalizing([
             'Leading',
             'Planning'
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Filter by assigned and unassigned
         $args = $this->get_args([
@@ -594,7 +596,52 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Planning',
             'Talking',
             'Typing',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
+    }
+
+    public function test_can_be_filtered_by_assignment_type_but_returns_empty_result() {
+        $user1 = $this->generator()->create_user();
+        $user2 = $this->generator()->create_user();
+
+        // Only create assignments for user 1
+        $this->generate_competencies($user1->id);
+
+        $this->setUser($user2);
+
+        $args = $this->get_args([
+            'user_id' => $user2->id,
+            'filters' => [],
+        ]);
+
+        $result = self_assignable_competencies::resolve($args, $this->get_execution_context());
+        $this->assertIsArray($result);
+        $this->assertCount(11, $result['items']);
+        $this->assertEquals(11, $result['total_count']);
+        $this->assertEqualsCanonicalizing([
+            'Accounting',
+            'Baking skill-set',
+            'Chef proficiency',
+            'Coding',
+            'Cooking',
+            'Designing interiors',
+            'Hacking',
+            'Leading',
+            'Planning',
+            'Talking',
+            'Typing',
+        ], $this->get_fieldset_from_result('display_name', $result));
+
+        $args = $this->get_args([
+            'user_id' => $user2->id,
+            'filters' => [
+                'assignment_type' => [ user_groups::POSITION ]
+            ],
+        ]);
+
+        $result = self_assignable_competencies::resolve($args, $this->get_execution_context());
+        $this->assertIsArray($result);
+        $this->assertCount(0, $result['items']);
+        $this->assertEquals(0, $result['total_count']);
     }
 
     public function test_can_be_filtered_by_assignment_type() {
@@ -616,7 +663,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Talking',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Has organisation assignment
         $args = $this->get_args([
@@ -630,7 +677,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Coding',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Has cohort assignment
         $args = $this->get_args([
@@ -644,7 +691,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Hacking',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Has position and organisation assignment
         $args = $this->get_args([
@@ -662,7 +709,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertEqualsCanonicalizing([
             'Coding',
             'Talking'
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Has self assignment
         $args = $this->get_args([
@@ -678,7 +725,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Chef proficiency',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Has other assignment
         $args = $this->get_args([
@@ -694,7 +741,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Baking skill-set',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Has system assignment
         $args = $this->get_args([
@@ -710,7 +757,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Cooking',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Has admin assignment
         $args = $this->get_args([
@@ -727,7 +774,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $this->assertEqualsCanonicalizing([
             'Accounting',
             'Designing interiors',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Has system, position and organisation assignment
         $args = $this->get_args([
@@ -747,7 +794,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Coding',
             'Cooking',
             'Talking',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Has admin, system and position assignment
         $args = $this->get_args([
@@ -768,7 +815,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Cooking',
             'Designing interiors',
             'Talking',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // Has admin, system, position and organisation assignment
         $args = $this->get_args([
@@ -791,7 +838,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Cooking',
             'Designing interiors',
             'Talking',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
     }
 
     public function test_can_be_filtered_by_competency_type() {
@@ -815,7 +862,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Accounting',
             'Chef proficiency',
             'Typing'
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // has type 2
         $args = $this->get_args([
@@ -836,7 +883,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Leading',
             'Planning',
             'Talking',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
 
         // has type 1 and 2
         $args = $this->get_args([
@@ -860,7 +907,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
             'Planning',
             'Talking',
             'Typing',
-        ], array_column($result['items'], 'display_name'));
+        ], $this->get_fieldset_from_result('display_name', $result));
     }
 
     /**
@@ -1001,19 +1048,35 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         $cohort = $this->generator()->create_cohort();
 
         // Create an assignment for a competency
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_one->id, $user_id, ['type' => assignment::TYPE_ADMIN]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_three->id, $user_id, ['type' => assignment::TYPE_ADMIN]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_two->id, $user_id, ['type' => assignment::TYPE_SELF]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_four->id, $user_id, ['type' => assignment::TYPE_OTHER]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_five->id, $user_id, ['type' => assignment::TYPE_SYSTEM]);
-        $data['ass'][] = $this->generator()->create_position_assignment($comp_nine->id, $pos->id);
-        $data['ass'][] = $this->generator()->create_organisation_assignment($comp_seven->id, $org->id);
-        $data['ass'][] = $this->generator()->create_cohort_assignment($comp_eight->id, $cohort->id);
+        $data['ass'][] = $this->generator()->create_user_assignment($comp_one->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]);
+        $data['ass'][] = $this->generator()->create_user_assignment($comp_three->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]);
+        $data['ass'][] = $this->generator()->create_user_assignment($comp_two->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_SELF]);
+        $data['ass'][] = $this->generator()->create_user_assignment($comp_four->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_OTHER]);
+        $data['ass'][] = $this->generator()->create_user_assignment($comp_five->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_SYSTEM]);
+        $data['ass'][] = $this->generator()->create_position_assignment($comp_nine->id, $pos->id, ['status' => assignment::STATUS_ACTIVE]);
+        $data['ass'][] = $this->generator()->create_organisation_assignment($comp_seven->id, $org->id, ['status' => assignment::STATUS_ACTIVE]);
+        $data['ass'][] = $this->generator()->create_cohort_assignment($comp_eight->id, $cohort->id, ['status' => assignment::STATUS_ACTIVE]);
+
+        if ($user_id) {
+            job_assignment::create([
+                'userid' => $user_id,
+                'idnumber' => 'org1',
+                'organisationid' => $org->id
+            ]);
+            job_assignment::create([
+                'userid' => $user_id,
+                'idnumber' => 'pos1',
+                'positionid' => $pos->id
+            ]);
+            cohort_add_member($cohort->id, $user_id);
+
+            $this->expand();
+        }
 
         return $data;
     }
 
-    private function create_self_assignable_competency($data, $framework_id) {
+    private function create_self_assignable_competency(array $data, int $framework_id) {
         global $DB;
 
         /** @var tassign_competency_generator $assign_generator */
@@ -1028,7 +1091,7 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         return $comp;
     }
 
-    private function activate_self_assignable($comptency_id) {
+    private function activate_self_assignable(int $comptency_id) {
         global $DB;
         $DB->insert_record(
             'comp_assign_availability',
@@ -1036,12 +1099,18 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
         );
     }
 
-    private function activate_other_assignable($comptency_id) {
+    private function activate_other_assignable(int $comptency_id) {
         global $DB;
         $DB->insert_record(
             'comp_assign_availability',
             ['comp_id' => $comptency_id, 'availability' => competency_entity::ASSIGNMENT_CREATE_OTHER]
         );
+    }
+
+    private function get_fieldset_from_result(string $field, array $result): array {
+        return array_map(function (self_assignable_competency $item) use ($field) {
+            return $item->get_field($field);
+        }, $result['items']);
     }
 
     /**
@@ -1051,6 +1120,12 @@ class tassign_competency_webapi_resolver_query_self_assignable_competencies_test
      */
     protected function generator() {
         return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+    }
+
+    private function expand() {
+        // We need the expanded users for the logging to work
+        $expand_task = new expand_task($GLOBALS['DB']);
+        $expand_task->expand_all();
     }
 
 }

@@ -29,6 +29,7 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency as competency_entity;
+use tassign_competency\filter\competency_user_assignment_type;
 use totara_assignment\entities\user;
 use totara_competency\models\self_assignable_competency;
 
@@ -42,7 +43,7 @@ class self_assignable_competencies implements query_resolver {
      *
      * @param array $args
      * @param execution_context $ec
-     * @return competency_entity[]|collection
+     * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
         self::authorize($args);
@@ -59,6 +60,11 @@ class self_assignable_competencies implements query_resolver {
 
         // By default filter for visible only
         $filters['visible'] = true;
+
+        if (isset($filters['assignment_type'])) {
+            $filters['assignment_type'] = (new competency_user_assignment_type($user_id))
+                ->set_value($filters['assignment_type']);
+        }
 
         $repo = competency_entity::repository()
             ->set_filters($filters);
