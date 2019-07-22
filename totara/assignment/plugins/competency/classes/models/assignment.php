@@ -232,7 +232,7 @@ class assignment {
             throw new assignment_create_exception('Invalid user group has been passed');
         }
 
-        $class = "\\totara_assignment\\entities\\{$user_group_type}";
+        $class = "totara_assignment\\entities\\{$user_group_type}";
         if (!class_exists($class)) {
             throw new assignment_create_exception('Invalid user group has been passed');
         }
@@ -241,9 +241,10 @@ class assignment {
         $repo = $repo = $class::repository()
             ->where('id', $user_group_id);
 
-        if (is_a($class, user::class)) {
+        // TODO: Cover the following condition with tests
+        if ($class == user::class) {
             $repo->filter_by_not_deleted();
-        } else if (is_a($class, hierarchy_item::class)) {
+        } else if (is_subclass_of($class, hierarchy_item::class)) {
             $repo->set_filter((new hierarchy_item_visible())->set_value(true));
         }
 

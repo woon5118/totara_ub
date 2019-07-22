@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 class user_deleted {
 
     public static function observe(event\user_deleted $event) {
-        $id = $event->get_data()['objectid'];
+        $id = $event->get_data()['objectid'] ?? null;
         if (!empty($id)) {
             // First delete all individual assignments for this user
             assignment_actions::create()->delete_for_user_groups(user_groups::USER, $id, true);
