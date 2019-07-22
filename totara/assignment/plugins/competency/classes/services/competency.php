@@ -46,18 +46,13 @@ class competency extends \external_api {
                 'filters' => new external_single_structure(
                     [
                         'text' => new external_value(PARAM_TEXT, 'text search field value', VALUE_OPTIONAL, null),
-                        'assignmenttype' => new external_multiple_structure(
+                        'assignment_type' => new external_multiple_structure(
                             new external_value(PARAM_TEXT, 'admin, self, etc', VALUE_OPTIONAL),
                             'one or more assignment types',
                             VALUE_OPTIONAL
                         ),
-                        'usergrouptype' => new external_multiple_structure(
-                            new external_value(PARAM_TEXT, 'position, organisation, cohort, user', VALUE_OPTIONAL),
-                            'one or more user group types',
-                            VALUE_OPTIONAL
-                        ),
                         'framework' => new external_value(PARAM_INT, 'competency framework id', VALUE_OPTIONAL, null),
-                        'status' => new external_multiple_structure(
+                        'assignment_status' => new external_multiple_structure(
                             new external_value(PARAM_INT, 'unassigned (0), assigned (1)', VALUE_OPTIONAL),
                             'filter for assigned/unassigned competencies',
                             VALUE_OPTIONAL

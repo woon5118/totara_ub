@@ -47,7 +47,7 @@ abstract class filters {
 
     public static function create_assignment_type_filter(): select_multi {
         return select_multi::create(
-            'assignmenttype',
+            'assignment_type',
             get_string('header:assignment_type', 'tassign_competency'),
             true,
             [

@@ -303,7 +303,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
         ['fws' => $fws] = $this->generate_competencies();
 
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'status' => [ 1 ] ],
+            'filters' => [ 'assignment_status' => [ 1 ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -328,7 +328,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         $filters = [
-            'status' => [ 0 ],
+            'assignment_status' => [ 0 ],
             'framework' => $fws[1]->id,
         ];
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
@@ -356,7 +356,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has position assignment
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'assignmenttype' => [ user_groups::POSITION ] ],
+            'filters' => [ 'assignment_type' => [ user_groups::POSITION ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -371,7 +371,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has organisation assignment
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'assignmenttype' => [ user_groups::ORGANISATION ] ],
+            'filters' => [ 'assignment_type' => [ user_groups::ORGANISATION ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -386,7 +386,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has cohort assignment
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'assignmenttype' => [ user_groups::COHORT ] ],
+            'filters' => [ 'assignment_type' => [ user_groups::COHORT ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -401,7 +401,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has position and organisation assignment
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'assignmenttype' => [ user_groups::POSITION, user_groups::ORGANISATION ] ],
+            'filters' => [ 'assignment_type' => [ user_groups::POSITION, user_groups::ORGANISATION ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -417,7 +417,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has self assignment
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'assignmenttype' => [ assignment::TYPE_SELF ] ],
+            'filters' => [ 'assignment_type' => [ assignment::TYPE_SELF ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -432,7 +432,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has other assignment
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'assignmenttype' => [ assignment::TYPE_OTHER ] ],
+            'filters' => [ 'assignment_type' => [ assignment::TYPE_OTHER ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -447,7 +447,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has system assignment
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'assignmenttype' => [ assignment::TYPE_SYSTEM ] ],
+            'filters' => [ 'assignment_type' => [ assignment::TYPE_SYSTEM ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -462,7 +462,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has admin assignment
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'assignmenttype' => [ assignment::TYPE_ADMIN ] ],
+            'filters' => [ 'assignment_type' => [ assignment::TYPE_ADMIN ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -478,7 +478,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has system, position and organisation assignment
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'assignmenttype' => [ user_groups::ORGANISATION, user_groups::POSITION, assignment::TYPE_SYSTEM ] ],
+            'filters' => [ 'assignment_type' => [ user_groups::ORGANISATION, user_groups::POSITION, assignment::TYPE_SYSTEM ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -496,7 +496,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has admin, system and position assignment
         $res = $this->call_webservice_api('tassign_competency_competency_index', [
-            'filters' => [ 'assignmenttype' => [ user_groups::POSITION, assignment::TYPE_SYSTEM, assignment::TYPE_ADMIN ] ],
+            'filters' => [ 'assignment_type' => [ user_groups::POSITION, assignment::TYPE_SYSTEM, assignment::TYPE_ADMIN ] ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -514,7 +514,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
 
         // Has admin, system, position and organisation assignment
         $filters = [
-            'assignmenttype' => [
+            'assignment_type' => [
                 user_groups::ORGANISATION,
                 user_groups::POSITION,
                 assignment::TYPE_SYSTEM,

@@ -60,7 +60,7 @@ class competencies extends filters {
 
     public static function create_assignment_status_filter(): select_multi {
         return select_multi::create(
-            'status',
+            'assignment_status',
             get_string('filter:assignment_status', 'tassign_competency'),
             true,
             [

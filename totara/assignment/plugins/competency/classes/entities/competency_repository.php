@@ -43,8 +43,8 @@ class competency_repository extends hierarchy_item_repository {
         return array_merge(
             parent::get_default_filters(),
             [
-                'assignmenttype' => new competency_assignment_type(),
-                'status' => new competency_assignment_status(),
+                'assignment_type' => new competency_assignment_type(),
+                'assignment_status' => new competency_assignment_status(),
             ]
         );
     }
