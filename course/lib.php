@@ -1230,7 +1230,8 @@ function course_delete_module($cmid, $async = false) {
     question_delete_activity($cm);
 
     // Call the delete_instance function, if it returns false throw an exception.
-    if (!$deleteinstancefunction($cm->instance)) {
+    // Totara: If instance = 0, skip this step as there is no module instance.
+    if ($cm->instance != 0 && !$deleteinstancefunction($cm->instance)) {
         throw new moodle_exception('cannotdeletemoduleinstance', '', '', null,
             "Cannot delete the module $modulename (instance).");
     }
@@ -1280,7 +1281,8 @@ function course_delete_module($cmid, $async = false) {
     $DB->delete_records('course_modules', array('id' => $cm->id));
 
     // Delete module from that section.
-    if (!delete_mod_from_section($cm->id, $cm->section)) {
+    // Totara: If instance = 0, skip this step as there is no module instance.
+    if ($cm->instance != 0 && !delete_mod_from_section($cm->id, $cm->section)) {
         throw new moodle_exception('cannotdeletemodulefromsection', '', '', null,
             "Cannot delete the module $modulename (instance) from section.");
     }

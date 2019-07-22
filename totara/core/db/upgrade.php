@@ -630,5 +630,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019071801, 'totara', 'core');
     }
 
+    if ($oldversion < 2019072900) {
+        // Delete any un-created drag-and-drop SCORM modules (where instance = 0).
+        $mod_scorm = $DB->get_record('modules', array('name' => 'scorm'), 'id');
+        $DB->delete_records('course_modules', array('module' => $mod_scorm->id, 'instance' => 0));
+
+        upgrade_plugin_savepoint(true, 2019072900, 'totara', 'core');
+    }
+
     return true;
 }
