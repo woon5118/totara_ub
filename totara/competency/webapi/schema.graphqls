@@ -167,7 +167,14 @@ type totara_competency_self_assigned_competencies_result {
 }
 
 input totara_competency_self_assigned_competencies_filter {
-    visible: Boolean
+    text: param_text
+    assignment_type: [param_alphaext]
+    framework: param_integer
+    assignment_status: [param_integer]
+    parent: param_integer
+    path: param_integer
+    type: [param_integer]
+    ids: [param_integer]
 }
 
 extend type Query {

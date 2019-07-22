@@ -25,7 +25,6 @@ namespace totara_competency\webapi\resolver\query;
 
 use context_system;
 use core\orm\collection;
-use core\orm\query\builder;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use tassign_competency\entities\competency as competency_entity;
@@ -48,11 +47,14 @@ class self_assignable_competencies implements query_resolver {
 
         $is_self = $args['user_id'] == user::logged_in()->id;
 
-        $order_by = strtoupper($args['order_by'] ?? 'framework_hierarchy');
-        $order_dir = strtoupper($args['order_dir'] ?? 'asc');
+        $order_by = strtolower($args['order_by'] ?? 'framework_hierarchy');
+        $order_dir = strtolower($args['order_dir'] ?? 'asc');
         $filters = $args['filters'] ?? [];
         $limit = $args['limit'] ?? 0;
         $cursor = $args['cursor'] ?? null;
+
+        // By default filter for visible only
+        $filters['visible'] = true;
 
         $repo = competency_entity::repository()
             ->set_filters($filters);
@@ -64,6 +66,7 @@ class self_assignable_competencies implements query_resolver {
         }
 
         $competencies = $repo
+            ->set_filters($filters)
             ->order_by($order_by, $order_dir)
             ->get();
 
