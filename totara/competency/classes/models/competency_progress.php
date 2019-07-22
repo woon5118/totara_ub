@@ -98,7 +98,7 @@ class competency_progress extends model {
             ];
         }
 
-        $current->assignments[] = $assignment;
+        $current->assignments[] = \tassign_competency\models\assignment::load_by_entity($assignment);
 
         return $current;
     }
