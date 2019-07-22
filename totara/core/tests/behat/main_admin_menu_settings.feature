@@ -81,7 +81,8 @@ Feature: Totara settings for admin main menu
     And I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on "Menu settings" "link" in the "#quickaccess-popover-content" "css_element"
     Then I should see "Core platform"
-    And I click on "//div/child::h3[contains(., 'Core platform')]/following-sibling::div/child::a[contains(., 'Delete group')]" "xpath_element"
+    And I open the action menu in "//div[@aria-label='Core platform']" "xpath_element"
+    And I choose "Delete group" in the open action menu
     And I am on homepage
     And I click on "[aria-label='Show admin menu window']" "css_element"
     Then I should not see "Core platform"
@@ -106,7 +107,8 @@ Feature: Totara settings for admin main menu
     And I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on "Menu settings" "link" in the "#quickaccess-popover-content" "css_element"
     Then I should see "Core platform"
-    And I click on "//div/child::h3[contains(., 'Core platform')]/following-sibling::div/child::a[contains(., 'Delete group')]" "xpath_element"
+    And I open the action menu in "//div[@aria-label='Core platform']" "xpath_element"
+    And I choose "Delete group" in the open action menu
     And I click on "Add a new group" "button"
     And I should see "Untitled"
     And I click on "//div/child::h3[contains(., 'Untitled')]/span" "xpath_element"

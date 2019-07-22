@@ -106,18 +106,10 @@
             </a>
         </h3>
 
-        <div class="totara_core__QuickAccessSettings__group--controls">
-            <a href="#" data-quickaccesssettings-group-action="moveup">
-                {{#flex_icon}}arrow-up,quickaccesssettings:reordergroup-up,totara_core{{/flex_icon}}
-            </a>
-
-            <a href="#" data-quickaccesssettings-group-action="movedown">
-                {{#flex_icon}}arrow-down,quickaccesssettings:reordergroup-down,totara_core{{/flex_icon}}
-            </a>
-
-            <a href="#" data-quickaccesssettings-group-action="delete">
-                {{#flex_icon}}delete,quickaccesssettings:deletegroup,totara_core{{/flex_icon}}
-            </a>
+        <div class="totara_core__QuickAccessSettings__group--controls" data-accordion-noop>
+            {{#actions}}
+                {{> core/action_menu }}
+            {{/actions}}
         </div>
     {{/header_html}}
     {{$body_html}}

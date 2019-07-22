@@ -514,6 +514,7 @@ $string['quickaccesssettings:deletegroup'] = 'Delete group';
 $string['quickaccesssettings:deleteitem'] = 'Delete item';
 $string['quickaccesssettings:editgroupname'] = 'Edit group name';
 $string['quickaccesssettings:edititemname'] = 'Edit item name';
+$string['quickaccesssettings:groupactions'] = 'Group Actions';
 $string['quickaccesssettings:itemlabel'] = 'Item Label:';
 $string['quickaccesssettings:itemname'] = 'Item Target Page:';
 $string['quickaccesssettings:reordergroup-down'] = 'Reorder group lower';

@@ -28,6 +28,10 @@ use totara_core\quickaccessmenu\item;
 use totara_core\quickaccessmenu\menu;
 use totara_core\quickaccessmenu\helper;
 
+use action_menu;
+use action_menu_link;
+use core\output\flex_icon;
+
 final class quickaccesssettings extends \core\output\template {
 
     /**
@@ -47,7 +51,7 @@ final class quickaccesssettings extends \core\output\template {
      * @return quickaccesssettings
      */
     public static function create_from_menu(menu $menu): quickaccesssettings {
-        global $USER;
+        global $USER, $OUTPUT;
 
         $data = [];
         $groups = [];
@@ -56,6 +60,8 @@ final class quickaccesssettings extends \core\output\template {
         $tree_selector = self::get_tree_selector_data();
         $adminroot = self::get_admin_root();
 
+        $actions = self::get_group_actions();
+
         foreach (self::organise_items_by_group($menu->get_items(), $allgroups) as $group => $items) {
             $groups[$group] = [
                 'key'           => $group,
@@ -63,6 +69,7 @@ final class quickaccesssettings extends \core\output\template {
                 'has_items'     => !empty($items),
                 'item_count'    => count($items),
                 'items'         => [],
+                'actions'       => $actions->export_for_template($OUTPUT),
                 'tree_selector' => $tree_selector,
             ];
             /** @var item $item */
@@ -238,4 +245,36 @@ final class quickaccesssettings extends \core\output\template {
         return $groups;
     }
 
+    private static function get_group_actions() : action_menu {
+        global $OUTPUT;
+
+        // Set up group actions
+        $menu = new action_menu();
+        $menu->set_constraint('totara_core__QuickAccessSettings__group');
+        $menu->set_alignment(action_menu::TR, action_menu::BR);
+        $menu->set_menu_trigger($OUTPUT->flex_icon('settings', [
+            'alt' => get_string('quickaccesssettings:groupactions', 'totara_core')
+        ]));
+
+        // Create actions
+        $noop_url = new \moodle_url('#');
+        $moveup_icon = new flex_icon('arrow-up', ['alt' => get_string('quickaccesssettings:reordergroup-up','totara_core')]);
+        $action_moveup = new action_menu_link($noop_url, $moveup_icon , '', true, [
+            'data-quickaccesssettings-group-action' => 'moveup'
+        ]);
+        $movedown_icon = new flex_icon('arrow-down', ['alt' => get_string('quickaccesssettings:reordergroup-down','totara_core')]);
+        $action_movedown = new action_menu_link($noop_url, $movedown_icon, '', true, [
+            'data-quickaccesssettings-group-action' => 'movedown'
+        ]);
+        $action_delete = new action_menu_link($noop_url, null, get_string('quickaccesssettings:deletegroup', 'totara_core'), false, [
+            'data-quickaccesssettings-group-action' => 'delete'
+        ]);
+
+        // Add to the menu
+        $menu->add($action_moveup);
+        $menu->add($action_movedown);
+        $menu->add($action_delete);
+
+        return $menu;
+    }
 }

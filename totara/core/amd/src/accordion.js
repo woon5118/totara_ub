@@ -48,6 +48,9 @@ define(['core/templates'], function(templates) {
         var self = this;
 
         var toggleHeader = function(e) {
+            // If this is inside a no-op section, don't open/close the accordion
+            if (e.target.closest('[data-accordion-noop]')) { return; }
+
             var item = e.target.closest('.totara_core__Accordion__item');
             if (item) {
                 self.toggleItem(item);
