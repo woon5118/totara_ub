@@ -49,15 +49,7 @@ if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
         'PHPUnit_Framework_Error_Warning' => \PHPUnit\Framework\Error\Warning::class,
         'PHPUnit_Framework_Error_Notice' => \PHPUnit\Framework\Error\Notice::class,
         'PHPUnit_Framework_ExpectationFailedException' => \PHPUnit\Framework\ExpectationFailedException::class,
-        'PHPUnit_Extensions_Database_DataSet_FlatXmlDataSet' => \PHPUnit\DbUnit\DataSet\FlatXmlDataSet::class,
-        'PHPUnit_Extensions_Database_DataSet_XmlDataSet' => \PHPUnit\DbUnit\DataSet\XmlDataSet::class,
-        'PHPUnit_Extensions_Database_DataSet_CsvDataSet' => \PHPUnit\DbUnit\DataSet\CsvDataSet::class,
-        'PHPUnit_Extensions_Database_DataSet_IDataSet' => \PHPUnit\DbUnit\DataSet\IDataSet::class,
-        'PHPUnit_Extensions_Database_DataSet_DefaultTableMetaData' => \PHPUnit\DbUnit\DataSet\DefaultTableMetadata::class,
-        'PHPUnit_Extensions_Database_DataSet_DefaultTableIterator' => \PHPUnit\DbUnit\DataSet\DefaultTableIterator::class,
         'PHPUnit_Util_Fileloader' => \PHPUnit\Util\Fileloader::class,
         'PHPUnit_Util_Configuration' => \PHPUnit\Util\Configuration::class,
-        'PHPUnit_Extensions_Database_DataSet_ReplacementDataSet' => \PHPUnit\DbUnit\DataSet\ReplacementDataSet::class,
-        'PHPUnit_Extensions_Database_DataSet_DataSetFilter' => \PHPUnit\DbUnit\DataSet\Filter::class,
     ];
 }

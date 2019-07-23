@@ -117,40 +117,36 @@ abstract class advanced_testcase extends base_testcase {
     }
 
     /**
-     * Creates a new FlatXmlDataSet with the given $xmlFile. (absolute path.)
+     * Creates a new data set with the given $xmlFile. (absolute path.)
      *
      * @param string $xmlFile
-     * @return \PHPUnit\DbUnit\DataSet\FlatXmlDataSet
+     * @return phpunit_ArrayDataSet
      */
     protected function createFlatXMLDataSet($xmlFile) {
-        return new \PHPUnit\DbUnit\DataSet\FlatXmlDataSet($xmlFile);
+        return phpunit_ArrayDataSet::createFromFlatXML($xmlFile);
     }
 
     /**
-     * Creates a new XMLDataSet with the given $xmlFile. (absolute path.)
+     * Creates a new data set with the given $xmlFile. (absolute path.)
      *
      * @param string $xmlFile
-     * @return \PHPUnit\DbUnit\DataSet\XmlDataSet
+     * @return phpunit_ArrayDataSet
      */
     protected function createXMLDataSet($xmlFile) {
-        return new \PHPUnit\DbUnit\DataSet\XmlDataSet($xmlFile);
+        return phpunit_ArrayDataSet::createFromXML($xmlFile);
     }
 
     /**
-     * Creates a new CsvDataSet from the given array of csv files. (absolute paths.)
+     * Creates a new data set from the given array of csv files. (absolute paths.)
      *
      * @param array $files array tablename=>cvsfile
      * @param string $delimiter
      * @param string $enclosure
      * @param string $escape
-     * @return \PHPUnit\DbUnit\DataSet\CsvDataSet
+     * @return phpunit_ArrayDataSet
      */
     protected function createCsvDataSet($files, $delimiter = ',', $enclosure = '"', $escape = '"') {
-        $dataSet = new \PHPUnit\DbUnit\DataSet\CsvDataSet($delimiter, $enclosure, $escape);
-        foreach($files as $table=>$file) {
-            $dataSet->addTable($table, $file);
-        }
-        return $dataSet;
+        return phpunit_ArrayDataSet::createFromCSV($files, $delimiter, $enclosure, $escape);
     }
 
     /**
@@ -164,36 +160,32 @@ abstract class advanced_testcase extends base_testcase {
     }
 
     /**
-     * Load date into moodle database tables from standard PHPUnit data set.
+     * Load date into moodle database tables from data set.
      *
      * Note: it is usually better to use data generators
      *
-     * @param \PHPUnit\DbUnit\DataSet\IDataSet $dataset
+     * @param phpunit_ArrayDataSet
      * @return void
      */
-    protected function loadDataSet(\PHPUnit\DbUnit\DataSet\IDataSet $dataset) {
+    protected function loadDataSet(phpunit_ArrayDataSet $dataset) {
         global $DB;
 
-        foreach($dataset->getTableNames() as $tablename) {
-            $table = $dataset->getTable($tablename);
-            $metadata = $dataset->getTableMetaData($tablename);
-            $columns = $metadata->getColumns();
-
-            $doimport = in_array('id', $columns);
-            if ($doimport) {
-                $dbcolumns = $DB->get_columns($tablename, true);
-                $doimport = (isset($dbcolumns['id']) and $dbcolumns['id']->auto_increment);
-            }
-
-            for($r=0; $r<$table->getRowCount(); $r++) {
-                $record = $table->getRow($r);
-                if ($doimport) {
+        foreach ($dataset as $tablename => $rows) {
+            $imported = false;
+            foreach ($rows as $record) {
+                $record = (object)$record;
+                if (isset($record->id)) {
                     $DB->import_record($tablename, $record);
+                    $imported = true;
                 } else {
+                    if ($imported) {
+                        $DB->get_manager()->reset_sequence(new xmldb_table($tablename));
+                        $imported = false;
+                    }
                     $DB->insert_record($tablename, $record);
                 }
             }
-            if ($doimport) {
+            if ($imported) {
                 $DB->get_manager()->reset_sequence(new xmldb_table($tablename));
             }
         }

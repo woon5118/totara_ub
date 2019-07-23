@@ -191,22 +191,16 @@ class core_statslib_testcase extends advanced_testcase {
      * @return array
      */
     protected function load_xml_data_file($file) {
-        static $replacements = null;
+        global $CFG;
+        $xml = file_get_contents($file);
+        $xml = str_replace(array_keys($this->replacements), array_values($this->replacements), $xml);
+        $newfile = $CFG->dataroot . '/replaced.xml';
+        file_put_contents($newfile, $xml);
 
-        $raw   = $this->createXMLDataSet($file);
-        $clean = new \PHPUnit\DbUnit\DataSet\ReplacementDataSet($raw);
+        $tables = $this->createXMLDataSet($newfile)->getTables();
+        unlink($newfile);
 
-        foreach ($this->replacements as $placeholder => $value) {
-            $clean->addFullReplacement($placeholder, $value);
-        }
-
-        $logs = new \PHPUnit\DbUnit\DataSet\Filter($clean);
-        $logs->addIncludeTables(array('log'));
-
-        $stats = new \PHPUnit\DbUnit\DataSet\Filter($clean);
-        $stats->addIncludeTables(array('stats_daily', 'stats_user_daily'));
-
-        return array($logs, $stats);
+        return [['log' => $tables['log']], ['stats_daily' => $tables['stats_daily'], 'stats_user_daily' => $tables['stats_user_daily']]];
     }
 
     /**

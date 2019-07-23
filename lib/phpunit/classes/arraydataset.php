@@ -33,53 +33,255 @@
  * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class phpunit_ArrayDataSet extends \PHPUnit\DbUnit\DataSet\AbstractDataSet {
-    /**
-     * @var array
-     */
+final class phpunit_ArrayDataSet implements Iterator, ArrayAccess, Countable {
+    /** @var phpunit_DataSet_Table[] */
     protected $tables = array();
 
-    /**
-     * @param array $data
-     */
-    public function __construct(array $data) {
-        foreach ($data AS $tableName => $rows) {
-            $firstrow = reset($rows);
+    /** @var ArrayIterator */
+    private $iterator;
 
-            if (array_key_exists(0, $firstrow)) {
-                // columns in first row
-                $columnsInFirstRow = true;
-                $columns = $firstrow;
-                $key = key($rows);
-                unset($rows[$key]);
-            } else {
-                // column name is in each row as key
-                $columnsInFirstRow = false;
-                $columns = array_keys($firstrow);
-            }
-
-            $metaData = new \PHPUnit\DbUnit\DataSet\DefaultTableMetadata($tableName, $columns);
-            $table = new \PHPUnit\DbUnit\DataSet\DefaultTable($metaData);
-
-            foreach ($rows AS $row) {
-                if ($columnsInFirstRow) {
-                    $row = array_combine($columns, $row);
+    public function __construct(array $array) {
+        foreach ($array as $tablename => $data) {
+            if (isset($data[0][0])) {
+                $columns = array_shift($data);
+                $rows = [];
+                foreach ($data as $values) {
+                    $rows[] = array_combine($columns, $values);
                 }
-                $table->addRow($row);
+            } else {
+                $rows = $data;
             }
-            $this->tables[$tableName] = $table;
-        }
-    }
-
-    protected function createIterator($reverse = FALSE) {
-        return new \PHPUnit\DbUnit\DataSet\DefaultTableIterator($this->tables, $reverse);
-    }
-
-    public function getTable($tableName) {
-        if (!isset($this->tables[$tableName])) {
-            throw new InvalidArgumentException("$tableName is not a table in the current database.");
+            $this->tables[$tablename] = new phpunit_DataSet_Table($rows);
         }
 
-        return $this->tables[$tableName];
+        $this->iterator = new ArrayIterator($this->tables);
+    }
+
+    public function getTableNames(): array {
+        return array_keys($this->tables);
+    }
+
+    public function getTableMetaData(string $tablename) {
+        return new phpunit_DataSet_Table_Metadata(array_keys($this->tables[$tablename][0]));
+    }
+
+    public function getIterator() {
+        return new ArrayIterator($this->tables);
+    }
+
+    public function getTables(): array {
+        return $this->tables;
+    }
+
+    public function getTable(string $tablename): phpunit_DataSet_Table {
+        return $this->tables[$tablename];
+    }
+
+    public function count() {
+        return count($this->tables);
+    }
+
+    public function current() {
+        return $this->iterator->current();
+    }
+
+    public function next() {
+        $this->iterator->next();
+    }
+
+    public function key() {
+        return $this->iterator->key();
+    }
+
+    public function valid() {
+        return $this->iterator->valid();
+    }
+
+    public function rewind() {
+        $this->iterator->rewind();
+    }
+
+    public function offsetExists($offset) {
+        return array_key_exists($offset, $this->tables);
+    }
+
+    public function offsetGet($offset) {
+        return $this->tables[$offset];
+    }
+
+    public function offsetSet($offset, $value) {
+        throw new Exception('Cannot modify dataset tables');
+    }
+
+    public function offsetUnset($offset) {
+        throw new Exception('Cannot modify dataset tables');
+    }
+
+    public static function createFromCSV($files, $delimiter, $enclosure, $escape) {
+        $array = [];
+        foreach ($files as $tablename => $file) {
+            $lines = array_map('str_getcsv', file($file));
+            $columns = array_shift($lines);
+            $rows = [];
+            foreach ($lines as $record) {
+                $rows[] = array_combine($columns, $record);
+            }
+            $array[$tablename] = $rows;
+        }
+        return new self($array);
+    }
+
+    public static function createFromXML($xmlFile) {
+        $xml = simplexml_load_string(file_get_contents($xmlFile));
+
+        if ($xml->getName() !== 'dataset') {
+            throw new Error('Invalid data set file: ' . $xmlFile);
+        }
+
+        $array = [];
+
+        foreach ($xml->children() as $table) {
+            if ($table->getName() !== 'table') {
+                continue;
+            }
+            $tablename = strval($table->attributes()['name']);
+            $array[$tablename] = [];
+            $columns = [];
+            foreach ($table as $column) {
+                if ($column->getName() !== 'column') {
+                    continue;
+                }
+                $columns[] = $column->__toString();
+            }
+            if (!$columns) {
+                continue;
+            }
+            $rows = [];
+            foreach ($table as $row) {
+                if ($row->getName() !== 'row') {
+                    continue;
+                }
+                $record = [];
+                foreach ($row as $value) {
+                    if ($value->getName() !== 'value') {
+                        continue;
+                    }
+                    $record[] = $value->__toString();
+                }
+                $rows[] = array_combine($columns, $record);
+            }
+            $array[$tablename] = $rows;
+        }
+        return new self($array);
+    }
+
+    public static function createFromFlatXML($xmlFile) {
+        $xml = simplexml_load_string(file_get_contents($xmlFile));
+
+        if ($xml->getName() !== 'dataset') {
+            throw new Error('Invalid data set file: ' . $xmlFile);
+        }
+
+        $array = [];
+        foreach ($xml->children() as $table) {
+            $tablename = $table->getName();
+            if (!isset($array[$tablename])) {
+                $array[$tablename] = [];
+            }
+            $row = [];
+            foreach ($table->attributes() as $column) {
+                $row[$column->getName()] = $column->__toString();
+            }
+            if ($row) {
+                $array[$tablename][] = $row;
+            }
+        }
+        return new self($array);
+    }
+}
+
+/**
+ * Data set table class
+ */
+final class phpunit_DataSet_Table implements Iterator, ArrayAccess, Countable {
+    /** @var array */
+    protected $rows;
+
+    /** @var ArrayIterator */
+    protected $iterator;
+
+    public function __construct(array $rows) {
+        $this->rows = $rows;
+        $this->iterator = new ArrayIterator($this->rows);
+    }
+
+    public function getRowCount(): int {
+        return count($this->rows);
+    }
+
+    public function getRow(int $rowno): array {
+        return $this->rows[$rowno];
+    }
+
+    public function getValue(int $row, int $column) {
+        $row = $this->getRow($row);
+        $columname = array_keys($row)[$column];
+        return $row[$columname];
+    }
+
+    public function count() {
+        return count($this->rows);
+    }
+
+    public function current() {
+        return $this->iterator->current();
+    }
+
+    public function next() {
+        $this->iterator->next();
+    }
+
+    public function key() {
+        return $this->iterator->key();
+    }
+
+    public function valid() {
+        return $this->iterator->valid();
+    }
+
+    public function rewind() {
+        $this->iterator->rewind();
+    }
+
+    public function offsetExists($offset) {
+        return array_key_exists($offset, $this->rows);
+    }
+
+    public function offsetGet($offset) {
+        return $this->rows[$offset];
+    }
+
+    public function offsetSet($offset, $value) {
+        throw new Exception('Cannot modify dataset tables');
+    }
+
+    public function offsetUnset($offset) {
+        throw new Exception('Cannot modify dataset tables');
+    }
+}
+
+/**
+ * Data set table metadata
+ */
+final class phpunit_DataSet_Table_Metadata {
+    /** @var array */
+    protected $columns;
+
+    public function __construct(array $columns) {
+        $this->columns = $columns;
+    }
+
+    public function getColumns() {
+        return $this->columns;
     }
 }

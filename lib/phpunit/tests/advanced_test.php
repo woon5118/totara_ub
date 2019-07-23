@@ -322,6 +322,12 @@ class core_phpunit_advanced_testcase extends advanced_testcase {
         $this->assertSame('john.doe', $user5->username);
         $this->assertSame('jane.doe', $user7->username);
 
+        $this->assertSame(['user'], $dataset->getTableNames());
+        $this->assertSame(['id', 'username', 'email'], $dataset->getTableMetaData('user')->getColumns());
+        $this->assertSame(2, $dataset->getTable('user')->getRowCount());
+        $this->assertSame(['id' => '5', 'username' => 'john.doe', 'email' => 'john@example.com'], $dataset->getTable('user')->getRow(0));
+        $this->assertSame('john.doe', $dataset->getTable('user')->getValue(0, 1));
+
         $dataset = $this->createCsvDataSet(array('user'=>__DIR__.'/fixtures/sample_dataset.csv'));
         $this->loadDataSet($dataset);
         $this->assertEquals(8, $DB->get_field('user', 'id', array('username'=>'pepa.novak')));
@@ -349,6 +355,17 @@ class core_phpunit_advanced_testcase extends advanced_testcase {
         $this->loadDataSet($dataset);
         $this->assertTrue($DB->record_exists('user', array('username'=>'noidea')));
         $this->assertTrue($DB->record_exists('user', array('username'=>'onemore')));
+
+        $this->assertFalse($DB->record_exists('user', array('id'=>15)));
+        $this->assertFalse($DB->record_exists('user', array('id'=>17)));
+        $dataset = $this->createFlatXMLDataSet(__DIR__.'/fixtures/sample_dataset_flat.xml');
+        $this->loadDataSet($dataset);
+        $this->assertTrue($DB->record_exists('user', array('id'=>15)));
+        $this->assertTrue($DB->record_exists('user', array('id'=>17)));
+        $user15 = $DB->get_record('user', array('id'=>15));
+        $user17 = $DB->get_record('user', array('id'=>17));
+        $this->assertSame('nobody', $user15->username);
+        $this->assertSame('somebody', $user17->username);
     }
 
     public function test_assert_time_current() {
