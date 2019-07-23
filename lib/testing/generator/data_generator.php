@@ -41,6 +41,7 @@ class testing_data_generator {
     /** @var int The number of grade outcomes created */
     protected $gradeoutcomecounter = 0;
     protected $usercounter = 0;
+    protected $userusednames = [];
     protected $categorycount = 0;
     protected $cohortcount = 0;
     protected $coursecount = 0;
@@ -88,6 +89,7 @@ EOD;
      */
     public function reset() {
         $this->usercounter = 0;
+        $this->userusednames = [];
         $this->categorycount = 0;
         $this->coursecount = 0;
         $this->scalecount = 0;
@@ -157,8 +159,17 @@ EOD;
             $firstname = rand(0, 4);
             $lastname = rand(0, 4);
             $female = rand(0, 1);
-            $record['firstname'] = $this->firstnames[($country*10) + $firstname + ($female*5)];
-            $record['lastname'] = $this->lastnames[($country*10) + $lastname + ($female*5)];
+            // Totara: Make sure that the random full user names are unique.
+            $firstname = $this->firstnames[($country*10) + $firstname + ($female*5)];
+            $lastname = $this->lastnames[($country*10) + $lastname + ($female*5)];
+            if (!isset($this->userusednames[$firstname . ' ' . $lastname])) {
+                $record['firstname'] = $firstname;
+                $record['lastname'] = $lastname;
+                $this->userusednames[$record['firstname'] . ' ' . $record['lastname']] = true;
+            } else {
+                $record['firstname'] = $firstname.$i;
+                $record['lastname'] = $lastname.$i;
+            }
 
         } else if (!isset($record['firstname'])) {
             $record['firstname'] = 'Firstname'.$i;
