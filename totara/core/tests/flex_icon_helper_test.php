@@ -82,7 +82,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
     public function test_get_data_by_identifier() {
         global $CFG;
 
-        $expected = array('classes' => 'fa-edit');
+        $expected = array('classes' => 'fa-pencil');
         $this->assertSame($expected, flex_icon_helper::get_data_by_identifier($CFG->theme, 'edit'));
 
         $expected = array('classes' => array(

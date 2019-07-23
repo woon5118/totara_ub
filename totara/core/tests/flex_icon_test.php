@@ -127,7 +127,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         // New icon names.
         $icon = new flex_icon('edit', array('classes' => 'normalstuff'));
         $expected = array(
-            'classes' => 'fa-edit',
+            'classes' => 'fa-pencil',
             'identifier' => 'edit',
             'customdata' => array('classes' => 'normalstuff'),
         );
@@ -146,7 +146,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         // Legacy icon name.
         $icon = new flex_icon('core|i/edit');
         $expected = array(
-            'classes' => 'fa-edit',
+            'classes' => 'fa-pencil',
             'identifier' => 'core|i/edit',
             'customdata' => array(),
         );

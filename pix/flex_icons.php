@@ -790,7 +790,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-edit',
+                    'classes' => 'fa-pencil',
                 ),
         ),
     'email' =>
