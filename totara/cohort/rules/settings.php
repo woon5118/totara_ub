@@ -79,9 +79,9 @@ define('COHORT_RULES_TYPE_TEXT', 0);
  */
 function cohort_rules_list($reset = false){
     global $CFG, $DB;
-    static $rules = false;
+    static $rules = false; // This is no good for phpunit tests
 
-    if (!$rules || $reset) {
+    if (!$rules || $reset || PHPUNIT_TEST) {
         $rules = array();
 
         // User's idnumber
