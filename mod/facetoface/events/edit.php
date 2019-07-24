@@ -39,6 +39,18 @@ $savewithconflicts = optional_param('savewithconflicts', 0, PARAM_BOOL); // Save
 
 $seminarevent = new \mod_facetoface\seminar_event($s);
 $seminar = $seminarevent->get_seminar();
+if ($backtoevent) {
+    $returnurl = new moodle_url('/mod/facetoface/attendees/event.php', ['s' => $seminarevent->get_id()]);
+} else if ($backtoallsessions) {
+    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
+} else {
+    $returnurl = new moodle_url('/course/view.php', array('id' => $seminar->get_course()));
+}
+// Do not redirect if it copy event process.
+if ((bool)$seminarevent->get_cancelledstatus() && !(bool)$c) {
+    redirect($returnurl, get_string('error:cannoteditcancelledevent', 'mod_facetoface'), null, \core\notification::ERROR);
+}
+
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 $course = $DB->get_record('course', array('id' => $seminar->get_course()));
@@ -57,7 +69,6 @@ if ($cntdates === 0 && !empty($session->sessiondates)) {
     $cntdates = count($session->sessiondates);
 }
 
-$context = context_module::instance($cm->id);
 $f  = $seminar->get_id();
 $id = $cm->id;
 
@@ -94,14 +105,6 @@ $jsmodule = array(
     'fullpath' => '/mod/facetoface/js/event.js',
     'requires' => array('json', 'totara_core'));
 $PAGE->requires->js_init_call('M.totara_f2f_room.init', array($jsconfig), false, $jsmodule);
-
-if ($backtoevent) {
-    $returnurl = new moodle_url('/mod/facetoface/attendees/event.php', ['s' => $seminarevent->get_id()]);
-} else if ($backtoallsessions) {
-    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
-} else {
-    $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
-}
 
 $facetoface = new stdClass();
 $facetoface->id = $seminar->get_id();

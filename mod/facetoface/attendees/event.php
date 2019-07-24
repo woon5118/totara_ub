@@ -69,7 +69,9 @@ require_once($CFG->dirroot.'/mod/facetoface/attendees/tabs.php'); // If needed i
 /** @var mod_facetoface_renderer $renderer */
 $renderer = $PAGE->get_renderer('mod_facetoface');
 $renderer->setcontext($context);
-echo $renderer->render_editevent_button($seminarevent);
+if (!(bool)$seminarevent->get_cancelledstatus()) {
+    echo $renderer->render_editevent_button($seminarevent);
+}
 echo $renderer->render_seminar_event($seminarevent, true, false, true);
 echo $renderer->render_action_bar_on_tabpage($seminarurl);
 echo $OUTPUT->footer();
