@@ -575,6 +575,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'bookingstatus',
             get_string('bookingstatus', 'rb_source_facetoface_summary'),
             "(CASE WHEN {$now} > {$joindates}.timefinish AND cntsignups < {$joinsessions}.capacity THEN 'ended'
+                   WHEN {$joinsessions}.registrationtimefinish <> 0 AND {$now} > {$joinsessions}.registrationtimefinish THEN 'ended'
                    WHEN cancelledstatus <> 0 THEN 'cancelled'
                    WHEN cntsignups < {$joinsessions}.mincapacity THEN 'underbooked'
                    WHEN cntsignups < {$joinsessions}.capacity THEN 'available'
