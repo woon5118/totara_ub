@@ -57,6 +57,10 @@ class event_handler {
                 }
             }
         }
+
+        // Brute force unenrol from Seminar session role.
+        $DB->delete_records('facetoface_session_roles', array('userid' => $userid));
+
         return true;
     }
 

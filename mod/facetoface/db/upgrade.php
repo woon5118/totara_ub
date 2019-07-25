@@ -623,5 +623,13 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019061600, 'facetoface');
     }
 
+    // Remove orphaned session roles product of deleting a user.
+    if ($oldversion < 2019072500) {
+        $sql = "DELETE FROM {facetoface_session_roles} WHERE userid IN (SELECT id FROM {user} WHERE deleted = 1)";
+        $DB->execute($sql);
+
+        upgrade_mod_savepoint(true, 2019072500, 'facetoface');
+    }
+
     return true;
 }

@@ -365,7 +365,7 @@ class notice_sender {
             return false;
         }
 
-        $user = $DB->get_record('user', ['id' => $userid]);
+        $user = $DB->get_record('user', ['id' => $userid, 'deleted' => 0]);
         if (!$user) {
             return 'userdoesnotexist';
         }
