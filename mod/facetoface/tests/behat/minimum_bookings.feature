@@ -46,7 +46,7 @@ Feature: Minimum Seminar bookings
     Then the field "Minimum bookings" matches value "5"
 
     When I set the field "Minimum bookings" to "2"
-    And I click on "Edit session" "link" in the "Select room" "table_row"
+    And I click on "Edit session" "link" in the "Select rooms" "table_row"
     And I set the following fields to these values:
       | timestart[day]     | 29       |
       | timestart[month]   | December |

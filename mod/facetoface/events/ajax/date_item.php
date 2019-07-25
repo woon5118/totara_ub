@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2016 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,27 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
- * @package totara
- * @subpackage facetoface
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package mod_facetoface
  */
 
 define('AJAX_SCRIPT', true);
 
 require_once(__DIR__ . '/../../../../config.php');
 
-$roomid = required_param('id', PARAM_INT);  // room id
+$timestart = optional_param('timestart', 0, PARAM_INT);
+$timefinish = optional_param('timefinish', 0, PARAM_INT);
+$sesiontimezone = optional_param('sesiontimezone', '99', PARAM_TIMEZONE);
 
-// Setup / loading data
-ajax_require_login();
+require_sesskey();
 
-// Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
-send_headers('text/html; charset=utf-8', false);
+$PAGE->set_context(context_system::instance());
+$PAGE->set_url('/mod/facetoface/events/ajax/date_item.php');
 
-if (empty($roomid)) {
-    exit;
+// Render date string.
+$out = '';
+if ($timestart && $timefinish) {
+    $out = \mod_facetoface\event_dates::render($timestart, $timefinish, $sesiontimezone);
 }
 
-$room = new \mod_facetoface\room($roomid);
-
-echo $room->get_capacity();
+echo json_encode($out);

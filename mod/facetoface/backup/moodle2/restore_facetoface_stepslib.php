@@ -49,8 +49,17 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         if ($userinfo) {
             $paths[] = new restore_path_element('facetoface_signups_dates_status', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/signups_dates_status/signup_date_status');
         }
-        $paths[] = new restore_path_element('facetoface_room', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/room');
-        $paths[] = new restore_path_element('facetoface_room_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/room/room_fields/room_field');
+        /**
+         * Start.
+         * This is totara12 leftover for case if client has t12 old backup, upgraded to t13 and wants to restore on t13.
+         * Keep it as long as it necessary.
+         * Do not forget to delete the process_facetoface_room_t12() and process_facetoface_room_custom_field_t12() methods.
+         */
+        $paths[] = new restore_path_element('facetoface_room_t12', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/room');
+        $paths[] = new restore_path_element('facetoface_room_custom_field_t12', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/room/room_fields/room_field');
+        /** End. */
+        $paths[] = new restore_path_element('facetoface_room', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/rooms/room');
+        $paths[] = new restore_path_element('facetoface_room_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/rooms/room/room_fields/room_field');
         $paths[] = new restore_path_element('facetoface_asset', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/assets/asset');
         $paths[] = new restore_path_element('facetoface_asset_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/assets/asset/asset_fields/asset_field');
 
@@ -344,7 +353,6 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
             return;
         }
 
-        $data->roomid = 0;
         $data->timestart = $this->apply_date_offset($data->timestart);
         $data->timefinish = $this->apply_date_offset($data->timefinish);
 
@@ -352,6 +360,22 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $newitemid = $DB->insert_record('facetoface_sessions_dates', $data);
 
         $this->set_mapping('facetoface_sessions_date', $oldid, $newitemid);
+    }
+
+    /**
+     * This is totara12 leftover for case if client has t12 old backup, upgraded to t13 and wants to restore on t13.
+     * @param $data
+     */
+    protected function process_facetoface_room_t12($data) {
+        $this->process_facetoface_room($data);
+    }
+
+    /**
+     * This is totara12 leftover for case if client has t12 old backup, upgraded to t13 and wants to restore on t13.
+     * @param $data
+     */
+    protected function process_facetoface_room_custom_field_t12($data) {
+        $this->process_facetoface_room_custom_field($data);
     }
 
     protected function process_facetoface_room($data) {
@@ -378,7 +402,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
             if (!$newid) {
                 $newid = $this->create_facetoface_room($data);
             }
-            $DB->set_field('facetoface_sessions_dates', 'roomid', $newid, array('id' => $sessionsdateid));
+            $DB->insert_record('facetoface_room_dates', (object)array('roomid' => $newid, 'sessionsdateid' => $sessionsdateid));
             return;
         }
         // Only set the mapping when we actually create a new room!!!
@@ -408,7 +432,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
             }
         }
         // It should be fine to add the room to the session.
-        $DB->set_field('facetoface_sessions_dates', 'roomid', $room->get_id(), array('id' => $sessionsdateid));
+        $DB->insert_record('facetoface_room_dates', (object)array('roomid' => $room->get_id(), 'sessionsdateid' => $sessionsdateid));
     }
 
     protected function process_facetoface_room_custom_field($data) {

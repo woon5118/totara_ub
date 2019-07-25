@@ -75,8 +75,15 @@ final class messaging {
 
         // Get user object if only id is given.
         $user = is_object($user) ? $user : $DB->get_record('user', ['id' => $user]);
-        $rooms = \mod_facetoface\room_list::get_event_rooms($session->id);
-
+        $roomlist = [];
+        // Generating for updated dates.
+        foreach ($dates as $date) {
+            /** @var \mod_facetoface\room_list $rooms */
+            $rooms = \mod_facetoface\room_list::from_session($date->id);
+            if (!$rooms->is_empty()) {
+                $roomlist[] = $rooms;
+            }
+        }
         // If generating event for a single date, then use REQUEST, otherwise use PUBLISH.
         // Generally publish is used not for events, but for unsolicited invitations and must not
         // contain attendees, but requests with multiple dates simply don't work with apple calendar.
@@ -92,7 +99,7 @@ final class messaging {
         // Little helper which would have been a private method only if we had a class to generate
         // a VEVENT block for a single date to avoid code duplication.
         $generate_event_for_the_date = function ($date, $cancel = false)
-        use ($f2f, $session, $user, $method, $rooms, $description) {
+        use ($f2f, $session, $user, $method, $roomlist, $description) {
             global $CFG;
 
             $method = $cancel ? MDL_F2F_CANCEL : $method;
@@ -127,30 +134,52 @@ final class messaging {
             $icaldescription .= !empty($session->details) ? "\n" . $session->details : '';
             $DESCRIPTION = self::ical_escape($icaldescription, true);
 
+            // NOTE: Newlines are meant to be encoded with the literal sequence
+            // '\n'. But evolution presents a single line text field for location,
+            // and shows the newlines as [0x0A] junk. So we switch it for commas
+            // here. Remember commas need to be escaped too.
+            $delimiter = get_string('icallocationstringdelimiter', 'mod_facetoface');
             // Get the location data from custom fields if they exist.
             $location = [];
-            if (!empty($date->roomid) && $rooms->contains($date->roomid)) {
-                /**
-                 * @var \mod_facetoface\room $room
-                 */
-                $room = $rooms->get($date->roomid);
-                $roomcf = $room->get_customfield_array();
-
-                if (!empty($room->get_name())) {
-                    $location[] = $room->get_name();
-                }
-                if (!empty($roomcf['building'])) {
-                    $location[] = $roomcf['building'];
-                }
-                if (!empty($roomcf['location'])) {
-                    $location[] = $roomcf['location'];
+            foreach ($roomlist as $rooms) {
+                if (!$rooms->is_empty()) {
+                    if ($rooms->count() == 1) {
+                        $rooms->rewind();
+                        /** @var \mod_facetoface\room $room */
+                        $room = $rooms->current();
+                        $roomcf = $room->get_customfield_array();
+                        if (!empty($room->get_name())) {
+                            $location[] = $room->get_name();
+                        }
+                        if (!empty($roomcf['building'])) {
+                            $location[] = $roomcf['building'];
+                        }
+                        if (!empty($roomcf['location'])) {
+                            $location[] = $roomcf['location'];
+                        }
+                    } else {
+                        // More then one room
+                        foreach ($rooms as $room) {
+                            $place = [];
+                            $roomcf = $room->get_customfield_array();
+                            if (!empty($room->get_name())) {
+                                $place[] = $room->get_name();
+                            }
+                            if (!empty($roomcf['building'])) {
+                                $place[] = $roomcf['building'];
+                            }
+                            if (!empty($roomcf['location'])) {
+                                $place[] = $roomcf['location'];
+                            }
+                            $location[] = implode($delimiter, $place);
+                        }
+                    }
                 }
             }
             // NOTE: Newlines are meant to be encoded with the literal sequence
             // '\n'. But evolution presents a single line text field for location,
             // and shows the newlines as [0x0A] junk. So we switch it for commas
             // here. Remember commas need to be escaped too.
-            $delimiter = get_string('icallocationstringdelimiter', 'facetoface');
             $location = str_replace('\n', $delimiter, self::ical_escape(implode($delimiter."\n", $location), true));
 
             // Possibility of multiple commas, replaced with the single one.

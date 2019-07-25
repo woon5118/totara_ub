@@ -21,7 +21,11 @@
  * @package mod_facetoface
  */
 
+use mod_facetoface\room_list;
+
 defined('MOODLE_INTERNAL') || die();
+
+use \mod_facetoface\{seminar, seminar_event, room_helper};
 
 class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
 
@@ -86,12 +90,12 @@ class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
         $data = array(
             'sessionid' => $event->id,
             'sessiontimezone' => isset($CFG->timezone) ?  $CFG->timezone : 99,
-            'roomid' => $room->id,
             'timestart' => $time,
             'timefinish' => $time + 3600
         );
 
-        $DB->insert_record("facetoface_sessions_dates", (object)$data);
+        $fsdid = $DB->insert_record("facetoface_sessions_dates", (object)$data);
+        room_helper::sync($fsdid, [$room->id]);
     }
 
 
@@ -130,40 +134,17 @@ class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
     public function test_custom_room_is_appearing_in_search_result(): void {
         global $USER;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
+
+        $time = time();
 
         $course = $this->getDataGenerator()->create_course();
         $facetoface = $this->create_seminar($course);
+        $event = $this->create_facetoface_event($facetoface, $USER);
         $room = $this->create_custom_room($USER);
+        $this->create_event_session($event, $room);
 
-        $time = time();
-        $dialog = new totara_dialog_content();
-        $dialog->searchtype = 'facetoface_room';
-
-        $dialog->proxy_dom_data(['id', 'name', 'custom', 'capacity']);
-        $dialog->items = [$room];
-        $dialog->disabled_items = [];
-        $dialog->lang_file = 'facetoface';
-        $dialog->customdata = [
-            'facetofaceid' => $facetoface->id,
-            'timestart' => $time,
-            'timefinish' => $time + 3600,
-            'sessionid' => 0,
-            'selected' => $room->id,
-            'offset' => 0
-        ];
-
-        $dialog->string_nothingtodisplay = 'error:nopredefinedrooms';
-        $dialog->urlparams = [
-            'facetofaceid' => $facetoface->id,
-            'sessionid' => 0,
-            'timestart' => $time,
-            'timefinish' => $time + 3600,
-            'offset' => 0,
-        ];
-
-        $_POST = [
+        $post = [
             'search' => 1,
             'query' => 'seminar room'
         ];
@@ -173,7 +154,7 @@ class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
             'contain the custom room name:',
             'Seminar Room'
         );
-        $markup = $dialog->generate_search();
+        $markup = $this->set_data($event, $time, $time + 3600, $post);
         $this->assertContains("Seminar Room", $markup, implode(" ", $messages));
     }
 
@@ -193,47 +174,25 @@ class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
     public function test_used_custom_room_is_not_appearing_in_search_result(): void {
         global $USER;
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
-        $course = $this->getDataGenerator()->create_course();
-        $usedfacetoface = $this->create_seminar($course);
-        $room = $this->create_custom_room($USER);
-        $event = $this->create_facetoface_event($usedfacetoface, $USER);
-        $this->create_event_session($event, $room);
-
-        $facetoface = $this->create_seminar($course);
         $time = time();
 
-        $dialog = new totara_dialog_content();
-        $dialog->searchtype = "facetoface_room";
-        $dialog->proxy_dom_data(['id', 'name', 'custom', 'capacity']);
-        $dialog->items =  [$room];
-        $dialog->disabled_items = [];
-        $dialog->lang_file = "facetoface";
-        $dialog->customdata = [
-            'facetofaceid' => $facetoface->id,
-            'timestart' => $time,
-            'timefinish' => $time + 3600,
-            'sessionid' => 0,
-            'selected' => 0,
-            'offset' => 0,
-        ];
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface1 = $this->create_seminar($course);
+        $room = $this->create_custom_room($USER);
+        $event1 = $this->create_facetoface_event($facetoface1, $USER);
+        $this->create_event_session($event1, $room);
 
-        $dialog->urlparams = [
-            'facetofaceid' => $facetoface->id,
-            'sessionid' => 0,
-            'timestart' => $time,
-            'timefinish' => $time + 3600,
-            'offset' => 0,
-        ];
+        $facetoface2 = $this->create_seminar($course);
+        $event2 = $this->create_facetoface_event($facetoface2, $USER);
 
-        $_POST = [
+        $post = [
             'search' => 1,
             'query' => 'Seminar Room',
         ];
 
-        $markup = $dialog->generate_search();
+        $markup = $this->set_data($event2, $time, $time + 3600, $post);
         $this->assertContains('No results found for "Seminar Room"', $markup);
     }
 
@@ -244,49 +203,102 @@ class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
     public function test_custom_room_is_not_appearing_in_different_seminar(): void {
         global $USER;
 
-        $this->resetAfterTest();
         $this->setAdminUser();
+
+        $time = time() + (42 * 3600);
+
         $gen = $this->getDataGenerator();
 
         $course1 = $gen->create_course([], ['createsections' => 1]);
         $f2f1 = $this->create_seminar($course1);
         $room1 = $this->create_custom_room($USER);
-        $event = $this->create_facetoface_event($f2f1, $USER);
-        $sessiondate = $this->create_event_session($event, $room1);
+        $event1 = $this->create_facetoface_event($f2f1, $USER);
+        $this->create_event_session($event1, $room1);
 
         $course2 = $gen->create_course([], ['createsections' => 1]);
         $f2f2 = $this->create_seminar($course2);
+        $event2 = $this->create_facetoface_event($f2f2, $USER);
 
-        $time = time() + (42 * 3600);
-        $dialog = new totara_dialog_content();
-        $dialog->searchtype = 'facetoface_room';
-        $dialog->proxy_dom_data(['id', 'name', 'custom', 'capacity']);
-        $dialog->items = array();
-        $dialog->lang_file = 'facetoface';
-        $dialog->disabled_items = array();
-        $dialog->customdata = [
-            'facetofaceid' => $f2f2->id,
-            'timestart' => $time,
-            'timefinish' => $time + 3600,
-            'sessionid' => 0,
-            'selected' => 0,
-            'offset' => 0,
-        ];
-
-        $dialog->urlparams = [
-            'facetofaceid' => $f2f2->id,
-            'sessionid' => 0,
-            'timestart' => $time,
-            'timefinish' => $time + 3600,
-            'offset' => 0,
-        ];
-
-        $_POST = [
+        $post = [
             'search' => 1,
             'query' => 'Seminar Room',
         ];
 
-        $markup = $dialog->generate_search();
+        $markup = $this->set_data($event2, $time, $time + 3600, $post);
         $this->assertContains('No results found for "Seminar Room"', $markup);
+    }
+
+    private function set_data($event, $timestart, $timefinish, $post) {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/mod/facetoface/dialogs/seminar_dialog_content.php');
+
+        $offset = 0;
+        $selected = 0;
+
+        $seminarevent = new seminar_event($event->id);
+        $seminar = new seminar($seminarevent->get_facetoface());
+
+        $roomlist = room_list::get_available_rooms(0, 0 , $seminarevent);
+        $availablerooms = room_list::get_available_rooms($timestart, $timefinish, $seminarevent);
+        $selectedids = explode(',', $selected);
+        $allrooms = [];
+        $selectedrooms = [];
+        $unavailablerooms = [];
+        foreach ($roomlist as $room) {
+
+            // Note: We'll turn the room class into a stdClass container here until customfields and dialogs play nicely with the room class.
+            $roomdata = $room->to_record();
+
+            customfield_load_data($roomdata, "facetofaceroom", "facetoface_room");
+
+            $roomdata->fullname = (string)$room . " (" . get_string("capacity", "facetoface") . ": {$roomdata->capacity})";
+            if (!$availablerooms->contains($room->get_id()) && $seminarevent->get_cancelledstatus() == 0) {
+                $unavailablerooms[$room->get_id()] = $room->get_id();
+                $roomdata->fullname .= get_string('roomalreadybooked', 'mod_facetoface');
+            }
+            if ($roomdata->custom && $seminarevent->get_cancelledstatus() == 0) {
+                $roomdata->fullname .= ' (' . get_string('facetoface', 'mod_facetoface') . ': ' . format_string($seminar->get_name()) . ')';
+            }
+
+            if (in_array($room->get_id(), $selectedids)) {
+                $selectedrooms[$room->get_id()] = $roomdata;
+            }
+
+            $allrooms[$room->get_id()] = $roomdata;
+        }
+
+        $params = [
+            'facetofaceid' => $seminar->get_id(),
+            'sessionid' => $event->id,
+            'timestart' => $timestart,
+            'timefinish' => $timefinish,
+            'selected' => $selected,
+            'offset' => $offset,
+        ];
+
+        $dialog = new \seminar_dialog_content();
+        $dialog->baseurl = '/mod/facetoface/room/ajax/sessionrooms.php';
+        $dialog->proxy_dom_data(['id', 'name', 'custom', 'capacity']);
+        $dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
+        $dialog->items = $allrooms;
+        $dialog->disabled_items = $unavailablerooms;
+        $dialog->selected_items = $selectedrooms;
+        $dialog->selected_title = 'itemstoadd';
+        $dialog->lang_file = 'mod_facetoface';
+        $dialog->createid = 'show-editcustomroom' . $offset . '-dialog';
+        $dialog->customdata = $params;
+        $dialog->search_code = '/mod/facetoface/dialogs/search.php';
+        $dialog->searchtype = 'facetoface_room';
+        $dialog->string_nothingtodisplay = 'error:nopredefinedrooms';
+        // Additional url parameters needed for pagination in the search tab.
+        $dialog->urlparams = $params;
+
+        $_POST = $post;
+
+        // As the searching is no loging including the duplicated entries within count, therefore, with 50
+        // rooms records (barely the maximum per page) the test method should expecting no pagination at all
+        $content = $dialog->generate_search();
+        return $content;
     }
 }

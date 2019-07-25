@@ -36,9 +36,9 @@ Feature: I am able to edit the custom room
       | Description | This is description |
     And I follow "Seminar 1"
     And I follow "Add event"
-    And I follow "Select room"
+    And I follow "Select rooms"
     And I follow "room2"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     And I click on "Reports" in the totara menu
     And I follow "report1"

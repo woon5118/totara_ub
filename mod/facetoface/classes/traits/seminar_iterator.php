@@ -91,9 +91,9 @@ trait seminar_iterator {
      * Return the key of the current element
      *
      * @link http://php.net/manual/en/iterator.key.php
-     * @return int {facetoface_sessions_dates}.id on success, or null on failure.
+     * @return int id on success, or null on failure.
      */
-    public function key() : ?int {
+    public function key(): ?int {
         return key($this->items);
     }
 

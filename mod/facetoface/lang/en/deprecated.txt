@@ -17,6 +17,7 @@ cancel,mod_facetoface
 capacity_help,mod_facetoface
 changemanageremailaddress,mod_facetoface
 changemanageremailinstruction,mod_facetoface
+chooseroom,mod_facetoface
 conditions,mod_facetoface
 conditionsexplanation,mod_facetoface
 confirmmanageremailaddress,mod_facetoface
@@ -67,6 +68,7 @@ selectedpositionname,mod_facetoface
 selectedpositiontype,mod_facetoface
 selectposition,mod_facetoface
 selectpositiononsignup,mod_facetoface
+selectroom,mod_facetoface
 sessionattendance,mod_facetoface
 sessionattendance_help,mod_facetoface
 sessiondatetimeknown,mod_facetoface

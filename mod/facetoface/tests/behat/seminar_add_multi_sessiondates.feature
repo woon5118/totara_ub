@@ -21,9 +21,9 @@ Feature: Seminar with multi session dates compatible with room selection and new
       | Name | Seminar 1 |
     And I follow "Seminar 1"
     And I follow "Add event"
-    And I follow "Select room"
+    And I follow "Select rooms"
     And I follow "room 1"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I follow "Edit session"
     And I fill seminar session with relative date in form data:
       | sessiontimezone   | Pacific/Auckland |
@@ -37,15 +37,15 @@ Feature: Seminar with multi session dates compatible with room selection and new
     And I click on "Save changes" "button"
     And I follow "Edit event"
     And I click on "Add a new session" "button"
-    And I click on the link "Select room" in row 2
+    And I click on the link "Select rooms" in row 2
     And I follow "room 2"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I click on "Save changes" "button"
     And I follow "Edit event"
-    When I click on the link "Select room" in row 1
+    When I click on the link "Select rooms" in row 1
     Then I should see "room 1"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I click on the link "Select room" in row 2
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
+    And I click on the link "Select rooms" in row 2
     And I should see "room 2"
 
   # A scenario where editing an event without any session date, then the system should not try to adding a new session

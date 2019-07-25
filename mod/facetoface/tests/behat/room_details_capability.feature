@@ -32,9 +32,9 @@ Feature: Check room details capability view for student and manager
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I follow "Add event"
-    And I click on "Select room" "link"
-    And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
 

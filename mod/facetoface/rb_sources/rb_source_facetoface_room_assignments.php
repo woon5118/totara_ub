@@ -40,7 +40,7 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
 
         // Global report restrictions are applied in define_joinlist() method.
 
-        $this->base = '{facetoface_sessions_dates}';
+        $this->base = '{facetoface_room_dates}';
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_room_assignments');
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_facetoface_room_assignments');
         $this->sourcelabel = get_string('sourcelabel', 'rb_source_facetoface_room_assignments');
@@ -59,23 +59,26 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
     }
 
     protected function define_joinlist() {
-        global $DB;
 
         $joinlist = array();
-        $namesconactsql = $DB->sql_group_concat($DB->sql_cast_2char('fa.name'), ',');
         $joinlist[] = new rb_join(
-            'asset',
+            'sessiondate',
             'LEFT',
-            "(SELECT fad.sessionsdateid AS sessionsdateid, $namesconactsql AS names
-              FROM {facetoface_asset_dates} fad
-              INNER JOIN {facetoface_asset} fa ON (fad.assetid = fa.id)
-              GROUP BY fad.sessionsdateid
-             )",
-            '(base.id = asset.sessionsdateid)',
+            '{facetoface_sessions_dates}',
+            '(sessiondate.id = base.sessionsdateid)',
             REPORT_BUILDER_RELATION_ONE_TO_MANY
         );
 
-        $this->add_session_common_to_joinlist($joinlist);
+        $joinlist[] = new rb_join(
+            'room',
+            'LEFT',
+            '{facetoface_room}',
+            '(room.id = base.roomid)',
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            'sessiondate'
+        );
+
+        $this->add_session_common_to_joinlist($joinlist, 'sessiondate');
         $this->add_session_status_to_joinlist($joinlist);
         $this->add_core_course_tables($joinlist, 'facetoface', 'course');
 
@@ -87,21 +90,9 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
 
         $this->add_core_course_columns($columnoptions);
         $this->add_facetoface_common_to_columns($columnoptions);
-
-        $columnoptions[] = new rb_column_option(
-            'asset',
-            'assetnamelist',
-            get_string('assetnames', 'rb_source_facetoface_room_assignments'),
-            "asset.names",
-            array(
-                'joins' => 'asset',
-                'displayfunc' => 'format_text'
-            )
-        );
-
-        $this->add_session_common_to_columns($columnoptions);
-        $this->add_session_status_to_columns($columnoptions);
         $this->add_rooms_fields_to_columns($columnoptions, 'room');
+        $this->add_session_common_to_columns($columnoptions, 'sessiondate');
+        $this->add_session_status_to_columns($columnoptions, 'sessiondate');
 
         return $columnoptions;
     }
@@ -125,11 +116,15 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
             'text'
         );
 
+        $this->add_rooms_fields_to_filters($filteroptions);
         $filteroptions[] = new rb_filter_option(
-            'asset',
-            'assetnamelist',
-            get_string('assetnames', 'rb_source_facetoface_room_assignments'),
-            'text'
+            'room',
+            'roomavailable',
+            get_string('roomavailable', 'rb_source_facetoface_rooms'),
+            'f2f_roomavailable',
+            array(),
+            'room.id',
+            array('room')
         );
 
         $filteroptions[] = new rb_filter_option(
@@ -146,17 +141,6 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
             'date'
         );
 
-        $filteroptions[] = new rb_filter_option(
-            'room',
-            'roomavailable',
-            get_string('roomavailable', 'rb_source_facetoface_rooms'),
-            'f2f_roomavailable',
-            array(),
-            'room.id',
-            array('room')
-        );
-        $this->add_rooms_fields_to_filters($filteroptions);
-
         return $filteroptions;
     }
 
@@ -164,7 +148,7 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
         $paramoptions = array(
             new rb_param_option(
                 'roomid',
-                'base.roomid',
+                'room.id',
                 'room'
             )
         );
@@ -177,7 +161,7 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
             new rb_content_option(
                 'date',
                 get_string('thedate', 'rb_source_facetoface_sessions'),
-                'base.timestart'
+                'sessiondate.timestart'
             )
         );
         return $contentoptions;
@@ -225,17 +209,9 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
                 'value' => 'sessionstartdate'
             ),
             array(
-                'type' => 'date',
-                'value' => 'sessionfinishdate'
-            ),
-            array(
                 'type' => 'room',
                 'value' => 'name'
             ),
-            array(
-                'type' => 'room',
-                'value' => 'visible'
-            )
         );
 
         return $defaultfilters;

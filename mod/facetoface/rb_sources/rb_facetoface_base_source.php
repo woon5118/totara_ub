@@ -410,15 +410,6 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             REPORT_BUILDER_RELATION_ONE_TO_MANY,
             'sessions'
         );
-
-        $joinlist[] = new rb_join(
-            'room',
-            'LEFT',
-            '{facetoface_room}',
-            "room.id = {$sessiondatejoin}.roomid",
-            REPORT_BUILDER_RELATION_MANY_TO_ONE,
-            $sessiondatejoin
-        );
     }
 
     /**
@@ -1141,7 +1132,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
     }
 
     /**
-     * Add common room filter options (excluding custom fields)
+     * Add common asset filter options (excluding custom fields)
      * @param array $filteroptions
      */
     protected function add_assets_fields_to_filters(array &$filteroptions) {

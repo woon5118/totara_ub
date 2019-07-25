@@ -11,7 +11,9 @@ Feature: Edit seminar notification templates
       | Course 1 | C1        | 0        |
     And I log in as "admin"
 
+  @javascript
   Scenario: Check that the correct seminar notification templates have been installed
+    And I am on "Course 1" course homepage
     # Check the templates and ensure that there is at least a key line present from the body of the notification.
     # Also check which room placeholders are present as indicator that it is the 9.0+ version of the notification installed.
     When I navigate to "Notification templates" node in "Site administration > Seminars"

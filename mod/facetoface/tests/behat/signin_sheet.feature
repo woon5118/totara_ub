@@ -184,7 +184,7 @@ Feature: Download a seminar signin sheet
     And I turn editing mode off
     And I follow "Test seminar name"
     And I follow "Add event"
-    And I click on "Delete" "link" in the "Select room" "table_row"
+    And I click on "Delete" "link" in the "Select rooms" "table_row"
     And I press "Save changes"
     And I click on the link "Attendees" in row 1
     And I should not see "Download sign-in sheet"

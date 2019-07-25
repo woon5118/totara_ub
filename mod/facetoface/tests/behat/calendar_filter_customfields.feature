@@ -221,9 +221,9 @@ Feature: Filter seminar events in calendar by their customfields
       | timefinish[hour]     | +1              |
       | timefinish[minute]   | 0               |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 4" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 4" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I set the following fields to these values:
       | capacity                      | 2             |
       | Address                       | 54 oak street |
@@ -261,9 +261,9 @@ Feature: Filter seminar events in calendar by their customfields
       | timefinish[hour]     | +1              |
       | timefinish[minute]   | 0               |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 3" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 3" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I set the following fields to these values:
       | capacity                      | 2            |
       | Address                       | 35 oak cres. |

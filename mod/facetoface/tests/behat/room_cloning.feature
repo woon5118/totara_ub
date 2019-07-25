@@ -53,15 +53,15 @@ Feature: Clone pre-defined rooms in seminar
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
-    And I click on "Select room" "link"
-    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
 
     And I click on "Copy" "link"
-    When I click on "Select room" "link"
-    Then I should see "Room 1, That house, 123 here street (Capacity: 5) (Room unavailable)" in the "Choose a room" "totaradialogue"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    When I click on "Select rooms" "link"
+    Then I should see "Room 1, That house, 123 here street (Capacity: 5) (Room unavailable)" in the "Choose rooms" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -75,9 +75,9 @@ Feature: Clone pre-defined rooms in seminar
       | timefinish[hour]   | 15   |
       | timefinish[minute] | 0    |
     And I press "OK"
-    And I click on "Select room" "link"
-    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -104,8 +104,8 @@ Feature: Clone pre-defined rooms in seminar
       | timefinish[hour]   | 15   |
       | timefinish[minute] | 0    |
     And I press "OK"
-    And I click on "Select room" "link"
-    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     When I press "Save changes"
     Then I should see "Room 1" in the "2:00 PM - 3:00 PM" "table_row"

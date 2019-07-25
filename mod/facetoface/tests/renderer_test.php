@@ -36,6 +36,7 @@ use mod_facetoface\signup\condition\event_taking_attendance;
 use mod_facetoface\signup\state\booked;
 use mod_facetoface\signup\state\fully_attended;
 use mod_facetoface\signup\state\not_set;
+use mod_facetoface\room_helper;
 
 require_once($CFG->dirroot . '/lib/phpunit/classes/advanced_testcase.php');
 
@@ -49,7 +50,6 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
     public function setUp() {
         parent::setUp();
-        $this->resetAfterTest(true);
 
         $this->data_generator = $this->getDataGenerator();
         $this->facetoface_generator = $this->data_generator->get_plugin_generator('mod_facetoface');
@@ -82,7 +82,6 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * @throws coding_exception
      */
     public function test_get_regdates_tooltip_info($registrationtimestart, $registrationtimefinish, $displaytimezones) {
-        $this->resetAfterTest(true);
 
         $renderer = $this->create_f2f_renderer();
 
@@ -138,7 +137,6 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * @dataProvider data_provider_regdates_tooltip
      */
     public function test_get_regdates_tooltip_info_via_print_session_list_table($registrationtimestart, $registrationtimefinish, $displaytimezones) {
-        $this->resetAfterTest(true);
 
         $renderer = $this->create_f2f_renderer();
 
@@ -157,8 +155,6 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $sessiondate->timestart = time() + 2 * DAYSECS;
         $sessiondate->timefinish = time() + 3 * DAYSECS;
         $sessiondate->sessiontimezone = 'Pacific/Auckland';
-        $sessiondate->roomid = 0;
-        $sessiondate->assetids = array();
         $sessiondata->sessiondates = array($sessiondate);
 
         $sessionid = $this->facetoface_generator->add_session($sessiondata);
@@ -333,7 +329,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      *
      * @return \mod_facetoface_renderer
      */
-    private function create_f2f_renderer() : mod_facetoface_renderer {
+    private function create_f2f_renderer(): mod_facetoface_renderer {
         global $PAGE;
 
         // only admin can see the attendance taking column
@@ -367,7 +363,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $sessiondate->timestart = is_numeric($timestart) ? (string)(int)$timestart : strtotime($timestart);
         $sessiondate->timefinish = is_numeric($timeend) ? (string)(int)$timeend : strtotime($timeend);
         $sessiondate->sessiontimezone = '99';
-        $sessiondate->roomid = (string)(int)$roomid;
+        $sessiondate->roomids = [(int)$roomid];
         return $sessiondate;
     }
 
@@ -651,6 +647,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * @dataProvider data_provider_for_session_list_table_attendance_tracking_not_saved
      */
     public function test_session_list_table_attendance_tracking_not_saved(bool $cancelled, bool $signupuser, int $timestart, array $expections, string $tag) {
+
         $cols = 8;
 
         $now = time();
@@ -793,10 +790,6 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * Ensure that print_session_list_table() renders the list using the given $sessions parameter.
      */
     public function test_print_session_list_table_with_crafted_records() {
-        global $DB;
-        /** @var \moodle_database $DB */
-        $this->resetAfterTest(true);
-
         $course = $this->getDataGenerator()->create_course();
         $f2f = $this->facetoface_generator->create_instance(['course' => $course->id]);
         $room1 = $this->facetoface_generator->add_custom_room([ 'name' => 'Chamber', 'allowconflicts' => 1 ]);
@@ -829,14 +822,17 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $sessions[$session1id]->sessiondates[$firstid] = $firstrecord;
 
         // .. and change the room of one event to Arena
-        $DB->set_field('facetoface_sessions_dates', 'roomid', $room2->id, ['id' => $firstid]);
+        $data = new \stdClass();
+        $data->roomid = $room2->id;
+        $data->sessiondateid = $firstid;
+        room_helper::sync($data->sessiondateid, [$data->roomid]);
 
         $renderer = $this->create_f2f_renderer();
         $html = $renderer->print_session_list_table($sessions, false, true, false, array(), null, true, false, false, 0, false, false);
 
-        // .. then the database contains Arena while our $sessions don't
+        // .. multiple rooms in the session
         $this->assertContains('Chamber', $html);
-        $this->assertNotContains('Arena', $html);
+        $this->assertContains('Arena', $html);
 
         $doc = self::new_domdocument($html);
         $tables = $doc->getElementsByTagName('table');

@@ -33,20 +33,21 @@ admin_externalpage_setup('modfacetofacerooms');
 $id = optional_param('id', 0, PARAM_INT);
 $room = new room($id);
 
-if ($room->get_custom()) {
-    print_error(get_string('error:incorrectroomid', 'facetoface'));
-}
-
 $roomlisturl = new moodle_url('/mod/facetoface/room/manage.php');
 
-$customdata = ['room' => $room, 'editoroptions' => $TEXTAREA_OPTIONS];
-$form = new \mod_facetoface\form\editroom(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
-
-if ($form->is_cancelled()) {
+if ($room->get_custom()) {
+    \core\notification::error(get_string('error:incorrectroomid', 'mod_facetoface'));
     redirect($roomlisturl);
 }
 
-if ($data = $form->get_data()) {
+$customdata = ['room' => $room, 'editoroptions' => $TEXTAREA_OPTIONS];
+$mform = new \mod_facetoface\form\editroom(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
+
+if ($mform->is_cancelled()) {
+    redirect($roomlisturl);
+}
+
+if ($data = $mform->get_data()) {
     $room = \mod_facetoface\room_helper::save($data);
     $message = $id ? get_string('roomupdatesuccess', 'facetoface') : get_string('roomcreatesuccess', 'facetoface');
     \core\notification::success($message);
@@ -63,6 +64,6 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading($pageheading);
 
-$form->display();
+$mform->display();
 
 echo $OUTPUT->footer();

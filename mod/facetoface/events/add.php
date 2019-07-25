@@ -39,21 +39,18 @@ $session = null;
 $s = 0;
 $c = 0;
 
-if (!$facetoface = $DB->get_record('facetoface', array('id' => $f))) {
+$seminar = new mod_facetoface\seminar($f);
+if (!$seminar->exists()) {
     print_error('error:incorrectfacetofaceid', 'facetoface');
 }
-if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-    print_error('error:coursemisconfigured', 'facetoface');
-}
-if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
-    print_error('error:incorrectcoursemoduleid', 'facetoface');
-}
 
-$context = context_module::instance($cm->id);
-$f  = $facetoface->id;
+$cm = $seminar->get_coursemodule();
+$f  = $seminar->get_id();
 $id = $cm->id;
+$context = $seminar->get_contextmodule($cm->id);
+$course = $DB->get_record('course', array('id' => $seminar->get_course()));
 
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_capability('mod/facetoface:editevents', $context);
 
 local_js(array(
@@ -63,22 +60,12 @@ local_js(array(
 $PAGE->set_url('/mod/facetoface/events/add.php', array('f' => $f, 'backtoallsessions' => $backtoallsessions));
 $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
 $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
-$PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
+$PAGE->requires->strings_for_js(array('chooseassets', 'chooserooms', 'dateselect', 'useroomcapacity', 'nodatesyet',
     'createnewasset', 'editasset', 'createnewroom', 'editroom'), 'facetoface');
-$PAGE->set_title($facetoface->name);
+$PAGE->set_title($seminar->get_name());
 $PAGE->set_heading($course->fullname);
 
-$jsconfig = array('sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $facetoface->id);
-
-// Offer one date for new sessions by default.
-if ($cntdates < 1) {
-    $cntdates = 1;
-}
-for ($offset = 0; $offset < $cntdates; $offset++) {
-    $display_selected = dialog_display_currently_selected(get_string('selected', 'facetoface'), "selectroom{$offset}-dialog");
-    $jsconfig['display_selected_item' . $offset] = $display_selected;
-}
-
+$jsconfig = array('sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $seminar->get_id());
 $jsmodule = array(
     'name' => 'totara_f2f_room',
     'fullpath' => '/mod/facetoface/js/event.js',
@@ -86,11 +73,18 @@ $jsmodule = array(
 $PAGE->requires->js_init_call('M.totara_f2f_room.init', array($jsconfig), false, $jsmodule);
 
 if ($backtoallsessions) {
-    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
+    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
 } else {
     $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
 }
-
+// Offer one date for new sessions by default.
+if ($cntdates < 1) {
+    $cntdates = 1;
+}
+$facetoface = new stdClass();
+$facetoface->id = $seminar->get_id();
+$facetoface->allowcancellationsdefault = $seminar->get_allowcancellationsdefault();
+$facetoface->cancellationscutoffdefault = $seminar->get_cancellationscutoffdefault();
 list($sessiondata, $editoroptions, $defaulttimezone, $nbdays) = \mod_facetoface\form\event::prepare_data($session, $facetoface, $course, $context, $cntdates);
 
 $mform = new \mod_facetoface\form\event(
@@ -119,7 +113,7 @@ if ($todb = $mform->process_data()) { // Form submitted
 
 echo $OUTPUT->header();
 echo $OUTPUT->box_start();
-echo $OUTPUT->heading(get_string('addingsession', 'facetoface', format_string($facetoface->name)));
+echo $OUTPUT->heading(get_string('addingsession', 'facetoface', format_string($seminar->get_name())));
 
 $mform->display();
 

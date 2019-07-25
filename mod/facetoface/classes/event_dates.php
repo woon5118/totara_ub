@@ -105,13 +105,13 @@ class event_dates {
      * Validate dates and room availability
      * @param int $timestart
      * @param int $timefinish
-     * @param int $roomid
+     * @param array $roomids
      * @param array $assetids
      * @param int $sessionid ignore room conflicts within current session (as it is covered by dates and some dates can be marked as deleted)
      * @param int $facetofaceid
-     * @return array errors ('timestart' => string, 'timefinish' => string, 'assetids' => string, 'roomid' => string)
+     * @return array errors ('timestart' => string, 'timefinish' => string, 'assetids' => string, 'roomids' => string)
      */
-    public static function validate(int $timestart, int $timefinish, int $roomid, array $assetids, int $sessionid, int $facetofaceid): array {
+    public static function validate(int $timestart, int $timefinish, array $roomids, array $assetids, int $sessionid, int $facetofaceid): array {
         $seminar = new seminar($facetofaceid);
         $seminarevent = new seminar_event($sessionid);
 
@@ -130,18 +130,22 @@ class event_dates {
             $errors['timefinish'] = $errstr;
         }
 
-        // Validate room.
-        if (!empty($roomid)) {
-            // Check if the room is available.
-            $room = new \mod_facetoface\room($roomid);
-            if (!$room->exists()) {
-                // This will likely never be reached as room creation uses a MUST_EXIST database call.
-                $errors['roomid'] = get_string('roomdeleted', 'facetoface');
-            } else if (!$room->is_available($timestart, $timefinish, $seminarevent)) {
-                $link = \html_writer::link(new \moodle_url('/mod/facetoface/reports/rooms.php', array('roomid' => $roomid)), $room->get_name(),
-                    array('target' => '_blank'));
-                // We should not get here because users should be able to select only available slots.
-                $errors['roomid'] = get_string('error:isalreadybooked', 'facetoface', $link);
+        // Validate rooms.
+        if (!empty($roomids)) {
+            foreach ($roomids as $roomid) {
+                $room = new \mod_facetoface\room($roomid);
+                if (!$room->exists()) {
+                    // This will likely never be reached as room creation uses a MUST_EXIST database call.
+                    $errors['roomid'][] = get_string('roomdeleted', 'facetoface');
+                } else if (!$room->is_available($timestart, $timefinish, $seminarevent)) {
+                    $link = \html_writer::link(new \moodle_url('/mod/facetoface/reports/rooms.php', array('roomid' => $roomid)), $room->get_name(),
+                        array('target' => '_blank'));
+                    // We should not get here because users should be able to select only available slots.
+                    $errors['roomid'][] = get_string('error:isalreadybooked', 'facetoface', $link);
+                }
+            }
+            if (!empty($errors['roomid'])) {
+                $errors['roomids'] = implode(\html_writer::empty_tag('br'), $errors['roomid']);
             }
         }
 
@@ -168,7 +172,9 @@ class event_dates {
         if (!empty($errors['roomid']) || !empty($errors['assetid'])) {
             $items = array();
             if (!empty($errors['roomid'])) {
-                $items[] = \html_writer::tag('li', $errors['roomid']);
+                foreach ($errors['roomid'] as $roomerror) {
+                    $items[] = \html_writer::tag('li', $roomerror);
+                }
                 // Don't show duplicate error.
                 unset($errors['roomid']);
             }

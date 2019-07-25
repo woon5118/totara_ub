@@ -111,6 +111,9 @@ final class seminar_event_helper {
             $assets = isset($date->assetids) ? $date->assetids : [];
             unset($date->assetids);
 
+            $rooms = isset($date->roomids) ? $date->roomids : [];
+            unset($date->roomids);
+
             if ($date->id > 0) {
                 $DB->update_record('facetoface_sessions_dates', $date);
             } else {
@@ -118,6 +121,7 @@ final class seminar_event_helper {
                 $date->id = $DB->insert_record('facetoface_sessions_dates', $date);
             }
 
+            room_helper::sync($date->id, array_unique($rooms));
             asset_helper::sync($date->id, array_unique($assets));
         }
     }
@@ -141,11 +145,11 @@ final class seminar_event_helper {
             if ($sessions->contains($date->id)) {
                 $session = $sessions->get($date->id);
                 $sessions->remove($date->id);
-                $room = isset($date->roomid) ? $date->roomid : 0;
                 if ($session->get_sessiontimezone() == $date->sessiontimezone
                     && $session->get_timestart() == $date->timestart
-                    && $session->get_timefinish() == $date->timefinish
-                    && $session->get_roomid() == $room) {
+                    && $session->get_timefinish() == $date->timefinish) {
+                    $date->roomids = (isset($date->roomids) && is_array($date->roomids)) ? $date->roomids : [];
+                    room_helper::sync($date->id, array_unique($date->roomids));
                     $date->assetids = (isset($date->assetids) && is_array($date->assetids)) ? $date->assetids : [];
                     asset_helper::sync($date->id, array_unique($date->assetids));
                     return false;
@@ -228,7 +232,7 @@ final class seminar_event_helper {
         if (!$customrooms->is_empty()) {
             foreach ($customrooms as $customroom) {
                 // Only deleting the custom rooms that are NOT being used by different seminar event.
-                if ($DB->record_exists('facetoface_sessions_dates', ['roomid' => $customroom->get_id()])) {
+                if ($DB->record_exists('facetoface_room_dates', ['roomid' => $customroom->get_id()])) {
                     continue;
                 }
 

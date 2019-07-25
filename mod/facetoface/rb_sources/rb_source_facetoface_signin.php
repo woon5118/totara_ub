@@ -152,12 +152,20 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
+                'roomdates',
+                'LEFT',
+                '{facetoface_room_dates}',
+                'sessiondate.id = roomdates.sessionsdateid',
+                REPORT_BUILDER_RELATION_ONE_TO_MANY,
+                'sessiondate'
+            ),
+            new rb_join(
                 'room',
                 'LEFT',
                 '{facetoface_room}',
-                'sessiondate.roomid = room.id',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'sessiondate'
+                'roomdates.roomid = room.id',
+                REPORT_BUILDER_RELATION_ONE_TO_MANY,
+                'roomdates'
             ),
             new rb_join(
                 'bookedby',
@@ -779,20 +787,24 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $data[] = array(get_string('sessionenddate', 'mod_facetoface'), get_string('sessionenddatewithtime', 'facetoface', $dates));
         $data[] = array(get_string('maxbookings', 'mod_facetoface'), $seminarevent->get_capacity());
         $data[] = array(get_string('numberofattendees', 'mod_facetoface'), $helper->count_attendees());
-        $room = new \mod_facetoface\room($sessiondate->roomid);
-        if ($room->exists()) {
-            $info = customfield_get_data($room->to_record(), 'facetoface_room', 'facetofaceroom');
-            $data[] = array(get_string('place', 'mod_facetoface'), $room->get_name());
-            foreach ($info as $name => $roomdata) {
-                if (!empty($roomdata)) {
-                    $data[] = array($name, $roomdata);
+        /** @var \mod_facetoface\room_list $room */
+        $rooms = \mod_facetoface\room_list::from_session($sessiondate->id);
+        if (!$rooms->is_empty()) {
+            $dataroom = [];
+            foreach ($rooms as $room) {
+                $info = customfield_get_data($room->to_record(), 'facetoface_room', 'facetofaceroom');
+                $dataroom[] = array(get_string('place', 'mod_facetoface'), $room->get_name());
+                foreach ($info as $name => $roomdata) {
+                    if (!empty($roomdata)) {
+                        $dataroom[] = array($name, $roomdata);
+                    }
                 }
             }
+            $data[] = $dataroom;
         } else {
             $data[] = array(get_string('place', 'mod_facetoface'), get_string('notapplicable', 'facetoface'));
         }
         unset($room);
-
         if ($format === 'pdf' or $format === 'html') {
             $table = new html_table();
             $table->size = array('200px');

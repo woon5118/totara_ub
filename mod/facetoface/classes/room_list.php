@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class room_list represents all rooms
  */
-final class room_list implements \Iterator {
+final class room_list implements \Iterator, \Countable {
 
     use traits\seminar_iterator;
 
@@ -58,6 +58,7 @@ final class room_list implements \Iterator {
             $room = new room();
             $this->add($room->from_record($roomdata));
         }
+        $this->rewind();
     }
 
     /**
@@ -70,17 +71,15 @@ final class room_list implements \Iterator {
 
     /**
      * Get the relevant session rooms for a seminar activity
-     *
      * @param int $seminarid
      * @return room_list $this
      */
-    public static function get_seminar_rooms(int $seminarid) : room_list {
+    public static function get_seminar_rooms(int $seminarid): room_list {
         $sql = "SELECT DISTINCT fr.*
-                  FROM {facetoface_sessions} fs
-                  JOIN {facetoface_sessions_dates} fsd
-                    ON (fsd.sessionid = fs.id)
-                  JOIN {facetoface_room} fr
-                    ON (fsd.roomid = fr.id)
+                  FROM {facetoface_room} fr
+                  JOIN {facetoface_room_dates} frd ON frd.roomid = fr.id
+                  JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
+                  JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid
                  WHERE fs.facetoface = :facetofaceid
               ORDER BY fr.name ASC, fr.id ASC";
 
@@ -89,19 +88,54 @@ final class room_list implements \Iterator {
 
     /**
      * Get the room record for the specified session
-     *
      * @param int $seminareventid
      * @return room_list
      */
     public static function get_event_rooms(int $seminareventid): room_list {
+
         $sql = "SELECT DISTINCT fr.*
                   FROM {facetoface_room} fr
-                  JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = fr.id)
-                  JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
-                 WHERE fs.id = :seminareventid
+                  JOIN {facetoface_room_dates} frd ON frd.roomid = fr.id
+                  JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
+                 WHERE fsd.sessionid = :seminareventid 
               ORDER BY fr.name ASC, fr.id ASC";
 
         return new room_list($sql, ['seminareventid' => $seminareventid]);
+    }
+
+    /**
+     * Getting all the custom rooms given by the seminareventid.
+     * @param int $seminareventid
+     * @return room_list
+     */
+    public static function get_custom_rooms_from_seminarevent(int $seminareventid): room_list {
+
+        $sql = "SELECT DISTINCT fr.*
+                  FROM {facetoface_room} fr
+            INNER JOIN {facetoface_room_dates} frd ON frd.roomid = fr.id
+            INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
+                 WHERE fsd.sessionid = :seminareventid AND fr.custom = 1
+              ORDER BY fr.name ASC, fr.id ASC";
+
+        return new room_list($sql, ['seminareventid' => $seminareventid]);
+    }
+
+    /**
+     * Get assets by seminar session dates
+     * @param int $sessiondateid
+     * @return asset_list
+     */
+    public static function from_session(int $sessiondateid): room_list {
+
+        $sql = "SELECT fr.*
+                  FROM {facetoface_room} fr
+            INNER JOIN {facetoface_room_dates} frd ON frd.roomid = fr.id
+            INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
+                 WHERE fsd.id = :id
+              ORDER BY fr.name ASC, fr.id ASC";
+
+        return new room_list($sql, ['id' => $sessiondateid]);
+
     }
 
     /**
@@ -111,32 +145,48 @@ final class room_list implements \Iterator {
      *
      * @param int $timestart start of requested slot
      * @param int $timefinish end of requested slot
-     * @param seminar_event $event current session, 0 if session is being created, all current session rooms are always included
+     * @param seminar_event $seminarevent current session, 0 if session is being created, all current session rooms are always included
      * @return room_list
      */
-    public static function get_available_rooms(int $timestart, int $timefinish, seminar_event $event) : room_list {
+    public static function get_available_rooms(int $timestart, int $timefinish, seminar_event $seminarevent): room_list {
         global $DB, $USER;
 
         $list = new room_list('', ['id' => 0]); // Create an empty list
-        $eventid = $event->get_id();
-        $seminarid = $event->get_facetoface();
+        $seminarid = $seminarevent->get_facetoface();
 
         $params = array();
         $params['timestart'] = (int)$timestart;
         $params['timefinish'] = (int)$timefinish;
-        $params['sessionid'] = $eventid;
+        $params['sessionid'] = $seminarevent->get_id();
         $params['facetofaceid'] = $seminarid;
         $params['userid'] = $USER->id;
 
+        $bookedrooms = array();
+        if ($timestart and $timefinish) {
+            if ($timestart > $timefinish) {
+                debugging('Invalid slot specified, start cannot be later than finish', DEBUG_DEVELOPER);
+            }
+
+            $sql = "SELECT DISTINCT fr.*
+                      FROM {facetoface_room} fr
+                      JOIN {facetoface_room_dates} frd ON frd.roomid = fr.id
+                      JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
+                      JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid AND fs.cancelledstatus = 0
+                     WHERE fr.allowconflicts = 0 AND fsd.sessionid <> :sessionid
+                       AND (fsd.timestart < :timefinish AND fsd.timefinish > :timestart)";
+
+            $bookedrooms = $DB->get_records_sql($sql, $params);
+        }
         // First get all site rooms that either allow conflicts
         // or are not occupied at the given times
         // or are already used from the current event.
         // Note that hidden rooms may be reused in the same session if already there,
         // but are completely hidden everywhere else.
-        if (!empty($eventid)) {
+        if ($seminarevent->exists()) {
             $sql = "SELECT DISTINCT fr.*
                       FROM {facetoface_room} fr
-                 LEFT JOIN {facetoface_sessions_dates} fsd ON fr.id = fsd.roomid
+                 LEFT JOIN {facetoface_room_dates} frd ON frd.roomid = fr.id
+                 LEFT JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
                      WHERE fr.custom = 0 AND (fr.hidden = 0 OR fsd.sessionid = :sessionid)
                   ORDER BY fr.name ASC, fr.id ASC";
         } else {
@@ -146,35 +196,20 @@ final class room_list implements \Iterator {
                   ORDER BY fr.name ASC, fr.id ASC";
         }
         $rooms = $DB->get_records_sql($sql, $params);
-
-        // Now exclude any rooms that don't allow over booking that are booked during the times given.
-        $bookedrooms = array();
-        if ($timestart and $timefinish) {
-            if ($timestart > $timefinish) {
-                debugging('Invalid slot specified, start cannot be later than finish', DEBUG_DEVELOPER);
-            }
-            $sql = "SELECT DISTINCT fr.*
-                      FROM {facetoface_room} fr
-                      JOIN {facetoface_sessions_dates} fsd ON fr.id = fsd.roomid
-                     WHERE fr.allowconflicts = 0 AND fsd.sessionid <> :sessionid
-                           AND (fsd.timestart < :timefinish AND fsd.timefinish > :timestart)";
-            $bookedrooms = $DB->get_records_sql($sql, $params);
-
-            foreach ($bookedrooms as $rid => $unused) {
-                unset($rooms[$rid]);
-            }
+        foreach ($bookedrooms as $rid => $unused) {
+            unset($rooms[$rid]);
         }
 
         // Then include any custom rooms that are in the current facetoface activity.
-        if (!empty($seminarid)) {
+        if ($seminarid > 0) {
             $sql = "SELECT DISTINCT fr.*
                       FROM {facetoface_room} fr
-                      JOIN {facetoface_sessions_dates} fsd ON fr.id = fsd.roomid
+                      JOIN {facetoface_room_dates} frd ON frd.roomid = fr.id
+                      JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
                       JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid
-                     WHERE fr.custom = 1 AND fs.facetoface = :facetofaceid
+                     WHERE fs.facetoface = :facetofaceid AND fr.custom = 1
                   ORDER BY fr.name ASC, fr.id ASC";
             $customrooms = $DB->get_records_sql($sql, $params);
-
             foreach ($customrooms as $room) {
                 if (!isset($bookedrooms[$room->id])) {
                     $rooms[$room->id] = $room;
@@ -186,7 +221,8 @@ final class room_list implements \Iterator {
         // Add custom rooms of the current user that are not assigned yet or any more.
         $sql = "SELECT fr.*
                   FROM {facetoface_room} fr
-             LEFT JOIN {facetoface_sessions_dates} fsd ON fr.id = fsd.roomid
+             LEFT JOIN {facetoface_room_dates} frd ON frd.roomid = fr.id
+             LEFT JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
                  WHERE fsd.id IS NULL AND fr.custom = 1 AND fr.usercreated = :userid
               ORDER BY fr.name ASC, fr.id ASC";
         $userrooms = $DB->get_records_sql($sql, $params);
@@ -194,32 +230,12 @@ final class room_list implements \Iterator {
             $rooms[$room->id] = $room;
         }
 
-        // Construct all the rooms and add them to the iterator list.
+        // Construct all the assets and add them to the iterator list.
         foreach ($rooms as $roomdata) {
             $room = new room();
             $room->from_record($roomdata);
             $list->add($room);
         }
-
         return $list;
-    }
-
-    /**
-     * Getting all the custom rooms given by the eventid.
-     *
-     * @param int $seminareventid
-     * @return room_list
-     */
-    public static function get_custom_rooms_from_seminarevent(int $seminareventid): room_list {
-        $sql = "
-            SELECT r.*
-            FROM {facetoface_room} r
-            INNER JOIN {facetoface_sessions_dates} AS fsd
-            ON fsd.roomid = r.id
-            WHERE r.custom = 1
-            AND fsd.sessionid = :eventid
-        ";
-
-        return new room_list($sql, ['eventid' => $seminareventid]);
     }
 }

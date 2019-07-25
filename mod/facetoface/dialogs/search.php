@@ -53,7 +53,7 @@ if (strlen($query)) {
         $params['query'] = $query;
         $message = get_string('noresultsfor', 'totara_core', (object)$params);
         echo html_writer::tag('p', $message, array('class' => 'message'));
-        die();
+        return;
     }
 
     $founditems = [];

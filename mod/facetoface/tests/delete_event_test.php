@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar_event, signup, seminar_session, role, seminar_event_helper, room, asset, asset_helper};
+use mod_facetoface\{seminar_event, signup, seminar_session, role, seminar_event_helper, room, asset, asset_helper, room_helper};
 use mod_facetoface\signup\state\booked;
 
 class mod_facetoface_delete_event_testcase extends advanced_testcase {
@@ -56,7 +56,6 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
     public function test_delete_event_with_email_sendingout(): void {
         global $DB;
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         $event = $this->create_seminar_event();
@@ -119,7 +118,6 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
     public function test_delete_event_without_email_sendingout(): void {
         global $DB;
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         $event = $this->create_seminar_event();
@@ -175,7 +173,6 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
     public function test_delete_event_with_custom_room(): void {
         global $DB;
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         $room = room::create_custom_room();
@@ -187,8 +184,8 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         $s->set_timestart(time() + 3600);
         $s->set_timefinish(time() + 7200);
         $s->set_sessionid($seminarevent->get_id());
-        $s->set_roomid($roomid);
         $s->save();
+        room_helper::sync($s->get_id(), [$roomid]);
 
         // Add this custom room to be used at different seminar event, so that we can check whether the room is being
         // deleted after the first event cancelled or not.
@@ -197,8 +194,8 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         $s2->set_timestart(time() + 7200);
         $s2->set_timefinish(time() + 7200 + 3600);
         $s2->set_sessionid($seminarevent2->get_id());
-        $s2->set_roomid($roomid);
         $s2->save();
+        room_helper::sync($s2->get_id(), [$roomid]);
 
         $seminareventid = $seminarevent->get_id();
         seminar_event_helper::delete_seminarevent($seminarevent);
@@ -217,7 +214,6 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
     public function test_delete_event_with_custom_assets(): void {
         global $DB;
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         $asset1 = asset::create_custom_asset();

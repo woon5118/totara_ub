@@ -113,7 +113,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
     public function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
         set_config('noreplyaddress', 'noreply@example.com');
         $this->facetoface_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
         $this->customfield_generator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
@@ -1627,7 +1626,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
     }
 
     function test_facetoface_get_sessions() {
-        $this->resetAfterTest();
         $now = time();
 
         $sitewideroom1 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 1));
@@ -1649,12 +1647,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         $sessionid1_1 = $seminarevent->get_id();
         foreach ($sessiondates1_1 as $i => $sessiondate) {
-            $session = new seminar_session();
-            $session->from_record($sessiondate);
-            $session->set_sessionid($sessionid1_1);
-            $session->save();
-
-            $sessiondates1_1[$i]->id = $session->get_id();
+            $sessiondates1_1[$i]->id = $this->create_session_room($sessionid1_1, $sessiondate);
         }
 
         $sessiondates1_2 = array();
@@ -1667,12 +1660,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         $sessionid1_2 = $seminarevent->get_id();
         foreach ($sessiondates1_2 as $i => $sessiondate) {
-            $session = new seminar_session();
-            $session->from_record($sessiondate);
-            $session->set_sessionid($sessionid1_2);
-            $session->save();
-
-            $sessiondates1_2[$i]->id = $session->get_id();
+            $sessiondates1_2[$i]->id = $this->create_session_room($sessionid1_2, $sessiondate);
         }
 
         $sessiondates2_1 = array();
@@ -1683,12 +1671,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         $sessionid2_1 = $seminarevent->get_id();
         foreach ($sessiondates2_1 as $i => $sessiondate) {
-            $session = new seminar_session();
-            $session->from_record($sessiondate);
-            $session->set_sessionid($sessionid2_1);
-            $session->save();
-
-            $sessiondates2_1[$i]->id = $session->get_id();
+            $sessiondates2_1[$i]->id = $this->create_session_room($sessionid2_1, $sessiondate);
         }
 
         $seminarevents = (new seminar($facetoface1->id))->get_events();
@@ -1706,12 +1689,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
             foreach ($sessiondates as $sessiondate) {
                 $sessions = $seminarevent->get_sessions();
-
-                $this->assertEquals(
-                    $sessiondate->roomid,
-                    $sessions->get($sessiondate->id)->get_roomid()
-                );
-
                 $this->assertEquals(
                     $sessiondate->timestart,
                     $sessions->get($sessiondate->id)->get_timestart()
@@ -1722,11 +1699,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $seminarevents = (new seminar($facetoface2->id))->get_events();
         $this->assertCount(1, $seminarevents);
         $this->assertCount(1, $seminarevents->get($sessionid2_1)->get_sessions());
-        $this->assertEquals(
-            $sessiondates2_1[0]->roomid,
-            $seminarevents->get($sessionid2_1)->get_sessions()->get_first()->get_roomid()
-        );
-
         $this->assertEquals(
             $sessiondates2_1[0]->timestart,
             $seminarevents->get($sessionid2_1)->get_sessions()->get_first()->get_timestart());
@@ -1760,6 +1732,19 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertCount(0, $seminarevents);
     }
 
+    private function create_session_room(int $sessionid, $sessiondate): int {
+        $roomids = $sessiondate->roomids;
+        unset($sessiondate->roomids);
+        $session = new seminar_session();
+        $session->from_record($sessiondate);
+        $session->set_sessionid($sessionid);
+        $session->save();
+        if ($roomids) {
+            \mod_facetoface\room_helper::sync($session->get_id(), $roomids);
+        }
+        return $session->get_id();
+    }
+
     private function make_session($f2f, $room, $dates, $cancelrightnow = false) : int {
         $dates = array_map(
             function ($e) use ($room) {
@@ -1776,7 +1761,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
     }
 
     public function test_facetoface_get_sessions_eventtime() {
-        $this->resetAfterTest();
         $now = time();
 
         $course = $this->getDataGenerator()->create_course();
@@ -3966,7 +3950,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sessiondate->timestart = (string)$timestart;
         $sessiondate->timefinish = (string)$timeend;
         $sessiondate->sessiontimezone = '99';
-        $sessiondate->roomid = (string)$roomid;
+        $sessiondate->roomids[] = $roomid;
         return $sessiondate;
     }
 
@@ -4507,11 +4491,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         // First we need a session.
         $now = time();
-        $room = $this->facetoface_generator->add_site_wide_room([
-            'name' => 'Storage room',
-            'allowconflicts' => 1
-        ]);
-
         $f2f = $this->facetoface_generator->create_instance([
             'course' => $this->getDataGenerator()->create_course()->id
         ]);
@@ -4523,19 +4502,16 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
                     'timestart' => $now,
                     'timefinish' => $now + WEEKSECS,
                     'sessiontimezone' => 'Europe/London',
-                    'roomid' => $room->id,
                 ],
                 (object) [
                     'timestart' => $now + DAYSECS * 10,
                     'timefinish' => $now + DAYSECS * 10 + HOURSECS,
                     'sessiontimezone' => 'Europe/London',
-                    'roomid' => $room->id,
                 ],
                 (object) [
                     'timestart' => $now + YEARSECS,
                     'timefinish' => $now + YEARSECS + HOURSECS * 2,
                     'sessiontimezone' => 'Europe/London',
-                    'roomid' => $room->id,
                 ],
             ],
         ]));
@@ -4548,20 +4524,17 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
                 'timestart' => $now,
                 'timefinish' => $now + WEEKSECS,
                 'sessiontimezone' => '1Europe/London',
-                'roomid' => $room->id,
                 'id' => $sessions[0]->id
             ],
             (object) [
                 'timestart' => $now + WEEKSECS * 3,
                 'timefinish' => $now + WEEKSECS * 3 + HOURSECS,
                 'sessiontimezone' => '2Europe/London',
-                'roomid' => $room->id,
             ],
             (object) [
                 'timestart' => $now + YEARSECS,
                 'timefinish' => $now + YEARSECS + HOURSECS * 2,
                 'sessiontimezone' => '3Europe/London',
-                'roomid' => $room->id,
                 'id' => $sessions[2]->id
             ],
             // User may try to sneak in the date from another event.
@@ -4569,7 +4542,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
                 'timestart' => $now + YEARSECS + 696,
                 'timefinish' => $now + YEARSECS + HOURSECS * 2,
                 'sessiontimezone' => '4Europe/London',
-                'roomid' => $room->id,
                 'id' => 123456
             ],
         ];
@@ -4589,8 +4561,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             foreach ($dates as $key => $item) {
                 if ($item->sessiontimezone == $date->sessiontimezone &&
                     $item->timestart == $date->timestart &&
-                    $item->timefinish == $date->timefinish &&
-                    $item->roomid == $date->roomid) {
+                    $item->timefinish == $date->timefinish) {
                     unset($dates[$key]);
                     if (isset($item->id)) {
                         return $item->id != $date->id;
@@ -4602,11 +4573,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
             return true;
         });
-
         // Assert all the dates match and the dates array is empty.
         $this->assertEmpty($updated);
-
-        $this->resetAfterTest();
     }
 
     public function test_sync_assets() {
@@ -4624,7 +4592,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
                     'timestart' => $now,
                     'timefinish' => $now + WEEKSECS,
                     'sessiontimezone' => 'Europe/London',
-                    'roomid' => 0,
                     'assetids' => [1,2,3,4,5,6,7,8,9,10]
                 ],
             ],

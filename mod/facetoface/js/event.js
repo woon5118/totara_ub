@@ -36,7 +36,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
     /**
      * Per-date fields that should be copied to clone event.
      */
-    clonefields: ['roomid', 'assetids', 'timestart', 'timefinish', 'sessiontimezone'],
+    clonefields: ['roomids', 'assetids', 'timestart', 'timefinish', 'sessiontimezone'],
 
     /**
      * Base url
@@ -101,8 +101,13 @@ M.totara_f2f_room = M.totara_f2f_room || {
                 if ($('input[name="datedelete[' + offset + ']"]').val() > 0) {
                     continue;
                 }
-                if ($('input[name="roomid[' + offset + ']"]').val() > 0) {
-                    roomcnt++;
+                var ids = [];
+                var $input = $('input[name="roomids[' + offset + ']"]');
+                if ($input.val().length > 0) {
+                    ids = $input.val().split(',');
+                    ids.forEach(function() {
+                        roomcnt++;
+                    });
                 }
                 cnt++;
             }
@@ -180,7 +185,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
             $dateitem.empty();
             $dateitem.text(M.util.get_string('loadinghelp', 'moodle'));
             $.post(
-                url + 'room/ajax/date_item.php',
+                url + 'events/ajax/date_item.php',
                 {
                     timestart: $('input[name="timestart[' + offset + ']"]').val(),
                     timefinish: $('input[name="timefinish[' + offset + ']"]').val(),
@@ -226,9 +231,9 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     title: '<h2>' + M.util.get_string('dateselect', 'facetoface') + '</h2>'
                 },
                 function() {
-                    return url + 'room/ajax/sessiondates.php?sessiondateid=' + $('input[name="sessiondateid[' + offset + ']"]').val() +
+                    return url + 'events/ajax/sessiondates.php?sessiondateid=' + $('input[name="sessiondateid[' + offset + ']"]').val() +
                         '&facetofaceid=' + M.totara_f2f_room.config.facetofaceid +
-                        '&roomid=' + $('input[name="roomid[' + offset + ']"]').val() +
+                        '&roomids=' + $('input[name="roomids[' + offset + ']"]').val() +
                         '&assetids=' + $('input[name="assetids[' + offset + ']"]').val() +
                         '&timezone=' + encodeURIComponent($('input[name="sessiontimezone[' + offset + ']"]').val()) +
                         '&start=' + $('input[name="timestart[' + offset + ']"]').val() +
@@ -246,70 +251,98 @@ M.totara_f2f_room = M.totara_f2f_room || {
     init_rooms: function() {
         var url = this.url;
 
-        $('.show-selectroom-dialog').each(function() {
+        /**
+         * Create DOM for room with attached action buttons and handlers.
+         * @param data room data (name, custom, etc)
+         * @param $input associated hidden input that stored ids
+         * @return
+         */
+        var render_room_item = function(data, $input, offset) {
+            var $elem = $('<li class="roomname" id="roomname' + offset + '_' + data.id + '" data-roomid="' + data.id + '" data-custom="' + data.custom + '" data-capacity="' + data.capacity + '">' + data.name + '</li>');
+            require(['core/templates'], function(templates) {
+                if (Number(data.custom) > 0) {
+                    var $editbutton = $('<a href="#"></a>');
+                    $editbutton.click(function(e) {
+                        e.preventDefault();
+                        M.totara_f2f_room.config.editroom = data.id;
+                        totaraDialogs['editcustomroom' + offset].config.title = '<h2>' + M.util.get_string('editroom', 'facetoface') + '</h2>';
+                        totaraDialogs['editcustomroom' + offset].open();
+                    });
+                    $elem.append($editbutton);
+                    templates.renderIcon('edit', M.util.get_string('editroom', 'facetoface')).done(function(html) {
+                        $editbutton.html(html);
+                    });
+                }
+
+                var $deletebutton = $('<a href="#"></a>');
+                $deletebutton.click(function(e) {
+                    e.preventDefault();
+                    var $li = $deletebutton.closest('li');
+                    var delid = $li.data('roomid') + "";
+                    var ids = $input.val().split(',');
+                    var index = ids.indexOf(delid);
+                    if (index > -1) {
+                        ids.splice(index, 1);
+                        $input.val(ids.join());
+                    }
+                    $li.remove();
+                    var min = 0;
+                    ids.forEach(function(id) {
+                        var li = $('#roomname' + offset + '_' + id);
+                        var current = Number(li.data().capacity);
+                        if (min === 0 || (min > current && current > 0)) {
+                            min = current;
+                        }
+                        $('input[name="roomcapacity[' + offset + ']"]').val(min);
+                    });
+                });
+                $elem.append($deletebutton);
+                templates.renderIcon('delete', M.util.get_string('delete', 'totara_core')).done(function(html) {
+                    $deletebutton.html(html);
+                });
+            });
+            return $elem;
+        };
+
+        // Select room dialog.
+        $('.show-selectrooms-dialog').each(function() {
             var offset = $(this).data('offset');
-            var $roomitem = $('#roomname' + offset);
-            var $input = $('input[name="roomid[' + offset + ']"]');
+            var $roomlist = $('#roomlist' + offset);
+            var $input = $('input[name="roomids[' + offset + ']"]');
 
             if ($('input[name="datedelete[' + offset + ']"]').val() > 0) {
                 return;
             }
 
-            // Select room dialog handler.
-            var handler = new totaraDialog_handler_treeview_singleselect('roomid[' + offset + ']', 'roomname' + offset);
-
-            // Reset name as "Name (Capacity)" durinng gialog save.
-            handler.external_function = function() {
-                var selected_val = $('#treeview_selected_val_'+this._title).val();
-                var $item = $('.treeview span.unclickable#item_'+selected_val, this._container);
-                var elem = $item.data();
-                $('#'+this.text_element_id).html(elem.name + ' (' + elem.capacity + ')');
-                // Re-init delete.
-                this.setup_delete();
-
-                $('input[name="roomcapacity[' + offset + ']"]').val(elem.capacity);
-            };
-
-            // Init room.
-            var load_rooms = function() {
-                var initroom = $input.val();
-                if (initroom > 0) {
-                    $roomitem.empty();
-                    $roomitem.text(M.util.get_string('loadinghelp', 'moodle'));
+            // Init rooms.
+            function load_rooms() {
+                var inititems = $input.val();
+                if (inititems.length) {
+                    $roomlist.append($('<li>' + M.util.get_string('loadinghelp', 'moodle') + '</li>'));
                     $.post(
                         url + 'room/ajax/room_item.php',
                         {
                             facetofaceid:  M.totara_f2f_room.config.facetofaceid,
-                            itemid: initroom,
+                            itemids: inititems,
                             sesskey: M.cfg.sesskey
                         },
-                        function(elem) {
-                            $roomitem.empty();
-                            $roomitem.text(elem.name + ' (' + elem.capacity + ')');
-                            $roomitem.addClass('nonempty');
-                            // Edit button.
-                            if (Number(elem.custom) > 0) {
-                                var $editbutton = $('<a href="#"></a>');
-                                $editbutton.click(function(e) {
-                                    e.preventDefault();
-                                    M.totara_f2f_room.config.editroom = elem.id;
-                                    totaraDialogs['editcustomroom' + offset].config.title = '<h2>' + M.util.get_string('editroom', 'facetoface') + '</h2>';
-                                    totaraDialogs['editcustomroom' + offset].open();
-                                });
-                                $roomitem.append($editbutton);
-                                require(['core/templates'], function (templates) {
-                                    templates.renderIcon('edit', M.util.get_string('editroom', 'facetoface')).done(function (html) {
-                                        $editbutton.html(html);
-                                    });
-                                });
-                            }
-                            handler.setup_delete();
-                            $('input[name="roomcapacity[' + offset + ']"]').val(elem.capacity);
+                        function(data) {
+                            $roomlist.empty();
+                            var min = 0;
+                            data.forEach(function(elem) {
+                                var $elem = render_room_item(elem, $input, offset);
+                                var current = Number(elem.capacity);
+                                if (min === 0 || (min > current && current > 0)) {
+                                    min = current;
+                                }
+                                $('input[name="roomcapacity[' + offset + ']"]').val(min);
+                                $roomlist.append($elem);
+                            });
                         },
                         'json'
                     );
                 }
-            };
+            }
             load_rooms();
 
             // Create new room dialog handler.
@@ -323,10 +356,16 @@ M.totara_f2f_room = M.totara_f2f_room || {
                 try {
                     // We expect json if dates processed without errors.
                     var elem = $.parseJSON(response);
-                    $input.val(elem.id);
+                    var ids = [];
+                    if ($input.val().length > 0) {
+                        ids = $input.val().split(',');
+                    }
+                    if (ids.indexOf(elem.id.toString()) === -1) {
+                        ids.push(elem.id);
+                    }
+                    $input.val(ids.toString());
                     load_rooms();
                     editcustomroomhandler._dialog.hide();
-                    $('input[name="defaultcapacity"]').attr('disabled', false);
                 } catch(e) {
                     this._dialog.render(response);
                 }
@@ -334,8 +373,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
 
             // Create new room dialog.
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok','moodle')] = function() { editcustomroomhandler.submit(); };
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { editcustomroomhandler._cancel(); };
+            buttonsObj[M.util.get_string('ok', 'moodle')] = function() { editcustomroomhandler.submit(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { editcustomroomhandler._cancel(); };
 
             totaraDialogs['editcustomroom' + offset] = new totaraDialog(
                 'editcustomroom' + offset + '-dialog',
@@ -357,44 +396,65 @@ M.totara_f2f_room = M.totara_f2f_room || {
                 editcustomroomhandler
             );
 
-            // Room dialog.
-            var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok','moodle')] = function() {
-                handler._save();
-                $('input[name="defaultcapacity"]').attr('disabled', false);
+            // Select room dialog handler.
+            var handler = new totaraDialog_handler_treeview_multiselect();
+            handler._update = function() {
+                var elements = $('.selected > div > span', this._container);
+                var ids = this._get_ids(elements);
+                $roomlist.empty();
+                // Display elements.
+                var min = 0;
+                ids.forEach(function(id) {
+                    var $item = $('#item_' + id, this._container).clone();
+                    // Get name and render room.
+                    $('span', $item).remove();
+                    var $elem = render_room_item($item.data(), $input, offset);
+                    var current = Number($item.data().capacity);
+                    if (min === 0 || (min > current && current > 0)) {
+                        min = current;
+                    }
+                    $('input[name="roomcapacity[' + offset + ']"]').val(min);
+                    if (min > 0) {
+                        $('input[name="defaultcapacity"]').attr('disabled', false);
+                    }
+                    $roomlist.append($elem);
+                });
+                $input.val(ids.join());
+                this._dialog.hide();
             };
+
+            // Select room dialog.
+            var buttonsObj = {};
+            buttonsObj[M.util.get_string('ok','moodle')] = function() { handler._update(); };
             buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
 
-            var sessionid = M.totara_f2f_room.config.sessionid;
-            // If event is a cloning then remove session id and behave as a new event to get rooms availability.
-            if ($('input[name="c"]').val() == 1) {
-                sessionid = 0;
-            }
-
             handler.oldLoad = handler.load;
-            handler.load = function() {
-                handler.oldLoad();
-                var context = $(".ui-dialog [id^='selectroom'][id$='-dialog']"),
+
+            handler.load = function(response) {
+                handler.oldLoad(response);
+                var context = $(".ui-dialog [id^='selectrooms'][id$='-dialog']"),
                     height = context.height() - $('.dialog-footer', context).outerHeight();
 
                 $('.select', context).outerHeight(height);
             };
 
-            totaraDialogs['selectroom'+offset] = new totaraDialog(
-                'selectroom'+offset+'-dialog',
+            totaraDialogs['selectrooms' + offset] = new totaraDialog(
+                'selectrooms' + offset + '-dialog',
                 $(this).attr('id'),
                 {
                     buttons: buttonsObj,
-                    title: '<h2>' + M.util.get_string('chooseroom', 'facetoface') +
-                            M.totara_f2f_room.config['display_selected_item' + offset] + '</h2>'
+                    title: '<h2>' + M.util.get_string('chooserooms', 'facetoface') + '</h2>'
                 },
                 function() {
-                    return url + 'room/ajax/sessionrooms.php' +
-                        '?sessionid=' + sessionid +
+                    var sessionid = M.totara_f2f_room.config.sessionid;
+                    if (Number(M.totara_f2f_room.config.clone) == 1) {
+                        sessionid = 0;
+                    }
+                    return url + 'room/ajax/sessionrooms.php?sessionid=' + sessionid +
                         '&facetofaceid=' + M.totara_f2f_room.config.facetofaceid +
                         '&timestart=' + $('input[name="timestart[' + offset + ']"]').val() +
                         '&timefinish=' + $('input[name="timefinish[' + offset + ']"]').val() +
-                        '&selected=' + $('input[name="roomid[' + offset + ']"]').val() +
+                        '&selected=' + $('input[name="roomids[' + offset + ']"]').val() +
                         '&offset=' + offset +
                         '&sesskey=' + M.cfg.sesskey;
                 },
@@ -582,7 +642,11 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     title: '<h2>' + M.util.get_string('chooseassets', 'facetoface') + '</h2>'
                 },
                 function() {
-                    return url + 'asset/ajax/sessionassets.php?sessionid=' + M.totara_f2f_room.config.sessionid +
+                    var sessionid = M.totara_f2f_room.config.sessionid;
+                    if (Number(M.totara_f2f_room.config.clone) == 1) {
+                        sessionid = 0;
+                    }
+                    return url + 'asset/ajax/sessionassets.php?sessionid=' + sessionid +
                         '&facetofaceid=' + M.totara_f2f_room.config.facetofaceid +
                         '&timestart=' + $('input[name="timestart[' + offset + ']"]').val() +
                         '&timefinish=' + $('input[name="timefinish[' + offset + ']"]').val() +

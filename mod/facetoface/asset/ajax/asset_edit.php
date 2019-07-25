@@ -85,11 +85,6 @@ if ($data = $form->get_data()) {
     $asset = \mod_facetoface\asset_helper::save($data);
     echo json_encode(array('id' => $asset->get_id(), 'name' => $asset->get_name(), 'custom' => $asset->get_custom()));
 } else {
-    $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
-    $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
-    $PAGE->requires->strings_for_js(array('chooseassets', 'dateselect', 'nodatesyet',
-        'createnewasset', 'editasset', 'createnewasset'), 'facetoface');
-
     // This is required because custom fields may use AMD module for JS and we can't re-initialise AMD
     // which will happen if we call get_end_code() without setting the first arg to false.
     // It must be called before form->display and importantly before get_end_code.

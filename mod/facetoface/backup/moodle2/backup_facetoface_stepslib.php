@@ -134,6 +134,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             'signup_date_status', array('id'), array('signupid', 'attendancecode', 'superceded', 'createdby', 'timecreated')
         );
 
+        $rooms = new backup_nested_element('rooms');
         $room = new backup_nested_element('room', array('id'), array(
             'name', 'description', 'capacity', 'allowconflicts', 'custom', 'hidden', 'usercreated', 'usermodified', 'timecreated', 'timemodified'));
         // NOTE: we need to use different element names for custom fields because each type needs different SQL query.
@@ -186,7 +187,8 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $sessions_date->add_child($signups_dates_status);
         $signups_dates_status->add_child($signup_date_status);
 
-        $sessions_date->add_child($room);
+        $sessions_date->add_child($rooms);
+        $rooms->add_child($room);
         $room->add_child($room_fields);
         $room_fields->add_child($room_field);
 
@@ -231,8 +233,8 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         $room->set_source_sql("SELECT fr.*
                                  FROM {facetoface_room} fr
-                                 JOIN {facetoface_sessions_dates} fsd  ON (fsd.roomid = fr.id)
-                                WHERE fsd.id = :sessionsdateid",
+                                 JOIN {facetoface_room_dates} frd  ON (frd.roomid = fr.id)
+                                WHERE frd.sessionsdateid = :sessionsdateid",
             array('sessionsdateid' => backup::VAR_PARENTID));
         $this->add_customfield_set_source($room_field, 'facetoface_room', 'facetofaceroomid');
 

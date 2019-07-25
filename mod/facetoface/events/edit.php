@@ -88,18 +88,12 @@ if ($backtoevent) {
 $PAGE->set_url($baseurl);
 $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
 $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
-$PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
+$PAGE->requires->strings_for_js(array('chooseassets', 'chooserooms', 'dateselect', 'useroomcapacity', 'nodatesyet',
     'createnewasset', 'editasset', 'createnewroom', 'editroom', 'bookingconflict'), 'facetoface');
 $PAGE->set_title($seminar->get_name());
 $PAGE->set_heading($course->fullname);
 
-$jsconfig = array('sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $seminar->get_id());
-
-for ($offset = 0; $offset < $cntdates; $offset++) {
-    $display_selected = dialog_display_currently_selected(get_string('selected', 'facetoface'), "selectroom{$offset}-dialog");
-    $jsconfig['display_selected_item' . $offset] = $display_selected;
-}
-
+$jsconfig = array('sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $seminar->get_id(), 'clone' => $c);
 $jsmodule = array(
     'name' => 'totara_f2f_room',
     'fullpath' => '/mod/facetoface/js/event.js',

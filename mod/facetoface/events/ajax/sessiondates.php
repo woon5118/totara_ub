@@ -31,23 +31,19 @@ $start = required_param('start', PARAM_INT);
 $finish = required_param('finish', PARAM_INT);
 $sessiondateid = optional_param('sessiondateid', null, PARAM_INT);       // Empty when adding new session.
 $timezone = optional_param('timezone', '99', PARAM_TIMEZONE);
-$roomid = optional_param('roomid', null, PARAM_INT);
+$roomids = optional_param('roomids', null, PARAM_SEQUENCE);
 $assetids = optional_param('assetids', null, PARAM_SEQUENCE);
 
-if (!$facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid))) {
+$seminar = new mod_facetoface\seminar($facetofaceid);
+if (!$seminar->exists()) {
     print_error('error:incorrectfacetofaceid', 'facetoface');
 }
 
-if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-    print_error('error:coursemisconfigured', 'facetoface');
-}
+$cm = $seminar->get_coursemodule();
+$context = $seminar->get_contextmodule($cm->id);
 
-if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
-    print_error('error:incorrectcoursemoduleid', 'facetoface');
-}
-
-$params = compact('facetofaceid', 'start', 'finish', 'timezone', 'roomid', 'assetids', 'sessiondateid');
-$currenturl = new moodle_url('/mod/facetoface/room/ajax/sessiondates.php', $params);
+$params = compact('facetofaceid', 'start', 'finish', 'timezone', 'roomids', 'assetids', 'sessiondateid');
+$currenturl = new moodle_url('/mod/facetoface/events/ajax/sessiondates.php', $params);
 
 $params['sessionid'] = 0;
 if ($sessiondateid) {
@@ -56,16 +52,14 @@ if ($sessiondateid) {
     if (!$seminarevent->exists()) {
         print_error('error:incorrectcoursemodulesession', 'facetoface');
     }
-    if ($seminarevent->get_facetoface() != $facetoface->id) {
+    if ($seminarevent->get_facetoface() != $facetofaceid) {
         print_error('error:incorrectcoursemodulesession', 'facetoface');
     }
     $currenturl->param('sessiondateid', $sessiondateid);
     $params['sessionid'] = $sessionid;
 }
 
-$context = context_module::instance($cm->id);
-
-ajax_require_login($course, false, $cm);
+ajax_require_login($seminar->get_course(), false, $cm);
 require_sesskey();
 require_capability('mod/facetoface:editevents', $context);
 
@@ -78,7 +72,7 @@ $PAGE->requires->js_init_call('M.totara_f2f_dateintervalkeeper.init', array(), f
 
 $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
 $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
-$PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
+$PAGE->requires->strings_for_js(array('chooseassets', 'chooserooms', 'dateselect', 'useroomcapacity', 'nodatesyet',
     'createnewasset', 'editasset', 'createnewroom', 'editroom'), 'facetoface');
 
 $form = new \mod_facetoface\form\event_date($currenturl, $params, 'post', '', array('class' => 'dialog-nobind'), true, null, md5($start.$finish));

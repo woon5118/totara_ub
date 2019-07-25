@@ -81,10 +81,10 @@ Feature: Seminar session date with timezone management
       | timefinish[minute]   | 0                |
       | timefinish[timezone] | Europe/Prague    |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    When I click on "Select room" "link"
+    When I click on "Select rooms" "link"
     And I wait "1" seconds
-    And I click on "Room 1" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
 
     And I press "Add a new session"
     And I click on "Edit session" "link" in the ".f2fmanagedates .lastrow" "css_element"
@@ -103,9 +103,9 @@ Feature: Seminar session date with timezone management
       | timefinish[minute]   | 0             |
       | timefinish[timezone] | Europe/Prague |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    When I click on "Select room" "link" in the ".f2fmanagedates .lastrow" "css_element"
-    And I click on "Room 2" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    When I click on "Select rooms" "link" in the ".f2fmanagedates .lastrow" "css_element"
+    And I click on "Room 2" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     When I press "Save changes"
     Then I should see "3:00 PM - 4:00 PM" in the "Room 1" "table_row"
     Then I should see "Timezone: Pacific/Auckland" in the "Room 1" "table_row"
@@ -166,9 +166,9 @@ Feature: Seminar session date with timezone management
       | timefinish[minute]   | 00            |
       | sessiontimezone      | Europe/Prague |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    When I click on "Select room" "link" in the ".f2fmanagedates .lastrow" "css_element"
-    And I click on "Room 3" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    When I click on "Select rooms" "link" in the ".f2fmanagedates .lastrow" "css_element"
+    And I click on "Room 3" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
 
     When I press "Save changes"
     Then I should see "3:00 PM - 4:00 PM" in the "Room 1" "table_row"

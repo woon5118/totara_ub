@@ -1155,10 +1155,6 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         $sessiondates = $DB->get_records_select('facetoface_sessions_dates', "sessionid $idin", $params, 'timestart ASC');
         foreach ($sessiondates as $sessiondate) {
             $sessions[$sessiondate->sessionid]->sessiondates[] = $sessiondate;
-            if ($sessiondate->roomid) {
-                $room = $DB->get_record('facetoface_room', array('id' => $sessiondate->roomid));
-                $sessiondate->room = $room;
-            }
         }
 
         $managers = \totara_job\job_assignment::get_all_manager_userids($USER->id);

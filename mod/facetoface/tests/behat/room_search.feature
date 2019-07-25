@@ -40,22 +40,22 @@ Feature: Search pre-defined rooms in seminar
       | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add event"
-    And I click on "Select room" "link"
-    And I click on "Search" "link" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Search" "link" in the "Choose rooms" "totaradialogue"
 
-    And I search for "Room 1" in the "Choose a room" totara dialogue
-    Then I should see "Room 1 (Capacity: 5)"
+    And I search for "Room 1" in the "Choose rooms" totara dialogue
+    Then I should see "Room 1, That house, 123 here street (Capacity: 5)"
     And I should not see "Room 2 (Capacity: 6)"
 
-    And I search for "Room 2" in the "Choose a room" totara dialogue
-    Then I should see "Room 2 (Capacity: 6)"
+    And I search for "Room 2" in the "Choose rooms" totara dialogue
+    Then I should see "Room 2, Your house, 123 near street (Capacity: 6)"
     And I should not see "Room 1 (Capacity: 5)"
 
-    And I search for "Room" in the "Choose a room" totara dialogue
-    Then I should see "Room 1 (Capacity: 5)"
-    And I should see "Room 2 (Capacity: 6)"
-    And I click on "Room 1 (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I search for "Room" in the "Choose rooms" totara dialogue
+    Then I should see "Room 1, That house, 123 here street (Capacity: 5)"
+    And I should see "Room 2, Your house, 123 near street (Capacity: 6)"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "link" in the "//div[contains(@id,'search-tab')]" "xpath_element"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
 
   Scenario: Check paginator works as expected
@@ -124,9 +124,9 @@ Feature: Search pre-defined rooms in seminar
     And I follow "Add event"
 
     # Making sure there are results instead of an error. String order is made.
-    When I click on "Select room" "link"
-    And I click on "Search" "link" in the "Choose a room" "totaradialogue"
-    And I search for "Room 102" in the "Choose a room" totara dialogue
+    When I click on "Select rooms" "link"
+    And I click on "Search" "link" in the "Choose rooms" "totaradialogue"
+    And I search for "Room 102" in the "Choose rooms" totara dialogue
     Then I should see "Room 102"
     And I should see "Room 1021"
     And I should not see "Room 1028"
@@ -228,13 +228,13 @@ Feature: Search pre-defined rooms in seminar
     And I follow "Add event"
 
     # Find a previously undisplayed room using a partial search criteria.
-    When I click on "Select room" "link"
-    And I click on "Search" "link" in the "Choose a room" "totaradialogue"
-    And I search for "Room 1027" in the "Choose a room" totara dialogue
+    When I click on "Select rooms" "link"
+    And I click on "Search" "link" in the "Choose rooms" "totaradialogue"
+    And I search for "Room 1027" in the "Choose rooms" totara dialogue
     Then I should see "Room 10278 (Capacity: 50)"
     # Select the room and check that underlying page updates correctly.
     When I click on "Room 10278 (Capacity: 50)" "link" in the "//div[contains(@id,'search-tab')]" "xpath_element"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     Then I should see "Room 10278"
     When I press "Save changes"
     Then I should see "Room 10278" in the ".mod_facetoface__sessionlist" "css_element"

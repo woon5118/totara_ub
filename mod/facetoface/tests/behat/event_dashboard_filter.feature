@@ -87,7 +87,7 @@ Feature: Verify various conditions of the seminar event dashboard
 
     # Cancelled events will be adjusted with magic
     And the following "seminar sessions" exist in "mod_facetoface" plugin:
-      | eventdetails                    | start                           | finish                          | room   |
+      | eventdetails                    | start                           | finish                          | rooms  |
       | event future open               |  1 January   next year  +1 hour |  1 January   next year  +2 hour | Room 1 |
       | event future full               |  2 February  next year  +2 hour |  2 February  next year  +3 hour | Room 2 |
       | event future cancelled          |  3 March     next year  +3 hour |  3 March     next year  +4 hour | Room 1 |
@@ -211,7 +211,7 @@ Feature: Verify various conditions of the seminar event dashboard
     And I should see "Cancelled" in the "3:00 AM - 4:00 AM" "table_row"
     And I should not see "Upcoming" in the "3:00 AM - 4:00 AM" "table_row"
     And I should not see "Over" in the "3:00 AM - 4:00 AM" "table_row"
-    And I should not see "Room 1" in the "3:00 AM - 4:00 AM" "table_row"
+    And I should see "Room 1" in the "3:00 AM - 4:00 AM" "table_row"
     And I should not see "Will open at session start time" in the "3:00 AM - 4:00 AM" "table_row"
     And I should not see "Take attendance" in the "3:00 AM - 4:00 AM" "table_row"
     And I should not see "Attendance saved" in the "3:00 AM - 4:00 AM" "table_row"
@@ -243,14 +243,14 @@ Feature: Verify various conditions of the seminar event dashboard
     And I should see "Cancelled" in the "8:00 AM - 9:00 AM" "table_row"
     And I should not see "Upcoming" in the "8:00 AM - 9:00 AM" "table_row"
     And I should not see "Over" in the "8:00 AM - 9:00 AM" "table_row"
-    And I should not see "Room 2" in the "8:00 AM - 9:00 AM" "table_row"
+    And I should see "Room 2" in the "8:00 AM - 9:00 AM" "table_row"
     And I should not see "Will open at" in the "8:00 AM - 9:00 AM" "table_row"
     And I should not see "Take attendance" in the "8:00 AM - 9:00 AM" "table_row"
     And I should not see "Attendance saved" in the "8:00 AM - 9:00 AM" "table_row"
 
     # event future and past cancelled (past)
     And I should see "Cancelled" in the "9:00 AM - 10:00 AM" "table_row"
-    And I should not see "Room 1" in the "9:00 AM - 10:00 AM" "table_row"
+    And I should see "Room 1" in the "9:00 AM - 10:00 AM" "table_row"
     And I should not see "Will open at" in the "9:00 AM - 10:00 AM" "table_row"
     And I should not see "Take attendance" in the "9:00 AM - 10:00 AM" "table_row"
     And I should not see "Attendance saved" in the "9:00 AM - 10:00 AM" "table_row"
@@ -271,7 +271,7 @@ Feature: Verify various conditions of the seminar event dashboard
     # event past cancelled
     And I should see "Cancelled" in the "12:00 PM - 1:00 PM" "table_row"
     And I should not see "Over" in the "12:00 PM - 1:00 PM" "table_row"
-    And I should not see "Room 2" in the "12:00 PM - 1:00 PM" "table_row"
+    And I should see "Room 2" in the "12:00 PM - 1:00 PM" "table_row"
     And I should not see "Session over" in the "12:00 PM - 1:00 PM" "table_row"
     And I should not see "Will open at session start time" in the "12:00 PM - 1:00 PM" "table_row"
     And I should not see "Take attendance" in the "12:00 PM - 1:00 PM" "table_row"
@@ -297,7 +297,7 @@ Feature: Verify various conditions of the seminar event dashboard
     And I should see "Cancelled" in the "1 / 6" "table_row"
     And I should not see "In progress" in the "1 / 6" "table_row"
     And I should not see "Over" in the "1 / 6" "table_row"
-    And I should not see "Room 6" in the "1 / 6" "table_row"
+    And I should see "Room 6" in the "1 / 6" "table_row"
     And I should not see "Session in progress" in the "1 / 6" "table_row"
     And I should not see "Session over" in the "1 / 6" "table_row"
     And I should not see "Will open at session start time" in the "1 / 6" "table_row"
@@ -325,12 +325,12 @@ Feature: Verify various conditions of the seminar event dashboard
     And I follow "View all events"
 
     # Note that behat will see a text one more time if an <option> label matches the text
-    And I should see "Room 1" exactly "5" times
-    And I should see "Room 2" exactly "5" times
+    And I should see "Room 1" exactly "7" times
+    And I should see "Room 2" exactly "7" times
     And I should see "Room 3" exactly "2" times
     And I should see "Room 4" exactly "2" times
     And I should see "Room 5" exactly "2" times
-    And I should not see "Room 6"
+    And I should see "Room 6"
     And I should see "Cancelled" exactly "11" times
     And I should not see "Reset" in the ".mod_facetoface__filter" "css_element"
     And I should not see "Showing events form last"
@@ -352,12 +352,12 @@ Feature: Verify various conditions of the seminar event dashboard
     And I click on "Reset" "link"
 
     When I set the field "Room:" to "Room 1"
-    Then I should see "Room 1" exactly "5" times
-    And I should see "Room 2" exactly "3" times
+    Then I should see "Room 1" exactly "7" times
+    And I should see "Room 2" exactly "4" times
     And I should see "Room 3" exactly "1" times
     And I should see "Room 4" exactly "1" times
     And I should see "Room 5" exactly "1" times
-    And I should not see "Room 6"
+    And I should see "Room 6"
     And I click on "Reset" "link"
 
     When I set the field "Advanced:" to "Take attendance"
@@ -377,7 +377,7 @@ Feature: Verify various conditions of the seminar event dashboard
     And I should see "Room 3" exactly "2" times
     And I should see "Room 4" exactly "2" times
     And I should see "Room 5" exactly "2" times
-    And I should not see "Room 6"
+    And I should see "Room 6"
     And I should see "Over" exactly "1" times
     And I should see "In progress" exactly "6" times
     And I should see "Session in progress" exactly "3" times
@@ -397,8 +397,8 @@ Feature: Verify various conditions of the seminar event dashboard
     Then I should see "Room 1" exactly "1" times
 
     When I click on "Reset" "link"
-    Then I should see "Room 1" exactly "5" times
-    And I should see "Room 2" exactly "5" times
+    Then I should see "Room 1" exactly "7" times
+    And I should see "Room 2" exactly "7" times
     And I should see "Cancelled" exactly "11" times
 
     When the following config values are set as admin:

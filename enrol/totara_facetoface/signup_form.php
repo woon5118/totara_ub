@@ -188,7 +188,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
         $mform->addElement('html', html_writer::start_tag('tr'));
         $mform->addElement('html', html_writer::tag('th', get_string('selectsession', 'enrol_totara_facetoface'))); // No title for radio button col.
         $mform->addElement('html', html_writer::tag('th', get_string('sessiondatetime', 'facetoface')));
-        $mform->addElement('html', html_writer::tag('th', get_string('room', 'facetoface')));
+        $mform->addElement('html', html_writer::tag('th', get_string('rooms', 'mod_facetoface')));
         $mform->addElement('html', html_writer::tag('th', get_string('additionalinformation', 'enrol_totara_facetoface')));
         $mform->addElement('html', html_writer::end_tag('tr'));
         $mform->addElement('html', html_writer::end_tag('thead'));
@@ -237,12 +237,13 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             }
             $mform->addElement('html', html_writer::tag('td', $allsessiondates, array('class' => 'session-dates')));
 
-            // Room.
-            if (isset($session->room)) {
-                $renderer = $PAGE->get_renderer('mod_facetoface');
-                $roomhtml = $renderer->get_room_details_html($session->room, $PAGE->url);
-            } else {
-                $roomhtml = '';
+            // Rooms.
+            $roomhtml = '';
+            $rooms = \mod_facetoface\room_list::from_session($session->id);
+            if (!$rooms->is_empty()) {
+                foreach ($rooms as $room) {
+                    $roomhtml .= (string)$room;
+                }
             }
             $mform->addElement('html', html_writer::tag('td', $roomhtml, array('class' => 'session-room')));
 

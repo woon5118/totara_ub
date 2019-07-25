@@ -52,7 +52,7 @@ Feature: Take attendance for a seminar with multiple sessions
       | timefinish[minute]   | +5            |
     And I press "OK"
 
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I click on "Create" "link"
     And I set the following fields to these values:
       | Name             | later session   |
@@ -83,7 +83,7 @@ Feature: Take attendance for a seminar with multiple sessions
       | timefinish[minute]   | 0             |
     And I press "OK"
 
-    And I click on "Select room" "link" in the ".lastrow" "css_element"
+    And I click on "Select rooms" "link" in the ".lastrow" "css_element"
     And I click on "Create" "link"
     And I set the following fields to these values:
       | Name             | earlier session |

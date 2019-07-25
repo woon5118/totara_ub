@@ -94,10 +94,20 @@ class cleanup_task extends \core\task\scheduled_task {
         global $DB;
 
         // Get all old custom rooms that are not assigned to any date.
+        $sql = "SELECT frd.id
+                  FROM {facetoface_room_dates} frd
+             LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.id = frd.sessionsdateid)
+                 WHERE fsd.id IS NULL";
+        $dateids = $DB->get_fieldset_sql($sql);
+        foreach ($dateids as $dateid) {
+            $DB->delete_records('facetoface_room_dates', array('id' => $dateid));
+        }
+
+        // Now delete all old unused custom rooms.
         $sql = "SELECT fr.id
                   FROM {facetoface_room} fr
-             LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = fr.id)
-                 WHERE fsd.id IS NULL AND fr.custom = 1 AND fr.timecreated < :old";
+             LEFT JOIN {facetoface_room_dates} frd ON (frd.roomid = fr.id)
+                 WHERE frd.id IS NULL AND fr.custom = 1 AND fr.timecreated < :old";
 
         // Allow one day for unassigned room as it can be just created and not stored in seminar session yet.
         $roomids = $DB->get_fieldset_sql($sql, array('old' => time() - 86400));

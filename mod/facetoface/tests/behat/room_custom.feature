@@ -24,7 +24,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I click on "//a[contains(.,'Add event') or contains(.,'Add a new event')]" "xpath_element"
 
     # Create a custom room
-    When I click on "Select room" "link"
+    When I click on "Select rooms" "link"
     And I click on "Create" "link"
     Then I should see "Create new room" in the "Create new room" "totaradialogue"
     And the field "Publish for reuse by other events" matches value "0"
@@ -37,7 +37,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I click on "//*[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element" in the "Create new room" "totaradialogue"
-    Then I should see "Room created (5)"
+    Then I should see "Room created"
     And I press "Save changes"
 
     And I navigate to "Rooms" node in "Site administration > Seminars"
@@ -54,7 +54,7 @@ Feature: Manage custom rooms by admin and non-admin user
       | Name         | Room edited |
       | roomcapacity | 10          |
     And I click on "//*[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element" in the "Edit room" "totaradialogue"
-    Then I should see "Room edited (10)"
+    Then I should see "Room edited"
     And I press "Save changes"
 
     And I navigate to "Rooms" node in "Site administration > Seminars"
@@ -72,8 +72,11 @@ Feature: Manage custom rooms by admin and non-admin user
       | roomcapacity | 15             |
     And I set the field "Publish for reuse by other events" to "1"
     And I click on "//*[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element" in the "Edit room" "totaradialogue"
-    Then I should see "Room published (15)"
-    And I should not see "Edit room" in the "Room published (15)" "table_row"
+    # Lets save the form until user does not change the mind
+#    And I press "Save changes"
+#    When I click on "Edit event" "link"
+    Then I should see "Room published"
+    And I should not see "Edit room" in the "Room published" "table_row"
     # No need to submit a form here; the room is published as soon as the totaradialogue is closed
 
     And I navigate to "Rooms" node in "Site administration > Seminars"
@@ -90,7 +93,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I click on "//a[contains(.,'Add event') or contains(.,'Add a new event')]" "xpath_element"
 
     # Create a site-wide room
-    When I click on "Select room" "link"
+    When I click on "Select rooms" "link"
     And I click on "Create" "link"
     Then I should see "Create new room" in the "Create new room" "totaradialogue"
     And the field "Publish for reuse by other events" matches value "0"
@@ -101,8 +104,8 @@ Feature: Manage custom rooms by admin and non-admin user
       | roomcapacity | 20                  |
     And I set the field "Publish for reuse by other events" to "1"
     And I click on "//*[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element" in the "Create new room" "totaradialogue"
-    Then I should see "Site-wide room (20)"
-    And I should not see "Edit room" in the "Site-wide room (20)" "table_row"
+    Then I should see "Site-wide room"
+    And I should not see "Edit room" in the "Site-wide room" "table_row"
     # No need to submit a form here; the room is published as soon as the totaradialogue is closed
 
     And I navigate to "Rooms" node in "Site administration > Seminars"
@@ -118,7 +121,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I click on "//a[contains(.,'Add event') or contains(.,'Add a new event')]" "xpath_element"
-    When I click on "Select room" "link"
+    When I click on "Select rooms" "link"
     And I click on "Create" "link"
     Then I should see "Create new room" in the "Create new room" "totaradialogue"
     And I should not see "Publish for reuse"
@@ -131,7 +134,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I click on "//*[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element" in the "Create new room" "totaradialogue"
-    Then I should see "Room 1 (5)"
+    Then I should see "Room 1"
 
     # Edit
     When I click on "Edit room" "link"
@@ -141,4 +144,4 @@ Feature: Manage custom rooms by admin and non-admin user
       | Name         | Room edited |
       | roomcapacity | 10          |
     And I click on "//*[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element" in the "Edit room" "totaradialogue"
-    Then I should see "Room edited (10)"
+    Then I should see "Room edited"

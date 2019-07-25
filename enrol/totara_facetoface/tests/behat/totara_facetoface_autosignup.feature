@@ -86,7 +86,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | Allow manager reservations | Yes                        |
     And I follow "Test seminar name 1"
     And I follow "Add event"
-    And I click on "Delete" "link" in the "Select room" "table_row"
+    And I click on "Delete" "link" in the "Select rooms" "table_row"
     And I press "Save changes"
     And I follow "Course 1"
     And I am on "Course 1" course homepage

@@ -40,10 +40,6 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
     word-wrap: break-word;
 }
 
-.mod_facetoface-room {
-    display: block;
-}
-
 /** This is a hack to get full height divs for the status columns with background colours */
 .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
 .reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
@@ -131,18 +127,19 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
     float: right;
 }
 
-.mod_facetoface-assetlist {
+.mod_facetoface-assetlist,
+.mod_facetoface-roomlist {
     list-style-type: none;
     margin: 0;
 }
 
 .ui-dialog [id^='selectassets'][id$='-dialog'] .select,
-.ui-dialog [id^='selectroom'][id$='-dialog'] .select {
+.ui-dialog [id^='selectrooms'][id$='-dialog'] .select {
     overflow: auto;
 }
 
 .ui-dialog [id^='selectassets'][id$='-dialog'] .dialog-footer,
-.ui-dialog [id^='selectroom'][id$='-dialog'] .dialog-footer {
+.ui-dialog [id^='selectrooms'][id$='-dialog'] .dialog-footer {
     padding-top: 0.5em;
     display: block;
     float: left;
@@ -371,6 +368,13 @@ select.menuf2f-select {
             max-width: 15em;
             &__link {
                 .force-link-color();
+            }
+            > ul.roomlist {
+                margin: 0;
+                padding: 0;
+                > li.room {
+                    list-style-type: none;
+                }
             }
         }
 

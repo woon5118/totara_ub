@@ -63,8 +63,6 @@ class mod_facetoface_notify_under_capacity_testcase extends advanced_testcase {
                     'timestart' => $time,
                     'timefinish' => $time + 3600,
                     'sessiontimezone' => 'Pacific/Auckland',
-                    'roomid' => 0,
-                    'assetids' => [],
                 ]
             ],
             'mincapacity' => 3,

@@ -64,8 +64,6 @@ class mod_facetoface_cm_info_view_testcase extends advanced_testcase {
                         'timestart' => $time,
                         'timefinish' => $time + 3600,
                         'sessiontimezone' => 'Pacific/Auckland',
-                        'roomid' => 0,
-                        'assetids' => []
                     ],
                 ]
             ];

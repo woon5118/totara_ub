@@ -195,12 +195,15 @@ final class export_helper {
 
         $sessions = static::get_sessions($seminar->get_id());
         foreach ($sessions as $session) {
-            if (null == $session->roomid) {
-                $session->roomid = 0;
-            }
-
             $session->sessiondates = static::get_sessiondates($session, $worksheet, $displaytimezones);
-            $session->roomstring = static::get_roomstring($session);
+            $session->roomstring = '';
+            /** @var \mod_facetoface\room_list $rooms */
+            $rooms = \mod_facetoface\room_list::from_session($session->dateid);
+            if (!$rooms->is_empty()) {
+                foreach ($rooms as $room) {
+                    $session->roomstring .= (string)$room . "\n";
+                }
+            }
             if ($session->timestart) {
                 $session->status = static::get_status($session, $timenow);
             }
@@ -358,8 +361,8 @@ final class export_helper {
     private static function get_sessions(int $seminarid) : array {
         global $DB;
 
-        $sql = "SELECT d.id as dateid, s.id, s.capacity, d.timestart, d.timefinish, d.roomid,
-                   d.sessiontimezone, s.cancelledstatus, s.registrationtimestart, s.registrationtimefinish
+        $sql = "SELECT d.id as dateid, s.id, s.capacity, d.timestart, d.timefinish, d.sessiontimezone, s.cancelledstatus,
+                   s.registrationtimestart, s.registrationtimefinish
               FROM {facetoface_sessions} s
               JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
              WHERE s.facetoface = :fid

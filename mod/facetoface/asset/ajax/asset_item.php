@@ -31,32 +31,21 @@ use \mod_facetoface\asset;
 $facetofaceid = required_param('facetofaceid', PARAM_INT);
 $itemseq = required_param('itemids', PARAM_SEQUENCE);
 $itemids = explode(',', $itemseq);
+
 if (empty($itemids) || empty($itemids[0])) {
     exit();
 }
 
-if (!$facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid))) {
-    print_error('error:incorrectfacetofaceid', 'facetoface');
-}
+$seminar = new \mod_facetoface\seminar($facetofaceid);
+$cm = $seminar->get_coursemodule();
+$context = $seminar->get_contextmodule($cm->id);
 
-if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-    print_error('error:coursemisconfigured', 'facetoface');
-}
-
-if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
-    print_error('error:incorrectcoursemoduleid', 'facetoface');
-}
-
-$context = context_module::instance($cm->id);
-
-require_login($course, false, $cm);
+require_login($seminar->get_course(), false, $cm);
 require_sesskey();
 require_capability('mod/facetoface:editevents', $context);
 
 $PAGE->set_context($context);
-$PAGE->set_url('/mod/facetoface/asset/ajax/asset_item.php', array(
-    'itemids' => $itemseq
-));
+$PAGE->set_url('/mod/facetoface/asset/ajax/asset_item.php', ['facetofaceid' => $facetofaceid, 'itemids' => $itemseq]);
 
 $assets = array();
 foreach($itemids as $itemid) {

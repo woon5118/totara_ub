@@ -672,5 +672,50 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019090100, 'facetoface');
     }
 
+    // Add room to session dates many-to-many relationship.
+    if ($oldversion < 2019090400) {
+
+        $table = new xmldb_table('facetoface_room_dates');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('sessionsdateid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('roomid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        // Adding keys to table facetoface_room_dates.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('faceroomdate_sess_fk', XMLDB_KEY_FOREIGN, array('sessionsdateid'), 'facetoface_sessions_dates', array('id'));
+        $table->add_key('faceroomdate_room_fk', XMLDB_KEY_FOREIGN, array('roomid'), 'facetoface_room', array('id'));
+        // Adding index to table facetoface_room_dates.
+        $table->add_index('sessionsdateid-roomid', XMLDB_INDEX_UNIQUE, array('sessionsdateid, roomid'));
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $transaction = $DB->start_delegated_transaction();
+        // Move existing rooms to new table.
+        $sql = "SELECT * FROM {facetoface_sessions_dates} WHERE roomid > :roomid";
+        $rooms = $DB->get_records_sql($sql, ['roomid' => 0]);
+        foreach ($rooms as $item) {
+            $todb = new \stdClass();
+            $todb->sessionsdateid = $item->id;
+            $todb->roomid = $item->roomid;
+            $DB->insert_record('facetoface_room_dates', $todb);
+        }
+        $transaction->allow_commit();
+
+        // Drop roomid from facetoface_sessions_dates.
+        $table = new xmldb_table('facetoface_sessions_dates');
+        $roomidfield = new xmldb_field('roomid');
+        if ($dbman->field_exists($table, $roomidfield)) {
+            $dbman->drop_key(
+                $table,
+                new xmldb_key('facesessdate_roo_fk', XMLDB_KEY_FOREIGN, array('roomid'), 'facetoface_room', array('id'))
+            );
+            $dbman->drop_field($table, $roomidfield);
+        }
+
+        upgrade_mod_savepoint(true, 2019090400, 'facetoface');
+    }
+
     return true;
 }

@@ -548,12 +548,9 @@ class facetoface_notification extends data_object {
         $params["sessionid"] = $notif->id;
 
         $sql = "SELECT u.*
-                FROM {user} u
-                JOIN {facetoface_session_roles} sr
-                    ON u.id = sr.userid
-                WHERE sr.roleid $sqlin
-                AND sr.sessionid = :sessionid
-                AND u.suspended = 0";
+                  FROM {user} u
+                  JOIN {facetoface_session_roles} sr ON u.id = sr.userid
+                 WHERE sr.roleid $sqlin AND sr.sessionid = :sessionid AND u.suspended = 0";
         $users = $DB->get_records_sql($sql, $params);
 
         if (!$users) {
@@ -566,10 +563,7 @@ class facetoface_notification extends data_object {
             "conditiontype" => MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED
         );
 
-        $facetoface = $DB->get_record('facetoface', array('id' => $notif->facetoface));
-        $seminar = new \mod_facetoface\seminar();
-        $seminar->map_instance($facetoface);
-
+        $seminar = new \mod_facetoface\seminar($notif->facetoface);
         // Workaround to build the seminar_event record, that has mintimestart, maxtimefinish and
         // sessiondates properties
         $sessions = [];
@@ -605,7 +599,7 @@ class facetoface_notification extends data_object {
                 continue;
             }
 
-            $notice->set_facetoface($facetoface);
+            $notice->set_facetoface($seminar->get_properties());
             $notice->_sessions = $sessions;
             $notice->set_newevent($user, $notif->id);
             $notice->send_to_user($user, $notif->id);
@@ -642,9 +636,7 @@ class facetoface_notification extends data_object {
         }
 
         // We've found a session that has not reached the minimum bookings by the cut-off - time to send out emails.
-        $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
-        $seminar = new \mod_facetoface\seminar();
-        $seminar->map_instance($facetoface);
+        $seminar = new \mod_facetoface\seminar($session->facetoface);
         $cm = $seminar->get_coursemodule();
 
         // Workaround to build the seminar_event record, that has mintimestart, maxtimefinish and
@@ -693,7 +685,7 @@ class facetoface_notification extends data_object {
                 continue;
             }
 
-            $notice->set_facetoface($facetoface);
+            $notice->set_facetoface($seminar->get_properties());
             $notice->_sessions = $sessions;
             $notice->set_newevent($recipient, $session->id);
             $notice->send_to_user($recipient, $session->id);
@@ -1646,32 +1638,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     // Legacy.
     $msg = str_replace(get_string('placeholder:registrationcutoff', 'facetoface'), $registrationcutoff, $msg);
 
-    $roomcf = array();
-    $roomlist = \mod_facetoface\room_list::get_event_rooms($data->id);
-    if ($roomlist->is_empty()) {
-        // If the roomlist is empty, then we start checking roomid within session dates of an event/session, because the custom
-        // room would have been removed from session date in the database at this point, whenever an event is cancelled.
-        if (isset($data->sessiondates) && is_array($data->sessiondates)) {
-            foreach ($data->sessiondates as $sessiondate) {
-                if (empty($sessiondate->roomid)) {
-                    continue;
-                }
-
-                $room = \mod_facetoface\room::seek($sessiondate->roomid);
-                if (!$room->exists()) {
-                    continue;
-                }
-
-                $roomlist->add($room);
-            }
-        }
-    }
-
-    foreach ($roomlist as $room) {
-        $roomcf[$room->get_id()] = customfield_get_data($room->to_record(), 'facetoface_room', 'facetofaceroom', false);
-    }
-    $msg = facetoface_notification_loop_session_placeholders($msg, $data, $roomlist, $roomcf, $user);
-    $msg = facetoface_notification_substitute_deprecated_placeholders($msg, $data, $roomlist, $roomcf);
+    $msg = facetoface_notification_loop_session_placeholders($msg, $data, null, [], $user);
 
     $details = '';
     $seminardescription = '';
@@ -1776,10 +1743,6 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
             continue;
         }
 
-        if (empty($rooms)) {
-            $rooms = new \mod_facetoface\room_list('', ['id' => 0]);
-        }
-
         // Get the segment that will be repeated for each session.
         $templatesegment = substr($msg, $startposition + strlen($starttag), $endposition - $startposition - strlen($starttag));
 
@@ -1827,6 +1790,12 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
             if (isset($user->timezone)) {
                 $sessiontimezone = ($sessiondate->sessiontimezone == 99 ? $user->timezone : $sessiondate->sessiontimezone);
             }
+            $roomcustomfields = [];
+            /** @var \mod_facetoface\room_list $rooms */
+            $rooms = \mod_facetoface\room_list::from_session($sessiondate->id);
+            foreach ($rooms as $room) {
+                $roomcustomfields[$room->get_id()] = customfield_get_data($room->to_record(), 'facetoface_room', 'facetofaceroom', false);
+            }
             foreach ($fixed_placeholders as $type => $fixed_placeholder) {
                 $value = '';
                 switch ($type) {
@@ -1850,15 +1819,24 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
                         $value = format_time((int)$sessiondate->timestart - (int)$sessiondate->timefinish);
                         break;
                     case 'room:name':
-                        if (!empty($sessiondate->roomid) && $rooms->contains($sessiondate->roomid)) {
-                            $room = $rooms->get($sessiondate->roomid);
-                            $value = $room->get_name();
+                        if (!$rooms->is_empty()) {
+                            $place = [];
+                            /** @var \mod_facetoface\room $room */
+                            foreach ($rooms as $room) {
+                                $place[] = $room->get_name();
+                            }
+                            $value = implode(', ', $place);
                         }
                         break;
                     case 'room:link':
-                        if (!empty($sessiondate->roomid)) {
-                            $roomdetailsurl = new moodle_url('/mod/facetoface/reports/rooms.php', ['roomid' => $sessiondate->roomid]);
-                            $value = html_writer::link($roomdetailsurl, $roomdetailsurl, ['title' => get_string('roomdetails', 'facetoface')]);
+                        if (!$rooms->is_empty()) {
+                            $placeurl = [];
+                            /** @var \mod_facetoface\room $room */
+                            foreach ($rooms as $room) {
+                                $url = new moodle_url('/mod/facetoface/reports/rooms.php', ['roomid' => $room->get_id()]);
+                                $palceurl[] = html_writer::link($url, $url, ['title' => get_string('roomdetails', 'mod_facetoface')]);
+                            }
+                            $value = implode("\n<br>", $placeurl);
                         }
                         break;
                     default:
@@ -1872,10 +1850,15 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
             }
             foreach ($room_cf_placeholders as $type => $room_cf_placeholder) {
                 $value = '';
-                if (!empty($sessiondate->roomid) && $rooms->contains($sessiondate->roomid)) {
-                    if (!empty($roomcustomfields[$sessiondate->roomid][$type])) {
-                        $value = $roomcustomfields[$sessiondate->roomid][$type];
+                if (!$rooms->is_empty()) {
+                    /** @var \mod_facetoface\room $room */
+                    $place = [];
+                    foreach ($rooms as $room) {
+                        if (!empty($roomcustomfields[$room->get_id()][$type])) {
+                            $place[] = $roomcustomfields[$room->get_id()][$type];
+                        }
                     }
+                    $value = implode("\n<br>", $place);
                 }
                 // If the value for this field for this session is false or null, we'll use an empty string.
                 if (is_null($value) or ($value === false)) {
@@ -1988,63 +1971,6 @@ function facetoface_message_substitutions_userfields($msg, $user) {
             $msg = str_replace('[user:'.$field->shortname.']', $value, $msg);
         }
     }
-
-    return $msg;
-}
-
-/**
- * Substitute values for placeholders that are deprecated since 9.0.
- *
- * These placeholders were deprecated when rooms were changed from per-session to per-sessiondate.
- * Because they may have been left in some notifications, the will subsitute in values for the room
- * corresponding to the first session date.
- *
- * Properties in $session that may be required are:
- * $session->sessiondates
- *
- * @param string $msg - the string for the notification.
- * @param stdClass $session - an object that includes the sessiondates and also room data if that's necessary.
- * @param array $rooms - array of room objects
- * @param array $roomcustomfields - array of room custom fields values with room->id as keys,
- * and for the values: customfield arrays of the format ['shortname' => value].
- * @return string the message with the looped replacements added.
- */
-function facetoface_notification_substitute_deprecated_placeholders($msg, $session, $rooms = array(), $roomcustomfields = array()) {
-
-    $roomcf = false;
-    $roomnamevalue = '';
-    $locationvalue = '';
-    $venuevalue = '';
-
-    // Reset returns the first value in the sessiondates array.
-    $firstsessiondate = reset($session->sessiondates);
-    if (!empty($firstsessiondate->roomid) && $rooms->contains($firstsessiondate->roomid)) {
-        $room = $rooms->get($firstsessiondate->roomid);
-        if (!empty($room->get_name())) {
-            $roomnamevalue = $room->get_name();
-        }
-
-        if (isset($roomcustomfields[$firstsessiondate->roomid])) {
-            $roomcf = $roomcustomfields[$firstsessiondate->roomid];
-        }
-    }
-
-    if (isset($roomcf['location'])) {
-        $locationvalue = $roomcf['location'];
-    }
-
-    if (isset($roomcf['building'])) {
-        $venuevalue = $roomcf['building'];
-    }
-
-    // Get the deprecated placeholders.
-    $roomnameplaceholder = '[session:room]';
-    $locationplaceholder = '[session:location]';
-    $venueplaceholder = '[session:venue]';
-
-    $msg = str_replace($roomnameplaceholder, $roomnamevalue, $msg);
-    $msg = str_replace($locationplaceholder, $locationvalue, $msg);
-    $msg = str_replace($venueplaceholder, $venuevalue, $msg);
 
     return $msg;
 }

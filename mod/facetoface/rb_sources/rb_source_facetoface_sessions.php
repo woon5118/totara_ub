@@ -80,11 +80,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return true;
     }
 
-    //
-    //
     // Methods for defining contents of source
-    //
-    //
 
     protected function define_joinlist() {
         global $CFG, $DB;
@@ -155,12 +151,20 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
+                'roomdates',
+                'LEFT',
+                '{facetoface_room_dates}',
+                'roomdates.sessionsdateid = sessiondate.id',
+                REPORT_BUILDER_RELATION_ONE_TO_MANY,
+                'sessiondate'
+            ),
+            new rb_join(
                 'room',
                 'LEFT',
                 '{facetoface_room}',
-                'sessiondate.roomid = room.id',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'sessiondate'
+                'roomdates.roomid = room.id',
+                REPORT_BUILDER_RELATION_ONE_TO_MANY,
+                'roomdates'
             ),
             new rb_join(
                 'bookedby',

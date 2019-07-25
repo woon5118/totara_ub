@@ -73,6 +73,23 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->add_session_common_to_joinlist($joinlist);
 
         $joinlist[] = new rb_join(
+            'roomdates',
+            'LEFT',
+            '{facetoface_room_dates}',
+            'roomdates.sessionsdateid = base.id',
+            REPORT_BUILDER_RELATION_ONE_TO_MANY
+        );
+
+        $joinlist[] = new rb_join(
+            'room',
+            'LEFT',
+            '{facetoface_room}',
+            'roomdates.roomid = room.id',
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            'roomdates'
+        );
+
+        $joinlist[] = new rb_join(
             'assetdate',
             'LEFT',
             '{facetoface_asset_dates}',
@@ -663,7 +680,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $paramoptions = array(
             new rb_param_option(
                 'roomid',
-                'base.roomid',
+                'room.id',
                 'room'
             ),
             new rb_param_option(

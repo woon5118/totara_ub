@@ -67,9 +67,9 @@ Feature: Manage pre-defined rooms
       | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add event"
-    When I click on "Select room" "link"
-    Then I should see "Room 1, That house, 123 here street (Capacity: 5)" in the "Choose a room" "totaradialogue"
-    And I should see "Room 2, Your house, 123 near street (Capacity: 6)" in the "Choose a room" "totaradialogue"
+    When I click on "Select rooms" "link"
+    Then I should see "Room 1, That house, 123 here street (Capacity: 5)" in the "Choose rooms" "totaradialogue"
+    And I should see "Room 2, Your house, 123 near street (Capacity: 6)" in the "Choose rooms" "totaradialogue"
 
   Scenario: Fill a room
     Given I am on "Course 1" course homepage with editing mode on
@@ -81,10 +81,10 @@ Feature: Manage pre-defined rooms
     And I follow "Add event"
     And I set the following fields to these values:
       | capacity           | 7   |
-    When I click on "Select room" "link"
+    When I click on "Select rooms" "link"
     And I wait "1" seconds
-    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I wait "1" seconds
     And I press "Use room capacity"
     And I wait "1" seconds
@@ -134,10 +134,10 @@ Feature: Manage pre-defined rooms
     And I press "OK"
     And I set the following fields to these values:
       | capacity           | 5    |
-    When I click on "Select room" "link"
+    When I click on "Select rooms" "link"
     And I wait "1" seconds
-    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
 
@@ -155,10 +155,10 @@ Feature: Manage pre-defined rooms
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
-    When I click on "Select room" "link"
+    When I click on "Select rooms" "link"
     And I wait "1" seconds
-    Then I should see "(Room unavailable)" in the "Choose a room" "totaradialogue"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    Then I should see "(Room unavailable)" in the "Choose rooms" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I wait "1" seconds
     And I click on "Edit session" "link"
     And I set the following fields to these values:
@@ -173,9 +173,9 @@ Feature: Manage pre-defined rooms
       | timefinish[hour]   | 15   |
       | timefinish[minute] | 0    |
     And I press "OK"
-    When I click on "Select room" "link"
-    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    When I click on "Select rooms" "link"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I wait "1" seconds
     And I click on "Edit session" "link"
     And I set the following fields to these values:
@@ -219,10 +219,10 @@ Feature: Manage pre-defined rooms
     And I press "OK"
     And I set the following fields to these values:
       | capacity                | 7                |
-    When I click on "Select room" "link"
+    When I click on "Select rooms" "link"
     And I wait "1" seconds
-    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
 
@@ -244,10 +244,10 @@ Feature: Manage pre-defined rooms
     And I press "OK"
     And I set the following fields to these values:
       | capacity                | 7             |
-    When I click on "Select room" "link"
+    When I click on "Select rooms" "link"
     And I wait "1" seconds
-    Then I should see "(Room unavailable)" in the "Choose a room" "totaradialogue"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    Then I should see "(Room unavailable)" in the "Choose rooms" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]       | 2             |
@@ -264,9 +264,9 @@ Feature: Manage pre-defined rooms
       | timefinish[timezone] | Europe/London |
     And I press "OK"
     And I wait "1" seconds
-    When I click on "Select room" "link"
-    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    When I click on "Select rooms" "link"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I wait "1" seconds
     And I click on "Edit session" "link"
     And I set the following fields to these values:

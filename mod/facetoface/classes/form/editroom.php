@@ -42,8 +42,8 @@ class editroom extends \moodleform {
         $room = $this->_customdata['room'];
         /** @var \mod_facetoface\seminar $seminar */
         $seminar = empty($this->_customdata['seminar']) ? null : $this->_customdata['seminar'];
-        /** @var \mod_facetoface\seminar_event $event */
-        $event = empty($this->_customdata['event']) ? null : $this->_customdata['event'];
+        /** @var \mod_facetoface\seminar_event $seminarevent */
+        $seminarevent = empty($this->_customdata['seminarevent']) ? null : $this->_customdata['seminarevent'];
         $editoroptions = $this->_customdata['editoroptions'];
 
         $modconfig = has_capability('totara/core:modconfig', \context_system::instance());
@@ -55,8 +55,8 @@ class editroom extends \moodleform {
             $mform->addElement('hidden', 'f', $seminar->get_id());
             $mform->setType('f', PARAM_INT);
         }
-        if (!empty($event)) {
-            $mform->addElement('hidden', 's', $event->get_id());
+        if (!empty($seminarevent)) {
+            $mform->addElement('hidden', 's', $seminarevent->get_id());
             $mform->setType('s', PARAM_INT);
         }
 
@@ -75,15 +75,19 @@ class editroom extends \moodleform {
 
         $mform->addElement('advcheckbox', 'allowconflicts', get_string('allowroomconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'allowroomconflicts', 'mod_facetoface');
-
-        $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'facetoface'), null, $this->_customdata['editoroptions']);
-
-        customfield_definition($mform, (object)['id' => $room->get_id()], 'facetofaceroom', 0, 'facetoface_room');
+        $mform->setType('allowconflicts', PARAM_INT);
 
         if ($modconfig and !empty($seminar) and $room->get_custom()) {
             $mform->addElement('advcheckbox', 'notcustom', get_string('publishreuse', 'mod_facetoface'));
             // Disable if does not seem to work in dialog forms, back luck.
+        } else {
+            $mform->addElement('hidden', 'notcustom');
         }
+        $mform->setType('notcustom', PARAM_INT);
+
+        $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'facetoface'), null, $this->_customdata['editoroptions']);
+
+        customfield_definition($mform, (object)['id' => $room->get_id()], 'facetofaceroom', 0, 'facetoface_room');
 
         if (!empty($room) && $room->exists()) {
             $mform->addElement('header', 'versions', get_string('versioncontrol', 'mod_facetoface'));

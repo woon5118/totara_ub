@@ -273,6 +273,7 @@ final class seminar_session_list implements \Iterator, \Countable {
      */
     public function delete(): void {
         foreach ($this->items as $item) {
+            room_helper::sync($item->get_id(), []);
             asset_helper::sync($item->get_id(), []);
         }
         $this->traitDelete();
@@ -315,8 +316,7 @@ final class seminar_session_list implements \Iterator, \Countable {
         for ($i = 0; $i < count($olddates); $i++) {
             if ($olddates[$i]->timestart != $newdates[$i]->timestart ||
                 $olddates[$i]->timefinish != $newdates[$i]->timefinish ||
-                $olddates[$i]->sessiontimezone != $newdates[$i]->sessiontimezone ||
-                $olddates[$i]->roomid != $newdates[$i]->roomid && $newdates[$i]->roomid != 0) {
+                $olddates[$i]->sessiontimezone != $newdates[$i]->sessiontimezone) {
                 $dateschanged = true;
                 break;
             }

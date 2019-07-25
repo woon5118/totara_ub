@@ -78,7 +78,6 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
      * @param array $result
      */
     public function test_check_session_status(array $time, int $currenttime, array $result): void {
-        $this->resetAfterTest();
         $event = $this->create_event();
 
         $session = new seminar_session();
@@ -185,7 +184,6 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
      */
     public function test_is_attendance_open(array $time, int $currenttime, array $seminarsetting,
                                             bool $result): void {
-        $this->resetAfterTest();
         $event = $this->create_event();
 
         $seminar = $event->get_seminar();
@@ -243,7 +241,7 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
         $sessiondate->timestart = (string)$timestart;
         $sessiondate->timefinish = (string)$timeend;
         $sessiondate->sessiontimezone = '99';
-        $sessiondate->roomid = (string)$roomid;
+        $sessiondate->roomids = [$roomid];
         return $sessiondate;
     }
 

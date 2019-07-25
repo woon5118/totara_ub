@@ -67,13 +67,13 @@ Feature: Display the rooms in select room dialog when room is booked and hidden
       | timefinish[minute] | 00   |
     And I press "OK"
 
-    When I click on "Select room" "link"
-    Then I should see "Room 1, Building 123, 123 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
-    And I should see "Room 2, Building 234, 234 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
-    And I should see "Room 3, Building 345, 345 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
+    When I click on "Select rooms" "link"
+    Then I should see "Room 1, Building 123, 123 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
+    And I should see "Room 2, Building 234, 234 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
+    And I should see "Room 3, Building 345, 345 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
 
-    And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
 
     And I follow "Add event"
@@ -91,13 +91,13 @@ Feature: Display the rooms in select room dialog when room is booked and hidden
       | timefinish[minute] | 00   |
     And I press "OK"
 
-    When I click on "Select room" "link"
-    Then I should see "Room 1, Building 123, 123 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
-    And I should see "Room 2, Building 234, 234 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
-    And I should see "Room 3, Building 345, 345 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
+    When I click on "Select rooms" "link"
+    Then I should see "Room 1, Building 123, 123 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
+    And I should see "Room 2, Building 234, 234 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
+    And I should see "Room 3, Building 345, 345 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
 
-    And I click on "Room 2, Building 234, 234 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 2, Building 234, 234 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
 
     And I navigate to "Rooms" node in "Site administration > Seminars"
@@ -107,16 +107,16 @@ Feature: Display the rooms in select room dialog when room is booked and hidden
     And I follow "Seminar TL-9152"
 
     And I click on "Edit event" "link" in the "Room 2" "table_row"
-    When I click on "Select room" "link"
-    Then I should see "Room 1, Building 123, 123 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
-    And I should see "Room 2, Building 234, 234 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
-    And I should see "Room 3, Building 345, 345 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
+    When I click on "Select rooms" "link"
+    Then I should see "Room 1, Building 123, 123 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
+    And I should see "Room 2, Building 234, 234 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
+    And I should see "Room 3, Building 345, 345 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
 
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I click on "#id_cancel" "css_element"
 
     And I click on "Edit event" "link" in the "Room 1" "table_row"
-    When I click on "Select room" "link"
-    Then I should see "Room 1, Building 123, 123 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
-    And I should not see "Room 2, Building 234, 234 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
-    And I should see "Room 3, Building 345, 345 Tory street (Capacity: 10)" in the "Choose a room" "totaradialogue"
+    When I click on "Select rooms" "link"
+    Then I should see "Room 1, Building 123, 123 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
+    And I should not see "Room 2, Building 234, 234 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
+    And I should see "Room 3, Building 345, 345 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"

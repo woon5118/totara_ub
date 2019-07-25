@@ -28,6 +28,8 @@ defined("MOODLE_INTERNAL") || die();
 global $CFG;
 require_once($CFG->dirroot . "/totara/reportbuilder/lib.php");
 
+use mod_facetoface\room_helper;
+
 /**
  * Unit test for facetoface_rooms reprot builder
  * and the test is testing the SQL query of custom report plust
@@ -104,7 +106,7 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
             'toolbarsearch'     => 1,
             'globalrestriction' => 1,
             'timemodified'      => time(),
-            'defaultsortorder'  => 4
+            'defaultsortorder'  => 4,
         ];
 
         $id = $DB->insert_record('report_builder', (object)$rp);
@@ -170,8 +172,8 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
         ];
 
         if ($isobj) {
-            $data[0] = (object) $data[0];
-            $data[1] =  (object) $data[1];
+            $data[0] = (object)$data[0];
+            $data[1] = (object)$data[1];
         }
         return $data;
     }
@@ -190,7 +192,6 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
     public function test_query(): void {
         global $USER;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
         $user = $USER;
 
@@ -211,24 +212,24 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
      */
     public function test_query2(): void {
         global $DB, $USER;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
         $user = $USER;
 
         $reportbuilder = $this->set_up_report_builder($user, false);
-        $data = $this->dummy_data($user,true);
+        $data = $this->dummy_data($user, false);
         $this->create_face2face_rooms($data);
-
         $ghostroom = $data[1];
+
         $params = [
-            'sessionid'         => 1,
-            'sessiontimezone'   => "something",
-            'roomid'            => $ghostroom->id,
-            'timestart'         => time(),
-            'timefinish'        => time() * 36
+            'sessionid'       => 1,
+            'sessiontimezone' => "something",
+            'timestart'       => time(),
+            'timefinish'      => time() * 36,
         ];
 
-        $DB->insert_record("facetoface_sessions_dates", (object) $params);
+        $fsdid = $DB->insert_record("facetoface_sessions_dates", (object)$params);
+        room_helper::sync($fsdid, [$ghostroom->id]);
 
         $this->assertEquals(2, $reportbuilder->get_filtered_count());
     }
@@ -249,8 +250,6 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
 
         $this->setAdminUser();
         $user = $USER;
-
-        $this->resetAfterTest(true);
 
         $reportbuilder = $this->set_up_report_builder($user, true);
         $data = $this->dummy_data($user, false);

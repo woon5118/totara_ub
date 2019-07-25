@@ -54,9 +54,7 @@ if ($action === 'delete') {
     if ($room->get_custom()) {
         print_error('error:roomnotpublished', 'facetoface', $returnurl);
     }
-
-    $roominuse = $DB->count_records('facetoface_sessions_dates', array('roomid' => $id));
-    if ($roominuse) {
+    if ($room->is_used()) {
         print_error('error:roomisinuse', 'facetoface', $returnurl);
     }
 

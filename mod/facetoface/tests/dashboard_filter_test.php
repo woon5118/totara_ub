@@ -65,7 +65,6 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
 
     public function setUp() {
         parent::setUp();
-        $this->resetAfterTest(true);
         $this->generator = $this->getDataGenerator();
         $this->facetoface_generator = $this->generator->get_plugin_generator('mod_facetoface');
         $this->course = $this->generator->create_course();
@@ -96,7 +95,7 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
         $sessiondate->timestart = (string)$timestart;
         $sessiondate->timefinish = (string)$timeend;
         $sessiondate->sessiontimezone = '99';
-        $sessiondate->roomid = (string)$roomid;
+        $sessiondate->roomids[] = $roomid;
         return $sessiondate;
     }
 
@@ -165,12 +164,12 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
         $this->assertFalse(has_capability('mod/facetoface:takeattendance', $this->context, $student));
 
         $room = $this->facetoface_generator->add_site_wide_room([]);
-        $seminareventid = $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => [] ]);
+        $seminareventid = $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => []]);
         $seminarevent = new seminar_event($seminareventid);
         $this->create_users_signups(1, $seminarevent, booked::class);
 
         $now = time();
-        seminar_event_helper::merge_sessions($seminarevent, [ $this->prepare_date($now - DAYSECS * 2, $now - DAYSECS, $room->id) ]);
+        seminar_event_helper::merge_sessions($seminarevent, [$this->prepare_date($now - DAYSECS * 2, $now - DAYSECS, $room->id)]);
 
         // No session attendance tracking, no attendance filter
         $this->seminar->set_sessionattendance(seminar::SESSION_ATTENDANCE_DISABLED)->save();

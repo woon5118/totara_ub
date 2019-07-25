@@ -250,7 +250,7 @@ final class signup implements seminar_iterator_item {
     }
 
     /**
-     * Create/update {facetoface_sessions_dates}.record
+     * Create/update {facetoface_signups}.record
      * @return signup
      */
     public function save(): signup {

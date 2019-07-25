@@ -172,7 +172,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         } else {
             $tableheader[] = get_string('sessionslist:time', 'mod_facetoface');
         }
-        $tableheader[] = get_string('room', 'mod_facetoface');
+        $tableheader[] = get_string('rooms', 'mod_facetoface');
         if (!$minimal) {
             $tableheader[] = get_string('sessionslist:sessionstatus', 'mod_facetoface');
             if ($attendancetracking) {
@@ -216,8 +216,6 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $signupcount = $helper->count_attendees_with_codes($statuscodes, $includedeleted);
             $signupcount += $helper->count_reserved_spaces();
             $sessionfull = ($signupcount >= $seminarevent->get_capacity());
-
-            $rooms = \mod_facetoface\room_list::get_event_rooms($seminarevent->get_id());
 
             if (!$seminarevent->is_sessions()) {
                 // An event without session dates, is a wait-listed event
@@ -309,10 +307,16 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
                     // Room
                     $time = time();
-                    if ($date->has_room() && $rooms->contains($date->get_roomid())) {
+                    $rooms = \mod_facetoface\room_list::from_session($date->get_id());
+                    if (!$rooms->is_empty()) {
+                        $roomoutput = html_writer::start_tag('ul', ['class' => 'roomlist']);
                         /** @var \mod_facetoface\room $room */
-                        $room = $rooms->get($date->get_roomid());
-                        $cell = new html_table_cell($this->get_room_details_html($room, $currenturl));
+                        foreach ($rooms as $room) {
+                            $roomstring = $this->get_room_details_html($room, $currenturl);
+                            $roomoutput .= html_writer::tag('li', $roomstring, ['class' => 'room']);
+                        }
+                        $roomoutput .= html_writer::end_tag('ul');
+                        $cell = new html_table_cell($roomoutput);
                         $cell->attributes['class'] = 'mod_facetoface__sessionlist__room';
                         $sessionrow[] = $cell;
                     } else {
@@ -2260,15 +2264,26 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $output .= html_writer::tag('dt', get_string('duration', 'mod_facetoface') . ':');
                 $output .= html_writer::tag('dd', format_time((int)$date->get_timestart() - (int)$date->get_timefinish()));
 
-                if ($date->get_roomid() || $rooms->contains($date->get_roomid())) {
-                    /** @var room $room */
-                    $room = $rooms->get($date->get_roomid());
-
-                    // Display room information
+                $rooms = \mod_facetoface\room_list::from_session($date->get_id());
+                if (!$rooms->is_empty()) {
                     $backurl = $PAGE->has_set_url() ? $PAGE->url : null;
-                    $roomstring = $this->get_room_details_html($room, $backurl);
-                    $output .= html_writer::tag('dt', get_string('room', 'mod_facetoface') . ':');
-                    $output .= html_writer::tag('dd', html_writer::tag('span', $roomstring, ['class' => 'roomdescription']));
+                    $output .= html_writer::tag('dt', get_string('rooms', 'mod_facetoface') . ':');
+                    $roomoutput = html_writer::start_tag('ul');
+                    foreach ($rooms as $room) {
+                        $roomstring = $this->get_room_details_html($room, $backurl);
+                        $description = file_rewrite_pluginfile_urls(
+                            $room->get_description(),
+                            'pluginfile.php',
+                            \context_system::instance()->id,
+                            'mod_facetoface',
+                            'room',
+                            $room->get_id()
+                        );
+                        $roomstring .= format_text($description, FORMAT_HTML);
+                        $roomoutput .= html_writer::tag('li', $roomstring, ['class' => 'roomdescription']);
+                    }
+                    $roomoutput .= html_writer::end_tag('ul');
+                    $output .= html_writer::tag('dd', $roomoutput);
                 }
 
                 $assets = \mod_facetoface\asset_list::from_session($date->get_id());

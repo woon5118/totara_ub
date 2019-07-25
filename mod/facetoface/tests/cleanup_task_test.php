@@ -45,8 +45,6 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         global $CFG, $DB;
         require_once($CFG->dirroot.'/user/lib.php');
 
-        $this->resetAfterTest(true);
-
         $time = time();
 
         $user1 = $this->getDataGenerator()->create_user();
@@ -88,7 +86,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
                     'timestart' => $time + HOURSECS * 36,
                     'timefinish' => $time + HOURSECS * 38,
                     'sessiontimezone' => 'Pacific/Auckland',
-                    'roomid' => $room2->id
+                    'roomids' => [$room2->id]
                 ]
             ]
         ]);
@@ -102,13 +100,12 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
                     'timestart' => $time + HOURSECS * 39,
                     'timefinish' => $time + HOURSECS * 41,
                     'sessiontimezone' => 'Pacific/Auckland',
-                    'roomid' => $room3->id
+                    'roomids' => [$room3->id]
                 ]
             ]
         ]);
         $seminarevent2 = new \mod_facetoface\seminar_event($session2id);
         $helper2 = new \mod_facetoface\attendees_helper($seminarevent2);
-
 
         // Sign the users up to the first session.
         $sink = $this->redirectMessages();
@@ -203,10 +200,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         global $CFG, $DB;
         require_once($CFG->dirroot.'/user/lib.php');
 
-        $this->resetAfterTest(true);
-
         $time = time();
-        $day = 86400;
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();

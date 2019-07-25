@@ -46,7 +46,7 @@ Feature: Seminar timezones in reports
       | timefinish[timezone] | Australia/Perth |
     And I press "OK"
 
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I click on "Create" "link"
     And I set the following fields to these values:
       | Name             | Room 1          |
@@ -81,7 +81,7 @@ Feature: Seminar timezones in reports
       | timefinish[timezone] | Australia/Perth |
     And I press "OK"
 
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I click on "Create" "link"
     And I set the following fields to these values:
       | Name             | Room 2          |

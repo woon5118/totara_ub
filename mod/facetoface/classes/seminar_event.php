@@ -233,18 +233,6 @@ final class seminar_event implements seminar_iterator_item {
         // Notify managers who had reservations.
         notice_sender::reservation_cancelled($this);
 
-        // Start cleaning up the custom rooms, custom assets here at the very end of this cancellation task, because we would want
-        // the information of custom rooms and custom assets to be included in the email sending to users which should have happened
-        // before this stage.
-        $sessions = $this->get_sessions();
-
-        /** @var seminar_session $session */
-        foreach ($sessions as $session) {
-            // Unlink rooms, orphaned custom rooms are deleted from cleanup task.
-            $session->set_roomid(0);
-            $session->save();
-        }
-
         $cm = get_coursemodule_from_instance('facetoface', $this->get_facetoface());
         $context = context_module::instance($cm->id);
         \mod_facetoface\event\session_cancelled::create_from_session($this->to_record(), $context)->trigger();

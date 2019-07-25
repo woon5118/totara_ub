@@ -91,7 +91,6 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source {
         $this->add_assets_fields_to_columns($columnoptions, 'asset');
         $this->add_session_common_to_columns($columnoptions, 'sessiondate');
         $this->add_session_status_to_columns($columnoptions, 'sessiondate');
-        $this->add_rooms_fields_to_columns($columnoptions, 'room');
 
         return $columnoptions;
     }
@@ -140,18 +139,11 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source {
             'date'
         );
 
-        $this->add_rooms_fields_to_filters($filteroptions);
-
         return $filteroptions;
     }
 
     protected function define_paramoptions() {
         $paramoptions = array(
-            new rb_param_option(
-                'roomid',
-                'sessiondate.roomid',
-                'room'
-            ),
             new rb_param_option(
                 'assetid',
                 'asset.id',
@@ -182,10 +174,6 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source {
             array(
                 'type' => 'facetoface',
                 'value' => 'namelink'
-            ),
-            array(
-                'type' => 'room',
-                'value' => 'name'
             ),
             array(
                 'type' => 'asset',
@@ -232,15 +220,6 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source {
     }
 
     protected function add_customfields() {
-        $this->add_totara_customfield_component(
-            'facetoface_room',
-            'room',
-            'facetofaceroomid',
-            $this->joinlist,
-            $this->columnoptions,
-            $this->filteroptions
-        );
-
         $this->add_totara_customfield_component(
             'facetoface_asset',
             'asset',

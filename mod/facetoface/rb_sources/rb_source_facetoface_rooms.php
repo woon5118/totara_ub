@@ -88,27 +88,29 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
         $joinlist = array();
 
         $joinlist[] = new rb_join(
-            'assigned',
+            'roomdates',
             'LEFT',
-            '(SELECT roomid, COUNT(*) AS cntdates FROM {facetoface_sessions_dates} GROUP BY roomid)',
-            'assigned.roomid = base.id',
+            '{facetoface_room_dates}',
+            'roomdates.roomid = base.id',
             REPORT_BUILDER_RELATION_ONE_TO_MANY
         );
 
-        // Required by room availability.
-        $joinlist[] = new rb_join(
-            'sessions',
-            'INNER',
-            '{facetoface_sessions}',
-            'base.id = sessiondates.sessionid',
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            'sessiondates'
-        );
         $joinlist[] = new rb_join(
             'sessiondates',
-            'INNER',
+            'LEFT',
             '{facetoface_sessions_dates}',
-            'base.id = sessiondates.roomid',
+            'sessiondate.id = roomdates.sessionsdateid',
+            REPORT_BUILDER_RELATION_ONE_TO_MANY
+        );
+
+        $joinlist[] = new rb_join(
+            'assigned',
+            'LEFT',
+            '(SELECT roomid, COUNT(*) AS cntdates
+              FROM {facetoface_room_dates} frd
+              INNER JOIN {facetoface_sessions_dates} fsd ON (frd.sessionsdateid = fsd.id)
+              GROUP BY roomid)',
+            'assigned.roomid = base.id',
             REPORT_BUILDER_RELATION_ONE_TO_MANY
         );
 
@@ -130,7 +132,7 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
                 'nosort' => true,
                 'joins' => 'assigned',
                 'capability' => 'totara/core:modconfig',
-                'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates', 'custom' => 'base.custom'),
+                'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates'),
                 'displayfunc' => 'f2f_room_actions',
                 'hidden' => false
             )

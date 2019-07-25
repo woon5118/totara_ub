@@ -552,7 +552,6 @@ class notice_sender {
                 'sessiontimezone' => $eventsession->get_sessiontimezone(),
                 'timestart' => $eventsession->get_timestart(),
                 'timefinish' => $eventsession->get_timefinish(),
-                'roomid' => $eventsession->get_roomid()
             ]);
         }
 
@@ -569,8 +568,7 @@ class notice_sender {
                 unset($olds[$date->id]);
                 if ($old->sessiontimezone == $date->sessiontimezone &&
                     $old->timestart == $date->timestart &&
-                    $old->timefinish == $date->timefinish &&
-                    $old->roomid == $date->roomid) {
+                    $old->timefinish == $date->timefinish) {
                     return false;
                 }
             }

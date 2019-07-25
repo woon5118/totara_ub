@@ -104,9 +104,9 @@ final class room implements seminar_iterator_item {
      * @param int $id {facetoface_room}.id If 0 - new Seminar Room will be created
      */
     public function __construct(int $id = 0) {
-        $this->id = $id;
 
-        if ($id) {
+        if ((int)$id > 0) {
+            $this->id = $id;
             $this->load();
         }
     }
@@ -153,9 +153,7 @@ final class room implements seminar_iterator_item {
      */
     public function get_detailed_name(bool $all_fields = false): string {
         $customfields = $this->get_customfield_array();
-
         $displayfields = static::get_display_customfields($all_fields);
-
         $items = [];
         $items[] = isset($this->name) ? $this->name : null;
         foreach ($displayfields as $field) {
@@ -176,7 +174,7 @@ final class room implements seminar_iterator_item {
      *
      * @return room
      */
-    public static function create_custom_room() : room {
+    public static function create_custom_room(): room {
         $room = new room();
         $room->custom = 1;
         return $room;
@@ -209,7 +207,7 @@ final class room implements seminar_iterator_item {
      * @param \stdClass $object
      * @return room this
      */
-    public function from_record(\stdClass $object) : room {
+    public function from_record(\stdClass $object): room {
         $this->map_object($object);
         return $this;
     }
@@ -252,14 +250,14 @@ final class room implements seminar_iterator_item {
         }
 
         $this->delete_customfields();
-
         $this->delete_embedded_files();
 
         // Unlink this room from any session.
-        $DB->set_field('facetoface_sessions_dates', 'roomid', 0, ['roomid' => $this->id]);
-
+        $DB->delete_records('facetoface_room_dates', ['roomid' => $this->id]);
         // Finally delete the room record itself.
-        $DB->delete_records('facetoface_room', ['id' => $this->id]);
+        $DB->delete_records(self::DBTABLE, ['id' => $this->id]);
+
+        $this->map_object((object)get_object_vars(new self()));
     }
 
     /**
@@ -294,7 +292,6 @@ final class room implements seminar_iterator_item {
         if ($this->id == 0) {
             return;
         }
-
         $fs = get_file_storage();
         $syscontext = \context_system::instance();
         $fs->delete_area_files($syscontext->id, 'mod_facetoface', 'room', $this->id);
@@ -306,8 +303,18 @@ final class room implements seminar_iterator_item {
      *
      * @return bool - true if the room has an $id, false if it hasn't
      */
-    public function exists() : bool {
-        return !empty($this->id);
+    public function exists(): bool {
+        return (bool)$this->get_id();
+    }
+
+    /**
+     * Checks if the room is in use anywhere
+     * @return bool
+     */
+    public function is_used(): bool {
+        global $DB;
+        $count = $DB->count_records('facetoface_room_dates', ['roomid' => $this->get_id()]);
+        return $count > 0;
     }
 
     /**
@@ -326,9 +333,11 @@ final class room implements seminar_iterator_item {
 
     /**
      * @param string $name
+     * @return room this
      */
-    public function set_name(string $name): void {
+    public function set_name(string $name): room {
         $this->name = $name;
+        return $this;
     }
 
     /**
@@ -338,15 +347,16 @@ final class room implements seminar_iterator_item {
         if (is_null($this->capacity)) {
             return null;
         }
-
         return (int)$this->capacity;
     }
 
     /**
      * @param int $capacity
+     * @return room this
      */
-    public function set_capacity(int $capacity): void {
+    public function set_capacity(int $capacity): room {
         $this->capacity = $capacity;
+        return $this;
     }
 
     /**
@@ -358,9 +368,11 @@ final class room implements seminar_iterator_item {
 
     /**
      * @param bool $allowconflicts
+     * @return room this
      */
-    public function set_allowconflicts(bool $allowconflicts): void {
+    public function set_allowconflicts(bool $allowconflicts): room {
         $this->allowconflicts = (int)$allowconflicts;
+        return $this;
     }
 
     /**
@@ -372,9 +384,11 @@ final class room implements seminar_iterator_item {
 
     /**
      * @param string $description
+     * @return room this
      */
-    public function set_description(string $description): void {
+    public function set_description(string $description): room {
         $this->description = $description;
+        return $this;
     }
 
     /**
@@ -395,13 +409,11 @@ final class room implements seminar_iterator_item {
      *
      * @return room $this
      */
-    public function publish() : room {
+    public function publish(): room {
         if ($this->custom == false) {
             print_error('error:cannotrepublishroom', 'facetoface');
         }
-
         $this->custom = (int)false;
-
         return $this;
     }
 
@@ -422,9 +434,8 @@ final class room implements seminar_iterator_item {
      *
      * @return room $this
      */
-    public function hide() : room {
+    public function hide(): room {
         $this->hidden = (int)true;
-
         return $this;
     }
 
@@ -434,31 +445,32 @@ final class room implements seminar_iterator_item {
      *
      * @return room $this
      */
-    public function show() : room {
+    public function show(): room {
         $this->hidden = (int)false;
-
         return $this;
     }
 
     /**
      * @return int
      */
-    public function get_usercreated() : int {
+    public function get_usercreated(): int {
         return (int)$this->usercreated;
     }
 
     /**
      * @return int
      */
-    public function get_usermodified() : int {
+    public function get_usermodified(): int {
         return (int)$this->usermodified;
     }
 
     /**
      * @param int $usermodified
+     * @return room this
      */
-    public function set_usermodified(int $usermodified): void {
+    public function set_usermodified(int $usermodified): room {
         $this->usermodified = $usermodified;
+        return $this;
     }
 
     /**
@@ -477,9 +489,11 @@ final class room implements seminar_iterator_item {
 
     /**
      * @param int $timemodified
+     * @return room this
      */
-    public function set_timemodified(int $timemodified): void {
+    public function set_timemodified(int $timemodified): room {
         $this->timemodified = $timemodified;
+        return $this;
     }
 
     /**
@@ -490,83 +504,92 @@ final class room implements seminar_iterator_item {
      *
      * @param int $timestart
      * @param int $timefinish
-     * @param seminar_event $event
+     * @param seminar_event $seminarevent
      * @return bool
      */
-    public function is_available(int $timestart, int $timefinish, seminar_event $event) : bool {
+    public function is_available(int $timestart, int $timefinish, seminar_event $seminarevent): bool {
         global $DB, $USER;
 
-       if ($this->hidden) {
+       if ($this->get_hidden()) {
             // Hidden rooms can be assigned only if they are already used in the session.
-            if (!$event->exists()) {
+            if (!$seminarevent->exists()) {
                 return false;
             }
-            if (!$DB->record_exists('facetoface_sessions_dates', ['roomid' => $this->id, 'sessionid' => $event->get_id()])) {
-                return false;
-            }
-        }
+            $sql = "SELECT 'x'
+                      FROM {facetoface_room_dates} frd
+                      JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
+                     WHERE frd.roomid = :roomid AND fsd.sessionid = :sessionid";
 
-        if ($this->custom) {
+            if (!$DB->record_exists_sql($sql, ['roomid' => $this->id, 'sessionid' => $seminarevent->get_id()])) {
+                return false;
+            }
+       }
+
+       if ($this->get_custom()) {
             // Custom rooms can be used only if already used in seminar
             // or not used anywhere and created by current user.
             $sql = "SELECT 'x'
-                      FROM {facetoface_sessions_dates} fsd
-                      JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
-                     WHERE fsd.roomid = :roomid AND fs.facetoface = :facetofaceid";
+                      FROM {facetoface_room_dates} frd
+                      JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
+                      JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid
+                     WHERE frd.roomid = :roomid AND fs.facetoface = :facetofaceid";
 
-            if (!$DB->record_exists_sql($sql, ['roomid' => $this->id, 'facetofaceid' => $event->get_facetoface()])) {
+            if (!$DB->record_exists_sql($sql, ['roomid' => $this->id, 'facetofaceid' => $seminarevent->get_facetoface()])) {
                 if ($this->usercreated == $USER->id) {
-                    if ($DB->record_exists('facetoface_sessions_dates', ['roomid' => $this->id])) {
+                    if ($DB->record_exists('facetoface_room_dates', array('roomid' => $this->id))) {
                         return false;
                     }
                 } else {
                     return false;
                 }
             }
-        }
+       }
 
-        if (!$timestart and !$timefinish) {
-            // Time not specified, no need to verify conflicts.
-            return true;
-        }
+       if (!$timestart and !$timefinish) {
+           // Time not specified, no need to verify conflicts.
+           return true;
+       }
 
-        if ($this->allowconflicts) {
-            // No need to worry about time slots.
-            return true;
-        }
+       if ($this->allowconflicts) {
+           // No need to worry about time slots.
+           return true;
+       }
 
-        if ($timestart > $timefinish) {
-            debugging('Invalid slot specified, start cannot be later than finish', DEBUG_DEVELOPER);
-        }
+       if ($timestart > $timefinish) {
+           debugging('Invalid slot specified, start cannot be later than finish', DEBUG_DEVELOPER);
+       }
 
-        // Is there any other event using this room in this slot?
-        // Note that there cannot be collisions in session dates of one event because they cannot overlap.
-        $params = ['timestart' => $timestart, 'timefinish' => $timefinish, 'roomid' => $this->id, 'sessionid' => $event->get_id()];
+       // Is there any other event using this room in this slot?
+       // Note that there cannot be collisions in session dates of one event because they cannot overlap.
+       $params = array('timestart' => $timestart, 'timefinish' => $timefinish, 'roomid' => $this->id, 'sessionid' => $seminarevent->get_id());
 
-        $sql = "SELECT 'x'
-                  FROM {facetoface_sessions_dates} fsd
-                  JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
-                 WHERE fsd.roomid = :roomid AND fs.id <> :sessionid
-                       AND :timefinish > fsd.timestart AND :timestart < fsd.timefinish";
-        return !$DB->record_exists_sql($sql, $params);
+       $sql = "SELECT 'x'
+             FROM {facetoface_room_dates} frd
+             JOIN {facetoface_sessions_dates} fsd ON (fsd.id = frd.sessionsdateid)
+             JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
+            WHERE frd.roomid = :roomid AND fs.id <> :sessionid
+                  AND :timefinish > fsd.timestart AND :timestart < fsd.timefinish";
+       return !$DB->record_exists_sql($sql, $params);
     }
 
     /**
      * Find out if the room has any scheduling conflicts.
      * @return bool
      */
-    public function has_conflicts() : bool {
+    public function has_conflicts(): bool {
         global $DB;
 
         $sql = "SELECT 'x'
-                  FROM {facetoface_sessions_dates} fsd
-                  JOIN {facetoface_sessions_dates} fsd2
-                    ON (fsd2.roomid = fsd.roomid AND fsd2.id <> fsd.id)
-                 WHERE fsd.roomid = :roomid
-                   AND ((fsd.timestart >= fsd2.timestart AND fsd.timestart < fsd2.timefinish) OR
-                        (fsd.timefinish > fsd2.timestart AND fsd.timefinish <= fsd2.timefinish))";
+              FROM {facetoface_sessions_dates} fsd
+              JOIN {facetoface_room_dates} frd ON frd.sessionsdateid = fsd.id
+              JOIN {facetoface_room_dates} frd2 ON frd2.roomid = frd.roomid
+              JOIN {facetoface_sessions_dates} fsd2 ON (fsd2.id = frd2.sessionsdateid AND fsd2.id <> fsd.id)
+              JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid AND fs.cancelledstatus = 0)
+             WHERE frd.roomid = :roomid
+               AND ((fsd.timestart >= fsd2.timestart AND fsd.timestart < fsd2.timefinish) OR 
+                    (fsd.timefinish > fsd2.timestart AND fsd.timefinish <= fsd2.timefinish))";
 
-        return $DB->record_exists_sql($sql, ['roomid' => $this->id]);
+        return $DB->record_exists_sql($sql, array('roomid' => $this->get_id()));
     }
 
     /**
@@ -574,7 +597,7 @@ final class room implements seminar_iterator_item {
      *
      * @return array
      */
-    public function get_customfield_array() : array {
+    public function get_customfield_array(): array {
         global $CFG;
         require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
         require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');

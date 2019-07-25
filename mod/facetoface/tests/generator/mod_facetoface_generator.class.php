@@ -164,7 +164,7 @@ class mod_facetoface_generator extends testing_module_generator {
             $sessiondate->timestart = $time;
             $sessiondate->timefinish = $time + (DAYSECS * 2);
             $sessiondate->sessiontimezone = 'Pacific/Auckland';
-            $sessiondate->roomid = 0;
+            $sessiondate->roomids = [];
             $sessiondate->assetids = array();
             $sessiondates = array($sessiondate);
         } else {
@@ -235,7 +235,7 @@ class mod_facetoface_generator extends testing_module_generator {
         global $DB, $USER;
 
         $this->roominstancecount++;
-        $record = (object) $record;
+        $record = (object)$record;
 
         if (!isset($record->name)) {
             $record->name = 'Room '.$this->roominstancecount;

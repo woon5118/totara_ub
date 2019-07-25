@@ -48,10 +48,6 @@ final class seminar_session implements seminar_iterator_item {
      */
     private $sessiontimezone = "99";
     /**
-     * @var int {facetoface_sessions_dates}.roomid
-     */
-    private $roomid = 0;
-    /**
      * @var int {facetoface_sessions_dates}.timestart
      */
     private $timestart = 0;
@@ -177,33 +173,6 @@ final class seminar_session implements seminar_iterator_item {
      */
     public function set_sessiontimezone(string $sessiontimezone): seminar_session {
         $this->sessiontimezone = $sessiontimezone;
-        return $this;
-    }
-
-    /**
-     * Get room id for this session date
-     *
-     * @return int
-     */
-    public function get_roomid(): int {
-        return (int)$this->roomid;
-    }
-
-    /**
-     * @return bool
-     */
-    public function has_room(): bool {
-        return !empty($this->roomid);
-    }
-
-    /**
-     * Set room id for this session date
-     *
-     * @param int $roomid
-     * @return seminar_session
-     */
-    public function set_roomid(int $roomid): seminar_session {
-        $this->roomid = $roomid;
         return $this;
     }
 
@@ -460,5 +429,35 @@ final class seminar_session implements seminar_iterator_item {
         } else {
             return attendance_taking_status::OPEN;
         }
+    }
+
+    /**
+     * Get room id for this session date
+     * @return int
+     * @deprecated since Totara 13
+     */
+    public function get_roomid(): int {
+        debugging('seminar_session::get_roomid() function has been deprecated, please use room::get_id()', DEBUG_DEVELOPER);
+        return 0;
+    }
+
+    /**
+     * @return bool
+     * @deprecated since Totara 13
+     */
+    public function has_room(): bool {
+        debugging('seminar_session::has_room() function has been deprecated, please use room::exists()', DEBUG_DEVELOPER);
+        return !empty(0);
+    }
+
+    /**
+     * Set room id for this session date
+     * @param int $roomid
+     * @return seminar_session
+     * @deprecated since Totara 13
+     */
+    public function set_roomid(int $roomid): seminar_session {
+        debugging('seminar_session::set_roomid() function has been deprecated, please use room::__construct(id)', DEBUG_DEVELOPER);
+        return $this;
     }
 }

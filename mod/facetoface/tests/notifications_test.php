@@ -46,7 +46,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      */
     public function setUp() {
         parent::setUp();
-        $this->resetAfterTest();
     }
 
     /**
@@ -85,11 +84,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $start = $start ?: time();
         $finish = $finish ?: $start + 3600;
 
-        return (object) [
+        return (object)[
             'sessiontimezone' => $timezone,
             'timestart' => $start,
             'timefinish' => $finish,
-            'roomid' => $room,
+            'roomids' => [$room],
         ];
     }
 
@@ -398,16 +397,23 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $session = $this->addSeminarSession($seminar, $dates);
 
         $icals['original'] = [
-            $this->dissect_ical(\mod_facetoface\messaging::generate_ical($seminar,
+            $this->dissect_ical(\mod_facetoface\messaging::generate_ical(
+                $seminar,
                 $session,
                 MDL_F2F_INVITE,
                 $students[0],
-                null,[],
-                'iCal description must have this text')->content, ['location', 'uid', 'sequence', 'dtstart', 'dtend', 'description']),
-            $this->dissect_ical(\mod_facetoface\messaging::generate_ical($seminar,
+                null,
+                [],
+                'iCal description must have this text')->content,
+                ['location', 'uid', 'sequence', 'dtstart', 'dtend', 'description']
+            ),
+            $this->dissect_ical(\mod_facetoface\messaging::generate_ical(
+                $seminar,
                 $session,
                 MDL_F2F_INVITE,
-                $students[1])->content, ['location', 'uid', 'sequence', 'dtstart', 'dtend']),
+                $students[1])->content,
+                ['location', 'uid', 'sequence', 'dtstart', 'dtend']
+            ),
         ];
 
         // Checking that iCal contains custom description.
@@ -560,8 +566,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // Both dates must be cancelled.
         $this->assertCount(2, $icals['first_user_status_changed'][0]->status,
             $errors['cancelled_count_dont_match']);
-
-        $this->resetAfterTest();
     }
 
     /**
@@ -696,8 +700,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // seminar event needs to be reloaded with info from DB
         $seminarevent = new seminar_event($seminarevent->get_id());
         $this->assertEquals(1, $seminarevent->get_cancelledstatus());
-
-        $this->resetAfterTest(true);
     }
 
     /**
@@ -859,24 +861,16 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      * of functions for saving to and retrieving from database.
      */
     public function test_facetoface_notification_loop_session_placeholders() {
-        $this->resetAfterTest(true);
 
-        // We'll use the server timezone otherwise this test will fail in some parts of the world and not others.
-        $timezone = core_date::get_server_timezone();
-
-        $times = $this->create_array_of_times();
+        [$session, $roomlist, $roomcf, $times, $timezone] = $this->set_data_for_session_placeholders(false);
 
         $msg = "Testing with non-saved session.[#sessions] Start time is [session:starttime]. Finish time is [session:finishtime].[/sessions] That is all.";
-        $dataset['sessions'] = array();
-        $session = new stdClass();
-        $sessiondate = new stdClass();
-        $sessiondate->sessiontimezone = $timezone;
-        $sessiondate->timestart = $times['start1'];
-        $sessiondate->timefinish = $times['end1'];
-        $session->sessiondates = array($sessiondate);
+
         $replacedmsg = facetoface_notification_loop_session_placeholders($msg, $session);
+
         $expectedstart = userdate($times['start1'], get_string('strftimetime', 'langconfig'), $timezone);
         $expectedend = userdate($times['end1'], get_string('strftimetime', 'langconfig'), $timezone);
+
         $this->assertEquals("Testing with non-saved session. Start time is ".$expectedstart.". Finish time is ".$expectedend.". That is all.", $replacedmsg);
     }
 
@@ -885,27 +879,13 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      * of functions for saving to and retrieving from database. In this case, there are two lots of tags.
      */
     public function test_facetoface_notification_loop_session_placeholders_double() {
-        $this->resetAfterTest(true);
 
-        // We'll use the server timezone otherwise this test will fail in some parts of the world and not others.
-        $timezone = core_date::get_server_timezone();
-
-        $times = $this->create_array_of_times();
+        [$session, $roomlist, $roomcf, $times, $timezone] = $this->set_data_for_session_placeholders();
 
         $msg = "Testing with non-saved session.[#sessions]Start time is [session:starttime]. Finish time is [session:finishtime].\n[/sessions]";
         $msg .= "[#sessions]Start date is [session:startdate]. Finish date is [session:finishdate].\n[/sessions]";
         $msg .= "That is all.";
-        $dataset['sessions'] = array();
-        $session = new stdClass();
-        $sessiondate1 = new stdClass();
-        $sessiondate1->sessiontimezone = $timezone;
-        $sessiondate1->timestart = $times['start1'];
-        $sessiondate1->timefinish = $times['end1'];
-        $sessiondate2 = new stdClass();
-        $sessiondate2->sessiontimezone = $timezone;
-        $sessiondate2->timestart = $times['start2'];;
-        $sessiondate2->timefinish = $times['end2'];
-        $session->sessiondates = array($sessiondate1, $sessiondate2);
+
         $replacedmsg = facetoface_notification_loop_session_placeholders($msg, $session);
 
         // Get strings for display of dates and times in email.
@@ -927,8 +907,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertEquals($expectedmsg, $replacedmsg);
     }
  public function test_facetoface_notification_loop_session_placeholders_no_session() {
-        $this->resetAfterTest(true);
-
         $msg = "Testing with non-saved session. A[#sessions]Start time is [session:starttime]. Finish time is [session:finishtime].\n[/sessions]A";
         $msg .= " I repeat: [#sessions]Start date is [session:startdate]. Finish date is [session:finishdate].\n[/sessions]";
         $msg .= " That is all.";
@@ -945,70 +923,12 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      * to retrieve facetoface session data.
      */
     public function test_facetoface_notification_loop_session_placeholders_with_session() {
-        $this->resetAfterTest(true);
-        global $DB;
 
-        // We'll use the server timezone otherwise this test will fail in some parts of the world and not others.
-        $timezone = core_date::get_server_timezone();
-
-        $times = $this->create_array_of_times();
-
-        $course = $this->getDataGenerator()->create_course();
-
-        /** @var mod_facetoface_generator $facetofacegenerator */
-        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
-
-        $facetofacedata = array(
-            'name' => 'facetoface',
-            'course' => $course->id
-        );
-        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
-
-        // Create a room to add to a session date. Ideally this would use an existing function rather than
-        // a direct db insert - none exists while writing this test.
-        $room = new stdClass();
-        $room->name = 'Room One';
-        $room->capacity = 20;
-        $room->timemodified = time();
-        $room->timecreated = $room->timemodified;
-        $room->id = $DB->insert_record('facetoface_room', $room);
-
-        $sessiondate1 = new stdClass();
-        $sessiondate1->sessiontimezone = $timezone;
-        $sessiondate1->timestart = $times['start1'];
-        $sessiondate1->timefinish = $times['end1'];
-        $sessiondate1->roomid = $room->id;
-        $sessiondate1->assetids = array();
-
-        $sessiondate2 = new stdClass();
-        $sessiondate2->sessiontimezone = $timezone;
-        $sessiondate2->timestart = $times['start2'];
-        $sessiondate2->timefinish = $times['end2'];
-        $sessiondate2->assetids = array();
-
-        $sessiondata = array(
-            'facetoface' => $facetoface->id,
-            'capacity' => 3,
-            'allowoverbook' => 1,
-            'sessiondates' => array($sessiondate1, $sessiondate2),
-            'mincapacity' => '1',
-            'cutoff' => DAYSECS - 60
-        );
-
-        $sessionid = $facetofacegenerator->add_session($sessiondata);
-        $seminarevent = new seminar_event($sessionid);
-
-        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
-        $roomcf = [];
-        $roomlist = \mod_facetoface\room_list::get_event_rooms($session->id);
-        foreach ($roomlist as $room) {
-            $roomcf[$room->get_id()] = customfield_get_data($room->to_record(), "facetoface_room", "facetofaceroom");
-        }
+        [$session, $roomlist, $roomcf, $times, $timezone] = $this->set_data_for_session_placeholders();
 
         $msg = "The details for each session:\n";
-        $msg .= "[#sessions]* Start time of [session:startdate] at [session:starttime]";
-        $msg .= " and end time of [session:finishdate] at [session:finishtime] ([session:timezone]).\n";
+        $msg .= "[#sessions]";
+        $msg .= "* Start time of [session:startdate] at [session:starttime] and end time of [session:finishdate] at [session:finishtime] ([session:timezone]).\n";
         $msg .= "  Location is [session:room:name].\n";
         $msg .= "[/sessions]";
         $msg .= "Those are all the details.";
@@ -1035,8 +955,47 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertEquals($expectedmsg, $replacedmsg);
     }
 
+    private function set_data_for_session_placeholders(bool $multisessiondates = true) {
+        // We'll use the server timezone otherwise this test will fail in some parts of the world and not others.
+        $timezone = core_date::get_server_timezone();
+
+        $times = $this->create_array_of_times();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        /** @var mod_facetoface_generator $facetofacegenerator */
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface',
+            'course' => $course->id
+        );
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        // Create a room to add to a session date.
+        $room = $this->createSeminarRoom(['name' => 'Room One', 'capacity' => 20]);
+
+        $dates = [
+            $this->createSeminarDate($times['start1'], $times['end1'], $room->id, $timezone),
+        ];
+
+        if ($multisessiondates) {
+            $dates[] =
+                $this->createSeminarDate($times['start2'], $times['end2'], 0, $timezone);
+        }
+
+        $session = $this->addSeminarSession($facetoface, $dates);
+
+        $roomcf = [];
+        $roomlist = \mod_facetoface\room_list::get_event_rooms($session->id);
+        foreach ($roomlist as $room) {
+            $roomcf[$room->get_id()] = customfield_get_data($room->to_record(), "facetoface_room", "facetofaceroom");
+        }
+
+        return [$session, $roomlist, $roomcf, $times, $timezone];
+    }
+
     public function test_facetoface_notification_loop_session_placeholders_room_customfields() {
-        $this->resetAfterTest(true);
         global $DB;
 
         // We'll use the server timezone otherwise this test will fail in some parts of the world and not others.
@@ -1100,14 +1059,14 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $sessiondate1->sessiontimezone = $timezone;
         $sessiondate1->timestart = $times['start1'];
         $sessiondate1->timefinish = $times['end1'];
-        $sessiondate1->roomid = $room1->id;
+        $sessiondate1->roomids = [$room1->id];
         $sessiondate1->assetids = array();
 
         $sessiondate2 = new stdClass();
         $sessiondate2->sessiontimezone = $timezone;
         $sessiondate2->timestart = $times['start2'];
         $sessiondate2->timefinish = $times['end2'];
-        $sessiondate2->roomid = $room2->id;
+        $sessiondate2->roomids = [$room2->id];
         $sessiondate2->assetids = array();
 
         $sessiondata = array(
@@ -1155,210 +1114,9 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     /**
-     * Tests the function facetoface_notification_substitute_deprecated_placeholders, ensuring that the values within
-     * the 'location' and 'building' custom fields are substituted where the [session:location]
-     * and [session:venue] placeholders are found.
-     */
-    public function test_facetoface_notification_substitute_deprecated_placeholders_with_customfield_values() {
-        $this->resetAfterTest(true);
-        global $DB;
-
-        // We'll use the server timezone otherwise this test will fail in some parts of the world and not others.
-        $timezone = core_date::get_server_timezone();
-
-        $times = $this->create_array_of_times();
-
-        $course = $this->getDataGenerator()->create_course();
-
-        /** @var mod_facetoface_generator $facetofacegenerator */
-        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
-
-        /** @var totara_customfield_generator $customfieldgenerator */
-        $customfieldgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
-
-        $locationfieldid = $DB->get_field('facetoface_room_info_field', 'id', array('shortname' => 'location'));
-        $buildingfieldid = $DB->get_field('facetoface_room_info_field', 'id', array('shortname' => 'building'));
-
-        $facetofacedata = array(
-            'name' => 'facetoface',
-            'course' => $course->id
-        );
-        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
-
-        // Create a room to add to a session date. Ideally this would use an existing function rather than
-        // a direct db insert - none exists while writing this test.
-        $room1 = new stdClass();
-        $room1->name = 'Room One';
-        $room1->capacity = 20;
-        $room1->timemodified = time();
-        $room1->timecreated = $room1->timemodified;
-        $room1->id = $DB->insert_record('facetoface_room', $room1);
-
-        $customfieldgenerator->set_location_address($room1, $locationfieldid, '150 Willis Street', 'facetofaceroom', 'facetoface_room');
-        $customfieldgenerator->set_text($room1, $buildingfieldid, 'Building One', 'facetofaceroom', 'facetoface_room');
-
-        // Create a room to add to a session date. Ideally this would use an existing function rather than
-        // a direct db insert - none exists while writing this test.
-        $room2 = new stdClass();
-        $room2->name = 'Room Two';
-        $room2->capacity = 20;
-        $room2->timemodified = time();
-        $room2->timecreated = $room2->timemodified;
-        $room2->id = $DB->insert_record('facetoface_room', $room2);
-
-        $sessiondate1 = new stdClass();
-        $sessiondate1->sessiontimezone = $timezone;
-        $sessiondate1->timestart = $times['start1'];
-        $sessiondate1->timefinish = $times['end1'];
-        $sessiondate1->roomid = $room1->id;
-        $sessiondate1->assetids = array();
-
-        $sessiondate2 = new stdClass();
-        $sessiondate2->sessiontimezone = $timezone;
-        $sessiondate2->timestart = $times['start2'];
-        $sessiondate2->timefinish = $times['end2'];
-        $sessiondate2->roomid = $room2->id;
-        $sessiondate2->assetids = array();
-
-        $sessiondata = array(
-            'facetoface' => $facetoface->id,
-            'capacity' => 3,
-            'allowoverbook' => 1,
-            'sessiondates' => array($sessiondate1, $sessiondate2),
-            'mincapacity' => '1',
-            'cutoff' => DAYSECS - 60
-        );
-
-        $sessionid = $facetofacegenerator->add_session($sessiondata);
-        $seminarevent = new seminar_event($sessionid);
-
-        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
-        $roomcf = [];
-        $roomlist = \mod_facetoface\room_list::get_event_rooms($session->id);
-        foreach ($roomlist as $room) {
-            $roomcf[$room->get_id()] = customfield_get_data($room->to_record(), "facetoface_room", "facetofaceroom", false);
-        }
-
-        $msg = "Using the old deprecated subsitutions ";
-        $msg .= "Room name: [session:room] ";
-        $msg .= "Building name: [session:venue]. ";
-        $msg .= "Location: [session:location]. ";
-        $msg .= "Those are all the details.";
-
-        $replacedmsg = facetoface_notification_substitute_deprecated_placeholders($msg, $session, $roomlist, $roomcf);
-
-        $expectedmsg = "Using the old deprecated subsitutions ";
-        $expectedmsg .= "Room name: Room One ";
-        $expectedmsg .= "Building name: Building One. ";
-        $expectedmsg .= "Location: 150 Willis Street. ";
-        $expectedmsg .= "Those are all the details.";
-
-        $this->assertEquals($expectedmsg, $replacedmsg);
-    }
-
-    /**
-     * Tests the function facetoface_notification_substitute_deprecated_placeholders where there are no values for
-     * the 'location' and 'building' custom fields.  In these cases, the [session:location] and
-     * [session:venue] placeholders should be replaced with empty strings.
-     */
-    public function test_facetoface_notification_substitute_deprecated_placeholders_with_customfields_empty() {
-        $this->resetAfterTest(true);
-        global $DB;
-
-        // We'll use the server timezone otherwise this test will fail in some parts of the world and not others.
-        $timezone = core_date::get_server_timezone();
-
-        $times = $this->create_array_of_times();
-
-        $course = $this->getDataGenerator()->create_course();
-
-        /** @var mod_facetoface_generator $facetofacegenerator */
-        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
-
-        /** @var totara_customfield_generator $customfieldgenerator */
-        $customfieldgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
-
-        $facetofacedata = array(
-            'name' => 'facetoface',
-            'course' => $course->id
-        );
-        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
-
-        // Create a room to add to a session date. Ideally this would use an existing function rather than
-        // a direct db insert - none exists while writing this test.
-        $room1 = new stdClass();
-        $room1->name = 'Room One';
-        $room1->capacity = 20;
-        $room1->timemodified = time();
-        $room1->timecreated = $room1->timemodified;
-        $room1->id = $DB->insert_record('facetoface_room', $room1);
-
-        // Create a room to add to a session date. Ideally this would use an existing function rather than
-        // a direct db insert - none exists while writing this test.
-        $room2 = new stdClass();
-        $room2->name = 'Room Two';
-        $room2->capacity = 20;
-        $room2->timemodified = time();
-        $room2->timecreated = $room2->timemodified;
-        $room2->id = $DB->insert_record('facetoface_room', $room2);
-
-        $sessiondate1 = new stdClass();
-        $sessiondate1->sessiontimezone = $timezone;
-        $sessiondate1->timestart = $times['start1'];
-        $sessiondate1->timefinish = $times['end1'];
-        $sessiondate1->roomid = $room1->id;
-        $sessiondate1->assetids = array();
-
-        $sessiondate2 = new stdClass();
-        $sessiondate2->sessiontimezone = $timezone;
-        $sessiondate2->timestart = $times['start2'];
-        $sessiondate2->timefinish = $times['end2'];
-        $sessiondate2->roomid = $room2->id;
-        $sessiondate2->assetids = array();
-
-        $sessiondata = array(
-            'facetoface' => $facetoface->id,
-            'capacity' => 3,
-            'allowoverbook' => 1,
-            'sessiondates' => array($sessiondate1, $sessiondate2),
-            'mincapacity' => '1',
-            'cutoff' => DAYSECS - 60
-        );
-
-        $sessionid = $facetofacegenerator->add_session($sessiondata);
-        $seminarevent = new seminar_event($sessionid);
-
-        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
-        $roomcf = [];
-        $roomlist = \mod_facetoface\room_list::get_event_rooms($session->id);
-        foreach ($roomlist as $room) {
-            $roomcf[$room->get_id()] = customfield_get_data($room->to_record(), "facetoface_room", "facetofaceroom");
-        }
-
-        $msg = "Using the old deprecated subsitutions ";
-        $msg .= "Room name: [session:room] ";
-        $msg .= "Building name: [session:venue]. ";
-        $msg .= "Location: [session:location]. ";
-        $msg .= "Those are all the details.";
-
-        $replacedmsg = facetoface_notification_substitute_deprecated_placeholders($msg, $session, $roomlist, $roomcf);
-
-        $expectedmsg = "Using the old deprecated subsitutions ";
-        $expectedmsg .= "Room name: Room One ";
-        $expectedmsg .= "Building name: . ";
-        $expectedmsg .= "Location: . ";
-        $expectedmsg .= "Those are all the details.";
-
-        $this->assertEquals($expectedmsg, $replacedmsg);
-    }
-
-    /**
      * Tests the output of facetoface_get_default_notifications.
      */
     public function test_facetoface_get_default_notifications() {
-        $this->resetAfterTest(true);
         global $DB;
 
         $course = $this->getDataGenerator()->create_course();
@@ -1388,7 +1146,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      * Tests values returned by facetoface_notification_get_templates_with_old_placeholders.
      */
     public function test_facetoface_notification_get_templates_with_old_placeholders() {
-        $this->resetAfterTest(true);
         global $DB;
 
         $oldnotifications = facetoface_notification_get_templates_with_old_placeholders();
@@ -1517,7 +1274,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     private function session_generate_data($future = true) {
         global $DB;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         $teacher1 = $this->getDataGenerator()->create_user();
@@ -1569,7 +1325,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     public function test_booking_confirmation_default() {
-
         // Default test Manager copy is enable and suppressccmanager is disabled.
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
@@ -1590,7 +1345,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      * - notification to neither user, or manager.
      */
     public function test_booking_confirmation_not_sent() {
-
 
         $emailsink = $this->redirectMessages();
 
@@ -1631,7 +1385,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     public function test_booking_confirmation_suppress_ccmanager() {
-
         // Test Manager copy is enable and suppressccmanager is enabled(do not send a copy to manager).
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
@@ -1647,7 +1400,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     public function test_booking_confirmation_no_ccmanager() {
-
         // Test Manager copy is disabled and suppressccmanager is disbaled.
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
@@ -1668,7 +1420,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     public function test_booking_confirmation_no_ccmanager_and_suppress_ccmanager() {
-
         // Test Manager copy is disabled and suppressccmanager is disbaled.
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
@@ -1695,7 +1446,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     public function test_booking_cancellation_default() {
-
         // Default test Manager copy is enable and suppressccmanager is disabled.
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
@@ -1719,7 +1469,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     public function test_booking_cancellation_suppress_ccmanager() {
-
         // Test Manager copy is enable and suppressccmanager is enabled.
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
@@ -1748,7 +1497,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     public function test_booking_cancellation_only_ccmanager() {
-
         // Test Manager copy is disabled and suppressccmanager is disbaled.
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
@@ -1783,7 +1531,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     public function test_booking_cancellation_no_ccmanager() {
-
         // Test Manager copy is disabled and suppressccmanager is disbaled.
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
@@ -1814,7 +1561,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     public function test_booking_cancellation_no_ccmanager_and_suppress_ccmanager() {
-
         // Test Manager copy is disabled and suppressccmanager is disbaled.
         list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
@@ -2011,7 +1757,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      */
     public function test_facetoface_cancel_session() {
         global $DB;
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         /** @var mod_facetoface_generator $generator */
@@ -2193,7 +1938,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      */
     public function test_oneperday_waitlisted_no_events() {
         global $DB;
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         set_config('facetoface_oneemailperday', true);
@@ -2278,8 +2022,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
                 unset($CFG->facetoface_notificationdisable);
             }
         }
-
-        $this->resetAfterTest();
     }
 
     /**
@@ -2344,7 +2086,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      */
     public function test_facetoface_notify_under_capacity_not_sent_for_cancelled_events($cancelled) {
         global $CFG, $DB;
-        $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
 
@@ -2414,7 +2155,6 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_trainer_confirmation_trainer_unassigned(): void {
         global $DB;
 
-        $this->resetAfterTest(true);
         // Prepare data.
         $f2f = $this->create_facetoface();
         $role = $DB->get_record('role', array('shortname' => 'teacher'));

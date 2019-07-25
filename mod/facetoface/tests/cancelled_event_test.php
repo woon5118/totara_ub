@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar_event, room, seminar_session, signup};
+use mod_facetoface\{seminar_event, room, seminar_session, signup, room_helper};
 use mod_facetoface\signup\state\booked;
 
 class mod_facetoface_cancelled_event_testcase extends advanced_testcase {
@@ -34,7 +34,8 @@ class mod_facetoface_cancelled_event_testcase extends advanced_testcase {
      * @return void
      */
     public function test_sending_cancellation_with_room_info(): void {
-        $this->resetAfterTest();
+        global $DB;
+
         $this->setAdminUser();
 
         $gen = $this->getDataGenerator();
@@ -58,8 +59,8 @@ class mod_facetoface_cancelled_event_testcase extends advanced_testcase {
         $ss->set_timestart(time() + 3600);
         $ss->set_timefinish(time() + 7200);
         $ss->set_sessionid($e->get_id());
-        $ss->set_roomid($room->get_id());
         $ss->save();
+        room_helper::sync($ss->get_id(), [$room->get_id()]);
 
         // Adding signup here, so that we do have users to receive the email with the room information in it.
         for ($i = 0; $i < 2; $i ++) {

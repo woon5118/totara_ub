@@ -281,7 +281,7 @@ class event extends \moodleform {
         $table->attributes['class'] = 'generaltable fullwidth f2fmanagedates';
         $table->head = array(
             get_string('dateandtime', 'facetoface'),
-            get_string('room', 'facetoface'),
+            get_string('rooms', 'mod_facetoface'),
             get_string('assets', 'facetoface'),
             ''
         );
@@ -315,7 +315,7 @@ class event extends \moodleform {
         global $OUTPUT;
 
         $dateid   = !empty($sessiondata->{"sessiondateid[$offset]"}) ? $sessiondata->{"sessiondateid[$offset]"} : 0;
-        $roomid   = !empty($sessiondata->{"roomid[$offset]"}) ? $sessiondata->{"roomid[$offset]"} : '';
+        $roomids  = !empty($sessiondata->{"roomids[$offset]"}) ? $sessiondata->{"roomids[$offset]"} : '';
         $assetids = !empty($sessiondata->{"assetids[$offset]"}) ? $sessiondata->{"assetids[$offset]"} : '';
 
         // Add per-date form elements.
@@ -324,8 +324,8 @@ class event extends \moodleform {
         $mform->setType("sessiondateid[$offset]", PARAM_INT);
         $mform->addElement('hidden', "roomcapacity[$offset]");
         $mform->setType("roomcapacity[$offset]", PARAM_INT);
-        $mform->addElement('hidden', "roomid[$offset]", $roomid);
-        $mform->setType("roomid[$offset]", PARAM_INT);
+        $mform->addElement('hidden', "roomids[$offset]", $roomids);
+        $mform->setType("roomids[$offset]", PARAM_SEQUENCE);
         $mform->addElement('hidden', "assetids[$offset]", $assetids);
         $mform->setType("assetids[$offset]", PARAM_SEQUENCE);
         $mform->addElement('hidden', "timestart[$offset]");
@@ -372,11 +372,18 @@ class event extends \moodleform {
         $row[] = $editicon . \html_writer::span($dateshtml, 'timeframe-text', array('id' => 'timeframe-text' . $offset));
 
         // Room.
-        $selectroom = \html_writer::link("#", get_string('selectroom', 'facetoface'),
-            array('id' => "show-selectroom{$offset}-dialog", 'class' => 'show-selectroom-dialog', 'data-offset' => $offset));
+        $selectrooms = \html_writer::link("#", get_string('selectrooms', 'facetoface'), array(
+            'id' => "show-selectrooms{$offset}-dialog",
+            'class' => 'show-selectrooms-dialog',
+            'data-offset' => $offset
+        ));
 
-        // Room name and capacity will be loaded by js.
-        $row[] = \html_writer::div('', 'roomname', array('id' => 'roomname' . $offset)) . $selectroom;
+        // Room names and capacity will be loaded by js.
+        $row[] =  \html_writer::tag('ul', '', array(
+                'id' => 'roomlist' . $offset,
+                'class' => 'mod_facetoface-roomlist nonempty',
+                'data-offset' => $offset
+            )) . $selectrooms;
 
         // Assets.
         $selectassets = \html_writer::link("#", get_string('selectassets', 'facetoface'), array(
@@ -422,16 +429,20 @@ class event extends \moodleform {
 
             $starttime = $data["timestart"][$i];
             $endtime = $data["timefinish"][$i];
-            $roomid = $data["roomid"][$i];
+            $roomids = $data["roomids"][$i];
+            $roomlist = [];
             $assetids = $data["assetids"][$i];
             $assetlist = [];
 
+            if (!empty($roomids)) {
+                $roomlist = explode(',', $roomids);
+            }
             if (!empty($assetids)) {
                 $assetlist = explode(',', $assetids);
             }
             // If event is a cloning then remove session id and behave as a new event to get rooms availability.
             $sessid = ($data['c'] ? 0 : $data['s']);
-            $errdate = \mod_facetoface\event_dates::validate($starttime, $endtime, $roomid, $assetlist, $sessid, $facetofaceid);
+            $errdate = \mod_facetoface\event_dates::validate($starttime, $endtime, $roomlist, $assetlist, $sessid, $facetofaceid);
 
             if (!empty($errdate['timestart'])) {
                 $errdates[] = $errdate['timestart'];
@@ -439,8 +450,8 @@ class event extends \moodleform {
             if (!empty($errdate['timefinish'])) {
                 $errdates[] = $errdate['timefinish'];
             }
-            if (!empty($errdate['roomid'])) {
-                $errdates[] = $errdate['roomid'];
+            if (!empty($errdate['roomids'])) {
+                $errdates[] = $errdate['roomids'];
             }
 
             if (!empty($errdate['assetids'])) {
@@ -481,7 +492,6 @@ class event extends \moodleform {
             $date = new \stdClass();
             $date->timestart = $starttime;
             $date->timefinish = $endtime;
-            $date->roomid = $roomid;
             $dates[] = $date;
         }
 
@@ -755,7 +765,7 @@ class event extends \moodleform {
                     $timestartfield = "timestart[$i]";
                     $timefinishfield = "timefinish[$i]";
                     $timezonefield = "sessiontimezone[$i]";
-                    $roomidfield = "roomid[$i]";
+                    $roomsfield = "roomids[$i]";
                     $assetsfield = "assetids[$i]";
 
                     if ($date->sessiontimezone === '') {
@@ -771,7 +781,7 @@ class event extends \moodleform {
                     $sessiondata->$timestartfield = $date->timestart;
                     $sessiondata->$timefinishfield = $date->timefinish;
                     $sessiondata->$timezonefield = $date->sessiontimezone;
-                    $sessiondata->$roomidfield = $date->roomid;
+                    $sessiondata->$roomsfield = \mod_facetoface\room_helper::get_session_roomids($date->id);
                     $sessiondata->$assetsfield = \mod_facetoface\asset_helper::get_session_assetids($date->id);
 
                     // NOTE: There is no need to remove rooms and assets
@@ -918,13 +928,14 @@ class event extends \moodleform {
                 continue; // skip this date
             }
             if (!empty($fromform->timestart[$i]) && !empty($fromform->timefinish[$i])) {
+
                 $date = new \stdClass();
 
                 $date->id = isset($fromform->sessiondateid[$i]) ? $fromform->sessiondateid[$i] : null;
                 $date->sessiontimezone = $fromform->sessiontimezone[$i];
                 $date->timestart  = $fromform->timestart[$i];
                 $date->timefinish = $fromform->timefinish[$i];
-                $date->roomid   = $fromform->roomid[$i];
+                $date->roomids  = !empty($fromform->roomids[$i]) ? explode(',', $fromform->roomids[$i]) : array();
                 $date->assetids = !empty($fromform->assetids[$i]) ? explode(',', $fromform->assetids[$i]) : array();
                 $sessiondates[] = $date;
             }

@@ -29,24 +29,28 @@ require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/dialogs/seminar_dialog_content.php');
 
+use mod_facetoface\room_list;
+use mod_facetoface\seminar;
+use mod_facetoface\seminar_event;
+
 $facetofaceid = required_param('facetofaceid', PARAM_INT); // Necessary when creating new sessions.
 $sessionid = required_param('sessionid', PARAM_INT);       // Empty when adding new session.
 $timestart = required_param('timestart', PARAM_INT);
 $timefinish = required_param('timefinish', PARAM_INT);
 $offset = optional_param('offset', 0, PARAM_INT);
 $search = optional_param('search', 0, PARAM_INT);
-$selected = optional_param('selected', 0, PARAM_INT);
+$selected = optional_param('selected', '', PARAM_SEQUENCE);
 
 if (empty($timestart) || empty($timefinish)) {
     print_error('notimeslotsspecified', 'facetoface');
 }
 
-$seminar = new \mod_facetoface\seminar($facetofaceid);
+$seminar = new seminar($facetofaceid);
 if (!$seminar->exists()) {
     print_error('error:incorrectfacetofaceid', 'facetoface');
 }
 
-$seminarevent = new \mod_facetoface\seminar_event($sessionid);
+$seminarevent = new seminar_event($sessionid);
 if (!$seminarevent->exists()) {
     // If it doesn't exist we'll need to set the facetofaceid for the event.
     $seminarevent->set_facetoface($seminar->get_id());
@@ -68,7 +72,7 @@ $params = [
     'timestart' => $timestart,
     'timefinish' => $timefinish,
     'selected' => $selected,
-    'offset' => $offset
+    'offset' => $offset,
 ];
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/facetoface/room/ajax/sessionrooms.php', $params);
@@ -77,36 +81,50 @@ $PAGE->set_url('/mod/facetoface/room/ajax/sessionrooms.php', $params);
 send_headers('text/html; charset=utf-8', false);
 
 // Setup / loading data
-$roomlist = \mod_facetoface\room_list::get_available_rooms(0, 0 , $seminarevent);
-$availablerooms = \mod_facetoface\room_list::get_available_rooms($timestart, $timefinish, $seminarevent);
-$unavailablerooms = [];
+$roomlist = room_list::get_available_rooms(0, 0 , $seminarevent);
+$availablerooms = room_list::get_available_rooms($timestart, $timefinish, $seminarevent);
+$selectedids = explode(',', $selected);
 $allrooms = [];
-
+$selectedrooms = [];
+$unavailablerooms = [];
+/** @var \mod_facetoface\room $room */
 foreach ($roomlist as $room) {
+
     // Note: We'll turn the room class into a stdClass container here until customfields and dialogs play nicely with the room class.
     $roomdata = $room->to_record();
 
+    customfield_load_data($roomdata, "facetofaceroom", "facetoface_room");
+
     $roomdata->fullname = (string)$room . " (" . get_string("capacity", "facetoface") . ": {$roomdata->capacity})";
-    if (!$availablerooms->contains($roomdata->id)) {
-        $unavailablerooms[$roomdata->id] = $roomdata->id;
-        $roomdata->fullname .= get_string('roomalreadybooked', 'facetoface');
+    if (!$availablerooms->contains($room->get_id()) && $seminarevent->get_cancelledstatus() == 0) {
+        $unavailablerooms[$room->get_id()] = $room->get_id();
+        $roomdata->fullname .= get_string('roomalreadybooked', 'mod_facetoface');
     }
-    if ($roomdata->custom) {
-        $roomdata->fullname .= ' (' . get_string('facetoface', 'facetoface') . ': ' . format_string($seminar->get_name()) . ')';
+    if ($roomdata->custom && $seminarevent->get_cancelledstatus() == 0) {
+        $roomdata->fullname .= ' (' . get_string('facetoface', 'mod_facetoface') . ': ' . format_string($seminar->get_name()) . ')';
     }
 
-    $allrooms[$roomdata->id] = $roomdata;
+    if (in_array($room->get_id(), $selectedids)) {
+        $selectedrooms[$room->get_id()] = $roomdata;
+    }
+
+    $allrooms[$room->get_id()] = $roomdata;
 }
 
 // Display page.
 $dialog = new \seminar_dialog_content();
-$dialog->searchtype = 'facetoface_room';
+$dialog->baseurl = '/mod/facetoface/room/ajax/sessionrooms.php';
 $dialog->proxy_dom_data(['id', 'name', 'custom', 'capacity']);
+$dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
 $dialog->items = $allrooms;
 $dialog->disabled_items = $unavailablerooms;
-$dialog->lang_file = 'facetoface';
+$dialog->selected_items = $selectedrooms;
+$dialog->selected_title = 'itemstoadd';
+$dialog->lang_file = 'mod_facetoface';
 $dialog->createid = 'show-editcustomroom' . $offset . '-dialog';
 $dialog->customdata = $params;
+$dialog->search_code = '/mod/facetoface/dialogs/search.php';
+$dialog->searchtype = 'facetoface_room';
 $dialog->string_nothingtodisplay = 'error:nopredefinedrooms';
 // Additional url parameters needed for pagination in the search tab.
 $dialog->urlparams = $params;

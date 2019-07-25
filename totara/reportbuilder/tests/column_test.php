@@ -207,6 +207,10 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         'description' => 'Room description', 'custom' => 0, 'timecreated' => 1265963591, 'timemodified' => 1265963591
     );
 
+    protected $f2f_room_dates = array(
+        'id' => 1, 'roomid' => 1, 'sessionsdateid' => 1
+    );
+
     protected $f2f_data = array(
         'id' => 1, 'course' => 1, 'name' => 'F2F name', 'shortname' => 'f2f', 'details' => 'details', 'approvaltype' => 0
     );
@@ -217,7 +221,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $f2f_session_dates_data = array(
-        'id' => 1, 'sessionid' => 1, 'timestart' => 1140519599, 'timefinish' => 114051960, 'roomid' => 1
+        'id' => 1, 'sessionid' => 1, 'timestart' => 1140519599, 'timefinish' => 114051960
     );
 
     protected $f2f_signups_data = array(
@@ -630,6 +634,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $this->type_field_data = null;
         $this->type_data_data = null;
         $this->f2f_room_data = null;
+        $this->f2f_room_dates = null;
         $this->f2f_data = null;
         $this->f2f_session_data = null;
         $this->f2f_session_dates_data = null;
@@ -756,6 +761,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'goal_record' => array($this->goal_record),
             'goal_item_history' => array($this->goal_item_history_data),
             'facetoface_room' => array($this->f2f_room_data),
+            'facetoface_room_dates' => array($this->f2f_room_dates),
             'facetoface' => array($this->f2f_data),
             'facetoface_sessions' => array($this->f2f_session_data),
             'facetoface_sessions_dates' => array($this->f2f_session_dates_data),
@@ -865,7 +871,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     public function test_columns_and_filters($sourcename, $title) {
         global $SESSION, $DB;
 
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         // We need to be able to calculate the total count.
@@ -1126,7 +1131,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     }
 
     public function test_embedded_reports() {
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         $embeddedobjects = reportbuilder_get_all_embedded_reports();

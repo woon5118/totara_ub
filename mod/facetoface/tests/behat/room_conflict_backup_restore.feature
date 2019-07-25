@@ -58,9 +58,9 @@ Feature: Test room conflicts through backup/restore
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
-    And I click on "Select room" "link"
-    And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
 
     And I follow "Add event"
@@ -77,9 +77,9 @@ Feature: Test room conflicts through backup/restore
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
-    And I click on "Select room" "link"
-    And I click on "Room 2, Building 234, 234 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 2, Building 234, 234 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
 
     And I am on "Course 1" course homepage with editing mode on

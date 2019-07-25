@@ -54,7 +54,7 @@ Feature: Test deletion of a Seminar event
       | Description | Test seminar description |
     And I follow "Test seminar name"
     And I follow "Add event"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I click on "Create" "link"
     And I set the following fields to these values:
       | Name         | Room 1          |
@@ -66,7 +66,7 @@ Feature: Test deletion of a Seminar event
     And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I should not see "Publish for reuse"
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
-    Then I should see "Room 1 (5)"
+    Then I should see "Room 1"
 
     When I press "Save changes"
     Then I should see "Room 1"

@@ -95,18 +95,16 @@
         <KEY NAME="facesess_use_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_sessions_dates" COMMENT="Describes sessions of event. Specifies the start time, end time and optionally room and assets. Sessions can be set over multiple days or blocks of time.">
+    <TABLE NAME="facetoface_sessions_dates" COMMENT="Describes sessions of event. Specifies the start time, end time. Sessions can be set over multiple days or blocks of time.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="sessiontimezone" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Timezone used for display of dates and times, 99 means use user timeozone"/>
-        <FIELD NAME="roomid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Foreign key to facetoface_room"/>
         <FIELD NAME="timestart" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timefinish" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="facesessdate_roo_fk" TYPE="foreign" FIELDS="roomid" REFTABLE="facetoface_room" REFFIELDS="id"/>
         <KEY NAME="sessionid" TYPE="foreign" FIELDS="sessionid" REFTABLE="facetoface_sessions" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -646,6 +644,21 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="sessionsdateid-assetid" UNIQUE="true" FIELDS="sessionsdateid, assetid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="facetoface_room_dates" COMMENT="Rooms to session dates many-to-many relationship">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="sessionsdateid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="roomid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="faceroomdate_sess_fk" TYPE="foreign" FIELDS="sessionsdateid" REFTABLE="facetoface_sessions_dates" REFFIELDS="id"/>
+        <KEY NAME="faceroomdate_room_fk" TYPE="foreign" FIELDS="roomid" REFTABLE="facetoface_room" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="sessionsdateid-roomid" UNIQUE="true" FIELDS="sessionsdateid, roomid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

@@ -124,12 +124,25 @@ final class mod_facetoface_generator_util {
         $rc->timestart = $times['start']['computed'];
         $rc->timefinish = $times['finish']['computed'];
         $rc->sessiontimezone = isset($record['sessiontimezone']) ? $record['sessiontimezone'] : 99;
-
-        if (isset($record['room'])) {
-            $rc->roomid = $DB->get_field('facetoface_room', 'id', ['name' => $record['room']], MUST_EXIST);
-        }
-
         $rc->id = $DB->insert_record('facetoface_sessions_dates', $rc);
+
+        if (isset($record['rooms'])) {
+            // Start processing on rooms if there are any provided.
+            $rooms = explode(",", $record['rooms']);
+            array_walk(
+                $rooms,
+                function (string &$room): void {
+                    trim($room);
+                }
+            );
+            foreach ($rooms as $room) {
+                $frd = new \stdClass();
+                $frd->sessionsdateid = $rc->id;
+                // Expecting room to be existing in the storage, with the given name from the step.
+                $frd->roomid = $DB->get_field('facetoface_room', 'id', ['name' => $room], MUST_EXIST);
+                $DB->insert_record('facetoface_room_dates', $frd);
+            }
+        }
 
         if (isset($record['assets'])) {
             // Start processing on assets if there are any provided.
@@ -140,11 +153,9 @@ final class mod_facetoface_generator_util {
                     trim($asset);
                 }
             );
-
             foreach ($assets as $asset) {
                 $o = new \stdClass();
-                $o->sessiondateid = $rc->id;
-
+                $o->sessionsdateid = $rc->id;
                 // Expecting asset to be existing in the storage, with the given name from the step.
                 $o->assetid = $DB->get_field('facetoface_asset', 'id', ['name' => $asset], MUST_EXIST);
                 $DB->insert_record('facetoface_asset_dates', $o);

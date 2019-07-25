@@ -69,7 +69,8 @@ final class room_filter extends filter {
             s.id IN (
                 SELECT sd.sessionid
                 FROM {facetoface_sessions_dates} sd
-                WHERE sd.roomid = :roomid
+                JOIN {facetoface_room_dates} frd ON frd.sessionsdateid = sd.id
+                WHERE frd.roomid = :roomid
             )
         ";
 

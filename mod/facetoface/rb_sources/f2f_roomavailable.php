@@ -37,9 +37,10 @@ class rb_filter_f2f_roomavailable extends rb_filter_f2f_available {
         $sql = "$field NOT IN (
             SELECT fr.id
               FROM {facetoface_room} fr
-              JOIN {facetoface_sessions_dates} fsd ON fsd.roomid = fr.id
+              JOIN {facetoface_room_dates} frd ON frd.roomid = fr.id
+              JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
              WHERE fr.allowconflicts = 0 AND :{$paramends} > fsd.timestart AND fsd.timefinish > :{$paramstarts}
-             )";
+        )";
 
         $params = array();
         $params[$paramstarts] = $sessionstarts;

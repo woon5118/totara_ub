@@ -34,27 +34,28 @@ $facetofaceid = required_param('f', PARAM_INT);   // Face-to-face id.
 $sessionid = optional_param('s', 0, PARAM_INT);
 
 $seminar = new \mod_facetoface\seminar($facetofaceid);
-$course = $DB->get_record('course', array('id' => $seminar->get_course()), '*', MUST_EXIST);
 $cm = $seminar->get_coursemodule();
 
-$event = new \mod_facetoface\seminar_event($sessionid);
-if (!$event->exists()) {
-    $event->set_facetoface($seminar->get_id());
+$seminarevent = new \mod_facetoface\seminar_event($sessionid);
+if (!$seminarevent->exists()) {
+    $seminarevent->set_facetoface($seminar->get_id());
 }
 
 $context = context_module::instance($cm->id);
-ajax_require_login($course, false, $cm, false, true);
+ajax_require_login($seminar->get_course(), false, $cm, false, true);
 require_capability('mod/facetoface:editevents', $context);
 require_sesskey();
 
 if ($id) {
     $room = new room($id);
-    if ($room->exists()) {
-        // Only custom rooms can be changed here!
-        if (!$room->is_available(0, 0, $event)) {
-            // They should never get here, any error will do.
-            print_error('Error: Room is unavailable in this seminar event');
-        }
+    // Only custom room can be changed here!
+    if (!$room->get_custom()) {
+        throw new coding_exception('Site wide room must be edited from the Site administration > Seminar > Room menu');
+    }
+
+    if (!$room->is_available(0, 0, $seminarevent)) {
+        // They should never get here, any error will do.
+        print_error('Error: Room is unavailable in this seminar event');
     }
 } else {
     $room = room::create_custom_room();
@@ -64,15 +65,17 @@ if ($id) {
 send_headers('text/html; charset=utf-8', false);
 
 $PAGE->set_context($context);
-$PAGE->set_url('/mod/facetoface/room/ajax/room_edit.php');
+$PAGE->set_url('/mod/facetoface/room/ajax/room_edit.php', ['id' => $id, 'f' => $facetofaceid]);
 
-$customdata = ['room' => $room, 'seminar' => $seminar, 'event' => $event, 'editoroptions' => $TEXTAREA_OPTIONS];
+$customdata = ['room' => $room, 'seminar' => $seminar, 'seminarevent' => $seminarevent, 'editoroptions' => $TEXTAREA_OPTIONS];
 $form = new \mod_facetoface\form\editroom(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
 
 if ($data = $form->get_data()) {
     $data->custom = empty($data->notcustom);
     $room = \mod_facetoface\room_helper::save($data);
-    echo json_encode(array('id' => $room->get_id(), 'name' => $room->get_name(), 'custom' => $room->get_custom()));
+    echo json_encode(
+        ['id' => $room->get_id(), 'name' => $room->get_name(), 'custom' => (int)$room->get_custom(), 'capacity' => $room->get_capacity()]
+    );
 } else {
     // This is required because custom fields may use AMD module for JS and we can't re-initialise AMD
     // which will happen if we call get_end_code() without setting the first arg to false.

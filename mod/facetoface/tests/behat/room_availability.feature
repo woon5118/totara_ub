@@ -65,17 +65,17 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
+    And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Add a new session"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
     And I press "Save changes"
@@ -93,12 +93,12 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Add a new session"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
     And I press "Save changes"
@@ -116,15 +116,15 @@ Feature: Seminar room availability
       | timefinish[hour]   | 13   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I should see "Room 1 (10)" in the "1:00 PM" "table_row"
-    And I should see "Room 1 (10)" in the "11:00 AM -1 January" "table_row"
-    And I should see "Room 2 (10)" in the "1 February" "table_row"
+    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
+    And I should see "Room 1" in the "1:00 PM" "table_row"
+    And I should see "Room 1" in the "11:00 AM -1 January" "table_row"
+    And I should see "Room 2" in the "1 February" "table_row"
     And I press "Save changes"
 
     When I follow "Add event"
@@ -143,12 +143,12 @@ Feature: Seminar room availability
       | timefinish[hour]   | 11   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     Then I should see "Room 1" in the "0 / 20" "table_row"
 
@@ -168,12 +168,12 @@ Feature: Seminar room availability
       | timefinish[hour]   | 14   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     Then I should see "Room 1" in the "0 / 30" "table_row"
 
@@ -193,12 +193,12 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     Then I should see "Room 2" in the "0 / 40" "table_row"
 
@@ -218,9 +218,9 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     Then I should see "Room 1 (Capacity: 10) (Room unavailable)"
-    When I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    When I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Cancel"
 
     And I click on "Edit event" "link" in the "0 / 20" "table_row"
@@ -261,17 +261,17 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
+    And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     And I log out
     And I log in as "admin"
@@ -296,19 +296,19 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     Then I should not see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Cancel"
 
     When I click on "Edit event" "link" in the "0 / 20" "table_row"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Add a new session"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
     And I press "Save changes"
@@ -326,12 +326,12 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     Then I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     And I should see "Upcoming events"
 
@@ -355,8 +355,8 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Create" "link" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
     And I set the following fields to these values:
       | Name                         | Zimmer 1 |
       | roomcapacity                 | 30       |
@@ -380,13 +380,13 @@ Feature: Seminar room availability
       | timefinish[hour]   | 13   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     Then I should see "Zimmer 1 (Capacity: 30) (Seminar: Test Seminar 1)"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Zimmer 1 (Capacity: 30) (Seminar: Test Seminar 1)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Zimmer 1 (Capacity: 30) (Seminar: Test Seminar 1)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     And I should see "Upcoming events"
 
@@ -406,12 +406,12 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     Then I should see "Zimmer 1 (Capacity: 30) (Room unavailable) (Seminar: Test Seminar 1)"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Create" "link" in the "Choose a room" "totaradialogue"
+    And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
     And I set the following fields to these values:
       | Name                         | Zimmer 2 |
       | roomcapacity                 | 40       |
@@ -422,25 +422,25 @@ Feature: Seminar room availability
     And I should not see "Zimmer 2" in the "0 / 40" "table_row"
 
     When I click on "Edit event" "link" in the "0 / 40" "table_row"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     Then I should see "Zimmer 1 (Capacity: 30) (Room unavailable) (Seminar: Test Seminar 1)"
     And I should see "Zimmer 2 (Capacity: 40) (Seminar: Test Seminar 1)"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Cancel"
 
     When I am on "Course 1" course homepage
     And I follow "Test Seminar 2"
     And I follow "Add event"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     Then I should not see "Zimmer 1"
     And I should see "Zimmer 2 (Capacity: 40) (Seminar: Test Seminar 2)"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Cancel"
     And I log out
 
@@ -448,25 +448,25 @@ Feature: Seminar room availability
     And I am on "Course 1" course homepage
     And I follow "Test Seminar 2"
     And I follow "Add event"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     Then I should not see "Zimmer 1"
     And I should not see "Zimmer 2"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Cancel"
 
     When I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
     And I follow "Add event"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     Then I should see "Zimmer 1 (Capacity: 30) (Seminar: Test Seminar 1)"
     And I should not see "Zimmer 2"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
     And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Cancel"
 
   Scenario: Seminar switch site room to not allow conflicts
@@ -489,9 +489,9 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     And I follow "Add event"
     And I set the following fields to these values:
@@ -509,9 +509,9 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     When I press "Save changes"
     Then I should see "Room 2" in the "0 / 20" "table_row"
     And I should see "Room 2" in the "0 / 30" "table_row"
@@ -568,8 +568,8 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Create" "link" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
     And I set the following fields to these values:
       | Name                         | Zimmer 1 |
       | roomcapacity                 | 40       |
@@ -592,15 +592,15 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
+    And I click on "Select rooms" "link"
     And I click on "Zimmer 1 (Capacity: 40) (Seminar: Test Seminar 1)" "link"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     Then I should see "Zimmer 1" in the "0 / 40" "table_row"
     And I should see "Zimmer 1" in the "0 / 50" "table_row"
 
     When I click on "Edit event" "link" in the "0 / 50" "table_row"
-    And I click on "Edit room" "link" in the "Zimmer 1 (40)" "table_row"
+    And I click on "Edit room" "link" in the "Zimmer 1" "table_row"
     And I set the following fields to these values:
       | Allow room booking conflicts | 0 |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
@@ -621,7 +621,7 @@ Feature: Seminar room availability
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     When I click on "Edit event" "link" in the "0 / 50" "table_row"
-    And I click on "Edit room" "link" in the "Zimmer 1 (40)" "table_row"
+    And I click on "Edit room" "link" in the "Zimmer 1" "table_row"
     And I set the following fields to these values:
       | Allow room booking conflicts | 0 |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
@@ -648,9 +648,9 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     And I follow "Add event"
     And I set the following fields to these values:
@@ -668,9 +668,9 @@ Feature: Seminar room availability
       | timefinish[hour]   | 14   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     And I follow "Add event"
     And I set the following fields to these values:
@@ -688,9 +688,9 @@ Feature: Seminar room availability
       | timefinish[hour]   | 16   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select rooms" "link"
+    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
     And I navigate to "Rooms" node in "Site administration > Seminars"
 
