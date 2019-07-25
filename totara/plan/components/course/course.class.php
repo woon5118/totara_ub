@@ -563,9 +563,10 @@ class dp_course_component extends dp_base_component {
         $params['pscaleid'] = $priorityscaleid;
         list($insql, $inparams) = $DB->get_in_or_equal($list, SQL_PARAMS_NAMED);
         $where = " WHERE ca.id $insql
-            AND ca.approved = :approved ";
+            AND ca.approved >= :status ";
         $params = array_merge($params, $inparams, $visibilityparams);
-        $params['approved'] = DP_APPROVAL_APPROVED;
+        // We are looking for courses that were added to an approved plan by a user with "Request" permission.
+        $params['status'] = DP_APPROVAL_UNAPPROVED;
         $where .= " AND {$visibilitysql} ";
         $sort = " ORDER BY c.fullname";
 

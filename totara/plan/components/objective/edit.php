@@ -66,7 +66,7 @@ $menuitem = ($ownplan) ? '\totara_plan\totara\menu\learningplans' : '\totara_cor
 $PAGE->set_totara_menu_selected($menuitem);
 
 // Permission checks.
-if (!$plan->can_update()) {
+if (!$plan->can_update() && !$plan->can_request_approval()) {
     print_error('error:nopermissions', 'totara_plan');
 }
 

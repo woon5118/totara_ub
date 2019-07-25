@@ -62,7 +62,7 @@ $component = $plan->get_component($componentname);
 ///
 /// Permissions check
 ///
-if (!$plan->can_update()) {
+if (!$plan->can_update() && !$plan->can_request_approval()) {
     print_error('error:cannotupdateitems', 'totara_plan');
 }
 

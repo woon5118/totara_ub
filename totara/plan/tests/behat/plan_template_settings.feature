@@ -53,6 +53,11 @@ Feature: Test plan teamplate settings
     And I set the field "updatemanager" to "Deny"
     When I click on "Save changes" "button"
     Then I should see "Plan settings successfully updated"
+    And I switch to "Courses" tab
+    And I set the field "updatecourselearner" to "Deny"
+    And I set the field "updatecoursemanager" to "Deny"
+    When I click on "Save changes" "button"
+    Then I should see "Course settings successfully updated"
     And I log out
 
     Then I log in as "learner1"

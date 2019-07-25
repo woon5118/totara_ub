@@ -98,7 +98,7 @@ $PAGE->set_url(new moodle_url('/totara/plan/component.php', array('id' => $id, '
 $plan->print_header($componentname);
 $table = $component->display_list();
 
-if ($plan->can_update()) {
+if ($plan->can_update() || $plan->can_request_approval()) {
     echo $component->display_picker();
 
     $form = html_writer::start_tag('form', array('id' => "dp-component-update",  'action' => $component->get_url(),
