@@ -171,6 +171,10 @@ abstract class restore_dbops {
 
         // Get loaded roles from backup_ids
         $rs = $DB->get_recordset('backup_ids_temp', array('backupid' => $restoreid, 'itemname' => 'role'), '', 'itemid, info');
+        // Totara: Records in set may be changed, which could lock MSSQL unless pre-loaded.
+        if ($DB->get_dbfamily() === 'mssql') {
+            $rs->preload();
+        }
         foreach ($rs as $recrole) {
             // If the rolemappings->modified flag is set, that means that we are coming from
             // manually modified mappings (by UI), so accept those mappings an put them to backup_ids
@@ -953,6 +957,10 @@ abstract class restore_dbops {
         }
         $fileupdates = array(); // Totara: do not update temporary table that is being iterated.
         $rs = $DB->get_recordset_sql($sql, $params);
+        // Totara: Records in set may be changed, which could lock MSSQL unless pre-loaded.
+        if ($DB->get_dbfamily() === 'mssql') {
+            $rs->preload();
+        }
         foreach ($rs as $rec) {
             // Report progress each time around loop.
             if ($progress) {
@@ -1117,6 +1125,10 @@ abstract class restore_dbops {
 
         // Iterate over all the included users with newitemid = 0, have to create them
         $rs = $DB->get_recordset('backup_ids_temp', array('backupid' => $restoreid, 'itemname' => 'user', 'newitemid' => 0), '', 'itemid, parentitemid, info');
+        // Totara: Records in set may be changed, which could lock MSSQL unless pre-loaded.
+        if ($DB->get_dbfamily() === 'mssql') {
+            $rs->preload();
+        }
         foreach ($rs as $recuser) {
             $progress->progress();
             $user = (object)backup_controller_dbops::decode_backup_temp_info($recuser->info);
@@ -1555,6 +1567,10 @@ abstract class restore_dbops {
 
         // Iterate over all the included users
         $rs = $DB->get_recordset('backup_ids_temp', $conditions, '', 'itemid, info');
+        // Totara: Records in set may be changed, which could lock MSSQL unless pre-loaded.
+        if ($DB->get_dbfamily() === 'mssql') {
+            $rs->preload();
+        }
         foreach ($rs as $recuser) {
             $user = (object)backup_controller_dbops::decode_backup_temp_info($recuser->info);
 

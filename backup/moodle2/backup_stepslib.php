@@ -2143,6 +2143,10 @@ class backup_annotate_all_question_files extends backup_execution_step {
                                         JOIN {backup_ids_temp} bi ON bi.itemid = qc.id
                                        WHERE bi.backupid = ?
                                          AND bi.itemname = 'question_categoryfinal'", array($this->get_backupid()));
+        // Totara: Records in set may be changed, which could lock MSSQL unless pre-loaded.
+        if ($DB->get_dbfamily() === 'mssql') {
+            $rs->preload();
+        }
         // To know about qtype specific components/fileareas
         $components = backup_qtype_plugin::get_components_and_fileareas();
         // Let's loop
@@ -2275,6 +2279,10 @@ class backup_annotate_all_user_files extends backup_execution_step {
         // Fetch all annotated (final) users
         $rs = $DB->get_recordset('backup_ids_temp', array(
             'backupid' => $this->get_backupid(), 'itemname' => 'userfinal'));
+        // Totara: Records in set may be changed, which could lock MSSQL unless pre-loaded.
+        if ($DB->get_dbfamily() === 'mssql') {
+            $rs->preload();
+        }
         $progress = $this->task->get_progress();
         $progress->start_progress($this->get_name());
         foreach ($rs as $record) {
