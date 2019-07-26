@@ -91,7 +91,7 @@ class totara_hierarchy_organisation_dialog_content_hierarchy_get_framework_testc
                 'reportid' => $rid,
                 'type' => $type,
                 'name' => 'recursive',
-                'value' => rb_current_org_content::CONTENT_ORG_EQUAL
+                'value' => \totara_reportbuilder\rb\content\current_org::CONTENT_ORG_EQUAL
             ]
         ]);
 

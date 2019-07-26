@@ -130,6 +130,7 @@ final class audience extends base {
      * @return boolean True if form was successfully processed
      */
     public function form_process($reportid, $fromform) {
+        $status = true;
 
         if ($this->has_audience_capability()) {
 
@@ -137,13 +138,15 @@ final class audience extends base {
             $audienceenable = $fromform->user_audience_enable ?? 0;
 
             if (!empty($audienceenable) && empty($audience)) {
-                $link = new moodle_url('/totara/reportbuilder/content.php', ['id' => $reportid]);
-                throw new moodle_exception('noaudienceselected', 'totara_reportbuilder', $link);
+                $link = new \moodle_url('/totara/reportbuilder/content.php', ['id' => $reportid]);
+                throw new \moodle_exception('noaudienceselected', 'totara_reportbuilder', $link);
             }
 
-            \reportbuilder::update_setting($reportid, self::TYPE, 'audience', $audience);
-            \reportbuilder::update_setting($reportid, self::TYPE, 'enable', $audienceenable);
+            $status = $status && \reportbuilder::update_setting($reportid, self::TYPE, 'audience', $audience);
+            $status = $status && \reportbuilder::update_setting($reportid, self::TYPE, 'enable', $audienceenable);
         }
+
+        return $status;
     }
 
     /**
@@ -152,7 +155,7 @@ final class audience extends base {
      * @return bool
      */
     private function has_audience_capability(): bool {
-        return has_capability("moodle/cohort:view", context_system::instance());
+        return has_capability("moodle/cohort:view", \context_system::instance());
     }
 
     /**

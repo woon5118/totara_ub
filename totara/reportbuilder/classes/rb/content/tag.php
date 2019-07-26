@@ -189,7 +189,6 @@ class tag extends base {
         } else {
             return '';
         }
-
     }
 
 
@@ -206,13 +205,10 @@ class tag extends base {
         $enable = \reportbuilder::get_setting($reportid, self::TYPE, 'enable');
         $include_logic = \reportbuilder::get_setting($reportid, self::TYPE, 'include_logic');
         $exclude_logic = \reportbuilder::get_setting($reportid, self::TYPE, 'exclude_logic');
-        $activeincludes = explode('|',
-            \reportbuilder::get_setting($reportid, self::TYPE, 'included'));
-        $activeexcludes = explode('|',
-            \reportbuilder::get_setting($reportid, self::TYPE, 'excluded'));
+        $activeincludes = explode('|', \reportbuilder::get_setting($reportid, self::TYPE, 'included'));
+        $activeexcludes = explode('|', \reportbuilder::get_setting($reportid, self::TYPE, 'excluded'));
 
-        $mform->addElement('header', 'tag_header',
-            get_string('showbytag', 'totara_reportbuilder'));
+        $mform->addElement('header', 'tag_header', get_string('showbytag', 'totara_reportbuilder'));
         $mform->setExpanded('tag_header');
         $mform->addHelpButton('tag_header', 'reportbuildertag', 'totara_reportbuilder');
 
@@ -221,14 +217,16 @@ class tag extends base {
         $mform->setDefault('tag_enable', $enable);
         $mform->disabledIf('tag_enable', 'contentenabled', 'eq', 0);
 
-        $mform->addElement('html', html_writer::empty_tag('br'));
+        $mform->addElement('html', \html_writer::empty_tag('br'));
 
         // include the following tags
-        $tags = $DB->get_records('tag', array('isstandard' => 1), 'name');
+        $tags = $DB->get_records('tag', ['isstandard' => 1], 'name');
         if (!empty($tags)) {
-            $checkgroup = array();
-            $opts = array(1 => get_string('anyofthefollowing', 'totara_reportbuilder'),
-                          0 => get_string('allofthefollowing', 'totara_reportbuilder'));
+            $checkgroup = [];
+            $opts = [
+                1 => get_string('anyofthefollowing', 'totara_reportbuilder'),
+                0 => get_string('allofthefollowing', 'totara_reportbuilder')
+            ];
             $mform->addElement('select', 'tag_include_logic', get_string('includetags', 'totara_reportbuilder'), $opts);
             $mform->setDefault('tag_include_logic', $include_logic);
             $mform->disabledIf('tag_enable', 'contentenabled', 'eq', 0);
@@ -241,19 +239,21 @@ class tag extends base {
                     $mform->setDefault('tag_include_option_' . $tag->id, 1);
                 }
             }
-            $mform->addGroup($checkgroup, 'tag_include_group', '', html_writer::empty_tag('br'), false);
+            $mform->addGroup($checkgroup, 'tag_include_group', '', \html_writer::empty_tag('br'), false);
         }
         $mform->disabledIf('tag_include_group', 'contentenabled', 'eq', 0);
         $mform->disabledIf('tag_include_group', 'tag_enable',
             'notchecked');
 
-        $mform->addElement('html', str_repeat(html_writer::empty_tag('br'), 2));
+        $mform->addElement('html', str_repeat(\html_writer::empty_tag('br'), 2));
 
         // exclude the following tags
         if (!empty($tags)) {
-            $checkgroup = array();
-            $opts = array(1 => get_string('anyofthefollowing', 'totara_reportbuilder'),
-                          0 => get_string('allofthefollowing', 'totara_reportbuilder'));
+            $checkgroup = [];
+            $opts = [
+                1 => get_string('anyofthefollowing', 'totara_reportbuilder'),
+                0 => get_string('allofthefollowing', 'totara_reportbuilder')
+            ];
             $mform->addElement('select', 'tag_exclude_logic', get_string('excludetags', 'totara_reportbuilder'), $opts);
             $mform->setDefault('tag_exclude_logic', $exclude_logic);
             $mform->disabledIf('tag_enable', 'contentenabled', 'eq', 0);
@@ -266,12 +266,10 @@ class tag extends base {
                     $mform->setDefault('tag_exclude_option_' . $tag->id, 1);
                 }
             }
-            $mform->addGroup($checkgroup, 'tag_exclude_group', '', html_writer::empty_tag('br'), false);
+            $mform->addGroup($checkgroup, 'tag_exclude_group', '', \html_writer::empty_tag('br'), false);
         }
         $mform->disabledIf('tag_exclude_group', 'contentenabled', 'eq', 0);
-        $mform->disabledIf('tag_exclude_group', 'tag_enable',
-            'notchecked');
-
+        $mform->disabledIf('tag_exclude_group', 'tag_enable', 'notchecked');
     }
 
 
@@ -328,7 +326,6 @@ class tag extends base {
                         $activeexcludes[] = $tag->id;
                     }
                 }
-
             }
 
             // implode into string and update setting

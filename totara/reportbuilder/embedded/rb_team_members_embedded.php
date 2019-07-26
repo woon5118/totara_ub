@@ -22,9 +22,6 @@
  * @subpackage reportbuilder
  */
 
-global $CFG;
-require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
-
 use totara_reportbuilder\rb\content\user;
 
 class rb_team_members_embedded extends rb_base_embedded {

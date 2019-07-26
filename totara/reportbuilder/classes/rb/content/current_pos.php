@@ -242,7 +242,7 @@ class current_pos extends base {
         $radiogroup[] =& $mform->createElement('radio', 'current_pos_recursive',
             '', get_string('showrecordsbelowposonly', 'totara_reportbuilder'), self::CONTENT_POS_BELOW);
         $mform->addGroup($radiogroup, 'current_pos_recursive_group',
-            get_string('includechildpos', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
+            get_string('includechildpos', 'totara_reportbuilder'), \html_writer::empty_tag('br'), false);
         $mform->setDefault('current_pos_recursive', $recursive);
         $mform->disabledIf('current_pos_recursive_group', 'contentenabled', 'eq', 0);
         $mform->disabledIf('current_pos_recursive_group', 'current_pos_enable', 'notchecked');
@@ -263,15 +263,13 @@ class current_pos extends base {
         // enable checkbox option
         $enable = (isset($fromform->current_pos_enable) &&
             $fromform->current_pos_enable) ? 1 : 0;
-        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE,
-            'enable', $enable);
+        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE, 'enable', $enable);
 
         // recursive radio option
         $recursive = isset($fromform->current_pos_recursive) ?
             $fromform->current_pos_recursive : 0;
 
-        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE,
-            'recursive', $recursive);
+        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE, 'recursive', $recursive);
 
         return $status;
     }

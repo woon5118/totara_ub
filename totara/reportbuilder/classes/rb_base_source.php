@@ -527,7 +527,7 @@ abstract class rb_base_source {
         if (isset($contentoptions) && is_array($contentoptions)) {
             foreach ($contentoptions as $option) {
                 $name = $option->classname;
-                $classname = 'rb_' . $name . '_content';
+                $classname = '\totara_reportbuilder\rb\content\\' . $name;
                 $settingname = $name . '_content';
                 if (class_exists($classname)) {
                     if ($name == 'completed_org' || $name == 'current_org') {

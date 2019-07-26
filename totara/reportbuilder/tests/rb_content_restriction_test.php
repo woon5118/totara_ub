@@ -28,6 +28,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 use totara_reportbuilder\rb\content\current_pos;
 use totara_reportbuilder\rb\content\current_org;
+use totara_reportbuilder\rb\content\user;
 
 /**
  * @group totara_reportbuilder
@@ -544,7 +545,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
         reportbuilder::update_setting($this->reportid, 'user_content', 'who', 1); // USER_OWN
 
         foreach ($this->users as $user) {
-            $content = new rb_user_content($user->id);
+            $content = new user($user->id);
             list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
 
             $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
@@ -561,7 +562,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
         reportbuilder::update_setting($this->reportid, 'user_content', 'who', 2); // USER_DIRECT_REPORTS
 
         foreach ($this->hierarchy as $top => $team) {
-            $content = new rb_user_content($top);
+            $content = new user($top);
             list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
 
             $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
@@ -571,7 +572,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
             }
 
             foreach ($team as $mid => $staff) {
-                $content = new rb_user_content($mid);
+                $content = new user($mid);
                 list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
 
                 $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
@@ -581,7 +582,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                 }
 
                 foreach ($staff as $sub => $users) {
-                    $content = new rb_user_content($sub);
+                    $content = new user($sub);
                     list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
 
                     $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
@@ -598,7 +599,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
         reportbuilder::update_setting($this->reportid, 'user_content', 'who', 4); // USER_INDIRECT_REPORTS
 
         foreach ($this->hierarchy as $top => $team) {
-            $content = new rb_user_content($top);
+            $content = new user($top);
             list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
 
             $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
@@ -617,14 +618,14 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
             }
 
             foreach ($team as $mid => $staff) {
-                $content = new rb_user_content($mid);
+                $content = new user($mid);
                 list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
 
                 $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                 $this->assertEquals(0, count($results));
 
                 foreach ($staff as $sub => $users) {
-                    $content = new rb_user_content($sub);
+                    $content = new user($sub);
                     list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
 
                     $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
@@ -664,13 +665,13 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
 
 
         foreach ($this->users as $user) {
-            $content = new rb_user_content($user->id);
+            $content = new user($user->id);
             list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
             $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
             $this->assertEquals(0, count($results));
         }
 
-        $content = new rb_user_content($tempman->id);
+        $content = new user($tempman->id);
         list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
         $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
         $this->assertEquals(count($expected), count($results));

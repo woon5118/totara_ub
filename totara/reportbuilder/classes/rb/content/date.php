@@ -55,52 +55,51 @@ class date extends base {
             " OR {$field} IS NULL OR {$field} = 0 " : " AND {$field} != 0 ";
 
         switch ($settings['when']) {
-        case 'past':
-            return array("({$field} < {$now} {$includenulls})", array());
-        case 'future':
-            return array("({$field} > {$now} {$includenulls})", array());
-        case 'last30days':
-            $sql = "( ({$field} < {$now}  AND {$field}  >
-                ({$now} - 60*60*24*30)) {$includenulls})";
-            return array($sql, array());
-        case 'next30days':
-            $sql = "( ({$field} > {$now} AND {$field} <
-                ({$now} + 60*60*24*30)) {$includenulls})";
-            return array($sql, array());
-        case 'currentfinancial':
-            $required_year = date('Y', $now);
-            $year_before = $required_year - 1;
-            $year_after = $required_year + 1;
-            if (date('z', $now) >= date('z', mktime(0, 0, 0, $month, $day, $required_year))) {
-                $start = mktime(0, 0, 0, $month, $day, $required_year);
-                $end = mktime(0, 0, 0, $month, $day, $year_after);
-            } else {
-                $start = mktime(0, 0, 0, $month, $day, $year_before);
-                $end = mktime(0, 0, 0, $month, $day, $required_year);
-            }
-            $sql = "( ({$field} >= {$start} AND {$field} <
-                {$end}) {$includenulls})";
-            return array($sql, array());
-        case 'lastfinancial':
-            $required_year = date('Y', $now) - 1;
-            $year_before = $required_year - 1;
-            $year_after = $required_year + 1;
-            if (date('z', $now) >= date('z', mktime(0, 0, 0, $month, $day, $required_year))) {
-                $start = mktime(0, 0, 0, $month, $day, $required_year);
-                $end = mktime(0, 0, 0, $month, $day, $year_after);
-            } else {
-                $start = mktime(0, 0, 0, $month, $day, $year_before);
-                $end = mktime(0, 0, 0, $month, $day, $required_year);
-            }
-            $sql = "( ({$field} >= {$start} AND {$field} <
-                {$end}) {$includenulls})";
-            return array($sql, array());
-        default:
-            // no match
-            // using 1=0 instead of FALSE for MSSQL support
-            return array("(1=0 {$includenulls})", array());
+            case 'past':
+                return array("({$field} < {$now} {$includenulls})", array());
+            case 'future':
+                return array("({$field} > {$now} {$includenulls})", array());
+            case 'last30days':
+                $sql = "( ({$field} < {$now}  AND {$field}  >
+                    ({$now} - 60*60*24*30)) {$includenulls})";
+                return array($sql, array());
+            case 'next30days':
+                $sql = "( ({$field} > {$now} AND {$field} <
+                    ({$now} + 60*60*24*30)) {$includenulls})";
+                return array($sql, array());
+            case 'currentfinancial':
+                $required_year = date('Y', $now);
+                $year_before = $required_year - 1;
+                $year_after = $required_year + 1;
+                if (date('z', $now) >= date('z', mktime(0, 0, 0, $month, $day, $required_year))) {
+                    $start = mktime(0, 0, 0, $month, $day, $required_year);
+                    $end = mktime(0, 0, 0, $month, $day, $year_after);
+                } else {
+                    $start = mktime(0, 0, 0, $month, $day, $year_before);
+                    $end = mktime(0, 0, 0, $month, $day, $required_year);
+                }
+                $sql = "( ({$field} >= {$start} AND {$field} <
+                    {$end}) {$includenulls})";
+                return array($sql, array());
+            case 'lastfinancial':
+                $required_year = date('Y', $now) - 1;
+                $year_before = $required_year - 1;
+                $year_after = $required_year + 1;
+                if (date('z', $now) >= date('z', mktime(0, 0, 0, $month, $day, $required_year))) {
+                    $start = mktime(0, 0, 0, $month, $day, $required_year);
+                    $end = mktime(0, 0, 0, $month, $day, $year_after);
+                } else {
+                    $start = mktime(0, 0, 0, $month, $day, $year_before);
+                    $end = mktime(0, 0, 0, $month, $day, $required_year);
+                }
+                $sql = "( ({$field} >= {$start} AND {$field} <
+                    {$end}) {$includenulls})";
+                return array($sql, array());
+            default:
+                // no match
+                // using 1=0 instead of FALSE for MSSQL support
+                return array("(1=0 {$includenulls})", array());
         }
-
     }
 
     /**
@@ -120,31 +119,31 @@ class date extends base {
                          $settings['incnulls']) ? " (or $title is empty)" : '';
 
         switch ($settings['when']) {
-        case 'past':
-            return $title . ' ' . get_string('occurredbefore', 'totara_reportbuilder') . ' ' .
-                userdate(time(), '%c'). $includenulls;
-        case 'future':
-            return $title . ' ' . get_string('occurredafter', 'totara_reportbuilder') . ' ' .
-                userdate(time(), '%c'). $includenulls;
-        case 'last30days':
-            return $title . ' ' . get_string('occurredafter', 'totara_reportbuilder') . ' ' .
-                userdate(time() - 60*60*24*30, '%c') . get_string('and', 'totara_reportbuilder') .
-                get_string('occurredbefore', 'totara_reportbuilder') . userdate(time(), '%c') .
-                $includenulls;
+            case 'past':
+                return $title . ' ' . get_string('occurredbefore', 'totara_reportbuilder') . ' ' .
+                    userdate(time(), '%c'). $includenulls;
+            case 'future':
+                return $title . ' ' . get_string('occurredafter', 'totara_reportbuilder') . ' ' .
+                    userdate(time(), '%c'). $includenulls;
+            case 'last30days':
+                return $title . ' ' . get_string('occurredafter', 'totara_reportbuilder') . ' ' .
+                    userdate(time() - 60 * 60 * 24 * 30, '%c') . get_string('and', 'totara_reportbuilder') .
+                    get_string('occurredbefore', 'totara_reportbuilder') . userdate(time(), '%c') .
+                    $includenulls;
 
-        case 'next30days':
-            return $title . ' ' . get_string('occurredafter', 'totara_reportbuilder') . ' ' .
-                userdate(time(), '%c') . get_string('and', 'totara_reportbuilder') .
-                get_string('occurredbefore', 'totara_reportbuilder') .
-                userdate(time() + 60*60*24*30, '%c') . $includenulls;
-        case 'currentfinancial':
-            return $title . ' ' . get_string('occurredthisfinancialyear', 'totara_reportbuilder') .
-                $includenulls;
-        case 'lastfinancial':
-            return $title . ' ' . get_string('occurredprevfinancialyear', 'totara_reportbuilder') .
-                $includenulls;
-        default:
-            return 'Error with date content restriction';
+            case 'next30days':
+                return $title . ' ' . get_string('occurredafter', 'totara_reportbuilder') . ' ' .
+                    userdate(time(), '%c') . get_string('and', 'totara_reportbuilder') .
+                    get_string('occurredbefore', 'totara_reportbuilder') .
+                    userdate(time() + 60 * 60 * 24 * 30, '%c') . $includenulls;
+            case 'currentfinancial':
+                return $title . ' ' . get_string('occurredthisfinancialyear', 'totara_reportbuilder') .
+                    $includenulls;
+            case 'lastfinancial':
+                return $title . ' ' . get_string('occurredprevfinancialyear', 'totara_reportbuilder') .
+                    $includenulls;
+            default:
+                return 'Error with date content restriction';
         }
     }
 
@@ -184,7 +183,7 @@ class date extends base {
         $radiogroup[] =& $mform->createElement('radio', 'date_when', '',
             get_string('lastfinancial', 'totara_reportbuilder'), 'lastfinancial');
         $mform->addGroup($radiogroup, 'date_when_group',
-            get_string('includerecordsfrom', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
+            get_string('includerecordsfrom', 'totara_reportbuilder'), \html_writer::empty_tag('br'), false);
         $mform->setDefault('date_when', $when);
         $mform->disabledIf('date_when_group', 'contentenabled', 'eq', 0);
         $mform->disabledIf('date_when_group', 'date_enable', 'notchecked');
@@ -212,20 +211,17 @@ class date extends base {
         // enable checkbox option
         $enable = (isset($fromform->date_enable) &&
             $fromform->date_enable) ? 1 : 0;
-        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE,
-            'enable', $enable);
+        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE, 'enable', $enable);
 
         // when radio option
         $when = isset($fromform->date_when) ?
             $fromform->date_when : 0;
-        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE,
-            'when', $when);
+        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE, 'when', $when);
 
         // include nulls checkbox option
         $incnulls = (isset($fromform->date_incnulls) &&
             $fromform->date_incnulls) ? 1 : 0;
-        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE,
-            'incnulls', $incnulls);
+        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE, 'incnulls', $incnulls);
 
         return $status;
     }

@@ -36,7 +36,6 @@ require_once($CFG->libdir . '/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_source.php');
-require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_embedded.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_join.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_column.php');
@@ -2801,7 +2800,7 @@ class reportbuilder {
         if (isset($this->contentoptions) && is_array($this->contentoptions)) {
             foreach ($this->contentoptions as $option) {
                 $name = $option->classname;
-                $classname = 'rb_' . $name . '_content';
+                $classname = '\totara_reportbuilder\rb\content\\' . $name;
                 $settingname = $name . '_content';
 
                 $fields = array();
@@ -2877,7 +2876,7 @@ class reportbuilder {
         if (isset($this->contentoptions) && is_array($this->contentoptions)) {
             foreach ($this->contentoptions as $option) {
                 $name = $option->classname;
-                $classname = 'rb_' . $name . '_content';
+                $classname = '\totara_reportbuilder\rb\content\\' . $name;
                 $settingname = $name . '_content';
 
                 if (class_exists($classname) && method_exists($classname, 'sql_hierarchy_restriction')) {
@@ -2923,7 +2922,7 @@ class reportbuilder {
         if ($this->contentmode != REPORT_BUILDER_CONTENT_MODE_NONE) {
             foreach ($this->contentoptions as $option) {
                 $name = $option->classname;
-                $classname = 'rb_' . $name . '_content';
+                $classname = '\totara_reportbuilder\rb\content\\' . $name;
                 $settingname = $name . '_content';
                 $title = $option->title;
                 if (class_exists($classname)) {
@@ -3136,7 +3135,7 @@ class reportbuilder {
         $contentjoins = array();
         foreach ($this->contentoptions as $option) {
             $name = $option->classname;
-            $classname = 'rb_' . $name . '_content';
+            $classname = '\totara_reportbuilder\rb\content\\' . $name;
             if (class_exists($classname)) {
                 // @TODO take settings form instance, not database, otherwise caching will fail after content settings change
                 if (reportbuilder::get_setting($reportid, $name . '_content', 'enable')) {
@@ -3168,7 +3167,7 @@ class reportbuilder {
         if (isset($this->contentoptions) && is_array($this->contentoptions)) {
             foreach ($this->contentoptions as $option) {
                 $name = $option->classname;
-                $classname = 'rb_' . $name . '_content';
+                $classname = '\totara_reportbuilder\rb\content\\' . $name;
                 $settingname = $name . '_content';
                 if (class_exists($classname)) {
                     if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
@@ -6771,10 +6770,10 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
         }
         // Add content restrictions.
         foreach ($embed->contentsettings as $option => $settings) {
-            $classname = $option . '_content';
-            if (class_exists('rb_' . $classname)) {
+            $classname = '\totara_reportbuilder\rb\content\\' . $option;
+            if (class_exists($classname)) {
                 foreach ($settings as $name => $value) {
-                    if (!reportbuilder::update_setting($newid, $classname, $name, $value)) {
+                    if (!reportbuilder::update_setting($newid, $classname::TYPE, $name, $value)) {
                             throw new moodle_exception('Error inserting content restrictions');
                         }
                 }

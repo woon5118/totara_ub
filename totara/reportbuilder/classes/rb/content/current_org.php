@@ -242,7 +242,7 @@ class current_org extends base {
         $radiogroup[] =& $mform->createElement('radio', 'current_org_recursive',
             '', get_string('showrecordsbeloworgonly', 'totara_reportbuilder'), self::CONTENT_ORG_BELOW);
         $mform->addGroup($radiogroup, 'current_org_recursive_group',
-            get_string('includechildorgs', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
+            get_string('includechildorgs', 'totara_reportbuilder'), \html_writer::empty_tag('br'), false);
         $mform->setDefault('current_org_recursive', $recursive);
         $mform->disabledIf('current_org_recursive_group', 'contentenabled',
             'eq', 0);

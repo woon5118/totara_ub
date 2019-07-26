@@ -121,7 +121,7 @@ function reportbuilder_update_content($id, $report, $fromform) {
 
     // pass form data to content class for processing
     foreach ($contentoptions as $option) {
-        $classname = 'rb_' . $option->classname . '_content';
+        $classname = '\totara_reportbuilder\rb\content\\' . $option->classname;
         if (!class_exists($classname)) {
             throw new coding_exception("The content class '{$classname}' does not exist");
         }

@@ -52,14 +52,13 @@ class report_access extends base {
 
         $params = [];
         $norestriction = [" 1=1 ", $params]; // No restrictions.
-        $restriction   = [" 1=0 ", $params]; // Restrictions.
 
         $enable = \reportbuilder::get_setting($reportid, self::TYPE, 'enable');
         if (!$enable) {
             return $norestriction;
         }
 
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
         $manageuserreports = has_capability('totara/reportbuilder:managereports', $syscontext);
         $manageembeddedreports = has_capability('totara/reportbuilder:manageembeddedreports', $syscontext);
         // If you can manage both user and embedded reports we know you can see all reports.

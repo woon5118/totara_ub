@@ -30,7 +30,6 @@ $renamedclasses = [
     'rb_current_org_content' => \totara_reportbuilder\rb\content\current_org::class,
     'rb_current_pos_content' => \totara_reportbuilder\rb\content\current_pos::class,
     'rb_date_content' => \totara_reportbuilder\rb\content\date::class,
-    'rb_prog_availablity' => \totara_reportbuilder\rb\content\availability::class,
     'rb_report_access_content' => \totara_reportbuilder\rb\content\report_access::class,
     'rb_session_roles_content' => \totara_reportbuilder\rb\content\session_roles::class,
     'rb_tag_content' => \totara_reportbuilder\rb\content\tag::class,

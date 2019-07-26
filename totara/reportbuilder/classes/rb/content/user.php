@@ -44,9 +44,7 @@ class user extends base {
      * @return array containing SQL snippet to be used in a WHERE clause, as well as array of SQL params
      */
     public function sql_restriction($field, $reportid) {
-        global $CFG, $DB;
-
-        $userid = $this->reportfor;
+        global $DB;
 
         $settings = \reportbuilder::get_all_settings($reportid, self::TYPE);
         $restriction = isset($settings['who']) ? $settings['who'] : null;
@@ -194,7 +192,7 @@ class user extends base {
         $mform->setType('user_who['.self::USER_TEMP_REPORTS.']', PARAM_INT);
 
         $mform->addGroup($checkgroup, 'user_who_group',
-            get_string('includeuserrecords', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
+            get_string('includeuserrecords', 'totara_reportbuilder'), \html_writer::empty_tag('br'), false);
         $usergroups = array(self::USER_OWN, self::USER_DIRECT_REPORTS, self::USER_INDIRECT_REPORTS, self::USER_TEMP_REPORTS);
         foreach ($usergroups as $usergroup) {
             // Bitwise comparison.

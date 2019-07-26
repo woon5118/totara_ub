@@ -40,8 +40,6 @@ class totara_reportbuilder_admin_settings_cohort_select extends admin_setting_co
      * Lazy-load the available choices for the select box
      */
     public function load_choices() {
-        global $CFG;
-
         if (is_array($this->choices)) {
             return true;
         }
@@ -50,5 +48,4 @@ class totara_reportbuilder_admin_settings_cohort_select extends admin_setting_co
 
         return true;
     }
-
 }

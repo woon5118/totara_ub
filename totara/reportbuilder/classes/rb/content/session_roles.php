@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Oleg Demeshev <oleg.demeshev@totaralms.com>
- * @package totara
- * @subpackage reportbuilder
+ * @package totara_reportbuilder
  */
 
 namespace totara_reportbuilder\rb\content;
@@ -125,7 +124,7 @@ class session_roles extends base {
         $ids = array_intersect($userroles, $allowedroles);
         $rolelocalnames = role_fix_names(array_flip($ids), null, ROLENAME_ORIGINAL, true);
 
-        $a = new stdClass();
+        $a = new \stdClass();
         $a->rolelocalnames = implode(', ', array_values($rolelocalnames));
         $a->title = $title;
         $a->userfullname = fullname($user);
@@ -164,7 +163,7 @@ class session_roles extends base {
 
         }
         $mform->addGroup($checkgroup, 'session_roles_group',
-            get_string('includesessionroles', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
+            get_string('includesessionroles', 'totara_reportbuilder'), \html_writer::empty_tag('br'), false);
 
         foreach ($this->cfgsessionroles as $rolegroup) {
             if (in_array($rolegroup, $roles)) {

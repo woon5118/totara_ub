@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara
- * @subpackage reportbuilder
+ * @package totara_reportbuilder
  */
 
 namespace totara_reportbuilder\rb\content;
@@ -137,7 +136,7 @@ class trainer extends base {
         $radiogroup[] =& $mform->createElement('radio', 'trainer_who', '',
             get_string('both', 'totara_reportbuilder'), 'ownandreports');
         $mform->addGroup($radiogroup, 'trainer_who_group',
-            get_string('includetrainerrecords', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
+            get_string('includetrainerrecords', 'totara_reportbuilder'), \html_writer::empty_tag('br'), false);
         $mform->setDefault('trainer_who', $who);
         $mform->disabledIf('trainer_who_group', 'contentenabled', 'eq', 0);
         $mform->disabledIf('trainer_who_group', 'trainer_enable', 'notchecked');

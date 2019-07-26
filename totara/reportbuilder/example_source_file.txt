@@ -103,7 +103,7 @@ class rb_source_[source_name] extends rb_base_source {
         $contentoptions = array(
             /*
             // array of rb_content_option objects, e.g:
-            // see classes/rb_base_content.php for some you can use
+            // see classes in classes/rb/content for some you can use
             new rb_content_option(
                 '',     // class name
                 '',     // title
