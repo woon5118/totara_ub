@@ -26,6 +26,9 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+use totara_reportbuilder\rb\content\current_pos;
+use totara_reportbuilder\rb\content\current_org;
+
 /**
  * @group totara_reportbuilder
  */
@@ -199,13 +202,13 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
         reportbuilder::update_setting($this->reportid, 'current_pos_content', 'recursive', 0); //CONTENT_POS_EQUAL
 
         // Admin shouldn't see anyone.
-        $content = new rb_current_pos_content($USER->id);
+        $content = new current_pos($USER->id);
         list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
         $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
         $this->assertEquals(0, count($results));
 
         foreach ($this->hierarchy as $top => $team) {
-            $content = new rb_current_pos_content($top);
+            $content = new current_pos($top);
             list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
             $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
             $this->assertEquals(3, count($results));
@@ -217,7 +220,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
             }
 
             foreach ($team as $mid => $staff) {
-                $content = new rb_current_pos_content($mid);
+                $content = new current_pos($mid);
                 list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                 $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                 $this->assertEquals(3, count($results));
@@ -229,7 +232,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                 }
 
                 foreach ($staff as $sub) {
-                    $content = new rb_current_pos_content($sub);
+                    $content = new current_pos($sub);
                     list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                     $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                     $this->assertEquals(3, count($results));
@@ -251,7 +254,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
         reportbuilder::update_setting($this->reportid, 'current_pos_content', 'recursive', 1); //CONTENT_POS_EQUALANDBELOW
 
         // Admin shouldn't see anyone.
-        $content = new rb_current_pos_content($USER->id);
+        $content = new current_pos($USER->id);
         list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
         $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
         $this->assertEquals(0, count($results));
@@ -270,7 +273,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                 $expected = $this->positions['path200'];
             }
 
-            $content = new rb_current_pos_content($top);
+            $content = new current_pos($top);
             list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
             $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
             $this->assertEquals(count($expected), count($results));
@@ -289,7 +292,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                     $expected = $this->positions['path120'];
                 }
 
-                $content = new rb_current_pos_content($mid);
+                $content = new current_pos($mid);
                 list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                 $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                 $this->assertEquals(count($expected), count($results));
@@ -298,7 +301,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                 }
 
                 foreach ($staff as $sub) {
-                    $content = new rb_current_pos_content($sub);
+                    $content = new current_pos($sub);
                     list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                     $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                     $this->assertEquals(3, count($results));
@@ -329,7 +332,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                     $this->positions['path112']
                 );
             }
-            $content = new rb_current_pos_content($top);
+            $content = new current_pos($top);
             list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
             $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
             $this->assertEquals(count($expected), count($results));
@@ -345,7 +348,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                         $this->positions['path112']
                     );
                 }
-                $content = new rb_current_pos_content($mid);
+                $content = new current_pos($mid);
                 list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                 $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                 $this->assertEquals(count($expected), count($results));
@@ -354,7 +357,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                 }
 
                 foreach ($staff as $sub => $users) {
-                    $content = new rb_current_pos_content($sub);
+                    $content = new current_pos($sub);
                     list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                     $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                     $this->assertEquals(0, count($results));
@@ -370,13 +373,13 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
         reportbuilder::update_setting($this->reportid, 'current_org_content', 'recursive', 0); //CONTENT_org_EQUAL
 
         // Admin shouldn't see anyone.
-        $content = new rb_current_org_content($USER->id);
+        $content = new current_org($USER->id);
         list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
         $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
         $this->assertEquals(0, count($results));
 
         foreach ($this->hierarchy as $top => $team) {
-            $content = new rb_current_org_content($top);
+            $content = new current_org($top);
             list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
             $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
             $this->assertEquals(3, count($results));
@@ -388,7 +391,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
             }
 
             foreach ($team as $mid => $staff) {
-                $content = new rb_current_org_content($mid);
+                $content = new current_org($mid);
                 list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                 $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                 $this->assertEquals(3, count($results));
@@ -400,7 +403,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                 }
 
                 foreach ($staff as $sub) {
-                    $content = new rb_current_org_content($sub);
+                    $content = new current_org($sub);
                     list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                     $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                     $this->assertEquals(3, count($results));
@@ -422,7 +425,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
         reportbuilder::update_setting($this->reportid, 'current_org_content', 'recursive', 1); //CONTENT_org_EQUALANDBELOW
 
         // Admin shouldn't see anyone.
-        $content = new rb_current_org_content($USER->id);
+        $content = new current_org($USER->id);
         list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
         $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
         $this->assertEquals(0, count($results));
@@ -441,7 +444,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                 $expected = $this->organisations['path200'];
             }
 
-            $content = new rb_current_org_content($top);
+            $content = new current_org($top);
             list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
             $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
             $this->assertEquals(count($expected), count($results));
@@ -460,7 +463,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                     $expected = $this->organisations['path120'];
                 }
 
-                $content = new rb_current_org_content($mid);
+                $content = new current_org($mid);
                 list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                 $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                 $this->assertEquals(count($expected), count($results));
@@ -469,7 +472,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                 }
 
                 foreach ($staff as $sub) {
-                    $content = new rb_current_org_content($sub);
+                    $content = new current_org($sub);
                     list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                     $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                     $this->assertEquals(3, count($results));
@@ -500,7 +503,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                     $this->organisations['path112']
                 );
             }
-            $content = new rb_current_org_content($top);
+            $content = new current_org($top);
             list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
             $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
             $this->assertEquals(count($expected), count($results));
@@ -516,7 +519,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                         $this->organisations['path112']
                     );
                 }
-                $content = new rb_current_org_content($mid);
+                $content = new current_org($mid);
                 list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                 $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                 $this->assertEquals(count($expected), count($results));
@@ -525,7 +528,7 @@ class totara_rb_content_restrictions_testcase extends advanced_testcase {
                 }
 
                 foreach ($staff as $sub => $users) {
-                    $content = new rb_current_org_content($sub);
+                    $content = new current_org($sub);
                     list($contentsql, $params) = $content->sql_restriction('base.id', $this->reportid);
                     $results = $DB->get_records_sql($this->wrapper . $contentsql, $params);
                     $this->assertEquals(0, count($results));

@@ -28,7 +28,6 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
-require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
 
 /**
  * @group totara_reportbuilder
@@ -55,7 +54,7 @@ class totara_reportbuilder_rb_team_members_embedded_cache_testcase extends repor
 
     protected $report_builder_settings_data = array(
         array('id' => 5, 'reportid' => 17, 'type' => 'user_content', 'name' => 'enable', 'value' => '1'),
-        array('id' => 6, 'reportid' => 17, 'type' => 'user_content',  'name' => 'who', 'value' => rb_user_content::USER_DIRECT_REPORTS)
+        array('id' => 6, 'reportid' => 17, 'type' => 'user_content',  'name' => 'who', 'value' => \totara_reportbuilder\rb\content\user::USER_DIRECT_REPORTS)
     );
 
     // Work data

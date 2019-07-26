@@ -28,17 +28,22 @@
  * that can be used by any report builder source
  *
  * Defines the properties and methods required by content restrictions
+ *
+ * @deprecated Since 13.0
  */
 abstract class rb_base_content {
 
     public $reportfor;
 
     /*
+     * @deprecated Since 13.0
      * @param integer $reportfor User ID to determine who the report is for
      *                           Typically this will be $USER->id, except
      *                           in the case of scheduled reports run by cron
      */
     public function __construct($reportfor=null) {
+        debugging('rb_base_content has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\base instead', DEBUG_DEVELOPER);
+
         $this->reportfor = $reportfor;
     }
 
@@ -59,6 +64,8 @@ abstract class rb_base_content {
  * Restrict content by a position ID
  *
  * Pass in an integer that represents the position ID
+ *
+ * @deprecated Since 13.0
  */
 class rb_current_pos_content extends rb_base_content {
 
@@ -70,6 +77,7 @@ class rb_current_pos_content extends rb_base_content {
     /**
      * Generate the SQL to apply this content restriction
      *
+     * @deprecated Since 13.0
      * @param string $field SQL field to apply the restriction against
      * @param integer $reportid ID of the report
      *
@@ -77,6 +85,8 @@ class rb_current_pos_content extends rb_base_content {
      */
     public function sql_restriction($field, $reportid) {
         global $DB;
+
+        debugging('rb_current_pos_content::sql_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_pos::sql_restriction instead', DEBUG_DEVELOPER);
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -140,9 +150,12 @@ class rb_current_pos_content extends rb_base_content {
     /**
      * Return hierarchy prefix to which this restriction applies
      *
+     * @deprecated Since 13.0
      * @return string Hierarchy prefix
      */
     public function sql_hierarchy_restriction_prefix() {
+        debugging('rb_current_pos_content::sql_hiearachy_restriction_prefix has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_pos::sql_hierarchy_restriction_prefix instead', DEBUG_DEVELOPER);
+
         return 'pos';
     }
 
@@ -153,6 +166,7 @@ class rb_current_pos_content extends rb_base_content {
      * NOTE: always return parent categories even if user is not allowed to see data from them,
      *       this is necessary for trees in dialogs.
      *
+     * @deprecated Since 13.0
      * @param string $field position id SQL field to apply the restriction against
      * @param integer $reportid ID of the report
      *
@@ -160,6 +174,8 @@ class rb_current_pos_content extends rb_base_content {
      */
     public function sql_hierarchy_restriction($field, $reportid) {
         global $DB;
+
+        debugging('rb_current_pos_content::sql_hiearachy_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_pos::sql_hierarchy_restriction instead', DEBUG_DEVELOPER);
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -219,6 +235,7 @@ class rb_current_pos_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
+     * @deprecated Since 13.0
      * @param string $title Name of the field being restricted
      * @param integer $reportid ID of the report
      *
@@ -226,6 +243,8 @@ class rb_current_pos_content extends rb_base_content {
      */
     public function text_restriction($title, $reportid) {
         global $DB;
+
+        debugging('rb_current_pos_content::text_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_pos::text_restriction instead', DEBUG_DEVELOPER);
 
         $userid = $this->reportfor;
 
@@ -252,11 +271,15 @@ class rb_current_pos_content extends rb_base_content {
     /**
      * Adds form elements required for this content restriction's settings page
      *
+     * @deprecated Since 13.0
      * @param object &$mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
     public function form_template(&$mform, $reportid, $title) {
+
+        debugging('rb_current_pos_content::form_template has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_pos::form_template instead', DEBUG_DEVELOPER);
+
         // get current settings
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -288,12 +311,16 @@ class rb_current_pos_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
+     * @deprecated Since 13.0
      * @param integer $reportid ID of the report to process
      * @param object $fromform Moodle form data received via form submission
      *
      * @return boolean True if form was successfully processed
      */
     public function form_process($reportid, $fromform) {
+
+        debugging('rb_current_pos_content::form_process has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_pos::form_process instead', DEBUG_DEVELOPER);
+
         $status = true;
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -320,6 +347,8 @@ class rb_current_pos_content extends rb_base_content {
  * Restrict content by an organisation ID
  *
  * Pass in an integer that represents the organisation ID
+ *
+ * @deprecated Since 13.0
  */
 class rb_current_org_content extends rb_base_content {
 
@@ -338,6 +367,8 @@ class rb_current_org_content extends rb_base_content {
      */
     public function sql_restriction($field, $reportid) {
         global $DB;
+
+        debugging('rb_current_org_content::sql_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_org::sql_restriction instead', DEBUG_DEVELOPER);
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -401,9 +432,13 @@ class rb_current_org_content extends rb_base_content {
     /**
      * Return hierarchy prefix to which this restriction applies
      *
+     * @deprecated Since 13.0
      * @return string Hierarchy prefix
      */
     public function sql_hierarchy_restriction_prefix() {
+
+        debugging('rb_current_org_content::sql_hierarchy_restriction_prefix has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_org::sql_hierarchy_restriction_prefix instead', DEBUG_DEVELOPER);
+
         return 'org';
     }
 
@@ -414,6 +449,7 @@ class rb_current_org_content extends rb_base_content {
      * NOTE: always return parent categories even if user is not allowed to see data from them,
      *       this is necessary for trees in dialogs.
      *
+     * @deprecated Since 13.0
      * @param string $field organisation id SQL field to apply the restriction against
      * @param integer $reportid ID of the report
      *
@@ -421,6 +457,8 @@ class rb_current_org_content extends rb_base_content {
      */
     public function sql_hierarchy_restriction($field, $reportid) {
         global $DB;
+
+        debugging('rb_current_org_content::sql_hierarchy_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_org::sql_hierarchy_restriction instead', DEBUG_DEVELOPER);
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -480,6 +518,7 @@ class rb_current_org_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
+     * @deprecated Since 13.0
      * @param string $title Name of the field being restricted
      * @param integer $reportid ID of the report
      *
@@ -487,6 +526,8 @@ class rb_current_org_content extends rb_base_content {
      */
     public function text_restriction($title, $reportid) {
         global $DB;
+
+        debugging('rb_current_org_content::text_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_org::text_restriction instead', DEBUG_DEVELOPER);
 
         $userid = $this->reportfor;
 
@@ -514,11 +555,15 @@ class rb_current_org_content extends rb_base_content {
     /**
      * Adds form elements required for this content restriction's settings page
      *
+     * @deprecated Since 13.0
      * @param object &$mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
     public function form_template(&$mform, $reportid, $title) {
+
+        debugging('rb_current_org_content::form_template had been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_org::form_template instead', DEBUG_DEVELOPER);
+
         // get current settings
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -553,12 +598,16 @@ class rb_current_org_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
+     * @deprecated Since 13.0
      * @param integer $reportid ID of the report to process
      * @param object $fromform Moodle form data received via form submission
      *
      * @return boolean True if form was successfully processed
      */
     public function form_process($reportid, $fromform) {
+
+        debugging('rb_current_org_content::form_process has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\current_org::form_process instead', DEBUG_DEVELOPER);
+
         $status = true;
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -584,6 +633,8 @@ class rb_current_org_content extends rb_base_content {
  * Restrict content by an organisation at time of completion
  *
  * Pass in an integer that represents an organisation ID
+ *
+ * @deprecated Since 13.0
  */
 class rb_completed_org_content extends rb_base_content {
     const CONTENT_ORGCOMP_EQUAL = 0;
@@ -593,6 +644,7 @@ class rb_completed_org_content extends rb_base_content {
     /**
      * Generate the SQL to apply this content restriction
      *
+     * @deprecated Since 13.0
      * @param string $field SQL field to apply the restriction against
      * @param integer $reportid ID of the report
      *
@@ -602,6 +654,8 @@ class rb_completed_org_content extends rb_base_content {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
+
+        debugging('rb_completed_org_content::sql_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\completed_org::sql_restriction instead', DEBUG_DEVELOPER);
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -660,6 +714,7 @@ class rb_completed_org_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
+     * @deprecated Since 13.0
      * @param string $title Name of the field being restricted
      * @param integer $reportid ID of the report
      *
@@ -667,6 +722,8 @@ class rb_completed_org_content extends rb_base_content {
      */
     public function text_restriction($title, $reportid) {
         global $DB;
+
+        debugging('rb_completed_org_content::text_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\completed_org::text_restriction instead', DEBUG_DEVELOPER);
 
         $userid = $this->reportfor;
 
@@ -699,11 +756,13 @@ class rb_completed_org_content extends rb_base_content {
     /**
      * Adds form elements required for this content restriction's settings page
      *
+     * @deprecated Since 13.0
      * @param object &$mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
     public function form_template(&$mform, $reportid, $title) {
+        debugging('rb_completed_org_content::form_template has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\completed_org::form_template instead', DEBUG_DEVELOPER);
         // get current settings
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -738,12 +797,14 @@ class rb_completed_org_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
+     * @deprecated Since 13.0
      * @param integer $reportid ID of the report to process
      * @param object $fromform Moodle form data received via form submission
      *
      * @return boolean True if form was successfully processed
      */
     public function form_process($reportid, $fromform) {
+        debugging('rb_completed_org_content::form_process has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\completed_org::form_process instead', DEBUG_DEVELOPER);
         $status = true;
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -767,6 +828,8 @@ class rb_completed_org_content extends rb_base_content {
 
 /*
  * Restrict content by a particular user or group of users
+ *
+ * @deprecated Since 13.0
  */
 class rb_user_content extends rb_base_content {
 
@@ -785,6 +848,8 @@ class rb_user_content extends rb_base_content {
      */
     public function sql_restriction($field, $reportid) {
         global $CFG, $DB;
+
+        debugging('rb_user_content::sql_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\user::sql_restriction instead', DEBUG_DEVELOPER);
 
         $userid = $this->reportfor;
 
@@ -860,6 +925,7 @@ class rb_user_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
+     * @deprecated Since 13.0
      * @param string $title Name of the field being restricted
      * @param integer $reportid ID of the report
      *
@@ -867,6 +933,8 @@ class rb_user_content extends rb_base_content {
      */
     public function text_restriction($title, $reportid) {
         global $DB;
+
+        debugging('rb_user_content::text_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\user::text_restriction instead', DEBUG_DEVELOPER);
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -906,11 +974,14 @@ class rb_user_content extends rb_base_content {
     /**
      * Adds form elements required for this content restriction's settings page
      *
+     * @deprecated Since 13.0
      * @param object &$mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
     public function form_template(&$mform, $reportid, $title) {
+
+        debugging('rb_user_content::form_template has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\user::form_template instead', DEBUG_DEVELOPER);
 
         // get current settings
         // remove rb_ from start of classname
@@ -957,12 +1028,16 @@ class rb_user_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
+     * @deprecated Since 13.0
      * @param integer $reportid ID of the report to process
      * @param object $fromform Moodle form data received via form submission
      *
      * @return boolean True if form was successfully processed
      */
     public function form_process($reportid, $fromform) {
+
+        debugging('rb_user_content::text_process has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\user::form_process instead', DEBUG_DEVELOPER);
+
         $status = true;
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -996,6 +1071,8 @@ class rb_user_content extends rb_base_content {
  * Restrict content by a particular date
  *
  * Pass in an integer that contains a unix timestamp
+ *
+ * @deprecated Since 13.0
  */
 class rb_date_content extends rb_base_content {
     /**
@@ -1008,6 +1085,9 @@ class rb_date_content extends rb_base_content {
      */
     public function sql_restriction($field, $reportid) {
         global $DB;
+
+        debugging('rb_date_content::sql_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\date::sql_restriction instead', DEBUG_DEVELOPER);
+
         $now = time();
         $financialyear = get_config('reportbuilder', 'financialyear');
         $month = substr($financialyear, 2, 2);
@@ -1074,12 +1154,15 @@ class rb_date_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
+     * @deprecated Since 13.0
      * @param string $title Name of the field being restricted
      * @param integer $reportid ID of the report
      *
      * @return string Human readable description of the restriction
      */
     public function text_restriction($title, $reportid) {
+
+        debugging('rb_date_content::text_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\date::text_restriction instead', DEBUG_DEVELOPER);
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -1122,11 +1205,15 @@ class rb_date_content extends rb_base_content {
     /**
      * Adds form elements required for this content restriction's settings page
      *
+     * @deprecated Since 13.0
      * @param object &$mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
     public function form_template(&$mform, $reportid, $title) {
+
+        debugging('rb_date_content::form_template has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\date::form_template instead', DEBUG_DEVELOPER);
+
         // get current settings
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -1173,12 +1260,16 @@ class rb_date_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
+     * @deprecated Since 13.0
      * @param integer $reportid ID of the report to process
      * @param object $fromform Moodle form data received via form submission
      *
      * @return boolean True if form was successfully processed
      */
     public function form_process($reportid, $fromform) {
+
+        debugging('rb_date_content::form_process has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\date::form_process instead', DEBUG_DEVELOPER);
+
         $status = true;
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -1210,11 +1301,14 @@ class rb_date_content extends rb_base_content {
  * Restrict content by offical tags
  *
  * Pass in a column that contains a pipe '|' separated list of official tag ids
+ *
+ * @deprecated Since 13.0
  */
 class rb_tag_content extends rb_base_content {
     /**
      * Generate the SQL to apply this content restriction
      *
+     * @deprecated Since 13.0
      * @param string $field SQL field to apply the restriction against
      * @param integer $reportid ID of the report
      *
@@ -1222,6 +1316,8 @@ class rb_tag_content extends rb_base_content {
      */
     public function sql_restriction($field, $reportid) {
         global $DB;
+
+        debugging('rb_tag_content::sql_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\tag::sql_restriction instead', DEBUG_DEVELOPER);
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -1318,6 +1414,7 @@ class rb_tag_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
+     * @deprecated Since 13.0
      * @param string $title Name of the field being restricted
      * @param integer $reportid ID of the report
      *
@@ -1325,6 +1422,8 @@ class rb_tag_content extends rb_base_content {
      */
     public function text_restriction($title, $reportid) {
         global $DB;
+
+        debugging('rb_tag_content::text_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\tag::text_restriction instead', DEBUG_DEVELOPER);
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -1381,12 +1480,15 @@ class rb_tag_content extends rb_base_content {
     /**
      * Adds form elements required for this content restriction's settings page
      *
+     * @deprecated Since 13.0
      * @param object &$mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
     public function form_template(&$mform, $reportid, $title) {
         global $DB;
+
+        debugging('rb_tag_content::form_template has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\tag::form_template instead', DEBUG_DEVELOPER);
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -1465,6 +1567,7 @@ class rb_tag_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
+     * @deprecated Since 13.0
      * @param integer $reportid ID of the report to process
      * @param object $fromform Moodle form data received via form submission
      *
@@ -1472,6 +1575,8 @@ class rb_tag_content extends rb_base_content {
      */
     public function form_process($reportid, $fromform) {
         global $DB;
+
+        debugging('rb_tag_content::form_process has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\tag::form_process instead', DEBUG_DEVELOPER);
 
         $status = true;
         // remove the rb_ from class

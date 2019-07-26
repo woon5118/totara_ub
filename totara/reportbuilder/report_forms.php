@@ -27,7 +27,6 @@
  */
 
 require_once "$CFG->dirroot/lib/formslib.php";
-include_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
@@ -1031,7 +1030,7 @@ class report_builder_edit_content_form extends moodleform {
             // display any content restriction form sections that are enabled for
             // this source
             foreach ($contentoptions as $option) {
-                $classname = 'rb_' . $option->classname.'_content';
+                $classname = '\totara_reportbuilder\rb\content\\' . $option->classname;
                 if (class_exists($classname)) {
                     $obj = new $classname();
                     $obj->form_template($mform, $id, $option->title);

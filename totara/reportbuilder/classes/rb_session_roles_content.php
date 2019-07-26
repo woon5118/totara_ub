@@ -25,6 +25,8 @@
 /**
  * Restrict content by the session roles
  * Pass in an integer list that represents the session role ids
+ *
+ * @deprecated Since 13.0
  */
 class rb_session_roles_content extends rb_base_content {
 
@@ -36,6 +38,8 @@ class rb_session_roles_content extends rb_base_content {
     public function __construct($reportfor = null) {
         global $CFG;
 
+        debugging('rb_session_roles_content::__construct has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\session_roles instead', DEBUG_DEVELOPER);
+
         $this->cfgsessionroles = array();
         if (!empty($CFG->facetoface_session_roles)) {
             $this->cfgsessionroles = explode(',', $CFG->facetoface_session_roles);
@@ -46,6 +50,7 @@ class rb_session_roles_content extends rb_base_content {
     /**
      * Generate the SQL to apply this content restriction
      *
+     * @deprecated Since 13.0
      * @param string $field SQL field to apply the restriction against
      * @param integer $reportid ID of the report
      *
@@ -53,6 +58,8 @@ class rb_session_roles_content extends rb_base_content {
      */
     public function sql_restriction($field, $reportid) {
         global $DB;
+
+        debugging('rb_session_roles_content::sql_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\session_roles::sql_restriction instead', DEBUG_DEVELOPER);
 
         $params = array();
         $norestriction = array(" 1=1 ", $params); // No restrictions.
@@ -102,6 +109,7 @@ class rb_session_roles_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
+     * @deprecated Since 13.0
      * @param string $title Name of the field being restricted
      * @param integer $reportid ID of the report
      *
@@ -109,6 +117,8 @@ class rb_session_roles_content extends rb_base_content {
      */
     public function text_restriction($title, $reportid) {
         global $DB;
+
+        debugging('rb_session_roles_content::text_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\session_roles::text_restriction instead', DEBUG_DEVELOPER);
 
         $type = substr(get_class($this), 3);
         $values = reportbuilder::get_setting($reportid, $type, 'roles');
@@ -133,11 +143,14 @@ class rb_session_roles_content extends rb_base_content {
     /**
      * Adds form elements required for this content restriction's settings page
      *
+     * @deprecated Since 13.0
      * @param object &$mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
     public function form_template(&$mform, $reportid, $title) {
+
+        debugging('rb_session_roles_content::form_template has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\session_roles::form_template instead', DEBUG_DEVELOPER);
 
         if (empty($this->cfgsessionroles)) {
             return;
@@ -178,12 +191,15 @@ class rb_session_roles_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
+     * @deprecated Since 13.0
      * @param integer $reportid ID of the report to process
      * @param object $fromform Moodle form data received via form submission
      *
      * @return boolean True if form was successfully processed
      */
     public function form_process($reportid, $fromform) {
+
+        debugging('rb_session_roles_content::form_process has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\session_roles::form_process instead', DEBUG_DEVELOPER);
 
         $status = true;
         $type = substr(get_class($this), 3);

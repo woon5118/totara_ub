@@ -21,17 +21,18 @@
  * @package totara_reportbuilder
  */
 
+namespace totara_reportbuilder\rb\content;
+
 /*
  * Restrict the report content by a particular audience
- *
- * @deprecated Since 13.0
  */
-final class rb_audience_content extends rb_base_content {
+final class audience extends base {
+
+    const TYPE = 'audience_content';
 
     /**
      * Generate the SQL to apply this content restriction
      *
-     * @deprecated Since 13.0
      * @param string  $field    SQL field to apply the restriction against
      * @param integer $reportid ID of the report
      *
@@ -39,10 +40,7 @@ final class rb_audience_content extends rb_base_content {
      */
     public function sql_restriction($field, $reportid) {
 
-        debugging('rb_audience_content::sql_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\audience::sql_restriction instead', DEBUG_DEVELOPER);
-
-        $type = $this->get_type();
-        $settings = reportbuilder::get_all_settings($reportid, $type);
+        $settings = \reportbuilder::get_all_settings($reportid, self::TYPE);
         $cohortid = $settings['audience'] ?? 0;
 
         $restriction = " 1=1 ";
@@ -51,8 +49,8 @@ final class rb_audience_content extends rb_base_content {
         if (!empty($cohortid)) {
             $restriction = "(EXISTS (SELECT 1
                                        FROM {cohort_members} cm
-                                       WHERE 
-                                         cm.userid = {$field} 
+                                       WHERE
+                                         cm.userid = {$field}
                                          AND cm.cohortid = :audiencecontentaudienceid
                                      ))";
             $params = ['audiencecontentaudienceid' => $cohortid];
@@ -64,30 +62,24 @@ final class rb_audience_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
-     * @deprecated Since 13.0
      * @param string  $title    Name of the field being restricted
      * @param integer $reportid ID of the report
      *
      * @return string Human readable description of the restriction
      */
     public function text_restriction($title, $reportid) {
-        debugging('rb_audience_content::text_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\audience::text_restriction instead', DEBUG_DEVELOPER);
-
         return get_string('reportbuilderaudience', 'totara_reportbuilder');
     }
 
     /**
      * Adds form elements required for this content restriction's settings page
      *
-     * @deprecated Since 13.0
      * @param object  &$mform   Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string  $title    Name of the field the restriction is acting on
      */
     public function form_template(&$mform, $reportid, $title) {
         global $OUTPUT;
-
-        debugging('rb_audience_content::form_template has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\audience::form_template instead', DEBUG_DEVELOPER);
 
         $mform->addElement(
             'header', 'user_audience_header',
@@ -96,9 +88,8 @@ final class rb_audience_content extends rb_base_content {
         $mform->setExpanded('user_audience_header');
 
         if ($this->has_audience_capability()) {
-            $type = $this->get_type();
-            $cohortid = reportbuilder::get_setting($reportid, $type, 'audience');
-            $enable = reportbuilder::get_setting($reportid, $type, 'enable');
+            $cohortid = \reportbuilder::get_setting($reportid, self::TYPE, 'audience');
+            $enable = \reportbuilder::get_setting($reportid, self::TYPE, 'enable');
 
             $mform->addElement(
                 'checkbox', 'user_audience_enable', '',
@@ -115,7 +106,7 @@ final class rb_audience_content extends rb_base_content {
             $mform->disabledIf('user_audience', 'user_audience_enable', 'notchecked');
             $mform->disabledIf('user_audience_enable', 'contentenabled', 'eq', 0);
         } else {
-            $settings = reportbuilder::get_all_settings($reportid, $this->get_type());
+            $settings = \reportbuilder::get_all_settings($reportid, self::TYPE);
             $cohortid = $settings['audience'] ?? 0;
 
             $warning = get_string('reportbuilderaudiencenopermission', 'totara_reportbuilder');
@@ -133,7 +124,6 @@ final class rb_audience_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
-     * @deprecated Since 13.0
      * @param integer $reportid ID of the report to process
      * @param object  $fromform Moodle form data received via form submission
      *
@@ -141,10 +131,7 @@ final class rb_audience_content extends rb_base_content {
      */
     public function form_process($reportid, $fromform) {
 
-        debugging('rb_audience_content::form_process has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\audience::form_process instead', DEBUG_DEVELOPER);
-
         if ($this->has_audience_capability()) {
-            $type = $this->get_type();
 
             $audience = $fromform->user_audience ?? 0;
             $audienceenable = $fromform->user_audience_enable ?? 0;
@@ -154,68 +141,47 @@ final class rb_audience_content extends rb_base_content {
                 throw new moodle_exception('noaudienceselected', 'totara_reportbuilder', $link);
             }
 
-            reportbuilder::update_setting($reportid, $type, 'audience', $audience);
-            reportbuilder::update_setting($reportid, $type, 'enable', $audienceenable);
+            \reportbuilder::update_setting($reportid, self::TYPE, 'audience', $audience);
+            \reportbuilder::update_setting($reportid, self::TYPE, 'enable', $audienceenable);
         }
     }
 
     /**
      * Check audience capability
      *
-     * @deprecated Since 13.0
      * @return bool
      */
     private function has_audience_capability(): bool {
-        debugging('rb_audience_content::has_audience_capability has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\audience::has_audience_capability instead', DEBUG_DEVELOPER);
-
         return has_capability("moodle/cohort:view", context_system::instance());
-    }
-
-    /**
-     * @deprecated Since 13.0
-     * @return string
-     */
-    private function get_type(): string {
-        debugging('rb_audience_content::get_type has been deprecated since Totara 13.0 use self::TYPE instead', DEBUG_DEVELOPER);
-        // remove rb_ from start of classname
-        return substr(get_class($this), 3);
     }
 
     /**
      * Update default audience restrictions
      *
-     * @deprecated Since 13.0
      * @param int $reportid
      * @param int $cohortid
      */
     public function set_default_restriction(int $reportid, int $cohortid) {
         global $DB;
 
-        debugging('rb_audience_content::set_default_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\audience::set_default_restriction instead', DEBUG_DEVELOPER);
-
-        $type = $this->get_type();
-
         // update content mode to ANY criteria
-        $report = new stdClass();
+        $report = new \stdClass();
         $report->id = $reportid;
         $report->contentmode = REPORT_BUILDER_CONTENT_MODE_ANY;
         $DB->update_record('report_builder', $report);
 
         // enable audience and update global settings
-        reportbuilder::update_setting($reportid, $type, 'audience', $cohortid);
-        reportbuilder::update_setting($reportid, $type, 'enable', 1);
+        \reportbuilder::update_setting($reportid, self::TYPE, 'audience', $cohortid);
+        \reportbuilder::update_setting($reportid, self::TYPE, 'enable', 1);
     }
 
     /**
      * get all options for an audience/cohort select box
      *
-     * @deprecated Since 13.0
      * @return array
      */
     public static function get_cohort_select_options(): array {
         global $DB;
-
-        debugging('rb_audience_content::get_cohort_select_options has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\audience::get_cohort_select_options instead', DEBUG_DEVELOPER);
 
         $sql = "SELECT * FROM {cohort} ORDER BY name ASC, idnumber ASC";
         $cohorts = $DB->get_records_sql($sql);

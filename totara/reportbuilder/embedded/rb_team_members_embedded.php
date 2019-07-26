@@ -25,6 +25,8 @@
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
 
+use totara_reportbuilder\rb\content\user;
+
 class rb_team_members_embedded extends rb_base_embedded {
 
     public $url, $source, $fullname, $filters, $columns;
@@ -79,7 +81,7 @@ class rb_team_members_embedded extends rb_base_embedded {
         $this->contentsettings = array(
             'user' => array(
                 'enable' => 1,
-                'who' => rb_user_content::USER_DIRECT_REPORTS + rb_user_content::USER_TEMP_REPORTS,
+                'who' => user::USER_DIRECT_REPORTS + user::USER_TEMP_REPORTS,
             )
         );
 

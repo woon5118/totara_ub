@@ -22,17 +22,19 @@
  * @subpackage reportbuilder
  */
 
+namespace totara_reportbuilder\rb\content;
+
 /**
  * Restrict content by a particular trainer or group of trainers
  * Pass in an integer that represents a trainer's moodle id
- *
- * @deprecated Since 13.0
  */
-class rb_trainer_content extends rb_base_content {
+class trainer extends base {
+
+    const TYPE = 'trainer_content';
+
     /**
      * Generate the SQL to apply this content restriction
      *
-     * @deprecated Since 13.0
      * @param string $field SQL field to apply the restriction against
      * @param integer $reportid ID of the report
      *
@@ -41,11 +43,7 @@ class rb_trainer_content extends rb_base_content {
     function sql_restriction($field, $reportid) {
         global $DB, $USER;
 
-        debugging('rb_trainer_content::sql_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\trainer::sql_restriction instead', DEBUG_DEVELOPER);
-
-        // remove rb_ from start of classname
-        $type = substr(get_class($this), 3);
-        $settings = reportbuilder::get_all_settings($reportid, $type);
+        $settings = \reportbuilder::get_all_settings($reportid, self::TYPE);
         $userid = $this->reportfor;
 
         $uniqueparam = rb_unique_param('ctr');
@@ -83,7 +81,6 @@ class rb_trainer_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
-     * @deprecated Since 13.0
      * @param string $title Name of the field being restricted
      * @param integer $reportid ID of the report
      *
@@ -92,11 +89,7 @@ class rb_trainer_content extends rb_base_content {
     function text_restriction($title, $reportid) {
         global $DB;
 
-        debugging('rb_trainer_content::text_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\trainer::text_restriction instead', DEBUG_DEVELOPER);
-
-        // remove rb_ from start of classname
-        $type = substr(get_class($this), 3);
-        $settings = reportbuilder::get_all_settings($reportid, $type);
+        $settings = \reportbuilder::get_all_settings($reportid, self::TYPE);
         $userid = $this->reportfor;
 
         $user = $DB->get_record('user', array('id' => $userid));
@@ -119,20 +112,15 @@ class rb_trainer_content extends rb_base_content {
     /**
      * Adds form elements required for this content restriction's settings page
      *
-     * @deprecated Since 13.0
      * @param object &$mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
     function form_template(&$mform, $reportid, $title) {
 
-        debugging('rb_trainer_content::form_template has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\trainer::form_template instead', DEBUG_DEVELOPER);
-
         // get current settings
-        // remove rb_ from start of classname
-        $type = substr(get_class($this), 3);
-        $enable = reportbuilder::get_setting($reportid, $type, 'enable');
-        $who = reportbuilder::get_setting($reportid, $type, 'who');
+        $enable = \reportbuilder::get_setting($reportid, self::TYPE, 'enable');
+        $who = \reportbuilder::get_setting($reportid, self::TYPE, 'who');
 
         $mform->addElement('header', 'trainer_header', get_string('showbyx',
             'totara_reportbuilder', lcfirst($title)));
@@ -159,33 +147,26 @@ class rb_trainer_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
-     * @deprecated Since 13.0
      * @param integer $reportid ID of the report to process
      * @param object $fromform Moodle form data received via form submission
      *
      * @return boolean True if form was successfully processed
      */
     function form_process($reportid, $fromform) {
-
-        debugging('rb_trainer_content::form_process has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\trainer::form_process instead', DEBUG_DEVELOPER);
-
         $status = true;
-        // remove rb_ from start of classname
-        $type = substr(get_class($this), 3);
 
         // enable checkbox option
         $enable = (isset($fromform->trainer_enable) &&
             $fromform->trainer_enable) ? 1 : 0;
-        $status = $status && reportbuilder::update_setting($reportid, $type,
+        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE,
             'enable', $enable);
 
         // who radio option
         $who = isset($fromform->trainer_who) ?
             $fromform->trainer_who : 0;
-        $status = $status && reportbuilder::update_setting($reportid, $type,
+        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE,
             'who', $who);
 
         return $status;
     }
-
-} // end of rb_trainer_content class
+}

@@ -21,6 +21,8 @@
  * @package totara_reportbuilder
  */
 
+namespace totara_reportbuilder\rb\content;
+
 /**
  * Restrict content by report access
  *
@@ -32,15 +34,14 @@
  *
  * It does NOT take into account results from the is_capable() method on
  * embedded reports because of the per-report cost of doing so.
- *
- * @deprecated Since 13.0
  */
-class rb_report_access_content extends rb_base_content {
+class report_access extends base {
+
+    const TYPE = 'report_access_content';
 
     /**
      * Generate the SQL to apply this content restriction
      *
-     * @deprecated Since 13.0
      * @param string $field SQL field to apply the restriction against
      * @param integer $reportid ID of the report
      *
@@ -49,14 +50,11 @@ class rb_report_access_content extends rb_base_content {
     public function sql_restriction($field, $reportid) {
         global $DB;
 
-        debugging('rb_report_access_content::sql_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\report_access::sql_restriction instead', DEBUG_DEVELOPER);
-
         $params = [];
         $norestriction = [" 1=1 ", $params]; // No restrictions.
         $restriction   = [" 1=0 ", $params]; // Restrictions.
 
-        $type = substr(get_class($this), 3);
-        $enable = reportbuilder::get_setting($reportid, $type, 'enable');
+        $enable = \reportbuilder::get_setting($reportid, self::TYPE, 'enable');
         if (!$enable) {
             return $norestriction;
         }
@@ -79,7 +77,7 @@ class rb_report_access_content extends rb_base_content {
         // 1. A user who can view all reports won't use this code (they will have the capabilities above so they see everything.
         // 2. We are assuming that a site doesn't have tens or hundreds of thousands of reports,
         // all of which are individually shared with this user.
-        $allowedreports = reportbuilder::get_permitted_reports($this->reportfor);
+        $allowedreports = \reportbuilder::get_permitted_reports($this->reportfor);
         $allowedreportids = array_map(function($obj) { return $obj->id; }, $allowedreports);
         list($sqlin, $params) = $DB->get_in_or_equal($allowedreportids, SQL_PARAMS_NAMED);
         $sqls[] = "{$field} {$sqlin}";
@@ -102,32 +100,26 @@ class rb_report_access_content extends rb_base_content {
     /**
      * Generate a human-readable text string describing the restriction
      *
-     * @deprecated Since 13.0
      * @param string $title Name of the field being restricted
      * @param integer $reportid ID of the report
      *
      * @return string Human readable description of the restriction
      */
     public function text_restriction($title, $reportid) {
-        debugging('rb_report_access_content::text_restriction has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\report_access::text_restriction instead', DEBUG_DEVELOPER);
-
         return get_string('accessiblereportsonly', 'totara_reportbuilder');
     }
 
     /**
      * Adds form elements required for this content restriction's settings page
      *
-     * @deprecated Since 13.0
      * @param object &$mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
     public function form_template(&$mform, $reportid, $title) {
 
-        debugging('rb_report_access_content::form_template has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\report_access::form_template instead', DEBUG_DEVELOPER);
 
-        $type = substr(get_class($this), 3);
-        $enable = reportbuilder::get_setting($reportid, $type, 'enable');
+        $enable = \reportbuilder::get_setting($reportid, self::TYPE, 'enable');
 
         $mform->addElement('header', 'report_access', get_string('showbyx', 'totara_reportbuilder', get_string('reportaccess', 'totara_reportbuilder')));
         $mform->setExpanded('report_access');
@@ -141,7 +133,6 @@ class rb_report_access_content extends rb_base_content {
     /**
      * Processes the form elements created by {@link form_template()}
      *
-     * @deprecated Since 13.0
      * @param integer $reportid ID of the report to process
      * @param object $fromform Moodle form data received via form submission
      *
@@ -149,12 +140,9 @@ class rb_report_access_content extends rb_base_content {
      */
     public function form_process($reportid, $fromform) {
 
-        debugging('rb_report_access_content::form_process has been deprecated since Totara 13.0 use \totara_reportbuilder\rb\content\report_access::form_process instead', DEBUG_DEVELOPER);
-
         $status = true;
-        $type = substr(get_class($this), 3);
         $enable = (isset($fromform->report_access_enable) && $fromform->report_access_enable) ? 1 : 0;
-        $status = $status && reportbuilder::update_setting($reportid, $type, 'enable', $enable);
+        $status = $status && \reportbuilder::update_setting($reportid, self::TYPE, 'enable', $enable);
 
         return $status;
     }

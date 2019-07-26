@@ -79,7 +79,7 @@ class totara_reportbuilder_observer {
             $report = reportbuilder::create($reportid, null, false);
 
             if (in_array('audience', $report->get_content_options())) {
-                $restriction = new rb_audience_content();
+                $restriction = new \totara_reportbuilder\rb\content\audience();
                 $restriction->set_default_restriction($reportid, $defaultcohortid);
             }
         }

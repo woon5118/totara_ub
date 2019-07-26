@@ -46,9 +46,7 @@ class totara_reportbuilder_admin_settings_cohort_select extends admin_setting_co
             return true;
         }
 
-        require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_audience_content.php');
-
-        $this->choices = rb_audience_content::get_cohort_select_options();
+        $this->choices = \totara_reportbuilder\rb\content\audience::get_cohort_select_options();
 
         return true;
     }
