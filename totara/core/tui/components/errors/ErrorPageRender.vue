@@ -81,13 +81,13 @@ export default {
 
 <lang-strings>
 {
-    "moodle": [
-        "error"
-    ],
-    "totara_core": [
-        "details",
-        "error:pagerender",
-        "retry"
-    ]
+  "moodle": [
+    "error"
+  ],
+  "totara_core": [
+    "details",
+    "error:pagerender",
+    "retry"
+  ]
 }
 </lang-strings>

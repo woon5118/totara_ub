@@ -390,6 +390,20 @@ $icons = array(
                     'classes' => 'ft-checklist',
                 ),
         ),
+    'chevron-down' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-chevron-down',
+                ),
+        ),
+    'chevron-up' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-chevron-up',
+                ),
+        ),
     'circle-danger' =>
         array(
             'data' =>
@@ -1101,6 +1115,13 @@ $icons = array(
                     'classes' => 'ft-grades',
                 ),
         ),
+    'grid' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-th',
+                ),
+        ),
     'groups-no' =>
         array(
             'template' => 'core/flex_icon_stack',
@@ -1300,6 +1321,13 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'ft-mnethost',
+                ),
+        ),
+    'more' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-ellipsis-h'
                 ),
         ),
     'mouse-pointer' =>
@@ -1837,6 +1865,13 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'ft-slash',
+                ),
+        ),
+    'slider' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-sliders',
                 ),
         ),
     'sort' =>

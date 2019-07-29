@@ -21,6 +21,7 @@
  */
 
 import { unloadedStrings, loadStrings } from '../i18n';
+import * as flexIcons from '../flex_icons';
 import { collectStrings } from '../i18n_vue_plugin';
 import tui from '../tui';
 
@@ -73,6 +74,8 @@ export default {
       );
       promises.push(
         Promise.all([
+          // load icons
+          wrapReqTry(() => flexIcons.load()),
           // load error strings
           wrapReqTry(() =>
             loadStrings(

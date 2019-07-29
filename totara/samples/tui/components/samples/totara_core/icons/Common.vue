@@ -70,16 +70,29 @@
 
 <script>
 import Add from 'totara_core/components/icons/common/Add';
+import AddUser from 'totara_core/components/icons/common/AddUser';
+import Archive from 'totara_core/components/icons/common/Archive';
 import CheckSuccess from 'totara_core/components/icons/common/CheckSuccess';
 import Close from 'totara_core/components/icons/common/Close';
+import Comment from 'totara_core/components/icons/common/Comment';
 import Delete from 'totara_core/components/icons/common/Delete';
 import Edit from 'totara_core/components/icons/common/Edit';
+import Error from 'totara_core/components/icons/common/Error';
 import Collapse from 'totara_core/components/icons/common/Collapse';
 import Expand from 'totara_core/components/icons/common/Expand';
+import More from 'totara_core/components/icons/common/More';
+import RemoveUser from 'totara_core/components/icons/common/RemoveUser';
+import Remove from 'totara_core/components/icons/common/Remove';
 import Search from 'totara_core/components/icons/common/Search';
 import Slider from 'totara_core/components/icons/common/Slider';
+import Success from 'totara_core/components/icons/common/Success';
 import Show from 'totara_core/components/icons/common/Show';
 import Hide from 'totara_core/components/icons/common/Hide';
+import List from 'totara_core/components/icons/common/List';
+import Grid from 'totara_core/components/icons/common/Grid';
+import Info from 'totara_core/components/icons/common/Info';
+import Spinner from 'totara_core/components/icons/common/Spinner';
+import Warning from 'totara_core/components/icons/common/Warning';
 
 import Cell from 'totara_core/components/datatable/Cell';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
@@ -113,6 +126,16 @@ export default {
           desc: '...',
         },
         {
+          icon: AddUser,
+          name: 'AddUser',
+          desc: '...',
+        },
+        {
+          icon: Archive,
+          name: 'Archive',
+          desc: '...',
+        },
+        {
           icon: CheckSuccess,
           name: 'CheckSuccess',
           desc: '...',
@@ -120,6 +143,16 @@ export default {
         {
           icon: Close,
           name: 'Close',
+          desc: '...',
+        },
+        {
+          icon: Collapse,
+          name: 'Collapse',
+          desc: 'Used for collapsing additional content',
+        },
+        {
+          icon: Comment,
+          name: 'Comment',
           desc: '...',
         },
         {
@@ -133,19 +166,19 @@ export default {
           desc: '...',
         },
         {
+          icon: Error,
+          name: 'Error',
+          desc: '...',
+        },
+        {
           icon: Expand,
           name: 'Expand',
           desc: 'Used for expanding additional content',
         },
         {
-          icon: Collapse,
-          name: 'Collapse',
-          desc: 'Used for collapsing additional content',
-        },
-        {
-          icon: Show,
-          name: 'Show',
-          desc: 'Used for expanding form like elements',
+          icon: Grid,
+          name: 'Grid',
+          desc: '...',
         },
         {
           icon: Hide,
@@ -153,17 +186,62 @@ export default {
           desc: 'Used for collasping form like elements',
         },
         {
+          icon: Info,
+          name: 'Info',
+          desc: '...',
+        },
+        {
+          icon: List,
+          name: 'List',
+          desc: '...',
+        },
+        {
+          icon: More,
+          name: 'More',
+          desc: '...',
+        },
+        {
+          icon: Remove,
+          name: 'Remove',
+          desc: '...',
+        },
+        {
+          icon: RemoveUser,
+          name: 'RemoveUser',
+          desc: '...',
+        },
+        {
           icon: Search,
           name: 'Search',
           desc: '...',
+        },
+        {
+          icon: Show,
+          name: 'Show',
+          desc: 'Used for expanding form like elements',
         },
         {
           icon: Slider,
           name: 'Slider',
           desc: '...',
         },
+        {
+          icon: Spinner,
+          name: 'Spinner',
+          desc: '...',
+        },
+        {
+          icon: Success,
+          name: 'Success',
+          desc: '...',
+        },
+        {
+          icon: Warning,
+          name: 'Warning',
+          desc: '...',
+        },
       ],
-      size: '400',
+      size: '200',
       codeTemplate: `<Close :size="size"/>`,
       codeScript: `import Close from 'totara_core/components/icons/common/Close';
 
