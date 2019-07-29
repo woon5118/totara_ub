@@ -38,6 +38,7 @@ $sheet     = optional_param('sheet', '', PARAM_SAFEDIR);
 $usesvg    = optional_param('svg', 1, PARAM_BOOL);
 $chunk     = optional_param('chunk', null, PARAM_INT);
 $rtl       = optional_param('rtl', false, PARAM_BOOL);
+$report    = optional_param('report', null, PARAM_RAW);
 
 if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
     // The theme exists in standard location - ok.
@@ -82,7 +83,21 @@ if ($content = $cache->get($key)) {
     }
 }
 
-$csscontent = $theme->get_css_content_debug($type, $subtype, $sheet, $rtl);
+try {
+    $csscontent = $theme->get_css_content_debug($type, $subtype, $sheet, $rtl);
+} catch(Exception $e) {
+    if ($report === 'json') {
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store, no-cache');
+        echo json_encode([
+            'status' => 'error',
+            'stack' => get_class($e) . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString()
+        ]);
+        die;
+    } else {
+        throw $e;
+    }
+}
 $cache->set($key, array('data' => $csscontent, 'created' => time()));
 
 // We need to chunk the content.
@@ -92,6 +107,13 @@ if ($chunk !== null) {
     // See {@link css_chunk_by_selector_count()} for more details.
     $chunks = css_chunk_by_selector_count($csscontent, $chunkurl->out(false));
     $csscontent = ($chunk === 0) ? end($chunks) : $chunks[$chunk - 1];
+}
+
+if ($report === 'json') {
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store, no-cache');
+    echo '{"status":"ok","message": "Rendered without errors"}';
+    die;
 }
 
 css_send_uncached_css($csscontent);

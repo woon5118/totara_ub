@@ -2015,7 +2015,8 @@ class html_writer {
             return self::tag('script', "\n//<![CDATA[\n$jscode\n//]]>\n", $attributes) . "\n";
 
         } else if ($url) {
-            $attributes = array('type'=>'text/javascript', 'src'=>$url);
+            // Totara: page resource error handling
+            $attributes = array('src' => $url, 'onerror' => '(loadErrors=window.loadErrors||[]).push(event)');
             return self::tag('script', '', $attributes) . "\n";
 
         } else {

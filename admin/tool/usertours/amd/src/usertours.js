@@ -167,7 +167,7 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
          * Mark the specified step as being shownd by the user.
          *
          * @method  markStepShown
-         * @param {Object} data Bootstrap tour object data 
+         * @param {Object} data Bootstrap tour object data
          */
         markStepShown: function(data) {
             var stepConfig = this.getStepConfig(this.getCurrentStepNumber());

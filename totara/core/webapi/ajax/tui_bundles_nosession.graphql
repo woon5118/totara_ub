@@ -1,0 +1,9 @@
+query totara_core_tui_bundles_nosession($components: [String!]!) {
+  bundles: totara_core_tui_bundles(components: $components) {
+    id
+    component
+    name
+    type
+    url
+  }
+}

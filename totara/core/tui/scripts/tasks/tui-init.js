@@ -1,0 +1,141 @@
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Simon Chester <simon.chester@totaralearning.com>
+ * @package totara_core
+ */
+
+const fs = require('fs');
+const path = require('path');
+const { rootDir } = require('../lib/common');
+const { formatCodeWithPath } = require('../lib/prettier');
+const { getComponentDir } = require('../lib/resolution');
+
+const args = require('yargs')
+  .help()
+  .version(false)
+  .command('$0 <component>', false, yargs => {
+    yargs
+      .positional('component', {
+        describe: 'Totara component to initialise TUI in, e.g. mod_foo',
+      })
+      .describe(
+        'vendor',
+        'unique string identifying the authoring organisation'
+      )
+      .default('vendor', 'totara');
+  }).argv;
+
+const dir = getComponentDir(args.component);
+if (dir === null) {
+  console.error(
+    `Error: unknown component ${args.component}.\n` +
+      `If this is a new core component or plugin type, you may need to run\n` +
+      `'php totara/core/dev/generate_tui_data.php' to generate required data.\n`
+  );
+  process.exit(1);
+}
+const fullDir = path.join(rootDir, dir);
+
+if (!fs.existsSync(fullDir)) {
+  console.error(`Error: directory ${dir} does not exist.`);
+  process.exit(1);
+}
+
+const fullTuiDir = path.join(fullDir, 'tui');
+
+// make tui dir if it does not exist
+
+if (!fs.existsSync(fullTuiDir)) {
+  fs.mkdirSync(fullTuiDir);
+}
+
+/**
+ * Write a file if it does not exist, formatting content with prettier.
+ *
+ * @param {string} file
+ * @param {string} content
+ */
+function write(file, content) {
+  const filePath = path.join(fullTuiDir, file);
+  if (fs.existsSync(filePath)) {
+    console.log(`${file} already exists, skipping...`);
+    return;
+  }
+  if (file.endsWith('.json') && typeof content !== 'string') {
+    content = JSON.stringify(content, null, 2);
+  }
+  content = formatCodeWithPath(filePath, content);
+  fs.writeFileSync(filePath, content, 'utf8');
+}
+
+console.log(`Initializing TUI in ${path.join(dir, 'tui')}/...`);
+
+const coreTuiRelative = path.relative(
+  path.join(dir, 'tui'),
+  path.join(getComponentDir('totara_core'), 'tui')
+);
+
+/**
+ * Generate a string that could be passed to require for a file in core TUI dir.
+ *
+ * @param {string} file
+ * @returns {string}
+ */
+function coreTuiRequire(file) {
+  let requirePath = path.join(coreTuiRelative, file);
+  if (!path.isAbsolute(requirePath) && requirePath[0] != '.') {
+    requirePath = './' + requirePath;
+  }
+  return requirePath;
+}
+
+write('tui.json', { component: args.component, vendor: args.vendor });
+write(
+  '.eslintrc.js',
+  `module.exports = {
+  extends: [${JSON.stringify(
+    coreTuiRequire('scripts/configs/.eslintrc_tui.js')
+  )}]
+};`
+);
+write(
+  '.stylelintrc.js',
+  `module.exports = {
+  extends: [${JSON.stringify(
+    coreTuiRequire('scripts/configs/.stylelintrc_tui.js')
+  )}]
+};`
+);
+
+[
+  'js',
+  'pages',
+  'containers',
+  'presentation',
+  'tests',
+  'styles',
+  'tests/unit',
+].forEach(subdir => {
+  const fullSubdir = path.join(fullTuiDir, subdir);
+  if (!fs.existsSync(fullSubdir)) {
+    fs.mkdirSync(fullSubdir);
+  }
+});
+
+console.log('Done!');

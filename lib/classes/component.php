@@ -379,6 +379,56 @@ $cache = '.var_export($cache, true).';
     }
 
     /**
+     * Get data needed to map components to directories
+     *
+     * Returns an array containing two keys - subsystems and plugintypes.
+     * 'subsystems' is a map of subsystem names (the bit after "core_") to paths relative to dirroot.
+     * 'plugintypes' is a map of plugin types (the bit before the underscore in a frankenstyle name) to paths relative
+     * to dirroot.
+     *
+     * All returned paths start with a slash.
+     *
+     * This is intended to allow code that cannot run PHP to map frankenstyle names to directories.
+     *
+     * @return array
+     */
+    public static function get_component_path_data() {
+        if (!isset(self::$plugintypes)) {
+            self::fill_all_caches();
+        }
+
+        $data = [
+            'subsystems' => array_filter(self::$subsystems),
+            'plugintypes' => self::$plugintypes,
+        ];
+
+        foreach ($data['subsystems'] as $subsystem => $path) {
+            $data['subsystems'][$subsystem] = self::strip_dirroot($path);
+        }
+
+        foreach ($data['plugintypes'] as $subsystem => $path) {
+            $data['plugintypes'][$subsystem] = self::strip_dirroot($path);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Remove leading $CFG->dirroot from a path
+     *
+     * @param string $path
+     * @return string
+     */
+    private static function strip_dirroot(string $path): string {
+        global $CFG;
+        $prefix = $CFG->dirroot . '/';
+        if (substr($path, 0, strlen($prefix)) === $prefix) {
+            $path = substr($path, strlen($prefix));
+        }
+        return $path;
+    }
+
+    /**
      * Fill all caches.
      */
     protected static function fill_all_caches() {
@@ -441,6 +491,8 @@ $cache = '.var_export($cache, true).';
         global $CFG;
 
         // NOTE: Any additions here must be verified to not collide with existing add-on modules and subplugins!!!
+
+        // Totara: please run totara/core/dev/generate_tui_data.php after updating this list to generate data for frontend
 
         $info = array(
             'access'      => null,
@@ -523,6 +575,8 @@ $cache = '.var_export($cache, true).';
      */
     protected static function fetch_plugintypes() {
         global $CFG;
+
+        // Totara: please run totara/core/dev/generate_tui_data.php after updating this list to generate data for frontend
 
         $types = array(
             'antivirus'     => $CFG->dirroot . '/lib/antivirus',
@@ -1285,15 +1339,42 @@ $cache = '.var_export($cache, true).';
                 $plugs = self::fetch_plugins($type, $typedir);
             }
             foreach ($plugs as $plug => $fullplug) {
-                $plugin = new stdClass();
-                $plugin->version = null;
-                $module = $plugin;
-                include($fullplug.'/version.php');
+                $plugin = core_component::load_version_file($fullplug.'/version.php');
                 $versions[$type.'_'.$plug] = $plugin->version;
             }
         }
 
         return sha1(serialize($versions));
+    }
+
+    /**
+     * Get a list of all components that are a dependency of the provided
+     * component's TUI bundle.
+     *
+     * @param string $component
+     * @return string[]|null
+     */
+    public static function get_tui_dependencies(string $component) {
+        if (!$component) {
+            return null;
+        }
+        $dir = self::get_component_directory($component);
+        $plugin = core_component::load_version_file($dir.'/version.php');
+        return $plugin->tuidependencies ?? null;
+    }
+
+    /**
+     * Load data from the provided version file.
+     *
+     * @param string $filepath
+     * @return array
+     */
+    private static function load_version_file(string $filepath) {
+        $plugin = new stdClass();
+        $plugin->version = null;
+        $module = $plugin;
+        include($filepath);
+        return $plugin;
     }
 
     /**

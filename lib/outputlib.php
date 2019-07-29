@@ -229,6 +229,14 @@ class theme_config {
     public $parents_exclude_javascripts = null;
 
     /**
+     * @var bool Does this theme provide or override TUI components?
+     * TUI JS and CSS bundles for the theme will only be loaded if this is set
+     * to true. TUI bundles will also be loaded for any parent themes if they
+     * have this option set to true.
+     */
+    public $tui = false;
+
+    /**
      * @var array Which file to use for each page layout.
      *
      * This is an array of arrays. The keys of the outer array are the different layouts.
@@ -579,7 +587,7 @@ class theme_config {
 
         $configurable = array(
             'parents', 'sheets', 'parents_exclude_sheets', 'plugins_exclude_sheets',
-            'javascripts', 'javascripts_footer', 'parents_exclude_javascripts',
+            'javascripts', 'javascripts_footer', 'parents_exclude_javascripts', 'tui',
             'layouts', 'enable_dock','enable_hide', 'enablecourseajax', 'requiredblocks',
             'rendererfactory', 'csspostprocess', 'editor_sheets', 'rarrow', 'larrow', 'uarrow', 'darrow',
             'hidefromselector', 'doctype', 'yuicssmodules', 'blockrtlmanipulations',
@@ -1127,6 +1135,8 @@ class theme_config {
 
         $cssfiles = array('plugins'=>array(), 'parents'=>array(), 'theme'=>array());
 
+        $cssfiles['plugins']['totara_core_tui'] = core_output_choose_build_file("{$CFG->dirroot}/totara/core/tui/build/tui_bundle.css");
+
         // Get all plugin sheets.
         $excludes = $this->resolve_excludes('plugins_exclude_sheets');
         if ($excludes !== true) {
@@ -1170,28 +1180,34 @@ class theme_config {
         if ($excludes !== true) {
             foreach (array_reverse($this->parent_configs) as $parent_config) { // Base first, the immediate parent last.
                 $parent = $parent_config->name;
-                if (empty($parent_config->sheets) || (!empty($excludes[$parent]) and $excludes[$parent] === true)) {
+                if (!empty($excludes[$parent]) and $excludes[$parent] === true) {
                     continue;
                 }
-                foreach ($parent_config->sheets as $sheet) {
-                    if (!empty($excludes[$parent]) && is_array($excludes[$parent])
-                            && in_array($sheet, $excludes[$parent])) {
-                        continue;
-                    }
+                if (!empty($parent_config->sheets)) {
+                    foreach ($parent_config->sheets as $sheet) {
+                        if (!empty($excludes[$parent]) && is_array($excludes[$parent])
+                                && in_array($sheet, $excludes[$parent])) {
+                            continue;
+                        }
 
-                    // We never refer to the parent LESS files.
-                    if ($rtl) {
-                        $sheetfile = "$parent_config->dir/style/$sheet-rtl.css";
-                        if (!is_readable($sheetfile)) {
+                        // We never refer to the parent LESS files.
+                        if ($rtl) {
+                            $sheetfile = "$parent_config->dir/style/$sheet-rtl.css";
+                            if (!is_readable($sheetfile)) {
+                                $sheetfile = "$parent_config->dir/style/$sheet.css";
+                            }
+                        } else {
                             $sheetfile = "$parent_config->dir/style/$sheet.css";
                         }
-                    } else {
-                        $sheetfile = "$parent_config->dir/style/$sheet.css";
+                        // Check whether a sheetfile exists and is readable.
+                        if (is_readable($sheetfile)) {
+                            $cssfiles['parents'][$parent][$sheet] = $sheetfile;
+                        }
                     }
-                    // Check whether a sheetfile exists and is readable.
-                    if (is_readable($sheetfile)) {
-                        $cssfiles['parents'][$parent][$sheet] = $sheetfile;
-                    }
+                }
+                if (!empty($parent_config->tui)) {
+                    $cssfiles['parents'][$parent]['tui'] =
+                        core_output_choose_build_file("{$parent_config->dir}/tui/build/tui_bundle.css");
                 }
             }
         }
@@ -1234,6 +1250,10 @@ class theme_config {
                     $cssfiles['theme'][$sheet] = $sheetfile;
                 }
             }
+        }
+
+        if (!empty($this->tui)) {
+            $cssfiles['theme']['tui'] = core_output_choose_build_file("{$this->dir}/tui/build/tui_bundle.css");
         }
 
         if ($cache) {
@@ -1568,12 +1588,20 @@ class theme_config {
             $type = 'javascripts';
         }
 
+        $tui_suffix = core_useragent::is_ie() ? '.legacy' : '';
+
         $js = array();
         // find out wanted parent javascripts
         $excludes = $this->resolve_excludes('parents_exclude_javascripts');
         if ($excludes !== true) {
             foreach (array_reverse($this->parent_configs) as $parent_config) { // base first, the immediate parent last
                 $parent = $parent_config->name;
+                if ($type == 'javascripts_footer' && !empty($parent_config->tui)) {
+                    $path = core_output_choose_build_file("{$parent_config->dir}/tui/build/tui_bundle{$tui_suffix}.js");
+                    if ($path) {
+                        $js[] = $path;
+                    }
+                }
                 if (empty($parent_config->$type)) {
                     continue;
                 }
@@ -1590,6 +1618,13 @@ class theme_config {
                         $js[] = $javascriptfile;
                     }
                 }
+            }
+        }
+
+        if ($type == 'javascripts_footer' && !empty($this->tui)) {
+            $path = core_output_choose_build_file("{$this->dir}/tui/build/tui_bundle{$tui_suffix}.js");
+            if ($path) {
+                $js[] = $path;
             }
         }
 

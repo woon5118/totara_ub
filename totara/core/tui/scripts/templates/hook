@@ -1,0 +1,5 @@
+#!/bin/sh
+# totara hook
+if [ -f node_modules/run-node/run-node ] && [ -f totara/core/tui/scripts/tasks/run-hook.js ]; then
+    node_modules/run-node/run-node totara/core/tui/scripts/tasks/run-hook.js {{hook}}
+fi

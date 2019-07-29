@@ -154,6 +154,11 @@ class page_requirements_manager {
     protected $yuicssmodules = array();
 
     /**
+     * @var \core\tui\requirements $tui TUI requirements tracker
+     */
+    protected $tui;
+
+    /**
      * @var array Some config vars exposed in JS, please no secret stuff there
      */
     protected $M_cfg;
@@ -189,6 +194,7 @@ require(['core/autoinitialise'], function(ai) {
 
         $this->yui3loader = new stdClass();
         $this->YUI_config = new YUI_config();
+        $this->tui = new \core\tui\requirements();
 
         if (is_https() && !empty($CFG->useexternalyui)) {
             // On HTTPS sites all JS must be loaded from https sites,
@@ -304,6 +310,9 @@ require(['core/autoinitialise'], function(ai) {
         // Add the moodle group's module data.
         $this->YUI_config->add_moodle_metadata();
 
+        // Load the TUI core code on every page.
+        $this->tui->require_component('totara_core');
+
         // Every page should include definition of following modules.
         $this->js_module($this->find_module('core_filepicker'));
         $this->js_module($this->find_module('core_comment'));
@@ -365,6 +374,7 @@ require(['core/autoinitialise'], function(ai) {
                 'usertimezone'        => usertimezone(),
                 'contextid'           => $contextid,
                 'currentlanguage'     => $currentlanguage,
+                'NODE_ENV'            => $CFG->debugdeveloper ? 'development' : 'production',
             );
             if ($CFG->debugdeveloper) {
                 $this->M_cfg['developerdebug'] = true;
@@ -713,6 +723,16 @@ require(['core/autoinitialise'], function(ai) {
         }
 
         return $output;
+    }
+
+    /**
+     * Returns the actual url through which a script is served.
+     *
+     * @param moodle_url|string $url full moodle url, or shortened path to script
+     * @return moodle_url
+     */
+    public function get_js_url($url) {
+        return $this->js_fix_url($url);
     }
 
     /**
@@ -1136,6 +1156,15 @@ require(['core/autoinitialise'], function(ai) {
     }
 
     /**
+     * Request the TUI bundle(s) for the provided component be loaded.
+     *
+     * @param string $component Totara component
+     */
+    public function tui_bundle(string $component) {
+        $this->tui->require_component($component);
+    }
+
+    /**
      * Ensure that the specified JavaScript function is called from an inline script
      * from page footer.
      *
@@ -1540,7 +1569,13 @@ require(['core/autoinitialise'], function(ai) {
         // Please note custom CSS is strongly discouraged,
         // because it can not be overridden by themes!
         // It is suitable only for things like mod/data which accepts CSS from teachers.
-        $attributes = array('rel'=>'stylesheet', 'type'=>'text/css');
+        $attributes = [
+            'rel' => 'stylesheet',
+            'type' => 'text/css',
+            'href' => '',
+            // Totara: page resource error handling
+            'onerror' => '(loadErrors=window.loadErrors||[]).push(event)'
+        ];
 
         // Add the YUI code first. We want this to be overridden by any Moodle CSS.
         $code = $this->get_yui3lib_headcss();
@@ -1614,6 +1649,10 @@ require(['core/autoinitialise'], function(ai) {
         $js .= $this->YUI_config->get_config_functions();
         $js .= js_writer::set_variable('YUI_config', $this->YUI_config, false) . "\n";
         $js .= "M.yui.loader = {modules: {}};\n"; // Backwards compatibility only, not used any more.
+        // Totara: page resource error handling
+        $js .= "window.addEventListener('DOMContentLoaded',function(){function s(){s=function(){},alert(" .
+            json_encode(get_string('pageloadresourcefail', 'error')) . ")};".
+            "window.loadErrors&&loadErrors.length&&s(),loadErrors={push:s}});\n";
         $js = $this->YUI_config->update_header_js($js);
 
         $output .= html_writer::script($js);
@@ -1705,6 +1744,10 @@ require(['core/autoinitialise'], function(ai) {
 
         // Call amd init functions.
         if ($initialiseamd) {
+            foreach ($this->tui->get_bundles('js') as $bundle) {
+                $output .= html_writer::script('', $this->js_fix_url($bundle->get_file_path()));
+            }
+
             // Totara: ajaxy form fetching does not like AMD.
             $this->js_call_amd('core/log', 'setConfig', array($logconfig));
         }
@@ -2196,4 +2239,35 @@ function js_reset_all_caches() {
     }
 
     set_config('jsrev', $next);
+}
+
+/**
+ * If certain conditions are met, change path to point at a variant of the build file.
+ *
+ * Currently the conditions are:
+ * * If debugdeveloper is on, file is in /tui/build/, .development variant
+ *   exists, and is newer: use the .development variant.
+ *
+ * Returns null if the build file does not exist.
+ *
+ * @param string $path
+ * @param string $dir Prepended to path to produce absolute path
+ * @return string|null
+ */
+function core_output_choose_build_file($path, $dir = '') {
+    global $CFG;
+    // try and load tui dev bundles if they are newer than the prod bundles
+    if ($CFG->debugdeveloper && preg_match('/\/tui\/build\//', $path)) {
+        $last_dot = strrpos($path, '.');
+        $dev_path = substr($path, 0, $last_dot) . '.development' . substr($path, $last_dot);
+
+        $prod_mtime = @filemtime($dir . $path);
+        $dev_mtime = @filemtime($dir . $dev_path);
+
+        // load dev file if there is no standard file or if the dev file is newer
+        if ($dev_mtime !== false && (!$prod_mtime || $dev_mtime > $prod_mtime)) {
+            $path = $dev_path;
+        }
+    }
+    return file_exists($dir . $path) ? $path : null;
 }

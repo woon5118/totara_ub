@@ -75,7 +75,11 @@ EOD;
                 $compressed[] = "\n\n// Cannot read JS file ".basename(dirname(dirname($file))).'/'.basename(dirname($file)).'/'.basename($file)."\n\n";
                 continue;
             }
-            $compressed[] = self::js($content);
+            // Totara: skip minifying TUI build files as they are already minified
+            if (!preg_match('/\/tui\/build\//', $file)) {
+                $content = self::js($content);
+            }
+            $compressed[] = $content;
         }
 
         return implode(";\n", $compressed);

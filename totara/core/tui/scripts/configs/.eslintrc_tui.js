@@ -1,0 +1,60 @@
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Simon Chester <simon.chester@totaralearning.com>
+ * @package totara_core
+ */
+
+module.exports = {
+  root: true,
+  env: {
+    browser: true,
+    commonjs: true,
+    node: true,
+    // some ES6 globals are emulated in IE11 via polyfill - see lib/javascript_polyfill/
+    es6: true,
+  },
+  plugins: ['tui'],
+  extends: [
+    'eslint:recommended',
+    'plugin:jest/recommended',
+    'plugin:vue/recommended',
+    // disable rules that would conflict with prettier
+    'prettier',
+    'prettier/vue',
+  ],
+  globals: {
+    // tui global interface
+    tui: true,
+  },
+  rules: {
+    // we use console for error reporting
+    'no-console': 'off',
+    'vue/no-v-html': 'off',
+    'vue/require-default-prop': 'off',
+    'vue/html-self-closing': ['warn', { html: { void: 'any' } }],
+    // generators compile to large (regenerator-runtime) and slow code with
+    // babel for IE 11, so disallow them
+    'tui/no-generators': 'error',
+    'tui/no-export-vue-extend': 'error',
+    // Edge does not support object spread
+    'tui/no-object-spread': 'error',
+    'tui/no-tui-internal': 'error',
+    'tui/no-for-of': 'error',
+  },
+};

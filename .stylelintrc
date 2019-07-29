@@ -1,9 +1,5 @@
 {
-    "plugins": [
-        "stylelint-csstree-validator"
-    ],
     "rules": {
-        "csstree/validator": true,
         "at-rule-empty-line-before": [ "always",
           {"except": [ "blockless-after-blockless"], ignore: ["after-comment", "inside-block"]}
         ],
@@ -24,7 +20,6 @@
         "color-no-invalid-hex": true,
         "declaration-bang-space-after": "never",
         "declaration-bang-space-before": "always",
-        "declaration-block-no-duplicate-properties": true,
         "declaration-block-no-shorthand-property-overrides": true,
         "declaration-block-semicolon-newline-after": "always-multi-line",
         "declaration-block-semicolon-space-after": "always-single-line",

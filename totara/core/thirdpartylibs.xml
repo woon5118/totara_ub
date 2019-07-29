@@ -48,4 +48,32 @@
         <version>1.10.11</version>
         <licenseversion></licenseversion>
     </library>
+    <library>
+        <location>tui/build</location>
+        <name>Vue</name>
+        <license>MIT</license>
+        <version>2.6.10</version>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>tui/build</location>
+        <name>Vue Apollo</name>
+        <license>MIT</license>
+        <version>3.0.2</version>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>tui/build</location>
+        <name>Apollo Client</name>
+        <license>MIT</license>
+        <version>2.6.3</version>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>tui/build</location>
+        <name>graphql-js</name>
+        <license>MIT</license>
+        <version>14.4.2</version>
+        <licenseversion></licenseversion>
+    </library>
 </libraries>

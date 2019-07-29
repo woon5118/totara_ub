@@ -1,0 +1,15 @@
+"""
+Current status of the webapi, status is always 'ok'.
+This is intended to test that you are able to successfully execute GraphQL queries.
+"""
+type core_webapi_status {
+  status: String!
+  timestamp: Int!
+}
+
+extend type Query {
+  """
+  Simple query returning "ok" to test that you are able to successfully execute GraphQL queries.
+  """
+  core_webapi_status: core_webapi_status
+}

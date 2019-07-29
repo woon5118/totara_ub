@@ -1,0 +1,6 @@
+query core_webapi_status_nosession {
+  core_webapi_status {
+    status
+    timestamp
+  }
+}

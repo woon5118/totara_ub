@@ -4,6 +4,7 @@
 
 **/yui/build/** -diff
 **/amd/build/** -diff
+**/tui/build/** -diff
 
 # Compiled theme CSS files
 theme/roots/style/totara-rtl.css -diff

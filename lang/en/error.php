@@ -463,6 +463,7 @@ $string['onlyadmins'] = 'Only administrators can do that';
 $string['onlyeditingteachers'] = 'Only editing trainers can do that';
 $string['onlyeditown'] = 'You can only edit your own information';
 $string['orderidnotfound'] = 'Order ID {$a} not found';
+$string['pageloadresourcefail'] = 'A network error occurred while loading the page. Please refresh the page and try again.';
 $string['pagenotexist'] = 'An unusual error occurred (tried to reach a page that does not exist)';
 $string['pathdoesnotstartslash'] = 'No valid arguments supplied, path does not start with slash!';
 $string['pleasereport'] = 'If you have time, please let us know what you were trying to do when the error occurred:';

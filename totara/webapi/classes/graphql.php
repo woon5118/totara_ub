@@ -301,16 +301,18 @@ final class graphql {
     protected static function build_persisted_operations_array(string $type): array {
         global $CFG;
 
+        $subdir = 'webapi/' . $type;
+
         $operations = [];
 
-        $files = self::get_files_from_dir($CFG->libdir . '/webapi/' . $type, 'graphql');
+        $files = self::get_files_from_dir($CFG->libdir . '/' . $subdir, 'graphql');
         foreach ($files as $name => $file) {
             $operation_name = 'core_' . $name;
             $operations[$operation_name] = $file;
         }
 
         foreach (\core_component::get_core_subsystems() as $subsystem => $full_dir) {
-            $files = self::get_files_from_dir($full_dir . '/webapi/' . $type, 'graphql');
+            $files = self::get_files_from_dir($full_dir . '/' . $subdir, 'graphql');
             foreach ($files as $name => $file) {
                 $operation_name = 'core_' . $subsystem . '_' . $name;
                 $operations[$operation_name] = $file;
@@ -321,7 +323,7 @@ final class graphql {
         foreach ($plugin_types as $plugin_type => $unused) {
             $plugins = \core_component::get_plugin_list($plugin_type);
             foreach ($plugins as $plugin => $full_dir) {
-                $files = self::get_files_from_dir($full_dir . '/webapi/' . $type, 'graphql');
+                $files = self::get_files_from_dir($full_dir . '/' . $subdir, 'graphql');
                 foreach ($files as $name => $file) {
                     $operation_name = $plugin_type . '_' . $plugin . '_' . $name;
                     $operations[$operation_name] = $file;
