@@ -43,11 +43,11 @@ class event_allows_cancellation extends condition {
             return true;
         } else if ($allowed == $seminarevent::ALLOW_CANCELLATION_CUT_OFF) {
             $now = time();
-            $cutoff = $seminarevent->get_cutoff();
+            $cancellationcutoff = $seminarevent->get_cancellationcutoff();
             $minstart = $seminarevent->get_mintimestart();
 
-            // We are still before the cutoff, so we can cancel.
-            if ($now < ($minstart - $cutoff)) {
+            // We are still before the cancellation cutoff, so we can cancel.
+            if ($now < ($minstart - $cancellationcutoff)) {
                 return true;
             }
         }

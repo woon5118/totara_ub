@@ -46,7 +46,9 @@ if (!$signup->exists()) {
     );
 }
 
-if (!$seminarevent->get_allowcancellations()) {
+// Check user's eligibility to cancel.
+$currentstate = $signup->get_state();
+if (!$currentstate->can_switch(signup\state\user_cancelled::class)) {
     print_error('error:cancellationsnotallowed', 'facetoface');
 }
 

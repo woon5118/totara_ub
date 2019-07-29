@@ -192,6 +192,8 @@ Feature: Cancellation for session
     And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should not see "Cancel booking"
+    And I follow "Event info"
+    Then I should not see "Cancel booking"
     And I log out
 
   @javascript
