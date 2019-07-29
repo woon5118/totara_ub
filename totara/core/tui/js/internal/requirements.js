@@ -20,6 +20,12 @@
  * @package totara_core
  */
 
+import { unloadedStrings, loadStrings } from '../i18n';
+import { collectStrings } from '../i18n_vue_plugin';
+import tui from '../tui';
+
+let loadedOneOffs = false;
+
 /**
  * Component requirement loading
  *
@@ -35,9 +41,12 @@ export default {
    *     Requirements object.
    *     `.any` property can be checked to determine if there are any.
    */
-  get: function() {
+  get(component) {
+    const compUnloadedStrings = unloadedStrings(collectStrings(component));
     return {
-      any: false,
+      unloadedStrings: compUnloadedStrings,
+      oneOffs: !loadedOneOffs,
+      any: compUnloadedStrings.length > 0 || !loadedOneOffs,
     };
   },
 
@@ -50,7 +59,52 @@ export default {
    *     Promise resolving when loading has finished
    *     (whether successful or not)
    */
-  load: function() {
+  load(reqs) {
+    const promises = [];
+    if (reqs.unloadedStrings) {
+      promises.push(wrapReqTry(() => loadStrings(reqs.unloadedStrings)));
+    }
+    if (reqs.oneOffs) {
+      const ErrorBoundary = tui.defaultExport(
+        tui.require('totara_core/presentation/errors/ErrorBoundary')
+      );
+      const ErrorPageRender = tui.defaultExport(
+        tui.require('totara_core/presentation/errors/ErrorPageRender')
+      );
+      promises.push(
+        Promise.all([
+          // load error strings
+          wrapReqTry(() =>
+            loadStrings(
+              collectStrings({
+                components: {
+                  ErrorBoundary,
+                  ErrorPageRender,
+                },
+              })
+            )
+          ),
+        ]).then(() => {
+          loadedOneOffs = true;
+        })
+      );
+    }
+    if (promises.length) {
+      return Promise.all(promises);
+    }
     return Promise.resolve();
   },
 };
+
+function logLoadError(e) {
+  console.error('Error while loading requirements:', e);
+}
+
+// error handling:
+// if a requirement fails, try and load it a second time, but if it still fails keep rendering anyway.
+function wrapReqTry(fn) {
+  return fn().catch(() =>
+    // try again one more time
+    fn().catch(logLoadError)
+  );
+}

@@ -23,12 +23,17 @@
 <template>
   <div class="tui-errorDisplay">
     <h1 class="tui-errorDisplay__title">
-      Error
+      {{ $str('error', 'moodle') }}
     </h1>
-    <p>An error occurred while rendering the page.</p>
+    <p>
+      {{
+        $tryStr('error:pagerender', 'totara_core') ||
+          'An error occurred while rendering the page.'
+      }}
+    </p>
     <div class="tui-errorDisplay__buttons">
       <button v-if="retryable" type="button" @click.prevent="retry">
-        Retry
+        {{ $str('retry', 'totara_core') }}
       </button>
     </div>
     <a
@@ -37,7 +42,7 @@
       href="javascript:;"
       @click.prevent="toggleDetails"
     >
-      {{ (showDetails ? '▾ ' : '▸ ') + 'Details' }}
+      {{ (showDetails ? '▾ ' : '▸ ') + $str('details', 'totara_core') }}
     </a>
     <pre v-if="error && showDetails" class="tui-errorDisplay__detailsPre">{{
       error.stack ? error.stack : error
@@ -73,3 +78,16 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+{
+    "moodle": [
+        "error"
+    ],
+    "totara_core": [
+        "details",
+        "error:pagerender",
+        "retry"
+    ]
+}
+</lang-strings>

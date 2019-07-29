@@ -160,6 +160,10 @@ function createConfig({
       exclude: /node_modules/,
       loader: require.resolve('../webpack/graphql_loader'),
     },
+    {
+      resourceQuery: /blockType=lang-strings/,
+      loader: require.resolve('../webpack/tui_lang_strings_loader'),
+    },
     primary && {
       enforce: 'pre',
       test: /\.(js|vue)$/,

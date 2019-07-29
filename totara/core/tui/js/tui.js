@@ -27,6 +27,7 @@ import VueApollo from 'vue-apollo';
 import BundleLoader from './internal/BundleLoader';
 import TotaraModuleStore from './internal/TotaraModuleStore';
 import tuiPlugin from './tui_vue_plugin';
+import i18nPlugin from './i18n_vue_plugin';
 import requirements from './internal/requirements';
 import { memoize } from './util';
 import apolloClient from './apollo_client';
@@ -34,6 +35,7 @@ import theme from './theme';
 
 Vue.use(tuiPlugin);
 Vue.use(VueApollo);
+Vue.use(i18nPlugin);
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
