@@ -92,8 +92,10 @@ class mod_lti_archive_testcase extends advanced_testcase {
 
         // Create LTI submission data.
         self::assertEquals(0, $DB->count_records('lti_submission'));
+        self::assertEquals(0, $DB->count_records('lti_submission_history'));
         lti_update_grade($lti, $user->id, 255, 0.65);
         self::assertEquals(1, $DB->count_records('lti_submission'));
+        self::assertEquals(0, $DB->count_records('lti_submission_history')); // History should not be written yet.
 
         // Trigger the module completion - set viewed.
         self::assertEquals(1, $DB->count_records('course_completions'));
@@ -121,6 +123,7 @@ class mod_lti_archive_testcase extends advanced_testcase {
         self::assertEquals(1, $DB->count_records('course_completion_crit_compl'));
         self::assertEquals(1, $DB->count_records('course_modules_completion'));
         self::assertEquals(1, $DB->count_records('lti_submission'));
+        self::assertEquals(0, $DB->count_records('lti_submission_history'));
         archive_course_completion($user->id, $course->id);
         self::assertEquals(0, $DB->count_records('course_completions'));
         archive_course_activities($user->id, $course->id);
@@ -128,5 +131,6 @@ class mod_lti_archive_testcase extends advanced_testcase {
         self::assertEquals(0, $DB->count_records('course_completion_crit_compl'));
         self::assertEquals(0, $DB->count_records('course_modules_completion'));
         self::assertEquals(0, $DB->count_records('lti_submission'));
+        self::assertEquals(1, $DB->count_records('lti_submission_history'));
     }
 }

@@ -195,6 +195,10 @@ function lti_delete_instance($id) {
     // Delete any dependent records here.
     lti_grade_item_delete($basiclti);
 
+    // Delete any dependent submission records.
+    $DB->delete_records('lti_submission_history', ['ltiid' => $basiclti->id]);
+    $DB->delete_records('lti_submission', ['ltiid' => $basiclti->id]);
+
     $ltitype = $DB->get_record('lti_types', array('id' => $basiclti->typeid));
     if ($ltitype) {
         $DB->delete_records('lti_tool_settings',
@@ -641,7 +645,8 @@ function lti_archive_completion(int $userid, int $courseid, int $windowopens = n
     $completion = new completion_info($course);
 
     $sql = "SELECT ls.id AS submissionid,
-                   lti.id AS ltiid
+                   lti.id AS ltiid,
+                   ls.launchid
             FROM {lti_submission} ls
             INNER JOIN {lti} lti
                 ON lti.id = ls.ltiid AND lti.course = :courseid
@@ -649,6 +654,8 @@ function lti_archive_completion(int $userid, int $courseid, int $windowopens = n
     $params = ['userid' => $userid, 'courseid' => $courseid];
 
     if ($submissions = $DB->get_records_sql($sql, $params)) {
+        $now = time();
+
         // Create the reset grade.
         $grade = new stdClass();
         $grade->userid = $userid;
@@ -656,6 +663,15 @@ function lti_archive_completion(int $userid, int $courseid, int $windowopens = n
 
         foreach ($submissions as $submission) {
             $cm = get_coursemodule_from_instance('lti', $submission->ltiid, $course->id);
+
+            // Create a record in lti_submission_history before we delete anything.
+            // This is needed to be able to correctly track attempts with the LTI provider.
+            $history = new stdClass();
+            $history->ltiid = $submission->ltiid;
+            $history->userid = $userid;
+            $history->launchid = $submission->launchid;
+            $history->timecreated = $now;
+            $DB->insert_record('lti_submission_history', $history);
 
             // Delete LTI submission records.
             $DB->delete_records('lti_submission', ['userid' => $userid, 'ltiid' => $submission->ltiid]);

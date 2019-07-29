@@ -366,6 +366,28 @@ function lti_build_sourcedid($instanceid, $userid, $servicesalt, $typeid = null,
 }
 
 /**
+ * Builds a resource_link_id based on how many records are in the 'lti_submission_history'.
+ * The link is going to be persistent between the LTI submission attempts.
+ *
+ * @param int $instanceid
+ *
+ * @return string
+ */
+function lti_get_resource_link_id(int $instanceid): string {
+    global $USER, $DB;
+
+    $revision = $DB->count_records('lti_submission_history', ['userid' => $USER->id, 'ltiid' => $instanceid]);
+    if ($revision > 0) {
+        // Build a resource_link_id in form instanceId_rev: 1_2, 35_3, 49_4;
+        return $instanceid . '_' . ($revision + 1);
+    }
+
+    // Or return plain instance id if no revisions found.
+    // Cast to string to avoid any surprises.
+    return (string)$instanceid;
+}
+
+/**
  * This function builds the request that must be sent to the tool producer
  *
  * @param object    $instance       Basic LTI instance object
@@ -406,7 +428,7 @@ function lti_build_request($instance, $typeconfig, $course, $typeid = null, $isl
         $requestparams['resource_link_description'] = $intro;
     }
     if (!empty($instance->id)) {
-        $requestparams['resource_link_id'] = $instance->id;
+        $requestparams['resource_link_id'] = lti_get_resource_link_id($instance->id);
     }
     if (!empty($instance->resource_link_id)) {
         $requestparams['resource_link_id'] = $instance->resource_link_id;
@@ -508,7 +530,7 @@ function lti_build_standard_request($instance, $orgid, $islti2, $messagetype = '
     $requestparams = array();
 
     if ($instance) {
-        $requestparams['resource_link_id'] = $instance->id;
+        $requestparams['resource_link_id'] = lti_get_resource_link_id($instance->id);
         if (property_exists($instance, 'resource_link_id') and !empty($instance->resource_link_id)) {
             $requestparams['resource_link_id'] = $instance->resource_link_id;
         }
