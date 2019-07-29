@@ -244,5 +244,27 @@ function xmldb_totara_program_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019052101, 'totara', 'program');
     }
 
+    if ($oldversion < 2019062701) {
+        // Remove records from prog_completion, prog_completion_history
+        // and prog_compeltion_log if the program has been deleted
+        $completionsql = 'DELETE FROM {prog_completion}
+                    WHERE programid NOT IN
+                    (SELECT id FROM {prog})';
+
+        $completionhistsql = 'DELETE from {prog_completion_history}
+                    WHERE programid NOT IN
+                    (SELECT id FROM {prog})';
+
+        $completionlogsql = 'DELETE FROM {prog_completion_log}
+                    WHERE programid NOT IN
+                    (SELECT id FROM {prog})';
+
+        $DB->execute($completionsql);
+        $DB->execute($completionhistsql);
+        $DB->execute($completionlogsql);
+
+        upgrade_plugin_savepoint(true, 2019062701, 'totara', 'program');
+    }
+
     return true;
 }

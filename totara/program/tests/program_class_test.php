@@ -1794,9 +1794,9 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->assertSame(0, $DB->count_records('prog', ['id' => $program->id]));
         $this->assertSame(0, $DB->count_records('dp_plan_program_assign', ['programid' => $program->id]));
         $this->assertSame(0, $DB->count_records('prog_assignment', ['programid' => $program->id]));
-        // $this->assertSame(0, $DB->count_records('prog_completion', ['programid' => $program->id]));
-        // $this->assertSame(0, $DB->count_records('prog_completion_history', ['programid' => $program->id]));
-        // $this->assertSame(0, $DB->count_records('prog_completion_log', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_completion', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_completion_history', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_completion_log', ['programid' => $program->id]));
         $this->assertSame(0, $DB->count_records('prog_courseset', ['programid' => $program->id]));
         $this->assertSame(0, $DB->count_records('prog_exception', ['programid' => $program->id]));
         $this->assertSame(0, $DB->count_records('prog_extension', ['programid' => $program->id]));

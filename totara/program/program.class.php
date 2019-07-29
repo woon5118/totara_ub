@@ -340,6 +340,13 @@ class program {
             certif_delete(CERTIFTYPE_PROGRAM, $this->certifid);
         }
 
+        // Delete all completion records associated with this program
+        $DB->delete_records('prog_completion', ['programid' => $this->id]);
+        $DB->delete_records('prog_completion_history', ['programid' => $this->id]);
+
+        // Delete program log entries
+        $DB->delete_records('prog_completion_log', ['programid' => $this->id]);
+
         // delete all tag instances.
         core_tag_tag::remove_all_item_tags('totara_program', 'prog', $this->id);
 
