@@ -430,8 +430,7 @@ function create_data() {
                 // Working together
                 'communication' => [
                     'fullname' => 'Communicating with clarity',
-                    'description' => '	
-This is about the ability to impart accurate information (both verbal and written) in a timely way and be receptive to other peoples\' opinions. It is also about sharing information across University boundaries and externally. At the higher level, it is about making University communication and understanding with other bodies outside the University more effective.',
+                    'description' => 'This is about the ability to impart accurate information (both verbal and written) in a timely way and be receptive to other peoples\' opinions. It is also about sharing information across University boundaries and externally. At the higher level, it is about making University communication and understanding with other bodies outside the University more effective.',
                 ],
                 'embracing' => [
                     'fullname' => 'Embracing change',

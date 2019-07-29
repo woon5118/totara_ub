@@ -84,19 +84,8 @@
         </div>
         <transition name="totara_competency-profile__transition-fade">
           <div v-if="activeTab === 'charts'">
-            <Accordion ref="assignmentsProgressAccordion">
-              <AccordionItem
-                v-for="item in data.items"
-                :key="item.key"
-                :name="item.name"
-                :item-key="item.key"
-                :is-open="data.items.length <= 5"
-              >
-                <IndividualAssignmentProgress
-                  :assignment-progress="item"
-                ></IndividualAssignmentProgress>
-              </AccordionItem>
-            </Accordion>
+            <!-- Available charts -->
+            <CompetencyCharts :data="data"></CompetencyCharts>
           </div>
         </transition>
         <transition name="totara_competency-profile__transition-fade">
@@ -114,22 +103,18 @@
 <script>
 import AssignmentProgress from '../container/AssignmentProgress';
 import FlexIcon from 'totara_core/presentation/icons/FlexIcon';
-import IndividualAssignmentProgress from '../container/IndividualAssignmentProgress';
-import Accordion from '../container/Accordion';
-import AccordionItem from '../container/AccordionItem';
 import ProgressAssignmentFilters from '../presentation/ProgressAssignmentFilters';
 import CompetencyList from '../presentation/Profile/CompetencyList';
+import CompetencyCharts from '../presentation/Profile/CompetencyCharts';
 
 const ACTIVE_ASSIGNMENT = 1;
 const ARCHIVED_ASSIGNMENT = 2;
 
 export default {
   components: {
+    CompetencyCharts,
     CompetencyList,
     ProgressAssignmentFilters,
-    AccordionItem,
-    Accordion,
-    IndividualAssignmentProgress,
     FlexIcon,
     AssignmentProgress,
   },

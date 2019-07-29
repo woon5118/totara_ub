@@ -1,3 +1,52 @@
+.totara_competency-accordion__items {
+    & > div:not(:last-child) {
+        padding-bottom: 5px;
+    }
+}
+
+.totara_competency-accordion__header {
+    display: flex;
+    flex-direction: row-reverse;
+    padding: 15px 0;
+}
+
+.totara_competency-profile__accordion-item {
+    & .totara_competency-profile__accordion-item-header {
+        display: inline-flex;
+        padding: 15px;
+        width: 100%;
+        line-height: 15px;
+        background-color: #f7f7f7;
+        border: 1px #979797 solid;
+        cursor: pointer;
+
+
+        &[data-is-open="open"] {
+            border-radius: 5px 5px 0 0;
+        }
+
+        &[data-is-open="closed"] {
+            border-radius: 5px;
+        }
+    }
+
+    & .totara_competency-profile__accordion-item-content {
+        background-color: #f9f9f9;
+        border: 1px #cbcbcb solid;
+        border-top: 0;
+        border-radius: 0 0 5px 5px;
+    }
+}
+
+.totara_competency-profile-accordion-item__fade-enter-active,
+.totara_competency-profile-accordion-item__fade-leave-active {
+    transition: opacity .5s;
+}
+.totara_competency-profile-accordion-item__fade-enter,
+.totara_competency-profile-accordion-item__fade-leave-to {
+    opacity: 0;
+}
+
 .totara_competency-list__cell {
 
     padding: 1.5rem;
@@ -79,7 +128,7 @@
     border-radius: 4px;
     padding: 6px 12px;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
     height: 34px;
 }
 
@@ -96,55 +145,6 @@
 
 .totara_competency-profile__progress-card {
     width: 250px;
-}
-
-.totara_competency-accordion__items {
-    & > div:not(:last-child) {
-        padding-bottom: 5px;
-    }
-}
-
-.totara_competency-accordion__header {
-    display: flex;
-    flex-direction: row-reverse;
-    padding: 15px 0;
-}
-
-.totara_competency-profile__accordion-item {
-    & .totara_competency-profile__accordion-item-header {
-        display: inline-flex;
-        padding: 15px;
-        width: 100%;
-        line-height: 15px;
-        background-color: #f7f7f7;
-        border: 1px #979797 solid;
-        cursor: pointer;
-
-
-        &[data-is-open="open"] {
-            border-radius: 5px 5px 0 0;
-        }
-
-        &[data-is-open="closed"] {
-            border-radius: 5px;
-        }
-    }
-
-    & .totara_competency-profile__accordion-item-content {
-        background-color: #f9f9f9;
-        border: 1px #cbcbcb solid;
-        border-top: 0;
-        border-radius: 0 0 5px 5px;
-    }
-}
-
-.totara_competency-profile-accordion-item__fade-enter-active,
-.totara_competency-profile-accordion-item__fade-leave-active {
-    transition: opacity .5s;
-}
-.totara_competency-profile-accordion-item__fade-enter,
-.totara_competency-profile-accordion-item__fade-leave-to {
-    opacity: 0;
 }
 
 // Header, the big boy.
