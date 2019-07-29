@@ -83,7 +83,7 @@ define(['core/templates', 'core/ajax', 'core/notification', 'core/event'], funct
             // Listener for filter
             this.widget.addEventListener(selectRegionPanelEvents + ':add', function(e) {
                 that.setFilterAdd(e.detail);
-                that.filterPanelCount ++;
+                that.filterPanelCount++;
                 that.setFilterPanelToggleCount();
             });
             this.widget.addEventListener(selectRegionPanelEvents + ':changed', function() {
@@ -91,7 +91,7 @@ define(['core/templates', 'core/ajax', 'core/notification', 'core/event'], funct
             });
             this.widget.addEventListener(selectRegionPanelEvents + ':remove', function(e) {
                 that.setFilterRemove(e.detail);
-                that.filterPanelCount --;
+                that.filterPanelCount--;
                 that.setFilterPanelToggleCount();
             });
 
@@ -671,7 +671,7 @@ define(['core/templates', 'core/ajax', 'core/notification', 'core/event'], funct
          *
          */
         setFilterPanelToggleCount: function() {
-            var toggleBtnContent = this.filterPanelCount === 0 ? '' : '( ' + this.filterPanelCount + ' )',
+            var toggleBtnContent = this.filterPanelCount >= 1 ? '( ' + this.filterPanelCount + ' )' : '',
                 node = this.widget.querySelector('[data-tw-toggleFilterPanel]');
             node.setAttribute('data-tw-toggleFilterPanel-addLabelContent', toggleBtnContent);
         },

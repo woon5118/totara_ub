@@ -297,7 +297,10 @@ define([], function() {
             if (!activeNode) {
                 var defaultNode = this.widget.querySelector('[data-tw-selectTree-default] [data-tw-selectTree-urlVal]');
                 if (defaultNode) {
-                    this.setEventType(defaultNode.getAttribute('data-tw-selectTree-urlVal'));
+                    var defaultNodeValue = defaultNode.getAttribute('data-tw-selectTree-urlVal');
+                    if (defaultNodeValue) {
+                        this.setEventType(defaultNodeValue);
+                    }
                 }
                 return;
             }
