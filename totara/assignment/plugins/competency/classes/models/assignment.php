@@ -331,7 +331,19 @@ class assignment {
      * @return competency
      */
     public function get_competency(): competency {
-        return competency::repository()->find($this->entity->competency_id);
+        if ($this->competency) {
+            return $this->competency;
+        } elseif ($this->entity->has_attribute('competency')) {
+            $this->competency = $this->entity->competency;
+        } else {
+            $this->competency = competency::repository()->find($this->entity->competency_id);
+
+            if (!$this->competency) {
+                throw new \moodle_exception('Requested competency does not exist');
+            }
+        }
+
+        return $this->get_competency();
     }
 
     /**
@@ -422,10 +434,7 @@ class assignment {
             case 'progress_name':
                 return $this->get_progress_name();
             case 'competency':
-                if (!$this->competency) {
-                    $this->competency = competency::repository()->find($this->entity->competency_id);
-                }
-                return $this->competency;
+                return $this->get_competency();
             default:
                 if ($this->entity->has_attribute($field)) {
                     return $this->entity->$field;

@@ -92,6 +92,7 @@ class assignment extends \external_api {
         $order_dir = (strtolower($order_dir) == 'asc') ? 'ASC' : 'DESC';
 
         $repository = entities\assignment::repository()
+            ->select('*')
             ->with_names()
             ->set_filters($filters);
 

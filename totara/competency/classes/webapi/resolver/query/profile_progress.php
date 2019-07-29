@@ -25,7 +25,7 @@ namespace totara_competency\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use totara_competency\models\progress;
+use totara_competency\data_providers\progress;
 
 class profile_progress implements query_resolver {
     public static function resolve(array $args, execution_context $ec) {

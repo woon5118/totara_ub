@@ -27,36 +27,31 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use totara_competency\data_providers\competency_progress;
 
-class profile_competency_progress implements query_resolver {
+class profile_competency_details implements query_resolver {
     public static function resolve(array $args, execution_context $ec) {
         if (!isset($args['user_id'])) {
             throw new \coding_exception('User id is required');
         }
+        if (!isset($args['competency_id'])) {
+            throw new \coding_exception('Competency id is required');
+        }
 
         $progress = competency_progress::for($args['user_id']);
-        $progress->set_filters($args['filters'] ?? [])
-            ->set_order($args['order'] ?? null)
-            ->fetch();
+        $progress = $progress->fetch_for_competency($args['competency_id']);
 
-        $all = $progress->get()->map(function($competency_progress) {
-            return (object) [
-                'competency' => $competency_progress->competency,
-                'items' => array_map(function($assignment) {
-                    $proficient = $assignment->has_field('achievement') ? ($assignment->get_field('achievement')->scale_value->proficient ?? false) : false;
+        return (object) [
+            'competency' => $progress->competency,
+            'items' => array_map(function($assignment) {
+                $proficient = $assignment->has_field('achievement') ? ($assignment->get_field('achievement')->scale_value->proficient ?? false) : false;
 
-                    return( (object) [
-                        'assignment' => $assignment,
-                        'competency' => $assignment->get_competency(),
-                        'proficient' => boolval($proficient),
-                        'my_value' => $assignment->has_field('achievement') ? $assignment->get_field('achievement')->scale_value : null,
-                        'min_value' => $assignment->get_competency()->scale->min_proficient_value ?? null,
-                    ]);
-                }, $competency_progress->assignments),
-            ];
-        })->all();
-
-        //var_dump($all);die;
-
-        return $all;
+                return( (object) [
+                    'assignment' => $assignment,
+                    'competency' => $assignment->get_competency(),
+                    'proficient' => boolval($proficient),
+                    'my_value' => $assignment->has_field('achievement') ? $assignment->get_field('achievement')->scale_value : null,
+                    'min_value' => $assignment->get_competency()->scale->min_proficient_value ?? null,
+                ]);
+            }, $progress->assignments),
+        ];
     }
 }

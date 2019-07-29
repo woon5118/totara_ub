@@ -21,7 +21,7 @@
  * @package totara_competency
  */
 
-namespace totara_competency\models;
+namespace totara_competency\data_providers;
 
 
 use totara_assignment\entities\user;
@@ -35,7 +35,7 @@ use core\orm\entity\entity;
  * @internal
  * @package totara_competency\models
  */
-abstract class model {
+abstract class user_data_provider {
 
     protected $user;
 

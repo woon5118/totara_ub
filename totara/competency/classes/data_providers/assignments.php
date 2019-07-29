@@ -21,9 +21,10 @@
  * @package totara_competency
  */
 
-namespace totara_competency\models;
+namespace totara_competency\data_providers;
 
 
+use core\orm\query\subquery;
 use tassign_competency\entities\assignment;
 use tassign_competency\entities\assignment_repository;
 use tassign_competency\entities\competency;
@@ -34,7 +35,7 @@ use totara_competency\entities\scale_value;
 use core\orm\query\builder;
 use core\orm\collection;
 
-class assignments extends model {
+class assignments extends user_data_provider {
 
     protected $with_competencies = false;
 
@@ -91,13 +92,50 @@ class assignments extends model {
 
         $this->apply_filters($repo);
 
+        // TODO this is a temporary workaround to accommodate for archived assignments
+        // There probably should be something better
+
+        $positions = builder::table('job_assignment')
+            ->select_raw('distinct positionid as position_id')
+            ->where('userid', $this->user->id)
+            ->get()
+            ->pluck('position_id');
+
+        $organisations = builder::table('job_assignment')
+            ->select_raw('distinct organisationid as organisation_id')
+            ->where('userid', $this->user->id)
+            ->get()
+            ->pluck('organisation_id');
+
+        $audiences = builder::table('cohort_members')
+            ->select_raw('distinct cohortid as audience_id')
+            ->where('userid', $this->user->id)
+            ->get()
+            ->pluck('audience_id');
+
         $this->items = $repo
-            ->select(['*', 'ass_user.created_at as assigned_at'])
+            ->select('*')
+            ->add_select((new subquery(function (builder $builder) {
+                $builder->from('totara_assignment_competency_users')
+                    ->select('created_at')
+                    ->where_field('assignment_id', 'totara_assignment_competencies.id')
+                    ->where('user_id', $this->user->id);
+                }))->as('assigned_at'))
             ->with_user_group_name()
             ->with_competency_name()
-            ->join(['totara_assignment_competency_users', 'ass_user'], 'id', 'assignment_id')
-            ->where('ass_user.user_id', $this->user->id)
-            ->where('ass_user.user_id', $this->user->id)
+            ->where('status', '!=', assignment::STATUS_DRAFT)
+            ->where(function(builder $builder) use ($positions, $organisations, $audiences) {
+                $builder->where(function(builder $builder) use ($audiences) {
+                    $builder->where('user_group_type', user_groups::COHORT)
+                        ->where('user_group_id', $audiences);
+                })->or_where(function(builder $builder) use ($positions) {
+                    $builder->where('user_group_type', user_groups::POSITION)
+                        ->where('user_group_id', $positions);
+                })->or_where(function(builder $builder) use ($organisations) {
+                    $builder->where('user_group_type', user_groups::ORGANISATION)
+                        ->where('user_group_id', $organisations);
+                });
+            })
             ->get();
 
         return $this;
@@ -213,23 +251,23 @@ class assignments extends model {
 
         // Let's compare status
         if ($first->status != $second->status) {
-            return $first->status <= $second->status ? -1 : 1;
+            return $first->status <=> $second->status;
         }
 
         // Let's compare types first
         if ($first->type != $second->type) {
-            return $type_map[$first->type] < $type_map[$second->type] ? -1 : 1;
+            return $type_map[$first->type] <=> $type_map[$second->type];
         }
 
         // Let's compare user group first
         if ($first->user_group_type != $second->user_group_type) {
-            return $ug_type_map[$first->user_group_type] < $ug_type_map[$second->user_group_type] ? -1 : 1;
+            return $ug_type_map[$first->user_group_type] <=> $ug_type_map[$second->user_group_type];
         }
 
         // Then assignment type is the same, let's compare assignment creation date then
         if ($first->created_at != $second->created_at) {
             // Most recent first
-            return $first->created_at > $second->created_at ? -1 : 1;
+            return $second->created_at <=> $first->created_at;
         }
 
         // If assignments were fetched with competency names, we use their name to sort alphabetically if
@@ -293,10 +331,14 @@ class assignments extends model {
         $repository->where('user_group_id', $value);
     }
 
+    protected function filter_by_competency_id(assignment_repository $repository, int $value) {
+        $repository->where('competency_id', $value);
+    }
+
     protected function filter_by_search(assignment_repository $repository, $value) {
-//        if (true || !$repository->has_join('comp')) { // TODO remove true
-//            $repository->join('comp', 'competency_id', 'id');
-//        }
+        if (!$repository->has_join('comp')) {
+            $repository->join('comp', 'competency_id', 'id');
+        }
 
         $repository->where(function(builder $builder) use ($value) {
             $builder->where('comp.fullname', 'ilike', $value)

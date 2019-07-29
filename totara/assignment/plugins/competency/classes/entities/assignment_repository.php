@@ -189,7 +189,7 @@ class assignment_repository extends entity_repository {
         //   WHEN type = USER and empty ug_name THEN NULL
         //   ...
         // PS someone, find a better way of doing this.
-        $this->builder->select('*')
+        $this->builder
             // Later we want to run the name fields through the fullname function so we need all of them
             ->add_select_raw(totara_get_all_user_name_fields(true, '"user"', null, null, true))
             ->add_select_raw(
@@ -216,8 +216,12 @@ class assignment_repository extends entity_repository {
      * @return $this
      */
     public function with_competency_name(): assignment_repository {
-        $this->builder->join('comp', 'competency_id', 'id')
-            ->add_select('comp.fullname as competency_name')
+
+        if (!$this->builder->has_join('comp')) {
+            $this->builder->join('comp', 'competency_id', 'id');
+        }
+
+        $this->add_select('comp.fullname as competency_name')
             ->add_select('comp.description as competency_description');
 
         return $this;

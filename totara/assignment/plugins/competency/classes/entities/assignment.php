@@ -92,9 +92,10 @@ class assignment extends entity {
     /**
      * Get status attribute
      *
+     * @param int $status
      * @return int
      */
-    public function get_status_attribute($status): int {
+    public function get_status_attribute($status = 0): int {
         return (int) $status;
     }
 

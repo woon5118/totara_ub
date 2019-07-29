@@ -1,38 +1,18 @@
 <template>
-  <div class="totara_competency-profile__accordion-item">
-    <div
-      class="totara_competency-profile__accordion-item-header"
-      :data-is-open="open ? 'open' : 'closed'"
-      @click.prevent="toggle"
-    >
-      <!-- Header -->
-      <div>
-        <FlexIcon :id="toggleIcon"></FlexIcon>
-      </div>
-      <div style="padding-left: 7px;">
-        <strong>
-          {{ name }}
-        </strong>
-      </div>
-    </div>
-    <transition name="totara_competency-profile-accordion-item__fade">
-      <div
-        v-if="open"
-        class="totara_competency-profile__accordion-item-content"
-      >
-        <!-- Content -->
-        <slot></slot>
-      </div>
-    </transition>
+  <div v-if="isActive" class="tui-ProfileTab" role="tabpanel">
+    <!-- Content -->
+    <slot></slot>
   </div>
 </template>
 
 <script>
-import FlexIcon from '../../../core/tui/presentation/icons/FlexIcon';
 export default {
-  components: { FlexIcon },
   props: {
     name: {
+      type: String,
+      required: true
+    },
+    subtitle: {
       type: String,
       required: true
     },
@@ -40,7 +20,7 @@ export default {
       type: [String, Number],
       required: true
     },
-    isOpen: {
+    active: {
       type: Boolean,
       default: false
     }
@@ -48,35 +28,25 @@ export default {
 
   data: function() {
     return {
-      open: false
+      isActive: false
     };
   },
 
-  computed: {
-    toggleIcon: function() {
-      return this.open
-        ? 'totara_core|accordion-expanded'
-        : 'totara_core|accordion-collapsed';
-    }
-  },
+  computed: {},
 
   watch: {
-    isOpen: function(newValue) {
-      this.open = newValue;
+    active(newValue) {
+      this.isActive = newValue;
     }
   },
 
   created: function() {
-    this.open = this.isOpen;
+    this.isActive = this.active;
   },
 
   mounted: function() {},
 
-  methods: {
-    toggle: function() {
-      this.open = !this.open;
-    }
-  }
+  methods: {}
 };
 </script>
 <style lang="scss">

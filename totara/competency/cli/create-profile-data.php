@@ -25,6 +25,12 @@ function create_data() {
         'audiences' => [],
         'scales' => [],
         'comps' => [],
+        'description' => '<h1>What to look for on this site?</h1><hr/><p>
+This is to have some demonstration of the competency profile and related functionality, so far there is a few pages available,
+including the competency profile page itself with various graphs and table. Different competencies have different scales, some users have achievements, some not.
+Please remember: <i>This is still work in progress.</i><br/>
+Feel free to browse, list of users is below, their password is 12345.
+</p>'
     ];
 
     // First we need to create a few users
@@ -35,6 +41,7 @@ function create_data() {
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has all available assignments, no archived.',
         ],
         'ss' => [
             'firstname' => 'Steven',
@@ -42,6 +49,7 @@ function create_data() {
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has all available assignments, some archived.',
         ],
         'dt' => [
             'firstname' => 'Denny',
@@ -49,6 +57,7 @@ function create_data() {
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has one current and one archived assignment.',
         ],
         'jt' => [
             'firstname' => 'John',
@@ -56,6 +65,7 @@ function create_data() {
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has 7 assignments',
         ],
         'ut' => [
             'firstname' => 'Uma',
@@ -63,6 +73,7 @@ function create_data() {
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has 10 assignments + archived',
         ],
         'sj' => [
             'firstname' => 'Samuel',
@@ -70,6 +81,7 @@ function create_data() {
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has 3 assignments',
         ],
         'tr' => [
             'firstname' => 'Tim',
@@ -77,6 +89,7 @@ function create_data() {
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has something.',
         ],
         'bw' => [
             'firstname' => 'Bruce',
@@ -84,6 +97,7 @@ function create_data() {
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has a self-assignment and an audience assignment.',
         ],
         'vp' => [
             'firstname' => 'Vladimir',
@@ -91,19 +105,22 @@ function create_data() {
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has no assignments.',
         ],
         'bo' => [
             'firstname' => 'Barack',
             'lastname' => 'Obama',
             'caps' => [
             ],
+            'description' => 'Has assignments, but cannot view his competency profile.',
         ],
-        'jb' => [
+        'gb' => [
             'firstname' => 'George',
             'lastname' => 'Bush',
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has only archived assignments.',
         ],
         'gm' => [
             'firstname' => 'Glenn',
@@ -111,11 +128,12 @@ function create_data() {
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
+            'description' => 'Has exactly one current assignment',
         ],
     ];
 
     foreach ($users as $key => $user) {
-        $data['users'][$key] = create_user($user);
+        $data['users'][$key] = create_user($user, $key);
     }
 
     // Then we need to create a few scale values
@@ -606,7 +624,7 @@ function create_data() {
                     'description' => 'Very important accountant',
                     'members' => [
                         'jt' => get_user('jt', $data), // To assign and archive
-                        'jb' => get_user('jb', $data),
+                        'gb' => get_user('gb', $data),
                         'bo' => get_user('bo', $data),
                     ],
                     'competencies' => [
@@ -624,7 +642,7 @@ function create_data() {
                     'fullname' => 'Human Relation Manager',
                     'description' => 'No one can survive without HR manager, especially the one making decisions without being competent in the area',
                     'members' => [
-                        'jb' => get_user('jb', $data), // To assign and archive
+                        'gb' => get_user('gb', $data), // To assign and archive
                         'bo' => get_user('bo', $data),
                     ],
                     'competencies' => [
@@ -940,16 +958,30 @@ function create_data() {
 
         archive_assignment($ass[0], $ass[1] ?? false);
     }
+
+    create_info_block($data);
 }
 
 /**
  * Create a user and assign given capabilities (if any)
  *
  * @param array $attributes
+ * @param null $username
  * @return stdClass
+ * @throws coding_exception
+ * @throws dml_exception
  */
-function create_user($attributes) {
-    $user = generator()->create_user($attributes);
+function create_user($attributes, $username = null) {
+
+    $defaults = [
+        'password' => '12345',
+        'username' => $username
+    ];
+
+    $user = generator()->create_user($attributes = array_merge($defaults, $attributes));
+
+    $user->password = $attributes['password'];
+    $user->description = $attributes['description'] ?? null;
 
     if (is_array($attributes['caps'] ?? null)) {
         // Let's allow the user what we want to.
@@ -1339,6 +1371,51 @@ function hierarchy_generator() {
  */
 function assignment_generator() {
     return generator()->get_plugin_generator('tassign_competency');
+}
+
+function create_info_block($data) {
+
+    $html = '';
+
+    if ($data['description']) {
+        $html .= $data['description'];
+    }
+    // Let's build description.
+    foreach ($data['users'] as $key => $user) {
+        $html .= '<div>
+<p>
+    <strong>' . $user->firstname . ' ' . $user->lastname . '</strong> - login: <storng>' . $user->username . '</storng>';
+
+        if ($user->description) {
+            $html .= '<br/>' . $user->description;
+        }
+
+        $html .= '</p>
+</div>';
+    }
+
+    $object = [
+        'blockname' => 'html',
+        'parentcontextid' => 2,
+        'showinsubcontexts' => 0,
+        'requiredbytheme' => 0,
+        'pagetypepattern' => 'site-index',
+        'defaultregion' => 'main',
+        'defaultweight' => 1,
+        'configdata' => base64_encode(serialize((object) [
+            'text' => $html,
+            'format' => 1,
+        ])),
+        'common_config' => json_encode([
+            'title' => 'What to look for?',
+            'override_title' => true,
+            'enable_hiding' => false,
+            'show_header' => false,
+            'show_border' => false
+        ]),
+    ];
+
+    builder::table('block_instances')->insert($object);
 }
 
 /**

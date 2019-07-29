@@ -4,13 +4,10 @@ query totara_competency_progress_for_user($user_id: core_id, $filters: totara_co
             fullname
         }
         items {
-            key
-            name
             overall_progress
-            competencies {
-                id
-                assignment_id
-                name
+            name
+            items {
+                proficient
                 min_value {
                     id
                     name
@@ -22,6 +19,10 @@ query totara_competency_progress_for_user($user_id: core_id, $filters: totara_co
                     name
                     percentage
                     proficient
+                }
+                competency {
+                    id
+                    fullname
                 }
             }
         }

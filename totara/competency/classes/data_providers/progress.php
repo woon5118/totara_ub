@@ -21,18 +21,17 @@
  * @package totara_competency
  */
 
-namespace totara_competency\models;
+namespace totara_competency\data_providers;
 
 
 use tassign_competency\entities\assignment;
 use totara_assignment\entities\user;
-use totara_assignment\user_groups;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
 use core\orm\collection;
 
-class progress extends model {
+class progress extends user_data_provider {
 
     /**
      * @var assignments

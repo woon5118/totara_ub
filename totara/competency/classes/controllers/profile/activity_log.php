@@ -23,42 +23,28 @@
 
 namespace totara_competency\controllers\profile;
 
+use totara_competency\entities\competency;
 use totara_mvc\view;
-use user_picture;
 
-
-class index extends base {
+class activity_log extends base {
 
     public function action() {
-
         global $OUTPUT;
 
         // Add breadcrumbs.
-        $this->add_navigation();
-
-        $title = get_string('competency_profile', 'totara_competency', $this->user->firstname . ' ' . $this->user->lastname);
+        $this->add_navigation(get_string('competencydetails', 'totara_hierarchy'));
 
         $props = [
-            'profile-picture' => $this->get_my_profile_picture_url(),
-            'self-assignment-url' => (string) $this->get_self_assignment_url(),
             'user-id' => $this->user->id,
-            'user-name' => $this->user->fullname,
-            'is-mine' => $this->is_for_current_user(),
             'base-url' => (string) $this->get_base_url(),
+            'go-back-link' => (string)$this->get_profile_url(),
         ];
 
         $data = [
-            'title' => $title,
-            'competency_profile' => $OUTPUT->tui_component('totara_competency/views/CompetencyProfile', $props),
+            'component' => $OUTPUT->tui_component('totara_competency/views/ActivityLog', $props)
         ];
 
-        return view::create('totara_competency/profile_index', $data)
-            ->set_title($title);
-    }
-
-    protected function get_my_profile_picture_url(int $size = 100): string {
-        $avatar = new user_picture((object)($this->user->to_array()));
-        $avatar->size = $size;
-        return $avatar->get_url($this->page);
+        return view::create('totara_competency/profile_competency_details', $data)
+            ->set_title(get_string('activity_log', 'totara_competency'));
     }
 }

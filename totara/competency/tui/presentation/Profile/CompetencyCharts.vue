@@ -8,10 +8,10 @@
     <template v-else>
       <Accordion ref="assignmentsProgressAccordion">
         <AccordionItem
-          v-for="item in data.items"
-          :key="item.key"
+          v-for="(item, key) in data.items"
+          :key="key"
           :name="item.name"
-          :item-key="item.key"
+          :item-key="key"
           :is-open="data.items.length <= 5"
         >
           <IndividualAssignmentProgress
@@ -32,14 +32,14 @@ export default {
   components: {
     IndividualAssignmentProgress,
     AccordionItem,
-    Accordion,
+    Accordion
   },
 
   props: {
     data: {
       required: true,
-      type: Object,
-    },
+      type: Object
+    }
   },
 
   data: function() {
@@ -52,7 +52,7 @@ export default {
 
   mounted: function() {},
 
-  methods: {},
+  methods: {}
 };
 </script>
 <style lang="scss"></style>

@@ -51,24 +51,24 @@ export default {
   props: {
     data: {
       type: Array,
-      required: true,
+      required: true
     },
 
     columns: {
       type: Array,
-      required: true,
+      required: true
     },
 
     rowKey: {
       type: [String, Function],
       required: false,
-      default: null,
-    },
+      default: null
+    }
   },
 
   data: function() {
     return {
-      items: [],
+      items: []
     };
   },
 
@@ -76,7 +76,7 @@ export default {
     getData: function() {
       // TODO support passing paginated data
       return this.data;
-    },
+    }
   },
 
   mounted: function() {
@@ -143,23 +143,34 @@ export default {
     getColumnSize: function(column) {
       if (typeof column.size === 'string') {
         return {
-          ['totara_competency-list__cell-size-' + column.size]: true,
+          ['totara_competency-list__cell-size-' + column.size]: true
         };
       }
     },
 
     getColumnAlignment: function(column) {
-      if (typeof column.alignment === 'string') {
-        return {
-          ['totara_competency-list__cell-align-' + column.alignment]: true,
-        };
+      let alignment = column.alignment;
+
+      if (typeof alignment !== 'undefined') {
+        if (!Array.isArray(alignment)) {
+          alignment = [alignment];
+        }
+
+        let result = {};
+
+        alignment.forEach(item => {
+          if (typeof item === 'string') {
+            result[`totara_competency-list__cell-align-${item}`] = true;
+          }
+        });
+        return result;
       }
     },
 
     getColumnClasses: function(column) {
       let classes = {
         'totara_competency-list__cell-grow':
-          typeof column.grow === 'boolean' && column.grow === true,
+          typeof column.grow === 'boolean' && column.grow === true
       };
 
       return Object.assign(
@@ -167,8 +178,8 @@ export default {
         this.getColumnSize(column),
         this.getColumnAlignment(column)
       );
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss">

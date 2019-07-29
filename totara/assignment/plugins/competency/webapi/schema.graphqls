@@ -13,8 +13,9 @@ type tassign_competency_assignment {
     optional: Boolean
     status: Int!
     created_by: Int
-    created_at (format: core_date_format = HTML): core_date!
-    updated_at (format: core_date_format = HTML): core_date!
+    created_at (format: core_date_format = TIMESTAMP): core_date!
+    updated_at (format: core_date_format = TIMESTAMP): core_date!
+    archived_at (format: core_date_format = TIMESTAMP): core_date
     competency: totara_competency_competency!
     user_group: tassign_competency_user_group!
     progress_name (format: core_format = HTML): String

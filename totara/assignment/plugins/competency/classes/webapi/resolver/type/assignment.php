@@ -45,10 +45,8 @@ class assignment implements type_resolver {
             throw new \coding_exception('Accepting only assignment models.');
         }
 
-        $format = $args['format'] ?? null;
-
         $formatter = new assignment_formatter($assignment, \context_system::instance());
-        return $formatter->format($field, $format);
+        return $formatter->format($field, $args['format'] ?? null);
     }
 
 }

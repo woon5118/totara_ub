@@ -46,6 +46,7 @@ abstract class base extends controller {
     protected $user = null;
 
     protected function setup_context(): context {
+        require_login();
 
         // Let's make sure that we've tried to get user id off the query parameters
         // and if not we get a user id off the logged in user.
@@ -61,7 +62,7 @@ abstract class base extends controller {
      * @return $this
      */
     protected function authorize() {
-        parent::authorize();
+        // parent::authorize(); We don't need to call require login here, it's always required.
 
         $this->is_for_current_user() ?
             require_capability('totara/competency:view_own_profile', context_system::instance()) :
@@ -150,6 +151,10 @@ abstract class base extends controller {
         }
 
         return $this;
+    }
+
+    public function get_base_url() {
+        return new moodle_url('/totara/competency/profile', []);
     }
 
     public function get_profile_url() {

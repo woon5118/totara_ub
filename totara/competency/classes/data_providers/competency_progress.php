@@ -21,14 +21,15 @@
  * @package totara_competency
  */
 
-namespace totara_competency\models;
+namespace totara_competency\data_providers;
 
 
 use stdClass;
 use tassign_competency\entities\assignment;
 use core\orm\collection;
+use tassign_competency\models\assignment as assignment_model;
 
-class competency_progress extends model {
+class competency_progress extends user_data_provider {
 
     /**
      * Progress object
@@ -75,6 +76,14 @@ class competency_progress extends model {
         return $this->build_competency_progress_list();
     }
 
+    public function fetch_for_competency(int $competency_id) {
+        $this->set_filters([
+            'competency_id' => $competency_id,
+        ]);
+
+        return $this->fetch()->get()->first();
+    }
+
     protected function build_competency_progress_list() {
         $competencies = [];
 
@@ -98,19 +107,35 @@ class competency_progress extends model {
             ];
         }
 
-        $current->assignments[] = \tassign_competency\models\assignment::load_by_entity($assignment);
+        $current->assignments[] = assignment_model::load_by_entity($assignment);
 
         return $current;
     }
 
     protected function order_progress() {
+
+        $latestAssignment = function($assignments, $field) {
+            $maxDate = 0;
+            foreach ($assignments as $assignment) {
+                if ($assignment->get_field($field) > $maxDate) {
+                    $maxDate = $assignment->get_field($field);
+                }
+            }
+
+            return $maxDate;
+        };
+
         switch ($this->order) {
             case 'recently-assigned': // TODO const?
-                $this->items->sort('assigned_at', 'desc');
+                $this->items->sort(function ($a, $b) use ($latestAssignment) {
+                    return $latestAssignment($b->assignments, 'assigned_at') <=> $latestAssignment($a->assignments, 'assigned_at');
+                });
                 break;
 
             case 'recently-archived':
-                $this->items->sort('assigned_at', 'desc'); // TODO add proper sorting here
+                $this->items->sort(function ($a, $b) use ($latestAssignment) {
+                    return $latestAssignment($b->assignments, 'archived_at') <=> $latestAssignment($a->assignments, 'archived_at');
+                });
                 break;
 
             case 'alphabetical':
@@ -130,7 +155,6 @@ class competency_progress extends model {
     }
 
     protected function filter_progress() {
-
         $filters = array_filter($this->filters, function($key) {
             return in_array($key, ['proficient']);
         }, ARRAY_FILTER_USE_KEY);
@@ -169,7 +193,7 @@ class competency_progress extends model {
         parent::set_filters($filters);
 
         $progress_filters = array_filter($filters, function($key) {
-            return in_array($key, ['status', 'type', 'user_group_type', 'user_group_id', 'search']);
+            return in_array($key, ['status', 'type', 'user_group_type', 'user_group_id', 'search', 'competency_id']);
         }, ARRAY_FILTER_USE_KEY);
 
         if ($this->progress) {

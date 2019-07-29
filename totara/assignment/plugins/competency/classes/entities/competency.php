@@ -77,6 +77,7 @@ class competency extends hierarchy_item {
     public function get_assigned_user_groups_attribute(): array {
         $assignments = assignment::repository()
             ->where('competency_id', $this->id)
+            ->select('*')
             ->with_user_group_name()
             ->get();
 

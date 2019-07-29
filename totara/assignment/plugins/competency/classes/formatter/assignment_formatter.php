@@ -45,6 +45,7 @@ class assignment_formatter extends formatter {
             'created_by' => null,
             'created_at' => date_field_formatter::class,
             'updated_at' => date_field_formatter::class,
+            'archived_at' => date_field_formatter::class,
             'user_group' => null,
             'competency' => null,
             'status_name' => null,
