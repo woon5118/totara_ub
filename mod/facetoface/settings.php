@@ -137,6 +137,20 @@ if ($ADMIN->fulltree) { // Improve performance.
     $setting->set_updatedcallback('facetoface_displaysessiontimezones_updated');
     $settings->add($setting);
 
+    $options = [];
+    $options[\mod_facetoface\room::ROOM_IDENTIFIER_NAME] = new lang_string('roomidentifier_nameonly', 'facetoface');
+    $options[\mod_facetoface\room::ROOM_IDENTIFIER_BUILDING] = new lang_string('roomidentifier_name_building', 'facetoface');
+    $options[\mod_facetoface\room::ROOM_IDENTIFIER_LOCATION] = new lang_string('roomidentifier_name_building_address', 'facetoface');
+    $settings->add(
+        new admin_setting_configselect(
+            'facetoface_roomidentifier',
+            new lang_string('setting:roomidentifier', 'mod_facetoface'),
+            new lang_string('setting:roomidentifier_help', 'mod_facetoface'),
+            \mod_facetoface\room::ROOM_IDENTIFIER_NAME,
+            $options
+        )
+    );
+
     $settings->add(
         new admin_setting_configcheckbox(
             'facetoface_selectjobassignmentonsignupglobal',

@@ -33,6 +33,13 @@ final class room implements seminar_iterator_item {
     use traits\crud_mapper;
 
     /**
+     * Room identifier options
+     */
+    const ROOM_IDENTIFIER_NAME = 0;
+    const ROOM_IDENTIFIER_BUILDING = 1;
+    const ROOM_IDENTIFIER_LOCATION = 2;
+
+    /**
      * @var int {facetoface_room}.id
      */
     private $id = 0;
@@ -106,27 +113,58 @@ final class room implements seminar_iterator_item {
 
     /**
      * Get names of customfields that should be displayed along with rooms name
+     *
+     * @param bool $all if true return all possible display custom fields, otherwise return fields based on roomidentifier setting
      * @return array
      */
-    protected static function get_display_customfields() : array {
-        return [CUSTOMFIELD_BUILDING, CUSTOMFIELD_LOCATION];
+    protected static function get_display_customfields(bool $all = true): array {
+        if ($all) {
+            return [CUSTOMFIELD_BUILDING, CUSTOMFIELD_LOCATION];
+        } else {
+            global $CFG;
+            switch ($CFG->facetoface_roomidentifier) {
+                case self::ROOM_IDENTIFIER_BUILDING:
+                    return [CUSTOMFIELD_BUILDING];
+
+                case self::ROOM_IDENTIFIER_LOCATION:
+                    return [CUSTOMFIELD_BUILDING, CUSTOMFIELD_LOCATION];
+
+                default:
+                    return [];
+            }
+        }
     }
 
     /**
-     * get a detailed room description as a string
+     * Get a detailed room description as a string
+     *
      * @return string
      */
-    public function __toString() : string {
+    public function __toString(): string {
+        // Return all details, regardless of roomidentifier configuration.
+        return $this->get_detailed_name(true);
+    }
+
+    /**
+     * Get a detailed room description as a string
+     *
+     * @param bool $all_fields if true include all possible display custom fields, otherwise include fields based on roomidentifier setting
+     * @return string
+     */
+    public function get_detailed_name(bool $all_fields = false): string {
         $customfields = $this->get_customfield_array();
 
-        $displayfields = static::get_display_customfields();
-
+        $displayfields = static::get_display_customfields($all_fields);
 
         $items = [];
         $items[] = isset($this->name) ? $this->name : null;
         foreach ($displayfields as $field) {
             if (!empty($customfields[$field])) {
-                $items[] = $customfields[$field];
+                if ($field == CUSTOMFIELD_LOCATION) {
+                    $items[] = str_replace('<br />', ', ', $customfields[$field]);
+                } else {
+                    $items[] = $customfields[$field];
+                }
             }
         }
 

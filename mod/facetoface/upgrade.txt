@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* mod_facetoface_renderer::get_room_details_html() displays room custom fields (or not) depending on the facetoface_roomidentifier setting
+* room::get_display_customfields() returns building and location by default, but will optionally return fields based on facetoface_roomidentifier setting
 * 'teacher' and 'editingteacher' roles got the 'mod/facetoface:viewallsessions' capability
 * [facetofacename] notification placeholder is changed to [seminarname]
 * new [seminardescription] notification placeholder is added to support seminar notifications
@@ -76,8 +78,7 @@ information provided here is intended especially for developers.
         * session list with the following for each session:
         * session dates/times
         * session duration
-        * linked room name
-        * room description
+        * linked room name (and identifiers if configured)
         * list of assets
 * mod_facetoface_renderer::print_userlist_table() has been updated to respect the showuseridentity config
 * take_attendance::create() has been updated, added 'Upload attendance' button

@@ -309,8 +309,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     if ($date->has_room() && $rooms->contains($date->get_roomid())) {
                         /** @var \mod_facetoface\room $room */
                         $room = $rooms->get($date->get_roomid());
-                        $link = $date->get_timefinish() > $time;
-                        $cell = new html_table_cell($this->get_room_details_html($room, $currenturl, $link));
+                        $cell = new html_table_cell($this->get_room_details_html($room, $currenturl));
                         $cell->attributes['class'] = 'mod_facetoface__sessionlist__room';
                         $sessionrow[] = $cell;
                     } else {
@@ -1610,12 +1609,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     /**
      * Gets the HTML output for room details.
      *
-     * @param \room $room - The room instance to get details for
+     * @param \mod_facetoface\room $room - The room instance to get details for
      * @param string|null $backurl
      * @return string containing room details with relevant html tags.
      */
-    public function get_room_details_html(room $room, string $backurl = null): string {
-
+    public function get_room_details_html(\mod_facetoface\room $room, string $backurl = null): string {
+        global $CFG;
         $url = new moodle_url('/mod/facetoface/reports/rooms.php', array(
             'roomid' => $room->get_id(),
             'b' => $backurl
@@ -1627,6 +1626,26 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $link = $this->output->action_link($url, s($room->get_name()), $action, array('class' => 'mod_facetoface__sessionlist__room__link'));
         /* both room and room_details CSS classes should be considered @deprecated as of t13 */
         $roomhtml = html_writer::span($link, 'room room_details');
+
+        // Display room custom fields?
+        if (!empty($CFG->facetoface_roomidentifier)) {
+            $customfields = $room->get_customfield_array();
+            $cfs = [];
+            // Always display building if present.
+            if (!empty($customfields[CUSTOMFIELD_BUILDING])) {
+                $cfs[] = s($customfields[CUSTOMFIELD_BUILDING]);
+            }
+            // Also display location if configured to, and present.
+            if ($CFG->facetoface_roomidentifier == \mod_facetoface\room::ROOM_IDENTIFIER_LOCATION && !empty($customfields[CUSTOMFIELD_LOCATION])) {
+                $cfs[] = s(str_replace('<br />', ', ', $customfields[CUSTOMFIELD_LOCATION]));
+            }
+            if (!empty($cfs)) {
+                $cf_glue = '<br>';
+                $cf_class = 'mod_facetoface__sessionlist__roomdetails';
+                $roomhtml .= html_writer::tag('span', implode($cf_glue, $cfs), ['class' => $cf_class]);
+            }
+        }
+
         return $roomhtml;
     }
 
@@ -2221,15 +2240,6 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     // Display room information
                     $backurl = $PAGE->has_set_url() ? $PAGE->url : null;
                     $roomstring = $this->get_room_details_html($room, $backurl);
-                    $descriptionhtml = file_rewrite_pluginfile_urls(
-                        $room->get_description(),
-                        'pluginfile.php',
-                        \context_system::instance()->id,
-                        'mod_facetoface',
-                        'room',
-                        $room->get_id()
-                    );
-                    $roomstring .= format_text($descriptionhtml, FORMAT_HTML);
                     $output .= html_writer::tag('dt', get_string('room', 'mod_facetoface') . ':');
                     $output .= html_writer::tag('dd', html_writer::tag('span', $roomstring, ['class' => 'roomdescription']));
                 }

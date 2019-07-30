@@ -84,7 +84,7 @@ final class room_filter implements filter {
         // Here used to be some fancy code that deal with missing room names,
         // that magic cannot be done easily any more, allow selection of named rooms only here.
         foreach ($rooms as $room) {
-            $roomname = format_string($room->get_name());
+            $roomname = format_string((string) $room);
             if ($roomname === '') {
                 continue;
             }
