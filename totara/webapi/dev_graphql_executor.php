@@ -21,6 +21,8 @@
  * @package totara_webapi
  */
 
+use GraphQL\Error\Debug;
+use GraphQL\Server\StandardServer;
 use core\webapi\execution_context;
 use totara_webapi\graphql;
 use totara_webapi\local\util;
@@ -46,8 +48,8 @@ try {
     $schema = graphql::get_schema();
     $schema->assertValid();
 
-    $server = new \GraphQL\Server\StandardServer([
-        'debug' => true,
+    $server = new StandardServer([
+        'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE,
         'schema' => $schema,
         'fieldResolver' => [graphql::class, 'default_resolver'],
         'rootValue' => graphql::get_server_root($schema),
@@ -56,6 +58,6 @@ try {
     ]);
     $server->handleRequest();
 } catch (Throwable $e) {
-    \GraphQL\Server\StandardServer::send500Error($e, true, true);
+    StandardServer::send500Error($e, Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE, true);
 }
 

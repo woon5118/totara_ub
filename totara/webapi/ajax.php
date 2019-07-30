@@ -33,6 +33,8 @@
  * interrupted by errors and order of execution may not be guaranteed in future.
  */
 
+use GraphQL\Error\Debug;
+use GraphQL\Error\FormattedError;
 use totara_webapi\graphql;
 use totara_webapi\local\util;
 use core\webapi\execution_context;
@@ -127,14 +129,21 @@ $PAGE->set_url('/totara/webapi/ajax.php');
 $ajaxrequest = fix_utf8($ajaxrequest);
 $return = [];
 
+// If debugging is enabled let's set flags to include message & trace
+if ((bool)$CFG->debugdeveloper) {
+    $debug = Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE;
+} else {
+    $debug = false;
+}
+
 foreach ($ajaxrequest as $op) {
     try {
         $result = graphql::execute_operation(execution_context::create('ajax', $op['operationName']), $op['variables']);
         $result->setErrorsHandler([util::class, 'graphql_error_handler']);
-        $return[] = $result->toArray((bool)$CFG->debugdeveloper);
+        $return[] = $result->toArray($debug);
     } catch (Throwable $ex) {
         $return[] = [
-            'errors' => [\GraphQL\Error\FormattedError::createFromException($ex, (bool)$CFG->debugdeveloper)],
+            'errors' => [FormattedError::createFromException($ex, $debug)],
         ];
     }
 }
