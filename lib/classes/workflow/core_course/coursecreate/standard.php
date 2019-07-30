@@ -38,7 +38,10 @@ class standard extends \totara_workflow\workflow\base {
     }
 
     public function get_image(): ?\moodle_url {
-        return new \moodle_url('/course/defaultimage.svg');
+        if ($this->output) {
+            return $this->output->image_url('course_defaultimage');
+        }
+        return new \moodle_url('/pix/course_defaultimage.svg');
     }
 
     protected function get_workflow_url(): \moodle_url {

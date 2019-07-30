@@ -36,6 +36,11 @@ abstract class base implements \templatable {
     protected $manager;
 
     /**
+     * @var \renderer_base
+     */
+    protected $output = null;
+
+    /**
      * Constructor.
      *
      * @param \totara_workflow\workflow_manager\base $workflowmanager
@@ -167,7 +172,7 @@ abstract class base implements \templatable {
      * @return array Template context data.
      */
     public function export_for_template(\renderer_base $output): array {
-
+        $this->output = $output;
         list($managercomponent, $manager, $workflowcomponent, $workflow) = self::split_classname(get_class($this));
 
         return [
