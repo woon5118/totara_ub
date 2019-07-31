@@ -31,6 +31,6 @@ use core_tag\totara_catalog\feature_factory as tag_feature_factory;
 class tags extends feature_factory {
 
     public static function get_features(): array {
-        return tag_feature_factory::get_features('course', 'course');
+        return tag_feature_factory::get_features('course', 'course', 'core');
     }
 }

@@ -1,0 +1,172 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Kian Nguyen <kian.nguyen@totaralearning.com>
+  @module totara_engage
+-->
+
+<template>
+  <div class="tui-accessDisplay">
+    <div class="tui-accessDisplay__accessIcon">
+      <div class="tui-accessDisplay__accessIcon__icons">
+        <AccessIcon :access="accessValue" size="300" />
+        <span>{{ viewLabel }}</span>
+      </div>
+      <div v-if="showButton" class="tui-accessDisplay__accessIcon__shareButton">
+        <Button
+          :text="$str('share', 'totara_engage')"
+          :styleclass="{ primary: true, small: true }"
+          @click="$emit('request-open')"
+        />
+      </div>
+    </div>
+
+    <div v-if="timeView" class="tui-accessDisplay__timeView">
+      <Clock
+        size="300"
+        :alt="$str('clock', 'totara_engage')"
+        custom-class="tui-icon--dimmed"
+      />
+      {{ getTimeView }}
+    </div>
+
+    <div v-if="topics.length" class="tui-accessDisplay__topics">
+      <TagIcon
+        size="200"
+        :alt="$str('tags', 'totara_engage')"
+        custom-class="tui-icon--dimmed"
+      />
+
+      <template v-for="(topic, index) in topics">
+        <Tag
+          :key="index"
+          :text="topic.value"
+          :href="$url('/totara/catalog/index.php')"
+          class="tui-accessDisplay__topics__topic"
+        />
+      </template>
+    </div>
+
+    <div v-if="showButton" class="tui-accessDisplay__editSettings">
+      <span
+        class="tui-accessDisplay__editSettings__text"
+        @click.prevent="$emit('request-open')"
+      >
+        {{ $str('editsettings', 'totara_engage') }}
+      </span>
+    </div>
+  </div>
+</template>
+
+<script>
+import TagIcon from 'tui/components/icons/common/Tags';
+import Tag from 'tui/components/tag/Tag';
+import Clock from 'tui/components/icons/common/Clock';
+import { AccessManager, TimeViewType } from 'totara_engage/index';
+import AccessIcon from 'totara_engage/components/icons/access/computed/AccessIcon';
+import Button from 'tui/components/buttons/Button';
+
+export default {
+  components: {
+    AccessIcon,
+    TagIcon,
+    Clock,
+    Tag,
+    Button,
+  },
+
+  props: {
+    accessValue: {
+      type: String,
+      required: true,
+      validator(prop) {
+        return AccessManager.isValid(prop);
+      },
+    },
+
+    topics: {
+      type: [Array, Object],
+      default() {
+        return [];
+      },
+
+      validator(topics) {
+        topics = Array.prototype.slice.call(topics);
+        for (let i in topics) {
+          if (!Object.prototype.hasOwnProperty.call(topics, i)) {
+            continue;
+          }
+
+          if (!topics[i].value) {
+            return false;
+          }
+        }
+
+        return true;
+      },
+    },
+
+    timeView: {
+      type: String,
+      default: null,
+    },
+    showButton: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  computed: {
+    viewLabel() {
+      if (AccessManager.isPublic(this.accessValue)) {
+        return this.$str('viewpublic', 'totara_engage');
+      } else if (AccessManager.isRestricted(this.accessValue)) {
+        return this.$str('viewrestricted', 'totara_engage');
+      }
+
+      return this.$str('viewprivate', 'totara_engage');
+    },
+
+    getTimeView() {
+      if (TimeViewType.isLessThanFive(this.timeView)) {
+        return this.$str('timelessthanfive', 'engage_article');
+      } else if (TimeViewType.isFiveToTen(this.timeView)) {
+        return this.$str('timefivetoten', 'engage_article');
+      } else if (TimeViewType.isMoreThanTen(this.timeView)) {
+        return this.$str('timemorethanten', 'engage_article');
+      }
+
+      return null;
+    },
+  },
+};
+</script>
+
+<lang-strings>
+  {
+    "totara_engage": [
+      "viewprivate",
+      "viewpublic",
+      "viewrestricted",
+      "tags",
+      "clock",
+      "share",
+      "editsettings"
+    ],
+    "engage_article": [
+      "timelessthanfive",
+      "timefivetoten",
+      "timemorethanten"
+    ]
+  }
+</lang-strings>

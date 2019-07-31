@@ -49,7 +49,7 @@ class totara_catalog_output_catalog_testcase extends output_test_base {
         global $PAGE;
         $PAGE->set_context(context_system::instance());
 
-        // Set up a basic test user.
+        // Set up a basic test user for the create resource/playlist capability checks.
         $generator = $this->getDataGenerator();
         $user = $generator->create_user(['firstname' => 'Barry', 'lastname' => 'Gimbo']);
         $this->setUser($user);

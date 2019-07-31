@@ -1,0 +1,30 @@
+query totara_engage_share_recipients(
+  $itemid: param_integer!
+  $component: param_component!
+) {
+  recipients: totara_engage_share_recipients(
+    itemid: $itemid
+    component: $component
+  ) {
+    __typename
+    component
+    area
+    instanceid
+    user {
+      __typename
+      id
+      fullname
+      profileimageurl
+      profileimagealt
+      email
+    }
+    other {
+      __typename
+      category
+      fullname
+      imageurl
+      imagealt
+      email
+    }
+  }
+}

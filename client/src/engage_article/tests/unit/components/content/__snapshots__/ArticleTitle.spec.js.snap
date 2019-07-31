@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`engage_article/components/content/ArticleTitle.vue Checks snapshot 1`] = `
+<div class="tui-articleTitle">
+  <div class="tui-articleTitle__head">
+    <inlineediting-stub buttonarialabel="[edit - moodle]" fullwidth="true" updateable="true">
+      <h3 class="tui-articleTitle__head__title">
+        ArticleTitle
+      </h3>
+    </inlineediting-stub>
+    <!---->
+    <bookmarkbutton-stub size="300" bookmarked="true" circle="true"></bookmarkbutton-stub>
+  </div>
+  <articleseparator-stub></articleseparator-stub>
+</div>
+`;

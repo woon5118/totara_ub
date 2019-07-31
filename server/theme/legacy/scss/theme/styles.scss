@@ -63,6 +63,7 @@
 @import 'theme_legacy/blocks/totara_dashboard/totara_dashboard';
 @import 'theme_legacy/blocks/totara_featured_links/totara_featured_links';
 @import 'theme_legacy/blocks/totara_recent_learning/totara_recent_learning';
+@import 'theme_legacy/blocks/totara_recently_viewed/totara_recently_viewed';
 @import 'theme_legacy/blocks/totara_report_graph/totara_report_graph';
 @import 'theme_legacy/blocks/totara_report_table/totara_report_table';
 @import 'theme_legacy/blocks/totara_stats/totara_stats';
@@ -181,3 +182,6 @@
 @import 'theme_legacy/totara/competency/manage_competencies';
 @import 'theme_legacy/totara/competency/paging';
 @import 'theme_legacy/totara/competency/selection_basket';
+
+// Ms-teams
+@import 'theme_legacy/totara/msteams/msteams';

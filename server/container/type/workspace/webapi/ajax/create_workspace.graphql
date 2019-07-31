@@ -1,0 +1,57 @@
+mutation container_workspace_create_workspace(
+  $name: param_text!
+  $description: param_text
+  $description_format: param_integer
+  $draft_id: param_integer
+  $private: param_boolean!
+  $hidden: param_boolean!
+) {
+  workspace: container_workspace_create(
+    name: $name
+    description: $description
+    description_format: $description_format
+    draft_id: $draft_id
+    private: $private
+    hidden: $hidden
+  ) {
+    __typename
+    id
+    name(format: PLAIN)
+    description(format: PLAIN)
+    description_format
+    time_description
+
+    owner {
+      __typename
+      id
+      fullname
+      card_display {
+        __typename
+        profile_picture_alt
+        profile_picture_url
+        profile_url
+        display_fields {
+          __typename
+          value
+          label
+          is_custom
+          associate_url
+        }
+      }
+    }
+
+    image
+    total_members
+    interactor {
+      __typename
+      joined
+      own
+      can_update
+      can_delete
+      can_invite
+      can_join
+    }
+    url
+    access
+  }
+}

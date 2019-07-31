@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/icons/StatIcon.vue Checks snapshot 1`] = `
+<div
+  class="tui-totaraEngage-statIcon"
+>
+  <span
+    aria-label="15 likes"
+    class="tui-totaraEngage-statIcon__iconContainer"
+    role="img"
+  >
+    <icon-stub
+      class="tui-totaraEngage-statIcon__icon"
+      icon="totara_core|like"
+      title="15 likes"
+    />
+  </span>
+   
+  <span
+    aria-hidden="true"
+    class="tui-totaraEngage-statIcon__statNumber"
+  >
+    
+    15
+  
+  </span>
+</div>
+`;

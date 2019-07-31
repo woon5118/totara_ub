@@ -1,0 +1,31 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Kian Nguyen <kian.nguyen@totaralearning.com>
+  @module theme_ventura
+-->
+
+<style lang="scss">
+:root {
+  --tui-engage-article-separator-width: 40px;
+}
+.tui-articleSeparator {
+  display: block;
+  width: var(--tui-engage-article-separator-width);
+
+  margin-top: var(--tui-gap-4);
+  margin-bottom: var(--tui-gap-8);
+  border-bottom: solid var(--tui-border-width-thick) var(--tui-color-primary);
+}
+</style>

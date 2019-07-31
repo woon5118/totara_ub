@@ -73,7 +73,7 @@ export default {
      * exceeded, excess GridItems will wrap.
      **/
     maxUnits: {
-      type: String, // theme.getVar() always returns a String
+      type: [String, Number], // theme.getVar() always returns a String
       default: function() {
         return theme.getVar('tui-grid-maxunits');
       },

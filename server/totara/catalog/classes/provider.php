@@ -409,6 +409,5 @@ abstract class provider {
      * instead of running 50+ different database queries.
      */
     public function prime_provider_cache(): void {
-        return;
     }
 }

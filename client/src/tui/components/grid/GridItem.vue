@@ -51,7 +51,7 @@ export default {
      * The number of units a GridItem should use in the Grid
      **/
     units: {
-      type: Number,
+      type: [String, Number],
       default: 1,
       validator: function(value) {
         return value > 0;

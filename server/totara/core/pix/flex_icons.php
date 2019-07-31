@@ -108,6 +108,30 @@ $icons = array(
                     'classes' => 'fa-file-audio-o',
                 )
         ),
+
+    'totara_core|bookmark-active' =>
+        array (
+            'data' =>
+                array (
+                    'classes' => 'fa-bookmark'
+                )
+        ),
+
+    'totara_core|like' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-thumbs-o-up'
+                )
+        ),
+
+    'totara_core|like-active' =>
+        array(
+            'data' =>
+                array (
+                    'classes' => 'fa-thumbs-up'
+                )
+        ),
 );
 
 $aliases = array(

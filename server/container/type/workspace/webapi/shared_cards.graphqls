@@ -1,0 +1,31 @@
+extend type Query {
+  """
+  A query to fetch all the cards of items that were shared with this workspace
+  """
+  container_workspace_shared_cards(
+    """
+    ID of the workspace.
+    """
+    workspace_id: param_integer!
+    """
+    Area within workspace.
+    """
+    area: param_text!
+    """
+    Options to filter the shared cards.
+    """
+    filter: totara_engage_filter!
+    """
+    Footnote properties.
+    """
+    footnotes: totara_engage_footnotes
+    """
+    Cursor encoding the page and limit for classic offset based pagination.
+    """
+    cursor: String
+    """
+    Source indicating what page should be returned to when a library resource is opened
+    """
+    source: String
+  ): totara_engage_cards!
+}

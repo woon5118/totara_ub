@@ -111,6 +111,9 @@ class user_edit_form extends moodleform {
         $this->add_action_buttons(true, get_string('updatemyprofile'));
 
         $this->set_data($user);
+
+        $hook = new \core_user\hook\edit_form_definition_complete($this, $userid);
+        $hook->execute();
     }
 
     /**

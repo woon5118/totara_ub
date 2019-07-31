@@ -17,13 +17,7 @@
 -->
 
 <template>
-  <a
-    v-if="href"
-    :href="href"
-    class="tui-tag tui-tag__content"
-    role="tag-link"
-    >{{ text }}</a
-  >
+  <a v-if="href" :href="href" class="tui-tag tui-tag__content">{{ text }}</a>
 
   <div v-else class="tui-tag" :class="{ 'tui-tag--primary': primary }">
     <span

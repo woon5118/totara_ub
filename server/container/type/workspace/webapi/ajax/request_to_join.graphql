@@ -1,0 +1,46 @@
+mutation container_workspace_request_to_join(
+    $workspace_id: param_integer!
+) {
+    member_request: container_workspace_create_member_request(
+        workspace_id: $workspace_id
+    ) {
+        __typename
+        id
+        is_declined
+        is_accepted
+        user {
+            __typename
+            fullname
+            id
+            profileimagealt
+            profileimageurl
+        }
+        time_description
+        workspace_id
+        workspace_interactor {
+            __typename
+            can_delete
+            can_update
+            can_invite
+            can_join
+            joined
+            workspaces_admin
+            own
+            can_request_to_join
+            has_requested_to_join
+            can_view
+            can_view_discussions
+            can_view_library
+            can_view_members
+            can_view_member_requests
+            user {
+                __typename
+                id
+                # These are used within post discussion form.
+                fullname
+                profileimagealt
+                profileimageurl
+            }
+        }
+    }
+}

@@ -1,0 +1,133 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`] = `
+<div
+  class="tui-responsive tui-totaraEngage-cardsGrid"
+>
+  <div
+    aria-busy="true"
+    aria-label="[[items_list, totara_engage]]"
+    role="feed"
+    style="display: block; padding: 0px 0px 0px; overflow-y: false;"
+  >
+    <ul
+      class="tui-totaraEngage-cardsGrid__row tui-grid tui-grid--horizontal tui-grid--horizontal-gap"
+    >
+      <li
+        class="tui-grid-item tui-totaraEngage-cardsGrid__card tui-grid-item--first"
+      >
+        <span
+          access="PRIVATE"
+          aria-labelledby="idrow-0-0-label"
+          aria-posinset="1"
+          aria-setsize="4"
+          extra="{\\"image\\":\\"/\\",\\"usage\\":5}"
+          instanceid="1"
+          labelid="idrow-0-0-label"
+          name="Hello world resource"
+          numberofpeoplerated="0"
+          rating="0"
+          sharedbycount="5"
+          userfullname="Bolobala"
+          userid="12"
+          userprofileimagealt=""
+          userprofileimageurl="http://example.com"
+        />
+      </li>
+      <li
+        class="tui-grid-item tui-totaraEngage-cardsGrid__card"
+      >
+        <span
+          access="PRIVATE"
+          aria-labelledby="idrow-0-1-label"
+          aria-posinset="2"
+          aria-setsize="4"
+          extra="{\\"image\\":\\"/\\",\\"usage\\":5}"
+          instanceid="2"
+          labelid="idrow-0-1-label"
+          name="Hello world resource"
+          numberofpeoplerated="0"
+          rating="0"
+          sharedbycount="10"
+          userfullname="Bolobala"
+          userid="12"
+          userprofileimagealt=""
+          userprofileimageurl="http://example.com"
+        />
+      </li>
+    </ul>
+    <ul
+      class="tui-totaraEngage-cardsGrid__row tui-grid tui-grid--horizontal tui-grid--horizontal-gap"
+    >
+      <li
+        class="tui-grid-item tui-totaraEngage-cardsGrid__card tui-grid-item--first"
+      >
+        <span
+          access="PRIVATE"
+          aria-labelledby="idrow-1-0-label"
+          aria-posinset="3"
+          aria-setsize="4"
+          extra="{\\"image\\":\\"/\\",\\"usage\\":5}"
+          instanceid="3"
+          labelid="idrow-1-0-label"
+          name="Hello world resource"
+          numberofpeoplerated="0"
+          rating="0"
+          sharedbycount="3"
+          userfullname="Bolobala"
+          userid="12"
+          userprofileimagealt=""
+          userprofileimageurl="http://example.com"
+        />
+      </li>
+      <li
+        class="tui-grid-item tui-totaraEngage-cardsGrid__card"
+      >
+        <span
+          access="PRIVATE"
+          aria-labelledby="idrow-1-1-label"
+          aria-posinset="4"
+          aria-setsize="4"
+          extra="{\\"image\\":\\"/\\",\\"usage\\":5}"
+          instanceid="4"
+          labelid="idrow-1-1-label"
+          name="Hello world resource"
+          numberofpeoplerated="0"
+          rating="0"
+          sharedbycount="9"
+          userfullname="Bolobala"
+          userid="12"
+          userprofileimagealt=""
+          userprofileimageurl="http://example.com"
+        />
+      </li>
+    </ul>
+    <div
+      class="tui-loader tui-loader--active"
+    >
+      <div
+        class="tui-loader__empty"
+      />
+        
+      <div
+        class="tui-loader__overlay"
+        role="alert"
+      >
+        <div
+          class="tui-loader__overlay-positioner"
+        >
+          <div
+            class="tui-loader__display"
+          >
+            <span />
+            
+        [[loading, moodle]]
+      
+          </div>
+        </div>
+      </div>
+    </div>
+    <div />
+  </div>
+</div>
+`;

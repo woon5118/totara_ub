@@ -1,0 +1,11 @@
+type container_workspace_notification {
+  message: String!
+  type: String!
+}
+
+extend type Query {
+  """
+  A query to fetch all the notifications.
+  """
+  container_workspace_notifications: [container_workspace_notification]!
+}

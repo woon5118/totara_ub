@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_comment/components/card/CommentCard.vue Checks snapshot 1`] = `
+<div
+  class="tui-commentCard"
+>
+  <div
+    class="tui-commentCard__comment"
+  >
+    <div
+      class="tui-commentCard__comment__profilePicture"
+    />
+     
+    <div
+      class="tui-commentCard__comment__body"
+    >
+      <div
+        class="tui-commentCard__comment__body__header"
+      />
+       
+      <div
+        class="tui-commentCard__comment__body__content"
+      />
+       
+      <div
+        class="tui-commentCard__comment__body__footer"
+      />
+    </div>
+  </div>
+   
+  <div
+    class="tui-commentCard__replyBox"
+  />
+</div>
+`;

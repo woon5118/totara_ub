@@ -58,6 +58,25 @@ use core\pagination\offset_cursor_paginator as core_offset_cursor_paginator;
  * over a unique and sequential column to make sure if gives a consistent result across pages.
  */
 final class offset_cursor_paginator extends core_offset_cursor_paginator {
+    /**
+     * Reformat to set limit to zero and page to one if the page is zero.
+     *
+     * @param base_cursor|string|null $cursor
+     * @return base_cursor
+     */
+    protected static function normalise_cursor($cursor): base_cursor {
+        $cursor_instance = parent::normalise_cursor($cursor);
+        $page = $cursor_instance->get_page();
+
+        if (0 === $page) {
+            // Page zero also means that the we are going to fetch unlimited.
+            // Reset it to limit 0 and page to 1 in order to allow fetching works.
+            $cursor_instance->set_page(1);
+            $cursor_instance->set_limit(0);
+        }
+
+        return $cursor_instance;
+    }
 
     /**
      * @param sql $query
@@ -74,7 +93,7 @@ final class offset_cursor_paginator extends core_offset_cursor_paginator {
         $page = $this->cursor->get_page();
         $limit = $this->cursor->get_limit();
 
-        $offset = $page == 1 ? 0 : (($page - 1) * $limit);
+        $offset = ($page == 1 || $page == 0) ? 0 : (($page - 1) * $limit);
 
         if ($include_total) {
             $cnt_query = $query->get_sql();

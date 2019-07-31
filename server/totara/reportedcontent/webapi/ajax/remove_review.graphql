@@ -1,0 +1,6 @@
+mutation totara_reportedcontent_remove_review($review_id: param_integer!) {
+  review: totara_reportedcontent_remove_review(review_id: $review_id) {
+    id
+    status
+  }
+}

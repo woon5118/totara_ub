@@ -131,17 +131,21 @@ class advanced_feature {
             'certifications',
             'competencies',
             'competency_assignment',
+            'container_workspace',
+            'engage_resources',
             'evidence',
             'feedback360',
             'goals',
             'learningplans',
             'myteam',
+            'ml_recommender',
             'performance_activities',
             'positions',
             'programs',
             'recordoflearning',
             'reportgraphs',
             'totaradashboard',
+            'totara_msteams',
         ];
     }
 

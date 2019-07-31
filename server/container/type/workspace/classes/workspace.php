@@ -1,0 +1,596 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package container_workspace
+ */
+namespace container_workspace;
+
+use container_workspace\enrol\manager;
+use container_workspace\event\workspace_created;
+use container_workspace\event\workspace_updated;
+use container_workspace\exception\workspace_exception;
+use core_container\container;
+use core_container\container_helper;
+use core_container\facade\category_name_provider;
+use container_workspace\entity\workspace as workspace_entity;
+
+/**
+ * Class workspace
+ * @package container_workspace
+ */
+final class workspace extends container implements category_name_provider {
+    /**
+     * @var string
+     */
+    public const IMAGE_AREA = 'image';
+
+    /**
+     * @var string
+     */
+    public const DESCRIPTION_AREA = 'description';
+
+    /**
+     * @var workspace_entity|null
+     */
+    private $entity;
+
+    /**
+     * @param int $id
+     * @return workspace
+     */
+    public static function from_id(int $id): container {
+        global $DB;
+
+        $sql = '
+            SELECT 
+                c.*, 
+                wo.user_id, 
+                wo.id AS w_id,
+                wo.private AS workspace_private
+            FROM "ttr_course" c
+            INNER JOIN "ttr_workspace" wo ON wo.course_id = c.id
+            WHERE c.id = :course_id
+        ';
+
+        $params = ['course_id' => $id];
+        $record = $DB->get_record_sql($sql, $params, MUST_EXIST);
+
+        $workspace = new workspace();
+        $workspace->map_record($record);
+
+        return $workspace;
+    }
+
+    /**
+     * @param \stdClass $record
+     * @return workspace
+     */
+    public static function from_record(\stdClass $record): container {
+        global $DB;
+
+        if (!isset($record->id)) {
+            throw new \coding_exception("No id was specified");
+        }
+
+        if (!property_exists($record, 'user_id') ||
+            !property_exists($record, 'w_id') ||
+            !property_exists($record, 'workspace_private')) {
+            // Only fetch these fields if the record does not have it.
+            $workspace_record = $DB->get_record(
+                'workspace',
+                ['course_id' => $record->id],
+                'id, user_id, private'
+            );
+
+            // Cloning the record so that we don't modify the original
+            $record = clone $record;
+            $record->w_id = $workspace_record->id;
+            $record->user_id = $workspace_record->user_id;
+            $record->workspace_private = $workspace_record->private;
+        }
+
+        $workspace = new static();
+        $workspace->map_record($record);
+
+        return $workspace;
+    }
+
+    /**
+     * @param \stdClass $data
+     * @return void
+     */
+    protected static function pre_create(\stdClass $data): void {
+        parent::pre_create($data);
+
+        // Validate the type and visibility. Hidden can only be existing if the workspace is private.
+        if (isset($data->workspace_private) && isset($data->visible)) {
+            if (!$data->workspace_private && !$data->visible) {
+                // The workspace is not a private one, and also not visible - throw exception.
+                // As hidden workspace can only be existing if the workspace is private.
+                throw new \coding_exception(
+                    "The settings for workspace's access and visibility are miss matched, " .
+                    "the visibility should be set to zero when workspace is a hidden type"
+                );
+            }
+        }
+    }
+
+    /**
+     * @param \stdClass $data
+     * @return container
+     */
+    protected static function do_create(\stdClass $data): container {
+        global $DB, $USER;
+
+        // Checking for the existing of category
+        if (!$DB->record_exists('course_categories', ['id' => $data->category])) {
+            throw new \coding_exception("Category for id '{$data->category}' does not exist");
+        }
+
+        // Retrieving the user's id of whoever create this.
+        $user_id = $USER->id;
+
+        if (isset($data->user_id)) {
+            $user_id = $data->user_id;
+            unset($data->user_id);
+        } else if (isset($data->userid)) {
+            $user_id = $data->userid;
+            unset($data->userid);
+        }
+
+        $new_id = $DB->insert_record('course', $data);
+
+        $entity = new workspace_entity();
+        $entity->user_id = $user_id;
+        $entity->course_id = $new_id;
+        $entity->private = 0;
+
+        if (isset($data->workspace_private) && $data->workspace_private) {
+            $entity->private = 1;
+        }
+
+        $entity->save();
+        return static::from_id($new_id);
+    }
+
+    /**
+     * @param container|workspace $container
+     * @param \stdClass $data
+     */
+    protected static function post_create(container $container, \stdClass $data): void {
+        parent::post_create($container, $data);
+
+        $event = workspace_created::from_workspace($container);
+        $event->trigger();
+    }
+
+    /**
+     * Providing a name for category, of which this workspace is living within.
+     *
+     * @return string
+     */
+    public static function get_container_category_name(): string {
+        return get_string('category_name', 'container_workspace');
+    }
+
+    /**
+     * @return \moodle_url
+     */
+    public function get_view_url(): \moodle_url {
+        return new \moodle_url("/container/type/workspace/workspace.php", ['id' => $this->id]);
+    }
+
+    /**
+     * @param \stdClass $data
+     * @return \stdClass
+     */
+    protected static function normalise_data_on_create(\stdClass $data): \stdClass {
+        $record = parent::normalise_data_on_create($data);
+
+        // Default format for this container - it must always be `NONE` as we are not planning
+        // to re-use course format.
+        $record->format = 'none';
+
+        if (!isset($record->category)) {
+            $record->category = static::get_default_category_id();
+        }
+
+        if (!property_exists($record, 'timecreated')) {
+            $record->timecreated = time();
+        }
+
+        if (!property_exists($record, 'timemodified')) {
+            $record->timemodified = time();
+        }
+
+        if (!property_exists($record, 'summary')) {
+            $record->summary = null;
+        }
+
+        if (!property_exists($record, 'summaryformat')) {
+            // Just use plain format for the summary of workspace.
+            $record->summaryformat = FORMAT_PLAIN;
+        }
+
+        if (!property_exists($record, 'visible')) {
+            // Make it as default.
+            $record->visible = 1;
+        }
+
+        if (!property_exists($record, 'workspace_private')) {
+            // By default every workspace will be set to public.
+            $record->workspace_private = 0;
+        }
+
+        if (!property_exists($record, 'shortname')) {
+            // Generate random shortname for now.
+            $fullname = clean_param($data->fullname, PARAM_TEXT);
+            $short_name = strtolower($fullname);
+
+            $counter = 1;
+            while (true) {
+                $result = container_helper::is_container_existing_with_field('shortname', $short_name);
+                if (!$result) {
+                    break;
+                }
+
+                $short_name .= " - {$counter}";
+                $counter += 1;
+            }
+
+            $record->shortname = $short_name;
+        }
+
+        // By default, workspace does not enable any completion for now.
+        $record->enablecompletion = 0;
+        $record->completionstartonenrol = 0;
+        $record->completionprogressonview = 0;
+        $record->completionnotify = 0;
+
+        $record->visibleold = $record->visible;
+        return $record;
+    }
+
+    /**
+     * @param \stdClass $record
+     * @return void
+     */
+    protected function map_record(\stdClass $record): void {
+        if (!isset($record->id)) {
+            throw new \coding_exception("No id found");
+        }
+
+        // Making sure that we do not change any properties at the parent level.
+        $record = clone $record;
+
+        if (!isset($this->entity)) {
+            $this->entity = new workspace_entity();
+        }
+
+        if (property_exists($record, 'w_id')) {
+            $this->entity->id = $record->w_id;
+            unset($record->w_id);
+        }
+
+        if (property_exists($record, 'user_id')) {
+            $this->entity->user_id = $record->user_id;
+            unset($record->user_id);
+        }
+
+        if (property_exists($record, 'workspace_private')) {
+            // Convert it to boolean - so that we can make sure all the invalid number will be stripped out.
+            $this->entity->private = clean_param($record->workspace_private, PARAM_BOOL);
+            unset($record->workspace_private);
+        }
+
+        parent::map_record($record);
+    }
+
+    /**
+     * Returning the user record id of workspace's owner.
+     * @return int|null
+     */
+    public function get_user_id(): ?int {
+        return $this->entity->user_id;
+    }
+
+    /**
+     * @param \stdClass $data
+     * @return void
+     */
+    protected function pre_update(\stdClass $data): void {
+        parent::pre_update($data);
+        if (property_exists($data, 'visible')) {
+            $visible = $data->visible;
+            $old_visible = $this->visible;
+
+            if ($old_visible && !$visible) {
+                // This is not do-able.
+                throw new \coding_exception("Cannot move down to hidden workspace");
+            }
+        }
+
+        if (property_exists($data, 'workspace_private')) {
+            $new_private = $data->workspace_private;
+            $old_private = $this->entity->private;
+
+            if ($new_private != $old_private) {
+                throw new \coding_exception("The workspace cannot move between visibility");
+            }
+        }
+    }
+
+    /**
+     * @param \stdClass $data
+     * @return bool
+     */
+    protected function do_update(\stdClass $data): bool {
+        if (!isset($data->timemodified)) {
+            $data->timemodified = time();
+        }
+
+        if (isset($data->category) && $this->category != $data->category) {
+            // We need to prevent the move of category between workspace.
+            throw workspace_exception::on_update($this->fullname);
+        }
+
+        if (!property_exists($data, 'id')) {
+            // Set field id for $data.
+            $data->id = $this->get_id();
+        }
+
+        return parent::do_update($data);
+    }
+
+    /**
+     * @param \stdClass $data
+     * @return void
+     */
+    protected function post_update(\stdClass $data): void {
+        $this->reload();
+
+        // Trigger event for updating
+        $event = workspace_updated::from_workspace($this);
+        $event->trigger();
+    }
+
+    /**
+     * @return void
+     */
+    public function reload(): void {
+        parent::reload();
+        $this->entity->refresh();
+    }
+
+    /**
+     * @return manager
+     */
+    public function get_enrolment_manager(): manager {
+        return manager::from_workspace($this);
+    }
+
+    /**
+     * @return void
+     */
+    public function delete(): void {
+        global $DB;
+
+        // Delete any sections in here. If there are any.
+        $sections = $this->get_sections();
+
+        foreach ($sections as $section) {
+            $section->delete();
+        }
+
+        // Delete the workspace owner first, then delete the course table after ward.
+        $this->entity->delete();
+        $workspace_id = $this->get_id();
+
+        if (!$this->entity->deleted()) {
+            return;
+        }
+
+        // Deleting the context, then start deleting the record.
+        \context_helper::delete_instance(CONTEXT_COURSE, $workspace_id);
+
+        // Start deleting the course record.
+        $DB->delete_records('course', ['id' => $workspace_id]);
+    }
+
+    /**
+     * Moving itself default image into its own area. Note that this function does not check
+     * for the existing of the draft_id.
+     *
+     * @param int $draft_id
+     * @param int|null $user_id     The current actor.
+     * @return void
+     */
+    public function save_image(int $draft_id, ?int $user_id = null): void {
+        global $CFG, $USER;
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+
+        if (null === $user_id || 0 === $user_id) {
+            $user_id = $USER->id;
+        }
+
+        $user_context = \context_user::instance($user_id);
+        $fs = get_file_storage();
+
+        // We need to purge all the draft files that are not latest, then leave the latest one for saving it.
+        // Otherwise the process will pick up the first one in the draft file lists to save it instead of the other.
+        $draft_files = $fs->get_area_files(
+            $user_context->id,
+            'user',
+            'draft',
+            $draft_id,
+            'timemodified'
+        );
+
+        // Filtering the directory out of the list, then we will be sure that the files will be sorted for us.
+        // Then we can just pop the last one out of the list and delete the rest.
+        $draft_files = array_filter(
+            $draft_files,
+            function (\stored_file $file): bool {
+                return !$file->is_directory();
+            }
+        );
+
+        if (empty($draft_files)) {
+            // No draft files - hence no point to do the rest of the code.
+            return;
+        }
+
+        if (1 !== count($draft_files)) {
+            // There are more than one draft files. Which we can guess the last file with latest time modified
+            // to be the exact file that user want to use. However, need to debug what happened.
+            debugging("There are more than just one draft files", DEBUG_DEVELOPER);
+
+            // Pop the last item, which is the file that we want.
+            array_pop($draft_files);
+            foreach ($draft_files as $draft_file) {
+                $draft_file->delete();
+            }
+        }
+
+        $context = $this->get_context();
+        file_save_draft_area_files(
+            $draft_id,
+            $context->id,
+            static::get_type(),
+            static::IMAGE_AREA,
+            0,
+            ['maxfiles' => 1]
+        );
+    }
+
+    /**
+     * @return \moodle_url
+     */
+    public function get_image(): \moodle_url {
+        global $CFG, $OUTPUT;
+
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+        $fs = get_file_storage();
+
+        $component = workspace::get_type();
+        $context = $this->get_context();
+
+        $files = $fs->get_area_files(
+            $context->id,
+            $component,
+            workspace::IMAGE_AREA,
+            0
+        );
+
+        // Remove any directory.
+        $files = array_filter(
+            $files,
+            function (\stored_file $file): bool {
+                return !$file->is_directory();
+            }
+        );
+
+        if (empty($files)) {
+            return $OUTPUT->image_url('default_space', $component);
+        }
+
+        if (1 !== count($files)) {
+            debugging("There are more than one default image file", DEBUG_DEVELOPER);
+        }
+
+        /** @var \stored_file $file */
+        $file = reset($files);
+        return \moodle_url::make_pluginfile_url(
+            $context->id,
+            $component,
+            workspace::IMAGE_AREA,
+            0,
+            '/',
+            $file->get_filename()
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function get_name(): string {
+        return $this->fullname;
+    }
+
+    /**
+     * @param string|null $tab
+     * @return \moodle_url
+     */
+    public function get_workspace_url(?string $tab = null): \moodle_url {
+        $params = ['id' => $this->id];
+        if (null !== $tab) {
+            $params['tab'] = $tab;
+        }
+
+        return new \moodle_url("/container/type/workspace/workspace.php", $params);
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_public(): bool {
+        return $this->visible && !$this->entity->private;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_hidden() {
+        return !$this->visible && $this->entity->private;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_private(): bool {
+        return $this->visible && $this->entity->private;
+    }
+
+    /**
+     * Workspace can only move to private when it is a hidden workspace or a private workspace.
+     * @return bool
+     */
+    public function can_move_to_private(): bool {
+        return $this->is_hidden() || $this->is_private();
+    }
+
+    /**
+     * Only if the workspace is hidden - then yes, as nothing will be changed.
+     *
+     * @return bool
+     */
+    public function can_move_to_hidden(): bool {
+        return $this->is_hidden();
+    }
+
+    /**
+     * Only if the workspace is public - then yes, as nothing will be changed.
+     *
+     * @return bool
+     */
+    public function can_move_to_public(): bool {
+        return $this->is_public();
+    }
+}

@@ -540,7 +540,8 @@ $cache = '.var_export($cache, true).';
             'webservice'  => $CFG->dirroot.'/webservice',
             // Totara: extra subsystems - do not add any new!
             'elementlibrary' => $CFG->dirroot.'/elementlibrary',
-            'container'     => $CFG->dirroot . '/container'
+            'container'     => $CFG->dirroot . '/container',
+            'ml'            => $CFG->dirroot.'/ml',
         );
 
         return $info;
@@ -587,7 +588,8 @@ $cache = '.var_export($cache, true).';
             'tool'          => $CFG->dirroot.'/'.$CFG->admin.'/tool',
             'cachestore'    => $CFG->dirroot.'/cache/stores',
             'cachelock'     => $CFG->dirroot.'/cache/locks',
-            'container'     => $CFG->dirroot . '/container/type'
+            'container'     => $CFG->dirroot . '/container/type',
+            'ml'            => $CFG->dirroot.'/ml'
         );
         $parents = array();
         $subplugins = array();

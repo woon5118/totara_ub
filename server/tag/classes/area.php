@@ -231,6 +231,12 @@ class core_tag_area {
      */
     public static function update($existing, $data) {
         global $DB;
+
+        if (!\core_tag_collection::is_editable($existing->tagcollid)) {
+            // Totara: preventing the tag area to be updated,
+            // especially when it is in collection that it cannot be updated.
+            return;
+        }
         $data = array_intersect_key((array)$data,
                 array('enabled' => 1, 'tagcollid' => 1,
                     'callback' => 1, 'callbackfile' => 1, 'showstandard' => 1));
@@ -261,7 +267,7 @@ class core_tag_area {
      * @param string $componentname - The frankenstyle component name.
      */
     public static function reset_definitions_for_component($componentname) {
-        global $DB;
+        global $CFG;
         $dir = core_component::get_component_directory($componentname);
         $file = $dir . '/db/tag.php';
         $tagareas = null;
@@ -273,6 +279,13 @@ class core_tag_area {
         $component = $b ? ($a . '_' . $b) : $a;
 
         list($existingareas, $existingcolls) = self::get_definitions_for_component($componentname);
+
+        // Totara: get the topic collection so that we can check any $tagarea->collection against it.
+        $topic_collection = null;
+        if (isset($CFG->topic_collection_id)) {
+            // Only if it is set at one point.
+            $topic_collection = \core_tag_collection::get_by_id($CFG->topic_collection_id);
+        }
 
         $itemtypes = array();
         $collections = array();
@@ -309,6 +322,14 @@ class core_tag_area {
                 }
                 if (!isset($record->callbackfile)) {
                     $record->callbackfile = null;
+                }
+
+                // Totara: A flag within tag areas to let us know that this tag area is belong to topic collection.
+                if (!empty($record->topic)) {
+                    if ($topic_collection !== null) {
+                        $record->tagcollid = $topic_collection->id;
+                    }
+                    unset($record->topic);
                 }
                 $itemtypes[$record->itemtype . ':' . $record->component] = $record;
             }

@@ -468,8 +468,62 @@ class behat_totara_data_generators extends behat_base {
             'devices' => array(
                 'age_data' => 'age_mobile_devices'
             )
-        )
-
+        ),
+        'totara_topic' => array(
+            'topics' => array(
+                'datagenerator' => 'topic_from_params',
+                'required' => array('name')
+            )
+        ),
+        'totara_playlist' => array(
+            'playlists' => array(
+                'datagenerator' => 'playlist_from_params',
+                'required' => array('name', 'username', 'access')
+            )
+        ),
+        'engage_article' => array(
+            'articles' => array(
+                'datagenerator' => 'article_from_params',
+                'required' => array('name', 'content', 'username')
+            )
+        ),
+        'engage_survey' => array(
+            'surveys' => array(
+                'datagenerator' => 'survey_from_params',
+                'required' => array('question', 'username', 'access')
+            )
+        ),
+        'container_workspace' => array(
+            'workspaces' => array(
+                'plugin' => 'container_workspace',
+                'datagenerator' => 'workspace_from_params',
+                'required' => array('name', 'summary')
+            )
+        ),
+        'ml_recommender' => array(
+            'user recommendations' => array(
+                'plugin' => 'ml_recommender',
+                'datagenerator' => 'user_recommendation_from_params',
+                'required' => array('username', 'component', 'name')
+            ),
+            'item recommendations' => array(
+                'plugin' => 'ml_recommender',
+                'datagenerator' => 'item_recommendation_from_params',
+                'required' => array('component', 'name', 'target_name')
+            ),
+            'trending recommendations' => array(
+                'plugin' => 'ml_recommender',
+                'datagenerator' => 'trending_recommendation_from_params',
+                'required' => array('component', 'name')
+            ),
+        ),
+        'totara_comment' => array(
+            'comments' => array(
+                'plugin' => 'totara_comment',
+                'datagenerator' => 'comment_from_params',
+                'required' => array('component', 'name', 'username', 'area')
+            )
+        ),
     );
 
     /**

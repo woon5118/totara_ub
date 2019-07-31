@@ -1,0 +1,154 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package container_workspace
+ */
+namespace container_workspace\observer;
+
+use container_workspace\discussion\discussion;
+use totara_comment\event\comment_created;
+use container_workspace\workspace;
+use totara_comment\comment;
+use totara_comment\event\comment_soft_deleted;
+use totara_comment\event\comment_updated;
+use totara_comment\event\reply_created;
+use totara_comment\event\reply_soft_deleted;
+use totara_core\content\content_handler;
+
+/**
+ * Observer class for comment's events.
+ */
+final class comment_observer {
+    /**
+     * comment_observer constructor.
+     */
+    private function __construct() {
+        // Preventing this class from construction
+    }
+
+    /**
+     * @param comment $comment
+     * @return void
+     */
+    private static function touch_discussion(comment $comment): void {
+        $component = $comment->get_component();
+
+        if (workspace::get_type() !== $component) {
+            return;
+        }
+
+        $area = $comment->get_area();
+        if (discussion::AREA === $area) {
+            $discussion_id = $comment->get_instanceid();
+            $discussion = discussion::from_id($discussion_id);
+
+            $discussion->touch();
+        }
+    }
+
+    /**
+     * @param comment_created $event
+     * @return void
+     */
+    public static function on_comment_created(comment_created $event): void {
+        $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
+        $comment = comment::from_record($record);
+
+        static::touch_discussion($comment);
+        static::handle_comment($comment);
+    }
+
+    /**
+     * @param comment_updated $event
+     * @return void
+     */
+    public static function on_comment_updated(comment_updated $event): void {
+        $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
+        $comment = comment::from_record($record);
+
+        static::touch_discussion($comment);
+        static::handle_comment($comment);
+    }
+
+    /**
+     * Process comment through content handler
+     * @param comment $comment
+     */
+    private static function handle_comment($comment): void {
+        $component = $comment->get_component();
+        if (workspace::get_type() !== $component) {
+            return;
+        }
+
+        $area = $comment->get_area();
+        if (discussion::AREA === $area) {
+            $discussion_id = $comment->get_instanceid();
+            $discussion = discussion::from_id($discussion_id);
+
+            $workspace = workspace::from_id($discussion->get_workspace_id());
+
+            $handler = content_handler::create();
+            $handler->handle_with_params(
+                $workspace->get_name(),
+                $comment->get_content(),
+                $comment->get_format(),
+                $comment->get_id(),
+                $comment->get_component(),
+                $comment->get_area(),
+                $discussion->get_context()->id,
+                $workspace->get_view_url()
+            );
+        }
+    }
+
+    /**
+     * @param reply_created $event
+     * @return void
+     */
+    public static function on_reply_created(reply_created $event): void {
+        $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
+        $reply = comment::from_record($record);
+
+        static::touch_discussion($reply);
+        static::handle_comment($reply);
+    }
+
+    /**
+     * @param reply_soft_deleted $event
+     * @return void
+     */
+    public static function on_reply_soft_deleted(reply_soft_deleted $event): void {
+        $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
+        $reply = comment::from_record($record);
+
+        static::touch_discussion($reply);
+    }
+
+    /**
+     * @param comment_soft_deleted $event
+     * @return void
+     */
+    public static function on_comment_soft_deleted(comment_soft_deleted $event): void {
+        $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
+        $comment = comment::from_record($record);
+
+        static::touch_discussion($comment);
+    }
+}

@@ -1,0 +1,59 @@
+extend type Query {
+  """
+  Query to fetch all workspaces that related to the provided workspace ID
+  """
+  ml_recommender_recommended_workspaces(
+    """
+    The ID of the workspace to find recommended workspaces for
+    """
+    workspace_id: param_integer!
+    """
+    Fetch some results based on the provided cursor
+    """
+    cursor: param_text
+  ): [container_workspace_workspace]!
+
+  """
+  Query to fetch the next cursor for the recommended workspaces
+  """
+  ml_recommender_recommended_workspaces_cursor(
+    """
+    The ID of the workspace to find recommended workspaces for
+    """
+    workspace_id: param_integer!
+    """
+    This is current cursor that we are looking at, and it is used
+    to determine what the next cursor should be.
+    """
+    cursor: param_text
+  ): ml_recommender_cursor
+
+  """
+  Query to fetch all workspaces that related to the provided user ID
+  """
+  ml_recommender_recommended_user_workspaces(
+    """
+    The ID of the user to find recommended workspaces for
+    """
+    user_id: param_integer
+    """
+    Fetch some results based on the provided cursor
+    """
+    cursor: param_text
+  ): [container_workspace_workspace]!
+
+  """
+  Query to fetch the next cursor for the recommended workspaces by user ID
+  """
+  ml_recommender_recommended_user_workspaces_cursor(
+    """
+    The ID of the workspace to find recommended workspaces for
+    """
+    user_id: param_integer
+    """
+    This is current cursor that we are looking at, and it is used
+    to determine what the next cursor should be.
+    """
+    cursor: param_text
+  ): ml_recommender_cursor
+}

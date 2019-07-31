@@ -1,0 +1,43 @@
+# Load recommended articles for the user
+query ml_recommender_get_recommended_user_articles(
+  $user_id: param_integer
+  $cursor: param_text
+) {
+  cursor: ml_recommender_recommended_user_articles_cursor(
+    user_id: $user_id
+    cursor: $cursor
+  ) {
+    __typename
+    total
+    next
+  }
+
+  articles: ml_recommender_recommended_user_articles(
+    user_id: $user_id
+    cursor: $cursor
+  ) {
+    instanceid
+    name(format: PLAIN)
+    summary
+    component
+    tuicomponent
+    access
+    comments
+    reactions
+    timecreated
+    sharedbycount
+    bookmarked
+    extra
+    owned
+    user {
+      id
+      fullname
+      profileimageurl
+      profileimagealt
+    }
+    topics {
+      id
+      value(format: PLAIN)
+    }
+  }
+}

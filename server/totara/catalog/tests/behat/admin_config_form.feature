@@ -18,7 +18,7 @@ Feature: Admin can configure grid catalog search using configuration forms
 
   Scenario: Forms are showing correct default values and sections
     Then I should see the following Totara form fields having these values:
-      | Include in catalogue | Courses,Certifications,Programs |
+      | Include in catalogue | Courses,Resources,Certifications,Playlists,Programs |
     And I should see the "submitbutton" Totara form field is frozen
     And I should see the "cancelbutton" Totara form field is frozen
 
@@ -26,7 +26,7 @@ Feature: Admin can configure grid catalog search using configuration forms
     When I set the "Include in catalogue" Totara form field to "Courses"
     And I press "Undo changes"
     Then I should see the following Totara form fields having these values:
-      | Include in catalogue | Courses,Certifications,Programs |
+      | Include in catalogue | Courses,Resources,Certifications,Playlists,Programs |
     And I should see the "submitbutton" Totara form field is frozen
     And I should see the "cancelbutton" Totara form field is frozen
 
@@ -186,7 +186,7 @@ Feature: Admin can configure grid catalog search using configuration forms
     When I set the "Include in catalogue" Totara form field to "Courses"
     And I press "Save"
     Then I should see "Changes have been saved and will appear as soon as the processing is complete."
-    When I set the "Include in catalogue" Totara form field to "Courses,Certifications,Programs"
+    When I set the "Include in catalogue" Totara form field to "Courses,Resources,Certifications,Playlists,Programs"
     Then I should not see "Changes have been saved"
     And I press "Save"
     Then I should see "Changes have been saved and will appear as soon as the processing is complete."

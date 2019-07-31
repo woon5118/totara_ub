@@ -91,6 +91,9 @@
         :right-side-panel-limit-height="false"
         :right-side-panel-grow-height-on-scroll="false"
       >
+        <template v-slot:sidePanelLeft>
+          <p>Left Side Panel</p>
+        </template>
         <template v-slot:column>
           <p>Center Column Content</p>
         </template>

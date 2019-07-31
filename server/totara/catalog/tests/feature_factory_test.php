@@ -48,6 +48,8 @@ class totara_catalog_feature_factory_testcase extends advanced_testcase {
             'course' => 'core_course\totara_catalog\course\feature_factory\custom_fields',
             'certification' => 'totara_certification\totara_catalog\certification\feature_factory\custom_fields',
             'program' => 'totara_program\totara_catalog\program\feature_factory\custom_fields',
+            'article' => 'engage_article\totara_catalog\article',
+            'playlist' => 'totara_playlist\totara_catalog\playlist',
         ];
     }
 
@@ -64,6 +66,8 @@ class totara_catalog_feature_factory_testcase extends advanced_testcase {
             'core_course\totara_catalog\course' => 4,
             'totara_certification\totara_catalog\certification' => 2,
             'totara_program\totara_catalog\program' => 2,
+            'engage_article\totara_catalog\article' => 1,
+            'totara_playlist\totara_catalog\playlist' => 1,
         ];
 
         foreach ($expected_factory_counts as $provider_class => $count) {

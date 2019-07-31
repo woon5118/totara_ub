@@ -686,6 +686,13 @@ $icons = array(
                     'classes' => 'fa-check-square-o',
                 ),
         ),
+    'compress' =>
+        array (
+            'data' =>
+                array(
+                    'classes' => 'fa-compress',
+                ),
+        ),
     'contact-add' =>
         array(
             'template' => 'core/flex_icon_stack',

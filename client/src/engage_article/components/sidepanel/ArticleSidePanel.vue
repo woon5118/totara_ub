@@ -1,0 +1,306 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Kian Nguyen <kian.nguyen@totaralearning.com>
+  @module engage_article
+-->
+
+<template>
+  <EngageSidePanel v-if="!$apollo.loading" class="tui-articleSidePanel">
+    <MiniProfileCard
+      slot="author-profile"
+      :display="user.card_display"
+      :no-border="true"
+    >
+      <template v-if="article.owned" v-slot:drop-down-items>
+        <DropdownItem @click="openModalFromAction = true">
+          {{ $str('delete', 'moodle') }}
+        </DropdownItem>
+      </template>
+    </MiniProfileCard>
+
+    <template v-slot:modal>
+      <ModalPresenter
+        :open="openModalFromAction"
+        @request-close="openModalFromAction = false"
+      >
+        <EngageWarningModal
+          :title="$str('deletewarningtitle', 'engage_article')"
+          :message-content="$str('deletewarningmsg', 'engage_article')"
+          @delete="handleDelete"
+        />
+      </ModalPresenter>
+    </template>
+
+    <template v-slot:overview>
+      <Loader :fullpage="true" :loading="submitting" />
+      <p class="tui-articleSidePanel__timeDescription">
+        {{ article.timedescription }}
+      </p>
+      <AccessSetting
+        v-if="article.owned"
+        :item-id="resourceId"
+        component="engage_article"
+        :access-value="article.resource.access"
+        :topics="article.topics"
+        :submitting="false"
+        :open-modal="openModalFromButtonLabel"
+        :selected-time-view="article.timeview"
+        :enable-time-view="true"
+        @access-update="updateAccess"
+        @close-modal="openModalFromButtonLabel = false"
+      />
+      <AccessDisplay
+        v-else
+        :access-value="article.resource.access"
+        :time-view="article.timeview"
+        :topics="article.topics"
+        :show-button="false"
+      />
+
+      <MediaSetting
+        :owned="article.owned"
+        :access-value="article.resource.access"
+        :instance-id="resourceId"
+        :shared-by-count="article.sharedbycount"
+        :like-button-aria-label="likeButtonLabel"
+        :liked="article.reacted"
+        component-name="engage_article"
+        @access-update="updateAccess"
+        @access-modal="openModalFromButtonLabel = true"
+        @update-like-status="updateLikeStatus"
+      />
+
+      <ArticlePlaylistBox
+        :resource-id="resourceId"
+        class="tui-articleSidePanel__playlistBox"
+      />
+    </template>
+
+    <template v-slot:comments>
+      <SidePanelCommentBox
+        component="engage_article"
+        area="comment"
+        :instance-id="resourceId"
+      />
+    </template>
+
+    <template v-if="featureRecommenders" v-slot:related>
+      <Related
+        component="engage_article"
+        area="related"
+        :resource-id="resourceId"
+      />
+    </template>
+  </EngageSidePanel>
+</template>
+
+<script>
+import apolloClient from 'tui/apollo_client';
+import Loader from 'tui/components/loader/Loader';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import SidePanelCommentBox from 'totara_comment/components/box/SidePanelCommentBox';
+import AccessDisplay from 'totara_engage/components/sidepanel/access/AccessDisplay';
+import AccessSetting from 'totara_engage/components/sidepanel/access/AccessSetting';
+import EngageSidePanel from 'totara_engage/components/sidepanel/EngageSidePanel';
+import EngageWarningModal from 'totara_engage/components/modal/EngageWarningModal';
+import MediaSetting from 'totara_engage/components/sidepanel/media/MediaSetting';
+import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
+import DropdownItem from 'tui/components/dropdown/DropdownItem';
+import ArticlePlaylistBox from 'engage_article/components/sidepanel/content/ArticlePlaylistBox';
+import Related from 'engage_article/components/sidepanel/Related';
+
+// GraphQL queries
+import getArticle from 'engage_article/graphql/get_article';
+import updateArticle from 'engage_article/graphql/update_article';
+import deleteArticle from 'engage_article/graphql/delete_article';
+import engageAdvancedFeatures from 'totara_engage/graphql/advanced_features';
+
+export default {
+  components: {
+    AccessDisplay,
+    AccessSetting,
+    ArticlePlaylistBox,
+    EngageSidePanel,
+    EngageWarningModal,
+    Loader,
+    MediaSetting,
+    ModalPresenter,
+    Related,
+    SidePanelCommentBox,
+    MiniProfileCard,
+    DropdownItem,
+  },
+
+  props: {
+    resourceId: {
+      type: [Number, String],
+      required: true,
+    },
+  },
+
+  apollo: {
+    article: {
+      query: getArticle,
+      variables() {
+        return {
+          id: this.resourceId,
+        };
+      },
+    },
+
+    features: {
+      query: engageAdvancedFeatures,
+    },
+  },
+
+  data() {
+    return {
+      article: {},
+      submitting: false,
+      openModalFromButtonLabel: false,
+      openModalFromAction: false,
+      features: {},
+    };
+  },
+
+  computed: {
+    user() {
+      if (!this.article.resource || !this.article.resource.user) {
+        return {};
+      }
+
+      return this.article.resource.user;
+    },
+
+    sharedByCount() {
+      return this.article.sharedByCount;
+    },
+
+    likeButtonLabel() {
+      if (this.article.reacted) {
+        return this.$str(
+          'removelikearticle',
+          'engage_article',
+          this.article.resource.name
+        );
+      }
+
+      return this.$str(
+        'likearticle',
+        'engage_article',
+        this.article.resource.name
+      );
+    },
+
+    featureRecommenders() {
+      return this.features && this.features.recommenders;
+    },
+  },
+
+  methods: {
+    /**
+     * Updates Access for this article
+     *
+     * @param {String} access The access level of the article
+     * @param {Array} topics Topics that this article should be shared with
+     * @param {Array} shares An array of group id's that this article is shared with
+     */
+    updateAccess({ access, topics, shares, timeView }) {
+      this.submitting = true;
+      this.$apollo
+        .mutate({
+          mutation: updateArticle,
+          refetchAll: false,
+          variables: {
+            resourceid: this.resourceId,
+            access: access,
+            topics: topics.map(({ id }) => id),
+            shares: shares,
+            timeview: timeView,
+          },
+
+          update: (proxy, { data }) => {
+            proxy.writeQuery({
+              query: getArticle,
+              variables: { id: this.resourceId },
+              data,
+            });
+          },
+        })
+        .finally(() => {
+          this.submitting = false;
+        });
+    },
+
+    handleDelete() {
+      this.$apollo
+        .mutate({
+          mutation: deleteArticle,
+          variables: {
+            resourceid: this.resourceId,
+          },
+          refetchAll: false,
+        })
+        .then(({ data }) => {
+          if (data.result) {
+            this.$children.openModal = false;
+            window.location.href = this.$url(
+              '/totara/engage/your_resources.php'
+            );
+          }
+        });
+    },
+
+    /**
+     *
+     * @param {Boolean} status
+     */
+    updateLikeStatus(status) {
+      let { article } = apolloClient.readQuery({
+        query: getArticle,
+        variables: {
+          id: this.resourceId,
+        },
+      });
+
+      article = Object.assign({}, article);
+      article.reacted = status;
+
+      apolloClient.writeQuery({
+        query: getArticle,
+        variables: { id: this.resourceId },
+        data: { article: article },
+      });
+    },
+  },
+};
+</script>
+<lang-strings>
+  {
+    "engage_article": [
+      "deletewarningmsg",
+      "deletewarningtitle",
+      "timelessthanfive",
+      "timefivetoten",
+      "timemorethanten",
+      "likearticle",
+      "removelikearticle"
+    ],
+
+    "moodle": [
+      "delete"
+    ]
+  }
+</lang-strings>

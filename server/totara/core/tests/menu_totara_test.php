@@ -223,17 +223,20 @@ class totara_core_menu_totara_testcase extends advanced_testcase {
         $this->assertSame('', $menu[2]->parent);
         $this->assertSame('Find Learning', $menu[3]->linktext);
         $this->assertSame($menu[2]->name, $menu[3]->parent);
-        $this->assertSame('Test container 1', $menu[4]->linktext);
+        $this->assertSame('Collaborate', $menu[4]->linktext);
         $this->assertSame('', $menu[4]->parent);
-        $this->assertSame('Test sub container 2', $menu[5]->linktext);
-        $this->assertSame('totaramenuitem' . $container1->id, $menu[5]->parent);
-        $this->assertSame('Test item 2', $menu[6]->linktext);
-        $this->assertSame('totaramenuitem' . $container2->id, $menu[6]->parent);
-        $this->assertSame('', $menu[6]->target);
-        $this->assertSame('Test item 1', $menu[7]->linktext);
+        $this->assertSame('Find Workspaces', $menu[5]->linktext);
+        $this->assertSame('Test container 1', $menu[6]->linktext);
+        $this->assertSame('', $menu[6]->parent);
+        $this->assertSame('Test sub container 2', $menu[7]->linktext);
         $this->assertSame('totaramenuitem' . $container1->id, $menu[7]->parent);
-        $this->assertSame('_blank', $menu[7]->target);
-        $this->assertCount(8, $menu);
+        $this->assertSame('Test item 2', $menu[8]->linktext);
+        $this->assertSame('totaramenuitem' . $container2->id, $menu[8]->parent);
+        $this->assertSame('', $menu[8]->target);
+        $this->assertSame('Test item 1', $menu[9]->linktext);
+        $this->assertSame('totaramenuitem' . $container1->id, $menu[9]->parent);
+        $this->assertSame('_blank', $menu[9]->target);
+        $this->assertCount(10, $menu);
         $this->assertSame($rev, helper::get_cache_revision());
 
         $CFG->menulifetime = 60 * 10;
@@ -247,17 +250,20 @@ class totara_core_menu_totara_testcase extends advanced_testcase {
         $this->assertSame('', $menu[2]->parent);
         $this->assertSame('Find Learning', $menu[3]->linktext);
         $this->assertSame($menu[2]->name, $menu[3]->parent);
-        $this->assertSame('Test container 1', $menu[4]->linktext);
+        $this->assertSame('Collaborate', $menu[4]->linktext);
         $this->assertSame('', $menu[4]->parent);
-        $this->assertSame('Test sub container 2', $menu[5]->linktext);
-        $this->assertSame('totaramenuitem' . $container1->id, $menu[5]->parent);
-        $this->assertSame('Test item 2', $menu[6]->linktext);
-        $this->assertSame('totaramenuitem' . $container2->id, $menu[6]->parent);
-        $this->assertSame('', $menu[6]->target);
-        $this->assertSame('Test item 1', $menu[7]->linktext);
+        $this->assertSame('Find Workspaces', $menu[5]->linktext);
+        $this->assertSame('Test container 1', $menu[6]->linktext);
+        $this->assertSame('', $menu[6]->parent);
+        $this->assertSame('Test sub container 2', $menu[7]->linktext);
         $this->assertSame('totaramenuitem' . $container1->id, $menu[7]->parent);
-        $this->assertSame('_blank', $menu[7]->target);
-        $this->assertCount(8, $menu);
+        $this->assertSame('Test item 2', $menu[8]->linktext);
+        $this->assertSame('totaramenuitem' . $container2->id, $menu[8]->parent);
+        $this->assertSame('', $menu[8]->target);
+        $this->assertSame('Test item 1', $menu[9]->linktext);
+        $this->assertSame('totaramenuitem' . $container1->id, $menu[9]->parent);
+        $this->assertSame('_blank', $menu[9]->target);
+        $this->assertCount(10, $menu);
         $this->assertSame($rev, helper::get_cache_revision());
 
         // Test cache is invalidated based on lifetime.
@@ -265,7 +271,7 @@ class totara_core_menu_totara_testcase extends advanced_testcase {
         $this->setCurrentTimeStart();
         $menu = totara_build_menu();
         $this->assertSame('Test item 0', $menu[0]->linktext);
-        $this->assertCount(8, $menu);
+        $this->assertCount(10, $menu);
         $this->assertTimeCurrent($SESSION->mymenu['c']);
 
         $item0->title = 'xx';
@@ -273,12 +279,12 @@ class totara_core_menu_totara_testcase extends advanced_testcase {
         $SESSION->mymenu['c'] = time() - $CFG->menulifetime + 5;
         $menu = totara_build_menu();
         $this->assertSame('Test item 0', $menu[0]->linktext);
-        $this->assertCount(8, $menu);
+        $this->assertCount(10, $menu);
 
         $SESSION->mymenu['c'] = time() - $CFG->menulifetime - 1;
         $menu = totara_build_menu();
         $this->assertSame('xx', $menu[0]->linktext);
-        $this->assertCount(8, $menu);
+        $this->assertCount(10, $menu);
         $this->assertTimeCurrent($SESSION->mymenu['c']);
 
         // Test cache is invalidated based on current languages.
@@ -287,7 +293,7 @@ class totara_core_menu_totara_testcase extends advanced_testcase {
         totara_menu_reset_session_cache();
         $menu = totara_build_menu();
         $this->assertSame('Test item 0', $menu[0]->linktext);
-        $this->assertCount(8, $menu);
+        $this->assertCount(10, $menu);
 
         $item0->title = 'xx';
         $DB->update_record('totara_navigation', $item0);
@@ -305,7 +311,7 @@ class totara_core_menu_totara_testcase extends advanced_testcase {
         totara_menu_reset_session_cache();
         $menu = totara_build_menu();
         $this->assertSame('Test item 0', $menu[0]->linktext);
-        $this->assertCount(8, $menu);
+        $this->assertCount(10, $menu);
         $rev = helper::get_cache_revision();
 
         $item0->title = 'xx';
@@ -324,7 +330,7 @@ class totara_core_menu_totara_testcase extends advanced_testcase {
         totara_menu_reset_session_cache();
         $menu = totara_build_menu();
         $this->assertSame('Test item 0', $menu[0]->linktext);
-        $this->assertCount(8, $menu);
+        $this->assertCount(10, $menu);
 
         $item0->title = 'xx';
         $DB->update_record('totara_navigation', $item0);

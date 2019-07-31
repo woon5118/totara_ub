@@ -1300,5 +1300,42 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020072705, 'totara', 'core');
     }
 
+    if ($oldversion < 2020072900) {
+        // We need to added the topic in for upgrade step.
+        require_once("{$CFG->dirroot}/totara/topic/db/upgradelib.php");
+        totara_topic_add_tag_collection();
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2020072900, 'totara', 'core');
+    }
+
+    if ($oldversion < 2020072901) {
+        // Define table totara_core_mention to be created.
+        $table = new xmldb_table('totara_core_mention');
+
+        // Adding fields to table totara_core_mention.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('instanceid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('component', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('area', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table totara_core_mention.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('userid_fk', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'), 'cascade');
+
+        // Adding indexes to table totara_core_mention.
+        $table->add_index('component_idx', XMLDB_INDEX_NOTUNIQUE, array('component'));
+        $table->add_index('area_idx', XMLDB_INDEX_NOTUNIQUE, array('area'));
+
+        // Conditionally launch create table for totara_core_mention.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2020072901, 'totara', 'core');
+    }
+
     return true;
 }

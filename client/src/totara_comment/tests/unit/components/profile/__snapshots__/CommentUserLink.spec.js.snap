@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_comment/components/profile/CommentUserLink.vue Checks snapshot 1`] = `
+<a
+  class="tui-commentUserLink tui-commentUserLink--small"
+  href="http://example.com"
+>
+  
+  Admin user
+
+</a>
+`;

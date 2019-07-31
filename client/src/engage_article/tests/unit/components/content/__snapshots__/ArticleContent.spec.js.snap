@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`engage_article/components/content/ArticleContent.vue Checks snapshot 1`] = `
+<div class="tui-articleContent">
+  <inlineediting-stub absolutebutton="true" buttonarialabel="[edit-moodle]" fullwidth="true" restrictedmode="true" updateable="true">
+    <div class="tui-articleContent__content"></div>
+  </inlineediting-stub>
+  <!---->
+</div>
+`;

@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`engage_survey/components/CreateSurvey.vue Checks snapshot 1`] = `
+<div
+  class="tui-engageSurvey-createSurvey"
+  component="engage_survey"
+  itemid="1"
+>
+  <surveyform-stub
+    buttoncontent="next, moodle"
+    showbuttonright="true"
+    survey="[object Object]"
+  />
+   
+  <accessform-stub
+    component="engage_survey"
+    donebuttontext="done, totara_engage"
+    itemid="0"
+    selectedoptions="[object Object]"
+    showback="true"
+    style="display: none;"
+  />
+</div>
+`;

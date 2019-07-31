@@ -338,5 +338,22 @@
         <INDEX NAME="relationship_id_class_name" UNIQUE="true" FIELDS="relationship_id, class_name" COMMENT="Each resolver class must be unique per relationship"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="totara_core_mention" COMMENT="Mentioning records to keep track of who had been mentioned in a specific context">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Ther id of user recipient"/>
+        <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="area" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" ONDELETE="cascade"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="component_idx" UNIQUE="false" FIELDS="component"/>
+        <INDEX NAME="area_idx" UNIQUE="false" FIELDS="area"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

@@ -1602,4 +1602,34 @@ class core_tag_tag {
         // Finally delete all tags that we combined into the current one.
         self::delete_tags($ids);
     }
+
+    /**
+     * Totara: Added another factory API to allow the construction of this instance via pure dummy data record.
+     * @since Totara 13.0
+     *
+     * @param stdClass $record
+     * @return core_tag_tag
+     */
+    public static function from_record(stdClass $record): \core_tag_tag {
+        global $DB;
+        $columns = array_keys($DB->get_columns('tag'));
+
+        $inner = [];
+        $attributes = get_object_vars($record);
+
+        foreach ($attributes as $attribute => $value) {
+            if (!in_array($attribute, $columns)) {
+                debugging(
+                    "Invalid attribute being passed in '{$attribute}' as it does not appear in the table",
+                    DEBUG_DEVELOPER
+                );
+
+                continue;
+            }
+
+            $inner[$attribute] = $value;
+        }
+
+        return new static((object) $inner);
+    }
 }

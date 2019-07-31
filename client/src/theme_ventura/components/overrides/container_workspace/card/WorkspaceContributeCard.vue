@@ -1,0 +1,42 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
+  @module theme_ventura
+-->
+
+<style lang="scss">
+.tui-workspaceContributeCard {
+  width: 100%;
+  height: calc(var(--tui-totaraEngage-card-height) + 11px);
+
+  .tui-card {
+    // Overiding cards border
+    border: 2px dashed var(--tui-color-primary);
+  }
+
+  &__card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__icon {
+    color: var(--tui-color-primary);
+    cursor: pointer;
+  }
+}
+</style>

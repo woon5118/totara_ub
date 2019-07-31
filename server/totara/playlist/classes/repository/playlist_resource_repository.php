@@ -1,0 +1,158 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package totara_playlist
+ */
+namespace totara_playlist\repository;
+
+use core\orm\entity\entity;
+use core\orm\entity\repository;
+use core\orm\query\builder;
+use totara_playlist\entity\playlist_resource;
+
+final class playlist_resource_repository extends repository {
+    /**
+     * @param int $playlistid
+     * @return playlist_resource[]
+     */
+    public function get_all_for_playlist(int $playlistid): array {
+        $builder = builder::table(static::get_table());
+        $builder->map_to(playlist_resource::class);
+
+        $builder->where('playlistid', $playlistid);
+        return $builder->fetch();
+    }
+
+    /**
+     * @param int $playlistid
+     * @return int
+     */
+    public function get_total_of_resources(int $playlistid): int {
+        $builder = builder::table(static::get_table());
+        $builder->where('playlistid', $playlistid);
+
+        return $builder->count();
+    }
+
+    /**
+     * @param int $resourceid
+     * @param int $playlistid
+     * @return playlist_resource|null
+     */
+    public function find_resource(int $resourceid, int $playlistid): ?playlist_resource {
+        $builder = builder::table(static::get_table());
+        $builder->map_to(playlist_resource::class);
+
+        $builder->where('resourceid', $resourceid);
+        $builder->where('playlistid', $playlistid);
+
+        /** @var playlist_resource|null $entity */
+        $entity = $builder->one();
+        return $entity;
+    }
+
+    /**
+     * @param entity|playlist_resource $entity
+     * @return entity|playlist_resource
+     */
+    public function save_entity(entity $entity): entity {
+        $sortorder = $entity->sortorder;
+
+        if (null == $sortorder) {
+            $builder = builder::table(static::get_table());
+            $builder->select_raw('MAX(sortorder) AS sortorder');
+            $builder->where('playlistid', $entity->playlistid);
+
+            $record = $builder->one();
+
+            if (null == $record || null == $record->sortorder) {
+                $entity->sortorder = 1;
+            } else {
+                $entity->sortorder = $record->sortorder + 1;
+            }
+        }
+
+        return parent::save_entity($entity);
+    }
+
+    /**
+     * @param int $resouceid
+     * @return void
+     */
+    public function delete_resource_by_resourceid(int $resourceid): void {
+        $builder = builder::table(static::get_table());
+        $builder->map_to(playlist_resource::class);
+        $builder->where('resourceid', $resourceid);
+
+        /** @var playlist_resource|null $entity */
+        $entity = $builder->one();
+
+        // Resouce is not in the playlist.
+        if (empty($entity)) {
+            return;
+        }
+
+        $entity->delete();
+    }
+
+    /**
+     * @param int $playlist_id
+     */
+    public function delete_resources_by_playlistid(int $playlist_id): void {
+        builder::table(static::get_table())
+            ->where('playlistid', $playlist_id)
+            ->delete();
+    }
+
+    /**
+     * @param int $sort_order
+     * @param int $playlistid
+     * @return playlist_resource|null
+     */
+    public function find_resource_by_sortorder(int $sort_order, int $playlist_id): ?playlist_resource {
+        $builder = builder::table(static::get_table());
+        $builder->map_to(playlist_resource::class);
+
+        $builder->where('sortorder', $sort_order);
+        $builder->where('playlistid', $playlist_id);
+
+        /** @var playlist_resource|null $entity */
+        $entity = $builder->one();
+        return $entity;
+    }
+
+    /**
+     * @param int $source_order
+     * @param int $target_order
+     * @param int $playlist_id
+     * @return array|playlist_resource[]
+     */
+    public function find_resources_from_range(int $source_order, int $target_order, int $playlist_id): array {
+        $builder = builder::table(static::get_table());
+        $builder->map_to(playlist_resource::class);
+        $builder->where('playlistid', $playlist_id);
+        $builder->where('sortorder', '>=', $source_order);
+        $builder->where('sortorder', '<=', $target_order);
+
+        /** @var playlist_resource[] $entities */
+        $entities = $builder->fetch();
+        return $entities;
+    }
+}

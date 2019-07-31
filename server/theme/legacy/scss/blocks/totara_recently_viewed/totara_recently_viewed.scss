@@ -1,0 +1,635 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2020 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2020 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Cody Finegan <cody.finegan@totaralearning.com>
+// @package   theme_legacy
+//
+
+.block-totara-recently-viewed {
+  .block-trv-top-title {
+    font-size: var(--tui-font-size-13);
+    line-height: var(--tui-font-size-15);
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: var(--tui-gap-4);
+  }
+
+  > ul {
+    display: flex;
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    list-style-type: none;
+
+    &.block-trv-layout-vertical {
+      flex-direction: column;
+      flex-basis: 100%;
+      margin: calc(var(--tui-gap-1) * -1) 0;
+
+      li {
+        margin: var(--tui-gap-1) 0;
+        width: 100%;
+      }
+    }
+
+    &.block-trv-layout-horizontal {
+      margin: calc(var(--tui-gap-2) * -1);
+
+      &.block-trv-layout-horizontal-single {
+        align-items: center;
+        flex-direction: column;
+
+        li {
+          flex-basis: 100%;
+          width: 100%;
+          max-width: 284px;
+        }
+      }
+
+      li {
+        padding: var(--tui-gap-2);
+        display: flex;
+        box-sizing: border-box;
+        flex-basis: 33%;
+      }
+    }
+  }
+
+  a {
+    color: var(--tui-color-neutral-7);
+    text-decoration: none;
+
+    &:focus {
+      outline: none;
+      text-decoration: underline;
+    }
+
+    // make the whole card clickable
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+  }
+
+  // Standard card layout
+  // Wrapper holds the height
+  .block-trv-card-wrapper {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+
+  .block-trv-card-border {
+    border: 1px solid var(--tui-color-border);
+    border-radius: var(--tui-border-radius-normal);
+    transition: box-shadow var(--tui-transition-form-function)
+      var(--tui-transition-form-duration);
+    height: 100%;
+  }
+
+  .block-trv-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--tui-border-radius-normal);
+    &:hover,
+    &:focus-within {
+      box-shadow: var(--tui-shadow-2);
+      a:focus {
+        text-decoration: none;
+      }
+    }
+  }
+
+  // Float the playlist resources
+  .block-trv-image-wrapper {
+    position: relative;
+    width: 100%;
+    border-top-left-radius: var(--tui-card-border-radius);
+    border-top-right-radius: var(--tui-card-border-radius);
+    .block-trv-image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+
+      .block-trv-image-overlay-content {
+        width: 48px;
+        height: 48px;
+        background-color: var(--tui-color-neutral-1);
+        border-radius: 50%;
+
+        p {
+          margin: 0 auto;
+          padding: 0;
+          font-weight: 700;
+          font-size: var(--tui-font-size-16);
+          line-height: 48px;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  // Surveys have some specific styles
+  .block-trv-engage_survey {
+    &.block-trv-li-vertical {
+      text-align: initial;
+    }
+
+    .block-trv-header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: var(--tui-gap-2) var(--tui-gap-4) 0 var(--tui-gap-4);
+    }
+    .block-trv-header > :first-child {
+      width: 40px;
+      height: 40px;
+    }
+
+    .block-trv-name {
+      @include tui-font-heading-label-small();
+      margin-top: var(--tui-gap-2);
+      margin-left: var(--tui-gap-2);
+      color: var(--tui-color-neutral-6);
+    }
+
+    .block-trv-card {
+      border: var(--tui-border-width-normal) solid var(--tui-color-primary);
+
+      .block-trv-content {
+        padding: var(--tui-gap-2) var(--tui-gap-4) var(--tui-gap-4) var(--tui-gap-4);
+      }
+    }
+
+    &.block-trv-li-horizontal {
+      .block-trv-card {
+        height: calc(264px - 20px);
+      }
+
+      .block-trv-title {
+        flex-basis: 52%;
+        width: 100%;
+        font-weight: normal;
+        font-size: var(--tui-font-size-20);
+        line-height: 1.25;
+      }
+    }
+
+    &.block-trv-li-vertical {
+      .block-trv-card {
+        // Overriding min-width to fit survey card.
+        min-width: 0;
+        .block-trv-image-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 80px;
+          height: 80px;
+          padding: 0;
+          min-height: 80px;
+
+        }
+        .block-trv-image-wrapper > :first-child {
+          width: 40px;
+          height: 40px;
+        }
+        .block-trv-content {
+          padding: var(--tui-gap-2);
+        }
+        .block-trv-name-vertical {
+          @include tui-font-heading-label-small();
+          color: var(--tui-color-neutral-6);
+          margin-bottom: var(--tui-gap-2);
+        }
+      }
+    }
+
+    .block-trv-title {
+      font-weight: normal;
+    }
+
+    .block-trv-footer-text {
+      color: var(--tui-color-neutral-7);
+    }
+  }
+
+  // Article images are padded in
+  .block-trv-engage_article {
+    &.block-trv-li-horizontal {
+      .block-trv-image-wrapper {
+        img {
+          padding: var(--tui-gap-4) var(--tui-gap-4) 0 var(--tui-gap-4);
+        }
+      }
+    }
+  }
+
+  // Courses have a progress bar
+  .block-trv-container_course {
+    .block-trv-progress {
+      margin-top: var(--tui-gap-2);
+    }
+  }
+
+  // Workspace specific styles
+  .block-trv-container_workspace {
+    &.block-trv-li-horizontal {
+      .block-trv-gradient {
+        background-image: linear-gradient(
+          to top,
+          transparent 0%,
+          var(--tui-color-backdrop-heavy) 78%,
+          var(--tui-color-backdrop-heavy)
+        );
+        width: 100%;
+        height: 50%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 50%;
+        border-radius: var(--tui-border-radius-normal);
+      }
+
+      .block-trv-title {
+        color: var(--tui-color-neutral-1);
+      }
+
+      .block-trv-content {
+        z-index: 1;
+      }
+    }
+  }
+
+  // Title & font things
+  .block-trv-title {
+    font-weight: bold;
+    font-size: var(--tui-font-size-15);
+    line-height: var(--tui-font-size-18);
+    margin: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .block-trv-subtitle {
+    font-size: var(--tui-font-size-12);
+    line-height: var(--tui-font-size-16);
+    margin: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .block-trv-footer-text {
+    font-size: var(--tui-font-size-12);
+    line-height: var(--tui-font-size-15);
+    margin: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--tui-color-neutral-6);
+  }
+
+  // Actions & reactions
+  .block-trv-reactions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    .block-trv-timetoview {
+      margin-right: var(--tui-gap-4);
+    }
+  }
+
+  .block-trv-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .block-trv-footer-bar {
+    position: absolute;
+    left: 1px;
+    right: 1px;
+    bottom: var(--tui-gap-4);
+    font-size: var(--tui-font-size-12);
+    background: var(--tui-color-neutral-1);
+    display: flex;
+    height: 24px;
+    text-align: center;
+    align-items: center;
+
+    .block-trv-footer-divider {
+      width: 2%;
+      color: var(--tui-color-neutral-5);
+    }
+
+    .block-trv-footer-pretext,
+    .block-trv-footer-posttext {
+      width: 49%;
+    }
+
+    .block-trv-footer-posttext {
+      color: var(--tui-color-neutral-6);
+    }
+  }
+
+  // Set the sizes
+  &.block-trv-list {
+    .block-trv-card {
+      min-width: 187px;
+      height: 80px;
+      flex-direction: row;
+    }
+
+    .block-trv-card-inner {
+      flex-direction: row;
+    }
+
+    .block-trv-reactions {
+      margin-top: auto;
+      //margin-bottom: var(--tui-gap-1);
+    }
+
+    // Images
+    .block-trv-image-wrapper {
+      width: 80px;
+      height: 80px;
+      padding: 0;
+      min-height: 80px;
+
+      .block-trv-image {
+        min-height: 80px;
+        width: 80px;
+        height: 80px;
+        border-top-left-radius: var(--tui-border-radius-normal);
+        border-bottom-left-radius: var(--tui-border-radius-normal);
+        background-size: cover;
+      }
+    }
+
+    .block-trv-content {
+      padding: var(--tui-gap-2);
+    }
+
+    // Article image padded in
+    .block-trv-engage_article {
+      .block-trv-image {
+        border-radius: 0;
+        width: calc(80px - var(--tui-gap-4));
+        height: calc(80px - var(--tui-gap-4));
+        min-height: calc(80px - var(--tui-gap-4));
+        margin: var(--tui-gap-2);
+      }
+    }
+
+    // Playlist bubble is smaller
+    .block-trv-image-wrapper {
+      .block-trv-image-overlay {
+        .block-trv-image-overlay-content {
+          width: 32px;
+          height: 32px;
+
+          p {
+            font-size: var(--tui-font-size-13);
+            line-height: 32px;
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+
+  &.block-trv-tiles {
+    .block-trv-card {
+      height: 100%;
+      min-height: 284px;
+    }
+
+    .block-trv-image {
+      border-top-left-radius: var(--tui-border-radius-normal);
+      border-top-right-radius: var(--tui-border-radius-normal);
+      width: 100%;
+      height: 128px;
+      max-height: 128px;
+      min-height: 128px;
+      display: block;
+    }
+
+    .block-trv-reactions {
+      margin-top: var(--tui-gap-2);
+    }
+
+    .block-trv-content {
+      padding: var(--tui-gap-4);
+
+      // Titles don't wrap
+      .block-trv-title {
+        white-space: initial;
+        overflow: visible;
+      }
+    }
+
+    // Article image padded in
+    .block-trv-engage_article {
+      .block-trv-image {
+        border-radius: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    // Workspace
+    .block-trv-container_workspace {
+      .block-trv-content {
+        width: 100%;
+      }
+    }
+  }
+
+  // Misc elements
+  .block-trv-timetoview,
+  .block-trv-likes {
+    display: inline-flex;
+    align-items: center;
+    padding-right: var(--tui-gap-1);
+    border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+    border-radius: 50px;
+    font-size: var(--tui-font-size-12);
+    line-height: var(--tui-font-size-12);
+    max-width: 100%;
+    height: 22px;
+    .block-trv-timetoview-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: block;
+    }
+    .flex-icon {
+      min-width: 1.3em;
+      color: var(--tui-color-neutral-6);
+    }
+  }
+
+  .block-trv-likes {
+    border-color: transparent;
+    padding: 0;
+
+    .flex-icon {
+      font-size: var(--tui-font-size-14);
+    }
+  }
+
+  .block-trv-stars {
+    vertical-align: bottom;
+    display: inline-block;
+    font-size: var(--tui-font-size-12);
+    height: 15px;
+    white-space: nowrap;
+
+    svg {
+      width: var(--tui-font-size-14);
+      height: var(--tui-font-size-14);
+    }
+
+    .block-trv-star-filled {
+      stop-color: var(--tui-color-chart-background-2);
+    }
+
+    .block-trv-star-unfilled {
+      stop-color: var(--tui-color-neutral-1);
+    }
+
+    .block-trv-star-polygon {
+      stroke: var(--tui-color-neutral-7);
+      stroke-width: 3;
+    }
+  }
+
+  .block-trv-footer-text {
+    margin-top: auto;
+  }
+
+  .block-trv-progress {
+    width: 104px;
+    height: 12px;
+    position: relative;
+    font-size: var(--tui-font-size-11);
+    line-height: var(--tui-font-size-12);
+    max-width: 100%;
+
+    .block-trv-progress-bar-wrapper,
+    .block-trv-progress-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 40px;
+    }
+
+    .block-trv-progress-background {
+      background: var(--tui-color-neutral-4);
+    }
+
+    .block-trv-progress-bar {
+      background: var(--tui-color-chart-background-1);
+      border-radius: 40px;
+      text-align: right;
+    }
+
+    .block-trv-progress-bar,
+    .block-trv-progress-text-outer {
+      display: inline-block;
+      height: 100%;
+      vertical-align: top;
+    }
+
+    .block-trv-progress-text-outer {
+      margin-left: 5px;
+    }
+
+    .block-trv-progress-text-inner {
+      color: var(--tui-color-neutral-1);
+      margin-right: 5px;
+    }
+  }
+}
+
+// The floating dock needs specific overrides
+#block-region-side-pre,
+#block-region-side-post,
+#dock {
+  .block-totara-recently-viewed {
+    > ul {
+      flex-direction: column;
+
+      &.block-trv-layout-horizontal {
+        li {
+          flex-basis: 100%;
+          width: 100%;
+          align-self: center;
+          max-width: 284px;
+        }
+      }
+    }
+  }
+}
+
+#dock {
+  .block-totara-recently-viewed {
+    > ul {
+      flex-direction: column;
+
+      &.block-trv-layout-horizontal {
+        .block-trv-card {
+          min-height: 224px;
+
+          .block-trv-image-wrapper {
+            min-height: 88px;
+            height: 88px;
+            .block-trv-image {
+              min-height: 88px;
+              height: 88px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

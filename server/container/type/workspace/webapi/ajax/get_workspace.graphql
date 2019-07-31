@@ -1,0 +1,45 @@
+query container_workspace_get_workspace($id: param_integer!) {
+  workspace: container_workspace_workspace(id: $id) {
+    __typename
+    id
+    name(format: PLAIN)
+    description(format: HTML)
+    description_format
+    time_description
+    owner {
+      __typename
+      id
+      fullname
+    }
+    image
+    total_members
+    total_member_requests
+    interactor {
+      __typename
+      can_delete
+      can_update
+      can_invite
+      can_join
+      joined
+      workspaces_admin
+      own
+      can_request_to_join
+      has_requested_to_join
+      can_view
+      can_view_discussions
+      can_view_library
+      can_view_members
+      can_view_member_requests
+      user {
+        __typename
+        id
+        # These are used within post discussion form.
+        fullname
+        profileimagealt
+        profileimageurl
+      }
+    }
+    url
+    access
+  }
+}

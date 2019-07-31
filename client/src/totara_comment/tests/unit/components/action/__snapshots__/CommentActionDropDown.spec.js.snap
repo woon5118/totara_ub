@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_comment/components/action/CommentActionDropDown.vue Checks snapshot 1`] = `
+<dropdown-stub
+  animation="default"
+  canclose="true"
+  class="tui-commentActionDropDown"
+  closeonclick="true"
+  deleteable="true"
+  editable="true"
+  position="bottom-right"
+  role="menu"
+  separator="true"
+>
+   
+  <dropdownitem-stub
+    role="menuitem"
+  >
+    
+    edit-moodle
+  
+  </dropdownitem-stub>
+   
+  <dropdownitem-stub
+    role="menuitem"
+  >
+    
+    delete-moodle
+  
+  </dropdownitem-stub>
+   
+  <dropdownitem-stub
+    role="menuitem"
+  >
+    
+    reportcontent-totara_comment
+  
+  </dropdownitem-stub>
+</dropdown-stub>
+`;

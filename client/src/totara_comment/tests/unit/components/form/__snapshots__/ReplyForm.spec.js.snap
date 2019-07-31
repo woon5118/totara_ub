@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_comment/components/form/ReplyForm.vue Checks snapshot 1`] = `
+<responsebox-stub
+  class="tui-replyForm"
+>
+  <form-stub
+    class="tui-replyForm__form"
+    inputwidth="limited"
+  >
+    <weka-stub
+      area="reply"
+      class="tui-replyForm__form__editor"
+      component="totara_comment"
+      data-file-item-id="100"
+      fileitemid="100"
+      placeholder="enterreply-totara_comment"
+    />
+     
+    <submitcancelbuttonsgroup-stub
+      disablesubmit="true"
+      size="small"
+      submittext="reply-totara_comment"
+    />
+  </form-stub>
+</responsebox-stub>
+`;

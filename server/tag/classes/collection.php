@@ -133,7 +133,11 @@ class core_tag_collection {
      */
     public static function display_name($record) {
         $syscontext = context_system::instance();
-        if (!empty($record->component)) {
+        if (!empty($record->name)) {
+            // Totara: We use the instance name first, as some of the collection are being added via the plugin which
+            // could already include the name.
+            return format_string($record->name, true, array('context' => $syscontext));
+        } else if (!empty($record->component)) {
             $identifier = 'tagcollection_' .
                     clean_param($record->name, PARAM_STRINGID);
             $component = $record->component;
@@ -141,9 +145,6 @@ class core_tag_collection {
                 $component = 'tag';
             }
             return get_string($identifier, $component);
-        }
-        if (!empty($record->name)) {
-            return format_string($record->name, true, array('context' => $syscontext));
         } else if ($record->isdefault) {
             return get_string('defautltagcoll', 'tag');
         } else {
@@ -221,6 +222,12 @@ class core_tag_collection {
      */
     public static function update($tagcoll, $data) {
         global $DB;
+
+        if (!static::is_editable($tagcoll->id)) {
+            // Totara: preventing editing the tag collection that is not edit-able.
+            return false;
+        }
+
         $defaulttagcollid = self::get_default();
         $allowedfields = array('name', 'searchable', 'customurl');
         if ($tagcoll->id == $defaulttagcollid) {
@@ -267,7 +274,8 @@ class core_tag_collection {
         global $DB, $CFG;
 
         $defaulttagcollid = self::get_default();
-        if ($tagcoll->id == $defaulttagcollid) {
+        if (!static::is_deleteable($tagcoll->id)) {
+            // Totara: if the collection is not able to be deleted, then we will skip it.
             return false;
         }
 
@@ -461,5 +469,65 @@ class core_tag_collection {
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Checking whether the tag collection - $tagcollectionid is a able to be editted or not.
+     * Some special tag collection(s) might be using different interface and api to do the editable.
+     *
+     * False, if it is not editable - otherwise TRUE
+     *
+     * @param int $tagcollectionid
+     * @return bool
+     */
+    public static function is_editable(int $tagcollectionid): bool {
+        global $CFG;
+
+        if (!property_exists($CFG, 'topic_collection_id')) {
+            return false;
+        }
+
+        // As long as the tag collection id is not a topic collection id then it is able to be editted.
+        return $CFG->topic_collection_id != $tagcollectionid;
+    }
+
+    /**
+     * Given the tag collection's id, this function will give us the redirection url to manage that collection.
+     * Null return if the tag collection is not special at all.
+     *
+     * @param int $tagcollectionid
+     * @return moodle_url|null
+     */
+    public static function get_redirection(int $tagcollectionid): ?\moodle_url {
+        global $CFG;
+
+        if (property_exists($CFG, 'topic_collection_id') && $CFG->topic_collection_id == $tagcollectionid) {
+            return new \moodle_url("/totara/topic/index.php");
+        }
+
+        return null;
+    }
+
+    /**
+     * Checking whether the tag collection - $tagcollectionid is a able to be deleted or not.
+     *
+     * @param int $tagcollectionid
+     * @return bool
+     */
+    public static function is_deleteable(int $tagcollectionid): bool {
+        global $CFG;
+
+        $default = self::get_default();
+        if ($default == $tagcollectionid) {
+            // Default topic collection is not able to be deleted.
+            return false;
+        }
+
+        if (!property_exists($CFG, 'topic_collection_id')) {
+            return false;
+        }
+
+        // As long as the tag collection id is not a topic collection id then it is able to be deleted.
+        return $CFG->topic_collection_id != $tagcollectionid;
     }
 }

@@ -19,12 +19,12 @@
 <template>
   <div class="tui-sidePanelNavGroup">
     <div v-if="title" class="tui-sidePanelNavGroup__heading">
-      <h4
+      <h2
         :id="$id('side-panel-nav-group-heading-title')"
         class="tui-sidePanelNavGroup__heading-title"
       >
         {{ title }}
-      </h4>
+      </h2>
 
       <div class="tui-sidePanelNavGroup__heading-side">
         <slot name="heading-side" />

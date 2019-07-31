@@ -129,7 +129,6 @@ class totara_catalog_config_testcase extends config_base_testcase {
         }
     }
 
-
     public function test_get_bad_config_key() {
         $this->assertEquals(null, config::instance()->get_value('nonexistent_config_key'));
     }
@@ -233,7 +232,7 @@ class totara_catalog_config_testcase extends config_base_testcase {
     public function test_get_learning_types_in_catalog() {
         $config = config::instance();
         $actual = $config->get_learning_types_in_catalog();
-        $expected = ['course', 'program', 'certification'];
+        $expected = ['course', 'program', 'certification', 'engage_article', 'playlist'];
 
         $this->assertGreaterThanOrEqual(3, count($actual));
         foreach ($expected as $value) {

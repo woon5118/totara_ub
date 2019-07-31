@@ -94,6 +94,20 @@ final class config_item {
     }
 
     /**
+     * Returning a metadata array that is similar with the one from metadata editor_weka.php file.
+     * However this function will EXCLUDE the component and area, just purely metadata.
+     *
+     * @return array
+     */
+    public function get_metadata(): array {
+        return [
+            'showtoolbar' => $this->showtoolbar,
+            'includeextensions' => $this->extensions,
+            'extensionsoptions' => $this->extensionsoptions
+        ];
+    }
+
+    /**
      * @param array $config
      * @return config_item
      */

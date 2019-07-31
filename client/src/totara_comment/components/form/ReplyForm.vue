@@ -1,0 +1,220 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Kian Nguyen <kian.nguyen@totaralearning.com>
+  @module totara_comment
+-->
+<template>
+  <ResponseBox class="tui-replyForm">
+    <Form class="tui-replyForm__form">
+      <Weka
+        v-if="!$apollo.queries.editorOption.loading && draftId"
+        component="totara_comment"
+        area="reply"
+        :options="editorOption"
+        :doc="content.doc"
+        :placeholder="$str('enterreply', 'totara_comment')"
+        :file-item-id="draftId"
+        :data-file-item-id="draftId"
+        class="tui-replyForm__form__editor"
+        @update="update"
+        @editor-mounted="$emit('form-ready')"
+      />
+
+      <SubmitCancelButtonsGroup
+        :submit-text="$str('reply', 'totara_comment')"
+        :size="size"
+        :disable-submit="content.empty || submitting"
+        :disable-cancel="submitting"
+        @click-submit="submit"
+        @click-cancel="$emit('cancel')"
+      />
+    </Form>
+  </ResponseBox>
+</template>
+
+<script>
+import Weka from 'editor_weka/components/Weka';
+import Form from 'tui/components/form/Form';
+import SubmitCancelButtonsGroup from 'totara_comment/components/form/group/SubmitCancelButtonsGroup';
+import { FORMAT_JSON_EDITOR } from 'tui/format';
+import { debounce } from 'tui/util';
+import { createMentionContent } from 'editor_weka/helpers/mention';
+import { isValid, SIZE_SMALL } from 'totara_comment/size';
+import ResponseBox from 'totara_comment/components/form/box/ResponseBox';
+
+// GraphQL queries
+import getEditorWeka from 'totara_comment/graphql/get_editor_weka';
+import fileDraftId from 'core/graphql/file_unused_draft_item_id';
+
+export default {
+  components: {
+    Weka,
+    Form,
+    SubmitCancelButtonsGroup,
+    ResponseBox,
+  },
+
+  props: {
+    size: {
+      type: String,
+      default() {
+        return SIZE_SMALL;
+      },
+
+      validator(prop) {
+        return isValid(prop);
+      },
+    },
+
+    component: {
+      type: String,
+      required: true,
+    },
+
+    area: {
+      type: String,
+      required: true,
+    },
+
+    commentId: {
+      type: [String, Number],
+      required: true,
+    },
+
+    submitting: Boolean,
+
+    replyTo: {
+      type: Object,
+      default() {
+        return null;
+      },
+    },
+  },
+
+  apollo: {
+    editorOption: {
+      query: getEditorWeka,
+      variables() {
+        return {
+          area: this.area,
+          component: this.component,
+          comment_area: 'reply',
+        };
+      },
+
+      update({ editor }) {
+        console.log(editor);
+        return editor;
+      },
+    },
+  },
+
+  data() {
+    return {
+      draftId: null,
+      editorOption: null,
+      content: {
+        doc: null,
+        empty: true,
+      },
+    };
+  },
+
+  computed: {
+    isSmall() {
+      return SIZE_SMALL === this.size;
+    },
+  },
+
+  watch: {
+    /**
+     * @param {Object} value
+     */
+    replyTo: {
+      deep: true,
+      immediate: true,
+      handler(value) {
+        if (!value) {
+          this.content.doc = null;
+          this.content.empty = true;
+          return;
+        }
+
+        this.content.doc = createMentionContent(value);
+        this.content.empty = false;
+      },
+    },
+  },
+
+  async mounted() {
+    await this.$_loadDraftId();
+  },
+
+  methods: {
+    async $_loadDraftId() {
+      const {
+        data: { item_id },
+      } = await this.$apollo.mutate({ mutation: fileDraftId });
+      this.draftId = item_id;
+    },
+
+    $_readJSON: debounce(
+      /**
+       *
+       * @param {Object} opt
+       */
+      function(opt) {
+        this.content.doc = opt.getJSON();
+        this.content.empty = opt.isEmpty();
+      },
+      100
+    ),
+
+    /**
+     *
+     * @param {Object} opt
+     */
+    update(opt) {
+      this.$_readJSON(opt);
+    },
+
+    submit() {
+      if (this.submitting) {
+        return;
+      }
+
+      this.$emit('submit', {
+        content: JSON.stringify(this.content.doc),
+        format: FORMAT_JSON_EDITOR,
+        commentId: this.commentId,
+      });
+
+      this.content.doc = null;
+      this.content.empty = true;
+
+      this.$_loadDraftId();
+    },
+  },
+};
+</script>
+
+<lang-strings>
+  {
+    "totara_comment": [
+      "enterreply",
+      "reply"
+    ]
+  }
+</lang-strings>

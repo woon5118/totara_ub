@@ -1,0 +1,54 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package container_workspace
+ */
+namespace container_workspace\webapi\resolver\query;
+
+use container_workspace\loader\workspace\loader;
+use core\orm\pagination\offset_cursor_paginator;
+use core\webapi\execution_context;
+use core\webapi\query_resolver;
+use container_workspace\query\workspace\query;
+use totara_core\advanced_feature;
+
+/**
+ * Query resolver to fetch the cursor information for workspaces.
+ */
+final class workspace_cursor implements query_resolver {
+    /**
+     * @param array $args
+     * @param execution_context $ec
+     * @return offset_cursor_paginator
+     */
+    public static function resolve(array $args, execution_context $ec): offset_cursor_paginator {
+        global $USER;
+        require_login();
+        advanced_feature::require('container_workspace');
+
+        $user_id = $USER->id;
+        if (isset($args['user_id'])) {
+            $user_id = (int) $args['user_id'];
+        }
+
+        $query = query::from_parameters($args, $user_id);
+        return loader::get_workspaces($query);
+    }
+}

@@ -1,0 +1,237 @@
+type container_workspace_workspace {
+  id: Int!
+  name(format: core_format!): String!
+  description(format: core_format!): String
+  """
+  Summary format text value
+  """
+  description_format: Int!
+  """
+  The owner of the workspace.
+  """
+  owner: core_user!
+  """
+  Url to the workspace
+  """
+  url: String!
+  """
+  All the capability check against the actor sthat is interacting with the workspace.
+  All the state check of an actor against within the workspace.
+  If the actor_id was not being set, then user in session will be used.
+  """
+  interactor(actor_id: param_integer): container_workspace_workspace_interactor!
+  """
+  Total number of members within the workspace.
+  """
+  total_members: Int!
+  """
+  Url for default image.
+  """
+  image: String!
+  """
+  Time description of a workspace about create/update time.
+  """
+  time_description: String!
+  access: container_workspace_access!
+  """
+  Number of requests to join workspace.
+  """
+  total_member_requests: Int!
+}
+
+"""
+All the action available for a user within a workspace, also this includes the states of a user.
+"""
+type container_workspace_workspace_interactor {
+  """
+  Current workspace being checked against.
+  """
+  workspace_id: Int!
+  """
+  Current actor.
+  """
+  user: core_user!
+  """
+  Whether the user has capability to update a workspace or not.
+  """
+  can_update: Boolean!
+  """
+  Whether the user has capability to delete a workspace or not.
+  """
+  can_delete: Boolean!
+  """
+  Whether the user is able to invite other member to the workspace or not.
+  """
+  can_invite: Boolean!
+  """
+  Whether the user is able to join the workspace or not.
+  """
+  can_join: Boolean!
+  """
+  Whether user owns the workspace or not.
+  """
+  own: Boolean!
+  """
+  Whether the user had been joined the workspace or not.
+  """
+  joined: Boolean!
+  """
+  Whether the user is an admin within workspaces or not.
+  """
+  workspaces_admin: Boolean!
+  """
+  Whether the user actor is able to request to join or not.
+  """
+  can_request_to_join: Boolean!
+  """
+  Whether the user actor is able to view workspace or not.
+  """
+  can_view: Boolean!
+  """
+  Whether the user actor has requested to join or not.
+  """
+  has_requested_to_join: Boolean!
+  """
+  Whether user is able to view the discussion tab
+  """
+  can_view_discussions: Boolean!
+  """
+  Whether the user actor is able to view the member tab
+  """
+  can_view_members: Boolean!
+  """
+  Whether the user actor is able to view the library tab.
+  """
+  can_view_library: Boolean!
+  """
+  Whether the user actor is able to view the member requests block or not.
+  """
+  can_view_member_requests: Boolean!
+}
+
+extend type Query {
+  """
+  Query to fetch a single workspace based on the workspace's id.
+  """
+  container_workspace_workspace(
+    id: param_integer!
+  ): container_workspace_workspace!
+
+  """
+  Query to fetch the cursor information for the workspaces.
+  """
+  container_workspace_workspace_cursor(
+    """
+    For fetching the workspaces related to this very user. If the parameter
+    user_id is not set, then the user within session will be used.
+    """
+    user_id: param_integer
+    source: container_workspace_workspace_source!
+    """
+    Whether it is private/public workspaces.
+    """
+    access: container_workspace_access
+    """
+    Term to search workspace. If it is null, then no search will be applied.
+    """
+    search_term: param_text
+    """
+    The current cursor, which is help to detect the next cursor.
+    """
+    cursor: param_text
+  ): container_workspace_cursor!
+
+  """
+  A query to fetch all the workspaces that this user is a part of it.
+  """
+  container_workspace_workspaces(
+    """
+    For fetching the workspaces that related to this very user.
+    If paremter user_id is null, the then user within session will be used.
+    """
+    user_id: param_integer
+    source: container_workspace_workspace_source!
+    """
+    Term to search workspace on. If it is null, then no search will be applied
+    """
+    search_term: param_text
+    """
+    Sort option to sort the workspace
+    """
+    sort: container_workspace_workspace_sort!
+    """
+    Whether it is private/public workspaces.
+    """
+    access: container_workspace_access
+    """
+    The cursor that we want to fetch. If none is provided, then it will fetch the very first of the page.
+    """
+    cursor: param_text
+  ): [container_workspace_workspace!]!
+
+  """
+  Query to get interactor instance against the workspace provided via parameter.
+  """
+  container_workspace_workspace_interactor(
+    workspace_id: param_integer!
+    user_id: param_integer
+  ): container_workspace_workspace_interactor!
+}
+
+enum container_workspace_access {
+  """
+  This will result in column visibility to be '1' - but different enrolment
+  methods, which are self and manual enrolment.
+  """
+  PUBLIC
+  """
+  This when the column visibility is '1' - but different enrolment
+  methods, which are request and manual enrolment.
+  """
+  PRIVATE
+  """
+  This is when the column visibility is '0'
+  """
+  HIDDEN
+}
+
+extend type Mutation {
+  """
+  Mutation to create a workspace.
+  """
+  container_workspace_create(
+    name: param_text!
+    description: param_text
+    description_format: param_integer
+    """
+    Whether to tell if the workspace is the private workspace or not.
+    """
+    private: param_boolean!
+    """
+    Only works if the workspace is a private one. Otherwise exception will be thrown.
+    """
+    hidden: param_boolean!
+    """
+    If this is set, then we have uploaded image to process.
+    """
+    draft_id: param_integer
+  ): container_workspace_workspace!
+
+  """
+  Mutation to update the workspace.
+  """
+  container_workspace_update(
+    id: param_integer!
+    name: param_text
+    description: param_text
+    description_format: param_integer
+    draft_id: param_integer
+    private: param_boolean
+    hidden: param_boolean
+  ): container_workspace_workspace!
+
+  """
+  Mutation to delete the workspace.
+  """
+  container_workspace_delete(workspace_id: param_integer): Boolean!
+}

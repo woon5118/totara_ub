@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`engage_survey/components/box/RadioBox.vue Checks snapshot 1`] = `
+<div
+  class="tui-formRow tui-engageSurvey-radioBox"
+>
+  <div
+    class="tui-formRow__desc"
+  >
+    <label
+      class="tui-formLabel tui-formLabel--hidden"
+      for="some-undefined"
+      id="some-label"
+    >
+      
+  Label for the group of radios
+  
+      <!---->
+    </label>
+     
+    <!---->
+  </div>
+   
+  <div
+    class="tui-formRow__action"
+  >
+    <div
+      aria-labelledby="some-label"
+      class="tui-radioGroup"
+      role="radiogroup"
+    />
+  </div>
+</div>
+`;

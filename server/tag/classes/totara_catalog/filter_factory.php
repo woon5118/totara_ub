@@ -37,21 +37,25 @@ class filter_factory {
     /**
      * Get tag filters
      *
-     * @param string $itemtype the tag item type (not objecttype!) that is relevant
-     * @param string $objecttype
+     * @param string        $itemtype   the tag item type (not objecttype!) that is relevant
+     * @param string        $objecttype
+     * @param string|null   $component  If component is not provided, then it will be looked up base on the $itemtype.
      * @return array
      */
-    public static function get_filters(string $itemtype, string $objecttype): array {
+    public static function get_filters(string $itemtype, string $objecttype, ?string $component = null): array {
         global $CFG, $DB;
 
         if (empty($CFG->usetags)) {
             return [];
         }
 
-        $areas = \core_tag_area::get_areas();
-        // This makes the assumption that there is only one component for an itemtype, or that we can just use the
-        // first and can ignore the others.
-        $component = array_keys($areas[$itemtype])[0];
+        if (empty($component)) {
+            // Start looking for component base on the areas. If the $component is not provided.
+            $areas = \core_tag_area::get_areas();
+            // This makes the assumption that there is only one component for an itemtype, or that we can just use the
+            // first and can ignore the others.
+            $component = array_keys($areas[$itemtype])[0];
+        }
 
         if (!\core_tag_area::is_enabled($component, $itemtype)) {
             return [];
@@ -63,16 +67,25 @@ class filter_factory {
 
         $filters = [];
 
-        $optionsloader = function () use ($itemtype) {
+        $optionsloader = function () use ($itemtype, $coll) {
             global $DB;
 
-            $sql = "SELECT DISTINCT tag.id, tag.rawname AS name
-                      FROM {tag_instance} tag_instance
-                      JOIN {tag} tag
-                        ON tag_instance.tagid = tag.id
-                     WHERE tag_instance.itemtype = :itemtype";
+            $sql = '
+                SELECT DISTINCT tag.id, tag.rawname AS name
+                FROM "ttr_tag_instance" tag_instance
+                JOIN "ttr_tag" tag
+                    ON tag_instance.tagid = tag.id
+                WHERE tag_instance.itemtype = :itemtype
+                AND tag.tagcollid = :collection_id
+            ';
 
-            $records = $DB->get_records_sql($sql, ['itemtype' => $itemtype]);
+            $records = $DB->get_records_sql(
+                $sql,
+                [
+                    'itemtype' => $itemtype,
+                    'collection_id' => $coll->id
+                ]
+            );
 
             $systemcontext = \context_system::instance();
 

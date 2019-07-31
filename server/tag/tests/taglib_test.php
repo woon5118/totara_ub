@@ -694,7 +694,8 @@ class core_tag_taglib_testcase extends advanced_testcase {
 
         // Make sure there is one and only one tag coll that is marked as default.
         $tagcolls = core_tag_collection::get_collections();
-        $this->assertEquals(1, count($DB->get_records('tag_coll', array('isdefault' => 1))));
+        // Totara: expecting topic collection to be a default as well.
+        $this->assertEquals(2, count($DB->get_records('tag_coll', array('isdefault' => 1))));
         $defaulttagcoll = core_tag_collection::get_default();
 
         // Create a new tag coll to store user tags and something else.

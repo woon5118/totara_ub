@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`engage_article/components/form/ArticleForm.vue Checks snapshot 1`] = `
+<form-stub
+  class="tui-articleForm"
+  inputwidth="full"
+  vertical="true"
+>
+  <formrow-stub
+    class="tui-articleForm__title"
+    hidden="true"
+    label="articletitle, engage_article"
+    required="true"
+  />
+   
+  <div
+    class="tui-articleForm__description"
+  >
+    <formrow-stub
+      class="tui-articleForm__description__formRow"
+      hidden="true"
+      label="content, engage_article"
+      required="true"
+    />
+     
+    <div
+      class="tui-articleForm__description__tip"
+    >
+      <p>
+        contributetip, totara_engage
+      </p>
+       
+      <popover-stub
+        position="right"
+        triggers="click"
+      >
+         
+        <p
+          class="tui-articleForm__description__tip__content"
+        >
+          
+          contributetip_help, totara_engage
+        
+        </p>
+      </popover-stub>
+    </div>
+  </div>
+   
+  <buttongroup-stub
+    class="tui-articleForm__buttons"
+  >
+    <button-stub
+      aria-label="createarticleshort, engage_article"
+      disabled="true"
+      styleclass="[object Object]"
+      text="next, moodle"
+      type="button"
+    />
+     
+    <cancelbutton-stub />
+  </buttongroup-stub>
+</form-stub>
+`;

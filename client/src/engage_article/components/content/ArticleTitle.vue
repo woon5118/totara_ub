@@ -1,0 +1,145 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Kian Nguyen <kian.nguyen@totaralearning.com>
+  @module engage_article
+-->
+<template>
+  <div class="tui-articleTitle">
+    <div class="tui-articleTitle__head">
+      <InlineEditing
+        v-show="!editing"
+        :update-able="updateAble"
+        :full-width="true"
+        @click="editing = true"
+      >
+        <h3 slot="content" class="tui-articleTitle__head__title">
+          {{ title }}
+        </h3>
+      </InlineEditing>
+      <EditArticleTitleForm
+        v-if="editing"
+        :title="title"
+        :submitting="submitting"
+        @cancel="editing = false"
+        @submit="updateTitle"
+      />
+
+      <BookmarkButton
+        v-if="!owned"
+        :primary="false"
+        :circle="true"
+        :bookmarked="bookmarked"
+        size="300"
+        @click="$emit('bookmark', $event)"
+      />
+    </div>
+
+    <ArticleSeparator />
+  </div>
+</template>
+
+<script>
+import InlineEditing from 'totara_engage/components/form/InlineEditing';
+import BookmarkButton from 'totara_engage/components/buttons/BookmarkButton';
+import EditArticleTitleForm from 'engage_article/components/form/EditArticleTitleForm';
+import ArticleSeparator from 'engage_article/components/separator/ArticleSeparator';
+
+// GraphQL queries
+import updateArticle from 'engage_article/graphql/update_article';
+import getArticle from 'engage_article/graphql/get_article';
+
+export default {
+  components: {
+    EditArticleTitleForm,
+    InlineEditing,
+    BookmarkButton,
+    ArticleSeparator,
+  },
+
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+
+    updateAble: {
+      type: Boolean,
+      required: true,
+    },
+
+    bookmarked: {
+      type: Boolean,
+      required: true,
+    },
+
+    resourceId: {
+      type: [Number, String],
+      required: true,
+    },
+
+    owned: {
+      type: Boolean,
+      required: true,
+    },
+  },
+
+  data() {
+    return {
+      editing: false,
+      submitting: false,
+    };
+  },
+
+  methods: {
+    /**
+     *
+     * @param {String} title
+     */
+    updateTitle(title) {
+      this.submitting = true;
+
+      this.$apollo
+        .mutate({
+          mutation: updateArticle,
+          refetchAll: false,
+          variables: {
+            resourceid: this.resourceId,
+            name: title,
+          },
+
+          /**
+           *
+           * @param {DataProxy} proxy
+           * @param {Object} data
+           */
+          updateQuery: (proxy, data) => {
+            proxy.writeQuery({
+              query: getArticle,
+              variables: {
+                resourceid: this.resourceId,
+              },
+
+              data: data,
+            });
+          },
+        })
+        .finally(() => {
+          this.submitting = false;
+          this.editing = false;
+        });
+    },
+  },
+};
+</script>

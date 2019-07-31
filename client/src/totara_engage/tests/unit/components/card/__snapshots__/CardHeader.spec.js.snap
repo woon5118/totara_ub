@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/card/CardHeader.vue Checks snapshot 1`] = `
+<div
+  class="tui-totaraEngage-cardHeader"
+>
+  <div
+    class="tui-totaraEngage-cardHeader__first"
+  />
+   
+  <div
+    class="tui-totaraEngage-cardHeader__second"
+  />
+   
+  <div
+    class="tui-totaraEngage-cardHeader__third"
+  />
+</div>
+`;

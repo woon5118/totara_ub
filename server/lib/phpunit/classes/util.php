@@ -322,6 +322,27 @@ class phpunit_util extends testing_util {
         // Reset the user access controller.
         \core_user\access_controller::clear_instance_cache();
 
+        if (class_exists('http_message_sink')) {
+            http_message_sink::clear();
+        }
+
+        if (class_exists('totara_comment_default_resolver')) {
+            totara_comment_default_resolver::reset_callbacks();
+        }
+
+        if (class_exists('\totara_topic\resolver\resolver_factory')) {
+            // Reset cache for totara_topic
+            \totara_topic\resolver\resolver_factory::phpunit_clear_resolver();
+        }
+
+        if (class_exists('\totara_engage\question\question_resolver_factory')) {
+            \totara_engage\question\question_resolver_factory::clear_default_resolver();
+        }
+
+        if (class_exists('\totara_reaction\resolver\resolver_factory')) {
+            \totara_reaction\resolver\resolver_factory::phpunit_clear_resolver();
+        }
+
         if ($warnings) {
             $warnings = implode("\n", $warnings);
             trigger_error($warnings, E_USER_WARNING);

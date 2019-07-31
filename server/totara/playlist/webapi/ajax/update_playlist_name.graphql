@@ -1,0 +1,48 @@
+mutation totara_playlist_update_playlist_name(
+  $id: param_integer!
+  $name: param_text!
+) {
+  playlist: totara_playlist_update(id: $id, name: $name) {
+    __typename
+    name(format: PLAIN)
+    user {
+      __typename
+      id
+      card_display {
+        __typename
+        profile_picture_alt
+        profile_picture_url
+        profile_url
+        display_fields {
+          __typename
+          is_custom
+          associate_url
+          label
+          value
+        }
+      }
+    }
+    id
+    bookmarked
+    summary(format: PLAIN)
+    access
+    timedescription
+    contextid
+    updateable
+    contributable
+    topics {
+      __typename
+      value(format: PLAIN)
+      id
+    }
+    rating {
+      itemid
+      rating
+      count
+      rated
+    }
+    totalresources
+    owned
+    sharedbycount
+  }
+}

@@ -81,6 +81,52 @@ class core_dml_offset_cursor_paginator_testcase extends orm_query_builder_base {
         }
     }
 
+    public function test_get_all_items_with_page_zero(): void {
+        global $DB;
+        $this->create_sample_records();
+
+        $query = new sql("SELECT * FROM {{$this->table_name}} ORDER BY name");
+
+        $expected_query = clone $query;
+
+        $cursor = offset_cursor::create()
+            ->set_page(0)
+            ->set_limit(1);
+
+        $paginator = new offset_cursor_paginator($query, $cursor);
+
+        $result = $paginator->to_array();
+        $this->assertEquals([
+            'items',
+            'total',
+            'next_cursor',
+        ], array_keys($result));
+
+        $expected_result = $DB->get_records_sql($expected_query, null, 0, 0);
+
+        $this->assertEquals($expected_result, $paginator->get_items()->all(true));
+        $this->assertNull($paginator->get_next_cursor());
+        $this->assertEquals($cursor, $paginator->get_current_cursor());
+        $this->assertEquals(5, $paginator->get_total());
+
+        // Check that items are collection and paginator is traversable
+        $this->assertInstanceOf(collection::class, $paginator->get_items());
+
+        // Check that count works
+        $this->assertEquals(5, $paginator->count());
+        $this->assertEquals(5, count($paginator));
+
+        // Make sure we can do a foreach
+        $expected_items = convert_to_array($expected_result);
+        $prev_item = null;
+        foreach ($paginator as $item) {
+            $this->assertNotEquals($item, $prev_item);
+            $this->assertInstanceOf(stdClass::class, $item);
+            $this->assertContains((array)$item, $expected_items);
+            $prev_item = $item;
+        }
+    }
+
     public function test_passing_invalid_cursor() {
         $query = new sql("SELECT * FROM {{$this->table_name}} ORDER BY name, id");
 

@@ -459,6 +459,11 @@ final class executable implements \Serializable {
             $whitelist[$CFG->pcntl_phpclipath] = false;
         }
 
+        // Python for recommendations engines.
+        if (isset($CFG->py3path) && !empty($CFG->py3path)) {
+            $whitelist[$CFG->py3path] = true;
+        }
+
         // Merge any third party pathnames from the config file.
         // If any of the pathnames match what has been added already,
         // the third party true/false values will override them.

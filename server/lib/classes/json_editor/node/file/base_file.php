@@ -91,6 +91,8 @@ abstract class base_file extends node {
     }
 
     /**
+     * Returning the file name of this file.
+     *
      * @return string
      */
     public function get_filename(): string {

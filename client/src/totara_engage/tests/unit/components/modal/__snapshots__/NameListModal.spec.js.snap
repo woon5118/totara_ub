@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/modal/NameListModal Matchs snapshot 1`] = `
+<modal-stub
+  arialabelledby="tui-engage__components__modal__namelistmodal-title"
+  dismissable="true"
+  shade="true"
+  size="small"
+>
+  <h2
+    class="tui-engage__components__modal__namelistmodal-title"
+    id="tui-engage__components__modal__namelistmodal-title"
+  >
+    
+    You like me?
+  
+  </h2>
+   
+  <closebutton-stub
+    class="tui-engage__components__modal__namelistmodal-close"
+    size="300"
+  />
+   
+  <div
+    class="tui-engage__components__modal__namelistmodal-content"
+  >
+    <loading-stub />
+     
+    <div
+      class="tui-engage__components__modal__namelistmodal-content-loadmore"
+    >
+      <loading-stub />
+      
+      loading, core
+    
+    </div>
+  </div>
+</modal-stub>
+`;

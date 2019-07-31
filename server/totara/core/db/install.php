@@ -640,5 +640,11 @@ function xmldb_totara_core_install() {
 
     totara_core_upgrade_create_relationship('totara_core\relationship\resolvers\subject', 'subject', 1);
 
+    // Installing default topic collection, as this is required to be done before any other component/plugin
+    // being installed. If it is not being installed first, then by the time plugin get to installed, it will not be
+    // able to find any topic collection.
+    require_once("{$CFG->dirroot}/totara/topic/db/upgradelib.php");
+    totara_topic_add_tag_collection();
+
     return true;
 }

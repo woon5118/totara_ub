@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/form/RecipientsSelector.vue matches snapshot 1`] = `
+<div class="tui-sharedRecipientsSelector" selectedrecipients=""><label for="abc123" class="tui-formLabel tui-sharedRecipientsSelector__label">
+    resharetorecipients, totara_engage
+    <!----></label>
+  <div class="tui-sharedRecipientsSelector__icon"><button aria-expanded="false" aria-label="info, moodle" type="button" title="info, moodle" class="tui-iconBtn tui-InfoIconButton tui-iconBtn--prim tui-iconBtn--small tui-iconBtn--circle tui-iconBtn--transparent"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><img src="http://foo/theme/image.php/ventura/core/1001/info-circle" class="icon"></span>
+      <!----></span>
+      <!----></span></button>
+    <div class="tui-popoverPositioner tui-popoverPositioner--transition-default" style="transform: translate3d(0px, 0px, 0); display: none;">
+      <div class="tui-popoverFrame tui-popoverFrame--bottom">
+        <div class="tui-arrow tui-arrow--top tui-arrow--normal" style="left: 0px;"></div> <button aria-label="closebuttontitle, moodle" type="button" title="closebuttontitle, moodle" class="tui-iconBtn tui-popoverFrame__close tui-iconBtn--transparent"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><img src="http://foo/theme/image.php/ventura/core/1001/close" class="icon"></span>
+          <!----></span>
+          <!----></span></button>
+        <!---->
+        <div class="tui-popoverFrame__content">
+          sharehelpinfo, totara_engage
+        </div>
+        <!---->
+      </div>
+    </div>
+  </div>
+  <div class="tui-dropdown" id="abc123">
+    <div id="abc123" class="tui-dropdown__trigger">
+      <div class="tui-tagList">
+        <div class="tui-tagList__tags">
+          <div aria-live="polite" role="status" aria-atomic="false" aria-label="tags_selected, totara_core" aria-relevant="additions" class="tui-tagList__tagItems">
+            <div class="tui-tagList__input"><input aria-label="tag_list, totara_core" type="text" class="tui-formInput tui-formInput--transparent" style="display: none;"></div>
+          </div> <span class="tui-tagList__suffix" style="display: none;">n_more, totara_core</span>
+        </div> <button aria-expanded="false" aria-label="expand, moodle tag_list, totara_core" type="button" title="expand, moodle tag_list, totara_core" class="tui-iconBtn tui-iconBtn--transparent" aria-haspopup="menu"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><img src="http://foo/theme/image.php/ventura/core/1001/caret-down" class="icon"></span>
+          <!----></span>
+          <!----></span></button>
+      </div>
+    </div>
+    <div aria-hidden="true" aria-labelledby="abc123" aria-orientation="vertical" role="menu" class="tui-dropdown__menu" style="display: none;">
+      <div class="tui-dropdown__content tui-dropdown__content--separator"></div>
+    </div>
+  </div>
+</div>
+`;

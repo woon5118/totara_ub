@@ -1,0 +1,69 @@
+.tui-sample-weka {
+  &__json {
+    white-space: pre;
+  }
+}
+
+.tui-sample-wekaValue {
+  &__json {
+    white-space: pre;
+  }
+}
+
+.tui-testStarRating {
+  display: flex;
+  flex-direction: column;
+
+  &__text {
+    display: inline-flex;
+    width: 200px;
+    margin-top: 20px;
+  }
+
+  &__rating1 {
+    display: inline-flex;
+    justify-content: center;
+    width: 200px;
+
+    .tui-totaraEngage-star {
+      width: var(--tui-font-size-22);
+      height: var(--tui-font-size-22);
+
+      &__filled {
+        stop-color: var(--tui-color-chart-background-4);
+      }
+
+      &__unfilled {
+        stop-color: var(--tui-color-neutral-4);
+      }
+    }
+  }
+
+  &__rating2 {
+    display: inline-flex;
+    justify-content: center;
+    width: 200px;
+
+    .tui-totaraEngage-star {
+      width: var(--tui-font-size-48);
+      height: var(--tui-font-size-48);
+
+      &__filled {
+        stop-color: var(--tui-color-chart-background-5);
+      }
+
+      &__unfilled {
+        stop-color: var(--tui-color-neutral-4);
+      }
+    }
+  }
+
+  .tui-totaraEngage-rating {
+    margin: var(--tui-gap-1) 0;
+  }
+}
+
+.tui-totaraEngage-testMiniprofilecard {
+  width: 326px;
+}
+

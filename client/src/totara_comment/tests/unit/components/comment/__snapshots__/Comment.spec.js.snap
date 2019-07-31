@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_comment/components/comment/Comment.vue Checks snapshot 1`] = `
+<commentcard-stub
+  class="tui-comment"
+  data-id="42"
+>
+  <avatar-stub
+    imagealt="xx fwf"
+    imagesrc="http://example.com"
+    profileurl="/user/profile.php?[object Object]"
+  />
+   
+  <commentheader-stub
+    deleteable="true"
+    profileurl="/user/profile.php?[object Object]"
+    size="small"
+    timedescription="5th September 2019"
+    updateable="true"
+    userfullname="xx fwf"
+  />
+   
+  <commentcontent-stub
+    content="Hello world"
+    itemid="42"
+    size="small"
+  />
+   
+  <commentaction-stub
+    area="comment"
+    class="tui-comment__footer"
+    commentid="42"
+    reactable="true"
+    replyable="true"
+    size="small"
+    totalreplies="21"
+  />
+   
+  <replybox-stub
+    area="comment"
+    class="tui-comment__replyBox"
+    commentid="42"
+    component="totara_comment"
+    replyable="true"
+    size="small"
+    totalreplies="21"
+  />
+</commentcard-stub>
+`;

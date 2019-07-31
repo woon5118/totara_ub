@@ -1,0 +1,22 @@
+query engage_survey_questions($resourceid: param_integer!) {
+  questions: engage_survey_questions(resourceid: $resourceid) {
+    __typename
+    id
+    value(format: PLAIN)
+    answertype
+
+    options {
+      __typename
+      id
+      value(format: PLAIN)
+    }
+
+    user {
+      __typename
+      id
+      fullname
+      profileimagealt
+      profileimageurl
+    }
+  }
+}

@@ -72,6 +72,12 @@ if ($tagcoll) {
     // We are inside a tag collection - add it to the breadcrumb.
     $PAGE->navbar->add(core_tag_collection::display_name($tagcoll),
             new moodle_url($manageurl, array('tc' => $tagcoll->id)));
+
+    $url = \core_tag_collection::get_redirection($tagcoll->id);
+    if (null !== $url) {
+        // Totara: redirecting to a topic management page, if the collection is a topic collection
+        redirect($url);
+    }
 }
 
 $PAGE->set_blocks_editing_capability('moodle/tag:editblocks');

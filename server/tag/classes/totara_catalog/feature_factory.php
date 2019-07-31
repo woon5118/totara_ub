@@ -35,21 +35,25 @@ class feature_factory {
     /**
      * Get tag features
      *
-     * @param string $itemtype the tag item type (not objecttype!) that is relevant
-     * @param string $objecttype
+     * @param string        $itemtype   the tag item type (not objecttype!) that is relevant
+     * @param string        $objecttype
+     * @param string|null   $component  If component is not null, it will use the component to find the tag_area.
+     *                                  Otherwise, searching within tag_area base on the itemtype
      * @return array
      */
-    public static function get_features(string $itemtype, string $objecttype): array {
+    public static function get_features(string $itemtype, string $objecttype, ?string $component = null): array {
         global $CFG, $DB;
 
         if (empty($CFG->usetags)) {
             return [];
         }
 
-        $areas = \core_tag_area::get_areas();
-        // This makes the assumption that there is only one component for an itemtype, or that we can just use the
-        // first and can ignore the others.
-        $component = array_keys($areas[$itemtype])[0];
+        if (empty($component)) {
+            $areas = \core_tag_area::get_areas();
+            // This makes the assumption that there is only one component for an itemtype, or that we can just use the
+            // first and can ignore the others.
+            $component = array_keys($areas[$itemtype])[0];
+        }
 
         if (!\core_tag_area::is_enabled($component, $itemtype)) {
             return [];

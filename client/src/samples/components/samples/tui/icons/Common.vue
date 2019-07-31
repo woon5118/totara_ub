@@ -92,6 +92,8 @@ import Info from 'tui/components/icons/common/Info';
 import Spinner from 'tui/components/icons/common/Spinner';
 import Preview from 'tui/components/icons/common/Preview';
 import Warning from 'tui/components/icons/common/Warning';
+import Bookmark from 'tui/components/icons/common/Bookmark';
+import BookmarkActive from 'tui/components/icons/common/BookmarkActive';
 
 import Cell from 'tui/components/datatable/Cell';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
@@ -253,6 +255,16 @@ export default {
         {
           icon: Warning,
           name: 'Warning',
+          desc: '...',
+        },
+        {
+          icon: Bookmark,
+          name: 'Bookmark',
+          desc: '...',
+        },
+        {
+          icon: BookmarkActive,
+          name: 'BookmarkActive',
           desc: '...',
         },
       ],

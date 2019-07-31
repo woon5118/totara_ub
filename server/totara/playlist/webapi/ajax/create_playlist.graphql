@@ -1,0 +1,41 @@
+mutation totara_playlist_create_playlist(
+  $name: param_text!
+  $summary: param_text
+  $summary_format: param_integer
+  $access: totara_engage_access
+  $contextid: param_integer
+  $topics: [param_integer!]
+  $shares: [totara_engage_recipient_in!]
+) {
+  playlist: totara_playlist_create(
+    name: $name
+    summary: $summary
+    summary_format: $summary_format
+    access: $access
+    contextid: $contextid
+    topics: $topics
+    shares: $shares
+  ) {
+    __typename
+    id
+    name(format: PLAIN)
+    summary(format: PLAIN)
+    access
+    owned
+    timedescription
+    topics {
+      __typename
+      id
+      value(format: PLAIN)
+    }
+    rating {
+      itemid
+      rating
+      count
+      rated
+    }
+    updateable
+    contributable
+    sharedbycount
+  }
+}

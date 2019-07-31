@@ -119,19 +119,6 @@ export default {
   methods: {
     /**
      *
-     * @param {Array} jobAssignments
-     */
-    getJobAssignment(jobAssignments) {
-      if (jobAssignments && jobAssignments.length > 0) {
-        let { fullname } = jobAssignments[0];
-        return fullname;
-      }
-
-      return '';
-    },
-
-    /**
-     *
      * @param {Number} id
      * @param {String} fullname
      */

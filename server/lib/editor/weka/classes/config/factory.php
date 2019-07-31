@@ -27,6 +27,7 @@ namespace editor_weka\config;
  */
 final class factory {
     /**
+     * The array of configuration which is categorized by the item's component name and area.
      * @var array
      */
     private $configuration;
@@ -133,5 +134,32 @@ final class factory {
         $data['area'] = $area;
 
         return config_item::from_array($data);
+    }
+
+    /**
+     * This function will be mainly used to mock the configuration of the editor weka based for the place of
+     * '{$area} - {$component}'. Note that this API will only cache the data to memory but not to physical storage.
+     *
+     * @param string        $component
+     * @param string        $area
+     * @param config_item   $config_item
+     *
+     * @return void
+     */
+    public function add_configuration(string $component, string $area, config_item $config_item): void {
+        if (!isset($this->configuration[$component])) {
+            $this->configuration[$component] = [];
+        }
+
+        $config = $this->configuration[$component];
+
+        if (isset($config[$area])) {
+            throw new \coding_exception(
+                "The area '{$area}' for component '{$component}' is already existing in the configuration data"
+            );
+        }
+
+        $config[$area] = $config_item->get_metadata();
+        $this->configuration[$component] = $config;
     }
 }

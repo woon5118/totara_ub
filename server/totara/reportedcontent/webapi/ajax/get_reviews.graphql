@@ -1,0 +1,48 @@
+query totara_reportedcontent_get_reviews(
+  $component: param_component!
+  $area: param_area!
+  $context_id: param_integer!
+  $item_id: param_integer!
+) {
+  reviews: totara_reportedcontent_reviews(
+    component: $component
+    area: $area
+    context_id: $context_id
+    item_id: $item_id
+  ) {
+    __typename
+    id
+    target_user {
+      __typename
+      id
+      fullname
+      profileimagealt
+      profileimageurl
+    }
+    complainer {
+      __typename
+      id
+      fullname
+      profileimagealt
+      profileimageurl
+    }
+    reviewer {
+      __typename
+      id
+      fullname
+      profileimagealt
+      profileimageurl
+    }
+    content(format: HTML)
+    url
+    approved
+    removed
+    time_created
+    time_content
+    time_reviewed
+    item_id
+    context_id
+    component
+    area
+  }
+}

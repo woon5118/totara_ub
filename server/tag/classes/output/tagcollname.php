@@ -45,7 +45,12 @@ class tagcollname extends \core\output\inplace_editable {
      * @param \stdClass $tagcoll
      */
     public function __construct($tagcoll) {
-        $editable = has_capability('moodle/tag:manage', context_system::instance());
+        if (!core_tag_collection::is_editable($tagcoll->id)) {
+            // Totara: preventing editable if the collection is a topic collection
+            $editable = false;
+        } else {
+            $editable = has_capability('moodle/tag:manage', context_system::instance());
+        }
         $edithint = new lang_string('editcollname', 'core_tag');
         $value = $tagcoll->name;
         $name = \core_tag_collection::display_name($tagcoll);

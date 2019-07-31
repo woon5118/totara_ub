@@ -1,0 +1,366 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
+  @module totara_engage
+-->
+
+<template>
+  <Form class="tui-accessForm" :vertical="true" input-width="full">
+    <div :class="['tui-accessForm__options', optionsWrapperCss]">
+      <FormRow
+        v-slot="{ id, labelId }"
+        :label="$str('whocansee', 'totara_engage')"
+      >
+        <AccessSelector
+          :id="id"
+          :aria-labelledby="labelId"
+          :selected-access="access"
+          :private-disabled="privateDisabled"
+          :public-disabled="publicDisabled"
+          :restricted-disabled="restrictedDisabled"
+          @change="access = $event"
+        />
+      </FormRow>
+
+      <FormRow
+        v-if="timeViewVisible"
+        v-slot="{ id, labelId }"
+        :label="$str('timetoread', 'totara_engage')"
+        class="tui-accessForm__time"
+      >
+        <TimeViewSelector
+          :id="id"
+          :selected-time="selectedTime"
+          :aria-labelledby="labelId"
+          @change="selectedTime = $event"
+        />
+      </FormRow>
+    </div>
+
+    <div v-if="!accessPrivate" class="tui-accessForm__tagLists">
+      <TopicsSelector
+        v-if="accessPublic"
+        class="tui-accessForm__tagList"
+        :selected-topics="selectedTopics"
+        @change="selectedTopics = $event"
+      />
+
+      <RecipientsSelector
+        :item-id="itemId"
+        :component="component"
+        :access="access"
+        :selected-users="selectedRecipients"
+        :container="container"
+        class="tui-accessForm__tagList"
+        @pick-recipient="selectedRecipients.push($event)"
+        @remove-recipient="removeRecipient"
+      />
+
+      <SharedBoard :receipts="sharedTo" />
+    </div>
+
+    <ButtonGroup class="tui-accessForm__buttons">
+      <Button
+        v-show="showBack"
+        :text="$str('back', 'moodle')"
+        :disabled="submitting"
+        class="tui-accessForm__buttons__back"
+        @click="$emit('back')"
+      />
+
+      <LoadingButton
+        :loading="submitting"
+        :primary="true"
+        :disabled="disabled"
+        :text="doneButtonText"
+        @click="done"
+      />
+      <CancelButton :disabled="submitting" @click="$emit('cancel')" />
+    </ButtonGroup>
+  </Form>
+</template>
+
+<script>
+import Form from 'tui/components/form/Form';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import Button from 'tui/components/buttons/Button';
+import CancelButton from 'tui/components/buttons/Cancel';
+import { FormRow } from 'tui/components/uniform';
+
+import LoadingButton from 'totara_engage/components/buttons/LoadingButton';
+import TopicsSelector from 'totara_engage/components/form/access/EngageTopicsSelector';
+import RecipientsSelector from 'totara_engage/components/form/access/RecipientsSelector';
+import AccessSelector from 'totara_engage/components/form/access/AccessSelector';
+import SharedBoard from 'totara_engage/components/form/SharedBoard';
+import { AccessManager, TimeViewType } from 'totara_engage/index';
+
+// GraphQL
+import ShareRecipients from 'totara_engage/graphql/share_recipients';
+
+// Mixins
+import ContainerMixin from 'totara_engage/mixins/container_mixin';
+import TimeViewSelector from 'totara_engage/components/form/access/TimeViewSelector';
+import RecipientMixin from 'totara_engage/mixins/recipient_mixin';
+
+const slice = Array.prototype.slice;
+
+export default {
+  components: {
+    FormRow,
+    AccessSelector,
+    RecipientsSelector,
+    Form,
+    ButtonGroup,
+    Button,
+    LoadingButton,
+    CancelButton,
+    TopicsSelector,
+    TimeViewSelector,
+    SharedBoard,
+  },
+
+  mixins: [ContainerMixin],
+
+  apollo: {
+    sharedTo: {
+      query: ShareRecipients,
+      variables() {
+        return this.shareToVariables;
+      },
+      update({ recipients }) {
+        return recipients.reduce(
+          (obj, item) => {
+            if (item.user) {
+              obj['people'].push(item.user.fullname);
+            }
+            if (item.other) {
+              obj['workspaces'].push(item.other.fullname);
+            }
+            return obj;
+          },
+          { people: [], workspaces: [] }
+        );
+      },
+    },
+  },
+
+  props: {
+    showBack: Boolean,
+
+    itemId: {
+      type: [Number, String],
+      required: true,
+    },
+
+    component: {
+      type: String,
+      required: true,
+    },
+
+    selectedAccess: {
+      type: String,
+      default: null,
+      validator(prop) {
+        return AccessManager.isValid(prop);
+      },
+    },
+
+    selectedTimeView: {
+      type: String,
+      default: null,
+      validator(prop) {
+        return TimeViewType.isValid(prop);
+      },
+    },
+
+    selectedOptions: {
+      type: Object,
+      default() {
+        return {
+          shares: [],
+          topics: [],
+        };
+      },
+    },
+
+    submitting: {
+      type: Boolean,
+      default: false,
+    },
+
+    publicDisabled: {
+      type: Boolean,
+      default: false,
+    },
+
+    restrictedDisabled: {
+      type: Boolean,
+      default: false,
+    },
+
+    privateDisabled: {
+      type: Boolean,
+      default: false,
+    },
+
+    doneButtonText: {
+      type: String,
+      default() {
+        return this.$str('done', 'totara_engage');
+      },
+    },
+
+    enableTimeView: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
+  data() {
+    return {
+      access: this.selectedAccess,
+      selectedRecipients: slice.call(this.selectedOptions.shares),
+      selectedTime: this.selectedTimeView,
+      selectedTopics: slice.call(this.selectedOptions.topics),
+      sharedTo: { people: [], workspaces: [] },
+    };
+  },
+
+  computed: {
+    // Resource needs to inherit the container's shares.
+    shareToVariables() {
+      return {
+        itemid: this.containerValues.instance || this.itemId,
+        component: this.containerValues.component || this.component,
+      };
+    },
+
+    disabled() {
+      if (
+        !this.access ||
+        this.submitting ||
+        (this.enableTimeView && !this.selectedTime && !this.accessPrivate)
+      ) {
+        return true;
+      } else if (this.accessPublic) {
+        return 0 >= this.selectedTopics.length;
+      } else if (this.accessRestricted) {
+        if (
+          this.sharedTo.people.length > 0 ||
+          this.sharedTo.workspaces.length > 0
+        ) {
+          return false;
+        }
+        return 0 >= this.selectedRecipients.length;
+      }
+
+      return false;
+    },
+
+    accessPublic() {
+      return null !== this.access && AccessManager.isPublic(this.access);
+    },
+
+    accessRestricted() {
+      return null !== this.access && AccessManager.isRestricted(this.access);
+    },
+
+    accessPrivate() {
+      // For private path, if the access is not set then it should be treated as private as well.
+      return null === this.access || AccessManager.isPrivate(this.access);
+    },
+
+    optionsWrapperCss() {
+      if (this.accessPrivate) {
+        return 'tui-accessForm__access--withoutTagLists';
+      }
+
+      return 'tui-accessForm__access--withTagLists';
+    },
+
+    timeViewVisible() {
+      return !this.accessPrivate && this.enableTimeView;
+    },
+  },
+
+  mounted() {
+    this.$apollo.queries.sharedTo.refetch();
+  },
+
+  methods: {
+    /**
+     *
+     * @param {Number} id
+     */
+    removeTopic({ id }) {
+      this.selectedTopics = this.selectedTopics.filter(
+        topic => id !== topic.id
+      );
+    },
+
+    /**
+     *
+     * @param {Object} oldRecipient
+     */
+    removeRecipient(oldRecipient) {
+      this.selectedRecipients = this.selectedRecipients.filter(recipient => {
+        return !RecipientMixin.compareRecipients(recipient, oldRecipient);
+      });
+    },
+
+    done() {
+      if (!this.accessPublic) {
+        this.selectedTopics = [];
+      }
+
+      if (this.accessPrivate) {
+        this.selectedRecipients = [];
+        this.selectedTime = null;
+      }
+
+      this.$emit('done', {
+        access: this.access,
+        shares: this.selectedRecipients.map(recipient => {
+          return {
+            instanceid: recipient.instanceid,
+            component: recipient.component,
+            area: recipient.area,
+          };
+        }),
+        timeView: this.selectedTime,
+        topics: this.selectedTopics,
+      });
+    },
+  },
+};
+</script>
+
+<lang-strings>
+  {
+    "moodle": [
+      "back"
+    ],
+
+    "totara_core": [
+      "settings"
+    ],
+
+    "totara_engage": [
+      "done",
+      "whocansee",
+      "timetoread"
+    ]
+  }
+</lang-strings>

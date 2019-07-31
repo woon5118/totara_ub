@@ -1,0 +1,183 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Kian Nguyen <kian.nguyen@totaralearning.com>
+  @module container_workspace
+-->
+<template>
+  <div class="tui-workspaceFilter">
+    <template v-if="!$apollo.loading">
+      <FilterBar
+        v-model="selection"
+        :title="$str('find_spaces', 'container_workspace')"
+        class="tui-workspaceFilter__filter"
+      >
+        <template v-slot:filters-left="{ stacked }">
+          <SelectFilter
+            v-model="selection.access"
+            :label="$str('workspace_access', 'container_workspace')"
+            :show-label="true"
+            :options="options.accesses"
+            :stacked="stacked"
+          />
+
+          <SelectFilter
+            v-model="selection.source"
+            :label="$str('membership', 'container_workspace')"
+            :show-label="true"
+            :options="options.sources"
+            :stacked="stacked"
+          />
+        </template>
+
+        <template v-slot:filters-right="{ stacked }">
+          <SearchBox
+            v-model="selection.searchTerm"
+            :label="$str('search_spaces', 'container_workspace')"
+            :placeholder="$str('search_spaces', 'container_workspace')"
+            :show-label="false"
+            :stacked="stacked"
+            @submit="submitSearch"
+          />
+        </template>
+      </FilterBar>
+
+      <div class="tui-workspaceFilter__sortFilter">
+        <SelectFilter
+          v-model="selection.sort"
+          :label="$str('sortby', 'moodle')"
+          :show-label="true"
+          :options="options.sorts"
+        />
+      </div>
+    </template>
+  </div>
+</template>
+
+<script>
+import FilterBar from 'tui/components/filters/FilterBar';
+import SelectFilter from 'tui/components/filters/SelectFilter';
+import SearchBox from 'tui/components/form/SearchBox';
+
+// GraphQL queries
+import getFilterOptions from 'container_workspace/graphql/workspace_filter_options';
+
+export default {
+  components: {
+    FilterBar,
+    SelectFilter,
+    SearchBox,
+  },
+
+  props: {
+    selectedSource: {
+      type: String,
+      default: null,
+    },
+
+    selectedSort: {
+      type: String,
+      default: null,
+    },
+
+    searchTerm: {
+      type: String,
+      default: '',
+    },
+
+    selectedAccess: {
+      type: String,
+      default: null,
+    },
+  },
+
+  apollo: {
+    options: {
+      query: getFilterOptions,
+      /**
+       *
+       * @param {Array} sources
+       * @param {Array} sorts
+       * @param {Array} accesses
+       */
+      update({ sources, sorts, accesses }) {
+        accesses = [
+          {
+            label: this.$str('all', 'moodle'),
+            value: null,
+          },
+        ].concat(accesses);
+
+        return {
+          sources: Array.prototype.map.call(sources, ({ value, label }) => {
+            return {
+              id: value,
+              label: label,
+            };
+          }),
+
+          sorts: Array.prototype.map.call(sorts, ({ value, label }) => {
+            return {
+              id: value,
+              label: label,
+            };
+          }),
+
+          accesses: Array.prototype.map.call(accesses, ({ value, label }) => {
+            return {
+              id: value,
+              label: label,
+            };
+          }),
+        };
+      },
+    },
+  },
+
+  data() {
+    return {
+      options: {},
+
+      selection: {
+        source: this.selectedSource,
+        sort: this.selectedSort,
+        access: this.selectedAccess,
+        searchTerm: this.searchTerm,
+      },
+    };
+  },
+
+  methods: {
+    submitSearch() {
+      this.$emit('submit-search', this.selection);
+    },
+  },
+};
+</script>
+
+<lang-strings>
+  {
+    "container_workspace": [
+      "membership",
+      "search_spaces",
+      "find_spaces",
+      "workspace_access"
+    ],
+
+    "moodle": [
+      "all",
+      "sortby"
+    ]
+  }
+</lang-strings>

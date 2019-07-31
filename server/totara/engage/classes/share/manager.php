@@ -1,0 +1,257 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
+ * @package totara_engage
+ */
+namespace totara_engage\share;
+
+use totara_engage\entity\share as share_entity;
+use totara_engage\entity\share_recipient as recipient_entity;
+use totara_engage\event\share_created;
+use totara_engage\exception\share_exception;
+use totara_engage\repository\share_recipient_repository;
+use totara_engage\repository\share_repository;
+use totara_engage\share\recipient\manager as recipient_manager;
+use totara_engage\share\recipient\recipient;
+use totara_engage\task\share_item_task;
+use totara_engage\task\shared_item_task;
+use core\task\manager as task_manager;
+
+final class manager {
+
+    /**
+     * Create new database entries.
+     *
+     * @param int $itemid
+     * @param int $ownerid
+     * @param string $component
+     * @param recipient[] $recipients
+     * @param $contextid
+     * @param int|null $sharerid
+     * @return share[]
+     */
+    private static function create(int $itemid, int $ownerid, string $component, array $recipients,
+                                   $contextid, int $sharerid = null): array {
+        global $USER;
+        $sharerid = $sharerid ?? $USER->id;
+
+        $share_entity = static::create_share($itemid, $ownerid, $component, $contextid);
+
+        $shares = [];
+        foreach ($recipients as $recipient) {
+            $recipient_entity = static::create_recipient($share_entity->id, $sharerid, $recipient);
+            $shares[] = new share($share_entity, $recipient_entity);
+        }
+
+        return $shares;
+    }
+
+    /**
+     * This is the main sharing function that will validate the instance that wants to be shared
+     * and if its sharable then a share will be created. The post-share functionality will also
+     * executed.
+     *
+     * @param shareable $instance
+     * @param string $component
+     * @param recipient[] $recipients
+     * @return int
+     */
+    public static function share(shareable $instance, string $component, array $recipients): int {
+        global $USER;
+
+        // First check if user is allowed to share this instance.
+        if (!$instance->can_share($USER->id)) {
+            throw new share_exception('error:sharecapability', $component);
+        }
+
+        // Get the shareable state of the instance.
+        $sharable = $instance->get_shareable();
+        if (!$sharable->is_shareable()) {
+            throw new share_exception($sharable->get_reason(), $component);
+        }
+
+        // Validate recipients
+        foreach ($recipients as $recipient) {
+            $recipient->validate();
+        }
+
+        // Get context in which instance is being shared.
+        $context = $instance->get_context();
+
+        // Create shares for this resource.
+        $shares = self::create($instance->get_id(), $instance->get_userid(), $component, $recipients, $context->id);
+        
+        foreach ($shares as $share) {
+            if ($share->get_recipient_component() === 'core_user' && $share->get_recipient_area() === 'USER') {
+                $task = new share_item_task();
+                $task->set_component('totara_engage');
+                $task->set_custom_data(
+                    [
+                        'component' => helper::get_provider_type($share->get_component()),
+                        'recipient_id' => $share->get_recipient_instanceid(),
+                        'sharer_id' => $share->get_sharer_id(),
+                        'item_name' => helper::get_resource_name($share->get_component(), $share->get_item_id()),
+                    ]
+                );
+
+                task_manager::queue_adhoc_task($task);
+
+            } else {
+                // Trigger share event for workspace.
+                share_created::from_share($share)->trigger();
+            }
+        }
+
+        if (empty($shares)) {
+            // The process should have crashed earlier but this is just in case.
+            throw new \coding_exception('Failed creating shares');
+        }
+
+        // Do any post share stuff.
+        foreach ($shares as $share) {
+            $instance->shared($share);
+        }
+
+        // Re-share occurs if the user isn't the same as the resource owner
+        if ($instance->can_reshare($USER->id)) {
+            $instance->reshare($USER->id);
+        }
+
+        // Return the share id.
+        return reset($shares)->get_id();
+    }
+
+    /**
+     * Retrieve share or otherwise create a new share.
+     *
+     * @param int $itemid
+     * @param int $ownerid
+     * @param string $component
+     * @param int $contextid
+     * @return share_entity
+     */
+    private static function create_share(int $itemid, int $ownerid, string $component, int $contextid): share_entity {
+        /** @var share_repository $repo */
+        $repo = share_entity::repository();
+        $share_entity = $repo->get_share($itemid, $component);
+        if (empty($share_entity)) {
+            $share_entity = new share_entity();
+            $share_entity->itemid = $itemid;
+            $share_entity->ownerid = $ownerid;
+            $share_entity->component = $component;
+            $share_entity->contextid = $contextid;
+            $share_entity->save();
+        }
+        return $share_entity;
+    }
+
+    /**
+     * Retrieve recipient or otherwise create a new recipient.
+     *
+     * @param int $shareid
+     * @param int $sharerid
+     * @param recipient $recipient
+     * @return recipient_entity
+     */
+    private static function create_recipient(int $shareid, int $sharerid, recipient $recipient): recipient_entity {
+        /** @var share_recipient_repository $repo */
+        $repo = recipient_entity::repository();
+        $recipient_entity = $repo->get_recipient(
+            $shareid, $recipient->get_id(), $recipient->get_area(), $recipient->get_component()
+        );
+        if (empty($recipient_entity)) {
+            $recipient_entity = new recipient_entity();
+            $recipient_entity->shareid = $shareid;
+            $recipient_entity->sharerid = $sharerid;
+            $recipient_entity->instanceid = $recipient->get_id();
+            $recipient_entity->area = $recipient->get_area();
+            $recipient_entity->component = $recipient->get_component();
+            $recipient_entity->visibility = share::VISIBILITY_VISIBLE;
+            $recipient_entity->notified = share::NOT_NOTIFIED;
+            $recipient_entity->save();
+        }
+
+        return $recipient_entity;
+    }
+
+    /**
+     * @param shareable $instance
+     * @param string $component
+     * @return share_entity|null
+     */
+    public static function get_share(shareable $instance, string $component): ?share_entity {
+        /** @var share_repository $repo */
+        $repo = share_entity::repository();
+        return $repo->get_share($instance->get_id(), $component);
+    }
+
+    /**
+     * Clone shares from one item to another.
+     *
+     * @param shareable $instance
+     * @param string $component
+     * @param int $fromid
+     */
+    public static function clone_shares(shareable $instance, string $component, int $fromid): void {
+        /** @var share_repository $repo_share */
+        $repo_share = share_entity::repository();
+        /** @var share_recipient_repository $repo_recipient */
+        $repo_recipient = recipient_entity::repository();
+
+        // Get share for instance.
+        $share = $repo_share->get_share($instance->get_id(), $component);
+
+        // If instance is shared already we just need to clone the differences,
+        // otherwise just clone all the recipients onto the resource.
+        if (!empty($share)) {
+            $recipients = $repo_recipient->get_difference($fromid, $share->id);
+        } else {
+            $recipients = $repo_recipient->get_recipients($fromid);
+        }
+
+        // Clone the recipients onto the instance.
+        if (!empty($recipients)) {
+            $recipients = recipient_manager::create_from_entity($recipients);
+            self::share($instance, $component, $recipients);
+        }
+    }
+
+    /**
+     * @param int $id
+     * @param string $component
+     */
+    public static function delete(int $id, string $component): void {
+        /** @var share_repository $repo */
+        $share_repo = share_entity::repository();
+
+        /** @var share_recipient_repository $repo */
+        $recipient_repo = recipient_entity::repository();
+
+        $entity = $share_repo->get_share($id, $component);
+
+        // The resource has not been shared.
+        if (empty($entity)) {
+            return;
+        }
+
+        $share_repo->delete_share_by_id($entity->id);
+        $recipient_repo->delete_recipient_by_shareid($entity->id);
+    }
+}

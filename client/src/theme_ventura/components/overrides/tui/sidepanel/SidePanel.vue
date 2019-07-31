@@ -102,6 +102,7 @@
       // SidePanel, which could be very tall in IE11
       align-self: flex-start;
       max-width: 30px;
+      margin-top: var(--tui-gap-8);
     }
 
     flex-grow: 0;

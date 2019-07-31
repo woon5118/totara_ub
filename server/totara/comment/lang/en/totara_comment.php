@@ -1,0 +1,51 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package totara_comment
+ */
+defined('MOODLE_INTERNAL') || die();
+
+$string['bracketnumber'] = '({$a})';
+$string['comments'] = 'Comments ({$a})';
+$string['deletecommentconfirm'] = 'Your comment will be deleted. Any replies to your comment will remain.';
+$string['deletedcomment'] = "This comment has been deleted.";
+$string['done'] = 'Done';
+$string['edited'] = 'Edited';
+$string['entercomment'] = 'Enter a comment';
+$string['enterreply'] = 'Enter a reply';
+$string['likecomment'] = "Like the comment";
+$string['loadmorecomments'] = "View earlier comments";
+$string['post'] = "Post";
+$string['pluginname'] = "Totara comment";
+$string['removedcomment'] = "This comment has been removed.";
+$string['removelikeforcomment'] = "Remove like for the comment";
+$string['reportcontent'] = "Report";
+$string['reply'] = "Reply";
+$string['triggermenu'] = "Menu trigger";
+$string['user_data_item_comment'] = 'Comment';
+$string['user_data_item_comment_help'] = 'When purging, all the replies, reactions associated with the comment will be deleted';
+$string['user_data_item_reply'] = 'Reply';
+$string['user_data_item_reply_help'] = 'When purging, all the reactions associated with the reply will be deleted';
+$string['viewreplies'] = "View replies";
+
+// Using for error exceptions.
+$string['error:create'] = "Cannot create a comment";
+$string['error:update'] = "Cannot update a comment";
+$string['error:softdelete'] = "Cannot delete a comment";

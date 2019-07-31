@@ -1,0 +1,49 @@
+# Load recommended workspaces for the user
+query ml_recommender_get_recommended_user_workspaces(
+  $user_id: param_integer
+  $cursor: param_text
+) {
+  cursor: ml_recommender_recommended_user_workspaces_cursor(
+    user_id: $user_id
+    cursor: $cursor
+  ) {
+    __typename
+    total
+    next
+  }
+
+  workspaces: ml_recommender_recommended_user_workspaces(
+    user_id: $user_id
+    cursor: $cursor
+  ) {
+    __typename
+    id
+    name(format: PLAIN)
+    description(format: HTML)
+    description_format
+    time_description
+
+    owner {
+      __typename
+      id
+      fullname
+      email
+      profileimagealt
+      profileimageurl
+    }
+
+    image
+    total_members
+    interactor {
+      __typename
+      joined
+      own
+      can_update
+      can_delete
+      can_invite
+      can_join
+    }
+    url
+    access
+  }
+}

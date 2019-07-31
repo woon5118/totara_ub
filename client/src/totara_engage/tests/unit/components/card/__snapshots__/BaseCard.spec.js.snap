@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/card/BaseCard.vue Checks snapshot 1`] = `
+<article
+  class="tui-baseCard"
+>
+  <corecard-stub
+    class="tui-baseCard__card"
+    clickable="true"
+  >
+    <div
+      class="tui-baseCard__headerImage"
+    />
+     
+    <div
+      class="tui-baseCard__description"
+    >
+      <div
+        class="tui-baseCard__description__header"
+      >
+        <a
+          class="tui-baseCard__link"
+          href="#"
+        />
+      </div>
+       
+      <div
+        class="tui-baseCard__description__infoContent"
+      />
+       
+      <div
+        class="tui-baseCard__description__footer"
+      />
+    </div>
+  </corecard-stub>
+   
+  <!---->
+</article>
+`;

@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_comment/components/box/CommentBox.vue Checks snapshot 1`] = `
+<div
+  class="tui-commentBox"
+>
+  <commentthread-stub
+    area="comment"
+    class="tui-commentBox__comments"
+    component="totara_comment"
+    instanceid="15"
+    size="small"
+  />
+   
+  <commentform-stub
+    area="comment"
+    class="tui-commentBox__commentForm"
+    component="totara_comment"
+    instanceid="15"
+    size="small"
+    submitbuttontext="post-totara_comment"
+  />
+</div>
+`;

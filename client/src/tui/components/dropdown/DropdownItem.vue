@@ -52,7 +52,7 @@ export default {
     clickItem(e) {
       if (!this.href) {
         e.preventDefault();
-        this.$emit('click');
+        this.$emit('click', e);
         return;
       }
 
@@ -62,7 +62,7 @@ export default {
         return;
       }
 
-      this.$emit('click');
+      this.$emit('click', e);
     },
   },
 };

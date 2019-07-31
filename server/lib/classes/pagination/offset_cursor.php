@@ -47,7 +47,7 @@ class offset_cursor extends base_cursor {
     protected function validate(array $cursor): void {
         parent::validate($cursor);
 
-        if (!isset($cursor['page']) || !is_numeric($cursor['page']) || $cursor['page'] <= 0) {
+        if (!isset($cursor['page']) || !is_numeric($cursor['page']) || $cursor['page'] < 0) {
             throw new coding_exception('You must provide a positive page number within your cursor.');
         }
     }
@@ -68,7 +68,7 @@ class offset_cursor extends base_cursor {
      * @return $this
      */
     public function set_page(int $page) {
-        if (!$page > 0) {
+        if (!($page >= 0)) {
             throw new coding_exception('Page has to be a positive integer');
         }
         $this->cursor['page'] = $page;

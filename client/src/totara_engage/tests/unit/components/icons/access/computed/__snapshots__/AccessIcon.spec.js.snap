@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/icons/access/computed/AccessIcon.vue Checks snapshot for access private 1`] = `
+<privateicon-stub
+  coloring="true"
+  customclass=""
+/>
+`;
+
+exports[`totara_engage/components/icons/access/computed/AccessIcon.vue Checks snapshot for access public 1`] = `
+<publicicon-stub
+  coloring="true"
+  customclass=""
+/>
+`;
+
+exports[`totara_engage/components/icons/access/computed/AccessIcon.vue Checks snapshot for access restricted 1`] = `
+<restrictedicon-stub
+  coloring="true"
+  customclass=""
+/>
+`;

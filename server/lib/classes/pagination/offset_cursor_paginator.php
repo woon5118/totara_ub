@@ -73,10 +73,12 @@ abstract class offset_cursor_paginator extends base_cursor_paginator {
      * @inheritDoc
      */
     protected function validate_cursor($query, base_cursor $cursor): void {
-        if (!($cursor->get_page() > 0)) {
-            throw new coding_exception('The cursor needs a page to be set, 1 or greater');
+        // Page zero means unlimited fetch.
+        if (!($cursor->get_page() >= 0)) {
+            throw new coding_exception('The cursor needs a page to be set, 0 or greater');
         }
-        // Limit 0 means all rows
+
+        // Or limit zero also means unlimited fetch.
         if (!($cursor->get_limit() >= 0)) {
             throw new coding_exception('The cursor needs a limit to be set, 0 or greater');
         }
@@ -93,7 +95,9 @@ abstract class offset_cursor_paginator extends base_cursor_paginator {
     protected function create_next_cursor(int $page, int $limit): ?base_cursor {
         $next_cursor = null;
 
-        if ($limit > 0) {
+        // If page is zero, means that it is unlimited fetch - hence there is no point to do the
+        // calculation for the next cursor.
+        if ($limit > 0 && $page > 0) {
             $last_page = ceil($this->total / $limit);
             if ($page < $last_page) {
                 $next_cursor = offset_cursor::create()

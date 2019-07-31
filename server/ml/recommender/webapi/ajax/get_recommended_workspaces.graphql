@@ -1,0 +1,59 @@
+# Load recommended workspaces
+query ml_recommender_get_recommended_workspaces(
+  $workspace_id: param_integer!
+  $cursor: param_text
+) {
+  cursor: ml_recommender_recommended_workspaces_cursor(
+    workspace_id: $workspace_id
+    cursor: $cursor
+  ) {
+    __typename
+    total
+    next
+  }
+
+  workspaces: ml_recommender_recommended_workspaces(
+    workspace_id: $workspace_id
+    cursor: $cursor
+  ) {
+    __typename
+    id
+    name(format: PLAIN)
+    description(format: HTML)
+    description_format
+    time_description
+
+    owner {
+      __typename
+      id
+      fullname
+      card_display {
+        __typename
+        profile_picture_alt
+        profile_picture_url
+        profile_url
+        display_fields {
+          __typename
+          value
+          label
+          is_custom
+          associate_url
+        }
+      }
+    }
+
+    image
+    total_members
+    interactor {
+      __typename
+      joined
+      own
+      can_update
+      can_delete
+      can_invite
+      can_join
+    }
+    url
+    access
+  }
+}

@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/contribution/Contribute.vue Checks snapshot 1`] = `
+<div>
+  <buttonicon-stub
+    arialabel="contribute, totara_engage"
+    styleclass="[object Object]"
+    text="contribute, totara_engage"
+    type="button"
+  >
+    <!---->
+  </buttonicon-stub>
+   
+  <modalpresenter-stub>
+    <contributemodal-stub />
+  </modalpresenter-stub>
+</div>
+`;

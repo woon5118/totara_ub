@@ -1,0 +1,89 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package container_workspace
+ */
+namespace container_workspace\webapi\resolver\mutation;
+
+use container_workspace\discussion\discussion_helper;
+use core\webapi\execution_context;
+use core\webapi\mutation_resolver;
+use container_workspace\discussion\discussion;
+use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
+use core\webapi\middleware\clean_editor_content;
+
+/**
+ * Resolver for updating discussion.
+ */
+final class update_discussion implements mutation_resolver, has_middleware {
+    /**
+     * @param array $args
+     * @param execution_context $ec
+     *
+     * @return discussion
+     */
+    public static function resolve(array $args, execution_context $ec): discussion {
+        global $USER, $DB;
+        require_login();
+        advanced_feature::require('container_workspace');
+
+        $discussion_id = $args['id'];
+
+        if (!$ec->has_relevant_context()) {
+            $workspace_id = $DB->get_field(
+                'workspace_discussion',
+                'course_id',
+                ['id' => $discussion_id],
+                MUST_EXIST
+            );
+
+            $context = \context_course::instance($workspace_id);
+            $ec->set_relevant_context($context);
+        }
+
+        $content_format = null;
+        if (isset($args['content_format'])) {
+            $content_format = $args['content_format'];
+        }
+
+        $draft_id = null;
+        if (isset($args['draft_id'])) {
+            $draft_id = (int) $args['draft_id'];
+        }
+
+        return discussion_helper::update_discussion_content(
+            $discussion_id,
+            $args['content'],
+            $draft_id,
+            $content_format,
+            $USER->id
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public static function get_middleware(): array {
+        return [
+            new clean_editor_content('content', 'content_format')
+        ];
+    }
+}

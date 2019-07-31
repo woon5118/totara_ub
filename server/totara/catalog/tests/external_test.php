@@ -39,7 +39,7 @@ require_once($CFG->dirroot . "/totara/catalog/tests/output_test_base.php");
 class totara_catalog_external_testcase extends output_test_base {
 
     public function setUp(): void {
-        // Set up a basic test user.
+        // Set up a basic test user for the create resource/playlist capability checks.
         $generator = $this->getDataGenerator();
         $user = $generator->create_user(['firstname' => 'Barry', 'lastname' => 'Gimbo']);
         $this->setUser($user);

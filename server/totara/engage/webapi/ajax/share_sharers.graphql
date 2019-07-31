@@ -1,0 +1,13 @@
+query totara_engage_share_sharers(
+  $itemid: param_integer!
+  $component: param_component!
+) {
+  sharers: totara_engage_share_sharers(itemid: $itemid, component: $component) {
+    __typename
+    id
+    fullname
+    profileimagealt
+    profileimageurl
+    profileimageurlsmall
+  }
+}

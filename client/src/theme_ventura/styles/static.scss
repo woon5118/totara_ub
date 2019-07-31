@@ -60,3 +60,26 @@ html {
     max-width: 700px;
   }
 }
+
+// Color state for the icons.
+.tui-icon {
+  &--info {
+    color: var(--tui-color-prompt-info);
+  }
+
+  &--alert {
+    color: var(--tui-color-prompt-alert);
+  }
+
+  &--warning {
+    color: var(--tui-color-prompt-warning);
+  }
+
+  &--success {
+    color: var(--tui-color-prompt-success);
+  }
+
+  &--dimmed {
+    color: var(--tui-color-neutral-6);
+  }
+}

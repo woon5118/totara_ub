@@ -130,7 +130,8 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $tag_coll_data = array(
-        'id' => 2, 'sortorder' => 1
+        // 2 records by default now for tag collection
+        'id' => 3, 'sortorder' => 2
     );
 
     protected $tag_instance_data = array(
@@ -138,7 +139,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $tag_data = array(
-        'id' => 1, 'userid' => 2, 'name' => 'Tag', 'isstandard' => '1', 'tagcollid' => 2
+        'id' => 1, 'userid' => 2, 'name' => 'Tag', 'isstandard' => '1', 'tagcollid' => 3
     );
 
     protected $grade_items_data = array(

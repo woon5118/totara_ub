@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_playlist/components/sidepanel/PlaylistSummary Checks snapshot 1`] = `
+<div
+  class="tui-playlistSummary"
+>
+  <p>
+    Hello world
+  </p>
+</div>
+`;

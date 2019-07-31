@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
+<basecard-stub
+  class="tui-engageArticle-articleCard"
+  data-card-unique="1"
+  href=""
+>
+  <imageheader-stub
+    class="tui-engageArticle-articleCard__imageheader"
+  >
+    <img
+      alt="Hello world resource"
+      class="tui-engageArticle-articleCard__image"
+      src="/"
+    />
+     
+    <div
+      class="tui-engageArticle-articleCard__icons"
+    >
+      <buttonicon-stub
+        arialabel="[addtoplaylist, engage_article - undefined]"
+        styleclass="[object Object]"
+        type="button"
+      >
+        <addtoplaylisticon-stub />
+      </buttonicon-stub>
+      <buttonicon-stub
+        arialabel="[share, totara_engage - undefined]"
+        styleclass="[object Object]"
+        type="button"
+      >
+        <shareicon-stub />
+      </buttonicon-stub>
+      <buttonicon-stub
+        arialabel="[more, totara_engage - undefined]"
+        styleclass="[object Object]"
+        type="button"
+      >
+        <moreicon-stub />
+      </buttonicon-stub>
+    </div>
+  </imageheader-stub>
+   
+  <cardheader-stub
+    class="tui-engageArticle-articleCard__header"
+  >
+    <bookmarkbutton-stub
+      class="tui-engageArticle-articleCard__bookmark"
+      size="300"
+      small="true"
+      transparent="true"
+    />
+     
+    <h3
+      class="tui-engageArticle-articleCard__title"
+      id="article-1"
+    >
+      
+      Hello world resource
+    
+    </h3>
+     
+    <!---->
+  </cardheader-stub>
+   
+  <div
+    class="tui-engageArticle-articleCard__footer"
+  >
+    <staticon-stub
+      icon="totara_core|like"
+      statnumber="15"
+      title="[numberoflikes, totara_engage - 15]"
+    />
+    <staticon-stub
+      icon="totara_engage|comment"
+      statnumber="1"
+      title="[numberofcomments, totara_engage - 1]"
+    />
+     
+    <accessicon-stub
+      access="PRIVATE"
+      coloring="true"
+      customclass="tui-engageArticle-articleCard__visibilityIcon"
+      size="300"
+    />
+  </div>
+</basecard-stub>
+`;

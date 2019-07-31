@@ -584,6 +584,43 @@ if ($hassiteconfig) {
     }
 }
 
+// Machine learning plugins.
+if ($hassiteconfig) {
+    $ADMIN->add('modules', new admin_category('machine_learning_settings', new lang_string('ml_settings', 'ml')));
+
+    $ADMIN->add(
+        'machine_learning_settings',
+        new admin_externalpage(
+            'machine_learning_manage',
+            get_string('manage_ml_plugins', 'ml'),
+            new \moodle_url("/admin/machine_learning.php")
+        )
+    );
+
+    // Environment configuration.
+    $env_page = new admin_settingpage(
+        'machine_learning_environment',
+        get_string('envconfig', 'ml')
+    );
+
+    $env_page->add(
+        new admin_setting_configexecutable(
+            'py3path',
+            get_string('py3pathlabel', 'ml'),
+            get_string('py3path', 'ml'),
+            ''
+        )
+    );
+
+    $ADMIN->add('machine_learning_settings', $env_page);
+
+    foreach (core_plugin_manager::instance()->get_plugins_of_type('ml') as $plugin) {
+        if ($plugin->is_enabled()) {
+            $plugin->load_settings($ADMIN, 'machine_learning_settings', $hassiteconfig);
+        }
+    }
+}
+
 // Add any settings from totara modules.
 foreach (core_component::get_plugin_list('totara') as $plugin => $plugindir) {
     $settings_path = "$plugindir/settings.php";

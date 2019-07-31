@@ -1309,6 +1309,7 @@ class core_plugin_manager {
                 'totara_tasks', 'totara_certifications', 'gaccess', 'totara_program_completion',
                 'totara_dashboard', 'totara_report_table', 'last_course_accessed',
                 'current_learning', 'totara_featured_links', 'totara_user_profile',
+                'totara_recently_viewed', 'totara_recommendations',
                 'course_search',
                 'admin_subnav', 'admin_related_pages', 'course_navigation',
                 'totara_competency',
@@ -1332,7 +1333,7 @@ class core_plugin_manager {
 
             // Totara
             'container' => array(
-                'course', 'site', 'perform',
+                'course', 'site', 'perform', 'workspace'
             ),
 
             // Totara
@@ -1436,7 +1437,7 @@ class core_plugin_manager {
             'message' => array(
                 'email', 'jabber', 'popup'
                 // Totara
-                , 'totara_alert', 'totara_task'
+                , 'totara_alert', 'totara_task', 'msteams'
             ),
 
             'mnetservice' => array(
@@ -1458,6 +1459,10 @@ class core_plugin_manager {
             'performelement' => array(
                 'short_text', 'multi_choice', 'long_text', 'multi_choice_multi',
                 'date_picker', 'multi_choice_single', 'static_content', 'numeric_rating_scale',
+            ),
+
+            'ml' => array(
+                'recommender'
             ),
 
             'plagiarism' => array(
@@ -1532,7 +1537,7 @@ class core_plugin_manager {
             'theme' => array(
                 'base'
                 // Totara:
-                , 'roots', 'basis', 'legacy', 'ventura',
+                , 'roots', 'basis', 'legacy', 'ventura', 'msteams'
             ),
 
             'tool' => array(
@@ -1552,7 +1557,8 @@ class core_plugin_manager {
                 'certification', 'completionimport', 'mssql', 'generator', 'connect', 'form',
                 'gap', 'job', 'completioneditor', 'userdata', 'catalog', 'workflow', 'contentmarketplace',
                 'tenant', 'webapi', 'evidence', 'mvc', 'cloudfiledir', 'extfiledir', 'samples', 'mobile',
-                'competency', 'criteria',
+                'competency', 'criteria', 'msteams', 'reaction', 'comment', 'engage', 'playlist',
+                'reportedcontent', 'topic',
             ),
 
             'tabexport' => array(

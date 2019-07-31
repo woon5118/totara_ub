@@ -1,0 +1,123 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Alvin Smith <alvin.smith@totaralearning.com>
+  @package engage_article
+-->
+
+<template>
+  <div class="tui-articleRelated">
+    <article
+      v-for="{
+        bookmarked,
+        instanceid,
+        image,
+        name,
+        reactions,
+        timeview,
+        url,
+      } in articles"
+      :key="instanceid"
+    >
+      <RelatedCard
+        :resource-id="instanceid"
+        :bookmarked="bookmarked"
+        :image="image"
+        :name="name"
+        :reactions="reactions"
+        :timeview="timeview"
+        :url="url"
+        @update="update"
+      />
+    </article>
+  </div>
+</template>
+
+<script>
+import RelatedCard from 'engage_article/components/card/RelatedCard';
+import { UrlSourceType } from 'totara_engage/index';
+
+import getRecommendation from 'ml_recommender/graphql/get_recommended_articles';
+import updateBookmark from 'totara_engage/graphql/update_bookmark';
+
+export default {
+  components: {
+    RelatedCard,
+  },
+  props: {
+    resourceId: {
+      type: [Number, String],
+      required: true,
+    },
+  },
+
+  data() {
+    return {
+      articles: [],
+    };
+  },
+
+  mounted() {
+    this.getRecommendations();
+  },
+
+  methods: {
+    getRecommendations() {
+      this.$apollo
+        .query({
+          query: getRecommendation,
+          refetchAll: false,
+          variables: {
+            article_id: this.resourceId,
+            source: UrlSourceType.article(this.resourceId),
+          },
+        })
+        .then(({ data }) => {
+          this.articles = data.articles.map(item => {
+            const {
+              bookmarked,
+              extra,
+              name,
+              instanceid,
+              reactions,
+              url,
+            } = item;
+            const { image, timeview } = JSON.parse(extra);
+            return {
+              bookmarked,
+              instanceid,
+              image,
+              name,
+              reactions,
+              timeview,
+              url,
+            };
+          });
+        });
+    },
+
+    update(resourceId, bookmarked) {
+      this.$apollo.mutate({
+        mutation: updateBookmark,
+        refetchAll: false,
+        variables: {
+          itemid: resourceId,
+          component: 'engage_article',
+          bookmarked,
+        },
+      });
+    },
+  },
+};
+</script>

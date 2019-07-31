@@ -44,7 +44,13 @@ class tagareashowstandard extends \core\output\inplace_editable {
      * @param \stdClass $tagarea
      */
     public function __construct($tagarea) {
-        $editable = has_capability('moodle/tag:manage', context_system::instance());
+        if (!\core_tag_collection::is_editable($tagarea->tagcollid)) {
+            // Totara: extending the ability to lock down on editing for the 'shows standard'.
+            $editable = false;
+        } else {
+            $editable = has_capability('moodle/tag:manage', context_system::instance());
+        }
+
         $edithint = new lang_string('editisstandard', 'core_tag');
         $value = $tagarea->showstandard;
         $areaname = core_tag_area::display_name($tagarea->component, $tagarea->itemtype);

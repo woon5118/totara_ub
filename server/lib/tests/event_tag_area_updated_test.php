@@ -39,7 +39,13 @@ class event_tag_area_updated_test extends advanced_testcase {
         global $DB;
         // Check event when tag area disabled
         $sink = $this->redirectEvents();
-        $record = $DB->get_record('tag_area', ['itemtype' => 'course']);
+        $record = $DB->get_record(
+            'tag_area',
+            [
+                'itemtype' => 'course',
+                'tagcollid' => \core_tag_collection::get_default()
+            ]
+        );
         tagareaenabled::update($record->id, 0);
         $events = $sink->get_events();
         $event = reset($events);
@@ -54,7 +60,13 @@ class event_tag_area_updated_test extends advanced_testcase {
         global $DB;
         // Check event when tag area disabled
         $sink = $this->redirectEvents();
-        $record = $DB->get_record('tag_area', ['itemtype' => 'course']);
+        $record = $DB->get_record(
+            'tag_area',
+            [
+                'itemtype' => 'course',
+                'tagcollid' => \core_tag_collection::get_default()
+            ]
+        );
         tagareaenabled::update($record->id, 1);
         $events = $sink->get_events();
         $event = reset($events);

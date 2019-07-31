@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/sidepanel/access/AccessSeting.vue Checks snapshot 1`] = `
+<div
+  class="tui-accessDisplay"
+>
+  <div
+    class="tui-accessDisplay__accessIcon"
+  >
+    <div
+      class="tui-accessDisplay__accessIcon__icons"
+    >
+      <accessicon-stub
+        access="PUBLIC"
+        coloring="true"
+        size="300"
+      />
+       
+      <span>
+        viewpublic-totara_engage
+      </span>
+    </div>
+     
+    <div
+      class="tui-accessDisplay__accessIcon__shareButton"
+    >
+      <button-stub
+        styleclass="[object Object]"
+        text="share-totara_engage"
+        type="button"
+      />
+    </div>
+  </div>
+   
+  <!---->
+   
+  <!---->
+   
+  <div
+    class="tui-accessDisplay__editSettings"
+  >
+    <span
+      class="tui-accessDisplay__editSettings__text"
+    >
+      
+      editsettings-totara_engage
+    
+    </span>
+  </div>
+</div>
+`;

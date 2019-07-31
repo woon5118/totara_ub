@@ -1,0 +1,103 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = `
+<basecard-stub
+  class="tui-totaraPlaylist-playlistCard"
+  data-card-unique="1"
+  href=""
+>
+  <imageheader-stub>
+    <div
+      class="tui-totaraPlaylist-playlistCard__imageHeader"
+    >
+      <div
+        class="tui-totaraPlaylist-playlistCard__numberOfResourcesContainer"
+      >
+        <div
+          class="tui-totaraPlaylist-playlistCard__numberOfResources"
+        >
+          <p>
+            0
+          </p>
+        </div>
+      </div>
+       
+      <div
+        class="tui-totaraPlaylist-playlistCard__imageContainer"
+      >
+        <img
+          alt="Hello world"
+          class="tui-totaraPlaylist-playlistCard__image"
+        />
+      </div>
+    </div>
+     
+    <div
+      class="tui-totaraPlaylist-playlistCard__icons"
+    >
+      <buttonicon-stub
+        arialabel="[share, totara_engage - undefined]"
+        styleclass="[object Object]"
+        type="button"
+      >
+        <shareicon-stub />
+      </buttonicon-stub>
+       
+      <!---->
+    </div>
+  </imageheader-stub>
+   
+  <cardheader-stub
+    class="tui-totaraPlaylist-playlistCard__header"
+  >
+    <bookmarkbutton-stub
+      class="tui-totaraPlaylist-playlistCard__bookmark"
+      size="300"
+      small="true"
+      transparent="true"
+    />
+     
+    <h4
+      class="tui-totaraPlaylist-playlistCard__title"
+      id=""
+    >
+      
+      Hello world
+    
+    </h4>
+  </cardheader-stub>
+   
+  <starrating-stub
+    class="tui-totaraPlaylist-playlistCard__rating"
+    increment="0.1"
+    maxrating="5"
+    rating="0"
+    readonly="true"
+    size="15"
+    starpoints=""
+    title="[numberofpeoplerating, totara_engage - undefined]"
+  />
+   
+  <div
+    class="tui-totaraPlaylist-playlistCard__footer"
+  >
+    <staticon-stub
+      icon="totara_engage|comment"
+      statnumber="0"
+      title="[numberofcomments, totara_engage - 0]"
+    />
+    <staticon-stub
+      icon="totara_engage|share"
+      statnumber="0"
+      title="[numberofshares, totara_engage - 0]"
+    />
+     
+    <accessicon-stub
+      access="PUBLIC"
+      coloring="true"
+      customclass="tui-totaraPlaylist-playlistCard__visibilityIcon"
+      size="300"
+    />
+  </div>
+</basecard-stub>
+`;

@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/page/BaseLayout Checks snapshot 1`] = `
+<grid-stub
+  class="tui-totaraEngage-baseLayout"
+  direction="horizontal"
+  maxunits="undefined"
+  usehorizontalgap="true"
+  useverticalgap="true"
+>
+  <griditem-stub
+    class="tui-totaraEngage-baseLayout__content"
+    hyphens="true"
+    shrinks="true"
+    sizedata="[object Object]"
+    units="7"
+  />
+   
+  <griditem-stub
+    class="tui-totaraEngage-baseLayout__sidePanel"
+    hyphens="true"
+    shrinks="true"
+    sizedata="[object Object]"
+    units="5"
+  />
+</grid-stub>
+`;

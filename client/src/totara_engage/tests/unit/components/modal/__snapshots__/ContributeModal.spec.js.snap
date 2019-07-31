@@ -1,0 +1,75 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_engage/components/modal/ContributeModal.vue Checks snapshot 1`] = `
+<modal-stub
+  arialabelledby="id-title"
+  dismissable="[object Object]"
+  shade="true"
+  size="large"
+>
+  <modalcontent-stub
+    class="tui-contributeModal"
+    title="contribute, totara_engage"
+    titlevisible="true"
+  >
+    <div
+      class="tui-contributeModal__adderContainer"
+    >
+      <span>
+        
+        or, totara_engage
+        
+        <button-stub
+          styleclass="[object Object]"
+          text="select an existing resource"
+          type="button"
+        />
+        
+        some where you like
+      
+      </span>
+    </div>
+     
+    <tabs-stub
+      class="tui-contributeModal__tabs"
+      direction="horizontal"
+      selected="engage_survey"
+      smalltabs="true"
+    >
+      <tab-stub
+        id="engage_article"
+        name="cc"
+      >
+        <div
+          class="tui-contributeModal__componentContent"
+        >
+          <engage_survey-stub />
+        </div>
+      </tab-stub>
+      <tab-stub
+        id="engage_survey"
+        name="cd"
+      >
+        <div
+          class="tui-contributeModal__componentContent"
+        >
+          <engage_survey-stub />
+        </div>
+      </tab-stub>
+    </tabs-stub>
+     
+    <buttonicon-stub
+      arialabel="expand, totara_engage"
+      class="tui-contributeModal__resize"
+      styleclass="[object Object]"
+      type="button"
+    >
+      <flexicon-stub
+        alt=""
+        customclass=""
+        icon="expand"
+      />
+    </buttonicon-stub>
+  </modalcontent-stub>
+</modal-stub>
+`;

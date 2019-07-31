@@ -1,0 +1,226 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
+ * @package theme_msteams
+ */
+
+namespace theme_msteams\output;
+
+defined('MOODLE_INTERNAL') || die();
+
+use cache;
+use context_system;
+use core_minify;
+use html_writer;
+use moodle_url;
+use single_button;
+use theme_msteams\hook\get_page_navigation_hook;
+use theme_msteams\session;
+
+/**
+ * Override core_renderer.
+ */
+class core_renderer extends \core_renderer {
+    /**
+     * The URL to the Microsoft Teams SDK.
+     */
+    const MSTEAMS_SDK_URL = 'https://statics.teams.cdn.office.net/sdk/v1.6.0/js/MicrosoftTeams.min.js';
+
+    private const THEME_CSS_CACHE_KEY = 'css_theme_custom';
+    private const MSSTUB_JS_CACHE_KEY = 'js_theme_msteams_stub';
+    private const HELPER_JS_CACHE_KEY = 'js_theme_teams';
+    private const IFRAME_JS_CACHE_KEY = 'js_theme_iframe';
+
+    /**
+     * @inheritDoc
+     */
+    public function standard_head_html() {
+        $out = parent::standard_head_html();
+        // Inject JavaScript code into the <head> element.
+        $payload = self::include_iframe_js();
+        return $out.$payload;
+    }
+
+    /**
+     * Return <script> pointing to the Microsoft Teams SDK.
+     *
+     * @return string
+     */
+    public static function include_msteams_sdk(): string {
+        // Do not load the real SDK on behat tests.
+        if (defined('BEHAT_UTIL') || defined('BEHAT_TEST') || defined('BEHAT_SITE_RUNNING')) {
+            return self::load_script_internal(self::MSSTUB_JS_CACHE_KEY, '/theme/msteams/script/sdk_stub.js');
+        }
+        return html_writer::script('', (new moodle_url(self::MSTEAMS_SDK_URL))->out(false));
+    }
+
+    /**
+     * Return <script> containing the minified helper JavaScript code.
+     *
+     * @return string
+     */
+    public static function include_helper_js(): string {
+        return self::load_script_internal(self::HELPER_JS_CACHE_KEY, '/theme/msteams/script/teams.js');
+    }
+
+    /**
+     * Return <script> containing the minified iframe checker JavaScript code.
+     *
+     * @return string
+     */
+    public static function include_iframe_js(): string {
+        return self::load_script_internal(self::IFRAME_JS_CACHE_KEY, '/theme/msteams/script/iframe.js');
+    }
+
+    /**
+     * Return <style> containing minified theme CSS code.
+     *
+     * @return string
+     */
+    public static function include_theme_css(): string {
+        // Always serve the LTR version. The layout of the minimal HTML should be language neutral.
+        return self::load_css_internal(self::THEME_CSS_CACHE_KEY, '/theme/msteams/style/custom.css');
+    }
+
+    /**
+     * Load a script and return its minified version.
+     *
+     * @param string $key cache key
+     * @param string $relpath relative path from $CFG->dirroot, starting with '/'
+     * @return string <script> containing minified code
+     */
+    public static function load_script_internal(string $key, string $relpath): string {
+        global $CFG;
+        $cache = cache::make('theme_msteams', 'postprocessedcode');
+        $js = $cache->get($key);
+        if ($js === false) {
+            $js = core_minify::js_files([$CFG->dirroot.$relpath]);
+            $cache->set($key, $js);
+        }
+        return html_writer::script($js);
+    }
+
+    /**
+     * Load a css and return its minified version.
+     *
+     * @param string $key cache key
+     * @param string $relpath relative path from $CFG->dirroot, starting with '/'
+     * @return string <style> containing minified css
+     */
+    public static function load_css_internal(string $key, string $relpath): string {
+        global $CFG;
+        $cache = cache::make('theme_msteams', 'postprocessedcode');
+        $css = $cache->get($key);
+        if ($css === false) {
+            $css = core_minify::css_files([$CFG->dirroot.$relpath]);
+            $cache->set($key, $css);
+        }
+        return html_writer::tag('style', $css);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function standard_top_of_body_html() {
+        $out = parent::standard_top_of_body_html();
+
+        $out .= self::include_msteams_sdk();
+        $out .= self::include_helper_js();
+
+        $data = session::get_tab_data();
+        $hook = new get_page_navigation_hook($this->page->context ?? context_system::instance(), $this->page->url, $data);
+        $hook->execute();
+
+        $nav = '';
+        $alert = '';
+
+        if ($hook->navigation !== false) {
+            // Convert array to template data.
+            $links = array_map(function ($obj) {
+                $obj = (object)$obj;
+                $link = [
+                    'href' => (new moodle_url($obj->href))->out(false),
+                    'text' => $obj->text ?? get_string('goback', 'theme_msteams'),
+                    'icon' => [],
+                    'attributes' => []
+                ];
+                if (!empty($obj->icon)) {
+                    $link['icon'] = [
+                        'template' => $obj->icon->get_template(),
+                        'context' => $obj->icon->export_for_template($this),
+                    ];
+                }
+                if (!empty($obj->attributes)) {
+                    foreach ($obj->attributes as $name => $value) {
+                        $link['attributes'][] = ['name' => $name, 'value' => $value];
+                    }
+                }
+                return $link;
+            }, $hook->navigation);
+
+            // Add 'open in new window' link.
+            $icon = new \core\output\flex_icon('theme_msteams|open-externally');
+            $links[] = [
+                'href' => $this->page->url->out(false),
+                'text' => get_string('openexternally', 'theme_msteams'),
+                'icon' => [
+                    'template' => $icon->get_template(),
+                    'context' => $icon->export_for_template($this),
+                ],
+                'attributes' => [
+                    [
+                        'name' => 'target',
+                        'value' => '_blank'
+                    ]
+                ]
+            ];
+
+            $data = [
+                'links' => $links
+            ];
+            $nav = $this->render(new navigation($data));
+        }
+
+        if ((string)$hook->alert !== '') {
+            $alert = html_writer::div($hook->alert, 'totara_msteams__alert');
+        }
+
+        return $out.$nav.$alert;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function continue_button($url) {
+        if (!($url instanceof moodle_url)) {
+            $url = new moodle_url($url);
+        }
+
+        $button = new single_button($url, get_string('continue'), 'get', true);
+        $button->class = 'continuebutton';
+
+        // Attach a custom CSS class to the continue button when you can't enrol in a course pinned to a teams channel.
+        if ($url->compare(new moodle_url('/index.php'))) {
+            $button->class .= ' theme_msteams--continue--back-to-index';
+        }
+
+        return $this->render($button);
+    }
+}

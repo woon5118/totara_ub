@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`engage_survey/components/box/SquareBox.vue Checks snapshot 1`] = `
+<div
+  class="tui-formRow tui-engageSurvey-squareBox"
+>
+  <div
+    class="tui-formRow__desc"
+  >
+    <label
+      class="tui-formLabel tui-formLabel--hidden"
+      for="id"
+      id="id-label"
+    >
+      
+  Label for the group of checkboxes
+  
+      <!---->
+    </label>
+     
+    <!---->
+  </div>
+   
+  <div
+    class="tui-formRow__action"
+  >
+    <div
+      aria-labelledby="id-label"
+      class="tui-checkboxGroup"
+      role="group"
+    >
+      <div
+        class="tui-formRow"
+      >
+        <div
+          class="tui-formRow__desc"
+        >
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <div
+          class="tui-formRow__action"
+        >
+          <div
+            class="tui-checkbox tui-engageSurvey-squareBox__checkbox"
+          >
+            <input
+              class="tui-checkbox__input"
+              id="id"
+              name="engagesurvey-checkbox"
+              type="checkbox"
+              value="42"
+            />
+             
+            <label
+              class="tui-checkbox__label"
+              for="id"
+            >
+              
+        hello
+      
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

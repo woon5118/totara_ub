@@ -183,6 +183,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'debugging' => 'Development',
                 'optionalsubsystems' => 'Advanced features',
                 'adminnotifications' => 'System information',
+                'msteamssetup' => 'Microsoft Teams',
             ]
         ], $user);
     }

@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`totara_playlist/components/card/AddNewPlaylistCard.spec.js Checks snapshot 1`] = `
+<div
+  class="tui-totaraPlaylist-addNewPlaylistCard"
+>
+  <card-stub
+    class="tui-totaraPlaylist-addNewPlaylistCard__card"
+  >
+    <contribute-stub
+      adder="[object Object]"
+      arialabel="contribute-totara_engage"
+      container="[object Object]"
+      showicon="true"
+      size="500"
+      styleclass="[object Object]"
+    />
+  </card-stub>
+   
+  <adder-stub
+    griddirection="horizontal"
+    playlistid="1"
+    units="12"
+  />
+</div>
+`;

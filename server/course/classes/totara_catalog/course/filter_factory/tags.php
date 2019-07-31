@@ -32,6 +32,6 @@ use core_tag\totara_catalog\filter_factory as tags_filter_factory;
 class tags extends filter_factory {
 
     public static function get_filters(): array {
-        return tags_filter_factory::get_filters('course', 'course');
+        return tags_filter_factory::get_filters('course', 'course', 'core');
     }
 }

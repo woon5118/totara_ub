@@ -43,6 +43,7 @@ class totara_catalog_feature_handler_testcase extends advanced_testcase {
      * Test get_all_features() method.
      */
     public function test_get_all_features() {
+        global $CFG;
         $this->resetAfterTest();
 
         $features = feature_handler::instance()->get_all_features();
@@ -57,7 +58,14 @@ class totara_catalog_feature_handler_testcase extends advanced_testcase {
         $tagcollectionid = \core_tag_area::get_collection('totara_program', 'prog');
 
         // Make sure the expected default features are there.
-        $expected = ['course_format_ftrd', 'tag_' . $tagcollectionid, 'course_type_ftrd', 'cat_cgry_ftrd'];
+        $expected = [
+            'course_format_ftrd',
+            'tag_' . $tagcollectionid,
+            'course_type_ftrd',
+            'cat_cgry_ftrd',
+            'tag_' . $CFG->topic_collection_id
+        ];
+
         foreach ($expected as $value) {
             $this->assertContains($value, $keys);
         }

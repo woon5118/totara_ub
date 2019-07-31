@@ -24,7 +24,7 @@
 .tui-weka {
   width: 100%;
   background-color: var(--tui-color-neutral-1);
-  border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+  border: var(--tui-border-width-thin) solid var(--tui-form-input-border-color);
 
   &__placeholder {
     // Styling for the place holder.

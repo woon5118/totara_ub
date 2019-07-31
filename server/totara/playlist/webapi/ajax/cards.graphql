@@ -1,0 +1,34 @@
+query totara_playlist_cards($id: param_integer!, $cursor: String, $source: String) {
+  contribution: totara_playlist_cards(id: $id, cursor: $cursor) {
+    cursor {
+      total
+      next
+    }
+    cards {
+      name(format: PLAIN)
+      instanceid
+      user {
+        id
+        fullname
+        profileimageurl
+        profileimagealt
+      }
+      comments
+      tuicomponent
+      component
+      reactions
+      comments
+      sharedbycount
+      bookmarked
+      extra
+      access
+      timecreated
+      owned
+      topics {
+        id
+        value(format: PLAIN)
+      }
+      url(source: $source)
+    }
+  }
+}
