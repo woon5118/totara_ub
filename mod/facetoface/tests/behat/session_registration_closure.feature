@@ -126,6 +126,7 @@ Feature: Seminar Event Registration Closure
     And I should see "Declined" in the "Jelly Jel" "table_row"
     And I should see "Declined" in the "Minny Min" "table_row"
     And I should see "Booked" in the "Sally Sal" "table_row"
+    And I run all adhoc tasks
 
     When I log out
     And I log in as "manager"
