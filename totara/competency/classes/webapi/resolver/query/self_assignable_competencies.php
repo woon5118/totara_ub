@@ -24,14 +24,10 @@
 namespace totara_competency\webapi\resolver\query;
 
 use context_system;
-use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency as competency_entity;
-use tassign_competency\filter\competency_user_assignment_type;
 use totara_assignment\entities\user;
-use totara_competency\models\self_assignable_competency;
+use totara_competency\data_providers\self_assignable_competencies as provider;
 
 /**
  * Query to return competencies available for self assignment.
@@ -48,73 +44,12 @@ class self_assignable_competencies implements query_resolver {
     public static function resolve(array $args, execution_context $ec) {
         self::authorize($args);
 
-        $user_id = $args['user_id'];
-
-        $is_self = $args['user_id'] == user::logged_in()->id;
-
-        $order_by = strtolower($args['order_by'] ?? 'framework_hierarchy');
-        $order_dir = strtolower($args['order_dir'] ?? 'asc');
         $filters = $args['filters'] ?? [];
-        $limit = $args['limit'] ?? 0;
-        $cursor = $args['cursor'] ?? null;
 
-        // By default filter for visible only
-        $filters['visible'] = true;
-
-        if (isset($filters['assignment_type'])) {
-            $filters['assignment_type'] = (new competency_user_assignment_type($user_id))
-                ->set_value($filters['assignment_type']);
-        }
-
-        $repo = competency_entity::repository()
-            ->set_filters($filters);
-
-        if ($is_self) {
-            $repo->filter_by_self_assignable();
-        } else {
-            $repo->filter_by_other_assignable();
-        }
-
-        /** @var collection $competencies */
-        $competencies = $repo
+        return provider::for($args['user_id'])
             ->set_filters($filters)
-            ->order_by($order_by, $order_dir)
-            ->get();
-
-        // TODO This should definitely be extracted somewhere
-        // Load all assignments for the competencies which belong to the user
-        $assignments = assignment::repository()
-            ->join(['totara_assignment_competency_users', 'ua'], 'id', 'assignment_id')
-            ->where('ua.user_id', $user_id)
-            ->where('status', assignment::STATUS_ACTIVE)
-            ->where('competency_id', $competencies->pluck('id'))
-            ->get();
-
-        /** @var collection|self_assignable_competency[] $competencies */
-        $competencies = $competencies ->transform(function ($item) {
-            return self_assignable_competency::load_by_entity($item);
-        });
-
-        // Now combine competencies and the user assignments
-        if ($assignments->count() > 0) {
-            foreach ($competencies as $competency) {
-                $user_assignments = $assignments->filter('competency_id', $competency->get_id());
-                if ($user_assignments->count() > 0) {
-                    $user_assignments->transform(function ($assignment_entity) {
-                        return \tassign_competency\models\assignment::load_by_entity($assignment_entity);
-                    });
-                    $competency->set_user_assignments($user_assignments);
-                }
-            }
-        }
-
-        $result = [
-            'items' => $competencies->all(),
-            'total_count' => $competencies->count(),
-            'page_info' => ['next_cursor' => 'dssd']
-        ];
-
-        return $result;
+            ->set_order($args['order_by'], $args['order_dir'])
+            ->fetch_paginated($args['cursor'], $args['limit']);
     }
 
     protected static function authorize(array $args) {

@@ -102,7 +102,7 @@ class assignment_user_log {
         // We ignore the continuous tracking assignment
         if (!is_null($this->competency_id) && $this->assignment_type !== assignment::TYPE_SYSTEM) {
             $assignment_user = new assignment_user($this->user_id);
-            $assignments = $assignment_user->get_active_assignments($this->competency_id);
+            $assignments = $assignment_user->get_active_assignments_for_competency($this->competency_id);
             // If the current assignment is the only one, tracking just got started
             if ($assignments->count() === 1 && $assignments->first()->id == $this->assignment_id) {
                 $this->log(competency_assignment_user_log::ACTION_TRACKING_START);

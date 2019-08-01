@@ -23,6 +23,7 @@
 
 namespace tassign_competency\models;
 
+use core\orm\query\builder;
 use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency_assignment_user;
 use tassign_competency\expand_task;
@@ -82,21 +83,43 @@ class assignment_user {
      * @return bool
      */
     public function has_active_assignments(int $competency_id): bool {
-        return count($this->get_active_assignments($competency_id)) > 0;
+        return count($this->get_active_assignments_for_competency($competency_id)) > 0;
     }
 
     /**
-     * Check if the user has any active assignments for a competency
+     * Returns active assignments for a single competency
      *
-     * @param int|null $competency_id
+     * @param int $competency_id
      * @return collection
      */
-    public function get_active_assignments(int $competency_id): collection {
+    public function get_active_assignments_for_competency(int $competency_id): collection {
+        return $this->fetch_active_assignments($competency_id);
+    }
+
+    /**
+     * Returns all active assignments for multiple competencies
+     *
+     * @param array $competency_ids
+     * @return collection
+     */
+    public function get_active_assignments_for_competencies(array $competency_ids): collection {
+        return $this->fetch_active_assignments($competency_ids);
+    }
+
+    /**
+     * Returns activate assignments for the user
+     *
+     * @param null|array|int $competency_ids
+     * @return collection
+     */
+    private function fetch_active_assignments($competency_ids = null): collection {
         return assignment::repository()
             ->join('totara_assignment_competency_users', 'id', 'assignment_id')
             ->where('totara_assignment_competency_users.user_id', $this->user_id)
             ->where('status', assignment::STATUS_ACTIVE)
-            ->where('competency_id', $competency_id)
+            ->when(!is_null($competency_ids), function (builder $builder) use ($competency_ids) {
+                $builder->where('competency_id', $competency_ids);
+            })
             ->get();
     }
 
