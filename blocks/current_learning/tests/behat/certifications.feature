@@ -43,7 +43,7 @@ Feature: User certifications and their courses appear correctly in the current l
     And I click on "Ok" "button" in the "addmulticourse" "totaradialogue"
 
     # Use OR operator.
-    And I click on "or" "option" in the ".nextsetoperator-and select" "css_element"
+    And I set the field with xpath "//div[@class='nextsetoperator-and']/child::select" to "or"
 
     # Add recert CS.
     And I click on "addcontent_rc" "button" in the "#programcontent_rc" "css_element"
@@ -57,9 +57,9 @@ Feature: User certifications and their courses appear correctly in the current l
     And I set the following fields to these values:
       | activenum | 6 |
       | windownum | 2 |
-    And I click on "Month(s)" "option" in the "#id_activeperiod" "css_element"
-    And I click on "Month(s)" "option" in the "#id_windowperiod" "css_element"
-    And I click on "Use certification completion date" "option" in the "#id_recertifydatetype" "css_element"
+    And I set the field "activeperiod" to "Month(s)"
+    And I set the field "windowperiod" to "Month(s)"
+    And I set the field "recertifydatetype" to "Use certification completion date"
     And I press "Save changes"
     And I click on "Save all changes" "button"
     And I log out
