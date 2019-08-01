@@ -49,6 +49,6 @@ class self_assignment extends base {
         ];
 
         return view::create('totara_competency/profile_self_assignment', $data)
-            ->set_title(get_string('search_competencies', 'totara_competency'));
+            ->set_title(get_string('assign_competencies', 'totara_competency'));
     }
 }

@@ -25,6 +25,7 @@ namespace totara_assignment\entities;
 
 
 use core\orm\entity\entity;
+use stdClass;
 
 /**
  * User entity
@@ -106,6 +107,15 @@ class user extends entity {
         }
 
         return new static($USER, false);
+    }
+
+    /**
+     * Convert to a simple object
+     *
+     * @return stdClass
+     */
+    public function to_the_origins() {
+        return (object) ($this->add_extra_attribute('fullname')->to_array());
     }
 
     public function get_fullname_attribute() {

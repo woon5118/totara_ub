@@ -4,8 +4,8 @@
     @mouseover="showTooltip = true"
     @mouseleave="showTooltip = false"
   >
-    {{ value.name
-    }}<Tooltip :display="showTooltip">
+    <span class="tui-MyRatingCell__link-alike">{{ value.name }}</span
+    ><Tooltip :display="showTooltip">
       <template v-if="scale">
         <strong>
           Rating scale
@@ -21,9 +21,7 @@
                 id="check"
               ></FlexIcon>
             </td>
-            <td>
-              {{ scaleValue.name }}
-            </td>
+            <td>{{ scaleValue.name }}</td>
           </tr>
         </table>
       </template>
@@ -62,8 +60,6 @@ export default {
     },
 
     minProficientValue() {
-      console.log(this.scale.values.find(({ proficient }) => proficient));
-
       return this.scale.values.find(({ proficient }) => proficient);
     }
   },
@@ -95,6 +91,12 @@ export default {
 
   &inline {
     display: inline-block;
+  }
+
+  &link-alike {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    cursor: pointer;
   }
 }
 </style>

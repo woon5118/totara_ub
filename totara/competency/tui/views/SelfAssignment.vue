@@ -3,7 +3,7 @@
     <a :href="goBackLink">{{
       $str('back_to_competency_profile', 'totara_competency')
     }}</a>
-    <h2>{{ $str('search_competencies', 'totara_competency') }}</h2>
+    <h2>{{ $str('assign_competencies', 'totara_competency') }}</h2>
     <h4>{{ $str('search_competencies_descriptive', 'totara_competency') }}</h4>
     <div style="text-align: right; width: 100%;">
       <button
@@ -167,7 +167,7 @@ export default {
         ],
         "totara_competency": [
             "back_to_competency_profile",
-            "search_competencies",
+            "assign_competencies",
             "search_competencies_descriptive"
         ]
     }

@@ -37,8 +37,7 @@ export default {
               {
                 text: this.$str('proficient', 'totara_competency'),
                 font: {
-                  size: '20',
-                  family: 'Comic Sans MS'
+                  size: '24'
                 },
                 color: '#3f9852'
               },
@@ -50,6 +49,9 @@ export default {
               }
             ]
           }
+        },
+        tooltips: {
+          enabled: false
         },
         cutoutPercentage: 75,
         legend: {

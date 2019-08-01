@@ -25,7 +25,7 @@
         <a
           :href="selfAssignmentUrl"
           class="btn totara_style-btn"
-          v-text="$str('search_competencies', 'totara_competency')"
+          v-text="$str('assign_competencies', 'totara_competency')"
         ></a>
       </div>
     </div>
@@ -38,11 +38,11 @@
           </li>
         </ul>
         <div class="tui-CompetencyProfile__header-user-details">
-          <img :src="profilePicture" :alt="userName" />
+          <img v-if="!isMine" :src="profilePicture" :alt="userName" />
           <a
             :href="selfAssignmentUrl"
             class="btn totara_style-btn"
-            v-text="$str('search_competencies', 'totara_competency')"
+            v-text="$str('assign_competencies', 'totara_competency')"
           ></a>
           <div
             v-if="data.latest_achievement"
@@ -188,7 +188,6 @@ export default {
 
   mounted() {
     this.loadProgressData(true);
-    this.selectTab('table'); // Let's open
   },
 
   methods: {
@@ -362,6 +361,6 @@ export default {
 </style>
 <lang-strings>
     {
-       "totara_competency": ["latest_achievement", "search_competencies", "no_competencies_assigned", "loading"]
+       "totara_competency": ["latest_achievement", "assign_competencies", "no_competencies_assigned", "loading"]
     }
 </lang-strings>

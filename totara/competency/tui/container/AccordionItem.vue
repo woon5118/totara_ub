@@ -86,7 +86,7 @@ export default {
     padding: 15px;
     width: 100%;
     line-height: 15px;
-    background-color: #f7f7f7;
+    background-color: #fff;
     border: 1px #979797 solid;
     cursor: pointer;
 
@@ -100,7 +100,7 @@ export default {
   }
 
   & .totara_competency-profile__accordion-item-content {
-    background-color: #f9f9f9;
+    background-color: #fff;
     border: 1px #cbcbcb solid;
     border-top: 0;
     border-radius: 0 0 5px 5px;

@@ -291,7 +291,7 @@ extend type Query {
 }
 
 """
- Pathway classification is simply an indication whether completing a pathway results in a specific scalevalue or can result in any of the scalevalues
+Pathway classification is simply an indication whether completing a pathway results in a specific scalevalue or can result in any of the scalevalues
 """
 enum totara_competency_pathway_classification {
   MULTIVALUE
@@ -299,7 +299,7 @@ enum totara_competency_pathway_classification {
 }
 
 """
- Possible pathway statuses
+Possible pathway statuses
 """
 enum totara_competency_pathway_status {
   ACTIVE
@@ -344,7 +344,7 @@ type totara_competency_pathway_aggregation {
 }
 
 """
- Achievement configuration
+Achievement configuration
 """
 type totara_competency_achievement_configuration {
   competency_id: core_id!

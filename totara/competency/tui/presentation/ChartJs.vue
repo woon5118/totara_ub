@@ -68,7 +68,6 @@ export default {
       } else {
         this.chart.config.data = this.config.data;
         this.chart.update();
-        console.log('updating with', this.config);
       }
     }
   }

@@ -23,27 +23,39 @@
 
 namespace totara_competency\webapi\resolver\query;
 
+use context_system;
+use context_user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use totara_competency\data_providers\progress;
+use totara_assignment\entities\user;
+use totara_competency\models\profile\progress as progress_model;
 
 class profile_progress implements query_resolver {
+
     public static function resolve(array $args, execution_context $ec) {
-        if (!isset($args['user_id'])) {
+        return progress_model::for(static::authorize($args['user_id'] ?? null), $args['filters'] ?? []);
+    }
+
+    public static function authorize($user_id = null) {
+        if (is_null($user_id)) {
             throw new \coding_exception('User id is required');
         }
 
-        $progress = progress::for($args['user_id']);
+        $user_id = intval($user_id);
 
-        $progress->set_filters($args['filters'] ?? [])->fetch();
+        if (!$authorized_user = user::logged_in()) {
+            require_login();
+        }
 
-        $latest_achievement = $progress->get_latest_achievement();
+        if ($authorized_user->id === $user_id) {
+            $cap = ['totara/competency:view_own_profile', context_system::instance()];
+        } else {
+            $cap = ['totara/competency:view_other_profile', context_user::instance($user_id)];
+        }
 
-        return (object) [
-            'user' => (object) ($progress->get_user()->add_extra_attribute('fullname')->to_array()),
-            'items' => $progress->build_progress_data_per_user_group(),
-            'filters' => $progress->build_filters(),
-            'latest_achievement' => $latest_achievement ? $latest_achievement->competency_name : null,
-        ];
+        require_capability(...$cap);
+
+        return $user_id;
     }
+
 }

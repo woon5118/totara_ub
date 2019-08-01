@@ -9,7 +9,7 @@
         style="justify-content: left; display: flex; flex-direction: row;"
         class="totara_competency-profile__comp-list-left-filters"
       >
-        <FlexIcon id="filter" size="500" alt="Filters"></FlexIcon>
+        <FlexIcon id="preferences" size="500" alt="Filters"></FlexIcon>
         <template v-if="filterNotArchived">
           <label
             for="competency-profile-proficient-filter"
@@ -22,14 +22,11 @@
             id="competency-profile-proficient-filter"
             v-model="proficientFilter"
           >
-            <option :value="null" v-text="$str('any', 'totara_competency')"
-              >Any</option
-            >
+            <option :value="null" v-text="$str('all', 'totara_competency')" />
             <option
               :value="true"
               v-text="$str('proficient', 'totara_competency')"
-              >Proficient</option
-            >
+            />
             <option
               :value="false"
               v-text="$str('not_proficient', 'totara_competency')"
@@ -62,10 +59,12 @@
             v-text="$str('sort:alphabetical', 'totara_competency')"
           ></option>
           <option
+            v-if="filterNotArchived"
             value="recently-assigned"
             v-text="$str('sort:recently_assigned', 'totara_competency')"
           ></option>
           <option
+            v-if="!filterNotArchived"
             value="recently-archived"
             v-text="$str('sort:recently_archived', 'totara_competency')"
           ></option>
@@ -85,16 +84,10 @@
             v-text="props.row.competency.fullname"
           ></a>
         </div>
-        <div
-          v-if="props.row.items.length > 1"
-          class="totara_competency-profile__competency-assignments-list"
-        >
-          <div v-text="displayAssignmentsList(props.row)"></div>
-        </div>
       </template>
       <template v-slot:column-proficient="props">
         <template v-if="props.row.items[0].proficient">
-          <FlexIcon id="star" alt="//TODO add something here" />
+          <FlexIcon id="check" alt="//TODO add something here" />
         </template>
       </template>
       <template v-slot:column-rating="props">
@@ -105,7 +98,12 @@
         ></MyRatingCell>
       </template>
     </List>
-    <List v-else :columns="archivedCompetencyColumns" :data="competencies">
+    <List
+      v-else
+      :columns="archivedCompetencyColumns"
+      :data="competencies"
+      bg-color="gray"
+    >
       <template v-slot:column-name="props">
         <div>
           <a
@@ -132,7 +130,7 @@
         <ul class="tui-CompetencyList__archived-assignments-list">
           <li v-for="(item, key) in props.row.items" :key="key">
             <template v-if="item.proficient">
-              <FlexIcon id="star" alt="//TODO add something here" />
+              <FlexIcon id="check" alt="//TODO add something here" />
             </template>
           </li>
         </ul>
@@ -140,8 +138,11 @@
       <template v-slot:column-rating="props">
         <ul class="tui-CompetencyList__archived-assignments-list">
           <li v-for="(item, key) in props.row.items" :key="key">
-            <span v-if="item.my_value" v-text="item.my_value.name"></span>
-            <span v-else>-</span>
+            <MyRatingCell
+              v-if="item.my_value"
+              :value="item.my_value"
+              :scales="scales"
+            ></MyRatingCell>
           </li>
         </ul>
       </template>
@@ -284,6 +285,16 @@ export default {
 
   methods: {
     loadCompetencies() {
+      if (this.filterNotArchived) {
+        if (this.order === 'recently-archived') {
+          this.order = 'alphabetical';
+        }
+      } else {
+        if (this.order === 'recently-assigned') {
+          this.order = 'alphabetical';
+        }
+      }
+
       this.isLoading = true;
 
       let args = {
@@ -392,7 +403,7 @@ export default {
 </style>
 <lang-strings>
     {
-      "totara_competency": ["proficient", "not_proficient", "any", "sort:alphabetical", "sort:recently_archived", "sort:recently_assigned"],
+      "totara_competency": ["proficient", "not_proficient", "all", "sort:alphabetical", "sort:recently_archived", "sort:recently_assigned"],
       "moodle": ["search"]
     }
 </lang-strings>

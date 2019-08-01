@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="getBgStyle">
     <div class="totara_competency-list__row totara_competency-list__header">
       <!-- Header -->
       <div
@@ -63,6 +63,12 @@ export default {
       type: [String, Function],
       required: false,
       default: null
+    },
+
+    bgColor: {
+      type: String,
+      required: false,
+      default: ''
     }
   },
 
@@ -76,11 +82,15 @@ export default {
     getData: function() {
       // TODO support passing paginated data
       return this.data;
-    }
-  },
+    },
 
-  mounted: function() {
-    console.log(this.$scopedSlots);
+    getBgStyle() {
+      if (this.bgColor.trim() !== '') {
+        return ['tui-List__background-gray'];
+      }
+
+      return [];
+    }
   },
 
   methods: {
@@ -183,6 +193,12 @@ export default {
 };
 </script>
 <style lang="scss">
+.tui-List__ {
+  &background-gray {
+    background-color: #f3f3f3;
+  }
+}
+
 .totara_competency-list__cell {
   padding: 1.5rem;
 

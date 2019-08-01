@@ -145,9 +145,9 @@ class assignment extends entity {
     protected function get_human_status_attribute() {
         switch ($this->status) {
             case assignment::STATUS_ACTIVE:
-                return get_string('status:active', 'tassign_competency');
+                return get_string('status:active-alt', 'tassign_competency');
             case assignment::STATUS_ARCHIVED:
-                return get_string('status:archived', 'tassign_competency');
+                return get_string('status:archived-alt', 'tassign_competency');
             case assignment::STATUS_DRAFT:
                 return get_string('status:draft', 'tassign_competency');
             default:

@@ -134,7 +134,6 @@ abstract class base extends controller {
             $this->page->navbar->add(get_string('competency_profile', 'totara_competency'));
         }
 
-
         return $this;
     }
 

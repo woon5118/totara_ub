@@ -129,7 +129,7 @@ export default {
             "activity_log",
             "back_to_competency_profile",
             "overview",
-            "search_competencies",
+            "assign_competencies",
             "search_competencies_descriptive",
             "unassigned"
         ],

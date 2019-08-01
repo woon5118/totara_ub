@@ -53,7 +53,6 @@ export default {
     activateFirst() {
       let activeTab = null;
       this.tabs.forEach(tab => {
-        console.log('1', tab);
         if (tab.isActive) {
           activeTab = tab;
         }

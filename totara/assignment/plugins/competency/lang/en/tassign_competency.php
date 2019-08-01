@@ -203,7 +203,9 @@ $string['sort:user_group_name'] = 'User group name';
 $string['sort:most_recently_updated'] = 'Most recently updated';
 
 $string['status:active'] = 'Active';
+$string['status:active-alt'] = 'Current assignments';
 $string['status:archived'] = 'Archived';
+$string['status:archived-alt'] = 'Archived assignments';
 $string['status:draft'] = 'Draft';
 
 $string['sync:is_scheduled'] = 'The sync task has already been scheduled – it is running in the background, and you will be notified once it is finished. You will be able to schedule a new sync task once the current one is complete.';

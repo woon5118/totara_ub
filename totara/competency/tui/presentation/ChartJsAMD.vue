@@ -84,8 +84,6 @@ let loadChartJS = function() {
           }
         });
 
-        console.log('ChartJs has been loaded');
-
         if (typeof resolve !== 'undefined') {
           resolve(chart);
         }

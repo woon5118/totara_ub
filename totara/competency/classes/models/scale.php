@@ -25,7 +25,11 @@ namespace totara_competency\models;
 
 use coding_exception;
 use core\orm\collection;
+use core\orm\entity\entity;
+use core\orm\entity\entity_repository;
 use core\orm\query\builder;
+use core\orm\query\subquery;
+use repository;
 use totara_competency\entities\scale as scale_entity;
 use totara_competency\entities\scale_value;
 
@@ -50,7 +54,7 @@ class scale {
     }
 
     public static function find_by_id(array $id, $with_values = true): self {
-        $model = new static(scale_entity::repository()->find_or_fail($id));
+        $model = new static(static::scale_repository()->find_or_fail($id));
 
         if ($with_values) {
             $model->load_values();
@@ -63,7 +67,7 @@ class scale {
 
         $ids = static::sanitize_ids($ids);
 
-        $scales = scale_entity::repository()->where('id', $ids)->get();
+        $scales = static::scale_repository()->where('id', $ids)->get();
 
         $values = $with_values ? static::preload_values($scales) : new collection();
 
@@ -88,7 +92,7 @@ class scale {
             ->select_raw('distinct frameworkid')
             ->where('id', static::sanitize_ids($ids));
 
-        $scale_ids = scale_entity::repository()
+        $scale_ids = static::scale_repository()
             ->select('id')
             ->join('comp_scale_assignments', 'id', 'scaleid')
             ->where('comp_scale_assignments.frameworkid', 'in', $subquery)
@@ -99,7 +103,7 @@ class scale {
     }
 
     public static function find_by_competency_id(int $id, $with_values = true): self {
-        $model = new static(scale_entity::repository()
+        $model = new static(static::scale_repository()
             ->join('comp_scale_assignments', 'id', 'scaleid')
             ->join('comp', 'comp_scale_assignments.frameworkid', 'frameworkid')
             ->where('comp.id', $id)
@@ -110,9 +114,25 @@ class scale {
         }
 
         return $model;
+    }
 
+    protected static function scale_repository(): entity_repository {
+        return scale_entity::repository()
+            ->select('*')
+            ->add_select((new subquery(function(builder $builder) {
+                $builder->from('comp_scale_values')
+                    ->select('id')
+                    ->where_field('scaleid', 'comp_scale.id')
+                    ->where('proficient', 1)
+                    ->when(true, function (builder $builder) {
+                        $subquery = builder::table('comp_scale_values')
+                            ->select('max(sortorder)')
+                            ->where_field('scaleid', 'comp_scale.id')
+                            ->where('proficient', 1);
 
-
+                        $builder->where('sortorder', $subquery);
+                    });
+            }))->as('min_proficient_value_id'));
     }
 
     protected function load_values() {
