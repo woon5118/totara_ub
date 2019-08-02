@@ -227,14 +227,10 @@ type totara_competency_competency_framework {
     competencies: [totara_competency_competency]
 }
 
-type totara_competency_self_assigned_competencies_page_info {
-    next_cursor: String
-}
-
 type totara_competency_self_assigned_competencies_result {
     items: [totara_competency_self_assignable_competency]
-    total_count: Int
-    page_info: totara_competency_self_assigned_competencies_page_info
+    total: Int
+    next_cursor: String
 }
 
 input totara_competency_self_assigned_competencies_filter {

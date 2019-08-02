@@ -24,6 +24,7 @@
 namespace totara_competency\data_providers;
 
 use core\orm\collection;
+use core\orm\cursor_paginator;
 use tassign_competency\entities\competency as competency_entity;
 use tassign_competency\filter\competency_user_assignment_type;
 use tassign_competency\models\assignment;
@@ -79,34 +80,30 @@ class self_assignable_competencies extends user_data_provider {
         }
 
         /** @var collection $competencies */
-        $competencies = $repo
+        $query = $repo
             ->set_filters($this->filters)
-            ->order_by($this->order_by, $this->order_dir)
-            ->get();
+            ->order_by($this->order_by, $this->order_dir);
+
+        $paginator = new cursor_paginator($query, $cursor, $limit);
 
         $GLOBALS['DB']->set_debug(0);
 
         $assignments = (new assignment_user($this->user->id))
-            ->get_active_assignments_for_competencies($competencies->pluck('id'));
+            ->get_active_assignments_for_competencies($paginator->get_items()->pluck('id'));
 
-        /** @var collection|self_assignable_competency[] $competencies */
-        $competencies = $competencies ->transform(function ($item) {
+        $paginator->get_items()->transform(function ($item) {
             return self_assignable_competency::load_by_entity($item);
         });
 
-        $this->combine_competencies_with_assignments($assignments, $competencies);
+        $this->combine_competencies_with_assignments($assignments, $paginator);
 
-        return [
-            'items' => $competencies->all(),
-            'total_count' => $competencies->count(),
-            'page_info' => ['next_cursor' => 'dssd']
-        ];
+        return $paginator->get();
     }
 
-    private function combine_competencies_with_assignments(collection $assignments, collection $competencies): void {
+    private function combine_competencies_with_assignments(collection $assignments, cursor_paginator $paginator): void {
         // Now combine competencies and the user assignments
         if ($assignments->count() > 0) {
-            foreach ($competencies as $competency) {
+            foreach ($paginator as $competency) {
                 $user_assignments = $assignments->filter('competency_id', $competency->get_id());
                 if ($user_assignments->count() > 0) {
                     $user_assignments->transform(function ($assignment_entity) {
