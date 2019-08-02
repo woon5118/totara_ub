@@ -2,34 +2,34 @@
 This is the order direction
 """
 enum totara_competency_order_dir {
-    ASC
-    DESC
+  ASC
+  DESC
 }
 
 type totara_competency_assignment {
-    type: String
-    user_group_type: String
-    user_group_id: core_id
-    label: String
-    progress_name: String
+  type: String
+  user_group_type: String
+  user_group_id: core_id
+  label: String
+  progress_name: String
 }
 
 type totara_competency_activity_log_row {
-    timestamp (format: core_date_format = TIMESTAMP): core_date
-    description (format: core_format = HTML): String
-    proficient_status: Boolean
-    assignment: totara_competency_assignment
-    type: String
+  timestamp(format: core_date_format = TIMESTAMP): core_date
+  description(format: core_format = HTML): String
+  proficient_status: Boolean
+  assignment: totara_competency_assignment
+  type: String
 }
 
 """
 Competency profile overall progress
 """
 type totara_competency_profile_overall_progress {
-    user: core_user,
-    items: [totara_competency_profile_progress_item!]!,
-    latest_achievement: String,
-    filters: [totara_competency_profile_assignment_filter_option!]
+  user: core_user
+  items: [totara_competency_profile_progress_item!]!
+  latest_achievement: String
+  filters: [totara_competency_profile_assignment_filter_option!]
 }
 
 """
@@ -37,96 +37,96 @@ Competency profile overall progress individual items
 To simplify, it is a list of assignments grouped by assignment type, user group type and user group id
 """
 type totara_competency_profile_progress_item {
-    overall_progress: Int!
-    name: String!
-    items: [totara_competency_profile_assignment_progress]
+  overall_progress: Int!
+  name: String!
+  items: [totara_competency_profile_assignment_progress]
 }
 
 """
 Competency profile progress item per assignment,
 """
 type totara_competency_profile_assignment_progress {
-    assignment: tassign_competency_assignment
-    competency: totara_competency_competency
-    proficient: Boolean
-    my_value: totara_competency_profile_scale_value_progress
-    min_value: totara_competency_profile_scale_value_progress!
+  assignment: tassign_competency_assignment
+  competency: totara_competency_competency
+  proficient: Boolean
+  my_value: totara_competency_profile_scale_value_progress
+  min_value: totara_competency_profile_scale_value_progress!
 }
 
 """
 Competency profile progress item per competency, with a list of assignments (for a given user)
 """
 type totara_competency_profile_competency_progress {
-    competency: totara_competency_competency
-    items: [totara_competency_profile_assignment_progress]
+  competency: totara_competency_competency
+  items: [totara_competency_profile_assignment_progress]
 }
 
 """
 Competency profile scale_value progress type that includes extra details (the percentage towards competency progress)
 """
 type totara_competency_profile_scale_value_progress {
-    id: core_id
-    scaleid: core_id
-    name: String!,
-    percentage: Int,
-    proficient: Boolean,
+  id: core_id
+  scaleid: core_id
+  name: String!
+  percentage: Int
+  proficient: Boolean
 }
 
 """
 Competency profile assignment filter option
 """
 type totara_competency_profile_assignment_filter_option {
-    name: String!,
-    user_group_type: String!,
-    user_group_id: Int!,
-    type: String!,
-    status: Int!,
-    status_name: String!
+  name: String!
+  user_group_type: String!
+  user_group_id: Int!
+  type: String!
+  status: Int!
+  status_name: String!
 }
 
 """
 Competency scale
 """
 type totara_competency_scale {
-    id: core_id!
-    name(format: core_format = HTML): String!
-    description(format: core_format = HTML): String
-    timemodified(format: core_date_format = TIMESTAMP): core_date!
-    usermodified: core_id
-    defaultid: core_id
-    values: [totara_competency_scale_value!]!
+  id: core_id!
+  name(format: core_format = HTML): String!
+  description(format: core_format = HTML): String
+  timemodified(format: core_date_format = TIMESTAMP): core_date!
+  usermodified: core_id
+  defaultid: core_id
+  values: [totara_competency_scale_value!]!
 }
 
 """
 Competency scale value
 """
 type totara_competency_scale_value {
-    id: core_id!
-    name(format: core_format = HTML): String!
-    idnumber(format: core_format = HTML): String
-    description(format: core_format = HTML): String
-    scaleid: core_id!
-    numericscore: Int
-    sortorder: Int!
-    timemodified(format: core_date_format = TIMESTAMP): core_date!
-    usermodified: core_id
-    proficient: Boolean!
+  id: core_id!
+  name(format: core_format = HTML): String!
+  idnumber(format: core_format = HTML): String
+  description(format: core_format = HTML): String
+  scaleid: core_id!
+  numericscore: Int
+  sortorder: Int!
+  timemodified(format: core_date_format = TIMESTAMP): core_date!
+  usermodified: core_id
+  proficient: Boolean!
 }
 
 """
 Competency profile assignment filters
 """
 input totara_competency_profile_assignment_filters {
-    user_group_type: String,
-    user_group_id: Int,
-    type: String,
-    status: Int,
-    proficient: Boolean,
-    search: String,
+  user_group_type: String
+  user_group_id: Int
+  type: String
+  status: Int
+  proficient: Boolean
+  search: String
 }
 
 input totara_competency_activity_log_filters {
-    assignment_id: core_id
+  assignment_id: core_id
 }
 
 """
@@ -135,67 +135,67 @@ Competency
 NOTE: The query is responsible for ensuring the user can see the competency.
 """
 interface totara_competency_competency_interface {
-    id: core_id!
-    fullname(format: core_format = HTML): String!
-    idnumber(format: core_format = HTML): String
-    shortname(format: core_format = HTML): String
-    display_name(format: core_format = HTML): String
-    description(format: core_format = HTML): String
-    timecreated(format: core_date_format = TIMESTAMP): core_date
-    timemodified(format: core_date_format = TIMESTAMP): core_date
-    frameworkid: core_id
-    framework: totara_competency_competency_framework
-    path: String!
-    visible: Boolean!
-    parentid: core_id
-    parent: totara_competency_competency
-    children: [totara_competency_competency]!
-    typeid: core_id
-    type: totara_competency_competency_type
-    assignments: [tassign_competency_assignment]
+  id: core_id!
+  fullname(format: core_format = HTML): String!
+  idnumber(format: core_format = HTML): String
+  shortname(format: core_format = HTML): String
+  display_name(format: core_format = HTML): String
+  description(format: core_format = HTML): String
+  timecreated(format: core_date_format = TIMESTAMP): core_date
+  timemodified(format: core_date_format = TIMESTAMP): core_date
+  frameworkid: core_id
+  framework: totara_competency_competency_framework
+  path: String!
+  visible: Boolean!
+  parentid: core_id
+  parent: totara_competency_competency
+  children: [totara_competency_competency]!
+  typeid: core_id
+  type: totara_competency_competency_type
+  assignments: [tassign_competency_assignment]
 }
 
 type totara_competency_competency implements totara_competency_competency_interface {
-    id: core_id!
-    fullname(format: core_format = HTML): String!
-    idnumber(format: core_format = HTML): String
-    shortname(format: core_format = HTML): String
-    display_name(format: core_format = HTML): String
-    description(format: core_format = HTML): String
-    timecreated(format: core_date_format = TIMESTAMP): core_date
-    timemodified(format: core_date_format = TIMESTAMP): core_date
-    frameworkid: core_id
-    framework: totara_competency_competency_framework
-    path: String!
-    visible: Boolean!
-    parentid: core_id
-    parent: totara_competency_competency
-    children: [totara_competency_competency]!
-    typeid: core_id
-    type: totara_competency_competency_type
-    assignments: [tassign_competency_assignment]
+  id: core_id!
+  fullname(format: core_format = HTML): String!
+  idnumber(format: core_format = HTML): String
+  shortname(format: core_format = HTML): String
+  display_name(format: core_format = HTML): String
+  description(format: core_format = HTML): String
+  timecreated(format: core_date_format = TIMESTAMP): core_date
+  timemodified(format: core_date_format = TIMESTAMP): core_date
+  frameworkid: core_id
+  framework: totara_competency_competency_framework
+  path: String!
+  visible: Boolean!
+  parentid: core_id
+  parent: totara_competency_competency
+  children: [totara_competency_competency]!
+  typeid: core_id
+  type: totara_competency_competency_type
+  assignments: [tassign_competency_assignment]
 }
 
 type totara_competency_self_assignable_competency implements totara_competency_competency_interface {
-    id: core_id!
-    fullname(format: core_format = HTML): String!
-    idnumber(format: core_format = HTML): String
-    shortname(format: core_format = HTML): String
-    display_name(format: core_format = HTML): String
-    description(format: core_format = HTML): String
-    timecreated(format: core_date_format = TIMESTAMP): core_date
-    timemodified(format: core_date_format = TIMESTAMP): core_date
-    frameworkid: core_id
-    framework: totara_competency_competency_framework
-    path: String!
-    visible: Boolean!
-    parentid: core_id
-    parent: totara_competency_competency
-    children: [totara_competency_competency]!
-    typeid: core_id
-    type: totara_competency_competency_type
-    assignments: [tassign_competency_assignment]
-    user_assignments: [tassign_competency_assignment]
+  id: core_id!
+  fullname(format: core_format = HTML): String!
+  idnumber(format: core_format = HTML): String
+  shortname(format: core_format = HTML): String
+  display_name(format: core_format = HTML): String
+  description(format: core_format = HTML): String
+  timecreated(format: core_date_format = TIMESTAMP): core_date
+  timemodified(format: core_date_format = TIMESTAMP): core_date
+  frameworkid: core_id
+  framework: totara_competency_competency_framework
+  path: String!
+  visible: Boolean!
+  parentid: core_id
+  parent: totara_competency_competency
+  children: [totara_competency_competency]!
+  typeid: core_id
+  type: totara_competency_competency_type
+  assignments: [tassign_competency_assignment]
+  user_assignments: [tassign_competency_assignment]
 }
 
 """
@@ -204,12 +204,12 @@ Competency type
 NOTE: The query is responsible for ensuring the user can see the position type
 """
 type totara_competency_competency_type {
-    id: core_id!
-    display_name(format: core_format = HTML): String
-    fullname(format: core_format = HTML): String!
-    idnumber(format: core_format = HTML): String
-    shortname(format: core_format = HTML): String
-    description(format: core_format = HTML): String
+  id: core_id!
+  display_name(format: core_format = HTML): String
+  fullname(format: core_format = HTML): String!
+  idnumber(format: core_format = HTML): String
+  shortname(format: core_format = HTML): String
+  description(format: core_format = HTML): String
 }
 
 """
@@ -218,129 +218,142 @@ Competency framework
 NOTE: The query is responsible for ensuring the user can see the position framework
 """
 type totara_competency_competency_framework {
-    id: core_id!
-    display_name(format: core_format = HTML): String
-    fullname(format: core_format = HTML): String!
-    shortname(format: core_format = HTML): String
-    idnumber(format: core_format = HTML): String
-    description(format: core_format = HTML): String
-    competencies: [totara_competency_competency]
+  id: core_id!
+  display_name(format: core_format = HTML): String
+  fullname(format: core_format = HTML): String!
+  shortname(format: core_format = HTML): String
+  idnumber(format: core_format = HTML): String
+  description(format: core_format = HTML): String
+  competencies: [totara_competency_competency]
 }
 
-type totara_competency_self_assigned_competencies_result {
-    items: [totara_competency_self_assignable_competency]
-    total: Int
-    next_cursor: String
+type totara_competency_self_assigned_competencies_result implements core_pageable_result {
+  items: [totara_competency_self_assignable_competency]
+  total: Int!
+  next_cursor: String!
 }
 
 input totara_competency_self_assigned_competencies_filter {
-    text: param_text
-    assignment_type: [param_alphaext]
-    framework: param_integer
-    assignment_status: [param_integer]
-    parent: param_integer
-    path: param_integer
-    type: [param_integer]
-    ids: [param_integer]
+  text: param_text
+  assignment_type: [param_alphaext]
+  framework: param_integer
+  assignment_status: [param_integer]
+  parent: param_integer
+  path: param_integer
+  type: [param_integer]
+  ids: [param_integer]
 }
 
 extend type Query {
-    totara_competency_activity_log(
-        competency_id: core_id!,
-        user_id: core_id!,
-        filters: totara_competency_activity_log_filters
-    ) : [totara_competency_activity_log_row]
-
-    totara_competency_profile_progress(
-        user_id: core_id, filters: totara_competency_profile_assignment_filters
-    ): totara_competency_profile_overall_progress
-
-    totara_competency_profile_competency_progress(
-        user_id: core_id, order: String, filters: totara_competency_profile_assignment_filters,
-    ): [totara_competency_profile_competency_progress]
-
-    totara_competency_profile_competency_details(
-        user_id: core_id, competency_id: core_id,
-    ): totara_competency_profile_competency_progress
-
-    totara_competency_competency(
-        competencyid: core_id!
-    ): totara_competency_competency!
-
-    totara_competency_scale(
-        id: core_id
-        competency_id: core_id
-    ): totara_competency_scale!
-
-    totara_competency_scales(
-        id: [core_id!]
-        competency_id: [core_id!]
-    ): [totara_competency_scale]!
-
-    totara_competency_self_assignable_competencies(
-        user_id: core_id!
-        filters: totara_competency_self_assigned_competencies_filter
-        order_by: String
-        order_dir: totara_competency_order_dir
-        limit: Int
-        cursor: String
-    ): totara_competency_self_assigned_competencies_result!
-}
-}
-
-
-""" Pathway classification is simply an indication whether completing a pathway results in a specific scalevalue or can result in any of the scalevalues """
-enum totara_competency_pathway_classification {
-    MULTIVALUE
-    SINGLEVALUE
-}
-
-""" Possible pathway statuses """
-enum totara_competency_pathway_status {
-    ACTIVE
-    ARCHIVED
-}
-
-""" Summarized pathway criteria detail
-    None of the strings are retrieved from user input - therefore no formatting requirement """
-type totara_competency_summarized_pathway_criteria {
-    item_type: String!
-    item_aggregation: String
-    items: [String!]
-}
-
-""" This is the generic pathway type. Each plugin must define its specific type with name pathway_<pathway_type>_instance
-    These should be retrieved separately and should contain the plugin specific detail
-    None of the strings are retrieved from user input - therefore no formatting requirement """
-type totara_competency_pathway {
-    id: core_id!
-    pathway_type: String!
-    instance_id: core_id
-    title: String!
-    sortorder: Int!
-    status: totara_competency_pathway_status!
-    classification: totara_competency_pathway_classification!
-    scale_value: String
-    criteria_summary: [totara_competency_summarized_pathway_criteria!]
-}
-
-""" How achievement values are aggregated
-    None of the strings are retrieved from user input - therefore no formatting requirement """
-type totara_competency_pathway_aggregation {
-    aggregation_type: String!
-    title: String!
-    description: String
-}
-
-""" Achievement configuration """
-type totara_competency_achievement_configuration {
+  totara_competency_activity_log(
     competency_id: core_id!
-    overall_aggregation: totara_competency_pathway_aggregation!
-    paths: [totara_competency_pathway!]!
+    user_id: core_id!
+    filters: totara_competency_activity_log_filters
+  ): [totara_competency_activity_log_row]
+
+  totara_competency_profile_progress(
+    user_id: core_id
+    filters: totara_competency_profile_assignment_filters
+  ): totara_competency_profile_overall_progress
+
+  totara_competency_profile_competency_progress(
+    user_id: core_id
+    order: String
+    filters: totara_competency_profile_assignment_filters
+  ): [totara_competency_profile_competency_progress]
+
+  totara_competency_profile_competency_details(
+    user_id: core_id
+    competency_id: core_id
+  ): totara_competency_profile_competency_progress
+
+  totara_competency_competency(
+    competencyid: core_id!
+  ): totara_competency_competency!
+
+  totara_competency_scale(
+    id: core_id
+    competency_id: core_id
+  ): totara_competency_scale!
+
+  totara_competency_scales(
+    id: [core_id!]
+    competency_id: [core_id!]
+  ): [totara_competency_scale]!
+
+  totara_competency_self_assignable_competencies(
+    user_id: core_id!
+    filters: totara_competency_self_assigned_competencies_filter
+    order_by: String
+    order_dir: totara_competency_order_dir
+    cursor: String
+  ): totara_competency_self_assigned_competencies_result!
+}
+
+"""
+ Pathway classification is simply an indication whether completing a pathway results in a specific scalevalue or can result in any of the scalevalues
+"""
+enum totara_competency_pathway_classification {
+  MULTIVALUE
+  SINGLEVALUE
+}
+
+"""
+ Possible pathway statuses
+"""
+enum totara_competency_pathway_status {
+  ACTIVE
+  ARCHIVED
+}
+
+"""
+ Summarized pathway criteria detail
+None of the strings are retrieved from user input - therefore no formatting requirement
+"""
+type totara_competency_summarized_pathway_criteria {
+  item_type: String!
+  item_aggregation: String
+  items: [String!]
+}
+
+"""
+ This is the generic pathway type. Each plugin must define its specific type with name pathway_<pathway_type>_instance
+These should be retrieved separately and should contain the plugin specific detail
+None of the strings are retrieved from user input - therefore no formatting requirement
+"""
+type totara_competency_pathway {
+  id: core_id!
+  pathway_type: String!
+  instance_id: core_id
+  title: String!
+  sortorder: Int!
+  status: totara_competency_pathway_status!
+  classification: totara_competency_pathway_classification!
+  scale_value: String
+  criteria_summary: [totara_competency_summarized_pathway_criteria!]
+}
+
+"""
+ How achievement values are aggregated
+None of the strings are retrieved from user input - therefore no formatting requirement
+"""
+type totara_competency_pathway_aggregation {
+  aggregation_type: String!
+  title: String!
+  description: String
+}
+
+"""
+ Achievement configuration
+"""
+type totara_competency_achievement_configuration {
+  competency_id: core_id!
+  overall_aggregation: totara_competency_pathway_aggregation!
+  paths: [totara_competency_pathway!]!
 }
 
 extend type Query {
-    totara_competency_achievement_criteria(
-        competency_id: core_id!
-    ) : totara_competency_achievement_configuration!
+  totara_competency_achievement_criteria(
+    competency_id: core_id!
+  ): totara_competency_achievement_configuration!
 }

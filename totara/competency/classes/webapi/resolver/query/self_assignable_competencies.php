@@ -24,6 +24,7 @@
 namespace totara_competency\webapi\resolver\query;
 
 use context_system;
+use core\orm\cursor;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use totara_assignment\entities\user;
@@ -46,10 +47,12 @@ class self_assignable_competencies implements query_resolver {
 
         $filters = $args['filters'] ?? [];
 
+        $cursor = !is_null($args['cursor']) ? cursor::decode($args['cursor']) : null;
+
         return provider::for($args['user_id'])
             ->set_filters($filters)
             ->set_order($args['order_by'], $args['order_dir'])
-            ->fetch_paginated($args['cursor'], $args['limit']);
+            ->fetch_paginated($cursor);
     }
 
     protected static function authorize(array $args) {

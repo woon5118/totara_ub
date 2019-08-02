@@ -24,6 +24,7 @@
 namespace totara_competency\data_providers;
 
 use core\orm\collection;
+use core\orm\cursor;
 use core\orm\cursor_paginator;
 use tassign_competency\entities\competency as competency_entity;
 use tassign_competency\filter\competency_user_assignment_type;
@@ -68,8 +69,11 @@ class self_assignable_competencies extends user_data_provider {
         return parent::set_filters($filters);
     }
 
-    public function fetch_paginated(?string $cursor, ?int $limit): array {
-        // $GLOBALS['DB']->set_debug(1);
+    /**
+     * @param cursor|null $cursor if null is passed the default limit is applied
+     * @return array
+     */
+    public function fetch_paginated(?cursor $cursor = null): array {
         $repo = competency_entity::repository()
             ->set_filters($this->filters);
 
@@ -84,9 +88,7 @@ class self_assignable_competencies extends user_data_provider {
             ->set_filters($this->filters)
             ->order_by($this->order_by, $this->order_dir);
 
-        $paginator = new cursor_paginator($query, $cursor, $limit);
-
-        $GLOBALS['DB']->set_debug(0);
+        $paginator = new cursor_paginator($query, $cursor);
 
         $assignments = (new assignment_user($this->user->id))
             ->get_active_assignments_for_competencies($paginator->get_items()->pluck('id'));
