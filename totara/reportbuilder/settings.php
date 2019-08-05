@@ -147,7 +147,7 @@ if ($ADMIN->fulltree) {
             'totara_reportbuilder/graphlibclass',
             new lang_string('graphlibsetting', 'totara_reportbuilder'),
             new lang_string('graphlibsetting_desc', 'totara_reportbuilder'),
-            'totara_reportbuilder/local/graph/chartjs',
+            'totara_reportbuilder\local\graph\chartjs',
             $options
         )
     );
