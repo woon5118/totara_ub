@@ -43,7 +43,7 @@ class self_assignable_competencies extends user_data_provider {
      * @return $this
      */
     public function set_order(?string $order_by, ?string $order_dir) {
-        $this->order_by = strtolower($order_by ?? 'framework_hierarchy');
+        $this->order_by = strtolower($order_by ?? 'name');
         $this->order_dir  = strtolower($order_dir ?? 'asc');
 
         return $this;

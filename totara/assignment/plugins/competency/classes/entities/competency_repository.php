@@ -87,6 +87,10 @@ class competency_repository extends hierarchy_item_repository {
      */
     public function order_by(string $column, string $direction = 'asc') {
         switch ($column) {
+            case 'name':
+                return $this->order_by('fullname')
+                    ->order_by('id');
+                break;
             case 'framework_hierarchy':
                 return $this->order_by('frameworkid')
                     ->order_by('sortthread')
