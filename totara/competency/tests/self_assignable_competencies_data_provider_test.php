@@ -227,10 +227,14 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $this->assertEquals(0, $result['total_count']);
     }
 
-    public function test_competencies_are_loaded() {
-        $this->generate_competencies();
-
+    public function test_competencies_able_assign_by_self_are_loaded() {
         $user1 = $this->generator()->create_user();
+
+        ['comps' => $comps] = $this->generate_competencies($user1->id);
+
+        foreach ($comps as $comp) {
+            $this->activate_other_assignable($comp->id);
+        }
 
         $this->setUser($user1);
 
@@ -243,11 +247,55 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
             ->set_order($order_by, $order_dir)
             ->fetch_paginated(null, null);
         $this->assertIsArray($result);
-        $this->assertCount(11, $result['items']);
-        $this->assertEquals(11, $result['total_count']);
+        $this->assertCount(10, $result['items']);
+        $this->assertEquals(10, $result['total_count']);
         $this->assertEqualsCanonicalizing([
             'Accounting',
             'Baking skill-set',
+            // This one is not in the result as it's already self-assigned
+            // 'Chef proficiency',
+            'Coding',
+            'Cooking',
+            'Designing interiors',
+            'Hacking',
+            'Leading',
+            'Planning',
+            'Talking',
+            'Typing',
+        ], $this->get_fieldset_from_result('display_name', $result));
+    }
+
+    public function test_competencies_able_to_assign_by_others_are_loaded() {
+        $user1 = $this->generator()->create_user();
+        $user2 = $this->generator()->create_user();
+
+        // User is now managing another user and can assign competencies for them
+        $manager_job = job_assignment::create(['userid' => $user2->id, 'idnumber' => 1]);
+        job_assignment::create(['userid' => $user1->id, 'idnumber' => 2, 'managerjaid' => $manager_job->id]);
+
+        ['comps' => $comps] = $this->generate_competencies($user1->id);
+
+        foreach ($comps as $comp) {
+            $this->activate_other_assignable($comp->id);
+        }
+
+        $this->setUser($user2);
+
+        $filters = [];
+        $order_by = null;
+        $order_dir = null;
+
+        $result = data_provider::for($user1->id)
+            ->set_filters($filters)
+            ->set_order($order_by, $order_dir)
+            ->fetch_paginated(null, null);
+        $this->assertIsArray($result);
+        $this->assertCount(10, $result['items']);
+        $this->assertEquals(10, $result['total_count']);
+        $this->assertEqualsCanonicalizing([
+            'Accounting',
+            // This one is not in the result because it's already assigned via others
+            // 'Baking skill-set',
             'Chef proficiency',
             'Coding',
             'Cooking',
@@ -260,7 +308,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         ], $this->get_fieldset_from_result('display_name', $result));
     }
 
-    public function test_result_gets_ordered_by_framework_hierarchy_by_default() {
+    public function test_result_gets_ordered_by_name_by_default() {
         $this->generate_competencies();
 
         $user1 = $this->generator()->create_user();
@@ -278,7 +326,8 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $this->assertIsArray($result);
 
         $expected_ids = competency::repository()
-            ->order_by_raw('frameworkid ASC, sortthread ASC, id ASC')
+            ->order_by('fullname')
+            ->order_by('id')
             ->where('visible', true)
             ->get()
             ->pluck('id');
@@ -671,10 +720,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
             ->fetch_paginated(null, null);
-        $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing([
-            'Chef proficiency',
-        ], $this->get_fieldset_from_result('display_name', $result));
+        $this->assertEmpty($result['items']);
 
         // Has other assignment
         $filters = ['assignment_type' => [assignment::TYPE_OTHER]];
