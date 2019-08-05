@@ -27,7 +27,17 @@ defined('MOODLE_INTERNAL') || die();
  * Tests of our upstream hacks.
  */
 class totara_core_moodlelib_testcase extends advanced_testcase {
-
+    /**
+     * Test encoding of dangerous and incompatible characters in URLs.
+     */
+    public function test_clean_param_url() {
+        $this->assertSame('http://www.example.com/course/view.php?id=1', clean_param('http://www.example.com/course/view.php?id=1', PARAM_URL));
+        $this->assertSame('http://www.example.com/?whatever=%27%22%20%09%0A', clean_param("http://www.example.com/?whatever='\" \t\n", PARAM_URL));
+        $this->assertSame('http://www.example.com/?whatever%5B%5D=abc', clean_param('http://www.example.com/?whatever[]=abc', PARAM_URL));
+        $this->assertSame('http://www.example.com/?whatever%5B0%5D=abc&%5B1%5D=def', clean_param('http://www.example.com/?whatever[0]=abc&[1]=def', PARAM_URL));
+        $this->assertSame('/?whatever%5B%5D=abc', clean_param('/?whatever[]=abc', PARAM_URL));
+        $this->assertSame('', clean_param('whatever[]=abc', PARAM_URL));
+    }
     /**
      * Test fix for Safari lang detection.
      *

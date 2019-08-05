@@ -66,7 +66,7 @@ if ($data = $mform->get_data()) {
     $link->userid = $USER->id;
     $link->block_instance_id = $blockinstanceid;
     $link->title = $data->linktitle;
-    $link->url = $data->linkurl;
+    $link->url = clean_param($data->linkurl, PARAM_URL);
 
     $params = array('block_instance_id' => $blockinstanceid);
     $link->displaypos = $DB->count_records('block_quicklinks', $params) > 0 ? $DB->get_field('block_quicklinks', 'MAX(displaypos)+1', $params) : 0;

@@ -36,6 +36,7 @@ class totara_quicklinks_add_quicklink_form extends moodleform {
         $mform->addElement('text', 'linkurl', get_string('url', 'block_totara_quicklinks'));
         $mform->addRule('linkurl', null, 'required', null, 'client');
         // Use PARAM_RAW so we can do nice validation for the user.
+        // This is not a nice hack, we must clean the url again when processing the form data!
         $mform->setType('linkurl', PARAM_RAW);
 
         $this->add_action_buttons(false, get_string('addlink', 'block_totara_quicklinks'));
@@ -52,7 +53,7 @@ class totara_quicklinks_add_quicklink_form extends moodleform {
         $errors = parent::validation($data, $files);
 
         // Validate URL here for better UX.
-        if (clean_param($data['linkurl'], PARAM_URL) !== $data['linkurl']) {
+        if (clean_param($data['linkurl'], PARAM_URL) === '') {
             $errors['linkurl'] = get_string('invalidurl', 'block_totara_quicklinks');
         }
 

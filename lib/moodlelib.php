@@ -1044,6 +1044,11 @@ function clean_param($param, $type) {
 
         case PARAM_URL:          // Allow safe ftp, http, mailto urls.
             $param = fix_utf8($param);
+            // Totara: encode dangerous and incompatible characters.
+            $param = str_replace(
+                ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t"],
+                ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09'],
+                $param);
             include_once($CFG->dirroot . '/lib/validateurlsyntax.php');
             if (!empty($param) && validateUrlSyntax($param, 's?H?S?F?E?u-P-a?I?p?f?q?r?')) {
                 // All is ok, param is respected.
