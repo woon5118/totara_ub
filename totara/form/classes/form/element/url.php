@@ -91,6 +91,13 @@ class url extends text {
         if (!preg_match('/^[a-z]+:/i', $data[$name])) {
             $data[$name] = 'http://' . $data[$name];
         }
+
+        // Make sure the value will pass through PARAM_URL.
+        $data[$name] = str_replace(
+            ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t"],
+            ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09'],
+            $data[$name]);
+
         return $data;
     }
 }
