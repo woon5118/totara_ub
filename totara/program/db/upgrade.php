@@ -266,5 +266,16 @@ function xmldb_totara_program_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019062701, 'totara', 'program');
     }
 
+    if ($oldversion < 2019080600) {
+        // Remove orphaned courseset completion records
+        $deletecompletionsql = 'DELETE FROM {prog_completion}
+                        WHERE coursesetid NOT IN
+                        (SELECT id FROM {prog_courseset})';
+
+        $DB->execute($deletecompletionsql);
+
+        upgrade_plugin_savepoint(true, 2019080600, 'totara', 'program');
+    }
+
     return true;
 }
