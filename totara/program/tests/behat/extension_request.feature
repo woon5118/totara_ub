@@ -36,8 +36,8 @@ Feature: Request extensions in programs
     And I press "Save changes"
     And I click on "Assignments" "link" in the "#program-overview" "css_element"
     And I click on "Set due date" "link"
-    And I click on "Day(s)" "option" in the "#timeperiod" "css_element"
-    And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
+    And I set the field "timeperiod" to "Day(s)"
+    And I set the field "eventtype" to "Program enrollment date"
     And I set the following fields to these values:
       | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
@@ -152,7 +152,7 @@ Feature: Request extensions in programs
     And I click on "Team" in the totara menu
     And I click on "1" "link" in the "Sam Student" "table_row"
     Then I should see "14 January 2025, 2:55 PM"
-    When I click on "Grant" "option" in the ".approval" "css_element"
+    When I set the field with xpath "//select[contains(@class,'approval')]" to "Grant"
     And I press "Update Extensions"
     Then I should see "All extensions successfully updated"
     When I log out
@@ -176,7 +176,7 @@ Feature: Request extensions in programs
     And I click on "Team" in the totara menu
     And I click on "1" "link" in the "Sam Student" "table_row"
     Then I should see "14 January 2025, 2:55 PM"
-    When I click on "Deny" "option" in the ".approval" "css_element"
+    When I set the field with xpath "//select[contains(@class,'approval')]" to "Deny"
     And I press "Update Extensions"
     Then I should see "All extensions successfully updated"
     When I log out

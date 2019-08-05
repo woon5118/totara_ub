@@ -35,9 +35,9 @@ Feature: The Certification Completion report displays correctly for a learner.
     And I set the following fields to these values:
       | activenum | 6 |
       | windownum | 2 |
-    And I click on "Month(s)" "option" in the "#id_activeperiod" "css_element"
-    And I click on "Month(s)" "option" in the "#id_windowperiod" "css_element"
-    And I click on "Use certification completion date" "option" in the "#id_recertifydatetype" "css_element"
+    And I set the field "activeperiod" to "Month(s)"
+    And I set the field "windowperiod" to "Month(s)"
+    And I set the field "recertifydatetype" to "Use certification completion date"
     And I press "Save changes"
     And I click on "Save all changes" "button"
     And the following "program assignments" exist in "totara_program" plugin:
@@ -81,8 +81,8 @@ Feature: The Certification Completion report displays correctly for a learner.
     And I press "Edit certification details"
     And I switch to "Assignments" tab
     And I click on "Set due date" "link" in the "fn_001 ln_001" "table_row"
-    And I click on "Day(s)" "option" in the "#timeperiod" "css_element"
-    And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
+    And I set the field "timeperiod" to "Day(s)"
+    And I set the field "eventtype" to "Program enrollment date"
     And I set the following fields to these values:
       | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"

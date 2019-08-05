@@ -127,7 +127,7 @@ Feature: Users visibility of programs can be toggled
     And I click on "Visibility Program Tests" "link"
     And I click on "Edit program details" "button"
     And I click on "Details" "link"
-    And I click on "No users" "option" in the "#id_audiencevisible" "css_element"
+    And I set the field "audiencevisible" to "No users"
     And I press "Save changes"
     And I log out
 
@@ -163,7 +163,7 @@ Feature: Users visibility of programs can be toggled
     And I click on "Visibility Program Tests" "link"
     And I click on "Edit program details" "button"
     And I click on "Details" "link"
-    And I click on "Enrolled users only" "option" in the "#id_audiencevisible" "css_element"
+    And I set the field "audiencevisible" to "Enrolled users only"
     And I press "Save changes"
     And I log out
 
@@ -199,7 +199,7 @@ Feature: Users visibility of programs can be toggled
     And I click on "Visibility Program Tests" "link"
     And I click on "Edit program details" "button"
     And I click on "Details" "link"
-    And I click on "Enrolled users and members of the selected audiences" "option" in the "#id_audiencevisible" "css_element"
+    And I set the field "audiencevisible" to "Enrolled users and members of the selected audiences"
     And I click on "Add visible audiences" "button"
     And I click on "Audience1" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
     And I click on "OK" "button" in the "course-cohorts-visible-dialog" "totaradialogue"

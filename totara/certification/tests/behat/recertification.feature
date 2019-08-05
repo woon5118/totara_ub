@@ -40,9 +40,9 @@ Feature: User recertification and expiry of certification
     And I set the following fields to these values:
         | activenum | 6 |
         | windownum | 2 |
-    And I click on "Month(s)" "option" in the "#id_activeperiod" "css_element"
-    And I click on "Month(s)" "option" in the "#id_windowperiod" "css_element"
-    And I click on "Use certification completion date" "option" in the "#id_recertifydatetype" "css_element"
+    And I set the field "activeperiod" to "Month(s)"
+    And I set the field "windowperiod" to "Month(s)"
+    And I set the field "recertifydatetype" to "Use certification completion date"
     And I press "Save changes"
     And I click on "Save all changes" "button"
     # Get back the removed dashboard item for now.

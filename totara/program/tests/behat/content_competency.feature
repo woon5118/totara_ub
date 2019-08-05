@@ -31,7 +31,7 @@ Feature: Adding competencies to program content
     And I click on "Course 1" "link" in the "evidence" "totaradialogue"
     And I click on "Course 2" "link" in the "evidence" "totaradialogue"
     And I click on "Save" "button" in the "evidence" "totaradialogue"
-    And I click on "Mandatory" "option" in the "Course 1" "table_row"
+    And I set the field with xpath "//tr/td//text()[.='Course 1']/ancestor::tr//select[contains(@class,'linktype')]" to "Mandatory"
 
   @javascript
   Scenario: Test program completion with courseset "AND"
@@ -40,7 +40,7 @@ Feature: Adding competencies to program content
     And I click on "Program Content Tests" "link"
     And I click on "Edit program details" "button"
     And I switch to "Content" tab
-    And I click on "Competency" "option" in the "#contenttype_ce" "css_element"
+    And I set the field "Add a new" to "Competency"
     And I click on "addcontent_ce" "button" in the "#edit-program-content" "css_element"
     Then I should see "Competency101" in the "addcompetency" "totaradialogue"
     And I should not see "Competency102" in the "addcompetency" "totaradialogue"

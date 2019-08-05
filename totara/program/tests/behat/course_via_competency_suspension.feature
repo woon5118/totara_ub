@@ -54,7 +54,7 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I click on "Miscellaneous" "link" in the "evidence" "totaradialogue"
     And I click on "Course 1" "link" in the "evidence" "totaradialogue"
     And I click on "Save" "button" in the "evidence" "totaradialogue"
-    And I click on "Mandatory" "option" in the "Course 1" "table_row"
+    And I set the field with xpath "//tr/td//text()[.='Course 1']/ancestor::tr//select[contains(@class,'linktype')]" to "Mandatory"
 
     And the following "programs" exist in "totara_program" plugin:
       | fullname                | shortname |

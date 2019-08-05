@@ -104,8 +104,8 @@ Feature: Access programs content as a learner
     And I click on "Save all changes" "button"
     And I click on "Assignments" "link"
     And I click on "Set due date" "link" in the "fn_001 ln_001" "table_row"
-    And I click on "Day(s)" "option" in the "#timeperiod" "css_element"
-    And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
+    And I set the field "timeperiod" to "Day(s)"
+    And I set the field "eventtype" to "Program enrollment date"
     And I set the following fields to these values:
       | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
@@ -186,8 +186,8 @@ Feature: Access programs content as a learner
     And I click on "Save all changes" "button"
     And I click on "Assignments" "link"
     And I click on "Set due date" "link" in the "fn_001 ln_001" "table_row"
-    And I click on "Day(s)" "option" in the "#timeperiod" "css_element"
-    And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
+    And I set the field "timeperiod" to "Day(s)"
+    And I set the field "eventtype" to "Program enrollment date"
     And I set the following fields to these values:
       | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"

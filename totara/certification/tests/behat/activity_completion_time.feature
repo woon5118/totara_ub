@@ -71,7 +71,7 @@ Feature: Certification completion date is based on course completion time
     And I press "OK"
     And I press "Save changes"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I click on "Learner One, learner1@example.com" "option"
     And I press exact "add"
     And I wait "1" seconds
@@ -99,7 +99,7 @@ Feature: Certification completion date is based on course completion time
 
     And I click on "Attendees" "link"
     And I click on "Take attendance" "link"
-    And I click on "Fully attended" "option" in the "Learner One" "table_row"
+    And I set the field "Learner One's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     When I press "View all events"
