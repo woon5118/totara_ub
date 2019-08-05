@@ -75,7 +75,7 @@ class self_assignable_competencies extends user_data_provider {
         if ($this->is_logged_in_user()) {
             $repo->filter_by_self_assignable($this->user->id);
         } else {
-            $repo->filter_by_other_assignable();
+            $repo->filter_by_other_assignable($this->user->id);
         }
 
         /** @var collection $competencies */
