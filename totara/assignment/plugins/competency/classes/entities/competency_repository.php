@@ -52,13 +52,22 @@ class competency_repository extends hierarchy_item_repository {
     /**
      * Filter by competencies which are only self assignable
      *
+     * @param int $user_id
      * @return $this
      */
-    public function filter_by_self_assignable() {
+    public function filter_by_self_assignable(int $user_id) {
         if (!$this->has_join('comp_assign_availability', 'availabilityself')) {
             $this->join(['comp_assign_availability', 'availabilityself'], 'id', 'comp_id');
             $this->where('availabilityself.availability', \totara_competency\entities\competency::ASSIGNMENT_CREATE_SELF);
         }
+
+        $exist_builder = builder::table(competency_assignment_user::TABLE)
+            ->join([assignment::TABLE, 'ass'], 'assignment_id', 'id')
+            ->where_field('competency_id', new field('id', $this->builder))
+            ->where('user_id', $user_id)
+            ->where('ass.type', assignment::TYPE_SELF);
+
+        $this->where_not_exists($exist_builder);
 
         return $this;
     }

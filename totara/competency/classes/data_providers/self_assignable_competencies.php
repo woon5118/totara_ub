@@ -68,11 +68,12 @@ class self_assignable_competencies extends user_data_provider {
     }
 
     public function fetch_paginated(?string $cursor, ?int $limit): array {
+        // $GLOBALS['DB']->set_debug(1);
         $repo = competency_entity::repository()
             ->set_filters($this->filters);
 
         if ($this->is_logged_in_user()) {
-            $repo->filter_by_self_assignable();
+            $repo->filter_by_self_assignable($this->user->id);
         } else {
             $repo->filter_by_other_assignable();
         }
@@ -82,6 +83,8 @@ class self_assignable_competencies extends user_data_provider {
             ->set_filters($this->filters)
             ->order_by($this->order_by, $this->order_dir)
             ->get();
+
+        $GLOBALS['DB']->set_debug(0);
 
         $assignments = (new assignment_user($this->user->id))
             ->get_active_assignments_for_competencies($competencies->pluck('id'));
