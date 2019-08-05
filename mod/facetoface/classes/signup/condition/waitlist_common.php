@@ -45,19 +45,20 @@ class waitlist_common extends condition {
 
         $nosession = new event_has_no_session($this->signup);
         $notcancelledcond = new event_is_not_cancelled($this->signup);
-        $notcancelled = $notcancelledcond->pass();
-        if ($nosession->pass() && $notcancelled) {
+        $registrationopen = new event_registration_is_available($this->signup);
+        $available = $notcancelledcond->pass() && $registrationopen->pass();
+        if ($nosession->pass() && $available) {
             return true;
         }
 
         $waitlistall = new waitlist_everyone_enabled($this->signup);
-        if ($waitlistall->pass() && $notcancelled) {
+        if ($waitlistall->pass() && $available) {
             return true;
         }
 
         $waitlist = new waitlist_enabled($this->signup);
         $nocapacity = new event_has_no_capacity($this->signup);
-        if ($waitlist->pass() && $nocapacity->pass() && $notcancelled) {
+        if ($waitlist->pass() && $nocapacity->pass() && $available) {
             return true;
         }
         return false;
@@ -81,6 +82,11 @@ class waitlist_common extends condition {
         $notcancelled = new event_is_not_cancelled($this->signup);
         if (!$notcancelled->pass()) {
             $reason = array_merge($reason, $notcancelled->get_failure());
+        }
+
+        $registrationopen = new event_registration_is_available($this->signup);
+        if (!$registrationopen->pass() && $notcancelled->pass()) {
+            $reason = array_merge($reason, $registrationopen->get_failure());
         }
 
         $nosession = new event_has_no_session($this->signup);

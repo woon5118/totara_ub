@@ -73,11 +73,6 @@ class booking_common extends condition {
             $reason = array_merge($reason, $waitlist->get_failure());
         }
 
-        $sessions = new event_has_session($this->signup);
-        if (!$sessions->pass()) {
-            $reason = array_merge($reason, $sessions->get_failure());
-        }
-
         $capacity = new event_has_capacity($this->signup);
         if (!$capacity->pass()) {
             $reason = array_merge($reason, $capacity->get_failure());
@@ -96,6 +91,12 @@ class booking_common extends condition {
         $nocancel = new event_is_not_cancelled($this->signup);
         if (!$nocancel->pass()) {
             $reason = array_merge($reason, $nocancel->get_failure());
+        }
+
+        // Move event_has_session at bottom because "Event does not have session" is not very clear.
+        $sessions = new event_has_session($this->signup);
+        if (!$sessions->pass()) {
+            $reason = array_merge($reason, $sessions->get_failure());
         }
 
         return $reason;
