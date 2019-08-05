@@ -19,7 +19,7 @@ Feature: Test the add tile button in the Featured Links block
     When I click on "Customise this page" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description |
     And I click on "Save changes" "button"
     Then I should see "default description"
@@ -31,17 +31,17 @@ Feature: Test the add tile button in the Featured Links block
   Scenario: Add multiple tile and check that the order is maintained when deleting
     When I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description1 |
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description2 |
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description3 |
     And I click on "Save changes" "button"
     And I click on "div.block-totara-featured-links-edit div.moodle-actionmenu" "css_element"

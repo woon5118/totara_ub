@@ -19,14 +19,14 @@ Feature: The content of the featured links blocks should be carried over when ba
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link" in the "Featured Links" "block"
     And I set the following fields to these values:
-      | URL         | www.example.com                |
+      | URL         | https://www.example.com        |
       | Description | The featured links tile exists |
     And I click on "Save changes" "button"
 
     And I add the "Featured Links" block
     And I click on "Add Tile" "link" in the "Featured Links" "block"
     And I set the following fields to these values:
-      | URL         | www.example.com |
+      | URL         | https://www.example.com |
       | Description | Second FLB |
     And I click on "Save changes" "button"
 

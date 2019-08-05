@@ -22,7 +22,7 @@ Feature: Tests the behaviour of the gallery tile
 
     When I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description |
     And I click on "Save changes" "button"
 
@@ -44,12 +44,12 @@ Feature: Tests the behaviour of the gallery tile
     And I click on "Save and Edit content" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description |
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description2 |
     And I click on "Save changes" "button"
 
@@ -62,7 +62,7 @@ Feature: Tests the behaviour of the gallery tile
     And I click on "Save and Edit content" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description |
     And I click on "Save changes" "button"
     And I follow "Finished editing"
@@ -82,7 +82,7 @@ Feature: Tests the behaviour of the gallery tile
     And I click on "Save and Edit content" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description|
     And I click on "Save changes" "button"
     And I follow "Finished editing"
@@ -105,12 +105,12 @@ Feature: Tests the behaviour of the gallery tile
     And I click on "Save and Edit content" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | Tile one |
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | Tile two |
     And I click on "Save changes" "button"
     And I follow "Finished editing"
@@ -132,17 +132,17 @@ Feature: Tests the behaviour of the gallery tile
     And I click on "Save and Edit content" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | Tile one |
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | Tile two |
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | Tile three |
     And I click on "Save changes" "button"
     And I follow "Finished editing"
@@ -170,12 +170,12 @@ Feature: Tests the behaviour of the gallery tile
     And I click on "Save and Edit content" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | Tile one |
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | Tile two |
     And I click on "Save changes" "button"
     And I follow "Finished editing"
@@ -194,12 +194,12 @@ Feature: Tests the behaviour of the gallery tile
     And I click on "Save and Edit content" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | Tile one |
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | Tile two |
     And I click on "Save changes" "button"
     And I follow "Finished editing"
@@ -220,7 +220,7 @@ Feature: Tests the behaviour of the gallery tile
 
     When I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description |
     And I click on "Save changes" "button"
 
@@ -244,12 +244,12 @@ Feature: Tests the behaviour of the gallery tile
     And I click on "Save and Edit content" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description |
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL   | www.example.com |
+      | URL   | https://www.example.com |
       | Title | title           |
       | Description | default description2 |
     And I click on "Save changes" "button"
@@ -264,7 +264,7 @@ Feature: Tests the behaviour of the gallery tile
     And I click on "Save and Edit content" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description |
     And I click on "Save changes" "button"
     And I follow "Finished editing"
@@ -309,7 +309,7 @@ Feature: Tests the behaviour of the gallery tile
 
     When I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL         | www.example.com     |
+      | URL         | https://www.example.com     |
       | Description | default description |
     And I click on "Save changes" "button"
     Then I should see "Finished editing"

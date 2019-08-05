@@ -27,7 +27,7 @@ Feature: Check that the visibility options for the tiles work correctly
     And I follow "Turn editing on"
     And I add the "Featured Links" block
     And I click on "Add Tile" "link"
-    And I set the field "url" to "www.example.com"
+    And I set the field "url" to "https://www.example.com"
     And I set the field "textbody" to "default description"
     And I click on "Save changes" "button"
 
@@ -278,7 +278,7 @@ Feature: Check that the visibility options for the tiles work correctly
     And I add the "Featured Links" block
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | textbody | default description |
     And I click on "Save changes" "button"
     Then "Visibility" "link" should not exist

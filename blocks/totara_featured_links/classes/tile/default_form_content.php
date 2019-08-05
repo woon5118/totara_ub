@@ -34,6 +34,7 @@ use totara_form\form\element\filemanager;
 use totara_form\form\element\radios;
 use totara_form\form\element\text;
 use totara_form\form\element\textarea;
+use totara_form\form\element\url;
 use totara_form\form\group\section;
 use totara_form\form\validator\element_filemanager;
 use totara_form\group;
@@ -52,7 +53,7 @@ class default_form_content extends base_form_content{
      * @return void
      */
     public function specific_definition(group $group) {
-        $url = $group->add(new text('url', get_string('url_title', 'block_totara_featured_links'), PARAM_URL));
+        $url = $group->add(new url('url', get_string('url_title', 'block_totara_featured_links')));
         $url->add_help_button('url_title', 'block_totara_featured_links');
         $url->set_attribute('required', true);
 

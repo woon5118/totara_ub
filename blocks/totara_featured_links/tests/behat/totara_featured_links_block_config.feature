@@ -11,7 +11,7 @@ Feature: Test edit the block config for the featured links block
     And I click on "Add Tile" "link"
     And I wait "1" seconds
     And I set the following fields to these values:
-      | URL | www.example.com |
+      | URL | https://www.example.com |
       | Description | default description |
     And I click on "Save changes" "button"
 
