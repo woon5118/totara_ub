@@ -30,6 +30,9 @@ default:
               prefs:
                 credentials_enable_service: false
               w3c: false
+              useAutomationExtension: false
+              excludeSwitches:
+                - enable-automation
     Moodle\BehatExtension:
       moodledirroot: /Should/Change/To/Totara/dirroot
       steps_definitions: {  }
@@ -48,3 +51,6 @@ headless:
               prefs:
                 credentials_enable_service: false
               w3c: false
+              useAutomationExtension: false
+              excludeSwitches:
+                - enable-automation
