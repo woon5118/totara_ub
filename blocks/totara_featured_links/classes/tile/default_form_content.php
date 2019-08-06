@@ -54,8 +54,8 @@ class default_form_content extends base_form_content{
      */
     public function specific_definition(group $group) {
         $url = $group->add(new url('url', get_string('url_title', 'block_totara_featured_links')));
-        $url->add_help_button('url_title', 'block_totara_featured_links');
-        $url->set_attribute('required', true);
+        // Help button is not necessary, this is a regular URL element now.
+        $url->set_attributes(['required' => true, 'size' => 60]);
 
         $group->add(new checkbox('target', get_string('link_target_label', 'block_totara_featured_links'), '_blank', '_self'));
 

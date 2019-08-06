@@ -40,7 +40,7 @@ final class add extends \totara_form\form {
         $linktitle->set_attributes(array('required'=> 1));
         $this->model->add($linktitle);
         $linkurl = new \totara_form\form\element\url('linkurl', get_string('url', 'block_totara_quicklinks'));
-        $linkurl->set_attributes(array('required'=> 1, 'size' => 80));
+        $linkurl->set_attributes(['required' => true, 'size' => 60]);
         $this->model->add($linkurl);
 
         $this->model->add_action_buttons(false, get_string('addlink', 'block_totara_quicklinks'));
