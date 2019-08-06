@@ -353,8 +353,7 @@ class core_completion_progressinfo_testcase extends externallib_advanced_testcas
 
         $cache = cache::make('totara_core', 'completion_progressinfo');
         $cachekey = "{$course->id}_{$learner->id}";
-        $cachedata = $cache->get($cachekey);
-        self::assertFalse($cachedata);
+        $cache->delete($cachekey);
 
         $completion = new completion_completion(['userid' => $learner->id, 'course' => $course->id]);
         self::assertFalse($completion->is_complete());
@@ -753,8 +752,7 @@ class core_completion_progressinfo_testcase extends externallib_advanced_testcas
 
         $cache = cache::make('totara_core', 'completion_progressinfo');
         $cachekey = "{$course->id}_{$learner->id}";
-        $cachedata = $cache->get($cachekey);
-        self::assertFalse($cachedata);
+        $cache->delete($cachekey);
 
         $completion = new completion_completion(['userid' => $learner->id, 'course' => $course->id]);
         self::assertFalse($completion->is_complete());
