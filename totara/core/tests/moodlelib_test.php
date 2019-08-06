@@ -41,6 +41,7 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame('http://www.example.com/course/view.php?id=1', clean_param('http://www.example.com/course/view.php?id=1', PARAM_URL));
         $this->assertSame('https://www.example.com/course/view.php?id=1', clean_param('https://www.example.com/course/view.php?id=1', PARAM_URL));
         $this->assertSame('ftp://www.example.com/index.html', clean_param('ftp://www.example.com/index.html', PARAM_URL));
+        $this->assertSame('', clean_param('gpher://www.example.com/index.html', PARAM_URL));
 
         // Protocol case is not important.
         $this->assertSame('HttP://www.example.com/course/view.php?id=1', clean_param('HttP://www.example.com/course/view.php?id=1', PARAM_URL));
@@ -71,6 +72,57 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame('', clean_param('whatever[]=abc', PARAM_URL));
         $this->assertSame('', clean_param('[]', PARAM_URL));
         $this->assertSame('', clean_param('{}', PARAM_URL));
+    }
+
+    public function test_clean_param_url_preexisting() {
+        global $CFG;
+        include_once($CFG->dirroot . '/lib/validateurlsyntax.php');
+
+        $oldclean = function ($url) {
+            if (validateUrlSyntax($url, 's?H?S?F?E?u-P-a?I?p?f?q?r?')) {
+                return $url;
+            }
+            return '';
+        };
+
+        $url = "http://www.example.com/?whatever='\" \t\n&bbb={1,2}&amp;c=<br>";
+        $this->assertSame('', $oldclean($url)); // Fixed in new cleaning
+
+        // Only these 3 protocols are supported.
+        $this->assertSame('http://www.example.com/course/view.php?id=1', $oldclean('http://www.example.com/course/view.php?id=1'));
+        $this->assertSame('https://www.example.com/course/view.php?id=1', $oldclean('https://www.example.com/course/view.php?id=1'));
+        $this->assertSame('ftp://www.example.com/index.html', $oldclean('ftp://www.example.com/index.html'));
+        $this->assertSame('', $oldclean('gpher://www.example.com/index.html'));
+
+        // Protocol case is not important.
+        $this->assertSame('HttP://www.example.com/course/view.php?id=1', $oldclean('HttP://www.example.com/course/view.php?id=1'));
+
+        // Ports are allowed.
+        $this->assertSame('http://www.example.com:8080/course/view.php?id=1', $oldclean('http://www.example.com:8080/course/view.php?id=1'));
+        $this->assertSame('https://www.example.com:443/course/view.php?id=1', $oldclean('https://www.example.com:443/course/view.php?id=1'));
+
+        // Various arguments should be ok, some of them may be URL encoded
+        $this->assertSame('http://www.example.com/course/view.php?id=13#test', $oldclean('http://www.example.com/course/view.php?id=13#test'));
+        $this->assertSame('', $oldclean('http://www.example.com/?whatever[]=abc')); // Fixed in new cleaning
+        $this->assertSame('', $oldclean('http://www.example.com/?whatever[0]=abc&[1]=def')); // Fixed in new cleaning
+        $this->assertSame('', $oldclean('/?whatever[]=abc')); // Fixed in new cleaning
+
+        // mailto: never worked and never will
+        $this->assertSame('', $oldclean('mailto:someone@example.com'));
+
+        // Non-ascii characters never worked.
+        $this->assertSame('', $oldclean('http://www.example.com/course/view.php?id=škoďák'));
+        $this->assertSame('', $oldclean('http://www.example.com/course/škoďák.php'));
+        $this->assertSame('', $oldclean('http://www.example.com/course/view.php#škoďák'));
+
+        // Broken URLs.
+        $this->assertSame('', $oldclean('://www.example.com/course/view.php?id=1'));
+        $this->assertSame('', $oldclean(' http://www.example.com/course/view.php?id=1'));
+        $this->assertSame('http://', $oldclean('http://')); // Fixed in new cleaning
+        $this->assertSame('', $oldclean(' '));
+        $this->assertSame('', $oldclean('whatever[]=abc'));
+        $this->assertSame('', $oldclean('[]'));
+        $this->assertSame('', $oldclean('{}'));
     }
 
     /**

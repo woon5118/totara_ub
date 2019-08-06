@@ -1049,10 +1049,10 @@ function clean_param($param, $type) {
                 ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t",  '{',   '}',   '<',   '>'],
                 ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09', '%7B', '%7D', '%3C', '%3E'],
                 $param);
-            if (preg_match('/^.*:/i', $param)) {
+            if (preg_match('/^.*:/', $param)) {
                 // Totara: the validateUrlSyntax() does not support extended characters,
                 //         that means we can use native PHP url validation without risk of regressions
-                //         to improve security.
+                //         to improve security, but only for full URLs.
                 $param = filter_var($param, FILTER_VALIDATE_URL);
                 if ($param === false) {
                     return '';
