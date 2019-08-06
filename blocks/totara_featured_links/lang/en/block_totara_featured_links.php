@@ -172,7 +172,6 @@ $string['totara_featured_links:edit'] = 'Edit the tiles in the block';
 $string['totara_featured_links:myaddinstance'] = 'Add a new Featured Links block to the page';
 $string['transition'] = 'Transition';
 $string['url_title'] = 'URL';
-$string['url_title_help'] = 'URLs can be full names (http://www.sitename.com), partial names, (sitename.com) or local (for addresses on this Totara site). Local URLs should start with a slash ( / ) as this ensures the link will continue to work if the site\'s URL changes. When used, a local URL will have the site\'s web address added.';
 $string['userdataitemtotara_featured_links_tiles'] = 'Featured links';
 $string['visibility_custom'] = 'Apply rules';
 $string['visibility_edit'] = 'Edit Visibility';
@@ -183,5 +182,7 @@ $string['visibility_menu_title'] = 'Visibility';
 $string['visibility_menu_title_sr-only'] = 'Edit visibility for the {$a} tile';
 $string['visibility_show'] = 'Visible to all';
 
-
-
+/**
+ * @deprecated since Totara 13.0.
+ */
+$string['url_title_help'] = 'URLs can be full names (http://www.sitename.com), partial names, (sitename.com) or local (for addresses on this Totara site). Local URLs should start with a slash ( / ) as this ensures the link will continue to work if the site\'s URL changes. When used, a local URL will have the site\'s web address added.';
