@@ -4,7 +4,7 @@
       for="totara_competency-profile-assignment-filters-unique-id"
       class="totara_competency-profile-assignment-filters_label"
       v-text="$str('viewing', 'totara_competency')"
-    ></label>
+    />
     <select
       id="totara_competency-profile-assignment-filters-unique-id"
       :disabled="disable"
@@ -15,8 +15,7 @@
         :key="key"
         :value="key"
         v-text="option.name"
-      >
-      </option>
+      />
     </select>
   </div>
 </template>

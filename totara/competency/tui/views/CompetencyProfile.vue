@@ -1,12 +1,12 @@
 <template>
   <div>
     <transition name="tui-CompetencyProfile__transition-fade">
-      <div v-if="isLoading" class="tui-CompetencyProfile__overlay">
+      <div v-if="$apollo.loading" class="tui-CompetencyProfile__overlay">
         <div>
           <h1
             class="title is-1"
             v-text="$str('loading', 'totara_competency')"
-          ></h1>
+          />
         </div>
       </div>
     </transition>
@@ -14,19 +14,19 @@
       <div class="alert alert-info alert-with-icon">
         <!-- TODO bootstrap alert -->
         <div class="alert-icon">
-          <FlexIcon id="notification-info"></FlexIcon>
+          <FlexIcon icon="notification-info" />
         </div>
         <div
           class="alert-message"
           v-text="$str('no_competencies_assigned', 'totara_competency')"
-        ></div>
+        />
       </div>
       <div class="tui-CompetencyProfile__no-assignments-search-competencies">
         <a
           :href="selfAssignmentUrl"
           class="btn totara_style-btn"
           v-text="$str('assign_competencies', 'totara_competency')"
-        ></a>
+        />
       </div>
     </div>
     <div v-else>
@@ -34,7 +34,7 @@
       <div class="tui-CompetencyProfile__header">
         <ul>
           <li v-for="(item, key) in progress" :key="key">
-            <AssignmentProgress :progress="item"></AssignmentProgress>
+            <AssignmentProgress :progress="item" />
           </li>
         </ul>
         <div class="tui-CompetencyProfile__header-user-details">
@@ -43,7 +43,7 @@
             :href="selfAssignmentUrl"
             class="btn totara_style-btn"
             v-text="$str('assign_competencies', 'totara_competency')"
-          ></a>
+          />
           <div
             v-if="data.latest_achievement"
             class="tui-CompetencyProfile__latest-achievement"
@@ -51,15 +51,15 @@
             <div>
               <div>
                 <FlexIcon
-                  id="star"
+                  icon="star"
                   :alt="$str('latest_achievement', 'totara_competency')"
                 />
               </div>
               <strong
                 v-text="$str('latest_achievement', 'totara_competency')"
-              ></strong>
+              />
             </div>
-            <span v-text="data.latest_achievement"></span>
+            <span v-text="data.latest_achievement" />
           </div>
         </div>
       </div>
@@ -68,22 +68,21 @@
         <div class="tui-CompetencyProfile__filters-bar">
           <div class="tui-CompetencyProfile__tabs">
             <div :class="chartsTabClass" @click="selectTab('charts')">
-              <FlexIcon id="bar-chart" size="500" />
+              <FlexIcon icon="bar-chart" size="500" />
             </div>
             <div :class="tableTabClass" @click="selectTab('table')">
-              <FlexIcon id="bars" size="500" />
+              <FlexIcon icon="bars" size="500" />
             </div>
           </div>
           <ProgressAssignmentFilters
             v-model="selectedFilters"
             :filters="filters"
-            @changed="loadProgressData()"
-          ></ProgressAssignmentFilters>
+          />
         </div>
         <transition name="tui-CompetencyProfile__transition-fade">
           <div v-if="activeTab === 'charts'">
             <!-- Available charts -->
-            <CompetencyCharts :data="data"></CompetencyCharts>
+            <CompetencyCharts :data="data" />
           </div>
         </transition>
         <transition name="tui-CompetencyProfile__transition-fade">
@@ -94,7 +93,7 @@
               :user-id="userId"
               :is-mine="isMine"
               :base-url="baseUrl"
-            ></CompetencyList>
+            />
           </div>
         </transition>
       </div>
@@ -104,10 +103,12 @@
 
 <script>
 import AssignmentProgress from '../container/AssignmentProgress';
-import FlexIcon from 'totara_core/presentation/icons/FlexIcon';
+import FlexIcon from 'totara_core/containers/icons/FlexIcon';
 import ProgressAssignmentFilters from '../presentation/ProgressAssignmentFilters';
 import CompetencyList from '../presentation/Profile/CompetencyList';
 import CompetencyCharts from '../presentation/Profile/CompetencyCharts';
+
+import ProgressQuery from '../../webapi/ajax/progress_for_user.graphql';
 
 const ACTIVE_ASSIGNMENT = 1;
 const ARCHIVED_ASSIGNMENT = 2;
@@ -118,33 +119,33 @@ export default {
     CompetencyList,
     ProgressAssignmentFilters,
     FlexIcon,
-    AssignmentProgress
+    AssignmentProgress,
   },
   props: {
     profilePicture: {
       required: true,
-      type: String
+      type: String,
     },
     selfAssignmentUrl: {
       required: true,
-      type: String
+      type: String,
     },
     userId: {
       required: true,
-      type: Number
+      type: Number,
     },
     userName: {
       required: true,
-      type: String
+      type: String,
     },
     baseUrl: {
       required: true,
-      type: String
+      type: String,
     },
     isMine: {
       required: true,
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
 
   data: function() {
@@ -155,10 +156,9 @@ export default {
         status: ACTIVE_ASSIGNMENT,
         type: null,
         user_group_id: null,
-        user_group_type: null
+        user_group_type: null,
       },
-      isLoading: true,
-      progress: []
+      progress: [],
     };
   },
 
@@ -166,28 +166,51 @@ export default {
     chartsTabClass() {
       return {
         'tui-CompetencyProfile__tab-toggle-link': true,
-        active: this.activeTab === 'charts'
+        active: this.activeTab === 'charts',
       };
     },
 
     tableTabClass() {
       return {
         'tui-CompetencyProfile__tab-toggle-link': true,
-        active: this.activeTab === 'table'
+        active: this.activeTab === 'table',
       };
     },
 
     filters() {
+      if (!this.data) {
+        return [];
+      }
+
       return this.data.filters ? this.data.filters : [];
     },
 
     noAssignments() {
       return !this.isLoading && !this.filters.length;
-    }
+    },
   },
 
-  mounted() {
-    this.loadProgressData(true);
+  apollo: {
+    data: {
+      query: ProgressQuery,
+      variables() {
+        return {
+          user_id: this.userId,
+          filters: this.selectedFilters,
+        };
+      },
+      update(data) {
+        return data.totara_competency_profile_progress;
+      },
+
+      result({ data: { totara_competency_profile_progress: data } }) {
+        if (!this.progress.length) {
+          this.setProgress(Object.assign({}, data));
+        }
+
+        this.progressDataLoaded(this.data, this.selectedFilters);
+      },
+    },
   },
 
   methods: {
@@ -197,33 +220,6 @@ export default {
       }
 
       this.activeTab = tab;
-    },
-
-    loadProgressData(initial = false) {
-      this.isLoading = true;
-
-      let args = {
-        user_id: this.userId,
-        filters: this.selectedFilters
-      };
-
-      this.$webapi
-        .query('totara_competency_progress_for_user', args)
-        .then(({ totara_competency_profile_progress: progress }) => {
-          this.data = progress;
-
-          if (initial) {
-            this.setProgress(progress);
-          }
-
-          this.progressDataLoaded(progress, args.filters);
-
-          this.isLoading = false;
-        })
-        .catch(error => {
-          this.isLoading = false;
-          console.error(error);
-        });
     },
 
     progressDataLoaded(data, filters) {
@@ -238,11 +234,11 @@ export default {
       data.items.forEach(({ name, overall_progress }) => {
         this.progress.push({
           name: name,
-          overall_progress: overall_progress
+          overall_progress: overall_progress,
         });
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -1,26 +1,33 @@
 query totara_competency_progress_for_user($user_id: core_id, $filters: totara_competency_profile_assignment_filters) {
     totara_competency_profile_progress(user_id: $user_id, filters: $filters) {
+        __typename
         user {
+            __typename
             fullname
         }
         items {
+            __typename
             overall_progress
             name
             items {
+                __typename
                 proficient
                 min_value {
+                    __typename
                     id
                     name
                     percentage
                     proficient
                 }
                 my_value {
+                    __typename
                     id
                     name
                     percentage
                     proficient
                 }
                 competency {
+                    __typename
                     id
                     fullname
                 }
@@ -28,6 +35,7 @@ query totara_competency_progress_for_user($user_id: core_id, $filters: totara_co
         }
         latest_achievement
         filters {
+            __typename
             name
             status_name
             status

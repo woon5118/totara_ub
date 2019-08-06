@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="totara_competency-accordion__items">
-      <slot></slot>
+      <slot />
     </div>
   </div>
 </template>

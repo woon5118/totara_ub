@@ -13,7 +13,7 @@
           :column="column"
         >
           <div>
-            <strong v-text="getColumnTitle(column)"></strong>
+            <strong v-text="getColumnTitle(column)" />
           </div>
         </slot>
       </div>
@@ -38,7 +38,7 @@
             :column="column"
             :row="row"
           >
-            <div v-text="getColumnValue(column, row)"></div>
+            <div v-text="getColumnValue(column, row)" />
           </slot>
         </div>
       </div>
@@ -51,30 +51,30 @@ export default {
   props: {
     data: {
       type: Array,
-      required: true
+      required: true,
     },
 
     columns: {
       type: Array,
-      required: true
+      required: true,
     },
 
     rowKey: {
       type: [String, Function],
       required: false,
-      default: null
+      default: null,
     },
 
     bgColor: {
       type: String,
       required: false,
-      default: ''
-    }
+      default: '',
+    },
   },
 
   data: function() {
     return {
-      items: []
+      items: [],
     };
   },
 
@@ -90,7 +90,7 @@ export default {
       }
 
       return [];
-    }
+    },
   },
 
   methods: {
@@ -153,7 +153,7 @@ export default {
     getColumnSize: function(column) {
       if (typeof column.size === 'string') {
         return {
-          ['totara_competency-list__cell-size-' + column.size]: true
+          ['totara_competency-list__cell-size-' + column.size]: true,
         };
       }
     },
@@ -180,7 +180,7 @@ export default {
     getColumnClasses: function(column) {
       let classes = {
         'totara_competency-list__cell-grow':
-          typeof column.grow === 'boolean' && column.grow === true
+          typeof column.grow === 'boolean' && column.grow === true,
       };
 
       return Object.assign(
@@ -188,8 +188,8 @@ export default {
         this.getColumnSize(column),
         this.getColumnAlignment(column)
       );
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">

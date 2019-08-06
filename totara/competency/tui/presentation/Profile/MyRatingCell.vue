@@ -16,10 +16,7 @@
             :key="scaleValue.id"
           >
             <td :data-has-icon="isMinProficientValue(scaleValue)">
-              <FlexIcon
-                v-if="isMinProficientValue(scaleValue)"
-                id="check"
-              ></FlexIcon>
+              <FlexIcon v-if="isMinProficientValue(scaleValue)" icon="check" />
             </td>
             <td>{{ scaleValue.name }}</td>
           </tr>
@@ -34,23 +31,23 @@
 
 <script>
 import Tooltip from '../../container/Tooltip';
-import FlexIcon from '../../../../core/tui/presentation/icons/FlexIcon';
+import FlexIcon from 'totara_core/containers/icons/FlexIcon';
 export default {
   components: { FlexIcon, Tooltip },
   props: {
     value: {
       required: true,
-      type: Object
+      type: Object,
     },
     scales: {
       required: true,
-      type: Array
-    }
+      type: Array,
+    },
   },
 
   data: function() {
     return {
-      showTooltip: false
+      showTooltip: false,
     };
   },
 
@@ -61,7 +58,7 @@ export default {
 
     minProficientValue() {
       return this.scale.values.find(({ proficient }) => proficient);
-    }
+    },
   },
 
   methods: {
@@ -73,8 +70,8 @@ export default {
       }
 
       return minProficientValue.id === value.id;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">

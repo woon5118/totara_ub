@@ -17,14 +17,14 @@
       class="tui-ScaleDetail__row"
     >
       <div class="tui-ScaleDetail__value-cell" :data-active="isMyValue(value)">
-        <span v-text="value.name"></span><br />
-        <small v-text="value.description"></small>
+        <span v-text="value.name" /><br />
+        <small v-text="value.description" />
         <span v-if="minProficientValue && minProficientValue.id === value.id">
-          <FlexIcon id="star"></FlexIcon> - Proficient
+          <FlexIcon icon="star" /> - Proficient
         </span>
       </div>
       <div v-if="isMyValue(value)" class="tui-ScaleDetail__my-value-cell">
-        <div>Your rating <FlexIcon id="nav-expand"></FlexIcon></div>
+        <div>Your rating <FlexIcon icon="nav-expand" /></div>
       </div>
     </div>
   </div>
@@ -37,42 +37,45 @@
           assignment.archived_at
         )
       "
-    ></h4>
+    />
     <div class="tui-ScaleDetail__proficient-box">
-      <div>Your rating <FlexIcon id="nav-expand"></FlexIcon></div>
+      <div>Your rating <FlexIcon icon="nav-expand" /></div>
       <div>
-        <span v-if="myValue" v-text="myValue.name"></span>
+        <span v-if="myValue" v-text="myValue.name" />
         <span
           v-else
           v-text="$str('proficiency_not_achieved', 'totara_competency')"
-        ></span>
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import FlexIcon from '../../../../core/tui/presentation/icons/FlexIcon';
+import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+
+import ScaleDetailsQuery from '../../../webapi/ajax/scale.graphql';
+
 export default {
   components: { FlexIcon },
   props: {
     myValue: {
       required: true,
-      validator: prop => typeof prop === 'object' || prop === null
+      validator: prop => typeof prop === 'object' || prop === null,
     },
     assignment: {
       required: true,
-      type: Object
+      type: Object,
     },
     competencyId: {
       required: true,
-      type: Number
-    }
+      type: Number,
+    },
   },
 
   data: function() {
     return {
-      scale: {}
+      scale: {},
     };
   },
 
@@ -86,25 +89,28 @@ export default {
     reversedValues() {
       if (!this.scale.values) return [];
       return this.scale.values.slice(0).reverse();
-    }
+    },
   },
 
-  mounted: function() {
-    // Fetch competency scale
-    this.$webapi
-      .query('totara_competency_scale', {
-        competency_id: this.competencyId
-      })
-      .then(({ totara_competency_scale: scale }) => {
-        this.scale = scale;
-      });
+  apollo: {
+    scale: {
+      query: ScaleDetailsQuery,
+      variables() {
+        return {
+          competency_id: this.competencyId,
+        };
+      },
+      update({ totara_competency_scale: scale }) {
+        return scale;
+      },
+    },
   },
 
   methods: {
     isMyValue(value) {
       return this.myValue && this.myValue.id === value.id;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">

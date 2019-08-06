@@ -9,7 +9,7 @@
         style="justify-content: left; display: flex; flex-direction: row;"
         class="totara_competency-profile__comp-list-left-filters"
       >
-        <FlexIcon id="preferences" size="500" alt="Filters"></FlexIcon>
+        <FlexIcon icon="preferences" size="500" alt="Filters" />
         <template v-if="filterNotArchived">
           <label
             for="competency-profile-proficient-filter"
@@ -30,7 +30,7 @@
             <option
               :value="false"
               v-text="$str('not_proficient', 'totara_competency')"
-            ></option>
+            />
           </select>
         </template>
         <label class="sr-only" for="competency-profile-proficient-text-search">
@@ -57,17 +57,17 @@
           <option
             value="alphabetical"
             v-text="$str('sort:alphabetical', 'totara_competency')"
-          ></option>
+          />
           <option
             v-if="filterNotArchived"
             value="recently-assigned"
             v-text="$str('sort:recently_assigned', 'totara_competency')"
-          ></option>
+          />
           <option
             v-if="!filterNotArchived"
             value="recently-archived"
             v-text="$str('sort:recently_archived', 'totara_competency')"
-          ></option>
+          />
         </select>
       </div>
     </div>
@@ -82,12 +82,12 @@
           <a
             :href="competencyDetailsLink(props.row)"
             v-text="props.row.competency.fullname"
-          ></a>
+          />
         </div>
       </template>
       <template v-slot:column-proficient="props">
         <template v-if="props.row.items[0].proficient">
-          <FlexIcon id="check" alt="//TODO add something here" />
+          <FlexIcon icon="check" alt="//TODO add something here" />
         </template>
       </template>
       <template v-slot:column-rating="props">
@@ -95,7 +95,7 @@
           v-if="props.row.items[0].my_value"
           :value="props.row.items[0].my_value"
           :scales="scales"
-        ></MyRatingCell>
+        />
       </template>
     </List>
     <List
@@ -109,20 +109,20 @@
           <a
             :href="competencyDetailsLink(props.row)"
             v-text="props.row.competency.fullname"
-          ></a>
+          />
         </div>
         <ul
           class="tui-CompetencyList__archived-assignments-list tui-CompetencyList__archived-assignments-list-padded"
         >
           <li v-for="(item, key) in props.row.items" :key="key">
-            <span v-text="item.assignment.progress_name"></span>
+            <span v-text="item.assignment.progress_name" />
           </li>
         </ul>
       </template>
       <template v-slot:column-archived-date="props">
         <ul class="tui-CompetencyList__archived-assignments-list">
           <li v-for="(item, key) in props.row.items" :key="key">
-            <span v-text="item.assignment.archived_at"></span>
+            <span v-text="item.assignment.archived_at" />
           </li>
         </ul>
       </template>
@@ -130,7 +130,7 @@
         <ul class="tui-CompetencyList__archived-assignments-list">
           <li v-for="(item, key) in props.row.items" :key="key">
             <template v-if="item.proficient">
-              <FlexIcon id="check" alt="//TODO add something here" />
+              <FlexIcon icon="check" alt="//TODO add something here" />
             </template>
           </li>
         </ul>
@@ -142,7 +142,7 @@
               v-if="item.my_value"
               :value="item.my_value"
               :scales="scales"
-            ></MyRatingCell>
+            />
           </li>
         </ul>
       </template>
@@ -152,8 +152,11 @@
 
 <script>
 import List from '../../container/List';
-import FlexIcon from 'totara_core/presentation/icons/FlexIcon';
+import FlexIcon from 'totara_core/containers/icons/FlexIcon';
 import MyRatingCell from './MyRatingCell';
+
+import CompetencyProgressQuery from '../../../webapi/ajax/competency_progress_for_user.graphql';
+import CompetencyScalesQuery from '../../../webapi/ajax/scales.graphql';
 
 let competencyColumns = [
   {
@@ -161,19 +164,19 @@ let competencyColumns = [
     value: 'competency.fullname',
     title: 'Competency',
     grow: true,
-    size: 'md'
+    size: 'md',
   },
   {
     key: 'proficient',
     title: 'Proficient',
     size: 'xs',
-    alignment: ['center']
+    alignment: ['center'],
   },
   {
     key: 'rating',
     title: 'Rating',
-    size: 'sm'
-  }
+    size: 'sm',
+  },
 ];
 
 let archivedCompetencyColumns = [
@@ -182,51 +185,51 @@ let archivedCompetencyColumns = [
     value: 'competency.fullname',
     title: 'Competency',
     grow: true,
-    size: 'md'
+    size: 'md',
   },
   {
     key: 'archived-date',
     title: 'Archived date',
-    size: 'sm'
+    size: 'sm',
   },
   {
     key: 'proficient',
     title: 'Proficient',
     size: 'xs',
-    alignment: 'center'
+    alignment: 'center',
   },
   {
     key: 'rating',
     title: 'Rating',
-    size: 'sm'
-  }
+    size: 'sm',
+  },
 ];
 
 export default {
   components: {
     MyRatingCell,
     FlexIcon,
-    List
+    List,
   },
 
   props: {
     filters: {
       required: false,
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     userId: {
       required: true,
-      type: Number
+      type: Number,
     },
     baseUrl: {
       required: true,
-      type: String
+      type: String,
     },
     isMine: {
       required: true,
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
 
   data() {
@@ -236,7 +239,7 @@ export default {
       order: 'alphabetical',
       proficientFilter: null,
       searchFilter: '',
-      scales: []
+      scales: [],
     };
   },
 
@@ -254,7 +257,7 @@ export default {
       // archived assignments
 
       const extraFilters = {
-        search: this.searchFilter
+        search: this.searchFilter,
       };
 
       if (this.filterNotArchived) {
@@ -266,76 +269,54 @@ export default {
 
     filterNotArchived() {
       return this.filters && this.filters.status !== 2;
-    }
+    },
   },
 
-  watch: {
-    selectedFilters() {
-      this.loadCompetencies();
+  apollo: {
+    competencies: {
+      query: CompetencyProgressQuery,
+      variables() {
+        if (this.filterNotArchived) {
+          if (this.order === 'recently-archived') {
+            this.order = 'alphabetical';
+          }
+        } else {
+          if (this.order === 'recently-assigned') {
+            this.order = 'alphabetical';
+          }
+        }
+
+        return {
+          user_id: this.userId,
+          order: this.order,
+          filters: this.selectedFilters,
+        };
+      },
+      update({ totara_competency_profile_competency_progress: data }) {
+        return data;
+      },
     },
 
-    order() {
-      this.loadCompetencies();
-    }
-  },
+    scales: {
+      query: CompetencyScalesQuery,
+      variables() {
+        return {
+          competency_id: this.competencies.map(
+            ({ competency }) => competency.id
+          ),
+        };
+      },
+      update({ totara_competency_scales: data }) {
+        return data;
+      },
 
-  mounted() {
-    this.loadCompetencies();
+      skip() {
+        return !this.competencies.length;
+      },
+    },
   },
 
   methods: {
-    loadCompetencies() {
-      if (this.filterNotArchived) {
-        if (this.order === 'recently-archived') {
-          this.order = 'alphabetical';
-        }
-      } else {
-        if (this.order === 'recently-assigned') {
-          this.order = 'alphabetical';
-        }
-      }
-
-      this.isLoading = true;
-
-      let args = {
-        user_id: this.userId,
-        order: this.order,
-        filters: this.selectedFilters
-      };
-
-      this.$webapi
-        .query('totara_competency_competency_progress_for_user', args)
-        .then(
-          ({ totara_competency_profile_competency_progress: competencies }) => {
-            this.competencies = competencies;
-            this.isLoading = false;
-            this.loadScales();
-          }
-        )
-        .catch(error => {
-          this.isLoading = false;
-          console.error(error);
-        });
-    },
-
-    loadScales() {
-      this.isLoading = true;
-      let ids = this.competencies.map(({ competency }) => competency.id);
-
-      this.$webapi
-        .query('totara_competency_scales', {
-          competency_id: ids
-        })
-        .then(({ totara_competency_scales: scales }) => {
-          this.scales = scales;
-          this.isLoading = false;
-        })
-        .catch(error => {
-          this.isLoading = false;
-          console.error(error);
-        });
-    },
-
     competencyDetailsLink(row) {
       let link = `${this.baseUrl}/details/?competency_id=${row.competency.id}`;
 
@@ -359,8 +340,8 @@ export default {
     shortenText(str, maxLen, separator = ' ') {
       if (str.length <= maxLen) return str;
       return str.substr(0, str.lastIndexOf(separator, maxLen));
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">

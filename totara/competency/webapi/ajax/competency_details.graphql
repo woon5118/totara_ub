@@ -1,17 +1,22 @@
 query totara_competency_competency_details($user_id: core_id, $competency_id: core_id) {
     totara_competency_profile_competency_details(user_id: $user_id, competency_id: $competency_id) {
+        __typename
         competency {
+            __typename
             id
             fullname
             description
         },
         items {
+            __typename
             proficient
             assignment {
+                __typename
                 archived_at (format: DATE)
                 progress_name
             }
             my_value {
+                __typename
                 id
                 name
                 percentage

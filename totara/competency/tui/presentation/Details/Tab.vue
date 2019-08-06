@@ -1,7 +1,7 @@
 <template>
   <div v-if="isActive" class="tui-ProfileTab" role="tabpanel">
     <!-- Content -->
-    <slot></slot>
+    <slot />
   </div>
 </template>
 
@@ -10,25 +10,25 @@ export default {
   props: {
     name: {
       type: String,
-      required: true
+      required: true,
     },
     subtitle: {
       type: String,
-      required: true
+      required: true,
     },
     itemKey: {
       type: [String, Number],
-      required: true
+      required: true,
     },
     active: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
 
   data: function() {
     return {
-      isActive: false
+      isActive: false,
     };
   },
 
@@ -37,7 +37,7 @@ export default {
   watch: {
     active(newValue) {
       this.isActive = newValue;
-    }
+    },
   },
 
   created: function() {
@@ -46,7 +46,7 @@ export default {
 
   mounted: function() {},
 
-  methods: {}
+  methods: {},
 };
 </script>
 <style lang="scss">

@@ -5,7 +5,7 @@
     :options="options"
     :canvas-attributes="canvasAttributes"
     class="tui-AssignmentProgress__progress-card"
-  ></ChartJs>
+  />
 </template>
 
 <script>
@@ -16,8 +16,8 @@ export default {
   props: {
     progress: {
       required: true,
-      type: Object
-    }
+      type: Object,
+    },
   },
 
   computed: {
@@ -30,45 +30,45 @@ export default {
                 text: this.progress.overall_progress + '%',
                 font: {
                   size: '40',
-                  weight: 'bold'
+                  weight: 'bold',
                 },
-                color: '#3f9852'
+                color: '#3f9852',
               },
               {
                 text: this.$str('proficient', 'totara_competency'),
                 font: {
-                  size: '24'
+                  size: '24',
                 },
-                color: '#3f9852'
+                color: '#3f9852',
               },
               {
                 text: '',
                 font: {
-                  size: '5'
-                }
-              }
-            ]
-          }
+                  size: '5',
+                },
+              },
+            ],
+          },
         },
         tooltips: {
-          enabled: false
+          enabled: false,
         },
         cutoutPercentage: 75,
         legend: {
-          display: false
+          display: false,
         },
         title: {
           display: true,
-          text: this.truncateTitle(this.progress.name)
+          text: this.truncateTitle(this.progress.name),
         },
         layout: {
           padding: {
             left: 0,
             right: 0,
             top: 0,
-            bottom: 0
-          }
-        }
+            bottom: 0,
+          },
+        },
       };
     },
 
@@ -76,26 +76,26 @@ export default {
       return {
         labels: [
           this.$str('proficient', 'totara_competency'),
-          this.$str('not_proficient', 'totara_competency')
+          this.$str('not_proficient', 'totara_competency'),
         ],
         datasets: [
           {
             data: [
               this.progress.overall_progress,
-              100 - this.progress.overall_progress
+              100 - this.progress.overall_progress,
             ],
-            backgroundColor: ['#3f9852', '#8c8c8c40']
-          }
-        ]
+            backgroundColor: ['#3f9852', '#8c8c8c40'],
+          },
+        ],
       };
     },
 
     canvasAttributes: function() {
       return {
         width: '100%',
-        height: '100%'
+        height: '100%',
       };
-    }
+    },
   },
 
   mounted: function() {},
@@ -110,8 +110,8 @@ export default {
       title = title.substr(0, title.lastIndexOf(separator, maxLen));
 
       return title + '...';
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">

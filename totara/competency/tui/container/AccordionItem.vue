@@ -7,7 +7,7 @@
     >
       <!-- Header -->
       <div>
-        <FlexIcon :id="toggleIcon"></FlexIcon>
+        <FlexIcon :icon="toggleIcon" />
       </div>
       <div style="padding-left: 7px;">
         <strong>
@@ -21,34 +21,34 @@
         class="totara_competency-profile__accordion-item-content"
       >
         <!-- Content -->
-        <slot></slot>
+        <slot />
       </div>
     </transition>
   </div>
 </template>
 
 <script>
-import FlexIcon from '../../../core/tui/presentation/icons/FlexIcon';
+import FlexIcon from 'totara_core/containers/icons/FlexIcon';
 export default {
   components: { FlexIcon },
   props: {
     name: {
       type: String,
-      required: true
+      required: true,
     },
     itemKey: {
       type: [String, Number],
-      required: true
+      required: true,
     },
     isOpen: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
 
   data: function() {
     return {
-      open: false
+      open: false,
     };
   },
 
@@ -57,13 +57,13 @@ export default {
       return this.open
         ? 'totara_core|accordion-expanded'
         : 'totara_core|accordion-collapsed';
-    }
+    },
   },
 
   watch: {
     isOpen: function(newValue) {
       this.open = newValue;
-    }
+    },
   },
 
   created: function() {
@@ -75,8 +75,8 @@ export default {
   methods: {
     toggle: function() {
       this.open = !this.open;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">

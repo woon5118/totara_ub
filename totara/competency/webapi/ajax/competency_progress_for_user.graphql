@@ -1,16 +1,21 @@
 query totara_competency_competency_progress_for_user($user_id: core_id, $order: String, $filters: totara_competency_profile_assignment_filters) {
     totara_competency_profile_competency_progress(user_id: $user_id, filters: $filters, order: $order) {
+        __typename
         competency {
+            __typename
             id
             fullname
         },
         items {
+            __typename
             proficient
             assignment {
+                __typename
                 archived_at (format: DATE)
                 progress_name
             }
             my_value {
+                __typename
                 id
                 scaleid
                 name

@@ -1,6 +1,6 @@
 <template>
   <div data-chart="" class="chart">
-    <canvas v-bind="canvasAttributes"></canvas>
+    <canvas v-bind="canvasAttributes" />
   </div>
 </template>
 
@@ -38,7 +38,7 @@ let loadChartJS = function() {
                   txt: txt,
                   color: color,
                   sidePadding: sidePadding,
-                  sidePaddingCalculated: sidePaddingCalculated
+                  sidePaddingCalculated: sidePaddingCalculated,
                 };
               };
 
@@ -81,7 +81,7 @@ let loadChartJS = function() {
                 renderText(getTextConfig(element));
               });
             }
-          }
+          },
         });
 
         if (typeof resolve !== 'undefined') {
@@ -103,26 +103,26 @@ export default {
   props: {
     type: {
       required: true,
-      type: String
+      type: String,
     },
     data: {
       required: true,
-      type: Object
+      type: Object,
     },
     options: {
       required: false,
       type: Object,
       default: function() {
         return {};
-      }
+      },
     },
     canvasAttributes: {
       required: false,
       type: Object,
       default: function() {
         return {};
-      }
-    }
+      },
+    },
   },
 
   computed: {
@@ -130,9 +130,9 @@ export default {
       return {
         type: this.type,
         data: this.data,
-        options: this.options
+        options: this.options,
       };
-    }
+    },
   },
 
   watch: {
@@ -140,8 +140,8 @@ export default {
       deep: true,
       handler: function() {
         this.render();
-      }
-    }
+      },
+    },
   },
 
   mounted: function() {
@@ -172,7 +172,7 @@ export default {
       } else {
         console.log('ChartJS has not loaded yet');
       }
-    }
-  }
+    },
+  },
 };
 </script>

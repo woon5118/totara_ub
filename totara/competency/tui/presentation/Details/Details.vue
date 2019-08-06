@@ -1,13 +1,13 @@
 <template>
   <div>
     <div>
-      <h2 v-text="competency.fullname"></h2>
-      <h5 v-html="competency.description"></h5>
+      <h2 v-text="data.competency.fullname" />
+      <h5 v-html="data.competency.description" />
     </div>
     <div>
       <Tabs>
         <Tab
-          v-for="(item, key) in assignmentItems"
+          v-for="(item, key) in data.items"
           :key="key"
           :item-key="key"
           :subtitle="
@@ -22,7 +22,7 @@
             :competency-id="competencyId"
             :my-value="item.my_value"
             :assignment="item.assignment"
-          ></ScaleDetail>
+          />
         </Tab>
       </Tabs>
     </div>
@@ -35,50 +35,50 @@ import Tab from './Tab';
 import Tabs from './Tabs';
 import ScaleDetail from './ScaleDetail';
 
+import CompetencyDetailsQuery from '../../../webapi/ajax/competency_details.graphql';
+
 export default {
   components: { ScaleDetail, Tab, Tabs },
   props: {
     userId: {
       required: true,
-      type: Number
+      type: Number,
     },
     competencyId: {
       required: true,
-      type: Number
-    }
+      type: Number,
+    },
   },
 
   data: function() {
     return {
-      competency: {
-        fullname: ''
+      data: {
+        competency: {
+          fullname: '',
+        },
+        items: [],
       },
-      assignmentItems: []
     };
   },
 
   computed: {},
 
-  mounted: function() {
-    // Fetch competency details
-    this.$webapi
-      .query('totara_competency_competency_details', {
-        user_id: this.userId,
-        competency_id: this.competencyId
-      })
-      .then(
-        ({
-          totara_competency_profile_competency_details: { competency, items }
-        }) => {
-          this.competency = competency;
-          this.assignmentItems = items;
-        }
-      );
+  apollo: {
+    data: {
+      query: CompetencyDetailsQuery,
+      variables() {
+        return {
+          user_id: this.userId,
+          competency_id: this.competencyId,
+        };
+      },
+      update({
+        totara_competency_profile_competency_details: { competency, items },
+      }) {
+        return { competency, items };
+      },
+    },
   },
-
-  methods: {
-    fetchCompetencyDetails() {}
-  }
 };
 </script>
 <style lang="scss"></style>

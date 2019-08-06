@@ -9,16 +9,16 @@
           @click.prevent="selectTab(tab)"
         >
           <div>
-            <strong v-text="tab.name"></strong>
+            <strong v-text="tab.name" />
           </div>
           <div v-if="tab.subtitle">
-            <small v-text="tab.subtitle"></small>
+            <small v-text="tab.subtitle" />
           </div>
         </li>
       </ul>
     </div>
     <div class="tui-ProfileTabs__tabs">
-      <slot></slot>
+      <slot />
     </div>
   </div>
 </template>
@@ -27,7 +27,7 @@
 export default {
   data() {
     return {
-      tabs: []
+      tabs: [],
     };
   },
 
@@ -61,8 +61,8 @@ export default {
       if (!activeTab && this.tabs[0]) {
         this.tabs[0].$data.isActive = true;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">

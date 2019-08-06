@@ -8,7 +8,7 @@
       </div>
       <div class="tui-CompetencyDetail__nav-links-right">
         <ul>
-          <li v-text="$str('viewing')"></li>
+          <li v-text="$str('viewing')" />
           <li>
             <a
               href="#"
@@ -16,7 +16,7 @@
               :class="tabClass(activeTab === 'details')"
               @click.prevent="activeTab = 'details'"
               v-text="$str('overview', 'totara_competency')"
-            ></a>
+            />
           </li>
           <li>
             <a
@@ -25,7 +25,7 @@
               :class="tabClass(activeTab === 'log')"
               @click.prevent="activeTab = 'log'"
               v-text="$str('activity_log', 'totara_competency')"
-            ></a>
+            />
           </li>
         </ul>
       </div>
@@ -34,14 +34,11 @@
     <div>
       <!-- Competency details -->
       <div v-if="activeTab === 'details'">
-        <Details :competency-id="competencyId" :user-id="userId"></Details>
+        <Details :competency-id="competencyId" :user-id="userId" />
       </div>
       <!-- Competency activity log -->
       <div v-if="activeTab === 'log'">
-        <ActivityLog
-          :competency-id="competencyId"
-          :user-id="userId"
-        ></ActivityLog>
+        <ActivityLog :competency-id="competencyId" :user-id="userId" />
       </div>
     </div>
   </div>
@@ -56,21 +53,21 @@ export default {
   props: {
     goBackLink: {
       required: true,
-      type: String
+      type: String,
     },
     userId: {
       required: true,
-      type: Number
+      type: Number,
     },
     competencyId: {
       required: true,
-      type: Number
-    }
+      type: Number,
+    },
   },
 
   data() {
     return {
-      activeTab: 'details'
+      activeTab: 'details',
     };
   },
 
@@ -83,8 +80,8 @@ export default {
   methods: {
     tabClass(isActive) {
       return [isActive ? 'btn-primary' : 'btn-secondary'];
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">

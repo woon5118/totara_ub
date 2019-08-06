@@ -1,5 +1,5 @@
 <template>
-  <ChartJs :type="type" :data="data" :options="options"></ChartJs>
+  <ChartJs :type="type" :data="data" :options="options" />
 </template>
 
 <script>
@@ -10,8 +10,8 @@ export default {
   props: {
     assignmentProgress: {
       required: true,
-      type: Object
-    }
+      type: Object,
+    },
   },
 
   computed: {
@@ -20,12 +20,12 @@ export default {
         tooltips: {},
         legend: {
           position: 'top',
-          display: true
+          display: true,
         },
         title: {
           display: true,
-          text: this.assignmentProgress.name
-        }
+          text: this.assignmentProgress.name,
+        },
       };
 
       if (this.type === 'radar') {
@@ -33,8 +33,8 @@ export default {
           ticks: {
             beginAtZero: true,
             display: false,
-            max: 100
-          }
+            max: 100,
+          },
         };
       } else {
         let min = this.assignmentProgress.items.slice(0, 1).pop();
@@ -53,18 +53,18 @@ export default {
             {
               ticks: {
                 beginAtZero: true,
-                display: false
-              }
-            }
+                display: false,
+              },
+            },
           ],
           xAxes: [
             {
               ticks: {
                 min,
-                max
-              }
-            }
-          ]
+                max,
+              },
+            },
+          ],
         };
       }
 
@@ -85,7 +85,7 @@ export default {
           console.log(tooltipItem, data, label);
 
           return label;
-        }
+        },
       };
 
       return options;
@@ -101,7 +101,7 @@ export default {
             borderColor: '#3869b1',
             rawData: [],
             data: [],
-            values: []
+            values: [],
           },
           {
             label: this.$str('proficient_value', 'totara_competency'),
@@ -111,9 +111,9 @@ export default {
             steppedLine: 'middle',
             rawData: [],
             data: [],
-            values: []
-          }
-        ]
+            values: [],
+          },
+        ],
       };
 
       this.assignmentProgress.items.forEach(
@@ -162,7 +162,7 @@ export default {
         this.assignmentProgress.items.length >= 12
         ? 'bar'
         : 'radar';
-    }
+    },
   },
 
   mounted: function() {},
@@ -171,8 +171,8 @@ export default {
     shorten: function(str, maxLen, separator = ' ') {
       if (str.length <= maxLen) return str;
       return str.substr(0, str.lastIndexOf(separator, maxLen));
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss"></style>

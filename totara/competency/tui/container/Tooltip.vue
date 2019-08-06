@@ -1,7 +1,7 @@
 <template>
   <div v-if="display" class="tui-Tooltip__wrapper">
     <div class="tui-Tooltip__content">
-      <slot></slot>
+      <slot />
     </div>
   </div>
 </template>
@@ -11,15 +11,15 @@ export default {
   props: {
     display: {
       required: true,
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
 
   data: function() {
     return {};
   },
 
-  methods: {}
+  methods: {},
 };
 </script>
 <style lang="scss">

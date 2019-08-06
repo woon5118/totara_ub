@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 v-text="$str('activity_log', 'totara_competency')"></h2>
+    <h2 v-text="$str('activity_log', 'totara_competency')" />
     <br />
     <pre style="margin: 0 auto; width: 350px">
                        .
@@ -28,12 +28,12 @@ export default {
   props: {
     userId: {
       required: true,
-      type: Number
+      type: Number,
     },
     competencyId: {
       required: true,
-      type: Number
-    }
+      type: Number,
+    },
   },
 
   data: function() {
@@ -44,7 +44,7 @@ export default {
 
   mounted: function() {},
 
-  methods: {}
+  methods: {},
 };
 </script>
 <style lang="scss"></style>

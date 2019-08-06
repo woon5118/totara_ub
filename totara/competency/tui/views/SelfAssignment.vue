@@ -30,7 +30,7 @@
           <th style="width: 20%">Assigned</th>
         </thead>
         <tbody>
-          <tr v-for="item in data.items" :key="item.id">
+          <tr v-for="item in allItems" :key="item.id">
             <td>
               <input
                 v-model="selectedItems"
@@ -48,7 +48,9 @@
         <tfoot>
           <tr v-if="data.next_cursor !== ''">
             <td colspan="4">
-              <button @click="loadCompetencies()">Load More</button>
+              <button @click="nextCursor = data.next_cursor">
+                Load More
+              </button>
             </td>
           </tr>
         </tfoot>
@@ -58,16 +60,18 @@
 </template>
 
 <script>
+import SelfAssignableCompetenciesQuery from '../../webapi/ajax/self_assignable_competencies.graphql';
+
 export default {
   props: {
     goBackLink: {
       required: true,
-      type: String
+      type: String,
     },
     userId: {
       required: true,
-      type: Number
-    }
+      type: Number,
+    },
   },
 
   data: function() {
@@ -77,15 +81,45 @@ export default {
       data: {
         items: [],
         total: 0,
-        next_cursor: null
-      }
+        next_cursor: null,
+      },
+      nextCursor: null,
+      allItems: [],
     };
   },
 
-  computed: {},
+  apollo: {
+    data: {
+      query: SelfAssignableCompetenciesQuery,
+      variables() {
+        let encodedCursor = this.nextCursor;
 
-  mounted: function() {
-    this.loadCompetencies();
+        // On first load use new cursor
+        if (encodedCursor === null) {
+          let cursor = {
+            limit: 5,
+            columns: null,
+          };
+          encodedCursor = window.btoa(JSON.stringify(cursor));
+        }
+
+        return {
+          user_id: this.userId,
+          cursor: encodedCursor,
+        };
+      },
+
+      update({ totara_competency_self_assignable_competencies: data }) {
+        return data;
+      },
+
+      result({
+        data: { totara_competency_self_assignable_competencies: data },
+      }) {
+        data = JSON.parse(JSON.stringify(data));
+        this.allItems = this.allItems.concat(data.items.slice(0));
+      },
+    },
   },
 
   methods: {
@@ -108,8 +142,10 @@ export default {
     selectAll: function() {
       this.selectedItems = [];
       if (!this.allSelected) {
-        for (let item in this.data.items) {
-          this.selectedItems.push(this.data.items[item].id);
+        for (let item in this.allItems) {
+          if (this.allItems.hasOwnProperty(item)) {
+            this.selectedItems.push(this.allItems[item].id);
+          }
         }
       }
     },
@@ -129,34 +165,7 @@ export default {
         competency.user_assignments && competency.user_assignments.length > 0
       );
     },
-
-    loadCompetencies: function() {
-      let encoded_cursor = this.data.next_cursor;
-      // On first load use new cursor
-      if (this.data.items.length === 0 && encoded_cursor === null) {
-        var cursor = {
-          limit: 5,
-          columns: null
-        };
-        encoded_cursor = window.btoa(JSON.stringify(cursor));
-      }
-
-      // Load the list via GraphQL
-      this.$webapi
-        .query('totara_competency_self_assignable_competencies', {
-          user_id: this.userId,
-          cursor: encoded_cursor
-        })
-        .then(
-          function(data) {
-            let result = data.totara_competency_self_assignable_competencies;
-            this.data.items = this.data.items.concat(result.items);
-            this.data.total = result.total;
-            this.data.next_cursor = result.next_cursor;
-          }.bind(this)
-        );
-    }
-  }
+  },
 };
 </script>
 

@@ -1,11 +1,13 @@
 query totara_competency_scale($id: core_id, $competency_id: core_id) {
     totara_competency_scale(id: $id, competency_id: $competency_id) {
+        __typename
         id
         name
         description
         defaultid
 
         values {
+            __typename
             id
             name
             idnumber
