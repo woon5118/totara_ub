@@ -31,13 +31,48 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
      * Test encoding of dangerous and incompatible characters in URLs.
      */
     public function test_clean_param_url() {
+        // Make sure the special characters are encoded properly.
+        $url = "http://www.example.com/?whatever='\" \t\n&bbb={1,2}";
+        $result = clean_param($url, PARAM_URL);
+        $this->assertSame('http://www.example.com/?whatever=%27%22%20%09%0A&bbb=%7B1,2%7D', $result);
+        $this->assertSame($url, urldecode($result));
+
+        // Only these 3 protocols are supported.
         $this->assertSame('http://www.example.com/course/view.php?id=1', clean_param('http://www.example.com/course/view.php?id=1', PARAM_URL));
-        $this->assertSame('http://www.example.com/?whatever=%27%22%20%09%0A', clean_param("http://www.example.com/?whatever='\" \t\n", PARAM_URL));
+        $this->assertSame('https://www.example.com/course/view.php?id=1', clean_param('https://www.example.com/course/view.php?id=1', PARAM_URL));
+        $this->assertSame('ftp://www.example.com/index.html', clean_param('ftp://www.example.com/index.html', PARAM_URL));
+
+        // Protocol case is not important.
+        $this->assertSame('HttP://www.example.com/course/view.php?id=1', clean_param('HttP://www.example.com/course/view.php?id=1', PARAM_URL));
+
+        // Ports are allowed.
+        $this->assertSame('http://www.example.com:8080/course/view.php?id=1', clean_param('http://www.example.com:8080/course/view.php?id=1', PARAM_URL));
+        $this->assertSame('https://www.example.com:443/course/view.php?id=1', clean_param('https://www.example.com:443/course/view.php?id=1', PARAM_URL));
+
+        // Various arguments should be ok, some of them may be URL encoded
+        $this->assertSame('http://www.example.com/course/view.php?id=13#test', clean_param('http://www.example.com/course/view.php?id=13#test', PARAM_URL));
         $this->assertSame('http://www.example.com/?whatever%5B%5D=abc', clean_param('http://www.example.com/?whatever[]=abc', PARAM_URL));
         $this->assertSame('http://www.example.com/?whatever%5B0%5D=abc&%5B1%5D=def', clean_param('http://www.example.com/?whatever[0]=abc&[1]=def', PARAM_URL));
         $this->assertSame('/?whatever%5B%5D=abc', clean_param('/?whatever[]=abc', PARAM_URL));
+
+        // mailto: never worked and never will
+        $this->assertSame('', clean_param('mailto:someone@example.com', PARAM_URL));
+
+        // Non-ascii characters never worked.
+        $this->assertSame('', clean_param('http://www.example.com/course/view.php?id=škoďák', PARAM_URL));
+        $this->assertSame('', clean_param('http://www.example.com/course/škoďák.php', PARAM_URL));
+        $this->assertSame('', clean_param('http://www.example.com/course/view.php#škoďák', PARAM_URL));
+
+        // Broken URLs.
+        $this->assertSame('', clean_param('://www.example.com/course/view.php?id=1', PARAM_URL));
+        $this->assertSame('', clean_param(' http://www.example.com/course/view.php?id=1', PARAM_URL));
+        $this->assertSame('', clean_param('http://', PARAM_URL));
+        $this->assertSame('', clean_param(' ', PARAM_URL));
         $this->assertSame('', clean_param('whatever[]=abc', PARAM_URL));
+        $this->assertSame('', clean_param('[]', PARAM_URL));
+        $this->assertSame('', clean_param('{}', PARAM_URL));
     }
+
     /**
      * Test fix for Safari lang detection.
      *
