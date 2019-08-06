@@ -26,7 +26,7 @@ use mod_facetoface\{seminar, seminar_event, seminar_session, signup, signup_stat
 use mod_facetoface\signup\condition\{ condition, event_taking_attendance };
 use mod_facetoface\signup\restriction\restriction;
 use mod_facetoface\signup\state\{not_set, state, booked, event_cancelled};
-use mod_facetoface\signup\transaction;
+use mod_facetoface\signup\transition;
 
 defined('MOODLE_INTERNAL') || die();
 

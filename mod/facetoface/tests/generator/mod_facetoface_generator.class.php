@@ -120,6 +120,8 @@ class mod_facetoface_generator extends testing_module_generator {
         $defaults['eventgradingmanual'] = 0;
         $defaults['eventgradingmethod'] = seminar::GRADING_METHOD_GRADEHIGHEST;
         $defaults['completionpass'] = seminar::COMPLETION_PASS_DISABLED;
+        $defaults['completiondelay'] = null;
+
         foreach ($defaults as $field => $value) {
             if (!isset($record->$field)) {
                 $record->$field = $value;

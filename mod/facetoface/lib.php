@@ -30,6 +30,7 @@ use mod_facetoface\{
     seminar,
     signup,
     seminar_event,
+    seminar_session,
     notice_sender,
     signup_list,
     signup_helper,
@@ -147,6 +148,27 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
     $params = array('fid' => $cm->instance);
     if (!$facetoface = $DB->get_record_sql($sql, $params)) {
         print_error('cannotfindfacetoface');
+    }
+
+    // Check for completiondelay and act on it if necessary.
+    if ($facetoface->completiondelay !== '' && $facetoface->completiondelay !== null) {
+        // Get signups. Find earliest possible activity completion window based on signups.
+        $signups = signup_list::user_active_signups_within_seminar($userid, $cm->instance);
+        $delay_seconds = $facetoface->completiondelay * DAYSECS;
+        $go_time = 0;
+        $timefinish = 0;
+        foreach ($signups as $signup) {
+            /* @var $signup \mod_facetoface\signup */
+            $seminar_event = $signup->get_seminar_event();
+            $timefinish = $seminar_event->get_maxtimefinish();
+            if ($go_time == 0 || $timefinish + $delay_seconds < $go_time) {
+                $go_time = $timefinish + $delay_seconds;
+            }
+        }
+        if ($go_time && time() < $go_time) {
+            // Earliest window hasn't arrived yet.
+            return false;
+        }
     }
 
     // Check for passing grade.

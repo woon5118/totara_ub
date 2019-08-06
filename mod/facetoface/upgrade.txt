@@ -205,7 +205,7 @@ information provided here is intended especially for developers.
 * facetoface_get_user_submissions() function has been deprecated, please use \mod_facetoface\signup_list class instead
 * facetoface_get_attendees() function has been deprecated, please use \mod_facetoface\attendees_helper::get_attendees_with_codes() instead
 * facetoface_update_grades() function has been changed; facetoface.eventgradingmethod now takes into account when the third argument is true (by default)
-* facetoface_get_completion_state() function has been updated to calculate activity completion based on a seminar grade
+* facetoface_get_completion_state() function has been updated to calculate activity completion based on a seminar grade, and to delay completion if required
 * Added/fixed type hints/docblocks of the following methods of the mod_facetoface_renderer class
   print_session_list_table, print_session_list, session_customfield_table_cells, session_capacity_table_cell,
   attendance_tracking_table_cell, session_status_table_cell, event_status_table_cell, session_resgistrationperiod_table_cell,

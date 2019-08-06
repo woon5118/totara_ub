@@ -126,6 +126,12 @@ final class seminar implements seminar_iterator_item {
     const COMPLETION_PASS_GRADEPASS = 2;
 
     /**
+     * Activity completion delay min/max days
+     */
+    const COMPLETION_DELAY_MINIMUM = 0;
+    const COMPLETION_DELAY_MAXIMUM = 999;
+
+    /**
      * @var int {facetoface}.id
      */
     private $id = 0;
@@ -287,6 +293,10 @@ final class seminar implements seminar_iterator_item {
      * @var int {facetoface}.completionpass
      */
     private $completionpass = self::COMPLETION_PASS_DISABLED;
+    /**
+     * @var int|null {facetoface}.completiondelay
+     */
+    private $completiondelay = null;
     /**
      * @var string facetoface table name
      */
@@ -1140,6 +1150,29 @@ final class seminar implements seminar_iterator_item {
      */
     public function set_completionpass(int $completionpass) : seminar {
         $this->completionpass = $completionpass;
+        return $this;
+    }
+
+    /**
+     * Get completiondelay setting.
+     *
+     * @return int|null
+     */
+    public function get_completiondelay(): ?int {
+        if ($this->completiondelay === '' || $this->completiondelay === null) {
+            return null;
+        } else {
+            return (int)$this->completiondelay;
+        }
+    }
+    /**
+     * Set completiondelay setting.
+     *
+     * @param int|null $completiondelay Number of days to delay completion
+     * @return seminar
+     */
+    public function set_completiondelay(?int $completiondelay): seminar {
+        $this->completiondelay = $completiondelay;
         return $this;
     }
 

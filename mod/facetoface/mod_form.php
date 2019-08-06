@@ -28,18 +28,34 @@ require_once($CFG->libdir . '/pear/HTML/QuickForm/Rule.php');
 
 /**
  * Provide numeric range rule.
+ * This class could be moved to its own file, but it is only used here.
  */
 class mod_facetoface_rule_numeric_range extends HTML_QuickForm_Rule {
     /**
-     * Validates a value.
+     * Validates a numeric value.
+     *
+     * Provided $options must include min and max values.
+     * If $options['int'] is true, the value must be an integer.
      *
      * @param mixed $value
-     * @param array|null $options contains ['min', 'max']
+     * @param null|array $options contains 'min', 'max', and optionally 'int'
      * @return mixed
      */
     public function validate($value, $options = null) {
         $float = unformat_float($value, true);
-        return $float !== false && $options['min'] <= $float && $float <= $options['max'];
+        if ($float === false) {
+            return false;
+        }
+        if (!empty($options['int']) && ($float != (int)$float)) {
+            return false;
+        }
+        if (isset($options['min']) && $options['min'] > $float) {
+            return false;
+        }
+        if (isset($options['max']) && $options['max'] < $float) {
+            return false;
+        }
+        return true;
     }
 }
 
@@ -494,6 +510,21 @@ class mod_facetoface_mod_form extends moodleform_mod {
         }
         $mform->addHelpButton($firstkey, 'completionstatusrequired', 'facetoface');
 
+        // Require event over for x days (completiondelay).
+        $enabled_input = $mform->createElement('checkbox', 'completiondelayenabled', 1);
+        $days_input = $mform->createElement('text', 'completiondelay');
+        $days_input->setSize(3);
+        $days_text = $mform->createElement('static', null, null, get_string('completiondelaydays', 'facetoface'));
+        $mform->addGroup([$enabled_input, $days_input, $days_text], 'completiondelay', get_string('completiondelay', 'facetoface'), '&nbsp;', false);
+        $mform->setType('completiondelayenabled', PARAM_BOOL);
+        $mform->setType('completiondelay', PARAM_RAW);
+        $mform->setDefault('completiondelay', 0);
+        $minmax = ['min' => \mod_facetoface\seminar::COMPLETION_DELAY_MINIMUM, 'max' => \mod_facetoface\seminar::COMPLETION_DELAY_MAXIMUM, 'int' => true];
+        $mform->addRule('completiondelay', get_string('completiondelay_error', 'mod_facetoface', $minmax), 'f2f_numericrange', $minmax);
+        $mform->disabledIf('completiondelay', 'completiondelayenabled', 'notchecked');
+        $mform->addHelpButton('completiondelay', 'completiondelay', 'facetoface');
+        $items[] = 'completiondelay';
+
         return $items;
     }
 
@@ -629,6 +660,11 @@ class mod_facetoface_mod_form extends moodleform_mod {
                 break;
         }
 
+        // Completion delay should be set to null if disabled.
+        if (!isset($data->completiondelayenabled)) {
+            $data->completiondelay = null;
+        }
+
         return $data;
     }
 
@@ -680,6 +716,11 @@ class mod_facetoface_mod_form extends moodleform_mod {
             // Manually load the default setting to correctly format the value.
             $gradepass = get_config('facetoface', 'gradepass');
             $defaultvalues['gradepass'] = \mod_facetoface\grade_helper::format($gradepass, $this->current->course);
+        }
+
+        // If there is a completiondelay value, then check the enabled checkbox.
+        if (isset($defaultvalues['completiondelay']) && $defaultvalues['completiondelay'] != '') {
+            $defaultvalues['completiondelayenabled'] = true;
         }
 
         parent::set_data($defaultvalues);

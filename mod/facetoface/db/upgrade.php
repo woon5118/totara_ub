@@ -661,5 +661,16 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019081300, 'facetoface');
     }
 
+    // Define field completiondelay to create criteria for number of days after event when activity completion is allowed.
+    if ($oldversion < 2019090100) {
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('completiondelay', XMLDB_TYPE_INTEGER, '7', null, false, null, null, 'completionpass');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2019090100, 'facetoface');
+    }
+
     return true;
 }

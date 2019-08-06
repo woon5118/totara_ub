@@ -22,6 +22,7 @@
 
 $string['actions'] = 'Actions';
 $string['activate'] = 'Activate';
+$string['activitycompletiontask'] = 'Trigger delayed seminar activity completions';
 $string['activitydefaults'] = 'Activity defaults';
 $string['addattendees'] = 'Add users';
 $string['addattendeestep1'] = "Select users to add (step 1 of 2)";
@@ -364,6 +365,12 @@ $string['confirmationsent'] = 'You will receive a booking confirmation email sho
 $string['confirmationsentmgr'] = 'You will be notified about their decision.';
 $string['completionstatusrequired'] = 'Require status';
 $string['completionstatusrequired_help'] = 'Checking one or more statuses will require a user to achieve at least one of the checked statuses in order to be marked complete in this seminar activity, as well as any other Activity Completion requirements.';
+$string['completiondelay'] = 'Require event over for';
+$string['completiondelay_error'] = '"Require event over for" must be a whole number between {$a->min} and {$a->max} days.';
+$string['completiondelay_help'] = 'Checking this completion criteria will require the event to be over by the number of days set. The activity will not be considered complete until this time has lapsed. 
+
+Use this setting to allow trainers to mark attendance and/or grades without triggering activity completions. The setting of 0 days will delay activity completion until the event is over.';
+$string['completiondelaydays'] = 'days';
 $string['copyingsession'] = 'Copying as a new event in {$a}';
 $string['copynotification'] = 'Copy notification';
 $string['copynotificationcreated'] = 'Copy of the notification is created.';
