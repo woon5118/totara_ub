@@ -94,8 +94,8 @@ class url extends text {
 
         // Make sure the value will pass through PARAM_URL.
         $data[$name] = str_replace(
-            ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t",  '{',   '}'],
-            ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09', '%7B', '%7D'],
+            ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t",  '{',   '}',   '<',   '>'],
+            ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09', '%7B', '%7D', '%3C', '%3E'],
             $data[$name]);
 
         $validated = filter_var($data[$name], FILTER_VALIDATE_URL);

@@ -177,6 +177,14 @@ class totara_form_element_url_testcase extends advanced_testcase {
         $data = (array)$form->get_data();
         $this->assertSame(array('someurl1' => 'http://example.com/?some%5B%5D=1'), $data);
 
+        $url = "http://www.example.com/?whatever='\" \t\n&bbb={1,2}&amp;c=<br>";
+        $expected = clean_param($url, PARAM_URL);
+        $this->assertSame($url, urldecode($expected));
+        test_form::phpunit_set_post_data(array('someurl1' => $url));
+        $form = new test_form(null);
+        $data = (array)$form->get_data();
+        $this->assertSame(array('someurl1' => $expected), $data);
+
         test_form::phpunit_set_post_data(array('someurl1' => ''));
         $form = new test_form(null);
         $data = (array)$form->get_data();

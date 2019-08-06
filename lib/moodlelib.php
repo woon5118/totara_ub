@@ -1046,8 +1046,8 @@ function clean_param($param, $type) {
             $param = fix_utf8($param);
             // Totara: encode dangerous and incompatible characters.
             $param = str_replace(
-                ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t",  '{',   '}'],
-                ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09', '%7B', '%7D'],
+                ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t",  '{',   '}',   '<',   '>'],
+                ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09', '%7B', '%7D', '%3C', '%3E'],
                 $param);
             if (preg_match('/^.*:/i', $param)) {
                 // Totara: the validateUrlSyntax() does not support extended characters,

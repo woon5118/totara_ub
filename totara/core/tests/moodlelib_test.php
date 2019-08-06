@@ -32,9 +32,9 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
      */
     public function test_clean_param_url() {
         // Make sure the special characters are encoded properly.
-        $url = "http://www.example.com/?whatever='\" \t\n&bbb={1,2}";
+        $url = "http://www.example.com/?whatever='\" \t\n&bbb={1,2}&amp;c=<br>";
         $result = clean_param($url, PARAM_URL);
-        $this->assertSame('http://www.example.com/?whatever=%27%22%20%09%0A&bbb=%7B1,2%7D', $result);
+        $this->assertSame('http://www.example.com/?whatever=%27%22%20%09%0A&bbb=%7B1,2%7D&amp;c=%3Cbr%3E', $result);
         $this->assertSame($url, urldecode($result));
 
         // Only these 3 protocols are supported.
