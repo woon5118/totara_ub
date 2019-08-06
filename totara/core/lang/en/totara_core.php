@@ -79,6 +79,7 @@ Alternatively you can choose to keep all existing completion records and accept 
 $string['completionexcludefailuresoff'] = 'Users may complete activities in any way, failures are acceptable.';
 $string['completionexcludefailureson'] = 'Users have to complete activities without failures.';
 $string['configdynamicappraisals'] = 'This setting allows you to specify whether appraisals lock on activation and no longer update assignments and roles or continue to update after activation';
+$string['configdynamicappraisalsautoprogress'] = 'When Dynamic Appraisals is enabled, this setting allows you to specify whether appraisals will automatically progress to the next stage if one or more roles are empty (assuming all filled roles are complete and there is at least one role filled). When Dynamic Appraisals is not enabled, appraisals will automatically progress.';
 $string['configforcelogintotara'] = 'Normally, the entire site is only available to logged in users. If you would like to make the front page and the course listings (but not the course contents) available without logging in, then you should uncheck this setting.';
 $string['core:appearance'] = 'Configure site appearance settings';
 $string['core:coursemanagecustomfield'] = 'Manage a course custom field';
@@ -179,6 +180,7 @@ $string['disablefeature'] = 'Disable';
 $string['downloaderrorlog'] = 'Download error log';
 $string['downloadregistrationdata'] = 'Download encrypted registration data';
 $string['dynamicappraisals'] = 'Dynamic Appraisals';
+$string['dynamicappraisalsautoprogress'] = 'Dynamic Appraisals Automatic Progression';
 $string['editheading'] = 'Edit the Report Heading Block';
 $string['edition'] = 'Edition';
 $string['elearning'] = 'E-learning';

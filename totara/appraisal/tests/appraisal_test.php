@@ -27,7 +27,7 @@
 global $CFG;
 require_once($CFG->dirroot.'/totara/appraisal/tests/appraisal_testcase.php');
 
-class appraisal_test extends appraisal_testcase {
+class totara_appraisal_appraisal_testcase extends appraisal_testcase {
 
     public function test_set_status() {
         $this->resetAfterTest();
@@ -1971,5 +1971,99 @@ class appraisal_test extends appraisal_testcase {
             $this->assertFalse($DB->record_exists('appraisal_user_assignment', $params));
             $this->assertFalse($DB->record_exists('appraisal_role_assignment', $paramsrole));
         }
+    }
+
+    public function test_get_mandatory_completion() {
+        // Create appraisal and activate it.
+        $user1 = $this->getDataGenerator()->create_user();
+
+        $def = array('name' => 'Appraisal', 'stages' => array(
+            array('name' => 'Stage1', 'timedue' => time() + 86400, 'pages' => array(
+                array('name' => 'Page', 'questions' => array(
+                    array('name' => 'Text', 'type' => 'text', 'roles' => array(
+                        appraisal::ROLE_LEARNER => appraisal::ACCESS_MUSTANSWER,
+                        appraisal::ROLE_MANAGER => appraisal::ACCESS_MUSTANSWER
+                    ))
+                ))
+            )),
+            array('name' => 'Stage2', 'timedue' => time() + 86400, 'pages' => array(
+                array('name' => 'Page', 'questions' => array(
+                    array('name' => 'Text', 'type' => 'text', 'roles' => array(
+                        appraisal::ROLE_LEARNER => appraisal::ACCESS_CANANSWER,
+                        appraisal::ROLE_MANAGER => appraisal::ACCESS_CANANSWER
+                    ))
+                ))
+            ))
+        ));
+
+        /** @var appraisal $appraisal */
+        list($appraisal, $users) = $this->prepare_appraisal_with_users($def, array($user1));
+        $appraisal->activate();
+        $this->update_job_assignments($appraisal);
+
+        $map = $this->map($appraisal);
+
+        $stage = new appraisal_stage($map['stages']['Stage1']);
+
+        // Enable dynamic appraisals, disable auto-progress. Mandatory roles should be all roles involved
+        // in the stage.
+        set_config('dynamicappraisals', true);
+        set_config('dynamicappraisalsautoprogress', false);
+
+        $mandatory_roles = $stage->get_mandatory_completion($user1->id);
+        $this->assertEquals(array(appraisal::ROLE_LEARNER, appraisal::ROLE_MANAGER), array_keys($mandatory_roles));
+
+        // Enable dynamic appraisals, enable auto-progress. Unfilled roles are not mandatory.
+        set_config('dynamicappraisals', true);
+        set_config('dynamicappraisalsautoprogress', true);
+
+        $mandatory_roles = $stage->get_mandatory_completion($user1->id);
+        $this->assertEquals(array(appraisal::ROLE_LEARNER), array_keys($mandatory_roles));
+
+        // Disable dynamic appraisals, disbale auto-progress. Unfilled roles are not mandatory.
+        set_config('dynamicappraisals', false);
+        set_config('dynamicappraisalsautoprogress', false);
+
+        $mandatory_roles = $stage->get_mandatory_completion($user1->id);
+        $this->assertEquals(array(appraisal::ROLE_LEARNER), array_keys($mandatory_roles));
+
+        // Disable dynamic appraisals, enable auto-progress. Unfilled roles are not mandatory.
+        set_config('dynamicappraisals', false);
+        set_config('dynamicappraisalsautoprogress', true);
+
+        $mandatory_roles = $stage->get_mandatory_completion($user1->id);
+        $this->assertEquals(array(appraisal::ROLE_LEARNER), array_keys($mandatory_roles));
+
+        // Repeat with CANANSWER - no difference.
+        $stage = new appraisal_stage($map['stages']['Stage2']);
+
+        // Enable dynamic appraisals, disable auto-progress. Mandatory roles should be all roles involved
+        // in the stage.
+        set_config('dynamicappraisals', true);
+        set_config('dynamicappraisalsautoprogress', false);
+
+        $mandatory_roles = $stage->get_mandatory_completion($user1->id);
+        $this->assertEquals(array(appraisal::ROLE_LEARNER, appraisal::ROLE_MANAGER), array_keys($mandatory_roles));
+
+        // Enable dynamic appraisals, enable auto-progress. Unfilled roles are not mandatory.
+        set_config('dynamicappraisals', true);
+        set_config('dynamicappraisalsautoprogress', true);
+
+        $mandatory_roles = $stage->get_mandatory_completion($user1->id);
+        $this->assertEquals(array(appraisal::ROLE_LEARNER), array_keys($mandatory_roles));
+
+        // Disable dynamic appraisals, disbale auto-progress. Unfilled roles are not mandatory.
+        set_config('dynamicappraisals', false);
+        set_config('dynamicappraisalsautoprogress', false);
+
+        $mandatory_roles = $stage->get_mandatory_completion($user1->id);
+        $this->assertEquals(array(appraisal::ROLE_LEARNER), array_keys($mandatory_roles));
+
+        // Disable dynamic appraisals, enable auto-progress. Unfilled roles are not mandatory.
+        set_config('dynamicappraisals', false);
+        set_config('dynamicappraisalsautoprogress', true);
+
+        $mandatory_roles = $stage->get_mandatory_completion($user1->id);
+        $this->assertEquals(array(appraisal::ROLE_LEARNER), array_keys($mandatory_roles));
     }
 }

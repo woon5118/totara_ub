@@ -2946,22 +2946,20 @@ class appraisal_stage {
     }
 
     public function get_mandatory_completion($subjectid) {
-        global $DB;
+        global $CFG, $DB;
 
         $cananswer = $this->get_user_roles_involved(appraisal::ACCESS_CANANSWER, $subjectid);
-        $mustanswer = $this->get_user_roles_involved(appraisal::ACCESS_MUSTANSWER, $subjectid);
 
         $roles = array();
 
-        foreach ($mustanswer as $role) {
+        foreach ($cananswer as $role) {
             $roles[$role->appraisalrole] = $role->appraisalrole;
         }
 
-        foreach ($cananswer as $role) {
-            if (!empty($role->userid)) {
-                $roles[$role->appraisalrole] = $role->appraisalrole;
-            }
-        }
+        // Ignore empty roles when dynamic appraisals is off or dynamic appraisals is on and
+        // auto-progress is switched on.
+        $skip_empty_roles = empty($CFG->dynamicappraisals) || !empty($CFG->dynamicappraisalsautoprogress);
+        $exclude_empty = $skip_empty_roles ? "AND ara.userid <> 0" : "";
 
         $sql = 'SELECT ara.appraisalrole, ara.userid, ara.activepageid, asd.timecompleted,
                        asd.usercompleted, asd.realusercompleted
@@ -2973,7 +2971,7 @@ class appraisal_stage {
                     ON ara.id = asd.appraisalroleassignmentid
                  WHERE aua.userid = ?
                    AND aua.appraisalid = ?
-                   AND ara.userid <> 0
+                   ' . $exclude_empty . '
                  ORDER BY ara.appraisalrole';
         $completiondata = $DB->get_records_sql($sql, array($this->id, $subjectid, $this->appraisalid));
         return array_intersect_key($completiondata, $roles);

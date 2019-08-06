@@ -116,8 +116,12 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     // Dynamic Appraisals.
     $optionalsubsystems->add(new admin_setting_configcheckbox('dynamicappraisals',
-            new lang_string('dynamicappraisals', 'totara_core'),
-            new lang_string('configdynamicappraisals', 'totara_core'), 1));
+        new lang_string('dynamicappraisals', 'totara_core'),
+        new lang_string('configdynamicappraisals', 'totara_core'), 1));
+
+    $optionalsubsystems->add(new admin_setting_configcheckbox('dynamicappraisalsautoprogress',
+        new lang_string('dynamicappraisalsautoprogress', 'totara_core'),
+        new lang_string('configdynamicappraisalsautoprogress', 'totara_core'), 1));
 
     // Show Hierarchy shortcodes.
     $optionalsubsystems->add(new admin_setting_configcheckbox('showhierarchyshortnames',
