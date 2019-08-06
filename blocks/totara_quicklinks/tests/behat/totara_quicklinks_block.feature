@@ -35,9 +35,10 @@ Feature: Test Quick Links block
     And I follow "Configure My Links block"
     And I expand all fieldsets
     And I click on "Manage links" "link"
-    And I set the field "linktitle" to "Totara"
-    And I set the field "linkurl" to "https://www.totaralms.com/"
+    And I set the "linktitle" Totara form field to "Totara"
+    And I set the "linkurl" Totara form field to "https://www.totaralms.com/"
     And I click on "Add link" "button"
+    And I should see "Successfully added new quicklink"
     And I click on "Dashboard" in the totara menu
     Then I should see "My Links"
     And I should see "Totara" in the "My Links" "block"
@@ -79,9 +80,10 @@ Feature: Test Quick Links block
     And I configure the "Course Links" block
     And I expand all fieldsets
     And I click on "Manage links" "link"
-    And I set the field "linktitle" to "Totara"
-    And I set the field "linkurl" to "https://www.totaralms.com/"
+    And I set the "linktitle" Totara form field to "Totara"
+    And I set the "linkurl" Totara form field to "https://www.totaralms.com/"
     And I click on "Add link" "button"
+    And I should see "Successfully added new quicklink"
     Then I am on "Course 1" course homepage
     Then I should see "Course Links"
     And I should see "Totara" in the "Course Links" "block"
@@ -148,9 +150,10 @@ Feature: Test Quick Links block
     And I follow "Configure My Links block"
     And I expand all fieldsets
     And I click on "Manage links" "link"
-    And I set the field "linktitle" to "My calendar link"
-    And I set the field "linkurl" to "view.php?view=month&time=151934400"
+    And I set the "linktitle" Totara form field to "My calendar link"
+    And I set the "linkurl" Totara form field to local url "/calendar/view.php?view=month&time=151934400"
     And I click on "Add link" "button"
+    And I should see "Successfully added new quicklink"
     And I add the "Navigation" block if not present
     And I navigate to "Calendar" node in "Site pages"
     Then I should see "My Links"

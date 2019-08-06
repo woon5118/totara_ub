@@ -100,6 +100,19 @@ class behat_totara_form extends behat_base {
     }
 
     /**
+     * Sets the Totara form field to wwwroot plus the given path.
+     *
+     * @Given /^I set the "(?P<locator>(?:[^"]|\\")*)" Totara form field to local url "(?P<value>(?:[^"]|\\")*)"$/
+     */
+    public function i_set_totara_form_field_to_local_url($locator, $value, $lookfordataname = false) {
+        global $CFG;
+        \behat_hooks::set_step_readonly(false);
+        $field = $this->get_field_element_given_locator($locator, $lookfordataname);
+        $field->assert_not_frozen();
+        $field->set_value($CFG->wwwroot . '/' . ltrim($value, '/'));
+    }
+
+    /**
      * Sets the value of a Totara form multiple_select field.
      *
      * This needs a separate step because it's not a regular form element with a "name"-attribute,
