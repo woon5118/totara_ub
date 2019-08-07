@@ -2224,7 +2224,7 @@ $string['signupfields'] = 'Sign-up fields';
 $string['signupfieldslimitation'] = 'The values entered below will be populated for all selected users. To enter different values for each user use the <a href="{$a}">file import</a>';
 $string['signupfor'] = 'Sign-up for {$a}';
 $string['signupforsession'] = 'Sign-up for an available upcoming event';
-$string['signupforthissession'] = 'Sign-up for this seminar event';
+$string['signupforthissession'] = 'Go to this <a href="{$a}">Seminar event</a>';
 $string['signups'] = 'Sign-ups';
 $string['signupunavailable'] = 'Sign-up unavailable';
 $string['spacesreserved'] = 'Spaces reserved';

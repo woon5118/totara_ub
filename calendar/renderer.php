@@ -23,6 +23,8 @@
  * @package calendar
  */
 
+use mod_facetoface\signup_helper;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -704,16 +706,15 @@ class core_calendar_renderer extends plugin_renderer_base {
         $output = $seminarrenderer->render_seminar_event($seminarevent, false, true);
 
         $signup = \mod_facetoface\signup::create($USER->id, $seminarevent);
-        if ($seminar->get_usercalentry() && $signup->exists()) {
+        if ($seminar->get_usercalentry() && signup_helper::is_booked($signup)) {
             // Better way is to get an user status and display it.
             $linkurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $seminarevent->get_id()));
-            $output .= get_string("calendareventdescriptionbooking", 'facetoface', $linkurl->out());
+            $output .= get_string("calendareventdescriptionbooking", 'mod_facetoface', $linkurl->out());
         } else if (in_array($seminar->get_showoncalendar(), [F2F_CAL_SITE, F2F_CAL_COURSE])) {
             // If the user has not signed up before.
             if (!$seminar->has_unarchived_signups() || $seminar->get_multiplesessions() == 1) {
                 $linkurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $seminarevent->get_id()));
-                $linktext = get_string('signupforthissession', 'facetoface');
-                $output .= html_writer::link($linkurl, $linktext);
+                $output .= get_string('signupforthissession', 'mod_facetoface', $linkurl->out());
             }
         } else {
             $output = '';

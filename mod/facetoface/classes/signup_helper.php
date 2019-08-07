@@ -32,6 +32,7 @@ use mod_facetoface\signup\state\{
     booked,
     requested,
     requestedrole,
+    requestedadmin,
     waitlisted,
     user_cancelled,
     attendance_state
@@ -677,5 +678,23 @@ final class signup_helper {
         global $DB;
 
         return $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+    }
+
+    /**
+     * A simple function to check whether the signup state is booked, waitlisted, requested, one of graded states, or not.
+     *
+     * @param signup $signup
+     * @return boolean
+     */
+    public static function is_booked(signup $signup): bool {
+        $statuscodes = attendance_state::get_all_attendance_code_with([
+            requested::class,
+            requestedrole::class,
+            requestedadmin::class,
+            waitlisted::class,
+            booked::class,
+        ]);
+        $state = $signup->get_state();
+        return $signup->exists() && in_array($state::get_code(), $statuscodes);
     }
 }
