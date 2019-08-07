@@ -16,6 +16,10 @@ Feature: Test the basic functionality of the Totara report graph block
       | learner6 | Learner6  | CZ      |
 
     When I log in as "admin"
+    And I navigate to "General settings" node in "Site administration > Reports"
+#    Can't run this on ChartJS, since behat can't look into the resulting chart elements
+    And I set the field "Graph Library" to "SVGGraph"
+    And I press "Save changes"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
     And I press "Create report"
     And I set the following fields to these values:
