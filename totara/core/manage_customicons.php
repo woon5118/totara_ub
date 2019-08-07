@@ -41,7 +41,7 @@ $component = 'totara_core';
 $filetypes = array('course', 'program');
 $options = array('maxbytes' => $CFG->maxbytes,
     'subdirs'        => 0,
-    'maxfiles'       => 99,
+    'maxfiles'       => EDITOR_UNLIMITED_FILES,
     'accepted_types' => 'web_image');
 
 $data = new stdClass();
