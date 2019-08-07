@@ -45,6 +45,7 @@ class index extends base {
             'user-name' => $this->user->fullname,
             'is-mine' => $this->is_for_current_user(),
             'base-url' => (string) $this->get_base_url(),
+            'can-assign' => $this->can_assign()
         ];
 
         $data = [
@@ -60,5 +61,13 @@ class index extends base {
         $avatar = new user_picture((object)($this->user->to_array()));
         $avatar->size = $size;
         return $avatar->get_url($this->page);
+    }
+
+    protected function can_assign(): bool {
+        if ($this->is_for_current_user()) {
+            return has_capability('tassign/competency:assignself', \context_system::instance());
+        } else {
+            return has_capability('tassign/competency:assignother', $this->context);
+        }
     }
 }

@@ -21,7 +21,10 @@
           v-text="$str('no_competencies_assigned', 'totara_competency')"
         />
       </div>
-      <div class="tui-CompetencyProfile__no-assignments-search-competencies">
+      <div
+        v-if="canAssign"
+        class="tui-CompetencyProfile__no-assignments-search-competencies"
+      >
         <a
           :href="selfAssignmentUrl"
           class="btn totara_style-btn"
@@ -143,6 +146,10 @@ export default {
       type: String,
     },
     isMine: {
+      required: true,
+      type: Boolean,
+    },
+    canAssign: {
       required: true,
       type: Boolean,
     },
