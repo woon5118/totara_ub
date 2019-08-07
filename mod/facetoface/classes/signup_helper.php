@@ -156,9 +156,6 @@ final class signup_helper {
             }
         }
 
-        // Remove the calendar entry for the seminar event.
-        \mod_facetoface\calendar::remove_seminar_event($seminarevent, 0, $signup->get_userid());
-
         // Open the spot up for anyone on the waitlist.
         self::update_attendees($seminarevent);
 

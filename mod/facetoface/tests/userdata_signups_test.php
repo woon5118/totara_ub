@@ -125,8 +125,10 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->assertEquals(item::RESULT_STATUS_SUCCESS, $status);
 
         // Check that signup cancelling was called correctly (triggers event signup_status_updated).
-        $event = array_pop($events);
-        $this->assertInstanceOf('\mod_facetoface\event\signup_status_updated', $event);
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf('\mod_facetoface\event\signup_status_updated', $events[0]);
+        $this->assertInstanceOf('\mod_facetoface\event\booking_cancelled', $events[1]);
+        $event = $events[0];
         $event_data = $event->get_data();
         $this->assertEquals($student1->id, $event_data['other']['userid']);
 
@@ -601,8 +603,10 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         // Check that signup cancelling was called correctly (triggers event signup_status_updated).
         // For deleted and suspended users this doesn't trigger an event because it already happened at deletion/suspension time.
         if (!$targetuser->deleted && !$targetuser->suspended) {
-            $event = array_pop($events);
-            $this->assertInstanceOf('\mod_facetoface\event\signup_status_updated', $event);
+            $this->assertCount(2, $events);
+            $this->assertInstanceOf('\mod_facetoface\event\signup_status_updated', $events[0]);
+            $this->assertInstanceOf('\mod_facetoface\event\booking_cancelled', $events[1]);
+            $event = $events[0];
             $event_data = $event->get_data();
             $this->assertEquals($targetuser->id, $event_data['other']['userid']);
         } else {

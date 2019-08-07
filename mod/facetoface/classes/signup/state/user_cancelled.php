@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * This class represents user cancelled state.
  */
-class user_cancelled extends state {
+class user_cancelled extends state implements interface_event {
 
     /**
      * @inheritDoc
