@@ -39,22 +39,31 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
 
         // Only these 3 protocols are supported.
         $this->assertSame('http://www.example.com/course/view.php?id=1', clean_param('http://www.example.com/course/view.php?id=1', PARAM_URL));
-        $this->assertSame('https://www.example.com/course/view.php?id=1', clean_param('https://www.example.com/course/view.php?id=1', PARAM_URL));
+        $this->assertSame('https://www.example.com/course/view.php?id=:1', clean_param('https://www.example.com/course/view.php?id=:1', PARAM_URL));
         $this->assertSame('ftp://www.example.com/index.html', clean_param('ftp://www.example.com/index.html', PARAM_URL));
         $this->assertSame('', clean_param('gpher://www.example.com/index.html', PARAM_URL));
 
         // Protocol case is not important.
         $this->assertSame('HttP://www.example.com/course/view.php?id=1', clean_param('HttP://www.example.com/course/view.php?id=1', PARAM_URL));
 
+        $this->assertSame('', clean_param('://www.example.com/course/view.php?id=1', PARAM_URL));
+        $this->assertSame('www.example.com/course/view.php?id=1', clean_param('www.example.com/course/view.php?id=1', PARAM_URL));
+
         // Ports are allowed.
         $this->assertSame('http://www.example.com:8080/course/view.php?id=1', clean_param('http://www.example.com:8080/course/view.php?id=1', PARAM_URL));
         $this->assertSame('https://www.example.com:443/course/view.php?id=1', clean_param('https://www.example.com:443/course/view.php?id=1', PARAM_URL));
+
+        // Incomplete URLs should pass.
+        $this->assertSame('/course/view.php?id=1', clean_param('/course/view.php?id=1', PARAM_URL));
+        $this->assertSame('course/view.php?id=1', clean_param('course/view.php?id=1', PARAM_URL));
 
         // Various arguments should be ok, some of them may be URL encoded
         $this->assertSame('http://www.example.com/course/view.php?id=13#test', clean_param('http://www.example.com/course/view.php?id=13#test', PARAM_URL));
         $this->assertSame('http://www.example.com/?whatever%5B%5D=abc', clean_param('http://www.example.com/?whatever[]=abc', PARAM_URL));
         $this->assertSame('http://www.example.com/?whatever%5B0%5D=abc&%5B1%5D=def', clean_param('http://www.example.com/?whatever[0]=abc&[1]=def', PARAM_URL));
         $this->assertSame('/?whatever%5B%5D=abc', clean_param('/?whatever[]=abc', PARAM_URL));
+        $this->assertSame('/course/view.php?id=%3A1', clean_param('/course/view.php?id=:1', PARAM_URL));
+        $this->assertSame('course/view.php?id=%3A1', clean_param('course/view.php?id=:1', PARAM_URL));
 
         // mailto: never worked and never will
         $this->assertSame('', clean_param('mailto:someone@example.com', PARAM_URL));
@@ -90,12 +99,19 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
 
         // Only these 3 protocols are supported.
         $this->assertSame('http://www.example.com/course/view.php?id=1', $oldclean('http://www.example.com/course/view.php?id=1'));
-        $this->assertSame('https://www.example.com/course/view.php?id=1', $oldclean('https://www.example.com/course/view.php?id=1'));
+        $this->assertSame('https://www.example.com/course/view.php?id=:1', $oldclean('https://www.example.com/course/view.php?id=:1'));
         $this->assertSame('ftp://www.example.com/index.html', $oldclean('ftp://www.example.com/index.html'));
         $this->assertSame('', $oldclean('gpher://www.example.com/index.html'));
 
         // Protocol case is not important.
         $this->assertSame('HttP://www.example.com/course/view.php?id=1', $oldclean('HttP://www.example.com/course/view.php?id=1'));
+
+        $this->assertSame('', $oldclean('://www.example.com/course/view.php?id=1'));
+        $this->assertSame('www.example.com/course/view.php?id=1', $oldclean('www.example.com/course/view.php?id=1'));
+
+        // Incomplete URLs should pass.
+        $this->assertSame('/course/view.php?id=1', $oldclean('/course/view.php?id=1'));
+        $this->assertSame('course/view.php?id=1', $oldclean('course/view.php?id=1'));
 
         // Ports are allowed.
         $this->assertSame('http://www.example.com:8080/course/view.php?id=1', $oldclean('http://www.example.com:8080/course/view.php?id=1'));
@@ -106,6 +122,8 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame('', $oldclean('http://www.example.com/?whatever[]=abc')); // Fixed in new cleaning
         $this->assertSame('', $oldclean('http://www.example.com/?whatever[0]=abc&[1]=def')); // Fixed in new cleaning
         $this->assertSame('', $oldclean('/?whatever[]=abc')); // Fixed in new cleaning
+        $this->assertSame('/course/view.php?id=:1', $oldclean('/course/view.php?id=:1')); // Changed in new cleaning
+        $this->assertSame('course/view.php?id=:1', $oldclean('course/view.php?id=:1')); // Changed in new cleaning
 
         // mailto: never worked and never will
         $this->assertSame('', $oldclean('mailto:someone@example.com'));

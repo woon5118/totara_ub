@@ -1044,12 +1044,18 @@ function clean_param($param, $type) {
 
         case PARAM_URL:          // Allow safe ftp, http and https urls; mailto never worked here.
             $param = fix_utf8($param);
+            if ($param === '') {
+                return '';
+            }
             // Totara: encode dangerous and incompatible characters.
             $param = str_replace(
                 ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t",  '{',   '}',   '<',   '>'],
                 ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09', '%7B', '%7D', '%3C', '%3E'],
                 $param);
-            if (preg_match('/^.*:/', $param)) {
+            if (substr($param, 0, 1) === ':') {
+                // '://wwww.example.com/' urls were never allowed.
+                return '';
+            } else if (preg_match('/^[a-z]+:/i', $param)) {
                 // Totara: the validateUrlSyntax() does not support extended characters,
                 //         that means we can use native PHP url validation without risk of regressions
                 //         to improve security, but only for full URLs.
@@ -1057,6 +1063,8 @@ function clean_param($param, $type) {
                 if ($param === false) {
                     return '';
                 }
+            } else {
+                $param = str_replace(':', '%3A', $param);
             }
             include_once($CFG->dirroot . '/lib/validateurlsyntax.php');
             // Totara: mailto never worked here because of 'u-', instead of fixing it was removed.
