@@ -959,6 +959,57 @@ Feel free to browse, list of users is below, their password is 12345.
         archive_assignment($ass[0], $ass[1] ?? false);
     }
 
+    mark_competencies_self_assignable([
+        'binary' => [
+            'literate',
+            'doer',
+            'initiative',
+            'collider',
+        ],
+        'complex' => [
+            ['consultant', 1],
+            ['nurse', 1],
+            ['administrative-nurse', 1],
+            ['surgeon', 1],
+            ['priest', 1],
+            ['zoo-keeper', 1],
+            ['camp-ground-manager', 1],
+        ],
+        '4-value' => [
+            ['netflix', 2],
+            ['shop-keeper', 1],
+            ['machinery-operator', 2],
+            ['it', 1],
+            ['sommelier', 2],
+            ['barista', 1],
+            ['bartender', 2],
+            ['mad-preacher', 1],
+        ],
+        'star-wars' => [
+            ['lightsaber', 1],
+            ['pod-racer', 1],
+            ['storm-trooper', 1],
+            ['sith-lord', 1],
+        ],
+        'bs' => [
+            ['drive', 1],
+            ['serving', 2],
+            ['quality', 1],
+            ['integrity', 2],
+            ['planning', 1],
+            ['confidence', 2],
+            ['problem-solving', 1],
+            ['info-seeking', 2],
+            ['communication', 1],
+            ['embracing', 2],
+            ['collaborating', 1],
+            ['influencing', 2],
+            ['innovation', 1],
+            ['thinking', 2],
+            ['managing', 1],
+        ]
+    ], $data);
+
     create_info_block($data);
 }
 
@@ -1371,6 +1422,25 @@ function hierarchy_generator() {
  */
 function assignment_generator() {
     return generator()->get_plugin_generator('tassign_competency');
+}
+
+function mark_competencies_self_assignable($frameworks, $data) {
+    foreach ($frameworks as $key => $competencies) {
+        foreach ($competencies as $competency) {
+            if (!is_array($competency)) {
+                $competency = [$competency, 2];
+            }
+
+            $record = [
+                'comp_id' => get_competency($key, $competency[0] ?? '', $data)->id ?? null,
+                'availability' => $competency[1] ?? 2,
+            ];
+
+            builder::table('comp_assign_availability')->insert($record);
+        }
+    }
+
+
 }
 
 function create_info_block($data) {
