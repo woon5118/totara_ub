@@ -23,6 +23,8 @@
 
 namespace totara_competency\controllers\profile;
 
+use tassign_competency\entities\competency_framework;
+use tassign_competency\entities\competency_type;
 use totara_mvc\view;
 
 class self_assignment extends base {
@@ -42,6 +44,8 @@ class self_assignment extends base {
         $props = [
             'user-id' => $this->user->id,
             'go-back-link' => (string)$this->get_profile_url(),
+            'frameworks' => $this->get_frameworks(),
+            'types' => $this->get_types()
         ];
 
         $data = [
@@ -50,5 +54,36 @@ class self_assignment extends base {
 
         return view::create('totara_competency/profile_self_assignment', $data)
             ->set_title(get_string('assign_competencies', 'totara_competency'));
+    }
+
+    protected function get_frameworks() {
+        $frameworks = competency_framework::repository()
+            ->filter_by_visible()
+            ->order_by('sortorder', 'asc')
+            ->get();
+
+        $result = [];
+        /** @var competency_framework $framework */
+        foreach ($frameworks as $framework) {
+            $result[] = [
+                'id' => $framework->id,
+                'name' => $framework->fullname
+            ];
+        }
+        return $result;
+    }
+
+    protected function get_types() {
+        $competency_types = competency_type::repository()->get();
+
+        $result = [];
+        /** @var competency_framework $framework */
+        foreach ($competency_types as $type) {
+            $result[] = [
+                'id' => $type->id,
+                'name' => $type->fullname
+            ];
+        }
+        return $result;
     }
 }

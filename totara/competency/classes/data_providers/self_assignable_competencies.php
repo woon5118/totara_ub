@@ -66,6 +66,18 @@ class self_assignable_competencies extends user_data_provider {
                 ->set_value($filters['assignment_type']);
         }
 
+        if (array_key_exists('framework', $filters) && is_null($filters['framework'],)) {
+            unset($filters['framework']);
+        }
+
+        if (isset($filters['type']) && in_array(null, $filters['type'], true)) {
+            unset($filters['type']);
+        }
+
+        if (isset($filters['assignment_status']) && in_array(null, $filters['assignment_status'], true)) {
+            unset($filters['assignment_status']);
+        }
+
         return parent::set_filters($filters);
     }
 

@@ -18,7 +18,72 @@
       </div>
     </div>
     <div v-if="data.total > 0">
-      <div style="text-align: right; width: 100%;">
+      <div>
+        <label
+          for="competency-profile-assignment-text-filter"
+          style="line-height: 34px;"
+        >
+          {{ $str('search', 'totara_core') }}
+        </label>
+        <input
+          id="competency-profile-assignment-text-filter"
+          v-model="filters.text"
+          type="text"
+          @change="filterUpdated"
+        />
+      </div>
+      <label
+        for="competency-profile-frameworks-filter"
+        style="line-height: 34px;"
+      >
+        {{ $str('competencyframeworks', 'totara_hierarchy') }}
+      </label>
+      <select
+        id="competency-profile-frameworks-filter"
+        v-model="filters.framework"
+        @change="filterUpdated"
+      >
+        <option :value="null">{{ $str('all', 'totara_competency') }}</option>
+        <option
+          v-for="framework in frameworks"
+          :key="framework.id"
+          :value="framework.id"
+          v-text="framework.name"
+        />
+      </select>
+      <label for="competency-profile-type-filter" style="line-height: 34px;">
+        {{ $str('competencytypes', 'totara_hierarchy') }}
+      </label>
+      <select
+        id="competency-profile-type-filter"
+        v-model="filters.type"
+        multiple
+        size="3"
+        @change="filterUpdated"
+      >
+        <option :value="null">{{ $str('all', 'totara_competency') }}</option>
+        <option
+          v-for="type in types"
+          :key="type.id"
+          :value="type.id"
+          v-text="type.name"
+        />
+      </select>
+      <label for="competency-profile-status-filter" style="line-height: 34px;">
+        {{ $str('header:assignment_status', 'totara_competency') }}
+      </label>
+      <select
+        id="competency-profile-status-filter"
+        v-model="filters.assignment_status"
+        multiple
+        size="3"
+        @change="filterUpdated"
+      >
+        <option :value="null">{{ $str('all', 'totara_competency') }}</option>
+        <option :value="1" v-text="$str('assigned', 'totara_competency')" />
+        <option :value="0" v-text="$str('unassigned', 'totara_competency')" />
+      </select>
+      <div style=" width: 100%;text-align: right;">
         <button
           class="tw-selectionBasket__btn tw-selectionBasket__btn_small tw-selectionBasket__btn_prim"
           :disabled="selectedItems.length == 0"
@@ -51,7 +116,7 @@
           </th>
         </thead>
         <tbody>
-          <tr v-for="item in allItems" :key="item.id">
+          <tr v-for="item in data.items" :key="item.id">
             <td>
               <input
                 v-model="selectedItems"
@@ -78,7 +143,7 @@
         <tfoot>
           <tr v-if="data.next_cursor !== ''">
             <td colspan="5">
-              <button @click="nextCursor = data.next_cursor">
+              <button @click="loadMore">
                 {{ $str('loadmore', 'totara_core') }}
               </button>
             </td>
@@ -92,11 +157,26 @@
 <script>
 import SelfAssignableCompetenciesQuery from '../../webapi/ajax/self_assignable_competencies.graphql';
 
+const initial_cursor = window.btoa(
+  JSON.stringify({
+    limit: 5,
+    columns: null,
+  })
+);
+
 export default {
   props: {
+    frameworks: {
+      required: true,
+      type: Array,
+    },
     goBackLink: {
       required: true,
       type: String,
+    },
+    types: {
+      required: true,
+      type: Array,
     },
     userId: {
       required: true,
@@ -113,9 +193,25 @@ export default {
         total: null,
         next_cursor: null,
       },
-      nextCursor: null,
-      allItems: [],
+      filters: {},
     };
+  },
+
+  computed: {
+    encodedCursor: function() {
+      let encodedCursor = this.data.next_cursor;
+
+      // On first load use new cursor
+      if (encodedCursor === null) {
+        let cursor = {
+          limit: 5,
+          columns: null,
+        };
+        encodedCursor = window.btoa(JSON.stringify(cursor));
+      }
+
+      return encodedCursor;
+    },
   },
 
   methods: {
@@ -135,31 +231,12 @@ export default {
       }
     },
 
-    isAssigned: function(competency) {
-      return (
-        competency.user_assignments && competency.user_assignments.length > 0
-      );
-    },
-
-    isSelfAssigned: function(competency) {
-      if (competency.user_assignments) {
-        let self = competency.user_assignments.find(function(assignment) {
-          return assignment.type === 'self';
-        });
-        return typeof self !== 'undefined';
-      }
-      return false;
-    },
-
-    selectAll: function() {
-      this.selectedItems = [];
-      if (!this.allSelected) {
-        for (let item in this.allItems) {
-          if (this.allItems.hasOwnProperty(item)) {
-            this.selectedItems.push(this.allItems[item].id);
-          }
-        }
-      }
+    filterUpdated: function() {
+      this.$apollo.queries.data.refetch({
+        user_id: this.userId,
+        cursor: initial_cursor,
+        filters: this.filters,
+      });
     },
 
     getReasonAssigned: function(competency) {
@@ -182,38 +259,78 @@ export default {
       }
       return groupedAssignments;
     },
+
+    isAssigned: function(competency) {
+      return (
+        competency.user_assignments && competency.user_assignments.length > 0
+      );
+    },
+
+    isSelfAssigned: function(competency) {
+      if (competency.user_assignments) {
+        let self = competency.user_assignments.find(function(assignment) {
+          return assignment.type === 'self';
+        });
+        return typeof self !== 'undefined';
+      }
+      return false;
+    },
+
+    loadMore: function() {
+      // Fetch more data and transform the original result
+      this.$apollo.queries.data.fetchMore({
+        // New variables
+        variables: {
+          user_id: this.userId,
+          cursor: this.encodedCursor,
+          filters: this.filters,
+        },
+
+        updateQuery: (prev, { fetchMoreResult }) => {
+          var prevRes = prev.totara_competency_self_assignable_competencies;
+          var res =
+            fetchMoreResult.totara_competency_self_assignable_competencies;
+          const newItems = res.items;
+          const total = res.total;
+          const nextCursor = res.next_cursor;
+
+          return {
+            totara_competency_self_assignable_competencies: {
+              __typename: prevRes.__typename,
+              items: [...prevRes.items, ...newItems],
+              total: total,
+              next_cursor: nextCursor,
+            },
+          };
+        },
+      });
+    },
+
+    selectAll: function() {
+      this.selectedItems = [];
+      if (!this.allSelected) {
+        for (let item in this.data.items) {
+          if (this.data.items.hasOwnProperty(item)) {
+            this.selectedItems.push(this.data.items[item].id);
+          }
+        }
+      }
+    },
   },
 
   apollo: {
     data: {
       query: SelfAssignableCompetenciesQuery,
+
       variables() {
-        let encodedCursor = this.nextCursor;
-
-        // On first load use new cursor
-        if (encodedCursor === null) {
-          let cursor = {
-            limit: 5,
-            columns: null,
-          };
-          encodedCursor = window.btoa(JSON.stringify(cursor));
-        }
-
         return {
           user_id: this.userId,
-          cursor: encodedCursor,
+          cursor: initial_cursor,
         };
       },
 
       update({ totara_competency_self_assignable_competencies: data }) {
         return data;
-      },
-
-      result({
-        data: { totara_competency_self_assignable_competencies: data },
-      }) {
-        data = JSON.parse(JSON.stringify(data));
-        this.allItems = this.allItems.concat(data.items.slice(0));
       },
     },
   },
@@ -223,12 +340,16 @@ export default {
 <lang-strings>
   {
     "totara_core": [
-      "loadmore"
+      "loadmore",
+      "search"
     ],
     "totara_hierarchy": [
-      "assign"
+      "assign",
+      "competencyframeworks",
+      "competencytypes"
     ],
     "totara_competency": [
+      "all",
       "assigned",
       "assign_competencies",
       "back_to_competency_profile",
