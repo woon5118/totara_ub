@@ -112,6 +112,51 @@ export default {
     };
   },
 
+  methods: {
+    assign: function() {
+      const confirmMsg =
+        'You have selected ' +
+        this.selectedItems.length +
+        ' competencies to assign.\n\nDo you want to continue?';
+
+      let result = confirm(confirmMsg);
+      if (result) {
+        // TODO
+        // Show loading indicator (or disable assign button)
+        // send mutation request
+        // Show notification about result
+        console.log('Create assignments for: ', this.selectedItems);
+      }
+    },
+
+    isAssigned: function(competency) {
+      return (
+        competency.user_assignments && competency.user_assignments.length > 0
+      );
+    },
+
+    isSelfAssigned: function(competency) {
+      if (competency.user_assignments) {
+        let self = competency.user_assignments.find(function(assignment) {
+          return assignment.type === 'self';
+        });
+        return typeof self !== 'undefined';
+      }
+      return false;
+    },
+
+    selectAll: function() {
+      this.selectedItems = [];
+      if (!this.allSelected) {
+        for (let item in this.allItems) {
+          if (this.allItems.hasOwnProperty(item)) {
+            this.selectedItems.push(this.allItems[item].id);
+          }
+        }
+      }
+    },
+  },
+
   apollo: {
     data: {
       query: SelfAssignableCompetenciesQuery,
@@ -143,51 +188,6 @@ export default {
         data = JSON.parse(JSON.stringify(data));
         this.allItems = this.allItems.concat(data.items.slice(0));
       },
-    },
-  },
-
-  methods: {
-    assign: function() {
-      const confirmMsg =
-        'You have selected ' +
-        this.selectedItems.length +
-        ' competencies to assign.\n\nDo you want to continue?';
-
-      let result = confirm(confirmMsg);
-      if (result) {
-        // TODO
-        // Show loading indicator (or disable assign button)
-        // send mutation request
-        // Show notification about result
-        console.log('Create assignments for: ', this.selectedItems);
-      }
-    },
-
-    selectAll: function() {
-      this.selectedItems = [];
-      if (!this.allSelected) {
-        for (let item in this.allItems) {
-          if (this.allItems.hasOwnProperty(item)) {
-            this.selectedItems.push(this.allItems[item].id);
-          }
-        }
-      }
-    },
-
-    isSelfAssigned: function(competency) {
-      if (competency.user_assignments) {
-        let self = competency.user_assignments.find(function(assignment) {
-          return assignment.type === 'self';
-        });
-        return typeof self !== 'undefined';
-      }
-      return false;
-    },
-
-    isAssigned: function(competency) {
-      return (
-        competency.user_assignments && competency.user_assignments.length > 0
-      );
     },
   },
 };
