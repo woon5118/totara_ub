@@ -5,16 +5,28 @@
     }}</a>
     <h2>{{ $str('assign_competencies', 'totara_competency') }}</h2>
     <h4>{{ $str('search_competencies_descriptive', 'totara_competency') }}</h4>
-    <div style="text-align: right; width: 100%;">
-      <button
-        class="tw-selectionBasket__btn tw-selectionBasket__btn_small tw-selectionBasket__btn_prim"
-        :disabled="selectedItems.length == 0"
-        @click="assign"
-      >
-        {{ $str('assign', 'totara_hierarchy') }}
-      </button>
+    <div v-if="data.total === 0">
+      <div class="alert alert-info alert-with-icon">
+        <!-- TODO bootstrap alert -->
+        <div class="alert-icon">
+          <FlexIcon icon="notification-info" />
+        </div>
+        <div
+          class="alert-message"
+          v-text="$str('no_competency_to_assign', 'totara_competency')"
+        />
+      </div>
     </div>
-    <div>
+    <div v-if="data.total > 0">
+      <div style="text-align: right; width: 100%;">
+        <button
+          class="tw-selectionBasket__btn tw-selectionBasket__btn_small tw-selectionBasket__btn_prim"
+          :disabled="selectedItems.length == 0"
+          @click="assign"
+        >
+          {{ $str('assign', 'totara_hierarchy') }}
+        </button>
+      </div>
       <strong>{{ data.total }} competencies</strong>
       <table class="table table-hover table-striped">
         <thead>
@@ -80,7 +92,7 @@ export default {
       selectedItems: [],
       data: {
         items: [],
-        total: 0,
+        total: null,
         next_cursor: null,
       },
       nextCursor: null,
@@ -177,7 +189,8 @@ export default {
         "totara_competency": [
             "back_to_competency_profile",
             "assign_competencies",
-            "search_competencies_descriptive"
+            "search_competencies_descriptive",
+            "no_competency_to_assign"
         ]
     }
 </lang-strings>

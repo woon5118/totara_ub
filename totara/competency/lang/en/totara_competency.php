@@ -101,6 +101,7 @@ $string['my_competency_profile'] = '{$a} Competency profile';
 $string['my_rating'] = 'My rating';
 $string['next'] = 'Next';
 $string['no_competencies_assigned'] = 'There are no competencies currently assigned.';
+$string['no_competency_to_assign'] = 'There are no competencies available to assign.';
 $string['nocourseslinkedyet'] = 'No courses linked yet';
 $string['none'] = 'None';
 $string['nopaths'] = 'No achievement paths added';
