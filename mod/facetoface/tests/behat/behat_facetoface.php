@@ -282,6 +282,33 @@ class behat_facetoface extends behat_base {
     }
 
     /**
+     * Checks if a custom facilitator of the given name exists in the database.
+     * @Given /^a seminar custom facilitator called "([^"]*)" (should not|should) exist$/
+     * @throws \Behat\Mink\Exception\ExpectationException
+     * @param string $facilitatorname
+     * @param string $should
+     */
+    public function a_seminar_custom_facilitator_called_should_exist($facilitatorname, $should) {
+        \behat_hooks::set_step_readonly(true);
+        global $DB;
+
+        $params = array(
+            'custom' => 1,
+            'name' => $facilitatorname
+        );
+        $exists = $DB->record_exists('facetoface_facilitator', $params);
+        if ($should === 'should') {
+            if (!$exists) {
+                throw new \Behat\Mink\Exception\ExpectationException('Seminar custom facilitator by the name of "' . $facilitatorname . '" does not exist', $this->getSession());
+            }
+        } else {
+            if ($exists) {
+                throw new \Behat\Mink\Exception\ExpectationException('Seminar custom facilitator by the name of "' . $facilitatorname . '" still exists', $this->getSession());
+            }
+        }
+    }
+
+    /**
      * Clicks on the "Edit session" link for a Facetoface session.
      *
      * @throws \Behat\Mink\Exception\ExpectationException

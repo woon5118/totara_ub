@@ -61,6 +61,11 @@ class event_handler {
         // Brute force unenrol from Seminar session role.
         $DB->delete_records('facetoface_session_roles', array('userid' => $userid));
 
+        $facilitator = \mod_facetoface\facilitator_user::seek_by_userid($userid);
+        if ($facilitator->exists()) {
+            $facilitator->hide();
+            $facilitator->save();
+        }
         return true;
     }
 
@@ -88,6 +93,11 @@ class event_handler {
                     signup_helper::user_cancel($signup);
                 }
             }
+        }
+        $facilitator = \mod_facetoface\facilitator_user::seek_by_userid($userid);
+        if ($facilitator->exists()) {
+            $facilitator->hide();
+            $facilitator->save();
         }
         return true;
     }

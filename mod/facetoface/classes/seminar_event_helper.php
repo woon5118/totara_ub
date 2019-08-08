@@ -114,6 +114,9 @@ final class seminar_event_helper {
             $rooms = isset($date->roomids) ? $date->roomids : [];
             unset($date->roomids);
 
+            $facilitators = isset($date->facilitatorids) ? $date->facilitatorids : [];
+            unset($date->facilitatorids);
+
             if ($date->id > 0) {
                 $DB->update_record('facetoface_sessions_dates', $date);
             } else {
@@ -123,6 +126,7 @@ final class seminar_event_helper {
 
             room_helper::sync($date->id, array_unique($rooms));
             asset_helper::sync($date->id, array_unique($assets));
+            facilitator_helper::sync($date->id, array_unique($facilitators));
         }
     }
 
@@ -147,11 +151,17 @@ final class seminar_event_helper {
                 $sessions->remove($date->id);
                 if ($session->get_sessiontimezone() == $date->sessiontimezone
                     && $session->get_timestart() == $date->timestart
-                    && $session->get_timefinish() == $date->timefinish) {
+                    && $session->get_timefinish() == $date->timefinish)
+                {
                     $date->roomids = (isset($date->roomids) && is_array($date->roomids)) ? $date->roomids : [];
                     room_helper::sync($date->id, array_unique($date->roomids));
+
                     $date->assetids = (isset($date->assetids) && is_array($date->assetids)) ? $date->assetids : [];
                     asset_helper::sync($date->id, array_unique($date->assetids));
+
+                    $date->facilitatorids = (isset($date->facilitatorids) && is_array($date->facilitatorids)) ? $date->facilitatorids : [];
+                    facilitator_helper::sync($date->id, array_unique($date->facilitatorids));
+
                     return false;
                 }
             } else if ($date->id != 0) {

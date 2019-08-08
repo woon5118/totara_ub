@@ -26,6 +26,7 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_roomavailable.php');
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_assetavailable.php');
+require_once($CFG->dirroot . '/mod/facetoface/classes/rb/filter/facilitator_available.php');
 
 abstract class rb_facetoface_base_source extends rb_base_source {
     public function __construct() {

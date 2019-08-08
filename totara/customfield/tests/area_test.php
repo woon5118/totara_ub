@@ -41,6 +41,7 @@ class totara_customfield_area_testcase extends advanced_testcase {
                 'facetofaceroom' => array('facetofaceroom', 'facetofaceroom_filemgr'),
                 'facetofacesession' => array('facetofacesession', 'facetofacesession_filemgr'),
                 'facetofacesessioncancel' => array('facetofacesessioncancel', 'facetofacesessioncancel_filemgr'),
+                'facetofacefacilitator' => ['facetofacefacilitator', 'facetofacefacilitator_filemgr'],
             ),
             'totara_hierarchy' => array(
                 'goal' => array('goal', 'goal_filemgr'),

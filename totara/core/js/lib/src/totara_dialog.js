@@ -447,10 +447,10 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
                     }
 
                     if (dialog.dialog.find('a:visible, input:visible, select:visible, button:visible').length > 0) {
-                        dialog.dialog.find('a:visible, input:visible, select:visible, button:visible')[0].focus();
+                        //dialog.dialog.find('a:visible, input:visible, select:visible, button:visible')[0].focus();
                     } else {
                         // This should be the OK button
-                        dialog.dialog.parent().find('.ui-dialog-buttonpane button')[0].focus();
+                        //dialog.dialog.parent().find('.ui-dialog-buttonpane button')[0].focus();
                     }
                 }
             },
@@ -707,7 +707,7 @@ totaraDialog_handler_treeview.prototype.setup_tabs = function(e, ui) {
 
     // If showing search tab, focus search box
     if (ui && $(ui.newTab).attr('aria-controls') === 'search-tab') {
-        $('#id_query', this._container).focus();
+        //$('#id_query', this._container).focus();
     }
 }
 

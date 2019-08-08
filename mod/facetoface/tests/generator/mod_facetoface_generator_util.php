@@ -144,6 +144,26 @@ final class mod_facetoface_generator_util {
             }
         }
 
+        if (isset($record['facilitators'])) {
+            // Start processing on facilitators if there are any provided.
+            $facilitators = explode(",", $record['facilitators']);
+            array_walk(
+                $facilitators,
+                function (string &$facilitator): void {
+                    trim($facilitator);
+                }
+            );
+
+            foreach ($facilitators as $facilitator) {
+                $o = new \stdClass();
+                $o->sessiondateid = $rc->id;
+
+                // Expecting facilitator to be existing in the storage, with the given name from the step.
+                $o->facilitatorid = $DB->get_field('facetoface_facilitator', 'id', ['name' => $facilitator], MUST_EXIST);
+                $DB->insert_record('facetoface_facilitator_dates', $o);
+            }
+        }
+
         if (isset($record['assets'])) {
             // Start processing on assets if there are any provided.
             $assets = explode(",", $record['assets']);

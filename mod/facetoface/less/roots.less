@@ -15,6 +15,8 @@
 @mod_facetoface-navbar-height: @mod_facetoface-navbar-font-height * 2;
 @mod_facetoface-cancel-close-size: @totara_style-size_40;
 
+@mod_facetoface-ui-dialog-width: 870px;
+
 .f2fsessionlinks,
 .f2fsessionnotice {
     display: block;
@@ -52,21 +54,24 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
 /** This is a hack to get full height divs for the status columns with background colours */
 .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
 .reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
-.reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
+.reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr,
+.reportbuilder-table[data-source="rb_source_facetoface_facilitator_assignments"] tr {
     height: 1px;
 }
 
 /** Firefox requires a different hack **/
 .gecko .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
 .gecko .reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
-.gecko .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
+.gecko .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr,
+.gecko .reportbuilder-table[data-source="rb_source_facetoface_facilitator_assignments"] tr {
     height: 100%;
 }
 
 /** IE requires quite a bit more hacking! **/
 .ie .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
 .ie .reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
-.ie .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
+.ie .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr,
+.ie .reportbuilder-table[data-source="rb_source_facetoface_facilitator_assignments"] tr {
     height: 100%;
 }
 
@@ -137,18 +142,21 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
 }
 
 .mod_facetoface-assetlist,
-.mod_facetoface-roomlist {
+.mod_facetoface-roomlist,
+.mod_facetoface-facilitatorlist {
     list-style-type: none;
     margin: 0;
 }
 
 .ui-dialog [id^='selectassets'][id$='-dialog'] .select,
-.ui-dialog [id^='selectrooms'][id$='-dialog'] .select {
+.ui-dialog [id^='selectrooms'][id$='-dialog'] .select,
+.ui-dialog [id^='selectfacilitators'][id$='-dialog'] .select {
     overflow: auto;
 }
 
 .ui-dialog [id^='selectassets'][id$='-dialog'] .dialog-footer,
-.ui-dialog [id^='selectrooms'][id$='-dialog'] .dialog-footer {
+.ui-dialog [id^='selectrooms'][id$='-dialog'] .dialog-footer,
+.ui-dialog [id^='selectfacilitators'][id$='-dialog'] .dialog-footer {
     padding-top: 0.5em;
     display: block;
     float: left;
@@ -405,15 +413,31 @@ select.menuf2f-select {
             display: block;
         }
 
-        &__room {
+        &__room,
+        &__facilitator {
             max-width: 15em;
             > ul.roomlist {
                 .no-list-style();
             }
+            > ul.roomlist {
+                margin: 0;
+                padding: 0;
+                > li.room {
+                    list-style-type: none;
+                }
+            }
+            > ul.facilitatorlist {
+                margin: 0;
+                padding: 0;
+                > li.facilitator {
+                    list-style-type: none;
+                }
+            }
         }
 
-        &__roomdetails {
-            font-size: @totara_style-size_12;
+        &__roomdetails,
+        &__facilitatordetails {
+            font-size: @totara_style-size_13;
             display: block;
         }
 
@@ -456,7 +480,9 @@ select.menuf2f-select {
         hr {
             margin: @totara_style-spacing_small 0;
         }
-        &__room, &__asset {
+        &__room,
+        &__asset,
+        &__facilitator {
             margin-bottom: @totara_style-spacing_small;
         }
     }
@@ -1006,6 +1032,112 @@ a.mod_facetoface__action_goback {
     table.userstoupload {
         span.usernotfound {
             margin-left: @totara_style-size_4;
+        }
+    }
+}
+
+.path-mod-facetoface,
+.path-admin-mod-facetoface {
+    div.ui-widget {
+        //width: @mod_facetoface-ui-dialog-width;
+        font-family: @headings-font-family;
+    }
+    div.ui-dialog {
+        //width: @mod_facetoface-ui-dialog-width;
+        div.ui-dialog-titlebar {
+            padding: 13px 17px;
+            span.ui-dialog-title {
+                margin: 0;
+                span.title {
+                    h2 {
+                        margin: 0;
+                        span#treeview_currently_selected_span_facilitator {
+                            display: none;
+                            label {
+                                margin-right: @totara_style-spacing_x_small;
+                            }
+                            span#treeview_selected_text_facilitator {
+                                font-style: italic;
+                            }
+                        }
+                    }
+                }
+            }
+            button.ui-dialog-titlebar-close {
+                right: -1px;
+                top: -1px;
+                width: 2.4em;
+                margin: 0;
+                padding: 0;
+                span.ui-button-text {
+                    padding: 0;
+                }
+            }
+        }
+        div.ui-dialog-content {
+            div.select {
+                div#dialog-tabs {
+                    div.tabtree {
+                        margin: 0;
+                        ul.nav-tabs {
+                            padding: 0;
+                            li {
+                                border: 0;
+                                margin: 0;
+                            }
+                            li.ui-tabs-active a {
+                                color: #6e6e6e;
+                                background-color: #fff;
+                                border-top-color: #4bc3c4;
+                                box-shadow: 0 -1px #4bc3c4, -1px 0 transparent;
+                                border-bottom: 1px solid white;
+                            }
+                        }
+                    }
+                    div#search-tab {
+                        div#fitem_id_query {
+                            margin-bottom: 0;
+                            div.fitemtitle {
+                                padding: 5px 0 0 0;
+                            }
+                            div.ftext {
+                                padding-right: 0;
+                            }
+                        }
+                        div#fitem_id_dialogsearchsubmitbutton {
+                            margin-bottom: 0;
+                        }
+                    }
+                    div#browse-tab,
+                    div#search-tab {
+                        ul.treeview li {
+                            font-size: @totara_style-size_13;
+                            span {
+                                margin-left: 2px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.path-admin-mod-facetoface-facilitator {
+    form.manage_facilitator {
+        .felement > input.facilitator_search {
+            margin-right: 0;
+        }
+        input[name="facilitatorselector"] {
+            margin-right: @totara_style-spacing_small;
+        }
+    }
+    table#facetoface_facilitators {
+        td.facilitator_namelink,
+        td.facilitator_name {
+            span.userfullname {
+                margin-left: @totara_style-spacing_x_small;
+            }
         }
     }
 }

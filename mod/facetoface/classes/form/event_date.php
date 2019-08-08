@@ -45,8 +45,11 @@ class event_date extends \moodleform {
         $mform->setType('sessionid', PARAM_INT);
         $mform->addElement('hidden', 'roomids', $this->_customdata['roomids']);
         $mform->setType('roomids', PARAM_SEQUENCE);
+        $mform->addElement('hidden', 'facilitatorids', $this->_customdata['facilitatorids']);
+        $mform->setType('facilitatorids', PARAM_SEQUENCE);
         $mform->addElement('hidden', 'assetids', $this->_customdata['assetids']);
         $mform->setType('assetids', PARAM_SEQUENCE);
+
         $mform->addElement('static', 'dateunavailable', "");
 
         if ($displaytimezones) {
@@ -109,17 +112,28 @@ class event_date extends \moodleform {
     }
 
     function validation($data, $files) {
+
         $roomids = array();
         if (!empty($data['roomids'])) {
             $roomids = explode(',', $data['roomids']);
         }
+
+        $facilitatorids = array();
+        if (!empty($data['facilitatorids'])) {
+            $facilitatorids = explode(',', $data['facilitatorids']);
+        }
+
         $assetids = array();
         if (!empty($data['assetids'])) {
             $assetids = explode(',', $data['assetids']);
         }
+
         $facetofaceid = $this->_customdata['facetofaceid'];
-        $errors = \mod_facetoface\event_dates::validate($data['timestart'], $data['timefinish'], $roomids, $assetids,
-            $data['sessionid'], $facetofaceid);
+
+        $errors = \mod_facetoface\event_dates::validate(
+            $data['timestart'], $data['timefinish'], $roomids, $assetids, $data['sessionid'], $facetofaceid, $facilitatorids
+        );
+
         return $errors;
     }
 }

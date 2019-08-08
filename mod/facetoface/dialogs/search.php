@@ -42,7 +42,7 @@ $formdata = array(
     'query'         => $query,
     'searchtype'    => $searchtype
 );
-$mform = new dialog_search_form(null, $formdata);
+$mform = new \mod_facetoface\form\dialog_search(null, $formdata);
 // Display form
 $mform->display();
 

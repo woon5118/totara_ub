@@ -27,11 +27,13 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 
 class rb_source_facetoface_summary extends rb_facetoface_base_source {
+
     use \core_course\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
     use \mod_facetoface\rb\traits\required_columns;
     use \mod_facetoface\rb\traits\post_config;
+    use \mod_facetoface\rb\traits\facilitator;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
@@ -79,7 +81,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             'roomdates.sessionsdateid = base.id',
             REPORT_BUILDER_RELATION_ONE_TO_MANY
         );
-
         $joinlist[] = new rb_join(
             'room',
             'LEFT',
@@ -88,7 +89,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             REPORT_BUILDER_RELATION_ONE_TO_MANY,
             'roomdates'
         );
-
         $joinlist[] = new rb_join(
             'assetdate',
             'LEFT',
@@ -96,7 +96,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             'assetdate.sessionsdateid = base.id',
             REPORT_BUILDER_RELATION_MANY_TO_ONE
         );
-
         $joinlist[] = new rb_join(
             'asset',
             'LEFT',
@@ -105,6 +104,21 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             REPORT_BUILDER_RELATION_MANY_TO_ONE,
             'assetdate'
         );
+        $joinlist[] = new rb_join(
+            'facilitatordate',
+            'LEFT',
+            '{facetoface_facilitator_dates}',
+            'facilitatordate.sessionsdateid = base.id',
+            REPORT_BUILDER_RELATION_MANY_TO_ONE
+        );
+        $joinlist[] = new rb_join(
+            'facilitator',
+            'LEFT',
+            '{facetoface_facilitator}',
+            'facilitatordate.facilitatorid = facilitator.id',
+            REPORT_BUILDER_RELATION_MANY_TO_ONE,
+            'facilitatordate'
+            );
 
         $this->add_session_status_to_joinlist($joinlist);
         $this->add_core_course_tables($joinlist, 'facetoface', 'course');
@@ -441,6 +455,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->add_core_course_columns($columnoptions);
         $this->add_assets_fields_to_columns($columnoptions);
         $this->add_rooms_fields_to_columns($columnoptions);
+        $this->add_facilitators_fields_to_columns($columnoptions);
 
         return $columnoptions;
     }

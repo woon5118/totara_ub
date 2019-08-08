@@ -81,7 +81,7 @@ trait crud_mapper {
             if (property_exists($this, $property)) {
                 $this->{$property} = $value;
             } else if ($strict) {
-                debugging("Provided object does not have {$property} field", DEBUG_DEVELOPER);
+                debugging("Provided object does not have a \"{$property}\" field", DEBUG_DEVELOPER);
             }
         }
         return $this;

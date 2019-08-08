@@ -30,6 +30,7 @@ global $CFG;
 
 use mod_facetoface\attendees_helper;
 use mod_facetoface\signup\state\{booked, waitlisted};
+use mod_facetoface\facilitator;
 
 require_once("{$CFG->libdir}/formslib.php");
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
@@ -282,6 +283,7 @@ class event extends \moodleform {
         $table->head = array(
             get_string('dateandtime', 'facetoface'),
             get_string('rooms', 'mod_facetoface'),
+            get_string('facilitators', 'mod_facetoface'),
             get_string('assets', 'facetoface'),
             ''
         );
@@ -317,6 +319,7 @@ class event extends \moodleform {
         $dateid   = !empty($sessiondata->{"sessiondateid[$offset]"}) ? $sessiondata->{"sessiondateid[$offset]"} : 0;
         $roomids  = !empty($sessiondata->{"roomids[$offset]"}) ? $sessiondata->{"roomids[$offset]"} : '';
         $assetids = !empty($sessiondata->{"assetids[$offset]"}) ? $sessiondata->{"assetids[$offset]"} : '';
+        $facilitatorids = !empty($sessiondata->{"facilitatorids[$offset]"}) ? $sessiondata->{"facilitatorids[$offset]"} : '';
 
         // Add per-date form elements.
         // Clonable fields also must be listed in session.js.
@@ -326,6 +329,8 @@ class event extends \moodleform {
         $mform->setType("roomcapacity[$offset]", PARAM_INT);
         $mform->addElement('hidden', "roomids[$offset]", $roomids);
         $mform->setType("roomids[$offset]", PARAM_SEQUENCE);
+        $mform->addElement('hidden', "facilitatorids[$offset]", $facilitatorids);
+        $mform->setType("facilitatorids[$offset]", PARAM_SEQUENCE);
         $mform->addElement('hidden', "assetids[$offset]", $assetids);
         $mform->setType("assetids[$offset]", PARAM_SEQUENCE);
         $mform->addElement('hidden', "timestart[$offset]");
@@ -385,6 +390,20 @@ class event extends \moodleform {
                 'data-offset' => $offset
             )) . $selectrooms;
 
+        // Facilitators.
+        $selectfacilitators = \html_writer::link("#", get_string('selectfacilitators', 'mod_facetoface'), array(
+            'id' => "show-selectfacilitators{$offset}-dialog",
+            'class' => 'show-selectfacilitators-dialog',
+            'data-offset' => $offset
+        ));
+
+        // Facilitators items will be loaded by js.
+        $row[] =  \html_writer::tag('ul', '', array(
+                'id' => 'facilitatorlist' . $offset,
+                'class' => 'mod_facetoface-facilitatorlist nonempty',
+                'data-offset' => $offset
+            )) . $selectfacilitators;
+
         // Assets.
         $selectassets = \html_writer::link("#", get_string('selectassets', 'facetoface'), array(
             'id' => "show-selectassets{$offset}-dialog",
@@ -433,6 +452,9 @@ class event extends \moodleform {
             $roomlist = [];
             $assetids = $data["assetids"][$i];
             $assetlist = [];
+            $facilitatorids = $data["facilitatorids"][$i];
+            $facilitatorlist = [];
+
 
             if (!empty($roomids)) {
                 $roomlist = explode(',', $roomids);
@@ -440,9 +462,15 @@ class event extends \moodleform {
             if (!empty($assetids)) {
                 $assetlist = explode(',', $assetids);
             }
+            if (!empty($facilitatorids)) {
+                $facilitatorlist = explode(',', $facilitatorids);
+            }
             // If event is a cloning then remove session id and behave as a new event to get rooms availability.
             $sessid = ($data['c'] ? 0 : $data['s']);
-            $errdate = \mod_facetoface\event_dates::validate($starttime, $endtime, $roomlist, $assetlist, $sessid, $facetofaceid);
+
+            $errdate = \mod_facetoface\event_dates::validate(
+                $starttime, $endtime, $roomlist, $assetlist, $sessid, $facetofaceid, $facilitatorlist
+            );
 
             if (!empty($errdate['timestart'])) {
                 $errdates[] = $errdate['timestart'];
@@ -453,9 +481,11 @@ class event extends \moodleform {
             if (!empty($errdate['roomids'])) {
                 $errdates[] = $errdate['roomids'];
             }
-
             if (!empty($errdate['assetids'])) {
                 $errdates[] = $errdate['assetids'];
+            }
+            if (!empty($errdate['facilitatorids'])) {
+                $errdates[] = $errdate['facilitatorids'];
             }
 
             //Check this date does not overlap with any previous dates - time overlap logic from a Stack Overflow post
@@ -767,6 +797,7 @@ class event extends \moodleform {
                     $timezonefield = "sessiontimezone[$i]";
                     $roomsfield = "roomids[$i]";
                     $assetsfield = "assetids[$i]";
+                    $facilitatorsfield = "facilitatorids[$i]";
 
                     if ($date->sessiontimezone === '') {
                         $date->sessiontimezone = '99';
@@ -783,6 +814,7 @@ class event extends \moodleform {
                     $sessiondata->$timezonefield = $date->sessiontimezone;
                     $sessiondata->$roomsfield = \mod_facetoface\room_helper::get_session_roomids($date->id);
                     $sessiondata->$assetsfield = \mod_facetoface\asset_helper::get_session_assetids($date->id);
+                    $sessiondata->$facilitatorsfield = \mod_facetoface\facilitator_helper::get_session_facilitatorids($date->id);
 
                     // NOTE: There is no need to remove rooms and assets
                     //       because form validation will not allow saving
@@ -937,6 +969,7 @@ class event extends \moodleform {
                 $date->timefinish = $fromform->timefinish[$i];
                 $date->roomids  = !empty($fromform->roomids[$i]) ? explode(',', $fromform->roomids[$i]) : array();
                 $date->assetids = !empty($fromform->assetids[$i]) ? explode(',', $fromform->assetids[$i]) : array();
+                $date->facilitatorids = !empty($fromform->facilitatorids[$i]) ? explode(',', $fromform->facilitatorids[$i]) : array();
                 $sessiondates[] = $date;
             }
         }
@@ -993,6 +1026,20 @@ class event extends \moodleform {
         }
 
         \mod_facetoface\calendar::update_entries($seminarevent);
+        /**
+         * TODO:
+         * NOTE: keep this for case if we want to return to facilitator calendar
+        // Find and update facilitator calendar entries.
+        foreach ($sessiondates as $date) {
+            $facilitators = isset($date->facilitatorids) ? $date->facilitatorids : [];
+            foreach (array_unique($facilitators) as $facilitatorid) {
+                $facilitator = new facilitator($facilitatorid);
+                if ($facilitator->get_userid() > 0) {
+                    \mod_facetoface\calendar::add_seminar_event($seminarevent, 'user', $facilitator->get_userid(), facilitator::EVENTTYPE);
+                }
+            }
+        }
+         */
 
         if ($update) {
             // Send any necessary datetime change notifications but only if date/time is known.

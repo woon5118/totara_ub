@@ -38,9 +38,9 @@ use mod_facetoface\{
     seminar_event_list,
     reservations
 };
-
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\sortorder\past_sortorder;
+use mod_facetoface\customfield_area\facetofacefacilitator as facilitatorcustomfield;
 
 require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->dirroot.'/grade/lib.php');
@@ -997,6 +997,14 @@ function facetoface_extend_settings_navigation(settings_navigation $settings, na
     if ($facetoface->declareinterest && has_capability('mod/facetoface:viewinterestreport', $context)) {
         $facetofacenode->add(get_string('declareinterestreport', 'facetoface'), new moodle_url('/mod/facetoface/reports/interests.php', array('facetofaceid' => $PAGE->cm->instance)), navigation_node::TYPE_SETTING);
     }
+
+    if (has_capability('mod/facetoface:managesitewidefacilitators', $context)) {
+        $facetofacenode->add(
+            get_string('facilitators', 'mod_facetoface'),
+            new moodle_url('/mod/facetoface/facilitator/manage.php', ['f' => $PAGE->cm->instance]),
+            navigation_node::TYPE_SETTING
+        );
+    }
 }
 
 /**
@@ -1081,7 +1089,9 @@ function facetoface_calendar_set_filter() {
 function facetoface_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $DB;
 
-    if ($context->contextlevel == CONTEXT_SYSTEM && ($filearea === 'room' || $filearea === 'asset')) {
+    if ($context->contextlevel == CONTEXT_SYSTEM && ($filearea === 'room' || $filearea === 'asset' ||
+            $filearea === facilitatorcustomfield::get_area_name()))
+    {
         // NOTE: we do not know where is the room and asset description visible,
         //       this means we cannot do any strict access control, bad luck.
         $fs = get_file_storage();

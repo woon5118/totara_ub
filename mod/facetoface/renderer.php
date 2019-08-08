@@ -176,7 +176,10 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         } else {
             $tableheader[] = get_string('sessionslist:time', 'mod_facetoface');
         }
+
         $tableheader[] = get_string('rooms', 'mod_facetoface');
+        $tableheader[] = get_string('facilitators', 'mod_facetoface');
+
         if (!$minimal) {
             $tableheader[] = get_string('sessionslist:sessionstatus', 'mod_facetoface');
             if ($attendancetracking) {
@@ -228,7 +231,10 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 // Session times (empty cell)
                 $sessionrow[] = '';
 
-                // Room (empty cell)
+                // Rooms (empty cell)
+                $sessionrow[] = '';
+
+                // Facilitators (empty cell)
                 $sessionrow[] = '';
 
                 if (!$minimal) {
@@ -283,7 +289,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     // Session times
                     $sessionrow[] = session_time::to_html($date->get_timestart(), $date->get_timefinish(), $date->get_sessiontimezone(), $displaytimezones);
 
-                    // Room
+                    // Rooms.
                     $time = time();
                     $rooms = \mod_facetoface\room_list::from_session($date->get_id());
                     if (!$rooms->is_empty()) {
@@ -296,6 +302,23 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                         $roomoutput .= html_writer::end_tag('ul');
                         $cell = new html_table_cell($roomoutput);
                         $cell->attributes['class'] = 'mod_facetoface__sessionlist__room';
+                        $sessionrow[] = $cell;
+                    } else {
+                        $sessionrow[] = ''; // (empty)
+                    }
+
+                    // Facilitators.
+                    $facilitators = \mod_facetoface\facilitator_list::from_session($date->get_id());
+                    if (!$facilitators->is_empty()) {
+                        $facilitatoroutput = html_writer::start_tag('ul', ['class' => 'facilitatorlist']);
+                        /** @var \mod_facetoface\facilitator_user $facilitator */
+                        foreach ($facilitators as $facilitator) {
+                            $facilitatorstring = $this->get_facilitator_details($facilitator, $currenturl);
+                            $facilitatoroutput .= html_writer::tag('li', $facilitatorstring, ['class' => 'facilitator']);
+                        }
+                        $facilitatoroutput .= html_writer::end_tag('ul');
+                        $cell = new html_table_cell($facilitatoroutput);
+                        $cell->attributes['class'] = 'mod_facetoface__sessionlist__facilitator';
                         $sessionrow[] = $cell;
                     } else {
                         $sessionrow[] = ''; // (empty)
@@ -1178,6 +1201,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             get_string('sessioncustomfieldtab', 'facetoface'));
         $row[] = new tabobject('facetofaceasset', new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofaceasset')),
             get_string('assetcustomfieldtab', 'facetoface'));
+        $row[] = new tabobject('facetofacefacilitator', new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacefacilitator')),
+            get_string('facilitatorcustomfieldtab', 'mod_facetoface'));
         $row[] = new tabobject('facetofaceroom', new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofaceroom')),
             get_string('roomcustomfieldtab', 'facetoface'));
         $row[] = new tabobject('facetofacesignup', new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesignup')),
@@ -1502,6 +1527,19 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Gets the HTML output for facilitator details.
+     * @param \mod_facetoface\facilitator_user $facilitator - The facilitator instance to get details for
+     * @param string|null $backurl
+     * @return string containing facilitator details with relevant html tags.
+     */
+    public function get_facilitator_details_html(\mod_facetoface\facilitator_user $facilitator, string $backurl = null): string {
+        $url = new moodle_url('/mod/facetoface/reports/facilitators.php', [
+            'facilitatorid' => $facilitator->get_id(),
+        ]);
+        return $this->render_details_popup_html($facilitator->get_name(), 'facilitator', $url, $backurl, $facilitator->get_fullname_link());
+    }
+
+    /**
      * Gets the HTML output for asset details.
      *
      * @param \mod_facetoface\asset $asset - The asset instance to get details for
@@ -1624,6 +1662,25 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $output = implode('', $output);
 
         return $output;
+    }
+
+    /**
+     * Gets the HTML output for facilitator details.
+     * @param \mod_facetoface\facilitator $facilitator - The facilitator instance to get details for
+     * @param string|null $backurl
+     * @return string containing facilitator details with relevant html tags.
+     */
+    public function get_facilitator_details(\mod_facetoface\facilitator_user $facilitator, string $backurl = null): string {
+        $url = new moodle_url('/mod/facetoface/reports/facilitators.php', array(
+            'facilitatorid' => $facilitator->get_id(),
+            'b' => $backurl
+        ));
+
+        $popupurl = clone($url);
+        $popupurl->param('popup', 1);
+        $action = new popup_action('click', $popupurl, 'popup', array('width' => 800, 'height' => 600));
+        $link = $this->output->action_link($url, s($facilitator->get_name()), $action, array('class' => 'mod_facetoface__sessionlist__facilitator__link'));
+        return html_writer::span($link . $facilitator->get_fullname_link(), 'mod_facetoface__sessionlist__facilitatordetails');
     }
 
     /**
@@ -2436,6 +2493,17 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     }
                     $roomoutput = $this->render_unordered_list($roomoutputs, '', $class, 'rooms', 'room');
                     $section->add_detail_unsafe(get_string('rooms', 'mod_facetoface'), $roomoutput);
+                }
+
+                $facilitators = \mod_facetoface\facilitator_list::from_session($date->get_id());
+                if (!$facilitators->is_empty()) {
+                    $facilitatoroutput = [];
+                    $backurl = $option->get_backurl();
+                    foreach ($facilitators as $facilitator) {
+                        $facilitatoroutput[] = $this->get_facilitator_details_html($facilitator, $backurl);
+                    }
+                    $facilitatoroutput = $this->render_unordered_list($facilitatoroutput, '', $class, 'facilitators', 'facilitator');
+                    $section->add_detail_unsafe(get_string('facilitators', 'mod_facetoface'), $facilitatoroutput);
                 }
 
                 if ($option->get_displayassetsinsessions()) {

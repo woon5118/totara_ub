@@ -72,11 +72,20 @@ final class calendar {
             $courseid = $seminar->get_course();
             $description .= \html_writer::link($linkurl, $linktext);
         } else if ($calendartype == 'user' && $seminar->get_usercalentry()) {
+        //} else if ($calendartype == 'user' && $seminar->get_usercalentry() && $eventtype != facilitator::EVENTTYPE) {
             $courseid = 0;
             if ($eventtype == 'session') {
                 $linkurl = new \moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id()));
             }
             $description .= get_string("calendareventdescription{$eventtype}", 'facetoface', $linkurl->out());
+        /**
+         * TODO:
+         * NOTE: keep this for case if we want to return to facilitator calendar
+            // } else if ($calendartype == 'user' && $eventtype == facilitator::EVENTTYPE) {
+            //     $courseid = $seminar->get_course();
+            //     $linkurl = new \moodle_url('/mod/facetoface/attendees/event.php', ['s' => $seminarevent->get_id()]);
+            //     $description .= get_string("calendareventdescriptionfacilitator", 'mod_facetoface', $linkurl->out());
+         */
         } else {
             return true;
         }

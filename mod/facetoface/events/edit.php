@@ -86,14 +86,23 @@ if ($backtoevent) {
     $baseurl->param('backtoallsessions', $backtoallsessions);
 }
 $PAGE->set_url($baseurl);
-$PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
-$PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
-$PAGE->requires->strings_for_js(array('chooseassets', 'chooserooms', 'dateselect', 'useroomcapacity', 'nodatesyet',
-    'createnewasset', 'editasset', 'createnewroom', 'editroom', 'bookingconflict'), 'facetoface');
 $PAGE->set_title($seminar->get_name());
 $PAGE->set_heading($course->fullname);
 
-$jsconfig = array('sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $seminar->get_id(), 'clone' => $c);
+$PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
+$PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
+$PAGE->requires->strings_for_js(
+    array(
+        'chooseassets', 'choosefacilitators', 'chooserooms', 'dateselect', 'useroomcapacity', 'nodatesyet', 'createnewasset',
+        'editasset', 'createnewroom', 'editroom', 'createnewfacilitator', 'editfacilitator', 'bookingconflict'
+    ),
+    'facetoface'
+);
+$jsconfig = array(
+    'sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $seminar->get_id(), 'clone' => $c,
+    'managesitewidefacilitators' => has_capability('mod/facetoface:managesitewidefacilitators', $context),
+    'manageadhocfacilitators' => has_capability('mod/facetoface:manageadhocfacilitators', $context),
+);
 $jsmodule = array(
     'name' => 'totara_f2f_room',
     'fullpath' => '/mod/facetoface/js/event.js',

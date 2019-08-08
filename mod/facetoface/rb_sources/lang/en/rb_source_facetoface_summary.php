@@ -79,6 +79,7 @@ $string['type_facetoface_asset'] = 'Asset Custom Fields';
 $string['type_facetoface_room'] = 'Room';
 $string['type_facetoface_session'] = 'Event Custom Fields';
 $string['type_facetoface_sessioncancel'] = 'Event cancellation Custom Fields';
+$string['type_facilitator'] = 'Facilitator';
 $string['type_date'] = 'Date';
 $string['type_role'] = 'Role';
 $string['type_room'] = 'Room';

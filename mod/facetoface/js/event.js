@@ -36,7 +36,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
     /**
      * Per-date fields that should be copied to clone event.
      */
-    clonefields: ['roomids', 'assetids', 'timestart', 'timefinish', 'sessiontimezone'],
+    clonefields: ['roomids', 'assetids', 'facilitatorids', 'timestart', 'timefinish', 'sessiontimezone'],
 
     /**
      * Base url
@@ -64,6 +64,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
 
         this.init_dates();
         this.init_rooms();
+        this.init_facilitators();
         this.init_assets();
 
         // Count of all dates (active and removed).
@@ -231,10 +232,15 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     title: '<h2>' + M.util.get_string('dateselect', 'facetoface') + '</h2>'
                 },
                 function() {
-                    return url + 'events/ajax/sessiondates.php?sessiondateid=' + $('input[name="sessiondateid[' + offset + ']"]').val() +
+                    var sessiondateid = $('input[name="sessiondateid[' + offset + ']"]').val();
+                    if (Number(M.totara_f2f_room.config.clone) == 1) {
+                        sessiondateid = 0;
+                    }
+                    return url + 'events/ajax/sessiondates.php?sessiondateid=' + sessiondateid +
                         '&facetofaceid=' + M.totara_f2f_room.config.facetofaceid +
                         '&roomids=' + $('input[name="roomids[' + offset + ']"]').val() +
                         '&assetids=' + $('input[name="assetids[' + offset + ']"]').val() +
+                        '&facilitatorids=' + $('input[name="facilitatorids[' + offset + ']"]').val() +
                         '&timezone=' + encodeURIComponent($('input[name="sessiontimezone[' + offset + ']"]').val()) +
                         '&start=' + $('input[name="timestart[' + offset + ']"]').val() +
                         '&finish=' + $('input[name="timefinish[' + offset + ']"]').val() +
@@ -651,6 +657,212 @@ M.totara_f2f_room = M.totara_f2f_room || {
                         '&timestart=' + $('input[name="timestart[' + offset + ']"]').val() +
                         '&timefinish=' + $('input[name="timefinish[' + offset + ']"]').val() +
                         '&selected=' + $('input[name="assetids[' + offset + ']"]').val() +
+                        '&offset=' + offset +
+                        '&sesskey=' + M.cfg.sesskey;
+                },
+                handler
+            );
+        });
+    },
+
+    /**
+     * Prepare facilitators dialogs and ajax updates.
+     */
+    init_facilitators: function() {
+        var url = this.url;
+
+        /**
+         * Create DOM for facilitator with attached action buttons and handlers.
+         * @param data facilitator data (name, custom, etc)
+         * @param $input associated hidden input that stored ids
+         * @return
+         */
+        var render_facilitator_item = function(data, $input, offset) {
+            var $elem = $('<li></li>');
+            var lid = 'facilitatorname' + offset + '_' + data.id;
+            $elem.html(data.name).attr('id', lid).attr('class', 'facilitatorname').attr('data-facilitatorid', data.id).attr('data-custom', data.custom);
+            require(['core/templates'], function (templates) {
+                var manageadhocfacilitators = Number(data.custom) > 0 && Boolean(M.totara_f2f_room.config.manageadhocfacilitators);
+                if (manageadhocfacilitators) {
+                    var $editbutton = $('<a href="#"></a>');
+                    $editbutton.click(function(e) {
+                        e.preventDefault();
+                        M.totara_f2f_room.config.editfacilitator = data.id;
+                        totaraDialogs['editcustomfacilitator' + offset].config.title = '<h2>' + M.util.get_string('editfacilitator', 'facetoface') + '</h2>';
+                        totaraDialogs['editcustomfacilitator' + offset].open();
+                    });
+                    $elem.append($editbutton);
+                    templates.renderIcon('edit', M.util.get_string('editfacilitator', 'facetoface')).done(function (html) {
+                        $editbutton.html(html);
+                    });
+                }
+                var managefacilitators = false;
+                if (Number(data.custom) > 0) {
+                    managefacilitators = Boolean(M.totara_f2f_room.config.manageadhocfacilitators);
+                } else {
+                    managefacilitators = Boolean(M.totara_f2f_room.config.managesitewidefacilitators);
+                }
+                if (managefacilitators) {
+                    var $deletebutton = $('<a href="#"></a>');
+                    $deletebutton.click(function (e) {
+                        e.preventDefault();
+                        var $li = $deletebutton.closest('li');
+                        var delid = $li.data('facilitatorid') + "";
+                        var ids = $input.val().split(',');
+                        var index = ids.indexOf(delid);
+                        if (index > -1) {
+                            ids.splice(index, 1);
+                            $input.val(ids.join());
+                        }
+                        $li.remove();
+                    });
+                    $elem.append($deletebutton);
+                    templates.renderIcon('delete', M.util.get_string('delete', 'totara_core')).done(function (html) {
+                        $deletebutton.html(html);
+                    });
+                }
+            });
+            return $elem;
+        };
+
+        // Select facilitators dialog.
+        $('.show-selectfacilitators-dialog').each(function() {
+            var offset = $(this).data('offset');
+            var $facilitatorlist = $('#facilitatorlist' + offset);
+            var $input = $('input[name="facilitatorids[' + offset + ']"]');
+
+            if ($('input[name="datedelete[' + offset + ']"]').val() > 0) {
+                return;
+            }
+
+            // Init facilitators.
+            function load_facilitators() {
+                var inititems = $input.val();
+                if (inititems.length) {
+                    $facilitatorlist.append($('<li>' + M.util.get_string('loadinghelp', 'moodle') + '</li>'));
+                    $.post(
+                        url + 'facilitator/ajax/facilitator_item.php',
+                        {
+                            facetofaceid:  M.totara_f2f_room.config.facetofaceid,
+                            itemids: inititems,
+                            sesskey: M.cfg.sesskey
+                        },
+                        function(data) {
+                            $facilitatorlist.empty();
+                            data.forEach(function(elem){
+                                var $elem = render_facilitator_item(elem, $input, offset);
+                                $facilitatorlist.append($elem);
+                            });
+                        },
+                        'json'
+                    );
+                }
+            }
+            load_facilitators();
+
+            // Create new facilitator dialog handler.
+            var editcustomfacilitatorhandler = new totaraDialog_handler_form();
+            editcustomfacilitatorhandler.every_load = function() {
+                totaraDialog_handler_form.prototype.every_load.call(this);
+                handler._dialog.hide();
+            };
+            // Change behaviour of update function.
+            editcustomfacilitatorhandler._updatePage = function(response) {
+                try {
+                    // We expect json if dates processed without errors.
+                    var elem = $.parseJSON(response);
+                    var ids = [];
+                    if ($input.val().length > 0) {
+                        ids = $input.val().split(',');
+                    }
+                    if (ids.indexOf(elem.id.toString()) === -1) {
+                        ids.push(elem.id);
+                    }
+                    $input.val(ids.toString());
+                    load_facilitators();
+                    editcustomfacilitatorhandler._dialog.hide();
+                } catch(e) {
+                    this._dialog.render(response);
+                }
+            };
+
+            // Create new facilitator dialog.
+            var buttonsObj = {};
+            buttonsObj[M.util.get_string('ok','moodle')] = function() { editcustomfacilitatorhandler.submit(); };
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { editcustomfacilitatorhandler._cancel(); };
+
+            totaraDialogs['editcustomfacilitator' + offset] = new totaraDialog(
+                'editcustomfacilitator' + offset + '-dialog',
+                'show-editcustomfacilitator' + offset + '-dialog',
+                {
+                    buttons: buttonsObj,
+                    title: '<h2>' + M.util.get_string('createnewfacilitator', 'facetoface') + '</h2>'
+                },
+                function() {
+                    var id = 0;
+                    // Store id in M.totara_f2f_room.config for now to allow edit custom facilitators.
+                    if (typeof M.totara_f2f_room.config.editfacilitator !== "undefined") {
+                        id = Number(M.totara_f2f_room.config.editfacilitator);
+                        M.totara_f2f_room.config.editfacilitator = 0;
+                    }
+                    return url + 'facilitator/ajax/edit.php?id=' + id + '&f=' + M.totara_f2f_room.config.facetofaceid +
+                        '&s=' + M.totara_f2f_room.config.sessionid + '&sesskey=' + M.cfg.sesskey;
+                },
+                editcustomfacilitatorhandler
+            );
+
+            // Select facilitator dialog handler.
+            var handler = new totaraDialog_handler_treeview_multiselect();
+            handler._update = function() {
+                var elements = $('.selected > div > span', this._container);
+                var ids = this._get_ids(elements);
+                $facilitatorlist.empty();
+
+                // Display elements.
+                ids.forEach(function(id){
+                    var $item = $('#item_' + id, this._container).clone();
+                    // Get name and render facilitator.
+                    $('span', $item).remove();
+                    $item.data('name', $item.text());
+                    var $elem = render_facilitator_item($item.data(), $input, offset);
+                    $facilitatorlist.append($elem);
+                });
+                $input.val(ids.join());
+                this._dialog.hide();
+            };
+
+            // Select facilitator dialog.
+            var buttonsObj = {};
+            buttonsObj[M.util.get_string('ok','moodle')] = function() { handler._update(); };
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
+
+            handler.oldLoad = handler.load;
+
+            handler.load = function(response) {
+                handler.oldLoad(response);
+                var context = $(".ui-dialog [id^='selectfacilitators'][id$='-dialog']"),
+                    height = context.height() - $('.dialog-footer', context).outerHeight();
+
+                $('.select', context).outerHeight(height);
+            };
+
+            totaraDialogs['selectfacilitators'+offset] = new totaraDialog(
+                'selectfacilitators'+offset+'-dialog',
+                $(this).attr('id'),
+                {
+                    buttons: buttonsObj,
+                    title: '<h2>' + M.util.get_string('choosefacilitators', 'facetoface') + '</h2>'
+                },
+                function() {
+                    var sessionid = M.totara_f2f_room.config.sessionid;
+                    if (Number(M.totara_f2f_room.config.clone) == 1) {
+                        sessionid = 0;
+                    }
+                    return url + 'facilitator/ajax/sessionfacilitators.php?sessionid=' + sessionid +
+                        '&facetofaceid=' + M.totara_f2f_room.config.facetofaceid +
+                        '&timestart=' + $('input[name="timestart[' + offset + ']"]').val() +
+                        '&timefinish=' + $('input[name="timefinish[' + offset + ']"]').val() +
+                        '&selected=' + $('input[name="facilitatorids[' + offset + ']"]').val() +
                         '&offset=' + offset +
                         '&sesskey=' + M.cfg.sesskey;
                 },

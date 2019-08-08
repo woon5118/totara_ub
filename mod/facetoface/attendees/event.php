@@ -38,9 +38,9 @@ $action = 'event';
 $seminarevent = new \mod_facetoface\seminar_event($s);
 $seminar = $seminarevent->get_seminar();
 $cm = $seminar->get_coursemodule();
-$context = context_module::instance($cm->id);
+$context = $seminar->get_contextmodule($cm->id);
 
-require_login($seminar->get_course(), false, $cm);
+require_login();
 
 // Print page header.
 $baseurl = new moodle_url('/mod/facetoface/attendees/event.php', ['s' => $seminarevent->get_id()]);
@@ -49,12 +49,6 @@ $PAGE->set_url($baseurl);
 
 list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
     = attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context);
-
-// $allowed_actions is already set, so we can now know if the current action is allowed.
-$seminarurl = new moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]);
-if (!in_array($action, $allowed_actions)) {
-    redirect($seminarurl);
-}
 
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
@@ -73,7 +67,7 @@ if (!(bool)$seminarevent->get_cancelledstatus()) {
     echo $renderer->render_editevent_button($seminarevent);
 }
 echo $renderer->render_seminar_event($seminarevent, true, false, true);
-echo $renderer->render_action_bar_on_tabpage($seminarurl);
+echo $renderer->render_action_bar_on_tabpage(new moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]));
 echo $OUTPUT->footer();
 
 \mod_facetoface\event\attendees_viewed::create_from_session((object)['id' => $seminarevent->get_id()], $context, $action)->trigger();

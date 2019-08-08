@@ -686,7 +686,7 @@ function xmldb_facetoface_upgrade($oldversion) {
         $table->add_key('faceroomdate_room_fk', XMLDB_KEY_FOREIGN, array('roomid'), 'facetoface_room', array('id'));
         // Adding index to table facetoface_room_dates.
         $table->add_index('sessionsdateid-roomid', XMLDB_INDEX_UNIQUE, array('sessionsdateid, roomid'));
-
+        // Conditionally launch create table for facetoface_room_dates.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
@@ -716,6 +716,114 @@ function xmldb_facetoface_upgrade($oldversion) {
         }
 
         upgrade_mod_savepoint(true, 2019090400, 'facetoface');
+    }
+
+    if ($oldversion < 2019090401) {
+        // Define table for facetoface_facilitator.
+        $table = new xmldb_table('facetoface_facilitator');
+        // Adding fields to table facetoface_facilitator.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('allowconflicts', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('description', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        $table->add_field('custom', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('hidden', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('usercreated', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        // Adding keys to table facetoface_facilitator.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('userid_fk', XMLDB_KEY_FOREIGN, array('userid'), 'user', 'id');
+        $table->add_key('usercreated_fk', XMLDB_KEY_FOREIGN, array('usercreated'), 'user', 'id');
+        $table->add_key('usermodified_fk', XMLDB_KEY_FOREIGN, array('usermodified'), 'user', 'id');
+        // Adding index to table facetoface_facilitator.
+        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+        $table->add_index('custom', XMLDB_INDEX_NOTUNIQUE, array('custom'));
+        // Conditionally launch create table for facetoface_facilitator.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table for facetoface_facilitator_info_data.
+        $table = new xmldb_table('facetoface_facilitator_info_data');
+        // Adding fields to table facetoface_facilitator_info_data.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('facetofacefacilitatorid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        // Adding keys to table facetoface_facilitator_info_data.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('facilitatorinfodata_fielid_fk', XMLDB_KEY_FOREIGN, array('fieldid'), 'facetoface_facilitator_info_field', array('id'));
+        $table->add_key('facilitatorinfodata_facilitatorid_fk', XMLDB_KEY_FOREIGN, array('facetofacefacilitatorid'), 'facetoface_facilitator', array('id'));
+        // Adding index to table facetoface_facilitator_info_data.
+        $table->add_index('facelitatorinfodata_fiefcltr_uix', XMLDB_INDEX_UNIQUE, array('fieldid, facetofacefacilitatorid'));
+        // Conditionally launch create table for facetoface_facilitator_info_data.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table for facetoface_facilitator_info_data_param.
+        $table = new xmldb_table('facetoface_facilitator_info_data_param');
+        // Adding fields to table facetoface_facilitator_info_data_param.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
+        // Adding keys to table facetoface_facilitator_info_data_param.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('facilitatorinfodatapara_dataid_fk', XMLDB_KEY_FOREIGN, array('dataid'), 'facetoface_facilitator_info_data', array('id'));
+        // Adding index to table facetoface_facilitator_info_data.
+        $table->add_index('facilitatorinfodatapara_value_ix', null, array('value'));
+        // Conditionally launch create table for facetoface_facilitator_info_data_param.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table for facetoface_facilitator_info_field.
+        $table = new xmldb_table('facetoface_facilitator_info_field');
+        // Adding fields to table facetoface_facilitator_info_field.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('datatype', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hidden', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('locked', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('required', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('forceunique', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('defaultdata', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param1', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param2', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param3', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param4', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param5', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fullname', XMLDB_TYPE_CHAR, '1024', null, null, null, null);
+        // Adding keys to table facetoface_facilitator_info_field.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        // Conditionally launch create table for facilitator_info_field.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table for facetoface_facilitator_dates to session dates many-to-many relationship.
+        $table = new xmldb_table('facetoface_facilitator_dates');
+        // Adding fields to table facetoface_facilitator_dates.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('sessionsdateid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('facilitatorid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        // Adding keys to table facetoface_facilitator_dates.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('facelitatordate_sess_fk', XMLDB_KEY_FOREIGN, array('sessionsdateid'), 'facetoface_sessions_dates', array('id'));
+        $table->add_key('facelitatordate_faci_fk', XMLDB_KEY_FOREIGN, array('facilitatorid'), 'facetoface_facilitator', array('id'));
+        // Adding index to table facetoface_facilitator_dates.
+        $table->add_index('sessionsdateid-facilitatorid', XMLDB_INDEX_UNIQUE, array('sessionsdateid, facilitatorid'));
+        // Conditionally launch create table for facetoface_facilitator_info_data_param.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2019090401, 'facetoface');
     }
 
     return true;

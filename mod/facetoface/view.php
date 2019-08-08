@@ -83,8 +83,8 @@ $PAGE->set_heading($course->fullname);
 
 $pagetitle = format_string($seminar->get_name());
 
-$f2f_renderer = $PAGE->get_renderer('mod_facetoface');
 /** @var mod_facetoface_renderer $f2f_renderer */
+$f2f_renderer = $PAGE->get_renderer('mod_facetoface');
 $f2f_renderer->setcontext($context);
 
 $completion = new \completion_info($course);

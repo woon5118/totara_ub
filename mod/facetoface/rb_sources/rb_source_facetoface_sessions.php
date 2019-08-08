@@ -34,6 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 
 class rb_source_facetoface_sessions extends rb_facetoface_base_source {
+
     use \core_course\rb\source\report_trait;
     use \core_tag\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_trait;
@@ -41,6 +42,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     use \mod_facetoface\rb\traits\required_columns;
     use \mod_facetoface\rb\traits\post_config;
     use \totara_cohort\rb\source\report_trait;
+    use \mod_facetoface\rb\traits\facilitator;
 
     /** @var string $returnpage name */
     private $returnpage = 'view';
@@ -222,14 +224,29 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'assetdate'
             ),
             new rb_join(
+                'facilitatordate',
+                'LEFT',
+                '{facetoface_facilitator_dates}',
+                'facilitatordate.sessionsdateid = sessiondate.id',
+                REPORT_BUILDER_RELATION_MANY_TO_ONE,
+                'sessiondate'
+            ),
+            new rb_join(
+                'facilitator',
+                'LEFT',
+                '{facetoface_facilitator}',
+                'facilitatordate.facilitatorid = facilitator.id',
+                REPORT_BUILDER_RELATION_MANY_TO_ONE,
+                'facilitatordate'
+            ),
+            new rb_join(
                 'selected_job_assignment',
                 'LEFT',
                 '{job_assignment}',
                 'selected_job_assignment.id = base.jobassignmentid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
-            )
+            ),
         );
-
 
         // include some standard joins
         $this->add_core_user_tables($joinlist, 'base', 'userid');
@@ -550,6 +567,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_assets_fields_to_columns($columnoptions);
         $this->add_rooms_fields_to_columns($columnoptions);
         $this->add_totara_cohort_course_columns($columnoptions);
+        $this->add_facilitators_fields_to_columns($columnoptions);
 
         return $columnoptions;
     }

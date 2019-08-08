@@ -380,5 +380,29 @@ $capabilities = array(
             'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'mod/facetoface:removeattendees'
-    )
+    ),
+
+    // Ability to add, edit and delete the sitewide facilitators
+    'mod/facetoface:managesitewidefacilitators' => array(
+        'riskbitmask' => RISK_CONFIG | RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+    ),
+
+    // Ability to add, edit and delete the adhoc facilitators
+    'mod/facetoface:manageadhocfacilitators' => array(
+        'riskbitmask' => RISK_CONFIG | RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+    ),
 );

@@ -54,6 +54,12 @@ class mod_facetoface_generator extends testing_module_generator {
     protected $assetinstancecount = 0;
 
     /**
+     * The number of facilitators created so far.
+     * @var int
+     */
+    protected $facilitatorinstancecount = 0;
+
+    /**
      * Cache to reduce lookups.
      * @var array
      */
@@ -166,6 +172,7 @@ class mod_facetoface_generator extends testing_module_generator {
             $sessiondate->sessiontimezone = 'Pacific/Auckland';
             $sessiondate->roomids = [];
             $sessiondate->assetids = array();
+            $sessiondate->facilitatorids = array();
             $sessiondates = array($sessiondate);
         } else {
             $sessiondates = array_map(function ($date) {
@@ -374,11 +381,76 @@ class mod_facetoface_generator extends testing_module_generator {
     }
 
     /**
+     * Create a facilitator - please use the add_custom_facilitator, or add_site_wide_facilitator methods.
+     * @param stdClass|array $record
+     * @return mixed
+     */
+    protected function add_facilitator($record) {
+        global $DB, $USER;
+
+        $this->facilitatorinstancecount++;
+        $record = (object)$record;
+
+        if (!isset($record->name)) {
+            $record->name = 'facilitator '.$this->facilitatorinstancecount;
+        }
+
+        if (!empty($record->allowconflicts)) {
+            $record->allowconflicts = 1;
+        } else {
+            $record->allowconflicts = 0;
+        }
+
+        if (!isset($record->description)) {
+            $record->description = 'Description for facilitator '.$this->facilitatorinstancecount;
+        }
+        if (!isset($record->custom)) {
+            $record->custom = 1;
+        }
+        if (!isset($record->usercreated)) {
+            $record->usercreated = $USER->id;
+        }
+        $record->usermodified = $record->usercreated;
+        if (!isset($record->usercreated)) {
+            $record->usercreated = $USER->id;
+        }
+        if (!isset($record->timecreated)) {
+            $record->timecreated = time();
+        }
+        $record->timemodified = $record->timecreated;
+        $id = $DB->insert_record('facetoface_facilitator', $record);
+        return $DB->get_record('facetoface_facilitator', array('id' => $id));
+    }
+
+    /**
+     * Add a custom facilitator.
+     * @param stdClass|array $record
+     * @return stdClass
+     */
+    public function add_custom_facilitator($record) {
+        $record = (object)$record;
+        $record->custom = 1;
+        return $this->add_facilitator($record);
+    }
+
+    /**
+     * Add a site wide facilitator.
+     * @param stdClass|array $record
+     * @return stdClass
+     */
+    public function add_site_wide_facilitator($record) {
+        $record = (object)$record;
+        $record->custom = 0;
+        return $this->add_facilitator($record);
+    }
+
+    /**
      * Resets this generator instance.
      */
     public function reset() {
         $this->roominstancecount = 0;
         $this->assetinstancecount = 0;
+        $this->facilitatorinstancecount = 0;
         parent::reset();
     }
 

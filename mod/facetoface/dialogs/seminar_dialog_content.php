@@ -32,15 +32,20 @@ class seminar_dialog_content extends \totara_dialog_content {
 
     /**
      * @var null id for create tab
-     * @uses /mod/facetoface/asset/ajax/sessionassets.php
+     * @uses /mod/facetoface/thing/ajax/sessionthings.php
      */
     public $createid = null;
 
     /**
      * @var null url for search tab
-     * @uses /mod/facetoface/asset/ajax/sessionassets.php
+     * @uses /mod/facetoface/thing/ajax/sessionthings.php
      */
     public $baseurl = null;
+
+    /**
+     * @var bool manageadhocthing
+     */
+    public $manageadhoc = false;
 
     /**
      * Generate markup from configuration and return
@@ -62,7 +67,7 @@ class seminar_dialog_content extends \totara_dialog_content {
             return $this->generate_treeview();
         }
 
-        $markup = html_writer::start_tag('div', array('class' => 'row-fluid'));
+        $markup = html_writer::start_tag('div', array('class' => 'row-fluid seminar_dialog_content_title'));
 
         // Open select container
         $width = ($this->type == self::TYPE_CHOICE_MULTI) ? 'span8' : 'span12';
@@ -76,11 +81,15 @@ class seminar_dialog_content extends \totara_dialog_content {
         $markup .= html_writer::start_tag('div', array('id' => 'dialog-tabs', 'class' => 'dialog-content-select'));
 
         $tabs[] = html_writer::link('#browse-tab', get_string('browse', 'totara_core'));
+        $markup .= html_writer::start_tag('div', array('class' => 'tabtree'));
         if (!empty($this->search_code)) {
             $tabs[] = html_writer::link('#search-tab', get_string('search'));
         }
-        $tabs[] = html_writer::link('#create-tab', get_string('create'), ['id' => $this->createid]);
-        $markup .= html_writer::alist($tabs, ['class' => 'nav nav-tabs tabs dialog-nobind']);
+        if ($this->manageadhoc) {
+            $tabs[] = html_writer::link('#create-tab', get_string('create'), ['id' => $this->createid]);
+        }
+        $markup .= html_writer::alist($tabs, ['class' => 'nav nav-tabs dialog-nobind']);
+        $markup .= html_writer::end_div();
 
         // Display treeview
         $markup .= html_writer::start_div('', ['id' => 'browse-tab']);

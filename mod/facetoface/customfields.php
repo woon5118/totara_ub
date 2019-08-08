@@ -42,6 +42,7 @@ $availableprefixes = [
     'facetofacesession',
     'facetofacesessioncancel',
     'facetofacesignup',
+    'facetofacefacilitator',
 ];
 if (!in_array($prefix, $availableprefixes)) {
     // Just a coding exception, this should never happen. If it does then stop hacking it.
@@ -61,10 +62,10 @@ $redirect = new moodle_url($redirectpage, $redirectoptions);
 $PAGE->set_url($redirect);
 admin_externalpage_setup('modfacetofacecustomfields', '', array('prefix' => $prefix));
 
-/** @var totara_customfield_renderer $renderer*/
+/** @var totara_customfield_renderer $renderer */
 $renderer = $PAGE->get_renderer('totara_customfield');
 
-/** @var mod_facetoface_renderer $renderer*/
+/** @var mod_facetoface_renderer $facetofacerenderer */
 $facetofacerenderer = $PAGE->get_renderer('mod_facetoface');
 $facetofacerenderer->setcontext($contextsystem);
 // Check if any actions need to be performed.

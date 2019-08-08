@@ -149,6 +149,13 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $asset_field = new backup_nested_element('asset_field', array('id'), array(
             'field_name', 'field_type', 'field_data', 'paramdatavalue'));
 
+        $facilitators = new backup_nested_element('facilitators');
+        $facilitator =  new backup_nested_element('facilitator', array('id'), array(
+            'name', 'userid', 'description', 'allowconflicts', 'custom', 'hidden', 'usercreated', 'usermodified', 'timecreated', 'timemodified'));
+        $facilitator_fields = new backup_nested_element('facilitator_fields');
+        $facilitator_field = new backup_nested_element('facilitator_field', array('id'), array(
+            'field_name', 'field_type', 'field_data', 'paramdatavalue'));
+
         $interests = new backup_nested_element('interests');
         $interest = new backup_nested_element('interest', array('id'), array(
             'userid', 'timedeclared', 'reason'));
@@ -196,6 +203,11 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $assets->add_child($asset);
         $asset->add_child($asset_fields);
         $asset_fields->add_child($asset_field);
+
+        $sessions_date->add_child($facilitators);
+        $facilitators->add_child($facilitator);
+        $facilitator->add_child($facilitator_fields);
+        $facilitator_fields->add_child($facilitator_field);
 
         $facetoface->add_child($interests);
         $interests->add_child($interest);
@@ -245,6 +257,13 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             array('sessionsdateid' => backup::VAR_PARENTID));
         $this->add_customfield_set_source($asset_field, 'facetoface_asset', 'facetofaceassetid');
 
+        $facilitator->set_source_sql("SELECT ff.*
+                                  FROM {facetoface_facilitator} ff
+                                  JOIN {facetoface_facilitator_dates} ffd  ON ffd.facilitatorid = ff.id
+                                 WHERE ffd.sessionsdateid = :sessionsdateid",
+            array('sessionsdateid' => backup::VAR_PARENTID));
+        $this->add_customfield_set_source($facilitator_field, 'facetoface_facilitator', 'facetofacefacilitatorid');
+
         if ($userinfo) {
             $interest->set_source_table('facetoface_interest', array('facetoface' => backup::VAR_PARENTID));
         }
@@ -272,6 +291,10 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $asset->annotate_ids('user', 'usercreated');
         $asset->annotate_ids('user', 'usermodified');
 
+        $facilitator->annotate_ids('user', 'userid');
+        $facilitator->annotate_ids('user', 'usercreated');
+        $facilitator->annotate_ids('user', 'usermodified');
+
         $interest->annotate_ids('user', 'userid');
 
         // Define file annotations.
@@ -281,6 +304,12 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $syscontext = context_system::instance();
         $room->annotate_files('mod_facetoface', 'room', 'id', $syscontext->id);
         $asset->annotate_files('mod_facetoface', 'asset', 'id', $syscontext->id);
+        $facilitator->annotate_files(
+            \mod_facetoface\customfield_area\facetofacefacilitator::get_component(),
+            \mod_facetoface\customfield_area\facetofacefacilitator::get_area_name(),
+            'id',
+            \mod_facetoface\customfield_area\facetofacefacilitator::get_context()->id
+            );
 
         // Return the root element (facetoface), wrapped into standard activity structure
         return $this->prepare_activity_structure($facetoface);

@@ -109,9 +109,11 @@ class event_dates {
      * @param array $assetids
      * @param int $sessionid ignore room conflicts within current session (as it is covered by dates and some dates can be marked as deleted)
      * @param int $facetofaceid
-     * @return array errors ('timestart' => string, 'timefinish' => string, 'assetids' => string, 'roomids' => string)
+     * @param array $facilitatorids
+     * @return array errors ('timestart' => string, 'timefinish' => string, 'assetids' => string, 'roomids' => string 'facilitatorids' => string)
      */
-    public static function validate(int $timestart, int $timefinish, array $roomids, array $assetids, int $sessionid, int $facetofaceid): array {
+    public static function validate(int $timestart, int $timefinish, array $roomids, array $assetids, int $sessionid, int $facetofaceid, array $facilitatorids): array {
+
         $seminar = new seminar($facetofaceid);
         $seminarevent = new seminar_event($sessionid);
 
@@ -168,8 +170,30 @@ class event_dates {
             }
         }
 
+        // Validate facilitators.
+        if (!empty($facilitatorids)) {
+            foreach ($facilitatorids as $facilitatorid) {
+                $facilitator = new facilitator($facilitatorid);
+                if (!$facilitator->exists()) {
+                    // This will likely never be reached as facilitator creation uses a MUST_EXIST database call.
+                    $errors['facilitatorid'][] = get_string('facilitatordeleted', 'mod_facetoface');
+                } else if (!$facilitator->is_available($timestart, $timefinish, $seminarevent)) {
+                    $link = \html_writer::link(
+                        new \moodle_url('/mod/facetoface/reports/facilitators.php', ['facilitatorid' => $facilitatorid]),
+                        $facilitator->get_name(),
+                        ['target' => '_blank']
+                    );
+                    // We should not get here because users should be able to select only available slots.
+                    $errors['facilitatorid'][] = get_string('error:isalreadybooked', 'mod_facetoface', $link);
+                }
+            }
+            if (!empty($errors['facilitatorid'])) {
+                $errors['facilitatorids'] = implode(\html_writer::empty_tag('br'), $errors['facilitatorid']);
+            }
+        }
+
         // Consolidate error message.
-        if (!empty($errors['roomid']) || !empty($errors['assetid'])) {
+        if (!empty($errors['roomid']) || !empty($errors['assetid']) || !empty($errors['facilitatorid'])) {
             $items = array();
             if (!empty($errors['roomid'])) {
                 foreach ($errors['roomid'] as $roomerror) {
@@ -184,6 +208,13 @@ class event_dates {
                 }
                 // Don't show duplicate error.
                 unset($errors['assetid']);
+            }
+            if (!empty($errors['facilitatorid'])) {
+                foreach ($errors['facilitatorid'] as $facilitatorerror) {
+                    $items[] = \html_writer::tag('li', $facilitatorerror);
+                }
+                // Don't show duplicate error.
+                unset($errors['facilitatorid']);
             }
             $details = \html_writer::tag('ul', implode('', $items));
             $errors['timestart'] = get_string('error:datesunavailablestuff', 'facetoface', $details);

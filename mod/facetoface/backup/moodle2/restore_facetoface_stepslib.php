@@ -62,6 +62,8 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $paths[] = new restore_path_element('facetoface_room_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/rooms/room/room_fields/room_field');
         $paths[] = new restore_path_element('facetoface_asset', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/assets/asset');
         $paths[] = new restore_path_element('facetoface_asset_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/assets/asset/asset_fields/asset_field');
+        $paths[] = new restore_path_element('facetoface_facilitator', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/facilitators/facilitator');
+        $paths[] = new restore_path_element('facetoface_facilitator_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/facilitators/facilitator/facilitator_fields/facilitator_field');
 
         if ($userinfo) {
             $paths[] = new restore_path_element('facetoface_interest', '/activity/facetoface/interests/interest');
@@ -566,6 +568,120 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $this->set_mapping('facetoface_asset', $oldid, $newid, true, $this->get_task()->get_old_system_contextid());
 
         $this->add_related_files('mod_facetoface', 'asset', 'facetoface_asset', $this->get_task()->get_old_system_contextid(), $oldid);
+
+        return $newid;
+    }
+
+    protected function process_facetoface_facilitator($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        /** @var restore_activity_task $task */
+        $task = $this->get_task();
+        $facetofaceid = $task->get_activityid();
+
+        $sessionsdateid = $this->get_new_parentid('facetoface_sessions_date');
+        if (!$sessionsdateid) {
+            $this->set_mapping('facetoface_facilitator', $oldid, null);
+            return;
+        }
+        $sessiondate = $DB->get_record('facetoface_sessions_dates', array('id' => $sessionsdateid), '*', MUST_EXIST);
+
+        if ($data->custom == 1) {
+            // Custom facilitators are easy, we just add a new one as exact copy,
+            // but watch out that custom facilitators might be shared in one seminar activity.
+            $newid = $this->get_mappingid('facetoface_facilitator', $oldid);
+            if (!$newid) {
+                $newid = $this->create_facetoface_facilitator($data);
+            }
+            $DB->insert_record('facetoface_facilitator_dates', (object)array('facilitatorid' => $newid, 'sessionsdateid' => $sessionsdateid));
+            return;
+        }
+        // Only set the mapping when we actually create a new facilitator!!!
+        $this->set_mapping('facetoface_facilitator', $oldid, null);
+
+        if (!$this->get_task()->is_samesite()) {
+            // We cannot restore site facilitators from inside courses, sorry!
+            $this->log('shared seminar facilitator from other site cannot be restored', backup::LOG_WARNING);
+            return;
+        }
+
+        // Ok, we are on the same site, let's see if the facilitator still exists and use it if there are no conflicts.
+        $facilitator = \mod_facetoface\facilitator::seek($oldid);
+        if (!$facilitator->exists()) {
+            $this->log('seminar facilitator is no longer available', backup::LOG_WARNING);
+            return;
+        }
+        if ($facilitator->get_custom()) {
+            // This should not ever happen, somebody hacked DB or backup file.
+            return;
+        }
+        if (!$facilitator->get_allowconflicts()) {
+            $seminarevent = new \mod_facetoface\seminar_event($sessiondate->sessionid);
+            if (!$facilitator->is_available($sessiondate->timestart, $sessiondate->timefinish, $seminarevent)) {
+                $this->log('seminar facilitator not available', backup::LOG_WARNING);
+                return;
+            }
+        }
+        if ((int)$data->userid > 0) {
+            $data->userid = $this->get_mappingid('user', $data->userid);
+            if (!$data->userid) {
+                $this->log('seminar facilitator is no longer available 2', backup::LOG_WARNING);
+                return;
+            }
+        }
+
+        // It should be fine to add the facilitator to the session.
+        $DB->insert_record('facetoface_facilitator_dates', (object)array('facilitatorid' => $facilitator->get_id(), 'sessionsdateid' => $sessionsdateid));
+    }
+
+    protected function process_facetoface_facilitator_custom_field($data) {
+        $data = (object)$data;
+
+        $newparentid = $this->get_new_parentid('facetoface_facilitator');
+        if (!$newparentid) {
+            return;
+        }
+
+        $this->create_custom_field_data(
+            $data,
+            $newparentid,
+            \mod_facetoface\customfield_area\facetofacefacilitator::get_prefix(),
+            'facetofacefacilitatorid'
+        );
+    }
+
+    /**
+     * Create a new facilitator.
+     * @param stdClass $facilitator
+     * @return int new facilitator id
+     */
+    private function create_facetoface_facilitator(stdClass $facilitator): int {
+        global $DB;
+
+        $oldid = $facilitator->id;
+        unset($facilitator->id);
+
+        // Keeping or moving these two times makes little sense, but it is the expected Moodle way...
+        $facilitator->timecreated = $this->apply_date_offset($facilitator->timecreated);
+        $facilitator->timemodified = $this->apply_date_offset($facilitator->timemodified);
+
+        // Moodle way is to map the original user even if it makes little sense.
+        $facilitator->usercreated = $this->get_mappingid('user', $facilitator->usercreated);
+        $facilitator->usermodified = $this->get_mappingid('user', $facilitator->usermodified);
+
+        $newid = $DB->insert_record('facetoface_facilitator', $facilitator);
+        $this->set_mapping('facetoface_facilitator', $oldid, $newid, true, $this->get_task()->get_old_system_contextid());
+
+        $this->add_related_files(
+            \mod_facetoface\customfield_area\facetofacefacilitator::get_component(),
+            \mod_facetoface\customfield_area\facetofacefacilitator::get_area_name(),
+            \mod_facetoface\customfield_area\facetofacefacilitator::get_prefix(),
+            $this->get_task()->get_old_system_contextid(),
+            $oldid
+        );
 
         return $newid;
     }
