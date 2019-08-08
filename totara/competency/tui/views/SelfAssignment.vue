@@ -27,7 +27,9 @@
           {{ $str('assign', 'totara_hierarchy') }}
         </button>
       </div>
-      <strong>{{ data.total }} competencies</strong>
+      <strong>{{
+        $str('competencies', 'totara_competency', data.total)
+      }}</strong>
       <table class="table table-hover table-striped">
         <thead>
           <th style="width: 5%">
@@ -38,8 +40,15 @@
               @click="selectAll"
             />
           </th>
-          <th style="width: 75%">Name</th>
-          <th style="width: 20%">Assigned</th>
+          <th style="width: 50%">
+            {{ $str('header:competency_name', 'totara_competency') }}
+          </th>
+          <th style="width: 15%">
+            {{ $str('header:assignment_status', 'totara_competency') }}
+          </th>
+          <th style="width: 30%">
+            {{ $str('header:assignment_reasons', 'totara_competency') }}
+          </th>
         </thead>
         <tbody>
           <tr v-for="item in allItems" :key="item.id">
@@ -53,15 +62,18 @@
               />
             </td>
             <td>{{ item.display_name }}</td>
-            <td v-if="isAssigned(item)">Assigned</td>
-            <td v-else>Unassigned</td>
+            <td v-if="isAssigned(item)">
+              {{ $str('assigned', 'totara_competency') }}
+            </td>
+            <td v-else>{{ $str('unassigned', 'totara_competency') }}</td>
+            <td>rr</td>
           </tr>
         </tbody>
         <tfoot>
           <tr v-if="data.next_cursor !== ''">
-            <td colspan="4">
+            <td colspan="5">
               <button @click="nextCursor = data.next_cursor">
-                Load More
+                {{ $str('loadmore', 'totara_core') }}
               </button>
             </td>
           </tr>
@@ -182,15 +194,24 @@ export default {
 </script>
 
 <lang-strings>
-    {
-        "totara_hierarchy": [
-            "assign"
-        ],
-        "totara_competency": [
-            "back_to_competency_profile",
-            "assign_competencies",
-            "search_competencies_descriptive",
-            "no_competency_to_assign"
-        ]
-    }
+  {
+    "totara_core": [
+      "loadmore"
+    ],
+    "totara_hierarchy": [
+      "assign"
+    ],
+    "totara_competency": [
+      "assigned",
+      "assign_competencies",
+      "back_to_competency_profile",
+      "competencies",
+      "header:competency_name",
+      "header:assignment_status",
+      "header:assignment_reasons",
+      "no_competency_to_assign",
+      "search_competencies_descriptive",
+      "unassigned"
+    ]
+  }
 </lang-strings>
