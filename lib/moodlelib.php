@@ -1047,15 +1047,12 @@ function clean_param($param, $type) {
             if ($param === '') {
                 return '';
             }
-            // Totara: encode dangerous and incompatible characters.
-            $param = str_replace(
-                ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t",  '{',   '}',   '<',   '>'],
-                ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09', '%7B', '%7D', '%3C', '%3E'],
-                $param);
             if (substr($param, 0, 1) === ':') {
                 // '://wwww.example.com/' urls were never allowed.
                 return '';
-            } else if (preg_match('/^[a-z]+:/i', $param)) {
+            }
+            $param = preprocess_param_url($param);
+            if (preg_match('/^[a-z]+:/i', $param)) {
                 // Totara: the validateUrlSyntax() does not support extended characters,
                 //         that means we can use native PHP url validation without risk of regressions
                 //         to improve security, but only for full URLs.
@@ -1064,6 +1061,7 @@ function clean_param($param, $type) {
                     return '';
                 }
             } else {
+                // Totara: Colons are not needed in relative URLs.
                 $param = str_replace(':', '%3A', $param);
             }
             include_once($CFG->dirroot . '/lib/validateurlsyntax.php');
@@ -1262,6 +1260,53 @@ function clean_param($param, $type) {
             // Doh! throw error, switched parameters in optional_param or another serious problem.
             print_error("unknownparamtype", '', '', $type);
     }
+}
+
+/**
+ * Fix some common issues that make URLs incompatible with PARAM_URL cleaning.
+ *
+ * @since Totara 12.9
+ *
+ * @internal intended to be used from clean_param() and URL form elements only
+ *
+ * @param string $url
+ * @return string
+ */
+function preprocess_param_url($url) {
+    $url = (string)$url;
+    if ($url === '') {
+        return '';
+    }
+    if (substr($url, 0, 1) === ':') {
+        // Invalid, nothing to fix anything, it will not pass URL cleaning.
+        return $url;
+    }
+    if (substr($url, 0, 2) === '//') {
+        // Fix protocol relative URLs, we know what this site is using.
+        if (is_https()) {
+            $url = 'https:' . $url;
+        } else {
+            $url = 'http:' . $url;
+        }
+    }
+
+    // Encode dangerous and incompatible characters.
+    $url = str_replace(
+        ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t",  '{',   '}',   '<',   '>'],
+        ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09', '%7B', '%7D', '%3C', '%3E'],
+        $url);
+
+    // NOTE: in the future we may add encoding of non-unicode characters in URL right here.
+
+    if (preg_match('/^[a-z]+:/i', $url)) {
+        $filtered = filter_var($url, FILTER_VALIDATE_URL);
+        if ($filtered !== false) {
+            // PHP docs do not specify if the returned value is ever changed, but let's assume it might in the future.
+            $url = $filtered;
+        }
+    }
+
+    return $url;
 }
 
 /**

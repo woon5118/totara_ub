@@ -27,6 +27,29 @@ defined('MOODLE_INTERNAL') || die();
  * Tests of our upstream hacks.
  */
 class totara_core_moodlelib_testcase extends advanced_testcase {
+    public function test_preprocess_param_url() {
+        global $CFG;
+
+        // Make sure the special characters are encoded properly.
+        $url = "http://www.example.com/?whatever='\" \t\n&bbb={1,2}&amp;c=<br>";
+        $result = preprocess_param_url($url);
+        $this->assertSame('http://www.example.com/?whatever=%27%22%20%09%0A&bbb=%7B1,2%7D&amp;c=%3Cbr%3E', $result);
+        $this->assertSame($url, urldecode($result));
+
+        $this->assertSame('', preprocess_param_url(''));
+        $this->assertSame('ssh://username@hostname:/path', preprocess_param_url('ssh://username@hostname:/path'));
+        $this->assertSame('http://username@hostname:/path', preprocess_param_url('http://username@hostname:/path'));
+
+        // Invalid data passes through without changes.
+        $this->assertSame('://', preprocess_param_url('://'));
+        $this->assertSame('aa/bb/:xx', preprocess_param_url('aa/bb/:xx'));
+
+        // Leading double slash is fixed.
+        $this->assertSame('https://example.com/', preprocess_param_url('//example.com/'));
+        $CFG->wwwroot = 'http:/nowhere.example.com';
+        $this->assertSame('http://example.com/', preprocess_param_url('//example.com/'));
+    }
+
     /**
      * Test encoding of dangerous and incompatible characters in URLs.
      */
@@ -46,6 +69,7 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         // Protocol case is not important.
         $this->assertSame('HttP://www.example.com/course/view.php?id=1', clean_param('HttP://www.example.com/course/view.php?id=1', PARAM_URL));
 
+        $this->assertSame('https://www.example.com/course/view.php?id=1', clean_param('//www.example.com/course/view.php?id=1', PARAM_URL));
         $this->assertSame('', clean_param('://www.example.com/course/view.php?id=1', PARAM_URL));
         $this->assertSame('www.example.com/course/view.php?id=1', clean_param('www.example.com/course/view.php?id=1', PARAM_URL));
 
@@ -106,6 +130,7 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         // Protocol case is not important.
         $this->assertSame('HttP://www.example.com/course/view.php?id=1', $oldclean('HttP://www.example.com/course/view.php?id=1'));
 
+        $this->assertSame('', $oldclean('//www.example.com/course/view.php?id=1')); // Fixed in new cleaning
         $this->assertSame('', $oldclean('://www.example.com/course/view.php?id=1'));
         $this->assertSame('www.example.com/course/view.php?id=1', $oldclean('www.example.com/course/view.php?id=1'));
 

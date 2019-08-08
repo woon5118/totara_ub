@@ -92,17 +92,8 @@ class url extends text {
             $data[$name] = 'http://' . $data[$name];
         }
 
-        // Make sure the value will pass through PARAM_URL.
-        $data[$name] = str_replace(
-            ['"',   "'",   '[',   ']',   ' ',   "\n",  "\t",  '{',   '}',   '<',   '>'],
-            ['%22', '%27', '%5B', '%5D', '%20', '%0A', '%09', '%7B', '%7D', '%3C', '%3E'],
-            $data[$name]);
-
-        $validated = filter_var($data[$name], FILTER_VALIDATE_URL);
-        if ($validated !== false) {
-            // Keep invalid value, the submission will be blocked by validator.
-            $data[$name] = $validated;
-        }
+        // Help the value pass through PARAM_URL validation if possible.
+        $data[$name] = preprocess_param_url($data[$name]);
 
         return $data;
     }
