@@ -16,7 +16,9 @@ query totara_competency_self_assignable_competencies(
       id
       display_name
       user_assignments {
+        id
         type
+        user_group_type
         progress_name
       }
     }

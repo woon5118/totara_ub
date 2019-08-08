@@ -66,7 +66,13 @@
               {{ $str('assigned', 'totara_competency') }}
             </td>
             <td v-else>{{ $str('unassigned', 'totara_competency') }}</td>
-            <td>rr</td>
+            <td>
+              <ul>
+                <li v-for="(type, key) in getReasonAssigned(item)" :key="key">
+                  {{ type }}
+                </li>
+              </ul>
+            </td>
           </tr>
         </tbody>
         <tfoot>
@@ -154,6 +160,27 @@ export default {
           }
         }
       }
+    },
+
+    getReasonAssigned: function(competency) {
+      var groupedAssignments = [];
+      if (competency.user_assignments) {
+        competency.user_assignments.forEach(function(assignment) {
+          var type = assignment.type;
+          if (assignment.type === 'admin') {
+            if (assignment.user_group_type === 'user') {
+              type = 'individual';
+            } else {
+              type = assignment.user_group_type;
+            }
+          }
+
+          if (!groupedAssignments.find(item => item === type)) {
+            groupedAssignments.push(type);
+          }
+        });
+      }
+      return groupedAssignments;
     },
   },
 
