@@ -150,7 +150,7 @@ if ($fromform = $mform->get_data()) {
     $signup->set_discountcode($fromform->discountcode);
 
     $managerselect = get_config(null, 'facetoface_managerselect');
-    if ($managerselect && isset($fromform->managerid)) {
+    if ($managerselect && isset($fromform->managerid) && !empty($fromform->managerid)) {
         $signup->set_managerid($fromform->managerid);
     }
 

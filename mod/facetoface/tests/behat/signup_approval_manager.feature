@@ -70,6 +70,52 @@ Feature: Seminar Signup Manager Approval
     And I should see "Manager Approval"
     And I should see "This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
 
+  Scenario: Student signs up with two managers assigned with manager select enabled and manager approval required
+    # Add two more managers
+    And the following "users" exist:
+      | username    | firstname | lastname | email              |
+      | tammy       | Tammy     | Tam      | tammy@example.com  |
+      | yummy       | Yummy     | Yum      | yummy@example.com  |
+      | funny       | Funny     | Fun      | funny@example.com  |
+    And the following job assignments exist:
+      | user  | fullname | idnumber | manager |
+      | sally | jajaja1  | 1        | tammy   |
+      | sally | jajaja2  | 2        | yummy   |
+    And I set the following administration settings values:
+      | facetoface_managerselect | 1 |
+    And I log out
+
+    And I log in as "sally"
+    And I am on "Classroom Connect Course" course homepage
+    And I follow "Request approval"
+    And I should see "Manager Approval"
+    And I press "Request approval"
+    Then I should see "Your request was sent to your manager for approval."
+    And I run all adhoc tasks
+    And I log out
+
+    And I log in as "tammy"
+    And I click on "Dashboard" in the totara menu
+    And I click on "View all tasks" "link"
+    And I should see "This is to advise that Sally Sal has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
+    And I click on "mod/facetoface/attendees" "link" in the "td.message_values_statement" "css_element"
+    Then I should see "Tammy Tam" in the "Sally Sal" "table_row"
+    Then I should see "Yummy Yum" in the "Sally Sal" "table_row"
+    And I log out
+
+    And I log in as "yummy"
+    And I click on "Dashboard" in the totara menu
+    And I click on "View all tasks" "link"
+    And I should see "This is to advise that Sally Sal has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
+    And I click on "mod/facetoface/attendees" "link" in the "td.message_values_statement" "css_element"
+    Then I should see "Tammy Tam" in the "Sally Sal" "table_row"
+    Then I should see "Yummy Yum" in the "Sally Sal" "table_row"
+    And I log out
+
+    And I log in as "funny"
+    And I click on "Dashboard" in the totara menu
+    And I should not see "View all tasks"
+
   Scenario: Student signs up with no manager assigned with manager select enabled and manager approval required
     When I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "s__facetoface_managerselect" "checkbox"

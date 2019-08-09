@@ -645,5 +645,21 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019080600, 'facetoface');
     }
 
+    if ($oldversion < 2019081300) {
+        // Reset managerid if it is incorrectly set.
+        $sql = 'UPDATE {facetoface_signups}
+                   SET managerid = NULL
+                 WHERE managerid = 0
+                   AND id IN (
+                    SELECT DISTINCT signupid
+                      FROM {facetoface_signups_status}
+                     WHERE superceded = 0 AND (statuscode = 40 OR statuscode = 45)
+                   )';
+        $DB->execute($sql);
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2019081300, 'facetoface');
+    }
+
     return true;
 }
