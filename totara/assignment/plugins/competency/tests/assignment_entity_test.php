@@ -27,7 +27,7 @@ use tassign_competency\entities\assignment;
 defined('MOODLE_INTERNAL') || die();
 
 
-class tassign_competency_assignment_testcase extends advanced_testcase {
+class tassign_competency_assignment_entity_testcase extends advanced_testcase {
 
     public function test_filters() {
 

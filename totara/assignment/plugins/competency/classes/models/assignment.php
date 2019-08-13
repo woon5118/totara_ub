@@ -24,6 +24,7 @@
 namespace tassign_competency\models;
 
 use coding_exception;
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\lazy_collection;
 use core\orm\query\builder;
@@ -88,7 +89,9 @@ class assignment {
 
         $system_assignments = [];
         $events = [];
-        $assigned_users = $this->get_assigned_users();
+        $assigned_users = competency_assignment_user::repository()
+            ->where('assignment_id', $this->entity->id)
+            ->get_lazy();
 
         /** @var competency_assignment_user $assignment_user */
         foreach ($assigned_users as $assignment_user) {
@@ -232,6 +235,11 @@ class assignment {
             throw new assignment_create_exception('Invalid user group has been passed');
         }
 
+        $allowed_user_only_types = [assignment_entity::TYPE_OTHER, assignment_entity::TYPE_SYSTEM, assignment_entity::TYPE_SELF];
+        if ($user_group_type !== user_groups::USER && in_array($type, $allowed_user_only_types, true)) {
+            throw new assignment_create_exception('Invalid combination of type and user_group_type given');
+        }
+
         $class = "totara_assignment\\entities\\{$user_group_type}";
         if (!class_exists($class)) {
             throw new assignment_create_exception('Invalid user group has been passed');
@@ -314,13 +322,29 @@ class assignment {
     }
 
     /**
-     * @return lazy_collection
+     * @return collection|competency_assignment_user[]
      */
-    public function get_assigned_users(): lazy_collection {
+    public function get_assigned_users(): collection {
         // Get all user records for this assignment
         return competency_assignment_user::repository()
             ->where('assignment_id', $this->entity->id)
-            ->get_lazy();
+            ->get();
+    }
+
+    public function is_active(): bool {
+        return $this->entity->status == assignment_entity::STATUS_ACTIVE;
+    }
+
+    public function is_draft(): bool {
+        return $this->entity->status == assignment_entity::STATUS_DRAFT;
+    }
+
+    public function is_archived(): bool {
+        return $this->entity->status == assignment_entity::STATUS_ARCHIVED;
+    }
+
+    public function get_status(): int {
+        return $this->entity->status;
     }
 
     /**
