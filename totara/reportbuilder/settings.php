@@ -32,6 +32,24 @@ $rb = new admin_settingpage('rbsettings',
                             array('totara/reportbuilder:managereports'));
 
 if ($ADMIN->fulltree) {
+    $rb->add(new admin_setting_configselect(
+        'totara_reportbuilder/defaultreportview',
+        new lang_string('defaultreportviewsetting', 'totara_reportbuilder'),
+        new lang_string('defaultreportviewsetting_desc', 'totara_reportbuilder'),
+        'grid',
+        [
+            'list' => new lang_string('defaultreportviewlist', 'totara_reportbuilder'),
+            'grid' => new lang_string('defaultreportviewgrid', 'totara_reportbuilder'),
+        ]
+    ));
+
+    $rb->add(new admin_setting_configcheckbox(
+        'totara_reportbuilder/showdescription',
+        new lang_string('showdescription', 'totara_reportbuilder'),
+        new lang_string('showdescription_desc', 'totara_reportbuilder'),
+        false
+    ));
+
     $rb->add(new totara_reportbuilder_admin_setting_configexportoptions());
 
     $rb->add(new admin_setting_configcheckbox('reportbuilder/exporttofilesystem', new lang_string('exporttofilesystem', 'totara_reportbuilder'),

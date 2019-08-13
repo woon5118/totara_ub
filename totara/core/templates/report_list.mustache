@@ -35,52 +35,66 @@
 
     Example context (json):
     {
-        "report_list": [
-            {
-                "name":"My Objectives",
-                "href": "http://example.com",
-                "edit_href": "http://example.com",
-                "icon": {
-                    "template": "core/flex_icon",
-                    "context": {
-                        "identifier" : "edit",
-                        "customdata": {
-                            "alt": "Edit report x"
-                        },
-                        "classes": "fa-edit"
+        "report_list": {
+            "tiles": [
+                {
+                    "name":"My Objectives",
+                    "href": "http://example.com",
+                   "edit_href": "http://example.com",
+                    "icon": {
+                        "template": "core/flex_icon",
+                        "context": {
+                            "identifier" : "edit",
+                            "customdata": {
+                                "alt": "Edit report x"
+                            },
+                            "classes": "fa-edit"
+                        }
+                    }
+                },
+                {
+                    "name":"My Users",
+                    "href": "http://example.com",
+                    "edit_href": "http://example.com",
+                    "icon": {
+                        "template": "core/flex_icon",
+                        "context": {
+                            "identifier" : "edit",
+                            "customdata": {
+                                "alt": "Edit report x"
+                            },
+                            "classes": "fa-edit"
+                        }
                     }
                 }
-            },
-            {
-                "name":"My Users",
-                "href": "http://example.com",
-                "edit_href": "http://example.com",
-                "icon": {
-                    "template": "core/flex_icon",
-                    "context": {
-                        "identifier" : "edit",
-                        "customdata": {
-                            "alt": "Edit report x"
-                        },
-                        "classes": "fa-edit"
-                    }
-                }
-            }
-        ]
+            ]
+        }
     }
 }}
-<ul class="reportmanager">
-{{#report_list}}
-    <li>
-        <a href="{{href}}">
-            {{#pix}}report_icon,totara_reportbuilder{{/pix}}
-            {{{name}}}
+
+<div data-core-autoinitialise="true"
+     data-core-autoinitialise-amd="totara_core/list_toggle"
+     data-tw-target=".totara_core__myreports__list"
+     data-tw-target-class="totara_core__myreports__list" class="totara_core__myreports__container">
+
+    {{! Switcher }}
+    <div class="totara_core__myreports__itemstyletoggle" data-tw-switcher>
+        <a href="#" class="totara_core__myreports__itemstyletoggle__btn totara_core__myreports__itemstyletoggle__btn--narrow"
+           data-tw-trigger="grid">
+            {{#flex_icon}}view-grid, tile_view, totara_catalog,{{/flex_icon}}
         </a>
-        {{#edit_href}}
-            <a href="{{edit_href}}" title="{{#str}}edit{{/str}}">
-                {{#icon}}{{#context}}{{> &&template}}{{/context}}{{/icon}}
-            </a>
-        {{/edit_href}}
-    </li>
-{{/report_list}}
-</ul>
+        <a href="#" class="totara_core__myreports__itemstyletoggle__btn totara_core__myreports__itemstyletoggle__btn--wide"
+           data-tw-trigger="table">
+            {{#flex_icon}}view-list, list_view, totara_catalog,{{/flex_icon}}
+        </a>
+    </div>
+
+    <ul class="reportmanager totara_core__myreports__list{{#isgrid}} totara_core__myreports__list--grid{{/isgrid}}{{#islist}} totara_core__myreports__list--table{{/islist}}">
+        {{#report_list}}
+            {{#tiles}}
+                {{#template_data}}{{> &&template_name }}{{/template_data}}
+            {{/tiles}}
+        {{/report_list}}
+    </ul>
+</div>
+

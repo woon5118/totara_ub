@@ -45,6 +45,7 @@ information provided here is intended especially for developers.
     - Method: \totara_core_renderer::totara_notifications() (alternative method: \core_renderer::course_content_header_notifications())
 * Deprecated function totara_print_scheduled_reports().
 * Changed quickaccesssettings_group.mustache to use core/action_menu for group controls
+* Changed report_list.mustache to have a grid and list view
 
 === 12.0 ===
 

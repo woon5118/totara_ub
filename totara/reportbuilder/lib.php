@@ -2576,11 +2576,14 @@ class reportbuilder {
         $enabled_plugins = self::get_reports_plugins_access($foruser);
         //get basic reports list
         $hidden = (!$showhidden) ? ' WHERE hidden = 0 ' : '';
-        $sql = "SELECT *
-                  FROM {report_builder}
+        $sql = "SELECT r.*, g.type AS graph
+                  FROM {report_builder} r
+                  LEFT JOIN {report_builder_graph} g
+                  ON r.id = g.reportid
                  $hidden
                  ORDER BY fullname ASC";
         $reports = $DB->get_records_sql($sql);
+
         //we now have all the information we need
         if ($reports) {
             foreach ($reports as $report) {

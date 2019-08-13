@@ -203,9 +203,21 @@ class totara_core_renderer extends plugin_renderer_base {
      * @return array List of reports.
      */
     public function report_list_export_for_template($reports, $canedit) {
+        global $CFG;
+
         $report_list = array();
         $systemcontext = context_system::instance();
 
+        $graphimages = [
+            'column' => 'graphicons/report_tile_image_column',
+            'line' => 'graphicons/report_tile_image_line',
+            'bar' => 'graphicons/report_tile_image_bar',
+            'pie' => 'graphicons/report_tile_image_pie',
+            'scatter' => 'graphicons/report_tile_image_scatter',
+            'area' => 'graphicons/report_tile_image_area',
+            'doughnut' => 'graphicons/report_tile_image_donut',
+            'progress' => 'graphicons/report_tile_image_progress'
+        ];
         foreach ($reports as $report) {
 
             $reportname = format_string($report->fullname, true, ['context' => $systemcontext]);
@@ -216,10 +228,27 @@ class totara_core_renderer extends plugin_renderer_base {
                 continue;
             }
 
+            if (totara_feature_visible('reportgraphs') && !empty($report->graph) && isset($graphimages[$report->graph])) {
+                $graphicon = new pix_icon(
+                    $graphimages[$report->graph],
+                    null,
+                    'totara_core'
+                );
+            } else {
+                $graphicon = new pix_icon(
+                    'graphicons/report_tile_image_nograph',
+                    null,
+                    'totara_core'
+                );
+            }
+
             // Escaping is done in the mustache template, so no need to do it in format string
             $report_data = [
                 'name' => $reportname,
-                'href' => $report->url
+                'href' => $report->url,
+                'description' => format_string($report->summary),
+                'graphimagetemplate' => $graphicon->get_template(),
+                'graphimagedata' => $graphicon->export_for_template($this)
             ];
 
             if ($canedit) {
@@ -235,10 +264,17 @@ class totara_core_renderer extends plugin_renderer_base {
                 $report_data['edit_href'] = (string) new moodle_url('/totara/reportbuilder/general.php', array('id' => $report->id));
             }
 
-            $report_list[] = $report_data;
+            $report_list[] = [
+                'template_name' => 'totara_core/report_item',
+                'template_data' => $report_data
+            ];
         }
 
-        return $report_list;
+        return [
+            'single_column' => false,
+            'tiles_exist' => !empty($report_list),
+            'tiles' => $report_list
+        ];
     }
 
     /**
@@ -261,6 +297,7 @@ class totara_core_renderer extends plugin_renderer_base {
      *
      * @param array $scheduledreports List of scheduled reports.
      * @param boolean $showoptions Show actions to edit or delete the scheduled report.
+     * @param string $addform form HTML to add another scheduled report.
      * @param string $addform form HTML to add another scheduled report.
      * @return object Table data object for the table template.
      */
@@ -753,6 +790,9 @@ class totara_core_renderer extends plugin_renderer_base {
         $context = context_system::instance();
         $canedit = has_capability('totara/reportbuilder:managereports',$context);
 
+        $defaultview = get_config('totara_reportbuilder', 'defaultreportview');
+        $showdescription = get_config('totara_reportbuilder', 'showdescription');
+
         // Prepare the data for the list of scheduled reports.
         $scheduledreports = get_my_scheduled_reports_list();
 
@@ -763,6 +803,12 @@ class totara_core_renderer extends plugin_renderer_base {
         // Build the template data.
         $template_data = $this->scheduled_reports_export_for_template($scheduledreports, true, $addform);
         $template_data->report_list = $this->report_list_export_for_template($reports, $canedit);
+
+        $template_data->canedit = $canedit;
+        $template_data->isgrid = $defaultview === 'grid';
+        $template_data->islist = $defaultview === 'list';
+        $template_data->showdescription = $showdescription;
+        $template_data->create_url = $CFG->wwwroot . '/totara/reportbuilder/create.php';
 
         return $this->render_from_template('totara_core/myreports', $template_data);
     }

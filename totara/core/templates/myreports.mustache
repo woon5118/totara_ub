@@ -219,7 +219,14 @@
     }
 
 }}
-<h2>{{#str}}reports, totara_core{{/str}}</h2>
+<div class="totara_core__myreports__title">
+    <h2>{{#str}}reports, totara_core{{/str}}</h2>
+
+    {{#canedit}}
+        <a href="{{create_url}}" class="btn totara_core__myreports__title__btn">Create Report</a>
+    {{/canedit}}
+</div>
+
 <div id="myreports_section">
     {{>totara_core/report_list}}
 </div>
