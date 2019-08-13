@@ -196,7 +196,7 @@ class assignment_actions {
      * @param array $user_groups ['ug type' => [ids]]
      * @param string $type type of assignment, admin, system, etc.
      * @param int $status Assignment activation status 0 - draft, 1 - active
-     * @return collection|assignment[]
+     * @return collection|assignment_model[]
      * @throws \coding_exception
      * @throws assignment_create_exception
      */

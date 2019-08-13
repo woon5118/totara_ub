@@ -244,6 +244,16 @@ input totara_competency_self_assigned_competencies_filter {
   ids: [param_integer]
 }
 
+extend type Mutation {
+    """
+    Creates new assignments for the user
+    """
+    totara_competency_create_user_assignments(
+        user_id: core_id!
+        competency_ids: [core_id!]!
+    ): [tassign_competency_assignment!]!
+}
+
 extend type Query {
   totara_competency_activity_log(
     competency_id: core_id!
