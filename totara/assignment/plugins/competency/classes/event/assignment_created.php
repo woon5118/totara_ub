@@ -23,6 +23,8 @@
 
 namespace tassign_competency\event;
 
+use tassign_competency\entities\assignment as assignment_entity;
+
 defined('MOODLE_INTERNAL') || die();
 
 class assignment_created extends assignment {
@@ -33,7 +35,7 @@ class assignment_created extends assignment {
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'totara_assignment_competencies';
+        $this->data['objecttable'] = assignment_entity::TABLE;
     }
 
     /**

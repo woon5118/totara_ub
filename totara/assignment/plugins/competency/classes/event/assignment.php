@@ -51,7 +51,7 @@ abstract class assignment extends base {
         ];
         /** @var static $event */
         $event = static::create($data);
-        $event->add_record_snapshot('totara_assignment_competencies', (object)$assignment->get_attributes_raw());
+        $event->add_record_snapshot(assignment_entity::TABLE, (object)$assignment->get_attributes_raw());
         return $event;
     }
 
@@ -74,7 +74,7 @@ abstract class assignment extends base {
         ];
         /** @var static $event */
         $event = static::create($data);
-        $event->add_record_snapshot('totara_assignment_competency_users', (object)$assignment_user->get_attributes_raw());
+        $event->add_record_snapshot(competency_assignment_user::TABLE, (object)$assignment_user->get_attributes_raw());
         return $event;
     }
 
