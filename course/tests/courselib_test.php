@@ -216,7 +216,8 @@ class core_course_courselib_testcase extends advanced_testcase {
         // Completion common to all module.
         $moduleinfo->completion = COMPLETION_TRACKING_AUTOMATIC;
         $moduleinfo->completionview = COMPLETION_VIEW_REQUIRED;
-        $moduleinfo->completiongradeitemnumber = 1;
+        $moduleinfo->completiongradeitemnumber = 0; // Totara: There is no value '1', either '0' or null.
+        $moduleinfo->completionusegrade = 1; // Totara: If completionusegrade is not set, the completiongradeitemnumber will be set to null true.
         $moduleinfo->completionexpected = time() + (7 * 24 * 3600);
 
         // Conditional activity.
@@ -232,6 +233,7 @@ class core_course_courselib_testcase extends advanced_testcase {
         // Grading and Advanced grading.
         require_once($CFG->dirroot . '/rating/lib.php');
         $moduleinfo->assessed = RATING_AGGREGATE_AVERAGE;
+        $moduleinfo->ratingtime = 1; // Totara: If ratingtime is not set then assesstimestart and assesstimefinish will be set to empty.
         $moduleinfo->scale = 10; // Note: it could be minus (for specific course scale). It is a signed number.
         $moduleinfo->assesstimestart = time();
         $moduleinfo->assesstimefinish = time() + (7 * 24 * 3600);
@@ -257,8 +259,12 @@ class core_course_courselib_testcase extends advanced_testcase {
         $modulesetvalues = $modulename.'_create_set_values';
         $this->$modulesetvalues($moduleinfo);
 
+        // Totara: Clone the $moduleinfo to make sure that our test is correct, otherwise the function create_module
+        // will modify the $moduleinfo via referencing.
+        $cloned = clone $moduleinfo;
+
         // Create the module.
-        $result = create_module($moduleinfo);
+        $result = create_module($cloned);
 
         // Retrieve the module info.
         $dbmodinstance = $DB->get_record($moduleinfo->modulename, array('id' => $result->instance));
@@ -293,13 +299,13 @@ class core_course_courselib_testcase extends advanced_testcase {
 
         // Some optional (but quite common) to some module.
         $this->assertEquals($moduleinfo->name, $dbmodinstance->name);
-        $this->assertEquals($moduleinfo->intro, $dbmodinstance->intro);
-        $this->assertEquals($moduleinfo->introformat, $dbmodinstance->introformat);
+        $this->assertEquals($moduleinfo->introeditor['text'], $dbmodinstance->intro);
+        $this->assertEquals($moduleinfo->introeditor['format'], $dbmodinstance->introformat);
 
         // Test specific to the module.
         $modulerunasserts = $modulename.'_create_run_asserts';
         $this->$modulerunasserts($moduleinfo, $dbmodinstance);
-        return $moduleinfo;
+        return $result;
     }
 
     /**
