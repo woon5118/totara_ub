@@ -29,7 +29,6 @@ Feature: Rename roles within a course
     And I expand "Switch role to..." node
     Then I should see "Tutor"
     And I should see "Learner"
-    And I press "Cancel"
     And I navigate to course participants
     And the "roleid" select box should contain "Tutor"
     And the "roleid" select box should contain "Learner"
@@ -44,7 +43,6 @@ Feature: Rename roles within a course
     And I should see "Teacher"
     And I should see "Student"
     And I should not see "Learner"
-    And I press "Cancel"
     And I navigate to course participants
     And the "roleid" select box should contain "Non-editing teacher"
     And the "roleid" select box should contain "Student"
