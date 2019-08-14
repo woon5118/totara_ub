@@ -48,7 +48,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Competency active: Achievement tracking started', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -60,7 +60,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Competency active: Achievement tracking stopped', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
     }
 
     public function test_system() {
@@ -83,7 +83,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Assignment transferred for continuous tracking', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -95,7 +95,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Continuous tracking', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -107,7 +107,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Continuous tracking', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
     }
 
     public function test_self() {
@@ -130,7 +130,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Assigned: Self-assigned', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -142,7 +142,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Self-assigned', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -154,7 +154,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Self-assigned', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
     }
 
     public function test_position() {
@@ -183,7 +183,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Assigned: Developer (Position)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -195,7 +195,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Developer (Position)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -207,7 +207,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Developer (Position)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
     }
 
     public function test_organisation() {
@@ -238,7 +238,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Assigned: Software Development (Organisation)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -250,7 +250,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Software Development (Organisation)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -262,7 +262,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Software Development (Organisation)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
     }
 
     public function test_audience() {
@@ -288,7 +288,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Assigned: Competent People (Audience)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -300,7 +300,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Competent People (Audience)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -312,7 +312,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Competent People (Audience)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
     }
 
     public function test_user_by_admin() {
@@ -338,7 +338,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Assigned: Isaac Newton (Admin)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -350,7 +350,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Isaac Newton (Admin)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -362,7 +362,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Isaac Newton (Admin)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
     }
 
     public function test_user_by_other() {
@@ -391,7 +391,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Assigned: Isaac Newton (Manager)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -403,7 +403,7 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Isaac Newton (Manager)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         $assignment_log = new competency_assignment_user_log();
         $assignment_log->created_at = $time;
@@ -415,6 +415,6 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $this->assertEquals('Unassigned: Isaac Newton (Manager)', $entry->get_description());
         $this->assertNull($entry->get_proficient_status());
         $this->assertEquals($time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
     }
 }

@@ -88,7 +88,7 @@ class competency_achieved_via extends activity_log {
             }
             /** @var base_achievement_detail $achievement_detail */
             $achievement_detail = new $detail_classname();
-            $achievement_detail->set_related_info($pathway_achieved_by['related_info']);
+            $achievement_detail->set_related_info((array) $pathway_achieved_by['related_info']);
             $criteria_met = array_merge($criteria_met, $achievement_detail->get_achieved_via_strings());
         }
 

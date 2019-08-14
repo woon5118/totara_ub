@@ -66,7 +66,7 @@ class totara_competency_models_activity_log_achieved_via_testcase extends advanc
 
         $this->assertEquals('Criteria met: . Achieved \'Great\' rating.', $entry->get_description());
         $this->assertEquals($achievement_time, $entry->get_date());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
 
         // While the *scale value* is in the description. This entry doesn't have return whether or not
         // we're dealing with a proficient value or not. That is the responsibilty of the activity_log/competency_achievement

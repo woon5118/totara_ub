@@ -26,6 +26,7 @@ namespace totara_competency\data_providers;
 use core\orm\entity\entity;
 use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency_assignment_user_log;
+use tassign_competency\models\assignment_user_log;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;
 use totara_competency\models\activity_log_factory;
@@ -129,6 +130,7 @@ class activity_log {
             ->where('user_id', $this->user_id)
             ->where(assignment::TABLE . '.competency_id', $this->competency_id)
             ->order_by('created_at', 'desc')
+            ->order_by(assignment::TABLE . '.type', 'desc')
             ->order_by('id', 'desc');
         if (!is_null($this->assignment_id)) {
             $assignment_log->where('assignment_id', $this->assignment_id);

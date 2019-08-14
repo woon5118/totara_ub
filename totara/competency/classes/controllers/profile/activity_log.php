@@ -29,22 +29,24 @@ use totara_mvc\view;
 class activity_log extends base {
 
     public function action() {
-        global $OUTPUT;
+        $page_title = get_string('activity_log', 'totara_competency');
+        $this->add_navigation($page_title);
 
-        // Add breadcrumbs.
-        $this->add_navigation(get_string('competencydetails', 'totara_hierarchy'));
+        $competency = competency::repository()->find_or_fail((int) $this->get_param('competency_id', PARAM_INT, null, true));
 
         $props = [
             'user-id' => $this->user->id,
+            'competency-id' => $competency->id,
             'base-url' => (string) $this->get_base_url(),
             'go-back-link' => (string)$this->get_profile_url(),
+            'starting-tab' => 'log',
         ];
 
         $data = [
-            'component' => $OUTPUT->tui_component('totara_competency/views/ActivityLog', $props)
+            'component' => view::core_renderer()->tui_component('totara_competency/views/CompetencyDetail', $props)
         ];
 
         return view::create('totara_competency/profile_competency_details', $data)
-            ->set_title(get_string('activity_log', 'totara_competency'));
+            ->set_title($page_title);
     }
 }

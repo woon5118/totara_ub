@@ -41,6 +41,7 @@ $string['activitylog_assignedposition'] = 'Assigned: {$a->position_name} (Positi
 $string['activitylog_criteriachange'] = 'Criteria change';
 $string['activitylog_criteriamet'] = 'Criteria met: {$a->criteria_met}. Achieved \'{$a->scale_value_name}\' rating.';
 $string['activitylog_minprofchanged'] = 'Minimum required proficient value changed to \'{$a->scale_value_name}\'';
+$string['activitylog_proficientstatus'] = 'Proficient status';
 $string['activitylog_rating'] = 'Rating: {$a->scale_value_name}';
 $string['activitylog_trackingstarted'] = 'Competency active: Achievement tracking started';
 $string['activitylog_trackingstopped'] = 'Competency active: Achievement tracking stopped';

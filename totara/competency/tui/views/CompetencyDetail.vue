@@ -43,11 +43,7 @@
       </div>
       <!-- Competency activity log -->
       <div v-if="activeTab === 'log'">
-        <ActivityLog
-          :competency-id="competencyId"
-          :user-id="userId"
-          :data="data"
-        />
+        <ActivityLog :competency-id="competencyId" :user-id="userId" />
       </div>
     </div>
   </div>

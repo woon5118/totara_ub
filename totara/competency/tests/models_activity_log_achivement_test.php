@@ -91,7 +91,7 @@ class totara_competency_models_activity_log_achievement_testcase extends advance
 
         $this->assertEquals('Rating: Great', $entry->get_description());
         $this->assertTrue($entry->get_proficient_status());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
+        $this->assertEquals($assignment->id, $entry->get_assignment()->get_id());
         $this->assertEquals($time, $entry->get_date());
     }
 }

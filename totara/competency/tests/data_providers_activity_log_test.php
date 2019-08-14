@@ -361,11 +361,11 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
 
         $last = array_pop($activity_log_data);
         $this->assertInstanceOf(activity_log\assignment::class, $last);
-        $this->assertEquals('Assignment transferred for continuous tracking', $last->get_description());
+        $this->assertEquals('Unassigned: Audience One (Audience)', $last->get_description());
 
         $last = array_pop($activity_log_data);
         $this->assertInstanceOf(activity_log\assignment::class, $last);
-        $this->assertEquals('Unassigned: Audience One (Audience)', $last->get_description());
+        $this->assertEquals('Assignment transferred for continuous tracking', $last->get_description());
 
         $last = array_pop($activity_log_data);
         $this->assertInstanceOf(activity_log\competency_achieved_via::class, $last);
