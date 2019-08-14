@@ -16,9 +16,17 @@
     <CurrentList
       v-if="filterNotArchived"
       :competencies="competencies"
+      :base-url="baseUrl"
+      :user-id="userId"
       :scales="scales"
     />
-    <ArchivedList v-else :competencies="competencies" :scales="scales" />
+    <ArchivedList
+      v-else
+      :competencies="competencies"
+      :scales="scales"
+      :base-url="baseUrl"
+      :user-id="userId"
+    />
   </div>
 </template>
 

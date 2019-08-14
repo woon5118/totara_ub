@@ -88,6 +88,14 @@ export default {
       required: true,
       type: Array,
     },
+    baseUrl: {
+      required: true,
+      type: String,
+    },
+    userId: {
+      required: true,
+      type: Number,
+    },
     scales: {
       required: true,
       type: Array,
