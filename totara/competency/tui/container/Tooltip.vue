@@ -35,23 +35,22 @@ export default {
     &:before {
       content: '';
       position: absolute;
-      top: -10px;
+      top: -$totara_style-size_8;
       left: 50%;
-      margin-left: -10px;
+      margin-left: -$totara_style-size_8;
       width: 0;
       height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 10px solid black;
+      border-left: $totara_style-size_8 solid transparent;
+      border-right: $totara_style-size_8 solid transparent;
+      border-bottom: $totara_style-size_8 solid $totara_style-color_neutral_5;
     }
-    margin-top: 10px;
+    margin-top: $totara_style-size_8;
     position: absolute;
-    padding: 2rem;
-    border: 1px #000 solid;
-    width: 300px;
-    border-radius: 1rem;
+    padding: $totara_style-size_8 $totara_style-size_12;
+    border: $totara_style-size_1 $totara_style-color_neutral_4 solid;
+    width: max-content;
 
-    background-color: #fff;
+    background-color: $totara_style-color_neutral_1;
   }
 }
 </style>
