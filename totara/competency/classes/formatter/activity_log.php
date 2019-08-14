@@ -34,6 +34,7 @@ class activity_log extends formatter {
             'description' => string_field_formatter::class,
             'proficient_status' => null,
             'assignment' => null,
+            'assignment_action' => null,
             'type' => null,
         ];
     }

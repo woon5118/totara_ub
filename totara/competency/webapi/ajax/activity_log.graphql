@@ -7,7 +7,9 @@ query totara_competency_activity_log($competency_id: core_id!, $user_id: core_id
         assignment {
             type
             user_group_type
+            progress_name
         }
+        assignment_action
         type
     }
 }

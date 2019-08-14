@@ -58,13 +58,19 @@ class assignment extends activity_log {
     }
 
     /**
+     * @return string
+     */
+    public function get_assignment_action(): string {
+        return $this->get_entity()->action_name;
+    }
+
+    /**
      * Gets the human-readable description for an assignment log type instance.
      *
      * @return string
      */
     public function get_description(): string {
-        /** @var entities\assignment $assignment */
-        $assignment = $this->get_assignment();
+        $assignment = new entities\assignment($this->get_assignment()->get_id());
         switch ($this->get_entity()->action) {
             case competency_assignment_user_log::ACTION_ASSIGNED:
                 switch ($assignment->type) {
@@ -112,7 +118,7 @@ class assignment extends activity_log {
                     default:
                         throw new \coding_exception(
                             'Invalid type',
-                            'Invalid assignment type: ' . $this->get_assignment()->type
+                            'Invalid assignment type: ' . $this->get_assignment()->get_type_name()
                         );
                 }
                 break;

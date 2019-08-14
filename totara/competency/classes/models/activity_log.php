@@ -24,7 +24,8 @@
 namespace totara_competency\models;
 
 use core\orm\entity\entity;
-use tassign_competency\entities\assignment;
+use tassign_competency\entities\assignment as assignment_entity;
+use tassign_competency\models\assignment as assignment_model;
 
 /**
  * Class activity_log_data
@@ -81,13 +82,20 @@ abstract class activity_log {
     }
 
     /**
-     * @return assignment|null
+     * @return assignment_model|null
      */
-    public function get_assignment(): ?assignment {
+    public function get_assignment(): ?assignment_model {
         if (isset($this->entity->assignment_id)) {
-            return assignment::repository()->find($this->entity->assignment_id);
+            return assignment_model::load_by_entity(assignment_entity::repository()->find($this->entity->assignment_id));
         }
 
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function get_assignment_action(): ?string {
         return null;
     }
 
@@ -112,6 +120,8 @@ abstract class activity_log {
                 return $this->get_proficient_status();
             case 'assignment':
                 return $this->get_assignment();
+            case 'assignment_action':
+                return $this->get_assignment_action();
             case 'type':
                 return (new \ReflectionClass($this))->getShortName();
         }
@@ -124,7 +134,7 @@ abstract class activity_log {
      * @return bool
      */
     public function has_field(string $field): bool {
-        if (in_array($field, ['timestamp', 'description', 'proficient_status', 'assignment', 'type'])) {
+        if (in_array($field, ['timestamp', 'description', 'proficient_status', 'assignment', 'assignment_action', 'type'])) {
             return true;
         }
         return false;
