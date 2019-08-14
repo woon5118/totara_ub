@@ -1,31 +1,26 @@
 <template>
   <div>
-    <div>
-      <h2 v-text="data.competency.fullname" />
-      <h5 v-html="data.competency.description" />
-    </div>
-    <div>
-      <Tabs>
-        <Tab
-          v-for="(item, key) in data.items"
-          :key="key"
-          :item-key="key"
-          :subtitle="
-            item.assignment.archived_at
-              ? $str('unassigned', 'totara_competency')
-              : ''
-          "
-          :active="key === 0"
-          :name="item.assignment.progress_name"
-        >
-          <ScaleDetail
-            :competency-id="competencyId"
-            :my-value="item.my_value"
-            :assignment="item.assignment"
-          />
-        </Tab>
-      </Tabs>
-    </div>
+    <h5 class="tui-Details__description" v-html="data.competency.description" />
+    <Tabs>
+      <Tab
+        v-for="(item, key) in data.items"
+        :key="key"
+        :item-key="key"
+        :subtitle="
+          item.assignment.archived_at
+            ? $str('unassigned', 'totara_competency')
+            : ''
+        "
+        :active="key === 0"
+        :name="item.assignment.progress_name"
+      >
+        <ScaleDetail
+          :competency-id="competencyId"
+          :my-value="item.my_value"
+          :assignment="item.assignment"
+        />
+      </Tab>
+    </Tabs>
     <hr />
   </div>
 </template>
@@ -34,8 +29,6 @@
 import Tab from './Tab';
 import Tabs from './Tabs';
 import ScaleDetail from './ScaleDetail';
-
-import CompetencyDetailsQuery from '../../../webapi/ajax/competency_details.graphql';
 
 export default {
   components: { ScaleDetail, Tab, Tabs },
@@ -48,40 +41,23 @@ export default {
       required: true,
       type: Number,
     },
-  },
-
-  data: function() {
-    return {
-      data: {
-        competency: {
-          fullname: '',
-        },
-        items: [],
-      },
-    };
+    data: {
+      required: true,
+      type: Object,
+    },
   },
 
   computed: {},
-
-  apollo: {
-    data: {
-      query: CompetencyDetailsQuery,
-      variables() {
-        return {
-          user_id: this.userId,
-          competency_id: this.competencyId,
-        };
-      },
-      update({
-        totara_competency_profile_competency_details: { competency, items },
-      }) {
-        return { competency, items };
-      },
-    },
-  },
 };
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+.tui-Details__ {
+  &description {
+    padding-top: $totara_style_spacing_2;
+    padding-bottom: $totara_style_spacing_4;
+  }
+}
+</style>
 <lang-strings>
   {
     "totara_competency": [
