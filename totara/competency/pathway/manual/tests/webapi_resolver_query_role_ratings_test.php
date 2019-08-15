@@ -88,7 +88,7 @@ class totara_competency_webapi_resolver_query_role_ratings_testcase extends adva
         $this->setUser($this->user2);
         assign_capability('totara/competency:view_other_profile', CAP_ALLOW, $role, context_user::instance($this->user1->id));
         $this->setUser($this->user1);
-        assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $role, context_system::instance());
+        assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $role, context_user::instance($this->user1->id));
 
         $this->setAdminUser();
     }

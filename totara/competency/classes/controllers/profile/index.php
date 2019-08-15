@@ -55,10 +55,7 @@ class index extends base {
     }
 
     protected function can_assign(): bool {
-        if ($this->is_for_current_user()) {
-            return has_capability('tassign/competency:assignself', \context_system::instance());
-        } else {
-            return has_capability('tassign/competency:assignother', $this->context);
-        }
+        $capability = $this->is_for_current_user() ? 'tassign/competency:assignself' : 'tassign/competency:assignother';
+        return has_capability($capability, $this->context);
     }
 }

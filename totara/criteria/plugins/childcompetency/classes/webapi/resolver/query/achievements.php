@@ -154,7 +154,7 @@ class achievements implements query_resolver {
      */
     public static function can_assign_competencies(int $user_id) {
         return static::is_for_current_user($user_id) ?
-            has_capability('tassign/competency:assignself', context_system::instance()) :
+            has_capability('tassign/competency:assignself', context_user::instance($user_id)) :
             has_capability('tassign/competency:assignother', context_user::instance($user_id));
     }
 
@@ -167,9 +167,10 @@ class achievements implements query_resolver {
     public static function authorize(int $user_id): bool {
         require_login(null, false, null, false, true);
 
-        static::is_for_current_user($user_id) ?
-            require_capability('totara/competency:view_own_profile', context_system::instance()) :
-            require_capability('totara/competency:view_other_profile', context_user::instance($user_id));
+        $capability = static::is_for_current_user($user_id)
+            ? 'totara/competency:view_own_profile'
+            : 'totara/competency:view_other_profile';
+        require_capability($capability, context_user::instance($user_id));
 
         return static::can_assign_competencies($user_id);
     }

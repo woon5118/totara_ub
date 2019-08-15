@@ -44,7 +44,7 @@ $capabilities = [
     'tassign/competency:assignself' => [
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
+        'contextlevel' => CONTEXT_USER,
         'archetypes' => [
             'user' => CAP_ALLOW
         ]

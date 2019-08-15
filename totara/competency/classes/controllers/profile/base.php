@@ -63,10 +63,8 @@ abstract class base extends controller {
      */
     protected function authorize() {
         // parent::authorize(); We don't need to call require login here, it's always required.
-
-        $this->is_for_current_user() ?
-            require_capability('totara/competency:view_own_profile', context_system::instance()) :
-            require_capability('totara/competency:view_other_profile', context_user::instance($this->user->id));
+        $capability = $this->is_for_current_user() ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';
+        require_capability($capability, $this->context);
 
         return $this;
     }

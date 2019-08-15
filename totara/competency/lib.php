@@ -21,14 +21,10 @@
  * @package totara_competency
  */
 
-use core_user\output\myprofile\tree;
 use core_user\output\myprofile\node;
+use core_user\output\myprofile\tree;
 
 defined('MOODLE_INTERNAL') || die();
-
-/**
- * I ❤️ lib files.
- */
 
 /**
  * Add competency profile link to the user profile page
@@ -42,9 +38,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 function totara_competency_myprofile_navigation(tree $tree, $user, $this_user, $course) {
 
-    $can_view = $this_user ?
-        has_capability('totara/competency:view_own_profile', \context_system::instance()) :
-        has_capability('totara/competency:view_other_profile', \context_user::instance($user->id));
+    $capability = $this_user ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';
+    $can_view = has_capability($capability, context_user::instance($user->id));
 
     $can_view && $tree->add_node(
         new node(

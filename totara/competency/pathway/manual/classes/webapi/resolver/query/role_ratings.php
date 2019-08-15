@@ -42,11 +42,8 @@ class role_ratings implements query_resolver {
         require_login(null, false, null, false, true);
 
         $user_id = $args['user_id'];
-        if ($USER->id == $user_id) {
-            require_capability('totara/competency:view_own_profile', context_system::instance());
-        } else {
-            require_capability('totara/competency:view_other_profile', context_user::instance($user_id));
-        }
+        $capability = $USER->id == $user_id ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';
+        require_capability($capability, context_user::instance($user_id));
 
         return competency_ratings::for_assignment($args['assignment_id'], $user_id)->fetch_role_ratings();
     }

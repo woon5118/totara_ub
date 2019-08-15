@@ -54,9 +54,10 @@ abstract class course_achievements implements query_resolver {
 
         // Currently we only use this for competencies, if the criteria is used
         // later in other areas like goals this need to be refactored
-        static::is_for_current_user($user_id) ?
-            require_capability('totara/competency:view_own_profile', context_system::instance()) :
-            require_capability('totara/competency:view_other_profile', context_user::instance($user_id));
+        $capability = static::is_for_current_user($user_id)
+            ? 'totara/competency:view_own_profile'
+            : 'totara/competency:view_other_profile';
+        require_capability($capability, context_user::instance($user_id));
 
         try {
             $criterion = static::get_criterion();

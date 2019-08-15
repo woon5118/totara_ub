@@ -77,7 +77,7 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $this->assertNull($items->item($data['competencies'][3]->id)['value']);
 
         // Now let's take away the capability and check that there is an error
-        assign_capability('totara/competency:view_own_profile', CAP_PROHIBIT, $data['role']->id, context_system::instance(), true);
+        assign_capability('totara/competency:view_own_profile', CAP_PROHIBIT, $data['role']->id, context_user::instance($data['user']->id), true);
 
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (View own competency profile)');
@@ -339,7 +339,7 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $this->getDataGenerator()->role_assign($role->id, $user->id);
 
         // Assign capability
-        assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $role->id, context_system::instance());
+        assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $role->id, context_user::instance($user->id));
 
         // This is the main user assignment for a parent competency
         $assignment = $this->assignment_generator()->create_assignment([

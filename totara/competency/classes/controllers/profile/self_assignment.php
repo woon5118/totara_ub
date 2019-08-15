@@ -31,11 +31,8 @@ class self_assignment extends base {
 
     public function action() {
 
-        if ($this->is_for_current_user()) {
-            $this->require_capability('tassign/competency:assignself', \context_system::instance());
-        } else {
-            $this->require_capability('tassign/competency:assignother', $this->context);
-        }
+        $capability = $this->is_for_current_user() ? 'tassign/competency:assignself' : 'tassign/competency:assignother';
+        $this->require_capability($capability, $this->context);
 
         // Add breadcrumbs.
         $this->add_navigation('Self assignment');

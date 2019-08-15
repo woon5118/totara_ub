@@ -79,11 +79,8 @@ class create_user_assignments implements mutation_resolver {
     protected static function authorize(int $user_id) {
         require_login(null, false);
 
-        if (self::is_logged_in_user($user_id)) {
-            require_capability('tassign/competency:assignself', context_system::instance());
-        } else {
-            require_capability('tassign/competency:assignother', context_user::instance($user_id));
-        }
+        $capability = self::is_logged_in_user($user_id) ? 'tassign/competency:assignself' : 'tassign/competency:assignother';
+        require_capability($capability, context_user::instance($user_id));
     }
 
     protected static function get_type(int $user_id): string {

@@ -27,7 +27,7 @@ $capabilities = [
     // View own competency profile.
     'totara/competency:view_own_profile' => [
         'captype' => 'read',
-        'contextlevel' => CONTEXT_SYSTEM,
+        'contextlevel' => CONTEXT_USER,
         'archetypes' => [
             'manager' => CAP_ALLOW
         ]

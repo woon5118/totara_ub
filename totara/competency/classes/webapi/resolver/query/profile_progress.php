@@ -47,13 +47,11 @@ class profile_progress implements query_resolver {
             require_login();
         }
 
-        if ($authorized_user->id === $user_id) {
-            $cap = ['totara/competency:view_own_profile', context_system::instance()];
-        } else {
-            $cap = ['totara/competency:view_other_profile', context_user::instance($user_id)];
-        }
+        $capability = $authorized_user->id === $user_id
+            ? 'totara/competency:view_own_profile'
+            : 'totara/competency:view_other_profile';
 
-        require_capability(...$cap);
+        require_capability($capability, context_user::instance($user_id));
 
         return $user_id;
     }
