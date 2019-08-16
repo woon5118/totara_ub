@@ -84,7 +84,7 @@ $string['assignment:createnew'] = 'Create assignments';
 $string['assignment:viewcurrent'] = 'Currently assigned user report';
 
 $string['assignment_reason:self'] = 'Self-assigned';
-$string['assignment_type:system'] = 'Continuous tracking';
+$string['assignment_reason:system'] = 'Continuous tracking';
 
 $string['assignment_type:admin'] = 'Individual (Admin)';
 $string['assignment_type:self'] = 'Self-assigned';
