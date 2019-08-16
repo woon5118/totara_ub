@@ -32,14 +32,14 @@ class competency_assignment_status extends filter {
 
     public function apply() {
         $val = $this->value;
-        if (count($val) === 1) {
-            $not = $val[0] != 1;
+        if (count($val) === 1 && !is_null($val[0])) {
+            $assigned = $val[0] === 1;
             $exist_builder = builder::table(assignment::TABLE)
                 ->where_field('competency_id', new field('id', $this->builder));
-            if ($not) {
-                $this->builder->where_not_exists($exist_builder);
-            } else {
+            if ($assigned) {
                 $this->builder->where_exists($exist_builder);
+            } else {
+                $this->builder->where_not_exists($exist_builder);
             }
         }
     }

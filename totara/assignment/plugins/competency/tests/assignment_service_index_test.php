@@ -149,25 +149,9 @@ class tassign_competency_assignment_index_service_testcase extends advanced_test
 
     private function assert_is_ordered_by($name, $dir, $result) {
         $columns = array_column($result['items'], $name);
-        $previous = null;
-        $failed = false;
-        foreach ($columns as $column) {
-            $column = (string) $column;
-            if ($previous) {
-                switch (strtolower($dir)) {
-                    case 'asc':
-                        $failed = strcmp($previous, $column) > 0;
-                        break;
-                    case 'desc':
-                        $failed = strcmp($previous, $column) < 0;
-                        break;
-                }
-                if ($failed) {
-                    $this->fail("Result is not properly ordered by {$name}");
-                }
-            }
-            $previous = $column;
-        }
+        $sorted_columns = $columns;
+        core_collator::asort($sorted_columns);
+        $this->assertEquals($columns, $sorted_columns);
     }
 
     public function test_filter_by_assignment_types() {

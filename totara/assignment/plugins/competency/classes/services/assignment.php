@@ -99,11 +99,11 @@ class assignment extends \external_api {
         // Some specific order requirements
         switch ($order_by) {
             case 'competency_name':
-                $order_by = "competency_name $order_dir, type $order_dir, user_group_name $order_dir, status $order_dir";
+                $order_by = "competency_name $order_dir, type $order_dir, user_group_name $order_dir, status $order_dir, id $order_dir";
                 $repository->order_by_raw($order_by);
                 break;
             case 'user_group_name':
-                $order_by = "user_group_name $order_dir, competency_name $order_dir, type $order_dir, status $order_dir";
+                $order_by = "user_group_name $order_dir, competency_name $order_dir, type $order_dir, status $order_dir, id $order_dir";
                 $repository->order_by_raw($order_by);
                 break;
             case 'most_recently_updated':

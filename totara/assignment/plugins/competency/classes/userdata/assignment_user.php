@@ -108,6 +108,7 @@ class assignment_user extends item {
 
         // Get all assignments for the given user
         $assignments = entities\assignment::repository()
+            ->select('*')
             ->with_names()
             ->join(entities\competency_assignment_user::TABLE, 'id', 'assignment_id')
             ->where(entities\competency_assignment_user::TABLE.'.user_id', $user->id)
