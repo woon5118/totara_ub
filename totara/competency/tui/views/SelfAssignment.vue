@@ -1,11 +1,12 @@
 <template>
   <div>
+    <Preloader :display="$apollo.loading" />
     <a :href="goBackLink">{{
       $str('back_to_competency_profile', 'totara_competency')
     }}</a>
     <h2>{{ $str('assign_competencies', 'totara_competency') }}</h2>
     <h4>{{ $str('search_competencies_descriptive', 'totara_competency') }}</h4>
-    <div v-if="data.total === 0">
+    <div v-if="data.total === 0 && filtered === false">
       <div class="alert alert-info alert-with-icon">
         <!-- TODO bootstrap alert -->
         <div class="alert-icon">
@@ -17,7 +18,7 @@
         />
       </div>
     </div>
-    <div v-if="data.total > 0">
+    <div v-if="data.total >= 0">
       <div>
         <label
           for="competency-profile-assignment-text-filter"
@@ -56,7 +57,7 @@
       </label>
       <select
         id="competency-profile-type-filter"
-        v-model="filters.type"
+        v-model="filters.assignment_type"
         multiple
         size="3"
         @change="filterUpdated"
@@ -156,6 +157,9 @@
 
 <script>
 import SelfAssignableCompetenciesQuery from '../../webapi/ajax/self_assignable_competencies.graphql';
+import CreateUserAssignmentMutation from '../../webapi/ajax/create_user_assignments.graphql';
+import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import Preloader from '../presentation/Preloader';
 
 const initial_cursor = window.btoa(
   JSON.stringify({
@@ -165,6 +169,10 @@ const initial_cursor = window.btoa(
 );
 
 export default {
+  components: {
+    Preloader,
+    FlexIcon,
+  },
   props: {
     frameworks: {
       required: true,
@@ -193,7 +201,13 @@ export default {
         total: null,
         next_cursor: null,
       },
-      filters: {},
+      filters: {
+        assignment_status: [],
+        text: null,
+        framework: null,
+        assignment_type: [],
+      },
+      filtered: false,
     };
   },
 
@@ -223,15 +237,39 @@ export default {
 
       let result = confirm(confirmMsg);
       if (result) {
-        // TODO
-        // Show loading indicator (or disable assign button)
-        // send mutation request
-        // Show notification about result
-        console.log('Create assignments for: ', this.selectedItems);
+        this.$apollo
+          .mutate({
+            // Query
+            mutation: CreateUserAssignmentMutation,
+            // Parameters
+            variables: {
+              user_id: this.userId,
+              competency_ids: this.selectedItems,
+            },
+          })
+          .then(data => {
+            if (
+              data.data &&
+              data.data.totara_competency_create_user_assignments
+            ) {
+              var result = data.data.totara_competency_create_user_assignments;
+              if (result.length > 0) {
+                // TODO Handle notification which should be displayed on the next page here?
+                window.location.href = this.goBackLink;
+              }
+              // TODO Handle case when no result is returned
+            }
+          })
+          .catch(error => {
+            // TODO Handle error case
+            console.log('error');
+            console.error(error);
+          });
       }
     },
 
     filterUpdated: function() {
+      this.filtered = true;
       this.$apollo.queries.data.refetch({
         user_id: this.userId,
         cursor: initial_cursor,
