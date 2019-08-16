@@ -285,18 +285,7 @@ export default {
       var groupedAssignments = [];
       if (competency.user_assignments) {
         competency.user_assignments.forEach(function(assignment) {
-          var type = assignment.type;
-          if (assignment.type === 'admin') {
-            if (assignment.user_group_type === 'user') {
-              type = 'individual';
-            } else {
-              type = assignment.user_group_type;
-            }
-          }
-
-          if (!groupedAssignments.find(item => item === type)) {
-            groupedAssignments.push(type);
-          }
+          groupedAssignments.push(assignment.reason_assigned);
         });
       }
       return groupedAssignments;

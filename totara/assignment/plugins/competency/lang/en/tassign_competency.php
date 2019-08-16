@@ -75,11 +75,17 @@ $string['all_competencies_framework'] = 'Framework home';
 
 $string['assigned_type_detail'] = 'Detail';
 $string['assigned_user_groups'] = 'Assigned user groups';
+
+$string['assigner_role:admin'] = 'Admin';
+$string['assigner_role:manager'] = 'Manager';
+
 $string['assignment:back_to_assignments'] = '<< Back to manage competency assignments';
 $string['assignment:createnew'] = 'Create assignments';
 $string['assignment:viewcurrent'] = 'Currently assigned user report';
 
-$string['assignment_type:auto'] = 'Auto';
+$string['assignment_reason:self'] = 'Self-assigned';
+$string['assignment_type:system'] = 'Continuous tracking';
+
 $string['assignment_type:admin'] = 'Individual (Admin)';
 $string['assignment_type:self'] = 'Self-assigned';
 $string['assignment_type:other'] = 'Directly assigned';

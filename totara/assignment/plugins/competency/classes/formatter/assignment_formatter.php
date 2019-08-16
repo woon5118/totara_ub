@@ -50,7 +50,8 @@ class assignment_formatter extends formatter {
             'competency' => null,
             'status_name' => null,
             'type_name' => null,
-            'progress_name' => string_field_formatter::class
+            'progress_name' => string_field_formatter::class,
+            'reason_assigned' => string_field_formatter::class
         ];
     }
 

@@ -19,6 +19,7 @@ type tassign_competency_assignment {
     competency: totara_competency_competency!
     user_group: tassign_competency_user_group!
     progress_name (format: core_format = HTML): String
+    reason_assigned (format: core_format = HTML): String
 }
 
 type tassign_competency_user_group {

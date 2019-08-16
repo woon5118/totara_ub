@@ -447,6 +447,48 @@ class assignment {
     }
 
     /**
+     * Gets human readable reason for assignment, we show
+     * - the fullname of the assigner and role
+     * - a fixed string for self and other
+     * - the actual name of the user group + type for position, organisation and audience
+     *
+     * @return string
+     * @throws coding_exception
+     */
+    public function get_reason_assigned(): string {
+        $type = $this->entity->type;
+        $user_group_type = $this->entity->user_group_type;
+
+        switch (true) {
+            case ($type === assignment_entity::TYPE_ADMIN && $user_group_type === user_groups::USER):
+            case $type === assignment_entity::TYPE_OTHER:
+                $assigner = $this->get_assigner();
+                $name = fullname((object)$assigner->to_array());
+                $role = $type === assignment_entity::TYPE_ADMIN ? 'admin' : 'manager';
+                $role_string = get_string('assigner_role:'.$role, 'tassign_competency');
+                $name .= " ({$role_string})";
+                break;
+            case $type === assignment_entity::TYPE_SYSTEM:
+            case $type === assignment_entity::TYPE_SELF:
+                $name = get_string('assignment_reason:'.$type, 'tassign_competency');
+                break;
+            default:
+                $name = $this->get_user_group_name();
+                $name .= " ({$this->get_type_name()})";
+                break;
+        }
+
+        return $name;
+    }
+
+    public function get_assigner(): ?user {
+        if ($this->entity->created_by > 0) {
+            return user::repository()->find($this->entity->created_by);
+        }
+        return null;
+    }
+
+    /**
      * Returns the value of the given field, throws exception if fields doesn't exist
      *
      * @param string $field
@@ -462,6 +504,8 @@ class assignment {
                 return $this->get_user_group();
             case 'progress_name':
                 return $this->get_progress_name();
+            case 'reason_assigned':
+                return $this->get_reason_assigned();
             case 'competency':
                 return $this->get_competency();
             default:
@@ -475,7 +519,14 @@ class assignment {
     }
 
     public function has_field(string $field): bool {
-        $extra_fields = ['user_group', 'competency', 'status_name', 'type_name', 'progress_name'];
+        $extra_fields = [
+            'user_group',
+            'competency',
+            'status_name',
+            'type_name',
+            'progress_name',
+            'reason_assigned'
+        ];
         return in_array($field, $extra_fields)
             || $this->entity->has_attribute($field);
     }

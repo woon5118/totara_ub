@@ -19,7 +19,7 @@ query totara_competency_self_assignable_competencies(
         id
         type
         user_group_type
-        progress_name
+        reason_assigned
       }
     }
     total
