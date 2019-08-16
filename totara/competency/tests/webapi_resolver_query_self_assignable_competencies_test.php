@@ -103,7 +103,7 @@ class totara_competency_webapi_resolver_query_self_assignable_competencies_testc
         $result = self_assignable_competencies::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
         $this->assertCount(0, $result['items']);
-        $this->assertEquals(0, $result['total_count']);
+        $this->assertEquals(0, $result['total']);
     }
 
     public function test_user_can_assign_to_others_with_permission() {
@@ -126,7 +126,7 @@ class totara_competency_webapi_resolver_query_self_assignable_competencies_testc
         $result = self_assignable_competencies::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
         $this->assertCount(0, $result['items']);
-        $this->assertEquals(0, $result['total_count']);
+        $this->assertEquals(0, $result['total']);
     }
 
     /**

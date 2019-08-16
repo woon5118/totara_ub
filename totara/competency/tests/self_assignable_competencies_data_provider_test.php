@@ -55,13 +55,13 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertArrayHasKey('items', $result);
-        $this->assertArrayHasKey('total_count', $result);
+        $this->assertArrayHasKey('total', $result);
         $this->assertIsArray($result['items']);
         $this->assertCount(0, $result['items']);
-        $this->assertEquals(0, $result['total_count']);
+        $this->assertEquals(0, $result['total']);
     }
 
     public function test_only_competencies_with_self_assign_setting_are_returned() {
@@ -97,10 +97,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(0, $result['items']);
-        $this->assertEquals(0, $result['total_count']);
+        $this->assertEquals(0, $result['total']);
 
         // Activate self assignment for the first competency
         $this->activate_self_assignable($comp1->id);
@@ -108,10 +108,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(1, $result['items']);
-        $this->assertEquals(1, $result['total_count']);
+        $this->assertEquals(1, $result['total']);
         $competency = $result['items'][0];
         $this->assertEquals($comp1->id, $competency->get_id());
 
@@ -121,10 +121,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(2, $result['items']);
-        $this->assertEquals(2, $result['total_count']);
+        $this->assertEquals(2, $result['total']);
         $expected_comp_ids = [$comp1->id, $comp2->id];
         $actual_comp_is = $this->get_fieldset_from_result('id', $result);
         $this->assertEqualsCanonicalizing($expected_comp_ids, $actual_comp_is);
@@ -141,10 +141,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user2->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(0, $result['items']);
-        $this->assertEquals(0, $result['total_count']);
+        $this->assertEquals(0, $result['total']);
     }
 
     public function test_only_competencies_with_other_assign_setting_are_returned() {
@@ -185,10 +185,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user2->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(0, $result['items']);
-        $this->assertEquals(0, $result['total_count']);
+        $this->assertEquals(0, $result['total']);
 
         // Activate other assignment for the first competency
         $this->activate_other_assignable($comp1->id);
@@ -196,10 +196,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user2->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(1, $result['items']);
-        $this->assertEquals(1, $result['total_count']);
+        $this->assertEquals(1, $result['total']);
         $competency = $result['items'][0];
         $this->assertEquals($comp1->id, $competency->get_id());
 
@@ -209,10 +209,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user2->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(2, $result['items']);
-        $this->assertEquals(2, $result['total_count']);
+        $this->assertEquals(2, $result['total']);
         $expected_comp_ids = [$comp1->id, $comp2->id];
         $actual_comp_is = $this->get_fieldset_from_result('id', $result);
         $this->assertEqualsCanonicalizing($expected_comp_ids, $actual_comp_is);
@@ -221,10 +221,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(0, $result['items']);
-        $this->assertEquals(0, $result['total_count']);
+        $this->assertEquals(0, $result['total']);
     }
 
     public function test_competencies_able_assign_by_self_are_loaded() {
@@ -245,10 +245,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(10, $result['items']);
-        $this->assertEquals(10, $result['total_count']);
+        $this->assertEquals(10, $result['total']);
         $this->assertEqualsCanonicalizing([
             'Accounting',
             'Baking skill-set',
@@ -288,10 +288,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(10, $result['items']);
-        $this->assertEquals(10, $result['total_count']);
+        $this->assertEquals(10, $result['total']);
         $this->assertEqualsCanonicalizing([
             'Accounting',
             // This one is not in the result because it's already assigned via others
@@ -322,7 +322,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
 
         $expected_ids = competency::repository()
@@ -352,7 +352,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
 
         $expected_ids = competency::repository()
@@ -372,7 +372,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
 
         $expected_ids = competency::repository()
@@ -392,7 +392,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
 
         $expected_ids = competency::repository()
@@ -419,7 +419,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Designing interiors',
@@ -433,7 +433,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Baking skill-set',
@@ -456,7 +456,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Baking skill-set',
@@ -483,7 +483,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Coding',
@@ -511,7 +511,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Coding',
@@ -525,9 +525,9 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     }
 
     public function test_can_be_filtered_by_status() {
-        ['fws' => $fws] = $this->generate_competencies();
-
         $user1 = $this->generator()->create_user();
+
+        ['fws' => $fws] = $this->generate_competencies($user1->id);
 
         $this->setUser($user1);
 
@@ -539,12 +539,13 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Accounting',
             'Baking skill-set',
-            'Chef proficiency',
+            // This competency is self assigned so should not be in the result
+            // 'Chef proficiency',
             'Coding',
             'Cooking',
             'Designing interiors',
@@ -557,13 +558,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
             'assignment_status' => [0],
             'framework' => $fws[1]->id,
         ];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Leading',
@@ -572,18 +571,17 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
         // Filter by assigned and unassigned
         $filters = ['assignment_status' => [0, 1]];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Accounting',
             'Baking skill-set',
-            'Chef proficiency',
+            // This competency is self assigned so should not be in the result
+            // 'Chef proficiency',
             'Coding',
             'Cooking',
             'Designing interiors',
@@ -611,10 +609,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user2->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(11, $result['items']);
-        $this->assertEquals(11, $result['total_count']);
+        $this->assertEquals(11, $result['total']);
         $this->assertEqualsCanonicalizing([
             'Accounting',
             'Baking skill-set',
@@ -630,16 +628,14 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         ], $this->get_fieldset_from_result('display_name', $result));
 
         $filters = ['assignment_type' => [ user_groups::POSITION ]];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user2->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertCount(0, $result['items']);
-        $this->assertEquals(0, $result['total_count']);
+        $this->assertEquals(0, $result['total']);
     }
 
     public function test_can_be_filtered_by_assignment_type() {
@@ -657,7 +653,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Talking',
@@ -665,13 +661,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
         // Has organisation assignment
         $filters = ['assignment_type' => [ user_groups::ORGANISATION ]];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Coding',
@@ -679,13 +673,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
         // Has cohort assignment
         $filters = ['assignment_type' => [ user_groups::COHORT ]];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Hacking',
@@ -698,13 +690,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
                 user_groups::ORGANISATION
             ]
         ];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Coding',
@@ -713,24 +703,20 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
         // Has self assignment
         $filters = ['assignment_type' => [assignment::TYPE_SELF]];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertEmpty($result['items']);
 
         // Has other assignment
         $filters = ['assignment_type' => [assignment::TYPE_OTHER]];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Baking skill-set',
@@ -738,13 +724,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
         // Has system assignment
         $filters = ['assignment_type' => [assignment::TYPE_SYSTEM]];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Cooking',
@@ -752,13 +736,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
         // Has admin assignment
         $filters = ['assignment_type' => [assignment::TYPE_ADMIN]];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Accounting',
@@ -773,13 +755,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
                 assignment::TYPE_SYSTEM
             ]
         ];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Coding',
@@ -795,13 +775,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
                 assignment::TYPE_ADMIN
             ]
         ];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Accounting',
@@ -819,13 +797,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
                 assignment::TYPE_ADMIN
             ]
         ];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Accounting',
@@ -851,7 +827,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Accounting',
@@ -861,13 +837,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
         // has type 2
         $filters = ['type' => [ $data['types'][1] ]];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Baking skill-set',
@@ -882,13 +856,11 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
         // has type 1 and 2
         $filters = ['type' => $data['types']];
-        $order_by = null;
-        $order_dir = null;
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)
             ->set_order($order_by, $order_dir)
-            ->fetch_paginated(null, null);
+            ->fetch_paginated(null);
         $this->assertIsArray($result);
         $this->assertEqualsCanonicalizing([
             'Accounting',

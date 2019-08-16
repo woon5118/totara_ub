@@ -27,6 +27,7 @@ use core\orm\collection;
 use core\orm\cursor;
 use core\orm\cursor_paginator;
 use tassign_competency\entities\competency as competency_entity;
+use tassign_competency\filter\competency_user_assignment_status;
 use tassign_competency\filter\competency_user_assignment_type;
 use tassign_competency\models\assignment;
 use tassign_competency\models\assignment_user;
@@ -60,22 +61,20 @@ class self_assignable_competencies extends user_data_provider {
         $filters['visible'] = true;
 
         // For self assignable competencies we need to override
-        // the assignment_type filter as it's working differently
+        // the assignment_type and assignment_status filters as they do need
+        // to be user based
         if (isset($filters['assignment_type'])) {
             $filters['assignment_type'] = (new competency_user_assignment_type($this->user->id))
                 ->set_value($filters['assignment_type']);
         }
 
-        if (array_key_exists('framework', $filters) && is_null($filters['framework'],)) {
+        if (isset($filters['assignment_status'])) {
+            $filters['assignment_status'] = (new competency_user_assignment_status($this->user->id))
+                ->set_value($filters['assignment_status']);
+        }
+
+        if (array_key_exists('framework', $filters) && is_null($filters['framework'])) {
             unset($filters['framework']);
-        }
-
-        if (isset($filters['type']) && in_array(null, $filters['type'], true)) {
-            unset($filters['type']);
-        }
-
-        if (isset($filters['assignment_status']) && in_array(null, $filters['assignment_status'], true)) {
-            unset($filters['assignment_status']);
         }
 
         return parent::set_filters($filters);

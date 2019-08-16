@@ -52,7 +52,7 @@ class competency_user_assignment_type extends filter {
             throw new coding_exception('The user assignment type filter can only filter competencies');
         }
 
-        if (!empty($this->value)) {
+        if (!is_null($this->value) && !empty($this->value) && !in_array(null, $this->value, true)) {
             $this->init_types();
 
             $exist_builder = builder::table(assignment::TABLE)
