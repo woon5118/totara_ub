@@ -66,10 +66,10 @@ export default {
     }
     if (reqs.oneOffs) {
       const ErrorBoundary = tui.defaultExport(
-        tui.require('totara_core/presentation/errors/ErrorBoundary')
+        tui.require('totara_core/components/errors/ErrorBoundary')
       );
       const ErrorPageRender = tui.defaultExport(
-        tui.require('totara_core/presentation/errors/ErrorPageRender')
+        tui.require('totara_core/components/errors/ErrorPageRender')
       );
       promises.push(
         Promise.all([

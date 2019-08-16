@@ -136,7 +136,7 @@ const tui = {
     return () => ({
       component: tui.loadComponent(id),
       error: tui.defaultExport(
-        tui.require('totara_core/presentation/errors/ErrorPageRender')
+        tui.require('totara_core/components/errors/ErrorPageRender')
       ),
     });
   }),
@@ -406,7 +406,7 @@ const tui = {
  */
 function mount(component, data, el) {
   const ErrorBoundary = tui.defaultExport(
-    tui.require('totara_core/presentation/errors/ErrorBoundary')
+    tui.require('totara_core/components/errors/ErrorBoundary')
   );
   const vm = new Vue({
     apolloProvider,

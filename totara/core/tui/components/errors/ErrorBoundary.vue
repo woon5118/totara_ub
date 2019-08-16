@@ -21,7 +21,7 @@
 -->
 
 <script>
-import ErrorPageRender from 'totara_core/presentation/errors/ErrorPageRender';
+import ErrorPageRender from 'totara_core/components/errors/ErrorPageRender';
 
 export default {
   // must declare here so it is picked up by lang string scanner

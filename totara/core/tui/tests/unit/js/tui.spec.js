@@ -40,7 +40,7 @@ const mockComp = name => {
     error.code = 'MODULE_NOT_FOUND';
     throw error;
   }
-  if (name == 'totara_core/presentation/errors/ErrorBoundary') {
+  if (name == 'totara_core/components/errors/ErrorBoundary') {
     return {
       $_name: name,
       render() {
@@ -102,11 +102,10 @@ describe('mount', () => {
         let vm = this.$parent;
         while (vm) {
           if (
-            vm.$options.$_name ==
-            'totara_core/presentation/errors/ErrorBoundary'
+            vm.$options.$_name == 'totara_core/components/errors/ErrorBoundary'
           ) {
             expect(vm.$options.$_name).toBe(
-              'totara_core/presentation/errors/ErrorBoundary'
+              'totara_core/components/errors/ErrorBoundary'
             );
           }
           vm = vm.$parent;
