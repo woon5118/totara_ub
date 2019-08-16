@@ -51,8 +51,7 @@ class assignment_repository extends entity_repository {
         global $DB;
         $user_name = $DB->sql_concat_join("' '", totara_get_all_user_name_fields_join('"user"', null, true));
         return [
-            'usergrouptype' => new in("user_group_type"),
-            'assignmenttype' => new competency_assignment_type(),
+            'assignment_type' => new competency_assignment_type(),
             'text' => new like([
                 new raw_field($user_name),
                 '"cohort".name',

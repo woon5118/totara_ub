@@ -51,12 +51,12 @@ class assignment extends \external_api {
                 'filters' => new external_single_structure(
                     [
                         'text' => new external_value(PARAM_TEXT, 'text search field value', VALUE_OPTIONAL, null),
-                        'assignmenttype' => new external_multiple_structure(
+                        'assignment_type' => new external_multiple_structure(
                             new external_value(PARAM_ALPHAEXT, 'admin, self, etc', VALUE_OPTIONAL),
                             'one or more assignment types',
                             VALUE_OPTIONAL
                         ),
-                        'usergrouptype' => new external_multiple_structure(
+                        'user_group_type' => new external_multiple_structure(
                             new external_value(PARAM_ALPHAEXT, 'position, organisation, cohort, user', VALUE_OPTIONAL),
                             'one or more user group types',
                             VALUE_OPTIONAL
