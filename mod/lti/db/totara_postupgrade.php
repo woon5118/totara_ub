@@ -66,14 +66,14 @@ function xmldb_lti_totara_postupgrade($version) {
     } else {
         if (!$dbman->key_exists($table, $table->getKey('ltiid'))) {
             // Delete any records that might conflict with the real foreign key.
-            $DB->execute('DELETE FROM {lti_submission_history} lsh
-                WHERE NOT EXISTS (SELECT 1 FROM {lti} lti WHERE lsh.ltiid = lti.id)');
+            $DB->execute('DELETE FROM {lti_submission_history}
+                WHERE NOT EXISTS (SELECT 1 FROM {lti} lti WHERE {lti_submission_history}.ltiid = lti.id)');
             $dbman->add_key($table, $table->getKey('ltiid'));
         }
         if (!$dbman->key_exists($table, $table->getKey('userid'))) {
             // Delete any records that might conflict with the real foreign key.
-            $DB->execute('DELETE FROM {lti_submission_history} lsh
-                WHERE NOT EXISTS (SELECT 1 FROM {user} u WHERE lsh.userid = u.id)');
+            $DB->execute('DELETE FROM {lti_submission_history}
+                WHERE NOT EXISTS (SELECT 1 FROM {user} u WHERE {lti_submission_history}.userid = u.id)');
             $dbman->add_key($table, $table->getKey('userid'));
         }
     }
