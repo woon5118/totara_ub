@@ -3,6 +3,11 @@
     <h4 class="tui-ActivityLog__subtitle">
       {{ $str('activity_log', 'totara_competency') }}
     </h4>
+    <AssignmentFilter
+      v-if="hasMultipleAssignments"
+      :assignments="assignments"
+      @filter-updated="assignmentFilterUpdated"
+    />
     <List :data="log" :columns="columns">
       <template v-slot:column-date="props">
         <Date :data="props.row" />
@@ -33,11 +38,12 @@ import List from '../../container/List';
 import Date from './Date';
 import ProficientStatus from './ProficientStatus';
 import Description from './Description';
+import AssignmentFilter from './AssignmentFilter';
 
 import ActivityLogQuery from '../../../webapi/ajax/activity_log.graphql';
 
 export default {
-  components: { Description, ProficientStatus, Date, List },
+  components: { Description, ProficientStatus, Date, List, AssignmentFilter },
   props: {
     userId: {
       required: true,
@@ -52,6 +58,8 @@ export default {
   data: function() {
     return {
       log: [],
+      assignments: [],
+      assignmentFilter: 0,
       showTooltip: false,
       columns: [
         {
@@ -78,7 +86,20 @@ export default {
     };
   },
 
-  computed: {},
+  computed: {
+    hasMultipleAssignments() {
+      return this.assignments.length > 1;
+    },
+
+    selectedFilter() {
+      if (this.assignmentFilter) {
+        return {
+          assignment_id: this.assignmentFilter,
+        };
+      }
+      return {};
+    },
+  },
 
   mounted: function() {},
 
@@ -91,6 +112,30 @@ export default {
         )
       );
     },
+
+    assignmentFilterUpdated(assignment) {
+      this.assignmentFilter = assignment;
+    },
+
+    refreshAssignmentList(log) {
+      let assignmentList = {};
+
+      log.forEach(entry => {
+        if (entry.assignment != null) {
+          assignmentList[entry.assignment.id] = {
+            id: entry.assignment.id,
+            label: entry.assignment.progress_name,
+          };
+        }
+      });
+
+      assignmentList = Object.values(assignmentList);
+      if (assignmentList.length >= this.assignments.length) {
+        return assignmentList;
+      } else {
+        return this.assignments;
+      }
+    },
   },
 
   apollo: {
@@ -100,9 +145,11 @@ export default {
         return {
           user_id: this.userId,
           competency_id: this.competencyId,
+          filters: this.selectedFilter,
         };
       },
       update({ totara_competency_activity_log: log }) {
+        this.assignments = this.refreshAssignmentList(log);
         return log;
       },
     },

@@ -5,6 +5,7 @@ query totara_competency_activity_log($competency_id: core_id!, $user_id: core_id
         description
         proficient_status
         assignment {
+            id
             type
             user_group_type
             progress_name
