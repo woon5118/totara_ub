@@ -160,6 +160,7 @@ class assignments extends user_data_provider {
         if ($this->with_achievements) {
             $achievements = competency_achievement::repository()
                 ->where('assignment_id', $this->items->pluck('id'))
+                ->where('user_id', $this->user->id)
                 ->where(function(builder $builder) {
                     // We have to set status to 0 to ensure that there will be only one achievement per assignment
                     $builder->where('status', 0)
