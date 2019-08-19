@@ -169,7 +169,7 @@ class event_handler {
     public static function remove_calendar_booked_entry(\mod_facetoface\event\booking_cancelled $event) {
         $signup = $event->get_signup();
         $seminarevent = $signup->get_seminar_event();
-        calendar::remove_seminar_event($seminarevent, $seminarevent->get_seminar()->get_course(), $signup->get_userid());
+        calendar::remove_seminar_event($seminarevent, 0, $signup->get_userid());
     }
 
     /**

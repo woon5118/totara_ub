@@ -146,11 +146,11 @@ Feature: Seminar event booking cancellation calendar views
     And I log in as "teacher"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                                 | Seminar 1               |
-      | How many times the user can sign-up? | Unlimited               |
-      | Mark attendance at                   | Any time (unrestricted) |
-      | Show entry on user's calendar        | 1                       |
-      | id_multisignuprestrictpartly         | 1                       |
+      | Name                                 | Seminar 1    |
+      | How many times the user can sign-up? | Unlimited    |
+      | Event attendance – mark at           | Unrestricted |
+      | Show entry on user's calendar        | 1            |
+      | id_multisignuprestrictpartly         | 1            |
     And I follow "View all events"
     And I follow "Add event"
     And I follow "show-selectdate0-dialog"
