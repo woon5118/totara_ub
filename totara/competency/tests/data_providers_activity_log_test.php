@@ -27,6 +27,7 @@ use tassign_competency\models\assignment_actions;
 use tassign_competency\expand_task;
 use tassign_competency\entities\assignment;
 use totara_competency\entities\competency_achievement;
+use totara_competency\entities\configuration_change;
 use totara_competency\models\activity_log;
 use totara_competency\entities\scale_value;
 use totara_competency\pathway_aggregator;
@@ -415,4 +416,74 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $this->assertInstanceOf(activity_log\configuration_change::class, $last);
         $this->assertEquals('Overall rating calculation change', $last->get_description());
     }
+
+    /**
+     * Test that only criteria config changes that happen after the first assignment are shown.
+     * Also test that no config changes are shown if the user is not assigned to the competency.
+     */
+    public function test_config_change_before_assignment() {
+        global $DB;
+        $user = $this->getDataGenerator()->create_user();
+
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $competency = $competency_generator->create_competency();
+
+        $configuration_change = new configuration_change();
+        $configuration_change->comp_id = $competency->id;
+        $configuration_change->change_type = configuration_change::CHANGED_MIN_PROFICIENCY;
+        $configuration_change->time_changed = time() - 5;
+        $configuration_change->save();
+
+        // Test that config doesn't show without assignment
+        (new expand_task($DB))->expand_all();
+        $this->assertEmpty(data_providers\activity_log::create($user->id, $competency->id)->fetch());
+
+        /** @var tassign_competency_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        $user_assignment = $assignment_generator->create_user_assignment($competency->id, $user->id);
+        (new assignment_actions())->activate([$user_assignment->id, $competency->id]);
+        (new expand_task($DB))->expand_all();
+        $this->waitForSecond();
+
+        $configuration_change = new configuration_change();
+        $configuration_change->comp_id = $competency->id;
+        $configuration_change->change_type = configuration_change::CHANGED_AGGREGATION;
+        $configuration_change->time_changed = time();
+        $configuration_change->save();
+
+        $this->waitForSecond();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $pos_frame = $hierarchy_generator->create_pos_frame([]);
+        $pos = $hierarchy_generator->create_pos(['frameworkid' => $pos_frame->id]);
+        \totara_job\job_assignment::create([
+            'userid' => $user->id,
+            'positionid' => $pos->id,
+            'idnumber' => 'xyz',
+        ]);
+        $pos_assignment = $assignment_generator->create_position_assignment($competency->id, $pos->id);
+        (new assignment_actions())->activate([$pos_assignment->id, $competency->id]);
+
+        $configuration_change = new configuration_change();
+        $configuration_change->comp_id = $competency->id;
+        $configuration_change->change_type = configuration_change::CHANGED_AGGREGATION;
+        $configuration_change->time_changed = time() + 5;
+        $configuration_change->save();
+
+        (new expand_task($DB))->expand_all();
+
+        $activity_log_data = data_providers\activity_log::create($user->id, $competency->id)->fetch();
+
+        // The first log entry shouldn't be config change since it was before the assignment
+        $this->assertNotInstanceOf(activity_log\configuration_change::class, end($activity_log_data));
+
+        // Middle change log entry should exist
+        $this->assertInstanceOf(activity_log\configuration_change::class, $activity_log_data[2]);
+
+        // The latest log entry should be config change since it happened after assignment
+        $this->assertInstanceOf(activity_log\configuration_change::class, $activity_log_data[0]);
+    }
+
 }

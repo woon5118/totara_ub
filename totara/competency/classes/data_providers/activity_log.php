@@ -24,6 +24,7 @@
 namespace totara_competency\data_providers;
 
 use core\orm\entity\entity;
+use core\orm\query\builder;
 use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency_assignment_user_log;
 use tassign_competency\models\assignment_user_log;
@@ -147,8 +148,13 @@ class activity_log {
         }
         $achievements = $achievements->get();
 
+        if ($assignment_log->count() === 0) {
+            return $achievements->all();
+        }
+
         $config_changes = configuration_change::repository()
             ->where('comp_id', $this->competency_id)
+            ->where('time_changed', '>', $assignment_log->last()->created_at)
             ->order_by('time_changed', 'desc')
             ->order_by('id', 'desc')
             ->get();
