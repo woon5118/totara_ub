@@ -3,6 +3,381 @@
 
 Totara Learn Changelog
 
+Release Evergreen (22nd August 2019):
+=====================================
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-20274   +   Introduced minimum required proficiency setting for competency scales
+
+                   Competency scales now have a value that is considered the minimum a user
+                   must achieve to be considered proficient. Values are no longer individually
+                   set as proficient or not proficient, but instead will respect this setting
+                   on the scale.
+
+                   This will be set for existing scales automatically on upgrade.
+
+                   IMPORTANT: Upgrade will be blocked if the proficient values in the scale
+                   are not ordered correctly (where there are non-proficient values that are
+                   higher on the scale than proficient ones). If that is the case, sites can
+                   be taken back to a release that contains TL-21175 where the proficient
+                   setting on individual scale values can be modified in order to fix this.
+
+Security issues:
+
+    TL-8385        Fixed users still having the ability to edit evidence despite lacking the capability
+
+                   Previously when a user did not have the 'Edit one's own site-level
+                   evidence' capability, they were still able to edit and delete their own
+                   evidence.
+
+                   With this patch, users without the capability are now prevented from
+                   editing and deleting their own evidence.
+
+    TL-21743       Prevented invalid email addresses in user upload
+
+                   Prior to this fix validation of user emails uploaded by the site
+                   administrator through the upload user administration tool was not
+                   consistent with the rest of the platform. Email addresses were validated,
+                   but if invalid they were not rejected or fixed, and the invalid email
+                   address was saved for the user.
+
+                   This fix ensures that user email address validation is consistent in all
+                   parts of the code base.
+
+    TL-21928       Ensured capabilities are checked when creating a course using single activity format
+
+                   When creating a course using the single activity course format, permissions
+                   weren't being checked to ensure the user was allowed to create an instance
+                   of an activity. Permissions are now checked correctly and users can only
+                   create single activity courses using activities they have permission to
+                   create.
+
+Performance improvements:
+
+    TL-21841       Improved performance of filtering by organisation in Report builder
+
+Improvements:
+
+    TL-18671       Added Totara 13 environment requirements including new check for 32-bit systems
+
+                   Totara 13 (evergreen) and onwards will now require:
+                    * PHP 7.2.10 or higher
+                    * PostgreSQL 9.6 or higher
+                    * MySQL 5.7.21 or higher
+                    * MSSQL Server 2017 or higher
+
+    TL-18786   +   Added support for Chart.js in Report builder
+    TL-20924   +   Updated PHPMailer to version 6.0.7
+    TL-20996   +   Improved the consistency of sanitisation for user email address
+    TL-21098   +   Implemented job assignment GraphQL services and converted the profile page
+
+                   This is a technical improvement, introducing new GraphQL services for job
+                   assignments and converting the profile interface list of jobs to use the
+                   new services.
+
+                   The following types have been added:
+                   * core_user
+                   * totara_job_assignment
+                   * totara_hierarchy_position
+                   * totara_hierarchy_position_type
+                   * totara_hierarchy_position_framework
+                   * totara_hierarchy_organisation
+                   * totara_hierarchy_organisation_type
+                   * totara_hierarchy_organisation_framework
+
+                   The following queries have been introduced:
+                   * totara_job_my_assignments
+                   * totara_job_assignments
+                   * totara_job_assignment
+
+                   The following mutations have been introduced:
+                   * totara_job_move_assignment
+                   * totara_job_sort_assignments
+                   * totara_job_delete_assignment
+                   * totara_job_create_assignment
+
+    TL-21437       Added button to allow manual downloading of site registration data
+
+                   It is now possible to manually download an encrypted copy of site
+                   registration data from the register page, in cases where a site cannot be
+                   registered automatically.
+
+    TL-21469       Improved the fade transition functionality in the gallery tile of the Featured links block
+
+                   The fade transition in the gallery tile had a white flash that was quite
+                   noticeable. The updates changed the background colour to grey (#666666)
+                   from white (#FFFFF) to make it less noticeable.
+
+                   This will require CSS to be regenerated for themes that use LESS
+                   inheritance.
+
+    TL-21486   +   Added an 'Edit event' button to seminar event details tab
+    TL-21487   +   Added ability to mark seminar event and session attendance at different times
+
+                   The previous 'Mark attendance at' option is now separated into two options
+                   - an option as to when you can mark Session Attendance AND a separate
+                   option for when you can mark Event Attendance.
+
+    TL-21565       Improved long category name tiles display in the Grid catalogue
+
+                   Previously the category name length affected tile size. This has now been
+                   fixed so that tiles for courses in any category are the same width.
+
+                   This will require CSS to be regenerated for themes that use LESS
+                   inheritance.
+
+    TL-21569   +   Changed the standard edit icon to a plain pencil icon
+    TL-21600   +   Improved the grid items functionality when reducing the browser size
+
+                   Previously grid items had some white space on the right (did not fill up
+                   the width). This has now been fixed.
+
+                   This will require CSS to be regenerated for themes that use LESS
+                   inheritance.
+
+    TL-21708       Ensured a new resource_link_id is generated for users re-attempting LTI activity
+
+                   Previously, when course completion was archived, LTI submissions were
+                   reset, but a new resource_link_id was not generated. This ID is used by
+                   external tool providers to ensure users can start a new attempt of the
+                   activity. With this change, when completion is archived, historic LTI
+                   submission records are stored, which allows the generation of a new
+                   resource_link_id for each new attempt.
+
+    TL-21739   +   Added option to display seminar room building and address values in addition to room name
+    TL-21772       Added setting to prevent automatic progression of dynamic appraisals with missing roles
+
+                   A new setting 'Dynamic Appraisals Automatic Progression' was added, which
+                   is on by default. When on, the previous behaviour is maintained, which
+                   causes appraisals to automatically progress to the next stage if one or
+                   more required roles are not filled (assuming at least one required role is
+                   filled and all filled required roles have completed the stage). When
+                   dynamic appraisals is enabled and the new setting is switched off, all
+                   required roles need to complete the stage. Empty required roles will need
+                   to have users assigned before the stage can be progressed.
+
+Bug fixes:
+
+    TL-8836        Ensured Program course set completion records are cleaned up after deleting a course set
+
+                   Previously when deleting a course set from a program, any related program
+                   completion records were not being removed, leading to orphaned records in
+                   the prog_completion table. The associated prog_completion records are now
+                   removed when a course set is deleted and existing orphaned records are
+                   cleaned up by an upgrade.
+
+    TL-20590       Fixed usability problem with group delete control on the quick access menu settings page
+
+                   The ‘X’ icon for deleting an entire menu group was easily misconstrued
+                   as an icon to trigger closing of the expanded group accordion. The delete
+                   function is now accessed via a text link after clicking a cog icon, which
+                   reduces the likelihood of a user inadvertently deleting an entire menu
+                   group.
+
+    TL-20951       Ensured program completion records are cleaned up correctly after a program is deleted
+
+                   Records in the tables prog_completion, prog_completion_history and
+                   prog_completion_log were being orphaned when the related program was
+                   deleted. These records are now removed when the program is deleted.
+
+    TL-21234       Added totara_visibility_where for Audience Based Visibility to Upcoming Certifications block
+
+                   Before this patch, when using Audience Based Visibility, the block would
+                   display regardless of how the visibility is set.
+
+                   The block now adheres to visibility either set via Audience Based
+                   Visibility or via Show/Hide in the Certification settings.
+
+    TL-21358       Fixed a permission error preventing a user from viewing their own goals in complex hierarchies
+
+                   Prior to this fix if a user had two or more job assignments where they were
+                   the manager of, and team member of, another user at the same time, they
+                   would encounter a permissions error when they attempted to view their own
+                   goals pages.
+                   This has now been fixed, and users in this situation can view their own
+                   goals.
+
+    TL-21378   +   Updated seminar 'Message users' tab to respect 'User identity' settings when displaying lists of users
+    TL-21400       Ensured 'totara/plan:accessanyplan' and 'totara/plan:manageanyplan' capabilities work correctly
+
+                   Previously, if a learning plan template permission was set to 'Deny' for a
+                   manager, users with the 'totara/plan:accessanyplan' and
+                   'totara/plan:manageanyplan' capabilities were also denied. This patch
+                   ensures that these capabilities take precedence over how the learning plan
+                   templates permissions have been set.
+
+    TL-21425       Fixed seminar calendar events displaying a user booked message even after a user cancels their booking
+    TL-21436   +   Updated seminar date/time columns in Report Builder to use the correct timezone
+
+                   Seminar sessions can be set to display their start and end time in a
+                   particular timezone, known as the event timezone. Aside from the start and
+                   end time, all other seminar date/time values (such as the signup period
+                   start and end time, or the date and time when a user declares interest) use
+                   the system timezone.
+
+                   This update causes all seminar-related date/time values, except for the
+                   session start and end times, to be displayed using the system timezone.
+
+    TL-21453       Ensure HTML entities display correctly in subject line of sent emails
+
+                   The core_text::entities_to_utf8() function is now being used in the
+                   email_to_user() function for the subject of the email.
+
+    TL-21465       Prevented MSSQL Server from locking during some backup and restore operations
+    TL-21508       Fixed bug causing ghost certifications to remain in Grid catalogue
+    TL-21519       Fixed sort order on 'All appraisals' page
+
+                   Prior to this patch, the 'All appraisals' page had an undefined sort order
+                   for appraisals with multiple learners assigned when viewed by a manager.
+                   This patch adds alphabetical sorting by learner's name, after the existing
+                   sorting by status and appraisal start date.
+
+    TL-21577       Fixed bug preventing seminar signup when a user has an inactive course enrolment
+    TL-21581       Added 'debugstringids' configuration setting support to core_string_manager
+
+                   Fixed issue when "Show origin of languages strings" in Development >
+                   Debugging is enabled, in some rare cases, not all strings origins were
+                   displayed.
+
+    TL-21584       Ensured 'Assigned roles' menu is displayed in program administration to users with correct permissions
+
+                   Previously, someone with a 'moodle/role:assign' capability assigned at the
+                   program level had no link in the program administration to assign other
+                   roles at that level. This option was displayed to site administrators
+                   only.
+
+                   This has been fixed and any user with the 'moodle/role:assign' capability
+                   in a program can now assign other roles in the context of that program.
+
+    TL-21585       Fixed a table name collision within the Grid catalogue when using two category filters
+
+                   If the catalogue was configured to display both the category panel filter
+                   and the category browse filter, and a user select a category in each, then
+                   a fatal error would be encountered due to a table name collision as both
+                   filters used the same table alias.
+
+                   Each filter now has a unique table alias.
+
+    TL-21615       Fixed the render_image_icon() function maintained for third-party plugin compatibility
+    TL-21617       Fixed bug in completion editor caused by incomplete activity creation
+
+                   Uploading a SCORM file via drag-and-drop on the course homepage creates a
+                   record in the course_modules table, which is later updated with the ID of
+                   the activity when created. However, an invalid file (or other failure)
+                   could cause the activity creation process to abort, leaving a
+                   course_modules record with no associated activity.
+
+                   With this release, any orphaned SCORM course_modules records are cleaned
+                   up, and the course module deletion code now properly deletes such records.
+
+    TL-21621       Fixed the inconsistent display of information under the 'Answers tolerance parameters' section in the Calculated multichoice question type
+    TL-21623       Fixed an issue where forum discussions RSS was incorrectly fetching deleted discussions instead of active ones
+    TL-21630       Ensured value in the 'Is user assigned?' column takes exception resolution into account
+
+                   If any user program or certification assignments generated exceptions which
+                   have not been resolved, the "Program/Certification Completion" report will
+                   display such users as not being currently assigned to the
+                   program/certification.
+
+    TL-21631   +   Fixed inconsistent booking status in events and sessions report
+
+                   Previously events with booking status 'closed' were showing as open in the
+                   events and session reports, now the 'booking status' column is updated in
+                   both reports to reflect the actual booking state.
+
+    TL-21670       Fixed JavaScript error when all available blocks have been added to a page
+    TL-21680       Fixed undefined adhoc task execution order
+
+                   Previously, the execution order of adhoc tasks was arbitrary, which could
+                   result in random PHPUnit failures. This has been fixed, the execution order
+                   is now predictable.
+
+    TL-21681       Fixed event context level checks when purging glossary entries
+    TL-21683       Fixed the display of the Grid catalogue when viewing on a mobile screen with no filters applied
+
+                   Previously 'show filters (-1)' was being  displayed on the Grid catalogue
+                   when viewing on a mobile screen with no filters applied, now the 'show
+                   filters' text is displayed as expected.
+
+    TL-21684       Fixed seminar event roles not being deleted when associated user is deleted
+    TL-21698       Fixed learners' ability to request learning items to be added to their learning plans based on the manager-driven workflow
+    TL-21707       Fixed seminar 'Allow cancellations until specified period' setting
+
+                   If the seminar 'Allow cancellations' setting was set to 'Until a specified
+                   period', learners could still cancel their seminar signups at any time
+                   until the start of the event. This has been fixed, and the setting now
+                   works as expected.
+
+    TL-21709       Fixed JavaScript initialisation from being incorrectly called twice for the Learning Plan block which resulted in an error
+    TL-21727       Fixed missing image on course creation workflow page
+
+                   This patch fixes an image that was missing on the course creation workflow
+                   page when a content marketplace was enabled.
+
+    TL-21775       URL validation and cleaning was updated to accept previously rejected URLs
+
+                   Prior to this patch, URL validation code was rejecting some valid URLs,
+                   such as the Grid Catalogue URL, with a query string including array
+                   parameters.
+
+                   With this patch the featured link block now supports URLs with a query
+                   string that has parameter values as an array, such as those used in Grid
+                   Catalogue URLs. The same applies to the quick links block that was
+                   converted to use the new URL form field with the updated validation.
+
+    TL-21779       Prevented users from signing up for a seminar outside of the designated sign-up period
+    TL-21820       Removed an arbitrary limit on the number of course and program custom icons allowed
+    TL-21821       Course completion caching was redesigned to be more reliable
+    TL-21854       Fixed an issue where some Seminar attendees requiring manager approval could not be approved by their manager
+
+                   When the 'Users Select Manager' setting is enabled for seminars, and a user
+                   signing up for a seminar does not select a manager when requesting
+                   approval, then a notice with an approval URL is sent to their immediate
+                   manager(s).
+
+                   Previously while managers who could approve any booking request would be
+                   able to use the URL to approve the request, managers who did not have that
+                   capability could not.
+
+                   This has now been fixed.
+
+    TL-21879       Fixed quiz navigation block where clicking on a question link did not scroll to the question on the page that required scrolling
+    TL-21886       Fixed typos in the reportbuilder language strings
+
+                   The following language strings were updated:
+                   - reportbuilderjobassignmentfilter
+                   - reportbuildertag_help
+                   - occurredthisfinancialyear
+                   - contentdesc_usertemp
+
+API changes:
+
+    TL-19892   +   Abandoned DbUnit extension for PHPUnit has been removed
+
+                   phpunit_ArrayDataSet class no longer extends AbstractDataSet from DbUnit.
+                   Any PHPUnit tests in customisations that may be failing due to this change
+                   will need to be fixed by the developers.
+
+    TL-21563   +   Removed portfolio_picasa and repository_picasa plugins that have been deprecated by Google
+
+                   In January 2019, Google deprecated its Picasa Web Albums Data API and
+                   disabled all associated OAuth scopes. In March 2019, the Picasa Web Albums
+                   API was completely turned off. We've removed the associated plugin and
+                   repository as they will no longer be functional.
+
+    TL-21711   +   Extracted Report Builder content code into autoloaded classes \totara_reportbuilder\rb\content\*
+
+Contributions:
+
+    * Carlos Jurado at Kineo UK - TL-21615
+    * Dustin Brisebois at Lambda Solutions - TL-21617
+    * Jo Jones at Kineo UK - TL-21581
+    * Michael Geering at Kineo UK - TL-21854
+
+
 Release Evergreen (17th July 2019):
 ===================================
 
