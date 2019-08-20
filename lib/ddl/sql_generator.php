@@ -336,6 +336,14 @@ abstract class sql_generator {
         // Add the CREATE TABLE to results
         $results[] = $table;
 
+        // Totara: add allowed values constraints.
+        foreach ($xmldb_fields as $xmldb_field) {
+            $constraint = $this->getAddAllowedValuesConstraintSQL($xmldb_table, $xmldb_field);
+            if ($constraint) {
+                $results[] = $constraint;
+            }
+        }
+
         // Add comments if specified and it exists
         if ($this->add_table_comments && $xmldb_table->getComment()) {
             $comment = $this->getCommentSQL($xmldb_table);
@@ -699,6 +707,11 @@ abstract class sql_generator {
         }
         $results[] = $altertable;
 
+        $constraint = $this->getAddAllowedValuesConstraintSQL($xmldb_table, $xmldb_field);
+        if ($constraint) {
+            $results[] = $constraint;
+        }
+
         return $results;
     }
 
@@ -824,6 +837,92 @@ abstract class sql_generator {
         $results = array_merge($results, $extra_sentences);
 
         return $results;
+    }
+
+    /**
+     * Returns expected constraint name for restricting of allowed field values.
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_table $xmldb_table
+     * @param xmldb_field $xmldb_field
+     * @return string
+     */
+    protected function getAllowedValuesContraintName(xmldb_table $xmldb_table, xmldb_field $xmldb_field): string {
+        return $this->getTableName($xmldb_table, false) . $xmldb_field->getName() . '_enum';
+    }
+
+    /**
+     * Returns SQL for finding out if allowed values constraint exists.
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_table $xmldb_table
+     * @param xmldb_field $xmldb_field
+     * @return core\dml\sql
+     */
+    public function getAllowedValuesContraintExistsSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field) {
+        $tablename = $this->getTableName($xmldb_table, false);
+        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+
+        $sql = "SELECT 1
+                  FROM information_schema.constraint_column_usage 
+                 WHERE table_name = :tablename and constraint_name = :constraintname";
+        $params = ['tablename' => $tablename, 'constraintname' => $constraintname];
+
+        return new core\dml\sql($sql, $params);
+    }
+
+    /**
+     * Returns constraint SQL for restricting of allowed field values.
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_table $xmldb_table
+     * @param xmldb_field $xmldb_field
+     * @return string|null
+     */
+    public function getAddAllowedValuesConstraintSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field): ?string {
+        $type = $xmldb_field->getType();
+        if ($type != XMLDB_TYPE_CHAR and $type != XMLDB_TYPE_INTEGER) {
+            return null;
+        }
+        $values = $xmldb_field->getAllowedValues();
+        if (!$values) {
+            return null;
+        }
+
+        $tablename = $this->getTableName($xmldb_table, true);
+        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+        $fieldname = $xmldb_field->getName();
+
+        if ($type == XMLDB_TYPE_INTEGER) {
+            $values = array_map('intval', $values);
+        } else {
+            $values = array_map(function ($val) { return "'" . str_replace("'", '', $val) . "'";}, $values);
+        }
+        $values = implode(',', $values);
+        $isnull = '';
+        if (!$xmldb_field->getNotNull()) {
+            $isnull = " OR $fieldname IS NULL";
+        }
+        return "ALTER TABLE $tablename ADD CONSTRAINT \"$constraintname\" CHECK ($fieldname IN ($values)$isnull)";
+    }
+
+    /**
+     * Returns SQL code for dropping of constraint restricting of allowed field values.
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_table $xmldb_table
+     * @param xmldb_field $xmldb_field
+     * @return string
+     */
+    public function getDropAllowedValuesConstraintSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field): string {
+        $tablename = $this->getTableName($xmldb_table, true);
+        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+
+        return "ALTER TABLE $tablename DROP CONSTRAINT IF EXISTS \"$constraintname\"";
     }
 
     /**

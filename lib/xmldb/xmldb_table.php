@@ -775,10 +775,11 @@ class xmldb_table extends xmldb_object {
      * @param bool $sequence XMLDB_SEQUENCE or null (or false)
      * @param mixed $default meaningful default o null (or false)
      * @param xmldb_object $previous name of the previous field in the table or null (or false)
+     * @param array|null $allowedvalues
      * @return xmldb_field
      */
-    public function add_field($name, $type, $precision=null, $unsigned=null, $notnull=null, $sequence=null, $default=null, $previous=null) {
-        $field = new xmldb_field($name, $type, $precision, $unsigned, $notnull, $sequence, $default);
+    public function add_field($name, $type, $precision=null, $unsigned=null, $notnull=null, $sequence=null, $default=null, $previous=null, array $allowedvalues=null) {
+        $field = new xmldb_field($name, $type, $precision, $unsigned, $notnull, $sequence, $default, $previous, $allowedvalues);
         $this->addField($field, $previous);
 
         return $field;

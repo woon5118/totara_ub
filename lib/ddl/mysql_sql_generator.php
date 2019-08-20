@@ -555,6 +555,46 @@ class mysql_sql_generator extends sql_generator {
     }
 
     /**
+     * Returns SQL for finding out if allowed values constraint exists.
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_table $xmldb_table
+     * @param xmldb_field $xmldb_field
+     * @return core\dml\sql
+     */
+    public function getAllowedValuesContraintExistsSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field) {
+        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+
+        $sql = "SELECT * 
+                  FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+                 WHERE CONSTRAINT_NAME = :constraintname";
+        $params = ['constraintname' => $constraintname];
+
+        return new core\dml\sql($sql, $params);
+    }
+
+    /**
+     * Returns SQL code for dropping of constraint restricting of allowed field values.
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_table $xmldb_table
+     * @param xmldb_field $xmldb_field
+     * @return string
+     */
+    public function getDropAllowedValuesConstraintSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field): string {
+        $tablename = $this->getTableName($xmldb_table, true);
+        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+
+        if ($this->mdb->get_dbvendor()=== 'mariadb') {
+            return "ALTER TABLE $tablename DROP CONSTRAINT \"$constraintname\"";
+        } else {
+            return "ALTER TABLE $tablename DROP CHECK \"$constraintname\"";
+        }
+    }
+
+    /**
      * Returns the code (array of statements) needed to add one comment to the table.
      *
      * @param xmldb_table $xmldb_table The xmldb_table object instance.

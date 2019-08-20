@@ -52,6 +52,7 @@ function transformForm(event) {
     var notnullField      = document.getElementById('menunotnull');
     var sequenceField     = document.getElementById('menusequence');
     var defaultField      = document.getElementById('default');
+    var allowedvaluesField = document.getElementById('allowedvalues');
 
     var lengthTip         = document.getElementById('lengthtip');
     var decimalsTip       = document.getElementById('decimalstip');
@@ -61,6 +62,7 @@ function transformForm(event) {
     notnullField.disabled = false;
     sequenceField.disabled = false;
     defaultField.disabled = false;
+    allowedvaluesField.disabled = false;
 
     // Based on sequence, disable some items
     if (sequenceField.value == '1') {
@@ -83,11 +85,13 @@ function transformForm(event) {
             lengthTip.innerHTML = ' 1...20'; // Hardcoded xmldb_field::NUMBER_MAX_LENGTH, yes!
             lengthField.disabled = false;
             decimalsTip.innerHTML = ' 0...length or empty';
+            allowedvaluesField.disabled = true;
             break;
         case '3':  // XMLDB_TYPE_FLOAT
             lengthTip.innerHTML = ' 1...20 or empty'; // Hardcoded xmldb_field::FLOAT_MAX_LENGTH, yes!
             lengthField.disabled = false;
             decimalsTip.innerHTML = ' 0...length or empty';
+            allowedvaluesField.disabled = true;
             break;
         case '4':  // XMLDB_TYPE_CHAR
             lengthTip.innerHTML = ' 1...1333'; // Hardcoded xmldb_field::CHAR_MAX_LENGTH, yes!
@@ -108,6 +112,7 @@ function transformForm(event) {
             sequenceField.value = '0';
             defaultField.disabled = true;
             defaultField.value = '';
+            allowedvaluesField.disabled = true;
             break;
         case '6':  // XMLDB_TYPE_BINARY
             lengthTip.innerHTML = '';
@@ -119,6 +124,7 @@ function transformForm(event) {
             sequenceField.value = '0';
             defaultField.disabled = true;
             defaultField.value = '';
+            allowedvaluesField.disabled = true;
             break;
         case '7':  // XMLDB_TYPE_DATETIME
             lengthTip.innerHTML = '';
@@ -131,6 +137,7 @@ function transformForm(event) {
             sequenceField.value = '0';
             defaultField.disabled = true;
             defaultField.value = '';
+            allowedvaluesField.disabled = true;
             break;
     }
 }

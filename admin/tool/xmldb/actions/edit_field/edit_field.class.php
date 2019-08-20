@@ -77,6 +77,7 @@ class edit_field extends XMLDBAction {
         } else {
             return false;
         }
+        /** @var xmldb_structure $structure */
         if (!empty($XMLDB->editeddirs)) {
             $editeddir = $XMLDB->editeddirs[$dirpath];
             $structure = $editeddir->xml_file->getStructure();
@@ -166,6 +167,11 @@ class edit_field extends XMLDBAction {
         // xmldb_field Default
         $o.= '      <tr valign="top"><td><label for="default" accesskey="d">Default:</label></td>';
         $o.= '        <td colspan="2"><input type="text" name="default" size="30" maxlength="80" id="default" value="' . s($field->getDefault()) . '" /></td></tr>';
+        // xmldb_field allowed values
+        $o.= '      <tr valign="top"><td><label for="allowedvalues" accesskey="a">Allowed values:</label></td>';
+        $allowedvalues = $field->getAllowedValues();
+        $allowedvalues = isset($allowedvalues) ? implode(',', $allowedvalues) : '';
+        $o.= '        <td colspan="2"><input type="text" name="allowedvalues" size="30" maxlength="80" id="allowedvalues" value="' . s($allowedvalues) . '" /></td></tr>';
         // Change button
         $o.= '      <tr valign="top"><td>&nbsp;</td><td colspan="2"><input type="submit" value="' .$this->str['change'] . '" /></td></tr>';
         $o.= '    </table>';

@@ -96,8 +96,10 @@ class edit_field_save extends XMLDBAction {
         $sequence   = optional_param('sequence', false, PARAM_BOOL);
         $default    = optional_param('default', NULL, PARAM_PATH);
         $default    = trim($default);
+        $allowedvalues = optional_param('allowedvalues', NULL, PARAM_RAW);
 
         $editeddir = $XMLDB->editeddirs[$dirpath];
+        /** @var xmldb_structure $structure */
         $structure = $editeddir->xml_file->getStructure();
         $table = $structure->getTable($tableparam);
         $field = $table->getField($fieldparam);
@@ -118,6 +120,12 @@ class edit_field_save extends XMLDBAction {
         }
         if ($default === '') {
             $default = NULL;
+        }
+
+        if (trim($allowedvalues) === '') {
+            $allowedvalues = null;
+        } else {
+            $allowedvalues = explode(',', $allowedvalues);
         }
 
         // Perform some checks
@@ -208,6 +216,7 @@ class edit_field_save extends XMLDBAction {
             $tempfield->setNotNull($notnull);
             $tempfield->setSequence($sequence);
             $tempfield->setDefault($default);
+            $tempfield->setAllowedValues($allowedvalues);
             // Prepare the output
             $o = '<p>' .implode(', ', $errors) . '</p>
                   <p>' . $name . ': ' . $tempfield->readableInfo() . '</p>';
@@ -244,6 +253,7 @@ class edit_field_save extends XMLDBAction {
             $field->setNotNull($notnull);
             $field->setSequence($sequence);
             $field->setDefault($default);
+            $field->setAllowedValues($allowedvalues);
 
             // If the hash has changed from the old one, change the version
             // and mark the structure as changed

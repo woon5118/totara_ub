@@ -47,6 +47,12 @@ class xmldb_field extends xmldb_object {
     protected $decimals;
 
     /**
+     * List of allowed values
+     * @var array|null
+     */
+    protected $allowedvalues;
+
+    /**
      * Note:
      *  - Oracle: VARCHAR2 has a limit of 4000 bytes
      *  - SQL Server: NVARCHAR has a limit of 40000 chars
@@ -91,16 +97,18 @@ class xmldb_field extends xmldb_object {
      * @param bool $sequence XMLDB_SEQUENCE or null (or false)
      * @param mixed $default meaningful default o null (or false)
      * @param xmldb_object $previous
+     * @param array|null $allowedvalues
      */
-    public function __construct($name, $type=null, $precision=null, $unsigned=null, $notnull=null, $sequence=null, $default=null, $previous=null) {
+    public function __construct($name, $type=null, $precision=null, $unsigned=null, $notnull=null, $sequence=null, $default=null, $previous=null, array $allowedvalues = null) {
         $this->type = null;
         $this->length = null;
         $this->notnull = false;
         $this->default = null;
         $this->sequence = false;
         $this->decimals = null;
+        $this->allowedvalues = null;
         parent::__construct($name);
-        $this->set_attributes($type, $precision, $unsigned, $notnull, $sequence, $default, $previous);
+        $this->set_attributes($type, $precision, $unsigned, $notnull, $sequence, $default, $previous, $allowedvalues);
     }
 
     /**
@@ -113,8 +121,9 @@ class xmldb_field extends xmldb_object {
      * @param bool $sequence XMLDB_SEQUENCE or null (or false)
      * @param mixed $default meaningful default o null (or false)
      * @param xmldb_object $previous
+     * @param array|null $allowedvalues
      */
-    public function set_attributes($type, $precision=null, $unsigned=null, $notnull=null, $sequence=null, $default=null, $previous=null) {
+    public function set_attributes($type, $precision=null, $unsigned=null, $notnull=null, $sequence=null, $default=null, $previous=null, array $allowedvalues = null) {
         $this->type = $type;
     /// Try to split the precision into length and decimals and apply
     /// each one as needed
@@ -136,6 +145,8 @@ class xmldb_field extends xmldb_object {
         }
 
         $this->previous = $previous;
+
+        $this->setAllowedValues($allowedvalues);
     }
 
     /**
@@ -193,6 +204,18 @@ class xmldb_field extends xmldb_object {
      */
     public function getDefault() {
         return $this->default;
+    }
+
+    /**
+     * Get list of allowed values, null means not restricted.
+     *
+     * @return array|null
+     */
+    public function getAllowedValues() {
+        if ($this->type != XMLDB_TYPE_CHAR and $this->type != XMLDB_TYPE_INTEGER) {
+            return null;
+        }
+        return $this->allowedvalues;
     }
 
     /**
@@ -262,6 +285,33 @@ class xmldb_field extends xmldb_object {
             $default = null;
         }
         $this->default = $default;
+    }
+
+    /**
+     * Set allowed values, null means not restricted.
+     *
+     * @param array|null $values
+     * @return bool success
+     */
+    public function setAllowedValues(?array $values) {
+        if ($values === null) {
+            $this->allowedvalues = null;
+            return true;
+        }
+        if ($this->type != XMLDB_TYPE_CHAR and $this->type != XMLDB_TYPE_INTEGER) {
+            $this->errormsg = 'XMLDB has detected one column (' . $this->name . ") cannot have allowed values.";
+            $this->debug($this->errormsg);
+            $this->allowedvalues = null;
+            return false;
+        }
+        if (!is_array($values) or empty($values)) {
+            $this->errormsg = 'XMLDB has detected one column (' . $this->name . ") has invalid allowed values.";
+            $this->debug($this->errormsg);
+            $this->allowedvalues = null;
+            return false;
+        }
+        $this->allowedvalues = $values;
+        return true;
     }
 
     /**
@@ -390,6 +440,23 @@ class xmldb_field extends xmldb_object {
             $this->decimals = $decimals;
         }
 
+        // Totara: set list of allowed values if present
+        $this->allowedvalues = null;
+        if (isset($xmlarr['@']['ALLOWED_VALUES'])) {
+            $values = trim($xmlarr['@']['ALLOWED_VALUES']);
+            if ($values === '') {
+                $this->errormsg = 'Allowed values atttribute cannot be empty';
+                $this->debug($this->errormsg);
+                $result = false;
+            } else {
+                $values = explode(',', $values);
+                $values = array_map('trim', $values);
+                if ($this->setAllowedValues($values) === false) {
+                    $result = false;
+                }
+            }
+        }
+
         if (isset($xmlarr['@']['COMMENT'])) {
             $this->comment = trim($xmlarr['@']['COMMENT']);
         }
@@ -488,7 +555,7 @@ class xmldb_field extends xmldb_object {
             $defaulthash = is_null($this->default) ? '' : sha1($this->default);
             $key = $this->name . $this->type . $this->length .
                    $this->notnull . $this->sequence .
-                   $this->decimals . $this->comment . $defaulthash;
+                   $this->decimals . serialize($this->allowedvalues) . $this->comment . $defaulthash;
             $this->hash = md5($key);
         }
     }
@@ -521,6 +588,9 @@ class xmldb_field extends xmldb_object {
         $o.= ' SEQUENCE="' . $sequence . '"';
         if ($this->decimals !== null) {
             $o.= ' DECIMALS="' . $this->decimals . '"';
+        }
+        if ($this->allowedvalues !== null) {
+            $o.= ' ALLOWED_VALUES="' . implode(',', $this->allowedvalues) . '"';
         }
         if ($this->comment) {
             $o.= ' COMMENT="' . htmlspecialchars($this->comment) . '"';
@@ -699,6 +769,9 @@ class xmldb_field extends xmldb_object {
                 $result .= ', null';
             }
         }
+        if ($allowedvalues = $this->getAllowedValues()) {
+            $result .= ", '" . implode(',', $allowedvalues) . "'";
+        }
         // Return result
         return $result;
     }
@@ -740,6 +813,9 @@ class xmldb_field extends xmldb_object {
             } else {
                 $o .= $this->default;
             }
+        }
+        if ($allowedvalues = $this->getAllowedValues()) {
+            $o .= ' allowed values [' . implode(',', $allowedvalues) . ']';
         }
         // sequence
         if ($this->sequence) {

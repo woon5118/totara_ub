@@ -194,6 +194,43 @@ class database_manager {
     }
 
     /**
+     * Does the table field in database contain any allowed field constraint?
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_table $table
+     * @param xmldb_field $field
+     * @return bool
+     */
+    public function field_allowed_values_constraint_exists(xmldb_table $table, xmldb_field $field) {
+        $sql = $this->generator->getAllowedValuesContraintExistsSQL($table, $field);
+        return $this->mdb->record_exists_sql($sql);
+    }
+
+    /**
+     * Add, remove or update list of allowed values for the field.
+     *
+     * NOTE: developer must make sure that the table contains only allowed values, otherwise
+     *       the old constraint may be dropped and adding of new constraint may fail with error.
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_table $table
+     * @param xmldb_field $field
+     */
+    public function change_field_allowed_values(xmldb_table $table, xmldb_field $field) {
+        if ($this->field_allowed_values_constraint_exists($table, $field)) {
+            $sql = $this->generator->getDropAllowedValuesConstraintSQL($table, $field);
+            $this->mdb->change_database_structure($sql, [$table->getName()]);
+        }
+
+        $sql = $this->generator->getAddAllowedValuesConstraintSQL($table, $field);
+        if ($sql) {
+            $this->mdb->change_database_structure($sql, [$table->getName()]);
+        }
+    }
+
+    /**
      * Given one xmldb_index, the function returns the name of the index in DB
      * of false if it doesn't exist
      *
@@ -1093,6 +1130,15 @@ class database_manager {
                                 if ($field->getLength() != $dbfield->max_length) {
                                     $errors[$tablename][] = "column '$fieldname' length is $dbfield->max_length, expected {$field->getLength()} ($dbfield->meta_type)";
                                 }
+                                if ($field->getAllowedValues()) {
+                                    if (!$this->field_allowed_values_constraint_exists($table, $field)) {
+                                        $errors[$tablename][] = "column '$fieldname' does not have expected allowed values constraint";
+                                    }
+                                } else {
+                                    if ($this->field_allowed_values_constraint_exists($table, $field)) {
+                                        $errors[$tablename][] = "column '$fieldname' has unexpected allowed values constraint";
+                                    }
+                                }
 
                             } else if ($dbtype == XMLDB_TYPE_INTEGER) {
                                 // Integers may be bigger in some DBs.
@@ -1103,6 +1149,15 @@ class database_manager {
                                 }
                                 if ($length > $dbfield->max_length) {
                                     $errors[$tablename][] = "column '$fieldname' length is $dbfield->max_length, expected at least {$field->getLength()} ($dbfield->meta_type)";
+                                }
+                                if ($field->getAllowedValues()) {
+                                    if (!$this->field_allowed_values_constraint_exists($table, $field)) {
+                                        $errors[$tablename][] = "column '$fieldname' does not have expected allowed values constraint";
+                                    }
+                                } else {
+                                    if ($this->field_allowed_values_constraint_exists($table, $field)) {
+                                        $errors[$tablename][] = "column '$fieldname' has unexpected allowed values constraint";
+                                    }
                                 }
 
                             } else if ($dbtype == XMLDB_TYPE_BINARY) {

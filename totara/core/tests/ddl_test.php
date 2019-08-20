@@ -1825,6 +1825,403 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $dbman->drop_table(new xmldb_table($tablename));
     }
 
+    public function test_create_table_allowed_values() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, ['active', 'suspended']);
+        $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, ['0', '1']);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $dbman->create_table($table);
+        $this->assertTrue($dbman->table_exists('test_table'));
+
+        $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('name')));
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+
+        $record = new stdClass();
+        $record->name = 'abc';
+        $record->status = 'active';
+        $record->deleted = 1;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        $record = new stdClass();
+        $record->name = 'def';
+        $record->status = 'suspended';
+        $record->deleted = 0;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        $record = new stdClass();
+        $record->name = 'ghi';
+        $record->status = 'suspended';
+        $record->deleted = null;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        try {
+            $update = clone($record);
+            $update->status = 'grrr';
+            $DB->update_record('test_table', $update);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        try {
+            $update = clone($record);
+            $update->deleted = 2;
+            $DB->update_record('test_table', $update);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        try {
+            $record = new stdClass();
+            $record->name = 'xyz';
+            $record->status = 'xactive';
+            $record->deleted = 1;
+            $DB->insert_record('test_table', $record);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $this->assertCount(3, $DB->get_records('test_table'));
+
+        try {
+            $record = new stdClass();
+            $record->name = 'xyz';
+            $record->status = 'active';
+            $record->deleted = 2;
+            $DB->insert_record('test_table', $record);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $this->assertCount(3, $DB->get_records('test_table'));
+    }
+
+    public function test_create_table_allowed_values_file() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $dbman->install_from_xmldb_file(__DIR__ . '/fixtures/xmldb_allowed_values.xml');
+        $this->assertTrue($dbman->table_exists('test_table'));
+
+        $record = new stdClass();
+        $record->name = 'abc';
+        $record->status = 'active';
+        $record->deleted = 1;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        $record = new stdClass();
+        $record->name = 'def';
+        $record->status = 'suspended';
+        $record->deleted = 0;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        $record = new stdClass();
+        $record->name = 'ghi';
+        $record->status = 'suspended';
+        $record->deleted = null;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        try {
+            $record = new stdClass();
+            $record->name = 'xyz';
+            $record->status = 'xactive';
+            $record->deleted = 1;
+            $DB->insert_record('test_table', $record);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $this->assertCount(3, $DB->get_records('test_table'));
+
+        try {
+            $record = new stdClass();
+            $record->name = 'xyz';
+            $record->status = 'active';
+            $record->deleted = 2;
+            $DB->insert_record('test_table', $record);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $this->assertCount(3, $DB->get_records('test_table'));
+    }
+
+    public function test_add_field_allowed_values() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $dbman->create_table($table);
+        $this->assertTrue($dbman->table_exists('test_table'));
+        $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('name')));
+
+        $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, ['active', 'suspended']);
+        $dbman->add_field($table, $field);
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+
+        $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, ['0', '1']);
+        $dbman->add_field($table, $field);
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+
+        $record = new stdClass();
+        $record->name = 'abc';
+        $record->status = 'active';
+        $record->deleted = 1;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        $record = new stdClass();
+        $record->name = 'def';
+        $record->status = 'suspended';
+        $record->deleted = 0;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        $record = new stdClass();
+        $record->name = 'ghi';
+        $record->status = 'suspended';
+        $record->deleted = null;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        try {
+            $record = new stdClass();
+            $record->name = 'xyz';
+            $record->status = 'xactive';
+            $record->deleted = 1;
+            $DB->insert_record('test_table', $record);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $this->assertCount(3, $DB->get_records('test_table'));
+
+        try {
+            $record = new stdClass();
+            $record->name = 'xyz';
+            $record->status = 'active';
+            $record->deleted = 2;
+            $DB->insert_record('test_table', $record);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $this->assertCount(3, $DB->get_records('test_table'));
+    }
+
+    public function test_field_remove_allowed_values() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, ['active', 'suspended']);
+        $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, ['0', '1']);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $dbman->create_table($table);
+        $this->assertTrue($dbman->table_exists('test_table'));
+
+        $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('name')));
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+
+        $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null);
+        $dbman->change_field_allowed_values($table, $field);
+        $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $field));
+
+        $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null);
+        $dbman->change_field_allowed_values($table, $field);
+        $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $field));
+
+        $record = new stdClass();
+        $record->name = 'abc';
+        $record->status = 'xxx';
+        $record->deleted = 22;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+    }
+
+    public function test_field_add_allowed_values() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null);
+        $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $dbman->create_table($table);
+        $this->assertTrue($dbman->table_exists('test_table'));
+        $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('name')));
+        $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
+        $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+
+        $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, ['active', 'suspended']);
+        $dbman->change_field_allowed_values($table, $field);
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+
+        $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, ['0', '1']);
+        $dbman->change_field_allowed_values($table, $field);
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+
+        $record = new stdClass();
+        $record->name = 'abc';
+        $record->status = 'active';
+        $record->deleted = 1;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        $record = new stdClass();
+        $record->name = 'def';
+        $record->status = 'suspended';
+        $record->deleted = 0;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        $record = new stdClass();
+        $record->name = 'ghi';
+        $record->status = 'suspended';
+        $record->deleted = null;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        try {
+            $record = new stdClass();
+            $record->name = 'xyz';
+            $record->status = 'xactive';
+            $record->deleted = 1;
+            $DB->insert_record('test_table', $record);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $this->assertCount(3, $DB->get_records('test_table'));
+
+        try {
+            $record = new stdClass();
+            $record->name = 'xyz';
+            $record->status = 'active';
+            $record->deleted = 2;
+            $DB->insert_record('test_table', $record);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $this->assertCount(3, $DB->get_records('test_table'));
+    }
+
+    public function test_field_change_allowed_values() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null);
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, ['active', 'suspended']);
+        $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, [0, 1]);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $dbman->create_table($table);
+        $this->assertTrue($dbman->table_exists('test_table'));
+
+        $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('name')));
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+
+        $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, ['active', 'passive']);
+        $dbman->change_field_allowed_values($table, $field);
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+
+        $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, [2, 3]);
+        $dbman->change_field_allowed_values($table, $field);
+        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+
+        $record = new stdClass();
+        $record->name = 'abc';
+        $record->status = 'passive';
+        $record->deleted = 2;
+
+        $record->id = $DB->insert_record('test_table', $record);
+        $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
+        $this->assertEquals($record, $newrecord);
+
+        try {
+            $record = new stdClass();
+            $record->name = 'xyz';
+            $record->status = 'suspended';
+            $record->deleted = 2;
+            $DB->insert_record('test_table', $record);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $this->assertCount(1, $DB->get_records('test_table'));
+
+        try {
+            $record = new stdClass();
+            $record->name = 'xyz';
+            $record->status = 'passive';
+            $record->deleted = 1;
+            $DB->insert_record('test_table', $record);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(dml_write_exception::class, $e);
+        }
+        $this->assertCount(1, $DB->get_records('test_table'));
+    }
+
     /**
      * Load db schema from text file.
      *

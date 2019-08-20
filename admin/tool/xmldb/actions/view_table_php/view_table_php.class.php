@@ -125,6 +125,7 @@ class view_table_php extends XMLDBAction {
                          $optionspacer . 'change_field_precision',
                          $optionspacer . 'change_field_notnull',
                          $optionspacer . 'change_field_default',
+                         $optionspacer . 'change_field_allowed_values',
                          'Keys',
                          $optionspacer . 'add_key',
                          $optionspacer . 'drop_key',
@@ -223,6 +224,13 @@ class view_table_php extends XMLDBAction {
                 case 'change_field_default':
                     if ($fieldkeyindexinitial == 'f') { // Only if we have got one field
                         $o.= s($this->change_field_default_php($structure, $tableparam, $fieldkeyindexparam));
+                    } else {
+                        $o.= $this->str['mustselectonefield'];
+                    }
+                    break;
+                case 'change_field_allowed_values':
+                    if ($fieldkeyindexinitial == 'f') { // Only if we have got one field
+                        $o.= s($this->change_field_allowedvalues_php($structure, $tableparam, $fieldkeyindexparam));
                     } else {
                         $o.= $this->str['mustselectonefield'];
                     }
@@ -613,6 +621,54 @@ class view_table_php extends XMLDBAction {
         $result .= XMLDB_LINEFEED;
         $result .= '        // Launch change of default for field ' . $field->getName() . '.' . XMLDB_LINEFEED;
         $result .= '        $dbman->change_field_default($table, $field);' . XMLDB_LINEFEED;
+
+        // Add the proper upgrade_xxxx_savepoint call
+        $result .= $this->upgrade_savepoint_php ($structure);
+
+        // Add standard PHP footer
+        $result .= XMLDB_PHP_FOOTER;
+
+        return $result;
+    }
+
+    /**
+     * This function will generate all the PHP code needed to
+     * change the allowed values for a field.
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_structure $structure object containing all the info
+     * @param string $table table name
+     * @param string $field field name to change
+     * @return string
+     */
+    function change_field_allowedvalues_php($structure, $table, $field) {
+
+        $result = '';
+        // Validate if we can do it
+        if (!$table = $structure->getTable($table)) {
+            return false;
+        }
+        if (!$field = $table->getField($field)) {
+            return false;
+        }
+        if ($table->getAllErrors()) {
+            return false;
+        }
+
+        // Add the standard PHP header
+        $result .= XMLDB_PHP_HEADER;
+
+        // Add contents
+        $result .= XMLDB_LINEFEED;
+        $result .= '        // Change the allowed values for field ' . $field->getName() . ' on table ' . $table->getName() . XMLDB_LINEFEED;
+        $result .= '        $table = new xmldb_table(' . "'" . $table->getName() . "'" . ');' . XMLDB_LINEFEED;
+        $result .= '        $field = new xmldb_field(' . "'" . $field->getName() . "', " . $field->getPHP(true) . ');' . XMLDB_LINEFEED;
+
+        // Launch the proper DDL
+        $result .= XMLDB_LINEFEED;
+        $result .= '        // Launch change of allowed values for field ' . $field->getName() . '.' . XMLDB_LINEFEED;
+        $result .= '        $dbman->change_field_allowed_values($table, $field);' . XMLDB_LINEFEED;
 
         // Add the proper upgrade_xxxx_savepoint call
         $result .= $this->upgrade_savepoint_php ($structure);

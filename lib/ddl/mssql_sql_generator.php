@@ -767,6 +767,26 @@ class mssql_sql_generator extends sql_generator {
     }
 
     /**
+     * Returns SQL for finding out if allowed values constraint exists.
+     *
+     * @since Totara 13
+     *
+     * @param xmldb_table $xmldb_table
+     * @param xmldb_field $xmldb_field
+     * @return core\dml\sql
+     */
+    public function getAllowedValuesContraintExistsSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field) {
+        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+
+        $sql = "SELECT 1
+                  FROM sys.check_constraints
+                 WHERE type = 'C' AND name = :constraintname";
+        $params = ['constraintname' => $constraintname];
+
+        return new core\dml\sql($sql, $params);
+    }
+
+    /**
      * Returns the code (array of statements) needed to add one comment to the table.
      *
      * @param xmldb_table $xmldb_table The xmldb_table object instance.
