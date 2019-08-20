@@ -74,12 +74,19 @@ class user_cancelled extends state implements interface_event {
      */
     public function get_action_label(): string {
         $multisignup = new condition\multisignup_common($this->signup);
+        $userhasmanager = new condition\user_has_manager($this->signup);
 
         // If user is not able to sign up to different session, and user already has another signup,
         // then this state should be treated as not_set state.
         if (!$multisignup->pass()) {
             return parent::get_action_label();
         }
+
+        // If the user cannot sign-up because manager assigned is needed, then return the state action level.
+        if (!$userhasmanager->pass()) {
+            return parent::get_action_label();
+        }
+
         return get_string('cancelbooking', 'mod_facetoface');
     }
 

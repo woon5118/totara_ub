@@ -89,6 +89,43 @@ Feature: Sign up status
     Then I should see "Cancelled"
     And I log out
 
+  Scenario: Cancelled users who cannot sign-up should be given Event info option and no any other option that cannot perform
+    And I follow "Add event"
+    And I press "Save changes"
+    And I navigate to "Global settings" node in "Site administration > Seminars"
+    And I click on "s__facetoface_approvaloptions[approval_admin]" "checkbox"
+    And I press "Save changes"
+    And I log out
+    And I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Sign-up"
+    And I press "Sign-up"
+    And I log out
+    And I log in as "admin"
+    And I am on "Course 1" course homepage
+    And I follow "Test seminar name"
+    And I follow "Edit settings"
+    And I expand all fieldsets
+    And I set the field "Manager and Administrative approval" to "1"
+    And I click on "Add approver" "button"
+    And I click on "Admin User" "link" in the "Select activity level approvers" "totaradialogue"
+    And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
+    And I click on "Save and display" "button"
+    And I follow "Attendees"
+    And I set the field "Attendee actions" to "Remove users"
+    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I press "Remove"
+    And I wait "1" seconds
+    And I press "Continue"
+    And I press "Confirm"
+    And I should see "Bulk remove users success"
+    And I log out
+    And I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I should see "Event info"
+    And I should not see "Cancel booking"
+    And I should not see "Sign-up"
+
   Scenario Outline: Event cancelled should be displayed in the status column regardless the signup period
     Given I follow "Add event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
