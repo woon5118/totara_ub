@@ -43,7 +43,7 @@ export default {
     },
     latestAchievement: {
       required: true,
-      type: String,
+      validator: prop => typeof prop === 'string' || prop === null, // String or null
     },
     isMine: {
       required: true,

@@ -134,6 +134,9 @@ class assignments extends user_data_provider {
                 })->or_where(function(builder $builder) use ($organisations) {
                     $builder->where('user_group_type', user_groups::ORGANISATION)
                         ->where('user_group_id', $organisations);
+                })->or_where(function(builder $builder) use ($organisations) {
+                    $builder->where('user_group_type', user_groups::USER)
+                        ->where('user_group_id', $this->user->id);
                 });
             })
             ->get();

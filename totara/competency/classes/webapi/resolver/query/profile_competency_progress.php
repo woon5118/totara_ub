@@ -48,7 +48,7 @@ class profile_competency_progress implements query_resolver {
                         'assignment' => $assignment,
                         'competency' => $assignment->get_competency(),
                         'proficient' => boolval($proficient),
-                        'my_value' => $assignment->has_field('achievement') ? $assignment->get_field('achievement')->scale_value : null,
+                        'my_value' => $assignment->has_field('achievement') ? ($assignment->get_field('achievement')->scale_value ?? null): null,
                         'min_value' => $assignment->get_competency()->scale->min_proficient_value ?? null,
                     ]);
                 }, $competency_progress->assignments),

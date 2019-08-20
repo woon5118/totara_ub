@@ -122,25 +122,6 @@ class assignment extends entity {
         return $name;
     }
 
-    // TODO This is now part of the model, existing code should be changed
-    public function get_progress_name_attribute() {
-        switch ($this->get_attributes_raw()['type'] ?? null) {
-            case 'other':
-                return get_string('assignment_type:other', 'tassign_competency');
-            case 'system':
-                return get_string('assignment_type:system', 'tassign_competency');
-            case 'self':
-                return get_string('assignment_type:self', 'tassign_competency');
-            default:
-                if (!isset($this->user_group_name)) {
-                    debugging('You must fetch assignments with user group names in order to use this function', DEBUG_DEVELOPER);
-                    return '';
-                }
-
-                return $this->user_group_name;
-        }
-    }
-
     // TODO This is part of the model, existing code should be changed
     protected function get_human_status_attribute() {
         switch ($this->status) {

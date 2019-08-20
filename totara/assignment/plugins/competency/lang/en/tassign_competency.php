@@ -81,8 +81,8 @@ $string['assignment:viewcurrent'] = 'Currently assigned user report';
 
 $string['assignment_type:auto'] = 'Auto';
 $string['assignment_type:admin'] = 'Individual (Admin)';
-$string['assignment_type:self'] = 'Individual (Self)';
-$string['assignment_type:other'] = 'Individual (Other user)';
+$string['assignment_type:self'] = 'Self-assigned';
+$string['assignment_type:other'] = 'Directly assigned';
 $string['assignment_type:system'] = 'Individual (System)';
 
 $string['basket:empty_basket_can_not_proceed_creating_assignment'] = 'You need to select at least one competency before you can proceed with assignment creation';
@@ -112,10 +112,14 @@ $string['confirm_assignment_creation_plural_skipped_plural'] = '{$a->created} co
 $string['confirm_assignment_creation_none_singular'] = 'No new competency assignment was created, as it already exists.';
 $string['confirm_assignment_creation_none_plural'] = 'No new competency assignments were created, as they already exist.';
 
+$string['continuous_tracking'] = 'Continuous tracking';
+
 $string['deleted_user'] = '(user deleted)';
 $string['deleted_audience'] = '(audience deleted)';
 $string['deleted_position'] = '(position deleted)';
 $string['deleted_organisation'] = '(organisation deleted)';
+
+$string['directly_assigned'] = 'Directly assigned';
 
 $string['event:assignment_activated'] = 'Competency assignment activated';
 $string['event:assignment_archived'] = 'Competency assignment archived';

@@ -58,7 +58,7 @@ class item extends basic_model {
             if (!$progress->item($key = $this->build_key($assignment->type, $assignment->user_group_type, $assignment->user_group_id))) {
                 $progress->set((object) [
                     'key' => $key,
-                    'name' => $assignment->progress_name,
+                    'name' => $assignment->get_progress_name(),
                     'user' => $this->user,
                     'assignments' => new collection([$assignment]),
                     'overall_progress' => 0,

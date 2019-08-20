@@ -65,10 +65,14 @@ class progress extends user_data_provider {
         $progress = new collection();
 
         foreach ($this->assignments->get() as $assignment) {
-            if (!$progress->item($key = $this->build_key($assignment->type, $assignment->user_group_type, $assignment->user_group_id))) {
+            if (!$progress->item($key = $this->build_key($assignment))) {
+
+                // TODO do something about it, either everything should operate on those or nothing...
+                $model = \tassign_competency\models\assignment::load_by_entity($assignment);
+
                 $progress->set((object) [
                     'key' => $key,
-                    'name' => $assignment->progress_name,
+                    'name' => $model->get_progress_name(),
                     'user' => $this->user,
                     'assignments' => new collection([$assignment]),
                     'overall_progress' => 0,
@@ -112,8 +116,19 @@ class progress extends user_data_provider {
             ->first();
     }
 
-    protected function build_key($type, $user_group_type, $user_group_id) {
+    protected function build_key_old($type, $user_group_type, $user_group_id) {
         return md5("$type/$user_group_type/$user_group_id");
+    }
+
+    protected function build_key(assignment $assignment) {
+        $type = $assignment->type;
+
+        // We are grouping individual admin and manager assignments together...
+        if ($type === assignment::TYPE_OTHER) {
+            $type = assignment::TYPE_ADMIN;
+        }
+
+        return md5("$assignment->status/$type/$assignment->user_group_type/$assignment->user_group_id");
     }
 
     public function build_filters() {
@@ -126,8 +141,11 @@ class progress extends user_data_provider {
         $filters = [];
 
         $ass_info = function ($assignment, $key) {
+            // TODO do something about it, either everything should operate on those or nothing...
+            $model = \tassign_competency\models\assignment::load_by_entity($assignment);
+
             return (object) [
-                'name' => $assignment->progress_name,
+                'name' => $model->get_progress_name(),
                 'status_name' => $assignment->human_status,
                 'status' => $assignment->status,
                 'user_group_type' => $assignment->user_group_type,
@@ -138,7 +156,7 @@ class progress extends user_data_provider {
         };
 
         foreach ($assignments as $assignment) {
-            $key = $this->build_key($assignment->status . $assignment->type, $assignment->user_group_type, $assignment->user_group_id);
+            $key = $this->build_key($assignment);
             if (!isset($filters[$key])) {
                 $filters[$key] = $ass_info($assignment, $key);
             }

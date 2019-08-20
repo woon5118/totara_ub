@@ -4,31 +4,28 @@
       <IndividualAssignmentProgress :assignment-progress="data.items[0]" />
     </template>
     <template v-else>
-      <Accordion ref="assignmentsProgressAccordion">
-        <AccordionItem
+      <div class="tui-CompetencyCharts">
+        <div
           v-for="(item, key) in data.items"
           :key="key"
           :name="item.name"
           :item-key="key"
           :is-open="data.items.length <= 5"
+          class="tui-CompetencyCharts__chart"
         >
           <IndividualAssignmentProgress :assignment-progress="item" />
-        </AccordionItem>
-      </Accordion>
+        </div>
+      </div>
     </template>
   </div>
 </template>
 
 <script>
-import Accordion from '../../container/Accordion';
-import AccordionItem from '../../container/AccordionItem';
 import IndividualAssignmentProgress from '../../container/IndividualAssignmentProgress';
 
 export default {
   components: {
     IndividualAssignmentProgress,
-    AccordionItem,
-    Accordion,
   },
 
   props: {
@@ -51,7 +48,24 @@ export default {
   methods: {},
 };
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+.tui-CompetencyCharts {
+  display: flex;
+  flex-wrap: wrap;
+
+  &__chart {
+    width: calc(100% - 0.5rem);
+    padding: 0.5rem;
+    margin: 0 0.5rem 1rem 0;
+    border: 1px #999c9c solid;
+    border-radius: 1rem;
+
+    @media (min-width: $totara_style-screen_sm_min) {
+      width: calc(50% - 0.5rem);
+    }
+  }
+}
+</style>
 <lang-strings>
   {}
 </lang-strings>

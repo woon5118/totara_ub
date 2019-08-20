@@ -209,13 +209,9 @@ export default {
   &filters-bar {
     display: flex;
     flex-direction: row-reverse;
+    justify-content: space-between;
     line-height: 32px;
-
-    & > div {
-      &:not(:first-child) {
-        margin-right: 15px;
-      }
-    }
+    margin-bottom: 1rem;
   }
 }
 </style>

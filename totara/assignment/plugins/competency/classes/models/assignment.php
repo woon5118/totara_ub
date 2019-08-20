@@ -367,7 +367,7 @@ class assignment {
                     break;
             }
         } else {
-            $type_name = get_string('assignment_type:'.$this->entity->type, 'tassign_competency');
+            $type_name = get_string('assignment_type:' . $this->entity->type, 'tassign_competency');
         }
 
         return $type_name;
@@ -406,10 +406,15 @@ class assignment {
      */
     public function get_progress_name(): string {
         switch ($this->entity->type ?? null) {
+            case assignment_entity::TYPE_ADMIN:
+                if ($this->entity->user_group_type !== user_groups::USER) {
+                    return $this->get_user_group_name();
+                }
+                return get_string('directly_assigned', 'tassign_competency');
             case assignment_entity::TYPE_OTHER:
-                return get_string('assignment_type:other', 'tassign_competency');
+                return get_string('directly_assigned', 'tassign_competency');
             case assignment_entity::TYPE_SYSTEM:
-                return get_string('assignment_type:system', 'tassign_competency');
+                return get_string('continuous_tracking', 'tassign_competency');
             case assignment_entity::TYPE_SELF:
                 return get_string('assignment_type:self', 'tassign_competency');
             default:

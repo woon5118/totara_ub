@@ -5,6 +5,20 @@
 <script>
 import ChartJs from '../presentation/ChartJs';
 
+/**
+ *  To get line chart working properly there is trickery involved.
+ *  The idea is as follows, we are wrapping our data set (appending & prepending)
+ *  with the null values for bar chart and the values matching the first and the last respectively.
+ *
+ *  To make it work there is also a trick with X-axis ticks required, we have to tell chartjs to ignore
+ *  our appended and prepended columns, to do so we have to specify min & max ticks matching first and
+ *  last label.
+ *
+ *  To complicate stuff more we are appending chart with the empty data to prevent it from looking
+ *  giant when displaying data for one or two competencies. To do so we are manually appending dataset
+ *  with empty values BEFORE wrapping it with data from the comments above, that requires adjusting max
+ *  tick manually to our fake one.
+ */
 export default {
   components: { ChartJs },
   props: {
@@ -17,7 +31,13 @@ export default {
   computed: {
     options: function() {
       let options = {
-        tooltips: {},
+        tooltips: {
+          filter(tooltipItem, data) {
+            // We are filtering out
+            let label = data.labels[tooltipItem.index];
+            return [''].indexOf(label.trim());
+          },
+        },
         legend: {
           position: 'top',
           display: true,
@@ -37,6 +57,8 @@ export default {
           },
         };
       } else {
+        // This is to make bar-line chart to expand line to the borders of the graph.
+        // See the comment above and below.
         let min = this.assignmentProgress.items.slice(0, 1).pop();
         let max = this.assignmentProgress.items.slice(-1).pop();
 
@@ -46,6 +68,12 @@ export default {
 
         if (max) {
           max = max.competency.fullname;
+
+          // We also need this extra condition to make it work with our additional empty data to prevent
+          // charts from being giant...
+          if (this.assignmentProgress.items.length <= 2) {
+            max = '   ';
+          }
         }
 
         options.scales = {
@@ -82,8 +110,6 @@ export default {
                 .name;
           }
 
-          console.log(tooltipItem, data, label);
-
           return label;
         },
       };
@@ -106,7 +132,8 @@ export default {
           {
             label: this.$str('proficient_value', 'totara_competency'),
 
-            backgroundColor: '#cc242850',
+            // For bar charts the area under the line should be transparent
+            backgroundColor: this.type === 'bar' ? 'transparent' : '#cc242850',
             borderColor: '#cc2428',
             steppedLine: 'middle',
             rawData: [],
@@ -137,6 +164,21 @@ export default {
         if (data.datasets[0].data.length) {
           const first = data.datasets[1].data.slice(0, 1).pop();
           const last = data.datasets[1].data.slice(-1).pop();
+
+          // Appending extra empty "bars" to the chart to avoid it being giant when displayed for a single
+          // competency.
+          if (this.assignmentProgress.items.length <= 2) {
+            for (let i = this.assignmentProgress.items.length; i <= 3; i++) {
+              data.datasets[0].data.push(null);
+              data.datasets[1].data.push(last);
+
+              if (i === 3) {
+                data.labels.push('   ');
+              } else {
+                data.labels.push(' ');
+              }
+            }
+          }
 
           data.datasets[0].rawData.push(null);
           data.datasets[0].rawData.unshift(null);
