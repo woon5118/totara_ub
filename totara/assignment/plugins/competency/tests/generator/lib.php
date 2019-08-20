@@ -46,7 +46,6 @@ class tassign_competency_generator extends component_generator_base {
 
         $attributes['competency_id'] = $competency_id;
         $attributes['user_group_id'] = $position_id;
-        $attributes['status'] = assignment::STATUS_ACTIVE;
         $attributes['user_group_type'] = user_groups::POSITION;
 
         return $this->create_assignment($attributes);
@@ -71,7 +70,6 @@ class tassign_competency_generator extends component_generator_base {
 
         $attributes['competency_id'] = $competency_id;
         $attributes['user_group_id'] = $organisation_id;
-        $attributes['status'] = assignment::STATUS_ACTIVE;
         $attributes['user_group_type'] = user_groups::ORGANISATION;
 
         return $this->create_assignment($attributes);
@@ -154,7 +152,7 @@ class tassign_competency_generator extends component_generator_base {
         $attributes = array_merge([
             'optional' => '0',
             'type' => assignment::TYPE_ADMIN,
-            'status' => '0',
+            'status' => assignment::STATUS_ACTIVE,
             'created_by' => $this->logged_user(),
             'created_at' => time(),
             'updated_at' => time(),

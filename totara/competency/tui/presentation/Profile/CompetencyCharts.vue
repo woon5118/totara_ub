@@ -1,7 +1,12 @@
 <template>
   <div>
     <template v-if="data.items && data.items.length === 1">
-      <IndividualAssignmentProgress :assignment-progress="data.items[0]" />
+      <div class="tui-CompetencyCharts__single_chart_container">
+        <IndividualAssignmentProgress
+          :assignment-progress="data.items[0]"
+          class="tui-CompetencyCharts__single_chart"
+        />
+      </div>
     </template>
     <template v-else>
       <div class="tui-CompetencyCharts">
@@ -52,6 +57,15 @@ export default {
 .tui-CompetencyCharts {
   display: flex;
   flex-wrap: wrap;
+
+  &__single_chart_container {
+    display: flex;
+    justify-content: center;
+  }
+
+  &__single_chart {
+    max-width: $totara_style-screen_sm_min;
+  }
 
   &__chart {
     width: calc(100% - 0.5rem);
