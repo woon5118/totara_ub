@@ -4657,10 +4657,9 @@ function guest_user() {
  * @param string $password  User's password
  * @param bool $ignorelockout useful when guessing is prevented by other mechanism such as captcha or SSO
  * @param int $failurereason login failure reason, can be used in renderers (it may disclose if account exists)
- * @param mixed logintoken If this is set to a string it is validated against the login token for the session.
  * @return stdClass|false A {@link $USER} object or false if error
  */
-function authenticate_user_login($username, $password, $ignorelockout=false, &$failurereason=null, $logintoken=false) {
+function authenticate_user_login($username, $password, $ignorelockout=false, &$failurereason=null) {
     global $CFG, $DB;
     require_once("$CFG->libdir/authlib.php");
 
@@ -4680,20 +4679,6 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
             }
             unset($users);
         }
-    }
-
-    // Make sure this request came from the login form.
-    if (!\core\session\manager::validate_login_token($logintoken)) {
-        $failurereason = AUTH_LOGIN_FAILED;
-
-        // Trigger login failed event.
-        $event = \core\event\user_login_failed::create(array('userid' => $user->id,
-            'other' => array('username' => $username, 'reason' => $failurereason)));
-        $event->trigger();
-        if (!PHPUNIT_TEST) {
-            error_log('[client ' . getremoteaddr() . "]  $CFG->wwwroot  Invalid Login Token:  $username  " . $_SERVER['HTTP_USER_AGENT']);
-        }
-        return false;
     }
 
     $authsenabled = get_enabled_auth_plugins();
