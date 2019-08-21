@@ -993,6 +993,40 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Checks, that the first specified element appears before the second one in the specified container element.
+     *
+     * @Given /^"(?P<preceding_element_string>(?:[^"]|\\")*)" "(?P<selector1_string>(?:[^"]|\\")*)" should appear before "(?P<following_element_string>(?:[^"]|\\")*)" "(?P<selector2_string>(?:[^"]|\\")*)" in the "(?P<container_element_string>(?:[^"]|\\")*)" "(?P<selector3_string>(?:[^"]|\\")*)"$/
+     * @throws ExpectationException
+     * @param string $preelement The locator of the preceding element
+     * @param string $preselectortype The locator of the preceding element
+     * @param string $postelement The locator of the latest element
+     * @param string $postselectortype The selector type of the latest element
+     * @param string $containerelement The locator of the container element
+     * @param string $containerselectortype The selector type of the container element
+     *
+     * @since Totara 12.10, Totara 13
+     */
+    public function should_appear_before_in($preelement, $preselectortype, $postelement, $postselectortype, $containerelement, $containerselectortype) {
+        \behat_hooks::set_step_readonly(true);
+
+        $containernode = $this->get_selected_node($containerselectortype, $containerelement);
+
+        // We allow postselectortype as a non-text based selector.
+        list($preselector, $prelocator) = $this->transform_selector($preselectortype, $preelement);
+        list($postselector, $postlocator) = $this->transform_selector($postselectortype, $postelement);
+
+        $prexpath = $this->find($preselector, $prelocator, false, $containernode)->getXpath();
+        $postxpath = $this->find($postselector, $postlocator, false, $containernode)->getXpath();
+
+        // Using following xpath axe to find it.
+        $msg = '"'.$preelement.'" "'.$preselectortype.'" does not appear before "'.$postelement.'" "'.$postselectortype.'"';
+        $xpath = $prexpath.'/following::*[contains(., '.$postxpath.')]';
+        if (!$this->getSession()->getDriver()->find($xpath)) {
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
      * Checks, that the first specified element appears after the second one.
      *
      * @Given /^"(?P<following_element_string>(?:[^"]|\\")*)" "(?P<selector1_string>(?:[^"]|\\")*)" should appear after "(?P<preceding_element_string>(?:[^"]|\\")*)" "(?P<selector2_string>(?:[^"]|\\")*)"$/

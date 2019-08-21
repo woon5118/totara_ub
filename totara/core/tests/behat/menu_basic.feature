@@ -59,7 +59,6 @@ Feature: A basic test of the Totara Main menu
     When I click on "Show" "link" in the "Test item" "table_row"
     Then I should see "Test item" in the totara menu
 
-  @javascript
   Scenario: Move Main menu items
     Given I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Add new menu item" "button"
@@ -71,10 +70,10 @@ Feature: A basic test of the Totara Main menu
     And I click on "Add" "button"
     And I should see "Another item" in the totara menu
     When I click on "Move up" "link" in the "Another item" "table_row"
-    Then "Another item" "link" should appear before "Test item" "link"
+    Then "Another item" "link" should appear before "Test item" "link" in the "#totaramenutable" "css_element"
     When I navigate to "Main menu" node in "Site administration > Navigation"
     And I click on "Move down" "link" in the "Another item" "table_row"
-    Then "Test item" "link" should appear before "Another item" "link"
+    Then "Test item" "link" should appear before "Another item" "link" in the "#totaramenutable" "css_element"
 
   Scenario: Delete Main menu items
     Given I navigate to "Main menu" node in "Site administration > Navigation"

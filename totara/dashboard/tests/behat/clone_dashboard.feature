@@ -48,8 +48,8 @@ Feature: Clone a dashboard
     And I should see "Original dashboard"
     And I should see "Secondary dashboard"
     And I should see "Primary dashboard copy 1"
-    And "Original dashboard" "text" should appear before "Secondary dashboard" "text"
-    And "Secondary dashboard" "text" should appear before "Primary dashboard" "text"
+    And "Original dashboard" "text" should appear before "Secondary dashboard" "text" in the ".generaltable" "css_element"
+    And "Secondary dashboard" "text" should appear before "Primary dashboard" "text" in the ".generaltable" "css_element"
 
     # Confirm the cloned dashboard
     When I click on "Primary dashboard" "link"
