@@ -8,6 +8,8 @@
 import Chart from 'chart.js';
 import 'chartjs-plugin-doughnutlabel';
 
+Chart.defaults.global.defaultFontSize = 14;
+
 export default {
   name: 'ChartJs',
 

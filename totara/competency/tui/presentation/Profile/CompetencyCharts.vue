@@ -1,27 +1,12 @@
 <template>
-  <div>
-    <template v-if="data.items && data.items.length === 1">
-      <div class="tui-CompetencyCharts__single_chart_container">
-        <IndividualAssignmentProgress
-          :assignment-progress="data.items[0]"
-          class="tui-CompetencyCharts__single_chart"
-        />
-      </div>
-    </template>
-    <template v-else>
-      <div class="tui-CompetencyCharts">
-        <div
-          v-for="(item, key) in data.items"
-          :key="key"
-          :name="item.name"
-          :item-key="key"
-          :is-open="data.items.length <= 5"
-          class="tui-CompetencyCharts__chart"
-        >
-          <IndividualAssignmentProgress :assignment-progress="item" />
-        </div>
-      </div>
-    </template>
+  <div class="tui-CompetencyCharts">
+    <div
+      v-for="(item, key) in data.items"
+      :key="key"
+      class="tui-CompetencyCharts__chart"
+    >
+      <IndividualAssignmentProgress :assignment-progress="item" />
+    </div>
   </div>
 </template>
 
@@ -57,15 +42,7 @@ export default {
 .tui-CompetencyCharts {
   display: flex;
   flex-wrap: wrap;
-
-  &__single_chart_container {
-    display: flex;
-    justify-content: center;
-  }
-
-  &__single_chart {
-    max-width: $totara_style-screen_sm_min;
-  }
+  justify-content: center;
 
   &__chart {
     width: calc(100% - 0.5rem);
@@ -74,7 +51,11 @@ export default {
     border: 1px #999c9c solid;
     border-radius: 1rem;
 
-    @media (min-width: $totara_style-screen_sm_min) {
+    @media (min-width: $totara_style-screen_sm_min) and (max-width: $totara_style-screen_xl_min) {
+      width: $totara_style-screen_sm_min - 0.5rem;
+    }
+
+    @media (min-width: $totara_style-screen_xl_min) {
       width: calc(50% - 0.5rem);
     }
   }
