@@ -447,7 +447,8 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
     public function view_report_link($reporturl) {
 
         $url = new moodle_url($reporturl);
-        return html_writer::link($url, get_string('viewreport', 'totara_reportbuilder'));
+        return html_writer::link($url, get_string('view', 'totara_reportbuilder'),
+            array('title' => get_string('viewreport', 'totara_reportbuilder')));
     }
 
     /**
@@ -888,6 +889,19 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         $table->head = array(get_string('learner'), get_string('assignedvia', 'totara_core'));
         $out = $this->output->container(html_writer::table($table), 'clearfix', 'assignedusers');
         return $out;
+    }
+
+    /**
+     * Renders the edit report page heading
+     *
+     * @param reportbuilder $report The report object
+     * @return string The heading html
+     */
+    public function edit_report_heading(reportbuilder $report) : string {
+        return $this->heading(get_string('editreportwithurl', 'totara_reportbuilder', array(
+            'fullname' => format_string($report->fullname),
+            'url' => $this->view_report_link($report->report_url())
+        )));
     }
 
     /**

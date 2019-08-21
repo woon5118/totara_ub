@@ -271,7 +271,7 @@ Feature: Verify the User System Role filter.
     Then I should not see "User System Role" in the "newstandardfilter" "select"
 
     # Add the filter to the Manage users embedded report.
-    When I follow "All embedded reports"
+    When I follow "Manage embedded reports"
     And I click on "Settings" "link" in the "Manage users" "table_row"
     And I switch to "Filters" tab
     And I set the field "newstandardfilter" to "User System Role"

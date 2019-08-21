@@ -71,11 +71,9 @@ if ($fromform = $mform->get_data()) {
 echo $output->header();
 
 echo $output->container_start('reportbuilder-navlinks');
-echo $output->view_all_reports_link($report->embedded) . ' | ';
-echo $output->view_report_link($report->report_url());
+echo $output->view_all_reports_link($report->embedded);
 echo $output->container_end();
-
-echo $output->heading(get_string('editreport', 'totara_reportbuilder', format_string($report->fullname)));
+echo $output->edit_report_heading($report);
 
 if ($report->get_cache_status() > 0) {
     echo $output->cache_pending_notification($id);

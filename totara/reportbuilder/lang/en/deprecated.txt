@@ -42,3 +42,4 @@ publicsearch,totara_reportbuilder
 graphsettings,totara_reportbuilder
 graphsettings_help,totara_reportbuilder
 hidden,totara_reportbuilder
+editreport,totara_reportbuilder

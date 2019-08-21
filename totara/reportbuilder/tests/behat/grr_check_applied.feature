@@ -15,7 +15,7 @@ Feature: Check global report restrictions default settings
     And I click on "Edit this report" "button"
     And I switch to "Columns" tab
     And I add the "Global report restrictions" column to the report
-    And I follow "All embedded reports"
+    And I follow "Manage embedded reports"
   # Only check embedded reports that are likely to appear on the first page (to avoid having to navigate or increase page size)
     And I should see "No" in the "Alerts (View)" "table_row"
     And I should see "No" in the "Appraisal Detail (View)" "table_row"
@@ -38,7 +38,7 @@ Feature: Check global report restrictions default settings
     And I press "Create report"
     And I switch to "Content" tab
     Then the field "Global report restrictions" matches value "1"
-    When I follow "All user reports"
+    When I follow "Manage user reports"
     And I click on "Edit this report" "button"
     And I switch to "Columns" tab
     And I add the "Global report restrictions" column to the report
@@ -48,5 +48,5 @@ Feature: Check global report restrictions default settings
     And I switch to "Content" tab
     And I set the field "Global report restrictions" to "0"
     And I press "Save changes"
-    And I follow "All user reports"
+    And I follow "Manage user reports"
     Then I should see "No" in the "Audience report (View)" "table_row"
