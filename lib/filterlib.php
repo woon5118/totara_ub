@@ -98,6 +98,12 @@ class filter_manager {
      * Resets the caches, usually to be called between unit tests
      */
     public static function reset_caches() {
+        global $FILTERLIB_PRIVATE;
+
+        // Reset the global cache, it stores the filters loaded from the database.
+        if (isset($FILTERLIB_PRIVATE)) {
+            $FILTERLIB_PRIVATE = null;
+        }
         if (self::$singletoninstance) {
             self::$singletoninstance->unload_all_filters();
         }

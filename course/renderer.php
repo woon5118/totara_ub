@@ -721,6 +721,8 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string
      */
     public function course_section_cm_text(cm_info $mod, $displayoptions = array()) {
+        global $CFG;
+
         $output = '';
         if (!$mod->uservisible && empty($mod->availableinfo)) {
             // nothing to be displayed to the user
@@ -730,6 +732,12 @@ class core_course_renderer extends plugin_renderer_base {
         if ($mod->modname === 'label' && get_config('label', 'allowxss')) {
             $options['allowxss'] = true;
         }
+        if (!empty($CFG->disableconsistentcleaning) && empty($options['allowxss'])) {
+            // This is the legacy behaviour. It was originally setting the noclean option.
+            // We use the allowxss option now, and only if the consistent cleaning is off.
+            $options['allowxss'] = true;
+        }
+
         $content = $mod->get_formatted_content($options);
         $accesstext = '';
         $textclasses = '';
