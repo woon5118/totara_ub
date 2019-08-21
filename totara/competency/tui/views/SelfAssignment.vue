@@ -123,7 +123,6 @@
                 v-model="selectedItems"
                 type="checkbox"
                 :value="item.id"
-                :disabled="isSelfAssigned(item)"
                 name="assignselect"
               />
             </td>
