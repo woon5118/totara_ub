@@ -58,7 +58,7 @@ class report_builder_new_form extends moodleform {
             $mform->addRule('source', get_string('error:mustselectsource', 'totara_reportbuilder'), 'regex', '/[^0]+/');
             $mform->addHelpButton('source', 'reportbuildersource', 'totara_reportbuilder');
 
-            $mform->addElement('advcheckbox', 'hidden', get_string('hidden', 'totara_reportbuilder'), '', null, array(0, 1));
+            $mform->addElement('advcheckbox', 'hidden', get_string('reportbuilderhidden', 'totara_reportbuilder'), '', null, array(0, 1));
             $mform->addHelpButton('hidden', 'reportbuilderhidden', 'totara_reportbuilder');
             $this->add_action_buttons(true, get_string('createreport', 'totara_reportbuilder'));
 
@@ -96,7 +96,7 @@ class report_builder_edit_form extends moodleform {
         $mform->addElement('static', 'reportsource', get_string('source', 'totara_reportbuilder'), $report->src->sourcetitle);
         $mform->addHelpButton('reportsource', 'reportbuildersource', 'totara_reportbuilder');
 
-        $mform->addElement('advcheckbox', 'hidden', get_string('hidden', 'totara_reportbuilder'), '', null, array(0, 1));
+        $mform->addElement('advcheckbox', 'hidden', get_string('reportbuilderhidden', 'totara_reportbuilder'), '', null, array(0, 1));
         $mform->setType('hidden', PARAM_INT);
         $mform->addHelpButton('hidden', 'reportbuilderhidden', 'totara_reportbuilder');
 
