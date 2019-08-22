@@ -177,7 +177,9 @@ class rb_source_goal_custom extends rb_base_source {
                 'goalname',
                 get_string('goalname', 'rb_source_goal_custom'),
                 'base.name',
-                array('displayfunc' => 'format_string')
+                array('displayfunc' => 'goal_name',
+                      'extrafields' => array('userid' => 'base.userid', 'scope' => 'base.personalcompany')
+                )
             ),
             new rb_column_option(
                 'goal',

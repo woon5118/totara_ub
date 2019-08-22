@@ -139,8 +139,8 @@ class rb_source_goal_status_history extends rb_base_source {
                 array('defaultheading' => get_string('goalnameheading', 'rb_source_goal_status_history'),
                       'dbdatatype' => 'char',
                       'outputformat' => 'text',
-                      'capability' => 'totara/hierarchy:viewallgoals',
-                      'displayfunc' => 'format_string'
+                      'displayfunc' => 'goal_name',
+                      'extrafields' => array('userid' => 'base.userid', 'scope' => 'base.scope')
                     )
             ),
             new rb_column_option(

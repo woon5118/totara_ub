@@ -714,6 +714,7 @@ $string['goalmissingname'] = 'Missing goal name';
 $string['goalmissingnameframework'] = 'Missing goal framework name';
 $string['goalmissingnametype'] = 'Missing goal type name';
 $string['goalmissingshortname'] = 'Missing goal short name';
+$string['goalnamehidden'] = '[Hidden]';
 $string['goalnoframeworks'] = 'No goal frameworks defined';
 $string['goalnoframeworkssetup'] = 'There are no goal frameworks setup for this site.';
 $string['goalnotypes'] = 'No goal types';

@@ -138,8 +138,8 @@ class rb_source_goal_details extends rb_base_source {
                       'defaultheading' => get_string('goalnameheading', 'rb_source_goal_details'),
                       'dbdatatype' => 'char',
                       'outputformat' => 'text',
-                      'capability' => 'totara/hierarchy:viewallgoals',
-                      'displayfunc' => 'format_string'
+                      'displayfunc' => 'goal_name',
+                      'extrafields' => array('userid' => 'base.userid', 'scope' => \goal::SCOPE_COMPANY)
                     )
             ),
             new rb_column_option(

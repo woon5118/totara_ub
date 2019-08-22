@@ -1035,4 +1035,143 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
     }
 
+    public function test_goal_name() {
+        $this->setAdminUser();
+
+        // Create some users.
+        $user1      = $this->getDataGenerator()->create_user();
+        $user2      = $this->getDataGenerator()->create_user();
+        $user3      = $this->getDataGenerator()->create_user();
+        $manager1   = $this->getDataGenerator()->create_user();
+        $manager2   = $this->getDataGenerator()->create_user();
+
+        // Assign manager1 as user1's manager.
+        $manager1ja = \totara_job\job_assignment::create_default($manager1->id);
+        \totara_job\job_assignment::create(array(
+            'userid' => $user1->id,
+            'idnumber' => 'id1',
+            'managerjaid' => $manager1ja->id,
+        ));
+
+        // Assign manager2 as user2's manager.
+        $manager2ja = \totara_job\job_assignment::create_default($manager2->id);
+        \totara_job\job_assignment::create(array(
+            'userid' => $user2->id,
+            'idnumber' => 'id1',
+            'managerjaid' => $manager2ja->id,
+        ));
+
+        // Set up the roles / capabilities.
+        $viewowncompanygoal_prohibit_role = $this->getDataGenerator()->create_role();
+        assign_capability('totara/hierarchy:viewowncompanygoal', CAP_PROHIBIT, $viewowncompanygoal_prohibit_role, context_system::instance());
+
+        $viewownpersonalgoal_prohibit_role = $this->getDataGenerator()->create_role();
+        assign_capability('totara/hierarchy:viewownpersonalgoal', CAP_PROHIBIT, $viewownpersonalgoal_prohibit_role, context_system::instance());
+
+        $viewallgoals_role = $this->getDataGenerator()->create_role();
+        assign_capability('totara/hierarchy:viewallgoals', CAP_ALLOW, $viewallgoals_role, context_system::instance());
+
+        // Create a Goal Status report to test company goals.
+        $rid = $this->create_report('goal_details', 'Goal Status');
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
+
+        // Mock objects to use in the display function.
+        // The records we will be testing will all be for user1.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('goal', 'name', 'goalname', 'name', array('extrafields' => array('userid' => $user1->id, 'scope' => 'company'))))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        // Set the extra fields.
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'scope');
+        $row->$extrafieldrow = 'company';
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'userid');
+        $row->$extrafieldrow = $user1->id;
+
+        // Test for user1 viewing the report.
+        $this->setUser($user1);
+
+        // It's their own goal so the goal name should be shown.
+        $display = \totara_hierarchy\rb\display\goal_name::display("Goal name", $format, $row, $column, $report);
+        $this->assertEquals("Goal name", $display);
+
+        // Now remove the totara/hierarchy:viewowncompanygoal capability.
+        // The goal name should not be shown.
+        $this->getDataGenerator()->role_assign($viewowncompanygoal_prohibit_role, $user1->id);
+        $display = \totara_hierarchy\rb\display\goal_name::display("Goal name", $format, $row, $column, $report);
+        $this->assertEquals(get_string('goalnamehidden', 'totara_hierarchy'), $display);
+
+        // Test for user2 viewing the report.
+        $this->setUser($user2);
+
+        // It's not their own goal so the goal name should not be shown.
+        $display = \totara_hierarchy\rb\display\goal_name::display("Goal name", $format, $row, $column, $report);
+        $this->assertEquals(get_string('goalnamehidden', 'totara_hierarchy'), $display);
+
+        // Now add the totara/hierarchy:viewallgoals capability.
+        $this->getDataGenerator()->role_assign($viewallgoals_role, $user2->id);
+        $display = \totara_hierarchy\rb\display\goal_name::display("Goal name", $format, $row, $column, $report);
+        $this->assertEquals('Goal name', $display);
+
+
+        // Create a Goal Status report to test personal goals.
+        $rid = $this->create_report('goal_details', 'Goal Status');
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
+
+        // Mock objects to use in the display function.
+        // The records we will be testing for all tests will be for user1.
+        $column = $this->getMockBuilder('\rb_column')
+            ->setConstructorArgs(array('goal', 'name', 'goalname', 'name', array('extrafields' => array('userid' => $user1->id, 'scope' => 'company'))))
+            ->getMock();
+        $format = "html";
+        $row = new stdClass();
+
+        // Set the extra fields.
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'scope');
+        $row->$extrafieldrow = 'personal';
+        $extrafieldrow = reportbuilder_get_extrafield_alias($column->type, $column->value, 'userid');
+        $row->$extrafieldrow = $user1->id;
+
+        // Test for user1 viewing the report.
+        $this->setUser($user1);
+
+        // It's their own goal so the goal name should be shown.
+        $display = \totara_hierarchy\rb\display\goal_name::display("Goal name", $format, $row, $column, $report);
+        $this->assertEquals("Goal name", $display);
+
+        // Now remove the totara/hierarchy:viewownpersonalgoal capability.
+        // The goal name should not be shown.
+        $this->getDataGenerator()->role_assign($viewownpersonalgoal_prohibit_role, $user1->id);
+        $display = \totara_hierarchy\rb\display\goal_name::display("Goal name", $format, $row, $column, $report);
+        $this->assertEquals(get_string('goalnamehidden', 'totara_hierarchy'), $display);
+
+        // Test for user3 viewing the report.
+        $this->setUser($user3);
+
+        // It's not their own goal so the goal name should not be shown.
+        $display = \totara_hierarchy\rb\display\goal_name::display("Goal name", $format, $row, $column, $report);
+        $this->assertEquals(get_string('goalnamehidden', 'totara_hierarchy'), $display);
+
+        // Now add the totara/hierarchy:viewallgoals capability.
+        $this->getDataGenerator()->role_assign($viewallgoals_role, $user3->id);
+        $display = \totara_hierarchy\rb\display\goal_name::display("Goal name", $format, $row, $column, $report);
+        $this->assertEquals('Goal name', $display);
+
+        // Test for manager1.
+        $this->setUser($manager1);
+
+        // Manager1 is user1's manager so the goal name should be shown.
+        $display = \totara_hierarchy\rb\display\goal_name::display("Goal name", $format, $row, $column, $report);
+        $this->assertEquals("Goal name", $display);
+
+        // Test for manager2.
+        $this->setUser($manager2);
+
+        // Manager2 is not user1's manager so the goal name should not be shown.
+        $display = \totara_hierarchy\rb\display\goal_name::display("Goal name", $format, $row, $column, $report);
+        $this->assertEquals(get_string('goalnamehidden', 'totara_hierarchy'), $display);
+    }
 }
