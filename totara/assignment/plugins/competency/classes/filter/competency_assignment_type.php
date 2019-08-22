@@ -42,7 +42,8 @@ class competency_assignment_type extends filter {
     protected $user_group_types = [];
 
     public function apply() {
-        if (!is_null($this->value) && !empty($this->value) && !in_array(null, $this->value, true)) {
+        // If any element in the array is null we ignore this filter
+        if (!empty($this->value) && !in_array(null, $this->value, true)) {
             $this->init_types();
 
             if ($this->builder->get_table() == assignment::TABLE) {
