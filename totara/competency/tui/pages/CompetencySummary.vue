@@ -21,23 +21,92 @@
 -->
 
 <template>
-  <div class="tui_totara_competency_summary">
+  <div>
+    <div class="tui-competencySummary__header">
+      <a :href="backLinkUrl" class="tui-competencySummary__header_backLink">
+        {{ $str('back_to', 'totara_competency', frameworkName) }}
+      </a>
+      <h2 class="tui-competencySummary__header_title">
+        {{ competencyTitle }}
+      </h2>
+    </div>
+    <General :competency-id="competencyId" />
+    <LinkedCourses :competency-id="competencyId" />
     <AchievementConfiguration :competency-id="competencyId" />
   </div>
 </template>
 
 <script>
-import AchievementConfiguration from 'totara_competency/containers/configuration/AchievementConfiguration';
+import General from 'totara_competency/presentation/summary/General';
+import LinkedCourses from 'totara_competency/presentation/summary/LinkedCourses';
+import AchievementConfiguration from 'totara_competency/presentation/summary/AchievementConfiguration';
 
 export default {
   components: {
+    General,
+    LinkedCourses,
     AchievementConfiguration,
   },
 
   props: {
     competencyId: {
       type: Number,
+      required: true,
+    },
+    competencyName: {
+      type: String,
+      required: true,
+    },
+    frameworkId: {
+      type: Number,
+      required: true,
+    },
+    frameworkName: {
+      type: String,
+      required: true,
+    },
+  },
+
+  computed: {
+    backLinkUrl() {
+      return this.$url('/totara/hierarchy/index.php', {
+        prefix: 'competency',
+        frameworkid: this.frameworkId,
+      });
+    },
+
+    competencyTitle() {
+      return this.$str('competencytitle', 'totara_hierarchy', {
+        framework: this.frameworkName,
+        fullname: this.competencyName,
+      });
     },
   },
 };
 </script>
+
+<style lang="scss">
+.tui-competencySummary {
+  &__header {
+    &_backLink {
+      display: inline-block;
+      padding-bottom: $totara_style-spacing_1;
+    }
+    &_title {
+      margin: 0;
+      padding-bottom: $totara_style-spacing_4;
+    }
+  }
+}
+</style>
+
+<lang-strings>
+  {
+    "totara_competency": [
+      "back_to"
+    ],
+    "totara_hierarchy": [
+      "competencytitle"
+    ]
+  }
+</lang-strings>

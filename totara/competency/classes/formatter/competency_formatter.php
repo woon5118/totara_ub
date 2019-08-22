@@ -63,7 +63,9 @@ class competency_formatter extends entity_formatter {
             'visible' => null,
             'children' => null,
             'typeid' => null,
-            'type' => null
+            'type' => null,
+            'assign_availability' => null,
+            'custom_fields' => null,
         ];
     }
 

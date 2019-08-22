@@ -23,26 +23,4 @@
 
 require_once(__DIR__ . '/../../config.php');
 
-use totara_competency\entities\competency;
-
-//(new totara_competency\controllers\competency_controller())->process('summary');
-
-$comp_id = required_param('id', PARAM_INT);
-
-require_login();
-//require_capability('moodle/site:config', $systemcontext);
-
-$url = new moodle_url('/totara/competency/competency_summary.php', ['id' => $comp_id]);
-
-$PAGE->set_context(context_system::instance());
-$PAGE->set_url($url);
-
-$competency = new competency($comp_id);
-$heading = get_string('competencytitle',
-    'totara_hierarchy',
-    (object)['framework' => $competency->framework->fullname, 'fullname' => $competency->fullname]);
-
-echo $OUTPUT->header();
-echo $OUTPUT->heading($heading);
-echo $OUTPUT->tui_component('totara_competency/pages/CompetencySummary', ['competencyId' => $comp_id]);
-echo $OUTPUT->footer();
+(new totara_competency\controllers\competency_controller())->process('summary');

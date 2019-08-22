@@ -53,6 +53,8 @@ use totara_assignment\user_groups;
  * @property-read array $assigned_user_groups
  * @property-read int $children_count
  * @property-read int $assignments_count
+ * @property-read int $assign_availability
+ * @property-read array $custom_fields
  *
  * @method static competency_repository repository()
  *
@@ -96,6 +98,72 @@ class competency extends hierarchy_item {
         };
 
         return $user_group_names;
+    }
+
+    /**
+     * Retrieve assignment availability settings
+     *
+     * @return array Of assignment availability types
+     */
+    public function get_assign_availability_attribute(): array {
+        // This is copied from totara/competency/classes/entities/competency.php
+        // TODO sort out way to not have this duplicated
+        global $DB;
+
+        $sql =
+            'SELECT availability
+               FROM {comp_assign_availability}
+              WHERE comp_id = :compid';
+        return $DB->get_fieldset_sql($sql, ['compid' => $this->id]);
+    }
+
+    /**
+     * Retrieve all custom field definitions and values for this competency
+     *
+     * @return array of customfield objects, the following is returned: type, title, value
+     */
+    public function get_custom_fields_attribute(): array {
+        // This is copied from totara/competency/classes/entities/competency.php
+        // TODO sort out way to not have this duplicated
+        global $DB, $CFG;
+
+        $customfields = [];
+
+        $sql = "
+            SELECT c.*, f.datatype, f.hidden, f.fullname, f.shortname
+              FROM {comp_type_info_data} c
+        INNER JOIN {comp_type_info_field} f
+                ON c.fieldid = f.id
+             WHERE c.competencyid = :compid
+          ORDER BY f.sortorder";
+
+        $cflds = $DB->get_records_sql($sql, ['compid' => $this->id]);
+
+        // Now get the values
+        if ($cflds) {
+            foreach ($cflds as $cf) {
+                // Don't show hidden custom fields.
+                if ($cf->hidden) {
+                    continue;
+                }
+
+                /** @var \customfield_base $cf_class */
+                $cf_class = "customfield_{$cf->datatype}";
+                require_once($CFG->dirroot.'/totara/customfield/field/'.$cf->datatype.'/field.class.php');
+
+                $customfields[] = (object) [
+                    'type' => $cf->datatype,
+                    'title' => $cf->fullname,
+                    'value' => $cf_class::display_item_data($cf->data, [
+                        'prefix' => 'competency',
+                        'itemid' => $cf->id,
+                        'extended' => true,
+                    ])
+                ];
+            }
+        }
+
+        return $customfields;
     }
 
 }

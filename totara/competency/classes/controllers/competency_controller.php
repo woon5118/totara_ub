@@ -25,44 +25,42 @@
 namespace totara_competency\controllers;
 
 use context;
+use moodle_url;
+use tassign_competency\entities\competency;
 use tassign_competency\entities\competency_framework;
 use totara_competency\achievement_configuration;
 use totara_competency\achievement_criteria;
-use totara_competency\entities\competency;
-use totara_competency\linked_courses;
 use totara_competency\pathway;
-use totara_competency\pathway_aggregation_factory;
 use totara_competency\pathway_factory;
 use totara_competency\plugintypes;
 use totara_mvc\admin_controller;
+use totara_mvc\view;
 
+global $CFG;
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/item/edit_form.php');
 
-
 class competency_controller extends admin_controller {
-    /** @var competency $competency */
-    private $competency;
+
+    /**
+     * @var competency
+     */
+    protected $competency;
+
+    /**
+     * @var competency_framework
+     */
+    protected $framework;
 
     protected $admin_external_page_name = 'competencymanage';
 
     private $prefix = 'competency';
 
-    private $shortprefix = 'comp';
-
-    private $endpoints = [
-        'summary' => '/totara/competency/competency_summary.php',
-        'edit' => '/totara/competency/competency_edit.php',
-    ];
-
     protected function setup_context(): context {
         return \context_system::instance();
     }
 
-    public function action_summary() {
-        global $CFG;
-        require_once ($CFG->dirroot . '/totara/hierarchy/renderer.php');
-
+    protected function setup() {
         \hierarchy::check_enable_hierarchy($this->prefix);
 
         $permissions = $this->get_user_permissions();
@@ -70,29 +68,40 @@ class competency_controller extends admin_controller {
             print_error('accessdenied', 'admin');
         }
 
-        $comp_id = $this->get_param('id', PARAM_INT, null, true);
-        $this->competency = new competency($comp_id);
+        $this->competency = new competency(
+            required_param('id', PARAM_INT)
+        );
+        $this->framework = new competency_framework($this->competency->frameworkid);
 
-        $heading = get_string('competencytitle',
-            'totara_hierarchy',
-            (object)['framework' => $this->competency->framework->fullname, 'fullname' => $this->competency->fullname]);
+        $this->page->navbar
+            ->add(
+                format_string($this->framework->fullname),
+                new moodle_url('/totara/hierarchy/index.php', [
+                    'prefix' => $this->prefix, 'frameworkid' => $this->framework->id
+                ])
+            );
+    }
 
-        $data = [
-            'comp_id' => $comp_id,
-            'title' => $heading,
-            'tabs' => \totara_hierarchy_renderer::get_competency_tabs($comp_id, 'summary'),
-            'sections' => [
-                $this->export_general_summary(),
-                $this->export_linkedcourses_summary(),
-                $this->export_achievementpaths_summary(),
-            ],
-        ];
+    public function action_summary() {
+        $this->setup();
 
-        $this->add_navigation();
+        $url = new moodle_url('/totara/competency/competency_summary.php', ['id' => $this->competency->id]);
+        $title = get_string('competencytitle', 'totara_hierarchy', (object) [
+            'framework' => format_string($this->framework->fullname),
+            'fullname' => $this->competency->display_name
+        ]);
+        $this->page->set_url($url);
+        $this->page->set_title($title);
+        $this->page->navbar->add($this->competency->display_name);
 
-        return new \totara_mvc\view(
-            'totara_competency/competency_summary',
-            $data
+        return new view(
+            'totara_competency/vue_component',
+            view::core_renderer()->tui_component('totara_competency/pages/CompetencySummary', [
+                'competency-id' => $this->competency->id,
+                'competency-name' => $this->competency->display_name,
+                'framework-id' => $this->framework->id,
+                'framework-name' => format_string($this->framework->fullname),
+            ])
         );
     }
 
@@ -100,14 +109,8 @@ class competency_controller extends admin_controller {
         global $CFG;
         require_once ($CFG->dirroot . '/totara/hierarchy/renderer.php');
 
-        \hierarchy::check_enable_hierarchy($this->prefix);
+        $this->setup();
 
-        $permissions = $this->get_user_permissions();
-        if (!$this->validate_user_access($permissions)) {
-            print_error('accessdenied', 'admin');
-        }
-
-        $comp_id = $this->get_param('id', PARAM_INT, null, true);
         $section = $this->get_param('s', PARAM_ALPHA, null, true);
 
         $exportmethod = "export_{$section}_edit";
@@ -115,22 +118,22 @@ class competency_controller extends admin_controller {
             print_error('invalidsection', 'totara_competency', '', $section);
         }
 
-        $this->competency = new competency($comp_id);
+        $heading = get_string('editcompetency', 'totara_competency', $this->competency->display_name);
+        $this->page->navbar->add($heading);
+
+        // TODO: Use one single competency entity instead of using both kinds!
+        $this->competency = new \totara_competency\entities\competency($this->competency->id);
         $config = new achievement_configuration($this->competency);
 
-        $heading = get_string('editcompetency', 'totara_competency', $this->competency->fullname);
-
         $data = [
-            'comp_id' => $comp_id,
+            'comp_id' => $this->competency->id,
             'scale_id' => $this->competency->scale->id,
             'heading' => $heading,
-            'tabs' => \totara_hierarchy_renderer::get_competency_tabs($comp_id, $section),
+            'tabs' => \totara_hierarchy_renderer::get_competency_tabs($this->competency->id, "edit$section"),
             'detail' => $this->$exportmethod(),
             'singleuse' => (int)$config->has_singleuse_criteria(),
-            'backurl' => new \moodle_url('/totara/competency/competency_summary.php', ['id' => $comp_id]),
+            'backurl' => new \moodle_url('/totara/competency/competency_summary.php', ['id' => $this->competency->id]),
         ];
-
-        $this->add_navigation();
 
         return new \totara_mvc\view(
             'totara_competency/competency_edit',
@@ -165,195 +168,6 @@ class competency_controller extends admin_controller {
         }
 
         return $this->permissions;
-    }
-
-    /**
-     * Export the general summary data
-     *
-     * @return array
-     */
-    private function export_general_summary(): array {
-        $results = [
-            'editurl' => new \moodle_url($this->endpoints['edit'], ['id' => $this->competency->id, 's' => 'general']),
-            'expanded' => true,
-            'heading' => get_string('general', 'totara_competency'),
-            'key' => 'general',
-            'section_data' => [
-                'templatename' => 'totara_competency/competency_summary_general',
-                'fullname' => $this->competency->fullname ?? $this->competency->shortname ?? '',
-                'idnumber' => $this->competency->idnumber ?? '',
-                'description' => $this->competency->description ?? '',
-                'type' => '',
-                'assign_availability' => [],
-                'customfields' => [],
-            ],
-        ];
-
-        $comp_type = $this->competency->comp_type;
-        if (is_null($comp_type)) {
-            $results['section_data']['type'] = get_string('unclassified', 'totara_hierarchy');
-        } else {
-            $results['section_data']['type'] = $comp_type->fullname ?? $comp_type->shortname ?? $val['values'][0];
-        }
-
-        $assign_availability = $this->competency->assign_availability;
-        foreach ($assign_availability as $avail) {
-            switch ($avail) {
-                case \competency::ASSIGNMENT_CREATE_SELF:
-                    $results['section_data']['assign_availability'][] = get_string('competencyassignavailabilityself', 'totara_hierarchy');
-                    break;
-                case \competency::ASSIGNMENT_CREATE_OTHER:
-                    $results['section_data']['assign_availability'][] = get_string('competencyassignavailabilityother', 'totara_hierarchy');
-                    break;
-            }
-        }
-
-        if (count($results['section_data']['assign_availability']) == 0) {
-            $results['section_data']['assign_availability'][] = get_string('none', 'totara_competency');
-        }
-
-        $customfields = $this->competency->custom_fields;
-        if (!empty($customfields)) {
-            foreach ($customfields as $cf) {
-                $results['section_data']['customfields'][] = [
-                    'label' => $cf->title,
-                    'value' => $cf->value,
-                ];
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Export the linked courses data
-     *
-     * @return array
-     */
-    private function export_linkedcourses_summary(): array {
-        $linkedcourses = linked_courses::get_linked_courses($this->competency->id);
-
-        $results = [
-            'editurl' => new \moodle_url($this->endpoints['edit'], ['id' => $this->competency->id, 's' => 'linkedcourses']),
-            'expanded' => count($linkedcourses) == 0,
-            'heading' => get_string('linkedcourses', 'totara_competency'),
-            'key' => 'linkedcourses',
-            'section_data' => [
-                'templatename' => 'totara_competency/competency_summary_linkedcourses',
-            ]
-        ];
-
-        if (count($linkedcourses) > 0) {
-            $str_mandatory = get_string('mandatory', 'totara_competency');
-            $str_optional = get_string('optional', 'totara_competency');
-
-            $results['section_data']['courses'] = [];
-
-            foreach ($linkedcourses as $lcourse) {
-                $results['section_data']['courses'][] = [
-                    'url' => new \moodle_url('/course/view.php', ['id' => $lcourse->id]),
-                    'fullname' => $lcourse->fullname,
-                    'linktype' => $lcourse->linktype == linked_courses::LINKTYPE_MANDATORY ? $str_mandatory : $str_optional,
-                ];
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Export the achievement paths data
-     *
-     * @return array
-     */
-    private function export_achievementpaths_summary(): array {
-        $scale = $this->competency->scale;
-        $agg_type = $this->competency->scale_aggregation_type ?: 'highest';
-        $agg = pathway_aggregation_factory::create($agg_type);
-
-        $results = [
-            'editurl' => new \moodle_url($this->endpoints['edit'], ['id' => $this->competency->id, 's' => 'achievementpaths']),
-            'haspaths' => true,
-            'expanded' => false,
-            'heading' => get_string('achievementpaths', 'totara_competency'),
-            'key' => 'achievementpaths',
-            'section_data' => [
-                'templatename' => 'totara_competency/competency_summary_paths',
-                'overall_aggregation' => $agg->get_title(),
-            ],
-        ];
-
-        // Pathways
-        // Assuming returned in sortorder order
-        $config = new achievement_configuration($this->competency);
-        $paths = $config->get_active_pathways();
-
-        if (count($paths) == 0) {
-            $results['haspaths'] = false;
-            $results['expanded'] = true;
-            return $results;
-        }
-
-        // Order in template format
-        $results['paths'] = [];
-        $critidx = null;
-        $idx = 0;
-
-        foreach ($paths as $pw) {
-            // Grouping all single-value pws together
-            // Note:  - at the moment there is only 1 single-value pathway plugin (criteria_group)
-            //          may need to have a method/array const defining this
-
-            if ($pw->get_classification() == pathway::PATHWAY_MULTI_VALUE) {
-                $results['paths'][$idx++] = $pw->export_pathway_view_template();
-            } else {
-                // Pathways are added under the correct scalevalue
-                if (is_null($critidx)) {
-                    $critidx = $idx++;
-                    $results['paths'][$critidx] = [
-                        'pathway_templatename' => 'totara_competency/scalevalue_pathways',
-                        'scalevalues' => []];
-
-                    // mustache doesn't like non-following numeric array indexes!!
-                    $scalevalue_idx = [];
-
-                    $scalevalues = $scale->scale_values;
-                    foreach ($scalevalues as $scalevalue) {
-                        if (!isset($scalevalue_idx[$scalevalue->id])) {
-                            $scalevalue_idx[$scalevalue->id] = count($scalevalue_idx);
-                        }
-
-                        $valueidx = $scalevalue_idx[$scalevalue->id];
-                        $results['paths'][$critidx]['scalevalues'][$valueidx] = [
-                            'id' => $scalevalue->id,
-                            'name' => $scalevalue->name,
-                            'proficient' => $scalevalue->proficient,
-                        ];
-                    }
-                }
-
-                $valueidx = $scalevalue_idx[$pw->get_scale_value()->id];
-
-                if (!isset($results['paths'][$critidx]['scalevalues'][$valueidx]['pathways'])) {
-                    $results['paths'][$critidx]['scalevalues'][$valueidx]['haspathways'] = true;
-                    $results['paths'][$critidx]['scalevalues'][$valueidx]['pathways'] = [];
-                }
-
-                $pwbase = &$results['paths'][$critidx]['scalevalues'][$valueidx]['pathways'];
-
-                // Remove the pathway's templatename as it is displayed through the scalevalue template
-                $pw_data = $pw->export_pathway_view_template();
-                if (isset($pw_data['pathway_templatename'])) {
-                    unset($pw_data['pathway_templatename']);
-                }
-
-                // We want to show a divider between pathways that result in the same value
-                $pw_data['showor'] = count($pwbase) > 0;
-                $pwbase[] = $pw_data;
-            }
-        }
-
-        return $results;
     }
 
     /**
@@ -456,8 +270,7 @@ class competency_controller extends admin_controller {
         if ($canviewframeworks) {
             $url = new \moodle_url('/totara/hierarchy/index.php', ['prefix' => $this->prefix, 'frameworkid' => $this->competency->frameworkid]);
         }
-        $framework = competency_framework::repository()->find($this->competency->frameworkid);
-        $this->page->navbar->add(format_string($framework->fullname), $url);
+        $this->page->navbar->add(format_string($this->competency->framework->fullname), $url);
 
         $name = $this->competency->fullname ?? $this->competency->shortname ?? '';
         if (!empty($name)) {

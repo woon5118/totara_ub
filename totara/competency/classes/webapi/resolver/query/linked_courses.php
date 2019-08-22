@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
- * @package totara_job
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @package totara_competency
  */
 
 namespace totara_competency\webapi\resolver\query;
@@ -26,30 +26,14 @@ namespace totara_competency\webapi\resolver\query;
 use context_system;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use tassign_competency\entities\competency as competency_entity;
 
-/**
- * Query to return a single competency.
- */
-class competency implements query_resolver {
+class linked_courses implements query_resolver {
 
-    /**
-     * Returns a competency, given its ID.
-     *
-     * @param array $args
-     * @param execution_context $ec
-     * @return competency_entity
-     */
     public static function resolve(array $args, execution_context $ec) {
-        // Basic sanity check, GraphQL does this for us, but other can call resolve.
-        if (!isset($args['competency_id'])) {
-            throw new \coding_exception('A required parameter (competency_id) was missing');
-        }
-
         require_login();
         require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
-        return new competency_entity($args['competency_id']);
+        return array_values(\totara_competency\linked_courses::get_linked_courses($args['competency_id']));
     }
 
 }

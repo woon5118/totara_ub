@@ -21,17 +21,28 @@
 -->
 
 <template>
-  <div class="tui-totara-competency-achievement-configuration">
-    <h3>{{ $str('achievementpaths', 'totara_competency') }}</h3>
+  <div class="tui-competencySummaryAchievementConfiguration">
+    <div class="tui-competencySummaryAchievementConfiguration__header">
+      <div class="tui-competencySummaryAchievementConfiguration__header_title">
+        {{ $str('achievementpaths', 'totara_competency') }}
+      </div>
+      <a
+        :href="editUrl"
+        class="tui-competencySummaryAchievementConfiguration__header_edit"
+        :title="$str('edit', 'moodle')"
+      >
+        <FlexIcon icon="edit" size="200" :alt="$str('edit', 'moodle')" />
+      </a>
+    </div>
 
     <div
-      v-if="!$apollo.loading"
-      class="tui-totara-competency-achievement-configuration__response"
+      v-if="!$apollo.loading && hasPathways"
+      class="tui-competencySummaryAchievementConfiguration__response"
     >
-      <div class="tui-totara-competency-achievement-configuration__aggregation">
+      <div class="tui-competencySummaryAchievementConfiguration__aggregation">
         <Label :label="$str('overallratingcalc', 'totara_competency')" />
         <div
-          class="tui-totara-competency-achievement-configuration__aggregation_title"
+          class="tui-competencySummaryAchievementConfiguration__aggregation_title"
         >
           {{ achievementConfiguration.overall_aggregation.title }}
         </div>
@@ -40,33 +51,33 @@
       <div
         v-for="pathGroup in pathGroups"
         :key="pathGroup.key"
-        class="tui-totara-competency-achievement-configuration__pathgroup"
+        class="tui-competencySummaryAchievementConfiguration__pathgroup"
       >
         <div
           v-for="scaleValue in pathGroup.scaleValues"
           :key="scaleValue.value"
-          class="tui-totara-competency-achievement-configuration__pathgroup_scalevalue"
+          class="tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue"
         >
           <Label :label="scaleValue.value" />
 
           <div
-            class="tui-totara-competency-achievement-configuration__pathgroup_scalevalue__paths"
+            class="tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__paths"
           >
             <div
               v-for="(path, pathIdx) in scaleValue.paths"
               :key="path.id"
-              class="tui-totara-competency-achievement-configuration__pathgroup_scalevalue__path"
+              class="tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path"
             >
               <Divider v-if="pathIdx" label="OR" bordered />
 
               <div
-                class="tui-totara-competency-achievement-configuration__pathgroup_scalevalue__path__criteria"
+                class="tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path__criteria"
                 :class="{ bordered: path.multiCriteria }"
               >
                 <div
                   v-for="(criterion, criterionIdx) in path.criteria_summary"
                   :key="criterionIdx"
-                  class="tui-totara-competency-achievement-configuration__pathgroup_scalevalue__path_criterion"
+                  class="tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path_criterion"
                 >
                   <Divider v-if="criterionIdx" label="AND" />
 
@@ -87,12 +98,19 @@
         </div>
       </div>
     </div>
+    <div
+      v-else-if="!$apollo.loading"
+      class="tui-competencySummaryAchievementConfiguration__noPaths"
+    >
+      {{ $str('nopaths', 'totara_competency') }}
+    </div>
   </div>
 </template>
 
 <script>
 // Import components
 import Label from 'totara_core/presentation/form/Label';
+import FlexIcon from 'totara_core/containers/icons/FlexIcon';
 import Divider from 'totara_competency/presentation/common/Divider';
 
 // Import queries
@@ -102,6 +120,7 @@ export default {
   // Register required components
   components: {
     Label,
+    FlexIcon,
     Divider,
   },
 
@@ -118,10 +137,18 @@ export default {
   },
 
   computed: {
-    numPathways: () => {
-      return this.achievementConfiguration
-        ? this.achievementConfiguration.paths.length
-        : 0;
+    editUrl() {
+      return this.$url('/totara/competency/competency_edit.php', {
+        s: 'achievementpaths',
+        id: this.competencyId,
+      });
+    },
+
+    hasPathways() {
+      return (
+        this.achievementConfiguration.paths != null &&
+        this.achievementConfiguration.paths.length > 0
+      );
     },
 
     // Order paths by sortorder
@@ -140,7 +167,7 @@ export default {
 
         // multi-value paths are always placed in their own group with scale value 'Any value'
         // All single-value paths are grouped in a single group
-        if (path.classification == 'MULTIVALUE') {
+        if (path.classification === 'MULTIVALUE') {
           if (!singleValueGroup) {
             topGroups.push({
               key: 'group-' + idx,
@@ -210,7 +237,34 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-totara-competency-achievement-configuration {
+.tui-competencySummaryAchievementConfiguration {
+  padding-top: $totara_style-spacing_4;
+  &__header {
+    margin-bottom: $totara_style-spacing_2;
+    padding-bottom: $totara_style-spacing_1;
+    border-bottom: 1px solid $totara_style-color_neutral_5;
+
+    &_title {
+      display: inline-block;
+      margin-top: auto;
+      margin-bottom: auto;
+      margin-left: $totara_style-spacing_2;
+      font-weight: bold;
+      font-size: $totara_style-size_18;
+    }
+
+    &_edit {
+      float: right;
+      margin-bottom: $totara_style-spacing_4;
+      padding-left: $totara_style-spacing_2;
+    }
+  }
+
+  &__noPaths {
+    padding: $totara_style-size_8;
+    font-style: italic;
+  }
+
   &__aggregation {
     display: flex;
     flex-direction: row;
@@ -277,10 +331,14 @@ export default {
 
 <lang-strings>
 {
+  "moodle": [
+    "edit"
+  ],
   "totara_competency": [
     "achievementpaths",
     "overallratingcalc",
-    "anyscalevalue"
+    "anyscalevalue",
+    "nopaths"
   ]
 }
 </lang-strings>
