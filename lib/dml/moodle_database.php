@@ -3596,4 +3596,20 @@ abstract class moodle_database {
 
         return $default;
     }
+
+    /**
+     * Gets a database optimizer hint given a Totara identifier for it.
+     *
+     * This function returns the hint to embed into your query at the right point, or an empty string if the hint is
+     * not supported by the database or not known to the database.
+     *
+     * @since Totara 12.10 + 13.0
+     * @param string $hint The hint identifier you want to us
+     * @param mixed $parameter A parameter to provide to the DML engine to assist it producing the hint if required.
+     * @return string
+     */
+    public function get_optimizer_hint(string $hint, $parameter = null): string {
+        // If your database supports hints and you want to support this override this function.
+        return '';
+    }
 }

@@ -2664,4 +2664,116 @@ ORDER BY tt1.groupid";
         $dbman->drop_table($table);
     }
 
+    public function test_get_optimizer_hint() {
+        global $DB;
+
+        // Test that we always get back an empty string for the unrecognised.
+        self::assertSame('', $DB->get_optimizer_hint('totara_core_dml_test'));
+        self::assertSame('', $DB->get_optimizer_hint(''));
+
+        // Test that any parameter type is accepted, the database specific instance is responsible for any validation
+        self::assertSame('', $DB->get_optimizer_hint('totara_core_dml_test', 'foo'));
+        self::assertSame('', $DB->get_optimizer_hint('totara_core_dml_test', ['foo', 'bar']));
+        self::assertSame('', $DB->get_optimizer_hint('totara_core_dml_test', (object)['foo', 'bar']));
+    }
+
+    public function test_optimizer_hint_mariadb_materialization_force_off() {
+        global $DB;
+
+        $ismaridab = ($DB->get_dbvendor() === 'mariadb');
+
+        $expectedmarker = '';
+        if ($ismaridab) {
+            $expectedmarker = '/*optimizer_disable_materialization*/';
+        }
+        self::assertSame($expectedmarker, $DB->get_optimizer_hint('mariadb_materialization_force_off'));
+
+        $guestid = guest_user()->id;
+        $context = \context_user::instance($guestid);
+
+        $sql = "{$expectedmarker}SELECT id FROM {context} WHERE instanceid = :guestid AND contextlevel = 30";
+        $params = ['guestid' => $guestid];
+
+        // Query tests of all non-rs queries.
+        self::assertEquals($context->id, $DB->get_field_sql($sql, $params));
+        self::assertEquals($context->id, current($DB->get_fieldset_sql($sql, $params)));
+        self::assertEquals($context->id, $DB->get_record_sql($sql, $params)->id);
+        self::assertEquals($context->id, $DB->get_records_sql($sql, $params)[$context->id]->id);
+        self::assertEquals($context->id, key($DB->get_records_sql_menu($sql, $params)));
+        self::assertEquals($context->id, $DB->get_counted_records_sql($sql, $params, 0, 10, $count)[$context->id]->id);
+        self::assertSame(1, $count);
+
+        $rawsql = $DB::sql($sql, $params);
+        self::assertEquals($context->id, $DB->get_field_sql($rawsql));
+        self::assertEquals($context->id, current($DB->get_fieldset_sql($rawsql)));
+        self::assertEquals($context->id, $DB->get_record_sql($rawsql)->id);
+        self::assertEquals($context->id, $DB->get_records_sql($rawsql)[$context->id]->id);
+        self::assertEquals($context->id, key($DB->get_records_sql_menu($rawsql)));
+        self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, $params, 0, 10, $count)[$context->id]->id);
+        self::assertSame(1, $count);
+
+        // Recordset query tests of all rs queries.
+        $extract = function(moodle_recordset $rs) {
+            $record = $rs->current();
+            $rs->close();
+            return $record;
+        };
+        self::assertEquals($context->id, $extract($DB->get_recordset_sql($sql, $params))->id);
+        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($sql, $params, 0, 10, $count))->id);
+        self::assertSame(1, $count);
+
+        self::assertEquals($context->id, $extract($DB->get_recordset_sql($rawsql))->id);
+        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, $params, 0, 10, $count))->id);
+        self::assertSame(1, $count);
+
+        // Now just test with the expected inserted into the middle.
+        $sql = "SELECT id FROM {context} {$expectedmarker}WHERE instanceid = :guestid AND contextlevel = 30";
+        self::assertEquals($context->id, $DB->get_field_sql($sql, $params));
+        self::assertEquals($context->id, current($DB->get_fieldset_sql($sql, $params)));
+        self::assertEquals($context->id, $DB->get_record_sql($sql, $params)->id);
+        self::assertEquals($context->id, $DB->get_records_sql($sql, $params)[$context->id]->id);
+        self::assertEquals($context->id, key($DB->get_records_sql_menu($sql, $params)));
+        self::assertEquals($context->id, $DB->get_counted_records_sql($sql, $params, 0, 10, $count)[$context->id]->id);
+        self::assertSame(1, $count);
+        self::assertEquals($context->id, $extract($DB->get_recordset_sql($sql, $params))->id);
+        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($sql, $params, 0, 10, $count))->id);
+        self::assertSame(1, $count);
+
+        $rawsql = $DB::sql($sql, $params);
+        self::assertEquals($context->id, $DB->get_field_sql($rawsql));
+        self::assertEquals($context->id, current($DB->get_fieldset_sql($rawsql)));
+        self::assertEquals($context->id, $DB->get_record_sql($rawsql)->id);
+        self::assertEquals($context->id, $DB->get_records_sql($rawsql)[$context->id]->id);
+        self::assertEquals($context->id, key($DB->get_records_sql_menu($rawsql)));
+        self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, $params, 0, 10, $count)[$context->id]->id);
+        self::assertSame(1, $count);
+        self::assertEquals($context->id, $extract($DB->get_recordset_sql($rawsql))->id);
+        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, $params, 0, 10, $count))->id);
+        self::assertSame(1, $count);
+
+        // And finally test with the token at the end.
+        $sql = "SELECT id FROM {context} WHERE instanceid = :guestid AND contextlevel = 30{$expectedmarker}";
+        self::assertEquals($context->id, $DB->get_field_sql($sql, $params));
+        self::assertEquals($context->id, current($DB->get_fieldset_sql($sql, $params)));
+        self::assertEquals($context->id, $DB->get_record_sql($sql, $params)->id);
+        self::assertEquals($context->id, $DB->get_records_sql($sql, $params)[$context->id]->id);
+        self::assertEquals($context->id, key($DB->get_records_sql_menu($sql, $params)));
+        self::assertEquals($context->id, $DB->get_counted_records_sql($sql, $params, 0, 10, $count)[$context->id]->id);
+        self::assertSame(1, $count);
+        self::assertEquals($context->id, $extract($DB->get_recordset_sql($sql, $params))->id);
+        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($sql, $params, 0, 10, $count))->id);
+        self::assertSame(1, $count);
+
+        $rawsql = $DB::sql($sql, $params);
+        self::assertEquals($context->id, $DB->get_field_sql($rawsql));
+        self::assertEquals($context->id, current($DB->get_fieldset_sql($rawsql)));
+        self::assertEquals($context->id, $DB->get_record_sql($rawsql)->id);
+        self::assertEquals($context->id, $DB->get_records_sql($rawsql)[$context->id]->id);
+        self::assertEquals($context->id, key($DB->get_records_sql_menu($rawsql)));
+        self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, $params, 0, 10, $count)[$context->id]->id);
+        self::assertSame(1, $count);
+        self::assertEquals($context->id, $extract($DB->get_recordset_sql($rawsql))->id);
+        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, $params, 0, 10, $count))->id);
+        self::assertSame(1, $count);
+    }
 }

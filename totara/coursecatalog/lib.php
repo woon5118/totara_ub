@@ -258,7 +258,7 @@ function totara_get_style_visibility($component, $oldvisfield = 'visible', $audv
 function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fieldvisible = 'course.visible',
              $fieldaudvis = 'course.audiencevisible', $tablealias = 'course', $type = 'course', $iscached = false,
              $showhidden = false) {
-    global $CFG, $USER;
+    global $CFG, $DB, $USER;
 
     if ($userid === null) {
         $userid = $USER->id;
@@ -423,8 +423,12 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
         // Condition above are overridden when user have capability to see hidden content in this context
         list($capsql, $capparams) = totara_core\access::get_has_capability_sql($capability, "ctx{$separator}id", $userid);
 
+        $returnsql = "({$sqlnousers} AND ({$sqlall} OR {$sqlselected} OR {$sqlenrolled}) OR {$capsql})";
+        // Force disable materialization for MariaDB, there is a problem with subquery materialization.
+        $returnsql .= $DB->get_optimizer_hint('mariadb_materialization_force_off');
+
         return [
-            "({$sqlnousers} AND ({$sqlall} OR {$sqlselected} OR {$sqlenrolled}) OR {$capsql})",
+            $returnsql,
             array_merge($paramsnousers, $paramsall, $paramsselected, $paramsenrolled, $capparams)
         ];
     }
