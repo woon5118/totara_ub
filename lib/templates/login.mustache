@@ -61,7 +61,7 @@
                     {{{errorformatted}}}
                 </div>
             {{/error}}
-            <form action="{{loginurl}}" method="post" id="login">
+            <form action="{{loginurl}}" method="post" id="login" data-core-autoinitialise="true" data-core-autoinitialise-amd="core/form_duplicate_prevent">
                 <div class="loginform">
                     <div class="userforget">
                         <div class="form-label">
@@ -109,7 +109,7 @@
         {{#canloginasguest}}
             <div class="subcontent guestsub">
                 <div class="desc">{{#str}} someallowguest {{/str}}</div>
-                <form action="{{loginurl}}" method="post" id="guestlogin">
+                <form action="{{loginurl}}" method="post" id="guestlogin" data-core-autoinitialise="true" data-core-autoinitialise-amd="core/form_duplicate_prevent">
                     <div class="guestform">
                         <input type="hidden" name="username" value="guest" />
                         <input type="hidden" name="password" value="guest" />
@@ -130,7 +130,7 @@
             {{{instructions}}}
             {{#cansignup}}
                 <div class="signupform">
-                    <form action="{{signupurl}}" method="get" id="signup">
+                    <form action="{{signupurl}}" method="get" id="signup" data-core-autoinitialise="true" data-core-autoinitialise-amd="core/form_duplicate_prevent">
                         <div>
                             <input type="submit" value={{#quote}}{{#str}} startsignup {{/str}}{{/quote}} />
                         </div>
