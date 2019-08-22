@@ -21,7 +21,8 @@
         "autoprefixer": "^6.3.7",
         "grunt-postcss": "^0.8.0",
         "rtlcss": "^2.0.5",
-        "promise": "~6.1.0"
+        "promise": "~6.1.0",
+        "prettier": "1.18.2"
     },
     "engines": {
         "node": "8"
