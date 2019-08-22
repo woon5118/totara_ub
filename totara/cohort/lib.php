@@ -1923,77 +1923,33 @@ function totara_cohort_process_assig_roles() {
  * @return bool True if the user can see the learning component based on the audience visibility setting
  */
 function check_access_audience_visibility($type, $instance, $userid = null) {
-    global $CFG, $DB, $USER;
-
-    if (!$CFG->audiencevisibility) {
-        return true;
+    global $DB;
+    switch ($type) {
+        case 'course':
+            return totara_course_is_viewable($instance, $userid);
+        case 'program':
+            return totara_program_is_viewable($instance, $userid);
+        case 'certification':
+            return totara_certification_is_viewable($instance, $userid);
+        case 'prog':
+            // Legacy mess, it's either a program or a certification.
+            if (is_numeric($instance)) {
+                $ctxfields = \context_helper::get_preload_record_columns_sql('ctx');
+                $sql = "SELECT p.*, {$ctxfields}
+                          FROM {prog} p
+                          JOIN {context} ctx ON ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel
+                         WHERE p.id = :programid";
+                $program = $DB->get_record_sql($sql, ['programid' => $instance, 'contextlevel' => CONTEXT_PROGRAM]);
+                \context_helper::preload_from_record($program);
+            } else if (is_object($instance) && isset($instance->id)) {
+                $program = $instance;
+            }
+            if (!empty($program->certifid)) {
+                return totara_certification_is_viewable($program, $userid);
+            }
+            return totara_program_is_viewable($program, $userid);
     }
-
-    if ($userid === null) {
-        $userid = $USER->id;
-    }
-
-    // Checking type of the learning component.
-    if ($type === 'course') {
-        $table = 'course';
-        $alias = 'c';
-        $itemcontext = CONTEXT_COURSE;
-    } else {
-        $table = 'prog';
-        $alias = 'p';
-        $itemcontext = CONTEXT_PROGRAM;
-    }
-
-    // Checking the learning component object or ID.
-    if (is_numeric($instance)) {
-        $object = $DB->get_record($table, array('id' => $instance), '*', MUST_EXIST);
-    } else if (is_object($instance) and isset($instance->id)) {
-        $object = $instance;
-    } else {
-        return false;
-    }
-
-    if (isset($object->totara_isvisibletouser)) {
-        // If we see this then the data has already been loaded and no need to go to the database.
-        // Don't rely on this too much - it's a hack to improve performance without getting too messy.
-        $totarajoinisvisible = $object->totara_isvisibletouser;
-    } else {
-        require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
-        list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join($userid, $type, $alias);
-        $params = array_merge(array('itemcontext' => $itemcontext, 'instanceid' => $object->id), $visibilityjoinparams);
-
-        // Get context data for preload.
-        $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
-        $ctxjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = {$alias}.id AND ctx.contextlevel = :itemcontext)";
-
-        $sql = "SELECT {$alias}.id, {$ctxfields}, visibilityjoin.isvisibletouser
-            FROM {{$table}} {$alias}
-                 {$visibilityjoinsql}
-                 {$ctxjoin}
-            WHERE {$alias}.id = :instanceid";
-        $record = $DB->get_record_sql($sql, $params);
-        context_helper::preload_from_record($record);
-
-        $totarajoinisvisible = $record->isvisibletouser;
-    }
-
-    if (!empty($totarajoinisvisible)) {
-        return true;
-    }
-
-    if ($itemcontext == CONTEXT_COURSE) {
-        $context = context_course::instance($object->id);
-        if (has_capability('moodle/course:viewhiddencourses', $context, $userid)) {
-            return true;
-        }
-    } else {
-        $context = context_program::instance($object->id);
-        if (empty($object->certifid) && has_capability('totara/program:viewhiddenprograms', $context, $userid) ||
-            !empty($object->certifid) && has_capability('totara/certification:viewhiddencertifications', $context, $userid)) {
-            return true;
-        }
-    }
-
+    debugging('Unknown type in check_access_audience_visibility call', DEBUG_DEVELOPER);
     return false;
 }
 

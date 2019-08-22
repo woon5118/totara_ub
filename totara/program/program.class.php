@@ -2038,52 +2038,17 @@ class program {
      * @return boolean
      */
     public function is_viewable($user = null) {
-        global $USER, $CFG, $DB;
-        require_once($CFG->dirroot . '/totara/cohort/lib.php');
+        global $USER;
 
         if ($user == null) {
             $user = $USER;
         }
 
         if (empty($this->certifid)) {
-            $isprogram = true;
-            $instancetype = 'program';
+            return totara_program_is_viewable($this, $user->id);
         } else {
-            $isprogram = false;
-            $instancetype = 'certification';
+            return totara_certification_is_viewable($this, $user->id);
         }
-
-        list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join($user->id, $instancetype, 'p');
-        $params = array_merge(array('itemcontext' => CONTEXT_PROGRAM, 'instanceid' => $this->id), $visibilityjoinparams);
-
-        // Get context data for preload.
-        $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
-        $ctxjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = p.id AND ctx.contextlevel = :itemcontext)";
-
-        $sql = "SELECT p.id, {$ctxfields}, visibilityjoin.isvisibletouser
-                  FROM {prog} p
-                       {$visibilityjoinsql}
-                       {$ctxjoin}
-                 WHERE p.id = :instanceid";
-
-        $programs = $DB->get_records_sql($sql, $params);
-
-        // Look for a program that is visible (should be checking either 0 or 1 records).
-        foreach ($programs as $id => $program) {
-            if ($program->isvisibletouser) {
-                return true;
-            } else {
-                context_helper::preload_from_record($program);
-                $context = context_program::instance($id);
-                if ($isprogram && has_capability('totara/program:viewhiddenprograms', $context) ||
-                    !$isprogram && has_capability('totara/certification:viewhiddencertifications', $context) ||
-                    !empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**

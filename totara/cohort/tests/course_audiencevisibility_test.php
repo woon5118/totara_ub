@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 require_once($CFG->dirroot . '/totara/core/utils.php');
 require_once($CFG->dirroot . '/course/lib.php');
@@ -35,7 +34,7 @@ require_once($CFG->libdir  . '/coursecatlib.php');
 /**
  * Test audience visibility in courses.
  */
-class totara_cohort_course_audiencevisibility_testcase extends reportcache_advanced_testcase {
+class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase {
     /** @var stdClass $user1 */
     private $user1 = null;
     /** @var stdClass $user2 */
@@ -101,7 +100,6 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
     protected function setUp() {
         global $DB;
         parent::setup();
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         // Create some users.
@@ -242,8 +240,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
      * @dataProvider users_audience_visibility
      */
     public function test_audiencevisibility($user, $coursesvisible, $coursesnotvisible, $audvisibilityon) {
-        global $PAGE, $CFG;
-        $this->resetAfterTest(true);
+        global $PAGE, $CFG, $DB;
 
         // Set audiencevisibility setting.
         set_config('audiencevisibility', $audvisibilityon);
@@ -265,7 +262,9 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
             // Test #1: Login as $user and see what courses he can see.
             self::setUser($user);
             if ($enhancedcatalog) {
-                $content = $this->get_report_result('catalogcourses', array(), false, array());
+                $report = reportbuilder::create_embedded('catalogcourses');
+                list($sql, $params, $cache) = $report->build_query(false, true);
+                $content = $DB->get_records_sql($sql, $params);
             } else {
                 /** @var core_course_renderer $courserenderer */
                 $courserenderer = $PAGE->get_renderer('core', 'course');
@@ -361,22 +360,22 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
             foreach ($test['visible'] as $course) {
                 // Pass course id.
                 $visible = check_access_audience_visibility('course', $this->{$course}->id, $this->{$test['user']}->id);
-                self::assertTrue($visible);
+                self::assertTrue($visible, "{$test['user']} should see course {$course}");
 
                 // Pass course object.
                 $visible = check_access_audience_visibility('course', $this->{$course}, $this->{$test['user']}->id);
-                self::assertTrue($visible);
+                self::assertTrue($visible, "{$test['user']} should see course {$course}");
             }
 
             // Courses not visible to the user.
             foreach ($test['hidden'] as $course) {
                 // Pass course id.
                 $visible = check_access_audience_visibility('course', $this->{$course}->id, $this->{$test['user']}->id);
-                self::assertFalse($visible);
+                self::assertFalse($visible, "{$test['user']} should not see course {$course}");
 
                 // Pass course object.
                 $visible = check_access_audience_visibility('course', $this->{$course}, $this->{$test['user']}->id);
-                self::assertFalse($visible);
+                self::assertFalse($visible, "{$test['user']} should not see course {$course}");
             }
         }
     }
@@ -384,7 +383,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
     /**
      * Determine visibility of a course based on the content.
      * @param bool $audiencevisibility
-     * @param array $content Content when a user access to find certifications
+     * @param array|string $content Content when a user access to find certifications
      * @param stdClass $course The course to evaluate
      * @param int $userid
      * @return array Array that contains values related to the visibility of the course

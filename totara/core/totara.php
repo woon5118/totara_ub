@@ -117,39 +117,327 @@ if (!function_exists('array_key_last')) {
 /**
  * Returns true or false depending on whether or not this course is visible to a user.
  *
+ * This function is ideal for checking a single course.
+ * If you need to perform bulk checks consider using totara_visibility_where or like function instead.
+ *
  * @param int|stdClass $courseorid
- * @param int $userid
+ * @param int|null     $userid
+ *
  * @return bool
  */
-function totara_course_is_viewable($courseorid, $userid = null) {
-    global $USER, $CFG;
+function totara_course_is_viewable($courseorid, $userid = null): bool {
+    global $CFG, $DB, $USER;
 
     if ($userid === null) {
         $userid = $USER->id;
     }
 
-    if (is_object($courseorid)) {
-        $course = $courseorid;
-    } else {
-        $course = get_course($courseorid);
-    }
-    $coursecontext = context_course::instance($course->id);
+    if (!is_object($courseorid) || !isset($courseorid->visible) || !isset($courseorid->audiencevisible)) {
+        if (is_object($courseorid)) {
+            $courseorid = $courseorid->id;
+        }
+        $ctxfields = \context_helper::get_preload_record_columns_sql('ctx');
+        $sql = "SELECT c.*, {$ctxfields}
+                  FROM {course} c
+                  LEFT JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel
+                 WHERE c.id = :courseid";
+        $course = $DB->get_record_sql($sql, ['courseid' => $courseorid, 'contextlevel' => CONTEXT_COURSE]);
 
-    if ($coursecontext->is_user_access_prevented($userid)) {
+        if (!$course) {
+            return false;
+        }
+
+        \context_helper::preload_from_record($course);
+    } else {
+        $course = $courseorid;
+    }
+    $context = \context_course::instance($course->id);
+    $hiddencap = 'moodle/course:viewhiddencourses';
+    $manageaudienceviscap = 'totara/coursecatalog:manageaudiencevisibility';
+
+    // Enforce tenant separation.
+    if ($context->is_user_access_prevented($userid)) {
         return false;
     }
 
     if (empty($CFG->audiencevisibility)) {
-        // This check is moved from require_login().
-        if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', $coursecontext, $userid)) {
-            return false;
-        }
-    } else {
-        require_once($CFG->dirroot . '/totara/cohort/lib.php');
-        return check_access_audience_visibility('course', $course, $userid);
+        // Traditional visibility is EASY!
+        return ($course->visible || has_capability($hiddencap, $context, $userid));
     }
 
-    return true;
+    if ($course->audiencevisible == COHORT_VISIBLE_ALL) {
+        return true;
+    }
+
+    if (has_any_capability([$hiddencap, $manageaudienceviscap], $context, $userid)) {
+        // They can see it.
+        return true;
+    }
+
+    if ($course->audiencevisible == COHORT_VISIBLE_NOUSERS) {
+        return false;
+    }
+
+    // If you have an active enrollment and it's COHORT_VISIBLE_ENROLLED || COHORT_VISIBLE_AUDIENCE
+    // Cannot use is_enrolled($context, $userid, '', true) here because it calls this function
+    // and ends up in an infinite loop.
+    $enrolled = enrol_get_enrolment_end($context->instanceid, $userid);
+    if ($enrolled !== false) {
+        return true;
+    }
+
+    if ($course->audiencevisible == COHORT_VISIBLE_ENROLLED) {
+        return false;
+    }
+
+    // Lastly COHORT_VISIBLE_AUDIENCE
+    $sql = "SELECT 1
+              FROM {cohort_visibility} cv
+              JOIN {cohort_members} cm ON cv.cohortid = cm.cohortid
+             WHERE cv.instanceid = :courseid
+               AND cv.instancetype = :type
+               AND cm.userid = :userid";
+    $params = [
+        'courseid' => $course->id,
+        'userid'   => $userid,
+        'type'     => COHORT_ASSN_ITEMTYPE_COURSE,
+    ];
+    return $DB->record_exists_sql($sql, $params);
+}
+
+/**
+ * Checks if the given program is visible to the user.
+ *
+ * This function is ideal for checking a single program.
+ * If you need to perform bulk checks consider using totara_visibility_where or like function instead.
+ *
+ * @param int|stdClass|program $programorid
+ * @param int|null             $userid
+ *
+ * @return bool
+ */
+function totara_program_is_viewable($programorid, $userid = null): bool {
+    global $CFG, $DB, $USER;
+
+    if ($userid === null) {
+        $userid = $USER->id;
+    }
+
+    if ($programorid instanceof program) {
+        $program = $programorid;
+    } else {
+        if (is_numeric($programorid) || !isset($programorid->visible) || !isset($programorid->audiencevisible)) {
+            if (is_object($programorid)) {
+                $programorid = $programorid->id;
+            }
+            $ctxfields = \context_helper::get_preload_record_columns_sql('ctx');
+            $sql = "SELECT p.*, {$ctxfields}
+                  FROM {prog} p
+                  LEFT JOIN {context} ctx ON ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel
+                 WHERE p.id = :programid";
+            $program = $DB->get_record_sql($sql, ['programid' => $programorid, 'contextlevel' => CONTEXT_PROGRAM]);
+
+            if (!$program) {
+                return false;
+            }
+
+            \context_helper::preload_from_record($program);
+        } else {
+            $program = $programorid;
+        }
+    }
+
+    $context = \context_program::instance($program->id);
+    $hiddencap = 'totara/program:viewhiddenprograms';
+    $manageaudienceviscap = 'totara/coursecatalog:manageaudiencevisibility';
+
+    // Enforce tenant separation.
+    if ($context->is_user_access_prevented($userid)) {
+        return false;
+    }
+
+    $now = time();
+    $isavailable = (
+        $program->available == AVAILABILITY_TO_STUDENTS &&
+        (empty($program->availablefrom) || $program->availablefrom < $now) &&
+        (empty($program->availableuntil) || $program->availableuntil > $now)
+    );
+
+    if (empty($CFG->audiencevisibility)) {
+        // Traditional visibility is EASY!
+        if ($program->visible && $isavailable) {
+            return true;
+        }
+
+        // It's not visible or not available, you need the hidden cap.
+        return has_capability($hiddencap, $context, $userid);
+    }
+
+    if ($isavailable && $program->audiencevisible == COHORT_VISIBLE_ALL) {
+        // It's available and visible to all.
+        return true;
+    }
+
+    if (has_any_capability([$hiddencap, $manageaudienceviscap], $context, $userid)) {
+        // It's not available or visible to no one, you must hold the hidden cap.
+        return true;
+    }
+
+    if (!$isavailable || $program->audiencevisible == COHORT_VISIBLE_NOUSERS) {
+        // It's not available or visible to no one and you didn't have the hidden cap.
+        return false;
+    }
+
+    // If you're assigned you pass both the enrolled and audience states
+    $sql = "SELECT 1
+              FROM {prog_user_assignment} pua
+             WHERE pua.programid = :programid
+               AND pua.userid = :userid";
+    $params = [
+        'programid' => $program->id,
+        'userid'    => $userid,
+    ];
+    $assigned = $DB->record_exists_sql($sql, $params);
+
+    if ($assigned) {
+        return true;
+    }
+    if ($program->audiencevisible == COHORT_VISIBLE_ENROLLED) {
+        // You must be enrolled.
+        return false;
+    }
+
+    // Lastly COHORT_VISIBLE_AUDIENCE
+    $sql = "SELECT 1
+              FROM {cohort_visibility} cv
+              JOIN {cohort_members} cm ON cv.cohortid = cm.cohortid
+             WHERE cv.instanceid = :programid
+               AND cv.instancetype = :type
+               AND cm.userid = :userid";
+    $params = [
+        'programid' => $program->id,
+        'userid'    => $userid,
+        'type'      => COHORT_ASSN_ITEMTYPE_PROGRAM,
+    ];
+    return $DB->record_exists_sql($sql, $params);
+}
+
+/**
+ * Checks if the given certification is visible to the user.
+ *
+ * This function is ideal for checking a single certification.
+ * If you need to perform bulk checks consider using totara_visibility_where or like function instead.
+ *
+ * @param int|stdClass|program $certificationorid
+ * @param int|null             $userid
+ *
+ * @return bool
+ */
+function totara_certification_is_viewable($certificationorid, $userid = null): bool {
+    global $CFG, $DB, $USER;
+
+    if ($userid === null) {
+        $userid = $USER->id;
+    }
+
+    if ($certificationorid instanceof program) {
+        $certification = $certificationorid;
+    } else {
+        if (is_numeric($certificationorid) || !isset($certificationorid->visible) || !isset($certificationorid->audiencevisible)) {
+            if (is_object($certificationorid)) {
+                $certificationorid = $certificationorid->id;
+            }
+
+            $ctxfields = \context_helper::get_preload_record_columns_sql('ctx');
+            $sql = "SELECT p.*, {$ctxfields}
+                  FROM {prog} p
+                  LEFT JOIN {context} ctx ON ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel
+                 WHERE p.id = :certifid";
+            $certification = $DB->get_record_sql($sql, ['certifid' => $certificationorid, 'contextlevel' => CONTEXT_PROGRAM]);
+
+            if (!$certification) {
+                return false;
+            }
+
+            \context_helper::preload_from_record($certification);
+        } else {
+            $certification = $certificationorid;
+        }
+    }
+
+    $context = \context_program::instance($certification->id);
+    $hiddencap = 'totara/certification:viewhiddencertifications';
+    $manageaudienceviscap = 'totara/coursecatalog:manageaudiencevisibility';
+
+    // Enforce tenant separation.
+    if ($context->is_user_access_prevented($userid)) {
+        return false;
+    }
+
+    $now = time();
+    $isavailable = (
+        $certification->available == AVAILABILITY_TO_STUDENTS &&
+        (empty($certification->availablefrom) || $certification->availablefrom < $now) &&
+        (empty($certification->availableuntil) || $certification->availableuntil > $now)
+    );
+
+    if (empty($CFG->audiencevisibility)) {
+        // Traditional visibility is EASY!
+        if ($certification->visible && $isavailable) {
+            return true;
+        }
+
+        // It's not visible or not available, you need the hidden cap.
+        return has_capability($hiddencap, $context, $userid);
+    }
+
+    if ($isavailable && $certification->audiencevisible == COHORT_VISIBLE_ALL) {
+        // It's available and visible to all.
+        return true;
+    }
+
+    if (has_any_capability([$hiddencap, $manageaudienceviscap], $context, $userid)) {
+        // It's not available or visible to no one, you must hold the hidden cap.
+        return true;
+    }
+
+    if (!$isavailable || $certification->audiencevisible == COHORT_VISIBLE_NOUSERS) {
+        // It's not available or visible to no one and you didn't have the hidden cap.
+        return false;
+    }
+
+    // If you're assigned, you pass both the enrolled and audience states.
+    $sql = "SELECT 1
+              FROM {prog_user_assignment} pua
+             WHERE pua.programid = :certifid
+               AND pua.userid = :userid";
+    $params = [
+        'certifid' => $certification->id,
+        'userid'   => $userid,
+    ];
+    $assigned = $DB->record_exists_sql($sql, $params);
+
+    if ($assigned) {
+        return true;
+    }
+    if ($certification->audiencevisible == COHORT_VISIBLE_ENROLLED) {
+        // You must be enrolled.
+        return false;
+    }
+
+    // Lastly COHORT_VISIBLE_AUDIENCE
+    $sql = "SELECT 1
+              FROM {cohort_visibility} cv
+              JOIN {cohort_members} cm ON cv.cohortid = cm.cohortid
+             WHERE cv.instanceid = :certifid
+               AND cv.instancetype = :type
+               AND cm.userid = :userid";
+    $params = [
+        'certifid' => $certification->id,
+        'userid'   => $userid,
+        'type'     => COHORT_ASSN_ITEMTYPE_CERTIF,
+    ];
+    return $DB->record_exists_sql($sql, $params);
 }
 
 /**
