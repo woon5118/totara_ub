@@ -6,7 +6,7 @@
     }}</a>
     <h2>{{ $str('assign_competencies', 'totara_competency') }}</h2>
     <h4>{{ $str('search_competencies_descriptive', 'totara_competency') }}</h4>
-    <div v-if="data.total === 0 && filtered === false">
+    <div v-if="!hasResult && initialRequest">
       <div class="alert alert-info alert-with-icon">
         <!-- TODO bootstrap alert -->
         <div class="alert-icon">
@@ -18,7 +18,7 @@
         />
       </div>
     </div>
-    <div v-if="data.total >= 0">
+    <div v-if="hasResult">
       <div>
         <label
           for="competency-profile-assignment-text-filter"
@@ -224,6 +224,12 @@ export default {
       }
 
       return encodedCursor;
+    },
+    hasResult: function() {
+      return this.data.total >= 0;
+    },
+    initialRequest: function() {
+      return this.filtered === false;
     },
   },
 
