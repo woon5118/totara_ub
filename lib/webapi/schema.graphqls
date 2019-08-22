@@ -1,6 +1,6 @@
 schema {
-    query: Query
-    mutation: Mutation
+  query: Query
+  mutation: Mutation
 }
 
 """
@@ -97,10 +97,10 @@ scalar core_id
 Language string for localisation.
 """
 type core_lang_string {
-    lang: String!,
-    identifier: String!,
-    component: String!,
-    string: String!,
+  lang: String!
+  identifier: String!
+  component: String!
+  string: String!
 }
 
 """
@@ -120,33 +120,33 @@ The actual format used for userdate() is:
  get_string('strftime' . strtolower($arg['format']), 'langconfig')
 """
 enum core_date_format {
-    """
-    Standard unix timestamp, 0 is replaced with null.
-    """
-    TIMESTAMP
-    """
-    ISO-8601 time string in current user timezone, null if no date.
-    """
-    ISO8601
-    DAYDATETIME
-    TIME
-    TIMESHORT
-    DATE
-    DATESHORT
-    DATELONG
-    DATETIME
-    DATETIMESHORT
-    DATETIMELONG
-    DATETIMESECONDS
+  """
+  Standard unix timestamp, 0 is replaced with null.
+  """
+  TIMESTAMP
+  """
+  ISO-8601 time string in current user timezone, null if no date.
+  """
+  ISO8601
+  DAYDATETIME
+  TIME
+  TIMESHORT
+  DATE
+  DATESHORT
+  DATELONG
+  DATETIME
+  DATETIMESHORT
+  DATETIMELONG
+  DATETIMESECONDS
 }
 
 """
 Data output format, this is intended for texts that support multilang text syntax.
 """
 enum core_format {
-    RAW
-    HTML
-    PLAIN
+  RAW
+  HTML
+  PLAIN
 }
 
 """
@@ -155,53 +155,57 @@ User information.
 NOTE: for privacy reasons the query is responsible of filtering only users that are allowed to be seen
 """
 type core_user {
-    id: core_id!,
-    idnumber: String,
-    fullname: String!,
-    firstname: String,
-    lastname: String,
-    email: String,
-    address: String,
-    phone1: String,
-    phone2: String,
-    department: String,
-    institution: String,
-    city: String,
-    country: String,
-    description(format: core_format = HTML): String,
-    descriptionformat: Int,
-    profileimageurl: String,
-    profileimageurlsmall: String,
-    profileimagealt: String,
-    lang: String,
-    theme: String,
-    suspended: Boolean,
-    timezone: String,
-    interests: Boolean,
-    firstaccess(format: core_date_format = TIMESTAMP): core_date,
-    lastaccess(format: core_date_format = TIMESTAMP): core_date,
-    # TODO add custom profile fields
+  id: core_id!
+  idnumber: String
+  fullname: String!
+  firstname: String
+  lastname: String
+  email: String
+  address: String
+  phone1: String
+  phone2: String
+  department: String
+  institution: String
+  city: String
+  country: String
+  description(format: core_format = HTML): String
+  descriptionformat: Int
+  profileimageurl: String
+  profileimageurlsmall: String
+  profileimagealt: String
+  lang: String
+  theme: String
+  suspended: Boolean
+  timezone: String
+  interests: Boolean
+  firstaccess(format: core_date_format = TIMESTAMP): core_date
+  lastaccess(format: core_date_format = TIMESTAMP): core_date
+  # TODO add custom profile fields
 }
 
 """
 Type listing all available queries, plugins need to extend this type to add more queries.
 """
 type Query {
-    core_lang_strings(
-        lang: param_lang!,
-        """
-        ids argument is in the form "$identifier, $component" the same as in {{str}} mustache helper
-        """
-        ids: [String!]!
-    ) : [core_lang_string!]!
+  core_lang_strings(
+    lang: param_lang!
+    """
+    ids argument is in the form "$identifier, $component" the same as in {{str}} mustache helper
+    """
+    ids: [String!]!
+  ): [core_lang_string!]!
 
-    core_template(name: param_alphanumext!, component: param_component!, theme: param_theme!) : String!
+  core_template(
+    name: param_alphanumext!
+    component: param_component!
+    theme: param_theme!
+  ): String!
 }
 
 """
 Type listing all available mutations, plugins need to extend this type to add mroe queries.
 """
 type Mutation {
-    # TODO until we have some mutations in core we need to add a fake mutation to keep this file valid.
-    todo: String
+  # TODO until we have some mutations in core we need to add a fake mutation to keep this file valid.
+  todo: String
 }
