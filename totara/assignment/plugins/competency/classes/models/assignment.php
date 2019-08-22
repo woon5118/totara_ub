@@ -525,7 +525,7 @@ class assignment {
             'status_name',
             'type_name',
             'progress_name',
-            'reason_assigned'
+            'reason_assigned',
         ];
         return in_array($field, $extra_fields)
             || $this->entity->has_attribute($field);
