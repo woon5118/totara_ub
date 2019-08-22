@@ -5,8 +5,7 @@
       $str('back_to_competency_profile', 'totara_competency')
     }}</a>
     <h2>{{ $str('assign_competencies', 'totara_competency') }}</h2>
-    <h4>{{ $str('search_competencies_descriptive', 'totara_competency') }}</h4>
-    <div v-if="!hasResult && initialRequest">
+    <div v-if="hasEmptyResult && !isFiltered">
       <div class="alert alert-info alert-with-icon">
         <!-- TODO bootstrap alert -->
         <div class="alert-icon">
@@ -18,7 +17,7 @@
         />
       </div>
     </div>
-    <div v-if="hasResult">
+    <div v-else-if="data.total !== null">
       <div>
         <label
           for="competency-profile-assignment-text-filter"
@@ -211,7 +210,7 @@ export default {
   },
 
   computed: {
-    encodedCursor: function() {
+    encodedCursor() {
       let encodedCursor = this.data.next_cursor;
 
       // On first load use new cursor
@@ -225,11 +224,11 @@ export default {
 
       return encodedCursor;
     },
-    hasResult: function() {
-      return this.data.total >= 0;
+    hasEmptyResult() {
+      return this.data.total === 0;
     },
-    initialRequest: function() {
-      return this.filtered === false;
+    isFiltered() {
+      return this.filtered === true;
     },
   },
 
