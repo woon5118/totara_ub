@@ -346,6 +346,20 @@ abstract class testing_util {
                 }
             }
         }
+        if ($dbfamily === 'mysql') {
+            // Totara: MySQL does not have DROP with CASCADE, so delete all foreign keys first.
+            $sql = "SELECT constraint_name
+                      FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+                     WHERE table_name = :name AND constraint_name LIKE :fk ESCAPE '\\\\'";
+            $params = ['fk' => str_replace('_', '\\_', $prefix) . '%' . '\\_fk'];
+            foreach ($tables as $tablename) {
+                $params['name'] = $prefix.$tablename;
+                $fks = $DB->get_fieldset_sql($sql, $params);
+                foreach ($fks as $fk) {
+                    $DB->change_database_structure("ALTER TABLE \"{$prefix}{$tablename}\" DROP FOREIGN KEY {$fk}");
+                }
+            }
+        }
         foreach ($tables as $tablename) {
             // Totara: do not use DDL here, we need to get rid of circular foreign keys and potentially other stuff.
             if ($dbfamily === 'mssql') {
