@@ -979,40 +979,24 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $fields[] = $DB->sql_substr('c.summary', 1, 1). ' as hassummary';
         }
 
-        if ($checkvisibility and !empty($CFG->audiencevisibility)) {
+        if ($checkvisibility) {
             require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
-            // A hack to improve performance if audience visibility is in use. Not an ideal solution but
-            // avoids less than optimal caches or changes to multiple function signatures.
-            $fields[] = 'visibilityjoin.isvisibletouser AS totara_isvisibletouser';
-            list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join($USER->id, 'course', 'c');
+            list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
+
+            $whereclause .= " AND {$visibilitysql} ";
+            $params = array_merge($params, $visibilityparams);
         }
 
         $sql = "SELECT ". join(',', $fields). ", $ctxselect
                 FROM {course} c
                 JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = :contextcourse
-                ";
+                WHERE " . $whereclause . " ORDER BY c.sortorder";
 
-        if ($checkvisibility and !empty($CFG->audiencevisibility)) {
-            $sql .= $visibilityjoinsql . "
-            ";
-            $params = array_merge($params, $visibilityjoinparams);
-        }
+        $list = $DB->get_records_sql($sql, array('contextcourse' => CONTEXT_COURSE) + $params);
 
-        $sql .= "WHERE " . $whereclause . " ORDER BY c.sortorder";
-
-        $list = $DB->get_records_sql($sql,
-                array('contextcourse' => CONTEXT_COURSE) + $params);
-
-        if ($checkvisibility) {
-            // Loop through all records and make sure we only return the courses accessible by user.
-            foreach ($list as $course) {
-                if (isset($list[$course->id]->hassummary)) {
-                    $list[$course->id]->hassummary = strlen($list[$course->id]->hassummary) > 0;
-                }
-                context_helper::preload_from_record($course);
-                if (!totara_course_is_viewable($course)) {
-                    unset($list[$course->id]);
-                }
+        foreach ($list as $course) {
+            if (isset($list[$course->id]->hassummary)) {
+                $list[$course->id]->hassummary = strlen($list[$course->id]->hassummary) > 0;
             }
         }
 

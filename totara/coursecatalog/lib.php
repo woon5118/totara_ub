@@ -102,50 +102,20 @@ function totara_get_category_item_count($categoryids, $viewtype = 'course') {
     }
 
     // Add visibility.
-    list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join($USER->id, $viewtype, $itemalias);
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, "{$itemalias}.id", "{$itemalias}.visible", "{$itemalias}.audiencevisible", $itemalias, $viewtype);
 
     // Get context data for preload.
     $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
 
-    $sql = "SELECT {$itemalias}.id as itemid, {$itemalias}.visible, {$itemalias}.audiencevisible, ctx.path,
-                   {$ctxfields}, visibilityjoin.isvisibletouser
+    $sql = "SELECT {$itemalias}.id as itemid, {$itemalias}.visible, {$itemalias}.audiencevisible, ctx.path, {$ctxfields}
               FROM {context} ctx
               JOIN {$itemtable} {$itemalias}
-                ON {$itemalias}.id = ctx.instanceid AND contextlevel = :itemcontext
-                   {$visibilityjoinsql}
-             WHERE (" . implode(' OR ', $contextwhere) . ")" . $extrawhere;
-    $params = array_merge(array('itemcontext' => $itemcontext), $contextparams, $visibilityjoinparams);
+                ON {$itemalias}.id = ctx.instanceid AND ctx.contextlevel = :itemcontext
+             WHERE $visibilitysql AND (" . implode(' OR ', $contextwhere) . ")" . $extrawhere;
+    $params = array_merge(array('itemcontext' => $itemcontext), $visibilityparams, $contextparams);
 
     // Get all items inside all the categories.
     $items = $DB->get_records_sql($sql, $params);
-
-    // Remove items that aren't visible.
-    foreach ($items as $id => $item) {
-        if ($item->isvisibletouser) {
-            unset($item->isvisibletouser); // Visible.
-        } else {
-            context_helper::preload_from_record($item);
-            if ($viewtype == 'course') {
-                $context = context_course::instance($id);
-                if (has_capability('moodle/course:viewhiddencourses', $context) ||
-                    !empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
-                    unset($item->isvisibletouser); // Visible.
-                } else {
-                    unset($items[$id]); // Not visible.
-                }
-            } else {
-                $context = context_program::instance($id);
-                if (($viewtype == 'program') && has_capability('totara/program:viewhiddenprograms', $context) ||
-                    ($viewtype == 'certification') && has_capability('totara/certification:viewhiddencertifications', $context) ||
-                    !empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
-                    unset($item->isvisibletouser); // Visible.
-                } else {
-                    unset($items[$id]); // Not visible.
-                }
-            }
-
-        }
-    }
 
     if (!$items) {
         // Sub-categories are all empty.

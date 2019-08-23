@@ -472,6 +472,7 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
                            $type = 'program', $options = array()) {
     global $USER, $DB, $CFG;
     require_once($CFG->dirroot . '/totara/cohort/lib.php');
+    require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
     $offset = !empty($options['offset']) ? $options['offset'] : 0;
     $limit = !empty($options['limit']) ? $options['limit'] : null;
@@ -493,37 +494,19 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
     }
 
     // Manage visibility.
-    list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join($userid, $type, 'p');
-    $params = array_merge($params, $visibilityjoinparams);
+    list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'p.id', 'p.visible', 'p.audiencevisible', 'p', $type);
+    $params = array_merge($params, $visibilityparams);
 
     // Get context data for preload.
     $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
     $ctxjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel)";
 
     // Get all programs matching the criteria, with additional visibility info.
-    $sql = "SELECT DISTINCT {$fields}, {$ctxfields}, visibilityjoin.isvisibletouser
+    $sql = "SELECT DISTINCT {$fields}, {$ctxfields}
               FROM {prog} p
-                   {$visibilityjoinsql}
                    {$ctxjoin}
-             WHERE {$wheresql} {$sortstatement}";
+             WHERE {$wheresql} AND {$visibilitysql} {$sortstatement}";
     $programs = $DB->get_records_sql($sql, $params, $offset, $limit);
-
-    // Remove programs that aren't visible.
-    foreach ($programs as $id => $program) {
-        if ($program->isvisibletouser) {
-            unset($program->isvisibletouser); // Visible.
-        } else {
-            context_helper::preload_from_record($program);
-            $context = context_program::instance($id);
-            if ($isprogram && has_capability('totara/program:viewhiddenprograms', $context) ||
-                !$isprogram && has_capability('totara/certification:viewhiddencertifications', $context) ||
-                !empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
-                unset($program->isvisibletouser); // Visible.
-            } else {
-                unset($programs[$id]); // Not visible.
-            }
-        }
-    }
 
     return $programs;
 }
@@ -573,7 +556,7 @@ function prog_get_category_breadcrumbs($categoryid, $viewtype = 'program') {
 function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
                           $fields="p.id,p.sortorder,p.shortname,p.fullname,p.summary,p.visible",
                           &$totalcount, $limitfrom="", $limitnum="", $type = 'program') {
-    global $CFG, $DB;
+    global $DB;
 
     $params = array();
     $categoryselect = "";
@@ -586,8 +569,8 @@ function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
     $typesql = $isprogram ? " p.certifid IS NULL" : " p.certifid IS NOT NULL";
 
     // Visibility.
-    list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join(null, $type, 'p');
-    $params = array_merge($params, $visibilityjoinparams);
+    list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'p.id', 'p.visible', 'p.audiencevisible', 'p', $type);
+    $params = array_merge($params, $visibilityparams);
 
     // Get context data for preload.
     $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
@@ -595,49 +578,21 @@ function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
     $params['contextlevel'] = CONTEXT_PROGRAM;
 
     // Pull out all programs matching the cat.
-    $visibleprograms = array();
-
-    $progselect = "SELECT {$fields}, 'program' AS listtype, {$ctxfields}, visibilityjoin.isvisibletouser
+    $select = "SELECT {$fields}, 'program' AS listtype, {$ctxfields}
                      FROM {prog} p
-                          {$visibilityjoinsql}
                           {$ctxjoin}
-                    WHERE {$typesql}";
-
-    $select = $progselect.$categoryselect.' ORDER BY '.$sort;
-    $rs = $DB->get_recordset_sql($select, $params);
-
-    $totalcount = 0;
-    $visiblecount = 0;
+                    WHERE {$typesql} {$categoryselect} AND {$visibilitysql} ORDER BY {$sort}";
 
     if (!$limitfrom) {
         $limitfrom = 0;
     }
 
-    // Iterate through the records until enough have been found, skipping those that are not visible.
-    foreach ($rs as $program) {
-        $visible = false;
-        if ($program->isvisibletouser) {
-            $visible = true;
-        } else {
-            context_helper::preload_from_record($program);
-            $context = context_program::instance($program->id);
-            if ($isprogram && has_capability('totara/program:viewhiddenprograms', $context) ||
-                !$isprogram && has_capability('totara/certification:viewhiddencertifications', $context) ||
-                !empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
-                $visible = true;
-            }
-        }
-        if ($visible) {
-            $totalcount++;
-            if ($totalcount > $limitfrom && (!$limitnum || $visiblecount < $limitnum)) {
-                unset($program->isvisibletouser);
-                $visibleprograms [] = $program;
-                $visiblecount++;
-            }
-        }
-    }
+    $visibleprograms = $DB->get_records_sql($select, $params, $limitfrom, $limitnum);
 
-    $rs->close();
+    $totalcount = 0;
+    if ($visibleprograms) {
+        $totalcount = count($visibleprograms);
+    }
 
     return $visibleprograms;
 }

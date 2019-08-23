@@ -1481,9 +1481,16 @@ function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", 
         $sortstatement = "ORDER BY $sort";
     }
 
-    // Add audience visibility setting.
-    list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join(null, 'certification', 'p');
-    $params = array_merge($params, $visibilityjoinparams);
+    // Add visibility setting.
+    require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+    list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'p.id', 'p.visible', 'p.audiencevisible', 'p', 'certification');
+    $params = array_merge($params, $visibilityparams);
+
+    if (empty($categoryselect)) {
+        $visibilitysql = " WHERE {$visibilitysql}";
+    } else {
+        $visibilitysql = " AND {$visibilitysql}";
+    }
 
     // Get context data for preload.
     $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
@@ -1493,30 +1500,13 @@ function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", 
     // Pull out all certifications matching the category
     // the program join effectively removes programs which
     // are not certification-programs.
-    $certifications = $DB->get_records_sql("SELECT {$fields}, {$ctxfields}, visibilityjoin.isvisibletouser
+    $certifications = $DB->get_records_sql("SELECT {$fields}, {$ctxfields}
                         FROM {certif} cf
                         JOIN {prog} p ON (p.certifid = cf.id)
-                             {$visibilityjoinsql}
                              {$ctxjoin}
-                        {$categoryselect}
+                        {$categoryselect} {$visibilitysql}
                         {$sortstatement}", $params
                     );
-
-    // Remove certifications that aren't visible.
-    foreach ($certifications as $id => $cert) {
-        if ($cert->isvisibletouser) {
-            unset($cert->isvisibletouser);
-        } else {
-            context_helper::preload_from_record($cert);
-            $context = context_program::instance($id);
-            if (has_capability('totara/certification:viewhiddencertifications', $context) ||
-                !empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
-                unset($cert->isvisibletouser);
-            } else {
-                unset($certifications[$id]);
-            }
-        }
-    }
 
     return $certifications;
 }
