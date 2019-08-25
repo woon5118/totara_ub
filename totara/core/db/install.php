@@ -342,5 +342,8 @@ function xmldb_totara_core_install() {
         $dbman->add_field($table, $field);
     }
 
+    // When upgrading from Moodle change execution of the context cleanup task to once a day only by default.
+    totara_upgrade_context_task_timing();
+
     return true;
 }

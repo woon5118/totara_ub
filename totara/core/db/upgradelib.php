@@ -166,6 +166,30 @@ function totara_core_fix_old_upgraded_mssql() {
 }
 
 /**
+ * Change context cleanup task scheduling from every hour to once a day in off peak hour.
+ *
+ * NOTE: it is safe to call this repeatedly.
+ */
+function totara_upgrade_context_task_timing() {
+    global $DB;
+
+    // Add new and remove delted core tasks,
+    // this removes create_contexts_task before we bump up the main version.
+    \core\task\manager::reset_scheduled_tasks_for_component('moodle');
+
+    $task = $DB->get_record('task_scheduled', ['classname' => '\core\task\context_cleanup_task', 'component' => 'moodle']);
+    if (!$task) {
+        return;
+    }
+
+    if ($task->minute == 25 and $task->hour == '*' and $task->day == '*' and $task->customised == 0) {
+        $task->minute = 23;
+        $task->hour = 23;
+        $DB->update_record('task_scheduled', $task);
+    }
+}
+
+/**
  * Re-add changes to course completion for Totara
  *
  * Although these exist in lib/db/upgrade.php, anyone upgrading from Moodle 2.2.2 or above

@@ -2108,6 +2108,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
 
         $hidecat = false;
         if (empty($newparentcat->id)) {
+            $trans = $DB->start_delegated_transaction();
             $DB->set_field('course_categories', 'parent', 0, array('id' => $this->id));
             $newparent = context_system::instance();
         } else {
@@ -2115,6 +2116,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                 // Can not move to itself or it's own child.
                 throw new moodle_exception('cannotmovecategory');
             }
+            $trans = $DB->start_delegated_transaction();
             $DB->set_field('course_categories', 'parent', $newparentcat->id, array('id' => $this->id));
             $newparent = context_coursecat::instance($newparentcat->id);
 
@@ -2127,6 +2129,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         $this->parent = $newparentcat->id;
 
         $context->update_moved($newparent);
+        $trans->allow_commit();
 
         // Now make it last in new category.
         $DB->set_field('course_categories', 'sortorder', MAX_COURSES_IN_CATEGORY*MAX_COURSE_CATEGORIES, array('id' => $this->id));

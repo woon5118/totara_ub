@@ -627,26 +627,50 @@ EXISTS (
     public static function context_moved(\stdClass $record) {
         global $DB;
 
-        // Delete own context entries.
-        $DB->delete_records('context_map', array('childid' => $record->id));
-
-        if (!trim($record->path, '/')) {
-            // This should not happen, admin will have to do a full rebuild from CLI later.
+        $syscontext = \context_system::instance();
+        if ($record->id == $syscontext->id) {
             return;
         }
 
-        // Delete entries for all children.
-        $sql = "DELETE
-                  FROM {context_map}
-                 WHERE {context_map}.childid IN (
-                      SELECT id
-                        FROM {context}
-                       WHERE path LIKE :path
-                 )";
-        $params = array('path' => $record->path . '/%');
-        $DB->execute($sql, $params);
+        if (!trim($record->path, '/')) {
+            // This should not happen, context cleanup task will fix it later.
+            debugging('Context path not present, cannot rebuild map after context moved', DEBUG_DEVELOPER);
+            $DB->delete_records('context_map', ['childid' => $record->id]);
+            $DB->delete_records('context_map', ['parentid' => $record->id]);
+            return;
+        }
 
-        // NOTE: the rebuilding is initiated after transaction is committed in context::update_moved().
+        $currentparentpmap = $DB->get_records_menu('context_map', ['childid' => $record->id], '', 'parentid, childid');
+
+        $parents = explode('/', trim($record->path, '/'));
+        $children = $DB->get_fieldset_select('context', 'id', "path LIKE ?", [$record->path . '/%']);
+        array_unshift($children, $record->id);
+
+        try {
+            // Add missing.
+            foreach ($parents as $pid) {
+                if (isset($currentparentpmap[$pid])) {
+                    unset($currentparentpmap[$pid]);
+                    continue;
+                }
+                foreach ($children as $chid) {
+                    $DB->insert_record('context_map', ['parentid' => $pid, 'childid' => $chid]);
+                }
+            }
+            // Delete extras.
+            foreach ($currentparentpmap as $pid => $unused) {
+                list($select, $params) = $DB->get_in_or_equal($children, SQL_PARAMS_NAMED);
+                $params['parentid'] = $pid;
+                $DB->delete_records_select('context_map', "parentid = :parentid and childid $select", $params);
+            }
+
+        } catch (\moodle_exception $e) {
+            // This should not happen, context cleanup task will fix it later.
+            debugging('Error rebuilding context map after context moved', DEBUG_DEVELOPER);
+            $DB->delete_records('context_map', ['childid' => $record->id]);
+            $DB->delete_records('context_map', ['parentid' => $record->id]);
+            return;
+        }
     }
 
     /**

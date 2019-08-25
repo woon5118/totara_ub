@@ -5487,17 +5487,15 @@ abstract class context extends stdClass implements IteratorAggregate {
      * Update context info after moving context in the tree structure.
      *
      * @param context $newparent
-     * @param bool $readddeletedmapentries value true value is not compatible with transactions,
-     *             if false then totara_core\access::add_missing_map_entries(false) must be called later after commit.
      * @return void
      */
-    public function update_moved(context $newparent, bool $readddeletedmapentries = true) {
+    public function update_moved(context $newparent) {
         global $DB;
 
         $frompath = $this->_path;
         $newpath  = $newparent->path . '/' . $this->_id;
 
-        $trans = $DB->start_delegated_transaction();
+        // Totara: do not use transactions here, use it outside to wrap the whole move.
 
         $this->mark_dirty();
 
@@ -5531,20 +5529,9 @@ abstract class context extends stdClass implements IteratorAggregate {
 
         context::reset_caches();
 
-        // Totara: remove afected context_map entries.
+        // Totara: fix context_map entries.
         $newrecord = (object)array('id' => $this->id, 'path' => $newpath);
         \totara_core\access::context_moved($newrecord);
-
-        $trans->allow_commit();
-
-        if (!$readddeletedmapentries) {
-            // Totara: hack to work around incompatibility of context map building with DB transactions,
-            //         the \totara_core\access::add_missing_map_entries(false); must be called later after transaction commit.
-            return;
-        }
-        // Totara: Add all entries back, this may take a few minutes and it is safe if it gets interrupted,
-        //         so do it after the transaction.
-        \totara_core\access::add_missing_map_entries(false);
     }
 
     /**
@@ -5680,6 +5667,8 @@ abstract class context extends stdClass implements IteratorAggregate {
         $record->depth        = 0;
         $record->path         = null; //not known before insert
 
+        $trans = $DB->start_delegated_transaction();
+
         // Totara: value is updated later if not specified, we must make sure the value is valid if supplied
         if (!empty($CFG->tenantready)) {
             if ($tenantid !== null) {
@@ -5705,6 +5694,8 @@ abstract class context extends stdClass implements IteratorAggregate {
 
         // Totara: add context map entries for all parents of this context and self.
         \totara_core\access::context_created($record);
+
+        $trans->allow_commit();
 
         return $record;
     }
@@ -6416,6 +6407,10 @@ class context_system extends context {
                 // can not create context - table does not exist yet, sorry
                 return null;
             }
+            // Totara: add context map entry.
+            if (!$DB->record_exists('context_map', ['childid' => $record->id, 'parentid' => $record->id])) {
+                $DB->insert_record('context_map', ['childid' => $record->id, 'parentid' => $record->id]);
+            }
         }
 
         if ($record->instanceid != 0) {
@@ -6432,7 +6427,9 @@ class context_system extends context {
             $DB->update_record('context', $record);
 
             // Totara: add context map entry.
-            \totara_core\access::context_created($record);
+            if (!$DB->record_exists('context_map', ['childid' => $record->id, 'parentid' => $record->id])) {
+                $DB->insert_record('context_map', ['childid' => $record->id, 'parentid' => $record->id]);
+            }
         }
 
         if (!defined('SYSCONTEXTID')) {

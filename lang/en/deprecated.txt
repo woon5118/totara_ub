@@ -66,3 +66,4 @@ completionstartonenrolhelp,core_completion
 completionstartonenrol_help,core_completion
 coursetagging,core_tag
 coursetagginghelp,core_tag
+taskcreatecontexts,core_admin

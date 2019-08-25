@@ -80,8 +80,8 @@ $tasks = array(
     array(
         'classname' => 'core\task\context_cleanup_task',
         'blocking' => 0,
-        'minute' => '25',
-        'hour' => '*',
+        'minute' => '23',
+        'hour' => '23', // Do this once a day before all other nightly tasks.
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'
@@ -118,15 +118,6 @@ $tasks = array(
         'blocking' => 0,
         'minute' => '*',
         'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
-        'classname' => 'core\task\create_contexts_task',
-        'blocking' => 1,
-        'minute' => '0',
-        'hour' => '0',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'

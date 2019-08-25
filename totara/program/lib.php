@@ -675,16 +675,18 @@ function prog_move_programs($programids, $categoryid) {
                         prog_fix_program_sortorder($categoryid);
                     }
 
+                    $trans = $DB->start_delegated_transaction();
+
                     $program->category  = $categoryid;
                     $program->sortorder = $sortorder;
 
-                    if (!$DB->update_record('prog', $program)) {
-                        echo $OUTPUT->notification(get_string('error:prognotmoved', 'totara_program'));
-                    }
+                    $DB->update_record('prog', $program);
 
                     $context   = context_program::instance($program->id);
                     $newparent = context_coursecat::instance($program->category);
                     $context->update_moved($newparent);
+
+                    $trans->allow_commit();
                 }
             }
             prog_fix_program_sortorder();

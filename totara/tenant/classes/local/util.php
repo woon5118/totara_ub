@@ -437,7 +437,7 @@ final class util {
         if ($user->tenantid) {
             $moved = true;
             $DB->set_field('user', 'tenantid', null, ['id' => $user->id]);
-            $usercontext->update_moved($syscontext, false);
+            $usercontext->update_moved($syscontext);
         }
 
         $current = self::get_user_participation($user->id);
@@ -456,8 +456,6 @@ final class util {
 
         if ($moved) {
             \core\session\manager::kill_user_sessions($user->id);
-            // Hack: add map entries missing after context move  - this must be after DB transaction commit.
-            \totara_core\access::add_missing_map_entries(false);
         }
     }
 
@@ -493,7 +491,7 @@ final class util {
         $trans = $DB->start_delegated_transaction();
 
         $DB->set_field('user', 'tenantid', $tenant->id, ['id' => $user->id]);
-        $usercontext->update_moved($tenantcontext, false);
+        $usercontext->update_moved($tenantcontext);
 
         $alreadyparticipant = false;
         $sql = 'SELECT t.id, cm.cohortid
@@ -515,9 +513,6 @@ final class util {
         $trans->allow_commit();
 
         \core\session\manager::kill_user_sessions($user->id);
-
-        // Hack: add map entries missing after context move - this must be after DB transaction commit.
-        \totara_core\access::add_missing_map_entries(false);
     }
 
     /**

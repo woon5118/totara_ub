@@ -653,5 +653,11 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019073100, 'totara', 'core');
     }
 
+    if ($oldversion < 2019083002) {
+        // Delete create_contexts_task and execute the context cleanup task once a day only.
+        totara_upgrade_context_task_timing();
+        upgrade_plugin_savepoint(true, 2019083002, 'totara', 'core');
+    }
+
     return true;
 }

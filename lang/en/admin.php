@@ -1114,7 +1114,6 @@ $string['taskcalendarcron'] = 'Send calendar notifications';
 $string['taskcompletionregular'] = 'Calculate regular completion data';
 $string['taskcompletiondaily'] = 'Completion mark as started';
 $string['taskcontextcleanup'] = 'Cleanup contexts';
-$string['taskcreatecontexts'] = 'Create missing contexts';
 $string['taskdeletecachetext'] = 'Delete old text cache records';
 $string['taskdeleteincompleteusers'] = 'Delete incomplete users';
 $string['taskdeleteunconfirmedusers'] = 'Delete unconfirmed users';
@@ -1337,3 +1336,8 @@ $string['mobile'] = 'Mobile';
  */
 $string['loginpasswordautocomplete'] = 'Prevent password autocompletion on login form';
 $string['loginpasswordautocomplete_help'] = 'If enabled, users are not allowed to save their account password in their browser.';
+
+/*
+ * @deprecated since Totara 13.0
+ */
+$string['taskcreatecontexts'] = 'Create missing contexts';

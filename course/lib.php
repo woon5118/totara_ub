@@ -2158,11 +2158,13 @@ function move_courses($courseids, $categoryid) {
             $course->visible = 0;
         }
 
+        $trans = $DB->start_delegated_transaction();
         $DB->update_record('course', $course);
 
         // Update context, so it can be passed to event.
         $context = context_course::instance($course->id);
         $context->update_moved($newparent);
+        $trans->allow_commit();
 
         // Trigger a course updated event.
         $event = \core\event\course_updated::create(array(
@@ -2548,7 +2550,14 @@ function update_course($data, $editoroptions = NULL) {
     }
 
     // Update with the new data
+    $trans = $DB->start_delegated_transaction();
     $DB->update_record('course', $data);
+    if ($movecat) {
+        $newparent = context_coursecat::instance($data->category);
+        $context->update_moved($newparent);
+    }
+    $trans->allow_commit();
+
     // make sure the modinfo cache is reset
     rebuild_course_cache($data->id);
 
@@ -2557,10 +2566,6 @@ function update_course($data, $editoroptions = NULL) {
 
     $course = $DB->get_record('course', array('id'=>$data->id));
 
-    if ($movecat) {
-        $newparent = context_coursecat::instance($course->category);
-        $context->update_moved($newparent);
-    }
     $fixcoursesortorder = $movecat || (isset($data->sortorder) && ($oldcourse->sortorder != $data->sortorder));
     if ($fixcoursesortorder) {
         fix_course_sortorder();
