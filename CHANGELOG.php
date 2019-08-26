@@ -3,6 +3,32 @@
 
 Totara Learn Changelog
 
+Release Evergreen (26th August 2019):
+=====================================
+
+Key:           + Evergreen only
+
+Important:
+
+    TL-22087       Fixed a logic bug in the upgrade step cleaning-up orphaned prog_completion records
+
+                   The fix for TL-8836 that was recently released as part of Totara 11.18,
+                   12.9 and Evergreen 20190822 contained a dataloss regression. The fix was
+                   designed to remove orphaned program completion records, which previously
+                   occurred when a program course set was deleted. Due to this logic bug the
+                   upgrade step deleted all program completion records with a coursesetid of
+                   0, these records are used to mark the users completion state within a
+                   program.
+
+                   This issue sees that logic bug fixed, and the removal of orphaned
+                   completion records completed correctly.
+
+                   It does not fix data lost for those who have already upgraded to Totara
+                   11.18, 12.9 or Evergreen 20190822.
+                   If you have upgraded to one of these versions please get in touch with our
+                   help desk as soon as possible.
+
+
 Release Evergreen (22nd August 2019):
 =====================================
 
