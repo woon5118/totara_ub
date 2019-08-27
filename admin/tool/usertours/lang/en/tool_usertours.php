@@ -77,7 +77,7 @@ $string['pathmatch_help'] = 'Tours will be displayed on any page whose URL match
 You can use the % character as a wildcard to mean anything.
 Some example values include:
 
-* /my/% - to match the Dashboard
+* /totara/dashboard/% - to match the Dashboard
 * /course/view.php?id=2 - to match a specific course
 * /mod/forum/view.php% - to match the forum discussion list
 * /user/profile.php% - to match the user profile page
