@@ -271,6 +271,7 @@ $string['duration_hours_minutes'] = '{$a->hours}h {$a->minutes}m';
 $string['edit'] = 'Edit';
 $string['editingsavedsearch'] = 'Editing saved search';
 $string['editreportwithurl'] = 'Edit Report \'{$a->fullname}\' ({$a->url})';
+$string['editreportttitle'] = 'Edit Report Title';
 $string['editrestriction'] = 'Edit restriction \'{$a}\'';
 $string['editscheduledreport'] = 'Edit Scheduled Report';
 $string['editrecord'] = 'Edit {$a}';

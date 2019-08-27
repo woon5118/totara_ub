@@ -5614,6 +5614,18 @@ class reportbuilder {
     }
 
     /**
+     * Method for updating the fullname for a particular report
+     * @param integer $reportid ID of the report to update the fullname of
+     * @param string $fullname The value to set the fullname to
+     * @return bool True if the fullname could be set
+     */
+    public static function update_fullname(int $reportid, string $fullname) : bool {
+        global $DB;
+        $DB->set_field('report_builder', 'fullname', $fullname, ['id' => $reportid]);
+        return true;
+    }
+
+    /**
      * Determines if this report currently has any active filters or not
      *
      * This is done by fetching the filtering SQL to see if it is set yet

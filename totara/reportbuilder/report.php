@@ -97,8 +97,14 @@ $report->display_redirect_link();
 $report->display_restrictions();
 
 // Display heading including filtering stats.
-$heading = $fullname . ': ' . $output->result_count_info($report);
-echo $output->heading($heading);
+$heading = $fullname;
+echo $output->render_from_template('totara_reportbuilder/report_heading', [
+    'reportid' => $id,
+    'heading' => $heading,
+    'fullname' => $report->fullname,
+    'resultcount' => $output->result_count_info($report),
+    'can_edit' => has_capability('totara/reportbuilder:managereports', $context),
+]);
 echo $debughtml;
 
 // print report description if set

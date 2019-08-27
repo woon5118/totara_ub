@@ -134,7 +134,9 @@ define(['core/str'], function(str) {
             return;
         }
 
-        this.input.value = this.target.textContent.trim();
+        if (!this.input.value) {
+            this.input.value = this.target.textContent.trim();
+        }
 
         this.target.style.display = 'none';
         // TL-20522: IE11 needs an empty string to clear style attributes instead of null
@@ -149,7 +151,12 @@ define(['core/str'], function(str) {
 
         this.element.dispatchEvent(new CustomEvent('totara_core/inline-edit:edit', {
             bubbles: true,
-            detail: {elem: this.element}
+            detail: {
+                controller: this,
+                elem: this.element,
+                input: this.input,
+                target: this.target
+            }
         }));
     };
 
@@ -175,7 +182,30 @@ define(['core/str'], function(str) {
             return;
         }
 
-        this.target.textContent = text;
+        var update = true;
+
+        this.element.dispatchEvent(new CustomEvent('totara_core/inline-edit:save', {
+            bubbles: true,
+            detail: {
+                text: text,
+                controller: this,
+                elem: this.element,
+                input: this.input,
+                target: this.target,
+                /**
+                 * This function is used to control whether the function should update the visual element
+                 * This should be used when a parent wants to update the value of the target manually
+                 */
+                preventUpdate: function() {
+                    update = false;
+                }
+            }
+        }));
+
+        if (update) {
+            this.target.textContent = text;
+        }
+
 
         // TL-20522: IE11 needs an empty string to clear style attributes instead of null
         this.target.style.display = '';
@@ -184,11 +214,6 @@ define(['core/str'], function(str) {
 
         this.controller.style.display = '';
         this.editing = false;
-
-        this.element.dispatchEvent(new CustomEvent('totara_core/inline-edit:save', {
-            bubbles: true,
-            detail: {text: text, elem: this.element}
-        }));
     };
 
     /**
@@ -201,10 +226,8 @@ define(['core/str'], function(str) {
 
         this.element.dispatchEvent(new CustomEvent('totara_core/inline-edit:cancel', {
             bubbles: true,
-            detail: {elem: this.element}
+            detail: {elem: this.element, controller: this}
         }));
-
-        this.input.value = '';
 
         this.target.style.display = '';
         this.input.style.display = 'none';
@@ -218,10 +241,17 @@ define(['core/str'], function(str) {
      * Show an error message
      */
     InlineEditController.prototype.showError = function(string) {
+        this.showCustomError('inlineedit:' + string, 'totara_core');
+    };
+
+    /**
+     * Show a custom error message
+     */
+    InlineEditController.prototype.showCustomError = function(identifier, component) {
         var self = this;
-        this.error = string; // locking variable for the string
-        str.get_string('inlineedit:' + string, 'totara_core').done(function(inlinestring) {
-            if (self.error === string) {
+        this.error = identifier; // locking variable for the string
+        str.get_string(identifier, component).done(function(inlinestring) {
+            if (self.error === identifier) {
                 self.tooltip.textContent = inlinestring;
                 self.tooltip.classList.add('totara_core__InlineEdit--tooltip--error');
 

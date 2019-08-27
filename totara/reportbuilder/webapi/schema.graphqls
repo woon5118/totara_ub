@@ -1,0 +1,9 @@
+extend type Mutation {
+  """
+  Changes the title of a report
+  """
+  totara_reportbuilder_update_report_title(
+    reportid: core_id!
+    title: param_text!
+  ): String!
+}
