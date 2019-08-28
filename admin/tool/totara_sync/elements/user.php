@@ -1315,6 +1315,10 @@ class totara_sync_element_user extends totara_sync_element {
         // Get a list of all the usernames.
         $sql = "SELECT id, idnumber, username FROM {{$synctable}}";
         $rs = $DB->get_recordset_sql($sql);
+        if ($DB->get_dbfamily() === 'mssql') {
+            $rs->preload();
+        }
+
         foreach ($rs as $r) {
             // Get a clean version of the username with all invalid characters removed.
             $clean_username = clean_param($r->username, PARAM_USERNAME);
