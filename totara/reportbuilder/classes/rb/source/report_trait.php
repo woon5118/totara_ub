@@ -193,6 +193,16 @@ trait report_trait {
         );
         $this->columnoptions[] = new \rb_column_option(
             'report',
+            'summary',
+            get_string('reportsummary', 'totara_reportbuilder'),
+            "{$join}.summary",
+            [
+                'joins' => [$join],
+                'displayfunc' => 'format_string'
+            ]
+        );
+        $this->columnoptions[] = new \rb_column_option(
+            'report',
             'embedded',
             get_string('reportembedded', 'totara_reportbuilder'),
             "{$join}.embedded",

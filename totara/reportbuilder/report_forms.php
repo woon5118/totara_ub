@@ -89,6 +89,10 @@ class report_builder_edit_form extends moodleform {
 
         $mform->addHelpButton('fullname', 'reportbuilderfullname', 'totara_reportbuilder');
 
+        $mform->addElement('textarea', 'summary', get_string('reportsummary', 'totara_reportbuilder'), ['rows' => 6, 'cols' => 40]);
+        $mform->setType('summary', PARAM_TEXT);
+        $mform->addHelpButton('summary', 'reportsummary', 'totara_reportbuilder');
+
         $mform->addElement('editor', 'description_editor', get_string('description'), null, $TEXTAREA_OPTIONS);
         $mform->setType('description_editor', PARAM_CLEANHTML);
         $mform->addHelpButton('description_editor', 'reportbuilderdescription', 'totara_reportbuilder');

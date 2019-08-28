@@ -616,5 +616,19 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019073000, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2019090300) {
+        // Define field summary to be added to report_builder.
+        $table = new xmldb_table('report_builder');
+        $field = new xmldb_field('summary', XMLDB_TYPE_TEXT, null, null, null, null, null, 'contentmode');
+
+        // Conditionally launch add field summary.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2019090300, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

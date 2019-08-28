@@ -428,6 +428,7 @@ class reportbuilder {
         $this->hidden = $report->hidden;
         $this->initialdisplay = $report->initialdisplay;
         $this->toolbarsearch = $report->toolbarsearch;
+        $this->summary = $report->summary;
         $this->description = $report->description;
         $this->globalrestriction = $report->globalrestriction;
         $this->contentmode = $report->contentmode;

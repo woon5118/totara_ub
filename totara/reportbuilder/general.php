@@ -59,6 +59,7 @@ if ($report->cache) {
 $record = new stdClass();
 $record->id = $report->_id;
 $record->fullname = $report->fullname;
+$record->summary = $report->summary;
 $record->description = $report->description;
 $record->descriptionformat = FORMAT_HTML;
 $record->hidden = $report->hidden;
@@ -84,6 +85,7 @@ if ($fromform = $mform->get_data()) {
     $todb->timemodified = time();
     $todb->fullname = $fromform->fullname;
     $todb->hidden = $fromform->hidden;
+    $todb->summary = $fromform->summary;
     $todb->description_editor = $fromform->description_editor;
     // ensure we show between 1 and 9999 records
     $rpp = min(9999, max(1, (int) $fromform->recordsperpage));
