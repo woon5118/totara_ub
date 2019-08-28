@@ -430,7 +430,7 @@ module.exports = function(grunt) {
             prefix: {
                 options: {
                     processors: [
-                        require('autoprefixer')({browsers: 'last 2 versions, ie >= 9'})
+                        require('autoprefixer')()
                     ]
                 },
                 files: [{

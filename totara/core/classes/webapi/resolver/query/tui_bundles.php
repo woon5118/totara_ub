@@ -34,8 +34,10 @@ final class tui_bundles implements \core\webapi\query_resolver {
             $reqs->require_component($component);
         }
 
-        return array_map(function ($x) {
-            return $x->get_api_data();
+        $options = ['theme' => $args['theme']];
+
+        return array_map(function ($x) use ($options) {
+            return $x->get_api_data($options);
         }, $reqs->get_bundles());
     }
 }

@@ -74,6 +74,10 @@ module.exports = function(jsonSource, map) {
 };
 `;
 
+  if (fs.existsSync(path.resolve(self.context, './styles/static.scss'))) {
+    source += 'require("./styles/static.scss");\n';
+  }
+
   // execute pre-entry code
   // this is used by totara_core to set up the module store etc before we add to it below
   if (config.preEntry) {

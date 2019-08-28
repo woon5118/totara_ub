@@ -175,6 +175,9 @@ class requirements {
             if ($path) {
                 $result[] = new requirement_js('totara_core', 'tui_bundle.js', $path);
             }
+            if (core_output_choose_build_file('/totara/core/tui/build/tui_bundle.scss', $CFG->dirroot)) {
+                $result[] = new requirement_scss('totara_core', 'tui_bundle.scss');
+            }
         }
 
         foreach ($components as $component) {
@@ -190,6 +193,9 @@ class requirements {
                 $path = core_output_choose_build_file("{$dir}/tui/build/tui_bundle{$suffix}.js", $CFG->dirroot);
                 if ($path) {
                     $result[] = new requirement_js($component, 'tui_bundle.js', $path);
+                }
+                if (core_output_choose_build_file("{$dir}/tui/build/tui_bundle.scss", $CFG->dirroot)) {
+                    $result[] = new requirement_scss($component, 'tui_bundle.scss');
                 }
             }
         }

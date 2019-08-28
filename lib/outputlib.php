@@ -56,7 +56,7 @@ function theme_reset_all_caches() {
     set_config('themerev', $next); // time is unique even when you reset/switch database
 
     if (!empty($CFG->themedesignermode)) {
-        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'core', 'themedesigner');
+        $cache = cache::make('core', 'themedesigner');
         $cache->purge();
     }
 
@@ -455,6 +455,13 @@ class theme_config {
     protected $rtlmode = false;
 
     /**
+     * Whether we're generating CSS for a legacy browser or not.
+     * @var bool
+     * @since Totara 13
+     */
+    protected $legacybrowser = false;
+
+    /**
      * The LESS file to compile. When set, the theme will attempt to compile the file itself.
      * @var bool
      */
@@ -826,7 +833,8 @@ class theme_config {
         $urls = array();
 
         $svg = $this->use_svg_icons();
-        $separate = (core_useragent::is_ie() && !core_useragent::check_ie_version('10'));
+
+        // Totara: Removed chunking support as it's not used by currently supported browsers
 
         // Totara: RTL stylesheet.
         $rtl = (get_string('thisdirection', 'langconfig') === 'rtl');
@@ -844,9 +852,6 @@ class theme_config {
 
                 $slashargs .= '/'.$this->name.'/'.$rev.'/'.$filename;
 
-                if ($separate) {
-                    $slashargs .= '/chunk0';
-                }
                 $url->set_slashargument($slashargs, 'noparam', true);
             } else {
                 $params = array('theme' => $this->name, 'rev' => $rev, 'type' => $filename);
@@ -858,9 +863,6 @@ class theme_config {
                 // Totara: RTL stylesheet.
                 if ($rtl) {
                     $params['rtl'] = '1';
-                }
-                if ($separate) {
-                    $params['chunk'] = '0';
                 }
                 $url->params($params);
             }
@@ -878,55 +880,66 @@ class theme_config {
             if (right_to_left()) {
                 $baseurl->param('rtl', 1);
             }
-            if ($separate) {
-                // We might need to chunk long files.
-                $baseurl->param('chunk', '0');
-            }
             // Totara: RTL stylesheet.
             if ($rtl) {
                 $baseurl->param('rtl', '1');
             }
-            if (core_useragent::is_ie()) {
-                // Lalala, IE does not allow more than 31 linked CSS files from main document.
-                $urls[] = new moodle_url($baseurl, array('theme'=>$this->name, 'type'=>'ie', 'subtype'=>'plugins'));
-                foreach ($css['parents'] as $parent=>$sheets) {
-                    // We need to serve parents individually otherwise we may easily exceed the style limit IE imposes (4096).
-                    $urls[] = new moodle_url($baseurl, array('theme'=>$this->name,'type'=>'ie', 'subtype'=>'parents', 'sheet'=>$parent));
+            // Totara: Removed special handling to support IE 9
+            foreach ($css['plugins'] as $plugin => $unused) {
+                $urls[] = new moodle_url($baseurl, array('theme' => $this->name, 'type' => 'plugin', 'subtype' => $plugin));
+            }
+            foreach ($css['parents'] as $parent=>$sheets) {
+                foreach ($sheets as $sheet => $unused2) {
+                    $urls[] = new moodle_url(
+                        $baseurl,
+                        array('theme' => $this->name, 'type' => 'parent', 'subtype' => $parent, 'sheet' => $sheet)
+                    );
                 }
-                if ($this->get_scss_property()) {
-                    // No need to define the type as IE here.
+            }
+            foreach ($css['theme'] as $sheet => $filename) {
+                if ($sheet === self::SCSS_KEY) {
+                    // This is the theme SCSS file.
                     $urls[] = new moodle_url($baseurl, array('theme' => $this->name, 'type' => 'scss'));
-                } else if (!empty($this->lessfile)) {
-                    // No need to define the type as IE here.
+                } else if ($sheet === $this->lessfile) {
+                    // This is the theme LESS file.
                     $urls[] = new moodle_url($baseurl, array('theme' => $this->name, 'type' => 'less'));
-                }
-                $urls[] = new moodle_url($baseurl, array('theme'=>$this->name, 'type'=>'ie', 'subtype'=>'theme'));
-
-            } else {
-                foreach ($css['plugins'] as $plugin=>$unused) {
-                    $urls[] = new moodle_url($baseurl, array('theme'=>$this->name,'type'=>'plugin', 'subtype'=>$plugin));
-                }
-                foreach ($css['parents'] as $parent=>$sheets) {
-                    foreach ($sheets as $sheet=>$unused2) {
-                        $urls[] = new moodle_url($baseurl, array('theme'=>$this->name,'type'=>'parent', 'subtype'=>$parent, 'sheet'=>$sheet));
-                    }
-                }
-                foreach ($css['theme'] as $sheet => $filename) {
-                    if ($sheet === self::SCSS_KEY) {
-                        // This is the theme SCSS file.
-                        $urls[] = new moodle_url($baseurl, array('theme' => $this->name, 'type' => 'scss'));
-                    } else if ($sheet === $this->lessfile) {
-                        // This is the theme LESS file.
-                        $urls[] = new moodle_url($baseurl, array('theme' => $this->name, 'type' => 'less'));
-                    } else {
-                        // Sheet first in order to make long urls easier to read.
-                        $urls[] = new moodle_url($baseurl, array('sheet'=>$sheet, 'theme'=>$this->name, 'type'=>'theme'));
-                    }
+                } else {
+                    // Sheet first in order to make long urls easier to read.
+                    $urls[] = new moodle_url($baseurl, array('sheet' => $sheet, 'theme' => $this->name, 'type' => 'theme'));
                 }
             }
         }
 
+        // Totara: TUI theme SCSS
+        $requirement = new \core\tui\requirement_scss('theme', 'tui_bundle.scss');
+        $urls[] = $requirement->get_url(array('theme' => $this->name));
+
         return $urls;
+    }
+
+    /**
+     * Get CSS content for type and subtype. Called by styles.php.
+     *
+     * @param string $type
+     * @param string $subtype
+     * @return string
+     */
+    public function get_css_content_by($type, $subtype) {
+        if ($type === 'all' || $type === 'all-rtl') {
+            $csscontent = $this->get_css_cached_content();
+            if (!$csscontent) {
+                $csscontent = $this->get_css_content();
+                $this->set_css_content_cache($csscontent);
+            }
+            return $csscontent;
+        } else if ($type === 'tui_scss') {
+            $csscontent = $this->get_tui_css_content(false, $subtype);
+            $csscontent = $this->post_process($csscontent);
+            $csscontent = core_minify::css($csscontent);
+            return $csscontent;
+        } else {
+            return '';
+        }
     }
 
     /**
@@ -1030,37 +1043,19 @@ class theme_config {
                 return $this->post_process($csscontent);
             }
             return '';
+        } else if ($type === 'tui_scss') {
+            $csscontent = $this->get_tui_css_content(true, $subtype);
+            if ($csscontent !== false) {
+                return $this->post_process($csscontent);
+            }
+            return '';
         }
 
         $cssfiles = array();
         $css = $this->get_css_files(true);
 
-        if ($type === 'ie') {
-            // IE is a sloppy browser with weird limits, sorry.
-            if ($subtype === 'plugins') {
-                $cssfiles = $css['plugins'];
-
-            } else if ($subtype === 'parents') {
-                if (empty($sheet)) {
-                    // Do not bother with the empty parent here.
-                } else {
-                    // Build up the CSS for that parent so we can serve it as one file.
-                    foreach ($css[$subtype][$sheet] as $parent => $css) {
-                        $cssfiles[] = $css;
-                    }
-                }
-            } else if ($subtype === 'theme') {
-                $cssfiles = $css['theme'];
-                foreach ($cssfiles as $key => $value) {
-                    if (in_array($key, [$this->lessfile, self::SCSS_KEY])) {
-                        // Remove the LESS/SCSS file from the theme CSS files.
-                        // The LESS/SCSS files use the type 'less' or 'scss', not 'ie'.
-                        unset($cssfiles[$key]);
-                    }
-                }
-            }
-
-        } else if ($type === 'plugin') {
+        // Totara: removed legacy "ie" type as it is not needed in supported versions of IE
+        if ($type === 'plugin') {
             if (isset($css['plugins'][$subtype])) {
                 $cssfiles[] = $css['plugins'][$subtype];
             }
@@ -1106,6 +1101,44 @@ class theme_config {
     }
 
     /**
+     * Get the compiled TUI CSS content for the provided Totara component
+     *
+     * @param bool $themedesigner
+     * @param string $component
+     * @return string Compiled CSS
+     * @throws \Exception if SCSS is invalid
+     */
+    protected function get_tui_css_content($themedesigner, $component) {
+        $scss_options = new \core\tui\scss\scss_options();
+        $scss_options->set_themes($this->get_tui_theme_chain($themedesigner));
+        $scss_options->set_legacy($this->legacybrowser);
+        $scss_options->set_sourcemap_enabled($themedesigner);
+
+        $tui_scss = new \core\tui\scss\scss($scss_options);
+
+        // cache compiled result for performance in theme designer mode
+        $cache = null;
+        $cachekey = 'tui_scss_content:'.$component;
+        if ($themedesigner) {
+            $cache = cache::make('core', 'themedesigner', ['theme' => $this->name]);
+            $newest_file = $tui_scss->get_newest_tui_css_file($component);
+            if ($cached = $cache->get($cachekey)) {
+                if ($cached['newest_file'] == $newest_file) {
+                    return $cached['content'];
+                }
+            }
+        }
+
+        $result = $tui_scss->get_compiled_css($component);
+
+        if ($cache) {
+            $cache->set($cachekey, ['newest_file' => $newest_file, 'content' => $result]);
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns an array of organised CSS files required for this output.
      *
      * @param bool $themedesigner
@@ -1123,8 +1156,9 @@ class theme_config {
         if ($themedesigner) {
             require_once($CFG->dirroot.'/lib/csslib.php');
             // We need some kind of caching here because otherwise the page navigation becomes
-            // way too slow in theme designer mode. Feel free to create full cache definition later...
-            $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'core', 'themedesigner', array('theme' => $this->name));
+            // way too slow in theme designer mode.
+            // Totara: updated to use cache definition
+            $cache = cache::make('core', 'themedesigner', array('theme' => $this->name));
             if ($files = $cache->get($cachekey)) {
                 if ($files['created'] > time() - THEME_DESIGNER_CACHE_LIFETIME) {
                     unset($files['created']);
@@ -1134,8 +1168,6 @@ class theme_config {
         }
 
         $cssfiles = array('plugins'=>array(), 'parents'=>array(), 'theme'=>array());
-
-        $cssfiles['plugins']['totara_core_tui'] = core_output_choose_build_file("{$CFG->dirroot}/totara/core/tui/build/tui_bundle.css");
 
         // Get all plugin sheets.
         $excludes = $this->resolve_excludes('plugins_exclude_sheets');
@@ -1205,10 +1237,6 @@ class theme_config {
                         }
                     }
                 }
-                if (!empty($parent_config->tui)) {
-                    $cssfiles['parents'][$parent]['tui'] =
-                        core_output_choose_build_file("{$parent_config->dir}/tui/build/tui_bundle.css");
-                }
             }
         }
 
@@ -1252,16 +1280,65 @@ class theme_config {
             }
         }
 
-        if (!empty($this->tui)) {
-            $cssfiles['theme']['tui'] = core_output_choose_build_file("{$this->dir}/tui/build/tui_bundle.css");
-        }
-
         if ($cache) {
             $files = $cssfiles;
             $files['created'] = time();
             $cache->set($cachekey, $files);
         }
         return $cssfiles;
+    }
+
+    /**
+     * Get theme chain (e.g. ['base', 'roots', 'basis']) for TUI CSS.
+     *
+     * Themes are only included if they have `$THEME->tui = true` in config.php.
+     *
+     * @param bool $themedesigner Only used to decide whether to cache or not
+     * @return string[]
+     */
+    protected function get_tui_theme_chain($themedesigner) {
+        global $CFG;
+
+        $cache = null;
+        $cachekey = 'tui_scss_theme_chain';
+        if ($themedesigner) {
+            require_once($CFG->dirroot.'/lib/csslib.php');
+            $cache = cache::make('core', 'themedesigner', ['theme' => $this->name]);
+            if ($cached_data = $cache->get($cachekey)) {
+                if ($cached_data['created'] > time() - THEME_DESIGNER_CACHE_LIFETIME) {
+                    return $cached_data['themes'];
+                }
+            }
+        }
+        
+        $themes = [];
+
+        // Find out wanted parent sheets.
+        $excludes = $this->resolve_excludes('parents_exclude_sheets');
+        if ($excludes !== true) {
+            // Base first, the immediate parent last.
+            foreach (array_reverse($this->parent_configs) as $parent_config) {
+                $parent = $parent_config->name;
+                if (!empty($excludes[$parent]) and $excludes[$parent] === true) {
+                    continue;
+                }
+                if (!empty($parent_config->tui)) {
+                    $themes[] = $parent;
+                }
+            }
+        }
+
+        if (!empty($this->tui)) {
+            $themes[] = $this->name;
+        }
+
+        if ($cache) {
+            $cache->set($cachekey, [
+                'themes' => $themes,
+                'created' => time()
+            ]);
+        }
+        return $themes;
     }
 
     /**
@@ -1363,7 +1440,7 @@ class theme_config {
             // Compile!
             $compiled = $compiler->to_css();
 
-        } catch (\Leafo\ScssPhp\Exception $e) {
+        } catch (\ScssPhp\ScssPhp\Exception $e) {
             $compiled = false;
             debugging('Error while compiling SCSS: ' . $e->getMessage(), DEBUG_DEVELOPER);
         }
@@ -1556,6 +1633,9 @@ class theme_config {
         global $CFG;
 
         $rev = theme_get_revision();
+        if (!empty($CFG->tuidesignermode)) {
+            $rev = -1;
+        }
         $params = array('theme'=>$this->name,'rev'=>$rev);
         $params['type'] = $inhead ? 'head' : 'footer';
 
@@ -1757,6 +1837,12 @@ class theme_config {
 
             $css = $csstree->render();
             unset($csstree);
+        }
+
+        // Totara: Support for CSS variables
+        if ($this->legacybrowser) {
+            $vars = new \core\cssvars();
+            $css = $vars->transform($css);
         }
 
         return $css;
@@ -2155,6 +2241,18 @@ class theme_config {
      */
     public function set_rtl_mode($inrtl = true) {
         $this->rtlmode = $inrtl;
+    }
+
+    /**
+     * Set whether to generate CSS compatible with legacy browsers or not.
+     *
+     * This will likely be used when post processing the CSS before serving it.
+     *
+     * @param bool $legacybrowser
+     * @since Totara 13
+     */
+    public function set_legacy_browser($legacybrowser) {
+        $this->legacybrowser = $legacybrowser;
     }
 
     /**

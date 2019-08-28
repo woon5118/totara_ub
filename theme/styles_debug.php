@@ -36,8 +36,8 @@ $type      = optional_param('type', '', PARAM_SAFEDIR);
 $subtype   = optional_param('subtype', '', PARAM_SAFEDIR);
 $sheet     = optional_param('sheet', '', PARAM_SAFEDIR);
 $usesvg    = optional_param('svg', 1, PARAM_BOOL);
-$chunk     = optional_param('chunk', null, PARAM_INT);
 $rtl       = optional_param('rtl', false, PARAM_BOOL);
+$legacy    = optional_param('legacy', false, PARAM_BOOL);
 $report    = optional_param('report', null, PARAM_RAW);
 
 if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
@@ -51,33 +51,25 @@ if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
 $theme = theme_config::load($themename);
 $theme->force_svg_use($usesvg);
 $theme->set_rtl_mode($rtl);
+$theme->set_legacy_browser($legacy);
 
 if ($type === 'editor') {
     $csscontent = $theme->get_css_content_editor();
     css_send_uncached_css($csscontent);
 }
 
-$chunkurl = new moodle_url('/theme/styles_debug.php', array('theme' => $themename,
-    'type' => $type, 'subtype' => $subtype, 'sheet' => $sheet, 'usesvg' => $usesvg, 'rtl' => $rtl));
-
-// Totara RTL support.
-if ($rtl) {
-    $chunkurl->param('rtl', 1);
-}
+// Totara: Removed chunking support as it's not used by currently supported browsers
 
 // We need some kind of caching here because otherwise the page navigation becomes
-// way too slow in theme designer mode. Feel free to create full cache definition later...
-$key = "$type $subtype $sheet $usesvg $rtl";
-$cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'core', 'themedesigner', array('theme' => $themename));
+// way too slow in theme designer mode.
+$key = "$type $subtype $sheet $usesvg $rtl $legacy";
+// Totara: updated to use cache definition
+$cache = cache::make('core', 'themedesigner', array('theme' => $themename));
 if ($content = $cache->get($key)) {
     if ($content['created'] > time() - THEME_DESIGNER_CACHE_LIFETIME) {
         $csscontent = $content['data'];
 
-        // We need to chunk the content.
-        if ($chunk !== null) {
-            $chunks = css_chunk_by_selector_count($csscontent, $chunkurl->out(false));
-            $csscontent = ($chunk === 0) ? end($chunks) : $chunks[$chunk - 1];
-        }
+        // Totara: Removed chunking support as it's not used by currently supported browsers
 
         css_send_uncached_css($csscontent);
     }
@@ -100,14 +92,7 @@ try {
 }
 $cache->set($key, array('data' => $csscontent, 'created' => time()));
 
-// We need to chunk the content.
-if ($chunk !== null) {
-    // The chunks are ordered so that the last chunk is the one containing the @import, and so
-    // the first one to be included. All the other chunks are set in the array before that one.
-    // See {@link css_chunk_by_selector_count()} for more details.
-    $chunks = css_chunk_by_selector_count($csscontent, $chunkurl->out(false));
-    $csscontent = ($chunk === 0) ? end($chunks) : $chunks[$chunk - 1];
-}
+// Totara: Removed chunking support as it's not used by currently supported browsers
 
 if ($report === 'json') {
     header('Content-Type: application/json; charset=utf-8');

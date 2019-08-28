@@ -1,0 +1,177 @@
+<?php
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Simon Chester <simon.chester@totaralearning.com>
+ * @package core
+ */
+
+namespace core;
+
+/**
+ * Transform CSS variables to their static definitions 
+ */
+class cssvars {
+    /**
+     * @var string Regex to match var() calls.
+     */
+    const CSS_VAR_REGEX = '/var\(\s*([^),]+)(?:\s*,\s*([^)\s]+)\s*)?\)/s';
+
+    /**
+     * @var string Regex to match rules on :root.
+     */
+    const ROOT_RULE_REGEX = '/:root\s*{(.*?)}/s';
+
+    /**
+     * @var string Regex to match CSS comments.
+     */
+    const COMMENT_REGEX = '/(\\/\\*.*?\\*\\/)/s';
+
+    /**
+     * Execute tranformation on the provided CSS.
+     *
+     * @param string $css
+     * @param array $options
+     *   - string[] default_values: Default values to use in transform.
+     *                              Evaluated as if they were prepended to $css
+     *   - string[] override_values: Override values to use in transform.
+     *                               Evaluated as if they were appended to $css
+     * @return string
+     */
+    public function transform(string $css, array $options = []): string {
+        $options = (object)$options;
+        $values = array_merge(
+            $options->default_values ?? [],
+            $this->get_custom_property_values($css),
+            $options->override_values ?? []
+        );
+        $values = $this->resolve_var_references($values);
+        $css = $this->vars_compat($css);
+        $css = $this->substitute_provided_values($css, $values);
+        return $css;
+    }
+
+    /**
+     * Rewrite custom property declarations from `--abc: xyz;` to `-var--abc: xyz;` to allow parsing by IE.
+     *
+     * @param string $css
+     * @return string
+     */
+    private function vars_compat(string $css): string {
+        return preg_replace_callback(self::ROOT_RULE_REGEX, [$this, 'replace_custom_css_declarations'], $css);
+    }
+
+    private function replace_custom_css_declarations(array $match): string {
+        $content = preg_replace(self::COMMENT_REGEX, '', $match[1]);
+        $new_content = '';
+        foreach (explode(';', $content) as $line) {
+            $line = trim($line);
+            if (strlen($line) === 0) {
+                continue;
+            }
+            $new_content .= $line . ';';
+            if (substr($line, 0, 2) === '--') {
+                $new_content .= '-var' . $line . ';';
+            }
+        }
+        return ':root{' . $new_content . '}';
+    }
+
+    /**
+     * Get custom property values defined on :root
+     *
+     * @param string $css
+     * @return array
+     */
+    public function get_custom_property_values(string $css): array {
+        $matches_found = preg_match_all(self::ROOT_RULE_REGEX, $css, $matches);
+        if ($matches_found < 1) {
+            return [];
+        }
+        $result = [];
+        foreach ($matches[1] as $match) {
+            $content = preg_replace(self::COMMENT_REGEX, '', $match);
+            foreach (explode(';', $content) as $line) {
+                $line = trim($line);
+                if (strlen($line) === 0) {
+                    continue;
+                }
+
+                list($property, $value) = explode(':', $line);
+                $property = trim($property);
+                $value = trim($value);
+
+                if (substr($property, 0, 2) === '--') {
+                    $result[$property] = $value;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Resolve custom properties that reference other custom properties to their final value
+     *
+     * @param string[] $values Map of custom properties to values
+     * @return string[]
+     */
+    private function resolve_var_references(array $values): array {
+        $sorter = new topological_sort();
+
+        foreach ($values as $key => $value) {
+            $matches_found = preg_match_all(self::CSS_VAR_REGEX, $value, $matches);
+            if ($matches_found > 0) {
+                // matches[1] will be an array of the first argument to each var() call
+                $sorter->add($key, $matches[1]);
+            }
+        }
+
+        $sorted = $sorter->sort();
+
+        foreach ($sorted as $key) {
+            if (!isset($values[$key])) {
+                continue;
+            }
+            $values[$key] = self::substitute_provided_values($values[$key], $values);
+        }
+
+        return $values;
+    }
+
+    /**
+     * Replace var(--custom-prop) references in CSS with the value of the referenced custom property
+     *
+     * @param string $css
+     * @param string[] $values Map of custom properties to values
+     * @return string
+     */
+    private function substitute_provided_values(string $css, array $values): string {
+        return preg_replace_callback(self::CSS_VAR_REGEX, function ($match) use ($values) {
+            if (isset($values[$match[1]])) {
+                // found a value, use that
+                return $values[$match[1]];
+            } else if (isset($match[2])) {
+                // no value, use fallback
+                return $match[2];
+            } else {
+                // no value or fallback, leave it as-is
+                return $match[0];
+            }
+        }, $css);
+    }
+}

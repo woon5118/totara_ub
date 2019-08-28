@@ -1,3 +1,4 @@
+<?php
 /*
  * This file is part of Totara Learn
  *
@@ -17,14 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_core
+ * @package core
  */
 
-module.exports = {
-  extends: ['../../../../../.stylelintrc', 'stylelint-config-prettier'],
-  plugins: ['stylelint-order', '../stylelint/ascii-only'],
-  rules: {
-    'order/properties-order': require('./stylelint_order'),
-    'tui/ascii-only': true,
-  },
-};
+use core\tui\scss\scss_compiler_implementation;
+
+class testable_tui_scss_compiler_implementation extends scss_compiler_implementation {
+    public $fake_content = [];
+
+    protected function is_file(string $name): bool {
+        return isset($this->fake_content[$name]);
+    }
+
+    protected function load_file(string $path): ?string {
+        return $this->fake_content[$path];
+    }
+}

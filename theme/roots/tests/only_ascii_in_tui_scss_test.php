@@ -1,3 +1,4 @@
+<?php
 /*
  * This file is part of Totara Learn
  *
@@ -17,14 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_core
+ * @package theme_roots
  */
 
-module.exports = {
-  extends: ['../../../../../.stylelintrc', 'stylelint-config-prettier'],
-  plugins: ['stylelint-order', '../stylelint/ascii-only'],
-  rules: {
-    'order/properties-order': require('./stylelint_order'),
-    'tui/ascii-only': true,
-  },
-};
+require_once(__DIR__ . '/../../../lib/tests/only_ascii_in_tui_scss_base_testcase.php');
+
+class theme_roots_only_ascii_in_tui_scss_testcase extends core_only_ascii_in_tui_scss_base_testcase {
+    public function test_no_unicode_in_scss() {
+        $this->check_tui_scss_for_non_ascii('theme_roots');
+    }
+}

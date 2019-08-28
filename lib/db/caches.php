@@ -353,4 +353,9 @@ $definitions = array(
         'staticacceleration' => true,
         'staticaccelerationsize' => 10
     ),
+
+    // Caches theme data in theme designer mode for a short period
+    'themedesigner' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+    ),
 );

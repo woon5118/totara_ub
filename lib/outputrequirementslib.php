@@ -159,6 +159,11 @@ class page_requirements_manager {
     protected $tui;
 
     /**
+     * @var string[] URLs to TUI SCSS, populated by init_requirements_data()
+     */
+    protected $tui_css_urls = array();
+
+    /**
      * @var array Some config vars exposed in JS, please no secret stuff there
      */
     protected $M_cfg;
@@ -172,6 +177,11 @@ class page_requirements_manager {
      * @var array list of jQuery plugin overrides
      */
     protected $jquerypluginoverrides = array();
+
+    /**
+     * @var bool Have headers already been sent to the client?
+     */
+    protected $header_sent = false;
 
     /**
      * Page requirements constructor.
@@ -435,6 +445,14 @@ require(['core/autoinitialise'], function(ai) {
 
         // Include the YUI CSS Modules.
         $page->requires->set_yuicssmodules($page->theme->yuicssmodules);
+
+        // Include the CSS for loaded TUI components.
+        $tui_css_urls = array();
+        $tui_requirement_url_options = ['theme' => $page->theme->name];
+        foreach ($this->tui->get_bundles('css') as $bundle) {
+            $tui_css_urls[] = $bundle->get_url($tui_requirement_url_options);
+        }
+        $this->tui_css_urls = $tui_css_urls;
     }
 
     /**
@@ -1158,9 +1176,30 @@ require(['core/autoinitialise'], function(ai) {
     /**
      * Request the TUI bundle(s) for the provided component be loaded.
      *
-     * @param string $component Totara component
+     * This must be called before $OUTPUT->header(), as by then the <head> will have
+     * already been sent, meaning we wouldn't be able to add the CSS bundle.
+     *
+     * @param string $component Totara component, e.g. 'mod_example'.
+     *     Anything following a slash will be stripped, in order to allow
+     *     passing full component names like 'mod_example/pages/Example'.
      */
     public function tui_bundle(string $component) {
+        // header already sent, adding another bundle to the requirements at this point will
+        // result in it only being half-loaded as the JS will be loaded but the CSS will not.
+        // however, runtime loading should work in the majority of cases, so fall back to
+        // that when not in debug mode...
+        if ($this->header_sent) {
+            if (debugging()) {
+                throw new \coding_exception(
+                    "tui_bundle: unable to require TUI bundle for \"$component\" as the header has already been sent."
+                );
+            }
+            return;
+        }
+        $pos = strpos($component, '/');
+        if ($pos !== false) {
+            $component = substr($component, 0, $pos);
+        }
         $this->tui->require_component($component);
     }
 
@@ -1587,7 +1626,20 @@ require(['core/autoinitialise'], function(ai) {
         // is forced, usually by moving the mouse over the affected element.
         $code .= html_writer::tag('script', '/** Required in order to fix style inclusion problems in IE with YUI **/', array('id'=>'firstthemesheet', 'type'=>'text/css'));
 
-        $urls = $this->cssthemeurls + $this->cssurls;
+        $urls = array_values($this->cssthemeurls);
+
+        // Totara: add TUI SCSS bundles.
+        // Find last tui_scss url. It should be the theme.
+        for ($theme_index = count($urls) - 1; $theme_index >= 0; $theme_index--) {
+            if (strpos($urls[$theme_index], 'tui_scss')) {
+                break;
+            }
+        }
+        // Add the bundles before the theme CSS so theme CSS can override the CSS in them.
+        array_splice($urls, $theme_index === -1 ? count($urls) : $theme_index, 0, $this->tui_css_urls);
+
+        $urls = array_merge($urls, array_values($this->cssurls));
+
         foreach ($urls as $url) {
             $attributes['href'] = $url;
             $code .= html_writer::empty_tag('link', $attributes) . "\n";
@@ -1891,6 +1943,15 @@ require(['core/autoinitialise'], function(ai) {
                     'once per page, but it seems to be being output again.');
         }
         return $this->onetimeitemsoutput[$thing] = true;
+    }
+
+    /**
+     * Mark the header as having been sent.
+     * Once this is done certain things can no longer be done, e.g. adding TUI
+     * requirements.
+     */
+    public function header_sent() {
+        $this->header_sent = true;
     }
 }
 

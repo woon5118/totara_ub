@@ -70,5 +70,8 @@ extend type Query {
   """
   Query to return all of the TUI resource bundles for the provided components
   """
-  totara_core_tui_bundles(components: [String!]!): [totara_core_tui_bundle!]!
+  totara_core_tui_bundles(
+    components: [String!]!
+    theme: String!
+  ): [totara_core_tui_bundle!]!
 }

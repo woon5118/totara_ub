@@ -20,11 +20,37 @@
  * @package totara_core
  */
 
-module.exports = {
-  extends: ['../../../../../.stylelintrc', 'stylelint-config-prettier'],
-  plugins: ['stylelint-order', '../stylelint/ascii-only'],
-  rules: {
-    'order/properties-order': require('./stylelint_order'),
-    'tui/ascii-only': true,
-  },
-};
+const stylelint = require('stylelint');
+
+const ruleName = 'tui/ascii-only';
+const messages = stylelint.utils.ruleMessages(ruleName, {
+  rejected: 'Non-ascii character',
+});
+
+module.exports = stylelint.createPlugin(ruleName, on => {
+  return (root, result) => {
+    if (!on) {
+      return;
+    }
+
+    const reportFromIndex = index => {
+      stylelint.utils.report({
+        message: messages.rejected,
+        node: root,
+        index,
+        result,
+        ruleName,
+      });
+    };
+
+    const css = root.source.input.css;
+    // eslint-disable-next-line no-control-regex
+    const match = /[^\x00-\x7F]/.exec(css);
+    if (match) {
+      reportFromIndex(match.index);
+    }
+  };
+});
+
+module.exports.ruleName = ruleName;
+module.exports.messages = messages;

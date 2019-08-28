@@ -30,6 +30,7 @@ import tuiPlugin from './tui_vue_plugin';
 import requirements from './internal/requirements';
 import { memoize } from './util';
 import apolloClient from './apollo_client';
+import theme from './theme';
 
 Vue.use(tuiPlugin);
 Vue.use(VueApollo);
@@ -368,6 +369,11 @@ const tui = {
   _getLoadedComponentModules(totaraComponent) {
     return modules.getLoadedSubmodules(totaraComponent);
   },
+
+  /**
+   * Interface to theme
+   */
+  theme,
 
   /** @private */
   _modules: modules,

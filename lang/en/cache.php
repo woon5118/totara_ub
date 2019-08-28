@@ -70,6 +70,7 @@ $string['cachedef_grade_categories'] = 'Grade category queries';
 $string['cachedef_string'] = 'Language string cache';
 $string['cachedef_tags'] = 'Tags collections and areas';
 $string['cachedef_temp_tables'] = 'Temporary tables cache';
+$string['cachedef_themedesigner'] = 'Theme designer mode cache';
 $string['cachedef_userselections'] = 'Data used to persist user selections throughout Totara';
 $string['cachedef_user_group_groupings'] = 'User\'s groupings and groups per course';
 $string['cachedef_yuimodules'] = 'YUI Module definitions';

@@ -85,6 +85,11 @@ information provided here is intended especially for developers.
 * Updated login.mustache, adding calls to prevent duplicate form submissions
 * Added delay-rendering functions to core/action_menu template and actionmenu.js
 * Upgraded scssphp to v1.0.5, this involves renaming classes from Leafo => ScssPhp as the namespace has changed.
+* Removed support for serving chunked CSS as supported browsers do not use it.
+  - styles.php and styles_debug.php no longer accept a "chunk" parameter.
+  - The $chunk and $chunkurl parameters to css_store_css() are no longer used.
+  - css_chunk_by_selector_count() has been deprecated and will be removed in a future version.
+* Added IE 11 support for CSS var() and custom properties on :root {} within TUI SCSS.
 
 === 12.0 ===
 

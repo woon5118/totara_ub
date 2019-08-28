@@ -21,14 +21,21 @@
  */
 
 const path = require('path');
+const fs = require('fs');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
 const scanEntry = require('../webpack/scan_entry');
-const { rootDir } = require('../lib/common');
+const { rootDir, arrayUnique } = require('../lib/common');
 const tuiExternals = require('../webpack/tui_externals');
 const TuiAliasPlugin = require('../webpack/TuiAliasPlugin');
 const babelConfigs = require('./babel');
+const globSync = require('tiny-glob/sync');
+
+let entryCache = null;
+const getEntry = () =>
+  entryCache ? entryCache : (entryCache = scanEntry({ rootDir }));
 
 const coreBundle = 'totara/core/tui/build/tui_bundle';
 const isCoreBundleChunk = x =>
@@ -59,7 +66,7 @@ function createConfig({
   primary,
   bundleTag,
 }) {
-  let entry = scanEntry({ rootDir });
+  let entry = getEntry();
 
   // update output filenames base on config options
   entry = Object.entries(entry).reduce((acc, [key, val]) => {
@@ -71,7 +78,9 @@ function createConfig({
 
   const plugins = [
     new VueLoaderPlugin(),
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({
+      filename: '[name].scss',
+    }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': webpack.DefinePlugin.runtimeValue(
         ({ module }) => {
@@ -85,6 +94,18 @@ function createConfig({
       'process.env.LEGACY_BUNDLE': 'false',
       ...define,
     }),
+    // provide source mapping for JS files, equivalent to `devtool: 'eval'`
+    mode != 'production' &&
+      new webpack.EvalDevToolModulePlugin({
+        sourceUrlComment: '\n//# sourceURL=[url]',
+        moduleFilenameTemplate:
+          'webpack://[namespace]/[resource-path]?[loaders]',
+      }),
+    // provide source mapping for (S)CSS files
+    mode != 'production' &&
+      new webpack.SourceMapDevToolPlugin({
+        test: /\.(s?css)($|\?)/i,
+      }),
     mode == 'production' && new webpack.HashedModuleIdsPlugin(),
     analyze == name &&
       new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)(),
@@ -114,9 +135,24 @@ function createConfig({
       use: [require.resolve('../webpack/tui_vue_loader'), 'vue-loader'],
     },
     {
-      test: /\.css$/,
+      test: /\.scss$/,
       use: primary
-        ? [MiniCssExtractPlugin.loader, 'css-loader']
+        ? [
+            MiniCssExtractPlugin.loader,
+            // css-loader cannot parse SCSS
+            {
+              loader: require.resolve('../webpack/css_raw_loader'),
+              options: { sourceMap: true },
+            },
+            {
+              loader: 'postcss-loader',
+              options: {
+                parser: 'postcss-scss',
+                plugins: [require('autoprefixer')],
+                sourceMap: true,
+              },
+            },
+          ]
         : ['null-loader'],
     },
     {
@@ -176,6 +212,9 @@ function createConfig({
     // regular output is excessive
     stats: 'minimal',
 
+    // disable automatic sourcemap support as we're adding the plugins manually above
+    devtool: false,
+
     // stop webpack warning for file size
     performance: { hints: false },
 
@@ -212,6 +251,7 @@ function createConfig({
  * Modern webpack config
  *
  * @param {object} opts
+ * @return {object}
  */
 function modernConfig(opts) {
   return createConfig({ ...opts, name: 'modern', primary: true });
@@ -221,6 +261,7 @@ function modernConfig(opts) {
  * Legacy webpack config
  *
  * @param {object} opts
+ * @return {object}
  */
 function legacyConfig(opts) {
   return createConfig({
@@ -231,9 +272,98 @@ function legacyConfig(opts) {
   });
 }
 
+/**
+ * Transform SCSS to improved SCSS (by running autoprefixer)
+ *
+ * @param {object} opts
+ * @return {object}
+ */
+function scssToScssConfig({ mode, watch }) {
+  let entry = getEntry();
+  const tuiDirs = arrayUnique(
+    ...Object.values(entry).map(x => (Array.isArray(x) ? x : [x]))
+  ).map(x => path.dirname(x));
+
+  const scssEntry = tuiDirs.reduce((acc, dir) => {
+    if (fs.existsSync(path.join(rootDir, dir, 'styles'))) {
+      globSync('styles/**/*.scss', { cwd: dir }).forEach(x => {
+        if (x == 'styles/static.scss') {
+          // already included in bundle (see tui_json_loader)
+          return;
+        }
+        const out = path.join(
+          dir,
+          'build/styles',
+          x.slice('styles/'.length).replace(/\.scss$/, '')
+        );
+        const modeSuffix = mode == 'production' ? '' : '.' + mode;
+        acc[out + modeSuffix] = './' + path.join(dir, x);
+      });
+    }
+    return acc;
+  }, {});
+
+  if (Object.keys(scssEntry).length == 0) {
+    return;
+  }
+
+  const plugins = [
+    // this plugin can be removed once Webpack 5 is released
+    new FixStyleOnlyEntriesPlugin({
+      silent: true,
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].scss',
+    }),
+    mode != 'production' &&
+      new webpack.SourceMapDevToolPlugin({
+        test: /\.(s?css)($|\?)/i,
+      }),
+  ].filter(Boolean);
+
+  const rules = [
+    {
+      test: /\.scss$/,
+      use: [
+        MiniCssExtractPlugin.loader,
+        // css-loader cannot parse SCSS
+        {
+          loader: require.resolve('../webpack/css_raw_loader'),
+          options: { sourceMap: true },
+        },
+        {
+          loader: 'postcss-loader',
+          options: {
+            parser: 'postcss-scss',
+            plugins: [require('autoprefixer')],
+            sourceMap: true,
+          },
+        },
+      ],
+    },
+  ];
+
+  return {
+    name: 'scss-to-scss',
+    entry: scssEntry,
+    mode,
+    watch,
+    stats: 'minimal',
+    devtool: false,
+    output: { path: rootDir },
+    module: { rules },
+    plugins,
+  };
+}
+
 module.exports = function(opts) {
   if (!opts.mode) {
     opts = { ...opts, mode: 'production' };
   }
-  return [modernConfig(opts), legacyConfig(opts)];
+  const configs = [
+    modernConfig(opts),
+    legacyConfig(opts),
+    scssToScssConfig(opts),
+  ];
+  return configs.filter(Boolean);
 };

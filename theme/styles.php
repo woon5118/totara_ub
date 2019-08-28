@@ -44,11 +44,7 @@ if ($slashargument = min_get_slash_argument()) {
         $usesvg = true;
     }
 
-    $chunk = null;
-    if (preg_match('#/(chunk(\d+)(/|$))#', $slashargument, $matches)) {
-        $chunk = (int)$matches[2];
-        $slashargument = str_replace($matches[1], '', $slashargument);
-    }
+    // Totara: Removed chunking support as it's not used by currently supported browsers
 
     // TOTARA: RTL stylesheet.
     $rtl = false;
@@ -57,27 +53,37 @@ if ($slashargument = min_get_slash_argument()) {
         $slashargument = str_replace($matches[1], '', $slashargument);
     }
 
-    list($themename, $rev, $type) = explode('/', $slashargument, 3);
+    // Totara: Support for CSS variables
+    $legacy = false;
+    if (preg_match('#/(legacy(/|$))#', $slashargument, $matches)) {
+        $legacy = true;
+        $slashargument = str_replace($matches[1], '', $slashargument);
+    }
+
+    $slashargument_parts = explode('/', $slashargument);
+    list($themename, $rev, $type) = $slashargument_parts;
     $themename = min_clean_param($themename, 'SAFEDIR');
     $rev       = min_clean_param($rev, 'INT');
     $type      = min_clean_param($type, 'SAFEDIR');
+    $subtype   = isset($slashargument_parts[3]) ? min_clean_param($slashargument_parts[3], 'SAFEDIR') : null;
 
 } else {
     $themename = min_optional_param('theme', 'standard', 'SAFEDIR');
     $rev       = min_optional_param('rev', 0, 'INT');
     $type      = min_optional_param('type', 'all', 'SAFEDIR');
-    $chunk     = min_optional_param('chunk', null, 'INT');
+    $subtype   = min_optional_param('subtype', null, 'SAFEDIR');
     $usesvg    = (bool)min_optional_param('svg', '1', 'INT');
     $rtl       = (bool)min_optional_param('rtl', 0, 'INT');
+    $legacy    = (bool)min_optional_param('legacy', 0, 'INT');
 }
 
-if ($type === 'editor') {
-    // The editor CSS is never chunked.
-    $chunk = null;
-} else if ($type === 'all' || $type === 'all-rtl') {
-    // We're fine.
-} else {
+// Totara: Removed chunking support as it's not used by currently supported browsers
+if (!in_array($type, ['all', 'all-rtl', 'editor', 'tui_scss'])) {
     css_send_css_not_found();
+}
+
+if ($type !== 'tui_scss') {
+    $subtype = null;
 }
 
 if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
@@ -90,34 +96,28 @@ if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
 }
 
 $candidatedir = "$CFG->localcachedir/theme/$rev/$themename/css";
-$etag = "$rev/$themename/$type";
-$candidatename = $type;
+$type_key = $type . ($subtype ? ".$subtype" : '');
+$etag = "$rev/$themename/$type_key";
+$candidatename = $type_key;
 if (!$usesvg) {
     // Add to the sheet name, one day we'll be able to just drop this.
     $candidatedir .= '/nosvg';
     $etag .= '/nosvg';
 }
 
-if ($chunk !== null) {
-    $etag .= '/chunk'.$chunk;
-    // Totara RTL support.
-    if ($rtl) {
-        $candidatename .= '-rtl.' . $chunk;
-    } else {
-        $candidatename .= '.' . $chunk;
-    }
-}
-$candidatesheet = "$candidatedir/$candidatename.css";
+// Totara: Removed chunking support as it's not used by currently supported browsers
 
 // Totara RTL support.
 if ($rtl) {
-    if ($chunk !== null) {
-        $candidatesheet = "$candidatedir/$candidatename.css";
-    } else {
-        $candidatesheet = "$candidatedir/$candidatename-rtl.css";
-    }
+    $candidatename .= '-rtl';
     $etag .= '/rtl';
 }
+if ($legacy) {
+    $candidatename .= '-legacy';
+    $etag .= '/legacy';
+}
+
+$candidatesheet = "$candidatedir/$candidatename.css";
 
 $etag = sha1($etag);
 
@@ -140,7 +140,8 @@ require("$CFG->dirroot/lib/setup.php");
 
 $theme = theme_config::load($themename);
 $theme->force_svg_use($usesvg);
-$theme->set_rtl_mode($type === 'all-rtl' ? true : false);
+$theme->set_rtl_mode($type === 'all-rtl' || ($type == 'tui_scss' && $rtl) ? true : false);
+$theme->set_legacy_browser($legacy);
 
 $themerev = theme_get_revision();
 
@@ -150,18 +151,24 @@ if ($themerev <= 0 or $themerev != $rev) {
     $cache = false;
 
     $candidatedir = "$CFG->localcachedir/theme/$rev/$themename/css";
-    $etag = "$rev/$themename/$type";
-    $candidatename = $type;
+    $etag = "$rev/$themename/$type_key";
+    $candidatename = $type_key;
     if (!$usesvg) {
         // Add to the sheet name, one day we'll be able to just drop this.
         $candidatedir .= '/nosvg';
         $etag .= '/nosvg';
     }
 
-    if ($chunk !== null) {
-        $etag .= '/chunk'.$chunk;
-        $candidatename .= '.'.$chunk;
+    // Totara RTL support.
+    if ($rtl) {
+        $candidatename .= '-rtl';
+        $etag .= '/rtl';
     }
+    if ($legacy) {
+        $candidatename .= '-legacy';
+        $etag .= '/legacy';
+    }
+
     $candidatesheet = "$candidatedir/$candidatename.css";
     $etag = sha1($etag);
 }
@@ -170,7 +177,7 @@ make_localcache_directory('theme', false);
 
 if ($type === 'editor') {
     $csscontent = $theme->get_css_content_editor();
-    css_store_css($theme, "$candidatedir/editor.css", $csscontent, false);
+    css_store_css($theme, "$candidatedir/editor.css", $csscontent);
 
 } else {
     // Fetch a lock whilst the CSS is fetched as this can be slow and CPU intensive.
@@ -191,28 +198,11 @@ if ($type === 'editor') {
         }
     }
 
-    // Older IEs require smaller chunks.
-    if (!$csscontent = $theme->get_css_cached_content()) {
-        $csscontent = $theme->get_css_content();
-        $theme->set_css_content_cache($csscontent);
-    }
+    $csscontent = $theme->get_css_content_by($type, $subtype);
 
-    $relroot = preg_replace('|^http.?://[^/]+|', '', $CFG->wwwroot);
-    if (!empty($slashargument)) {
-        if ($usesvg) {
-            $chunkurl = "{$relroot}/theme/styles.php/{$themename}/{$rev}/$type";
-        } else {
-            $chunkurl = "{$relroot}/theme/styles.php/_s/{$themename}/{$rev}/$type";
-        }
-    } else {
-        if ($usesvg) {
-            $chunkurl = "{$relroot}/theme/styles.php?theme={$themename}&rev={$rev}&type=$type";
-        } else {
-            $chunkurl = "{$relroot}/theme/styles.php?theme={$themename}&rev={$rev}&type=$type&svg=0";
-        }
-    }
+    // Totara: Removed chunking support as it's not used by currently supported browsers
 
-    css_store_css($theme, "$candidatedir/$type.css", $csscontent, true, $chunkurl);
+    css_store_css($theme, "$candidatedir/$candidatename.css", $csscontent);
 
     if ($lock) {
         // Now that the CSS has been generated and/or stored, release the lock.
@@ -225,10 +215,6 @@ if (!$cache) {
     // Do not pollute browser caches if invalid revision requested,
     // let's ignore legacy IE breakage here too.
     css_send_uncached_css($csscontent);
-
-} else if ($chunk !== null and file_exists($candidatesheet)) {
-    // Greetings stupid legacy IEs!
-    css_send_cached_css($candidatesheet, $etag);
 
 } else {
     // Real browsers - this is the expected result!

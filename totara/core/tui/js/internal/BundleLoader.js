@@ -22,6 +22,7 @@
 
 import apollo from '../apollo_client';
 import bundleQuery from 'totara_core/graphql/tui_bundles_nosession';
+import { globalConfig } from '../config';
 
 /**
  * Possible states for a bundle
@@ -130,6 +131,7 @@ export default class BundleLoader {
       query: bundleQuery,
       variables: {
         components: totaraComponents,
+        theme: globalConfig.theme,
       },
       fetchPolicy: 'no-cache',
     });
@@ -194,6 +196,8 @@ export default class BundleLoader {
     switch (bundle.type) {
       case 'js':
         return this._loadScript(bundle.url);
+      case 'css':
+        return this._loadStyle(bundle.url);
       default:
         throw new Error('Unknown bundle type');
     }
@@ -219,6 +223,34 @@ export default class BundleLoader {
         reject();
       });
       document.head.appendChild(script);
+    });
+  }
+
+  /**
+   * Load the stylesheet at the specified URL.
+   *
+   * @private
+   * @param {string} url
+   * @returns {Promise} resolving if stylesheet loads and rejecting if it fails
+   */
+  _loadStyle(url) {
+    return new Promise((resolve, reject) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = url;
+      link.addEventListener('load', () => resolve());
+      link.addEventListener('error', () => reject());
+
+      // last tui_scss link should be the theme css, so insert directly before that.
+      const tuiLinks = document.head.querySelectorAll(
+        'link[rel=stylesheet][href*=tui_scss]'
+      );
+      const lastTuiLink = tuiLinks[tuiLinks.length - 1];
+      if (lastTuiLink) {
+        lastTuiLink.parentNode.insertBefore(link, lastTuiLink);
+      } else {
+        document.head.appendChild(link);
+      }
     });
   }
 

@@ -1,3 +1,4 @@
+<?php
 /*
  * This file is part of Totara Learn
  *
@@ -17,14 +18,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_core
+ * @package core
  */
 
-module.exports = {
-  extends: ['../../../../../.stylelintrc', 'stylelint-config-prettier'],
-  plugins: ['stylelint-order', '../stylelint/ascii-only'],
-  rules: {
-    'order/properties-order': require('./stylelint_order'),
-    'tui/ascii-only': true,
-  },
-};
+namespace core\tui\scss\transforms;
+
+use core\tui\scss\transform_resource;
+use core\tui\scss\util;
+
+/**
+ * Filter to only emit code that results in output (inverse of {@see definitions_only}).
+ * 
+ * In:
+ * $link-color: red; a { color: $link-color }
+ *
+ * Out:
+ * a { color: $link-color }
+ */
+class output_only extends base_output_filter {
+    /**
+     * {@inheritdoc}
+     */
+    public function execute(transform_resource $resource): void {
+        $tree = $resource->get_ast();
+        $context = (object) ['only_output' => true, 'name' => 'output_only'];
+        util::traverse($tree, $context, \Closure::fromCallable([$this, 'output_filter_visitor']));
+        $resource->mark_ast_modified();
+    }
+}
