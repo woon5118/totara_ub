@@ -1725,12 +1725,6 @@ class program {
         $progobj->id = $this->id;
         $summary = $programrenderer->coursecat_programbox_content(new programcat_helper(), new program_in_list($progobj));
         $out .= $summary;
-/* TODO: This needs fixing to work with the new catalogue
- *
-        $summary = file_rewrite_pluginfile_urls($this->summary, 'pluginfile.php',
-            context_program::instance($this->id)->id, 'totara_program', 'summary', 0);
-        $out .= html_writer::tag('div', $summary, array('class' => 'summary'));
- t2-feature-certification */
 
         // course sets - for certify or recertify paths
         if ($iscertif) {
