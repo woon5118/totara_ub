@@ -57,6 +57,7 @@ Feature: Basic recycle bin functionality
     And I am on "Course 1" course homepage
     And I should see "Test assign" in the "Topic 1" "section"
 
+  @javascript
   Scenario: Restore a deleted course
     Given I log in as "admin"
     And I go to the courses management page

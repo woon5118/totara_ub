@@ -709,6 +709,7 @@ Feature: Course category management interface performs as expected
     And I should see "Next" in the "#course-listing .listing-pagination" "css_element"
     And I should see "Last" in the "#course-listing .listing-pagination" "css_element"
 
+  @javascript
   Scenario: Test clicking to edit a course.
     Given the following "categories" exist:
       | name | category | idnumber |

@@ -150,6 +150,15 @@ switch ($action) {
         $outcome->html .= html_writer::end_tag('ul');
         $outcome->outcome = true;
         break;
+    // Totara: secondary actions in the action_menu
+    case 'totarasecondarymenu':
+        // Note that this query doesn't follow the rules the other ajax requests do.
+        // It returns template data instead of HTML.
+        $categoryid = required_param('categoryid', PARAM_INT);
+        $renderer = $PAGE->get_renderer('core_course', 'management');
+        $coursecat = coursecat::get($categoryid);
+        $outcome = $renderer->category_secondary_actions_data($coursecat);
+        break;
 }
 
 echo json_encode($outcome);

@@ -1796,6 +1796,22 @@ class behat_course extends behat_base {
         if (!$actionsnode) {
             throw new ExpectationException("Could not find the actions for $listingtype", $this->getSession());
         }
+
+        // Totara: category management action menu now requires JavaScript.
+        if ($listingtype == 'category') {
+            if (!$this->running_javascript()) {
+                throw new coding_exception('Clicking a management listitem action requires javascript.');
+            }
+            $actionsnode->find('css', 'a.toggle-display')->click();
+            $this->wait_for_pending_js(); // Wait for the actionmenu to populate items.
+            $actionnode = $actionsnode->find('css', '.action-'.$action);
+            if (!$actionnode || !$actionnode->isVisible()) {
+                throw new ExpectationException("Expected action was not available or not found ($action)", $this->getSession());
+            }
+            $actionnode->click();
+            return;
+        }
+
         $actionnode = $actionsnode->find('css', '.action-'.$action);
         if (!$actionnode) {
             throw new ExpectationException("Expected action was not available or not found ($action)", $this->getSession());

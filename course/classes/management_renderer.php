@@ -170,6 +170,34 @@ class core_course_management_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Returns the template data containing secondary actions.
+     *
+     * @param coursecat $category
+     * @return array the template data of action_menu
+     *
+     * @since Totara 13
+     */
+    public function category_secondary_actions_data(coursecat $category) {
+        $actions = \core_course\management\helper::get_category_listitem_actions($category);
+        // Create a dummy action_menu to add actions.
+        $menu = new action_menu();
+        foreach ($actions as $key => $action) {
+            // We need only secondary actions.
+            if (!isset($action['primary']) || $action['primary']) {
+                continue;
+            }
+            $menu->add_secondary_action(new action_menu_link(
+                $action['url'],
+                $action['icon'],
+                $action['string'],
+                false,
+                array('data-action' => $key, 'class' => 'action-'.$key)
+            ));
+        }
+        return $menu->export_for_template($this);
+    }
+
+    /**
      * Renders a category list item.
      *
      * This function gets called recursively to render sub categories.
@@ -256,7 +284,7 @@ class core_course_management_renderer extends plugin_renderer_base {
             );
             $icon = html_writer::span($icon, 'float-left');
         }
-        $actions = \core_course\management\helper::get_category_listitem_actions($category);
+        $actions = \core_course\management\helper::get_category_listitem_actions($category, true); // Totara: 'slow' actions are populated later.
         $hasactions = !empty($actions) || $category->can_create_course();
 
         $html = html_writer::start_tag('li', $attributes);
@@ -279,7 +307,7 @@ class core_course_management_renderer extends plugin_renderer_base {
             $html .= html_writer::tag('span', s($category->idnumber), array('class' => 'dimmed idnumber'));
         }
         if ($hasactions) {
-            $html .= $this->category_listitem_actions($category, $actions);
+            $html .= $this->category_listitem_actions($category, $actions, true); // Totara: Added delayload.
         }
         $countid = 'course-count-'.$category->id;
         $html .= html_writer::span(
@@ -348,10 +376,11 @@ class core_course_management_renderer extends plugin_renderer_base {
      * Renderers the actions for individual category list items.
      *
      * @param coursecat $category
-     * @param array $actions
+     * @param array|null $actions
+     * @param bool $delayload
      * @return string
      */
-    public function category_listitem_actions(coursecat $category, array $actions = null) {
+    public function category_listitem_actions(coursecat $category, array $actions = null, bool $delayload = false) {
         if ($actions === null) {
             $actions = \core_course\management\helper::get_category_listitem_actions($category);
         }
@@ -360,16 +389,24 @@ class core_course_management_renderer extends plugin_renderer_base {
         $hasitems = false;
         foreach ($actions as $key => $action) {
             $hasitems = true;
+            // Totara: Add only primary actions.
+            if (isset($action['primary']) && !$action['primary']) {
+                continue;
+            }
             $menu->add(new action_menu_link(
                 $action['url'],
                 $action['icon'],
                 $action['string'],
-                in_array($key, array('show', 'hide', 'moveup', 'movedown')),
+                true,
                 array('data-action' => $key, 'class' => 'action-'.$key)
             ));
         }
         if (!$hasitems) {
             return '';
+        }
+        // Totara: Set up delayload.
+        if ($delayload) {
+            $menu->set_delayloader('course/ajax/management.php', array('action' => 'totarasecondarymenu', 'categoryid' => $category->id));
         }
         return $this->render($menu);
     }

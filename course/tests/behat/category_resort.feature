@@ -59,6 +59,7 @@ Feature: Test we can resort categories in the management interface.
       | "Sort by Category ID number ascending"  | "Extended social studies" | "Social studies"          | "Applied sciences" |
       | "Sort by Category ID number descending" | "Applied sciences"        | "Social studies"          | "Extended social studies" |
 
+  @javascript
   Scenario Outline: Test resorting subcategories.
     Given the following "categories" exist:
       | category | name | idnumber | sortorder |

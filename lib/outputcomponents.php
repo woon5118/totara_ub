@@ -4000,6 +4000,20 @@ class action_menu implements renderable, templatable {
     protected $secondaryactions = array();
 
     /**
+     * A string of delayload URL not starting with '/'.
+     * @var string|null
+     * @since Totara 13
+     */
+    protected $loader_url = null;
+
+    /**
+     * An array of delayload parameters.
+     * @var array
+     * @since Totara 13
+     */
+    protected $loader_params = array();
+
+    /**
      * An array of attributes added to the container of the action menu.
      * Initialised with defaults during construction.
      * @var array
@@ -4209,6 +4223,10 @@ class action_menu implements renderable, templatable {
      * @return array
      */
     public function get_secondary_actions() {
+        // Totara: No secondary actions if delayload is enabled.
+        if (!empty($this->loader_url)) {
+            return array();
+        }
         return $this->secondaryactions;
     }
 
@@ -4257,6 +4275,21 @@ class action_menu implements renderable, templatable {
             default :
                 return 'tl';
         }
+    }
+
+    /**
+     * Enable delayload and sets the delayload options.
+     * Note that secondary actions will not be included in the template data.
+     *
+     * @param string|null $url URL not starting with '/' or null
+     * @param array $params passed to delayload request
+     *              note that 'sesskey' and 'ajax' are passed on the fly
+     *
+     * @since Totara 13
+     */
+    public function set_delayloader($url, $params = array()) {
+        $this->loader_url = $url;
+        $this->loader_params = $params;
     }
 
     /**
@@ -4396,6 +4429,20 @@ class action_menu implements renderable, templatable {
             }
             return $data;
         }, $this->secondaryactions);
+
+        // Totara: Add delayload information.
+        if (!empty($this->loader_url)) {
+            // Remove secondary actions if delayload is enabled.
+            $secondary->items = array();
+            $secondary->delayload = true;
+            $data->loader = new stdClass();
+            $data->loader->url = $this->loader_url;
+            if (empty($this->loader_params)) {
+                $data->loader->params = '';
+            } else {
+                $data->loader->params = json_encode($this->loader_params);
+            }
+        }
 
         $data->primary = $primary;
         $data->secondary = $secondary;

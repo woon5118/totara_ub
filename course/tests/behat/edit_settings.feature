@@ -34,6 +34,7 @@ Feature: Edit course settings
     And I am on homepage
     And I should see "Edited course fullname"
 
+  @javascript
   Scenario: Edit course settings and return to the management interface
     Given the following "categories" exist:
       | name | category | idnumber |

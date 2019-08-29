@@ -68,6 +68,7 @@ information provided here is intended especially for developers.
 * MariaDB has a new optimizer hint to disable materialization for a query
 * Extended modal_cancel template to support different text for the cancel button
 * Updated login.mustache, adding calls to prevent duplicate form submissions
+* Added delay-rendering functions to core/action_menu template and actionmenu.js
 
 === 12.0 ===
 

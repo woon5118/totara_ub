@@ -22,15 +22,20 @@
     Example context (json):
     {
         "classes": "",
+        "loader": {
+            "url": "/foo/ajax/loader.php",
+            "params": "{\"action\":\"secondaryactions\",\"id\":42}"
+        },
         "primary": {
             "items": [{"rawhtml": "<p>Item in primary menu</p>"}]
         },
         "secondary": {
+            "delayload": true,
             "items": [{"rawhtml": "<p>Item in secondary menu</p>"}]
         }
     }
 }}
-<div class="{{classes}}"{{#attributes}} {{name}}="{{value}}"{{/attributes}}>
+<div class="{{classes}}"{{#attributes}} {{name}}="{{value}}"{{/attributes}} {{#loader}}data-loader-url="{{url}}" data-loader-params="{{params}}"{{/loader}}>
     {{#primary}}
 
         <ul class="{{classes}}"{{#attributes}} {{name}}="{{value}}"{{/attributes}}>
@@ -47,6 +52,7 @@
 
     {{#secondary}}
         <ul class="{{classes}}"{{#attributes}} {{name}}="{{value}}"{{/attributes}}>
+            {{#delayload}}<li role="presentation" class="spinner">{{#flex_icon}}loading{{/flex_icon}}</li>{{/delayload}}
             {{#items}}<li role="presentation">{{> core/action_menu_item }}</li>{{/items}}
         </ul>
     {{/secondary}}

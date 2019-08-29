@@ -11,6 +11,7 @@ Feature: Test category management actions
   Test we can manage cohorts within a category
   Test we can manage filters for a category
 
+  @javascript
   Scenario: Test editing a category through the management interface.
     Given the following "categories" exist:
       | name | category | idnumber |
@@ -42,6 +43,7 @@ Feature: Test category management actions
     And I should see "Category 1 (edited)" in the "#category-listing" "css_element"
     And I should see "Category 1 (edited)" in the "#course-listing h3" "css_element"
 
+  @javascript
   Scenario: Test deleting a categories through the management interface.
     Given the following "categories" exist:
       | name | category | idnumber |
@@ -103,6 +105,7 @@ Feature: Test category management actions
     And I should not see "Cat 3" in the "#category-listing ul.ml" "css_element"
     And I should see "Course 1" in the "#course-listing ul.ml" "css_element"
 
+  @javascript
   Scenario: Test I can assign roles for a category through the management interface.
     Given the following "categories" exist:
       | name | category | idnumber |
@@ -123,6 +126,7 @@ Feature: Test category management actions
     And I should see the "Course categories and courses" management page
     And "Cat 1" "link" should exist in the "#category-listing" "css_element"
 
+  @javascript
   Scenario: Test I can set access permissions for a category through the management interface.
     Given the following "categories" exist:
       | name | category | idnumber |
@@ -142,6 +146,7 @@ Feature: Test category management actions
     And I should see the "Course categories and courses" management page
     And I should see "Cat 1" in the "#course-listing" "css_element"
 
+  @javascript
   Scenario: Test clicking to manage cohorts for a category through the management interface.
     Given the following "categories" exist:
       | name | category | idnumber |
@@ -157,6 +162,7 @@ Feature: Test category management actions
     # Redirect
     And I should see "Category: Cat 1: available audiences"
 
+  @javascript
   Scenario: Test configuring filters for a category
     Given the following "categories" exist:
       | name | category | idnumber |
@@ -348,6 +354,7 @@ Feature: Test category management actions
     When I press "Create category"
     Then I should see "ID number is already used for another category"
 
+  @javascript
   Scenario: Test that is possible to remove an idnumber from a course category
     Given the following "categories" exist:
       | name | category | idnumber |
@@ -364,3 +371,29 @@ Feature: Test category management actions
     # Redirect
     Then I should see "Category 1 (edited)" in the "#category-listing" "css_element"
     And I should not see "CAT1" in the "#course-listing" "css_element"
+
+  @javascript
+  Scenario: Test editing sub-sub category as site manager
+    Given the following "categories" exist:
+      | name | category | idnumber |
+      | Cat 1 | 0 | CAT1 |
+      | Cat 2 | 0 | CAT2 |
+      | CatSub 1 | CAT1 | CAT11 |
+      | CatSub 2 | CAT2 | CAT12 |
+      | CatSubSub 1 | CAT11 | CAT111 |
+      | CatSubSub 2 | CAT11 | CAT112 |
+      | CatSubSub 3 | CAT12 | CAT121 |
+    And the following "users" exist:
+      | username | firstname | lastname | email             |
+      | user1    | User      | One      | user1@example.com |
+    And the following "role assigns" exist:
+      | user  | role    | contextlevel | reference |
+      | user1 | manager | Category     | CAT11     |
+    And I log in as "user1"
+    When I go to the courses management page
+    And I click to expand category "CAT1" in the management interface
+    And I click to expand category "CAT11" in the management interface
+    And I click on "createnewsubcategory" action for "CatSub 1" in management category listing
+    And I set the field "Category name" to "CatSubSub 4 (added)"
+    And I press "Create category"
+    Then I should see "CatSubSub 4 (added)" in the "#category-listing" "css_element"

@@ -165,15 +165,20 @@ class helper {
      * Returns an array of actions that can be performed upon a category being shown in a list.
      *
      * @param \coursecat $category
+     * @param boolean $onlyfastactions Set true to get only 'fast' actions.
+     *                                 The fast actions require only cheap database queries or no database queries at all while
+     *                                 the slow actions require expensive database queries.
      * @return array
      */
-    public static function get_category_listitem_actions(\coursecat $category) {
+    public static function get_category_listitem_actions(\coursecat $category, bool $onlyfastactions = false) {
+        // Totara: Separate 'fast' and 'slow' actions.
         $manageurl = new \moodle_url('/course/management.php', array('categoryid' => $category->id));
         $baseurl = new \moodle_url($manageurl, array('sesskey' => \sesskey()));
         $actions = array();
         // Edit.
         if ($category->can_edit()) {
             $actions['edit'] = array(
+                'primary' => false, // Totara: secondary
                 'url' => new \moodle_url('/course/editcategory.php', array('id' => $category->id)),
                 'icon' => \core\output\flex_icon::get_icon('t/edit', 'core', array('alt' => new \lang_string('edit'))),
                 'string' => new \lang_string('edit')
@@ -184,11 +189,13 @@ class helper {
         if ($category->can_change_visibility()) {
             // We always show both icons and then just toggle the display of the invalid option with CSS.
             $actions['hide'] = array(
+                'primary' => true, // Totara: primary
                 'url' => new \moodle_url($baseurl, array('action' => 'hidecategory')),
                 'icon' => \core\output\flex_icon::get_icon('t/hide', 'core', array('alt' => new \lang_string('hide'))),
                 'string' => new \lang_string('hide')
             );
             $actions['show'] = array(
+                'primary' => true, // Totara: primary
                 'url' => new \moodle_url($baseurl, array('action' => 'showcategory')),
                 'icon' => \core\output\flex_icon::get_icon('t/show', 'core', array('alt' => new \lang_string('show'))),
                 'string' => new \lang_string('show')
@@ -198,11 +205,13 @@ class helper {
         // Move up/down.
         if ($category->can_change_sortorder()) {
             $actions['moveup'] = array(
+                'primary' => true, // Totara: primary
                 'url' => new \moodle_url($baseurl, array('action' => 'movecategoryup')),
                 'icon' => \core\output\flex_icon::get_icon('t/up', 'core', array('alt' => new \lang_string('up'))),
                 'string' => new \lang_string('up')
             );
             $actions['movedown'] = array(
+                'primary' => true, // Totara: primary
                 'url' => new \moodle_url($baseurl, array('action' => 'movecategorydown')),
                 'icon' => \core\output\flex_icon::get_icon('t/down', 'core', array('alt' => new \lang_string('down'))),
                 'string' => new \lang_string('down')
@@ -211,48 +220,57 @@ class helper {
 
         if ($category->can_create_subcategory()) {
             $actions['createnewsubcategory'] = array(
+                'primary' => false, // Totara: secondary
                 'url' => new \moodle_url('/course/editcategory.php', array('parent' => $category->id)),
                 'icon' => \core\output\flex_icon::get_icon('i/withsubcat', 'core', array('alt' => new \lang_string('createnewsubcategory'))),
                 'string' => new \lang_string('createnewsubcategory')
             );
         }
 
-        // Resort.
-        if ($category->can_resort_subcategories() && $category->has_children()) {
-            $actions['resortbyname'] = array(
-                'url' => new \moodle_url($baseurl, array('action' => 'resortcategories', 'resort' => 'name')),
-                'icon' => \core\output\flex_icon::get_icon('t/sort', 'core', array('alt' => new \lang_string('sort'))),
-                'string' => new \lang_string('resortsubcategoriesby', 'moodle' , get_string('categoryname'))
-            );
-            $actions['resortbynamedesc'] = array(
-                'url' => new \moodle_url($baseurl, array('action' => 'resortcategories', 'resort' => 'namedesc')),
-                'icon' => \core\output\flex_icon::get_icon('t/sort', 'core', array('alt' => new \lang_string('sort'))),
-                'string' => new \lang_string('resortsubcategoriesbyreverse', 'moodle', get_string('categoryname'))
-            );
-            $actions['resortbyidnumber'] = array(
-                'url' => new \moodle_url($baseurl, array('action' => 'resortcategories', 'resort' => 'idnumber')),
-                'icon' => \core\output\flex_icon::get_icon('t/sort', 'core', array('alt' => new \lang_string('sort'))),
-                'string' => new \lang_string('resortsubcategoriesby', 'moodle', get_string('idnumbercoursecategory'))
-            );
-            $actions['resortbyidnumberdesc'] = array(
-                'url' => new \moodle_url($baseurl, array('action' => 'resortcategories', 'resort' => 'idnumberdesc')),
-                'icon' => \core\output\flex_icon::get_icon('t/sort', 'core', array('alt' => new \lang_string('sort'))),
-                'string' => new \lang_string('resortsubcategoriesbyreverse', 'moodle', get_string('idnumbercoursecategory'))
-            );
-        }
+        if (!$onlyfastactions) {
+            // Resort.
+            if ($category->can_resort_subcategories() && $category->has_children()) {
+                $actions['resortbyname'] = array(
+                    'primary' => false, // Totara: secondary
+                    'url' => new \moodle_url($baseurl, array('action' => 'resortcategories', 'resort' => 'name')),
+                    'icon' => \core\output\flex_icon::get_icon('t/sort', 'core', array('alt' => new \lang_string('sort'))),
+                    'string' => new \lang_string('resortsubcategoriesby', 'moodle' , get_string('categoryname'))
+                );
+                $actions['resortbynamedesc'] = array(
+                    'primary' => false, // Totara: secondary
+                    'url' => new \moodle_url($baseurl, array('action' => 'resortcategories', 'resort' => 'namedesc')),
+                    'icon' => \core\output\flex_icon::get_icon('t/sort', 'core', array('alt' => new \lang_string('sort'))),
+                    'string' => new \lang_string('resortsubcategoriesbyreverse', 'moodle', get_string('categoryname'))
+                );
+                $actions['resortbyidnumber'] = array(
+                    'primary' => false, // Totara: secondary
+                    'url' => new \moodle_url($baseurl, array('action' => 'resortcategories', 'resort' => 'idnumber')),
+                    'icon' => \core\output\flex_icon::get_icon('t/sort', 'core', array('alt' => new \lang_string('sort'))),
+                    'string' => new \lang_string('resortsubcategoriesby', 'moodle', get_string('idnumbercoursecategory'))
+                );
+                $actions['resortbyidnumberdesc'] = array(
+                    'primary' => false, // Totara: secondary
+                    'url' => new \moodle_url($baseurl, array('action' => 'resortcategories', 'resort' => 'idnumberdesc')),
+                    'icon' => \core\output\flex_icon::get_icon('t/sort', 'core', array('alt' => new \lang_string('sort'))),
+                    'string' => new \lang_string('resortsubcategoriesbyreverse', 'moodle', get_string('idnumbercoursecategory'))
+                );
+            }
 
-        // Delete.
-        if ($category->can_delete()) { // Totara: Changed from can_delete_full() to improve performance.
-            $actions['delete'] = array(
-                'url' => new \moodle_url($baseurl, array('action' => 'deletecategory')),
-                'icon' => \core\output\flex_icon::get_icon('t/delete', 'core', array('alt' => new \lang_string('delete'))),
-                'string' => new \lang_string('delete')
-            );
+            // Delete.
+            if ($category->can_delete()) { // Totara: Changed from can_delete_full() to improve performance.
+                $actions['delete'] = array(
+                    'primary' => false, // Totara: secondary
+                    'url' => new \moodle_url($baseurl, array('action' => 'deletecategory')),
+                    'icon' => \core\output\flex_icon::get_icon('t/delete', 'core', array('alt' => new \lang_string('delete'))),
+                    'string' => new \lang_string('delete')
+                );
+            }
         }
 
         // Assign roles.
         if ($category->can_review_roles()) {
             $actions['assignroles'] = array(
+                'primary' => false, // Totara: secondary
                 'url' => new \moodle_url('/admin/roles/assign.php', array('contextid' => $category->get_context()->id,
                     'returnurl' => $manageurl->out_as_local_url(false))),
                 'icon' => \core\output\flex_icon::get_icon('t/assignroles', 'core', array('alt' => new \lang_string('assignroles', 'role'))),
@@ -263,6 +281,7 @@ class helper {
         // Permissions.
         if ($category->can_review_permissions()) {
             $actions['permissions'] = array(
+                'primary' => false, // Totara: secondary
                 'url' => new \moodle_url('/admin/roles/permissions.php', array('contextid' => $category->get_context()->id,
                     'returnurl' => $manageurl->out_as_local_url(false))),
                 'icon' => \core\output\flex_icon::get_icon('i/permissions', 'core', array('alt' => new \lang_string('permissions', 'role'))),
@@ -273,6 +292,7 @@ class helper {
         // Check permissions.
         if ($category->can_review_permissions()) {
             $actions['checkroles'] = array(
+                'primary' => false, // Totara: secondary
                 'url' => new \moodle_url('/admin/roles/check.php', array('contextid' => $category->get_context()->id,
                     'returnurl' => $manageurl->out_as_local_url(false))),
                 'icon' => \core\output\flex_icon::get_icon('i/checkpermissions', 'core', array('alt' => new \lang_string('checkpermissions', 'role'))),
@@ -283,24 +303,29 @@ class helper {
         // Cohorts.
         if ($category->can_review_cohorts()) {
             $actions['cohorts'] = array(
+                'primary' => false, // Totara: secondary
                 'url' => new \moodle_url('/cohort/index.php', array('contextid' => $category->get_context()->id)),
                 'icon' => \core\output\flex_icon::get_icon('t/cohort', 'core', array('alt' => new \lang_string('cohorts', 'cohort'))),
                 'string' => new \lang_string('cohorts', 'cohort')
             );
         }
 
-        // Filters.
-        if ($category->can_review_filters()) {
-            $actions['filters'] = array(
-                'url' => new \moodle_url('/filter/manage.php', array('contextid' => $category->get_context()->id,
-                    'return' => 'management')),
-                'icon' => \core\output\flex_icon::get_icon('i/filter', 'core', array('alt' => new \lang_string('filters', 'admin'))),
-                'string' => new \lang_string('filters', 'admin')
-            );
+        if (!$onlyfastactions) {
+            // Filters.
+            if ($category->can_review_filters()) {
+                $actions['filters'] = array(
+                    'primary' => false, // Totara: secondary
+                    'url' => new \moodle_url('/filter/manage.php', array('contextid' => $category->get_context()->id,
+                        'return' => 'management')),
+                    'icon' => \core\output\flex_icon::get_icon('i/filter', 'core', array('alt' => new \lang_string('filters', 'admin'))),
+                    'string' => new \lang_string('filters', 'admin')
+                );
+            }
         }
 
         if ($category->can_restore_courses_into()) {
             $actions['restore'] = array(
+                'primary' => false, // Totara: secondary
                 'url' => new \moodle_url('/backup/restorefile.php', array('contextid' => $category->get_context()->id)),
                 'icon' => \core\output\flex_icon::get_icon('i/restore', 'core', array('alt' => new \lang_string('restorecourse', 'admin'))),
                 'string' => new \lang_string('restorecourse', 'admin')
