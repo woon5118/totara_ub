@@ -124,6 +124,7 @@ if ($options['diffupstream']) {
 
 cli_heading('List of ' . count($totaraplugins) . ' Totara plugins');
 $today = date('Ymd') . '00';
+$today = '2019083000';
 $requirement = dev_get_requires_version();
 $error = false;
 $todo = array();
