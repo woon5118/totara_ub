@@ -65,8 +65,10 @@ class cohort_actions extends base {
         }
         $cloneurl = new \moodle_url('/cohort/view.php', array('id' => $value, 'clone' => 1, 'cancelurl' => qualified_me()));
         $str .= \html_writer::link($cloneurl, $OUTPUT->pix_icon('t/copy', get_string('copy', 'totara_cohort')));
-        $delurl = new \moodle_url('/cohort/view.php', array('id' => $value, 'delete' => 1, 'cancelurl' => qualified_me()));
-        $str .= \html_writer::link($delurl, $OUTPUT->pix_icon('t/delete', get_string('delete')));
+        if (empty($extrafields->component) or $extrafields->component !== 'totara_tenant') { // Surprising we allow deleting of protected cohorts, unless it is for tenants.
+            $delurl = new \moodle_url('/cohort/view.php', array('id' => $value, 'delete' => 1, 'cancelurl' => qualified_me()));
+            $str .= \html_writer::link($delurl, $OUTPUT->pix_icon('t/delete', get_string('delete')));
+        }
 
         return $str;
     }
