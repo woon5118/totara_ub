@@ -44,7 +44,6 @@ final class user_create extends \moodleform {
         $editoroptions = ['maxfiles'];
         $filemanageroptions = $this->_customdata['filemanageroptions'];
         $user = $this->_customdata['user'];
-        $userid = $user->id;
 
         $mform->addElement('hidden', 'tenantid');
         $mform->setType('tenantid', PARAM_INT);
@@ -77,7 +76,7 @@ final class user_create extends \moodleform {
         useredit_shared_definition($mform, $editoroptions, $filemanageroptions, $user);
 
         // Next the customisable profile fields.
-        profile_definition($mform, $userid);
+        profile_definition($mform, $user->id);
 
         $this->add_action_buttons(true, get_string('createuser'));
 
@@ -108,8 +107,11 @@ final class user_create extends \moodleform {
     public function validation($usernew, $files) {
         global $CFG, $DB;
 
+        $user = $this->_customdata['user']; // Defaults and presets.
+
         $usernew = (object)$usernew;
         $usernew->username = trim($usernew->username);
+        $usernew->id = $user->id;
 
         $err = array();
 
