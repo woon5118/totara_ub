@@ -48,6 +48,16 @@ if (!has_capability('totara/tenant:viewparticipants', $categorycontext)) {
     require_capability('moodle/user:viewalldetails', $tenantcontext);
 }
 
+if ($USER->tenantid) {
+    $embeddedname = 'tenant_users';
+    $strheading = get_string('users');
+} else {
+    $embeddedname = 'tenant_participants';
+    $strheading = get_string('participants', 'totara_tenant');
+}
+// Set some title in case this is not an admin page.
+$PAGE->set_title($strheading . ': ' . format_string($tenant->name));
+
 // Select appropriate admin external page to make the quick access work properly,
 // this must match logic in admin/settings/users.php
 if (!empty($USER->tenantid) and !has_capability('moodle/user:viewalldetails', $systemcontext)) {
@@ -56,14 +66,6 @@ if (!empty($USER->tenantid) and !has_capability('moodle/user:viewalldetails', $s
     } else if (has_capability('totara/tenant:viewparticipants', $categorycontext)) {
         admin_externalpage_setup('tenantusers');
     }
-}
-
-if ($USER->tenantid) {
-    $embeddedname = 'tenant_users';
-    $strheading = get_string('users');
-} else {
-    $embeddedname = 'tenant_participants';
-    $strheading = get_string('participants', 'totara_tenant');
 }
 
 $config = new rb_config();
