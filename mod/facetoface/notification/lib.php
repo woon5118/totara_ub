@@ -1630,7 +1630,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
                     continue;
                 }
 
-                $room = \mod_facetoface\room::find($sessiondate->roomid);
+                $room = \mod_facetoface\room::seek($sessiondate->roomid);
                 if (!$room->exists()) {
                     continue;
                 }

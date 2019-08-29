@@ -1598,11 +1598,11 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sessionid2 = 10;
 
         // Test for valid case.
-        $seminarevent1 = seminar_event::find($sessionid1);
+        $seminarevent1 = seminar_event::seek($sessionid1);
         $this->assertTrue($seminarevent1->is_sessions(), $this->msgtrue);
 
         // Test for invalid case.
-        $seminarevent2 = seminar_event::find($sessionid2);
+        $seminarevent2 = seminar_event::seek($sessionid2);
         $this->assertFalse($seminarevent2->is_sessions(), $this->msgfalse);
 
         // Test for order.

@@ -526,7 +526,7 @@ final class export_helper {
      * @return string
      */
     private static function get_roomstring(\stdClass $session) : string {
-        $room = \mod_facetoface\room::find($session->roomid);
+        $room = \mod_facetoface\room::seek($session->roomid);
         $roomstring = '';
         if ($room->exists()) {
             $roomstring = (string)$room;

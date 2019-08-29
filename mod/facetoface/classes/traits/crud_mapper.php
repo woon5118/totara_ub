@@ -33,11 +33,10 @@ trait crud_mapper {
 
     /**
      * Load object from a database record.
-     *
      * @param integer $strictness   IGNORE_MISSING, IGNORE_MULTIPLE or MUST_EXIST
      * @return self
      */
-    protected function crud_load(int $strictness = MUST_EXIST) : self {
+    protected function crud_load(int $strictness = MUST_EXIST): self {
         global $DB;
 
         if (!$this->id) {
@@ -49,16 +48,14 @@ trait crud_mapper {
             $this->id = 0;
             return $this;
         }
-
         $this->map_object($record);
-
         return $this;
     }
 
     /**
      * Save object to a database.
      */
-    protected function crud_save() : void {
+    protected function crud_save(): void {
         global $DB;
 
         $todb = $this->unmap_object();
@@ -74,12 +71,11 @@ trait crud_mapper {
 
     /**
      * Load object from a given object.
-     *
      * @param \stdClass $object
      * @param boolean $strict   Set false to suppress debugging() messages for non-existent properties.
      * @return self
      */
-    protected function map_object(\stdClass $object, bool $strict = true) : self {
+    protected function map_object(\stdClass $object, bool $strict = true): self {
 
         foreach ((array)$object as $property => $value) {
             if (property_exists($this, $property)) {
@@ -93,10 +89,9 @@ trait crud_mapper {
 
     /**
      * Convert object into a generic object.
-     *
      * @return \stdClass
      */
-    protected function unmap_object() : \stdClass {
+    protected function unmap_object(): \stdClass {
         global $DB;
 
         $columns = array_keys($DB->get_columns(self::DBTABLE));
@@ -107,7 +102,17 @@ trait crud_mapper {
                 $todb->{$property} = $value;
             }
         }
-
         return $todb;
+    }
+
+    /**
+     * Load record from $id, if it is the invalid $id, that does not exist within the database.
+     * @param int $id
+     * @return self
+     */
+    public static function seek(int $id): self {
+        $self = new static();
+        $self->id = $id;
+        return $self->crud_load(IGNORE_MISSING);
     }
 }

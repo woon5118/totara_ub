@@ -3,8 +3,10 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* mod_facetoface\room::find() function has been deprecated, please use mod_facetoface\room::seek()
+* mod_facetoface\seminar_event::find() function has been deprecated, please use mod_facetoface\seminar_event::seek()
 * mod_facetoface_renderer::get_room_details_html() displays room custom fields (or not) depending on the facetoface_roomidentifier setting
-* room::get_display_customfields() returns building and location by default, but will optionally return fields based on facetoface_roomidentifier setting
+* mod_facetoface\room::get_display_customfields() returns building and location by default, but will optionally return fields based on facetoface_roomidentifier setting
 * 'teacher' and 'editingteacher' roles got the 'mod/facetoface:viewallsessions' capability
 * [facetofacename] notification placeholder is changed to [seminarname]
 * new [seminardescription] notification placeholder is added to support seminar notifications

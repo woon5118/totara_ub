@@ -104,7 +104,7 @@ class rb_facetoface_waitlist_embedded extends rb_base_embedded {
      */
     public function is_capable($reportfor, $report) {
         $sessionid = $report->get_param_value('sessionid') ?? 0;
-        $seminarevent = \mod_facetoface\seminar_event::find($sessionid);
+        $seminarevent = \mod_facetoface\seminar_event::seek($sessionid);
         if ($seminarevent->exists()) {
             $cm = get_coursemodule_from_instance('facetoface', $seminarevent->get_facetoface());
             // Users can only view this report if they have the viewinterestreport capability for this context.

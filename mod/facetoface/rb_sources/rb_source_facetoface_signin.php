@@ -735,7 +735,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             return null;
         }
 
-        $seminarevent = \mod_facetoface\seminar_event::find($sessiondate->sessionid);
+        $seminarevent = \mod_facetoface\seminar_event::seek($sessiondate->sessionid);
         if (!$seminarevent->exists()) {
             return null;
         }

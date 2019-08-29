@@ -391,7 +391,11 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         }
 
         // Ok, we are on the same site, let's see if the room still exists and use it if there are no conflicts.
-        $room = new \mod_facetoface\room($oldid);
+        $room = \mod_facetoface\room::seek($oldid);
+        if (!$room->exists()) {
+            $this->log('seminar room is no longer available', backup::LOG_WARNING);
+            return;
+        }
         if ($room->get_custom()) {
             // This should not ever happen, somebody hacked DB or backup file.
             return;
@@ -483,8 +487,12 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         }
 
         // Ok, we are on the same site, let's see if the asset still exists and use it if there are no conflicts.
-        $asset = new \mod_facetoface\asset($oldid);
-        if (!$asset->get_custom()) {
+        $asset = \mod_facetoface\asset::seek($oldid);
+        if (!$asset->exists()) {
+            $this->log('seminar asset is no longer available', backup::LOG_WARNING);
+            return;
+        }
+        if ($asset->get_custom()) {
             // This should not ever happen, somebody hacked DB or backup file.
             return;
         }
