@@ -1480,7 +1480,7 @@ class totara_program_renderer extends plugin_renderer_base {
  */
 class programcat_helper extends coursecat_helper {
     /** @var string [none, collapsed, expanded] how (if) display programs list */
-    protected $showprograms = 10; /* totara_program_renderer::COURSECAT_SHOW_PROGRAMS_EXPANDED */
+    protected $showprograms = totara_program_renderer::COURSECAT_SHOW_PROGRAMS_COLLAPSED;
     /** @var array options to display programs list */
     protected $programsdisplayoptions = array();
 

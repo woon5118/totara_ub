@@ -1723,7 +1723,9 @@ class program {
         $programrenderer = $PAGE->get_renderer('totara_program');
         $progobj = new stdClass();
         $progobj->id = $this->id;
-        $summary = $programrenderer->coursecat_programbox_content(new programcat_helper(), new program_in_list($progobj));
+        $progcathelper = new programcat_helper();
+        $progcathelper->set_show_programs(totara_program_renderer::COURSECAT_SHOW_PROGRAMS_EXPANDED);
+        $summary = $programrenderer->coursecat_programbox_content($progcathelper, new program_in_list($progobj));
         $out .= $summary;
 
         // course sets - for certify or recertify paths
