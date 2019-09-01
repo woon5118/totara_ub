@@ -691,22 +691,23 @@ function xmldb_facetoface_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        $transaction = $DB->start_delegated_transaction();
-        // Move existing rooms to new table.
-        $sql = "SELECT * FROM {facetoface_sessions_dates} WHERE roomid > :roomid";
-        $rooms = $DB->get_records_sql($sql, ['roomid' => 0]);
-        foreach ($rooms as $item) {
-            $todb = new \stdClass();
-            $todb->sessionsdateid = $item->id;
-            $todb->roomid = $item->roomid;
-            $DB->insert_record('facetoface_room_dates', $todb);
-        }
-        $transaction->allow_commit();
-
-        // Drop roomid from facetoface_sessions_dates.
+        // If table structure has not already been modified, move existing rooms.
         $table = new xmldb_table('facetoface_sessions_dates');
         $roomidfield = new xmldb_field('roomid');
         if ($dbman->field_exists($table, $roomidfield)) {
+            $transaction = $DB->start_delegated_transaction();
+            // Move existing rooms to new table.
+            $sql = "SELECT * FROM {facetoface_sessions_dates} WHERE roomid > :roomid";
+            $rooms = $DB->get_records_sql($sql, ['roomid' => 0]);
+            foreach ($rooms as $item) {
+                $todb = new \stdClass();
+                $todb->sessionsdateid = $item->id;
+                $todb->roomid = $item->roomid;
+                $DB->insert_record('facetoface_room_dates', $todb);
+            }
+            $transaction->allow_commit();
+
+            // Drop roomid from facetoface_sessions_dates.
             $dbman->drop_key(
                 $table,
                 new xmldb_key('facesessdate_roo_fk', XMLDB_KEY_FOREIGN, array('roomid'), 'facetoface_room', array('id'))
