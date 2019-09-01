@@ -70,6 +70,11 @@ class rb_bookings_embedded extends rb_base_embedded {
                 'value' => 'statuscode',
                 'heading' => get_string('status', 'rb_source_facetoface_sessions'),
             ),
+            array(
+                'type' => 'room',
+                'value' => 'namelink',
+                'heading' => get_string('name', 'rb_source_facetoface_rooms'),
+            ),
         );
 
         // only add facilitator column if role exists
