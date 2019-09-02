@@ -50,7 +50,7 @@ class index extends base {
 
         $data = [
             'title' => $title,
-            'competency_profile' => $OUTPUT->tui_component('totara_competency/views/CompetencyProfile', $props),
+            'competency_profile' => $OUTPUT->tui_component('totara_competency/pages/CompetencyProfile', $props),
         ];
 
         return view::create('totara_competency/profile_index', $data)

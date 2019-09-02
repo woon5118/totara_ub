@@ -49,7 +49,7 @@ class self_assignment extends base {
         ];
 
         $data = [
-            'self_assignment' => $OUTPUT->tui_component('totara_competency/views/SelfAssignment', $props)
+            'self_assignment' => $OUTPUT->tui_component('totara_competency/pages/SelfAssignment', $props)
         ];
 
         return view::create('totara_competency/profile_self_assignment', $data)

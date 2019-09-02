@@ -44,7 +44,7 @@ class competency_details extends base {
         ];
 
         $data = [
-            'component' => $OUTPUT->tui_component('totara_competency/views/CompetencyDetail', $props)
+            'component' => $OUTPUT->tui_component('totara_competency/pages/CompetencyDetail', $props)
         ];
 
         return view::create('totara_competency/profile_competency_details', $data)

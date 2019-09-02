@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import Tooltip from '../../container/Tooltip';
+import Tooltip from 'totara_competency/containers/Tooltip';
 export default {
   components: { Tooltip },
   props: {

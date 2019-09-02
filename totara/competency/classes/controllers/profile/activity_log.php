@@ -43,7 +43,7 @@ class activity_log extends base {
         ];
 
         $data = [
-            'component' => view::core_renderer()->tui_component('totara_competency/views/CompetencyDetail', $props)
+            'component' => view::core_renderer()->tui_component('totara_competency/pages/CompetencyDetail', $props)
         ];
 
         return view::create('totara_competency/profile_competency_details', $data)

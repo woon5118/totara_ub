@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import List from '../../../container/List';
+import List from 'totara_competency/containers/List';
 import FlexIcon from 'totara_core/containers/icons/FlexIcon';
 import MyRatingCell from './../MyRatingCell';
 

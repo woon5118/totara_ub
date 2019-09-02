@@ -33,7 +33,7 @@
 
 <script>
 import FlexIcon from 'totara_core/containers/icons/FlexIcon';
-import AssignmentProgress from '../../container/AssignmentProgress';
+import AssignmentProgress from 'totara_competency/containers/AssignmentProgress';
 export default {
   components: { AssignmentProgress, FlexIcon },
   props: {

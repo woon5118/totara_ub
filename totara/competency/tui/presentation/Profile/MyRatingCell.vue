@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import Tooltip from '../../container/Tooltip';
+import Tooltip from 'totara_competency/containers/Tooltip';
 import FlexIcon from 'totara_core/containers/icons/FlexIcon';
 export default {
   components: { FlexIcon, Tooltip },

@@ -44,5 +44,5 @@ $heading = get_string('competencytitle',
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($heading);
-echo $OUTPUT->tui_component('totara_competency/views/CompetencySummary');
+echo $OUTPUT->tui_component('totara_competency/pages/CompetencySummary');
 echo $OUTPUT->footer();
