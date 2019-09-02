@@ -319,6 +319,9 @@ function self_completion_form($cmorid, $course = null) {
         // Completion is not enabled. No point in going further.
         return '';
     }
+    if ($completion->is_completed_via_rpl($cm)) { // Totara: RPL rules.
+        return '';
+    }
 
     $cmdata = $completion->get_data($cm);
 
@@ -733,6 +736,18 @@ class completion_info {
 
         // If changed, update
         if ($newstate != $current->completionstate) {
+            if ($newstate != COMPLETION_COMPLETE && // Totara: RPL rules.
+                $newstate != COMPLETION_COMPLETE_PASS &&
+                $newstate != COMPLETION_COMPLETE_FAIL &&
+                $this->is_completed_via_rpl($cm, $userid)) {
+                // When the activity module is completed via RPL, the completion status is not able to go back to "not complete".
+                //              [Completed] -- not allowed! -> x [Not complete]
+                //               | ^    | ^
+                //               v |    v |
+                // [Completed (pass)]  [Completed (fail)]
+                return;
+            }
+
             $current->completionstate = $newstate;
             $current->timemodified    = time();
             // If module_get_completion_state set time of completion then use it.
@@ -1445,6 +1460,37 @@ class completion_info {
             $completioncache->set($key, $cacheddata);
         }
         return (object)$cacheddata[$cm->id];
+    }
+
+    /**
+     * See if the activity module is completed via RPL.
+     *
+     * @param stdClass|cm_info $cm Activity; only required field is ->id
+     * @param int $userid User ID or 0 (default) for current user
+     * @return boolean
+     *
+     * @since Totara 11.19, Totara 12.10, Totara 13
+     */
+    public function is_completed_via_rpl($cm, $userid = 0) {
+        global $USER, $DB;
+
+        // Get user ID
+        if (!$userid) {
+            $userid = $USER->id;
+        }
+
+        $sql = 'SELECT 1
+                  FROM {course_completion_crit_compl} cccc
+            INNER JOIN {course_completion_criteria} ccc ON ccc.id = cccc.criteriaid
+            INNER JOIN {course_modules} cm ON cm.id = ccc.moduleinstance
+            INNER JOIN {modules} m ON m.name = ccc.module
+                 WHERE (cm.id = :cmid)
+                   AND (cccc.userid = :uid)
+                   AND (cccc.timecompleted IS NOT NULL AND cccc.timecompleted <> 0)
+                   AND (cccc.rpl IS NOT NULL AND cccc.rpl <> \'\')';
+        $params = ['cmid' => $cm->id, 'uid' => $userid];
+        $result = $DB->get_field_sql($sql, $params, IGNORE_MISSING);
+        return !empty($result);
     }
 
     /**

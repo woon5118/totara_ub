@@ -23,6 +23,7 @@
 
 use mod_facetoface\{signup, seminar_event, seminar};
 use mod_facetoface\signup\state\{
+    attendance_state,
     booked,
     waitlisted,
     requested,
@@ -325,7 +326,14 @@ final class mod_facetoface_generator_util {
         if (isset($record['status'])) {
             $status = $record['status'];
             if (isset(self::$map[$status])) {
-                $signup->switch_state(self::$map[$status]);
+                $desiredclass = self::$map[$status];
+                if ($desiredclass !== booked::class && in_array($desiredclass, attendance_state::get_all_attendance_states())) {
+                    // Set status to booked first, then set it to the desired state.
+                    $signup->switch_state(booked::class);
+                }
+                $signup->switch_state($desiredclass);
+            } else {
+                throw new coding_exception("The status '{$status}' is unknown.");
             }
         } else {
             // Status is not provided, try to switch to many different type of state here.

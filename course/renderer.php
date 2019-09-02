@@ -524,6 +524,14 @@ class core_course_renderer extends plugin_renderer_base {
                         array('title' => $imgalt, 'class' => 'iconsmall'));
                 $output .= html_writer::tag('span', $this->output->render($completionpixicon),
                         array('class' => 'autocompletion'));
+            } else if ($completion == COMPLETION_TRACKING_MANUAL && $completioninfo->is_completed_via_rpl($mod)) { // Totara: RPL rules.
+                // Use 'manual-y' for icon, 'auto-y' for text.
+                $imgalt = get_string('completion-alt-auto-y', 'completion', $formattedname);
+                $data = array(
+                    'alt' => $imgalt,
+                    'title' => $imgalt
+                );
+                $output = $this->render(new \core\output\flex_icon('completion-manual-y', $data));
             } else if ($completion == COMPLETION_TRACKING_MANUAL) {
                 $imgtitle = get_string('completion-title-' . $completionicon, 'completion', $formattedname);
                 $newstate =
