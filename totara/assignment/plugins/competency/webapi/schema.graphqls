@@ -4,34 +4,33 @@ Competency assignment
 NOTE: The query is responsible for ensuring the user can see the assignment.
 """
 type tassign_competency_assignment {
-    id: core_id!
-    type: String!
-    type_name: String!
-    competency_id: core_id!
-    user_group_type: String!
-    user_group_id: core_id!
-    optional: Boolean
-    status: Int!
-    created_by: Int
-    created_at (format: core_date_format = TIMESTAMP): core_date!
-    updated_at (format: core_date_format = TIMESTAMP): core_date!
-    archived_at (format: core_date_format = TIMESTAMP): core_date
-    competency: totara_competency_competency!
-    user_group: tassign_competency_user_group!
-    progress_name (format: core_format = HTML): String
-    reason_assigned (format: core_format = HTML): String
+  id: core_id!
+  type: String!
+  type_name: String!
+  competency_id: core_id!
+  user_group_type: String!
+  user_group_id: core_id!
+  optional: Boolean
+  status: Int!
+  created_by: Int
+  created_at(format: core_date_format = TIMESTAMP): core_date!
+  updated_at(format: core_date_format = TIMESTAMP): core_date!
+  archived_at(format: core_date_format = TIMESTAMP): core_date
+  competency: totara_competency_competency!
+  user_group: tassign_competency_user_group!
+  progress_name(format: core_format = HTML): String
+  reason_assigned(format: core_format = HTML): String
 }
 
 type tassign_competency_user_group {
-    id: ID!
-    name(format: core_format = HTML): String!
-    type: String!
-    is_deleted: Boolean!
+  id: ID!
+  name(format: core_format = HTML): String!
+  type: String!
+  is_deleted: Boolean!
 }
 
 extend type Query {
-    tassign_competency_assignment(
-        assignmentid: core_id!
-    ): tassign_competency_assignment!
-
+  tassign_competency_assignment(
+    assignmentid: core_id!
+  ): tassign_competency_assignment!
 }

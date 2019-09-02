@@ -18,7 +18,8 @@ type totara_competency_activity_log_row {
   timestamp(format: core_date_format = TIMESTAMP): core_date
   description(format: core_format = HTML): String
   proficient_status: Boolean
-  assignment: totara_competency_assignment
+  assignment: tassign_competency_assignment
+  assignment_action: String
   type: String
 }
 
@@ -27,7 +28,7 @@ Competency profile overall progress
 """
 type totara_competency_profile_overall_progress {
   user: core_user
-  items: [totara_competency_profile_progress_item!]!
+  items: [totara_competency_profile_progress_item!]
   latest_achievement: String
   filters: [totara_competency_profile_assignment_filter_option!]
 }
@@ -245,13 +246,13 @@ input totara_competency_self_assigned_competencies_filter {
 }
 
 extend type Mutation {
-    """
-    Creates new assignments for the user
-    """
-    totara_competency_create_user_assignments(
-        user_id: core_id!
-        competency_ids: [core_id!]!
-    ): [tassign_competency_assignment!]!
+  """
+  Creates new assignments for the user
+  """
+  totara_competency_create_user_assignments(
+    user_id: core_id!
+    competency_ids: [core_id!]!
+  ): [tassign_competency_assignment!]!
 }
 
 extend type Query {
