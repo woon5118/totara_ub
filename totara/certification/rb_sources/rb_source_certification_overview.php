@@ -54,6 +54,8 @@ class rb_source_certification_overview extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_certification_overview');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_certification_overview');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_certification_overview');
         $this->sourcewhere = $this->define_sourcewhere();
         $this->sourcejoins = $this->get_source_joins();
         $this->usedcomponents[] = 'totara_certification';

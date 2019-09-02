@@ -22,6 +22,8 @@
  */
 
 // lang file for local/plan/rb_sources/rb_source_dp_course.php
+$string['sourcelabel'] = 'Learning';
+$string['sourcesummary'] = 'Course assignment and completion information, by default used to build the Record of Learning embedded report.';
 $string['sourcetitle'] = 'Record of Learning: Courses';
 // columns
 $string['plan'] = 'Plan';

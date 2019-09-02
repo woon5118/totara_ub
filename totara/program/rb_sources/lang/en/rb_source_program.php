@@ -21,6 +21,8 @@
  * @subpackage reportbuilder
  */
 
+$string['sourcelabel'] = 'Program';
+$string['sourcesummary'] = 'Details about the programs and course category.';
 $string['sourcetitle'] = 'Programs';
 
 // Deprecated since Totara 12

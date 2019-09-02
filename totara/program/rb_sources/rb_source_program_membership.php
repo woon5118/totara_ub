@@ -49,6 +49,8 @@ class rb_source_program_membership extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_program_membership');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_program_membership');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_program_membership');
         $this->usedcomponents[] = 'totara_program';
         $this->usedcomponents[] = 'totara_cohort';
 

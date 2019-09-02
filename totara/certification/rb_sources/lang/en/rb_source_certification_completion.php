@@ -25,6 +25,8 @@
 $string['hasnevercertified'] = 'Has never certified';
 $string['iscertified'] = 'Is certified';
 $string['isnotcertified'] = 'Is not certified';
+$string['sourcelabel'] = 'Certification';
+$string['sourcesummary'] = 'Show users details and progress for users who are assigned to a certification.';
 $string['sourcetitle'] = 'Certification Completion';
 $string['status'] = 'Status';
 $string['type_certif'] = 'Certification';

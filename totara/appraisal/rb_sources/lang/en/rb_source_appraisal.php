@@ -45,6 +45,8 @@ $string['embeddedpositionheading'] = 'Position(s)';
 $string['embeddedpreviousstagetimecompletedheading'] = 'Previous stage time completed';
 $string['embeddedstatusheading'] = 'Status';
 $string['selectanappraisal'] = 'To view this report, first <a href="{$a}">select an appraisal</a> you want to view.';
+$string['sourcelabel'] = 'Perform';
+$string['sourcesummary'] = 'Performance management appraisal status details including stage information and completion status.';
 $string['sourcetitle'] = 'Appraisal Status';
 $string['statuscancelled'] = 'Assignment Cancelled';
 $string['statusclosed'] = 'Appraisal Closed';

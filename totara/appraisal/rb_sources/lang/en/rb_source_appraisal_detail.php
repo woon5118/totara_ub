@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+$string['sourcelabel'] = 'Perform';
+$string['sourcesummary'] = 'Performance management appraisal details including the questions and responses provided by each appraisal user.';
 $string['sourcetitle'] = 'Appraisal Detail';
 
 

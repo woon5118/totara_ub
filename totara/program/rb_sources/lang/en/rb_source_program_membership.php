@@ -24,6 +24,8 @@
 
 $string['editcompletion'] = 'Edit completion records';
 $string['isassigned'] = 'Is currently assigned';
+$string['sourcelabel'] = 'Program';
+$string['sourcesummary'] = 'All program assignment details.';
 $string['sourcetitle'] = 'Program Membership';
 $string['status'] = 'Status';
 $string['type_prog'] = 'Program';

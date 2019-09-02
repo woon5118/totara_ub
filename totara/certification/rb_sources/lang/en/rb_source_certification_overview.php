@@ -24,6 +24,8 @@
 
 $string['certifpath'] = 'Certification path';
 $string['programnameselect'] = 'Certification name (select box)';
+$string['sourcelabel'] = 'Certification';
+$string['sourcesummary'] = 'Show user and course details and progress for users who are assigned to a certification.';
 $string['sourcetitle'] = 'Certification Overview';
 $string['type_certif'] = 'Certification';
 $string['type_certif_completion'] = 'Certification Completion';

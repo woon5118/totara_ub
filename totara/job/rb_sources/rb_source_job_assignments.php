@@ -51,6 +51,8 @@ class rb_source_job_assignments extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_job_assignments');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_job_assignments');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_job_assignments');
 
         // Apply global report restrictions.
         $this->add_global_report_restriction_join('base', 'userid', 'base');

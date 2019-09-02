@@ -20,6 +20,8 @@
  * @package mod_facetoface
  */
 
+$string['sourcelabel'] = 'Seminar';
+$string['sourcesummary'] = 'List of seminar assets.';
 $string['sourcetitle'] = 'Seminar Assets';
 
 $string['allowconflicts'] = 'Asset Allow Schedule Conflicts';

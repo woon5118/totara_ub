@@ -22,6 +22,8 @@
  */
 
 // lang file for local/plan/rb_sources/rb_source_dp_objective.php
+$string['sourcelabel'] = 'Learning';
+$string['sourcesummary'] = 'Objective assignment and completion information.';
 $string['sourcetitle'] = 'Record of Learning: Objectives';
 // columns
 $string['plan'] = 'Plan';

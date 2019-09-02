@@ -22,6 +22,8 @@
  */
 
 // lang file for totara/reportbuilder/rb_sources/rb_source_courses.php
+$string['sourcelabel'] = 'Course';
+$string['sourcesummary'] = 'Details about all the courses.';
 $string['sourcetitle'] = 'Courses';
 // columns
 $string['content'] = 'Content';

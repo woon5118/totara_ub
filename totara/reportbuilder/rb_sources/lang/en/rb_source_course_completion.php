@@ -22,6 +22,8 @@
  */
 
 // lang string for totara/reportbuilder/rb_sources/rb_source_course_completion.php
+$string['sourcelabel'] = 'Course';
+$string['sourcesummary'] = 'Course completion status records including user details, course details and completion status.';
 $string['sourcetitle'] = 'Course Completion';
 // columns
 $string['completionstatus'] = 'Completion Status';

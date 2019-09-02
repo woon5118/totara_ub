@@ -31,6 +31,8 @@ class rb_source_scorm extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_scorm');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_scorm');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_scorm');
         $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();

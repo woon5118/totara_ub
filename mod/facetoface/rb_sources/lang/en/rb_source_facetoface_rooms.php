@@ -21,6 +21,8 @@
  * @package mod_facetoface
  */
 
+$string['sourcelabel'] = 'Seminar';
+$string['sourcesummary'] = 'List of seminar rooms.';
 $string['sourcetitle'] = 'Seminar Rooms';
 
 $string['allowconflicts'] = 'Room Allow Schedule Conflicts';

@@ -22,6 +22,8 @@
  */
 
 // lang strings for report builder 'user' source
+$string['sourcelabel'] = 'User';
+$string['sourcesummary'] = 'User profile data and completion statistics.';
 $string['sourcetitle'] = 'User';
 $string['userspicture'] = 'User\'s Picture';
 $string['lastlogin'] = 'Last Login';

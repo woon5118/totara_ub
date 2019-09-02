@@ -67,6 +67,8 @@ class rb_source_cohort_orphaned_users extends rb_source_user {
                 AND u.confirmed = 1
             )';
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_cohort_orphaned_users');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_cohort_orphaned_users');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_cohort_orphaned_users');
 
     }
 

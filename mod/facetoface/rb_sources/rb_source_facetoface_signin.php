@@ -68,6 +68,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_signin');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_facetoface_signin');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_facetoface_signin');
         $this->usedcomponents[] = 'totara_cohort';
         $this->add_customfields();
         parent::__construct();

@@ -21,6 +21,8 @@
  * @package totara_reportbuilder
  */
 
+$string['sourcelabel'] = 'User';
+$string['sourcesummary'] = 'List job assignments.';
 $string['sourcetitle'] = 'Job assignments';
 $string['type_appraiser'] = 'Appraiser';
 $string['type_base'] = 'Job assignment';

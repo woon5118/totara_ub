@@ -36,6 +36,8 @@ class rb_source_connect_servers extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_connect_servers');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_connect_servers');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_connect_servers');
 
         parent::__construct();
     }

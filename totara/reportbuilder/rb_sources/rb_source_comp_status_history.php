@@ -46,6 +46,8 @@ class rb_source_comp_status_history extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_comp_status_history');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_comp_status_history');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_comp_status_history');
 
         parent::__construct();
     }

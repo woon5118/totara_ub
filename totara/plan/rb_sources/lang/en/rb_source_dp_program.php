@@ -25,6 +25,8 @@
 
 $string['dateassigned'] = 'Date assigned';
 $string['datestarted'] = 'Date started';
+$string['sourcelabel'] = 'Learning';
+$string['sourcesummary'] = 'Program assignment and completion information.';
 $string['sourcetitle'] = 'Record of Learning: Programs';
 $string['program_completion_history_count'] = 'Count of previous completions';
 $string['program_completion_history_link'] = 'Previous completions';

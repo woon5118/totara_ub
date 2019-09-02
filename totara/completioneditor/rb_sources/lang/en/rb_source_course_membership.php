@@ -23,6 +23,8 @@
 
 $string['editcompletion'] = 'Edit completion records';
 $string['isassigned'] = 'Is currently assigned';
+$string['sourcelabel'] = 'Course';
+$string['sourcesummary'] = 'Details about course members.';
 $string['sourcetitle'] = 'Course Membership';
 $string['status'] = 'Status';
 $string['type_course'] = 'Course';

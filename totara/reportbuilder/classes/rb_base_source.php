@@ -41,6 +41,12 @@ abstract class rb_base_source {
     /** @var string name of the source, must be set */
     public $sourcetitle = null;
 
+    /** @var string the source label */
+    public $sourcelabel = null;
+
+    /** @var string the source summary */
+    public $sourcesummary = null;
+
     /** @var rb_column_option[] list of available columns */
     public $columnoptions = array();
 
@@ -144,6 +150,10 @@ abstract class rb_base_source {
         if (!isset($this->sourcetitle)) {
             debugging('No sourcetitle defined in report source', DEBUG_DEVELOPER);
             $this->sourcetitle = static::class;
+        }
+        if (empty($this->sourcelabel)) {
+            debugging('No sourcelabel defined in report source', DEBUG_DEVELOPER);
+            $this->sourcelabel = get_string('label:other', 'totara_reportbuilder');
         }
 
         // Check array types.

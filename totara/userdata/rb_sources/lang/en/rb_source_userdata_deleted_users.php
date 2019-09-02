@@ -21,6 +21,8 @@
  * @package totara_userdata
  */
 
+$string['sourcelabel'] = 'User data';
+$string['sourcesummary'] = 'Details about deleted users including their purge type.';
 $string['sourcetitle'] = 'Deleted user accounts';
 $string['type_deleted_purge_type'] = 'Deleted user purge type';
 $string['type_suspended_purge_type'] = 'Suspended user purge type';

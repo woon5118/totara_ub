@@ -46,6 +46,8 @@ final class rb_source_tenants extends rb_base_source {
         $this->defaultfilters =  $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_tenants');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_tenants');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_tenants');
 
         $this->cacheable = false;
 

@@ -49,6 +49,8 @@ class rb_source_site_logstore extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_site_logstore');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_site_logstore');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_site_logstore');
         $this->sourcewhere = 'anonymous = 0';
 
         // No caching!!! The table is way too big and there are tons of extra fields.

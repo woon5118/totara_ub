@@ -32,6 +32,8 @@ class rb_source_auth_approved_requests extends rb_base_source {
         $this->usedcomponents[] = 'auth_approved';
         $this->base = '{auth_approved_request}';
         $this->sourcetitle = get_string('reportrequests', 'auth_approved');
+        $this->sourcesummary = get_string('sourcesummary', 'auth_approved');
+        $this->sourcelabel = get_string('sourcelabel', 'auth_approved');
 
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();

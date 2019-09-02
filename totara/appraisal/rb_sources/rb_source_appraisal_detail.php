@@ -46,6 +46,8 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
 
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_appraisal_detail');
         $this->shortname = 'appraisal_detail';
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_appraisal_detail');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_appraisal_detail');
         $this->cacheable = false;
     }
 

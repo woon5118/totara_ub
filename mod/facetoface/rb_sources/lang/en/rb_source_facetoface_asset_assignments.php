@@ -20,6 +20,8 @@
  * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
  * @package mod_facetoface
  */
+$string['sourcelabel'] = 'Seminar';
+$string['sourcesummary'] = 'Upcoming events using assets.';
 $string['sourcetitle'] = 'Seminar Asset Assignments';
 
 $string['facetofacesummaryasset'] = 'Upcoming Sessions using Asset';

@@ -30,6 +30,8 @@ $string['coltimemodified'] = 'Time';
 $string['coltype'] = 'Type';
 $string['colversion'] = 'Version';
 
+$string['sourcelabel'] = 'Site and server';
+$string['sourcesummary'] = 'Provides information about upgrade history of this site.';
 $string['sourcetitle'] = 'Server upgrade history';
 
 // column types for this source, as strings

@@ -80,6 +80,8 @@ final class rb_source_scheduled_reports extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = [];
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_scheduled_reports');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_scheduled_reports');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_scheduled_reports');
 
         $this->cacheable = false;
 

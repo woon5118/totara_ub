@@ -20,6 +20,8 @@
  * @package totara_reportbuilder
  */
 
+$string['sourcelabel'] = 'Site and server';
+$string['sourcesummary'] = 'Site-wide user activity logging.';
 $string['sourcetitle'] = 'Site Logs';
 
 // Columns.

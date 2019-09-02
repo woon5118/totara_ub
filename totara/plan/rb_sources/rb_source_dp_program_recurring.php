@@ -56,6 +56,8 @@ class rb_source_dp_program_recurring extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_program_recurring');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_dp_program_recurring');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_dp_program_recurring');
         // only consider whole programs - not courseset completion
         $this->sourcewhere = 'base.coursesetid = 0';
         $this->usedcomponents[] = 'totara_program';

@@ -534,6 +534,7 @@ $string['jobassign_manager'] = 'All Assigned Manager(s)';
 $string['jobassign_organisation'] = 'All Assigned Organisation(s)';
 $string['jobassign_position'] = 'All Assigned Position(s)';
 $string['joinnotinjoinlist'] = '\'{$a->join}\' not in join list for {$a->usage}';
+$string['label:other'] = 'Other';
 $string['last30days'] = 'The last 30 days';
 $string['lastcached'] = 'Last cached at {$a}';
 $string['lastfinancial'] = 'The previous financial year';

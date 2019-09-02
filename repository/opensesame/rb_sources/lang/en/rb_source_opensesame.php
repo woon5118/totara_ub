@@ -22,6 +22,8 @@
  */
 
 $string['embeddedreportname'] = 'OpenSesame course packages';
+$string['sourcelabel'] = 'Course';
+$string['sourcesummary'] = 'List of OpenSesame downloaded content with availability and license details.';
 $string['sourcetitle'] = 'OpenSesame course packages';
 $string['type_instances'] = 'Repository instances';
 $string['type_opensesame'] = 'OpenSesame course packages';

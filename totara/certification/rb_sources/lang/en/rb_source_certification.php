@@ -21,5 +21,7 @@
  * @subpackage certification
  */
 
+$string['sourcelabel'] = 'Certification';
+$string['sourcesummary'] = 'Details of the certifications setup.';
 $string['sourcetitle'] = 'Certifications';
 $string['type_certif'] = 'Certification';

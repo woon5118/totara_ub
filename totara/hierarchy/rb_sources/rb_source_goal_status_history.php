@@ -61,6 +61,8 @@ class rb_source_goal_status_history extends rb_base_source {
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_goal_status_history');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_goal_status_history');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_goal_status_history');
         $this->shortname = 'goal_status_history';
         $this->usedcomponents[] = 'totara_hierarchy';
 

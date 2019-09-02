@@ -22,6 +22,8 @@
 
 $string['grade'] = 'Grade at time of completion';
 $string['iscurrent'] = 'Is current record';
+$string['sourcelabel'] = 'Course';
+$string['sourcesummary'] = 'Course completion status records including user details, course details for all courses.';
 $string['sourcetitle'] = 'Course Completion Including History';
 $string['timecompleted'] = 'Date completed';
 $string['type_base'] = 'Course Completion';

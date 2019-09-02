@@ -43,6 +43,8 @@ class rb_source_courses extends rb_base_source {
         $this->defaulttoolbarsearchcolumns = $this->define_defaultsearchcolumns();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_courses');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_courses');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_courses');
         list($this->sourcewhere, $this->sourceparams, $this->sourcejoins) = $this->define_source_args();
         $this->usedcomponents[] = 'totara_cohort';
 

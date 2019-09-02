@@ -24,6 +24,8 @@
 // lang strings for report builder 'program overview' source
 $string['dateassigned'] = 'Date assigned';
 $string['datestarted'] = 'Date started';
+$string['sourcelabel'] = 'Program';
+$string['sourcesummary'] = 'Program details and status including information about the courses that are a part of the program content.';
 $string['sourcetitle'] = 'Program Overview';
 $string['duedate'] = 'Due Date';
 $string['duedateextra'] = 'Due Date (extra info)';

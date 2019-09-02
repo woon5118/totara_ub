@@ -42,6 +42,8 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
 
         $this->base = '{facetoface_sessions_dates}';
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_room_assignments');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_facetoface_room_assignments');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_facetoface_room_assignments');
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();

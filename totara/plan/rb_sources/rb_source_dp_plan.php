@@ -57,6 +57,8 @@ class rb_source_dp_plan extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_plan');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_dp_plan');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_dp_plan');
         $this->usedcomponents[] = 'totara_plan';
         parent::__construct();
     }

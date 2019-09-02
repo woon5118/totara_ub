@@ -47,6 +47,8 @@ class rb_source_assign extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_assign');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_assign');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_assign');
 
         parent::__construct();
     }

@@ -22,6 +22,8 @@
  * @subpackage completionimport
  */
 
+$string['sourcelabel'] = 'Program';
+$string['sourcesummary'] = 'Log details from the import of certification records through a CSV file.';
 $string['sourcetitle'] = 'Completion import: Certification status';
 
 $string['columnbasecertificationidnumber'] = 'Certification ID Number';

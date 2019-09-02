@@ -84,6 +84,8 @@ class rb_source_dp_competency extends rb_base_source {
         $this->requiredcolumns = array();
         $this->dp_plans = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_competency');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_dp_competency');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_dp_competency');
         $this->usedcomponents[] = 'totara_plan';
         parent::__construct();
     }

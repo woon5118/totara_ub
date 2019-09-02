@@ -57,6 +57,8 @@ class rb_source_cohort extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_cohort');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_cohort');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_cohort');
         $this->usedcomponents[] = 'totara_cohort';
 
         $this->cacheable = false; // There is absolutely no reason to ever cache list of audiences!

@@ -21,5 +21,7 @@
  * @package totara_userdata
  */
 
+$string['sourcelabel'] = 'User data';
+$string['sourcesummary'] = 'All of the data purge types.';
 $string['sourcetitle'] = 'User data purge types';
 $string['type_purge_type'] = 'Purge type';

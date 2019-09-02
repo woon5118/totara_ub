@@ -22,6 +22,8 @@
  * @subpackage completionimport
  */
 
+$string['sourcelabel'] = 'Course';
+$string['sourcesummary'] = 'Log details from the import of course completion records through a CSV file.';
 $string['sourcetitle'] = 'Completion import: Course status';
 
 $string['columnbasecompletiondate'] = 'Completion date';

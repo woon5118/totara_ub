@@ -21,6 +21,8 @@
  * @package totara_userdata
  */
 
+$string['sourcelabel'] = 'User data';
+$string['sourcesummary'] = 'All of the user export items.';
 $string['sourcetitle'] = 'User data export items';
 $string['type_usercreated'] = 'Created by';
 $string['type_export'] = 'Export';

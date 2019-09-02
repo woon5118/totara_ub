@@ -22,6 +22,8 @@
  */
 
 // lang string for totara/reportbuilder/rb_sources/rb_source_course_completion_by_org.php
+$string['sourcelabel'] = 'Course';
+$string['sourcesummary'] = 'Course completion details grouped by organisation.';
 $string['sourcetitle'] = 'Course Completion by Organisation';
 // columns
 $string['completionorgid'] = 'Completion Organisation ID';

@@ -25,6 +25,8 @@
 $string['editcompletion'] = 'Edit completion records';
 $string['isassigned'] = 'Is currently assigned';
 $string['iscertified'] = 'Is currently certified';
+$string['sourcelabel'] = 'Certification';
+$string['sourcesummary'] = 'Details of all certification memberships.';
 $string['sourcetitle'] = 'Certification Membership';
 $string['status'] = 'Status';
 $string['type_certif'] = 'Certification';

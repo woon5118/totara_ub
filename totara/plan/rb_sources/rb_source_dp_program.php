@@ -60,6 +60,8 @@ class rb_source_dp_program extends rb_base_source {
         $this->instancetype = 'program';
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_program');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_dp_program');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_dp_program');
         $this->sourcewhere = 'base.certifid IS NULL';
         $this->usedcomponents[] = 'totara_program';
         $this->usedcomponents[] = 'totara_cohort';

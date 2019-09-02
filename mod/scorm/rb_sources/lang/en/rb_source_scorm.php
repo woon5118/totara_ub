@@ -1,5 +1,7 @@
 <?php
 // lang file for mod/scorm/rb_sources_scorm.php
+$string['sourcelabel'] = 'Course';
+$string['sourcesummary'] = 'SCORM activity completion details and settings collected across all courses.';
 $string['sourcetitle'] = 'SCORM';
 // columns
 $string['scormtitle'] = 'SCORM Title';

@@ -66,6 +66,8 @@ class rb_source_assignsummary extends rb_base_source {
         $this->requiredcolumns = array();
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_assignsummary');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_assignsummary');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_assignsummary');
         $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();

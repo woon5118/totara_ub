@@ -68,6 +68,8 @@ class rb_source_cohort_associations extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_cohort_associations');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_cohort_associations');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_cohort_associations');
         $this->usedcomponents[] = 'totara_cohort';
         parent::__construct();
     }

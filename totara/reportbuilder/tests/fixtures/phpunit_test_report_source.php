@@ -32,6 +32,8 @@ class phpunit_test_report_source extends rb_base_source {
     public function __construct() {
         $this->base = '{base}';
         $this->sourcetitle = 'some title';
+        $this->sourcelabel = 'some label';
+        $this->sourcesummary = 'some summary';
         $this->columnoptions[] = new rb_column_option('type', 'value', 'name', 'id');
         parent::__construct();
     }

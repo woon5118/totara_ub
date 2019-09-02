@@ -41,6 +41,8 @@ final class rb_source_userdata_deleted_users extends rb_base_source {
         $this->defaultfilters = array();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_userdata_deleted_users');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_userdata_deleted_users');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_userdata_deleted_users');
 
         $this->cacheable = false;
 

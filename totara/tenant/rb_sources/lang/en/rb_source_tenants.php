@@ -21,6 +21,8 @@
  * @package totara_tenant
  */
 
+$string['sourcelabel'] = 'Site and server';
+$string['sourcesummary'] = 'Show all Totara tenants.';
 $string['sourcetitle'] = 'Tenants';
 $string['timecreated'] = 'Created';
 $string['type_tenant'] = 'Tenant';

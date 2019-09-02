@@ -21,6 +21,8 @@
 * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
 * @package mod_facetoface
 */
+$string['sourcelabel'] = 'Seminar';
+$string['sourcesummary'] = 'Details on all seminar sessions.';
 $string['sourcetitle'] = 'Seminar Sessions';
 
 $string['approvalby'] = 'Approval by';

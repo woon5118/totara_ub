@@ -39,6 +39,8 @@ class rb_source_customlang extends rb_base_source {
         $this->defaulttoolbarsearchcolumns = $this->define_defaultsearchcolumns();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_customlang');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_customlang');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_customlang');
 
         parent::__construct();
     }

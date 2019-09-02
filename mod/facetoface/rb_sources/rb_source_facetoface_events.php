@@ -50,6 +50,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->paramoptions = $this->define_paramoptions();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_events');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_facetoface_events');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_facetoface_events');
         $this->add_customfields();
         $this->usedcomponents[] = 'totara_cohort';
 

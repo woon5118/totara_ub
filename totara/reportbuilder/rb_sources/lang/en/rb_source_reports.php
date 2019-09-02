@@ -21,5 +21,7 @@
  * @package totara_reportbuilder
  */
 
+$string['sourcelabel'] = 'Reports';
+$string['sourcesummary'] = 'Lists all report sources available.';
 $string['sourcetitle'] = 'Reports';
 $string['type_report'] = 'Report';

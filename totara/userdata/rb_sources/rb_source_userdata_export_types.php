@@ -44,6 +44,8 @@ final class rb_source_userdata_export_types extends rb_base_source {
         $this->defaultfilters = array();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_userdata_export_types');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_userdata_export_types');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_userdata_export_types');
 
         $this->cacheable = false;
 

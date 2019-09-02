@@ -51,6 +51,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->paramoptions = $this->define_paramoptions();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_summary');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_facetoface_summary');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_facetoface_summary');
         $this->usedcomponents[] = 'totara_cohort';
         $this->add_customfields();
 

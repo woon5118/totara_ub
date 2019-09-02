@@ -21,5 +21,7 @@
  * @subpackage totara_sync
  */
 
+$string['sourcelabel'] = 'Site and server';
+$string['sourcesummary'] = 'Logging of HR Import activity.';
 $string['sourcetitle'] = 'HR Import Log';
 $string['type_totara_sync_log'] = 'HR Import Log';

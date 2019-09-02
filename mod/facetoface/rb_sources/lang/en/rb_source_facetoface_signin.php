@@ -22,6 +22,8 @@
  */
 
 // Lang file for mod/facetoface/rb_sources/rb_source_facetoface_signin.php
+$string['sourcelabel'] = 'Seminar';
+$string['sourcesummary'] = 'A record of everyone who has signed into a seminar session.';
 $string['sourcetitle'] = 'Seminar Sign-in Sheet';
 
 // Columns.

@@ -67,6 +67,8 @@ class rb_source_dp_course extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_course');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_dp_course');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_dp_course');
         $this->usedcomponents[] = 'totara_plan';
         $this->usedcomponents[] = 'totara_cohort';
 

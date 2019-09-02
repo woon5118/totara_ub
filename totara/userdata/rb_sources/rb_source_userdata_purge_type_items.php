@@ -44,6 +44,8 @@ final class rb_source_userdata_purge_type_items extends rb_base_source {
         $this->defaultfilters = array();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_userdata_purge_type_items');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_userdata_purge_type_items');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_userdata_purge_type_items');
 
         $this->cacheable = false;
 

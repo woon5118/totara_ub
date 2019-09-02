@@ -43,6 +43,8 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
 
         $this->base = '{facetoface_asset}';
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_asset');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_facetoface_asset');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_facetoface_asset');
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();

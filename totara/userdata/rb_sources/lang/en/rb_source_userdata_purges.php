@@ -21,6 +21,8 @@
  * @package totara_userdata
  */
 
+$string['sourcelabel'] = 'User data';
+$string['sourcesummary'] = 'A record of all of the purged that have been run.';
 $string['sourcetitle'] = 'User data purges';
 $string['type_usercreated'] = 'Created by';
 $string['type_purge'] = 'Purge';

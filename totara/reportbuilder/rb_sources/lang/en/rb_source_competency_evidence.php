@@ -22,6 +22,8 @@
  */
 
 // lang strings for report builder 'competency evidence' source
+$string['sourcelabel'] = 'Perform';
+$string['sourcesummary'] = 'Learners\' progress on their assigned competencies.';
 $string['sourcetitle'] = 'Competency Status';
 // columns
 $string['proficientdate'] = 'Date Proficiency Achieved';

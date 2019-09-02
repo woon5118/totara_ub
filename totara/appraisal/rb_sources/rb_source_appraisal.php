@@ -47,6 +47,8 @@ class rb_source_appraisal extends rb_base_source {
         $this->embeddedparams = $this->define_embeddedparams();
         $this->usedcomponents[] = 'totara_appraisal';
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_appraisal');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_appraisal');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_appraisal');
         $this->shortname = 'appraisal_status';
 
         // Apply global report restrictions.

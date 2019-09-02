@@ -22,6 +22,8 @@
  */
 
 // lang file for totara/reportbuilder/rb_sources/rb_source_site_logs.php
+$string['sourcelabel'] = 'Site and server';
+$string['sourcesummary'] = 'Site-wide user activity logging.';
 $string['sourcetitle'] = 'Legacy Site Logs';
 // columns
 $string['time'] = 'Time';

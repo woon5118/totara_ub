@@ -21,6 +21,8 @@
  */
 
 // lang file for mod/facetoface/rb_sources/rb_source_facetoface_sessions.php
+$string['sourcelabel'] = 'Seminar';
+$string['sourcesummary'] = 'Provides detailed information of seminar events and who has signed up for them.';
 $string['sourcetitle'] = 'Seminar Sign-ups';
 
 // columns

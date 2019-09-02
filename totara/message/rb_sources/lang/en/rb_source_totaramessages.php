@@ -22,6 +22,8 @@
  */
 
 // lang file for totara/message/rb_sources/rb_source_totaramessage.php
+$string['sourcelabel'] = 'Site and server';
+$string['sourcesummary'] = 'Alerts and notifications sent by the system.';
 $string['sourcetitle'] = 'Messages';
 // columns
 $string['actions'] = 'Actions';

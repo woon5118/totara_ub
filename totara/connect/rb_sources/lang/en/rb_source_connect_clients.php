@@ -23,4 +23,6 @@
 
 $string['embeddedreportname'] = 'Totara Connect clients';
 $string['type_connect_clients'] = 'Client information';
+$string['sourcelabel'] = 'Site and server';
+$string['sourcesummary'] = 'Show all Totara sites using this server for their login authentication.';
 $string['sourcetitle'] = 'Totara Connect clients';

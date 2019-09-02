@@ -79,6 +79,8 @@ class rb_source_user extends rb_base_source {
         $this->requiredcolumns = array();
         $this->staff_f2f = $DB->get_field('report_builder', 'id', array('shortname' => 'staff_facetoface_sessions'));
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_user');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_user');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_user');
         $this->usedcomponents[] = 'totara_program';
 
         // Apply global report restrictions.

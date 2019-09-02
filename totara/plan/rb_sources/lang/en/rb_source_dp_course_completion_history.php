@@ -21,6 +21,8 @@
  */
 
 $string['grade'] = 'Grade at time of completion';
+$string['sourcelabel'] = 'Learning';
+$string['sourcesummary'] = 'Evidence information, by default used to build the Record of Learning embedded report.';
 $string['sourcetitle'] = 'Record of Learning: Previous Course Completions';
 $string['timecompleted'] = 'Date last completed';
 $string['type_base'] = 'Course Completion History';

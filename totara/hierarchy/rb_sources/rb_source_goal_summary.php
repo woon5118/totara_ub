@@ -53,6 +53,8 @@ class rb_source_goal_summary extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->embeddedparams = $this->define_embeddedparams();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_goal_summary');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_goal_summary');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_goal_summary');
         $this->shortname = 'goal_summary';
         $this->cacheable = false;
         $this->usedcomponents[] = 'totara_hierarchy';

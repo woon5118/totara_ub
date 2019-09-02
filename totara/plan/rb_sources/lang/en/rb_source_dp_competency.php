@@ -22,6 +22,8 @@
  */
 
 // lang file for local/plan/rb_sources/rb_sources_dp_competency.php
+$string['sourcelabel'] = 'Learning';
+$string['sourcesummary'] = 'Competency assignment and completion information.';
 $string['sourcetitle'] = 'Record of Learning: Competencies';
 // columns
 $string['duedate'] = 'Due date';

@@ -60,6 +60,8 @@ class rb_source_goal_custom extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->embeddedparams = $this->define_embeddedparams();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_goal_custom');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_goal_custom');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_goal_custom');
         $this->shortname = 'goal_custom';
         $this->cacheable = false;
         $this->usedcomponents[] = 'totara_hierarchy';

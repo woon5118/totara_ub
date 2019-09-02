@@ -37,6 +37,8 @@ class rb_source_pos extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_pos');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_pos');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_pos');
         $this->usedcomponents[] = 'totara_hierarchy';
 
         parent::__construct();

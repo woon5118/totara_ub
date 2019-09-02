@@ -65,6 +65,8 @@ class rb_source_dp_certification extends rb_base_source {
         $this->instancetype = 'certification';
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_certification');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_dp_certification');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_dp_certification');
         $this->sourcewhere = '(base.certifid > 0)';
         $this->usedcomponents[] = 'totara_plan';
         $this->usedcomponents[] = 'totara_program';

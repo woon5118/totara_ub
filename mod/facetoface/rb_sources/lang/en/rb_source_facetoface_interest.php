@@ -20,6 +20,8 @@
  * @package mod_facetoface
  */
 
+$string['sourcelabel'] = 'Seminar';
+$string['sourcesummary'] = 'Details on users who have declared interest in attending a seminar.';
 $string['sourcetitle'] = 'Seminar Interest';
 $string['declareinterestreportdate'] = 'Date of declared interest';
 $string['declareinterestreportreason'] = 'Stated reason for interest';

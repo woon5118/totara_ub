@@ -2,6 +2,8 @@
 
 // Report source title.
 $string['sourcetitle'] = 'Assignment submissions summary';
+$string['sourcelabel'] = 'Course';
+$string['sourcesummary'] = 'Assignment activity submission information by assignment.';
 
 // Column headings.
 $string['assignmentdescription'] = 'Assignment description';

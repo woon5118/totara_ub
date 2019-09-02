@@ -22,6 +22,8 @@
  */
 
 // lang file for local/plan/rb_sources/rb_source_dp_plan.php
+$string['sourcelabel'] = 'Learning';
+$string['sourcesummary'] = 'Learning plan information by user.';
 $string['sourcetitle'] = 'Learning Plans';
 // columns
 $string['description'] = 'Description';

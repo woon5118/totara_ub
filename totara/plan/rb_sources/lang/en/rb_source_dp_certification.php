@@ -22,6 +22,8 @@
  */
 
 // lang file for totara/plan/rb_sources/rb_source_dp_certification.php
+$string['sourcelabel'] = 'Learning';
+$string['sourcesummary'] = 'Certification assignment and course completion information.';
 $string['sourcetitle'] = 'Record of Learning: Certifications';
 
 // columns

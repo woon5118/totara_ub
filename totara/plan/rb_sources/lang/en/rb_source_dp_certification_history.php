@@ -22,6 +22,8 @@
  */
 
 // lang file for totara/plan/rb_sources/rb_source_dp_certification_history.php
+$string['sourcelabel'] = 'Learning';
+$string['sourcesummary'] = 'Certification assignment and course completion information including previous certifications.';
 $string['sourcetitle'] = 'Record of Learning: Previous Certifications';
 
 $string['na'] = 'N/A'; // Abbreviation for not applicable.
