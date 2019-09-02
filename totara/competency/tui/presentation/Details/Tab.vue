@@ -53,8 +53,8 @@ export default {
 .totara_competency-profile__accordion-item {
   & .totara_competency-profile__accordion-item-header {
     display: inline-flex;
-    padding: 15px;
     width: 100%;
+    padding: 15px;
     line-height: 15px;
     background-color: #f7f7f7;
     border: 1px #979797 solid;

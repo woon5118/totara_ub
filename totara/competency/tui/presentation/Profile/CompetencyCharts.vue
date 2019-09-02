@@ -46,8 +46,8 @@ export default {
 
   &__chart {
     width: calc(100% - 0.5rem);
-    padding: 0.5rem;
     margin: 0 0.5rem 1rem 0;
+    padding: 0.5rem;
     border: 1px #999c9c solid;
     border-radius: 1rem;
 

@@ -23,14 +23,14 @@ export default {
 .tui-Preloader {
   position: absolute;
   top: 0;
-  left: 0;
-  bottom: 0;
   right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.6);
-  z-index: 100;
 
   // Fade transitions
   &__transition-fade {

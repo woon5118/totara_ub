@@ -33,24 +33,24 @@ export default {
 
   &content {
     &:before {
-      content: '';
       position: absolute;
       top: -$totara_style-size_8;
       left: 50%;
-      margin-left: -$totara_style-size_8;
       width: 0;
       height: 0;
-      border-left: $totara_style-size_8 solid transparent;
+      margin-left: -$totara_style-size_8;
       border-right: $totara_style-size_8 solid transparent;
       border-bottom: $totara_style-size_8 solid $totara_style-color_neutral_5;
+      border-left: $totara_style-size_8 solid transparent;
+      content: '';
     }
-    margin-top: $totara_style-size_8;
     position: absolute;
-    padding: $totara_style-size_8 $totara_style-size_12;
-    border: $totara_style-size_1 $totara_style-color_neutral_4 solid;
     width: max-content;
+    margin-top: $totara_style-size_8;
+    padding: $totara_style-size_8 $totara_style-size_12;
 
     background-color: $totara_style-color_neutral_1;
+    border: $totara_style-size_1 $totara_style-color_neutral_4 solid;
   }
 }
 </style>

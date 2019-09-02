@@ -70,17 +70,17 @@ export default {
 </script>
 <style lang="scss">
 .tui-AssignmentFilter {
-  border-top: $totara_style-size_1 solid $totara_style-color_neutral_5;
-  border-bottom: $totara_style-size_1 solid $totara_style-color_neutral_5;
   display: block;
   margin-top: $totara_style-spacing_4;
   margin-bottom: $totara_style-spacing_2;
   padding: $totara_style-spacing_2;
+  border-top: $totara_style-size_1 solid $totara_style-color_neutral_5;
+  border-bottom: $totara_style-size_1 solid $totara_style-color_neutral_5;
 
   &_label {
-    padding-left: $totara_style-spacing_2;
-    padding-right: $totara_style-spacing_4;
     margin: 0;
+    padding-right: $totara_style-spacing_4;
+    padding-left: $totara_style-spacing_2;
     vertical-align: middle;
   }
 

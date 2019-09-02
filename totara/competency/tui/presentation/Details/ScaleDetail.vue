@@ -126,10 +126,10 @@ export default {
   }
 
   &value-cell {
-    border-bottom: 1px solid #dde1e5;
-    max-width: 80%;
     flex-grow: 1;
+    max-width: 80%;
     padding: 2rem;
+    border-bottom: 1px solid #dde1e5;
 
     &[data-active] {
       font-weight: bold;
@@ -138,19 +138,19 @@ export default {
 
   &my-value-cell {
     display: flex;
+    flex-grow: 1;
     align-items: center;
     justify-content: center;
-    flex-grow: 1;
     max-width: 20%;
 
     background-color: #e1e1e1;
 
     background-repeat: no-repeat;
-    background-attachment: fixed;
     background-position: center right;
+    background-attachment: fixed;
     & > div {
-      text-align: center;
       font-weight: bold;
+      text-align: center;
 
       &:not([data-no-rating]) {
         font-size: 3rem;
@@ -162,22 +162,21 @@ export default {
   }
 
   &proficient-box {
-    background-color: #e1e1e1;
-
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
 
     padding: 2rem 4rem;
+    background-color: #e1e1e1;
 
     background-repeat: no-repeat;
-    background-attachment: fixed;
     background-position: center right;
+    background-attachment: fixed;
     & > div {
-      text-align: center;
       font-weight: bold;
 
       font-size: 1.5rem;
+      text-align: center;
 
       &:nth-child(2) {
         margin-left: 5rem;

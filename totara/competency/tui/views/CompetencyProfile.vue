@@ -210,8 +210,8 @@ export default {
     display: flex;
     flex-direction: row-reverse;
     justify-content: space-between;
-    line-height: 32px;
     margin-bottom: 1rem;
+    line-height: 32px;
   }
 }
 </style>

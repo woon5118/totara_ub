@@ -217,7 +217,7 @@ export default {
   },
 };
 </script>
-<style lang="scss"></style>
+
 <lang-strings>
     {
         "totara_competency" : [

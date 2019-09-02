@@ -258,8 +258,8 @@ export default {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  width: 100%;
   justify-content: space-between;
+  width: 100%;
 
   &.totara_competency-list__header {
     border-bottom: 2px black solid;

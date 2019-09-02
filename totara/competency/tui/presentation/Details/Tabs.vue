@@ -71,20 +71,20 @@ export default {
     &-header {
       & > ul {
         display: flex;
-        padding: 0;
-        margin: 0;
-        list-style: none;
         flex-grow: 1;
         flex-wrap: wrap;
+        margin: 0;
+        padding: 0;
         text-align: left;
+        list-style: none;
 
         & > li {
           padding: 1.5rem 4.5rem;
 
           &:not(.tui-ProfileTabs__tabs-active) {
-            border-left: 1px transparent solid;
-            border-right: 1px transparent solid;
             border-top: 1px transparent solid;
+            border-right: 1px transparent solid;
+            border-left: 1px transparent solid;
             border-top-left-radius: 3px;
             border-top-right-radius: 3px;
           }
@@ -96,9 +96,9 @@ export default {
 
     &-active {
       font-weight: bold;
-      border-left: 1px #00a5e3 solid;
-      border-right: 1px #00a5e3 solid;
       border-top: 1px #00a5e3 solid;
+      border-right: 1px #00a5e3 solid;
+      border-left: 1px #00a5e3 solid;
       border-top-left-radius: 3px;
       border-top-right-radius: 3px;
     }

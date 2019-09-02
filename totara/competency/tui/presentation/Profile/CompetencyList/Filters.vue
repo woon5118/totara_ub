@@ -143,9 +143,9 @@ export default {
   justify-content: space-between;
 
   &__left {
-    justify-content: left;
     display: flex;
     flex-direction: row;
+    justify-content: left;
     line-height: 34px;
 
     > *:not(:last-child) {
@@ -154,9 +154,9 @@ export default {
   }
 
   &__right {
-    justify-content: right;
     display: flex;
     flex-direction: row;
+    justify-content: right;
     line-height: 34px;
     > *:not(:last-child) {
       margin-right: 1rem;
@@ -165,12 +165,12 @@ export default {
 
   //TODO: temporary styling for an input component
   &__input {
+    height: 34px;
+    padding: 6px 12px;
     border: 1px #ccc solid;
     border-radius: 4px;
-    padding: 6px 12px;
-    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    height: 34px;
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
   }
 }
 </style>

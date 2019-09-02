@@ -103,8 +103,8 @@ export default {
 </script>
 <style lang="scss">
 .totara_competency-profile-assignment-filters_label {
-  line-height: 32px;
   margin-right: 10px;
+  line-height: 32px;
 }
 </style>
 <lang-strings>

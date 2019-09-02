@@ -122,8 +122,8 @@ export default {
 <style lang="scss">
 .tui-CompetencyDetail__ {
   &backLink {
-    align-self: start;
     display: inline-block;
+    align-self: start;
     padding-bottom: $totara_style-spacing_2;
   }
   &nav-links {
@@ -138,13 +138,13 @@ export default {
 
       & > ul {
         display: flex;
-
-        padding: 0;
-        margin: 0;
-        list-style: none;
         flex-grow: 1;
         flex-wrap: wrap;
+        margin: 0;
+
+        padding: 0;
         line-height: $totara_style-size_32;
+        list-style: none;
 
         & > li:not(:last-child) {
           margin-right: $totara_style-size_14;

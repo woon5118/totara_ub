@@ -125,11 +125,11 @@ export default {
 .tui-ArchivedCompetencyList__ {
   &archived-assignments-list {
     display: flex;
-    padding: 0;
-    margin: 0;
-    list-style: none;
     flex-grow: 1;
     flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 
     &-padded {
       margin-left: 2rem;

@@ -79,23 +79,23 @@ export default {
 
   & > ul {
     display: flex;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    margin: 0;
+
+    padding: 0;
+    list-style: none;
 
     @media (min-width: $totara_style-screen_sm_min) {
       max-width: 80%;
     }
-
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    flex-grow: 1;
-    flex-wrap: wrap;
   }
 
   &__user-details {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-self: start;
+    justify-content: center;
     max-width: 300px;
 
     & > :not(:last-child) {
