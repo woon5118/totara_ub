@@ -109,16 +109,14 @@ abstract class state {
 
         // Iteratively search for desired state
         $map = $this->get_map();
+        $actor = $this->signup->get_actor();
         foreach ($desiredstateclasses as $desiredstateclass) {
             if ($desiredstateclass == not_set::class) {
                 // We never should switch to not_set class.
                 throw new signup_exception("New booking status cannot be 'not set'");
             }
             foreach ($map as $transition) {
-                $actor = $this->signup->get_actor();
-                /**
-                 * @var transition $transition
-                 */
+                /** @var transition $transition */
                 if ($transition->get_to() instanceof $desiredstateclass && $transition->possible($actor)) {
                     return $transition->get_to();
                 }

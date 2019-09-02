@@ -68,3 +68,17 @@ Feature: Seminar actions in upcoming block are correct
     Then I should see "(On waitlist)" in the "Cancel waitlist" "table_row"
     And I should see "On waitlist" in the "Upcoming events" "block"
     And I should not see "Sign-up" in the "Upcoming events" "block"
+    And I log out
+
+    # Lest make sure updating event does not update the attendee status with waitlist settings.
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    And I follow "Test seminar"
+    And I click on "Edit event" "link"
+    And I set the following fields to these values:
+      | Maximum bookings | 15 |
+    And I press "Save changes"
+    And I follow "Attendees"
+    Then I should not see "Sam1 Student1"
+    And I follow "Wait-list"
+    And I should see "Sam1 Student1"
