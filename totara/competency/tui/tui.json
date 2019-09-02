@@ -1,4 +1,4 @@
 {
   "component": "totara_competency",
-  "bundleWith": "totara_core"
+  "vendor": "totara"
 }
