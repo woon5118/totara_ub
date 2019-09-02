@@ -336,9 +336,9 @@ class editor extends element {
             $format = FORMAT_HTML;
         }
 
-        if ($this->get_current_file_area()) {
+        if ($currentfilearea = $this->get_current_file_area()) {
             if (empty($value['itemid'])) {
-                $draftitemid = (int)file_get_unused_draft_itemid();
+                $draftitemid = (int)$currentfilearea->create_draft_area();
                 $text = file_area::rewrite_links_to_draftarea($text, $draftitemid);
             } else {
                 $draftitemid = (int)$value['itemid'];
