@@ -38,6 +38,9 @@ class self_assignment extends base {
             $this->require_capability('tassign/competency:assignother', $this->context);
         }
 
+        // TODO Fix it so that tui_component is not requiring this
+        $renderer = $this->page->get_renderer('core');
+
         // Add breadcrumbs.
         $this->add_navigation('Self assignment');
 
