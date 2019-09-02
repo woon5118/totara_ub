@@ -84,6 +84,7 @@ use stdClass;
  * @property string $middlename
  * @property string $alternatename
  * @property bool $totarasync
+ * @property int $tenantid
  *
  * @method static user_repository repository()
  *
