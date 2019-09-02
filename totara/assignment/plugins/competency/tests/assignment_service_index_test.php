@@ -158,7 +158,7 @@ class tassign_competency_assignment_index_service_testcase extends advanced_test
         ['ass' => $ass] = $this->generate_data();
 
         // Only types
-        $filters = ['assignmenttype' => [entities\assignment::TYPE_ADMIN, entities\assignment::TYPE_SELF]];
+        $filters = ['assignment_type' => [entities\assignment::TYPE_ADMIN, entities\assignment::TYPE_SELF]];
         $res = $this->call_webservice_api('tassign_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
@@ -172,7 +172,7 @@ class tassign_competency_assignment_index_service_testcase extends advanced_test
         $this->assert_result_contains_ids([$ass[0]->id, $ass[1]->id], $result);
 
         // Mix of user_group_type and type
-        $filters = ['assignmenttype' => [user_groups::POSITION, entities\assignment::TYPE_SELF]];
+        $filters = ['assignment_type' => [user_groups::POSITION, entities\assignment::TYPE_SELF]];
         $res = $this->call_webservice_api('tassign_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
@@ -186,7 +186,7 @@ class tassign_competency_assignment_index_service_testcase extends advanced_test
         $this->assert_result_contains_ids([$ass[1]->id, $ass[3]->id], $result);
 
         // Just one system filter
-        $filters = ['assignmenttype' => [entities\assignment::TYPE_SYSTEM]];
+        $filters = ['assignment_type' => [entities\assignment::TYPE_SYSTEM]];
         $res = $this->call_webservice_api('tassign_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
@@ -200,7 +200,7 @@ class tassign_competency_assignment_index_service_testcase extends advanced_test
         $this->assert_result_contains_ids([$ass[2]->id], $result);
 
         // Just user group types
-        $filters = ['assignmenttype' => [user_groups::POSITION, user_groups::ORGANISATION]];
+        $filters = ['assignment_type' => [user_groups::POSITION, user_groups::ORGANISATION]];
         $res = $this->call_webservice_api('tassign_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
@@ -214,7 +214,7 @@ class tassign_competency_assignment_index_service_testcase extends advanced_test
         $this->assert_result_contains_ids([$ass[3]->id, $ass[4]->id], $result);
 
         // non existing types are ignored
-        $filters = ['assignmenttype' => ['foo', 'bar']];
+        $filters = ['assignment_type' => ['foo', 'bar']];
         $res = $this->call_webservice_api('tassign_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,

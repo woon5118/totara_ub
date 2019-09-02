@@ -88,9 +88,15 @@ class tassign_competency_actions_delete_testcase extends tassign_competency_assi
         $assignment2->status = entities\assignment::STATUS_ACTIVE;
         $assignment2->save();
 
+        $assignment3 = new entities\assignment($assignments[2]);
+
         // Expand and check that there are the expected records in the assignment user table
         $this->expand();
-        $this->assertEquals(1, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(2, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(1, entities\competency_assignment_user::repository()
+            ->where('assignment_id', $assignment2->id)
+            ->count()
+        );
 
         $model = new assignment_actions();
         $affected_ids = $model->delete($assignment1->id);
@@ -104,10 +110,14 @@ class tassign_competency_actions_delete_testcase extends tassign_competency_assi
         // this one is untouched
         $this->assertEquals(entities\assignment::STATUS_ACTIVE, $assignment2->status);
 
-        // Assert that only one user entry is left for the one assignment
-        $this->assertEquals(1, entities\competency_assignment_user::repository()->count());
+        // Assert that the two users for the other two assignments are still there
+        $this->assertEquals(2, entities\competency_assignment_user::repository()->count());
         $this->assertEquals(1, entities\competency_assignment_user::repository()
             ->where('assignment_id', $assignment2->id)
+            ->count()
+        );
+        $this->assertEquals(1, entities\competency_assignment_user::repository()
+            ->where('assignment_id', $assignment3->id)
             ->count()
         );
 

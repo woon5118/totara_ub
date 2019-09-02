@@ -90,11 +90,21 @@ class tassign_competency_user_log_testcase extends tassign_competency_assignment
         $model->delete($assignment1->id);
 
         // Records and logs for assignment should be gone after delete
-        $this->assertEquals(0, competency_assignment_user::repository() ->where('assignment_id', $assignment1->id) ->count());
+        $this->assertEquals(
+            0,
+            competency_assignment_user::repository()
+                ->where('assignment_id', $assignment1->id)
+                ->count()
+        );
         $this->assert_has_log_entry_amount(0, $assignment1->id);
 
         // Control record should still be there
-        $this->assertEquals(1, competency_assignment_user::repository()->count());
+        $this->assertEquals(
+            1,
+            competency_assignment_user::repository()
+                ->where('assignment_id', $assignment2->id)
+                ->count()
+        );
         $this->assert_has_log_entry_amount(2, $assignment2->id);
     }
 
@@ -112,7 +122,12 @@ class tassign_competency_user_log_testcase extends tassign_competency_assignment
         $this->expand();
 
         // User table should now be filled
-        $this->assertEquals(1, competency_assignment_user::repository()->count());
+        $this->assertEquals(
+            1,
+            competency_assignment_user::repository()
+                ->where('assignment_id', $assignment->id)
+                ->count()
+        );
         $this->assert_has_log_entry_amount(2, $assignment->id);
         $this->assert_log_entry_exists($user->id, $assignment->id, competency_assignment_user_log::ACTION_ASSIGNED);
         $this->assert_log_entry_exists($user->id, $assignment->id, competency_assignment_user_log::ACTION_TRACKING_START);
@@ -122,7 +137,12 @@ class tassign_competency_user_log_testcase extends tassign_competency_assignment
         $this->expand();
 
         // Check that User got unassigned, means the record in the user table should be gone
-        $this->assertEquals(0, competency_assignment_user::repository()->where('assignment_id', $assignment->id)->count());
+        $this->assertEquals(
+            0,
+            competency_assignment_user::repository()
+                ->where('assignment_id', $assignment->id)
+                ->count()
+        );
 
         $this->assert_has_log_entry_amount(3, $assignment->id);
         $this->assert_log_entry_exists($user->id, $assignment->id, competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP);
@@ -156,14 +176,34 @@ class tassign_competency_user_log_testcase extends tassign_competency_assignment
 
         // Expand and check that there are the expected records in the assignment user table
         $this->expand();
-        $this->assertEquals(0, competency_assignment_user::repository()->count());
-        $this->assertEquals(0, competency_assignment_user_log::repository()->count());
+        $this->assertEquals(
+            0,
+            competency_assignment_user::repository()
+                ->where('assignment_id', $assignment1->id)
+                ->count()
+        );
+        $this->assertEquals(
+            0,
+            competency_assignment_user_log::repository()
+                ->where('assignment_id', $assignment1->id)
+                ->count()
+        );
 
         $model = new assignment_actions();
         $model->delete($assignment1->id);
 
-        $this->assertEquals(0, competency_assignment_user::repository()->count());
-        $this->assertEquals(0, competency_assignment_user_log::repository()->count());
+        $this->assertEquals(
+            0,
+            competency_assignment_user::repository()
+                ->where('assignment_id', $assignment1->id)
+                ->count()
+        );
+        $this->assertEquals(
+            0,
+            competency_assignment_user_log::repository()
+                ->where('assignment_id', $assignment1->id)
+                ->count()
+        );
     }
 
     private function create_position_assignment(int $user_id, int $pos_id, int $comp_id): assignment {
