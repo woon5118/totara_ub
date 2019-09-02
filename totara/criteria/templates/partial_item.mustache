@@ -1,0 +1,53 @@
+{{!
+     This file is part of Totara LMS
+
+     Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 3 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+     @author Riana Rossouw <riana.rossouw@totaralearning.com>
+     @package totara_criteria
+}}
+{{!
+
+    @template totara_criteria/partial_item
+
+    This is the template for showing a criterion item
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * data-tw-criterion-item-value: string Item value
+    * data-tw-criterion-item-remove: Trigger for item removal
+
+    Context variables required for this template:
+    * value: string Item value
+    * text: string Display value
+
+    Other context variables for following partials:
+    * none
+
+    Strings:
+    * none
+
+}}
+<div data-tw-{{item_parent}}-item-value="{{value}}">
+    {{text}}
+    <a href="#">
+        <span class="tw_criterion_item__btn_small_icon" data-tw-{{item_parent}}-item-remove="">
+            {{#flex_icon}}trash{{/flex_icon}}
+        </span>
+    </a>
+</div>

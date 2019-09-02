@@ -1,0 +1,117 @@
+{{!
+   This file is part of Totara LMS
+
+   Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   @author Riana Rossouw <riana.rossouw@totaralearning.com>
+   @author Brendan Cox <brendan.cox@totaralearning.com>
+   @package criteria_coursecompletion
+}}
+{{!
+
+    @template criteria_coursecompletion/coursecompletion_edit
+
+    Template for management of Course Completion criteria
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+        * data-core-autoinitialise: State of this JS auto initilise
+        * data-core-autoinitialise-amd: AMD to be linked to template
+        * data-tw-criterionCourseCompletion: Target for course completion criterion
+        * data-tw-criterionCourseCompletion-detail: Target for detail section
+        * data-tw-criterionCourseCompletion-courses: Target for the courses section
+        * data-tw-criterionCourseCompletion-addCourses: Trigger for showing course adder
+        * data-tw-criterionCourseCompletion-error: Targets for error sections
+        * data-tw-criterionCourseCompletion-aggregation: Target for aggregation section
+        * data-tw-criterionCourseCompletion-aggregationMethod: int Section for the specific aggregation method
+        * data-tw-criterionCourseCompletion-aggregationMethod-changed: Trigger when aggregation settings changed
+        * data-tw-criterionCourseCompletion-aggregationCount: Section for ggregation required count
+        * data-tw-criterionCourseCompletion-aggregationCount-changed: Triger when arequired count changes
+
+    Context variables required for this template:
+        * key
+        * courses
+        * nocourses
+
+}}
+
+<div data-tw-criterionCourseCompletion=""
+     data-core-autoinitialise="true"
+     data-core-autoinitialise-amd="criteria_coursecompletion/coursecompletion"
+     data-tw-loader-target="">
+    <div data-tw-criterionCourseCompletion-detail="">
+        <div class="tw-criterion-label">
+            <span>{{#str}}courses, criteria_coursecompletion{{/str}}</span>
+        </div>
+        <div class="tw-criterion-value">
+            <div data-tw-criterionCourseCompletion-courses="">
+            </div>
+
+            <div>
+                <a href="#" data-tw-criterionCourseCompletion-addCourses="">
+                    <span class="tw-criterion-smalltitle">
+                        {{#str}}addcourses, criteria_coursecompletion{{/str}}
+                    </span>
+                </a>
+                <span class="tw-criterion-warning {{^nocourses}}tw-criterion-hidden{{/nocourses}}" data-tw-criterionCourseCompletion-error="nocourses">
+                    {{#flex_icon}}notification-warning{{/flex_icon}}
+                    {{#str}}error:nocourses, criteria_coursecompletion{{/str}}
+                </span>
+                <span class="tw-criterion-warning {{^courseerror}}tw-criterion-hidden{{/courseerror}}" data-tw-criterionCourseCompletion-error="invalidcourse">
+                    {{#flex_icon}}notification-warning{{/flex_icon}}
+                    {{#str}}error:courseerror, criteria_coursecompletion{{/str}}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div data-tw-criterionCourseCompletion-aggregation="">
+        <div class="tw-criterion-label">
+            <span>{{#str}}aggregation, totara_criteria{{/str}}</span>
+        </div>
+        <div class="tw-criterion-value">
+            <div data-tw-criterionCourseCompletion-aggregationMethod="1">
+                <input type="radio"
+                       id="tw_criterionCourseCompletion_agg_all__{{key}}"
+                       name="tw_criterionCourseCompletion_agg__{{key}}"
+                       value="1"
+                       data-tw-criterionCourseCompletion-aggregationMethod-changed="all"/>
+                <label for="tw_criterionCourseCompletion_agg_all__{{key}}"><span>{{#str}}completeall, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+            </div>
+
+            <div data-tw-criterionCourseCompletion-aggregationMethod="2">
+                <div class="tw-criterion-inline">
+                    <input type="radio"
+                           id="tw_criterionCourseCompletion_agg_any__{{key}}"
+                           name="tw_criterionCourseCompletion_agg__{{key}}"
+                           value="2"
+                           data-tw-criterionCourseCompletion-aggregationMethod-changed="any"/>
+                    <label for="tw_criterionCourseCompletion_agg_any__{{key}}"><span>{{#str}}completeany, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                </div>
+
+                <div class="tw-criterion-inline" data-tw-criterionCourseCompletion-aggregationCount="">
+                    <input type="number"
+                           name="tw_criterionCourseCompletion_agg_count__{{key}}"
+                           value="1" min="0"
+                           data-tw-criterionCourseCompletion-aggregationCount-changed=""
+                           disabled="disabled"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

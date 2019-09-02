@@ -1,0 +1,49 @@
+{{!
+     This file is part of Totara LMS
+
+     Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 3 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+     @author Riana Rossouw <riana.rossouw@totaralearning.com>
+     @package totara_competency
+}}
+{{!
+
+        @template totara_competency/partial_item
+
+        This template shows and item
+
+        Classes required for JS:
+        * none
+
+        Data attributes required for JS:
+
+        Context variables required for this template:
+
+        Other context variables for following partials:
+
+        Strings:
+
+}}
+<div class="pw_item"
+    data-pw-item-value="{{value}}"
+    data-pw-on-delete="mark">
+    {{text}}
+    <a href="#" data-cc-on-ordering="hide" data-pw-on-delete="hide">
+        <span class="pw_item__btn_small_icon" data-pw-item-remove="removeitem">
+            {{#flex_icon}}trash{{/flex_icon}}
+        </span>
+    </a>
+</div>

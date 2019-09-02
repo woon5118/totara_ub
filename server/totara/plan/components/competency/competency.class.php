@@ -122,8 +122,19 @@ class dp_competency_component extends dp_base_component {
                 AND cr.userid = :planuserid
                 LEFT JOIN
                     {comp_scale_values} csv
-                 ON cr.proficiency = csv.id";
+                 ON cr.proficiency = csv.id
+                 ";
             $params['planuserid'] = $this->plan->userid;
+
+            // We also will be checking for a value set for this plan only.
+            $status .= "
+                LEFT JOIN {dp_plan_competency_value} dpcv
+                       ON a.competencyid = dpcv.competency_id
+                      AND dpcv.user_id = :value_user_id
+                LEFT JOIN {comp_scale_values} dpcsv
+                       ON dpcv.scale_value_id = dpcsv.id
+            ";
+            $params['value_user_id'] = $this->plan->userid;
         }
 
         $params['contextlevel'] = CONTEXT_COURSE;
@@ -176,6 +187,16 @@ class dp_competency_component extends dp_base_component {
                 csv.id AS profscalevalueid,
                 csv.name AS status,
                 csv.sortorder AS profsort
+                ";
+        if (!$this->plan->is_complete()) {
+            // dpcsv won't be in there if the plan is complete. See the $status sql.
+            $sql .= ",
+                dpcsv.id AS planvalueid,
+                dpcsv.name AS planstatus,
+                dpcsv.sortorder AS planprofsort
+            ";
+        }
+        $sql .= "
             FROM
                 {dp_plan_competency_assign} a
             INNER JOIN
@@ -839,6 +860,10 @@ class dp_competency_component extends dp_base_component {
      */
     public function display_status($item) {
         // @todo: add colors and stuff?
+        if (isset($item->planstatus)) {
+            return format_string($item->planstatus);
+        }
+
         return format_string($item->status);
     }
 
@@ -915,10 +940,8 @@ class dp_competency_component extends dp_base_component {
                     $details->timeproficient = time();
                     $details->assessorname = fullname($USER);
                     $details->assessorid = $USER->id;
-                    $result = hierarchy_add_competency_evidence($competencyid, $this->plan->userid, $evidence, $this, $details);
-                    if ($result) {
-                        dp_plan_item_updated($this->plan->userid, 'competency', $competencyid);
-                    }
+                    $this->set_value($competencyid, $this->plan->userid, $evidence, $details);
+                    dp_plan_item_updated($this->plan->userid, 'competency', $competencyid);
                 }
             }
         }
@@ -1135,6 +1158,68 @@ class dp_competency_component extends dp_base_component {
         if (!$ajax) {
             redirect($currenturl);
         }
+    }
+
+    public function set_value($competency_id, $subject_id, $scale_value_id, $details) {
+        global $DB;
+
+        $record = $DB->get_record(
+            'dp_plan_competency_value',
+            ['competency_id' => $competency_id, 'user_id' => $subject_id]
+        );
+
+        // Note that we don't get based on or record a plan id for this record. So if the same competency
+        // is in two learning plans, either can update the same record. This is to align with behaviour
+        // where learning plans used to update the singular value that a user had across the site.
+
+        if (!$record) {
+            $record = new stdClass();
+            $record->competency_id = $competency_id;
+            $record->user_id = $subject_id;
+        }
+
+        $record->scale_value_id = $scale_value_id;
+        $record->date_assigned = time();
+
+        // Below are details that learning plans used to save directly to the comp_record table.
+
+        if (isset($details->positionid)) {
+            $record->positionid = $details->positionid;
+        }
+        if (isset($details->organisationid)) {
+            $record->organisationid = $details->organisationid;
+        }
+        if (isset($details->assessorid)) {
+            $record->assessorid = $details->assessorid;
+        }
+        if (isset($details->assessorname)) {
+            $record->assessorname = $details->assessorname;
+        }
+        if (isset($details->assessmenttype)) {
+            $record->assessmenttype = $details->assessmenttype;
+        }
+
+        // Set the timeproficient value if it has been passed through and the selected value is considered proficient.
+        $record->timeproficient = null;
+        if (!empty($scale_value_id) && $proficient = $DB->get_field('comp_scale_values', 'proficient', array('id' => $scale_value_id))) {
+            if (!empty($details->timeproficient) && $proficient == 1) {
+                $record->timeproficient = $details->timeproficient;
+            }
+        }
+
+        if (!empty($details->manual)) {
+            $record->manual = 1;
+        } else {
+            $record->manual = 0;
+        }
+
+        if (empty($record->id)) {
+            $record->id = $DB->insert_record('dp_plan_competency_value', $record);
+        } else {
+            $DB->update_record('dp_plan_competency_value', $record);
+        }
+
+        \totara_plan\event\competency_value_set::create_from_record($record)->trigger();
     }
 
 
@@ -1476,12 +1561,18 @@ class dp_competency_component extends dp_base_component {
             $formatscale[$key] = format_string($scale);
         }
 
+        if (isset($item->planvalueid)) {
+            $scale_value_id = $item->planvalueid;
+        } else {
+            $scale_value_id = $item->profscalevalueid;
+        }
+
         $attributes = array(); //in this case no attributes are set
         $output = html_writer::label(get_string('statusof', 'totara_plan', format_string($item->fullname)), "menucompprof_{$this->component}{$item->id}", true, array('class' => 'sr-only'));
         $output .= html_writer::select($formatscale,
                                     "compprof_{$this->component}[{$item->id}]",
-                                    $item->profscalevalueid,
-                                    array(($item->profscalevalueid ? '' : 0) => ($item->profscalevalueid ? '' : get_string('notset', 'totara_hierarchy'))),
+                                    $scale_value_id,
+                                    array(($scale_value_id ? '' : 0) => ($scale_value_id ? '' : get_string('notset', 'totara_hierarchy'))),
                                     $attributes);
 
         return $output;

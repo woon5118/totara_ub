@@ -70,6 +70,13 @@ class competency extends hierarchy {
     var $shortprefix = self::SHORT_PREFIX;
     protected $extrafields = array('evidencecount');
 
+
+    // The following is Perform specific constants. This may / should be moved in later versions of perform
+    /** Assign Availability constants */
+    public const ASSIGNMENT_CREATE_SELF = 1;
+    public const ASSIGNMENT_CREATE_OTHER = 2;
+
+
     /**
      * Get template
      * @param int Template id
@@ -174,6 +181,7 @@ class competency extends hierarchy {
             hierarchy::get_short_prefix('position').'_competencies' => 'competencyid',
             hierarchy::get_short_prefix('organisation').'_competencies' => 'competencyid',
             'dp_plan_competency_assign' => 'competencyid',
+            'comp_assign_availability' => 'comp_id',
         );
         list($items_sql, $items_params) = $DB->get_in_or_equal($items);
         foreach ($db_data as $table => $field) {
@@ -846,12 +854,7 @@ class competency extends hierarchy {
 
         $frameworkid = $this->frameworkid;
 
-        // Get all aggregation methods
         global $COMP_AGGREGATION;
-        $aggregations = array();
-        foreach ($COMP_AGGREGATION as $title => $key) {
-            $aggregations[$key] = get_string('aggregationmethod'.$key, 'totara_hierarchy');
-        }
 
         // Get the name of the framework's scale. (Note this code expects there
         // to be only one scale per framework, even though the DB structure
@@ -866,9 +869,10 @@ class competency extends hierarchy {
                 AND a.scaleid = s.id
         ", array($frameworkid));
 
-        $mform->addElement('select', 'aggregationmethod', get_string('aggregationmethod', 'totara_hierarchy'), $aggregations);
-        $mform->addHelpButton('aggregationmethod', 'competencyaggregationmethod', 'totara_hierarchy');
-        $mform->addRule('aggregationmethod', get_string('aggregationmethod', 'totara_hierarchy'), 'required', null);
+        // Not used by Perform anymore. Storing default 'ALL' for now
+        // TODO: deprecate strings: aggregationmethod'.$key, aggregationmethod
+        $mform->addElement('hidden', 'aggregationmethod', $COMP_AGGREGATION['ALL']);
+        $mform->setType('aggregationmethod', PARAM_INT);
 
         $mform->addElement('static', 'scalename', get_string('scale'), ($scaledesc) ? format_string($scaledesc) : get_string('none'));
         $mform->addHelpButton('scalename', 'competencyscale', 'totara_hierarchy');
@@ -877,6 +881,24 @@ class competency extends hierarchy {
         $mform->setType('proficiencyexpected', PARAM_INT);
         $mform->addElement('hidden', 'evidencecount', 0);
         $mform->setType('evidencecount', PARAM_INT);
+
+        // Assignment Availability required in
+        $checkboxGroup = array();
+        $checkboxGroup[] =& $mform->createElement('advcheckbox',
+            'assignavailself',
+            'assignavail',
+            get_string('competencyassignavailabilityself', 'totara_hierarchy'),
+            array('group' => 'tw_comp_assign_avail')
+        );
+        $checkboxGroup[] =& $mform->createElement('advcheckbox',
+            'assignavailother',
+            'assignavail',
+            get_string('competencyassignavailabilityother', 'totara_hierarchy'),
+            array('group' => 'tw_comp_assign_avail')
+        );
+
+        $mform->addGroup($checkboxGroup, 'assignavail', get_string('competencyassignavailability', 'totara_hierarchy'), array('<br />'), false);
+        $mform->addHelpButton('assignavail', 'competencyassignavailability', 'totara_hierarchy');
     }
 
     /**
@@ -1106,6 +1128,11 @@ class competency extends hierarchy {
 
         $olditem = $DB->get_record('comp', array('id' => $itemid));
 
+        if ($usetransaction) {
+            $transaction = $DB->start_delegated_transaction();
+        }
+
+        // Probably no longer needed for perform. Keeping it in for the moment
         if (isset($newitem->aggregationmethod) && $olditem->aggregationmethod != $newitem->aggregationmethod) {
             $now = time();
             $sql = "UPDATE {comp_record} SET reaggregate = ? WHERE competencyid = ?";
@@ -1113,7 +1140,40 @@ class competency extends hierarchy {
             $DB->execute($sql, $params);
         }
 
-        $updateditem = parent::update_hierarchy_item($itemid, $newitem, $usetransaction, $triggerevent, $removedesc);
+        if ($updateditem = parent::update_hierarchy_item($itemid, $newitem, false, false, $removedesc)) {
+            $oldrows = $DB->get_records('comp_assign_availability', array('comp_id' => $itemid));
+            $newrows = $this->get_assign_availability_records_from_item($newitem);
+
+            foreach ($oldrows as $oldid => $oldrow) {
+                foreach ($newrows as $newidx => $newrow) {
+                    if ($oldrow->availability == $newrow->availability) {
+                        // Nothing to do with this availability
+                        unset($oldrows[$oldid]);
+                        unset($newrows[$newidx]);
+
+                        break;
+                    }
+                }
+            }
+
+            if (count($oldrows) > 0) {
+                $DB->delete_records_list('comp_assign_availability', 'id', array_keys($oldrows));
+            }
+
+            if (count($newrows) > 0) {
+                $DB->insert_records('comp_assign_availability', $newrows);
+            }
+        }
+
+        if ($usetransaction) {
+            $transaction->allow_commit();
+        }
+
+        // Raise an event to let other parts of the system know.
+        if ($triggerevent) {
+                $eventclass = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_updated";
+            $eventclass::create_from_instance($updateditem)->trigger();
+        }
 
         return $updateditem;
     }
@@ -1141,6 +1201,103 @@ class competency extends hierarchy {
         );
 
         return $fields;
+    }
+
+    /**
+     * Retrieve the specific hierarchy item from the database
+     *
+     * @param int $id Id of the item to retrieve
+     */
+    function retrieve_hierarchy_item($id) {
+        global $DB;
+
+        if ($item = parent::retrieve_hierarchy_item($id)) {
+            $rows = $DB->get_records('comp_assign_availability', array('comp_id' => $id));
+            foreach ($rows as $row) {
+                switch ($row->availability) {
+                    case self::ASSIGNMENT_CREATE_SELF:
+                        $item->assignavailself = 1;
+                        break;
+
+                    case self::ASSIGNMENT_CREATE_OTHER:
+                        $item->assignavailother = 1;
+                        break;
+                }
+            }
+        }
+
+        return $item;
+    }
+
+    /**
+     * Add a new hierarchy item to an existing framework
+     *
+     * Given an object to insert and a parent id, create a new hierarchy item
+     * and attach it to the appropriate location in the hierarchy
+     *
+     * Also add comp_assign_availability rows if required
+     *
+     * @param object $item The item to insert. This should contain all data describing the object *except*
+     *                     the information related to its location in the hierarchy:
+     *                      - depthlevel
+     *                      - path
+     *                      - frameworkid
+     *                      - sortthread
+     *                      - parentid
+     *                      - timecreated
+     * @param integer $parentid The ID of the parent to attach to, or 0 for top level
+     * @param integer $frameworkid ID of the parent's framework (optional, unless parentid == 0)
+     * @param boolean $usetransaction If true this function will use transactions (optional, default: true)
+     * @param boolean $triggerevent If true, this command will trigger a "{$prefix}_added" event handler
+     * @param boolean $removedesc
+     *
+     * @return object|false A copy of the new item, or false if it could not be added
+     */
+    function add_hierarchy_item($item, $parentid, $frameworkid = null, $usetransaction = true, $triggerevent = true, $removedesc = true) {
+        global $DB;
+
+        if ($usetransaction) {
+            $transaction = $DB->start_delegated_transaction();
+        }
+
+        if ($newitem = parent::add_hierarchy_item($item, $parentid, $frameworkid, false, false, $removedesc)) {
+            $item->id = $newitem->id;
+            $records = $this->get_assign_availability_records_from_item($item);
+
+            if (count($records) > 0) {
+                $DB->insert_records('comp_assign_availability', $records);
+            }
+        }
+
+        if ($usetransaction) {
+            $transaction->allow_commit();
+        }
+
+        // Trigger an event if required.
+        if ($triggerevent) {
+            $eventclass = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_created";
+            $eventclass::create_from_instance($newitem)->trigger();
+        }
+
+        return $newitem;
+    }
+
+    /**
+     * Translate the item assignment availability attributes into comp_assign_availability records
+     *
+     * @param object $item Competency item
+     * @return array of objects
+     */
+    private function get_assign_availability_records_from_item($item) {
+        $records = [];
+        if (!empty($item->assignavailself)) {
+            $records[] = (object)array('comp_id' => $item->id, 'availability' => self::ASSIGNMENT_CREATE_SELF);
+        }
+        if (!empty($item->assignavailother)) {
+            $records[] = (object)array('comp_id' => $item->id, 'availability' => self::ASSIGNMENT_CREATE_OTHER);
+        }
+
+        return $records;
     }
 
 }  // class

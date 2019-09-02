@@ -72,7 +72,7 @@ if ($id == 0) {
     // editing existing item
     require_capability('totara/hierarchy:update'.$prefix, $context);
 
-    if (!$item = $DB->get_record($shortprefix, array('id' => $id))) {
+    if (!$item = $hierarchy->retrieve_hierarchy_item($id)) {
         print_error('incorrectid', 'totara_hierarchy');
     }
     $frameworkid = $item->frameworkid;
@@ -104,7 +104,11 @@ $itemform->set_data($item);
 // cancelled
 if ($itemform->is_cancelled()) {
 
-    redirect("{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix&amp;frameworkid={$item->frameworkid}&amp;page=$page");
+    if ($prefix === 'competency' && !empty($item->id)) {
+        redirect("{$CFG->wwwroot}/totara/hierarchy/item/view.php?prefix=$prefix&amp;id={$item->id}&amp;page=$page");
+    } else {
+        redirect("{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix&amp;frameworkid={$item->frameworkid}&amp;page=$page");
+    }
 
 // Update data
 } else if ($itemnew = $itemform->get_data()) {
@@ -163,13 +167,23 @@ if ($itemform->is_cancelled()) {
     }
 
     \core\notification::add(get_string($notificationtext . $prefix, 'totara_hierarchy', format_string($itemnew->fullname)), $notificationtype);
+    if ($prefix === 'competency') {
+        $notificationurl = new moodle_url('/totara/hierarchy/item/edit.php',
+            ['prefix' => $prefix, 'frameworkid' => $frameworkid, 'id' => $itemnew->id]);
+    }
+
     redirect($notificationurl);
 }
 
 $PAGE->navbar->add(format_string($framework->fullname), new moodle_url('/totara/hierarchy/index.php', array('prefix' => $prefix, 'frameworkid' => $framework->id)));
 if ($item->id) {
-    $PAGE->navbar->add(format_string($item->fullname), new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => $prefix, 'id' => $item->id)));
-    $PAGE->navbar->add(get_string('edit'.$prefix, 'totara_hierarchy'));
+    if ($prefix !== 'competency') {
+        $PAGE->navbar->add(format_string($item->fullname),
+            new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => $prefix, 'id' => $item->id)));
+        $PAGE->navbar->add(get_string('edit'.$prefix, 'totara_hierarchy'));
+    } else {
+        $PAGE->navbar->add(format_string($item->fullname));
+    }
 } else {
     $PAGE->navbar->add(get_string('addnew'.$prefix, 'totara_hierarchy'));
 }
@@ -177,10 +191,27 @@ if ($item->id) {
 /// Display page header
 echo $OUTPUT->header();
 
+if ($prefix === 'competency' && !empty($item->id)) {
+    echo $OUTPUT->container($OUTPUT->action_link(
+        new moodle_url('/totara/hierarchy/item/view.php',
+            ['prefix' => $prefix, 'id' => $item->id, 'page' => $page]),
+        '&laquo; ' . get_string('competencybacktocompetencypage', 'totara_hierarchy')),
+        'back-link'
+    );
+}
+
 if ($item->id == 0) {
     echo $OUTPUT->heading(get_string('addnew'.$prefix, 'totara_hierarchy'));
 } else {
-    echo $OUTPUT->heading(get_string('edit'.$prefix, 'totara_hierarchy'));
+    echo $OUTPUT->heading(get_string('edit'.$prefix, 'totara_hierarchy', $item->fullname));
+}
+
+if ($prefix === 'competency') {
+    require_once ($CFG->dirroot . '/totara/hierarchy/renderer.php');
+
+    echo $OUTPUT->render(totara_hierarchy_renderer::get_competency_tabs($item->id, 'editgeneral'));
+
+    echo html_writer::tag('h3', get_string('general'), ['class' => 'tw-editGeneral__title']);
 }
 
 /// Finally display THE form

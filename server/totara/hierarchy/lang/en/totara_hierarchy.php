@@ -179,8 +179,13 @@ If the aggregation method is set to **All** then all the child competencies will
 If the aggregation method is set to **Any** then only one of the child competencies needs to be met to successfully achieve the parent competency.
 
 If the aggregation method is set to **Off** then automatic achievement will be deactivated for this competency. (It may still be marked achieved manually.)';
+$string['competencyassignavailability'] = 'Non-admin assignment availability';
+$string['competencyassignavailability_help'] = 'RR Help';
+$string['competencyassignavailabilityself'] = 'Users who may self-assign';
+$string['competencyassignavailabilityother'] = 'Users who may assign to others';
 $string['competencyassigndeletecheck'] = 'Are you sure you would like to remove this competency assignment?';
 $string['competencybacktoallframeworks'] = 'Back to all competency frameworks';
+$string['competencybacktocompetencypage'] = 'Back to Competency page';
 $string['competencycreatetype'] = 'The competency type "{$a}" has been created';
 $string['competencycustomfields'] = 'Custom fields';
 $string['competencydeletedframework'] = 'The competency framework "{$a}" and its data have been completely deleted.';
@@ -329,6 +334,9 @@ $string['competencyscalevaluenumericalvalue'] = 'Scale value numerical value';
 $string['competencyscalevaluenumericalvalue_help'] = 'Scale value numerical value is the numerical value associated with the scale value. The scale value must be within the range -99999.99999 to 99999.99999 with no more than 5 decimal places.';
 $string['competencyshortname'] = 'Competency short name';
 $string['competencyshortname_help'] = 'Competency short name is the quick reference name of the competency and can be used for display purposes.';
+$string['competencytabgeneral'] = 'General';
+$string['competencytablinkedcourses'] = 'Linked courses';
+$string['competencytabachievementpaths'] = 'Achievement paths';
 $string['competencytemplatefullname_help'] = 'Template full name is the complete title of the competency template being set up.';
 $string['competencytemplategeneral_help'] = 'A **Competency Template** is a way of grouping competencies from one competency framework together.
 
@@ -336,6 +344,7 @@ When setting up a training event, for example an induction course, this could be
 $string['competencytemplatemanage'] = 'Manage templates';
 $string['competencytemplates'] = 'Competency templates';
 $string['competencytemplateshortname_help'] = 'Template short name is a quick reference name for the competency template and can be used for display purposes.';
+$string['competencytitle'] = '{$a->framework} - {$a->fullname}';
 $string['competencytype'] = 'Type';
 $string['competencytype_help'] = 'Administrators can create and assign types of competencies. If a competency is assigned a type it inherits any custom fields that have been assigned to that type. This allows you to organise meta-data relating to your competencies and only show the fields that each sort of competency needs.';
 $string['competencytypecustomfields'] = 'Competency type custom fields';
@@ -470,7 +479,7 @@ $string['depths'] = 'Depths';
 $string['description'] = 'Description';
 $string['descriptionview'] = 'Description';
 $string['displayoptions'] = 'Display Options';
-$string['editcompetency'] = 'Edit competency';
+$string['editcompetency'] = 'Edit competency - {$a}';
 $string['editdepthlevel'] = 'Edit depth level';
 $string['editgeneric'] = 'Edit {$a}';
 $string['editgoal'] = 'Edit goal';
@@ -601,8 +610,10 @@ $string['finishdate'] = 'Finish date';
 $string['finishdate_help'] = 'Click the calendar icon to select the date the user finished in that position.';
 $string['format'] = 'Format';
 $string['formrequiresjs'] = 'This form requires Javascript to be enabled.';
+$string['framework'] = 'Framework';
 $string['frameworkdoesntexist'] = 'The {$a} framework doesn\'t exist';
 $string['fullnamedepth'] = 'Depth level full name';
+$string['fullname'] = 'Full Name';
 $string['fullnameframework'] = 'Fullname';
 $string['fullnametemplate'] = 'Template full name';
 $string['fullnametype'] = 'Type full name';

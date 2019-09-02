@@ -1,0 +1,119 @@
+{{!
+   This file is part of Totara LMS
+
+   Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   @author Riana Rossouw <riana.rossouw@totaralearning.com>
+   @author Brendan Cox <brendan.cox@totaralearning.com>
+   @package criteria_linkedcourses
+}}
+{{!
+
+    @template criteria_linkedcourses/linkedcourses
+
+    Template for management of Linked Courses criteria
+
+    Classes required for JS:
+        * none
+
+    Data attributes required for JS:
+        * data-core-autoinitialise: State of this JS auto initilise
+        * data-core-autoinitialise-amd: AMD to be linked to template
+        * data-tw-criterionLinkedCourses: Target for linked courses criterion
+        * data-tw-criterionLinkedCourses-detail: Target for detail section
+        * data-tw-criterionLinkedCourses-linkedType-changed: Trigger when user changes linkedType value
+        * data-tw-criterionLinkedCourses-aggregation: Target for aggregation section
+        * data-tw-criterionLinkedCourses-aggregationMethod: int, Section for the specific aggregation method
+        * data-tw-criterionLinkedCourses-aggregationMethod-changed: Trigger when user changes aggregation method
+        * data-tw-criterionLinkedCourses-aggregationCount: Section for aggregation required count
+        * data-tw-criterionLinkedCourses-aggregationCount-changed: Trigger when user changes the required count
+
+    Context variables required for this template:
+        * key
+
+}}
+
+<div data-tw-criterionLinkedCourses=""
+     data-core-autoinitialise="true"
+     data-core-autoinitialise-amd="criteria_linkedcourses/linkedcourses"
+     data-tw-loader-target="">
+
+    <div data-tw-criterionLinkedCourses-detail="">
+        <div class="tw-criterion-label">
+            {{#str}}linkedtype, totara_competency{{/str}}
+        </div>
+        <div class="tw-criterion-value">
+            <div>
+                <input type="radio"
+                       id="tw_criterionLinkedCourses_linkedType_mandatory__{{key}}"
+                       name="tw_criterionLinkedCourses_linkedType__{{key}}"
+                       value="1"
+                       data-tw-criterionLinkedCourses-linkedType-changed="1"/>
+                <label for="tw_criterionLinkedCourses_linkedType_mandatory__{{key}}">
+                    <span>{{#str}}mandatory, totara_competency{{/str}}</span>
+                </label>
+                <span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+            </div>
+
+            <div>
+                <input type="radio"
+                       id="tw_criterionLinkedCourses_linkedType_all__{{key}}"
+                       name="tw_criterionLinkedCourses_linkedType__{{key}}"
+                       value="2"
+                       data-tw-criterionLinkedCourses-linkedType-changed="2"/>
+                <label for="tw_criterionLinkedCourses_linkedType_all__{{key}}">
+                    <span>{{#str}}all, totara_competency{{/str}}</span>
+                </label>
+                <span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div data-tw-criterionLinkedCourses-aggregation="">
+        <div class="tw-criterion-label">
+            <span>{{#str}}aggregation, totara_criteria{{/str}}</span>
+        </div>
+        <div class="tw-criterion-value">
+            <div data-tw-criterionLinkedCourses-aggregationMethod="1">
+                <input type="radio"
+                       id="tw_criterionLinkedCourses_agg_all__{{key}}"
+                       name="tw_criterionLinkedCourses_agg__{{key}}"
+                       value="1"
+                       data-tw-criterionLinkedCourses-aggregationMethod-changed="all"/>
+                <label for="tw_criterionLinkedCourses_agg_all__{{key}}"><span>{{#str}}completeall, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+            </div>
+
+            <div data-tw-criterionLinkedCourses-aggregationMethod="2">
+                <div class="tw-criterion-inline">
+                    <input type="radio"
+                           id="tw_criterionLinkedCourses_agg_any__{{key}}"
+                           name="tw_criterionLinkedCourses_agg__{{key}}"
+                           value="2"
+                           data-tw-criterionLinkedCourses-aggregationMethod-changed="any"/>
+                    <label for="tw_criterionLinkedCourses_agg_any__{{key}}"><span>{{#str}}completeany, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                </div>
+
+                <div class="tw-criterion-inline" data-tw-criterionLinkedCourses-aggregationCount="">
+                    <input type="number"
+                           name="tw_criterionLinkedCourses_agg_count__{{key}}"
+                           value="1" min="0"
+                           data-tw-criterionLinkedCourses-aggregationCount-changed=""
+                           disabled="disabled"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

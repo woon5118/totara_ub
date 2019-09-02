@@ -66,6 +66,10 @@ class update_competencies_task extends \core\task\scheduled_task {
      */
     public function execute() {
         global $CFG;
+
+        // Todo: deprecate or remove. This is to be done as part of clean-up subtask TL-22184.
+        return;
+
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/evidence.php');
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
@@ -456,6 +460,7 @@ class update_competencies_task extends \core\task\scheduled_task {
 
         // Because we do not want to send the alerts, set $notify to false.
         // We also pass null as the component as we don't have that here.
+        // Todo: There should be no more calls to this by end of our work. Leaving this one until all cron stuff is complete.
         hierarchy_add_competency_evidence($competencyid, $userid, $status, null, $details, true, false);
         // Hook for plan auto completion.
         dp_plan_item_updated($userid, 'competency', $competencyid);

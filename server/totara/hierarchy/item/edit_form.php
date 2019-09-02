@@ -61,7 +61,8 @@ class item_edit_form extends moodleform {
         $mform->addElement('hidden', 'page', $page);
         $mform->setType('page', PARAM_INT);
 
-        $mform->addElement('text', 'framework', get_string($prefix.'framework', 'totara_hierarchy'));
+        $label = $prefix === 'competency'? get_string('framework', 'totara_hierarchy') : get_string($prefix.'framework', 'totara_hierarchy');
+        $mform->addElement('text', 'framework', $label);
         $mform->hardFreeze('framework');
         $mform->setType('framework', PARAM_TEXT);
 
@@ -76,7 +77,8 @@ class item_edit_form extends moodleform {
         }
         $mform->setType('parentid', PARAM_INT);
 
-        $mform->addElement('text', 'fullname', get_string('name'), 'maxlength="1024" size="50"');
+        $label = $prefix === 'competency' ? get_string('fullname', 'totara_hierarchy') : get_string('name');
+        $mform->addElement('text', 'fullname', $label, 'maxlength="1024" size="50"');
         $mform->addRule('fullname', get_string($prefix.'missingname', 'totara_hierarchy'), 'required', null);
         $mform->setType('fullname', PARAM_MULTILANG);
 
@@ -86,7 +88,8 @@ class item_edit_form extends moodleform {
             $mform->setType('shortname', PARAM_MULTILANG);
         }
 
-        $mform->addElement('text', 'idnumber', get_string($prefix.'idnumber', 'totara_hierarchy'), 'maxlength="100"  size="10"');
+        $label = $prefix === 'competency' ? get_string('idnumberview', 'totara_hierarchy') : get_string($prefix.'idnumber', 'totara_hierarchy');
+        $mform->addElement('text', 'idnumber', $label, 'maxlength="100"  size="10"');
         $mform->addHelpButton('idnumber', $prefix.'idnumber', 'totara_hierarchy');
         $mform->setType('idnumber', PARAM_TEXT);
 
@@ -137,7 +140,7 @@ class item_edit_form extends moodleform {
         }
 
         // See if any hierarchy specific form definition exists.
-        $hierarchy->add_additional_item_form_fields($mform);
+        $hierarchy->add_additional_item_form_fields($mform, $item);
 
         // Next show the custom fields if we're editing an existing items (otherwise we don't know the typeid).
         if ($item->id && $item->typeid != 0) {

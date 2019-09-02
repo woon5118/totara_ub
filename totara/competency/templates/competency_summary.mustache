@@ -1,0 +1,85 @@
+{{!
+     This file is part of Totara LMS
+
+     Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 3 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+     @author Riana Rossouw <riana.rossouw@totaralearning.com>
+     @package totara_competerncy
+}}
+{{!
+
+        @template totara_competency/competency_summary
+
+        The template for displaying the competency summary
+
+        Classes required for JS:
+        * tw-compSummary__section_expanded: used for expanding/collapsing section
+
+        Data attributes required for JS:
+        * data-core-autoinitialise: State of this JS auto initilise
+        * data-core-autoinitialise-amd: AMD to be linked to template
+        * data-tw-compSummary-expand: Trigger for expanding/colapsing section
+        * data-tw-compSummary-expand-icon: Target for toggling expand icon
+        * data-tw-compSummary-section: Target for section
+
+        Context variables required for this template:
+        * title: string, page title
+        * sections: array of objects, section detail
+        * sections -> heading: string, section heading
+        * sections -> editurl: string, encoded section edit url
+        * sections -> expanded: bool, contents is expanded
+        * sections -> section_data: detail object
+        * sections -> section_data -> templatename: string, partial template name
+}}
+
+<div data-tw-compSummary=""
+     data-core-autoinitialise="true"
+     data-core-autoinitialise-amd="totara_competency/competency_summary">
+
+    <h2>{{title}}</h2>
+
+    {{#sections}}
+    <div class="tw-compSummary__section {{#expanded}}tw-compSummary__section_expanded{{/expanded}}" data-tw-compSummary-section="">
+        <div class="tw-compSummary__section_heading">
+            <a href="#" class="tw-compSummary__section_heading_expand" data-tw-compSummary-expand=""
+               aria-expanded="{{#expanded}}true{{/expanded}}{{^expanded}}false{{/expanded}}" aria-controls="compSummary{{key}}">
+               <span class="tw-compSummary__section_heading_expand_icon {{^expanded}}tw-compSummary__hidden{{/expanded}}"
+               data-tw-compSummary-expand-icon="">
+                   {{#flex_icon}}expanded, hide, core{{/flex_icon}}
+               </span>
+               <span class="tw-compSummary__section_heading_expand_icon {{#expanded}}tw-compSummary__hidden{{/expanded}}"
+               data-tw-compSummary-expand-icon="">
+                   {{#flex_icon}}collapsed, expand, core{{/flex_icon}}
+               </span>
+                <h3 class="tw-compSummary__section_heading_title">
+                    {{heading}}
+                </h3>
+            </a>
+            <a href="{{{editurl}}}" class="tw-compSummary__section_heading_edit">
+                {{#flex_icon}}edit, edit, core{{/flex_icon}}
+            </a>
+        </div>
+
+        <div id="compSummary{{key}}" class="tw-compSummary__section_body" data-tw-compSummary-section-body=""
+        aria-hidden="{{#expanded}}false{{/expanded}}{{^expanded}}true{{/expanded}}">
+            {{#section_data}}
+                {{> &&templatename}}
+            {{/section_data}}
+        </div>
+    </div>
+    {{/sections}}
+</div>
+

@@ -1,0 +1,308 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2019 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Riana Rossouw <riana.rossouw@totaralearning.com>
+// @package   theme_roots
+
+@import "totara/competency/less/competency_summary.less";
+
+// Size
+@comp-spacing_x_small: @totara_style-spacing_x_small;
+@comp-spacing_small: @totara_style-spacing_small;
+@comp-spacing_medium: @totara_style-spacing_medium;
+@comp-spacing_large: @totara_style-spacing_large;
+@comp-spacing_xx_large: @totara_style-spacing_xx_large;
+
+@comp-color_neutral_2: @totara_style-color_neutral_2;
+@comp-color_neutral_5: @totara_style-color_neutral_5;
+
+.tw-comp {
+    &__orDivider {
+        border-top: 1px solid @comp-color_neutral_5;
+        left: -@comp-spacing_x_small;
+        margin-top: @comp-spacing_xx_large;
+        padding: @comp-spacing_medium 0 @comp-spacing_small;
+        position: relative;
+        width: 30%;
+
+        &_label {
+            background: @comp-color_neutral_2;
+            border: 1px solid @comp-color_neutral_5;
+            display: inline-block;
+            left: 50%;
+            padding: @comp-spacing_x_small @comp-spacing_large;
+            position: absolute;
+            text-transform: uppercase;
+            top: -@comp-spacing_medium;
+            transform: translateX(-50%);
+        }
+    }
+}
+
+.cc_comp_summary_section {
+    margin-top: 2em;
+}
+
+.cc_title {
+    font-size: larger;
+    margin-bottom: 1.5em;
+    font-weight: bold;
+}
+
+.cc_section_title {
+    font-weight: bold;
+    border-bottom: solid 1px;
+}
+
+.cc_inline_element {
+    display: inline-block;
+}
+
+.cc_hidden {
+    display: none;
+}
+
+.cc_warning {
+    color: @brand-warning;
+}
+
+.cc_disabled {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+.cc_deleted {
+    span  {
+        text-decoration: line-through;
+        opacity: 0.4;
+    }
+
+    .cc_actions {
+        span {
+            text-decoration: none;
+            opacity: 1
+        }
+    }
+
+    input {
+        pointer-events:none;
+    }
+
+    label {
+        pointer-events:none;
+    }
+}
+
+.cc_detail_label {
+    display: inline-block;
+    min-width: 15em;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    vertical-align: top;
+}
+
+.cc_detail_value {
+    min-width: 15em;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.cc_allupper {
+    text-transform: uppercase;
+}
+
+.cc_firstupper {
+    text-transform: capitalize;
+}
+
+.cc_solid_border {
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+    box-shadow: -2px 3px 2px #D9D9D9, 2px 3px 2px #D9D9D9;
+
+    padding: 10px;
+    margin-bottom: 1em;
+
+    .cc_detail_value {
+        min-width: 24em;
+    }
+}
+
+.cc_order_border {
+    border: 2px dashed #D9D9D9;
+}
+
+
+.pw_divider_linetext {
+   width: 100%;
+   text-align: left;
+   text-indent: 5em;
+   border-bottom: 2px solid #D9D9D9;;
+   line-height: 0.1em;
+   margin: 10px 0 20px;
+
+    span {
+        text-transform: uppercase;
+        color: #DAEBD3;
+        background: #fff;
+        padding: 0 10px;
+    }
+}
+
+.pw_divider_text {
+    margin: 10px;
+
+    span {
+        text-transform: uppercase;
+    }
+}
+
+.cc_actions {
+    float: right;
+}
+
+.pw_none, .critgrp_criteria_none {
+    border-top: 1px solid #EEEEEE;
+    border-bottom: 1px solid #EEEEEE;
+    margin: 1.5em;
+    padding: 0.5em;
+    font-style: italic;
+}
+
+.scalevalue_pathways {
+    .pw_border {
+        border: 2px solid #DAEBD3;
+        padding: 5px;
+    }
+
+    .scalevalue_pathways_title {
+        .cc_helptext {
+            font-size: 0.8em;
+        }
+    }
+
+    .scalevalue_pathways_scale {
+        margin-top: 2em;
+
+        .pw_singlevalue_add_path {
+            margin-top: 0.5em;
+        }
+    }
+
+    .scalevalue_pathways_scale_title {
+        font-weight: bold;
+    }
+
+    .scalevalue_pathways_scale_title.empty_paths {
+        font-weight: normal;
+        color: @btn-link-disabled-color;
+    }
+}
+
+.pw_singlevalue_summary {
+    background-color: #ECECEC;
+
+    .criterion_summary {
+        margin-left: 25em;
+
+        .criterion_name {
+            font-weight: bold;
+        }
+
+        .cc_detail_label {
+            display: inline-block;
+            font-weight: normal;
+            min-width: 8em;
+            margin: 0;
+        }
+
+        .cc_detail_value {
+            display: inline-block;
+            min-width: 8em;
+            font-weight: bold;
+        }
+    }
+}
+
+.pw_aggregation {
+    margin-bottom: 1.5em;
+
+    .cc_smalltitle {
+        vertical-align: top;
+    }
+}
+
+.pw_item_add {
+    select {
+        font-size: 0.8em;
+    }
+}
+
+.criterion_detail {
+    .cc_smalltitle {
+        font-size: 1.1em;
+        font-weight: bold;
+        margin-bottom: 0.5em;
+    }
+}
+
+.criterion_detail_items {
+    .cc_detail_label {
+        font-size: 0.8em;
+    }
+
+    .cc_detail_value {
+        font-size: 0.8em;
+    }
+}
+
+.cc_group_buttons {
+    margin-top: 1em;
+}
+
+.criterion {
+    padding-left: 5em;
+}
+
+.btn_large_icon {
+    font-size: larger;
+}
+
+.btn_small_icon {
+    font-size: smaller;
+}
+
+
+.cc_selectTree__option {
+    background: #fff;
+    border: 1px solid #a8b7c7;
+    box-shadow: 0 3px 6px 0 #64717d;
+    font-size: 1.6rem;
+    max-height: 350px;
+    max-width: 300px;
+    min-width: 100px;
+    overflow-y: scroll;
+    position: absolute;
+    z-index: 2;
+}
+
+ul.cc_selectTree__list_flat {
+    list-style: none;
+}

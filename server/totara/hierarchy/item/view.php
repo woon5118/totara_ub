@@ -29,8 +29,10 @@ require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
 require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
 require_once($CFG->libdir.'/filelib.php');
 
+use totara_competency\criteria_renderer;
+
 // Get data.
-$prefix        = required_param('prefix', PARAM_ALPHA);
+$prefix      = required_param('prefix', PARAM_ALPHA);
 $id          = required_param('id', PARAM_INT);
 $edit        = optional_param('edit', -1, PARAM_BOOL);
 $frameworkid = optional_param('framework', 0, PARAM_INT);
@@ -41,6 +43,14 @@ $sitecontext = context_system::instance();
 $shortprefix = hierarchy::get_short_prefix($prefix);
 
 hierarchy::check_enable_hierarchy($prefix);
+
+if ($prefix === 'competency') {
+    $section = optional_param('s', '', PARAM_ALPHA);
+    if (empty($section)) {
+        $newurl = new moodle_url('/totara/competency/competency_summary.php', ['id' => $id]);
+        redirect($newurl);
+    }
+}
 
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
@@ -116,6 +126,11 @@ if ($canupdateitems) {
 }
 
 echo $OUTPUT->heading($heading);
+$renderer = $PAGE->get_renderer('totara_hierarchy');
+if ($prefix === 'competency') {
+    echo $OUTPUT->render(totara_hierarchy_renderer::get_competency_tabs($id, $section));
+}
+
 $data = $hierarchy->get_item_data($item);
 $cfdata = $hierarchy->get_custom_fields($item->id);
 if ($cfdata) {

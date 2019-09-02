@@ -1,0 +1,77 @@
+<?php
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @package totara_competency
+ */
+
+namespace totara_competency\webapi\resolver\type;
+
+use core\webapi\execution_context;
+use core\webapi\type_resolver;
+
+/**
+ * General totara competency pathway
+ *
+ * Please be aware that it is the responsibility of the query to ensure that the user is allowed to
+ * see this.
+ */
+class pathway implements type_resolver {
+
+    /**
+     * Resolves a competency pathway field.
+     *
+     * @param string $field
+     * @param pathway $pathway
+     * @param array $args
+     * @param execution_context $ec
+     * @return mixed
+     */
+    public static function resolve(string $field, $pathway, array $args, execution_context $ec) {
+
+        if (!$pathway instanceof \totara_competency\pathway) {
+            throw new \coding_exception('Only \totara_competency\pathway objects are accepted: ' . gettype($pathway));
+        }
+
+        switch ($field) {
+            case 'id':
+                return $pathway->get_id();
+            case 'pathway_type':
+                return $pathway->get_path_type();
+            case 'instance_id':
+                return $pathway->get_path_instance_id();
+            case 'title':
+                return $pathway->get_title();
+            case 'sortorder':
+                return $pathway->get_sortorder();
+            case 'status':
+                return $pathway->get_status_name();
+            case 'classification':
+                return $pathway->get_classification_name();
+            case 'scale_value':
+                $scale_value = $pathway->get_scale_value();
+                return is_null($scale_value) ? null : $scale_value->name;
+            case 'criteria_summary':
+                return $pathway->get_summarized_criteria_set();
+        }
+
+        throw new \coding_exception('Unknown field', $field);
+    }
+
+}

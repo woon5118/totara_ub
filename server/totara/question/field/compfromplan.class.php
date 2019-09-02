@@ -279,8 +279,9 @@ class question_compfromplan extends reviewrating {
 
         $compassign = $DB->get_record('dp_plan_competency_assign', array('id' => $compassignid));
         $plan = new development_plan($compassign->planid);
-        $componentname = 'competency';
-        $component = $plan->get_component($componentname);
+
+        /** @var dp_competency_component $component */
+        $component = $plan->get_component('competency');
 
         // Update the competency evidence.
         $details = new stdClass();
@@ -293,7 +294,7 @@ class question_compfromplan extends reviewrating {
         $details->assessorname = fullname($USER);
         $details->assessorid = $USER->id;
 
-        hierarchy_add_competency_evidence($compassign->competencyid, $this->subjectid, $scalevalueid, $component, $details);
+        $component->set_value($compassign->competencyid, $this->subjectid, $scalevalueid, $details);
 
         // Log it.
         $competencyname = $DB->get_field('comp', 'fullname', array('id' => $compassign->competencyid));

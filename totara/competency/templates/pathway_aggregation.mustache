@@ -1,0 +1,79 @@
+{{!
+   This file is part of Totara LMS
+
+   Copyright (C) 2018 onwards Totara Learning Solutions LTD
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   @author Riana Rossouw <riana.rossouw@totaralearning.com>
+   @package totara_competerncy
+}}
+{{!
+
+    @template totara_competency/pathway_aggregation
+
+    This template generates the output for pathway aggregation methods
+
+    Classes required for JS:
+    * none
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * aggregation
+    **  name
+    **  checked
+    **  description
+
+    Other context variables for following partials:
+
+    Strings:
+    * overallratingcalc, totara_competency
+
+}}
+
+<div class="pw_aggregation" data-cc-pw-aggregation="1">
+    <div class="cc_smalltitle cc_detail_label">
+        <strong>{{#str}}overallratingcalc, totara_competency{{/str}}</strong>
+    </div>
+
+    <div class="cc_detail_value">
+        <select name="cc_pw_aggregation_method"
+                data-cc-pw-agg-changed
+                data-cc-on-ordering="disable">
+            {{#aggregation_types}}
+                <option value="{{type}}"
+                        {{#editfunction}}data-cc-pw-agg-function="{{.}}"{{/editfunction}}
+                        {{#selected}}selected="selected"{{/selected}}>
+                    {{title}}
+                </option>
+            {{/aggregation_types}}
+        </select>
+    </div>
+
+    <div class="cc_inline_element {{^overall_aggregation_function}}cc_hidden{{/overall_aggregation_function}}" data-cc-pw-agg-actions>
+        <button class="cc_agg_action" data-cc-agg-action="edit" disabled="disabled">
+            <span class="pw_item__btn_small_icon">
+                {{#flex_icon}}edit{{/flex_icon}}
+            </span>
+        </button>
+        <button data-cc-agg-action="move">
+            <span class="pw_item__btn_small_icon">
+                {{#flex_icon}}arrows{{/flex_icon}}
+            </span>
+        </button>
+    </div>
+</div>

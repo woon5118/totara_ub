@@ -54,8 +54,9 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_url(qualified_me());
 $PAGE->set_pagelayout('report');
 $plan = new development_plan($id);
-$componentname = 'competency';
-$component = $plan->get_component($componentname);
+
+/** @var dp_competency_component $component */
+$component = $plan->get_component('competency');
 
 //Permissions check
 $result = hierarchy_can_add_competency_evidence($plan, $component, $userid, $competencyid);
@@ -128,13 +129,9 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $details->assessmenttype = $fromform->assessmenttype;
 
     // Add evidence
-    $result = hierarchy_add_competency_evidence($fromform->competencyid, $fromform->userid, $proficiency, $component, $details);
+    $component->set_value($fromform->competencyid, $fromform->userid, $proficiency, $details);
 
-    if ($result) {
-        redirect($returnurl);
-    } else {
-        redirect($returnurl, get_string('recordnotcreated', 'totara_core'));
-    }
+    redirect($returnurl);
 
 } else {
     $mform->set_data($toform);

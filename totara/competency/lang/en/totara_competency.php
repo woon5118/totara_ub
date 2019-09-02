@@ -1,0 +1,130 @@
+<?php
+/*
+ * This file is part of Totara LMS
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @package totara_competency
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+$string['pluginname'] = 'Totara competency';
+
+$string['achievementpathsetup'] = 'Achievement paths setup';
+$string['achievementpaths'] = 'Achievement paths';
+$string['active'] = 'Active';
+$string['activitylog_aggregationchanged'] = 'Overall rating calculation change';
+$string['activitylog_assignedaudience'] = 'Assigned: {$a->audience_name} (Audience)';
+$string['activitylog_assignedcontinuous'] = 'Assignment transferred for continuous tracking';
+$string['activitylog_assignedself'] = 'Assigned: Self-assigned';
+$string['activitylog_assignedadmin'] = 'Assigned: {$a->assigner_name} (Admin)';
+$string['activitylog_assignedorganisation'] = 'Assigned: {$a->organisation_name} (Organisation)';
+$string['activitylog_assignedother'] = 'Assigned: {$a->assigner_name} ({$a->assigner_role})';
+$string['activitylog_assignedposition'] = 'Assigned: {$a->position_name} (Position)';
+$string['activitylog_criteriachange'] = 'Criteria change';
+$string['activitylog_criteriamet'] = 'Criteria met: {$a->criteria_met}. Achieved \'{$a->scale_value_name}\' rating.';
+$string['activitylog_minprofchanged'] = 'Minimum required proficient value changed to \'{$a->scale_value_name}\'';
+$string['activitylog_rating'] = 'Rating: {$a->scale_value_name}';
+$string['activitylog_trackingstarted'] = 'Competency active: Achievement tracking started';
+$string['activitylog_trackingstopped'] = 'Competency active: Achievement tracking stopped';
+$string['activitylog_unassignedaudience'] = 'Unassigned: {$a->audience_name} (Audience)';
+$string['activitylog_unassignedcontinuous'] = 'Unassigned: Continuous tracking';
+$string['activitylog_unassignedself'] = 'Unassigned: Self-assigned';
+$string['activitylog_unassignedadmin'] = 'Unassigned: {$a->assigner_name} (Admin)';
+$string['activitylog_unassignedorganisation'] = 'Unassigned: {$a->organisation_name} (Organisation)';
+$string['activitylog_unassignedother'] = 'Unassigned: {$a->assigner_name} ({$a->assigner_role})';
+$string['activitylog_unassignedposition'] = 'Unassigned: {$a->position_name} (Position)';
+$string['addaltpath'] = 'Add alternative path';
+$string['addachievementpath'] = 'Add achievement path';
+$string['addlinkedcourses'] = 'Add linked courses';
+$string['all'] = 'All';
+$string['allcategories'] = 'All categories';
+$string['allscalevalues'] = 'All scale value';
+$string['addpathway'] = 'Add path';
+$string['and'] = 'and';
+$string['anyscalevalue'] = 'Any scale value';
+$string['applychanges'] = 'Apply changes';
+$string['applysuccess'] = 'Changes applied successfully';
+$string['archived'] = 'Archived';
+$string['assignmentcreationavailability'] = 'Assignment creation availability';
+$string['bulkachievementcriteria'] = 'Bulk set achievements criteria';
+$string['cancel'] = 'Cancel';
+$string['changesnotsaved:body'] = 'Changes will be lost if you continue. Do you want to continue?';
+$string['changesnotsaved:title'] = 'Changes have not been save.';
+$string['coursefullname'] = 'Full Name';
+$string['createachievementpath'] = 'Create achievement path';
+$string['createpath'] = 'Create path';
+$string['criteriatype'] = 'Criteria type';
+$string['description'] = 'Description';
+$string['disabled'] = 'Disabled';
+$string['done'] = 'Done';
+$string['enabled'] = 'Enabled';
+$string['editcompetency'] = 'Edit comptency: {$a}';
+$string['framework'] = 'Framework';
+$string['fullname'] = 'Full name';
+$string['general'] = 'General';
+$string['idnumber'] = 'ID number';
+$string['invalidsection'] = 'Invalid section {$a}';
+$string['linkdefaultpreset'] = 'Link default preset';
+$string['linkedcourses'] = 'Linked courses';
+$string['linkedcoursessaved'] = 'Linked courses have been saved';
+$string['linkedcourses_mustsavechange'] = 'Changes must be saved before they will be applied';
+$string['linkedtype'] = 'Link type';
+$string['managetypes_aggregation'] = 'Manage aggregation types';
+$string['managetypes_pathway'] = 'Manage pathway types';
+$string['mandatory'] = 'Mandatory';
+$string['next'] = 'Next';
+$string['nocourseslinkedyet'] = 'No courses linked yet';
+$string['none'] = 'None';
+$string['nopaths'] = 'No achievement paths added';
+$string['optional'] = 'Optional';
+$string['or'] = 'or';
+$string['overallratingcalc'] = 'Overall rating calculation';
+$string['pathtype'] = 'Path type';
+$string['pathwaymultivalue'] = 'Multivalue';
+$string['pathwaysinglevalue'] = 'Singlevalue';
+$string['pathwaystatusarchived'] = 'Archived';
+$string['pathwaystatusactive'] = 'Active';
+$string['pathwaystatusarchived'] = 'Archived';
+$string['removelinkedcourse'] = 'Remove linked course';
+$string['removedlinkedcourse'] = 'Removed linked course';
+$string['revertallchanges:body'] = 'Are you sure you want to revert all changes? All changes not yet activated will be permanently deleted.';
+$string['revertallchanges:title'] = 'Revert all changes';
+$string['savechanges'] = 'Save changes';
+$string['searchcourses'] = 'Search courses';
+$string['selectpathtype'] = 'Select path type';
+$string['selectcourses'] = 'Select courses';
+$string['selectcriteriontype'] = 'Select additional criteria for this path';
+$string['setupbasic'] = 'Basic';
+$string['setupbasictitle'] = 'Basic set up';
+$string['setupcustom'] = 'Custom';
+$string['setuptemplate'] = 'Use template';
+$string['setuptemplatetitle'] = 'Select template';
+$string['singlevaluepaths'] = 'Criteria-based paths';
+$string['singlevalueproficientmark_help'] = 'Proficient values marked with';
+$string['status_0'] = 'Active';
+$string['status_1'] = 'Draft';
+$string['status_2'] = 'Deleted';
+$string['type'] = 'Type';
+$string['undoall'] = 'Undo all';
+$string['undoRemoveLinkedCourse'] = 'Undo remove linked course';
+$string['updatecompachievements'] = 'Update competency achievements';
+$string['user_group_type:cohort'] = 'Audience';
+$string['user_group_type:position'] = 'Position';
+$string['user_group_type:organisation'] = 'Organisation';

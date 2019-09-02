@@ -1723,7 +1723,7 @@ function totara_plan_comment_add($comment) {
  * @param   int     $competencyid
  * @param   int     $userid
  * @param   object  $component
- * @return  bool
+ * @return  void
  */
 function plan_mark_competency_default($competencyid, $userid, $component) {
     global $DB, $CFG;
@@ -1761,7 +1761,8 @@ function plan_mark_competency_default($competencyid, $userid, $component) {
 
     $details = new stdClass();
     $details->assessmenttype = get_string('automateddefault', 'totara_plan');
-    hierarchy_add_competency_evidence($competencyid, $userid, $default, $component, $details, true, false);
+
+    $component->set_value($competencyid, $userid, $default, $details);
 }
 
 

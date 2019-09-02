@@ -742,4 +742,53 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
 
         return $this->render_from_template('totara_hierarchy/mygoals_personal_table', $templatedata);
     }
+
+    /**
+     * @param $section
+     * @param $id
+     * @return tabtree
+     */
+    public static function get_competency_tabs($id = 0, $section = 'summary'): \tabtree {
+
+        $tabs = array();
+
+        // $tabs[] = new \tabobject(
+        //     'oldgeneral',
+        //     !empty($id) ? new \moodle_url('/totara/hierarchy/item/view.php', ['prefix' => 'competency', 'id' => $id, 's' => 'oldgeneral']) : null,
+        //     'Old Landing'
+        // );
+
+        // $tabs[] = new \tabobject(
+        //     'summary',
+        //     !empty($id) ? new \moodle_url('/totara/competency/competency_summary.php', ['id' => $id]) : null,
+        //     'New Summary'
+        // );
+
+        $tabs[] = new \tabobject(
+            'editgeneral',
+            new \moodle_url('/totara/competency/competency_edit.php', ['id' => $id, 's' => 'general']),
+            get_string('competencytabgeneral', 'totara_hierarchy')
+        );
+
+        $tabs[] = new \tabobject(
+            'editlinkedcourses',
+            !empty($id) ? new \moodle_url('/totara/competency/competency_edit.php', ['id' => $id, 's' => 'linkedcourses']) : null,
+            get_string('competencytablinkedcourses', 'totara_hierarchy')
+        );
+
+        $tabs[] = new \tabobject(
+            'editachievementpaths',
+            !empty($id) ? new \moodle_url('/totara/competency/competency_edit.php', ['id' => $id, 's' => 'achievementpaths']) : null,
+            get_string('competencytabachievementpaths', 'totara_hierarchy')
+        );
+        // Ensure the current tab is selected and activated.
+        foreach ($tabs as $tab) {
+            if ($tab->id === $section) {
+                $tab->activated = true;
+                $tab->selected = true;
+            }
+        }
+
+        return new \tabtree($tabs);
+    }
 }

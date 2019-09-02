@@ -24,6 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use totara_competency\event\competency_achievement_updated;
+
+
 class totara_plan_observer {
 
     /**
@@ -71,5 +74,91 @@ class totara_plan_observer {
         $transaction->allow_commit();
 
         return true;
+    }
+
+    public static function competency_record_updated(competency_achievement_updated $event) {
+        global $DB;
+
+        // TODO: See the later part of this method where alerts are sent if the user has just become proficient
+        // and has a learning plan. This may not need to be done in an observer any more. It might only be done
+        // when a learning plan value is changed. Otherwise, this method will need to be fixed up to work with
+        // current code.
+        return;
+
+        if (empty($event->other->achieved_via_ids)) {
+            return;
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($event->other->achieved_via_ids);
+
+        $params[] = 'learning_plan';
+
+        $has_learning_plan = $DB->record_exists_sql(
+            'SELECT 1 
+                 FROM {pathway} p 
+                 JOIN {comp_user_pathway_achieved} cupa 
+                 ON p.id = cupa.pathway_id
+                 JOIN {comp_record_via} crv
+                 ON cupa.id = crv.id 
+                 WHERE crv.id ' . $insql .' AND path_type = ?',
+            $params
+        );
+
+        if (!$has_learning_plan) {
+            return;
+        }
+
+        $plan_value_record = $DB->get_record(
+            'dp_plan_competency_value',
+            ['competency_id' => $event->other->competency_id, 'user_id' => $event->relateduserid]
+        );
+
+        if (!$plan_value_record) {
+            // Not expected, as there was an achieved_via record. Still, nothing to do if it's missing.
+            return;
+        }
+
+        // if (newly completed) {  Todo: Can probably add a property to the event to represent this. That will replace all up til // Load the component.
+
+        // Todo: The lines using block_totara_stats and proficient db checks are very much temporary and copied from totara_stats
+        // to get things going.
+        $count = $DB->count_records(
+            'block_totara_stats',
+            ['userid' => $event->relateduserid, 'eventtype' => STATS_EVENT_COMP_ACHIEVED, 'data2' => $event->other->competency_id]
+        );
+        if (isset($scale_value)) {
+            $isproficient = $DB->get_field('comp_scale_values', 'proficient', array('id' => $scale_value->get_id()));
+        } else {
+            $isproficient = 0;
+        }
+        if ($isproficient && $count == 0) {
+
+            $plans = dp_get_plans($event->relateduserid);
+            foreach ($plans as $plan) {
+                if (!$DB->record_exists(
+                    'dp_plan_competency_assign',
+                    ['planid' => $plan->id, 'competencyid' => $event->other->competency_id]
+                )) {
+                    continue;
+                }
+
+                $competency_component = null;
+                $development_plan = new development_plan($plan->id);
+                foreach ($development_plan->get_components() as $component) {
+                    if ($component instanceof dp_competency_component) {
+                        $competency_component = $component;
+                    }
+                }
+                if (is_null($competency_component)) {
+                    continue;
+                }
+
+                // Send Alert.
+                $alert_detail = new \stdClass();
+                $alert_detail->itemname = $DB->get_field('comp', 'fullname', array('id' => $event->other->competency_id));
+                $alert_detail->text = get_string('competencycompleted', 'totara_plan');
+                $competency_component->send_component_complete_alert($alert_detail);
+            }
+        }
     }
 }

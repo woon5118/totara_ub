@@ -62,4 +62,8 @@ $observers = array(
         'eventname' => '\totara_plan\event\plan_deleted',
         'callback'  => 'totara_program_observer::learning_plan_deleted',
     ),
+    array(
+        'eventname' => '\totara_competency\event\competency_record_updated',
+        'callback'  => 'totara_plan_observer::competency_record_updated',
+    ),
 );

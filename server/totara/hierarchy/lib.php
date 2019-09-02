@@ -1800,6 +1800,17 @@ class hierarchy {
     }
 
     /**
+     * Retrieve the specific hierarchy item from the database
+     *
+     * @param int $id Id of the item to retrieve
+     */
+    function retrieve_hierarchy_item($id) {
+        global $DB;
+
+        return $DB->get_record($this->shortprefix, array('id' => $id));
+    }
+
+    /**
      * Add a new hierarchy item to an existing framework
      *
      * Given an object to insert and a parent id, create a new hierarchy item

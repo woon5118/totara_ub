@@ -1,0 +1,112 @@
+{{!
+     This file is part of Totara LMS
+
+     Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 3 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+     @author Riana Rossouw <riana.rossouw@totaralearning.com>
+     @package totara_competency
+}}
+{{!
+
+        @template totara_competency/competency_summary_general
+
+        The template for displaying the general section in the competency summary
+
+        Classes required for JS:
+        * none
+
+        Data attributes required for JS:
+        * none
+
+        Context variables required for this template:
+        * fullname: string, competency fullname
+        * idnumber: string, competency idnumber
+        * description: string, competency description
+        * assign_availability: array of strings, Availability string
+        * type: string, competency type
+        * customfields: array of objects, Customfields defined for the type
+        * customfield -> label: string, field label
+        * customfield -> value: string, encoded field value
+
+}}
+
+<div class="tw-compSummary__general" role="grid">
+    {{#fullname}}
+    <div class="tw-compSummary__general_row" role="row">
+        <div class="tw-compSummary__general_label" role="rowheader">
+            {{#str}}fullname, totara_competency{{/str}}
+        </div>
+        <div class="tw-compSummary__general_value" role="gridcell">
+            {{fullname}}
+        </div>
+    </div>
+    {{/fullname}}
+
+    {{#idnumber}}
+    <div class="tw-compSummary__general_row" role="row">
+        <div class="tw-compSummary__general_label" role="rowheader">
+            {{#str}}idnumber, totara_competency{{/str}}
+        </div>
+        <div class="tw-compSummary__general_value" role="gridcell">
+            {{idnumber}}
+        </div>
+    </div>
+    {{/idnumber}}
+
+    {{#description}}
+    <div class="tw-compSummary__general_row" role="row">
+        <div class="tw-compSummary__general_label" role="rowheader">
+            {{#str}}description, totara_competency{{/str}}
+        </div>
+        <div class="tw-compSummary__general_value" role="gridcell">
+            {{{description}}}
+        </div>
+    </div>
+    {{/description}}
+
+    {{#type}}
+    <div class="tw-compSummary__general_row" role="row">
+        <div class="tw-compSummary__general_label" role="rowheader">
+            {{#str}}type, totara_competency{{/str}}
+        </div>
+        <div class="tw-compSummary__general_value" role="gridcell">
+            {{type}}
+        </div>
+    </div>
+    {{/type}}
+
+    <div class="tw-compSummary__general_row" role="row">
+        <div class="tw-compSummary__general_label" role="rowheader">
+            {{#str}}assignmentcreationavailability, totara_competency{{/str}}
+        </div>
+        <div class="tw-compSummary__general_value" role="gridcell">
+            {{#assign_availability}}
+            <div>{{.}}</div>
+            {{/assign_availability}}
+        </div>
+    </div>
+
+    {{#customfields}}
+    <div class="tw-compSummary__general_row" role="row">
+        <div class="tw-compSummary__general_label" role="rowheader">
+            {{label}}
+        </div>
+        <div class="tw-compSummary__general_value" role="gridcell">
+            {{{value}}}
+        </div>
+    </div>
+    {{/customfields}}
+</div>

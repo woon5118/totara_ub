@@ -1248,6 +1248,10 @@ class core_plugin_manager {
 
         $standard_plugins = array(
 
+            'aggregation' => array(
+                'first', 'highest'
+            ),
+
             'antivirus' => array(
                 'clamav'
             ),
@@ -1341,6 +1345,10 @@ class core_plugin_manager {
 
             'coursereport' => array(
                 // Deprecated!
+            ),
+
+            'criteria' => array(
+                'childcompetency', 'coursecompletion', 'onactivate', 'linkedcourses'
             ),
 
             'datafield' => array(
@@ -1437,6 +1445,10 @@ class core_plugin_manager {
                 'quiz', 'resource', 'scorm', 'survey', 'url', 'wiki', 'workshop'
                 // Totara
                 , 'certificate', 'facetoface'
+            ),
+
+            'pathway' => array(
+                'criteria_group', 'learning_plan', 'manual'
             ),
 
             'plagiarism' => array(

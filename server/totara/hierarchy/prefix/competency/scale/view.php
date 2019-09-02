@@ -233,6 +233,8 @@ if ($canupdatescales || $candeletescales) {
             // Unset as we use another variable of the same name later.
             unset($proficient);
 
+            \totara_competency\entities\configuration_change::min_proficiency_change($scale->id, $scale->minproficiencyid);
+
             \core\notification::success(get_string('competencyscalechangeapplied', 'totara_hierarchy'));
         }
     }

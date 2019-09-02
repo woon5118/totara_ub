@@ -87,9 +87,13 @@ function hierarchy_can_add_competency_evidence($plan, $component, $userid, $comp
  * @param   true|int    $reaggregate (optional) time() if set to true, otherwise timestamp supplied
  * @param   bool        $notify (optional)
  * @return  int
+ *
+ * @deprecated since Totara 13
  */
 function hierarchy_add_competency_evidence($competencyid, $userid, $prof, $component, $details, $reaggregate = true, $notify = true) {
     global $DB;
+
+    debugging('hierarchy_add_competency_evidence() has been deprecated since Totara 13. See the new Totara Competency API.');
 
     $todb = new competency_evidence(
         array(

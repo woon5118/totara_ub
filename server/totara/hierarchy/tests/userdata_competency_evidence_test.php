@@ -37,6 +37,10 @@ class totara_hierarchy_userdata_competency_evidence_testcase extends advanced_te
      */
     private function get_setup_data() {
         global $DB, $CFG;
+
+        // Todo: User data items and refactoring to work with new competency code will happen in TL-19337
+        $this->markTestSkipped();
+
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
         $this->resetAfterTest();
         $data = new class(){

@@ -114,5 +114,36 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020062900, 'totara', 'plan');
     }
 
+    if ($oldversion < 2020062901) {
+
+        // Define table dp_plan_competency_value to be created.
+        $table = new xmldb_table('dp_plan_competency_value');
+
+        // Adding fields to table dp_plan_competency_value.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('competency_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('scale_value_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('date_assigned', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('positionid', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('organisationid', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('assessorid', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('assessorname', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('assessmenttype', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('timeproficient', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('manual', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table dp_plan_competency_value.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for dp_plan_competency_value.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Plan savepoint reached.
+        upgrade_plugin_savepoint(true, 2020062901, 'totara', 'plan');
+    }
+
     return true;
 }

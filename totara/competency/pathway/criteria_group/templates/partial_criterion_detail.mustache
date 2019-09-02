@@ -1,0 +1,91 @@
+{{!
+     This file is part of Totara LMS
+
+     Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 3 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+     @author Riana Rossouw <riana.rossouw@totaralearning.com>
+     @package pathway_criteria_group
+}}
+{{!
+
+    @template pathway_criteria_group/partial_criterion_detail
+
+    This template shows detail of a criterion
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+
+    Context variables required for this template:
+
+    Other context variables for following partials:
+
+}}
+
+{{#showand}}
+    {{> totara_competency/divider_and}}
+{{/showand}}
+
+{{#deleted}}
+    <div class="criterion_title cc_deleted" data-criterion-deleted><span>{{title}}</span></div>
+{{/deleted}}
+
+{{^deleted}}
+    {{#expandable}}
+        <div data-criterion-active data-cc-on-ordering="hide">
+            <div class="criterion_title"
+                 data-crit-action="toggle-detail"
+                 {{#expanded}}data-crit-detail-expanded="1"{{/expanded}}>
+
+                <a href="#">
+                    <span data-crit-detail-icon="expanded" {{^expanded}}class="cc_hidden"{{/expanded}}>
+                        {{#flex_icon}}expanded{{/flex_icon}}
+                    </span>
+                    <span data-crit-detail-icon="collapsed" {{#expanded}}class="cc_hidden"{{/expanded}}>
+                        {{#flex_icon}}collapsed{{/flex_icon}}
+                    </span>
+                    {{title}}
+                </a>
+            </div>
+
+            <div data-crit-detail="{{key}}" {{^expanded}}class="cc_hidden"{{/expanded}}>
+                {{#criterion_templatename}}
+                {{> &&criterion_templatename}}
+                {{/criterion_templatename}}
+            </div>
+        </div>
+
+        <div class="criterion_title cc_hidden"
+             data-cc-on-ordering="show">
+
+            <span data-crit-detail-icon="collapsed" {{#expanded}}class="cc_hidden"{{/expanded}}>
+                {{#flex_icon}}collapsed{{/flex_icon}}
+            </span>
+            {{title}}
+        </div>
+    {{/expandable}}
+
+    {{^expandable}}
+        <div class="criterion_title {{#deleted}}cc_deleted{{/deleted}}"><span>{{title}}</span></div>
+
+        {{#criterion_templatename}}
+            <div data-crit-detail="{{key}}" class="cc_hidden">
+                {{> &&criterion_templatename}}
+            </div>
+        {{/criterion_templatename}}
+    {{/expandable}}
+{{/deleted}}
