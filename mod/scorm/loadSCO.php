@@ -154,12 +154,16 @@ echo html_writer::tag('title', 'LoadSCO');
                 echo 'location = "'. $scolaunchurl .'";';
             }
             ?>
-        }
-        else {
-            document.body.innerHTML = "<p><?php echo get_string('activityloading', 'scorm');?>" +
-                                        "<span id='countdown'><?php echo $delayseconds ?></span> " +
-                                        "<?php echo get_string('numseconds', 'moodle', '');?>. &nbsp; " +
-                                        "<?php echo str_replace("\n", ' ', addslashes_js($OUTPUT->pix_icon('wait', '', 'scorm'))); ?></p>";
+        } else {
+            <?php
+            $htmlstring = json_encode("<p>" . get_string('activityloading', 'scorm')
+                    . "<span id='countdown'> $delayseconds </span>"
+                    . get_string('numseconds', 'moodle', '') . ".&nbsp;"
+                    . str_replace("\n", ' ', $OUTPUT->pix_icon('wait', '', 'scorm')) . "</p>");
+            ?>
+
+            document.body.innerHTML = <?php echo $htmlstring ?>
+
             var e = document.getElementById("countdown");
             var cSeconds = parseInt(e.innerHTML);
             var timer = setInterval(function() {
