@@ -24,6 +24,8 @@
 namespace totara_assignment\entities;
 
 
+use core\orm\collection;
+use core\orm\entity\relations\has_many;
 use ReflectionClass;
 use tassign_competency\entities\helpers\hierarchy_crumbtrail_helper;
 use core\orm\entity\entity;
@@ -162,11 +164,10 @@ abstract class hierarchy_item extends entity {
      * Returns all children of the current item
      *
      * @return collection|hierarchy_item[]
+     * @return has_many
      */
-    public function get_children_attribute(): collection {
-        return static::repository()
-            ->where('parentid', $this->id)
-            ->get();
+    public function children(): has_many {
+        return $this->has_many(static::class, 'parentid');
     }
 
     /**

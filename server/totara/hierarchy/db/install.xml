@@ -49,11 +49,6 @@
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="reaggregate" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="manual" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="last_aggregated" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="assignmentid" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timescalevalue" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timestatus" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -65,6 +60,7 @@
         <KEY NAME="compreco_pro_fk" TYPE="foreign" FIELDS="proficiency" REFTABLE="comp_scale_values" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
+        <INDEX NAME="compreco_usecom_uix" UNIQUE="true" FIELDS="userid, competencyid"/>
         <INDEX NAME="compreco_man_ix" UNIQUE="false" FIELDS="manual"/>
         <INDEX NAME="compreco_rea_ix" UNIQUE="false" FIELDS="reaggregate"/>
       </INDEXES>
@@ -78,8 +74,6 @@
         <FIELD NAME="timeproficient" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="assignmentid" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="timescalevalue" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

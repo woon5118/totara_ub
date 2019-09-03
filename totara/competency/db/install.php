@@ -28,4 +28,7 @@ function xmldb_totara_competency_install() {
     require_once($CFG->dirroot . '/totara/competency/db/upgradelib.php');
 
     totara_competency_install_migrate_achievements();
+
+    $task = new \totara_competency\task\default_criteria_on_install();
+    \core\task\manager::queue_adhoc_task($task);
 }

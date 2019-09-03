@@ -23,6 +23,8 @@
 
 namespace totara_competency\entities;
 
+use core\orm\collection;
+use core\orm\entity\relations\has_many;
 use totara_competency\achievement_configuration;
 use totara_assignment\entities\hierarchy_item;
 
@@ -206,5 +208,4 @@ class competency extends hierarchy_item {
               WHERE comp_id = :compid';
         return $DB->get_fieldset_sql($sql, ['compid' => $this->id]);
     }
-
 }

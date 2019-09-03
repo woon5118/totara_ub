@@ -227,145 +227,6 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019030700, 'totara', 'hierarchy');
     }
 
-    if ($oldversion < 2019030701) {
-
-        // Define field last_aggregated to be added to comp_record.
-        $table = new xmldb_table('comp_record');
-        $field = new xmldb_field('last_aggregated', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, '0', 'manual');
-
-        // Conditionally launch add field last_aggregated.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Hierarchy savepoint reached.
-        upgrade_plugin_savepoint(true, 2019030701, 'totara', 'hierarchy');
-    }
-
-    if ($oldversion < 2019030702) {
-
-        // Define field assignmentid to be added to comp_record.
-        $table = new xmldb_table('comp_record');
-        $field = new xmldb_field('assignmentid', XMLDB_TYPE_INTEGER, '18', null, null, null, null, 'last_aggregated');
-
-        // Conditionally launch add field assignmentid.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Hierarchy savepoint reached.
-        upgrade_plugin_savepoint(true, 2019030702, 'totara', 'hierarchy');
-    }
-
-    if ($oldversion < 2019030703) {
-
-        // Define field status to be added to comp_record.
-        $table = new xmldb_table('comp_record');
-        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'assignmentid');
-
-        // Conditionally launch add field status.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Hierarchy savepoint reached.
-        upgrade_plugin_savepoint(true, 2019030703, 'totara', 'hierarchy');
-    }
-
-    if ($oldversion < 2019030704) {
-
-        // Define index compreco_usecom_uix (unique) to be dropped form comp_record.
-        $table = new xmldb_table('comp_record');
-        $index = new xmldb_index('compreco_usecom_uix', XMLDB_INDEX_UNIQUE, array('userid', 'competencyid'));
-
-        // Conditionally launch drop index compreco_usecom_uix.
-        if ($dbman->index_exists($table, $index)) {
-            $dbman->drop_index($table, $index);
-        }
-
-        // Hierarchy savepoint reached.
-        upgrade_plugin_savepoint(true, 2019030704, 'totara', 'hierarchy');
-    }
-
-    if ($oldversion < 2019030705) {
-
-        // Define field timescalevalue to be added to comp_record.
-        $table = new xmldb_table('comp_record');
-        $field = new xmldb_field('timescalevalue', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, 0, 'status');
-
-        // Conditionally launch add field timescalevalue.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Hierarchy savepoint reached.
-        upgrade_plugin_savepoint(true, 2019030705, 'totara', 'hierarchy');
-    }
-
-    if ($oldversion < 2019030706) {
-
-        // Define field timestatus to be added to comp_record.
-        $table = new xmldb_table('comp_record');
-        $field = new xmldb_field('timestatus', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, 0, 'timescalevalue');
-
-        // Conditionally launch add field timestatus.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Hierarchy savepoint reached.
-        upgrade_plugin_savepoint(true, 2019030706, 'totara', 'hierarchy');
-    }
-
-    if ($oldversion < 2019030707) {
-
-        // Define field assignmentid to be added to comp_record_history.
-        $table = new xmldb_table('comp_record_history');
-        $field = new xmldb_field('assignmentid', XMLDB_TYPE_INTEGER, '18', null, null, null, null, 'usermodified');
-
-        // Conditionally launch add field assignmentid.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Hierarchy savepoint reached.
-        upgrade_plugin_savepoint(true, 2019030707, 'totara', 'hierarchy');
-    }
-
-    if ($oldversion < 2019030708) {
-
-        // Define field timescalevalue to be added to comp_record_history.
-        $table = new xmldb_table('comp_record_history');
-        $field = new xmldb_field('timescalevalue', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, '0', 'assignmentid');
-
-        // Conditionally launch add field timescalevalue.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Hierarchy savepoint reached.
-        upgrade_plugin_savepoint(true, 2019030708, 'totara', 'hierarchy');
-    }
-
-    if ($oldversion < 2019030709) {
-        // comp_assign_availability
-        $table = new xmldb_table('comp_assign_availability');
-
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('comp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('availability', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
-
-        // Adding keys to table comp_achievement_activity.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
-
-        // Competency savepoint reached.
-        upgrade_plugin_savepoint(true, 2019030709, 'totara', 'hierarchy');
-    }
-
     if ($oldversion < 2019052700) {
         // Define field minproficiencyid to be added to comp_scale.
         $table = new xmldb_table('comp_scale');
@@ -388,6 +249,25 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
 
         // Hierarchy savepoint reached.
         upgrade_plugin_savepoint(true, 2019052700, 'totara', 'hierarchy');
+    }
+
+    if ($oldversion < 2019090300) {
+        // comp_assign_availability
+        $table = new xmldb_table('comp_assign_availability');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('comp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('availability', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table comp_achievement_activity.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019090300, 'totara', 'hierarchy');
     }
 
     return true;

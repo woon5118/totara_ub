@@ -24,6 +24,7 @@
 namespace totara_competency\entities;
 
 
+use coding_exception;
 use core\orm\collection;
 use core\orm\entity\entity;
 
@@ -38,6 +39,8 @@ use core\orm\entity\entity;
  * @property int $defaultid Default id
  * @property int $minproficiencyid
  *
+ * @property_read scale_value $default_value
+ * @property_read scale_value $min_proficient_value
  * @property-read scale_value[]|collection $scale_values
  */
 class scale extends entity {
@@ -46,6 +49,10 @@ class scale extends entity {
 
     private $scale_value_cache;
 
+    /**
+     * @return collection
+     * @throws coding_exception
+     */
     public function get_scale_values_attribute() {
         if (!isset($this->scale_value_cache)) {
             $this->scale_value_cache = scale_value::repository()
@@ -55,5 +62,13 @@ class scale extends entity {
         }
 
         return $this->scale_value_cache;
+    }
+
+    public function get_default_value_attribute() {
+        return $this->get_scale_values_attribute()->item($this->defaultid);
+    }
+
+    public function get_min_proficient_value_attribute() {
+        return $this->get_scale_values_attribute()->item($this->minproficiencyid);
     }
 }
