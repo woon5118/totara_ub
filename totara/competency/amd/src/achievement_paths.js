@@ -706,7 +706,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
             // Generate a key to group all changes together for logging
             // Must convert to seconds to be compatible with PHP timestamps
-            var actionTime = Math.round(Date.now().getTime() / 1000);
+            var actionTime = Math.round(Date.now() / 1000);
 
             for (var a = 0; a < pwList.length; a++) {
                 apiEndpoint = pwList[a].getAttribute('data-pw-save-endpoint');
