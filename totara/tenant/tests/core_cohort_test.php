@@ -47,6 +47,7 @@ class totara_tenant_core_cohort_testcase extends advanced_testcase {
         cohort_update_cohort($record);
 
         $record = $DB->get_record('cohort', ['id' => $tenant->cohortid], '*', MUST_EXIST);
+        $record->timemodified = $cohort->timemodified; // Ignore update timestamp.
         $this->assertEquals($cohort, $record);
     }
 
