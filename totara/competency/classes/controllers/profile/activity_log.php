@@ -32,6 +32,9 @@ class activity_log extends base {
         $page_title = get_string('activity_log', 'totara_competency');
         $this->add_navigation($page_title);
 
+        // TODO Fix it so that tui_component is not requiring this
+        $renderer = $this->page->get_renderer('core');
+
         $competency = competency::repository()->find_or_fail((int) $this->get_param('competency_id', PARAM_INT, null, true));
 
         $props = [

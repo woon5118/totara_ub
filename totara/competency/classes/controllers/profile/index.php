@@ -38,6 +38,9 @@ class index extends base {
 
         $title = get_string('competency_profile', 'totara_competency', $this->user->firstname . ' ' . $this->user->lastname);
 
+        // TODO Fix it so that tui_component is not requiring this
+        $renderer = $this->page->get_renderer('core');
+
         $props = [
             'profile-picture' => $this->get_my_profile_picture_url(),
             'self-assignment-url' => (string) $this->get_self_assignment_url(),
