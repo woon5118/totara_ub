@@ -143,11 +143,8 @@ $string['pluginnotinstalled'] = 'Authentication plugin \'{$a}\' is not installed
 $string['potentialidps'] = 'Or log in with';
 $string['profileeditexternal'] = 'This user account is not expected to be modified through this form, authentication plugin uses custom page.';
 $string['recaptcha'] = 'reCAPTCHA';
-$string['recaptcha_help'] = 'The CAPTCHA is for preventing abuse from automated programs. Simply enter the words in the box, in order and separated by a space.
-
-If you are not sure what the words are, you can try getting another CAPTCHA or an audio CAPTCHA.';
-$string['recaptcha_link'] = 'auth/email';
-$string['security_question'] = 'Security question';
+$string['recaptcha_help'] = 'This challenge is designed to prevent abuse from automated programs. Please tick the \'I am not a robot\' box and follow the on-screen instructions.';
+$string['security_challenge'] = 'Security challenge';
 $string['selfregistration'] = 'Self registration';
 $string['selfregistration_help'] = 'If an authentication plugin, such as email-based self-registration, is selected, then it enables potential users to register themselves and create accounts. This results in the possibility of spammers creating accounts in order to use forum posts, blog entries etc. for spam. To avoid this risk, self-registration should be disabled or limited by **Allowed email domains** setting.';
 $string['sha1'] = 'SHA-1 hash';
@@ -169,3 +166,7 @@ $string['user_activatenotsupportusertype'] = 'auth: ldap user_activate() does no
 $string['user_disablenotsupportusertype'] = 'auth: ldap user_disable() does not support selected usertype (..yet)';
 $string['username'] = 'Username';
 $string['username_help'] = 'Please be aware that some authentication plugins will not allow you to change the username.';
+
+# Deprecated
+
+$string['security_question'] = 'Security question';

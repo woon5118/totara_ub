@@ -111,7 +111,7 @@ final class signup extends \moodleform {
         }
 
         if ($this->stage == request::STAGE_SIGNUP and $this->authplugin->is_captcha_enabled()) {
-            $mform->addElement('recaptcha', 'recaptcha_element', get_string('security_question', 'auth'));
+            $mform->addElement('recaptcha', 'recaptcha_element', get_string('security_challenge', 'auth'));
             $mform->addHelpButton('recaptcha_element', 'recaptcha', 'auth');
             $mform->closeHeaderBefore('recaptcha_element');
         }
