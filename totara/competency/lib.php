@@ -49,7 +49,7 @@ function totara_competency_myprofile_navigation(tree $tree, $user, $this_user, $
     $can_view && $tree->add_node(
         new node(
             'miscellaneous',
-            'evidence',
+            'competency_profile',
             get_string('competency_profile', 'totara_competency'),
             null,
             new moodle_url('/totara/competency/profile/index.php', $this_user ? [] : ['user_id' => $user->id])
