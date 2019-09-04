@@ -29,8 +29,6 @@ use tassign_competency\entities\assignment;
 class totara_competency_models_activity_log_achievement_testcase extends advanced_testcase {
 
     public function test_no_value() {
-        $time = time();
-
         $assignment = new assignment();
         $assignment->competency_id = 100;
         $assignment->user_group_id = 300;
@@ -39,22 +37,12 @@ class totara_competency_models_activity_log_achievement_testcase extends advance
         $assignment->save();
 
         $achievement = new competency_achievement();
-        $achievement->time_created = $time;
-        $achievement->proficient = true;
+        $achievement->time_created = time();
         $achievement->scale_value_id = null;
         $achievement->assignment_id = $assignment->id;
 
-        $entry = activity_log\competency_achievement::load_by_entity($achievement);
-
-        // Todo: What todo here when scale value is null
-        $this->markTestSkipped();
-
-        $this->assertFalse($entry->get_proficient_status());
-        $this->assertEquals($assignment->id, $entry->get_assignment()->id);
-        $this->assertEquals($time, $entry->get_date());
-
-        // Todo: If we are having an entry for scale value id = null in the first place, then what should description be?
-        $this->assertEquals('Rating: ', $entry->get_description());
+        $entry = activity_log\competency_achieved_via::load_by_entity($achievement);
+        $this->assertEquals('Rating value reset', $entry->get_description());
     }
 
     public function test_value_given() {

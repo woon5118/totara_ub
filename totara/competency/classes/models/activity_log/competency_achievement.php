@@ -59,9 +59,13 @@ class competency_achievement extends activity_log {
      * @return string
      */
     public function get_description(): string {
-        $a = new \stdClass();
-        $a->scale_value_name = (new scale_value($this->get_entity()->scale_value_id))->name;
-        return get_string('activitylog_rating', 'totara_competency', $a);
+        $scale_value = new scale_value($this->get_entity()->scale_value_id);
+        if (!$scale_value->exists()) {
+            return get_string('activitylog_no_rating', 'totara_competency');
+        }
+        return get_string('activitylog_rating', 'totara_competency', [
+            'scale_value_name' => $scale_value->name,
+        ]);
     }
 
     /**

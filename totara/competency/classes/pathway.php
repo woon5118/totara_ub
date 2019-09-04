@@ -472,6 +472,20 @@ abstract class pathway {
         return [(object)['item_type' => $this->get_title()]];
     }
 
+    /**
+     * Get the achievement detail object for this pathway type
+     *
+     * @return base_achievement_detail
+     */
+    public function get_achievement_detail(): base_achievement_detail {
+        $detail_class = pathway_factory::get_namespace($this->get_path_type()) . '\\achievement_detail';
+        if (!is_subclass_of($detail_class, base_achievement_detail::class)) {
+            throw new \coding_exception('Not detail class found', "No achievement_detail class found for {$this->get_path_type()}");
+        }
+        return new $detail_class();
+    }
+
+
     /*******************************************************************************************************
      * Data exporting
      *******************************************************************************************************/

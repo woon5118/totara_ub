@@ -486,4 +486,55 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $this->assertInstanceOf(activity_log\configuration_change::class, $activity_log_data[0]);
     }
 
+    /**
+     * Test that when a competency no longer has a scale value a generic 'Rating value reset' string and 'Rating: None' is shown
+     */
+    public function test_scale_value_reset_to_none() {
+        $time = time();
+        $assignment_id = 100;
+        $competency_id = 200;
+        $user_id = 300;
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $hierarchy_generator->create_scale(
+            'comp',
+            [],
+            [
+                ['name' => 'Great', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
+            ]
+        );
+        $great = scale_value::repository()->where('name', '=', 'Great')->one();
+
+        $achievement = new competency_achievement();
+        $achievement->time_created = $time + 1;
+        $achievement->scale_value_id = $great->id;
+        $achievement->assignment_id = $assignment_id;
+        $achievement->comp_id = $competency_id;
+        $achievement->user_id = $user_id;
+        $achievement->proficient = 1;
+        $achievement->status = 1;
+        $achievement->time_status = 0;
+        $achievement->save();
+
+        $achievement = new competency_achievement();
+        $achievement->time_created = $time + 2;
+        $achievement->scale_value_id = null;
+        $achievement->assignment_id = $assignment_id;
+        $achievement->comp_id = $competency_id;
+        $achievement->user_id = $user_id;
+        $achievement->proficient = 0;
+        $achievement->status = 1;
+        $achievement->time_status = 0;
+        $achievement->save();
+
+        $activity_log_data = data_providers\activity_log::create($user_id, $competency_id)->fetch();
+
+        $this->assertCount(4, $activity_log_data);
+        $this->assertEquals('Rating: None', $activity_log_data[0]->get_description());
+        $this->assertEquals('Rating value reset', $activity_log_data[1]->get_description());
+        $this->assertEquals('Rating: Great', $activity_log_data[2]->get_description());
+        $this->assertEquals('Criteria met: . Achieved \'Great\' rating.', $activity_log_data[3]->get_description());
+    }
+
 }

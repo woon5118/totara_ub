@@ -24,12 +24,9 @@
 namespace totara_competency\models\activity_log;
 
 use core\orm\entity\entity;
-use totara_competency\base_achievement_detail;
-use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
 use totara_competency\models\activity_log;
 use totara_competency\pathway;
-use totara_competency\pathway_factory;
 use totara_competency\entities;
 
 class competency_achieved_via extends activity_log {
@@ -65,37 +62,27 @@ class competency_achieved_via extends activity_log {
     public function get_description(): string {
         /** @var entities\competency_achievement $achievement */
         $achievement = $this->get_entity();
+        $scale_value = new scale_value($achievement->scale_value_id);
 
-        $data = [];
-        foreach ($achievement->get_achieved_via() as $via) {
-            /** @var pathway_achievement $via */
-            $data[] = [
-                // Skipping the pathway factory as we want to ignore the enabled check.
-                'pathway_type' => pathway::fetch($via->pathway_id)->get_path_type(),
-                'related_info' => json_decode($via->related_info),
-            ];
+        if (!$scale_value->exists()) {
+            return get_string('activitylog_rating_value_reset', 'totara_competency');
         }
-        $data[] = ['scale_value' => new scale_value($achievement->scale_value_id)];
 
-        $scale_value = array_pop($data)['scale_value'];
         $criteria_met = [];
-        foreach ($data as $pathway_achieved_by) {
-            $pathway_type = $pathway_achieved_by['pathway_type'];
-            $namespace = pathway_factory::get_namespace($pathway_type);
-            $detail_classname = $namespace . '\\achievement_detail';
-            if (!is_subclass_of($detail_classname, base_achievement_detail::class)) {
-                throw new \coding_exception('Not detail class found', 'No achievement_detail class found for ' . $pathway_type);
-            }
-            /** @var base_achievement_detail $achievement_detail */
-            $achievement_detail = new $detail_classname();
-            $achievement_detail->set_related_info((array) $pathway_achieved_by['related_info']);
-            $criteria_met = array_merge($criteria_met, $achievement_detail->get_achieved_via_strings());
+        foreach ($achievement->get_achieved_via() as $via) {
+            $achievement_detail_strings = pathway::fetch($via->pathway_id)
+                ->get_achievement_detail()
+                ->set_related_info((array) json_decode($via->related_info))
+                ->get_achieved_via_strings();
+
+            $criteria_met = array_merge($criteria_met, $achievement_detail_strings);
         }
+        $criteria_met = implode(', ', array_unique($criteria_met));
 
-        $a = new \stdClass();
-        $a->criteria_met = implode(', ', array_unique($criteria_met));
-        $a->scale_value_name = $scale_value->name;
-
-        return get_string('activitylog_criteriamet', 'totara_competency', $a);
+        return get_string('activitylog_criteriamet', 'totara_competency', [
+            'criteria_met' => $criteria_met,
+            'scale_value_name' => $scale_value->name,
+        ]);
     }
+
 }
