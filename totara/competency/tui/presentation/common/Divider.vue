@@ -46,28 +46,28 @@ export default {
 
 <style lang="scss">
 .tui-totara-competency-divider {
-  border-top: 1px solid #d9d9d9;
+  position: relative;
   left: -0.4rem;
+  width: 50%;
   margin-top: 4rem;
   padding: 1.6rem 0 0.8rem;
-  position: relative;
-  width: 50%;
+  border-top: 1px solid #d9d9d9;
 
   &__label {
-    background: #fff;
-    color: #daebd3;
-    display: inline-block;
-    left: 50%;
-    padding: 0.4rem 0.8rem;
     position: absolute;
-    text-transform: uppercase;
     top: -1.6rem;
+    left: 50%;
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    color: #daebd3;
+    text-transform: uppercase;
+    background: #fff;
     transform: translateX(-50%);
 
     &.bordered {
+      color: black;
       background: #f5f5f5;
       border: 1px solid #d9d9d9;
-      color: black;
     }
   }
 }

@@ -216,34 +216,34 @@ export default {
     flex-direction: row;
 
     &_title {
-      line-height: 1.5;
-      margin-left: 1rem;
       margin-right: 0.4rem;
+      margin-left: 1rem;
       padding-top: 0.4rem;
+      line-height: 1.5;
     }
   }
 
   &__pathgroup {
-    width: 100%;
-    border: 1px solid black;
-    border-radius: 6px;
-    margin-bottom: 0.5em;
-    padding: 1em;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    margin-bottom: 0.5em;
+    padding: 1em;
+    border: 1px solid black;
+    border-radius: 6px;
 
     &_scalevalue {
-      border-top: 1px solid grey;
       display: flex;
+      border-top: 1px solid grey;
 
       &:first-child {
         border: none;
       }
 
       .tui-formLabel {
-        text-transform: uppercase;
-        font-weight: normal;
         width: 20%;
+        font-weight: normal;
+        text-transform: uppercase;
       }
 
       &__paths {
@@ -253,9 +253,9 @@ export default {
       &__path {
         &__criteria {
           .tui-formLabel {
-            text-transform: none;
-            font-weight: bold;
             min-width: 10em;
+            font-weight: bold;
+            text-transform: none;
           }
 
           span {
@@ -264,10 +264,10 @@ export default {
         }
 
         &__criteria.bordered {
-          border: 0.5px solid lightgrey;
-          border-radius: 6px;
           margin-bottom: 0.5em;
           padding: 1em;
+          border: 0.5px solid lightgrey;
+          border-radius: 6px;
         }
       }
     }
