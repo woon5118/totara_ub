@@ -97,9 +97,9 @@ define([], function() {
          */
         addEventListeners: function() {
             var that = this,
-                module = that.component.querySelector('.tw-takeAttendanceBulkAction');
+                bulkAction = that.component.querySelector('.tw-takeAttendanceBulkAction');
 
-            module.addEventListener(
+            bulkAction.addEventListener(
                 'mod_facetoface/take_attendance_bulk_action:bulk-select-learner',
                 function(event) {
                     // We need to build up the operators first, dependings on the options, then inject it to
@@ -145,7 +145,7 @@ define([], function() {
                 }
             );
 
-            module.addEventListener(
+            bulkAction.addEventListener(
                 'mod_facetoface/take_attendance_bulk_action:bulk-take-attendance',
                 function(event) {
                     var data = event.detail,
@@ -179,6 +179,12 @@ define([], function() {
                     }
                 }
             );
+
+            that.component.addEventListener('change', function(e) {
+                if (e.target.closest('.mod-facetoface-attendees .selectedcheckboxes')) {
+                    bulkAction.dispatchEvent(new CustomEvent('mod_facetoface/take_attendance_bulk_action:user_selected'));
+                }
+            });
         },
 
         /**

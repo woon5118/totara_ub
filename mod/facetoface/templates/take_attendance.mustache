@@ -69,15 +69,21 @@
     {{#sessionpicker}}{{>mod_facetoface/take_attendance_session_picker}}{{/sessionpicker}}
 
     <form {{#formattributes}} {{name}}='{{value}}'{{/formattributes}}>
-        {{#bulkaction}}{{>mod_facetoface/take_attendance_bulk_action}}{{/bulkaction}}
-
         {{#hiddeninputs}}
             <input type="hidden" name="{{name}}"  value="{{value}}"/>
         {{/hiddeninputs}}
 
-        <div class="hide" id="noticeupdate"> </div>
+        {{#bulkaction}}{{>mod_facetoface/take_attendance_bulk_action}}{{/bulkaction}}
 
         {{{ tablecontent }}}
+
+        <div class="actionsbuttons">
+            <input type="submit" name="saveattendance" value="{{#str}} saveattendance, mod_facetoface {{/str}}" id="f2f-save-taking-attendance"
+                class="btn btn-primary" {{#disabled}}disabled{{/disabled}}/>
+            <input type="submit" name="cancelform" value="{{#str}} cancel, moodle {{/str}}" id="f2f-cancel-taking-attendance"
+                class="btn btn-cancel" {{#disabled}}disabled{{/disabled}}/>
+        </div>
+
     </form>
 <!-- TODO: do not remove until clear decision for DES-95
     <form autocomplete="off" accept-charset="utf-8" id="mform501" class="mform import_export">

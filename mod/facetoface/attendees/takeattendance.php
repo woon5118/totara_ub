@@ -32,50 +32,41 @@ require_once($CFG->libdir.'/odslib.class.php');
 require_once($CFG->libdir.'/excellib.class.php');
 
 use mod_facetoface\signup_helper;
+use \mod_facetoface\attendees_helper;
 use mod_facetoface\attendance\{attendance_helper, factory};
 
-/**
- * Load and validate base data
- */
+/** Load and validate base data */
 // Face-to-face session ID
 $s = optional_param('s', 0, PARAM_INT);
-
 // Face-to-face sessiondate Id
 $sd = optional_param('sd', 0, PARAM_INT);
-
 // Take attendance
 $takeattendance = optional_param('takeattendance', false, PARAM_BOOL);
-
 // Cancel request
 $cancelform = optional_param('cancelform', false, PARAM_BOOL);
-
 // Action being performed, a proper default will be set shortly.
 // Require for attendees.js
 $action = optional_param('action', 'takeattendance', PARAM_ALPHA);
-
 // Only return content
 $onlycontent = optional_param('onlycontent', false, PARAM_BOOL);
-
 // Export download.
 $download = optional_param('download', '', PARAM_ALPHA);
 
 // If there's no sessionid specified.
 if (!$s) {
-    \mod_facetoface\attendees_helper::process_no_sessionid('takeattendance');
+    attendees_helper::process_no_sessionid('takeattendance');
     exit;
 }
 
 $seminarevent = new \mod_facetoface\seminar_event($s);
 $seminar = $seminarevent->get_seminar();
 $cm = $seminar->get_coursemodule();
-$context = context_module::instance($cm->id);
+$context = $seminar->get_contextmodule($cm->id);
 $session = (object)['id' => $seminarevent->get_id()];
 
 require_login($seminar->get_course(), false, $cm);
-/**
- * Print page header
- */
-// Setup urls
+
+/** Setup urls */
 $baseurl = new moodle_url(
     '/mod/facetoface/attendees/takeattendance.php',
     ['s' => $seminarevent->get_id()]
@@ -83,6 +74,7 @@ $baseurl = new moodle_url(
 if ($sd) {
     $baseurl->param('sd', $sd);
 }
+/** Print page header */
 $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
 
@@ -95,15 +87,13 @@ $PAGE->set_url($baseurl);
     $cancellations,
     $requests,
     $attendees
-] = \mod_facetoface\attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context);
+] = attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context);
 $includeattendeesnote = (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context));
 
 $can_view_session = !empty($allowed_actions);
 if (!$can_view_session) {
     // If no allowed actions so far.
-    $return = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
-    redirect($return);
-    die();
+    redirect(new moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]));
 }
 // $allowed_actions is already set, so we can now know if the current action is allowed.
 $actionallowed = in_array($action, $allowed_actions);
@@ -111,13 +101,10 @@ $actionallowed = in_array($action, $allowed_actions);
 //Process the submitted data here
 if ($formdata = data_submitted()) {
     if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
+        redirect($baseurl, get_string('confirmsesskeybad', 'error'), null, core\notification::ERROR);
     }
 
     if ($cancelform) {
-        if ($sd > 0) {
-            $baseurl->param('sd', $sd);
-        }
         redirect($baseurl);
     }
 
@@ -125,7 +112,7 @@ if ($formdata = data_submitted()) {
     if ($actionallowed && $takeattendance) {
         // Check the attendance data matches the expected seminar event.
         if ($formdata->s != $seminarevent->get_id()) {
-            print_error('Mismatched attendance data handed through form submission.');
+            redirect($baseurl, 'Mismatched attendance data handed through form submission.', null, core\notification::ERROR);
         }
 
         // Pre-process form data.
@@ -168,11 +155,9 @@ if ($formdata = data_submitted()) {
                 $result = signup_helper::process_attendance($seminarevent, $states, $grades);
                 if ($result) {
                     // Trigger take attendance update event.
-                    $event = \mod_facetoface\event\attendance_updated::create_from_session($session, $context);
-                    $event->trigger();
+                    \mod_facetoface\event\attendance_updated::create_from_session($session, $context)->trigger();
                 }
             } else {
-                $baseurl->param('sd', $sd);
                 $result = attendance_helper::process_session_attendance($states, $sd);
             }
 
@@ -205,7 +190,7 @@ if (!$onlycontent && !$download) {
 
 //Print list attendees in taking attendance (if user able to view)
 if ($actionallowed) {
-    $helper = new \mod_facetoface\attendees_helper($seminarevent);
+    $helper = new attendees_helper($seminarevent);
     $numattendees = $helper->count_attendees();
     $overbooked = ($numattendees > $seminarevent->get_capacity());
 
@@ -233,6 +218,7 @@ if (!$onlycontent) {
     echo $OUTPUT->container_end();
 
     $backurl = new \moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]);
+    /** @var mod_facetoface_renderer $f2f_renderer */
     $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
     $f2f_renderer->setcontext($context);
     echo $f2f_renderer->render_action_bar_on_tabpage($backurl);

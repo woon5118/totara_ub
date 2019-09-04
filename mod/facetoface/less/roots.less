@@ -470,12 +470,24 @@ select.menuf2f-select {
     font-weight: normal;
 }
 
-form.f2f-attendance-form {
-    margin-top: 7px;
-}
-
 .f2f-attendees-table {
     margin-bottom: @form-group-margin-bottom;
+
+    input[name="saveattendance"] {
+        .btn-primary;
+    }
+
+    .actionsbuttons {
+        display: block;
+
+        @media (min-width: @totara_style-screen_md_min) {
+            margin-left: 33.3333%;
+        }
+
+        @media (min-width: @totara_style-screen_lg_min) {
+            margin-left: 25%;
+        }
+    }
 }
 
 .f2f-takeattendance-event-summary {
@@ -483,13 +495,43 @@ form.f2f-attendance-form {
 }
 
 .f2f-takeattendance-bulk-action-box {
-    margin-bottom: 16px;
-    display: flex;
+    margin-bottom: @form-group-margin-bottom;
     padding: @totara_style-spacing_small;
     border: 1px #e6e6e6 solid;
     border-radius: 2px;
-    input[name="saveattendance"] {
-        margin: 0 0 5px 5px;
+
+    .bulkactionstring {
+        margin-top: 7px;
+        margin-right: @totara_style-spacing_medium;
+        float: left;
+
+        @media (min-width: @totara_style-screen_md_min) {
+            width: 33.3333%;
+        }
+
+        @media (min-width: @totara_style-screen_lg_min) {
+            width: 25%;
+        }
+    }
+    
+    .facetoface-bulk-actions-selector,
+    .facetoface-bulk-actions-picker {
+        float: left;
+    }
+
+    #selectoptionbefore {
+        display: none;
+        color: @mod_facetoface-error-colour;
+        
+        &.f2f-selectionoptionbefore-error {
+            display: block;
+        }
+    }
+
+    &:after {
+        content: '';
+        display: block;
+        clear: both;
     }
 }
 
@@ -545,8 +587,11 @@ a.mod_facetoface__action_goback {
 .path-mod-facetoface {
     form.import_export {
         padding-top: @totara_style-spacing_large;
-        div.fitem > fieldset {
-            text-align: center;
+        legend {
+            margin-bottom: @totara_style-spacing_medium;
+        }
+        .fitem {
+            margin-left: 0px;
         }
         div.fitem > fieldset {
             a.mod_facetoface__action_uploadattendance,

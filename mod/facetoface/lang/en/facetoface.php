@@ -1133,6 +1133,7 @@ $string['selectnotsetop'] = 'Not Set';
 $string['selectlearner'] = 'Select learners';
 $string['selectmanager'] = 'Select manager';
 $string['selectoptionbefore'] = ' Please choose an option (All, Set or Not set) before selecting this option';
+$string['selectone'] = 'Select one ...';
 $string['selectroom'] = 'Select room';
 $string['selectsession'] = 'Select session';
 $string['selectsetop'] = 'Set';

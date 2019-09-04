@@ -89,7 +89,7 @@ define([], function() {
                     // Hide error msg, if any.
                     that.toggleError(false);
 
-                    if (!self.value) {
+                    if (!self.value || self.value === '-1') {
                         // No point to change the states.
                         return;
                     }
@@ -202,24 +202,16 @@ define([], function() {
          * @param {boolean} display
          */
         toggleError: function(display) {
-            var element = this.component.querySelector('#menubulk_select'),
-                notificationBox = this.component.querySelector('#selectoptionbefore');
+            var notificationBox = this.component.querySelector('#selectoptionbefore');
 
             if (display) {
-                if (!element.classList.contains('error')) {
-                    element.classList.add('error');
+                if (!notificationBox.classList.contains('f2f-selectionoptionbefore-error')) {
+                    notificationBox.classList.add('f2f-selectionoptionbefore-error');
                 }
 
-                if (notificationBox.classList.contains('hide')) {
-                    notificationBox.classList.remove('hide');
-                }
             } else {
-                if (element.classList.contains('error')) {
-                    element.classList.remove('error');
-                }
-
-                if (!notificationBox.classList.contains('hide')) {
-                    notificationBox.classList.add('hide');
+                if (notificationBox.classList.contains('f2f-selectionoptionbefore-error')) {
+                    notificationBox.classList.remove('f2f-selectionoptionbefore-error');
                 }
             }
         },
@@ -228,8 +220,13 @@ define([], function() {
          * Adding event listeners to those elements within this module.
          */
         addEvents: function() {
+            var that = this;
             this.bulkTakeAttendance();
             this.bulkSelectLearners();
+
+            this.component.addEventListener('mod_facetoface/take_attendance_bulk_action:user_selected', function() {
+                that.component.querySelector('#menubulk_select').value = that.getOptions().selectset;
+            });
         }
     };
 
@@ -246,10 +243,10 @@ define([], function() {
          */
         init: function(element) {
             return new Promise(
-                function(resolver) {
+                function(resolve) {
                     var module = new TakeAttendanceBulkAction(element);
                     module.addEvents();
-                    resolver(module);
+                    resolve(module);
                 }
             );
         }

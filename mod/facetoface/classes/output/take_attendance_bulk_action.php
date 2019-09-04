@@ -50,6 +50,7 @@ class take_attendance_bulk_action extends template {
      */
     public static function create(bool $disabled): take_attendance_bulk_action {
         $data = [
+            'disabled' => $disabled,
             'bulkselection' => self::create_bulkselection($disabled),
             'bulkaction' => self::create_bulkaction($disabled),
             'attendeesselector' => [

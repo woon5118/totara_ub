@@ -53,8 +53,10 @@
      data-core-autoinitialise="true"
      data-core-autoinitialise-amd="mod_facetoface/take_attendance_bulk_action">
 
+    <span class="bulkactionstring">{{#str}} bulkactions, mod_facetoface {{/str}}</span>
+
     {{#bulkselection}}
-        <div>
+        <div class="facetoface-bulk-actions-selector">
             <label for="menu{{name}}" class="f2f-inline-box custom-facetoface-label">
                 {{#str}} selectlearner, mod_facetoface {{/str}}
             </label>
@@ -80,8 +82,8 @@
             <select name="{{name}}" id="menu{{name}}" class="f2f-inline-box bulkactions" autocomplete="off"
                 {{#disabled}} disabled {{/disabled}}>
 
-                <option value="">
-                    {{#str}} bulkactions, mod_facetoface {{/str}}
+                <option value="-1">
+                    {{#str}} selectone, mod_facetoface {{/str}}
                 </option>
 
                 {{#options}}
@@ -90,14 +92,11 @@
                     </option>
                 {{/options}}
             </select>
-            <input type="submit" name="saveattendance"
-                   value="{{#str}} saveattendance, mod_facetoface {{/str}}"
-                   id="f2f-save-taking-attendance"
-                   class="btn btn-primary" {{#disabled}}disabled{{/disabled}}/>
-
-            <span id="selectoptionbefore" class="hide error">
+            <span id="selectoptionbefore">
                 {{#str}} selectoptionbefore, mod_facetoface {{/str}}
             </span>
         </div>
     {{/bulkaction}}
+    <input type="submit" name="saveattendance" value="{{#str}} saveattendance, mod_facetoface {{/str}}" id="f2f-save-taking-attendance"
+        class="btn btn-primary" {{#disabled}}disabled{{/disabled}}/>
 </div>

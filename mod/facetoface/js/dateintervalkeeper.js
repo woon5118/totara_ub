@@ -54,7 +54,6 @@ M.totara_f2f_dateintervalkeeper = M.totara_f2f_dateintervalkeeper || {
         M.totara_f2f_dateintervalkeeper.previousstartvalues = M.totara_f2f_dateintervalkeeper.getdate(elemstart);
 
         $('.fdate_time_selector select[name^="' + elemstart + '"]').change(function() {
-            console.log("change", this);
             var newstartdate = M.totara_f2f_dateintervalkeeper.getdate(elemstart);
             var oldstartdate = M.totara_f2f_dateintervalkeeper.previousstartvalues;
             var currentfinishdate = M.totara_f2f_dateintervalkeeper.getdate(elemfinish);
