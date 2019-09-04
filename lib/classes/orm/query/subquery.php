@@ -34,7 +34,7 @@ use core\orm\query\sql\query;
  *
  * // OR if you want to build a subquery on the go, you may use closure based syntax
  *
- * $builder->select((new subquery(function(builder $subquery) {
+ * $builder->select((new subquery(function (builder $subquery) {
  *      $subquery->from('another_table')
  *               ->select('max(something)')
  *               ->where('bla', 'bla');

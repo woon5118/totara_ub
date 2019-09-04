@@ -95,7 +95,7 @@ class core_orm_lazy_collection_testcase extends basic_testcase {
     }
 
     public function test_mapping_as_callable() {
-        $callback = function(array $item) {
+        $callback = function (array $item) {
             return new class($item) {
                 private $detail;
                 public function __construct(array $item) {

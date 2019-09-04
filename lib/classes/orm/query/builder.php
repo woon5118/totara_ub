@@ -824,6 +824,15 @@ final class builder extends builder_base implements interacts_with_query, intera
     }
 
     /**
+     * Return whether this query has order enforced
+     *
+     * @return bool
+     */
+    public function has_order_by(): bool {
+        return !empty($this->properties->orders);
+    }
+
+    /**
      * Add group by statement
      *
      * @param string|string[] $fields Field(s) to group by
@@ -965,7 +974,7 @@ final class builder extends builder_base implements interacts_with_query, intera
      * Note, this is a syntactic sugar for simple cases do not abuse it with monstrous logic
      * For example to have something like:
      * ->...
-     * ->when($visible_only, function(builder $builder) { $builder->where('visible', true) })
+     * ->when($visible_only, function (builder $builder) { $builder->where('visible', true) })
      * ->...
      *
      * @param bool $condition Condition to check
@@ -989,7 +998,7 @@ final class builder extends builder_base implements interacts_with_query, intera
      * Note, this is a syntactic sugar for simple cases do not abuse it with monstrous logic
      * For example to have something like:
      * ->...
-     * ->unless($hidden, function(builder $builder) { $builder->where('visible', true) }; )
+     * ->unless($hidden, function (builder $builder) { $builder->where('visible', true) }; )
      * ->...
      *
      * @param bool $condition Condition to check

@@ -524,7 +524,7 @@ interface interacts_with_query {
      * Note, this is a syntactic sugar for simple cases do not abuse it with monstrous logic
      * For example to have something like:
      * ->...
-     * ->when($visible_only, function(builder $builder) { $builder->where('visible', true) })
+     * ->when($visible_only, function (builder $builder) { $builder->where('visible', true) })
      * ->...
      *
      * @param bool $condition Condition to check
@@ -540,7 +540,7 @@ interface interacts_with_query {
      * Note, this is a syntactic sugar for simple cases do not abuse it with monstrous logic
      * For example to have something like:
      * ->...
-     * ->unless($hidden, function(builder $builder) { $builder->where('visible', true) }; )
+     * ->unless($hidden, function (builder $builder) { $builder->where('visible', true) }; )
      * ->...
      *
      * @param bool $condition Condition to check
