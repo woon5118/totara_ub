@@ -798,6 +798,28 @@ $string['existingcoursedeleting'] = 'Existing course, deleting it first';
 $string['existingcreators'] = 'Existing course creators';
 $string['existingstudents'] = 'Enrolled learners';
 $string['existingteachers'] = 'Existing trainers';
+$string['existingusernewpasswordsubj'] = 'New password for user account';
+$string['existingusernewpasswordtext'] = 'Hi {$a->firstname},
+
+You have been issued with a new temporary password
+for your account at \'{$a->sitename}\'.
+
+Your current login information is now:
+   username: {$a->username}
+   password: {$a->newpassword}
+             (you will have to change your password
+              when you login next time)
+
+To continue using \'{$a->sitename}\', login at
+   {$a->link}
+
+In most mail programs, this should appear as a blue link
+which you can just click on.  If that doesn\'t work,
+then cut and paste the address into the address
+line at the top of your web browser window.
+
+Cheers from the \'{$a->sitename}\' administrator,
+{$a->signoff}';
 $string['expand'] = 'Expand';
 $string['expandall'] = 'Expand all';
 $string['expandcategory'] = 'Expand {$a}';

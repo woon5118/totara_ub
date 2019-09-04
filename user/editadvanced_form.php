@@ -112,40 +112,42 @@ class user_editadvanced_form extends moodleform {
             $mform->addHelpButton('totarasync', 'totarasync', 'tool_totara_sync');
         }
 
-        $mform->addElement('advcheckbox', 'suspended', get_string('suspended', 'auth'));
-        $mform->addHelpButton('suspended', 'suspended', 'auth');
+        if ($userid == -1 || has_capability('moodle/user:managelogin', context_user::instance($userid))) {
+            $mform->addElement('advcheckbox', 'suspended', get_string('suspended', 'auth'));
+            $mform->addHelpButton('suspended', 'suspended', 'auth');
 
-        $mform->addElement('checkbox', 'createpassword', get_string('createpassword', 'auth'));
-        $mform->disabledIf('createpassword', 'auth', 'in', $cannotchangepass);
+            $mform->addElement('checkbox', 'createpassword', get_string('createpassword', 'auth'));
+            $mform->disabledIf('createpassword', 'auth', 'in', $cannotchangepass);
 
-        if (!empty($CFG->passwordpolicy)) {
-            $mform->addElement('static', 'passwordpolicyinfo', '', print_password_policy());
-        }
-        $mform->addElement('passwordunmask', 'newpassword', get_string('newpassword'), 'size="20"');
-        $mform->addHelpButton('newpassword', 'newpassword');
-        $mform->setType('newpassword', core_user::get_property_type('password'));
-        $mform->disabledIf('newpassword', 'createpassword', 'checked');
-
-        $mform->disabledIf('newpassword', 'auth', 'in', $cannotchangepass);
-
-        // Check if the user has active external tokens.
-        if ($userid and empty($CFG->passwordchangetokendeletion)) {
-            if ($tokens = webservice::get_active_tokens($userid)) {
-                $services = '';
-                foreach ($tokens as $token) {
-                    $services .= format_string($token->servicename) . ',';
-                }
-                $services = get_string('userservices', 'webservice', rtrim($services, ','));
-                $mform->addElement('advcheckbox', 'signoutofotherservices', get_string('signoutofotherservices'), $services);
-                $mform->addHelpButton('signoutofotherservices', 'signoutofotherservices');
-                $mform->disabledIf('signoutofotherservices', 'newpassword', 'eq', '');
-                $mform->setDefault('signoutofotherservices', 1);
+            if (!empty($CFG->passwordpolicy)) {
+                $mform->addElement('static', 'passwordpolicyinfo', '', print_password_policy());
             }
-        }
+            $mform->addElement('passwordunmask', 'newpassword', get_string('newpassword'), 'size="20"');
+            $mform->addHelpButton('newpassword', 'newpassword');
+            $mform->setType('newpassword', core_user::get_property_type('password'));
+            $mform->disabledIf('newpassword', 'createpassword', 'checked');
 
-        $mform->addElement('advcheckbox', 'preference_auth_forcepasswordchange', get_string('forcepasswordchange'));
-        $mform->addHelpButton('preference_auth_forcepasswordchange', 'forcepasswordchange');
-        $mform->disabledIf('preference_auth_forcepasswordchange', 'createpassword', 'checked');
+            $mform->disabledIf('newpassword', 'auth', 'in', $cannotchangepass);
+
+            // Check if the user has active external tokens.
+            if ($userid != -1 and empty($CFG->passwordchangetokendeletion)) {
+                if ($tokens = webservice::get_active_tokens($userid)) {
+                    $services = '';
+                    foreach ($tokens as $token) {
+                        $services .= format_string($token->servicename) . ',';
+                    }
+                    $services = get_string('userservices', 'webservice', rtrim($services, ','));
+                    $mform->addElement('advcheckbox', 'signoutofotherservices', get_string('signoutofotherservices'), $services);
+                    $mform->addHelpButton('signoutofotherservices', 'signoutofotherservices');
+                    $mform->disabledIf('signoutofotherservices', 'newpassword', 'eq', '');
+                    $mform->setDefault('signoutofotherservices', 1);
+                }
+            }
+
+            $mform->addElement('advcheckbox', 'preference_auth_forcepasswordchange', get_string('forcepasswordchange'));
+            $mform->addHelpButton('preference_auth_forcepasswordchange', 'forcepasswordchange');
+            $mform->disabledIf('preference_auth_forcepasswordchange', 'createpassword', 'checked');
+        }
 
         // Shared fields.
         useredit_shared_definition($mform, $editoroptions, $filemanageroptions, $user);

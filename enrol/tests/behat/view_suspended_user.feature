@@ -31,7 +31,9 @@ Feature: View an enrolled user list with suspended users in the course enrolment
     # Suspend user.
     When I log in as "admin"
     And I navigate to "Manage users" node in "Site administration > Users"
-    And I click on "Suspend James Second" "link" in the "James Second" "table_row"
+    And I click on "Manage login of James Second" "link" in the "James Second" "table_row"
+    And I set the "Choose" Totara form field to "Suspend user account"
+    And I press "Update"
     And I log out
     # Check if the teacher can see the suspended users.
     When I log in as "teacher1"

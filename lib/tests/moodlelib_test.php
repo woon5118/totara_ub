@@ -2953,31 +2953,79 @@ class core_moodlelib_testcase extends advanced_testcase {
      * Test setnew_password_and_mail.
      */
     public function test_setnew_password_and_mail() {
-        global $DB, $CFG;
+        global $DB;
 
-        $this->resetAfterTest();
-
-        $user = $this->getDataGenerator()->create_user();
+        $user = $this->getDataGenerator()->create_user(['suspended' => 0, 'deleted' => 0, 'auth' => 'manual', 'password' => '']);
 
         // Update user password.
         $sink = $this->redirectEvents();
         $sink2 = $this->redirectEmails(); // Make sure we are redirecting emails.
         setnew_password_and_mail($user);
         $events = $sink->get_events();
+        $emails = $sink2->get_messages();
         $sink->close();
         $sink2->close();
         $event = array_pop($events);
-
-        // Test updated value.
-        $dbuser = $DB->get_record('user', array('id' => $user->id));
-        $this->assertSame($user->firstname, $dbuser->firstname);
-        $this->assertNotEmpty($dbuser->password);
 
         // Test event.
         $this->assertInstanceOf('\core\event\user_password_updated', $event);
         $this->assertSame($user->id, $event->relateduserid);
         $this->assertEquals(context_user::instance($user->id), $event->get_context());
         $this->assertEventContextNotUsed($event);
+
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+        $body = $email->body;
+        $body = str_replace("=\n", '', $body);
+        $body = str_replace('=0A', "\n", $body);
+        $this->assertSame(1, preg_match('/password: ([^\s]+)/', $body, $matches));
+        $this->assertTrue(validate_internal_user_password($user, $matches[1]));
+        $this->assertSame($user->email, $email->to);
+        $this->assertSame('PHPUnit test site: New user account', $email->subject);
+
+        $newuser = $DB->get_record('user', ['id' => $user->id], '*', MUST_EXIST);
+        check_user_preferences_loaded($newuser);
+        $this->assertSame('1', $newuser->preference['auth_forcepasswordchange']);
+    }
+
+    public function test_setnew_password_and_mail_existing() {
+        global $DB;
+
+        $oldpassoword = 'SomePassword3_';
+        $user = $this->getDataGenerator()->create_user(['suspended' => 0, 'deleted' => 0, 'auth' => 'manual', 'password' => $oldpassoword]);
+        $this->assertTrue(validate_internal_user_password($user, $oldpassoword));
+
+        // Update user password.
+        $sink = $this->redirectEvents();
+        $sink2 = $this->redirectEmails(); // Make sure we are redirecting emails.
+        setnew_password_and_mail($user, false, false);
+        $events = $sink->get_events();
+        $emails = $sink2->get_messages();
+        $sink->close();
+        $sink2->close();
+
+        // Test event.
+        $event = array_pop($events);
+        $this->assertInstanceOf('\core\event\user_password_updated', $event);
+        $this->assertSame($user->id, $event->relateduserid);
+        $this->assertEquals(context_user::instance($user->id), $event->get_context());
+        $this->assertEventContextNotUsed($event);
+
+        $this->assertFalse(validate_internal_user_password($user, $oldpassoword));
+        $this->assertCount(1, $emails);
+        $email = $emails[0];
+
+        $body = $email->body;
+        $body = str_replace("=\n", '', $body);
+        $body = str_replace('=0A', "\n", $body);
+        $this->assertSame(1, preg_match('/password: ([^\s]+)/', $body, $matches));
+        $this->assertTrue(validate_internal_user_password($user, $matches[1]));
+        $this->assertSame($user->email, $email->to);
+        $this->assertSame('PHPUnit test site: New password for user account', $email->subject);
+
+        $newuser = $DB->get_record('user', ['id' => $user->id], '*', MUST_EXIST);
+        check_user_preferences_loaded($newuser);
+        $this->assertSame('1', $newuser->preference['auth_forcepasswordchange']);
     }
 
     /**

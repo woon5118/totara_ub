@@ -84,11 +84,18 @@ class user_actions extends base {
             // the order to be: edit, suspend, delete; as these three are the three main
             // action icons, followed by: unlock and confirm.
 
+            $user->fullname = clean_string($user->fullname);
+
             $usercontext = \context_user::instance($userid);
             $issiteadmin = is_siteadmin($userid);
             $iscurrentuser = ($userid == $USER->id);
             $canupdate = has_capability('moodle/user:update', $sitecontext);
             $candelete = has_capability('moodle/user:delete', $usercontext);
+            if (!is_siteadmin() && $issiteadmin) {
+                $canmanagelogin = false;
+            } else {
+                $canmanagelogin = has_capability('moodle/user:managelogin', $usercontext);
+            }
 
             // Add edit action icon but prevent editing of admins by non-admin users.
             if ((is_siteadmin($USER) || !$issiteadmin)) {
@@ -109,23 +116,21 @@ class user_actions extends base {
                 }
             }
 
-            // Add suspend and unsuspend icons.
-            if ($canupdate && !$iscurrentuser && !$issiteadmin) {
-                if ($user->suspended) {
-                    $title = get_string('unsuspendrecord', 'totara_reportbuilder', $user->fullname);
-                    $buttons[] = \html_writer::link(
-                        new \moodle_url($actionurl, array('action' => 'unsuspend', 'sesskey' => sesskey())),
-                        $OUTPUT->flex_icon('show', array('alt' => $title)),
-                        array('title' => $title)
-                    );
+            // Add manage login icon.
+            if ($canmanagelogin and $user->confirmed) {
+                if (login_is_lockedout($user)) {
+                    $title = get_string('unlockrecord', 'totara_reportbuilder', $user->fullname);
+                    $icon = 'unlock';
                 } else {
-                    $title = get_string('suspendrecord', 'totara_reportbuilder', $user->fullname);
-                    $buttons[] = \html_writer::link(
-                        new \moodle_url($actionurl, array('action' => 'suspend', 'sesskey' => sesskey())),
-                        $OUTPUT->flex_icon('hide', array('alt' => $title)),
-                        array('title' => $title)
-                    );
+                    $title = get_string('manageuserloginaction', 'totara_core', $user->fullname);
+                    $icon = 'lock';
                 }
+                $manageloginurl = new \moodle_url('/user/managelogin.php', ['id' => $user->id, 'returnurl' => $returnurl]);
+                $buttons[] = \html_writer::link(
+                    $manageloginurl,
+                    $OUTPUT->flex_icon($icon, array('alt' => $title)),
+                    array('title' => $title)
+                );
             }
 
             // Add options to purge user data from any accounts.
@@ -141,16 +146,6 @@ class user_actions extends base {
                 $buttons[] = \html_writer::link(
                     new \moodle_url($actionurl, array('action' => 'delete')),
                     $OUTPUT->flex_icon('delete', array('alt' => $title)),
-                    array('title' => $title)
-                );
-            }
-
-            // Add an unlock icon for when the user has locked their account.
-            if ($canupdate && login_is_lockedout($user)) {
-                $title = get_string('unlockrecord', 'totara_reportbuilder', $user->fullname);
-                $buttons[] = \html_writer::link(
-                    new \moodle_url($actionurl, array('action' => 'unlock', 'sesskey' => sesskey())),
-                    $OUTPUT->flex_icon('unlock', array('alt' => $title)),
                     array('title' => $title)
                 );
             }

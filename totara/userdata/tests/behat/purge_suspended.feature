@@ -24,6 +24,7 @@ Feature: Suspended user data purging
       | totara/userdata:viewinfo          | Allow      | datamanager| System       |           |
       | totara/core:seedeletedusers       | Allow      | datamanager| System       |           |
       | moodle/user:update                | Allow      | datamanager| System       |           |
+      | moodle/user:managelogin           | Allow      | datamanager| System       |           |
       | moodle/user:delete                | Allow      | datamanager| System       |           |
       | moodle/user:viewalldetails        | Allow      | datamanager| System       |           |
 
@@ -61,7 +62,9 @@ Feature: Suspended user data purging
     And I should see "Minimal suspended user purging" in the "Automatic purging once user is suspended" "definition_exact"
     And I should see "None" in the "All data purges" "definition_exact"
     And I navigate to "Manage users" node in "Site administration > Users"
-    And I click on "Suspend Bob1 Learner" "link" in the "Bob1 Learner" "table_row"
+    And I click on "Manage login of Bob1 Learner" "link" in the "Bob1 Learner" "table_row"
+    And I set the "Choose" Totara form field to "Suspend user account"
+    And I press "Update"
     And I set the following fields to these values:
       | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"
@@ -126,8 +129,12 @@ Feature: Suspended user data purging
     And I set the field "Default purging type for suspended users" to "Minimal suspended user purging"
     And I press "Save changes"
     And I navigate to "Manage users" node in "Site administration > Users"
-    And I click on "Suspend Bob2 Learner" "link" in the "Bob2 Learner" "table_row"
-    And I click on "Suspend Bob5 Learner" "link" in the "Bob5 Learner" "table_row"
+    And I click on "Manage login of Bob2 Learner" "link" in the "Bob2 Learner" "table_row"
+    And I set the "Choose" Totara form field to "Suspend user account"
+    And I press "Update"
+    And I click on "Manage login of Bob5 Learner" "link" in the "Bob5 Learner" "table_row"
+    And I set the "Choose" Totara form field to "Suspend user account"
+    And I press "Update"
     And I set the following fields to these values:
       | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"
@@ -147,8 +154,12 @@ Feature: Suspended user data purging
     And I set the following fields to these values:
       | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"
-    And I click on "Unsuspend Bob2 Learner" "link" in the "Bob2 Learner" "table_row"
-    And I click on "Suspend Bob2 Learner" "link" in the "Bob2 Learner" "table_row"
+    And I click on "Manage login of Bob2 Learner" "link" in the "Bob2 Learner" "table_row"
+    And I set the "Choose" Totara form field to "Activate user account"
+    And I press "Update"
+    And I click on "Manage login of Bob2 Learner" "link" in the "Bob2 Learner" "table_row"
+    And I set the "Choose" Totara form field to "Suspend user account"
+    And I press "Update"
     And I set the following fields to these values:
       | User Status | any value |
     And I press "id_submitgroupstandard_addfilter"

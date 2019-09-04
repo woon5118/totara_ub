@@ -114,8 +114,6 @@ if ($usernew = $userform->get_data()) {
 
     if ($createpassword) {
         setnew_password_and_mail($usernew);
-        unset_user_preference('create_password', $usernew);
-        set_user_preference('auth_forcepasswordchange', 1, $usernew);
     }
 
     redirect($returnurl);

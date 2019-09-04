@@ -433,6 +433,7 @@ $string['user:editprofile'] = 'Edit user profile';
 $string['user:ignoreuserquota'] = 'Ignore user quota limit';
 $string['user:loginas'] = 'Login as other users';
 $string['user:manageblocks'] = 'Manage blocks on user profile of other users';
+$string['user:managelogin'] = 'Manage user logins';
 $string['user:manageownblocks'] = 'Manage blocks on own public user profile';
 $string['user:manageownfiles'] = 'Manage files on own private file areas';
 $string['user:managesyspages'] = 'Configure default page layout for public user profiles';

@@ -235,21 +235,12 @@ if ($usernew = $userform->get_data()) {
         // Set new password if specified.
         if (!empty($usernew->newpassword)) {
             if ($authplugin->can_change_password()) {
-                if (!$authplugin->user_update_password($usernew, $usernew->newpassword)) {
+                $options = [
+                    'signoutofotherservices' => !empty($usernew->signoutofotherservices),
+                ];
+                if (!user_change_password($usernew->id, $usernew->newpassword, $options)) {
                     print_error('cannotupdatepasswordonextauth', '', '', $usernew->auth);
                 }
-                unset_user_preference('create_password', $usernew); // Prevent cron from generating the password.
-
-                if (!empty($CFG->passwordchangelogout)) {
-                    // We can use SID of other user safely here because they are unique,
-                    // the problem here is we do not want to logout admin here when changing own password.
-                    \core\session\manager::kill_user_sessions($usernew->id, session_id());
-                }
-                if (!empty($usernew->signoutofotherservices)) {
-                    webservice::delete_user_ws_tokens($usernew->id);
-                }
-                // Totara: always force users to login again after closing browser or normal session timeout.
-                \totara_core\persistent_login::kill_user($usernew->id);
             }
         }
 
@@ -297,8 +288,6 @@ if ($usernew = $userform->get_data()) {
 
     if ($createpassword) {
         setnew_password_and_mail($usernew);
-        unset_user_preference('create_password', $usernew);
-        set_user_preference('auth_forcepasswordchange', 1, $usernew);
     }
 
     // Trigger update/create event, after all fields are stored.

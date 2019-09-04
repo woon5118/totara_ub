@@ -583,6 +583,21 @@ $capabilities = array(
         )
     ),
 
+    // Totara: change password, suspend and other action that affect if user can log-in,
+    //         note that only admins can update other admins
+    'moodle/user:managelogin' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'tenantusermanager' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'moodle/user:update'
+    ),
+
     'moodle/user:viewdetails' => array( // Totara: this is used from course and user contexts.
 
         'captype' => 'read',

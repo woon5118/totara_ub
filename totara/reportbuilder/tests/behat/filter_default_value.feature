@@ -22,7 +22,9 @@ Feature: Filter default value works as expected
     And I should see "User Four"
     And I follow "Delete User One"
     And I press "Delete"
-    And I follow "Suspend User Two"
+    And I follow "Manage login of User Two"
+    And I set the "Choose" Totara form field to "Suspend user account"
+    And I press "Update"
 
   Scenario: Test default value to active only is correctly set and I see the right information
     When I navigate to "Manage users" node in "Site administration > Users"

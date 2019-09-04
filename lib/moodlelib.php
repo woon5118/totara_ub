@@ -6660,10 +6660,13 @@ function generate_email_signoff() {
  *
  * @param stdClass $user A {@link $USER} object
  * @param bool $fasthash If true, use a low cost factor when generating the hash for speed.
+ * @param bool $newaccount true means tell user about new account, false means we are resetting password of existing account
  * @return bool|string Returns "true" if mail was sent OK and "false" if there was an error
  */
-function setnew_password_and_mail($user, $fasthash = false) {
+function setnew_password_and_mail($user, $fasthash = false, $newaccount = true) {
     global $CFG, $DB;
+    require_once("$CFG->dirroot/user/lib.php");
+    require_once("$CFG->dirroot/lib/authlib.php");
 
     // We try to send the mail in language the user understands,
     // unfortunately the filter_string() does not support alternative langs yet
@@ -6690,9 +6693,35 @@ function setnew_password_and_mail($user, $fasthash = false) {
     $a->link        = $CFG->wwwroot .'/login/?lang=' . $lang;
     $a->signoff     = generate_email_signoff();
 
-    $message = (string)new lang_string('newusernewpasswordtext', '', $a, $lang);
+    // Totara: use different text for password reset of existing accounts.
+    if ($newaccount) {
+        $message = (string)new lang_string('newusernewpasswordtext', '', $a, $lang);
+        $subject = format_string($site->fullname) .': '. (string)new lang_string('newusernewpasswordsubj', '', $a, $lang);
+    } else {
+        $message = (string)new lang_string('existingusernewpasswordtext', '', $a, $lang);
+        $subject = format_string($site->fullname) .': '. (string)new lang_string('existingusernewpasswordsubj', '', $a, $lang);
+    }
 
-    $subject = format_string($site->fullname) .': '. (string)new lang_string('newusernewpasswordsubj', '', $a, $lang);
+    // Totara: make sure we do not reset the password again.
+    unset_user_preference('create_password', $user);
+
+    // Totara: always make sure user changes the password during the next login,
+    //         this is ignored if they cannot change password to prevent lockouts.
+    set_user_preference('auth_forcepasswordchange', 1, $user);
+
+    // Totara: Add to list of used passwords so that we can prevent reuse.
+    user_add_password_history($user->id, $newpassword);
+
+    // Totara: Make sure user is not locked out.
+    login_unlock_account($user);
+
+    if (!$newaccount) {
+        if (!empty($CFG->passwordchangelogout)) {
+            \core\session\manager::kill_user_sessions($user->id);
+        }
+        // Totara: Always force users to login again after closing browser or normal session timeout.
+        \totara_core\persistent_login::kill_user($user->id);
+    }
 
     // Directly email rather than using the messaging system to ensure its not routed to a popup or jabber.
     return email_to_user($user, $supportuser, $subject, $message);

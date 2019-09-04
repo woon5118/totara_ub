@@ -64,10 +64,7 @@ class send_new_user_passwords_task extends scheduled_task {
                 // hashing would be slow when emailing lots of users. Hashes
                 // will be automatically updated to a higher cost factor the first
                 // time the user logs in.
-                if (setnew_password_and_mail($newuser, true)) {
-                    unset_user_preference('create_password', $newuser);
-                    set_user_preference('auth_forcepasswordchange', 1, $newuser);
-                } else {
+                if (!setnew_password_and_mail($newuser, true)) {
                     trigger_error("Could not create and mail new user password!");
                 }
             }

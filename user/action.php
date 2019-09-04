@@ -174,7 +174,7 @@ if ($action === 'undelete') {
 }
 
 if ($action === 'suspend') {
-    require_capability('moodle/user:update', $context);
+    require_capability('moodle/user:managelogin', context_user::instance($user->id));
     require_sesskey();
 
     if ($user->deleted) {
@@ -187,39 +187,26 @@ if ($action === 'suspend') {
         redirect($returnurl, 'You cannot suspend yourself!', null, \core\notification::ERROR);
     }
 
-    if ($user->suspended != 1) {
-        $user->suspended = 1;
-        // Force logout.
-        \core\session\manager::kill_user_sessions($user->id);
-        user_update_user($user, false);
-
-        \totara_core\event\user_suspended::create_from_user($user)->trigger();
-    }
+    user_suspend_user($user->id);
 
     redirect($returnurl);
 }
 
 if ($action === 'unsuspend') {
-    require_capability('moodle/user:update', $context);
+    require_capability('moodle/user:managelogin', context_user::instance($user->id));
     require_sesskey();
 
     if ($user->deleted) {
         redirect($returnurl, get_string('userdeleted', 'core'), null, \core\notification::ERROR);
     }
 
-    if ($user->suspended == 1) {
-        $user->suspended = 0;
-        user_update_user($user, false);
-    }
-
-    // Make sure user is not locked out.
-    login_unlock_account($user);
+    user_unsuspend_user($user->id);
 
     redirect($returnurl);
 }
 
 if ($action === 'unlock') {
-    require_capability('moodle/user:update', $context);
+    require_capability('moodle/user:managelogin', context_user::instance($user->id));
     require_sesskey();
 
     if ($user->deleted) {

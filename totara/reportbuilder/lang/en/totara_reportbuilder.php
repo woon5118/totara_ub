@@ -539,6 +539,7 @@ $string['lastcached'] = 'Last cached at {$a}';
 $string['lastfinancial'] = 'The previous financial year';
 $string['lastlogin'] = 'Last Login';
 $string['legacyreportlink'] = 'Looking for the original version of this report? {$a->link_start}You can find it here.{$a->link_end}';
+$string['lockedoutuser'] = 'Locked out';
 $string['manageembeddedreports'] = 'Manage embedded reports';
 $string['managescheduledreports'] = 'Manage scheduled reports';
 $string['manageglobalrestrictions'] = 'Global report restrictions';

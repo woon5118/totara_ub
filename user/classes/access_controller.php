@@ -446,6 +446,14 @@ class access_controller {
             case 'interests':
                 $method = 'can_view_'.$field;
                 return $this->{$method}();
+            case 'lastip':
+                if (!$this->iscurrentuser && !$this->can_view_profile()) {
+                    return false;
+                }
+                if (!$this->context_user || !has_capability('moodle/user:viewlastip', $this->context_user)) {
+                    return false;
+                }
+                return (!in_array('lastip', $this->get_hidden_fields()) || $this->can_view_hidden_fields());
 
             // The following fields don't have access control - but we know about them so just return false.
             // They aren't there to be displayed, predominantly they are just flags.
@@ -459,7 +467,6 @@ class access_controller {
             case 'totarasync':
             case 'lastlogin':
             case 'currentlogin':
-            case 'lastip':
             case 'picture':
             case 'maildigest':
             case 'maildisplay':

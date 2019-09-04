@@ -226,6 +226,163 @@ function user_delete_user($user) {
 }
 
 /**
+ * Suspend user account.
+ *
+ * @since Totara 13
+ *
+ * @param int $userid
+ * @return bool
+ */
+function user_suspend_user(int $userid) {
+    global $DB;
+
+    $user = $DB->get_record('user', ['id' => $userid]);
+    if (!$user or isguestuser($user)) {
+        return false;
+    }
+    if ($user->deleted != 0) {
+        return false;
+    }
+    if ($user->suspended == 1) {
+        // Already suspended, nothing to do.
+        return true;
+    }
+
+    // Do not use user_update_user() here!
+    $user->suspended = '1';
+    $user->timemodified = (string)time();
+    $DB->set_fields('user', ['suspended' => $user->suspended, 'timemodified' => $user->timemodified], ['id' => $user->id]);
+
+    // Force logout.
+    \core\session\manager::kill_user_sessions($user->id);
+
+    $event = \core\event\user_updated::create_from_userid($user->id);
+    $event->add_record_snapshot('user', $user);
+    $event->trigger();
+
+    // DO NOT ABUSE THIS EVENT!
+    // No data should be deleted when user gets suspended, use userdata purging instead of event observers.
+    // There removal of bookings of suspended users in Seminar is a data loss bug.
+    $event = \totara_core\event\user_suspended::create_from_user($user);
+    $event->add_record_snapshot('user', $user);
+    $event->trigger();
+
+    return true;
+}
+
+/**
+ * Unsuspend user account.
+ *
+ * @since Totara 13
+ *
+ * @param int $userid
+ * @return bool
+ */
+function user_unsuspend_user(int $userid) {
+    global $DB, $CFG;
+    require_once("$CFG->dirroot/lib/authlib.php");
+
+    $user = $DB->get_record('user', ['id' => $userid]);
+    if (!$user or isguestuser($user)) {
+        return false;
+    }
+    if ($user->deleted != 0) {
+        return false;
+    }
+    if ($user->suspended == 0) {
+        // Already suspended, nothing to do.
+        return true;
+    }
+
+    // Do not use user_update_user() here!
+    $user->suspended = '0';
+    $user->timemodified = (string)time();
+    $DB->set_fields('user', ['suspended' => $user->suspended, 'timemodified' => $user->timemodified], ['id' => $user->id]);
+
+    $event = \core\event\user_updated::create_from_userid($user->id);
+    $event->add_record_snapshot('user', $user);
+    $event->trigger();
+
+    // Make sure user is not locked out.
+    login_unlock_account($user);
+
+    return true;
+}
+
+/**
+ * Change user password.
+ *
+ * @since Totara 13
+ * @param int $userid
+ * @param string $newpassword
+ * @param array $options
+ * @return bool
+ */
+function user_change_password(int $userid, string $newpassword, array $options = []) {
+    global $DB, $CFG;
+    require_once("$CFG->dirroot/lib/authlib.php");
+
+    $defaultoptions = [
+        'forcepasswordchange' => false,
+        'signoutofotherservices' => false,
+    ];
+    $options = array_merge($defaultoptions, $options);
+
+    $user = $DB->get_record('user', ['id' => $userid]);
+    if (!$user or isguestuser($user)) {
+        return false;
+    }
+    if ($user->deleted != 0) {
+        return false;
+    }
+
+    if (!exists_auth_plugin($user->auth)) {
+        return false;
+    }
+    $authplugin = get_auth_plugin($user->auth);
+    if (!$authplugin->can_change_password()) {
+        return false;
+    }
+    if ($authplugin->change_password_url()) {
+        // Cannot change password if external page is used.
+        return false;
+    }
+
+    if (!$authplugin->user_update_password($user, $newpassword)) {
+        return false;
+    }
+
+    // Prevent cron from generating initial password if not done yet.
+    unset_user_preference('create_password', $user);
+
+    if ($options['forcepasswordchange']) {
+        set_user_preference('auth_forcepasswordchange', 1, $user);
+    }
+
+    if (!empty($CFG->passwordchangelogout)) {
+        // We can use SID of other user safely here because they are unique,
+        // the problem here is we do not want to logout admin here when changing own password.
+        \core\session\manager::kill_user_sessions($user->id, session_id());
+    }
+
+    if ($options['signoutofotherservices']) {
+        // Delete external WS tokens, Moodle mobile is not supported in Totara.
+        webservice::delete_user_ws_tokens($user->id);
+    }
+
+    // Always force users to login again with new password after closing browser or normal session timeout.
+    \totara_core\persistent_login::kill_user($user->id);
+
+    // Make sure user is not locked out.
+    login_unlock_account($user);
+
+    // Add to list of used passwords so that we can prevent reuse.
+    user_add_password_history($user->id, $newpassword);
+
+    return true;
+}
+
+/**
  * Get users by id
  *
  * @param array $userids id of users to retrieve

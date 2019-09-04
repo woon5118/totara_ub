@@ -103,6 +103,13 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         }
     }
 
+    // Totara: login management
+    if (has_capability('moodle/user:managelogin', $usercontext) && (is_siteadmin() || !is_siteadmin($user))) {
+        $url = new \moodle_url('/user/managelogin.php', array('id' => $user->id, 'returnto' => 'profile'));
+        $node = new  core_user\output\myprofile\node('administration', 'manageuserlogin', get_string('manageuserlogin', 'totara_core'), null, $url);
+        $tree->add_node($node);
+    }
+
     // Totara: Preference page. Show it to the current user, administrators and people with the right capabilities.
     if ($iscurrentuser || $PAGE->settingsnav->can_view_user_preferences($user->id)) {
         $url = new moodle_url('/user/preferences.php', array('userid' => $user->id));

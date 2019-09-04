@@ -54,7 +54,7 @@ Feature: Suspend user in different session times
     And I press "Save changes"
 
     When I click on "Attendees" "link" in the "January" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "menuf2f-actions" to "Add users"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
     And I click on "Sam2 Student2, student2@example.com" "option"
@@ -74,7 +74,7 @@ Feature: Suspend user in different session times
     And I press "Save changes"
 
     When I click on "Attendees" "link" in the "Wait-listed" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "menuf2f-actions" to "Add users"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
     And I click on "Sam2 Student2, student2@example.com" "option"
@@ -107,7 +107,7 @@ Feature: Suspend user in different session times
     And I press "Save changes"
 
     When I click on "Attendees" "link" in the "February" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "menuf2f-actions" to "Add users"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
     And I click on "Sam2 Student2, student2@example.com" "option"
@@ -139,7 +139,7 @@ Feature: Suspend user in different session times
     And I press "Save changes"
 
     When I click on "Attendees" "link" in the "March" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "menuf2f-actions" to "Add users"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
     And I click on "Sam2 Student2, student2@example.com" "option"
@@ -153,8 +153,9 @@ Feature: Suspend user in different session times
 
     # Suspend Sam1 Student1 user
     And I navigate to "Manage users" node in "Site administration > Users"
-    And I click on "Suspend Sam1 Student1" "link" in the "Sam1 Student1" "table_row"
-    And I wait until the page is ready
+    And I click on "Manage login of Sam1 Student1" "link" in the "Sam1 Student1" "table_row"
+    And I set the "Choose" Totara form field to "Suspend user account"
+    And I press "Update"
 
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"

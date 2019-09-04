@@ -61,7 +61,7 @@ Feature: Tenant user manager without isolation
     And "tenantusermanager" row "User Status" column of "tenant_participants" table should contain "Active"
     And "tenantusermanager" row "Tenant member" column of "tenant_participants" table should contain "No"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Edit Tenant User Manager"
-    And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Suspend Tenant User Manager"
+    And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Manage login of Tenant User Manager"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "User data"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Delete Tenant User Manager"
     And I navigate to "Assign roles" node in "Tenant"
@@ -88,8 +88,7 @@ Feature: Tenant user manager without isolation
     And "member1" row "User Status" column of "tenant_participants" table should contain "Active"
     And "member1" row "Tenant member" column of "tenant_participants" table should contain "Yes"
     And "member1" row "Actions" column of "tenant_participants" table should contain "Edit Test User"
-    # Tenant user manager cannot have full update capability, we would have to add new capability to allow user suspending
-    And "member1" row "Actions" column of "tenant_participants" table should not contain "Suspend Test User"
+    And "member1" row "Actions" column of "tenant_participants" table should contain "Manage login of Test User"
     And "member1" row "Actions" column of "tenant_participants" table should not contain "User data"
     And "member1" row "Actions" column of "tenant_participants" table should contain "Delete Test User"
 
@@ -149,7 +148,7 @@ Feature: Tenant user manager without isolation
     And "tenantusermanager" row "User Status" column of "tenant_participants" table should contain "Active"
     And "tenantusermanager" row "Tenant member" column of "tenant_participants" table should contain "Yes"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Edit Tenant User Manager"
-    And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Suspend Tenant User Manager"
+    And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Manage login of Tenant User Manager"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "User data"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Delete Tenant User Manager"
     And I navigate to "Assign roles" node in "Tenant"
@@ -175,8 +174,7 @@ Feature: Tenant user manager without isolation
     And "member1" row "User's Fullname" column of "tenant_users" table should contain "Test User"
     And "member1" row "User Status" column of "tenant_users" table should contain "Active"
     And "member1" row "Actions" column of "tenant_users" table should contain "Edit Test User"
-    # Tenant user manager cannot have full update capability, we would have to add new capability to allow user suspending
-    And "member1" row "Actions" column of "tenant_users" table should not contain "Suspend Test User"
+    And "member1" row "Actions" column of "tenant_users" table should contain "Manage login of Test User"
     And "member1" row "Actions" column of "tenant_users" table should not contain "User data"
     And "member1" row "Actions" column of "tenant_users" table should contain "Delete Test User"
 

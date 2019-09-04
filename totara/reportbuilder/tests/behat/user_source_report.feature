@@ -53,13 +53,17 @@ Feature: Verify functionality of user source report.
 
   Scenario: Verify suspend and unsuspend of user in user source report.
 
-    Given I follow "Suspend Bob1 Learner1"
+    Given I follow "Manage login of Bob1 Learner1"
+    And I set the "Choose" Totara form field to "Suspend user account"
+    And I press "Update"
     Then I should see "User Report: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Suspended   |
 
-    When I follow "Unsuspend Bob1 Learner1"
+    When I follow "Manage login of Bob1 Learner1"
+    And I set the "Choose" Totara form field to "Activate user account"
+    And I press "Update"
     Then I should see "User Report: 6 records shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
@@ -144,6 +148,9 @@ Feature: Verify functionality of user source report.
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
 
     When I follow "Unlock Bob1 Learner1"
+    And I should see "Account can be unlocked by user, administrator or automatically when resetting or changing password."
+    And I set the "Choose" Totara form field to "Unlock account"
+    And I press "Update"
     Then I should not see "Unlock Bob1 Learner1"
     And I log out
 
