@@ -206,6 +206,9 @@ class text_field_formatter extends base {
             }
         }
 
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+
         $value = file_rewrite_pluginfile_urls(
             $value,
             $pluginfile_url_options['pluginfile'],
