@@ -53,9 +53,8 @@ class certif_completion_progress extends \totara_reportbuilder\rb\display\base {
 
         if ($extrafields->window < $now) {
             // The window is open, use the current record.
-            $vals = explode('|', $value);
-            $programid = $vals[0];
-            $userid = $vals[1];
+            $programid = $extrafields->programid;
+            $userid = $extrafields->userid;
 
             $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($programid, $userid);
             $percentage = $progressinfo->get_percentagecomplete();
