@@ -54,7 +54,6 @@ if (!empty($bui_addblock) || !empty($bui_editid) || !empty($bui_hideid) || !empt
 }
 
 $PAGE->set_url('/', $urlparams);
-$PAGE->set_course($SITE);
 $PAGE->set_pagelayout('frontpage');
 $PAGE->set_other_editing_capability('moodle/course:update');
 $PAGE->set_other_editing_capability('moodle/course:manageactivities');
@@ -63,11 +62,7 @@ $PAGE->set_other_editing_capability('moodle/course:activityvisibility');
 // Prevent caching of this page to stop confusion when changing page after making AJAX changes.
 $PAGE->set_cacheable(false);
 
-if ($CFG->forcelogin) {
-    require_login();
-} else {
-    user_accesstime_log();
-}
+require_course_login($SITE);
 
 $hasmaintenanceaccess = has_capability('moodle/site:maintenanceaccess', context_system::instance());
 
