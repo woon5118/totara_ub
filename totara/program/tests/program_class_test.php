@@ -2321,8 +2321,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
     public function test_update_exceptions() {
         global $DB;
 
-        $timedue = new DateTime('2 weeks'); // 2 weeks from now
-        $timedue->setTime(15, 30);
+        $timedue = new DateTime('2 weeks -22 seconds');
         $duedate = $timedue->getTimestamp();
 
         $program1 = $this->program_generator->create_program();
@@ -2348,14 +2347,11 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
         $this->assertCount(0, $exceptions);
 
-        // Disabled for pending release, fix in TL-20728
-        if (0) {
-            $program1->update_exceptions($this->users[0]->id, $assignment, $duedate);
+        $this->assertTrue($program1->update_exceptions($this->users[0]->id, $assignment, $duedate));
 
-            // There is a slight delay (of less than a minute) we still generate an exception
-            $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
-            $this->assertCount(1, $exceptions);
-        }
+        // There is a slight delay (of less than a minute) we still generate an exception
+        $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
+        $this->assertCount(1, $exceptions);
 
         $multicourseset1->certifpath = CERTIFPATH_STD;
         $multicourseset1->timeallowed = 3 * WEEKSECS; // 3 Weeks
@@ -2368,7 +2364,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
         $this->assertCount(0, $exceptions);
 
-        $program1->update_exceptions($this->users[0]->id, $assignment, $duedate);
+        $this->assertTrue($program1->update_exceptions($this->users[0]->id, $assignment, $duedate));
 
         // This should definitely generate a time allowance exception
         $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
@@ -2386,7 +2382,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
         $this->assertCount(0, $exceptions);
 
-        $program1->update_exceptions($this->users[0]->id, $assignment, $duedate);
+        $this->assertFalse($program1->update_exceptions($this->users[0]->id, $assignment, $duedate));
 
         // Plenty of time to complete, no exception created
         $exceptions = $DB->get_records('prog_exception', ['assignmentid' => $assignment->id]);
