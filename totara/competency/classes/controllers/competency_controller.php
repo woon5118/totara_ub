@@ -25,10 +25,10 @@
 namespace totara_competency\controllers;
 
 use context;
+use tassign_competency\entities\competency_framework;
 use totara_competency\achievement_configuration;
 use totara_competency\achievement_criteria;
 use totara_competency\entities\competency;
-use totara_competency\form\competency_edit_form;
 use totara_competency\linked_courses;
 use totara_competency\pathway;
 use totara_competency\pathway_aggregation_factory;
@@ -456,7 +456,8 @@ class competency_controller extends admin_controller {
         if ($canviewframeworks) {
             $url = new \moodle_url('/totara/hierarchy/index.php', ['prefix' => $this->prefix, 'frameworkid' => $this->competency->frameworkid]);
         }
-        $this->page->navbar->add(format_string($this->competency->framework->fullname), $url);
+        $framework = competency_framework::repository()->find($this->competency->frameworkid);
+        $this->page->navbar->add(format_string($framework->fullname), $url);
 
         $name = $this->competency->fullname ?? $this->competency->shortname ?? '';
         if (!empty($name)) {
