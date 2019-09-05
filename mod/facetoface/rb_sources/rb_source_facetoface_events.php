@@ -200,6 +200,22 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'session',
+                'unabletoattend',
+                get_string('unabletoattend', 'rb_source_facetoface_summary'),
+                "(SELECT COUNT('x')
+                    FROM {facetoface_signups} su
+                    {$global_restriction_join_su}
+                    JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+                   WHERE ss.superceded = 0 AND ss.statuscode = " . \mod_facetoface\signup\state\unable_to_attend::get_code() . " AND su.sessionid = base.id)",
+                array(
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer',
+                    'iscompound' => true,
+                    'issubquery' => true,
+                )
+            ),
+            new rb_column_option(
+                'session',
                 'noshowattendees',
                 get_string('noshowattendees', 'rb_source_facetoface_summary'),
                 "(SELECT COUNT('x')
