@@ -187,11 +187,17 @@ abstract class restore_dbops {
             } else {
                 $role = (object)backup_controller_dbops::decode_backup_temp_info($recrole->info);
                 $match = self::get_best_assignable_role($role, $courseid, $userid, $samesite);
+                if (!$match) { // Totara: check overridable roles as well as assignable roles
+                    $match = self::get_best_role($role, $courseid, $userid, $samesite, false);
+                }
                 // Send match to backup_ids
                 self::set_backup_ids_record($restoreid, 'role', $recrole->itemid, $match);
                 // Build the rolemappings element for controller
                 unset($role->id);
                 unset($role->nameincourse);
+                if ($role->name === '') { // Totara: Get a built-in name
+                    $role->name = role_get_name($role);
+                }
                 $role->targetroleid = $match;
                 $rolemappings->mappings[$recrole->itemid] = $role;
                 // Prepare warning if no match found
@@ -364,11 +370,25 @@ abstract class restore_dbops {
      * returning the id of the best matching role or 0 if no match is found
      */
     protected static function get_best_assignable_role($role, $courseid, $userid, $samesite) {
+        return static::get_best_role($role, $courseid, $userid, $samesite, true);
+    }
+
+    /**
+     * Given one role, as loaded from XML, perform the best possible matching against the assignable or the overridable
+     * roles, using different fallback alternatives (shortname, archetype, editingteacher => teacher, defaultcourseroleid)
+     * returning the id of the best matching role or 0 if no match is found
+     * @since Totara 11.19, Totara 12.10, Totara 13
+     */
+    protected static function get_best_role($role, $courseid, $userid, $samesite, $assignable) {
         global $CFG, $DB;
 
         // Gather various information about roles
         $coursectx = context_course::instance($courseid);
-        $assignablerolesshortname = get_assignable_roles($coursectx, ROLENAME_SHORT, false, $userid);
+        if ($assignable) {
+            $assignablerolesshortname = get_assignable_roles($coursectx, ROLENAME_SHORT, false, $userid);
+        } else {
+            $assignablerolesshortname = get_overridable_roles($coursectx, ROLENAME_SHORT, false, $userid);
+        }
 
         // Note: under 1.9 we had one function restore_samerole() that performed one complete
         // matching of roles (all caps) and if match was found the mapping was availabe bypassing

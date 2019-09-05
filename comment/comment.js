@@ -364,6 +364,9 @@ M.core_comment = {
             view: function(page) {
                 var commenttoggler = Y.one('#comment-link-' + this.client_id);
                 var container = Y.one('#comment-ctrl-'+this.client_id);
+                if (container === null) { // Totara: container will be null if a user does not have permission to see the comment block.
+                    return false;
+                }
                 var ta = Y.one('#dlg-content-'+this.client_id);
                 var commentlink = Y.one('#comment-link-' + this.client_id);
                 var d = container.getStyle('display');

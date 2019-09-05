@@ -1371,6 +1371,7 @@ class restore_ui_stage_process extends restore_ui_stage {
                 if (!empty($info->role_mappings->mappings)) {
                     $context = context_course::instance($this->ui->get_controller()->get_courseid());
                     $assignableroles = get_assignable_roles($context, ROLENAME_ALIAS, false);
+                    $assignableroles += get_overridable_roles($context, ROLENAME_ALIAS, false); // Totara: Append overridable roles.
                     $html .= $renderer->role_mappings($info->role_mappings->mappings, $assignableroles);
                 }
                 break;

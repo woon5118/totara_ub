@@ -3476,14 +3476,22 @@ function get_switchable_roles(context $context) {
  * @param int $rolenamedisplay the type of role name to display. One of the
  *      ROLENAME_X constants. Default ROLENAME_ALIAS.
  * @param bool $withcounts if true, count the number of overrides that are set for each role.
+ * @param integer|object $user A user id or object. By default (null) checks the permissions of the current user.
  * @return array if $withcounts is false, then an array $roleid => $rolename.
  *      if $withusercounts is true, returns a list of three arrays,
  *      $rolenames, $rolecounts, and $nameswithcounts.
  */
-function get_overridable_roles(context $context, $rolenamedisplay = ROLENAME_ALIAS, $withcounts = false) {
+function get_overridable_roles(context $context, $rolenamedisplay = ROLENAME_ALIAS, $withcounts = false, $user = null) {
     global $USER, $DB;
 
-    if (!has_any_capability(array('moodle/role:safeoverride', 'moodle/role:override'), $context)) {
+    // Totara: $userid over $USER->id
+    if ($user === null) {
+        $userid = isset($USER->id) ? $USER->id : 0;
+    } else {
+        $userid = is_object($user) ? $user->id : $user;
+    }
+
+    if (!has_any_capability(array('moodle/role:safeoverride', 'moodle/role:override'), $context, $userid)) { // Totara: $userid over $USER->id
         if ($withcounts) {
             return array(array(), array(), array());
         } else {
@@ -3497,7 +3505,7 @@ function get_overridable_roles(context $context, $rolenamedisplay = ROLENAME_ALI
     $params = array();
     $extrafields = '';
 
-    $params['userid'] = $USER->id;
+    $params['userid'] = $userid; // Totara: $userid over $USER->id
     if ($withcounts) {
         $extrafields = ', (SELECT COUNT(rc.id) FROM {role_capabilities} rc
                 WHERE rc.roleid = ro.id AND rc.contextid = :conid) AS overridecount';
@@ -3511,7 +3519,7 @@ function get_overridable_roles(context $context, $rolenamedisplay = ROLENAME_ALI
         $coursecontext = null;
     }
 
-    if (is_siteadmin()) {
+    if (is_siteadmin($userid)) { // Totara: $userid over $USER->id
         // show all roles to admins
         $roles = $DB->get_records_sql("
             SELECT ro.id, ro.name, ro.shortname, rn.name AS coursealias $extrafields
