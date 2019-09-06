@@ -58,7 +58,7 @@ $seminareventid = $seminarevent->get_id();
 
 // Check essential permissions
 require_login($seminar->get_course(), false, $cm);
-require_capability('mod/facetoface:addattendees', $context);
+require_capability('mod/facetoface:removeattendees', $context);
 
 $pagetitle = get_string('removeattendeestep1', 'mod_facetoface');
 $PAGE->set_context($context);
