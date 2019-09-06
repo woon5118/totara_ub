@@ -282,7 +282,7 @@ final class signup_helper {
             }
         }
 
-        return self::grade_signup($seminarevent, $signup);
+        return grade_helper::grade_signup($seminarevent, $signup);
     }
 
     /**
@@ -293,8 +293,16 @@ final class signup_helper {
      * @return float|null a grade value or null if nothing applicable
      */
     public static function compute_final_grade($facetoface, int $userid) : ?float {
-        $object = static::compute_final_grade_with_time($facetoface, $userid);
-        return $object !== null ? $object->grade : null;
+        debugging('The method ' . __METHOD__ . '() has been deprecated. Please use grade_helper::get_final_grades() instead.', DEBUG_DEVELOPER);
+
+        if (empty($userid)) { // Doesn't support this!
+            return null;
+        }
+        $grades = grade_helper::get_final_grades($facetoface, $userid, grade_helper::FORMAT_FACETOFACE);
+        if (empty($grades)) {
+            return null;
+        }
+        return $grades[$userid]->rawgrade;
     }
 
     /**
@@ -302,111 +310,22 @@ final class signup_helper {
      *
      * @param \stdClass|seminar $facetoface
      * @param int               $userid
-     * @return \stdClass|null an object containing [ grade, timecreated ], or null if nothing applicable
+     * @return \stdClass|null an object containing [ grade, timefinish ], or null if nothing applicable
      */
     public static function compute_final_grade_with_time($facetoface, int $userid) : ?\stdClass {
-        global $DB, $CFG;
+        debugging('The method ' . __METHOD__ . '() has been deprecated. Please use grade_helper::get_final_grades() instead.', DEBUG_DEVELOPER);
 
-        require_once($CFG->dirroot . '/lib/gradelib.php');
-
-        if ($facetoface instanceof seminar) {
-            $f2fid = $facetoface->get_id();
-            $grading_method = $facetoface->get_eventgradingmethod();
-        } else if ($facetoface instanceof \stdClass) {
-            $f2fid = $facetoface->id;
-            $grading_method = $facetoface->eventgradingmethod ?? 0; // default to 0 (highest)
-        } else {
-            throw new \coding_exception('$facetoface must be a signup object or a database record');
-        }
-
-        switch ($grading_method) {
-            case seminar::GRADING_METHOD_GRADEHIGHEST:
-                $order_by = 'sus.grade DESC';
-                break;
-            case seminar::GRADING_METHOD_GRADELOWEST:
-                $order_by = 'sus.grade';
-                break;
-            case seminar::GRADING_METHOD_EVENTFIRST:
-                $order_by = 'm.mintimestart';
-                break;
-            case seminar::GRADING_METHOD_EVENTLAST:
-                $order_by = 'm.maxtimefinish DESC';
-                break;
-
-            default:
-                throw new \coding_exception(sprintf(
-                    "Grading method %d of seminar #%d is not defined",
-                    $grading_method, $f2fid
-                ));
-        }
-
-        $sql = '
-            SELECT sus.grade, m.maxtimefinish AS timefinish
-            FROM {facetoface_signups_status} sus
-            JOIN {facetoface_signups} su ON su.id = sus.signupid
-            JOIN {facetoface_sessions} s ON s.id = su.sessionid
-            LEFT JOIN (
-                SELECT
-                    fsd.sessionid,
-                    MIN(fsd.timestart) AS mintimestart,
-                    MAX(fsd.timefinish) AS maxtimefinish
-                FROM {facetoface_sessions_dates} fsd
-                WHERE (1=1)
-                GROUP BY fsd.sessionid
-            ) m ON m.sessionid = s.id
-            JOIN {user} u ON u.id = su.userid
-            WHERE u.id = :uid AND s.facetoface = :f2f AND sus.superceded = 0 AND sus.grade IS NOT NULL AND (su.archived = 0 OR su.archived IS NULL)
-            ORDER BY ' . $order_by;
-
-        $set = $DB->get_recordset_sql($sql, ['uid' => $userid, 'f2f' => $f2fid], 0, 1);
-        try {
-            if ($set->valid()) {
-                $e = $set->current();
-                return (object)[ 'grade' => grade_floatval($e->grade), 'timefinish' => $e->timefinish ];
-            }
+        if (empty($userid)) { // Doesn't support this!
             return null;
-        } finally {
-            $set->close();
         }
-    }
-
-    /**
-     * Create grade item for given sign-up.
-     *
-     * @param seminar_event $seminarevent
-     * @param signup        $signup
-     * @return bool
-     */
-    private static function grade_signup(seminar_event $seminarevent, signup $signup) : bool {
-        global $CFG, $USER;
-
-        // Necessary for facetoface_grade_item_update()
-        require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-
-        $seminar = $seminarevent->get_seminar();
-
-        $finalgrade = self::compute_final_grade($seminar, $signup->get_userid());
-
-        $timenow = time();
-
-        $grade = new \stdClass();
-        $grade->userid = $signup->get_userid();
-        $grade->rawgrade = $finalgrade;
-        $grade->rawgrademin = 0;
-        $grade->rawgrademax = 100;
-        $grade->timecreated = $timenow;
-        $grade->timemodified = $timenow;
-        $grade->usermodified = $USER->id;
-
-        $facetoface = $seminar->get_properties();
-
-        // Grade functions stay in lib file.
-        if (!facetoface_grade_item_update($facetoface, $grade)) {
-            error_log("F2F: could not grade signup '{$signup->get_id()}' as '$grade'");
-            return false;
+        $grades = grade_helper::get_final_grades($facetoface, $userid, grade_helper::FORMAT_FACETOFACE);
+        if (empty($grades)) {
+            return null;
         }
-        self::update_activity_completion($signup->get_id());
-        return true;
+        $object = new \stdClass();
+        $object->grade = $grades[$userid]->rawgrade;
+        $object->timefinish = $grades[$userid]->timecompleted;
+        return $object;
     }
 
     /**
@@ -416,6 +335,8 @@ final class signup_helper {
      * @return void
      */
     protected static function update_activity_completion(int $signupid): void {
+        debugging('The method ' . __METHOD__ . '() has been deprecated. Please use seminar::set_completion() instead.', DEBUG_DEVELOPER);
+
         global $DB;
         /** @var \moodle_database $DB */
 

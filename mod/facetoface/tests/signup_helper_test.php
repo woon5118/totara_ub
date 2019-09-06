@@ -102,30 +102,38 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
         $that = $this->setup_compute_final_grade();
 
         $grade = signup_helper::compute_final_grade($that->seminar, $that->user1->id);
+        $this->assertDebuggingCalled();
         $this->assertSame(100., $grade);
 
         $grade = signup_helper::compute_final_grade($that->seminar, $that->user2->id);
+        $this->assertDebuggingCalled();
         $this->assertSame(null, $grade);
 
         $that->seminar->set_eventgradingmethod(seminar::GRADING_METHOD_GRADELOWEST);
         $grade = signup_helper::compute_final_grade($that->seminar, $that->user1->id);
+        $this->assertDebuggingCalled();
         $this->assertSame(50., $grade);
 
         $grade = signup_helper::compute_final_grade($that->seminar, $that->user2->id);
+        $this->assertDebuggingCalled();
         $this->assertSame(null, $grade);
 
         $f2f = (object)[ 'id' => $that->seminar->get_id() ];
         $grade = signup_helper::compute_final_grade($f2f, $that->user1->id);
+        $this->assertDebuggingCalled();
         $this->assertSame(100., $grade);
 
         $grade = signup_helper::compute_final_grade($f2f, $that->user2->id);
+        $this->assertDebuggingCalled();
         $this->assertSame(null, $grade);
 
         $f2f->eventgradingmethod = seminar::GRADING_METHOD_GRADELOWEST;
         $grade = signup_helper::compute_final_grade($f2f, $that->user1->id);
+        $this->assertDebuggingCalled();
         $this->assertSame(50., $grade);
 
         $grade = signup_helper::compute_final_grade($f2f, $that->user2->id);
+        $this->assertDebuggingCalled();
         $this->assertSame(null, $grade);
 
         $bogusf2fid = $f2f->id + 42;
@@ -137,6 +145,7 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
         $pr->setAccessible(true);
         $pr->setValue($seminar, $bogusf2fid); // invalidate seminar->id
         $grade = signup_helper::compute_final_grade($seminar, $that->user1->id);
+        $this->assertDebuggingCalled();
         $this->assertSame(null, $grade);
 
         $that->seminar->set_eventgradingmethod(42); // invalidate eventgradingmethod
@@ -144,11 +153,13 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
             signup_helper::compute_final_grade($that->seminar, $that->user1->id);
             $this->fail('Must fail when invalid eventgradingmethod is passed');
         } catch (\coding_exception $e) {
+            $this->resetDebugging();
         }
 
         $f2f->id += 42; // invalidate f2f->id
         $this->assertEquals(0, $DB->count_records('facetoface', [ 'id' => $f2f->id ]));
         $grade = signup_helper::compute_final_grade($f2f, $that->user1->id);
+        $this->assertDebuggingCalled();
         $this->assertSame(null, $grade);
 
         $f2f->eventgradingmethod = 42; // invalidate eventgradingmethod
@@ -156,12 +167,14 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
             signup_helper::compute_final_grade($f2f, $that->user1->id);
             $this->fail('Must fail when invalid eventgradingmethod is passed');
         } catch (\coding_exception $e) {
+            $this->resetDebugging();
         }
 
         try {
             signup_helper::compute_final_grade($f2f->id, $that->user1->id);
             $this->fail('Must fail when first argument is neither seminar nor stdClass');
         } catch (\coding_exception $e) {
+            $this->resetDebugging();
         }
     }
 

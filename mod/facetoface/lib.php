@@ -27,6 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use mod_facetoface\{
+    grade_helper,
     seminar,
     signup,
     seminar_event,
@@ -133,6 +134,10 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
 
     require_once($CFG->libdir . '/completionlib.php');
 
+    if (empty($userid)) {
+        return false;
+    }
+
     $result = $type;
 
     // Get face to face.
@@ -219,10 +224,10 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
                     $newstate = true;
                 }
                 if ($newstate) {
-                    $final = signup_helper::compute_final_grade_with_time($facetoface, $userid);
+                    $final = grade_helper::get_final_grades($facetoface, $userid, grade_helper::FORMAT_FACETOFACE);
                     // Tell completion_criteria_activity::review exact time of completion, otherwise it will use time of review run.
-                    if ($final) {
-                        $cm->timecompleted = $final->timefinish;
+                    if (!empty($final)) {
+                        $cm->timecompleted = $final[$userid]->timecompleted;
                     } else {
                         // None of the signup states can determine the final grade.
                         unset($cm->timecompleted);
@@ -414,6 +419,17 @@ function facetoface_get_grade($userid, $courseid, $facetofaceid) {
     }
 
     return $ret;
+}
+
+/**
+ * Return grade for given user or all users.
+ *
+ * @param int $facetoface facetoface record
+ * @param int $userid optional user id, 0 means all users
+ * @return array array of grades, false if none
+ */
+function facetoface_get_user_grades($facetoface, $userid) {
+    return grade_helper::get_final_grades($facetoface, $userid, grade_helper::FORMAT_GRADELIB);
 }
 
 /**
@@ -704,22 +720,14 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
  *
  * @param \stdClass|null $facetoface    null means all facetoface activities
  * @param int            $userid        specific user only, 0 mean all (not used here)
- * @param bool           $defaultifnone If a single user is specified and $defaultifnone is true, a grade item with a default rawgrade will be inserted
- *                                      the default rawgrade will be recalculated based on $facetoface->eventgradingmethod.
- * @return bool true
+ * @param bool           $nullifnone
+ * @return true
  */
-function facetoface_update_grades($facetoface = null, $userid = 0, $defaultifnone = true) {
+function facetoface_update_grades($facetoface = null, $userid = 0, $nullifnone = true) {
     global $DB;
 
-    if (($facetoface != null) && $userid && $defaultifnone) {
-        $grade = new stdClass();
-        $grade->userid   = $userid;
-        $grade->rawgrade = signup_helper::compute_final_grade($facetoface, $userid);
-        facetoface_grade_item_update($facetoface, $grade);
-    } else if ($facetoface != null) {
-        facetoface_grade_item_update($facetoface);
-    } else {
-        $sql = "SELECT f.*, cm.idnumber as cmidnumber
+    if ($facetoface === null) {
+        $sql = "SELECT f.*, cm.idnumber AS cmidnumber, m.name AS modname
                   FROM {facetoface} f
                   JOIN {course_modules} cm ON cm.instance = f.id
                   JOIN {modules} m ON m.id = cm.module
@@ -730,6 +738,15 @@ function facetoface_update_grades($facetoface = null, $userid = 0, $defaultifnon
             }
             $rs->close();
         }
+    } else if ($grades = facetoface_get_user_grades($facetoface, $userid)) {
+        facetoface_grade_item_update($facetoface, $grades);
+    } else if ($userid != 0 and $nullifnone) {
+        $grade = new stdClass();
+        $grade->userid   = $userid;
+        $grade->rawgrade = null;
+        facetoface_grade_item_update($facetoface, $grade);
+    } else {
+        facetoface_grade_item_update($facetoface);
     }
     return true;
 }

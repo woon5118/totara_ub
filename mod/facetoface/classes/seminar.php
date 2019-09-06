@@ -110,6 +110,7 @@ final class seminar implements seminar_iterator_item {
     const GRADING_METHOD_GRADELOWEST = 1;
     const GRADING_METHOD_EVENTFIRST = 2;
     const GRADING_METHOD_EVENTLAST = 3;
+    const GRADING_METHOD_DEFAULT = self::GRADING_METHOD_GRADEHIGHEST;
 
     /**
      * Event grading value to pass

@@ -3,6 +3,10 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* facetoface_update_grades() has been rewritten to provide better compatibility with other modules
+* signup_helper::compute_final_grade() has been deprecated; please use grade_helper::get_final_grades() instead
+* signup_helper::compute_final_grade_with_time() has been deprecated; please use grade_helper::get_final_grades() instead
+* signup_helper::update_activity_completion() has been deprecated; please use seminar::set_completion() instead
 * mod_facetoface\room::find() function has been deprecated, please use mod_facetoface\room::seek()
 * mod_facetoface\seminar_event::find() function has been deprecated, please use mod_facetoface\seminar_event::seek()
 * mod_facetoface_renderer::get_room_details_html() displays room custom fields (or not) depending on the facetoface_roomidentifier setting

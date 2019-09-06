@@ -118,7 +118,7 @@ class mod_facetoface_generator extends testing_module_generator {
         $defaults['sessionattendance'] = seminar::SESSION_ATTENDANCE_DEFAULT;
         $defaults['attendancetime'] = seminar::EVENT_ATTENDANCE_DEFAULT;
         $defaults['eventgradingmanual'] = 0;
-        $defaults['eventgradingmethod'] = seminar::GRADING_METHOD_GRADEHIGHEST;
+        $defaults['eventgradingmethod'] = seminar::GRADING_METHOD_DEFAULT;
         $defaults['completionpass'] = seminar::COMPLETION_PASS_DISABLED;
         $defaults['completiondelay'] = null;
 
@@ -166,7 +166,19 @@ class mod_facetoface_generator extends testing_module_generator {
             $sessiondate->assetids = array();
             $sessiondates = array($sessiondate);
         } else {
-            $sessiondates = $record->sessiondates;
+            $sessiondates = array_map(function ($date) {
+                if (is_number($date)) {
+                    $sessiondate = new stdClass();
+                    $sessiondate->timestart = (int)$date;
+                    $sessiondate->timefinish = (int)$date + (DAYSECS * 2);
+                    $sessiondate->sessiontimezone = 'Pacific/Auckland';
+                    $sessiondate->roomid = 0;
+                    $sessiondate->assetids = array();
+                    return $sessiondate;
+                } else {
+                    return (object) (array) $date;
+                }
+            }, $record->sessiondates);
             unset($record->sessiondates);
         }
 
