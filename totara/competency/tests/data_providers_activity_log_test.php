@@ -116,6 +116,13 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $competency_id = 100;
         $achievement_date = 200;
 
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $hierarchy_generator->create_scale('comp', [], [
+            ['name' => 'Great', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
+        ]);
+        $scale_value = scale_value::repository()->where('name', '=', 'Great')->one();
+
         $assignment = new assignment();
         $assignment->competency_id = $competency_id;
         $assignment->user_group_id = 300;
@@ -126,6 +133,7 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $achievement = new competency_achievement();
         $achievement->time_created = $achievement_date;
         $achievement->assignment_id = $assignment->id;
+        $achievement->scale_value_id = $scale_value->id;
 
         $mock1 = $this->getMockBuilder(activity_log::class)->setMethods(['get_date'])->getMockForAbstractClass();
         $mock1->method('get_date')->willReturn(2);
@@ -487,9 +495,10 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
     }
 
     /**
-     * Test that when a competency no longer has a scale value a generic 'Rating value reset' string and 'Rating: None' is shown
+     * Test that when a competency no longer has a scale value a generic 'Rating value reset' string and 'Rating: None' is shown,
+     * but only if there is a previous non-null rating that has been achieved.
      */
-    public function test_scale_value_reset_to_none() {
+    public function test_scale_value_none() {
         $time = time();
         $assignment_id = 100;
         $competency_id = 200;
@@ -505,6 +514,17 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
             ]
         );
         $great = scale_value::repository()->where('name', '=', 'Great')->one();
+
+        $achievement = new competency_achievement();
+        $achievement->time_created = $time;
+        $achievement->scale_value_id = null;
+        $achievement->assignment_id = $assignment_id;
+        $achievement->comp_id = $competency_id;
+        $achievement->user_id = $user_id;
+        $achievement->proficient = 1;
+        $achievement->status = 1;
+        $achievement->time_status = 0;
+        $achievement->save();
 
         $achievement = new competency_achievement();
         $achievement->time_created = $time + 1;

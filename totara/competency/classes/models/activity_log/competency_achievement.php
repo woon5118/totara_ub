@@ -31,6 +31,11 @@ use totara_competency\entities;
 class competency_achievement extends activity_log {
 
     /**
+     * @var scale_value
+     */
+    protected $scale_value;
+
+    /**
      * Load an instance of this model using data from the entity passed in.
      *
      * @param entity $entity
@@ -41,7 +46,10 @@ class competency_achievement extends activity_log {
             throw new \coding_exception('Invalid entity', 'Entity must be instance of competency_achievement');
         }
 
-        return (new competency_achievement())->set_entity($entity);
+        $model = new competency_achievement();
+        $model->set_entity($entity);
+        $model->scale_value = new scale_value($entity->scale_value_id);
+        return $model;
     }
 
     /**
@@ -59,12 +67,11 @@ class competency_achievement extends activity_log {
      * @return string
      */
     public function get_description(): string {
-        $scale_value = new scale_value($this->get_entity()->scale_value_id);
-        if (!$scale_value->exists()) {
+        if (!$this->has_scale_value()) {
             return get_string('activitylog_no_rating', 'totara_competency');
         }
         return get_string('activitylog_rating', 'totara_competency', [
-            'scale_value_name' => $scale_value->name,
+            'scale_value_name' => $this->scale_value->name,
         ]);
     }
 
@@ -84,4 +91,14 @@ class competency_achievement extends activity_log {
     public function get_proficient_status(): ?bool {
         return $this->get_entity()->proficient;
     }
+
+    /**
+     * Does this achievement have a rating with a value?
+     *
+     * @return bool
+     */
+    public function has_scale_value(): bool {
+        return $this->scale_value->exists();
+    }
+
 }

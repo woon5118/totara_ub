@@ -94,7 +94,7 @@ class activity_log {
      * Given an array of activity_log_data, this will sort them in reverse chronological order.
      * Any additional records will be added as necessary for the given type of activity_log_data instance.
      *
-     * @param models\activity_log[] $log_data
+     * @param models\activity_log[] $data
      * @return models\activity_log[]
      */
     private function arrange_log_data(array $data): array {
@@ -104,17 +104,18 @@ class activity_log {
         });
 
         $returned_data = [];
+        $has_rating = false;
 
-        foreach ($data as $datum) {
-            switch (get_class($datum)) {
-                case models\activity_log\competency_achievement::class:
-                    // Still add the achievement data entry first.
-                    $returned_data[] = $datum;
-                    $returned_data[] = $datum->get_achieved_via();
-                    break;
-                default:
-                    $returned_data[] = $datum;
+        foreach (array_reverse($data) as $entry) {
+            if ($entry instanceof models\activity_log\competency_achievement) {
+                if (!$has_rating && !$entry->has_scale_value()) {
+                    // We don't want to display an empty rating unless there has been a rating before it.
+                    continue;
+                }
+                array_unshift($returned_data, $entry->get_achieved_via());
+                $has_rating = true;
             }
+            array_unshift($returned_data, $entry);
         }
 
         return $returned_data;
