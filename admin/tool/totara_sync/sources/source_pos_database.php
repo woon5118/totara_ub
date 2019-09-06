@@ -24,10 +24,10 @@
 
 require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/classes/source.pos.class.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/lib.php');
-require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/databaselib.php');
 
 class totara_sync_source_pos_database extends totara_sync_source_pos {
+    use \tool_totara_sync\internal\source\database_trait;
 
     function config_form(&$mform) {
         global $PAGE, $OUTPUT;
@@ -40,67 +40,13 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
 
         $db_table = isset($this->config->{'database_dbtable'}) ? $this->config->{'database_dbtable'} : false;
 
-        if (!$db_table) {
-            $mform->addElement('html', html_writer::tag('p',get_string('dbconnectiondetails', 'tool_totara_sync')));
-        }
-
-        $db_options = get_installed_db_drivers();
-
-        // Database details
-        $mform->addElement('select', 'database_dbtype', get_string('dbtype', 'tool_totara_sync'), $db_options);
-        $mform->addElement('text', 'database_dbname', get_string('dbname', 'tool_totara_sync'));
-        $mform->addRule('database_dbname', get_string('err_required', 'form'), 'required');
-        $mform->setType('database_dbname', PARAM_RAW); // There is no safe cleaning of connection strings.
-        $mform->addElement('text', 'database_dbhost', get_string('dbhost', 'tool_totara_sync'));
-        $mform->setType('database_dbhost', PARAM_HOST);
-        $mform->addElement('text', 'database_dbuser', get_string('dbuser', 'tool_totara_sync'));
-        $mform->addRule('database_dbuser', get_string('err_required', 'form'), 'required');
-        $mform->setType('database_dbuser', PARAM_ALPHANUMEXT);
-        $mform->addElement('password', 'database_dbpass', get_string('dbpass', 'tool_totara_sync'));
-        $mform->setType('database_dbpass', PARAM_RAW);
-        $mform->addElement('text', 'database_dbport', get_string('dbport', 'tool_totara_sync'));
-        $mform->setType('database_dbport', PARAM_INT);
-
-        // Table name
-        $mform->addElement('text', 'database_dbtable', get_string('dbtable', 'tool_totara_sync'));
-        $mform->addRule('database_dbtable', get_string('err_required', 'form'), 'required');
-        $mform->setType('database_dbtable', PARAM_ALPHANUMEXT);
-
-        $mform->addElement('button', 'database_dbtest', get_string('dbtestconnection', 'tool_totara_sync'));
-
-        // Javascript include
-        local_js(array(TOTARA_JS_DIALOG));
-
-        $PAGE->requires->strings_for_js(array('dbtestconnectsuccess', 'dbtestconnectfail'), 'tool_totara_sync');
-
-        $jsmodule = array(
-                'name' => 'totara_syncdatabaseconnect',
-                'fullpath' => '/admin/tool/totara_sync/sources/sync_database.js',
-                'requires' => array('json', 'totara_core'));
-
-        $PAGE->requires->js_init_call('M.totara_syncdatabaseconnect.init', null, false, $jsmodule);
+        $this->config_form_add_database_details($mform);
 
         parent::config_form($mform);
     }
 
     function config_save($data) {
-        // Check database connection when saving
-        try {
-            setup_sync_DB($data->{'database_dbtype'}, $data->{'database_dbhost'}, $data->{'database_dbname'},
-                $data->{'database_dbuser'}, $data->{'database_dbpass'}, array('dbport' => $data->{'database_dbport'}));
-        } catch (Exception $e) {
-            \core\notification::error(get_string('cannotconnectdbsettings', 'tool_totara_sync'));
-            redirect(qualified_me());
-        }
-
-        $this->set_config('database_dbtype', $data->{'database_dbtype'});
-        $this->set_config('database_dbname', $data->{'database_dbname'});
-        $this->set_config('database_dbhost', $data->{'database_dbhost'});
-        $this->set_config('database_dbuser', $data->{'database_dbuser'});
-        $this->set_config('database_dbpass', $data->{'database_dbpass'});
-        $this->set_config('database_dbport', $data->{'database_dbport'});
-        $this->set_config('database_dbtable', $data->{'database_dbtable'});
-
+        $this->config_save_database_details($data);
         parent::config_save($data);
     }
 

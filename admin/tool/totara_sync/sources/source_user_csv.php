@@ -27,6 +27,7 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/lib.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/user.php');
 
 class totara_sync_source_user_csv extends totara_sync_source_user {
+    use \tool_totara_sync\internal\source\csv_trait;
 
     function get_filepath() {
         $path = '/csv/ready/user.csv';
@@ -49,126 +50,20 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         }
         $this->config->import_deleted = empty($this->element->config->sourceallrecords) ? "1" : "0";
 
-        // Add some source file details
-        $mform->addElement('header', 'fileheader', get_string('filedetails', 'tool_totara_sync'));
-        $mform->setExpanded('fileheader');
-
-        try {
-            if ($this->get_element()->get_fileaccess() == FILE_ACCESS_DIRECTORY) {
-                $mform->addElement('static', 'nameandloc', get_string('nameandloc', 'tool_totara_sync'),
-                    \html_writer::tag('strong', $this->get_filepath()));
-            } else {
-                $link = "{$CFG->wwwroot}/admin/tool/totara_sync/admin/uploadsourcefiles.php";
-                $mform->addElement('static', 'uploadfilelink', get_string('uploadfilelink', 'tool_totara_sync', $link));
-            }
-        } catch (\totara_sync_exception $e) {
-            $mform->addElement('static', 'configurefileaccess', '', get_string('configurefileaccess', 'tool_totara_sync'));
-        }
-
-        $encodings = core_text::get_encodings();
-        $mform->addElement('select', 'csvuserencoding', get_string('csvencoding', 'tool_totara_sync'), $encodings);
-        $mform->setType('csvuserencoding', PARAM_ALPHANUMEXT);
-        $default = $this->get_config('csvuserencoding');
-        $default = (!empty($default) ? $default : 'UTF-8');
-        $mform->setDefault('csvuserencoding', $default);
-
-        $delimiteroptions = array(
-            ',' => get_string('comma', 'tool_totara_sync'),
-            ';' => get_string('semicolon', 'tool_totara_sync'),
-            ':' => get_string('colon', 'tool_totara_sync'),
-            '\t' => get_string('tab', 'tool_totara_sync'),
-            '|' => get_string('pipe', 'tool_totara_sync')
-        );
-
-        $mform->addElement('select', 'delimiter', get_string('delimiter', 'tool_totara_sync'), $delimiteroptions);
-        $default = $this->config->delimiter;
-        if (empty($default)) {
-            $default = ',';
-        }
-        $mform->setDefault('delimiter', $default);
+        $this->config_form_add_csv_details($mform);
 
         parent::config_form($mform);
     }
 
     function config_save($data) {
-        // Make sure we use a tab character for the delimiter, if a tab is selected.
-        $this->set_config('delimiter', $data->{'delimiter'} == '\t' ? "\t" : $data->{'delimiter'});
-        $this->set_config('csvuserencoding', $data->{'csvuserencoding'});
-
+        $this->config_save_csv_file_details($data);
         parent::config_save($data);
     }
 
     function import_data($temptable) {
         global $CFG, $DB, $OUTPUT;
 
-        $fileaccess = $this->get_element()->get_fileaccess();
-        if ($fileaccess == FILE_ACCESS_DIRECTORY) {
-            if (!$this->filesdir) {
-                throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'nofilesdir');
-            }
-            $filepath = $this->get_filepath();
-            if (!file_exists($filepath)) {
-                throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'nofiletosync', $filepath, null, 'warn');
-            }
-            $filemd5 = md5_file($filepath);
-            while (true) {
-                // Ensure file is not currently being written to
-                sleep(2);
-                $newmd5 = md5_file($filepath);
-                if ($filemd5 != $newmd5) {
-                    $filemd5 = $newmd5;
-                } else {
-                    break;
-                }
-            }
-
-            // See if file is readable
-            if (!$file = is_readable($filepath)) {
-                throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'cannotreadx', $filepath);
-            }
-
-            // Move file to store folder
-            $storedir = $this->filesdir.'/csv/store';
-            if (!totara_sync_make_dirs($storedir)) {
-                throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'cannotcreatedirx', $storedir);
-            }
-
-            $storefilepath = $storedir . '/' . time() . '.' . basename($filepath);
-
-            rename($filepath, $storefilepath);
-        } else if ($fileaccess == FILE_ACCESS_UPLOAD) {
-            $fs = get_file_storage();
-            $systemcontext = context_system::instance();
-            $fieldid = get_config('totara_sync', 'sync_user_itemid');
-
-            // Check the file exist
-            if (!$fs->file_exists($systemcontext->id, 'totara_sync', 'user', $fieldid, '/', '')) {
-                throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'nofileuploaded', $this->get_element_name(), null, 'warn');
-            }
-
-            // Get the file
-            $fsfiles = $fs->get_area_files($systemcontext->id, 'totara_sync', 'user', $fieldid, 'id DESC', false);
-            $fsfile = reset($fsfiles);
-
-            // Set up the temp dir
-            $tempdir = $CFG->tempdir . '/totarasync/csv';
-            check_dir_exists($tempdir, true, true);
-
-            // Create temporary file (so we know the filepath)
-            $fsfile->copy_content_to($tempdir.'/user.php');
-            $itemid = $fsfile->get_itemid();
-            $fs->delete_area_files($systemcontext->id, 'totara_sync', 'user', $itemid);
-            $storefilepath = $tempdir.'/user.php';
-
-        }
-
-        $encoding = $this->get_config('csvuserencoding');
-        $storefilepath = totara_sync_clean_csvfile($storefilepath, $encoding, $fileaccess, $this->get_element_name());
-
-        // Open file from store for processing
-        if (!$file = fopen($storefilepath, 'r')) {
-            throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'cannotopenx', $storefilepath);
-        }
+        $file = $this->open_csv_file();
 
         // Map CSV fields.
         $fields = fgetcsv($file, 0, $this->config->delimiter);
@@ -433,14 +328,11 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         }
         unset($fieldmappings);
 
-        fclose($file);
         if ($badtimezones) {
             $OUTPUT->notification(get_string('badusertimezonemessage', 'tool_totara_timezonefix'), 'notifynotice');
         }
-        // Done, clean up the file(s)
-        if ($fileaccess == FILE_ACCESS_UPLOAD) {
-            unlink($storefilepath); // don't store this file in temp
-        }
+
+        $this->close_csv_file($file);
 
         // Update temporary table stats once import is done.
         $DB->update_temp_table_stats();
