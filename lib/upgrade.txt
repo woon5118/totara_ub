@@ -56,6 +56,7 @@ information provided here is intended especially for developers.
 * Deprecated format_date() and format_text() functions in webapi execution_context introduced in Evergreen release in favour of newly introduced \totara_core\formatter\field\date_field_formatter and \totara_core\formatter\field\text_field_formatter classes.
 * The DML layer now supports optimizer hints
 * MariaDB has a new optimizer hint to disable materialization for a query
+* Extended modal_cancel template to support different text for the cancel button
 
 === 12.0 ===
 

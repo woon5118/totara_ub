@@ -40,6 +40,9 @@
 
 {{< core/modal }}
     {{$footer}}
-        <button type="button" class="btn btn-secondary" data-action="cancel">{{#str}} cancel {{/str}}</button>
+        <button type="button" class="btn btn-secondary" data-action="cancel">
+            {{^cancel_str}}{{#str}} cancel {{/str}}{{/cancel_str}}
+            {{#cancel_str}}{{.}}{{/cancel_str}}
+        </button>
     {{/footer}}
 {{/ core/modal }}
