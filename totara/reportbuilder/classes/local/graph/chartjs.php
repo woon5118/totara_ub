@@ -118,6 +118,10 @@ final class chartjs extends base {
         if (!$this->is_pie_chart()) {
             foreach ($this->values as $k => $val) {
                 $this->values[$k]['backgroundColor'] = $this->colors[$k % count($this->colors)];
+
+                if ($this->record->type === 'line') {
+                    $this->values[$k]['borderColor'] = $this->colors[$k % count($this->colors)];
+                }
             }
         }
 
