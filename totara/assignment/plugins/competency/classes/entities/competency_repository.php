@@ -130,7 +130,7 @@ class competency_repository extends hierarchy_item_repository {
         $this->add_select((new subquery(function(builder $builder) {
             $builder->from('totara_assignment_competencies')
                 ->as('count_tac')
-                ->select('count(*)')
+                ->select('count(id)')
                 ->where_field('competency_id', new field('id', $this->builder));
         }))->as('assignments_count'));
 

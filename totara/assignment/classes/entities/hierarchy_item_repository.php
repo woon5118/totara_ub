@@ -49,7 +49,7 @@ abstract class hierarchy_item_repository extends entity_repository {
         $this->add_select((new subquery(function (builder $builder) {
             $builder->from($this->builder->get_table())
                 ->as('sq_ha')
-                ->select('count(*)')
+                ->select('count(id)')
                 ->where_field('parentid', new field('id', $this->builder));
         }))->as('children_count'));
 
