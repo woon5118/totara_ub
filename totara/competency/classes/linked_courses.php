@@ -55,7 +55,8 @@ class linked_courses {
                    JOIN {comp_criteria} cc
                      ON cc.itemtype = ?
                     AND course.id = cc.iteminstance
-                  WHERE cc.competencyid = ?',
+                  WHERE cc.competencyid = ?
+                  ORDER BY course.id',
             ['coursecompletion', $competency_id]
         );
 
