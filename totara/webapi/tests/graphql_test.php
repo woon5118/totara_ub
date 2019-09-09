@@ -89,23 +89,60 @@ class totara_webapi_graphql_testcase extends advanced_testcase {
 
     public function test_execute_operation() {
         // Any operation will do here.
-        $result = graphql::execute_operation(execution_context::create('ajax', 'core_lang_strings_nosession'), array('lang' => 'en', 'ids' => ['edit,core']));
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'core_lang_strings_nosession'),
+            [
+                'lang' => 'en',
+                'ids' => [
+                    'edit,core'
+                ]
+            ]
+        );
         $this->assertInstanceOf('GraphQL\Executor\ExecutionResult', $result);
         $result = $result->toArray(true);
-        $this->assertSame(['data' => ['lang_strings' => [['lang' => 'en', 'identifier' => 'edit', 'component' => 'core', 'string' => 'Edit']]]], $result);
+        $this->assertSame([
+            'data' => [
+                'lang_strings' => [
+                    [
+                        'lang' => 'en',
+                        'identifier' => 'edit',
+                        'component' => 'core',
+                        'string' => 'Edit'
+                    ]
+                ]
+            ]
+        ], $result);
+    }
 
-        $result = graphql::execute_operation(execution_context::create('ajax', 'core_lang_strings_nosession'), array('xlang' => 'en', 'ids' => ['edit,core']));
+    public function test_execute_operation_with_error_result() {
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'core_lang_strings_nosession'),
+            [
+                'xlang' => 'en',
+                'ids' => [
+                    'edit,core'
+                ]
+            ]
+        );
         $this->assertInstanceOf('GraphQL\Executor\ExecutionResult', $result);
         $result = $result->toArray();
         $this->assertArrayNotHasKey('data', $result);
         $this->assertArrayHasKey('errors', $result);
-
-        try {
-            graphql::execute_operation(execution_context::create('ajax', 'xxxcore_lang_strings_nosession'), array('lang' => 'en', 'ids' => ['edit,core']));
-            $this->fail("Exception expected");
-        } catch (moodle_exception $ex) {
-            $this->assertInstanceOf('coding_exception', $ex);
-            $this->assertSame('Coding error detected, it must be fixed by a programmer: Invalid Web API operation name', $ex->getMessage());
-        }
     }
+
+    public function test_execute_operation_with_invalid_name() {
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Invalid Web API operation name');
+
+        graphql::execute_operation(
+            execution_context::create('ajax', 'xxxcore_lang_strings_nosession'),
+            [
+                'lang' => 'en',
+                'ids' => [
+                    'edit,core'
+                ]
+            ]
+        );
+    }
+
 }
