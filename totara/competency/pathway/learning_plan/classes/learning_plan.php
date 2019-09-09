@@ -30,6 +30,8 @@ use totara_competency\pathway;
 
 class learning_plan extends pathway {
 
+    public const CLASSIFICATION = self::PATHWAY_MULTI_VALUE;
+
     protected function fetch_configuration() {
         // Do nothing.
     }

@@ -81,6 +81,7 @@ $string['competency:view_other_profile'] = 'View profile of other users';
 $string['competency_archived_at'] = 'Competency archived {$a}';
 $string['competency_profile'] = 'Competency profile';
 $string['competencies'] = '{$a} competencies';
+$string['complete_criteria'] = 'Complete the following criteria';
 $string['coursefullname'] = 'Full Name';
 $string['createachievementpath'] = 'Create achievement path';
 $string['createpath'] = 'Create path';

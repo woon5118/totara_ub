@@ -16,9 +16,11 @@
       >
         <ScaleDetail
           :competency-id="competencyId"
+          :user-id="userId"
           :my-value="item.my_value"
           :assignment="item.assignment"
         />
+        <AchievementDisplay :user-id="userId" :assignment="item.assignment" />
       </Tab>
     </Tabs>
     <hr />
@@ -29,9 +31,10 @@
 import Tab from './Tab';
 import Tabs from './Tabs';
 import ScaleDetail from './ScaleDetail';
+import AchievementDisplay from 'totara_competency/containers/AchievementDisplay';
 
 export default {
-  components: { ScaleDetail, Tab, Tabs },
+  components: { ScaleDetail, AchievementDisplay, Tab, Tabs },
   props: {
     userId: {
       required: true,

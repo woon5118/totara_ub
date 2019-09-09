@@ -1,0 +1,13 @@
+query totara_competency_scale_achievements($assignment_id: core_id!) {
+  totara_competency_scale_achievements(assignment_id: $assignment_id) {
+    scale_value {
+      name
+      numericscore
+      proficient
+    }
+    items {
+      instance_id
+      pathway_type
+    }
+  }
+}

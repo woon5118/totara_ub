@@ -35,20 +35,19 @@ class manual extends pathway {
     /**
      * Supported roles
      */
-    const ROLE_MANAGER = 'manager';
-    const ROLE_APPRAISER = 'appraiser';
-    const ROLE_SELF = 'self';
+    public const ROLE_MANAGER = 'manager';
+    public const ROLE_APPRAISER = 'appraiser';
+    public const ROLE_SELF = 'self';
     // Todo: manager's manager and whichever others we want.
 
     /**
      * Types of aggregation available in manual
      */
-    const AGGREGATE_ALL = 1;
-    const AGGREGATE_ANY_N = 2;
-    const AGGREGATE_LAST = 3;
+    public const AGGREGATE_ALL = 1;
+    public const AGGREGATE_ANY_N = 2;
+    public const AGGREGATE_LAST = 3;
 
-    /** @var int $classification  */
-    protected $classification = self::PATHWAY_MULTI_VALUE;
+    public const CLASSIFICATION = self::PATHWAY_MULTI_VALUE;
 
     /** @var array $roles*/
     private $roles = [];

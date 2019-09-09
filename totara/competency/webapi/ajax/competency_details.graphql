@@ -14,6 +14,7 @@ query totara_competency_competency_details(
     items {
       proficient
       assignment {
+        id
         archived_at(format: DATE)
         progress_name
       }

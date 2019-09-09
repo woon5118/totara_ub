@@ -1,0 +1,5 @@
+{
+  "component": "criteria_childcompetency",
+  "bundleWith": "totara_core",
+  "vendor": "totara"
+}

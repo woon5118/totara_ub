@@ -1,0 +1,13 @@
+type pathway_manual_achievement {
+  role: String! # manager, self, etc.
+  rater: core_user # user fullname, picture url, etc.
+  scale_value: totara_competency_scale_value # rating value id given
+  comment(format: core_format = HTML): String # comment added on rating
+}
+
+extend type Query {
+  pathway_manual_achievements(
+    user_id: core_id!
+    assignment_id: core_id!
+  ): [pathway_manual_achievement]
+}

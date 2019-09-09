@@ -16,59 +16,48 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Riana Rossouw <riana.rossouw@totaralearning.com>
+  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
   @package totara_competency
 -->
 
 <template>
-  <div class="tui-totara-competency-divider">
-    <div
-      class="tui-totara-competency-divider__label"
-      :class="{ bordered: bordered }"
-    >
-      {{ label }}
-    </div>
+  <div>
+    <component
+      :is="component"
+      :user-id="userId"
+      :assignment-id="assignmentId"
+    />
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    label: {
+    userId: {
+      required: true,
+      type: Number,
+    },
+    assignmentId: {
+      required: true,
+      type: Number,
+    },
+    type: {
+      required: true,
       type: String,
     },
-    bordered: {
-      type: Boolean,
-    },
   },
+
+  data: function() {
+    return {
+      component: null,
+    };
+  },
+
+  mounted: function() {
+    let compPath = `pathway_${this.type}/containers/AchievementDisplay`;
+    this.component = tui.asyncComponent(compPath);
+  },
+
+  methods: {},
 };
 </script>
-
-<style lang="scss">
-.tui-totara-competency-divider {
-  position: relative;
-  left: -0.4rem;
-  width: 50%;
-  margin-top: 4rem;
-  padding: 1.6rem 0 0.8rem;
-  border-top: 1px solid #d9d9d9;
-
-  &__label {
-    position: absolute;
-    top: -1.6rem;
-    left: 50%;
-    display: inline-block;
-    padding: 0.4rem 0.8rem;
-    color: #5e5e5e;
-    text-transform: uppercase;
-    background: #fff;
-    transform: translateX(-50%);
-
-    &.bordered {
-      color: black;
-      background: #f5f5f5;
-      border: 1px solid #d9d9d9;
-    }
-  }
-}
-</style>

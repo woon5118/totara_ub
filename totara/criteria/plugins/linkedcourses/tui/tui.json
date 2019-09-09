@@ -1,0 +1,5 @@
+{
+  "component": "criteria_linkedcourses",
+  "bundleWith": "totara_core",
+  "vendor": "totara"
+}

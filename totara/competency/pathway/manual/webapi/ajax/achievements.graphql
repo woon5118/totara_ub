@@ -1,0 +1,19 @@
+query pathway_manual_achievements(
+  $user_id: core_id!
+  $assignment_id: core_id!
+) {
+  pathway_manual_achievements(
+    user_id: $user_id
+    assignment_id: $assignment_id
+  ) {
+    rater {
+      fullname
+      profileimageurl
+    }
+    role
+    scale_value {
+      name
+    }
+    comment
+  }
+}

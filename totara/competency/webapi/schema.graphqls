@@ -390,3 +390,43 @@ extend type Query {
     competency_id: core_id!
   ): totara_competency_achievement_configuration!
 }
+
+"""
+Competency profile details page related types and queries
+"""
+type totara_competency_achievement_path {
+  class: totara_competency_pathway_classification! # SINGLE, MLULTI
+  type: String # manual, learning_plan, null
+}
+
+extend type Query {
+  """
+  This query returns all achievement paths for a given competency and user
+  """
+  totara_competency_achievement_paths(
+    assignment_id: core_id!
+  ): [totara_competency_achievement_path]
+}
+
+"""
+This represents an item which is shown under within a specific scale.
+The pathway_type can be any type which supports single scale values, i.e. criteria_group
+"""
+type totara_competency_scale_achievement_item {
+  instance_id: core_id! # specific instance id
+  pathway_type: String # criteria_group
+}
+
+"""
+Returns items for each scale value, which could be criteria groups
+"""
+type totara_competency_scale_achievement {
+  scale_value: totara_competency_scale_value
+  items: [totara_competency_pathway]
+}
+
+extend type Query {
+  totara_competency_scale_achievements(
+    assignment_id: core_id!
+  ): [totara_competency_scale_achievement]
+}

@@ -115,4 +115,42 @@ class pathway_factory {
         $classname = static::get_classname($type);
         return $classname::dump_pathway_configuration($id);
     }
+
+    /**
+     * Returns an array of all pathway types which have the single value classification
+     *
+     * @return array
+     */
+    public static function get_single_value_types(): array {
+        $types = [];
+        foreach (self::get_pathway_types() as $pathway_type) {
+            $pathway = self::create($pathway_type);
+            if ($pathway->get_classification() === pathway::PATHWAY_SINGLE_VALUE) {
+                $types[] = $pathway->get_path_type();
+            }
+        }
+
+        return $types;
+    }
+
+    /**
+     * Returns an array of all pathway types which have the multi value classification
+     *
+     * @return array
+     */
+    public static function get_multi_value_types(): array {
+        $types = [];
+        foreach (self::get_pathway_types() as $pathway_type) {
+            $pathway = self::create($pathway_type);
+            if ($pathway->get_classification() === pathway::PATHWAY_MULTI_VALUE) {
+                $types[] = $pathway->get_path_type();
+            }
+        }
+
+        return $types;
+    }
+
+    public static function get_pathway_types(): array {
+        return plugintypes::get_enabled_plugins('pathway', 'totara_competency');
+    }
 }

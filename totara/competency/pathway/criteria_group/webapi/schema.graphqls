@@ -1,0 +1,10 @@
+type pathway_criteria_group_achievement {
+  instance_id: Int! # instance of single criteria
+  type: String! # linkedcourses, childcompetency, etc.
+}
+
+extend type Query {
+  pathway_criteria_group_achievements(
+    instance_id: core_id!
+  ): [pathway_criteria_group_achievement]!
+}

@@ -40,11 +40,10 @@ class criteria_group extends pathway {
     /**
      * Types of aggregation available in groups
      */
-    const AGGREGATE_ALL = 1;
-    const AGGREGATE_ANY_N = 2;
+    public const AGGREGATE_ALL = 1;
+    public const AGGREGATE_ANY_N = 2;
 
-    /** @@var int $classification  */
-    protected $classification = self::PATHWAY_SINGLE_VALUE;
+    public const CLASSIFICATION = self::PATHWAY_SINGLE_VALUE;
 
     /** @var int */
     private $aggregation_method = self::AGGREGATE_ALL;

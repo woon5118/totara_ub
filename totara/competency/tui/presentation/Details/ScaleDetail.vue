@@ -95,6 +95,7 @@ export default {
   apollo: {
     scale: {
       query: ScaleDetailsQuery,
+      context: { batch: true },
       variables() {
         return {
           competency_id: this.competencyId,

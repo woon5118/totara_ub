@@ -35,13 +35,14 @@ use totara_competency\entities\scale_value;
 abstract class pathway {
 
     /* Status constants */
-    const PATHWAY_STATUS_ACTIVE = 0;
-    const PATHWAY_STATUS_ARCHIVED = 3;
+    public const PATHWAY_STATUS_ACTIVE = 0;
+    public const PATHWAY_STATUS_ARCHIVED = 3;
 
     /* Classification constants */
-    const PATHWAY_MULTI_VALUE = 0;
-    const PATHWAY_SINGLE_VALUE = 1;
+    public const PATHWAY_MULTI_VALUE = 0;
+    public const PATHWAY_SINGLE_VALUE = 1;
 
+    public const CLASSIFICATION = self::PATHWAY_MULTI_VALUE;
 
     /** @var int */
     private $id = 0;
@@ -60,9 +61,6 @@ abstract class pathway {
 
     /** @@var int $status  */
     private $status = self::PATHWAY_STATUS_ACTIVE;
-
-    /** @@var int $classification  */
-    protected $classification = self::PATHWAY_MULTI_VALUE;
 
     /********************************************************************
      * Instantiation
@@ -432,7 +430,7 @@ abstract class pathway {
      * @return int
      */
     public function get_classification(): int {
-        return $this->classification;
+        return static::CLASSIFICATION;
     }
 
     /**
@@ -446,7 +444,7 @@ abstract class pathway {
             static::PATHWAY_SINGLE_VALUE => 'pathwaysinglevalue',
         ];
 
-        return strtoupper(get_string($string_keys[$this->classification], 'totara_competency'));
+        return strtoupper(get_string($string_keys[static::CLASSIFICATION], 'totara_competency'));
     }
 
     /**

@@ -1,0 +1,5 @@
+{
+  "component": "criteria_onactivate",
+  "bundleWith": "totara_core",
+  "vendor": "totara"
+}
