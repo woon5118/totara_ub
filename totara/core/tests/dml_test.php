@@ -2709,7 +2709,7 @@ ORDER BY tt1.groupid";
         self::assertEquals($context->id, $DB->get_record_sql($rawsql)->id);
         self::assertEquals($context->id, $DB->get_records_sql($rawsql)[$context->id]->id);
         self::assertEquals($context->id, key($DB->get_records_sql_menu($rawsql)));
-        self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, $params, 0, 10, $count)[$context->id]->id);
+        self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, null, 0, 10, $count)[$context->id]->id);
         self::assertSame(1, $count);
 
         // Recordset query tests of all rs queries.
@@ -2723,7 +2723,7 @@ ORDER BY tt1.groupid";
         self::assertSame(1, $count);
 
         self::assertEquals($context->id, $extract($DB->get_recordset_sql($rawsql))->id);
-        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, $params, 0, 10, $count))->id);
+        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, null, 0, 10, $count))->id);
         self::assertSame(1, $count);
 
         // Now just test with the expected inserted into the middle.
@@ -2745,10 +2745,10 @@ ORDER BY tt1.groupid";
         self::assertEquals($context->id, $DB->get_record_sql($rawsql)->id);
         self::assertEquals($context->id, $DB->get_records_sql($rawsql)[$context->id]->id);
         self::assertEquals($context->id, key($DB->get_records_sql_menu($rawsql)));
-        self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, $params, 0, 10, $count)[$context->id]->id);
+        self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, null, 0, 10, $count)[$context->id]->id);
         self::assertSame(1, $count);
         self::assertEquals($context->id, $extract($DB->get_recordset_sql($rawsql))->id);
-        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, $params, 0, 10, $count))->id);
+        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, null, 0, 10, $count))->id);
         self::assertSame(1, $count);
 
         // And finally test with the token at the end.
@@ -2770,10 +2770,10 @@ ORDER BY tt1.groupid";
         self::assertEquals($context->id, $DB->get_record_sql($rawsql)->id);
         self::assertEquals($context->id, $DB->get_records_sql($rawsql)[$context->id]->id);
         self::assertEquals($context->id, key($DB->get_records_sql_menu($rawsql)));
-        self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, $params, 0, 10, $count)[$context->id]->id);
+        self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, null, 0, 10, $count)[$context->id]->id);
         self::assertSame(1, $count);
         self::assertEquals($context->id, $extract($DB->get_recordset_sql($rawsql))->id);
-        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, $params, 0, 10, $count))->id);
+        self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, null, 0, 10, $count))->id);
         self::assertSame(1, $count);
     }
 }
