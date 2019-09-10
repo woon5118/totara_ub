@@ -1113,7 +1113,7 @@ function totara_cohort_delete_stale_memberships() {
  * @param $cohortid
  */
 function totara_cohort_clone_cohort($oldcohortid) {
-    global $CFG, $DB, $USER;
+    global $CFG, $DB, $USER, $TEXTAREA_OPTIONS;
 
     $transaction = $DB->start_delegated_transaction();
 
@@ -1128,7 +1128,6 @@ function totara_cohort_clone_cohort($oldcohortid) {
     if (!$newcohort->idnumber) {
         $newcohort->idnumber = $oldcohort->idnumber . '.1';
     }
-    $newcohort->description =       $oldcohort->description;
     $newcohort->descriptionformat = $oldcohort->descriptionformat;
     $newcohort->component = ''; // Cloned cohort must not be added to any plugin, it must be manual.
     $newcohort->cohorttype =        $oldcohort->cohorttype;
@@ -1138,6 +1137,17 @@ function totara_cohort_clone_cohort($oldcohortid) {
     $newcohort->enddate =           $oldcohort->enddate;
 
     $newcohort->id = cohort_add_cohort($newcohort, $addcollections=false);
+
+    // Copy textarea files.
+    $data = new stdClass();
+    $data->description = $oldcohort->description;
+    $data->descriptionformat = $oldcohort->descriptionformat;
+    $data = file_prepare_standard_editor($data, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+        'cohort', 'description', $oldcohortid);
+
+    $data = file_postupdate_standard_editor($data, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+        'cohort', 'description', $newcohort->id);
+    $DB->set_field('cohort', 'description', $data->description, array('id' => $newcohort->id));
 
     // Copy tags
     require_once($CFG->dirroot . '/tag/lib.php');
