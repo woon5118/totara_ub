@@ -166,6 +166,65 @@ class totara_reportbuilder_rb_plan_courses_embedded_cache_testcase extends repor
         $this->assertCount(0, $result);
     }
 
+    /**
+     * Test courses report with parameters
+     *
+     * Test case:
+     * - complete course 1 for user1
+     * - complete course 4 for user2
+     * - Check that user1 has 1 active course (3) and one completed (1)
+     * - Check that user2 has two active courses (2,3) and one completed (4)
+     * - Check that user3 doesn't have any courses with either parameter
+     */
+    public function test_plan_courses_with_params() {
+        $time = time();
+        $completion = new completion_completion(array('userid' => $this->user1->id, 'course' => $this->course1->id));
+        $completion->mark_complete($time);
+        $completion = new completion_completion(array('userid' => $this->user2->id, 'course' => $this->course4->id));
+        $completion->mark_complete($time);
+
+        $courseidalias = reportbuilder_get_extrafield_alias('course', 'courselink', 'course_id');
+        $params = ['userid' => $this->user1->id, 'rolstatus' => 'active'];
+        $result = $this->get_report_result($this->report_builder_data['shortname'], $params, false);
+        $this->assertCount(1, $result);
+        foreach ($result as $r) {
+            $this->assertContains($r->$courseidalias, [$this->course3->id]);
+            $this->assertNotContains($r->$courseidalias, [$this->course1->id, $this->course2->id, $this->course4->id]);
+        }
+
+        $params = ['userid' => $this->user1->id, 'rolstatus' => 'completed'];
+        $result = $this->get_report_result($this->report_builder_data['shortname'], $params, false);
+        $this->assertCount(1, $result);
+        foreach ($result as $r) {
+            $this->assertContains($r->$courseidalias, [$this->course1->id]);
+            $this->assertNotContains($r->$courseidalias, [$this->course3->id, $this->course2->id, $this->course4->id]);
+        }
+
+        $params = ['userid' => $this->user2->id, 'rolstatus' => 'active'];
+        $result = $this->get_report_result($this->report_builder_data['shortname'], $params, false);
+        $this->assertCount(2, $result);
+        foreach ($result as $r) {
+            $this->assertContains($r->$courseidalias, [$this->course2->id, $this->course3->id]);
+            $this->assertNotContains($r->$courseidalias, [$this->course1->id, $this->course4->id]);
+        }
+
+        $params = ['userid' => $this->user2->id, 'rolstatus' => 'completed'];
+        $result = $this->get_report_result($this->report_builder_data['shortname'], $params, false);
+        $this->assertCount(1, $result);
+        foreach ($result as $r) {
+            $this->assertContains($r->$courseidalias, [$this->course4->id]);
+            $this->assertNotContains($r->$courseidalias, [$this->course1->id, $this->course2->id, $this->course3->id]);
+        }
+
+        $params = ['userid' => $this->user3->id, 'rolstatus' => 'active'];
+        $result = $this->get_report_result($this->report_builder_data['shortname'], $params, false);
+        $this->assertCount(0, $result);
+
+        $params = ['userid' => $this->user3->id, 'rolstatus' => 'completed'];
+        $result = $this->get_report_result($this->report_builder_data['shortname'], $params, false);
+        $this->assertCount(0, $result);
+    }
+
     public function test_is_capable() {
         $this->resetAfterTest();
 

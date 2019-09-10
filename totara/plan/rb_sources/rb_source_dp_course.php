@@ -678,7 +678,7 @@ class rb_source_dp_course extends rb_base_source {
                 false,
                 true
             );
-            $this->sourcewhere = "(course_completion.status > :notyetstarted) OR ({$sql})";
+            $this->sourcewhere = "((course_completion.status > :notyetstarted) OR ({$sql}))";
 
             $params['notyetstarted'] = COMPLETION_STATUS_NOTYETSTARTED;
             $this->sourceparams = $params;
