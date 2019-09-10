@@ -39,29 +39,37 @@ class course_item_combined extends item_combined {
         $this->create_item_records($criterion_id, $now);
 
         // No need to link with temp_users or list here as we've already ensured that there is a record for applicable users
+        $itemid_sql =
+            "SELECT tci.id
+               FROM {totara_criteria_item} tci 
+              WHERE tci.criterion_id = :criterionid
+                AND tci.item_type = :itemtype";
+
+        $userid_sql =
+            "SELECT cc.userid
+               FROM {totara_criteria_item} tci 
+               JOIN {course_completions} cc 
+                 ON cc.course = tci.item_id 
+              WHERE tci.criterion_id = :criterionid2
+                AND tci.item_type = :itemtype2
+                AND (cc.status = :statuscomplete OR cc.status = :statusrpl)";
+
         // Handle courses that are completed but item_record still indicates 'not met'
         $sql =
            "UPDATE {totara_criteria_item_record}
                SET criterion_met = :newmet, 
                    timeevaluated = :now
-             WHERE id IN (
-                   SELECT tcir.id
-                     FROM {totara_criteria_item_record} tcir
-                     JOIN {totara_criteria_item} tci 
-                       ON tci.id = tcir.criterion_item_id
-                      AND tci.item_type = :itemtype
-                     JOIN {course_completions} cc 
-                       ON cc.course = tci.item_id 
-                      AND cc.userid = tcir.user_id
-                    WHERE tci.criterion_id = :criterionid
-                      AND tcir.criterion_met = :currentmet
-                      AND (cc.status = :statuscomplete OR cc.status = :statusrpl))";
+             WHERE criterion_met = :currentmet
+               AND criterion_item_id IN ({$itemid_sql})
+               AND user_id IN ({$userid_sql})";
         $params = [
             'now' => $now,
             'itemtype' => 'course',
             'criterionid' => $criterion_id,
             'newmet' => 1,
             'currentmet' => 0,
+            'itemtype2' => 'course',
+            'criterionid2' => $criterion_id,
             'statuscomplete' => COMPLETION_STATUS_COMPLETE,
             'statusrpl' => COMPLETION_STATUS_COMPLETEVIARPL
         ];
@@ -70,24 +78,16 @@ class course_item_combined extends item_combined {
 
         // Now do the reverse. Todo: deal with timecompleted. That is also part of the check for whether a course is complete.
         // And if there happens to be an inconsistency between timecompleted and status, is the course considered complete or not?
-        // Note the small difference with the previous sql :- LEFT JOIN on course_completion
+
+        // We also need to make provision for users without a course_completion record
+        // TODO: Test performance!!!
          $sql =
            "UPDATE {totara_criteria_item_record}
                SET criterion_met = :newmet, 
                    timeevaluated = :now
-             WHERE id IN (
-                   SELECT tcir.id
-                     FROM {totara_criteria_item_record} tcir
-                     JOIN {totara_criteria_item} tci 
-                       ON tci.id = tcir.criterion_item_id
-                      AND tci.item_type = :itemtype
-                LEFT JOIN {course_completions} cc 
-                       ON cc.course = tci.item_id 
-                      AND cc.userid = tcir.user_id
-                    WHERE tci.criterion_id = :criterionid
-                      AND tcir.criterion_met = :currentmet
-                      AND (cc.id IS NULL OR
-                          (cc.status <> :statuscomplete AND cc.status <> :statusrpl)))";
+             WHERE criterion_met = :currentmet
+               AND criterion_item_id IN ({$itemid_sql})
+               AND user_id NOT IN ({$userid_sql})";
         $params['newmet'] = 0;
         $params['currentmet'] = 1;
 

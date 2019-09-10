@@ -223,24 +223,21 @@ abstract class item_combined {
         $temp_key_column = $this->temp_user_table->get_key_column();
         $temp_key_value = !empty($temp_key_column) ? $this->temp_user_table->get_key_value() : '';
 
-        $sql = "DELETE FROM {totara_criteria_item_record}
-                      WHERE id IN (
-                            SELECT tcir.id
-                              FROM {totara_criteria_item} tci
-                              JOIN {totara_criteria_item_record} tcir
-                                ON tcir.criterion_item_id = tci.id
-                             WHERE tci.criterion_id = :criterionid
-                               AND tcir.user_id NOT IN (
-                                   SELECT $temp_user_id_column
-                                     FROM {" . $temp_table_name . "}";
         $params = ['criterionid' => $criterion_id];
+        $sql = "DELETE FROM {totara_criteria_item_record}
+                      WHERE criterion_item_id IN (
+                            SELECT tci.id
+                              FROM {totara_criteria_item} tci
+                             WHERE tci.criterion_id = :criterionid)
+                        AND user_id NOT IN (
+                            SELECT $temp_user_id_column
+                              FROM {" . $temp_table_name . "}";
 
         if (!empty($temp_key_value)) {
             $sql .= " WHERE " . $temp_key_column . " = :keyvalue";
             $params['keyvalue'] = $temp_key_value;
         }
-
-        $sql .= " ) )";
+        $sql .= ")";
 
         $DB->execute($sql, $params);
     }
@@ -260,20 +257,16 @@ abstract class item_combined {
         }
 
         $sql = "DELETE FROM {totara_criteria_item_record}
-                      WHERE id IN (
-                            SELECT tcir.id
+                      WHERE criterion_item_id IN (
+                            SELECT tci.id
                               FROM {totara_criteria_item} tci
-                              JOIN {totara_criteria_item_record} tcir
-                                ON tcir.criterion_item_id = tci.id
-                             WHERE tci.criterion_id = :criterionid";
+                             WHERE tci.criterion_id = :criterionid)";
 
         $params = [];
-        if (!empty($this->user)) {
+        if (!empty($this->user_ids)) {
             [$users_in_sql, $params] = $DB->get_in_or_equal($this->user_ids, SQL_PARAMS_NAMED);
-            $sql .= " AND tcir.user_id NOT " . $users_in_sql;
+            $sql .= " AND user_id NOT {$users_in_sql}";
         }
-
-        $sql .= ')';
         $params['criterionid'] = $criterion_id;
 
         $DB->execute($sql, $params);

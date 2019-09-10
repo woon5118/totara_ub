@@ -56,18 +56,19 @@ class competency_item_evaluator {
         }
 
         $sql = "
-            SELECT tcir.id, tcir.criterion_met,
-                   MAX(COALESCE(tca.proficient, 0)) AS proficient
+            SELECT tcir.id, tcir.criterion_met, COALESCE(p.proficient, 0) as proficient
               FROM {totara_criteria_item} tci
               JOIN {totara_criteria_item_record} tcir
                 ON tcir.criterion_item_id = tci.id
-         LEFT JOIN {totara_competency_achievement} tca
-                ON tca.comp_id = tci.item_id
-               AND tca.user_id = tcir.user_id
-               AND tca.status = :achievementstatus
+         LEFT JOIN (
+                   SELECT tca.comp_id, tca.user_id, MAX(tca.proficient) AS proficient
+                     FROM {totara_competency_achievement} tca
+                    WHERE tca.status = :achievementstatus
+                    GROUP BY tca.comp_id, tca.user_id) p 
+                ON tci.item_id = p.comp_id
+               AND tcir.user_id = p.user_id     
              WHERE tci.item_type = 'competency'
-                {$userinsql}{$iteminsql}
-          GROUP BY tcir.id";
+                {$userinsql}{$iteminsql}";
 
         $params = array_merge(
             $userparams,
