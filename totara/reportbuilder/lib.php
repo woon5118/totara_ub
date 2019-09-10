@@ -7008,7 +7008,7 @@ function reportbuilder_set_default_access($reportid) {
  * @return int Id of new report if report was successfully cloned
  */
 function reportbuilder_clone_report(reportbuilder $report, $clonename) {
-    global $DB;
+    global $DB, $TEXTAREA_OPTIONS;
 
     $transaction = $DB->start_delegated_transaction();
     $reportid = $report->_id;
@@ -7038,7 +7038,18 @@ function reportbuilder_clone_report(reportbuilder $report, $clonename) {
 
     $cloneid = $DB->insert_record('report_builder', $reportrec);
 
-    // Restrict acces to Site Manager only for embedded reports.
+    // Copy textarea files.
+    $data = new stdClass();
+    $data->description = $reportrec->description;
+    $data->descriptionformat = FORMAT_HTML;
+    $data = file_prepare_standard_editor($data, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+        'totara_reportbuilder', 'report_builder', $reportid);
+
+    $data = file_postupdate_standard_editor($data, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+        'totara_reportbuilder', 'report_builder', $cloneid);
+    $DB->set_field('report_builder', 'description', $data->description, array('id' => $cloneid));
+
+    // Restrict access to Site Manager only for embedded reports.
     if ($embedded) {
         reportbuilder_set_default_access($cloneid);
     }
