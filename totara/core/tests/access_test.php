@@ -204,7 +204,7 @@ class totara_core_access_testcase extends advanced_testcase {
                 $systemcontext->id);
 
             // Test for an allow in the module context.
-            $method = new \ReflectionMethod('totara_core\access', 'get_allow_prevent_check_sql');
+            $method = new \ReflectionMethod('totara_core\access', 'get_permission_sql_complete');
             $method->setAccessible(true);
             list($allowpreventsql, $allowpreventparams) = $method->invoke(null, $capability, $user->id, 'cx.id');
             $sql = "SELECT * FROM {context} cx WHERE id = :id AND EXISTS ({$allowpreventsql})";

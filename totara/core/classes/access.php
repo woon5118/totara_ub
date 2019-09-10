@@ -107,8 +107,15 @@ final class access {
             return array("1=1", array());
         }
 
-        list($prohibitsql, $prohibitparams) = self::get_prohibit_check_sql($capability, $userid, 'hascapabilitycontext.id');
-        list($allowpreventsql, $allowpreventparams) = self::get_allow_prevent_check_sql($capability, $userid, 'hascapabilitycontext.id');
+        if (self::has_capability_definition_past_system($capability, $userid)) {
+            // The capability has been assigned at sub contexts, we're going to need to traverse.
+            // This is known to be an expensive query on some databases (namely mariadb).
+            list($permissionsql, $permissionparams) = self::get_permission_sql_complete($capability, $userid, 'hascapabilitycontext.id');
+        } else {
+            // The capability has only ever been assigned at the system context.
+            // YAY! This is going to be much faster.
+            list($permissionsql, $permissionparams) = self::get_permission_sql_system_level_only($capability, $userid);
+        }
 
         // They must have ALLOW in at least one role, and no prohibits in any role.
         $hascapsql = "
@@ -118,17 +125,12 @@ EXISTS (
      WHERE hascapabilitycontext.id = {$contextidfield} $tenantwhere
 
        AND EXISTS (
-{$allowpreventsql}
+{$permissionsql}
                   )
-
-       AND NOT EXISTS (
-{$prohibitsql}
-                      )
        )
 ";
-        $hascapparams = array_merge($allowpreventparams, $prohibitparams);
 
-        return array($hascapsql, $hascapparams);
+        return array($hascapsql, $permissionparams);
     }
 
     /**
@@ -246,6 +248,113 @@ EXISTS (
     }
 
     /**
+     * Returns true if the given capability has been prohibited at least once, anywhere throughout the system.
+     *
+     * This method could be further optimised by providing a userid and then only returning true if the user
+     * holds a role that has the prohibit flag for the given capability.
+     *
+     * @param string $capability
+     * @return bool
+     */
+    private static function has_prohibit_flag_being_used_anywhere(string $capability): bool {
+        global $DB;
+        return $DB->record_exists('role_capabilities', ['capability' => $capability, 'permission' => CAP_PROHIBIT]);
+    }
+
+    /**
+     * Returns true if the given capability is defined for the at least one of the roles held by the given user and any context
+     * level other than the system.
+     *
+     * @param string $capability
+     * @param int $userid
+     * @return bool
+     */
+    private static function has_capability_definition_past_system(string $capability, int $userid): bool {
+        global $DB;
+        $roleassignmentssql = self::get_role_assignments_subquery($userid);
+        $rc = $DB->get_unique_param('rc');
+        $ra = $DB->get_unique_param('ra');
+        $c1 = $DB->get_unique_param('ctx_alias');
+        $c2 = $DB->get_unique_param('ctx_alias');
+        $sql = "SELECT {$rc}.id
+                  FROM {role_capabilities} {$rc}
+                  JOIN {context} {$c1} ON {$c1}.id = {$rc}.contextid
+                  JOIN (
+{$roleassignmentssql}
+                       ) {$ra} ON {$ra}.roleid = {$rc}.roleid
+                  JOIN {context} {$c2} ON {$c2}.id = {$ra}.contextid
+                 WHERE {$rc}.capability = :capability AND ({$c2}.depth > 1 OR {$c1}.depth > 1)";
+        $params = [
+            'capability' => $capability,
+        ];
+        return $DB->record_exists_sql($sql, $params);
+    }
+
+    /**
+     * Returns SQL that allows you to filter results to just those where the user holds the given capability at the system level.
+     *
+     * This method should only be called if you know for sure that the capability is overridden at any context for any of the
+     * roles held by the user, including the assumed roles such as the authenticated user role.
+     * If you are unsure, or already know that the capability has been overridden then you should call
+     * {@link self::get_permission_sql_complete()}
+     *
+     * @param string $capability
+     * @param int $userid
+     * @return array
+     */
+    private static function get_permission_sql_system_level_only(string $capability, int $userid): array {
+        global $DB;
+
+        $roleassignmentssql = self::get_role_assignments_subquery($userid);
+
+        // Generate prefix and parameter names in order to avoid collisions.
+        $rc = $DB->get_unique_param('rc');
+        $ra = $DB->get_unique_param('ra');
+        $param_capability = $DB->get_unique_param('capability');
+        $param_systemcontextid = $DB->get_unique_param('context');
+        $param_allow = $DB->get_unique_param('permission');
+        $allowpreventsql = "
+            SELECT 'x'
+              FROM {role_capabilities} {$rc}
+              JOIN ({$roleassignmentssql}) {$ra} ON {$ra}.roleid = {$rc}.roleid
+             WHERE {$rc}.contextid = :{$param_systemcontextid} AND
+                   {$rc}.capability = :{$param_capability} AND
+                   {$rc}.permission = :{$param_allow}
+            ";
+        $params = [
+            $param_capability => $capability,
+            $param_systemcontextid => SYSCONTEXTID,
+            $param_allow => CAP_ALLOW,
+        ];
+
+        if (self::has_prohibit_flag_being_used_anywhere($capability)) {
+            // Generate new prefix and parameter names in order to avoid collisions.
+            $rc = $DB->get_unique_param('rc');
+            $ra = $DB->get_unique_param('ra');
+            $param_capability = $DB->get_unique_param('capability');
+            $param_systemcontextid = $DB->get_unique_param('context');
+            $param_allow = $DB->get_unique_param('permission');
+            $param_prohibit = $DB->get_unique_param('permission');
+
+            $allowpreventsql .= " AND
+                   NOT EXISTS (
+                        SELECT 'x'
+                          FROM {role_capabilities} {$rc}
+                          JOIN ({$roleassignmentssql}) {$ra} ON {$ra}.roleid = {$rc}.roleid
+                         WHERE {$rc}.contextid = :{$param_systemcontextid} AND
+                               {$rc}.capability = :{$param_capability} AND
+                               {$rc}.permission = :{$param_prohibit}
+                   )";
+            $params[$param_capability] = $capability;
+            $params[$param_systemcontextid] = SYSCONTEXTID;
+            $params[$param_allow] = CAP_PROHIBIT;
+            $params[$param_prohibit] = CAP_PROHIBIT;
+        }
+
+        return [$allowpreventsql, $params];
+    }
+
+    /**
      * Given an SQL field containing a context id, return an SQL snippet that returns
      * non-zero number of rows if the specified user is assigned any roles in that context which
      * grant them ALLOW permission on the specified capability. This takes into account
@@ -257,7 +366,7 @@ EXISTS (
      *
      * @return array Array of SQL and parameters that generate the query.
      */
-    private static function get_allow_prevent_check_sql($capability, $userid, $contextidfield) {
+    private static function get_permission_sql_complete($capability, $userid, $contextidfield) {
         global $DB;
 
         $capallow = CAP_ALLOW;
@@ -324,6 +433,13 @@ EXISTS (
            WHERE lineage.childid = {$contextidfield}
 ";
         $params = array_merge($params, array($paramcapability => $capability));
+
+        if (self::has_prohibit_flag_being_used_anywhere($capability)) {
+            // The prohibit permission has been used at least once for the capability, ensure we allow for it.
+            list($prohibitsql, $prohibitparams) = self::get_prohibit_check_sql($capability, $userid, $contextidfield);
+            $allowpreventsql .= " AND NOT EXISTS (\n{$prohibitsql}\n                )";
+            $params = array_merge($params, $prohibitparams);
+        }
 
         return array($allowpreventsql, $params);
     }
