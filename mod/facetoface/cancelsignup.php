@@ -35,6 +35,9 @@ if (!defined('FACETOFACE_EVENTINFO_INTERNAL')) {
 
 defined('MOODLE_INTERNAL') || die();
 
+require_login($course, false, $cm);
+require_capability('mod/facetoface:view', $context);
+
 $signup = signup::create($USER->id, $seminarevent);
 if (!$signup->exists()) {
     throw new coding_exception(
@@ -45,11 +48,8 @@ if (!$signup->exists()) {
 // Check user's eligibility to cancel.
 $currentstate = $signup->get_state();
 if (!$currentstate->can_switch(signup\state\user_cancelled::class)) {
-    print_error('error:cancellationsnotallowed', 'facetoface');
+    redirect($pageurl, get_string('error:cancellationsnotallowed', 'facetoface'), null, \core\notification::ERROR);
 }
-
-require_login($course, false, $cm);
-require_capability('mod/facetoface:view', $context);
 
 $currentstate = $signup->get_state();
 $userisinwaitlist = $currentstate instanceof waitlisted;

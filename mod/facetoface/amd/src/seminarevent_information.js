@@ -50,7 +50,9 @@ define([], function() {
                     }
                 });
                 Array.prototype.forEach.call(root.querySelectorAll(CLASS_TOGGLE), update);
-                resolve(true); // Nothing interesting to return.
+                require(['core/form_duplicate_prevent'], function(dupe) {
+                    dupe.init(root).then(resolve);
+                });
             });
         }
     };
