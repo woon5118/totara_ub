@@ -23,10 +23,17 @@
 
 namespace mod_facetoface;
 
+use context_course;
+
 /**
  * Additional room functionality.
  */
 final class room_helper {
+
+    /**
+     * The 15 minutes is time prior to the start of a session
+     */
+    const JOIN_NOW_TIME = MINSECS * 15;
 
     /**
      * Room data
@@ -35,6 +42,7 @@ final class room_helper {
      *      - int {facetoface_room}.id
      *      - string {facetoface_room}.name
      *      - int {facetoface_room}.capacity
+     *      - string {facetoface_room}.url
      *      - int {facetoface_room}.allowconflicts
      *      - string {facetoface_room}.description
      *      - bool {facetoface_room}.custom (optional)
@@ -62,6 +70,7 @@ final class room_helper {
         $room->set_name($data->name);
         $room->set_allowconflicts($data->allowconflicts);
         $room->set_capacity($data->roomcapacity);
+        $room->set_url($data->url);
 
         if (!$room->exists()) {
             $room->save();
@@ -134,5 +143,84 @@ final class room_helper {
                  WHERE fsd.id = :id";
         $ret = $DB->get_field_sql($sql, array('id' => $sessionid));
         return $ret ? $ret : '';
+    }
+
+    /**
+     * Can we display 'Join now' link button?
+     * @param seminar_event $seminarevent
+     * @param seminar_session $session
+     * @param signup|null $signup, if null is passed, create new signup instance with global $USER and $seminarevent
+     * @return bool
+     */
+    public static function show_joinnow(seminar_event $seminarevent, seminar_session $session, ?signup $signup = null): bool {
+        return self::has_time_come($session) && (self::is_attendee_booked($seminarevent, $signup) || self::seek_event_role($seminarevent));
+    }
+
+    /**
+     * room::show_joinnow(html button)::has_time_come(to display 'Join now' button)?
+     * Has time come to display the 'Join now' link button
+     * from 15 minutes prior to the session start time, until the session end time
+     * @param seminar_session $session
+     * @return bool
+     */
+    private static function has_time_come(seminar_session $session): bool {
+        $time = time();
+        if (($session->get_timestart() - self::JOIN_NOW_TIME) < $time && $time < $session->get_timefinish()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Is attendee 'booked' to current seminar event.
+     * @param seminar_event $seminarevent
+     * @param signup|null $signup, if null is passed, create new signup instance with global $USER and $seminarevent
+     * @return bool
+     */
+    private static function is_attendee_booked(seminar_event $seminarevent, ?signup $signup = null): bool {
+        global $USER;
+        // Private cache
+        static $states = [];
+        if (!isset($states[$seminarevent->get_id()][$USER->id])) {
+            if (is_null($signup)) {
+                $signup = signup::create($USER->id, $seminarevent);
+            }
+            $states[$seminarevent->get_id()][$USER->id] = $signup->get_state() instanceof \mod_facetoface\signup\state\booked;
+        }
+        return (bool)$states[$seminarevent->get_id()][$USER->id];
+    }
+
+    /**
+     * Seek any event role/s in current seminar event which may assigned
+     * @param seminar_event $seminarevent
+     * @return bool
+     */
+    private static function seek_event_role(seminar_event $seminarevent): bool {
+        global $USER;
+        // Private cache.
+        static $userlist = [];
+        if (isset($userlist[$seminarevent->get_id()][$USER->id])) {
+            return (bool)$userlist[$seminarevent->get_id()][$USER->id];
+        }
+
+        $anyrole = false;
+        $context = context_course::instance($seminarevent->get_seminar()->get_course());
+        $userroles = get_user_roles($context, $USER->id, false);
+        $eventroles = trainer_helper::get_trainer_roles($context);
+        foreach ($eventroles as $i => $eventrole) {
+            foreach ($userroles as $j => $userrole) {
+                if ((int)$userrole->roleid == (int)$eventrole->id) {
+                    $anyrole = true;
+                    // Exit second foreach
+                    break 1;
+                }
+            }
+            if ($anyrole) {
+                // Exit first foreach
+                break;
+            }
+        }
+        $userlist[$seminarevent->get_id()][$USER->id] = $anyrole;
+        return (bool)$userlist[$seminarevent->get_id()][$USER->id];
     }
 }

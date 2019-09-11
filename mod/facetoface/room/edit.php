@@ -28,9 +28,10 @@ require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
-admin_externalpage_setup('modfacetofacerooms');
-
 $id = optional_param('id', 0, PARAM_INT);
+
+admin_externalpage_setup('modfacetofacerooms', '', ['id' => $id], '/mod/facetoface/room/edit.php');
+
 $room = new room($id);
 
 $roomlisturl = new moodle_url('/mod/facetoface/room/manage.php');

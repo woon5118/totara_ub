@@ -28,8 +28,10 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 
-class rb_source_facetoface_rooms extends rb_facetoface_base_source
-{
+class rb_source_facetoface_rooms extends rb_facetoface_base_source {
+
+    use \mod_facetoface\rb\traits\rooms;
+
     /**
      * Url of embedded report required for certain actions
      * @var string

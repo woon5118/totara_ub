@@ -36,6 +36,7 @@ $string['namelink'] = 'Room Name (linked to room details page)';
 $string['published'] = 'Room Published';
 $string['roomavailable'] = 'Room Availability';
 $string['roomid'] = 'Room ID';
+$string['roomlink'] = 'Room Link';
 $string['sessionfinishdatetime'] = 'Finish Time';
 $string['sessionstartdatetime'] = 'Start Time';
 $string['type_date'] = 'Date/time';

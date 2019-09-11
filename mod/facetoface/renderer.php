@@ -296,7 +296,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                         $roomoutput = html_writer::start_tag('ul', ['class' => 'roomlist']);
                         /** @var \mod_facetoface\room $room */
                         foreach ($rooms as $room) {
-                            $roomstring = $this->get_room_details_html($room, $currenturl);
+                            $joinnow = false;
+                            if ((bool)$room->get_url()) {
+                                $joinnow = \mod_facetoface\room_helper::show_joinnow($seminarevent, $date);
+                            }
+                            $roomstring = $this->get_room_details_html($room, $currenturl, $joinnow);
                             $roomoutput .= html_writer::tag('li', $roomstring, ['class' => 'room']);
                         }
                         $roomoutput .= html_writer::end_tag('ul');
@@ -1408,10 +1412,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_room_details(room $room): string {
-        global $DB;
 
         $output = array();
-
         $output[] = html_writer::start_tag('dl', array('class' => 'f2f roomdetails dl-horizontal'));
 
         // Room name.
@@ -1439,6 +1441,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $output[] = html_writer::tag('dt', get_string('allowroomconflicts', 'facetoface'));
         $output[] = html_writer::tag('dd', $room->get_allowconflicts() ? get_string('yes') : get_string('no'));
 
+        // Room link.
+        if (!empty($room->get_url())) {
+            // No conditions, everyone allow to see the room link who can access the room information.
+            $roomurl = s($room->get_url());
+            $output[] = html_writer::tag('dt', get_string('roomurl', 'mod_facetoface'));
+            $output[] = html_writer::tag('dd', html_writer::link(new moodle_url($roomurl), $roomurl));
+        }
+
         // Description.
         if (!empty($room->get_description())) {
             $output[] = html_writer::tag('dt', get_string('roomdescription', 'facetoface'));
@@ -1458,10 +1468,13 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $created = new stdClass();
         $created->user = get_string('unknownuser');
         if (!empty($room->get_usercreated())) {
-            $created->user = html_writer::link(
-                new moodle_url('/user/view.php', array('id' => $room->get_usercreated())),
-                fullname($DB->get_record('user', array('id' => $room->get_usercreated())))
-            );
+            $url = user_get_profile_url($room->get_usercreated());
+            $user = fullname(\core_user::get_user($room->get_usercreated()));
+            if ($url) {
+                $created->user = html_writer::link($url, $user);
+            } else {
+                $created->user = html_writer::span($user);
+            }
         }
         $created->time = userdate($room->get_timecreated());
         $output[] = html_writer::tag('dt', get_string('created', 'mod_facetoface'));
@@ -1472,13 +1485,15 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $modified = new stdClass();
             $modified->user = get_string('unknownuser');
             if (!empty($room->get_usermodified())) {
-                $modified->user = html_writer::link(
-                    new moodle_url('/user/view.php', array('id' => $room->get_usermodified())),
-                    fullname($DB->get_record('user', array('id' => $room->get_usermodified())))
-                );
+                $url = user_get_profile_url($room->get_usermodified());
+                $user = fullname(\core_user::get_user($room->get_usermodified()));
+                if ($url) {
+                    $modified->user = html_writer::link($url, $user);
+                } else {
+                    $modified->user = html_writer::span($user);
+                }
             }
             $modified->time = userdate($room->get_timemodified());
-
             $output[] = html_writer::tag('dt', get_string('modified'));
             $output[] = html_writer::tag('dd', get_string('timestampbyuser', 'mod_facetoface', $modified));
         }
@@ -1495,15 +1510,25 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      *
      * @param \mod_facetoface\room $room - The room instance to get details for
      * @param string|null $backurl
+     * @param \mod_facetoface\seminar_session $date
+     * @param bool $joinnow to display virtual room link if exists and time has come(15 min prior to the session start time)
      * @return string containing room details with relevant html tags.
      */
-    public function get_room_details_html(\mod_facetoface\room $room, string $backurl = null): string {
+    public function get_room_details_html(room $room, string $backurl = null, bool $joinnow = false): string {
         global $CFG;
         $url = new moodle_url('/mod/facetoface/reports/rooms.php', array(
             'roomid' => $room->get_id(),
         ));
 
         $roomhtml = '';
+        if ($joinnow && !empty($room->get_url())) {
+            $roomurl = new moodle_url(s($room->get_url()));
+            $roomhtml .= '<br>' . html_writer::link(
+                $roomurl,
+                get_string('roomjoinnow', 'mod_facetoface'),
+                ['class' => 'roomurl btn btn-primary btn-xs', 'role' => 'button', 'target' => '_blank', 'rel' => 'noreferrer']
+            );
+        }
         // Display room custom fields?
         if (!empty($CFG->facetoface_roomidentifier)) {
             $customfields = $room->get_customfield_array();
@@ -2463,7 +2488,6 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             ->set_collapsible(true, html_writer::random_id('f2fsection'));
 
         if ($seminarevent->get_mintimestart()) {
-            $rooms = \mod_facetoface\room_list::get_event_rooms($seminarevent->get_id());
             /** @var \mod_facetoface\seminar_session $date */
             foreach ($seminarevent->get_sessions() as $date) {
                 $section = seminarevent_detail_section::builder('session');
@@ -2488,8 +2512,13 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     $roomoutputs = [];
                     // Display room information
                     $backurl = $option->get_backurl();
+                    /** @var \mod_facetoface\room $room */
                     foreach ($rooms as $room) {
-                        $roomoutputs[] = $this->get_room_details_html($room, $backurl);
+                        $joinnow = false;
+                        if ((bool)$room->get_url()) {
+                            $joinnow = \mod_facetoface\room_helper::show_joinnow($seminarevent, $date, $signup);
+                        }
+                        $roomoutputs[] = $this->get_room_details_html($room, $backurl, $joinnow);
                     }
                     $roomoutput = $this->render_unordered_list($roomoutputs, '', $class, 'rooms', 'room');
                     $section->add_detail_unsafe(get_string('rooms', 'mod_facetoface'), $roomoutput);

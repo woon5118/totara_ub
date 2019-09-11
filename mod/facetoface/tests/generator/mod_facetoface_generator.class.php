@@ -258,6 +258,10 @@ class mod_facetoface_generator extends testing_module_generator {
             $record->allowconflicts = 0;
         }
 
+        if (empty($record->url)) {
+            $record->url = 'https://example.com/channel/id/12345';
+        }
+
         if (!isset($record->description)) {
             $record->description = 'Description for room '.$this->roominstancecount;
         }

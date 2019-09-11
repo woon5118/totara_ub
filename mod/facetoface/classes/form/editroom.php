@@ -85,6 +85,9 @@ class editroom extends \moodleform {
         }
         $mform->setType('notcustom', PARAM_INT);
 
+        $mform->addElement('text', 'url', get_string('roomurl', 'mod_facetoface'), ['maxlength' => '1024', 'size' => '45']);
+        $mform->setType('url', PARAM_URL);
+
         $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'facetoface'), null, $this->_customdata['editoroptions']);
 
         customfield_definition($mform, (object)['id' => $room->get_id()], 'facetofaceroom', 0, 'facetoface_room');
@@ -142,6 +145,7 @@ class editroom extends \moodleform {
             'name' => $room->get_name(),
             'roomcapacity' => $room->get_capacity(),
             'allowconflicts' => $room->get_allowconflicts(),
+            'url' => $room->get_url(),
             'description_editor' => ['text' => $room->get_description()],
             'notcustom' => $room->get_custom() ? 0 : 1,
             'description' => $room->get_description(),
@@ -171,6 +175,12 @@ class editroom extends \moodleform {
 
             if ($room->has_conflicts()) {
                 $errors['allowconflicts'] = get_string('error:roomconflicts', 'mod_facetoface');
+            }
+        }
+
+        if (!empty($data->url)) {
+            if (!filter_var($data->url, FILTER_VALIDATE_URL)) {
+                $errors['url'] = get_string('error:urlformat', 'mod_facetoface');
             }
         }
 

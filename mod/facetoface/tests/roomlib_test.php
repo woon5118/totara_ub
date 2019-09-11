@@ -26,6 +26,8 @@
  */
 
 use mod_facetoface\room;
+use mod_facetoface\signup;
+use mod_facetoface\signup\state\booked;
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
@@ -74,18 +76,18 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $room = new \mod_facetoface\room($sitewideroom->id);
         $this->assertEquals($sitewideroom->id, $room->get_id());
         $this->assertEquals($sitewideroom->name, $room->get_name());
-        $this->assertEquals((boolean)$sitewideroom->custom, $room->get_custom());
-        $this->assertEquals((boolean)$sitewideroom->hidden, $room->get_hidden());
+        $this->assertEquals((boolean) $sitewideroom->custom, $room->get_custom());
+        $this->assertEquals((boolean) $sitewideroom->hidden, $room->get_hidden());
         $this->assertEquals($sitewideroom->capacity, $room->get_capacity());
-        $this->assertEquals((boolean)$sitewideroom->allowconflicts, $room->get_allowconflicts());
+        $this->assertEquals((boolean) $sitewideroom->allowconflicts, $room->get_allowconflicts());
 
         $room = new \mod_facetoface\room($customroom->id);
         $this->assertEquals($customroom->id, $room->get_id());
         $this->assertEquals($customroom->name, $room->get_name());
-        $this->assertEquals((boolean)$customroom->custom, $room->get_custom());
-        $this->assertEquals((boolean)$customroom->hidden, $room->get_hidden());
+        $this->assertEquals((boolean) $customroom->custom, $room->get_custom());
+        $this->assertEquals((boolean) $customroom->hidden, $room->get_hidden());
         $this->assertEquals($customroom->capacity, $room->get_capacity());
-        $this->assertEquals((boolean)$customroom->allowconflicts, $room->get_allowconflicts());
+        $this->assertEquals((boolean) $customroom->allowconflicts, $room->get_allowconflicts());
 
         $room = new \mod_facetoface\room();
         $this->assertFalse($room->exists());
@@ -115,16 +117,19 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 1), $now + (DAYSECS * 2), $sitewideroom1->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 2), $now + (DAYSECS * 3), $sitewideroom2->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $customroom1->id);
-        $sessionid1_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $sessionid1_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
 
         $sessiondates = array();
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $customroom3->id);
-        $sessionid1_2 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $sessionid1_2 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
 
         $sessiondates = array();
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 5), $now + (DAYSECS * 6), $customroom1->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 9), $now + (DAYSECS * 10), $sitewideroom2->id);
-        $sessionid2_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates));
+        $sessionid2_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates));
 
         $rooms = \mod_facetoface\room_list::get_seminar_rooms($facetoface1->id);
         $this->assertTrue($rooms->contains($customroom1->id));
@@ -140,7 +145,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $sitewideroom1 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site x 1'));
         customfield_load_data($sitewideroom1, 'facetofaceroom', 'facetoface_room');
         $sitewideroom2 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site a 2'));
-        customfield_load_data($sitewideroom2 , 'facetofaceroom', 'facetoface_room');
+        customfield_load_data($sitewideroom2, 'facetofaceroom', 'facetoface_room');
         $sitewideroom3 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site b 3'));
         customfield_load_data($sitewideroom3, 'facetofaceroom', 'facetoface_room');
         $customroom1 = $this->facetoface_generator->add_custom_room(array('name' => 'Custom 1'));
@@ -158,16 +163,19 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 1), $now + (DAYSECS * 2), $sitewideroom1->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 2), $now + (DAYSECS * 3), $sitewideroom2->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $customroom1->id);
-        $sessionid1_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $sessionid1_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
 
         $sessiondates = array();
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $customroom3->id);
-        $sessionid1_2 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $sessionid1_2 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
 
         $sessiondates = array();
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 5), $now + (DAYSECS * 6), $customroom1->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 9), $now + (DAYSECS * 10), $sitewideroom2->id);
-        $sessionid2_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates));
+        $sessionid2_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates));
 
         $rooms = \mod_facetoface\room_list::get_event_rooms($sessionid1_1);
         $this->assertTrue($rooms->contains($customroom1->id));
@@ -216,18 +224,24 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $sessiondate1->timefinish = $sessiondate1->timestart + (DAYSECS * 1);
         $sessiondate1->sessiontimezone = '99';
         $sessiondate1->roomids = [$sitewideroom->id];
-        $sessionid1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => array($sessiondate1)));
+        $sessionid1 = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface->id,
+            'sessiondates' => array($sessiondate1)
+        ));
         $rooms = \mod_facetoface\room_list::get_event_rooms($sessionid1);// from_session($sessionid1);
-        $this->assertSame((int)$sitewideroom->id, $rooms->get($sitewideroom->id)->get_id());
+        $this->assertSame((int) $sitewideroom->id, $rooms->get($sitewideroom->id)->get_id());
 
         $sessiondate2 = new stdClass();
         $sessiondate2->timestart = time() + (DAYSECS * 2);
         $sessiondate2->timefinish = $sessiondate2->timestart + (DAYSECS * 2);
         $sessiondate2->sessiontimezone = '99';
         $sessiondate2->roomids = [$customroom->id];
-        $sessionid2 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => array($sessiondate2)));
+        $sessionid2 = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface->id,
+            'sessiondates' => array($sessiondate2)
+        ));
         $rooms = \mod_facetoface\room_list::get_event_rooms($sessionid2);// from_session($sessionid2);
-        $this->assertSame((int)$customroom->id, $rooms->get($customroom->id)->get_id());
+        $this->assertSame((int) $customroom->id, $rooms->get($customroom->id)->get_id());
 
         $room = new room($sitewideroom->id);
         $room->delete();
@@ -237,7 +251,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertFalse($fs->file_exists_by_hash($sitefile->get_pathnamehash()));
 
         $rooms = \mod_facetoface\room_list::get_event_rooms($sessionid2);// from_session($sessionid2);
-        $this->assertSame((int)$customroom->id, $rooms->get($customroom->id)->get_id());
+        $this->assertSame((int) $customroom->id, $rooms->get($customroom->id)->get_id());
         $this->assertTrue($fs->file_exists_by_hash($customfile->get_pathnamehash()));
     }
 
@@ -252,7 +266,8 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         // Create a room customfield, text type.
         $roomcftextids = $this->customfield_generator->create_text($this->cftableprefix, array('fullname' => 'roomcftext'));
         // Add some text to it.
-        $this->customfield_generator->set_text($sitewideroom, $roomcftextids['roomcftext'], 'Some test text', $this->cfprefix, $this->cftableprefix);
+        $this->customfield_generator->set_text($sitewideroom, $roomcftextids['roomcftext'], 'Some test text', $this->cfprefix,
+            $this->cftableprefix);
         $cfdata = customfield_get_data($sitewideroom, $this->cftableprefix, $this->cfprefix);
         $this->assertEquals('Some test text', $cfdata['roomcftext']);
         $this->assertEquals(1, $DB->count_records('facetoface_room_info_data', array('facetofaceroomid' => $sitewideroom->id)));
@@ -312,9 +327,17 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertNotEmpty($infodata_sitewide_cffile);
         // Sitewide should now have testfile1 but not testfile2.
         $this->assertEquals(1, $DB->count_records('files',
-            array('filearea' => 'facetofaceroom_filemgr', 'filename' => 'testfile1.txt', 'itemid' => $infodata_sitewide_cffile->id)));
+            array(
+                'filearea' => 'facetofaceroom_filemgr',
+                'filename' => 'testfile1.txt',
+                'itemid' => $infodata_sitewide_cffile->id
+            )));
         $this->assertEquals(0, $DB->count_records('files',
-            array('filearea' => 'facetofaceroom_filemgr', 'filename' => 'testfile2.txt', 'itemid' => $infodata_sitewide_cffile->id)));
+            array(
+                'filearea' => 'facetofaceroom_filemgr',
+                'filename' => 'testfile2.txt',
+                'itemid' => $infodata_sitewide_cffile->id
+            )));
 
         $infodata_custom_cffile = $DB->get_record('facetoface_room_info_data',
             array('facetofaceroomid' => $customroom->id, 'fieldid' => $roomcffileid));
@@ -409,12 +432,15 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->customfield_generator->set_file($customroom, $roomcffileid, $itemid2, $this->cfprefix, $this->cftableprefix);
         //$this->customfield_generator->set_file($customroom, $roomcffileid, $testfile2, $this->cfprefix, $this->cftableprefix);
 
-        $this->customfield_generator->set_text($sitewideroom, $roomcftextid, 'Here is some text', $this->cfprefix, $this->cftableprefix);
-        $this->customfield_generator->set_text($customroom, $roomcftextid, 'Some other text', $this->cfprefix, $this->cftableprefix);
+        $this->customfield_generator->set_text($sitewideroom, $roomcftextid, 'Here is some text', $this->cfprefix,
+            $this->cftableprefix);
+        $this->customfield_generator->set_text($customroom, $roomcftextid, 'Some other text', $this->cfprefix,
+            $this->cftableprefix);
 
         $sitewidedate = 1000000;
         $customdate = 200000000;
-        $this->customfield_generator->set_datetime($sitewideroom, $roomcfdateid, $sitewidedate, $this->cfprefix, $this->cftableprefix);
+        $this->customfield_generator->set_datetime($sitewideroom, $roomcfdateid, $sitewidedate, $this->cfprefix,
+            $this->cftableprefix);
         $this->customfield_generator->set_datetime($customroom, $roomcfdateid, $customdate, $this->cfprefix, $this->cftableprefix);
 
         // Check all the data is as expecting before deleting any room.
@@ -423,9 +449,17 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertNotEmpty($infodata_sitewide_cffile);
         // Sitewide should now have testfile1 but not testfile2.
         $this->assertEquals(1, $DB->count_records('files',
-            array('filearea' => 'facetofaceroom_filemgr', 'filename' => 'testfile1.txt', 'itemid' => $infodata_sitewide_cffile->id)));
+            array(
+                'filearea' => 'facetofaceroom_filemgr',
+                'filename' => 'testfile1.txt',
+                'itemid' => $infodata_sitewide_cffile->id
+            )));
         $this->assertEquals(0, $DB->count_records('files',
-            array('filearea' => 'facetofaceroom_filemgr', 'filename' => 'testfile2.txt', 'itemid' => $infodata_sitewide_cffile->id)));
+            array(
+                'filearea' => 'facetofaceroom_filemgr',
+                'filename' => 'testfile2.txt',
+                'itemid' => $infodata_sitewide_cffile->id
+            )));
 
         $infodata_custom_cffile = $DB->get_record('facetoface_room_info_data',
             array('facetofaceroomid' => $customroom->id, 'fieldid' => $roomcffileid));
@@ -463,7 +497,11 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
             array('facetofaceroomid' => $sitewideroom->id, 'fieldid' => $roomcffileid));
         $this->assertNotEmpty($infodata_sitewide_cffile);
         $this->assertEquals(1, $DB->count_records('files',
-            array('filearea' => 'facetofaceroom_filemgr', 'filename' => 'testfile1.txt', 'itemid' => $infodata_sitewide_cffile->id)));
+            array(
+                'filearea' => 'facetofaceroom_filemgr',
+                'filename' => 'testfile1.txt',
+                'itemid' => $infodata_sitewide_cffile->id
+            )));
 
         // Nothing should have changed for the custom room values.
         $infodata_custom_cffile_again = $DB->get_record('facetoface_room_info_data',
@@ -495,16 +533,41 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        $sitewideroom1 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 0, 'hidden' => 0));
-        $sitewideroom2 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 2', 'allowconflicts' => 0, 'hidden' => 0));
-        $sitewideroom3 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 3', 'allowconflicts' => 0, 'hidden' => 1));
-        $sitewideroom4 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 4', 'allowconflicts' => 1, 'hidden' => 0));
-        $sitewideroom5 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 5', 'allowconflicts' => 1, 'hidden' => 0));
-        $customroom1 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 1', 'allowconflicts' => 0));
-        $customroom2 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 2', 'allowconflicts' => 0));
-        $customroom3 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user2->id, 'name' => 'Custom room 3', 'allowconflicts' => 0));
-        $customroom4 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 4', 'allowconflicts' => 1));
-        $customroom5 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 5', 'allowconflicts' => 1));
+        $sitewideroom1 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 0, 'hidden' => 0));
+        $sitewideroom2 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 2', 'allowconflicts' => 0, 'hidden' => 0));
+        $sitewideroom3 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 3', 'allowconflicts' => 0, 'hidden' => 1));
+        $sitewideroom4 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 4', 'allowconflicts' => 1, 'hidden' => 0));
+        $sitewideroom5 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 5', 'allowconflicts' => 1, 'hidden' => 0));
+        $customroom1 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 1',
+            'allowconflicts' => 0
+        ));
+        $customroom2 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 2',
+            'allowconflicts' => 0
+        ));
+        $customroom3 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user2->id,
+            'name' => 'Custom room 3',
+            'allowconflicts' => 0
+        ));
+        $customroom4 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 4',
+            'allowconflicts' => 1
+        ));
+        $customroom5 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 5',
+            'allowconflicts' => 1
+        ));
         $allrooms = new \mod_facetoface\room_list();
 
         $course = $this->getDataGenerator()->create_course();
@@ -519,21 +582,25 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 5), $now + (DAYSECS * 6), $customroom3->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 7), $now + (DAYSECS * 8), $customroom4->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 9), $now + (DAYSECS * 10), $sitewideroom4->id);
-        $sessionid1_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $sessionid1_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
         $event11 = new \mod_facetoface\seminar_event($sessionid1_1);
 
-        $sessionid1_2 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => array()));
+        $sessionid1_2 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => array()));
         $event12 = new \mod_facetoface\seminar_event($sessionid1_2);
 
         $sessiondates = array();
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 30), $now + (DAYSECS * 31), $sitewideroom1->id);
-        $sessionid1_3 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $sessionid1_3 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
         $event13 = new \mod_facetoface\seminar_event($sessionid1_3);
 
         $sessiondates = array();
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 5), $now + (DAYSECS * 6), $customroom3->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 9), $now + (DAYSECS * 10), $sitewideroom4->id);
-        $sessionid2_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates));
+        $sessionid2_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates));
         $event21 = new \mod_facetoface\seminar_event($sessionid2_1);
 
         $this->setUser(null);
@@ -1066,7 +1133,6 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
             $this->assertObjectHasAttribute('allowconflicts', $room);
         }
 
-
         // Test slot must have size.
         $rooms = \mod_facetoface\room_list::get_available_rooms(2, 1, $event00);
         $this->assertDebuggingCalled();
@@ -1085,18 +1151,48 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        $sitewideroom1 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 0, 'hidden' => 0));
-        $sitewideroom2 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 2', 'allowconflicts' => 0, 'hidden' => 0));
-        $sitewideroom3 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 3', 'allowconflicts' => 0, 'hidden' => 1));
-        $sitewideroom4 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 4', 'allowconflicts' => 1, 'hidden' => 0));
-        $sitewideroom5 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 5', 'allowconflicts' => 1, 'hidden' => 0));
-        $sitewideroom6 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 6', 'allowconflicts' => 1, 'hidden' => 1));
-        $customroom1 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 1', 'allowconflicts' => 0));
-        $customroom2 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 2', 'allowconflicts' => 0));
-        $customroom3 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user2->id, 'name' => 'Custom room 3', 'allowconflicts' => 0));
-        $customroom4 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 4', 'allowconflicts' => 1));
-        $customroom5 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 5', 'allowconflicts' => 1));
-        $customroom6 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user2->id, 'name' => 'Custom room 6', 'allowconflicts' => 1));
+        $sitewideroom1 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 0, 'hidden' => 0));
+        $sitewideroom2 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 2', 'allowconflicts' => 0, 'hidden' => 0));
+        $sitewideroom3 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 3', 'allowconflicts' => 0, 'hidden' => 1));
+        $sitewideroom4 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 4', 'allowconflicts' => 1, 'hidden' => 0));
+        $sitewideroom5 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 5', 'allowconflicts' => 1, 'hidden' => 0));
+        $sitewideroom6 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 6', 'allowconflicts' => 1, 'hidden' => 1));
+        $customroom1 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 1',
+            'allowconflicts' => 0
+        ));
+        $customroom2 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 2',
+            'allowconflicts' => 0
+        ));
+        $customroom3 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user2->id,
+            'name' => 'Custom room 3',
+            'allowconflicts' => 0
+        ));
+        $customroom4 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 4',
+            'allowconflicts' => 1
+        ));
+        $customroom5 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 5',
+            'allowconflicts' => 1
+        ));
+        $customroom6 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user2->id,
+            'name' => 'Custom room 6',
+            'allowconflicts' => 1
+        ));
 
         $course = $this->getDataGenerator()->create_course();
         $facetoface1 = $this->facetoface_generator->create_instance(array('course' => $course->id));
@@ -1110,20 +1206,23 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $customroom1->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 5), $now + (DAYSECS * 6), $customroom3->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 7), $now + (DAYSECS * 8), $customroom4->id);
-        $sessionid1_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $sessionid1_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
 
         $sessiondates = array();
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 1), $now + (DAYSECS * 3), $sitewideroom1->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 2.5), $now + (DAYSECS * 4.5), $sitewideroom2->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * -3), $now + (DAYSECS * -1.5), $sitewideroom3->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 4), $now + (DAYSECS * 7), $customroom4->id);
-        $sessionid1_2 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $sessionid1_2 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
 
         $sessiondates = array();
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 9), $now + (DAYSECS * 10), $sitewideroom4->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 5.5), $now + (DAYSECS * 5.6), $customroom3->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 8), $now + (DAYSECS * 9), $customroom4->id);
-        $sessionid2_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates));
+        $sessionid2_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates));
 
         $room = new \mod_facetoface\room();
 
@@ -1162,18 +1261,48 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        $sitewideroom1 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 0, 'hidden' => 0));
-        $sitewideroom2 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 2', 'allowconflicts' => 0, 'hidden' => 0));
-        $sitewideroom3 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 3', 'allowconflicts' => 0, 'hidden' => 1));
-        $sitewideroom4 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 4', 'allowconflicts' => 1, 'hidden' => 0));
-        $sitewideroom5 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 5', 'allowconflicts' => 1, 'hidden' => 0));
-        $sitewideroom6 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 6', 'allowconflicts' => 1, 'hidden' => 1));
-        $customroom1 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 1', 'allowconflicts' => 0));
-        $customroom2 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 2', 'allowconflicts' => 0));
-        $customroom3 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user2->id, 'name' => 'Custom room 3', 'allowconflicts' => 0));
-        $customroom4 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 4', 'allowconflicts' => 1));
-        $customroom5 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user1->id, 'name' => 'Custom room 5', 'allowconflicts' => 1));
-        $customroom6 = $this->facetoface_generator->add_custom_room(array('usercreated' => $user2->id, 'name' => 'Custom room 6', 'allowconflicts' => 1));
+        $sitewideroom1 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 0, 'hidden' => 0));
+        $sitewideroom2 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 2', 'allowconflicts' => 0, 'hidden' => 0));
+        $sitewideroom3 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 3', 'allowconflicts' => 0, 'hidden' => 1));
+        $sitewideroom4 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 4', 'allowconflicts' => 1, 'hidden' => 0));
+        $sitewideroom5 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 5', 'allowconflicts' => 1, 'hidden' => 0));
+        $sitewideroom6 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 6', 'allowconflicts' => 1, 'hidden' => 1));
+        $customroom1 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 1',
+            'allowconflicts' => 0
+        ));
+        $customroom2 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 2',
+            'allowconflicts' => 0
+        ));
+        $customroom3 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user2->id,
+            'name' => 'Custom room 3',
+            'allowconflicts' => 0
+        ));
+        $customroom4 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 4',
+            'allowconflicts' => 1
+        ));
+        $customroom5 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user1->id,
+            'name' => 'Custom room 5',
+            'allowconflicts' => 1
+        ));
+        $customroom6 = $this->facetoface_generator->add_custom_room(array(
+            'usercreated' => $user2->id,
+            'name' => 'Custom room 6',
+            'allowconflicts' => 1
+        ));
 
         $course = $this->getDataGenerator()->create_course();
         $facetoface1 = $this->facetoface_generator->create_instance(array('course' => $course->id));
@@ -1187,31 +1316,216 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $customroom1->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 5), $now + (DAYSECS * 6), $customroom3->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 7), $now + (DAYSECS * 8), $customroom4->id);
-        $sessionid1_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $sessionid1_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
 
         $sessiondates = array();
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 1), $now + (DAYSECS * 3), $sitewideroom1->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 2.5), $now + (DAYSECS * 4.5), $sitewideroom2->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * -3), $now + (DAYSECS * -1.5), $sitewideroom3->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 4), $now + (DAYSECS * 7), $customroom4->id);
-        $sessionid1_2 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $sessionid1_2 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
 
         $sessiondates = array();
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 9), $now + (DAYSECS * 10), $sitewideroom4->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 5.5), $now + (DAYSECS * 5.6), $customroom3->id);
         $sessiondates[] = $this->prepare_date($now + (DAYSECS * 8), $now + (DAYSECS * 9), $customroom4->id);
-        $sessionid2_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates));
+        $sessionid2_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates));
 
-
-        $dateids = $DB->get_fieldset_select('facetoface_sessions_dates', 'id', "sessionid = :sessionid", array('sessionid' => $sessionid2_1));
+        $dateids = $DB->get_fieldset_select('facetoface_sessions_dates', 'id', "sessionid = :sessionid",
+            array('sessionid' => $sessionid2_1));
         foreach ($dateids as $did) {
             $this->assertTrue($DB->record_exists('facetoface_room_dates', array('sessionsdateid' => $did)));
         }
         $seminarevent = new \mod_facetoface\seminar_event($sessionid2_1);
         $seminarevent->cancel();
-        $dateids = $DB->get_fieldset_select('facetoface_sessions_dates', 'id', "sessionid = :sessionid", array('sessionid' => $sessionid2_1));
+        $dateids = $DB->get_fieldset_select('facetoface_sessions_dates', 'id', "sessionid = :sessionid",
+            array('sessionid' => $sessionid2_1));
         foreach ($dateids as $did) {
             $this->assertTrue($DB->record_exists('facetoface_room_dates', array('sessionsdateid' => $did)));
+        }
+    }
+
+    /**
+     * test: false && (false || false)
+     */
+    public function test_show_joinnow_button_1() {
+        global $DB;
+        $now = time();
+
+        $testroom = $this->facetoface_generator->add_site_wide_room(array());
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $sessiondates = array();
+        $sessiondates[] = $this->prepare_date($now + (DAYSECS * 1), $now + (DAYSECS * 2), $testroom->id);
+        $seminareventid =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => $sessiondates));
+        $seminarevent = new \mod_facetoface\seminar_event($seminareventid);
+        // Test
+        foreach ($seminarevent->get_sessions() as $session) {
+            // time is not right, no attendee booked, no trainer
+            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+        }
+    }
+
+    /**
+     * test: true && (false || false)
+     */
+    public function test_show_joinnow_button_2() {
+        $now = time();
+        $testroom = $this->facetoface_generator->add_site_wide_room(array());
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $sessiondates = array();
+        // Time start: current time + 10 min, finish time: current time + 2 hours
+        $sessiondates[] = $this->prepare_date($now + (MINSECS * 10), $now + (HOURSECS * 2), $testroom->id);
+        $seminareventid =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => $sessiondates));
+        $seminarevent = new \mod_facetoface\seminar_event($seminareventid);
+        // Test
+        foreach ($seminarevent->get_sessions() as $session) {
+            // time is right, no attendee booked, no trainer
+            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+        }
+    }
+
+    /**
+     * test: true && (true || false)
+     */
+    public function test_show_joinnow_button_3() {
+        $now = time();
+        $testroom = $this->facetoface_generator->add_site_wide_room(array());
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $sessiondates = array();
+        // Time start: current time + 10 min, finish time: current time + 2 hours
+        $sessiondates[] = $this->prepare_date($now + (MINSECS * 10), $now + (HOURSECS * 2), $testroom->id);
+        $seminareventid =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => $sessiondates));
+        $seminarevent = new \mod_facetoface\seminar_event($seminareventid);
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $seminarevent->get_seminar()->get_course(), 'student');
+        $signup = signup::create($user->id, $seminarevent);
+        $signup->save();
+        $signup->switch_state(booked::class);
+        // Login as a student
+        $this->setUser($user);
+        // Test
+        foreach ($seminarevent->get_sessions() as $session) {
+            // time is right, attendee booked, no trainer
+            $this->assertTrue(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+        }
+    }
+
+    /**
+     * test: true && (false || true)
+     */
+    public function test_show_joinnow_button_4() {
+        global $DB;
+
+        $now = time();
+        $testroom = $this->facetoface_generator->add_site_wide_room(array());
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $sessiondates = array();
+        // Time start: current time + 10 min, finish time: current time + 2 hours
+        $sessiondates[] = $this->prepare_date($now + (MINSECS * 10), $now + (HOURSECS * 2), $testroom->id);
+        $seminareventid =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => $sessiondates));
+        $seminarevent = new \mod_facetoface\seminar_event($seminareventid);
+
+        // Create teacher.
+        set_config('facetoface_session_roles', '4');
+        $trainer = $this->getDataGenerator()->create_user();
+        $trainerrole = $DB->get_record('role', ['shortname' => 'teacher']);
+
+        $DB->set_field('facetoface', 'approvalrole', $trainerrole->id, ['id' => $facetoface->id]);
+        $DB->insert_record('facetoface_session_roles',
+            (object)['sessionid' => $seminarevent->get_id(), 'roleid' => $trainerrole->id, 'userid' => $trainer->id]);
+
+        $context = context_course::instance($seminarevent->get_seminar()->get_course());
+        $this->getDataGenerator()->role_assign($trainerrole->id, $trainer->id, $context->id);
+        $this->getDataGenerator()->enrol_user($trainer->id, $seminarevent->get_seminar()->get_course(), 'editingteacher');
+        // Login as a trainer
+        $this->setUser($trainer);
+        // Test
+        foreach ($seminarevent->get_sessions() as $session) {
+            // time is right, no attendee booked, yes trainer
+            $this->assertTrue(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+        }
+    }
+
+    /**
+     * test: false && (true || false)
+     */
+    public function test_show_joinnow_button_5() {
+        $now = time();
+        $testroom = $this->facetoface_generator->add_site_wide_room(array());
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $sessiondates = array();
+        $sessiondates[] = $this->prepare_date($now + (DAYSECS * 1), $now + (DAYSECS * 2), $testroom->id);
+        $seminareventid =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => $sessiondates));
+
+        $seminarevent = new \mod_facetoface\seminar_event($seminareventid);
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $seminarevent->get_seminar()->get_course(), 'student');
+        $signup = signup::create($user->id, $seminarevent);
+        $signup->save();
+        $signup->switch_state(booked::class);
+        // Login as a student
+        $this->setUser($user);
+        // Test
+        foreach ($seminarevent->get_sessions() as $session) {
+            // time is not right, attendee booked, no trainer
+            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+        }
+    }
+
+    /**
+     * test: false && (false || true)
+     */
+    public function test_show_joinnow_button_6() {
+        global $DB;
+
+        $now = time();
+        $testroom = $this->facetoface_generator->add_site_wide_room(array());
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $sessiondates = array();
+        $sessiondates[] = $this->prepare_date($now + (DAYSECS * 1), $now + (DAYSECS * 2), $testroom->id);
+        $seminareventid =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => $sessiondates));
+        $seminarevent = new \mod_facetoface\seminar_event($seminareventid);
+
+        // Create teacher.
+        set_config('facetoface_session_roles', '4');
+        $trainer = $this->getDataGenerator()->create_user();
+        $trainerrole = $DB->get_record('role', ['shortname' => 'teacher']);
+
+        $DB->set_field('facetoface', 'approvalrole', $trainerrole->id, ['id' => $facetoface->id]);
+        $DB->insert_record('facetoface_session_roles',
+            (object)['sessionid' => $seminarevent->get_id(), 'roleid' => $trainerrole->id, 'userid' => $trainer->id]);
+
+        $context = context_course::instance($seminarevent->get_seminar()->get_course());
+        $this->getDataGenerator()->role_assign($trainerrole->id, $trainer->id, $context->id);
+        $this->getDataGenerator()->enrol_user($trainer->id, $seminarevent->get_seminar()->get_course(), 'editingteacher');
+        // Login as a trainer
+        $this->setUser($trainer);
+        // Test
+        foreach ($seminarevent->get_sessions() as $session) {
+            // time is not right, no attendee booked, yes trainer
+            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
         }
     }
 

@@ -28,6 +28,11 @@ information provided here is intended especially for developers.
 * signup_helper::update_activity_completion() has been deprecated; please use seminar::set_completion() instead
 * mod_facetoface\room::find() function has been deprecated, please use mod_facetoface\room::seek()
 * mod_facetoface\seminar_event::find() function has been deprecated, please use mod_facetoface\seminar_event::seek()
+* added url property into mod_facetoface\room instance as optional property with default value 0
+* added url field(column) into 'room' sql table as optional field(column) with default value 0
+* added bool $joinnow var as 3rd param to mod_facetoface\mod_facetoface_renderer::get_room_details_html()
+* mod_facetoface\rb_sources\rb_facetoface_base_source::add_rooms_fields_to_columns() moved to mod_facetoface\rb\traits\rooms::add_rooms_fields_to_columns()
+* mod_facetoface\rb_sources\rb_facetoface_base_source::add_rooms_fields_to_filters() moved to mod_facetoface\rb\traits\rooms::add_rooms_fields_to_filters()
 * The room behaviour has been changed extensively. These are the main changes that developers should be aware of:
   * The roomid field has been removed from the facetoface_sessions_dates database table
   * The roomid values have been moved to the facetoface_room_dates database table, supporting a many-to-many relationship

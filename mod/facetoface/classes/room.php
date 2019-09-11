@@ -65,6 +65,11 @@ final class room implements seminar_iterator_item {
     private $description = '';
 
     /**
+     * @var string {facetoface_room}.url
+     */
+    private $url = '';
+
+    /**
      *  @var int {facetoface_room}.custom
      */
     private $custom = 0;
@@ -388,6 +393,23 @@ final class room implements seminar_iterator_item {
      */
     public function set_description(string $description): room {
         $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_url(): string {
+        return (string)$this->url;
+    }
+
+    /**
+     * Link to use in virtual room
+     * @param string $url
+     * @return room this
+     */
+    public function set_url(string $url): room {
+        $this->url = $url;
         return $this;
     }
 

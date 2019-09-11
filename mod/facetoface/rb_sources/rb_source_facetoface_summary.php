@@ -34,6 +34,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
     use \mod_facetoface\rb\traits\required_columns;
     use \mod_facetoface\rb\traits\post_config;
     use \mod_facetoface\rb\traits\facilitator;
+    use \mod_facetoface\rb\traits\rooms;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {

@@ -30,6 +30,7 @@ require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.ph
 
 class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
     use \core_course\rb\source\report_trait;
+    use \mod_facetoface\rb\traits\rooms;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
