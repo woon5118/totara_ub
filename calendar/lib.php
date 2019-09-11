@@ -812,16 +812,36 @@ function calendar_get_events($tstart, $tend, $users, $groups, $courses, $withdur
               FROM {event} e
          LEFT JOIN {modules} m ON e.modulename = m.name
                 -- Non visible modules will have a value of 0.
-             WHERE (m.visible = 1 OR m.visible IS NULL) AND $whereclause
+             WHERE (e.modulename <> 'facetoface' OR e.courseid <> " . SITEID . ") AND (m.visible = 1 OR m.visible IS NULL)
+                   AND $whereclause
           ORDER BY e.timestart";
     $events = $DB->get_records_sql($sql, $params);
 
-    if ($events === false) {
-        $events = array();
-    }
+    if ($DB->record_exists('event', ['modulename' => 'facetoface', 'course' => SITEID])) {
+        // We have the nasty Seminar events pushed to the frontpage,
+        // we need to use separate access control for them.
+        // Please note that the use of Totara visibility here is not correct,
+        // it should be something more like enrolments instead!
 
-    // Check the visibility of site wide events, T-11534.
-    $events = calendar_events_check_visibility($events);
+        list($twhere, $tparams) = totara_visibility_where();
+
+        $sql = "SELECT e.*
+                  FROM {event} e
+                  JOIN {facetoface} sem ON sem.id = e.instance
+                  JOIN {course} course ON c.id = sem.course
+                  JOIN {modules} m ON e.modulename = m.name AND m.visible = 1
+                 WHERE e.modulename = 'facetoface' AND e.courseid = " . SITEID . " AND $twhere
+                       AND $whereclause";
+        $params = array_merge($params, $tparams);
+        $semevents = $DB->get_records_sql($sql, $params);
+
+        if ($semevents) {
+            foreach ($semevents as $e) {
+                $events[$e->id] = $e;
+            }
+            core_collator::asort_objects_by_property($events, 'timestart', core_collator::SORT_NUMERIC);
+        }
+    }
 
     return $events;
 }
@@ -829,6 +849,8 @@ function calendar_get_events($tstart, $tend, $users, $groups, $courses, $withdur
 /**
  * Totara function added to handle visibility of activities sitewide calendar entries
  * See T-11534 for more details.
+ *
+ * @deprecated do not use
  *
  * @param array $events     An array of DB records from the table 'events'
  */
