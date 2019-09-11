@@ -176,10 +176,10 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $text = '<a href="https://en.wikipedia.org/wiki/Franks_Casket#ᛖᚾᛒᛖᚱᛁᚷ">'.$chars.'</a>';
         $options = ['newlines' => true, 'para' => true, 'blanktarget' => true];
 
-        $expected_html = '<a href="https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7" target="_blank" rel="noreferrer">' . $chars . '</a>';
+        $expected_html = '<a href="https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7" target="_blank" rel="noreferrer noopener">' . $chars . '</a>';
         $expected_plain = '<p>&lt;a href="https://en.wikipedia.org/wiki/Franks_Casket#ᛖᚾᛒᛖᚱᛁᚷ"&gt;' . $chars . '&lt;/a&gt;</p>';
-        $expected_markdown = '<p><a href="https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7" target="_blank" rel="noreferrer">' . $chars . '</a></p>';
-        $expected_moodle = '<div class="text_to_html"><a href="https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7" target="_blank" rel="noreferrer">' . $chars . '</a></div>';
+        $expected_markdown = '<p><a href="https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7" target="_blank" rel="noreferrer noopener">' . $chars . '</a></p>';
+        $expected_moodle = '<div class="text_to_html"><a href="https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7" target="_blank" rel="noreferrer noopener">' . $chars . '</a></div>';
 
         self::assertSame($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertSame($expected_plain, format_text($text, FORMAT_PLAIN, $options));
@@ -334,7 +334,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $options = ['noclean' => true];
         $expected_html = 'Check out <img src="#" onerror="alert(1)" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
-        $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
+        $expected_markdown = "<p>Check out <img src=\"#\" onerror=\"alert(1)\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" onerror="alert(1)" /></div>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
@@ -393,7 +393,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $options = ['trusted' => true];
         $expected_html = 'Check out <img src="#" onerror="alert(1)" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
-        $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
+        $expected_markdown = "<p>Check out <img src=\"#\" onerror=\"alert(1)\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" onerror="alert(1)" /></div>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
@@ -579,7 +579,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $options = ['allowid' => true];
         $expected_html = 'The <span id="frank">allowid</span> option';
         $expected_plain = 'The &lt;span id=&quot;frank&quot;&gt;allowid&lt;/span&gt; option';
-        $expected_markdown = "<p>The <span>allowid</span> option</p>\n";
+        $expected_markdown = "<p>The <span id=\"frank\">allowid</span> option</p>\n";
         $expected_moodle = '<div class="text_to_html">The <span id="frank">allowid</span> option</div>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
@@ -613,10 +613,10 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         // Test on, basic text
         $text = 'Check out my <a href="favourite">favourite course</a> today';
         $options = ['blanktarget' => true];
-        $expected_html = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer">favourite course</a> today</p>';
+        $expected_html = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite"&gt;favourite course&lt;/a&gt; today</p>';
-        $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer\">favourite course</a> today</p>";
-        $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_blank" rel="noreferrer">favourite course</a> today</div>';
+        $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer noopener\">favourite course</a> today</p>";
+        $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</div>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -625,10 +625,10 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         // Test on, many properties
         $text = 'Check out my <a href="favourite" title="Basic 101" tabindex=0>favourite course</a> today';
         $options = ['blanktarget' => true];
-        $expected_html = '<p>Check out my <a href="favourite" title="Basic 101" target="_blank" rel="noreferrer">favourite course</a> today</p>';
+        $expected_html = '<p>Check out my <a href="favourite" title="Basic 101" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" title="Basic 101" tabindex=0&gt;favourite course&lt;/a&gt; today</p>';
-        $expected_markdown = "<p>Check out my <a href=\"favourite\" title=\"Basic 101\" target=\"_blank\" rel=\"noreferrer\">favourite course</a> today</p>";
-        $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" title="Basic 101" target="_blank" rel="noreferrer">favourite course</a> today</div>';
+        $expected_markdown = "<p>Check out my <a href=\"favourite\" title=\"Basic 101\" target=\"_blank\" rel=\"noreferrer noopener\">favourite course</a> today</p>";
+        $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" title="Basic 101" target="_blank" rel="noreferrer noopener">favourite course</a> today</div>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -637,10 +637,10 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         // Test on, already defined but to parent - it changes them to blank :(
         $text = 'Check out my <a href="favourite" target="_parent" rel="nofollow">favourite course</a> today';
         $options = ['blanktarget' => true];
-        $expected_html = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer">favourite course</a> today</p>';
+        $expected_html = '<p>Check out my <a href="favourite">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" target="_parent" rel="nofollow"&gt;favourite course&lt;/a&gt; today</p>';
-        $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer\">favourite course</a> today</p>";
-        $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_blank" rel="noreferrer">favourite course</a> today</div>';
+        $expected_markdown = "<p>Check out my <a href=\"favourite\">favourite course</a> today</p>";
+        $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite">favourite course</a> today</div>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -663,7 +663,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $options = ['blanktarget' => true, 'allowxss' => true];
         $expected_html = '<p>Check out my <a href="favourite" target="_parent" rel="nofollow">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" target="_parent" rel="nofollow"&gt;favourite course&lt;/a&gt; today</p>';
-        $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer\">favourite course</a> today</p>";
+        $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_parent\" rel=\"nofollow\">favourite course</a> today</p>";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_parent" rel="nofollow">favourite course</a> today</div>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
@@ -673,10 +673,10 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         // Test on, defined only with a rel
         $text = 'Check out my <a href="favourite" rel="nofollow">favourite course</a> today';
         $options = ['blanktarget' => true];
-        $expected_html = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer">favourite course</a> today</p>';
+        $expected_html = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" rel="nofollow"&gt;favourite course&lt;/a&gt; today</p>';
-        $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer\">favourite course</a> today</p>";
-        $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_blank" rel="noreferrer">favourite course</a> today</div>';
+        $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer noopener\">favourite course</a> today</p>";
+        $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</div>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -687,7 +687,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $options = ['blanktarget' => true, 'allowxss' => true];
         $expected_html = '<p>Check out my <a href="favourite" rel="nofollow noreferrer" target="_blank">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" rel="nofollow"&gt;favourite course&lt;/a&gt; today</p>';
-        $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer\">favourite course</a> today</p>";
+        $expected_markdown = "<p>Check out my <a href=\"favourite\" rel=\"nofollow noreferrer\" target=\"_blank\">favourite course</a> today</p>";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" rel="nofollow noreferrer" target="_blank">favourite course</a> today</div>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));

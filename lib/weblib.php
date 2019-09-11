@@ -1353,14 +1353,58 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
             break;
 
         case FORMAT_MARKDOWN:
-            $text = markdown_to_html($text);
-            $cleantext = false; // markdown_to_html cleans text by default as of Totara 13.
+            $text = markdown_to_html($text, ['allowxss' => true]); // TOTARA: Don't clean it here, we'll clean it if need be shortly.
             break;
 
         default:  // Anything else.
             $text = text_to_html($text, null, $options['para'], $options['newlines']);
             break;
     }
+
+    /**
+     * TOTARA: perform manipulation and cleaning to ensure the two happen consistently and only once.
+     *
+     * @param string $text
+     * @param array $options
+     * @param bool $cleantext
+     * @return string
+     */
+    $cleantext_callable = function(string $text, array &$options, bool &$cleantext) {
+        if (!empty($options['overflowdiv'])) {
+            $text = html_writer::tag('div', $text, array('class' => 'no-overflow'));
+            $options['overflowdiv'] = false; // Only do this once.
+        }
+        if (!empty($options['blanktarget'])) {
+            // TODO: move this code to JS, see TL-20778
+            $domdoc = new DOMDocument();
+            libxml_use_internal_errors(true);
+            $domdoc->loadHTML('<?xml version="1.0" encoding="UTF-8" ?>' . $text);
+            libxml_clear_errors();
+            foreach ($domdoc->getElementsByTagName('a') as $link) {
+                if ($link->hasAttribute('target') && strpos($link->getAttribute('target'), '_blank') === false) {
+                    continue;
+                }
+                $link->setAttribute('target', '_blank');
+                if (strpos($link->getAttribute('rel'), 'noreferrer') === false) {
+                    $link->setAttribute('rel', trim($link->getAttribute('rel') . ' noreferrer'));
+                }
+            }
+
+            // This regex is nasty and I don't like it. The correct way to solve this is by loading the HTML like so:
+            // $domdoc->loadHTML($text, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD); however it seems like the libxml
+            // version that travis uses doesn't work properly and ends up leaving <html><body>, so I'm forced to use
+            // this regex to remove those tags.
+            $text = trim(preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $domdoc->saveHTML($domdoc->documentElement)));
+            $options['blanktarget'] = false; // Only do this once.
+        }
+        // Totara: text cleaning must be done at the very end, unsafe filters are the only exception.
+        if ($cleantext) {
+            $text = clean_text($text, FORMAT_HTML, ['allowid' => !empty($options['allowid'])]);
+            $cleantext = false;
+        }
+
+        return $text;
+    };
 
     if ($filtertext) {
         $filtermanager = filter_manager::instance();
@@ -1375,15 +1419,10 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
             $text = $filtermanager->filter_text($text, $context, $filteroptions);
         } else {
             // Clean and then filter.
-            if ($cleantext) {
-                $text = clean_text($text, FORMAT_HTML, ['allowid' => !empty($options['allowid'])]);
-                $cleantext = false; // Set clean_text to false, we've already done it.
-            }
+            $text = $cleantext_callable($text, $options, $cleantext);
             $text = $filtermanager->filter_text($text, $context, $filteroptions);
         }
-    }
 
-    if ($filtertext) {
         // At this point there should not be any draftfile links any more,
         // this happens when developers forget to post process the text.
         // The only potential problem is that somebody might try to format
@@ -1396,37 +1435,8 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
         }
     }
 
-    if (!empty($options['overflowdiv'])) {
-        $text = html_writer::tag('div', $text, array('class' => 'no-overflow'));
-    }
-
-    if ($options['blanktarget']) {
-        // TODO: move this code to JS, see TL-20778
-        $domdoc = new DOMDocument();
-        libxml_use_internal_errors(true);
-        $domdoc->loadHTML('<?xml version="1.0" encoding="UTF-8" ?>' . $text);
-        libxml_clear_errors();
-        foreach ($domdoc->getElementsByTagName('a') as $link) {
-            if ($link->hasAttribute('target') && strpos($link->getAttribute('target'), '_blank') === false) {
-                continue;
-            }
-            $link->setAttribute('target', '_blank');
-            if (strpos($link->getAttribute('rel'), 'noreferrer') === false) {
-                $link->setAttribute('rel', trim($link->getAttribute('rel') . ' noreferrer'));
-            }
-        }
-
-        // This regex is nasty and I don't like it. The correct way to solve this is by loading the HTML like so:
-        // $domdoc->loadHTML($text, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD); however it seems like the libxml
-        // version that travis uses doesn't work properly and ends up leaving <html><body>, so I'm forced to use
-        // this regex to remove those tags.
-        $text = trim(preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $domdoc->saveHTML($domdoc->documentElement)));
-    }
-
     // Totara: text cleaning must be done at the very end, unsafe filters are the only exception.
-    if ($cleantext) {
-        $text = clean_text($text, FORMAT_HTML, ['allowid' => !empty($options['allowid'])]);
-    }
+    $text = $cleantext_callable($text, $options, $cleantext);
 
     return $text;
 }
