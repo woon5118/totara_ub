@@ -61,6 +61,7 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
  * @property-read comp_type $comp_type Competency type
  * @property-read customfields $customfields Custom fields
  * @property-read string $scale_aggregation_type Scale aggregation type
+ * @property-read int[] $assign_availability Assignment creation availabilities
  *
  *
  * @package tassign_competency\resources
@@ -196,7 +197,7 @@ class competency extends hierarchy_item {
      *
      * @return array Of assignment availability types
      */
-    public function get_assign_availability_attribute(): array {
+    protected function get_assign_availability_attribute(): array {
         global $DB;
 
         $sql =

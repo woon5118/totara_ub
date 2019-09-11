@@ -77,6 +77,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $table->add_field('textcf1', XMLDB_TYPE_CHAR, '255');
         $table->add_field('menucf1', XMLDB_TYPE_CHAR, '255');
         $table->add_field('aggregationmethod', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('assignavailability', XMLDB_TYPE_TEXT);
 
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
@@ -115,6 +116,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $entry->timemodified = 0;
         $entry->frameworkidnumber = null;
         $entry->aggregationmethod = null;
+        $entry->assignavailability = null;
 
         $this->ext_dbconnection->insert_record($this->dbtable, $entry);
 
@@ -125,6 +127,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $source->set_config('import_frameworkidnumber', '1');
         $source->set_config('import_timemodified', '1');
         $source->set_config('import_aggregationmethod', '1');
+        $source->set_config('import_assignavailability', '1');
 
         $element = new totara_sync_element_comp();
         $element->set_config('allow_update', '1');
@@ -168,6 +171,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $entry->description = null;
         $entry->parentidnumber = null;
         $entry->aggregationmethod = null;
+        $entry->assignavailability = null;
 
         $this->ext_dbconnection->insert_record($this->dbtable, $entry);
 
@@ -180,6 +184,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $source->set_config('import_description', '1');
         $source->set_config('import_parentidnumber', '1');
         $source->set_config('import_aggregationmethod', '1');
+        $source->set_config('import_assignavailability', '1');
 
         $element = new totara_sync_element_comp();
         $element->set_config('allow_update', '1');
@@ -223,6 +228,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $entry->description = '';
         $entry->parentidnumber = '';
         $entry->aggregationmethod = 0;
+        $entry->assignavailability = '';
 
         $this->ext_dbconnection->insert_record($this->dbtable, $entry);
 
@@ -235,6 +241,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $source->set_config('import_description', '1');
         $source->set_config('import_parentidnumber', '1');
         $source->set_config('import_aggregationmethod', '1');
+        $source->set_config('import_assignavailability', '1');
 
         $element = new totara_sync_element_comp();
         $element->set_config('allow_update', '1');
@@ -248,6 +255,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $this->assertEquals('Competency 2', $comp2_actual->fullname);
         $this->assertEquals('0', $comp2_actual->parentid);
         $this->assertEquals('1', $comp2_actual->aggregationmethod);
+        $this->assertEquals(0, $DB->count_records('comp_assign_availability', ['comp_id' => $comp2->id]));
 
         $this->assertEquals(1, $DB->count_records('totara_sync_log', [
             'element' => 'comp',
@@ -294,6 +302,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $entry->frameworkidnumber = $compframework->idnumber;
         $entry->typeidnumber = null;
         $entry->aggregationmethod = 1;
+        $entry->assignavailability = 1;
 
         $this->ext_dbconnection->insert_record($this->dbtable, $entry);
 
@@ -305,6 +314,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $source->set_config('import_deleted', '1');
         $source->set_config('import_typeidnumber', '1');
         $source->set_config('import_aggregationmethod', '1');
+        $source->set_config('import_assignavailability', '1');
 
         $element = new totara_sync_element_comp();
         $element->set_config('allow_update', '1');
@@ -353,6 +363,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $entry->frameworkidnumber = $compframework->idnumber;
         $entry->typeidnumber = '';
         $entry->aggregationmethod = 1;
+        $entry->assignavailability = 1;
 
         $this->ext_dbconnection->insert_record($this->dbtable, $entry);
 
@@ -364,6 +375,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $source->set_config('import_deleted', '1');
         $source->set_config('import_typeidnumber', '1');
         $source->set_config('import_aggregationmethod', '1');
+        $source->set_config('import_assignavailability', '1');
 
         $element = new totara_sync_element_comp();
         $element->set_config('allow_update', '1');
@@ -421,6 +433,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $source->set_config('import_deleted', '1');
         $source->set_config('import_typeidnumber', '1');
         $source->set_config('import_aggregationmethod', '1');
+        $source->set_config('import_assignavailability', '1');
 
         // We need field mappings here because the customfield names are
         // stupid, we can fix this after TL-16723 is fixed
@@ -439,6 +452,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $entry->textcf1 = '';
         $entry->menucf1 = '';
         $entry->aggregationmethod = 1;
+        $entry->assignavailability = 1;
 
         $this->ext_dbconnection->insert_record($this->dbtable, $entry);
 
@@ -506,6 +520,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $source->set_config('import_deleted', '1');
         $source->set_config('import_typeidnumber', '1');
         $source->set_config('import_aggregationmethod', '1');
+        $source->set_config('import_assignavailability', '1');
 
         // We need field mappings here because the customfield names are
         // stupid, we can fix this after TL-16723 is fixed
@@ -524,6 +539,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $entry->textcf1 = null;
         $entry->menucf1 = null;
         $entry->aggregationmethod = 1;
+        $entry->assignavailability = 1;
 
         $comp1_cf_records = $DB->get_records('comp_type_info_data', array('competencyid' => $comp1->id), '', 'fieldid, id, competencyid, data');
         $this->assertEquals('TESTING1', $comp1_cf_records[$type_item1->id]->data);

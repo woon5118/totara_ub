@@ -161,6 +161,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
             'import_timemodified' => '1',
             'import_description' => '1',
             'import_aggregationmethod' => '1',
+            'import_assignavailability' => '1',
 
             // Customfields.
             'fieldmapping_customfield_textinput' => '',
@@ -187,6 +188,11 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
             $comp->$field = $value;
         }
 
+        // Add assignment availability
+        $comp->assignavailability = $DB->get_fieldset_select('comp_assign_availability', 'availability', 'comp_id = :id', [
+            'id' => $comp->id
+        ]);
+
         return $comp;
     }
 
@@ -199,8 +205,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $this->element->set_config('csvsaveemptyfields', false);
 
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "1,Competency 1,comp1,1,0,Description,,1";
+        $csv = $this->generate_csv_text("1,Competency 1,comp1,1,0,Description,,1,1");
         $this->source->set_csv_in_memory($csv);
 
         $this->assertTrue($this->element->sync()); // Run the sync.
@@ -231,8 +236,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $element = $this->get_element();
         $element->source = new totara_sync_source_comp_csv();
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "1,Competency 1,comp1,1,0,Description,,1";
+        $csv = $this->generate_csv_text("1,Competency 1,comp1,1,0,Description,,1,1");
         $element->source->set_csv_in_memory($csv);
 
         $this->assertTrue($element->sync()); // Run the sync.
@@ -262,32 +266,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
         $this->element->set_config('csvsaveemptyfields', false);
 
         // First add an competency we can update.
-        $competency = array(
-            'id' => 2,
-            'fullname' => 'competency 1',
-            'shortname' => 'comp1',
-            'idnumber' => 1,
-            'description' => 'Description',
-            'frameworkid' => 1,
-            'path' => '/2',
-            'depthlevel' => 1,
-            'parentid' => 0,
-            'sortthread' => 02,
-            'visible' => 1,
-            'timevalidfrom' => 0,
-            'timevalidto' => 0,
-            'timecreated' => 0,
-            'timemodified' => 0,
-            'usermodified' => 2,
-            'totarasync' => 1,
-            'aggregationmethod' => 1,
-            'proficiencyexpected' => 1,
-            'evidencecount' => 0,
-        );
-
-        $this->loadDataSet($this->createArrayDataset(array(
-            'comp' => array($competency)
-        )));
+        $this->create_competency();
 
         //
         // Now lets update the competency.
@@ -295,8 +274,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $element = $this->get_element();
         $element->source = new totara_sync_source_comp_csv();
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "1,Competency 1 edited,comp1edited,2,0,Description edited,,2";
+        $csv = $this->generate_csv_text("1,Competency 1 edited,comp1edited,2,0,Description edited,,2,2");
         $element->source->set_csv_in_memory($csv);
 
         $this->assertTrue($element->sync()); // Run the sync.
@@ -325,32 +303,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $this->element->set_config('csvsaveemptyfields', true);
 
-        $competency = array(
-            'id' => 2,
-            'fullname' => 'competency 1',
-            'shortname' => 'comp1',
-            'idnumber' => 1,
-            'description' => 'Description',
-            'frameworkid' => 1,
-            'path' => '/2',
-            'depthlevel' => 1,
-            'parentid' => 0,
-            'sortthread' => 02,
-            'visible' => 1,
-            'timevalidfrom' => 0,
-            'timevalidto' => 0,
-            'timecreated' => 0,
-            'timemodified' => 0,
-            'usermodified' => 2,
-            'totarasync' => 1,
-            'aggregationmethod' => 1,
-            'proficiencyexpected' => 1,
-            'evidencecount' => 0,
-        );
-
-        $this->loadDataSet($this->createArrayDataset(array(
-            'comp' => array($competency)
-        )));
+        $this->create_competency();
 
         //
         // Now lets update the competencies.
@@ -358,8 +311,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $element = $this->get_element();
         $element->source = new totara_sync_source_comp_csv();
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "1,Competency 1 edited,comp1edited,2,0,Description edited,,2";
+        $csv = $this->generate_csv_text("1,Competency 1 edited,comp1edited,2,0,Description edited,,2,2");
         $element->source->set_csv_in_memory($csv);
 
         $this->assertTrue($element->sync()); // Run the sync.
@@ -389,32 +341,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
         $this->element->set_config('csvsaveemptyfields', false);
 
         // First add an competency we can update.
-        $competency = array(
-            'id' => 2,
-            'fullname' => 'competency 1',
-            'shortname' => 'comp1',
-            'idnumber' => 1,
-            'description' => 'Description',
-            'frameworkid' => 1,
-            'path' => '/2',
-            'depthlevel' => 1,
-            'parentid' => 0,
-            'sortthread' => 02,
-            'visible' => 1,
-            'timevalidfrom' => 0,
-            'timevalidto' => 0,
-            'timecreated' => 0,
-            'timemodified' => 0,
-            'usermodified' => 2,
-            'totarasync' => 1,
-            'aggregationmethod' => 1,
-            'proficiencyexpected' => 1,
-            'evidencecount' => 0,
-        );
-
-        $this->loadDataSet($this->createArrayDataset(array(
-            'comp' => array($competency)
-        )));
+        $this->create_competency();
 
         //
         // Now lets update the competencies.
@@ -422,8 +349,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $element = $this->get_element();
         $element->source = new totara_sync_source_comp_csv();
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "1,Competency 1,,1,0,,,";
+        $csv = $this->generate_csv_text("1,Competency 1,,1,0,,,,");
         $element->source->set_csv_in_memory($csv);
 
         $this->assertTrue($element->sync()); // Run the sync.
@@ -453,32 +379,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
         $this->element->set_config('csvsaveemptyfields', true);
 
         // First add an competency we can update.
-        $competency = array(
-            'id' => 2,
-            'fullname' => 'competency 1',
-            'shortname' => 'comp1',
-            'idnumber' => 1,
-            'description' => 'Description',
-            'frameworkid' => 1,
-            'path' => '/2',
-            'depthlevel' => 1,
-            'parentid' => 0,
-            'sortthread' => 02,
-            'visible' => 1,
-            'timevalidfrom' => 0,
-            'timevalidto' => 0,
-            'timecreated' => 0,
-            'timemodified' => 0,
-            'usermodified' => 2,
-            'totarasync' => 1,
-            'aggregationmethod' => 2,
-            'proficiencyexpected' => 1,
-            'evidencecount' => 0,
-        );
-
-        $this->loadDataSet($this->createArrayDataset(array(
-            'comp' => array($competency)
-        )));
+        $this->create_competency();
 
         //
         // Now lets update the competency.
@@ -486,8 +387,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $element = $this->get_element();
         $element->source = new totara_sync_source_comp_csv();
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "1,Competency 1,,1,0,,,2";
+        $csv = $this->generate_csv_text("1,Competency 1,,1,0,,,2,2");
         $element->source->set_csv_in_memory($csv);
 
         $this->assertTrue($element->sync()); // Run the sync.
@@ -517,32 +417,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
         $this->element->set_config('csvsaveemptyfields', true);
 
         // First add an competency we can update.
-        $competency = array(
-            'id' => 2,
-            'fullname' => 'competency 1',
-            'shortname' => 'comp1',
-            'idnumber' => 1,
-            'description' => 'Description',
-            'frameworkid' => 1,
-            'path' => '/2',
-            'depthlevel' => 1,
-            'parentid' => 0,
-            'sortthread' => 02,
-            'visible' => 1,
-            'timevalidfrom' => 0,
-            'timevalidto' => 0,
-            'timecreated' => 0,
-            'timemodified' => 0,
-            'usermodified' => 2,
-            'totarasync' => 1,
-            'aggregationmethod' => 2,
-            'proficiencyexpected' => 1,
-            'evidencecount' => 0,
-        );
-
-        $this->loadDataSet($this->createArrayDataset(array(
-            'comp' => array($competency)
-        )));
+        $this->create_competency();
 
         //
         // Now lets update the competency.
@@ -550,8 +425,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $element = $this->get_element();
         $element->source = new totara_sync_source_comp_csv();
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "1,Competency 1,,1,0,,,";
+        $csv = $this->generate_csv_text("1,Competency 1,,1,0,,,,");
         $element->source->set_csv_in_memory($csv);
 
         ob_start();
@@ -634,8 +508,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $element = $this->get_element();
         $element->source = new totara_sync_source_comp_csv();
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "comp2,Competency 2,comp2,1,0,Description 2,,1";
+        $csv = $this->generate_csv_text("comp2,Competency 2,comp2,1,0,Description 2,,1,1");
         $element->source->set_csv_in_memory($csv);
 
         $this->assertCount(3, $DB->get_records('comp'));
@@ -716,8 +589,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $element = $this->get_element();
         $element->source = new totara_sync_source_comp_csv();
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "comp2,Competency 2,comp2,1,0,Description 2,,1";
+        $csv = $this->generate_csv_text("comp2,Competency 2,comp2,1,0,Description 2,,1,1");
         $element->source->set_csv_in_memory($csv);
 
         $this->assertCount(3, $DB->get_records('comp'));
@@ -737,8 +609,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $element = $this->get_element();
         $element->source = new totara_sync_source_comp_csv();
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "777,Competency 2,comp2,,0,Description 2,,1";
+        $csv = $this->generate_csv_text("777,Competency 2,comp2,,0,Description 2,,1,1");
         $element->source->set_csv_in_memory($csv);
 
         $this->assertTrue($element->sync());
@@ -756,12 +627,79 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
         $element = $this->get_element();
         $element->source = new totara_sync_source_comp_csv();
-        $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
-        $csv .= "777,Competency 2,comp2,,0,Description 2,,1";
+        $csv = $this->generate_csv_text("777,Competency 2,comp2,,0,Description 2,,1,1");
         $element->source->set_csv_in_memory($csv);
 
         $this->expectException(moodle_exception::class);
 
         $element->sync();
     }
+
+    public function test_sync_assign_availability_empty_field() {
+        global $DB;
+
+        $this->create_competency();
+        $this->assertEquals(1, $DB->count_records('comp_assign_availability'));
+
+        $this->element->set_config('csvsaveemptyfields', true);
+
+        $element = $this->get_element();
+        $element->source = new totara_sync_source_comp_csv();
+        $csv = $this->generate_csv_text("1,Competency 1,,1,0,,,1,");
+        $element->source->set_csv_in_memory($csv);
+        $this->assertTrue($element->sync());
+        $this->assertEquals(0, $DB->count_records('comp_assign_availability'));
+    }
+
+    private function generate_csv_text(string $first_row): string {
+        $header = [
+            'idnumber',
+            'fullname',
+            'shortname',
+            'frameworkidnumber',
+            'timemodified',
+            'description',
+            'parentidnumber',
+            'aggregationmethod',
+            'assignavailability',
+        ];
+        return implode(',', $header) . "\n" . $first_row;
+    }
+
+    private function create_competency(): array {
+        global $DB;
+
+        $competency = [
+            'id' => 2,
+            'fullname' => 'competency 1',
+            'shortname' => 'comp1',
+            'idnumber' => 1,
+            'description' => 'Description',
+            'frameworkid' => 1,
+            'path' => '/2',
+            'depthlevel' => 1,
+            'parentid' => 0,
+            'sortthread' => 02,
+            'visible' => 1,
+            'timevalidfrom' => 0,
+            'timevalidto' => 0,
+            'timecreated' => 0,
+            'timemodified' => 0,
+            'usermodified' => 2,
+            'totarasync' => 1,
+            'aggregationmethod' => 1,
+            'proficiencyexpected' => 1,
+            'evidencecount' => 0,
+        ];
+        $this->loadDataSet($this->createArrayDataset(['comp' => [$competency]]));
+
+        $competency['assignavailability'] = [1];
+        $DB->insert_record('comp_assign_availability', [
+            'comp_id' => $competency['id'],
+            'availability' => 1,
+        ]);
+
+        return $competency;
+    }
+
 }

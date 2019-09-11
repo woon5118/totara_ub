@@ -102,13 +102,15 @@ class tool_totara_sync_comp_csv_check_sanity_testcase extends totara_sync_csv_te
             'fieldmapping_parentidnumber'       => '',
             'fieldmapping_typeidnumber'         => '',
             'fieldmapping_aggregationmethod'    => '',
+            'fieldmapping_assignavailability'   => '',
 
             'import_shortname'                  => '0',
             'import_description'                => '0',
             'import_parentidnumber'             => '0',
             'import_typeidnumber'               => '0',
             'import_frameworkidnumber'          => '1',
-            'import_aggregationmethod'          => '1'
+            'import_aggregationmethod'          => '1',
+            'import_assignavailability'         => '1',
         ];
         $this->config = [
             'sourceallrecords'  => '1',
@@ -128,6 +130,7 @@ class tool_totara_sync_comp_csv_check_sanity_testcase extends totara_sync_csv_te
         $importfields['import_description']         = 0;
         $importfields['import_deleted']             = 0;
         $importfields['import_aggregationmethod']   = 1;
+        $importfields['import_assignavailability']  = 1;
 
         return $importfields;
     }

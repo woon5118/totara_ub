@@ -255,6 +255,25 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
                 $row['aggregationmethod'] = $aggregationmethod;
             }
 
+            if (!isset($row['assignavailability'])) {
+                // Empty because we don't want to update anything is fine.
+                $row['assignavailability'] = null;
+            } else if ($row['assignavailability'] === '' && $csvsaveemptyfields) {
+                // Default to not having any way of assigning this competency
+                $row['assignavailability'] = $this->get_assign_availability_json('none');
+            } else if ($row['assignavailability'] !== '') {
+                $assignavailability = $this->get_assign_availability_json($row['assignavailability']);
+                // This field must be valid (including non-empty).
+                if (!isset($assignavailability)) {
+                    $this->addlog(
+                        get_string('unrecognisedassignavailability','tool_totara_sync', $row['assignavailability']),
+                        'error',
+                        'populatesynctablecsv'
+                    );
+                }
+                $row['assignavailability'] = $assignavailability;
+            }
+
             // Unset fields we are not saving since they are empty
             if (!$csvsaveemptyfields) {
                 foreach ($row as $key => $value) {
@@ -334,6 +353,7 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
                 case 'frameworkidnumber':
                 case 'timemodified':
                 case 'aggregationmethod':
+                case 'assignavailability':
                     $cleaned[$key] = clean_param(trim($value), PARAM_TEXT);
                     break;
                 case 'deleted':

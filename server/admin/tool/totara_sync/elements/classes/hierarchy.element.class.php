@@ -319,16 +319,8 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             }
 
             // Save custom field data
-            if ($customfields = json_decode($newitem->customfields)) {
-                foreach ($customfields as $name=>$value) {
-                    if ($value === null) {
-                        continue; // Null means "don't update the existing data", so skip this field.
-                    }
-
-                    $hitem->{$name} = $value;
-                }
-                customfield_save_data($hitem, $this->hierarchy->prefix, $this->hierarchy->shortprefix.'_type', true);
-            }
+            $newitem->id = $hitem->id;
+            $this->sync_additional_data($newitem, false);
 
             $this->addlog(get_string('createdx', 'tool_totara_sync', "{$elname} {$hitem->idnumber}"), 'info', 'syncitem');
 
@@ -369,27 +361,37 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             $this->hierarchy->delete_custom_field_data($dbitem->id);
         }
 
-        if (isset($newitem->typeid) && !empty($newitem->typeid)) {
-            // Add/update custom field data
-            if (isset($newitem->customfields)) {
-                $newcustomfields = json_decode($newitem->customfields);
-                foreach ($newcustomfields as $name=>$value) {
-                    if ($value === null) {
-                        continue; // Null means "don't update the existing data", so skip this field.
-                    }
-
-                    // TODO: TL-16855 Check saving of menu customfield so it default data
-                    // when deleting value
-
-                    $newitem->{$name} = $value;
-                }
-                customfield_save_data($newitem, $this->hierarchy->prefix, $this->hierarchy->shortprefix.'_type', true);
-            }
-        }
+        // Add/update custom field data
+        $this->sync_additional_data($newitem, true);
 
         $this->addlog(get_string('updatedx', 'tool_totara_sync', "{$elname} {$newitem->idnumber}"), 'info', 'syncitem');
 
         return true;
+    }
+
+    /**
+     * Save additional data relevant to the hierarchy item, such as custom fields
+     *
+     * @param object $data Hierarchy item data
+     * @param bool $is_updating Are we updating or creating this hierarchy, or just creating?
+     */
+    protected function sync_additional_data(object $data, bool $is_updating) {
+        if (empty($data->customfields) || ($is_updating && empty($data->typeid))) {
+            return;
+        }
+
+        if ($custom_fields = json_decode($data->customfields)) {
+            foreach ($custom_fields as $name => $value) {
+                if ($value === null) {
+                    continue; // Null means "don't update the existing data", so skip this field.
+                }
+
+                // TODO: TL-16855 Check saving of menu customfield so it default data when deleting value
+
+                $data->{$name} = $value;
+            }
+            customfield_save_data($data, $this->hierarchy->prefix, $this->hierarchy->shortprefix . '_type', true);
+        }
     }
 
     /**

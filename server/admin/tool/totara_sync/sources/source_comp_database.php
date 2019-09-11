@@ -214,6 +214,19 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
                 $dbrow['aggregationmethod'] = $aggregationmethod;
             }
 
+            if (isset($dbrow['assignavailability'])) {
+                $assignavailability = $this->get_assign_availability_json($dbrow['assignavailability']);
+                // This field must be valid (including non-empty).
+                if (!isset($assignavailability)) {
+                    $this->addlog(
+                        get_string('unrecognisedassignavailability','tool_totara_sync', $dbrow['assignavailability']),
+                        'error',
+                        'populatesynctablecsv'
+                    );
+                }
+                $dbrow['assignavailability'] = $assignavailability;
+            }
+
             // Custom fields are special - needs to be json-encoded
             if (!empty($this->hierarchy_customfields)) {
                 $dbrow['customfields'] = $this->get_customfield_json($extdbrow);

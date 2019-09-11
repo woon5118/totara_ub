@@ -29,6 +29,7 @@
  * Library to construct competency hierarchies
  */
 
+use core\orm\query\builder;
 use totara_core\advanced_feature;
 
 require_once("{$CFG->dirroot}/totara/hierarchy/lib.php");
@@ -919,6 +920,18 @@ class competency extends hierarchy {
             $item->evidencecount = 0;
         }
 
+        // Properly format assignment availability from individual form values into a single array
+        $item->assignavailability = $item->assignavailability ?? [];
+        $checkbox_mappings = [
+            'assignavailself' => self::ASSIGNMENT_CREATE_SELF,
+            'assignavailother' => self::ASSIGNMENT_CREATE_OTHER,
+        ];
+        foreach ($checkbox_mappings as $checkbox => $availability) {
+            if (isset($item->$checkbox) && $item->$checkbox && !in_array($availability, $item->assignavailability)) {
+                $item->assignavailability[] = $availability;
+            }
+        }
+
         return $item;
     }
 
@@ -1140,29 +1153,10 @@ class competency extends hierarchy {
             $DB->execute($sql, $params);
         }
 
-        if ($updateditem = parent::update_hierarchy_item($itemid, $newitem, false, false, $removedesc)) {
-            $oldrows = $DB->get_records('comp_assign_availability', array('comp_id' => $itemid));
-            $newrows = $this->get_assign_availability_records_from_item($newitem);
+        $updateditem = parent::update_hierarchy_item($itemid, $newitem, false, false, $removedesc);
 
-            foreach ($oldrows as $oldid => $oldrow) {
-                foreach ($newrows as $newidx => $newrow) {
-                    if ($oldrow->availability == $newrow->availability) {
-                        // Nothing to do with this availability
-                        unset($oldrows[$oldid]);
-                        unset($newrows[$newidx]);
-
-                        break;
-                    }
-                }
-            }
-
-            if (count($oldrows) > 0) {
-                $DB->delete_records_list('comp_assign_availability', 'id', array_keys($oldrows));
-            }
-
-            if (count($newrows) > 0) {
-                $DB->insert_records('comp_assign_availability', $newrows);
-            }
+        if ($updateditem && isset($newitem->assignavailability)) {
+            $this->save_assignment_availabilities($itemid, $newitem->assignavailability);
         }
 
         if ($usetransaction) {
@@ -1195,12 +1189,40 @@ class competency extends hierarchy {
      * @return array Array of heading and query field maps
      */
     protected function get_export_fields() {
-        $fields = array_merge(
-            parent::get_export_fields(),
-            ['aggregationmethod' => 'hierarchy.aggregationmethod']
-        );
+        return array_merge(parent::get_export_fields(), [
+            'aggregationmethod' => 'hierarchy.aggregationmethod',
+            'assignavailability' =>
+                "CASE 
+                    WHEN assign_availability_self.availability IS NULL AND assign_availability_other.availability IS NULL
+                        THEN 'none'
+                    WHEN assign_availability_self.availability IS NOT NULL AND assign_availability_other.availability IS NOT NULL
+                        THEN 'any'
+                    WHEN assign_availability_self.availability IS NOT NULL
+                        THEN 'self'
+                    WHEN assign_availability_other.availability IS NOT NULL
+                        THEN 'other'
+                END",
+        ]);
+    }
 
-        return $fields;
+    /**
+     * Add joins for getting assignment availability values
+     *
+     * @return array
+     */
+    protected function get_export_join_def() {
+        $def = parent::get_export_join_def();
+        $availabilities = [
+            self::ASSIGNMENT_CREATE_SELF => 'self',
+            self::ASSIGNMENT_CREATE_OTHER => 'other',
+        ];
+        foreach ($availabilities as $value => $text) {
+            $def['from'] .= " LEFT JOIN (
+                SELECT comp_id, availability FROM {comp_assign_availability} WHERE availability = :{$text}_value
+            ) assign_availability_{$text} ON assign_availability_{$text}.comp_id = hierarchy.id";
+            $def['params'][$text . '_value'] = $value;
+        }
+        return $def;
     }
 
     /**
@@ -1209,20 +1231,18 @@ class competency extends hierarchy {
      * @param int $id Id of the item to retrieve
      */
     function retrieve_hierarchy_item($id) {
-        global $DB;
-
         if ($item = parent::retrieve_hierarchy_item($id)) {
-            $rows = $DB->get_records('comp_assign_availability', array('comp_id' => $id));
-            foreach ($rows as $row) {
-                switch ($row->availability) {
-                    case self::ASSIGNMENT_CREATE_SELF:
-                        $item->assignavailself = 1;
-                        break;
+            $item->assignavailability = builder::table('comp_assign_availability')
+                ->where('comp_id', $id)
+                ->get()
+                ->pluck('availability');
 
-                    case self::ASSIGNMENT_CREATE_OTHER:
-                        $item->assignavailother = 1;
-                        break;
-                }
+            $checkbox_mappings = [
+                self::ASSIGNMENT_CREATE_SELF => 'assignavailself',
+                self::ASSIGNMENT_CREATE_OTHER => 'assignavailother',
+            ];
+            foreach ($item->assignavailability as $availability) {
+                $item->{$checkbox_mappings[$availability]} = 1;
             }
         }
 
@@ -1262,10 +1282,9 @@ class competency extends hierarchy {
 
         if ($newitem = parent::add_hierarchy_item($item, $parentid, $frameworkid, false, false, $removedesc)) {
             $item->id = $newitem->id;
-            $records = $this->get_assign_availability_records_from_item($item);
 
-            if (count($records) > 0) {
-                $DB->insert_records('comp_assign_availability', $records);
+            if (isset($item->assignavailability)) {
+                $this->save_assignment_availabilities($item->id, $item->assignavailability);
             }
         }
 
@@ -1283,21 +1302,24 @@ class competency extends hierarchy {
     }
 
     /**
-     * Translate the item assignment availability attributes into comp_assign_availability records
+     * Save (create/update) assignment availability data for a competency
      *
-     * @param object $item Competency item
-     * @return array of objects
+     * @param int $comp_id
+     * @param array $availabilities
      */
-    private function get_assign_availability_records_from_item($item) {
-        $records = [];
-        if (!empty($item->assignavailself)) {
-            $records[] = (object)array('comp_id' => $item->id, 'availability' => self::ASSIGNMENT_CREATE_SELF);
-        }
-        if (!empty($item->assignavailother)) {
-            $records[] = (object)array('comp_id' => $item->id, 'availability' => self::ASSIGNMENT_CREATE_OTHER);
-        }
+    protected function save_assignment_availabilities(int $comp_id, array $availabilities) {
+        builder::get_db()->transaction(function () use ($comp_id, $availabilities) {
+            builder::table('comp_assign_availability')
+                ->where('comp_id', $comp_id)
+                ->delete();
 
-        return $records;
+            foreach ($availabilities as $availability) {
+                builder::table('comp_assign_availability')->insert([
+                    'comp_id' => $comp_id,
+                    'availability' => $availability,
+                ]);
+            }
+        });
     }
 
 }  // class

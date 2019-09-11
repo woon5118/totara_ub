@@ -61,6 +61,7 @@ abstract class totara_sync_source_comp extends totara_sync_source {
             'typeidnumber',
             'timemodified',
             'aggregationmethod',
+            'assignavailability',
         ];
 
         $this->hierarchy_customfields = customfield::get_all(new competency());
@@ -112,9 +113,17 @@ abstract class totara_sync_source_comp extends totara_sync_source {
         $mform->addElement('header', 'importheader', get_string('importfields', 'tool_totara_sync'));
         $mform->setExpanded('importheader');
 
+        $mandatory_columns = [
+            'idnumber',
+            'fullname',
+            'frameworkidnumber',
+            'timemodified',
+            'aggregationmethod',
+        ];
+
         foreach ($this->fields as $f) {
             $name = 'import_'.$f;
-            if (in_array($f, ['idnumber', 'fullname', 'frameworkidnumber', 'timemodified', 'aggregationmethod'])) {
+            if (in_array($f, $mandatory_columns)) {
                 $mform->addElement('hidden', $name, '1');
                 $mform->setType($name, PARAM_INT);
             } else if ($f == 'deleted') {
@@ -212,6 +221,7 @@ abstract class totara_sync_source_comp extends totara_sync_source {
         $table->add_field('customfields', XMLDB_TYPE_TEXT, 'big');
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null);
         $table->add_field('aggregationmethod', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('assignavailability', XMLDB_TYPE_TEXT, 'medium');
 
         // These values are set via hidden fields when creating or editing competencies. They are essentially fixed values.
         $table->add_field('proficiencyexpected', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 1);
@@ -265,6 +275,42 @@ abstract class totara_sync_source_comp extends totara_sync_source {
         }
 
         return $result;
+    }
+
+    /**
+     * Takes import data and gets the relevant assignment availability json
+     *
+     * @param string $fromsource Value given in import data.
+     * @return string|null JSON array of assignment availability integers, or null if it is invalid
+     */
+    protected function get_assign_availability_json($fromsource) {
+        $assignment_availabilities = [
+            'none'  => [],
+            'self'  => [competency::ASSIGNMENT_CREATE_SELF],
+            'other' => [competency::ASSIGNMENT_CREATE_OTHER],
+            'any'   => [
+                competency::ASSIGNMENT_CREATE_SELF,
+                competency::ASSIGNMENT_CREATE_OTHER,
+            ],
+        ];
+
+        if (is_number($fromsource)) {
+            $assignment_availabilities = [
+                0 => $assignment_availabilities['none'],
+                1 => $assignment_availabilities['self'],
+                2 => $assignment_availabilities['other'],
+            ];
+        } else {
+            // We also allow for the English names for the values as used in code.
+            // We cannot use language strings as these can change.
+            $fromsource = core_text::strtolower($fromsource);
+        }
+
+        if (isset($assignment_availabilities[$fromsource])) {
+            return json_encode($assignment_availabilities[$fromsource]);
+        }
+
+        return null;
     }
 
     /**

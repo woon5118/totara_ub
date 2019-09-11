@@ -21,6 +21,8 @@
  * @package tool_totara_sync
  */
 
+use totara_competency\entities\competency;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -117,6 +119,7 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
             'import_frameworkidnumber' => '1',
             'import_deleted' => '0',
             'import_aggregationmethod' => '1',
+            'import_assignavailability' => '1',
             'import_idnumber' => '1',
             'import_fullname' => '1',
             'import_timemodified' => '1',
@@ -147,10 +150,10 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
 
         $this->element->set_config('sourceallrecords', '1');
 
-        $csv = "idnumber,fullname,frameworkidnumber,timemodified,aggregationmethod\n";
-        $csv .= "111,Competency 1,OFW1,0,1\n";
-        $csv .= "222,Competency 2,OFW1,0,1\n";
-        $csv .= "333,Competency 3,OFW1,0,1";
+        $csv = "idnumber,fullname,frameworkidnumber,timemodified,aggregationmethod,assignavailability\n";
+        $csv .= "111,Competency 1,OFW1,0,1,1\n";
+        $csv .= "222,Competency 2,OFW1,0,1,1\n";
+        $csv .= "333,Competency 3,OFW1,0,1,1";
         $this->element->source->set_csv_in_memory($csv);
 
         $this->assertCount(4, $DB->get_records('comp', array('frameworkid' => $this->comp_framework_data1['id']))); // Initially we should have 4 Competencies.
@@ -168,10 +171,10 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
         $this->element->source->set_config('import_deleted', '1');
         $this->element->set_config('sourceallrecords', '0');
 
-        $csv = "idnumber,fullname,deleted,frameworkidnumber,timemodified,aggregationmethod\n";
-        $csv .= "111,Competency 1,0,OFW1,0,1\n";
-        $csv .= "222,Competency 2,1,OFW1,0,1\n";
-        $csv .= "333,Competency 3,0,OFW1,0,1";
+        $csv = "idnumber,fullname,deleted,frameworkidnumber,timemodified,aggregationmethod,assignavailability\n";
+        $csv .= "111,Competency 1,0,OFW1,0,1,1\n";
+        $csv .= "222,Competency 2,1,OFW1,0,1,1\n";
+        $csv .= "333,Competency 3,0,OFW1,0,1,1";
         $this->element->source->set_csv_in_memory($csv);
 
         $this->assertCount(4, $DB->get_records('comp', array('frameworkid' => $this->comp_framework_data1['id']))); // Initially we should have 4 users.
@@ -191,6 +194,7 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
         global $DB;
 
         $this->element->source->set_config('import_deleted', '1');
+        $this->element->source->set_config('import_assignavailability', '0');
         $this->element->set_config('sourceallrecords', '0');
 
         $csv = "idnumber,fullname,deleted,frameworkidnumber,timemodified,aggregationmethod\n";
@@ -217,10 +221,10 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
 
         $this->element->set_config('sourceallrecords', '1');
 
-        $csv = "idnumber,fullname,deleted,frameworkidnumber,timemodified,aggregationmethod\n";
-        $csv .= "111,Competency 1 Updated,0,OFW1,0,1\n";
-        $csv .= "222,Competency 2 Updated,1,OFW1,0,1\n";
-        $csv .= "333,Competency 3,0,OFW1,0,1";
+        $csv = "idnumber,fullname,deleted,frameworkidnumber,timemodified,aggregationmethod,assignavailability\n";
+        $csv .= "111,Competency 1 Updated,0,OFW1,0,1,1\n";
+        $csv .= "222,Competency 2 Updated,1,OFW1,0,1,1\n";
+        $csv .= "333,Competency 3,0,OFW1,0,1,1";
         $this->element->source->set_csv_in_memory($csv);
 
         // Initially we should have 4 users.
@@ -229,5 +233,86 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
 
         $this->assertCount(3, $DB->get_records('comp', array('frameworkid' => $this->comp_framework_data1['id'])));
     }
+
+    /**
+     * Assignment availability for competencies is located in a seperate table, so make sure it is synced to correctly
+     */
+    public function test_sync_assign_availability() {
+        $this->element->set_config('sourceallrecords', 1);
+        $this->element->set_config('csvsaveemptyfields', 0);
+
+        // Test creating
+        $csv = implode("\n", [
+            "idnumber,shortname,fullname,frameworkidnumber,timemodified,aggregationmethod,assignavailability",
+            "0,0,0,OFW1,0,1,",
+            "1,1,1,OFW1,0,1,none",
+            "2,2,2,OFW1,0,1,self",
+            "3,3,3,OFW1,0,1,other",
+            "4,4,4,OFW1,0,1,any",
+            "5,5,5,OFW1,0,1,",
+            "6,6,6,OFW1,0,1,1",
+            "7,7,7,OFW1,0,1,2",
+            "8,8,8,OFW1,0,1,any",
+        ]);
+        $this->element->source->set_csv_in_memory($csv);
+        $this->assertTrue($this->element->sync());
+
+        $expected = [
+            [],
+            [],
+            [competency::ASSIGNMENT_CREATE_SELF],
+            [competency::ASSIGNMENT_CREATE_OTHER],
+            [competency::ASSIGNMENT_CREATE_SELF, competency::ASSIGNMENT_CREATE_OTHER],
+            [],
+            [competency::ASSIGNMENT_CREATE_SELF],
+            [competency::ASSIGNMENT_CREATE_OTHER],
+            [competency::ASSIGNMENT_CREATE_SELF, competency::ASSIGNMENT_CREATE_OTHER],
+        ];
+        $actual = competency::repository()
+            ->order_by('idnumber')
+            ->get()
+            ->map(function (competency $comp) {
+                return $comp->assign_availability;
+            })
+            ->all();
+        $this->assertEquals($expected, $actual);
+
+        // Test updating, where empty values are ignored
+        $csv = implode("\n", [
+            "idnumber,shortname,fullname,frameworkidnumber,timemodified,aggregationmethod,assignavailability",
+            "0,0,0,OFW1,1,1,any",
+            "1,1,1,OFW1,1,1,none",
+            "2,2,2,OFW1,1,1,",
+            "3,3,3,OFW1,1,1,self",
+            "4,4,4,OFW1,1,1,",
+            "5,5,5,OFW1,1,1,none",
+            "6,6,6,OFW1,1,1,",
+            "7,7,7,OFW1,1,1,2",
+            "8,8,8,OFW1,1,1,other",
+        ]);
+        $this->element->source->set_csv_in_memory($csv);
+        $this->assertTrue($this->element->sync());
+
+        $expected = [
+            [competency::ASSIGNMENT_CREATE_SELF, competency::ASSIGNMENT_CREATE_OTHER],
+            [],
+            [competency::ASSIGNMENT_CREATE_SELF],
+            [competency::ASSIGNMENT_CREATE_SELF],
+            [competency::ASSIGNMENT_CREATE_SELF, competency::ASSIGNMENT_CREATE_OTHER],
+            [],
+            [competency::ASSIGNMENT_CREATE_SELF],
+            [competency::ASSIGNMENT_CREATE_OTHER],
+            [competency::ASSIGNMENT_CREATE_OTHER],
+        ];
+        $actual = competency::repository()
+            ->order_by('idnumber')
+            ->get()
+            ->map(function (competency $comp) {
+                return $comp->assign_availability;
+            })
+            ->all();
+        $this->assertEquals($expected, $actual);
+    }
+
 }
 

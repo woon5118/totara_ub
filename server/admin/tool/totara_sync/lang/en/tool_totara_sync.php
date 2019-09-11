@@ -201,6 +201,8 @@ $string['typeidnumber'] = 'Type';
 $string['aggregationmethod'] = 'Aggregation method';
 $string['unrecognisedaggregrationmethod'] = 'Unrecognised aggregation method value: {$a}';
 $string['aggregrationmethodmusthavevalue'] = 'The aggregation method must be given a value for item with idnumber: {$a}';
+$string['assignavailability'] = 'Assignment creation availability';
+$string['unrecognisedassignavailability'] = 'Unrecognised assignment creation availability value: {$a}';
 
 // Job assignment
 $string['appraiserxnotexistjobassignment'] = 'User \'{$a->appraiseridnumber}\' does not exist and was set to be assigned as appraiser. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';

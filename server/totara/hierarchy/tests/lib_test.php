@@ -151,6 +151,7 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
         $newcomp->evidencecount = 0;
         $newcomp->usermodified = $userid;
         $newcomp->typeid = $this->type1->id;
+        $newcomp->assignavailability = [];
         $this->comp1 = $this->competency->add_hierarchy_item($newcomp, 0, $this->frame1->id, false, true, false);
 
         $newcomp = new stdClass();
@@ -164,6 +165,7 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
         $newcomp->evidencecount = 0;
         $newcomp->usermodified = $userid;
         $newcomp->typeid = $this->type2->id;
+        $newcomp->assignavailability = [competency::ASSIGNMENT_CREATE_SELF];
         $this->comp2 = $this->competency->add_hierarchy_item($newcomp, $this->comp1->id, $this->frame1->id, false, true, false);
 
         $newcomp = new stdClass();
@@ -190,6 +192,7 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
         $newcomp->evidencecount = 0;
         $newcomp->usermodified = $userid;
         $newcomp->typeid = 0;
+        $newcomp->assignavailability = [competency::ASSIGNMENT_CREATE_OTHER];
         $this->comp4 = $this->competency->add_hierarchy_item($newcomp, $this->comp1->id, $this->frame1->id, false, true, false);
 
         $newcomp = new stdClass();
@@ -203,6 +206,7 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
         $newcomp->evidencecount = 0;
         $newcomp->usermodified = $userid;
         $newcomp->typeid = 0;
+        $newcomp->assignavailability = [competency::ASSIGNMENT_CREATE_SELF, competency::ASSIGNMENT_CREATE_OTHER];
         $this->comp5 = $this->competency->add_hierarchy_item($newcomp, 0, $this->frame1->id, false, true, false);
 
         //set up a hierarchy custom type field

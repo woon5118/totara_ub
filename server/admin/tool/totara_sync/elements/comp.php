@@ -49,6 +49,11 @@ class totara_sync_element_comp extends totara_sync_hierarchy {
         return new competency();
     }
 
+    public function sync_item($newitem, $synctable, $unused = false) {
+        $newitem->assignavailability = json_decode($newitem->assignavailability);
+        return parent::sync_item($newitem, $synctable, $unused);
+    }
+
     /**
      * Checks the temporary table for data integrity.
      *
