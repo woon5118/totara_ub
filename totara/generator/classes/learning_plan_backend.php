@@ -241,9 +241,13 @@ class totara_generator_learning_plan_backend extends tool_generator_backend {
             // Get a random program id and add it to the learning plan.
             $program_id = totara_generator_util::get_random_record_id('prog');
             if ($program_id) {
-                if (totara_generator_util::get_random_act($this->component_chance_percentage['program'])) {
-                    $component = $plan->get_component('program');
-                    $component->update_assigned_items(array($program_id));
+                $program = new \program($program_id);
+                // This must be a program (not a certification)
+                if (!$program->is_certif()) {
+                    if (totara_generator_util::get_random_act($this->component_chance_percentage['program'])) {
+                        $component = $plan->get_component('program');
+                        $component->update_assigned_items(array($program_id));
+                    }
                 }
             } else {
                 $this->log('assignfail', 'program');
