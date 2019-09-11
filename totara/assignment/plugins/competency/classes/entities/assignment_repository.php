@@ -30,7 +30,7 @@ use tassign_competency\filter\competency_assignment_type;
 use totara_assignment\filter\basket;
 use totara_assignment\user_groups;
 use core\orm\query\builder;
-use core\orm\entity\entity_repository;
+use core\orm\entity\repository;
 use core\orm\entity\filter\equal;
 use core\orm\entity\filter\in;
 use core\orm\entity\filter\like;
@@ -40,7 +40,7 @@ use core\orm\entity\filter\like;
  *
  * @package tassign_competency\entities
  */
-class assignment_repository extends entity_repository {
+class assignment_repository extends repository {
 
     /**
      * Define available default filters

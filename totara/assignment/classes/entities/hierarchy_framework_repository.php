@@ -28,9 +28,9 @@ use totara_assignment\filter\visible;
 use totara_assignment\entities\traits\has_visible_filter;
 use core\orm\query\field;
 use core\orm\entity\filter\like;
-use core\orm\entity\entity_repository;
+use core\orm\entity\repository;
 
-abstract class hierarchy_framework_repository extends entity_repository {
+abstract class hierarchy_framework_repository extends repository {
 
     protected $order = 'sortorder';
 

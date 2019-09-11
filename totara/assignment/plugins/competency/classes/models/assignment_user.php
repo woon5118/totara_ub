@@ -23,13 +23,13 @@
 
 namespace tassign_competency\models;
 
-use core\orm\query\builder;
+use core\orm\collection;
+use core\orm\entity\repository;
 use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency_assignment_user;
 use tassign_competency\expand_task;
 use totara_assignment\entities\user;
 use totara_assignment\user_groups;
-use core\orm\collection;
 
 class assignment_user {
 
@@ -117,8 +117,8 @@ class assignment_user {
             ->join('totara_assignment_competency_users', 'id', 'assignment_id')
             ->where('totara_assignment_competency_users.user_id', $this->user_id)
             ->where('status', assignment::STATUS_ACTIVE)
-            ->when(!is_null($competency_ids), function (builder $builder) use ($competency_ids) {
-                $builder->where('competency_id', $competency_ids);
+            ->when(!is_null($competency_ids), function (repository $repository) use ($competency_ids) {
+                $repository->where('competency_id', $competency_ids);
             })
             ->get();
     }

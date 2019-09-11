@@ -27,9 +27,9 @@ namespace totara_assignment\entities;
 use core\orm\entity\filter\in;
 use totara_assignment\filter\basket;
 use totara_assignment\filter\user_name;
-use core\orm\entity\entity_repository;
+use core\orm\entity\repository;
 
-class user_repository extends entity_repository {
+class user_repository extends repository {
 
     protected function get_default_filters(): array {
         return [

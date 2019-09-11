@@ -23,10 +23,10 @@
 
 namespace core\orm\entity\relations;
 
+use coding_exception;
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\repository;
-use core\orm\collection;
-use coding_exception;
 use core\orm\lazy_collection;
 use core\orm\paginator;
 use core\orm\query\builder;

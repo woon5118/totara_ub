@@ -25,11 +25,9 @@ namespace totara_competency\models;
 
 use coding_exception;
 use core\orm\collection;
-use core\orm\entity\entity;
-use core\orm\entity\entity_repository;
+use core\orm\entity\repository;
 use core\orm\query\builder;
 use core\orm\query\subquery;
-use repository;
 use totara_competency\entities\scale as scale_entity;
 use totara_competency\entities\scale_value;
 
@@ -116,7 +114,7 @@ class scale {
         return $model;
     }
 
-    protected static function scale_repository(): entity_repository {
+    protected static function scale_repository(): repository {
         return scale_entity::repository()
             ->select('*')
             ->add_select((new subquery(function(builder $builder) {

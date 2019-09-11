@@ -27,7 +27,7 @@ namespace totara_assignment\entities;
 use totara_assignment\entities\traits\has_visible_filter;
 use totara_assignment\filter\basket;
 use totara_assignment\filter\visible;
-use core\orm\entity\entity_repository;
+use core\orm\entity\repository;
 use core\orm\query\field;
 use core\orm\entity\filter\in;
 use core\orm\entity\filter\like;
@@ -35,7 +35,7 @@ use core\orm\entity\filter\like;
 /**
  * @package tassign_competency\entities
  */
-class cohort_repository extends entity_repository {
+class cohort_repository extends repository {
 
     use has_visible_filter;
 

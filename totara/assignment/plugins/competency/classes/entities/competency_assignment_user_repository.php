@@ -24,9 +24,9 @@
 namespace tassign_competency\entities;
 
 
-use core\orm\entity\entity_repository;
+use core\orm\entity\repository;
 
-class competency_assignment_user_repository extends entity_repository {
+class competency_assignment_user_repository extends repository {
 
     /**
      * Remove orphan users from assignments expansion table

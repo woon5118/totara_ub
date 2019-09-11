@@ -29,14 +29,14 @@ use tassign_competency\filter\path;
 use totara_assignment\entities\traits\has_visible_filter;
 use totara_assignment\filter\basket;
 use totara_assignment\filter\hierarchy_item_visible;
-use core\orm\entity\entity_repository;
+use core\orm\entity\repository;
 use core\orm\query\field;
 use core\orm\entity\filter\equal;
 use core\orm\entity\filter\in;
 use core\orm\entity\filter\like;
 use core\orm\query\builder;
 
-abstract class hierarchy_item_repository extends entity_repository {
+abstract class hierarchy_item_repository extends repository {
 
     use has_visible_filter;
 
@@ -100,7 +100,7 @@ abstract class hierarchy_item_repository extends entity_repository {
     /**
      * @param string $column
      * @param string $direction
-     * @return $this|entity_repository
+     * @return $this|repository
      */
     public function order_by(string $column, string $direction = 'asc') {
         if (empty($column)) {

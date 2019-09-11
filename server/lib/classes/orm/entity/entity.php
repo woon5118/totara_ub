@@ -271,7 +271,7 @@ abstract class entity implements \JsonSerializable {
      * in the same folder as the entity
      *
      * Example:
-     *  my_entity and my_entity_repository
+     *  my_entity and my_repository
      *
      * @return repository
      */

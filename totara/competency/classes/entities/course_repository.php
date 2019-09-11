@@ -26,9 +26,9 @@ namespace totara_competency\entities;
 use core\orm\entity\filter\equal;
 use core\orm\entity\filter\in;
 use core\orm\entity\filter\like;
-use core\orm\entity\entity_repository;
+use core\orm\entity\repository;
 
-class course_repository extends entity_repository {
+class course_repository extends repository {
 
     /**
      * Filter courses by name
