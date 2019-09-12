@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
 namespace totara_competency\entities;
@@ -27,18 +27,19 @@ namespace totara_competency\entities;
 use core\orm\entity\entity;
 
 /**
- * Resource comp_type
+ * entity competency_scale
  *
  * @property-read int $id ID
- * @property string $shortname Type short name
- * @property string $fullname Type full name
- * @property string $description Type description
- * @property string $idnumber Idnumber
- * @property int $timecreated Time created
+ * @property string $name Scale name
+ * @property string $description Scale description
  * @property int $timemodified Time modified
  * @property int $usermodified User modified
+ * @property int $defaultid Default id
+ *
+ * @package totara_competency\entities
  */
-class comp_type extends entity {
+class competency_scale extends entity {
 
-    public const TABLE = 'comp_type';
+    protected $table = 'comp_scale';
+
 }

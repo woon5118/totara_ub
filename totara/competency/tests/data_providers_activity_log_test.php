@@ -21,11 +21,11 @@
  * @package totara_competency
  */
 
-use tassign_competency\entities\competency_assignment_user_log;
+use totara_competency\entities\competency_assignment_user_log;
 use totara_competency\data_providers;
 use tassign_competency\models\assignment_actions;
 use tassign_competency\expand_task;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;
 use totara_competency\models\activity_log;

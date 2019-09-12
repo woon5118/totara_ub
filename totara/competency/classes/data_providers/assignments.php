@@ -25,9 +25,9 @@ namespace totara_competency\data_providers;
 
 
 use core\orm\query\subquery;
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\assignment_repository;
-use tassign_competency\entities\competency;
+use totara_competency\entities\assignment;
+use totara_competency\entities\assignment_repository;
+use totara_competency\entities\competency;
 use totara_assignment\user_groups;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\scale;
@@ -201,7 +201,7 @@ class assignments extends user_data_provider {
         $this->scales = $this->scales->map(function($item) {
             $entity = $this->append_property_to_entity($item, 'values', $this->scale_values->filter('scaleid', $item->id));
 
-            return $this->append_property_to_entity($entity, 'min_proficient_value', $this->scale_values->item($entity->min_proficient_value_id));
+            return $this->append_property_to_entity($entity, 'min_proficient_value', $this->scale_values->item($entity->minproficiencyid));
         });
 
         // Let's also map my value to achievements
@@ -213,6 +213,8 @@ class assignments extends user_data_provider {
 
             // And now let's inject scales into competencies, fun times.
             $assignment->competency = $this->append_property_to_entity($assignment->competency, 'scale', $this->scales->item($assignment->competency->scale_id));
+
+            //var_dump($assignment->competency->scale);
 
             return $assignment;
         });

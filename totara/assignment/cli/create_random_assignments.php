@@ -21,8 +21,8 @@
  * @package totara_assignment
  */
 
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency;
 use totara_assignment\entities\cohort;
 use totara_assignment\entities\organisation;
 use totara_assignment\entities\position;

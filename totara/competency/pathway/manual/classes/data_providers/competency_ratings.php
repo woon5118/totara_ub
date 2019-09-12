@@ -26,7 +26,7 @@ namespace pathway_manual\data_providers;
 use core\orm\query\builder;
 use pathway_manual\manual;
 use pathway_manual\models\role_rating;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_competency\entities\pathway;
 
 defined('MOODLE_INTERNAL') || die();

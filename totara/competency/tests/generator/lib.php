@@ -28,7 +28,7 @@ use pathway_learning_plan\learning_plan;
 use pathway_manual\entities\rating;
 use pathway_manual\manual;
 use pathway_test_pathway\test_pathway;
-use tassign_competency\entities\competency_framework;
+use totara_competency\entities\competency_framework;
 use totara_assignment\entities\user;
 use totara_competency\entities\competency;
 use totara_competency\entities\pathway as pathway_entity;

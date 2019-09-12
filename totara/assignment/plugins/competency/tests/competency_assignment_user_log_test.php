@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use tassign_competency\entities\competency_assignment_user_log;
+use totara_competency\entities\competency_assignment_user_log;
 
 class tassign_competency_competency_assignment_user_log_testcase extends advanced_testcase {
 

@@ -26,7 +26,7 @@ namespace totara_competency\webapi\resolver\query;
 use context_system;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use tassign_competency\entities\competency as competency_entity;
+use totara_competency\entities\competency as competency_entity;
 use totara_core\advanced_feature;
 
 /**
@@ -47,7 +47,10 @@ class competency implements query_resolver {
         require_login();
         require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
-        return new competency_entity($args['competency_id']);
+        return competency_entity::repository()
+            ->with(['framework', 'type'])
+            ->where('id', $args['competency_id'])
+            ->one();
     }
 
 }

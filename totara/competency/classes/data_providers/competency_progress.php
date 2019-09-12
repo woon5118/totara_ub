@@ -25,7 +25,7 @@ namespace totara_competency\data_providers;
 
 
 use stdClass;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use core\orm\collection;
 use tassign_competency\models\assignment as assignment_model;
 

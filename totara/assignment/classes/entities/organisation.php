@@ -24,8 +24,7 @@
 namespace totara_assignment\entities;
 
 
-use totara_assignment\entities\expand;
-use totara_assignment\entities\expandable;
+use core\orm\collection;
 
 /**
  * @property string $shortname Short name
@@ -46,7 +45,11 @@ use totara_assignment\entities\expandable;
  *
  * @method static organisation_repository repository()
  *
- * @package tassign_competency\entities
+ * @property-read position $parent Parent item
+ * @property-read collection $children Immediate children
+ * @property-read position_framework $framework Position framework
+ *
+ * @package totara_competency\entities
  */
 class organisation extends hierarchy_item implements expandable {
 

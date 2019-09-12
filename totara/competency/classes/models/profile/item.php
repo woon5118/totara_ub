@@ -23,14 +23,8 @@
 
 namespace totara_competency\models\profile;
 
-use coding_exception;
 use core\orm\collection;
-use core\orm\query\builder;
-use tassign_competency\entities\assignment;
-use totara_assignment\entities\user;
-use totara_competency\data_providers\progress;
-use totara_competency\entities\scale as scale_entity;
-use totara_competency\entities\scale_value;
+use totara_competency\entities\assignment;
 use totara_competency\models\basic_model;
 
 /**

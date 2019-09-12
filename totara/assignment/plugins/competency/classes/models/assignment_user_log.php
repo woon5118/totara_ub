@@ -23,8 +23,8 @@
 
 namespace tassign_competency\models;
 
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency_assignment_user_log;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency_assignment_user_log;
 
 class assignment_user_log {
     /**

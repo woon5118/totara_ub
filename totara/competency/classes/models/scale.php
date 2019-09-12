@@ -122,13 +122,13 @@ class scale {
                     ->select('id')
                     ->where_field('scaleid', 'comp_scale.id')
                     ->where('proficient', 1)
-                    ->when(true, function (builder $builder) {
+                    ->when(true, function (repository $repository) {
                         $subquery = builder::table('comp_scale_values')
                             ->select('max(sortorder)')
                             ->where_field('scaleid', 'comp_scale.id')
                             ->where('proficient', 1);
 
-                        $builder->where('sortorder', $subquery);
+                        $repository->where('sortorder', $subquery);
                     });
             }))->as('min_proficient_value_id'));
     }

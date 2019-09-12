@@ -22,7 +22,7 @@
  * @category test
  */
 
-use tassign_competency\entities;
+use totara_competency\entities;
 use totara_assignment\user_groups;
 
 defined('MOODLE_INTERNAL') || die();

@@ -24,7 +24,7 @@
 namespace tassign_competency\filter;
 
 use core\orm\query\field;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_assignment\user_groups;
 use core\orm\query\builder;
 use core\orm\entity\filter\filter;

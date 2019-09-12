@@ -23,11 +23,10 @@
 
 namespace tassign_competency\models;
 
-use core\orm\collection;
 use core\orm\entity\repository;
-use core\orm\query\builder;
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency_assignment_user;
+use core\orm\collection;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency_assignment_user;
 use tassign_competency\expand_task;
 use totara_assignment\entities\user;
 use totara_assignment\user_groups;

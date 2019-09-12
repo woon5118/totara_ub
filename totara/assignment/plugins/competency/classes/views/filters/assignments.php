@@ -23,7 +23,7 @@
 
 namespace tassign_competency\views\filters;
 
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_core\output\select_search_text;
 use totara_core\output\select_tree;
 

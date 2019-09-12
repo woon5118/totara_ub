@@ -24,24 +24,30 @@
 namespace totara_competency\entities;
 
 
-use core\orm\entity\entity;
+use core\orm\entity\repository;
 
-/**
- * Resource competency_scale
- *
- * @property-read int $id ID
- * @property string $name Value name
- * @property string $idnumber Unique identifier for end users
- * @property string $description Scale description
- * @property int $scaleid Scale id
- * @property int $numericscore Numeric score
- * @property int $sortorder Sortorder within the scale
- * @property int $timemodified Time modified
- * @property int $usermodified User modified
- * @property int $proficient Whether this value is counted as proficient
- */
-class scale_value extends entity {
+class competency_assignment_user_repository extends repository {
 
-    public const TABLE = 'comp_scale_values';
+    /**
+     * Remove orphan users from assignments expansion table
+     */
+    public static function remove_orphaned_records() {
+        // Delete all orphaned records
+        competency_assignment_user::repository()
+            ->where_raw("assignment_id NOT IN (
+                select id from {".assignment::TABLE."} WHERE status = ".assignment::STATUS_ACTIVE."
+            )")
+            ->delete();
+    }
+
+    /**
+     * @param int $assignment_id
+     * @return $this
+     */
+    public function filter_by_assignment_id(int $assignment_id): competency_assignment_user_repository {
+        $this->where('assignment_id', $assignment_id);
+
+        return $this;
+    }
 
 }

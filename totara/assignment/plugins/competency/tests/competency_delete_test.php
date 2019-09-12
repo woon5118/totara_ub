@@ -23,8 +23,8 @@
  */
 
 use competency as competency_hierarchy;
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency;
 
 defined('MOODLE_INTERNAL') || die();
 

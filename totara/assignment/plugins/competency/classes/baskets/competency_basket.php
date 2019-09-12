@@ -23,7 +23,7 @@
 
 namespace tassign_competency\baskets;
 
-use tassign_competency\entities\competency;
+use totara_competency\entities\competency;
 use totara_assignment\filter\basket;
 use totara_assignment\filter\hierarchy_item_visible;
 use totara_core\basket\basket_interface;

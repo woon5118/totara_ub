@@ -28,7 +28,7 @@ use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
 use pathway_manual\manual;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use tassign_competency\expand_task;
 use tassign_competency\models\assignment_actions;
 use totara_assignment\entities\user;

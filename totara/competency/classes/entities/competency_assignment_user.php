@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\entities;
+namespace totara_competency\entities;
 
 
 use core\orm\entity\entity;
@@ -40,7 +40,7 @@ use core\orm\entity\entity;
  *
  * @method static competency_assignment_user_repository repository()
  *
- * @package tassign_competency\entities
+ * @package totara_competency\entities
  */
 class competency_assignment_user extends entity {
 

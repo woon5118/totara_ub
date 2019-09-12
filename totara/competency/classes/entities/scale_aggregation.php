@@ -18,28 +18,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\entities;
+namespace totara_competency\entities;
 
+use core\orm\entity\relations\has_one;
+use totara_competency\achievement_configuration;
+use totara_assignment\entities\hierarchy_item;
 
-use core\orm\entity\entity;
+// Currently only required to re-use the constants
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 
 /**
- * entity competency_scale
+ *
+ * Class competency scale aggregation
  *
  * @property-read int $id ID
- * @property string $name Scale name
- * @property string $description Scale description
- * @property int $timemodified Time modified
- * @property int $usermodified User modified
- * @property int $defaultid Default id
+ * @property int $comp_id
+ * @property string $type
+ * @property int $timemodified
  *
- * @package tassign_competency\entities
  */
-class competency_scale extends entity {
+class scale_aggregation extends hierarchy_item {
 
-    protected $table = 'comp_scale';
-
+    public const TABLE = 'totara_competency_scale_aggregation';
+    
 }

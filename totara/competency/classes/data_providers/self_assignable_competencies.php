@@ -26,7 +26,7 @@ namespace totara_competency\data_providers;
 use core\orm\collection;
 use core\orm\cursor;
 use core\orm\cursor_paginator;
-use tassign_competency\entities\competency as competency_entity;
+use totara_competency\entities\competency as competency_entity;
 use tassign_competency\filter\competency_user_assignment_status;
 use tassign_competency\filter\competency_user_assignment_type;
 use tassign_competency\models\assignment;

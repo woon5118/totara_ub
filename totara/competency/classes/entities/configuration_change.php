@@ -3,7 +3,6 @@
 namespace totara_competency\entities;
 
 use core\orm\entity\entity;
-use tassign_competency\entities\competency_framework;
 
 /**
  * @property-read int $id ID

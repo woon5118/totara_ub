@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\entities;
+namespace totara_competency\entities;
 
 
 use core\orm\query\field;
@@ -38,7 +38,7 @@ use core\orm\entity\filter\like;
 /**
  * Assignment entity repository
  *
- * @package tassign_competency\entities
+ * @package totara_competency\entities
  */
 class assignment_repository extends repository {
 

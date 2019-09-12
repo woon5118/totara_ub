@@ -31,7 +31,7 @@ use core\orm\query\builder;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use criteria_childcompetency\childcompetency;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use tassign_competency\models\assignment_user;
 use totara_competency\entities\competency;
 use totara_core\advanced_feature;

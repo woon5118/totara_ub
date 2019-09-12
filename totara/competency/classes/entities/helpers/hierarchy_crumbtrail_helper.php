@@ -21,7 +21,7 @@
  * @package totara_userstatus
  */
 
-namespace tassign_competency\entities\helpers;
+namespace totara_competency\entities\helpers;
 
 
 use totara_assignment\entities\hierarchy_item;

@@ -23,7 +23,7 @@
  */
 
 use tassign_competency\admin_setting_continuous_tracking;
-use tassign_competency\entities;
+use totara_competency\entities;
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();

@@ -24,7 +24,7 @@
 namespace tassign_competency\userdata;
 
 use core\orm\query\builder;
-use tassign_competency\entities;
+use totara_competency\entities;
 use totara_assignment\user_groups;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;

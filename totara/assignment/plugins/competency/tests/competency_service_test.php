@@ -22,8 +22,8 @@
  * @category test
  */
 
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency;
 use totara_assignment\entities\user;
 use totara_assignment\user_groups;
 use totara_core\basket\session_basket;

@@ -25,7 +25,7 @@
 use core\webapi\execution_context;
 use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_competency\entities\pathway;
 use totara_competency\entities\scale_value;
 use totara_competency\plugintypes;

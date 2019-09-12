@@ -25,8 +25,8 @@ namespace tassign_competency\filter;
 
 use coding_exception;
 use core\orm\query\field;
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency;
 use totara_assignment\user_groups;
 use core\orm\query\builder;
 use core\orm\entity\filter\filter;

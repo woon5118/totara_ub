@@ -23,8 +23,8 @@
  */
 
 use core\webapi\execution_context;
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency;
 use tassign_competency\expand_task;
 use totara_assignment\user_groups;
 use totara_competency\data_providers\self_assignable_competencies as data_provider;

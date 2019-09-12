@@ -23,7 +23,7 @@
 
 namespace tassign_competency\filter;
 
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use core\orm\query\builder;
 use core\orm\query\field;
 use core\orm\entity\filter\filter;

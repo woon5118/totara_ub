@@ -28,7 +28,7 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
-use tassign_competency\entities;
+use totara_competency\entities;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
@@ -152,7 +152,7 @@ class competency extends \external_api {
      */
     public static function show(int $id, array $options) {
         advanced_feature::require('competency_assignment');
-        
+
         require_capability('tassign/competency:view', \context_system::instance());
 
         /** @var entities\competency $competency */

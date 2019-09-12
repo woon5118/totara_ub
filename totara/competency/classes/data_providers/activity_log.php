@@ -25,8 +25,8 @@ namespace totara_competency\data_providers;
 
 use core\orm\entity\entity;
 use core\orm\query\builder;
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency_assignment_user_log;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency_assignment_user_log;
 use tassign_competency\models\assignment_user_log;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;

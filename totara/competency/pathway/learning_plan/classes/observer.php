@@ -23,7 +23,7 @@
 
 namespace pathway_learning_plan;
 
-use tassign_competency\entities\competency_assignment_user;
+use totara_competency\entities\competency_assignment_user;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
 use totara_competency\pathway_aggregator;

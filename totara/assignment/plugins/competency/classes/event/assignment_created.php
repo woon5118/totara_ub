@@ -23,7 +23,7 @@
 
 namespace tassign_competency\event;
 
-use tassign_competency\entities\assignment as assignment_entity;
+use totara_competency\entities\assignment as assignment_entity;
 
 defined('MOODLE_INTERNAL') || die();
 

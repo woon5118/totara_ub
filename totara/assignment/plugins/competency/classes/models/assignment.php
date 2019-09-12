@@ -26,13 +26,12 @@ namespace tassign_competency\models;
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\entity;
-use core\orm\lazy_collection;
 use core\orm\query\builder;
 use tassign_competency\assignment_create_exception;
-use tassign_competency\entities\assignment as assignment_entity;
-use tassign_competency\entities\competency;
-use tassign_competency\entities\competency_assignment_user;
-use tassign_competency\entities\competency_assignment_user_log;
+use totara_competency\entities\assignment as assignment_entity;
+use totara_competency\entities\competency;
+use totara_competency\entities\competency_assignment_user;
+use totara_competency\entities\competency_assignment_user_log;
 use tassign_competency\event\assignment_activated;
 use tassign_competency\event\assignment_archived;
 use tassign_competency\event\assignment_created;
@@ -42,7 +41,6 @@ use totara_assignment\entities\hierarchy_item;
 use totara_assignment\entities\user;
 use totara_assignment\filter\hierarchy_item_visible;
 use totara_assignment\user_groups;
-use totara_competency\entities\competency as other_competency_entity;
 
 class assignment {
 

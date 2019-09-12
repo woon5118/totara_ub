@@ -23,8 +23,8 @@
 
 use totara_assignment\user_groups;
 use totara_competency\models\activity_log;
-use tassign_competency\entities\competency_assignment_user_log;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\competency_assignment_user_log;
+use totara_competency\entities\assignment;
 
 class totara_competency_models_activity_log_assignment_testcase extends advanced_testcase {
 

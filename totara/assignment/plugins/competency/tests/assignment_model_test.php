@@ -22,9 +22,9 @@
  * @category test
  */
 
-use tassign_competency\entities\assignment as assignment_entity;
-use tassign_competency\entities\competency as competency_entity;
-use tassign_competency\entities\competency_assignment_user;
+use totara_competency\entities\assignment as assignment_entity;
+use totara_competency\entities\competency as competency_entity;
+use totara_competency\entities\competency_assignment_user;
 use tassign_competency\expand_task;
 use tassign_competency\models\assignment as assignment_model;
 use tassign_competency\models\user_group\user;

@@ -22,7 +22,7 @@
  * @package totara_criteria
  */
 
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_assignment\user_groups;
 use totara_competency\entities\competency_achievement;
 use totara_core\advanced_feature;

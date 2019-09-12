@@ -26,8 +26,8 @@ namespace totara_competency\controllers;
 
 use context;
 use moodle_url;
-use tassign_competency\entities\competency;
-use tassign_competency\entities\competency_framework;
+use totara_competency\entities\competency;
+use totara_competency\entities\competency_framework;
 use totara_competency\achievement_configuration;
 use totara_competency\achievement_criteria;
 use totara_competency\pathway;
@@ -69,10 +69,12 @@ class competency_controller extends admin_controller {
             print_error('accessdenied', 'admin');
         }
 
-        $this->competency = new competency(
-            required_param('id', PARAM_INT)
-        );
-        $this->framework = new competency_framework($this->competency->frameworkid);
+        $this->competency = competency::repository()
+            ->where('id', required_param('id', PARAM_INT))
+            ->with(['scale_aggregation', 'framework'])
+            ->one();
+
+        $this->framework = $this->competency->framework;
 
         $this->page->navbar
             ->add(
@@ -218,7 +220,7 @@ class competency_controller extends admin_controller {
     private function export_achievementpaths_edit() {
         advanced_feature::require('competency_assignment');
 
-        $comp_agg_type = $this->competency->scale_aggregation_type ?: 'highest';
+        $comp_agg_type = $this->competency->scale_aggregation->type ?? 'highest';
 
         $results = [
             'templatename' => 'totara_competency/achievement_paths',
@@ -263,6 +265,7 @@ class competency_controller extends admin_controller {
      */
     private function add_navigation() {
 
+        // TODO this extract is really dodgy...
         $hierarchy = new \competency();
         extract($hierarchy->get_permissions());
 

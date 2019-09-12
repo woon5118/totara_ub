@@ -19,10 +19,10 @@
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\entities;
+namespace totara_competency\entities;
 
 
 use core\orm\query\builder;
@@ -58,7 +58,7 @@ class competency_repository extends hierarchy_item_repository {
     public function filter_by_self_assignable(int $user_id) {
         if (!$this->has_join('comp_assign_availability', 'availabilityself')) {
             $this->join(['comp_assign_availability', 'availabilityself'], 'id', 'comp_id');
-            $this->where('availabilityself.availability', \totara_competency\entities\competency::ASSIGNMENT_CREATE_SELF);
+            $this->where('availabilityself.availability', competency::ASSIGNMENT_CREATE_SELF);
         }
 
         $exist_builder = builder::table(competency_assignment_user::TABLE)
@@ -81,7 +81,7 @@ class competency_repository extends hierarchy_item_repository {
     public function filter_by_other_assignable(int $user_id) {
         if (!$this->has_join('comp_assign_availability', 'availabilityother')) {
             $this->join(['comp_assign_availability', 'availabilityother'], 'id', 'comp_id');
-            $this->where('availabilityother.availability', \totara_competency\entities\competency::ASSIGNMENT_CREATE_OTHER);
+            $this->where('availabilityother.availability', competency::ASSIGNMENT_CREATE_OTHER);
         }
 
         $exist_builder = builder::table(competency_assignment_user::TABLE)

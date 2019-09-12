@@ -24,6 +24,7 @@
 namespace totara_assignment\entities;
 
 
+use core\orm\collection;
 use totara_assignment\entities\expand;
 use totara_assignment\entities\expandable;
 
@@ -47,9 +48,14 @@ use totara_assignment\entities\expandable;
  * @property int $timevalidfrom Valid from time
  * @property int $timevalidto Valid to time
  *
+ * @property-read position $parent Parent item
+ * @property-read collection $children Immediate children
+ * @property-read position_framework $framework Position framework
+ *
+ *
  * @method static organisation_repository repository()
  *
- * @package tassign_competency\entities
+ * @package totara_competency\entities
  */
 class position extends hierarchy_item implements expandable {
 

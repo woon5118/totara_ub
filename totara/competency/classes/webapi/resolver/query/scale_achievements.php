@@ -26,7 +26,7 @@ namespace totara_competency\webapi\resolver\query;
 use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;

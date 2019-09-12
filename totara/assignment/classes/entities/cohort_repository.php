@@ -33,7 +33,7 @@ use core\orm\entity\filter\in;
 use core\orm\entity\filter\like;
 
 /**
- * @package tassign_competency\entities
+ * @package totara_competency\entities
  */
 class cohort_repository extends repository {
 

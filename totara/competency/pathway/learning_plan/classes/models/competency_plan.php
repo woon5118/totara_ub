@@ -27,7 +27,7 @@ use core\orm\entity\entity;
 use development_plan;
 use dp_competency_component;
 use pathway_learning_plan\entities\plan_competency_value;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_competency\entities\scale_value;
 
 defined('MOODLE_INTERNAL') || die();

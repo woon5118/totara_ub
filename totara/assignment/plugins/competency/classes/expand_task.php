@@ -23,9 +23,9 @@
 
 namespace tassign_competency;
 
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency_assignment_user;
-use tassign_competency\entities\competency_assignment_user_repository;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency_assignment_user;
+use totara_competency\entities\competency_assignment_user_repository;
 use tassign_competency\event\assignment_user_assigned;
 use tassign_competency\event\assignment_user_unassigned;
 use totara_assignment\entities\expandable;

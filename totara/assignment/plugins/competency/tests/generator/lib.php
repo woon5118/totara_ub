@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_assignment\user_groups;
 use totara_job\job_assignment;
 

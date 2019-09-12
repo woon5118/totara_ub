@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,38 +18,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\entities;
+namespace totara_competency\entities;
 
-
-use totara_assignment\entities\hierarchy_framework;
-use core\orm\collection;
+use core\orm\entity\entity;
 
 /**
- * @property string $shortname
- * @property string $idnumber
- * @property string $description
- * @property int $sortorder
- * @property int $visible
- * @property int $hidecustomfields
- * @property int $timecreatedcat
+ * Class competency
+ *
+ * @property int $scaleid
+ * @property int $frameworkid
  * @property int $timemodified
  * @property int $usermodified
- * @property string $fullname
  *
- * @method static competency_framework_repository repository()
+ *
+ * @package totara_competency\entities
  */
-class competency_framework extends hierarchy_framework {
+class competency_scale_assignment extends entity {
 
-    public const TABLE = 'comp_framework';
-
-    public function get_competencies_attribute(): collection {
-        return competency::repository()
-            ->where('frameworkid', $this->id)
-            ->order_by('sortthread')
-            ->get();
-    }
+    public const TABLE = 'comp_scale_assignments';
 
 }

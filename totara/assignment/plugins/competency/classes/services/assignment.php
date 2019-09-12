@@ -31,7 +31,7 @@ use external_single_structure;
 use external_value;
 use tassign_competency\assignment_create_exception;
 use tassign_competency\baskets;
-use tassign_competency\entities;
+use totara_competency\entities;
 use tassign_competency\models;
 use totara_core\advanced_feature;
 use totara_core\basket\session_basket;

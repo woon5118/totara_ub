@@ -21,7 +21,7 @@
  * @package tool_totara_sync
  */
 
-use tassign_competency\entities\competency_framework;
+use totara_competency\entities\competency_framework;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_assignment;
 use totara_core\advanced_feature;

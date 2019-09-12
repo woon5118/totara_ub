@@ -24,13 +24,13 @@
 namespace totara_competency\models\activity_log;
 
 use core\orm\entity\entity;
-use tassign_competency\entities\competency_assignment_user_log;
+use totara_competency\entities\competency_assignment_user_log;
 use totara_assignment\entities\cohort;
 use totara_assignment\entities\organisation;
 use totara_assignment\entities\position;
 use totara_assignment\entities\user;
 use totara_competency\models\activity_log;
-use tassign_competency\entities;
+use totara_competency\entities;
 
 class assignment extends activity_log {
 

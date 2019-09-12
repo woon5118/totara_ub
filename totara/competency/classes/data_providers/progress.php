@@ -24,7 +24,7 @@
 namespace totara_competency\data_providers;
 
 
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_assignment\entities\user;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\scale;
@@ -183,6 +183,9 @@ class progress extends user_data_provider {
     }
 
     protected function calculate_proficiency_chart_data(assignment $assignment) {
+
+        //var_dump($assignment->competency); die;
+
         // Min would always have a value
         $min = (object) [
             'id' => $assignment->competency->scale->min_proficient_value->id,

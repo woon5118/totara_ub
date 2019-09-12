@@ -23,7 +23,7 @@
 
 namespace totara_competency\formatter;
 
-use tassign_competency\entities\competency_type;
+use totara_competency\entities\competency_type;
 use totara_core\formatter\field\date_field_formatter;
 use totara_core\formatter\field\string_field_formatter;
 use totara_core\formatter\field\text_field_formatter;

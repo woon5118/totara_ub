@@ -53,7 +53,7 @@ use core\orm\entity\entity;
  *
  * @method static cohort_repository repository()
  *
- * @package tassign_competency\entities
+ * @package totara_competency\entities
  */
 class cohort extends entity implements expandable {
 

@@ -18,36 +18,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\entities;
+namespace totara_competency\entities;
 
 
-use core\orm\entity\repository;
+use totara_assignment\entities\hierarchy_framework;
+use core\orm\collection;
 
-class competency_assignment_user_repository extends repository {
+/**
+ * @property string $shortname
+ * @property string $idnumber
+ * @property string $description
+ * @property int $sortorder
+ * @property int $visible
+ * @property int $hidecustomfields
+ * @property int $timecreatedcat
+ * @property int $timemodified
+ * @property int $usermodified
+ * @property string $fullname
+ *
+ * @method static competency_framework_repository repository()
+ */
+class competency_framework extends hierarchy_framework {
 
-    /**
-     * Remove orphan users from assignments expansion table
-     */
-    public static function remove_orphaned_records() {
-        // Delete all orphaned records
-        competency_assignment_user::repository()
-            ->where_raw("assignment_id NOT IN (
-                select id from {".assignment::TABLE."} WHERE status = ".assignment::STATUS_ACTIVE."
-            )")
-            ->delete();
-    }
+    public const TABLE = 'comp_framework';
 
-    /**
-     * @param int $assignment_id
-     * @return $this
-     */
-    public function filter_by_assignment_id(int $assignment_id): competency_assignment_user_repository {
-        $this->where('assignment_id', $assignment_id);
-
-        return $this;
+    public function get_competencies_attribute(): collection {
+        return competency::repository()
+            ->where('frameworkid', $this->id)
+            ->order_by('sortthread')
+            ->get();
     }
 
 }

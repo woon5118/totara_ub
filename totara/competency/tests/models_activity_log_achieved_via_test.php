@@ -24,7 +24,7 @@
 use totara_competency\models\activity_log;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\scale_value;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 
 class totara_competency_models_activity_log_achieved_via_testcase extends advanced_testcase {
 

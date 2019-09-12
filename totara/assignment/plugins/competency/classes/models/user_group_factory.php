@@ -23,7 +23,7 @@
 
 namespace tassign_competency\models;
 
-use tassign_competency\entities\assignment as assignment_entity;
+use totara_competency\entities\assignment as assignment_entity;
 
 /**
  * Factory to return an instance of a specific user group model identified by a type

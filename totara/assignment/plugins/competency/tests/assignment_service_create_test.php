@@ -22,9 +22,9 @@
  * @category test
  */
 
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency;
-use tassign_competency\entities\competency_framework;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency;
+use totara_competency\entities\competency_framework;
 use tassign_competency\task\expand_assignment_task;
 use totara_assignment\entities\user;
 use totara_assignment\user_groups;

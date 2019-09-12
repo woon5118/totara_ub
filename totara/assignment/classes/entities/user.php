@@ -88,7 +88,7 @@ use stdClass;
  *
  * @method static user_repository repository()
  *
- * @package tassign_competency\entities
+ * @package totara_competency\entities
  */
 class user extends entity {
 

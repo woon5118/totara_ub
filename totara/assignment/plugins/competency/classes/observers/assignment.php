@@ -27,7 +27,7 @@ use tassign_competency\event\assignment_activated;
 use tassign_competency\event\assignment_archived;
 use tassign_competency\event\assignment_created;
 use tassign_competency\event\assignment_deleted;
-use tassign_competency\entities;
+use totara_competency\entities;
 use tassign_competency\task\expand_assignment_task;
 
 defined('MOODLE_INTERNAL') || die();

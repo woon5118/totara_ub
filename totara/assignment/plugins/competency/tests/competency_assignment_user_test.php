@@ -23,8 +23,7 @@
  */
 
 use core\orm\query\builder;
-use tassign_competency\entities;
-use tassign_competency\entities\competency_assignment_user_log;
+use totara_competency\entities;
 use tassign_competency\expand_task;
 use tassign_competency\models\assignment_user;
 
@@ -124,7 +123,7 @@ class tassign_competency_competency_assignment_user_testcase extends advanced_te
             ->insert([
                 'assignment_id' => $assignment->id,
                 'user_id' => $user->id,
-                'action' => competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED,
+                'action' => entities\competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED,
                 'created_at' => time(),
             ]);
 

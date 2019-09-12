@@ -19,10 +19,10 @@
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\entities;
+namespace totara_competency\entities;
 
 use totara_assignment\entities\hierarchy_type;
 

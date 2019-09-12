@@ -18,59 +18,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
 namespace totara_competency\entities;
 
-use core\collection;
-use core\orm\entity\relations\has_many;
+use core\orm\collection;
 use core\orm\entity\relations\has_one;
-use totara_competency\achievement_configuration;
+use core\orm\entity\relations\has_many;
+use core\orm\entity\relations\has_one_through;
 use totara_assignment\entities\hierarchy_item;
+use totara_assignment\user_groups;
 
 // Currently only required to re-use the constants
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 
 /**
- * Todo: Combine with assignments implementation of this and move somewhere central.
- * THIS IS A COPY OF THE ASSIGNMENT COMPETENCY WITH ASSIGNMENT STUFF TAKEN OUT AND SCALES ADDED IN.
- *
  * Class competency
+ *
+ * @property string $shortname Short name
+ * @property string $description Competency description
+ * @property string $idnumber External systems ID number
+ * @property int $frameworkid Framework ID
+ * @property string $path Competency path in the hierarchy
+ * @property int $parentid Parent competency ID
+ * @property bool $visible Visible flag
+ * @property int $timecreated Time created
+ * @property int $timemodified Time modified
+ * @property int $usermodified User modified
+ * @property string $fullname Full competency name
+ * @property int $depthlevel Depth level in the hierarchy
+ * @property int $typeid Competency type ID
+ * @property string $sortthread Sortorder
+ * @property bool $totarasync Totara sync flag
  *
  * @property int $aggregationmethod Aggregation method
  * @property int $proficiencyexpected Expected proficiency
  * @property int $evidencecount Evidence count
  *
- * @property-read int $id ID
- * @property string $shortname
- * @property string $description
- * @property string $idnumber
- * @property int $frameworkid
- * @property int $path
- * @property int $parentid
- * @property bool $visible
- * @property int $timecreated
- * @property int $timemodified
- * @property int $usermodified
- * @property string $fullname
- * @property int $depthlevel
- * @property int $typeid
- * @property string $sortthread
- * @property int $totarasync
+ * @property-read array $assigned_user_groups
+ * @property-read int $children_count
+ * @property-read int $assignments_count
+ * @property-read int[] $assign_availability
+ * @property-read array $custom_fields
  *
+ * @method static competency_repository repository()
  *
- * @property-read scale $scale Scale associated with this competency
+ * @property-read competency $parent Parent item
+ * @property-read collection $scale Scale associated with this competency
  * @property-read comp_type $comp_type Competency type
  * @property-read customfields $customfields Custom fields
  * @property-read string $scale_aggregation_type Scale aggregation type
- * @property-read int[] $assign_availability Assignment creation availabilities
  *
  * @property-read competency_achievement $achievement
  * @property-read collection $availability
  * @property-read pathway[] $pathways
  *
- * @package tassign_competency\resources
+ * @package totara_competency\entities
  */
 class competency extends hierarchy_item {
 
@@ -78,14 +82,6 @@ class competency extends hierarchy_item {
 
     public const ASSIGNMENT_CREATE_SELF = \competency::ASSIGNMENT_CREATE_SELF;
     public const ASSIGNMENT_CREATE_OTHER = \competency::ASSIGNMENT_CREATE_OTHER;
-
-    /**
-     * @var scale $scale
-     */
-    private $scale;
-
-    /** @var comp_type $comp_type*/
-    private $comp_type;
 
     /** @var array $customfields */
     private $customfields;
@@ -106,42 +102,21 @@ class competency extends hierarchy_item {
             ->where_in('status', [competency_achievement::ACTIVE_ASSIGNMENT, competency_achievement::ARCHIVED_ASSIGNMENT]);
     }
 
-    public function get_scale_attribute(): scale {
-        global $DB;
-
-        if (!isset($this->scale)) {
-            $sql = "
-                SELECT scale.*
-                  FROM {comp_scale_assignments} sa,
-                       {comp_scale} scale
-                 WHERE sa.scaleid = scale.id
-                   AND sa.frameworkid = :fwid";
-            $record = $DB->get_record_sql($sql, ['fwid' => $this->frameworkid]);
-
-            // Todo: Will have to centralise the scale_provider as well if doing this.
-            // Could alternatively add a get_scale_id() or add to scale_provider a get_scale_for_competency method.
-            $this->scale = new scale($record);
-        }
-
-        return $this->scale;
+    /**
+     * Get related scale
+     *
+     * @return has_one_through
+     */
+    public function scale(): has_one_through {
+        return $this->has_one_through(
+            scale::class,
+            competency_scale_assignment::class,
+            'frameworkid',
+            'id',
+            'frameworkid',
+            'scaleid'
+        );
     }
-
-    // Todo: take this away once competency has been moved. Overriding a method in hierarchy_item which doesn't work otherwise due to namespace.
-    public static function get_framework_class(): ?string {
-        return 'tassign_competency\entities\competency_framework';
-    }
-
-    public function get_comp_type_attribute(): ?comp_type {
-        // Not caching for now - not needed during aggregation
-        if (empty($this->comp_type) && !empty($this->typeid)) {
-            $this->comp_type = new comp_type($this->typeid);
-        }
-
-        return $this->comp_type;
-    }
-
-
-    // TODO: Move to own resources???
 
     /**
      * Retrieve all custom field definitions and values for this competency
@@ -191,20 +166,59 @@ class competency extends hierarchy_item {
     }
 
     /**
+     * If this is called this item will have a assigned_user_groups attribute loaded when to_array() is called
+     *
+     * @return $this
+     */
+    public function with_assigned_user_groups() {
+        return $this->add_extra_attribute('assigned_user_groups');
+    }
+
+    /**
+     * @return array
+     */
+    public function get_assigned_user_groups_attribute(): array {
+        $assignments = assignment::repository()
+            ->where('competency_id', $this->id)
+            ->select('*')
+            ->with_user_group_name()
+            ->get();
+
+        $user_group_names = [];
+        foreach ($assignments as $assignment) {
+            $name = $assignment->user_group_name;
+            if ($assignment->user_group_type == user_groups::USER) {
+                $user_name_fields = totara_get_all_user_name_fields();
+                $user = new \stdClass();
+                foreach ($user_name_fields as $field) {
+                    $user->$field = isset($assignment->$field) ? $assignment->$field : '';
+                }
+                $name = fullname($user);
+            }
+            $user_group_names[] = $name;
+        };
+
+        return $user_group_names;
+    }
+
+    /**
      * Retrieve scale_aggregation
      *
-     * @return ?string Scale aggregation type
+     * @return string Scale aggregation type
      */
-    public function get_scale_aggregation_type_attribute(): ?string {
-        global $DB;
+    public function get_scale_aggregation_type_attribute(): string {
+        return $this->scale_aggregation->type;
+    }
 
-        if (is_null($this->scale_aggregation_type)) {
-            $this->scale_aggregation_type = $DB->get_field('totara_competency_scale_aggregation',
-                'type',
-                ['comp_id' => $this->id]);
-        }
-
-        return $this->scale_aggregation_type;
+    /**
+     * Related scale aggregation record
+     *
+     * (Confirm whether it's has one or many)
+     *
+     * @return has_one
+     */
+    public function scale_aggregation(): has_one {
+        return $this->has_one(scale_aggregation::class, 'comp_id');
     }
 
     /**
@@ -217,18 +231,56 @@ class competency extends hierarchy_item {
     }
 
     /**
-     * Retrieve assignment availability settings
+     * Get assignment availability types
      *
      * @return array Of assignment availability types
      */
     protected function get_assign_availability_attribute(): array {
-        global $DB;
+        return $this->availability->pluck('availability');
+    }
 
-        $sql =
-            'SELECT availability
-               FROM {comp_assign_availability}
-              WHERE comp_id = :compid';
-        return $DB->get_fieldset_sql($sql, ['compid' => $this->id]);
+    /**
+     * Can this competency be assigned via the given assignment type?
+     * This should only be used to check low level flags on the competency.
+     * Any other condition checks should be done in the assignment model.
+     *
+     * @param string $assignment_type see constants in the assignment entity
+     * @return bool
+     */
+    public function can_assign(string $assignment_type) {
+        switch ($assignment_type) {
+            case assignment::TYPE_SELF:
+                $assignable = $this->can_assign_self();
+                break;
+            case assignment::TYPE_OTHER:
+                $assignable = $this->can_assign_other();
+                break;
+            default:
+                // For all other types we don't have a flag yet,
+                // so we default to be able to assign
+                $assignable = true;
+                break;
+        }
+
+        return $assignable;
+    }
+
+    /**
+     * Can this competency be assigned by users for themselves?
+     *
+     * @return bool
+     */
+    public function can_assign_self(): bool {
+        return in_array(static::ASSIGNMENT_CREATE_SELF, $this->assign_availability);
+    }
+
+    /**
+     * Can this competency be assigned by other users?
+     *
+     * @return bool
+     */
+    public function can_assign_other(): bool {
+        return in_array(static::ASSIGNMENT_CREATE_OTHER, $this->assign_availability);
     }
 
     /**

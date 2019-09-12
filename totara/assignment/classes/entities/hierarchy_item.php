@@ -23,12 +23,12 @@
 
 namespace totara_assignment\entities;
 
-
-use core\orm\collection;
-use core\orm\entity\relations\has_many;
 use ReflectionClass;
-use tassign_competency\entities\helpers\hierarchy_crumbtrail_helper;
+use core\orm\collection;
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
+use core\orm\entity\relations\has_many;
+use totara_competency\entities\helpers\hierarchy_crumbtrail_helper;
 
 /**
  * Class hierarchy item
@@ -42,7 +42,7 @@ use core\orm\entity\entity;
  * @property-read collection $children
  * @property-read hierarchy_type $type
  *
- * @package tassign_competency\entities
+ * @package totara_competency\entities
  */
 abstract class hierarchy_item extends entity {
 
@@ -56,23 +56,11 @@ abstract class hierarchy_item extends entity {
     ];
 
     /**
-     * Hierarchy item framework
-     *
-     * @var hierarchy_framework
-     */
-    protected $framework = null;
-
-    /**
      * Hierarchy item crumbtrail cached
      *
      * @var array
      */
     protected $crumbtrail_cached = null;
-
-    /**
-     * @var hierarchy_type
-     */
-    protected $type = null;
 
     /**
      * If this is called this item will have a crumbtrail attribute loaded when to_array() is called
@@ -112,17 +100,12 @@ abstract class hierarchy_item extends entity {
     }
 
     /**
-     * Get related framework
+     * Related hierarchy item framework
      *
-     * @return hierarchy_framework|null
+     * @return belongs_to
      */
-    protected function get_framework_attribute(): ?hierarchy_framework {
-
-        if (!$this->framework && $fw = self::get_framework_class()) {
-            $this->framework = new $fw($this->frameworkid);
-        }
-
-        return $this->framework;
+    public function framework(): belongs_to {
+        return $this->belongs_to(static::get_framework_class(), 'frameworkid');
     }
 
     /**
@@ -137,16 +120,12 @@ abstract class hierarchy_item extends entity {
     }
 
     /**
-     * Get associated type entity
+     * Related hierarchy item type
      *
-     * @return hierarchy_type|null
+     * @return belongs_to
      */
-    public function get_type_attribute(): ?hierarchy_type {
-        if ($this->typeid && !$this->type && $type = self::get_type_class()) {
-            $this->type = new $type($this->typeid);
-        }
-
-        return $this->type;
+    public function type(): belongs_to {
+        return $this->belongs_to(static::get_type_class(), 'typeid');
     }
 
     /**
@@ -161,7 +140,7 @@ abstract class hierarchy_item extends entity {
     }
 
     /**
-     * Returns all children of the current item
+     * Immediate hierarchy item children
      *
      * @return has_many
      */
@@ -170,12 +149,12 @@ abstract class hierarchy_item extends entity {
     }
 
     /**
-     * Returns the parent item if there's any
+     * Immediate hierarchy item parent
      *
-     * @return hierarchy_item|null
+     * @return belongs_to
      */
-    public function get_parent_attribute(): ?hierarchy_item {
-        return $this->parentid ? static::repository()->find($this->parentid) : null;
+    public function parent(): belongs_to {
+        return $this->belongs_to(static::class, 'parentid');
     }
 
 }

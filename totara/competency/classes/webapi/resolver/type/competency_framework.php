@@ -27,8 +27,8 @@ use context_system;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use tassign_competency\entities\competency as competency_entity;
-use tassign_competency\entities\competency_framework as competency_framework_entity;
+use totara_competency\entities\competency as competency_entity;
+use totara_competency\entities\competency_framework as competency_framework_entity;
 use totara_competency\formatter\competency_framework_formatter;
 
 /**

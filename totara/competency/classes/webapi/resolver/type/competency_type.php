@@ -26,8 +26,8 @@ namespace totara_competency\webapi\resolver\type;
 use context_system;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use tassign_competency\entities\competency as competency_entity;
-use tassign_competency\entities\competency_type as competency_type_entity;
+use totara_competency\entities\competency as competency_entity;
+use totara_competency\entities\competency_type as competency_type_entity;
 use totara_competency\formatter\competency_type_formatter;
 
 /**

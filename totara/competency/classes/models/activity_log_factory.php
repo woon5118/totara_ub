@@ -24,7 +24,7 @@
 namespace totara_competency\models;
 
 use core\orm\entity\entity;
-use tassign_competency\entities\competency_assignment_user_log;
+use totara_competency\entities\competency_assignment_user_log;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;
 

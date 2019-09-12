@@ -23,7 +23,7 @@
  */
 
 use core\webapi\execution_context;
-use tassign_competency\entities\assignment;
+use totara_competency\entities\assignment;
 use totara_competency\entities\pathway;
 use totara_competency\webapi\resolver\query\achievement_paths;
 

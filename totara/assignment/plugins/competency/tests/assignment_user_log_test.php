@@ -23,9 +23,9 @@
  */
 
 use tassign_competency\admin_setting_continuous_tracking;
-use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency_assignment_user;
-use tassign_competency\entities\competency_assignment_user_log;
+use totara_competency\entities\assignment;
+use totara_competency\entities\competency_assignment_user;
+use totara_competency\entities\competency_assignment_user_log;
 use tassign_competency\expand_task;
 use tassign_competency\models\assignment_actions;
 use tassign_competency\models\assignment_user_log;

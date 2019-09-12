@@ -23,7 +23,7 @@
  */
 
 use tassign_competency\models\assignment_actions;
-use tassign_competency\entities;
+use totara_competency\entities;
 
 defined('MOODLE_INTERNAL') || die();
 
