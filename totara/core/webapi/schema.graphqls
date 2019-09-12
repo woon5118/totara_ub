@@ -1,0 +1,58 @@
+"""
+Generic learning item data
+"""
+type totara_core_learning_item {
+  """
+  ID of the learning item
+  NOTE: there is potential overlap of course/prog/cert ids
+        this field can not be assumed to be unique
+  """
+  id: core_id!
+  """
+  Type of the learning item
+  (course, program, certification)
+  """
+  itemtype: String!
+  """
+  Component of the learning item
+  (core_course, totara_program, totara_certification)
+  """
+  itemcomponent: String!
+  """
+  Learning item shortname
+  """
+  shortname(format: core_format = HTML): String!
+  """
+  Learning item fullname
+  """
+  fullname(format: core_format = HTML): String!
+  """
+  Learning item description
+  """
+  description(format: core_format = HTML): String
+  """
+  The format of the learning item description
+  """
+  description_format: Int
+  """
+  Learning item progress, a percentage of how far
+  through the item the user viewing it is.
+  """
+  progress: Float
+  """
+  Learning item URL, a link to view the learning item
+  """
+  url_view: String!
+  """
+  Learning item duedate, the date the learning item
+  is due for the viewing user.
+  """
+  duedate(format: core_date_format = TIMESTAMP): core_date
+}
+
+extend type Query {
+  """
+  Return all learning items assigned to the current user
+  """
+  totara_core_my_current_learning: [totara_core_learning_item]!
+}

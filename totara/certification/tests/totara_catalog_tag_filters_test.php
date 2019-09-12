@@ -73,7 +73,7 @@ class totara_certification_totara_catalog_tag_filters_testcase extends \advanced
                 [
                     'fullname' => $fullname
                 ]
-            );
+            )->id;
             $all_certifications[] = $fullname;
             $tagged_certifications[] = $fullname;
 

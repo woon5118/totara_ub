@@ -75,7 +75,7 @@ class totara_program_userdata_assignment_completion_test extends totara_program_
         $programgenerator->assign_program($program3->id, [$user1->id, $user2->id]);
 
         // Have a certification to be able to test that it won't be affected.
-        $certid1 = $programgenerator->create_certification(['fullname' => 'Certification', 'category' => $category1->id]);
+        $certid1 = $programgenerator->create_certification(['fullname' => 'Certification', 'category' => $category1->id])->id;
         $programgenerator->assign_program($certid1, [$user1->id]);
 
         // 3 programs + 1 certification assignment.
@@ -159,7 +159,7 @@ class totara_program_userdata_assignment_completion_test extends totara_program_
 
         // Have a certification to be able to test that it won't be affected.
         $data = ['fullname' => 'Certification', 'category' => $fixtures->category1->id];
-        $fixtures->controlprogramid = $programgenerator->create_certification($data);
+        $fixtures->controlprogramid = $programgenerator->create_certification($data)->id;
         $programgenerator->assign_program($fixtures->controlprogramid, [$fixtures->activeuser->id]);
         $cert = $this->get_certification($fixtures->controlprogramid);
         $this->create_certif_history($cert->id, $fixtures->activeuser->id);

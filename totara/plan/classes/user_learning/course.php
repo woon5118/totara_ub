@@ -94,5 +94,11 @@ class course extends core_course implements item_has_dueinfo {
     public function item_has_duedate() {
         return true;
     }
+
+    public function ensure_duedate_loaded() {
+        // Note: this is a placeholder, this needs to be set from above by the plan item.
+        //       otherwise we'll end up reloading the plan content for every item without a duedate.
+        return true;
+    }
 }
 

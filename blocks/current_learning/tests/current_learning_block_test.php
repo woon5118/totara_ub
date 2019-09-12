@@ -84,7 +84,7 @@ class block_current_learning_testcase extends block_current_learning_testcase_ba
         $block_instance = new block_current_learning();
 
         // Run duplicate check.
-        $rm = new ReflectionMethod('block_current_learning', 'ensure_user_learning_items_unique');
+        $rm = new ReflectionMethod('totara_core\user_learning\item_helper', 'ensure_distinct_learning_items');
         $rm->setAccessible(true);
 
         $new_items = $rm->invoke($block_instance, $items);
@@ -142,7 +142,7 @@ class block_current_learning_testcase extends block_current_learning_testcase_ba
         $block_instance = new block_current_learning();
 
         // Run duplicate check.
-        $rm = new ReflectionMethod('block_current_learning', 'ensure_user_learning_items_unique');
+        $rm = new ReflectionMethod('totara_core\user_learning\item_helper', 'ensure_distinct_learning_items');
         $rm->setAccessible(true);
 
         $new_items = $rm->invoke($block_instance, $items);

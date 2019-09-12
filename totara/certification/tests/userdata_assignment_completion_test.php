@@ -66,9 +66,9 @@ class totara_certification_userdata_assignment_completion_test extends totara_pr
         $category1 = $generator->create_category();
         $category2 = $generator->create_category();
 
-        $programid1 = $programgenerator->create_certification(['fullname' => 'Certification 1', 'category' => $category1->id]);
-        $programid2 = $programgenerator->create_certification(['fullname' => 'Certification 2', 'category' => $category1->id]);
-        $programid3 = $programgenerator->create_certification(['fullname' => 'Certification 3', 'category' => $category2->id]);
+        $programid1 = $programgenerator->create_certification(['fullname' => 'Certification 1', 'category' => $category1->id])->id;
+        $programid2 = $programgenerator->create_certification(['fullname' => 'Certification 2', 'category' => $category1->id])->id;
+        $programid3 = $programgenerator->create_certification(['fullname' => 'Certification 3', 'category' => $category2->id])->id;
 
         $programgenerator->assign_program($programid1, [$user1->id, $user2->id]);
         $programgenerator->assign_program($programid2, [$user1->id]);
@@ -145,13 +145,9 @@ class totara_certification_userdata_assignment_completion_test extends totara_pr
         $fixtures->category1 = $generator->create_category();
         $fixtures->category2 = $generator->create_category();
 
-        $programid1 = $programgenerator->create_certification(['category' => $fixtures->category1->id]);
-        $programid2 = $programgenerator->create_certification(['category' => $fixtures->category1->id]);
-        $programid3 = $programgenerator->create_certification(['category' => $fixtures->category2->id]);
-
-        $fixtures->program1 = $this->get_program($programid1);
-        $fixtures->program2 = $this->get_program($programid2);
-        $fixtures->program3 = $this->get_program($programid3);
+        $fixtures->program1 = $programgenerator->create_certification(['category' => $fixtures->category1->id]);
+        $fixtures->program2 = $programgenerator->create_certification(['category' => $fixtures->category1->id]);
+        $fixtures->program3 = $programgenerator->create_certification(['category' => $fixtures->category2->id]);
 
         // As create_certification just returns the related program id we need to load the certifications.
         $fixtures->cert1 = $this->get_certification($fixtures->program1->id);

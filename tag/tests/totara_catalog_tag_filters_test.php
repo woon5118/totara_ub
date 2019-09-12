@@ -233,7 +233,7 @@ class core_tag_totara_catalog_tag_filters_testcase extends \advanced_testcase {
             $all_items[] = $fullname;
             $all_tagged_items[] = $fullname;
 
-            $item_id = $generator->create_certification(['fullname' => $fullname]);
+            $item_id = $generator->create_certification(['fullname' => $fullname])->id;
             $context = \context_program::instance($item_id);
 
             for ($j = 0; $j < $tags_per_item; $j++) {

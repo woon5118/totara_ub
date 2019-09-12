@@ -139,7 +139,7 @@ class block_totara_featured_links_test_validators_testcase extends test_helper {
     public function test_is_valid_program_certification() {
         $this->resetAfterTest(true);
         $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
-        $certificationid = $programgenerator->create_certification();
+        $certificationid = $programgenerator->create_certification()->id;
 
         $this->run_validator_check(
             new is_valid_program(),
@@ -156,7 +156,7 @@ class block_totara_featured_links_test_validators_testcase extends test_helper {
         $this->resetAfterTest(true);
 
         $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
-        $certificationid = $programgenerator->create_certification();
+        $certificationid = $programgenerator->create_certification()->id;
 
         $this->run_validator_check(
             new is_valid_certification(),
@@ -188,7 +188,7 @@ class block_totara_featured_links_test_validators_testcase extends test_helper {
         global $DB;
 
         $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
-        $certificationid = $programgenerator->create_certification();
+        $certificationid = $programgenerator->create_certification()->id;
         $certification = $DB->get_record('prog', ['id' => $certificationid]);
         $certification->visible = 0;
         $DB->update_record('prog', $certification);

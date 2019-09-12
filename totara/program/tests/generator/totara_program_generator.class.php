@@ -171,7 +171,7 @@ class totara_program_generator extends component_generator_base {
         $data['certifid'] = $this->create_certification_settings(0, $activeperiod, $windowperiod, $recertifydatetype);
         $program = $this->create_program($data);
 
-        return $program->id;
+        return $program;
     }
 
     /**

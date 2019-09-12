@@ -3,6 +3,12 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Deprecated the following functions and moved them to a more central location in user_learning
+** ensure_user_learning_items_unique() has been deprecated, please use \totara\core\item_helper::ensure_distinct_learning_items() instead.
+** filter_collective_content() is deprecated, please use \totara\core\item_helper::filter_collective_learning_items() instead.
+** expand_item_specialisations() is deprecated, please use \totara\core\item_helper::expand_learning_items_specialisations() instead.
+** only_prog_enrol() is deprecated, please use \totara\core\item_helper::only_prog_enrol() instead.
+
 === 12.0 ===
 
 * Updated course_row.mustache

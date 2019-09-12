@@ -111,17 +111,16 @@ class totara_catalog_delete_searchmetadata_testcase extends advanced_testcase {
 
         /** @var totara_program_generator $proggen */
         $proggen = $gen->get_plugin_generator('totara_program');
-        $id = $proggen->create_certification();
+        $cert = $proggen->create_certification();
 
         // Program and certification are pretty much the same, lets keep it that way.
         $metadata = new search_metadata();
-        $metadata->set_instanceid($id);
+        $metadata->set_instanceid($cert->id);
         $metadata->set_plugintype('totara');
         $metadata->set_pluginname('program');
         $metadata->set_value('Hello world this is not a keyword');
         $metadata->save();
 
-        $cert = new program($id);
         $cert->delete();
 
         // Start checking the existing of metadata record.

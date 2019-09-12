@@ -218,6 +218,15 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
         }
     }
 
+    /**
+     * Does this item have a duedate
+     *
+     * @return bool True
+     */
+    public function item_has_duedate() {
+        return true;
+    }
+
     public function ensure_duedate_loaded() {
         if ($this->duedate === null) {
             $completiondata = $this->program->get_completion_data($this->user->id);
@@ -273,15 +282,6 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
         }
 
         return $dueinfo;
-    }
-
-    /**
-     * Does this item have a duedate
-     *
-     * @return bool True
-     */
-    public function item_has_duedate() {
-        return true;
     }
 
     /**

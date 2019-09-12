@@ -183,6 +183,130 @@ type core_user {
   # TODO add custom profile fields
 }
 
+type core_course {
+  """
+  ID of the course
+  """
+  id: core_id!
+  """
+  Course idnumber
+  """
+  idnumber: String
+  """
+  Course fullname
+  """
+  fullname(format: core_format = HTML): String!
+  """
+  Course shortname
+  """
+  shortname(format: core_format = HTML): String!
+  """
+  Course summary
+  """
+  summary(format: core_format = HTML): String
+  """
+  The format of the courses summary
+  """
+  summaryformat: Int
+  """
+  The date/time the course was created
+  """
+  timecreated(format: core_date_format = TIMESTAMP): core_date
+  """
+  The date/time the course was last modified
+  """
+  timemodified(format: core_date_format = TIMESTAMP): core_date
+  """
+  Category this course is in, or null for the frontpage course.
+  """
+  category: core_category
+  """
+  ID of this course's category, or zero for the frontpage course.
+  """
+  categoryid: core_id
+  """
+  Course start date
+  """
+  startdate(format: core_date_format = TIMESTAMP): core_date
+  """
+  Course end date
+  """
+  enddate(format: core_date_format = TIMESTAMP): core_date
+  """
+  Force theme used in course, or null if not overridden in course.
+  """
+  theme: String
+  """
+  Force language used in course, or null if language not overridden in course.
+  """
+  lang: String
+  """
+  Course format.
+  """
+  format: String
+  """
+  Course type values are integers matching TOTARA_COURSE_TYPE_* constants defined in course/lib.php.
+  """
+  coursetype: Int
+  """
+  Name of course icon used to represent the course, or 'default' if no icon has been set.
+  """
+  icon: String
+  """
+  A URL for the course image
+  """
+  image: String
+}
+
+type core_category {
+  """
+  Category ID.
+  """
+  id: core_id!
+  """
+  Category name.
+  """
+  name(format: core_format = HTML): String!
+  """
+  Category idnumber
+  """
+  idnumber: String
+  """
+  Category description
+  """
+  description(format: core_format = HTML): String
+  """
+  The format of the categories description
+  """
+  descriptionformat: Int
+  """
+  Parent category this category is inside, or null for top level categories.
+  """
+  parent: core_category
+  """
+  Sub-categories that are inside this category.
+  """
+  children: [core_category!]!
+  """
+  Depth of this category in the tree. One means top-level category, add one for each level below that.
+  """
+  depth: Int
+  """
+  Courses that are inside this category.
+  """
+  courses: [core_course!]!
+  """
+  Number of courses in this category (not including courses in sub-categories).
+  """
+  coursecount: Int!
+  timemodified(format: core_date_format = TIMESTAMP): core_date
+  # Note: that I can't use param_theme here as 'param scalars are intended for data input only'
+  """
+  Force theme used in category, or null if not overridden in category.
+  """
+  theme: String
+}
+
 """
 Type listing all available queries, plugins need to extend this type to add more queries.
 """
@@ -200,6 +324,90 @@ type Query {
     component: param_component!
     theme: param_theme!
   ): String!
+
+  """
+  Return a single course from its ID if the user can access it
+  """
+  core_course(courseid: core_id!): core_course!
+
+  """
+  Return all the current user's enrolled courses. Internally calls enrol_get_my_courses().
+  """
+  core_my_courses(sort: core_course_sort_order = SORTORDER): [core_course!]!
+
+  """
+  Return all courses in the specified category visible to the current user. Excludes courses inside sub-categories.
+  """
+  core_courses_by_parent_category(
+    """
+    The ID of the category of the courses to return.
+    """
+    categoryid: core_id!
+    """
+    Order of courses to return.
+    """
+    sort: core_course_sort_order = SORTORDER
+  ): [core_course!]!
+
+  """
+  Return a single category from its ID
+  """
+  core_category(categoryid: core_id!): core_category!
+
+  """
+   Return all categories in the specified category visible to the current user. Excludes non-direct decendants
+  (sub-sub-categories).
+  """
+  core_categories_by_parent_category(
+    """
+    The ID of the parent category to return the children of.
+    """
+    categoryid: core_id!
+    """
+    Order of categories to return.
+    """
+    sort: core_category_sort_order = SORTORDER
+  ): [core_category!]!
+}
+
+"""
+Specify how a list of courses will be sorted.
+"""
+enum core_course_sort_order {
+  """
+  Sort in the order specified on the manage courses and categories page.
+  """
+  SORTORDER
+  """
+  Sort alphabetically by course fullname.
+  """
+  FULLNAME
+  """
+  Sort alphabetically by course shortname.
+  """
+  SHORTNAME
+  """
+  Sort alphabetically by course ID number.
+  """
+  IDNUMBER
+}
+
+"""
+Specify how a list of categories will be sorted.
+"""
+enum core_category_sort_order {
+  """
+  Sort in the order specified on the manage courses and categories page.
+  """
+  SORTORDER
+  """
+  Sort alphabetically by category name.
+  """
+  NAME
+  """
+  Sort alphabetically by category ID number.
+  """
+  IDNUMBER
 }
 
 """

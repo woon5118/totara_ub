@@ -79,7 +79,16 @@ class item extends item_base implements item_has_progress {
     public static function all($userorid) {
         $items = [];
         $user = self::resolve_user($userorid);
-        foreach (enrol_get_all_users_courses($user->id, true) as $course) {
+
+        $fields = ['id', 'category', 'sortorder',
+            'shortname', 'fullname', 'idnumber',
+            'summary', 'summaryformat', 'startdate',
+            'visible', 'defaultgroupingid',
+            'groupmode', 'groupmodeforce'
+        ];
+
+
+        foreach (enrol_get_all_users_courses($user->id, true, $fields) as $course) {
             $class = get_called_class();
             $items[] = new $class($user, $course);
         }
@@ -139,9 +148,10 @@ class item extends item_base implements item_has_progress {
         if (isset($data->summary)) {
             $this->description = $data->summary;
         }
-        if (isset($data->summary_format)) {
-            $this->description_format = $data->summary_format;
+        if (isset($data->summaryformat)) {
+            $this->description_format = $data->summaryformat;
         }
+
         $this->url_view = new \moodle_url('/course/view.php', array('id' => $this->id));
     }
 

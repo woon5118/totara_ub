@@ -23,7 +23,7 @@
 
 namespace totara_webapi;
 
-use core\webapi\execution_context;
+use \core\webapi\execution_context;
 
 /**
  * Main GraphQL API intended for plugins such as External API or mobile support.
@@ -262,9 +262,17 @@ final class graphql {
         if ($info->parentType->name === 'Query' or $info->parentType->name === 'Mutation') {
             $otype = ($info->parentType->name === 'Query') ? 'query' : 'mutation';
 
-            [$component, $name] = self::split_type_name($info->fieldName);
-            if (empty($component)) {
+            $parts = explode('_', $info->fieldName);
+            if (count($parts) < 2) {
                 throw new \coding_exception('GraphQL ' . $otype . ' name is invalid', $info->fieldName);
+            }
+            // NOTE: core resolvers cannot be placed in subsystems, always use lib/classes/webapi/query or lib/classes/webapi/mutation
+            if ($parts[0] === 'core') {
+                $component = array_shift($parts);
+                $name = implode('_', $parts);
+            } else {
+                $component = array_shift($parts) . '_' . array_shift($parts);
+                $name = implode('_', $parts);
             }
             $classname = "{$component}\\webapi\\resolver\\{$otype}\\{$name}";
             if (!class_exists($classname)) {
@@ -277,7 +285,14 @@ final class graphql {
         // Regular data type.
         $parts = explode('_', $info->parentType->name);
         if (count($parts) > 1) {
-            [$component, $name] = self::split_type_name($info->parentType->name);
+            // NOTE: core resolvers cannot be placed in subsystems, always use lib/classes/webapi/type/
+            if ($parts[0] === 'core') {
+                $component = array_shift($parts);
+                $name = implode('_', $parts);
+            } else {
+                $component = array_shift($parts) . '_' . array_shift($parts);
+                $name = implode('_', $parts);
+            }
             if (empty($name)) {
                 throw new \coding_exception('Type resolvers must be named as component_name, e.g. totara_job_job');
             }
@@ -289,51 +304,6 @@ final class graphql {
         }
 
         return \GraphQL\Executor\Executor::defaultFieldResolver($source, $args, $ec, $info);
-    }
-
-    /**
-     * Split type name, i.e. totara_competency_my_query_name into component (totara_competency) and the rest (my_query_name)
-     *
-     * @param string $name
-     * @return array
-     */
-    private static function split_type_name(string $name) {
-        if (strpos($name, 'core_') === 0) {
-            return ['core', substr($name, 5)];
-        }
-
-        // Build flat list out of all plugins and subplugins
-        $components = [];
-        $types = \core_component::get_plugin_types();
-        foreach ($types as $type => $typedir) {
-            $plugins = \core_component::get_plugin_list($type);
-            foreach ($plugins as $plugin => $plugindir) {
-                $plugin_component = $type.'_'.$plugin;
-                $components[$plugin_component] = $plugin_component;
-                $subplugins = \core_component::get_subplugins($plugin_component);
-                foreach ($subplugins ?? [] as $prefix => $subpluginnames) {
-                    foreach ($subpluginnames as $subplugin) {
-                        $subplugin_component = $prefix . '_' . $subplugin;
-                        $components[$subplugin_component] = $subplugin_component;
-                    }
-                }
-            }
-        }
-
-        // Now try to find component name by reducing the name one by one and checking existence in component list
-        $parts = explode('_', $name);
-        while (count($parts) > 0) {
-            array_pop($parts);
-            $component_search_name = implode('_', $parts);
-            if (isset($components[$component_search_name])) {
-                return [
-                    $component_search_name,
-                    substr($name, strlen($component_search_name) + 1)
-                ];
-            }
-        }
-
-        return [null, null];
     }
 
     /**

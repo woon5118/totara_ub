@@ -52,8 +52,7 @@ class totara_question_requiredlearning_export_testcase extends advanced_testcase
         /** @var totara_program_generator $programgenerator */
         $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
         $prog1 = $programgenerator->create_program();
-        $prog2id = $programgenerator->create_certification();
-        $prog2 = $DB->get_record('prog', ['id' => $prog2id]);
+        $prog2 = $programgenerator->create_certification();
         $prog3 = $programgenerator->create_program();
 
         $user1 = $this->getDataGenerator()->create_user();

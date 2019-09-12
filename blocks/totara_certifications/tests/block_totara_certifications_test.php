@@ -41,7 +41,7 @@ class block_totara_certifications_testcase extends advanced_testcase {
         $data = new stdClass();
         $data->user1 = $this->getDataGenerator()->create_user(['fullname' => 'user1']);
         $data->user2 = $this->getDataGenerator()->create_user(['fullname' => 'user2']);
-        $data->programid = $program_generator->create_certification(['fullname' => 'Test Certification 1']);
+        $data->programid = $program_generator->create_certification(['fullname' => 'Test Certification 1'])->id;
         $program_generator->assign_program($data->programid, [$data->user1->id]);
 
         return $data;

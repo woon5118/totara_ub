@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use totara_core\user_learning\item_helper as learning_item_helper;
+
 /**
  * Current learning block class.
  */
@@ -232,152 +234,31 @@ class block_current_learning extends block_base {
      *
      * If more than one are found then the primary for each type is kept.
      *
+     * @deprecated since Totara 13.0
      * @param \totara_core\user_learning\item_base[] $items
      * @return \totara_core\user_learning\item_base[]
      */
     private function ensure_user_learning_items_unique(array $items) {
-        // First iterate over the items and ensure no item appears twice.
-        $instances = [];
-        foreach ($items as $key => $item) {
-            $component = $item->get_component();
-            $type = $item->get_type();
+        debugging('block_current_learning->ensure_user_learning_items_unique() is deprecated,
+            please use \totara\core\item_helper::ensure_distinct_learning_items() instead.', DEBUG_DEVELOPER);
 
-            if (!isset($instances[$component][$type][$item->id])) {
-                $instances[$component][$type][$item->id] = $key;
-            } else {
-                // There are two and they are not the same :(
-                $oldisprimary = $items[$instances[$component][$type][$item->id]]->is_primary_user_learning_item();
-                $newisprimary = $item->is_primary_user_learning_item();
-
-                // Special case for plan courses (as they are a secondary item that we want to show instead of a primary item).
-                // This is so that the due date for the plan course is shown when available.
-                if ($item instanceof \totara_plan\user_learning\course ||
-                    $items[$instances[$component][$type][$item->id]] instanceof \totara_plan\user_learning\course) {
-                    // If the item is a plan course then use it.
-                    if ($item instanceof \totara_plan\user_learning\course) {
-                        unset($items[$instances[$component][$type][$item->id]]);
-                        $instances[$component][$type][$item->id] = $key;
-                    } else {
-                        unset($items[$key]);
-                    }
-                } else {
-                    if ($oldisprimary && $newisprimary) {
-                        // We should never ever be here!
-                        debugging('Two primary user learning instance with matching identifiers found - this should never happen.', DEBUG_DEVELOPER);
-                        // Unset this one just so we can progress.
-                        unset($items[$key]);
-                    } else if ($newisprimary) {
-                        // The new item is primary and the old is not, unset the old.
-                        unset($items[$instances[$component][$type][$item->id]]);
-                        $instances[$component][$type][$item->id] = $key;
-                    } else {
-                        // The old is primary and the new is not, unset the new.
-                        unset($items[$key]);
-                    }
-                }
-            }
-        }
-
-        return $items;
+        return learning_item_helper::ensure_distinct_learning_items($items);
     }
 
     /**
      * Filters the collective user learning items altering the structure to meet this blocks purpose.
      *
+     * @deprecated since Totara 13.0
      * @param \totara_core\user_learning\item_base[] $items
      * @return \totara_core\user_learning\item_base[]
      */
     private function filter_collective_content(array $items) {
         global $DB, $CFG;
 
-        if (empty($items)) {
-            return [];
-        }
+        debugging('block_current_learning->filter_collective_content() is deprecated,
+            please use \totara\core\item_helper::filter_collective_learning_items() instead.', DEBUG_DEVELOPER);
 
-        // First up we need to remove any courses from the top level that are within a program or certification that
-        // is not complete or unavailable.
-        $progcertcourses = [];
-        foreach ($items as $item) {
-            if ($item instanceof \totara_program\user_learning\item || $item instanceof \totara_certification\user_learning\item) {
-                $courses = $item->get_courseset_courses(false);
-                foreach ($courses as $course) {
-                    $progcertcourses[$course->id] = $course;
-                }
-            }
-        }
-
-        // Ensure the list of user learning items is unique.
-        $items = $this->ensure_user_learning_items_unique($items);
-
-        $counts = [];
-        if (!empty($CFG->gradebookroles)) {
-            // Gets all course where a user has an active enrolment and is assigned a gradeable role.
-            // There is a little gotcha here - we are only looking at roles assigned via an enrolment
-            // and not roles that have been assigned manually within the course.
-            $gradebookroles = explode(",", $CFG->gradebookroles);
-            $userscourses = enrol_get_all_users_courses($this->userid, true);
-            if (!empty($userscourses)) {
-                list($gradebookrolesinsql, $gradebookrolesinparams) = $DB->get_in_or_equal($gradebookroles, SQL_PARAMS_NAMED);
-                list($courseinsql, $courseinparams) = $DB->get_in_or_equal(array_keys($userscourses), SQL_PARAMS_NAMED);
-                $sql = "SELECT c.instanceid AS courseid, COUNT(ra.id) AS gradeablecount
-                        FROM {role_assignments} ra
-                        JOIN {context} c ON c.id = ra.contextid
-                        WHERE c.instanceid {$courseinsql}
-                        AND c.contextlevel = :coursecontext
-                        AND ra.roleid {$gradebookrolesinsql}
-                        AND ra.userid = :userid
-                    GROUP BY c.instanceid";
-                $params = array_merge($gradebookrolesinparams, $courseinparams, ['userid' => $this->userid, 'coursecontext' => CONTEXT_COURSE]);
-                $counts = $DB->get_records_sql_menu($sql, $params);
-            }
-        }
-
-        // Now make the manipulations required by this block.
-        foreach ($items as $key => $item) {
-
-            if ($item instanceof \core_course\user_learning\item) {
-                // Remove courses that are part of progs or certifications.
-                if (array_key_exists($item->id, $progcertcourses)) {
-                    unset($items[$key]);
-                    continue;
-                }
-
-                // Remove courses that don't have an owner and only have the totara_program enrolment for the user.
-                // A course can get into this state if the user is in a recert path, with different courses in the cert path,
-                // where the course in question has been completed via the standard cert path.
-                if (!$item->has_owner() && $this->only_prog_enrol($item)) {
-                    unset($items[$key]);
-                    continue;
-                }
-
-                // Remove completed courses, regardless of how they got here.
-                if ($item->is_complete() === true) {
-                    // Once removed continue so that we don't do anything more with this item.
-                    unset($items[$key]);
-                    continue;
-                }
-
-                if (empty($counts[$item->id]) && (!$item->has_owner() || !($item->get_owner() instanceof \totara_plan\user_learning\item))) {
-                    // The user does not hold a gradeable role and this course is not part of a plan.
-                    unset($items[$key]);
-                    continue;
-                }
-            }
-
-            // Remove completed courseset courses.
-            if (method_exists($item, 'remove_completed_courses')) {
-                $item->remove_completed_courses();
-            }
-
-            // Remove progs/certs that have no coursesets.
-            if (method_exists($item, 'get_coursesets')) {
-                if (empty($item->get_coursesets())) {
-                    unset($items[$key]);
-                };
-            }
-        }
-
-        return $items;
+        return learning_item_helper::filter_collective_learning_items($this->userid, $items);
     }
 
     /**
@@ -386,30 +267,18 @@ class block_current_learning extends block_base {
      * @return \totara_core\user_learning\item_base[]
      */
     private function get_user_learning_items() {
+        global $CFG;
 
-        /** @var \totara_core\user_learning\item_base[] $classes */
-        $classes = core_component::get_namespace_classes('user_learning', 'totara_core\user_learning\item_base');
-        /** @var \totara_core\user_learning\item_base[] $items */
-        $items = [];
-        foreach ($classes as $class) {
-            // First up we only want primary user learning items.
-            if (!$class::is_a_primary_user_learning_class()) {
-                continue;
-            }
-
-            /** @var \totara_core\user_learning\item_base[] $classitems */
-            $classitems = $class::all($this->userid);
-            $items = array_merge($items, array_values($classitems));
-        }
+        $items = learning_item_helper::get_users_current_learning_items($this->userid);
 
         // Expand the items are required to create a specialised list for this block.
-        $items = $this->expand_item_specialisations($items);
+        $items = learning_item_helper::expand_learning_item_specialisations($items);
 
         // Sort the data.
         core_collator::asort_objects_by_property($items, $this->sortorder, core_collator::SORT_NATURAL);
 
         // Filter the content to exclude duplications, completed courses and other block specific criteria.
-        $items = $this->filter_collective_content($items);
+        $items = learning_item_helper::filter_collective_learning_items($this->userid, $items);
 
         return $items;
     }
@@ -417,30 +286,29 @@ class block_current_learning extends block_base {
     /**
      * Expands any item specific user learning item data as required for this block.
      *
+     * @deprecated since Totara 13.0
      * @param \totara_core\user_learning\item_base[] $items
      * @return \totara_core\user_learning\item_base[]
      */
     private function expand_item_specialisations(array $items) {
-        foreach ($items as $item) {
-            if ($item instanceof \totara_plan\user_learning\item) {
-                $courses = $item->get_courses();
-                $programs = $item->get_programs();
-                $items = array_merge($items, array_values($courses), array_values($programs));
-            }
-        }
-        return $items;
+        debugging('block_current_learning->expand_item_specialisations() is deprecated,
+            please use \totara\core\item_helper::expand_learning_item_specialisations() instead.', DEBUG_DEVELOPER);
+
+        return learning_item_helper::expand_learning_item_specialisations($items);
     }
 
     /**
      * Check if totara_program is the only course enrollment for the user
      *
+     * @deprecated since Totara 13.0
      * @param \core_course\user_learning\item $item
      * @return bool
      */
     public function only_prog_enrol(\core_course\user_learning\item $item) {
-        $enrol = core_enrol_get_all_user_enrolments_in_course($this->userid, $item->id);
+        debugging('block_current_learning->only_prog_enrol() is deprecated,
+            please use \totara\core\item_helper::only_prog_enrol() instead.', DEBUG_DEVELOPER);
 
-        return (count($enrol) === 1 && current($enrol)->enrol === 'totara_program');
+        return learning_item_helper::only_prog_enrol($this->userid, $item);
     }
 
 

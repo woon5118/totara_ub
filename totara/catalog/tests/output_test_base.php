@@ -160,7 +160,7 @@ abstract class output_test_base extends advanced_testcase {
             return $program->id;
         }
 
-        return $program_generator->create_certification();
+        return $program_generator->create_certification()->id;
     }
 
     /**
