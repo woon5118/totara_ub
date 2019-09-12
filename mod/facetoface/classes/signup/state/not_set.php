@@ -68,6 +68,7 @@ class not_set extends state {
             transition::to(new requested($this->signup))->with_conditions(
                 multisignup_common::class,
                 approval_manager_required::class,
+                has_signup_capability::class,
                 has_required_job_assignment::class,
                 user_has_manager::class,
                 user_is_enrolable::class
@@ -76,6 +77,7 @@ class not_set extends state {
             transition::to(new requested($this->signup))->with_conditions(
                 multisignup_common::class,
                 approval_manager_required::class,
+                has_signup_capability::class,
                 has_required_job_assignment::class,
                 user_can_select_manager::class,
                 user_is_enrolable::class

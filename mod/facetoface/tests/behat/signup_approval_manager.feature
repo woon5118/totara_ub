@@ -260,3 +260,16 @@ Feature: Seminar Signup Manager Approval
     And I press "Update requests"
     Then I should see "Attendance requests updated"
     And I should not see "Jimmy Jim"
+
+  Scenario: Student is not given permission to sign up a seminar event
+    And the following "permission overrides" exist:
+      | capability            | permission | role    | contextlevel | reference |
+      | mod/facetoface:signup | Prohibit   | student | Course       | CCC       |
+    And I log out
+
+    And I log in as "jimmy"
+    And I am on "Classroom Connect Course" course homepage
+    And I follow "More info"
+    And I should see "Manager Approval"
+    But I should see "You don't have permission to signup to this seminar event"
+    And I should not see "Request approval"
