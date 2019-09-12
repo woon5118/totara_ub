@@ -17,297 +17,234 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_criteria
  */
 
+use totara_competency\aggregation_users_table;
 use totara_criteria\course_item_evaluator;
-use totara_criteria\criterion;
-use totara_criteria\entities\criterion as criterion_entity;
-use totara_criteria\item_evaluator;
+use totara_criteria\item_evaluator_user_source_table;
 
 class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
-    public function test_update_item_records_no_data() {
-        course_item_evaluator::update_item_records();
+    private function setup_data() {
+        $data = new class() {
+            public $users;
+            public $course;
+            public $coursecompletion;
+        };
+
+        $this->setAdminUser();
+        $GLOBALS['USER']->ignoresesskey = true;
+
+        $data->users = [];
+        for ($i = 1; $i <= 2; $i++) {
+            $data->users[$i] = $this->getDataGenerator()->create_user();
+        }
+
+        $record = [
+            'shortname' => "course1",
+            'fullname' => "Course 1",
+        ];
+        $data->course = $this->getDataGenerator()->create_course($record);
+
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $record = ['courseids' => [$data->course->id]];
+        $data->coursecompletion = $generator->create_coursecompletion($record);
+
+        $data->temp_table_def = new aggregation_users_table('totara_competency_temp_users',
+            'user_id',
+            'has_changed'
+        );
+
+        return $data;
     }
 
-    public function test_update_item_records_course_item_no_users() {
+    private function insert_temp_users(array $user_ids, int $has_changed = 0) {
         global $DB;
 
-        $course = $this->getDataGenerator()->create_course();
+        $temp_records = [];
+        foreach ($user_ids as $id) {
+            $temp_records[] = ['user_id' => $id, 'has_changed' => $has_changed];
+        }
 
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-
-        $criteria_generator->create_course_criterion_item($course);
-
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(0, $item_records);
+        $DB->insert_records('totara_competency_temp_users', $temp_records);
     }
 
-    public function test_update_item_records_course_item_no_completion() {
+    public function test_update_completion_no_users() {
         global $DB;
 
-        $course = $this->getDataGenerator()->create_course();
+        $data = $this->setup_data();
+        $this->assertSame(0, $DB->count_records('totara_criteria_item_record'));
 
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-
-        $item_id = $criteria_generator->create_course_criterion_item($course);
-
-        $user = $this->getDataGenerator()->create_user();
-
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(0, $item_records);
-
-        item_evaluator::create_item_records($item_id, [$user->id]);
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('0', $item_record->criterion_met);
-
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('0', $item_record->criterion_met);
+        $user_source = new item_evaluator_user_source_table($data->temp_table_def, true);
+        $item_evaluator = new course_item_evaluator($user_source);
+        $item_evaluator->update_completion($data->coursecompletion);
+        $this->assertSame(0, $DB->count_records('totara_criteria_item_record'));
     }
 
-    public function test_update_item_records_course_item_one_completed() {
+    public function test_update_completion_new_course_completion() {
         global $DB;
 
-        $course = $this->getDataGenerator()->create_course();
+        $data = $this->setup_data();
+        $test_users = [$data->users[1]->id, $data->users[2]->id];
 
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+        // Setting up ...
+        // 2 users assigned
+        $this->insert_temp_users($test_users);
 
-        $item_id = $criteria_generator->create_course_criterion_item($course);
+        // Create the initial item_records and wait for a second to ensure we have unique timestamps
+        $user_source = new item_evaluator_user_source_table($data->temp_table_def, true);
+        $item_evaluator = new course_item_evaluator($user_source);
+        $item_evaluator->update_completion($data->coursecompletion);
+        $this->waitForSecond();
 
-        $user = $this->getDataGenerator()->create_user();
+        // Reset the has_changed flag for all assignments which was set when the item_records were created
+        $DB->execute('UPDATE {totara_competency_temp_users} SET has_changed = 0');
 
+        // Mark user1 to have completed the course
         /** @var completion_completion $completion */
-        $completion = new completion_completion(['course' => $course->id, 'userid' => $user->id]);
+        $completion = new completion_completion(['course' => $data->course->id, 'userid' => $data->users[1]->id]);
         $completion->mark_complete();
 
-        course_item_evaluator::update_item_records();
+        // Now for the real test ...
+        // Testing that we mark item_records updated since the last time we performed the completion evaluation
+        $this->waitForSecond();
+        $item_evaluator->update_completion($data->coursecompletion);
 
-        // Still nothing created yet.
-        // This is because we don't know that we want to track this user for criteria.
+        // The criterion_met should have been updated for user1, but not user2.
         $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(0, $item_records);
+        $this->assertSame(count($test_users), count($item_records));
 
-        item_evaluator::create_item_records($item_id, [$user->id]);
+        foreach ($item_records as $record) {
+            $this->assertTrue(in_array($record->user_id, $test_users));
+            if ($record->user_id == $data->users[1]->id) {
+                $this->assertEquals(1, $record->criterion_met);
+            } else {
+                $this->assertEquals(0, $record->criterion_met);
+            }
+        }
 
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('0', $item_record->criterion_met);
-
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
+        // Similarly - user1's has_changes in the temp table should be set, but not user2's
+        $temp_records = $DB->get_records('totara_competency_temp_users');
+        $this->assertSame(count($test_users), count($temp_records));
+        foreach ($temp_records as $record) {
+            if ($record->user_id == $data->users[1]->id) {
+                $this->assertEquals(1, $record->has_changed);
+            } else {
+                $this->assertEquals(0, $record->has_changed);
+            }
+        }
     }
 
-    public function test_update_item_records_course_item_one_incomplete() {
+    public function test_update_completion_course_completion_no_longer_exist() {
         global $DB;
 
-        $course = $this->getDataGenerator()->create_course();
+        $data = $this->setup_data();
 
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+        $test_users = [$data->users[1]->id, $data->users[2]->id];
 
-        $item_id = $criteria_generator->create_course_criterion_item($course);
+        // Setting up ...
+        // 2 users assigned
+        $this->insert_temp_users($test_users);
 
-        $user = $this->getDataGenerator()->create_user();
+        // Create the initial item_records - tested in another function
+        $user_source = new item_evaluator_user_source_table($data->temp_table_def, true);
+        $item_evaluator = new course_item_evaluator($user_source);
+        $item_evaluator->update_completion($data->coursecompletion);
+        // Reset the has_changed flag
+        $DB->execute('UPDATE {totara_competency_temp_users} SET has_changed = 0');
 
-        /** @var completion_completion $completion */
-        $completion = new completion_completion(['course' => $course->id, 'userid' => $user->id]);
+        // Now for the real test ...
+        // Testing that the sql statements to catch item_records with invalid criterion_met values are updated correctly
 
-        item_evaluator::create_item_records($item_id, [$user->id]);
-        course_item_evaluator::update_item_records();
+        $DB->execute('UPDATE {totara_criteria_item_record} SET criterion_met = 1 WHERE user_id = :user2',
+            ['user2' => $data->users[2]->id]);
 
+        $this->waitForSecond();
+        $item_evaluator->update_completion($data->coursecompletion);
+
+        // The criterion_met should have been updated for user1, but not user2.
         $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('0', $item_record->criterion_met);
+        $this->assertSame(count($test_users), count($item_records));
+
+        foreach ($item_records as $record) {
+            $this->assertTrue(in_array($record->user_id, $test_users));
+            $this->assertEquals(0, $record->criterion_met);
+        }
+
+        // Similarly - user1's has_changes in the temp table should be set, but not user2's
+        $temp_records = $DB->get_records('totara_competency_temp_users');
+        $this->assertSame(count($test_users), count($temp_records));
+        foreach ($temp_records as $record) {
+            if ($record->user_id == $data->users[1]->id) {
+                $this->assertEquals(0, $record->has_changed);
+            } else {
+                $this->assertEquals(1, $record->has_changed);
+            }
+        }
     }
 
-    public function test_update_item_records_course_item_incomplete_stays_incomplete() {
+    public function test_update_completion_course_completion_missed_by_observer() {
         global $DB;
 
-        $course = $this->getDataGenerator()->create_course();
+        $data = $this->setup_data();
 
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+        $test_users = [$data->users[1]->id, $data->users[2]->id];
 
-        $item_id = $criteria_generator->create_course_criterion_item($course);
+        // Setting up ...
+        // 2 users assigned
+        $this->insert_temp_users($test_users);
 
-        $user = $this->getDataGenerator()->create_user();
+        // Create the initial item_records and wait for a second to ensure we have unique timestamps
+        $user_source = new item_evaluator_user_source_table($data->temp_table_def, true);
+        $item_evaluator = new course_item_evaluator($user_source);
+        $item_evaluator->update_completion($data->coursecompletion);
+        $this->waitForSecond();
 
+        // Reset the has_changed flag for all assignments which was set when the item_records were created
+        $DB->execute('UPDATE {totara_competency_temp_users} SET has_changed = 0');
+
+        // Mark user1 to have completed the course
         /** @var completion_completion $completion */
-        $completion = new completion_completion(['course' => $course->id, 'userid' => $user->id]);
-
-        item_evaluator::create_item_records($item_id, [$user->id]);
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('0', $item_record->criterion_met);
-
-        // There could be an existing completion record that is not marked as complete.
-        $completion->timecompleted = 0;
-        $completion->status = COMPLETION_STATUS_INPROGRESS;
-        $completion->mark_enrolled();
-        $completion->mark_inprogress();
-        $completion->reaggregate = 0;
-        $completion->insert();
-
-        $completion_record = $DB->get_record('course_completions', ['userid' => $user->id]);
-        $this->assertEquals(0, $completion_record->timecompleted);
-        $this->assertEquals(COMPLETION_STATUS_INPROGRESS, $completion_record->status);
-
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('0', $item_record->criterion_met);
-
-        // And the record could be deleted to make it incomplete.
-        $DB->delete_records('course_completions', ['id' => $completion_record->id]);
-
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('0', $item_record->criterion_met);
-    }
-
-    public function test_update_item_records_course_item_incomplete_becomes_complete() {
-        global $DB;
-
-        $course = $this->getDataGenerator()->create_course();
-
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-
-        $item_id = $criteria_generator->create_course_criterion_item($course);
-
-        $user = $this->getDataGenerator()->create_user();
-
-        /** @var completion_completion $completion */
-        $completion = new completion_completion(['course' => $course->id, 'userid' => $user->id]);
-
-        item_evaluator::create_item_records($item_id, [$user->id]);
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('0', $item_record->criterion_met);
-
-        $completion->mark_complete();
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('1', $item_record->criterion_met);
-    }
-
-    public function test_update_item_records_course_item_complete_stays_complete() {
-        global $DB;
-
-        $course = $this->getDataGenerator()->create_course();
-
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-
-        $item_id = $criteria_generator->create_course_criterion_item($course);
-
-        $user = $this->getDataGenerator()->create_user();
-
-        /** @var completion_completion $completion */
-        $completion = new completion_completion(['course' => $course->id, 'userid' => $user->id]);
+        $completion = new completion_completion(['course' => $data->course->id, 'userid' => $data->users[1]->id]);
         $completion->mark_complete();
 
-        item_evaluator::create_item_records($item_id, [$user->id]);
-        course_item_evaluator::update_item_records();
+        // For testing purposes only - resetting the item_record.criterion_met flag that is set in the
+        // event observer when the course was marked as completed by user1
+        // This is still a valid test as it handles the case where the event observer failed to set the criterion_met flag
+        // for some or other reason.
+        $DB->execute('UPDATE {totara_criteria_item_record} SET criterion_met = 0');
 
+        // Now for the real test ...
+        // Testing that the sql statements to catch item_records with invalid criterion_met values are updated correctly
+        $this->waitForSecond();
+        $item_evaluator->update_completion($data->coursecompletion);
+
+        // The criterion_met should have been updated for user1, but not user2.
         $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('1', $item_record->criterion_met);
+        $this->assertSame(count($test_users), count($item_records));
 
-        course_item_evaluator::update_item_records();
+        foreach ($item_records as $record) {
+            $this->assertTrue(in_array($record->user_id, $test_users));
+            if ($record->user_id == $data->users[1]->id) {
+                $this->assertEquals(1, $record->criterion_met);
+            } else {
+                $this->assertEquals(0, $record->criterion_met);
+            }
+        }
 
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('1', $item_record->criterion_met);
-    }
-
-    public function test_update_item_records_course_item_complete_becomes_incomplete() {
-        global $DB;
-
-        $course = $this->getDataGenerator()->create_course();
-
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-
-        $item_id = $criteria_generator->create_course_criterion_item($course);
-
-        $user = $this->getDataGenerator()->create_user();
-
-        /** @var completion_completion $completion */
-        $completion = new completion_completion(['course' => $course->id, 'userid' => $user->id]);
-        $completion->mark_complete();
-
-        item_evaluator::create_item_records($item_id, [$user->id]);
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('1', $item_record->criterion_met);
-
-        $completion->timecompleted = 0;
-        $completion->status = COMPLETION_STATUS_INPROGRESS;
-        $completion->mark_inprogress();
-        $completion->reaggregate = 0;
-        $completion->update();
-
-        $completion_record = $DB->get_record('course_completions', ['userid' => $user->id]);
-        $this->assertEquals(0, $completion_record->timecompleted);
-        $this->assertEquals(COMPLETION_STATUS_INPROGRESS, $completion_record->status);
-
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('0', $item_record->criterion_met);
-
-        // And the record could be deleted to make it incomplete.
-        $DB->delete_records('course_completions', ['id' => $completion_record->id]);
-
-        course_item_evaluator::update_item_records();
-
-        $item_records = $DB->get_records('totara_criteria_item_record');
-        $this->assertCount(1, $item_records);
-        $item_record = array_pop($item_records);
-        $this->assertEquals('0', $item_record->criterion_met);
+        // Similarly - user1's has_changes in the temp table should be set, but not user2's
+        $temp_records = $DB->get_records('totara_competency_temp_users');
+        $this->assertSame(count($test_users), count($temp_records));
+        foreach ($temp_records as $record) {
+            if ($record->user_id == $data->users[1]->id) {
+                $this->assertEquals(1, $record->has_changed);
+            } else {
+                $this->assertEquals(0, $record->has_changed);
+            }
+        }
     }
 
 }

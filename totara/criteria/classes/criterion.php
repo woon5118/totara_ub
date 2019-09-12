@@ -742,7 +742,6 @@ abstract class criterion {
      * @param int $user_id Evaluate criteria satisfaction for this user
      * @return bool
      */
-    // TODO: name ?? evaluate or aggregate??
     public function aggregate(int $user_id): bool {
         if (empty($this->item_ids)) {
             return false;

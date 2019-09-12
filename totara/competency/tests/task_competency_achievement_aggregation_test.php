@@ -21,13 +21,12 @@
  * @package totara_competency
  */
 
+use pathway_criteria_group\criteria_group;
 use totara_competency\entities\competency;
+use totara_competency\entities\competency_achievement;
 use totara_competency\task\competency_achievement_aggregation;
-use totara_competency\achievement_configuration;
-use totara_competency\pathway;
-use totara_competency\entities\scale_value;
 use totara_competency\entities\pathway_achievement;
-use totara_competency\pathway_aggregator;
+use totara_criteria\criterion;
 
 /**
  * Class task_competency_achievement_aggregation_testcase
@@ -42,125 +41,349 @@ use totara_competency\pathway_aggregator;
  */
 class task_competency_achievement_aggregation_testcase extends advanced_testcase {
 
-    private function generate_competency(): competency {
-        /** @var totara_hierarchy_generator $hierarchy_generator */
-        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
-
-        $scale = $hierarchy_generator->create_scale('comp');
-        $compfw = $hierarchy_generator->create_comp_frame(['scale' => $scale->id]);
-        $comp = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
-
-        return new competency($comp);
-    }
-
-    private function generate_active_expanded_user_assignments($competency, $users) {
+    // TODO: These are integration tests - Need to write proper unit tests
+    private function setup_data() {
         global $DB;
 
-        /** @var totara_competency_assignment_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
+        $data = new class() {
+            public $comp;
+            public $scale;
+            public $scalevalues;
+            public $users;
+            public $courses;
+            public $criteria = [];
+            public $pathways = [];
 
-        $assignment_ids = [];
-        foreach ($users as $user) {
-            $assignment = $assignment_generator->create_user_assignment($competency->id, $user->id);
-            $assignment_ids[] = $assignment->id;
-        }
+            public function setup_scale_and_competency(totara_hierarchy_generator $hierarchygenerator) {
+                global $DB;
 
-        $model = new \totara_competency\models\assignment_actions();
-        $model->activate($assignment_ids);
+                $this->scale = $hierarchygenerator->create_scale(
+                    'comp',
+                    ['name' => 'Test scale', 'description' => 'Test scale'],
+                    [
+                        1 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
+                        2 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                        3 => ['name' => 'Getting there', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
+                        4 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+                        5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+                    ]
+                );
 
-        $expand_task = new \totara_competency\expand_task($DB);
-        $expand_task->expand_all();
+                $framework = $hierarchygenerator->create_comp_frame(['scale' => $this->scale->id]);
+                $comp = $hierarchygenerator->create_comp(['frameworkid' => $framework->id]);
 
-        return $assignment_ids;
+                $rows = $DB->get_records('comp_scale_values', ['scaleid' => $this->scale->id], 'sortorder');
+                $this->scalevalues = [];
+                foreach ($rows as $row) {
+                    $this->scalevalues[$row->sortorder] = $row;
+                }
+
+                $this->comp = new competency($comp);
+            }
+
+            public function setup_active_expanded_user_assignments(tassign_competency_generator $assignment_generator, array $user_idxs = []) {
+                global $DB;
+
+                $assignment_ids = [];
+                foreach ($user_idxs as $idx) {
+                    $assignment = $assignment_generator->create_user_assignment($this->comp->id, $this->users[$idx]->id);
+                    $assignment_ids[] = $assignment->id;
+                }
+
+                $model = new \tassign_competency\models\assignment_actions();
+                $model->activate($assignment_ids);
+
+                $expand_task = new \tassign_competency\expand_task($DB);
+                $expand_task->expand_all();
+
+                return $assignment_ids;
+            }
+
+            public function setup_users_and_courses(testing_data_generator $generator) {
+                for ($i = 1; $i <= 10; $i++) {
+                    $this->users[$i] = $generator->create_user(['username' => "user{$i}"]);
+                }
+
+                // Create courses and enroll all users in all courses
+                for ($i = 1; $i <= 10; $i++) {
+                    $record = [
+                        'shortname' => "Course $i",
+                        'fullname' => "Course $i",
+                    ];
+
+                    $this->courses[$i] = $generator->create_course($record);
+                    foreach ($this->users as $user) {
+                        $generator->enrol_user($user->id, $this->courses[$i]->id);
+                    }
+                }
+            }
+
+            public function setup_criteria(totara_criteria_generator $criteria_generator) {
+
+                // Create coursecompletion criteria
+                $this->criteria['course_1'] = $criteria_generator->create_coursecompletion([
+                    'aggregation'=> criterion::AGGREGATE_ALL,
+                    'courseids' =>[$this->courses[1]->id],
+                ]);
+
+                $this->criteria['course_2_and_3'] = $criteria_generator->create_coursecompletion([
+                    'aggregation'=> criterion::AGGREGATE_ALL,
+                    'courseids' =>[$this->courses[2]->id, $this->courses[3]->id],
+                ]);
+
+                $this->criteria['course_3_or_4_or_5'] = $criteria_generator->create_coursecompletion([
+                    'aggregation' => [
+                        'method' => criterion::AGGREGATE_ANY_N,
+                        'req_items' => 1,
+                    ],
+                    'courseids' => [$this->courses[1]->id, $this->courses[3]->id, $this->courses[5]->id],
+                ]);
+            }
+
+            /**
+             * We can't use the results of setup_data in the data providers.
+             * Therefore we make use of keys when we need to refer to elements in the $data object.
+             * This function first translates the keys to the correct values and then use the correct generator function
+             * to create the pathway
+             *
+             * @param $competency_generator
+             * @param $pw_type
+             * @param $pw_data
+             * @return |null
+             */
+            public function setup_pathway($competency_generator, $pw_key, $pw_type, $pw_data) {
+                $this->map_keys_to_values($pw_data);
+
+                if (!isset($pw_data['comp_id'])) {
+                    $pw_data['comp_id'] = $this->comp->id;
+                }
+
+                $methodname = "create_{$pw_type}";
+                $this->pathways[$pw_key] = $competency_generator->$methodname($pw_data);
+                return $this->pathways[$pw_key];
+            }
+
+            public function map_keys_to_values(&$map_array) {
+                $matches = [];
+
+                foreach ($map_array as $name => $value) {
+                    if (preg_match('/(.*)_key/', $name, $matches)) {
+                        switch ($matches[1]) {
+                            case 'comp':
+                                $map_array['comp_id'] = $this->comp->id;
+                                break;
+
+                            case 'criteria':
+                                if (!is_array($value)) {
+                                    $value = [$value];
+                                }
+                                $map_array['criteria'] = [];
+                                foreach ($value as $key) {
+                                    $map_array['criteria'][] = $this->criteria[$key];
+                                }
+                                break;
+
+                            case 'item':
+                                if (is_array($value)) {
+                                    $item_type = $value[0];
+                                    $item_key = $value[1];
+                                    if (method_exists($this->$item_type[$item_key], 'get_id')) {
+                                        $map_array['item_id'] = $this->$item_type[$item_key]->get_id();
+                                    } else if (property_exists($this->$item_type[$item_key], 'id')) {
+                                        $map_array['item_id'] = $this->$item_type[$item_key]->id;
+                                    }
+                                }
+                                break;
+
+                            case 'pathway':
+                                $map_array['pathway_id'] = $this->pathways[$value]->get_id();
+                                break;
+
+                            case 'scale_value':
+                                if (is_null($value)) {
+                                    $map_array['scale_value_id'] = null;
+                                } else {
+                                    $map_array['scale_value_id'] = $this->scalevalues[$value]->id;
+                                }
+                                break;
+                        }
+
+                        unset($map_array[$matches[0]]);
+                    }
+                }
+            }
+
+        };
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $data->setup_scale_and_competency($hierarchygenerator);
+        $data->setup_users_and_courses($this->getDataGenerator());
+        $data->setup_criteria($criteria_generator);
+
+        return $data;
     }
 
-    private function generate_mock_pathway($competency, $scale_value): pathway {
-
-        /** @var totara_competency_generator $competency_generator */
-        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        /** @var test_pathway $pathway */
-        $pathway = $competency_generator->create_test_pathway();
-        $pathway->set_test_aggregate_current_value($scale_value);
-
-        $pathway->set_competency($competency);
-        $pathway->set_sortorder(1);
-        $pathway->save();
-
-        return $pathway;
-    }
-
-    private function create_competency_with_pathway() {
-        $competency = $this->generate_competency();
-        $scale_value = $competency->scale->sorted_values_high_to_low->first();
-
-        $pathway = $this->generate_mock_pathway($competency, $scale_value);
-        $config = new achievement_configuration($competency);
-        $config->set_aggregation_type('first')->save_aggregation();
-
-        return [$competency, $pathway, $scale_value];
-    }
 
     public function test_execute_with_no_data() {
+        global $DB;
+
         $task = new competency_achievement_aggregation();
         $task->execute();
+
+        $rows = $DB->get_records('totara_competency_achievement');
+        $this->assertSame(0, count($rows));
     }
 
     /**
-     * Single active assignment
-     * Single active pathway
-     * Single active pathway achievement
+     * Data provider for test_integrated_aggregation
      */
-    public function test_aggregation_of_single_competency_and_user() {
+    public function data_provider_test_integrated_aggregation_first_run() {
+        return [
+            [
+                'pathways' => [
+                    [
+                        'type' => 'criteria_group',
+                        'data' => [
+                            'sortorder' => 1,
+                            'scale_value_key' => 2,
+                            'criteria_key' => ['course_1'],
+                        ]
+                    ],
+                ],
+                'user_keys' => [1],
+                'expected' => [
+                    [
+                        'user_key' => 1,
+                        'item_records' => [
+                            [
+                                'item_key' => ['courses', 1],
+                                'criterion_met' => 0,
+                            ],
+                        ],
+                        'pathway_achievements' => [
+                            [
+                                'pathway_key' => 0,
+                                'scale_value_key' => null,
+                                'status' => pathway_achievement::STATUS_CURRENT,
+                                'related_info' => [],
+                            ],
+                        ],
+                        'competency_achievements' => [
+                            [
+                                'comp_key' => 0,
+                                'scale_value_key' => null,
+                                'proficient' => 0,
+                                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+
+            [
+                'pathways' => [
+                    [
+                        'type' => 'manual',
+                        'data' => [
+                            'sortorder' => 1,
+                            'roles' => ['manager'],
+                        ]
+                    ],
+                ],
+                'user_keys' => [1],
+                'expected' => [
+                    [
+                        'user_key' => 1,
+                        'pathway_achievements' => [
+                            [
+                                'pathway_key' => 0,
+                                'scale_value_key' => null,
+                                'status' => pathway_achievement::STATUS_CURRENT,
+                                'related_info' => [],
+                            ],
+                        ],
+                        'competency_achievements' => [
+                            [
+                                'comp_key' => 0,
+                                'scale_value_key' => null,
+                                'proficient' => 0,
+                                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+
+    /**
+     * Integrated test of competency aggregation
+     *
+     * @dataProvider data_provider_test_integrated_aggregation_first_run
+     */
+    public function test_integrated_aggregation_first_run($pathways, $users, $expected) {
         global $DB;
 
-        $user = $this->getDataGenerator()->create_user();
-        [$competency, $pathway, $scale_value] = $this->create_competency_with_pathway();
+        $data = $this->setup_data();
 
-        $this->generate_active_expanded_user_assignments($competency, [$user]);
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
+        $pw_instances = [];
+        foreach ($pathways as $key => $pw) {
+            $data->setup_pathway($competency_generator, $key, $pw['type'], $pw['data']);
+        }
+
+        // Assign user1 to the competency
+        /** @var tassign_competency_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
+        $data->setup_active_expanded_user_assignments($assignment_generator, $users);
 
         // Let's be clear on the state before running the task.
-        $this->assertEquals(1, $DB->count_records(
-            'totara_competency_pathway_achievement',
-            ['user_id' => $user->id, 'pathway_id' => $pathway->get_id()]
-        ));
+        $this->assertEquals(0, $DB->count_records('totara_criteria_item_record'));
+        $this->assertEquals(0, $DB->count_records('totara_competency_pathway_achievement'));
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
 
+        // Now run the task
         $task = new competency_achievement_aggregation();
-
-        // The method to get assigned users that need updating is the main thing to test here.
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(1, $user_ids);
-        $user_id = array_pop($user_ids);
-        $this->assertEquals($user->id, $user_id);
-
-        // Not necessary to check this sort of thing for all tests. The aggregator tests are what are really
-        // responsible for testing creation and updating of comp_records.
         $task->execute();
 
-        // A comp_record should have been generated based on the user's pathway achievement.
-        $comp_records = $DB->get_records('totara_competency_achievement');
-        $this->assertCount(1, $comp_records);
-        $comp_record = reset($comp_records);
-        $this->assertEquals($scale_value->id, $comp_record->scale_value_id);
+        // Verify item_record
+        $this->verify_achievement_records($expected, $data);
     }
 
     public function test_last_aggregated_field() {
         global $DB;
 
-        $user = $this->getDataGenerator()->create_user();
-        [$competency, $pathway] = $this->create_competency_with_pathway();
+        $data = $this->setup_data();
 
-        $this->generate_active_expanded_user_assignments($competency, [$user]);
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
+        $params = [
+           'comp_id' => $data->comp->id,
+           'sortorder' => 1,
+           'scale_value_id' => $data->scalevalues[2],
+           'criteria' => [$data->criteria['course_1']],
+        ];
+
+        $pw = $competency_generator->create_criteria_group($params);
+
+        // Assign user1 to the competency
+        /** @var tassign_competency_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
+        $data->setup_active_expanded_user_assignments($assignment_generator, [1]);
 
         $task = new competency_achievement_aggregation();
 
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(1, $user_ids);
-
         // Up until this point, this test will have been similar to test_aggregation_of_single_competency_and_user().
+        // We now run the task again without any changes
         $this->setCurrentTimeStart();
 
         $task->execute();
@@ -172,27 +395,22 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         // We've recorded the time we aggregated and we sent an event because there was a new value.
         $this->assertTimeCurrent($comp_record1->last_aggregated);
 
+        // Now we wait for a moment and then re-aggregate again
         $this->waitForSecond();
-
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(1, $user_ids);
-
         $task->execute();
 
+        // Nothing changed - so not expecting an update
         $comp_records2 = $DB->get_records('totara_competency_achievement');
         $this->assertCount(1, $comp_records2);
         $comp_record2 = reset($comp_records2);
 
-        // We aggregated again. This is because the pathway aggregation time was equal to the comp_record aggregation time.
-        // We catch those to do again which means we might repeat aggregation sometimes in favour of not missing any
-        // pathway achievements that are updated at the time of comp record aggregation.
-        $this->assertTrue($comp_record2->last_aggregated > $comp_record1->last_aggregated);
+        $this->assertEquals($comp_record1->last_aggregated, $comp_record2->last_aggregated);
 
-        // Todo: stop wasting time by shifting time back instead perhaps. Otherwise, we keep one test like this because accuracy of the test is also important.
+        // Now manually simulate a change on the lowest level - item_recor
         $this->waitForSecond();
 
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(0, $user_ids);
+        $DB->execute('UPDATE {totara_criteria_item_record} SET timeevaluated = :timeevaluated',
+            ['timeevaluated' => time()]);
 
         $task->execute();
 
@@ -200,193 +418,301 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         $this->assertCount(1, $comp_records3);
         $comp_record3 = reset($comp_records3);
 
-        // This time we didn't have to aggregate again because the pathway time was before the comp_record time.
-        $this->assertEquals($comp_record3->last_aggregated, $comp_record2->last_aggregated);
+        // This time we re-aggregated
+        $this->assertTrue($comp_record3->last_aggregated > $comp_record1->last_aggregated);
     }
 
-    /**
-     * Active assignment
-     * Active pathway
-     * Archived pathway achievement
-     */
-    public function test_new_active_assignment_archived_pathway_achievement() {
+//    /**
+//     * Active assignment
+//     * Active pathway
+//     * Archived pathway achievement
+//     */
+//    public function test_new_active_assignment_archived_pathway_achievement() {
+//        global $DB;
+//
+//        $this->markTestIncomplete('Will be fixed in TL-22139');
+//
+//        $user = $this->getDataGenerator()->create_user();
+//        [$competency, $pathway] = $this->create_competency_with_pathway();
+//
+//        $this->generate_active_expanded_user_assignments($competency, [$user]);
+//        (new pathway_evaluator($pathway))->aggregate([$user->id]);
+//
+//        pathway_achievement::get_current($pathway, $user->id)->archive();
+//
+//        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
+//        $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
+//
+//        $task = new competency_achievement_aggregation();
+//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
+//        $this->assertCount(1, $user_ids);
+//    }
+//
+//    /**
+//     * Archived assignment
+//     * Active pathway
+//     * Active pathway achievement
+//     */
+//    public function test_new_archived_assignment_active_pathway_achievement() {
+//        global $DB;
+//
+//        $this->markTestIncomplete('Will be fixed in TL-22139');
+//
+//        $user = $this->getDataGenerator()->create_user();
+//        [$competency, $pathway] = $this->create_competency_with_pathway();
+//
+//        $assignment_ids = $this->generate_active_expanded_user_assignments($competency, [$user]);
+//        (new pathway_evaluator($pathway))->aggregate([$user->id]);
+//
+//        (new \tassign_competency\models\assignment_actions())->archive($assignment_ids);
+//        (new \tassign_competency\expand_task($DB))->expand_all();
+//
+//        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
+//        $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
+//
+//        $task = new competency_achievement_aggregation();
+//
+//        $task->execute();
+//        // We only aggregate for active assignments.
+//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
+//        $this->assertCount(0, $user_ids);
+//    }
+//
+//    /**
+//     * Begin with active assignment, pathway and achievement.
+//     * Then set the achievement to be archived.
+//     */
+//    public function test_updated_active_assignment_archived_pathway_achievement() {
+//        global $DB;
+//
+//        $this->markTestIncomplete('Will be fixed in TL-22139');
+//
+//        $user = $this->getDataGenerator()->create_user();
+//        [$competency, $pathway, $scale_value] = $this->create_competency_with_pathway();
+//
+//        $this->generate_active_expanded_user_assignments($competency, [$user]);
+//        (new pathway_evaluator($pathway))->aggregate([$user->id]);
+//
+//        $task = new competency_achievement_aggregation();
+//
+//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
+//        $this->assertCount(1, $user_ids);
+//
+//        $task->execute();
+//
+//        // A comp_record should have been generated based on the user's pathway achievement.
+//        $comp_record = $DB->get_record('totara_competency_achievement', []);
+//
+//        $now = time();
+//
+//        pathway_achievement::get_current($pathway, $user->id)->archive();
+//
+//        // Work around the last_aggregated check so that this is updated if it needs to be.
+//        // Todo: Edge case here where if achievement is actually updated as record is being aggregated, it will be missed.
+//        $DB->set_field('totara_competency_achievement', 'last_aggregated', $now - 1, ['id' => $comp_record->id]);
+//
+//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
+//        $this->assertCount(1, $user_ids);
+//    }
+//
+//    /**
+//     * Begin with active assignment, pathway and achievement.
+//     * Then set the assignment to be archived.
+//     * Then archive the achievement and we should not see any change.
+//     */
+//    public function test_updated_archived_assignment_active_pathway_achievement() {
+//        global $DB;
+//
+//        $this->markTestIncomplete('Will be fixed in TL-22139');
+//
+//        $user = $this->getDataGenerator()->create_user();
+//        [$competency, $pathway, $scale_value] = $this->create_competency_with_pathway();
+//
+//        $assignment_ids = $this->generate_active_expanded_user_assignments($competency, [$user]);
+//        (new pathway_evaluator($pathway))->aggregate([$user->id]);
+//
+//        $task = new competency_achievement_aggregation();
+//
+//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
+//        $this->assertCount(1, $user_ids);
+//
+//        $task->execute();
+//
+//        // Now archive the assignment.
+//        (new \tassign_competency\models\assignment_actions())->archive($assignment_ids);
+//        (new \tassign_competency\expand_task($DB))->expand_all();
+//
+//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
+//        $this->assertCount(0, $user_ids);
+//
+//        $task->execute();
+//
+//        // Nothing should have changed.
+//        $comp_record = $DB->get_record('totara_competency_achievement', []);
+//
+//        $now = time();
+//        // Now archive the achievement.
+//        pathway_achievement::get_current($pathway, $user->id)->archive($now);
+//
+//        // Work around the last_aggregated check so that this is updated if it needs to be.
+//        // Todo: Edge case here where if achievement is actually updated as record is being aggregated, it will be missed.
+//        $DB->set_field('totara_competency_achievement', 'last_aggregated', $now - 1, ['id' => $comp_record->id]);
+//
+//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
+//        $this->assertCount(0, $user_ids);
+//    }
+//
+//    /**
+//     * First, an active achievement for active pathway and assignment leads to a comp_record value.
+//     * Then, archive the pathway itself.
+//     * That achievement should no longer contribute to the value.
+//     */
+//    public function test_archived_pathway_after_record_created() {
+//
+//        $this->markTestSkipped(); // Some more to implement before this will pass.
+//
+//        $user = $this->getDataGenerator()->create_user();
+//
+//        /**
+//         * @var competency $competency
+//         * @var pathway $pathway
+//         * @var scale_value $scale_value
+//         */
+//        [$competency, $pathway, $scale_value] = $this->create_competency_with_pathway();
+//
+//        $this->generate_active_expanded_user_assignments($competency, [$user]);
+//        (new pathway_evaluator($pathway))->aggregate([$user->id]);
+//
+//        $task = new competency_achievement_aggregation();
+//
+//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
+//        $this->assertCount(1, $user_ids);
+//
+//        $task->execute();
+//
+//        // Now archive the pathway.
+//        // Todo: Maybe this isn't the right way. Maybe there needs to be a method like set_as_archived which does all the work.
+//        $pathway->set_status(pathway::PATHWAY_STATUS_ARCHIVED);
+//        $pathway->activate_changes(); // Todo: Or just account for archived in this one.
+//
+//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
+//        $this->assertCount(0, $user_ids);
+//    }
+//
+//    /**
+//     * First, an active achievement for active pathway and assignment leads to a comp_record value.
+//     * Then, delete the pathway.
+//     * That achievement should no longer contribute to the value.
+//     */
+//    public function test_deleted_pathway_after_record_created() {
+//        $this->markTestIncomplete();
+//    }
+//
+//    /**
+//     * First, create two pathways that generate different scale values.
+//     * Aggregate so that the user has a comp_record based off one of them.
+//     * Update the aggregation method such that the user should now have the other value in their comp_record.
+//     * Run aggregation and check this occurs.
+//     */
+//    public function test_updated_aggregation_type_after_record_created() {
+//        $this->markTestIncomplete();
+//    }
+
+    private function verify_achievement_records($expected, $data) {
+        foreach ($expected as $expected_achievement_set) {
+            $this->assertTrue(isset($expected_achievement_set['user_key']));
+            $this->assertTrue(isset($data->users[$expected_achievement_set['user_key']]));
+            $user = $data->users[$expected_achievement_set['user_key']];
+
+            if (isset($expected_achievement_set['item_records'])) {
+                for ($i = 0; $i < count($expected_achievement_set['item_records']); $i++) {
+                    $data->map_keys_to_values($expected_achievement_set['item_records'][$i]);
+                }
+                $this->verify_item_records($user->id, $expected_achievement_set['item_records']);
+            }
+
+            if (isset($expected_achievement_set['pathway_achievements'])) {
+                for ($i = 0; $i < count($expected_achievement_set['pathway_achievements']); $i++) {
+                    $data->map_keys_to_values($expected_achievement_set['pathway_achievements'][$i]);
+                }
+                $this->verify_pathway_achievements($user->id, $expected_achievement_set['pathway_achievements']);
+            }
+
+            if (isset($expected_achievement_set['competency_achievements'])) {
+                for ($i = 0; $i < count($expected_achievement_set['competency_achievements']); $i++) {
+                    $data->map_keys_to_values($expected_achievement_set['competency_achievements'][$i]);
+                }
+                $this->verify_competency_achievements($user->id, $expected_achievement_set['competency_achievements']);
+            }
+        }
+    }
+
+    private function verify_item_records(int $user_id, array $expected_rows) {
         global $DB;
 
-        $user = $this->getDataGenerator()->create_user();
-        [$competency, $pathway] = $this->create_competency_with_pathway();
+        $sql =
+            "SELECT tcir.*, tci.item_id
+               FROM {totara_criteria_item_record} tcir
+               JOIN {totara_criteria_item} tci
+                 ON tci.id = tcir.criterion_item_id
+              WHERE tcir.user_id = :userid";
+        $actual_rows = $DB->get_records_sql($sql, ['userid' => $user_id]);
+        $this->assertSame(count($expected_rows), count($actual_rows));
 
-        $this->generate_active_expanded_user_assignments($competency, [$user]);
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
+        foreach ($actual_rows as $actual_row) {
+            foreach ($expected_rows as $key => $expected_row) {
+                if ((int)$actual_row->item_id == $expected_row['item_id']) {
+                    $this->assertEquals($expected_row['criterion_met'], $actual_row->criterion_met);
+                    unset($expected_rows[$key]);
+                    break;
+                }
+            }
+        }
 
-        pathway_achievement::get_current($pathway, $user->id)->archive();
-
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
-
-        $task = new competency_achievement_aggregation();
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(1, $user_ids);
+        $this->assertSame(0, count($expected_rows));
     }
 
-    /**
-     * Archived assignment
-     * Active pathway
-     * Active pathway achievement
-     */
-    public function test_new_archived_assignment_active_pathway_achievement() {
+    private function verify_pathway_achievements($user_id, $expected_rows) {
         global $DB;
 
-        $user = $this->getDataGenerator()->create_user();
-        [$competency, $pathway] = $this->create_competency_with_pathway();
+        $actual_rows = $DB->get_records('totara_competency_pathway_achievement', ['user_id' => $user_id]);
 
-        $assignment_ids = $this->generate_active_expanded_user_assignments($competency, [$user]);
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
+        $this->assertSame(count($expected_rows), count($actual_rows));
+        foreach ($actual_rows as $actual_row) {
+            foreach ($expected_rows as $key => $expected_row) {
+                if ((int)$actual_row->pathway_id == $expected_row['pathway_id'] &&
+                    (int)$actual_row->status == $expected_row['status'] &&
+                    (int)$actual_row->scale_value_id == $expected_row['scale_value_id'] &&
+                    (!isset($expected_row['related_info']) || $actual_row->related_info == json_encode($expected_row['related_info']))) {
 
-        (new \totara_competency\models\assignment_actions())->archive($assignment_ids);
-        (new \totara_competency\expand_task($DB))->expand_all();
+                    unset($expected_rows[$key]);
+                    break;
+                }
+            }
+        }
 
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
-
-        $task = new competency_achievement_aggregation();
-
-        $task->execute();
-        // We only aggregate for active assignments.
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(0, $user_ids);
+        $this->assertSame(0, count($expected_rows));
     }
 
-    /**
-     * Begin with active assignment, pathway and achievement.
-     * Then set the achievement to be archived.
-     */
-    public function test_updated_active_assignment_archived_pathway_achievement() {
+    private function verify_competency_achievements($user_id, $expected_rows) {
         global $DB;
 
-        $user = $this->getDataGenerator()->create_user();
-        [$competency, $pathway, $scale_value] = $this->create_competency_with_pathway();
+        $actual_rows = $DB->get_records('totara_competency_achievement', ['user_id' => $user_id]);
 
-        $this->generate_active_expanded_user_assignments($competency, [$user]);
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
+        $this->assertSame(count($expected_rows), count($actual_rows));
+        foreach ($actual_rows as $actual_row) {
+            foreach ($expected_rows as $key => $expected_row) {
+                if ((int)$actual_row->comp_id == $expected_row['comp_id'] &&
+                    (int)$actual_row->status == $expected_row['status'] &&
+                    (int)$actual_row->scale_value_id == $expected_row['scale_value_id'] &&
+                    (int)$actual_row->proficient == $expected_row['proficient']) {
 
-        $task = new competency_achievement_aggregation();
+                    unset($expected_rows[$key]);
+                    break;
+                }
+            }
+        }
 
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(1, $user_ids);
-
-        $task->execute();
-
-        // A comp_record should have been generated based on the user's pathway achievement.
-        $comp_record = $DB->get_record('totara_competency_achievement', []);
-
-        $now = time();
-
-        pathway_achievement::get_current($pathway, $user->id)->archive();
-
-        // Work around the last_aggregated check so that this is updated if it needs to be.
-        // Todo: Edge case here where if achievement is actually updated as record is being aggregated, it will be missed.
-        $DB->set_field('totara_competency_achievement', 'last_aggregated', $now - 1, ['id' => $comp_record->id]);
-
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(1, $user_ids);
-    }
-
-    /**
-     * Begin with active assignment, pathway and achievement.
-     * Then set the assignment to be archived.
-     * Then archive the achievement and we should not see any change.
-     */
-    public function test_updated_archived_assignment_active_pathway_achievement() {
-        global $DB;
-
-        $user = $this->getDataGenerator()->create_user();
-        [$competency, $pathway, $scale_value] = $this->create_competency_with_pathway();
-
-        $assignment_ids = $this->generate_active_expanded_user_assignments($competency, [$user]);
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
-
-        $task = new competency_achievement_aggregation();
-
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(1, $user_ids);
-
-        $task->execute();
-
-        // Now archive the assignment.
-        (new \totara_competency\models\assignment_actions())->archive($assignment_ids);
-        (new \totara_competency\expand_task($DB))->expand_all();
-
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(0, $user_ids);
-
-        $task->execute();
-
-        // Nothing should have changed.
-        $comp_record = $DB->get_record('totara_competency_achievement', []);
-
-        $now = time();
-        // Now archive the achievement.
-        pathway_achievement::get_current($pathway, $user->id)->archive($now);
-
-        // Work around the last_aggregated check so that this is updated if it needs to be.
-        // Todo: Edge case here where if achievement is actually updated as record is being aggregated, it will be missed.
-        $DB->set_field('totara_competency_achievement', 'last_aggregated', $now - 1, ['id' => $comp_record->id]);
-
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(0, $user_ids);
-    }
-
-    /**
-     * First, an active achievement for active pathway and assignment leads to a comp_record value.
-     * Then, archive the pathway itself.
-     * That achievement should no longer contribute to the value.
-     */
-    public function test_archived_pathway_after_record_created() {
-
-        $this->markTestSkipped(); // Some more to implement before this will pass.
-
-        $user = $this->getDataGenerator()->create_user();
-
-        /**
-         * @var competency $competency
-         * @var pathway $pathway
-         * @var scale_value $scale_value
-         */
-        [$competency, $pathway, $scale_value] = $this->create_competency_with_pathway();
-
-        $this->generate_active_expanded_user_assignments($competency, [$user]);
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
-
-        $task = new competency_achievement_aggregation();
-
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(1, $user_ids);
-
-        $task->execute();
-
-        // Now archive the pathway.
-        $pathway->delete();
-
-        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-        $this->assertCount(0, $user_ids);
-    }
-
-    /**
-     * First, an active achievement for active pathway and assignment leads to a comp_record value.
-     * Then, delete the pathway.
-     * That achievement should no longer contribute to the value.
-     */
-    public function test_deleted_pathway_after_record_created() {
-        $this->markTestIncomplete();
-    }
-
-    /**
-     * First, create two pathways that generate different scale values.
-     * Aggregate so that the user has a comp_record based off one of them.
-     * Update the aggregation method such that the user should now have the other value in their comp_record.
-     * Run aggregation and check this occurs.
-     */
-    public function test_updated_aggregation_type_after_record_created() {
-        $this->markTestIncomplete();
+        $this->assertSame(0, count($expected_rows));
     }
 }

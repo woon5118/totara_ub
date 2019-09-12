@@ -25,7 +25,7 @@ namespace totara_competency\webapi\resolver\type;
 
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use totara_competency\pathway_aggregation_factory;
+use totara_competency\overall_aggregation_factory;
 
 /**
  * General totata competency achievement configuration
@@ -58,7 +58,7 @@ class achievement_configuration implements type_resolver {
             case 'overall_aggregation':
                 /** @var string $atype */
                 $atype = $configuration->get_aggregation_type();
-                return pathway_aggregation_factory::create($atype);
+                return overall_aggregation_factory::create($atype);
             case 'paths':
                 return $configuration->get_active_pathways();
         }

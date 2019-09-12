@@ -28,6 +28,8 @@ use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
 use pathway_criteria_group\criteria_group;
 use pathway_manual\manual;
+use totara_competency\overall_aggregation_factory;
+use totara_competency\plugintypes;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
 use totara_criteria\criterion;
@@ -42,11 +44,11 @@ class achievement_criteria {
      *
      * @return array containing name, description and has_ui attributes for each available aggregation method
      */
-    public static function get_available_pathway_aggregation_methods(): array {
+    public static function get_available_overall_aggregation_methods(): array {
         $methods = [];
         $enabledtypes = plugintypes::get_enabled_plugins('aggregation', 'totara_competency');
         foreach ($enabledtypes as $agg_type) {
-            $methods[] = pathway_aggregation_factory::create($agg_type);
+            $methods[] = overall_aggregation_factory::create($agg_type);
         }
 
         return $methods;

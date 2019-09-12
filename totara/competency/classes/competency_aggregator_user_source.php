@@ -17,21 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package pathway_criteria_group
+ * @package totara_competency
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace totara_competency;
 
-$tasks = [
-    [
-        'classname' => 'pathway_criteria_group\task\aggregate',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ]
-];
+interface competency_aggregator_user_source {
+
+    /**
+     * Archive achievements of users no longer assigned
+     * @param int $competency_id
+     * @param int $aggregation_time
+     */
+    public function archive_non_assigned_achievements(int $competency_id, int $aggregation_time);
+
+    /**
+     * Get users to consider for reaggregation
+     * @param int $competency_id
+     * @param int $aggregation_time
+     */
+    public function get_users_to_reaggregate(int $competency_id, int $aggregation_time): \moodle_recordset;
+
+}

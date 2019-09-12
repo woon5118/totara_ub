@@ -118,7 +118,7 @@ class onactivate extends criterion {
      ************************************************************************************/
 
     public static function item_evaluator(): string {
-        return '';
+        return assignment_item_evaluator::class;
     }
 
 

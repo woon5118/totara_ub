@@ -37,13 +37,13 @@ class item_updated extends base {
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
-    public static function create_with_item_record($criterion_item_id, $item_record) {
+    public static function create_with_item_record($criterion_id, $item_record) {
         return item_updated::create(
             [
                 'context' => \context_system::instance(),
-                'objectid' => $item_record->id,
+                'objectid' => $criterion_id,
                 'relateduserid' => $item_record->user_id,
-                'other' => ['criterion_item_id' => $criterion_item_id]
+                'other' => ['criterion_type' => $item_record->criterion_item_id, 'criterion_met' => $item_record->criterion_met]
             ]
         );
     }

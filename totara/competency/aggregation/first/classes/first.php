@@ -26,10 +26,10 @@ namespace aggregation_first;
 
 use totara_competency\pathway;
 use totara_competency\entities\pathway_achievement;
-use totara_competency\pathway_aggregation;
+use totara_competency\overall_aggregation;
 
-class first extends pathway_aggregation {
-    protected function do_aggregation() {
+class first extends overall_aggregation {
+    protected function do_aggregation(int $user_id) {
         /** @var pathway[] $ordered_pathways */
         $ordered_pathways = [];
         foreach ($this->get_pathways() as $pathway) {
@@ -37,15 +37,12 @@ class first extends pathway_aggregation {
         }
         ksort($ordered_pathways);
 
-        foreach ($this->get_user_ids() as $user_id) {
-            foreach ($ordered_pathways as $pathway) {
-                $achievement = pathway_achievement::get_current($pathway, $user_id);
-                $value_id = $achievement->scale_value_id;
-                if (isset($value_id)) {
-                    $this->set_achieved_value_id($user_id, $value_id);
-                    $this->set_achieved_via($user_id, [$achievement]);
-                    break;
-                }
+        foreach ($ordered_pathways as $pathway) {
+            $achievement = pathway_achievement::get_current($pathway, $user_id);
+            $value_id = $achievement->scale_value_id;
+            if (isset($value_id)) {
+                $this->set_user_achievement($user_id, $value_id, [$achievement]);
+                break;
             }
         }
     }

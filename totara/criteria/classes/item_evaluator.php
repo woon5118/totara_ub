@@ -24,50 +24,67 @@
 
 namespace totara_criteria;
 
-trait item_evaluator {
-    abstract public static function update_item_records($user_ids = null, $item_ids = null);
+/**
+ * Class item_evaluator
+ * Item evaluators are responsible for evaluating which assigned users have satisfied criteria conditions.
+ * Results are stored in the totara_criteria_item_record table.
+ *
+ * @package totara_criteria
+ */
+abstract class item_evaluator {
 
-    public static function create_item_records($item_id, $user_ids = []) {
-        global $DB;
+    /** @var item_evaluator_user_source $user_source */
+    protected $user_source = null;
 
+    /**
+     * Constructor.
+     * @param item_evaluator_user_source $user_source Source containing the user ids
+     */
+    final public function __construct(item_evaluator_user_source $user_source) {
+        $this->user_source = $user_source;
+    }
+
+    /**
+     * Evaluate criteria completion / satisfaction for users in the source
+     * and save the last time the item was evaluated
+     *
+     * This function should ideally not be overridden, but not making it final
+     * to allow test classes to override it and simplify the testing process
+     *
+     * @param int $criterion_id
+     */
+    public function update_completion(criterion $criterion) {
+        // Getting the time at the start. This is used as last_evaluated time to
+        // ensure we don't miss items updating via observers during the marking process
         $now = time();
+        $criterion_id = $criterion->get_id();
 
-        $to_insert = [];
+        $this->user_source->delete_item_records($criterion_id);
+        $this->user_source->create_item_records($criterion_id, $this->get_default_criteria_met(), $now);
 
-        foreach ($user_ids as $user_id) {
-            $record = new \stdClass();
-            $record->user_id = $user_id;
-            $record->criterion_item_id = $item_id;
-            $record->criterion_met = 0; // Todo: Could be null for not evaluated yet, meaning we ignore until it is.
-            $record->timeevaluated = time(); // Did have this as 0 if not evaluated. Might actually have a status for that. Problem with putting the actual time is it's not correct if that gets reflect in aggregated values.
-            $to_insert[] = $record;
+        $this->update_criterion_completion($criterion, $now);
 
-            if (count($to_insert) > BATCH_INSERT_MAX_ROW_COUNT) {
-                $DB->insert_records('totara_criteria_item_record', $to_insert);
-                $to_insert = [];
-            }
-        }
+        // Now we mark all the users that changed since the last time the criterion was evaluated
+        $last_evaluated = $criterion->get_last_evaluated() ?? 0;
+        $this->user_source->mark_updated_assigned_users($criterion->get_id(), $last_evaluated);
 
-        if (count($to_insert) > 0) {
-            $DB->insert_records('totara_criteria_item_record', $to_insert);
-        }
+        $criterion->set_last_evaluated($now)
+            ->save_last_evaluated();
     }
 
-    public static function update_criterion_met($new_value, $record_ids) {
-        global $DB;
+    /**
+     * Evaluate criteria completion / satisfaction for users in the source
+     * @param int $criterion_id
+     * @param int $now
+     */
+    abstract protected function update_criterion_completion(criterion $criterion, int $now);
 
-        if (empty($record_ids)) {
-            return;
-        }
-
-        list($insql, $params) = $DB->get_in_or_equal($record_ids, SQL_PARAMS_NAMED);
-        $params['newvalue'] = $new_value;
-        $params['now'] = time();
-
-        $update_sql = "
-                UPDATE {totara_criteria_item_record}
-                SET criterion_met = :newvalue, timeevaluated = :now
-                WHERE id " . $insql;
-        $DB->execute($update_sql, $params);
+    /**
+     * Default value to insert into criterion_met for new item records
+     * @return ?int
+     */
+    protected function get_default_criteria_met(): ?int {
+        return 0;
     }
+
 }

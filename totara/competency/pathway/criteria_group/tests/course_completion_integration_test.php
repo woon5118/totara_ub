@@ -85,39 +85,6 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $this->assertEquals(0, $DB->count_records('totara_competency_pathway_achievement'));
         $this->assertEquals(0, $DB->count_records('totara_criteria_item_record'));
 
-        $this->assertEquals(false, $DB->get_field('totara_criteria_item_record', 'criterion_met', []));
-        $this->assertEquals(false, $DB->get_field('totara_competency_pathway_achievement', 'scale_value_id', []));
-
-        (new pathway_criteria_group\task\aggregate())->execute();
-
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
-        $this->assertEquals(0, $DB->count_records('totara_competency_pathway_achievement'));
-        $this->assertEquals(1, $DB->count_records('totara_criteria_item_record'));
-
-        $this->assertEquals(0, $DB->get_field('totara_criteria_item_record', 'criterion_met', []));
-        $this->assertEquals(false, $DB->get_field('totara_competency_pathway_achievement', 'scale_value_id', []));
-
-        (new totara_criteria\task\evaluate_items())->execute();
-
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
-        $this->assertEquals(0, $DB->count_records('totara_competency_pathway_achievement'));
-        $this->assertEquals(1, $DB->count_records('totara_criteria_item_record'));
-
-        $this->assertEquals(1, $DB->get_field('totara_criteria_item_record', 'criterion_met', []));
-        $this->assertEquals(false, $DB->get_field('totara_competency_pathway_achievement', 'scale_value_id', []));
-
-        (new pathway_criteria_group\task\aggregate())->execute();
-
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
-        $this->assertEquals(1, $DB->count_records('totara_competency_pathway_achievement'));
-        $this->assertEquals(1, $DB->count_records('totara_criteria_item_record'));
-
-        $this->assertEquals(1, $DB->get_field('totara_criteria_item_record', 'criterion_met', []));
-        $this->assertEquals($expected_value1->id, $DB->get_field('totara_competency_pathway_achievement', 'scale_value_id', []));
-
         (new totara_competency\task\competency_achievement_aggregation())->execute();
 
         $this->assertEquals(1, $DB->count_records('totara_competency_achievement'));
@@ -133,6 +100,8 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
     }
 
     public function test_course_completion_leads_to_comp_achievement_via_events() {
+
+        $this->markTestSkipped('Will be fixed in TL-22569');
         global $DB;
 
         /** @var totara_competency_generator $competency_generator */
@@ -179,21 +148,6 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
         $this->assertEquals(0, $DB->count_records('totara_competency_pathway_achievement'));
         $this->assertEquals(0, $DB->count_records('totara_criteria_item_record'));
-
-        $this->assertEquals(false, $DB->get_field('totara_criteria_item_record', 'criterion_met', []));
-        $this->assertEquals(false, $DB->get_field('totara_competency_pathway_achievement', 'scale_value_id', []));
-
-        // We just need to run this task to add the item record for the user.
-        // Doing this prior to any events.
-        (new \pathway_criteria_group\task\aggregate())->execute();
-
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
-        $this->assertEquals(0, $DB->count_records('totara_competency_pathway_achievement'));
-        $this->assertEquals(1, $DB->count_records('totara_criteria_item_record'));
-
-        $this->assertEquals(0, $DB->get_field('totara_criteria_item_record', 'criterion_met', []));
-        $this->assertEquals(false, $DB->get_field('totara_competency_pathway_achievement', 'scale_value_id', []));
 
         // Complete the course and the rest should be done via a series of events following that.
         /** @var completion_completion $completion */

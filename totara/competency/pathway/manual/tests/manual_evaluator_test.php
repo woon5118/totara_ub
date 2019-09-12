@@ -1,0 +1,307 @@
+<?php
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @package pathway_manual
+ */
+
+
+use pathway_manual\manual;
+use pathway_manual\manual_evaluator_user_source_table;
+use totara_competency\aggregation_users_table;
+use \totara_competency\entities\competency;
+use totara_competency\entities\pathway_achievement;
+use totara_competency\entities\scale_value;
+use totara_job\job_assignment;
+
+class pathway_manual_evaluator_testcase extends advanced_testcase {
+
+    private function setup_data() {
+        global $DB;
+
+        $data = new class() {
+            public $users = [];
+
+            /** @var competency $competency*/
+            public $competency;
+            public $scale;
+            public $scalevalues = [];
+
+            /** @var manual $manual */
+            public $manual;
+
+            /** @var aggregation_users_table $user_id_table */
+            public $user_id_table;
+            /** @var manual_evaluator_user_source_table $user_id_source*/
+            public $user_id_source;
+        };
+
+        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+
+        $data->scale = $hierarchygenerator->create_scale(
+            'comp',
+            ['name' => 'Test scale', 'description' => 'Test scale'],
+            [
+                1 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
+                2 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                3 => ['name' => 'Getting there', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
+                4 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+                5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+            ]
+        );
+        $rows = $DB->get_records('comp_scale_values', ['scaleid' => $data->scale->id], 'sortorder');
+        foreach ($rows as $row) {
+            $data->scalevalues[$row->sortorder] = new scale_value($row->id);
+        }
+
+        $framework = $hierarchygenerator->create_comp_frame(['scale' => $data->scale->id]);
+        $comp = $hierarchygenerator->create_comp(['frameworkid' => $framework->id]);
+        $data->competency = new competency($comp->id);
+
+        $data->users['manager'] = $this->getDataGenerator()->create_user();
+        $managerja = job_assignment::create_default($data->users['manager']->id);
+        $data->users['appraiser'] = $this->getDataGenerator()->create_user();
+        $appraiserja = job_assignment::create_default($data->users['appraiser']->id);
+        $data->users['user'] = $this->getDataGenerator()->create_user();
+        job_assignment::create_default(
+            $data->users['user']->id,
+            ['managerjaid' => $managerja->id, 'appraiserid' => $data->users['appraiser']->id]
+        );
+
+        $data->manual = new manual();
+        $data->manual->set_competency($data->competency);
+        $data->manual->set_roles([manual::ROLE_MANAGER, manual::ROLE_APPRAISER, manual::ROLE_SELF]);
+        $data->manual->save();
+
+        $data->user_id_table = new aggregation_users_table('totara_competency_temp_users',
+            'user_id',
+            'has_changed',
+            'process_key',
+            'update_operation_name'
+        );
+
+        $data->user_id_source = new manual_evaluator_user_source_table($data->user_id_table, true);
+
+        return $data;
+    }
+
+    public function test_aggregate() {
+
+        $data = $this->setup_data();
+        $now = time();
+
+        // Manually insert into ratings table to exercise the table sql explicitly
+        // (calling set_manual_value will call the aggregate function with a list source)
+        $this->create_rating_records($data->competency->id, [
+            [
+                'subject' => $data->users['user']->id,
+                'rater' => $data->users['manager']->id,
+                'role' => manual::ROLE_MANAGER,
+                'scalevalue' => $data->scalevalues[3]->id,
+                'date_assigned' => $now++,
+            ],
+        ]);
+
+        $this->create_userid_table_records($data->user_id_table, [$data->users['user']->id]);
+        $evaluator = new \pathway_manual\manual_evaluator($data->manual, $data->user_id_source);
+
+        // Now aggregate first time
+        $evaluator->aggregate($now++);
+
+        $expected = [
+            [
+                'pathway_id' => $data->manual->get_id(),
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'related_info' => [],
+            ],
+        ];
+        $this->verify_userid_table_records($data->user_id_table, [$data->users['user']->id => 1]);
+        $this->verify_pathway_achievements($data->users['user']->id, $expected);
+
+        // Add another and reaggregate again
+        $this->create_rating_records($data->competency->id, [
+            [
+                'subject' => $data->users['user']->id,
+                'rater' => $data->users['appraiser']->id,
+                'role' => manual::ROLE_APPRAISER,
+                'scalevalue' => $data->scalevalues[2]->id,
+                'date_assigned' => $now++,
+            ],
+        ]);
+
+        // Reset the has_changed flag
+        $data->user_id_table->reset_has_changed(0);
+
+        // Aggregate
+        $evaluator->aggregate($now++);
+
+        $expected = [
+            [
+                'pathway_id' => $data->manual->get_id(),
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'status' => pathway_achievement::STATUS_ARCHIVED,
+                'related_info' => [],
+            ],
+            [
+                'pathway_id' => $data->manual->get_id(),
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'related_info' => [],
+            ],
+        ];
+
+        $this->verify_userid_table_records($data->user_id_table, [$data->users['user']->id => 1]);
+        $this->verify_pathway_achievements($data->users['user']->id, $expected);
+
+        // Add a few more rating rows to ensure we get the latest - not the highest
+        $this->create_rating_records($data->competency->id, [
+            [
+                'subject' => $data->users['user']->id,
+                'rater' => $data->users['user']->id,
+                'role' => manual::ROLE_SELF,
+                'scalevalue' => $data->scalevalues[1]->id,
+                'date_assigned' => $now++,
+            ],
+            [
+                'subject' => $data->users['user']->id,
+                'rater' => $data->users['manager']->id,
+                'role' => manual::ROLE_MANAGER,
+                'scalevalue' => $data->scalevalues[4]->id,
+                'date_assigned' => $now++,
+            ],
+        ]);
+
+        // Reset the has_changed flag
+        $data->user_id_table->reset_has_changed(0);
+
+        // Aggregate
+        $evaluator->aggregate($now++);
+
+        $expected = [
+            [
+                'pathway_id' => $data->manual->get_id(),
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'status' => pathway_achievement::STATUS_ARCHIVED,
+                'related_info' => [],
+            ],
+            [
+                'pathway_id' => $data->manual->get_id(),
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'status' => pathway_achievement::STATUS_ARCHIVED,
+                'related_info' => [],
+            ],
+            [
+                'pathway_id' => $data->manual->get_id(),
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'related_info' => [],
+            ],
+        ];
+        $this->verify_userid_table_records($data->user_id_table, [$data->users['user']->id => 1]);
+        $this->verify_pathway_achievements($data->users['user']->id, $expected);
+
+        // Now aggregate without any new ratings - nothing should change
+        $data->user_id_table->reset_has_changed(0);
+        $evaluator->aggregate($now++);
+        $this->verify_userid_table_records($data->user_id_table, [$data->users['user']->id => 0]);
+        $this->verify_pathway_achievements($data->users['user']->id, $expected);
+    }
+
+
+    /**
+     * Create a rating record manually
+     *
+     */
+    private function create_rating_records(int $competency_id, array $ratings) {
+        foreach ($ratings as $to_create) {
+            $rating = new \pathway_manual\entities\rating();
+            $rating->comp_id = $competency_id;
+            $rating->user_id = $to_create['subject'];
+            $rating->scale_value_id = $to_create['scalevalue'];
+            $rating->assigned_by = $to_create['rater'];
+            $rating->assigned_by_role = $to_create['role'];
+            $rating->date_assigned = $to_create['date_assigned'] ?? time();
+            $rating->save();
+        }
+    }
+
+    /**
+     * Helper function to create rows in the user_id table
+     *
+     * @param aggregation_users_table $user_id_table
+     * @param array $assiged_users
+     */
+    private function create_userid_table_records(aggregation_users_table $user_id_table, array $assigned_users)
+    {
+        global $DB;
+
+        $user_id_table->truncate();
+        if (empty($assigned_users)) {
+            return;
+        }
+
+        $tablename = $user_id_table->get_table_name();
+        $temp_user_records = [];
+        foreach ($assigned_users as $user_id) {
+            $temp_user_records[] = $user_id_table->get_insert_record($user_id);
+        }
+        $DB->insert_records($tablename, $temp_user_records);
+    }
+
+    private function verify_pathway_achievements($user_id, $expected_rows) {
+        global $DB;
+
+        $actual_rows = $DB->get_records('totara_competency_pathway_achievement', ['user_id' => $user_id]);
+
+        $this->assertSame(count($expected_rows), count($actual_rows));
+        foreach ($actual_rows as $actual_row) {
+            foreach ($expected_rows as $key => $expected_row) {
+                if ((int)$actual_row->pathway_id == $expected_row['pathway_id'] &&
+                    (int)$actual_row->status == $expected_row['status'] &&
+                    (int)$actual_row->scale_value_id == $expected_row['scale_value_id']) {
+
+                    unset($expected_rows[$key]);
+                    break;
+                }
+            }
+        }
+
+        $this->assertSame(0, count($expected_rows));
+    }
+
+    /**
+     * Helper function to verify rows in the user_id table
+     *
+     * @param aggregation_users_table $user_id_table
+     * @param array $expected
+     */
+    private function verify_userid_table_records(aggregation_users_table $user_id_table, array $expected) {
+        global $DB;
+
+        $rows = $DB->get_records($user_id_table->get_table_name(), $user_id_table->get_filter('', true));
+        $this->assertSame(count($expected), count($rows));
+
+        foreach ($rows as $row) {
+            $this->assertTrue(isset($expected[$row->user_id]));
+            $this->assertEquals($expected[$row->user_id], $row->has_changed);
+        }
+    }
+
+}

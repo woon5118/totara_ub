@@ -402,7 +402,7 @@ type totara_competency_pathway {
  How achievement values are aggregated
 None of the strings are retrieved from user input - therefore no formatting requirement
 """
-type totara_competency_pathway_aggregation {
+type totara_competency_overall_aggregation {
   aggregation_type: String!
   title: String!
   description: String
@@ -413,7 +413,7 @@ Achievement configuration
 """
 type totara_competency_achievement_configuration {
   competency_id: core_id!
-  overall_aggregation: totara_competency_pathway_aggregation!
+  overall_aggregation: totara_competency_overall_aggregation!
   paths: [totara_competency_pathway!]!
 }
 

@@ -312,7 +312,6 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
 
 
 
-
      /**
      * Validate the generated coursecompletion against the source record
      *
@@ -369,7 +368,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
             }
         }
 
-        // Linked type
+        // Competency
         $rows = $DB->get_records('totara_criteria_metadata');
         $this->assertEquals(1, count($rows));
 

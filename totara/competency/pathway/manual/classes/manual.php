@@ -27,7 +27,7 @@ namespace pathway_manual;
 use pathway_manual\entities\rating;
 use totara_competency\base_achievement_detail;
 use totara_competency\pathway;
-use totara_competency\pathway_aggregator;
+use totara_competency\pathway_evaluator_user_source_list;
 use totara_job\job_assignment;
 
 class manual extends pathway {
@@ -394,7 +394,8 @@ class manual extends pathway {
         $rating->assigned_by_role = $as_role;
         $rating->save();
 
-        (new pathway_aggregator($this))->aggregate([$subject_id]);
+        $user_source = new pathway_evaluator_user_source_list([$subject_id], false);
+        (new manual_evaluator($this, $user_source))->aggregate();
 
         return $rating;
     }
@@ -409,7 +410,7 @@ class manual extends pathway {
             ->where('comp_id', $this->get_competency()->id)
             ->where('user_id', $user_id)
             ->where('assigned_by_role', $this->get_roles())
-            ->order_by('date_assigned', 'desc')
+            ->order_by('id', 'desc')
             ->first();
 
         $achievement_detail = new achievement_detail();

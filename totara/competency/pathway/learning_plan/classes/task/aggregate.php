@@ -26,7 +26,7 @@ namespace pathway_learning_plan\task;
 use core\task\scheduled_task;
 use pathway_criteria_group\criteria_group;
 use totara_competency\pathway;
-use totara_competency\pathway_aggregator;
+use totara_competency\pathway_evaluator;
 
 class aggregate extends scheduled_task {
 
@@ -51,7 +51,7 @@ class aggregate extends scheduled_task {
 
             if (count($user_ids) > 0) {
                 $pathway = criteria_group::fetch($learning_path->id);
-                (new pathway_aggregator($pathway))->aggregate($user_ids, $now);
+                (new pathway_evaluator($pathway))->aggregate($user_ids, $now);
             }
         }
 

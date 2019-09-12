@@ -171,6 +171,10 @@ if ($error) {
                             'metakey' => "competency_id",
                             'metavalue' => $data->comp->id,
                         ],
+                        [
+                            'metakey' => "compid",
+                            'metavalue' => $data->comp->id,
+                        ],
                     ],
                     'type' => "linkedcourses",
                 ],

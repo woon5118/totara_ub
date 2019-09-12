@@ -24,29 +24,18 @@
 namespace totara_competency;
 
 
-use totara_competency\entities\scale_value;
 use totara_competency\entities\competency_pathway_achievement;
 
-abstract class pathway_aggregation {
+abstract class overall_aggregation {
 
     /** @var string $agg_type Type of aggregatioon. Obtained from class */
     private $agg_type;
 
-    /** @var int[] Scale value ids */
-    private $achieved_value_id;
+    /** @var pathway[] Pathways to aggregate over*/
+    protected $pathways = [];
 
-    /** @var pathway_achievement[][] */
-    private $achieved_via;
-
-    /**
-     * @var int[] IDs of users to be aggregated.
-     */
-    private $user_ids;
-
-    /**
-     * @var pathway[]
-     */
-    private $pathways;
+    /** @var array Achievement information per user */
+    private $user_achievement = [];
 
 
     /**
@@ -61,52 +50,15 @@ abstract class pathway_aggregation {
         return $this->agg_type;
     }
 
-    public function set_user_ids(array $user_ids): pathway_aggregation {
-        if (isset($this->user_ids)) {
-            throw new \coding_exception('Users already set. This can only be done once.');
-        }
-        $this->user_ids = $user_ids;
-
-        return $this;
-    }
-
-    public function set_pathways(array $pathways): pathway_aggregation {
-        if (isset($this->pathways)) {
-            throw new \coding_exception('Pathways already set. This can only be done once.');
-        }
+    /**
+     * Set the pathways to aggregate over
+     *
+     * @param array $pathways
+     * @return overall_aggregation
+     */
+    public function set_pathways(array $pathways): overall_aggregation {
         $this->pathways = $pathways;
-
         return $this;
-    }
-
-    private function initialise_achieved() {
-        if (!isset($this->user_ids)) {
-            throw new \coding_exception('Users have not been set.');
-        }
-        $this->achieved_value = [];
-        $this->achieved_via = [];
-        foreach ($this->user_ids as $user_id) {
-            $this->achieved_value_id[$user_id] = null;
-            $this->achieved_via[$user_id] = [];
-        }
-    }
-
-    /**
-     * @param \stdClass $user
-     * @param pathway[] $pathways
-     */
-    public function aggregate(): pathway_aggregation {
-        $this->initialise_achieved();
-        $this->do_aggregation();
-
-        return $this;
-    }
-
-    /**
-     * @return int[]
-     */
-    protected function get_user_ids(): array {
-        return $this->user_ids;
     }
 
     /**
@@ -116,37 +68,50 @@ abstract class pathway_aggregation {
         return $this->pathways;
     }
 
-    protected function set_achieved_value_id($user_id, ?int $scale_value = null) {
-        $this->achieved_value_id[$user_id] = $scale_value;
+    /**
+     * @param int $user_id Id of user to aggregate
+     * @return [int, array] Keys: scale_value_id, achieved_via
+     */
+    public function aggregate_for_user(int $user_id): array {
+        if (!isset($this->user_achievement[$user_id])) {
+            $this->do_aggregation($user_id);
+        }
+
+        // TODO: can possibly make use of a separate class, but seems like an overkill at this point
+        return empty($this->user_achievement[$user_id]) ? ['scale_value_id' => null, 'achieved_via' => []] : $this->user_achievement[$user_id];
     }
 
-    protected function set_achieved_via($user_id, array $achieved_via) {
-        $this->achieved_via[$user_id] = $achieved_via;
+    protected abstract function do_aggregation(int $user_id);
+
+    protected function set_user_achievement($user_id, ?int $scale_value_id = null, array $achieved_via) {
+        // For now taking the last value set
+        $this->user_achievement[$user_id] = ['scale_value_id' => $scale_value_id, 'achieved_via' => $achieved_via];
     }
 
-    protected abstract function do_aggregation();
 
+    /**
+     * Return id of the achieved scale value
+     *
+     * @return int|null
+     */
     public function get_achieved_value_id($user_id): ?int {
-        if (!isset($this->achieved_value_id)) {
-            throw new \coding_exception('Aggregation has not been run');
+        if (!isset($this->user_achievement[$user_id])) {
+            return null;
         }
-        if (!array_key_exists($user_id, $this->achieved_value_id)) {
-            throw new \coding_exception('User ' . $user_id . ' was not added for aggregation');
-        }
-        return $this->achieved_value_id[$user_id];
+
+        return $this->user_achievement[$user_id]['scale_value_id'];
     }
 
     /**
+     * Return the list of pathway achievement through which the user achieved this
      * @return pathway_achievement[]
      */
     public function get_achieved_via($user_id): array {
-        if (!isset($this->achieved_via)) {
-            throw new \coding_exception('Aggregation has not been run');
+        if (!isset($this->user_achievement[$user_id])) {
+            return [];
         }
-        if (!array_key_exists($user_id, $this->achieved_via)) {
-            throw new \coding_exception('User ' . $user_id . ' was not added for aggregation');
-        }
-        return $this->achieved_via[$user_id];
+
+        return $this->user_achievement[$user_id]['achieved_via'];
     }
 
     public function get_title(): string {

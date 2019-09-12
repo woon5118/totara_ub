@@ -26,7 +26,7 @@ namespace pathway_learning_plan;
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
-use totara_competency\pathway_aggregator;
+use totara_competency\pathway_evaluator;
 use totara_plan\event\competency_value_set;
 
 class observer {
@@ -56,6 +56,7 @@ class observer {
         }
 
         $pathway = pathway_factory::fetch('learning_plan', $pathway_record->id);
-        (new pathway_aggregator($pathway))->aggregate([$user_id]);
+        $user_source = new learning_plan_evaluator_user_source_list([$user_id], false);
+        (new learning_plan_evaluator($pathway, $user_source))->aggregate();
     }
 }

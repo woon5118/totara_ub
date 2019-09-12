@@ -27,15 +27,15 @@ namespace totara_competency;
 /**
  * Aggregation factory to obtain an instance of the specific pathway aggregation type
  */
-class pathway_aggregation_factory {
+class overall_aggregation_factory {
 
     /**
      * Instantiate an instance of the given type of pathway aggregation.
      *
      * @param string $type
-     * @return pathway_aggregation of the requested type
+     * @return overall_aggregation of the requested type
      */
-    public static function create(string $type): pathway_aggregation {
+    public static function create(string $type): overall_aggregation {
         static::require_enabled($type);
 
         $classname = static::get_classname($type);
@@ -57,7 +57,7 @@ class pathway_aggregation_factory {
 
     /**
      * Returns the classname associated with the given $type.
-     * Ensures that the classname is a subclass of the pathway_aggregation base class.
+     * Ensures that the classname is a subclass of the overall_aggregation base class.
      *
      * Does not check that the type is enabled.
      *
@@ -67,7 +67,7 @@ class pathway_aggregation_factory {
      */
     public static function get_classname(string $type): string {
         $classname = static::get_namespace($type) . '\\' . $type;
-        if (!class_exists($classname) || !is_subclass_of($classname, pathway_aggregation::class)) {
+        if (!class_exists($classname) || !is_subclass_of($classname, overall_aggregation::class)) {
             throw new \coding_exception('Invalid type', 'Type, ' . $classname . ', is not valid');
         }
 

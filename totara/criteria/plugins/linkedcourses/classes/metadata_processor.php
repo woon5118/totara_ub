@@ -51,10 +51,7 @@ class metadata_processor {
         }
 
         // Although we need to perform the actions per competency,
-        // not doing an order on the query but rather in code to keep the query as
-        // inexpensive as possible
-        // Although we need to perform the actions per competency,
-        // not doing an order on the query but rather in code to keep the query as
+        // not doing an order bt on the query but rather in code to keep the query as
         // inexpensive as possible
         $select_criteria_sql =
             "SELECT tc.id AS criterion_id,

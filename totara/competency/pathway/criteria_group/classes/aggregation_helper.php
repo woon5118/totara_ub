@@ -27,7 +27,7 @@ namespace pathway_criteria_group;
 use totara_competency\achievement_configuration;
 use totara_competency\competency_achievement_aggregator;
 use totara_competency\pathway;
-use totara_competency\pathway_aggregator;
+use totara_competency\pathway_evaluator_user_source_list;
 
 class aggregation_helper {
 
@@ -61,10 +61,11 @@ class aggregation_helper {
         $competencies = [];
 
         $pathways = static::get_pathways_containing_criterion_item($criterion_item_id, pathway::PATHWAY_STATUS_ACTIVE);
+        $user_source = new pathway_evaluator_user_source_list([$user_id], false);
 
         foreach ($pathways as $pathway) {
-            $aggregator = new pathway_aggregator($pathway);
-            $aggregator->aggregate([$user_id]);
+            $aggregator = new criteria_group_evaluator($pathway, $user_source);
+            $aggregator->aggregate(time());
 
             $competency = $pathway->get_competency();
             // We'll aggregate the competencies in a separate loop.

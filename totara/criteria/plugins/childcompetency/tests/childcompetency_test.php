@@ -176,4 +176,6 @@ class criteria_childcompetency_testcase extends \advanced_testcase {
         }
    }
 
+
+    // TODO: test aggregate
 }

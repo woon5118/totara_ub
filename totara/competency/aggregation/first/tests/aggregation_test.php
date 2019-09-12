@@ -23,9 +23,10 @@
 
 use totara_competency\base_achievement_detail;
 use totara_competency\entities\scale_value;
-use totara_competency\pathway_aggregator;
 use totara_competency\entities\pathway_achievement;
 use aggregation_first\first;
+use totara_competency\pathway_evaluator;
+use totara_competency\pathway_evaluator_user_source_list;
 
 class aggregation_first_aggregation_testcase extends advanced_testcase {
 
@@ -33,40 +34,41 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $user_id = 101;
 
         $aggregation = new first();
-        $aggregation->set_user_ids([$user_id])
-                    ->set_pathways([])
-                    ->aggregate();
+        $aggregation->set_pathways([])
+                    ->aggregate_for_user($user_id);
 
         $this->assertNull($aggregation->get_achieved_value_id($user_id));
         $this->assertEquals([], $aggregation->get_achieved_via($user_id));
     }
 
     public function test_with_single_pathway_returning_null() {
-        $user_id = 101;
+        $user = $this->getDataGenerator()->create_user();
 
         $pathway1 = $this->getMockBuilder(\totara_competency\pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_sortorder'])
                          ->getMockForAbstractClass();
+
         $achievement_detail = $this->getMockForAbstractClass(base_achievement_detail::class);
         $pathway1->method('aggregate_current_value')->willReturn($achievement_detail);
         $pathway1->method('get_id')->willReturn(201);
         $pathway1->method('get_sortorder')->willReturn(1);
 
-        (new pathway_aggregator($pathway1))->aggregate([$user_id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
+        $pathway_evaluator->aggregate();
 
         $aggregation = new first();
-        $aggregation->set_user_ids([$user_id])
-                    ->set_pathways([$pathway1])
-                    ->aggregate();
+        $aggregation->set_pathways([$pathway1])
+                    ->aggregate_for_user($user->id);
 
-        $this->assertNull($aggregation->get_achieved_value_id($user_id));
-        $this->assertEquals([], $aggregation->get_achieved_via($user_id));
+        $this->assertNull($aggregation->get_achieved_value_id($user->id));
+        $this->assertEquals([], $aggregation->get_achieved_via($user->id));
     }
 
     public function test_with_single_pathway_returning_value() {
         global $DB;
 
-        $user_id = 101;
+        $user = $this->getDataGenerator()->create_user();
 
         $scale = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy')->create_scale('comp');
         $scale_values = $DB->get_records('comp_scale_values', ['scaleid' => $scale->id]);
@@ -81,24 +83,25 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $pathway1->method('get_id')->willReturn(201);
         $pathway1->method('get_sortorder')->willReturn(1);
 
-        (new pathway_aggregator($pathway1))->aggregate([$user_id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
+        $pathway_evaluator->aggregate();
 
         $aggregation = new first();
-        $aggregation->set_user_ids([$user_id])
-                    ->set_pathways([$pathway1])
-                    ->aggregate();
+        $aggregation->set_pathways([$pathway1])
+                    ->aggregate_for_user($user->id);
 
         // Reload current achievement as values will need to be strings from the database for the expected and actual to match.
-        $current_achievement = pathway_achievement::get_current($pathway1, $user_id);
+        $current_achievement = pathway_achievement::get_current($pathway1, $user->id);
 
-        $this->assertEquals($scale_value->id, $aggregation->get_achieved_value_id($user_id));
-        $this->assertEquals([$current_achievement], $aggregation->get_achieved_via($user_id));
+        $this->assertEquals($scale_value->id, $aggregation->get_achieved_value_id($user->id));
+        $this->assertEquals([$current_achievement], $aggregation->get_achieved_via($user->id));
     }
 
     public function test_multiple_pathways_returning_value_or_null() {
         global $DB;
 
-        $user_id = 101;
+        $user = $this->getDataGenerator()->create_user();
 
         $scale = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy')->create_scale('comp');
         $scale_values = $DB->get_records('comp_scale_values', ['scaleid' => $scale->id], 'sortorder DESC');
@@ -111,7 +114,9 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $pathway1->method('get_id')->willReturn(201);
         $pathway1->method('get_sortorder')->willReturn(1);
 
-        (new pathway_aggregator($pathway1))->aggregate([$user_id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        $pathway_evaluator1 = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
+        $pathway_evaluator1->aggregate();
 
         $scale_value2 = new scale_value(array_pop($scale_values));
         $pathway2 = $this->getMockBuilder(\totara_competency\pathway::class)
@@ -123,7 +128,8 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $pathway2->method('get_id')->willReturn(202);
         $pathway2->method('get_sortorder')->willReturn(2);
 
-        (new pathway_aggregator($pathway2))->aggregate([$user_id]);
+        $pathway_evaluator2 = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway2, $pw_user_source]);
+        $pathway_evaluator2->aggregate();
 
         $scale_value3 = new scale_value(array_pop($scale_values));
         $pathway3 = $this->getMockBuilder(\totara_competency\pathway::class)
@@ -135,20 +141,21 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $pathway3->method('get_id')->willReturn(203);
         $pathway3->method('get_sortorder')->willReturn(3);
 
-        (new pathway_aggregator($pathway3))->aggregate([$user_id]);
+        $pathway_evaluator3 = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway3, $pw_user_source]);
+        $pathway_evaluator3->aggregate();
 
         $aggregation = new first();
-        $aggregation->set_user_ids([$user_id])
-            // I order pathway 3 before pathway 2 in the input array.
-            // It should be reordered according to its get_sortorder value and that should mean that achievement2 is the achieved.
-            ->set_pathways([$pathway1, $pathway3, $pathway2])
-            ->aggregate();
+        // I order pathway 3 before pathway 2 in the input array.
+        // It should be reordered according to its get_sortorder value and that should mean that achievement2 is the achieved.
+        $aggregation->set_pathways([$pathway1, $pathway3, $pathway2])
+            ->aggregate_for_user($user->id);
 
-        $current_achievement2 = pathway_achievement::get_current($pathway2, $user_id);
+        $current_achievement2 = pathway_achievement::get_current($pathway2, $user->id);
 
-        // It skipped the null on the first pathway as it is lookingfor the first proper value.
+        // It skipped the null on the first pathway as it is looking for the first proper value.
         // pathway2 would have been ordered ahead of pathway3, and so we get the below:
-        $this->assertEquals($scale_value2->id, $aggregation->get_achieved_value_id($user_id));
-        $this->assertEquals([$current_achievement2], $aggregation->get_achieved_via($user_id));
+        $this->assertEquals($scale_value2->id, $aggregation->get_achieved_value_id($user->id));
+        $this->assertEquals([$current_achievement2], $aggregation->get_achieved_via($user->id));
     }
+
 }

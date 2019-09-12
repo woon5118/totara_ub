@@ -23,8 +23,10 @@
  */
 
 use pathway_manual\manual;
+use pathway_manual\manual_evaluator;
 use totara_competency\entities\competency;
-use totara_competency\pathway_aggregator;
+use totara_competency\pathway_evaluator;
+use totara_competency\pathway_evaluator_user_source_list;
 use totara_job\job_assignment;
 use totara_competency\entities\pathway_achievement;
 use pathway_manual\entities\rating;
@@ -50,8 +52,9 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         $manual->set_roles([manual::ROLE_SELF]);
         $manual->save();
 
-        $user_id = 201;
-        $this->assertNull(pathway_achievement::get_current($manual, $user_id)->scale_value_id);
+        // When using list sources, we need an actual user
+        $user = $this->getDataGenerator()->create_user();
+        $this->assertNull(pathway_achievement::get_current($manual, $user->id)->scale_value_id);
     }
 
     public function test_set_manual_null_value_as_self() {
@@ -63,18 +66,19 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         $manual->save();
 
         $this->setCurrentTimeStart();
-        $user_id = 201;
-        $manual->set_manual_value($user_id, $user_id, manual::ROLE_SELF, null, 'Go me');
+        // When using list sources, we need an actual user
+        $user = $this->getDataGenerator()->create_user();
+        $manual->set_manual_value($user->id, $user->id, manual::ROLE_SELF, null, 'Go me');
 
-        $this->assertNull(pathway_achievement::get_current($manual, $user_id)->scale_value_id);
+        $this->assertNull(pathway_achievement::get_current($manual, $user->id)->scale_value_id);
 
         $ratings = rating::repository()->get();
         $this->assertEquals(1, $ratings->count());
         /** @var rating $rating */
         $rating = $ratings->first();
         $this->assertEquals($competency->id, $rating->comp_id);
-        $this->assertEquals($user_id, $rating->user_id);
-        $this->assertEquals($user_id, $rating->assigned_by);
+        $this->assertEquals($user->id, $rating->user_id);
+        $this->assertEquals($user->id, $rating->assigned_by);
         $this->assertEquals(manual::ROLE_SELF, $rating->assigned_by_role);
         $this->assertNull($rating->scale_value_id);
         $this->assertTimeCurrent($rating->date_assigned);
@@ -89,15 +93,16 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         $manual->set_roles([manual::ROLE_SELF]);
         $manual->save();
 
-        $user_id = 201;
+        // When using list sources, we need an actual user
+        $user = $this->getDataGenerator()->create_user();
 
         $this->setCurrentTimeStart();
         $scale_value = $competency->scale->sorted_values_high_to_low->first();
-        $manual->set_manual_value($user_id, $user_id, manual::ROLE_SELF, $scale_value->id, 'Great jerb');
+        $manual->set_manual_value($user->id, $user->id, manual::ROLE_SELF, $scale_value->id, 'Great jerb');
 
         $this->assertEquals(
             $scale_value->id,
-            $pathway_achievement2 = pathway_achievement::get_current($manual, $user_id)->scale_value_id
+            $pathway_achievement2 = pathway_achievement::get_current($manual, $user->id)->scale_value_id
         );
 
         $ratings = rating::repository()->get();
@@ -105,8 +110,8 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         /** @var rating $rating */
         $rating = $ratings->first();
         $this->assertEquals($competency->id, $rating->comp_id);
-        $this->assertEquals($user_id, $rating->user_id);
-        $this->assertEquals($user_id, $rating->assigned_by);
+        $this->assertEquals($user->id, $rating->user_id);
+        $this->assertEquals($user->id, $rating->assigned_by);
         $this->assertEquals(manual::ROLE_SELF, $rating->assigned_by_role);
         $this->assertEquals($scale_value->id, $rating->scale_value_id);
         $this->assertTimeCurrent($rating->date_assigned);
@@ -267,6 +272,7 @@ class pathway_manual_rating_testcase extends advanced_testcase {
     }
 
     public function test_set_value_when_multiple_pathways() {
+
         $competency = $this->create_competency();
 
         $manual1 = new manual();
@@ -305,8 +311,10 @@ class pathway_manual_rating_testcase extends advanced_testcase {
 
         // This happens internally when setting a manual value. We do this now independent of a manual
         // value being set to ensure that one still does not pick up the other's value.
-        (new pathway_aggregator($manual1))->aggregate([$user->id]);
-        (new pathway_aggregator($manual2))->aggregate([$user->id]);
+
+        $user_source = new pathway_evaluator_user_source_list([$user->id]);
+        (new manual_evaluator($manual1, $user_source))->aggregate();
+        (new manual_evaluator($manual2, $user_source))->aggregate();
 
         $pathway_achievement1 = pathway_achievement::get_current($manual1, $user->id);
         $pathway_achievement2 = pathway_achievement::get_current($manual2, $user->id);

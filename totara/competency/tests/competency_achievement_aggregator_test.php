@@ -22,14 +22,16 @@
  * @package totara_competency
  */
 
+use totara_competency\competency_aggregator_user_source_list;
 use totara_competency\entities\competency;
 use totara_competency\achievement_configuration;
 use totara_competency\competency_achievement_aggregator;
 use totara_competency\entities\pathway_achievement;
-use totara_competency\pathway_aggregation;
+use totara_competency\overall_aggregation;
 use totara_competency\entities\scale_value;
-use totara_competency\pathway_aggregator;
+use totara_competency\pathway_evaluator;
 use totara_competency\entities\competency_achievement;
+use totara_competency\pathway_evaluator_user_source_list;
 
 /**
  * Class totara_competency_achievement_aggregator_testcase
@@ -40,9 +42,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
     /**
      * @param pathway_achievement[] $pathway_achievements
-     * @return pathway_aggregation
+     * @return overall_aggregation
      */
-    private function create_aggregation_method_achieved_by($pathway_achievements): pathway_aggregation {
+    private function create_aggregation_method_achieved_by($pathway_achievements): overall_aggregation {
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
@@ -86,18 +88,18 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
     }
 
     public function test_with_no_users() {
-
         /** @var totara_hierarchy_generator $hierarchy_generator */
         $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $compfw = $hierarchy_generator->create_comp_frame([]);
         $comp = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $aggregator = new competency_achievement_aggregator($achievement_configuration);
+        $user_source = new \totara_competency\competency_aggregator_user_source_list([], true);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $user_source);
 
         $event_sink = $this->redirectEvents();
         // We're mainly testing that aggregate completes without an exception.
-        $aggregator->aggregate([]);
+        $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         $this->assertCount(0, $events);
@@ -122,9 +124,11 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $user = $this->getDataGenerator()->create_user();
         $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        (new test_pathway_evaluator($pathway, $pw_user_source))->aggregate(time());
 
-        $aggregator = new competency_achievement_aggregator($achievement_configuration);
+        $comp_user_source = new competency_aggregator_user_source_list([$user->id], true);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
 
         $achievement = pathway_achievement::get_current($pathway, $user->id);
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement]);
@@ -133,7 +137,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
         $event_sink = $this->redirectEvents();
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
@@ -173,13 +177,15 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $user = $this->getDataGenerator()->create_user();
         $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        (new pathway_aggregator($pathway1))->aggregate([$user->id]);
-        (new pathway_aggregator($pathway2))->aggregate([$user->id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        (new test_pathway_evaluator($pathway1, $pw_user_source))->aggregate(time());
+        (new test_pathway_evaluator($pathway2, $pw_user_source))->aggregate(time());
 
         $achievement1 = pathway_achievement::get_current($pathway1, $user->id);
         $achievement2 = pathway_achievement::get_current($pathway2, $user->id);
 
-        $aggregator = new competency_achievement_aggregator($achievement_configuration);
+        $comp_user_source = new \totara_competency\competency_aggregator_user_source_list([$user->id]);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
 
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement1, $achievement2]);
         $aggregator->set_aggregation_instance($aggregation_method);
@@ -187,7 +193,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
         $event_sink = $this->redirectEvents();
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
@@ -233,20 +239,22 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $user = $this->getDataGenerator()->create_user();
         $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        (new pathway_aggregator($pathway1))->aggregate([$user->id]);
-        (new pathway_aggregator($pathway2))->aggregate([$user->id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        (new test_pathway_evaluator($pathway1, $pw_user_source))->aggregate(time());
+        (new test_pathway_evaluator($pathway2, $pw_user_source))->aggregate(time());
 
         $achievement1 = pathway_achievement::get_current($pathway1, $user->id);
         $achievement2 = pathway_achievement::get_current($pathway2, $user->id);
 
-        $aggregator = new competency_achievement_aggregator($achievement_configuration);
+        $comp_user_source = new \totara_competency\competency_aggregator_user_source_list([$user->id]);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
 
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement1, $achievement2]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
 
         // This point is tested more in previous tests.
         $this->assertEquals(1, $DB->count_records('totara_competency_achievement', ['status' => 0]));
@@ -257,7 +265,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $aggregator->set_aggregation_instance($aggregation_method);
 
         $event_sink = $this->redirectEvents();
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         // Check comp_record value. Just to make sure it hasn't been set to null or some such thing when the other
@@ -300,20 +308,22 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $user = $this->getDataGenerator()->create_user();
         $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        (new pathway_aggregator($pathway1))->aggregate([$user->id]);
-        (new pathway_aggregator($pathway2))->aggregate([$user->id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        (new test_pathway_evaluator($pathway1, $pw_user_source))->aggregate(time());
+        (new test_pathway_evaluator($pathway2, $pw_user_source))->aggregate(time());
 
         $achievement1 = pathway_achievement::get_current($pathway1, $user->id);
         $achievement2 = pathway_achievement::get_current($pathway2, $user->id);
 
-        $aggregator = new competency_achievement_aggregator($achievement_configuration);
+        $comp_user_source = new \totara_competency\competency_aggregator_user_source_list([$user->id]);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
 
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement1, $achievement2]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
 
         // This point is tested more in previous tests.
         $this->assertEquals(1, $DB->count_records('totara_competency_achievement'));
@@ -323,14 +333,14 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement2]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
 
         // Change what value the pathways return. We'll then need to update the achievements used.
         $pathway1->set_test_aggregate_current_value(null);
         $pathway2->set_test_aggregate_current_value(null);
 
-        (new pathway_aggregator($pathway1))->aggregate([$user->id]);
-        (new pathway_aggregator($pathway2))->aggregate([$user->id]);
+        (new test_pathway_evaluator($pathway1, $pw_user_source))->aggregate(time());
+        (new test_pathway_evaluator($pathway2, $pw_user_source))->aggregate(time());
 
         $achievement1 = pathway_achievement::get_current($pathway1, $user->id);
         $achievement2 = pathway_achievement::get_current($pathway2, $user->id);
@@ -339,7 +349,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $aggregator->set_aggregation_instance($aggregation_method);
 
         $event_sink = $this->redirectEvents();
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         // Order by newest at they back so they can be popped off in that order.
@@ -389,17 +399,19 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $user = $this->getDataGenerator()->create_user();
         $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        (new pathway_aggregator($pathway1))->aggregate([$user->id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        (new test_pathway_evaluator($pathway1, $pw_user_source))->aggregate(time());
         $achievement1 = pathway_achievement::get_current($pathway1, $user->id);
 
-        $aggregator = new competency_achievement_aggregator($achievement_configuration);
+        $comp_user_source = new competency_aggregator_user_source_list([$user->id]);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
 
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement1]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
 
         // Should all be about scale value and achievement #1.
         $comp_records = $DB->get_records('totara_competency_achievement');
@@ -417,14 +429,14 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $pathway2 = $competency_generator->create_test_pathway($competency);
         $pathway2->set_test_aggregate_current_value($scale_value2);
 
-        (new pathway_aggregator($pathway2))->aggregate([$user->id]);
+        (new test_pathway_evaluator($pathway2, $pw_user_source))->aggregate(time());
         $achievement2 = pathway_achievement::get_current($pathway2, $user->id);
 
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement2]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
         $event_sink = $this->redirectEvents();
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         // Order by newest at they back so they can be popped off in that order.
@@ -465,10 +477,12 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $achievement_configuration->set_aggregation_type('test_aggregation');
 
         $user = $this->getDataGenerator()->create_user();
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        (new test_pathway_evaluator($pathway, $pw_user_source))->aggregate(time());
         $assignmentids = $this->generate_active_expanded_user_assignments($competency, [$user], 2);
 
-        $aggregator = new competency_achievement_aggregator($achievement_configuration);
+        $comp_user_source = new competency_aggregator_user_source_list([$user->id], true);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
 
         $achievement = pathway_achievement::get_current($pathway, $user->id);
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement]);
@@ -477,7 +491,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
         $event_sink = $this->redirectEvents();
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
@@ -507,11 +521,11 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $expand_task = new \totara_competency\expand_task($DB);
         $expand_task->expand_all();
 
-        $aggregator = new competency_achievement_aggregator($achievement_configuration);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement]);
         $aggregator->set_aggregation_instance($aggregation_method);
         $event_sink->clear();
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
@@ -567,9 +581,11 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $user = $this->getDataGenerator()->create_user();
         $assignment_ids = $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        (new test_pathway_evaluator($pathway, $pw_user_source))->aggregate(time());
 
-        $aggregator = new competency_achievement_aggregator($achievement_configuration);
+        $comp_user_source = new competency_aggregator_user_source_list([$user->id], true);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
 
         $achievement = pathway_achievement::get_current($pathway, $user->id);
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement]);
@@ -578,7 +594,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
         $event_sink = $this->redirectEvents();
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
@@ -606,14 +622,14 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $pathway2 = $competency_generator->create_test_pathway($competency);
         $pathway2->set_test_aggregate_current_value($scale_value2);
 
-        (new pathway_aggregator($pathway2))->aggregate([$user->id]);
+        (new test_pathway_evaluator($pathway2, $pw_user_source))->aggregate(time());
         $achievement2 = pathway_achievement::get_current($pathway2, $user->id);
 
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement2]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
         $event_sink = $this->redirectEvents();
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         // There should still be one record.
@@ -656,9 +672,11 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $user = $this->getDataGenerator()->create_user();
         $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        (new test_pathway_evaluator($pathway, $pw_user_source))->aggregate(time());
 
-        $aggregator = new competency_achievement_aggregator($achievement_configuration);
+        $comp_user_source = new competency_aggregator_user_source_list([$user->id], true);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
 
         $achievement = pathway_achievement::get_current($pathway, $user->id);
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement]);
@@ -666,7 +684,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
         $this->assertCount(1, $comp_records);
@@ -682,13 +700,13 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $pathway2 = $competency_generator->create_test_pathway($competency);
         $pathway2->set_test_aggregate_current_value($scale_value2);
 
-        (new pathway_aggregator($pathway2))->aggregate([$user->id]);
+        (new test_pathway_evaluator($pathway2, $pw_user_source))->aggregate(time());
         $achievement2 = pathway_achievement::get_current($pathway2, $user->id);
 
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement2]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
         $this->assertCount(2, $comp_records);
@@ -706,13 +724,13 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $pathway3 = $competency_generator->create_test_pathway($competency);
         $pathway3->set_test_aggregate_current_value($scale_value3);
 
-        (new pathway_aggregator($pathway3))->aggregate([$user->id]);
+        (new test_pathway_evaluator($pathway3, $pw_user_source))->aggregate(time());
         $achievement3 = pathway_achievement::get_current($pathway3, $user->id);
 
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement3]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
-        $aggregator->aggregate([$user->id]);
+        $aggregator->aggregate();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
         $this->assertCount(3, $comp_records);

@@ -24,10 +24,30 @@
 
 use totara_competency\entities\competency_achievement;
 use totara_criteria\competency_item_evaluator;
-use totara_criteria\criterion;
-use totara_criteria\entities\criterion as criterion_item;
+use totara_criteria\item_evaluator_user_source_list;
 
 class totara_criteria_competency_item_evaluator_testcase extends advanced_testcase {
+
+    private function setup_data() {
+        global $DB;
+
+        $data = new class() {
+            public $criterion;
+        };
+
+        $this->setAdminUser();
+        $GLOBALS['USER']->ignoresesskey = true;
+
+        // Simulating a competency (id = 1) with 1 child (id 11)
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+        $data->criterion = $generator->create_childcompetency(['competency' => 1]);
+
+        // Creating the items manually to simulate the observer that will populate the items when the criterion is created
+        $record = ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => 11];
+        $DB->insert_record('totara_criteria_item', $record);
+
+        return $data;
+    }
 
     /**
      * Create a totara_criteria_item row
@@ -94,14 +114,17 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
         return $achievement->save()->id;
     }
 
-
     /**
      * Test with no row in totara_criterion_item row or competency_achievement
      */
-    public function test_update_item_records_no_achievements() {
+    public function test_update_completion_none_achieved() {
         global $DB;
 
-        competency_item_evaluator::update_item_records();
+        $data = $this->setup_data();
+
+        $user_source = new item_evaluator_user_source_list([], true);
+        $evaluator = new competency_item_evaluator($user_source);
+        $evaluator->update_completion($data->criterion);
         $this->assertSame(0, $DB->count_records('totara_criteria_item_record'));
     }
 
@@ -110,13 +133,13 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      */
     public function item_record_no_achievement_data_provider() {
         return [
-            ['comp_id' => 10, 'user_id' => 100, 'is_met' => 0],
-            ['comp_id' => 10, 'user_id' => 101, 'is_met' => 1]
+            ['child_id' => 11, 'user_id' => 100, 'is_met' => 0],
+            ['child_id' => 11, 'user_id' => 101, 'is_met' => 1]
         ];
     }
 
     /**
-     * Test update_item_records with totara_criteria_item_record row, but no totara_competency_achievment row
+     * Test update_item_records with totara_criteria_item_record row, but no totara_competency_achievement row
      *
      * @dataProvider item_record_no_achievement_data_provider
      *
@@ -124,16 +147,20 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      * @param int $user_id
      * @param bool $is_met
      */
-    public function test_update_item_records_competency_item_record_no_achievement($comp_id, $user_id, $is_met) {
+    public function test_update_item_records_competency_item_record_no_achievement($child_id, $user_id, $is_met) {
         global $DB;
 
-        // No need for an actual competency in this test
-        $item_id = $this->create_item($comp_id);
-        $this->create_item_record($item_id, $user_id, $is_met);
+        $data = $this->setup_data();
 
-        competency_item_evaluator::update_item_records();
+        $item_id = $DB->get_field('totara_criteria_item', 'id',
+            ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]);
+        $record_id = $this->create_item_record($item_id, $user_id, $is_met);
 
-        $record = $DB->get_record('totara_criteria_item_record', ['criterion_item_id' => $item_id, 'user_id' => $user_id]);
+        $user_source = new item_evaluator_user_source_list([$user_id], true);
+        $evaluator = new competency_item_evaluator($user_source);
+        $evaluator->update_completion($data->criterion);
+
+        $record = $DB->get_record('totara_criteria_item_record', ['id' => $record_id]);
         $this->assertEquals(0, $record->criterion_met);
     }
 
@@ -143,62 +170,102 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
     public function achievement_no_item_record_data_provider() {
         return [
             [
-                'comp_id' => 10,
+                'child_id' => 11,
                 'user_id' => 100,
                 'achievements' => [
-                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]
-                ],
-                0
+                    [
+                        'proficient' => 0,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ]
+                ], 0
             ],
             [
-                'comp_id' => 10,
+                'child_id' => 11,
                 'user_id' => 101,
                 'achievements' => [
-                    ['proficient' => 1, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]
-                ],
-                1
+                    [
+                        'proficient' => 1,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ]
+                ], 1
             ],
             [
-                'comp_id' => 10,
+                'child_id' => 11,
                 'user_id' => 102,
                 'achievements' => [
-                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
-                    ['proficient' => 1, 'status' => competency_achievement::SUPERSEDED],
+                    [
+                        'proficient' => 0,
+                        'assignment' => 1,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ],
+                    [
+                        'proficient' => 1,
+                        'assignment' => 1,
+                        'status' => competency_achievement::SUPERSEDED
+                    ],
                 ],
                 0
             ],
             [
-                'comp_id' => 10,
+                'child_id' => 11,
                 'user_id' => 103,
                 'achievements' => [
-                    ['proficient' => 0, 'status' => competency_achievement::SUPERSEDED],
-                    ['proficient' => 1, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
+                    [
+                        'proficient' => 0,
+                        'assignment' => 1,
+                        'status' => competency_achievement::SUPERSEDED
+                    ],
+                    [
+                        'proficient' => 1,
+                        'assignment' => 1,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ],
                 ],
                 1
             ],
             [
-                'comp_id' => 10,
+                'child_id' => 11,
                 'user_id' => 104,
                 'achievements' => [
-                    ['proficient' => 1, 'status' => competency_achievement::ARCHIVED_ASSIGNMENT]
+                    [
+                        'proficient' => 1,
+                        'assignment' => 1,
+                        'status' => competency_achievement::ARCHIVED_ASSIGNMENT
+                    ]
                 ],
-                false
+                0
             ],
             [
-                'comp_id' => 10,
+                'child_id' => 11,
                 'user_id' => 105,
                 'achievements' => [
-                    ['proficient' => 1, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
-                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
+                    [
+                        'proficient' => 1,
+                        'assignment' => 1,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ],
+                    [
+                        'proficient' => 0,
+                        'assignment' => 2,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ],
                 ],
                 1
             ],
             [
-                'comp_id' => 10,
+                'child_id' => 11,
                 'user_id' => 105,
                 'achievements' => [
-                    ['proficient' => 1, 'status' => competency_achievement::ARCHIVED_ASSIGNMENT],
-                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
+                    [
+                        'proficient' => 1,
+                        'assignment' => 1,
+                        'status' => competency_achievement::ARCHIVED_ASSIGNMENT
+                    ],
+                    [
+                        'proficient' => 0,
+                        'assignment' => 2,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ],
                 ],
                 0
             ],
@@ -214,50 +281,29 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      * @param array[] $achievements
      * @param bool $expected_is_met
      */
-    public function test_update_item_records_achievement_no_item_record($comp_id, $user_id, $achievements, $expected_is_met) {
-        $this->update_item_records_achievement_test($comp_id, $user_id, $achievements, $expected_is_met);
-    }
-
-    /**
-     * Actually test updating item record achievement
-     *
-     * @param int $comp_id
-     * @param int $user_id
-     * @param array[] $achievements
-     * @param bool $expected_is_met
-     * @param bool $criterion_met
-     */
-    protected function update_item_records_achievement_test($comp_id, $user_id, $achievements, $expected_is_met, $criterion_met = null) {
+    public function test_update_item_records_achievement_no_item_record($child_id, $user_id, $achievements, $expected_is_met) {
         global $DB;
 
-        // No need for an actual competency in this test
-        $item_id = $this->create_item($comp_id);
+        $data = $this->setup_data();
 
-        if (!is_null($criterion_met)) {
-            $this->create_item_record($item_id, $user_id, $criterion_met);
-        }
+        $item_id = $DB->get_field('totara_criteria_item', 'id',
+            ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]);
 
         foreach ($achievements as $achievement) {
-            if (is_null($assignment_id = $achievement['assignment'] ?? null)) {
-                $assignment = $this->generator()->assignment_generator()->create_user_assignment($comp_id, $user_id);
-                $assignment_id = $assignment->id;
-            }
-
-            $this->create_achievement($comp_id,
+            $this->create_achievement(
+                $child_id,
                 $user_id,
                 $assignment_id,
                 $achievement['proficient'] ?? 0,
                 $achievement['status'] ?? null);
         }
 
-        competency_item_evaluator::update_item_records();
+        $user_source = new item_evaluator_user_source_list([$user_id], true);
+        $evaluator = new competency_item_evaluator($user_source);
+        $evaluator->update_completion($data->criterion);
 
         $record = $DB->get_record('totara_criteria_item_record', ['criterion_item_id' => $item_id, 'user_id' => $user_id]);
-        if ($expected_is_met === false) {
-            $this->assertFalse($record);
-        } else {
-            $this->assertEquals($expected_is_met, $record->criterion_met);
-        }
+        $this->assertEquals($expected_is_met, $record->criterion_met);
     }
 
     /**
@@ -265,25 +311,25 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      */
     public function achievement_and_item_record_data_provider() {
         return [
-            ['comp_id' => 10, 'user_id' => 100,
+            ['child_id' => 11, 'user_id' => 100,
                 'achievements' => [
                     ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]],
                 'criterion_met' => 0,
                 'expected_met' => 0
             ],
-            ['comp_id' => 10, 'user_id' => 101,
+            ['child_id' => 11, 'user_id' => 101,
                 'achievements' => [
                     ['proficient' => 1, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]],
                 'criterion_met' => 0,
                 'expected_met' => 1
             ],
-            ['comp_id' => 10, 'user_id' => 102,
+            ['child_id' => 11, 'user_id' => 102,
                 'achievements' => [
                     ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]],
                 'criterion_met' => 1,
                 'expected_met' => 0
             ],
-            ['comp_id' => 10, 'user_id' => 103,
+            ['child_id' => 11, 'user_id' => 103,
                 'achievements' => [
                     ['proficient' => 1, 'status' => competency_achievement::SUPERSEDED],
                     ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
@@ -291,7 +337,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
                 'criterion_met' => 1,
                 'expected_met' => 0
             ],
-            ['comp_id' => 10, 'user_id' => 104,
+            ['child_id' => 11, 'user_id' => 104,
                 'achievements' => [
                     ['proficient' => 1, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
                     ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
@@ -306,16 +352,29 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      * Test update_item_records with totara_competency_achievement row as well as totara_criteria_item_record
      * @dataProvider achievement_and_item_record_data_provider
      */
-    public function test_update_item_records_achievement_and_item_record($comp_id, $user_id, $achievements, $criterion_met, $expected_is_met) {
-        $this->update_item_records_achievement_test($comp_id, $user_id, $achievements, $expected_is_met, $criterion_met);
-    }
+    public function test_update_item_records_achievement_and_item_record($child_id, $user_id, $achievements, $criterion_met, $expected_is_met) {
+        global $DB;
 
-    /**
-     * Get competency specific generator
-     *
-     * @return totara_competency_generator
-     */
-    protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $data = $this->setup_data();
+
+        // No need for an actual competency in this test
+        $item_id = $DB->get_field('totara_criteria_item', 'id',
+            ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]);
+        $record_id = $this->create_item_record($item_id, $user_id, $criterion_met);
+
+        foreach ($achievements as $achievement) {
+            $this->create_achievement($child_id,
+                $user_id,
+                $achievement['assignment'] ?? null,
+                $achievement['proficient'] ?? 0,
+                $achievement['status'] ?? null);
+        }
+
+        $user_source = new item_evaluator_user_source_list([$user_id], true);
+        $evaluator = new competency_item_evaluator($user_source);
+        $evaluator->update_completion($data->criterion);
+
+        $record = $DB->get_record('totara_criteria_item_record', ['criterion_item_id' => $item_id, 'user_id' => $user_id]);
+        $this->assertEquals($expected_is_met, $record->criterion_met);
     }
 }

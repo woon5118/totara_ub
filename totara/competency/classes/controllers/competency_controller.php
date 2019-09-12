@@ -246,7 +246,7 @@ class competency_controller extends admin_controller {
         }
 
         // Get the available pathway aggregation methods
-        $aggmethods = achievement_criteria::get_available_pathway_aggregation_methods();
+        $aggmethods = achievement_criteria::get_available_overall_aggregation_methods();
         foreach ($aggmethods as $method) {
             $results['aggregation_types'][] = [
                 'type' => $method->get_agg_type(),

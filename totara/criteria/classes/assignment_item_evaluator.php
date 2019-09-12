@@ -22,16 +22,23 @@
  * @package totara_criteria
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace totara_criteria;
 
-$tasks = [
-    [
-        'classname' => 'totara_criteria\task\evaluate_items',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ]
-];
+
+class assignment_item_evaluator extends item_evaluator {
+
+    protected function update_criterion_completion(criterion $criterion, int $now) {
+        // For assignment there is nothing to update after records of non-assigned users are
+        // deleted and new records are added for newly assigned users.
+        // This is already done by the paren method
+    }
+
+    /**
+     * Default value to insert into criterion_met for new item records
+     * @return ?int
+     */
+    protected function get_default_criteria_met(): ?int {
+        return 1;
+    }
+
+}

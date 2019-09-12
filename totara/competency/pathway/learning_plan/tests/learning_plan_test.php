@@ -25,6 +25,7 @@ use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
 use totara_competency\achievement_configuration;
 use totara_competency\competency_achievement_aggregator;
+use totara_competency\competency_aggregator_user_source_list;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
@@ -138,7 +139,8 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
         $pathway_achievement = pathway_achievement::get_current($lp_pathway, $not_assigned_user->id);
         $this->assertNull($pathway_achievement->scale_value_id);
 
-        (new competency_achievement_aggregator(new achievement_configuration($competency)))->aggregate([$user->id]);
+        $comp_user_source = new competency_aggregator_user_source_list([$user->id], true);
+        (new competency_achievement_aggregator(new achievement_configuration($competency), $comp_user_source))->aggregate();
 
         $achievements = competency_achievement::repository()
             ->where('user_id', '=', $user->id)

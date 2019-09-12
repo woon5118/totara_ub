@@ -17,54 +17,82 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_criteria
  */
 
 namespace totara_criteria;
 
-class course_item_evaluator {
-    use item_evaluator;
+use totara_criteria\criterion;
+use totara_criteria\item_evaluator;
 
-    public static function update_item_records($user_ids = null, $item_ids = null) {
-        global $CFG, $DB;
+class course_item_evaluator extends item_evaluator {
 
-        require_once($CFG->dirroot . '/completion/completion_completion.php');
+    /**
+     * Evaluate criteria completion / satisfaction for users in the source
+     * @param criterion $criterion
+     * @param int $now
+     */
+   protected function update_criterion_completion(criterion $criterion, int $now) {
+        global $DB;
 
-        // Todo: if item_ids and user_ids are null, allow all. If they are arrays. We restrict by those ids.
+        $criterion_id = $criterion->get_id();
 
-        // Todo: deal with timecompleted.
-        $item_to_course_sql = "
-            SELECT tcir.*
-              FROM {totara_criteria_item_record} tcir
-              JOIN {totara_criteria_item} tci ON tcir.criterion_item_id = tci.id
-              JOIN {course_completions} cc ON tci.item_id = cc.course AND tcir.user_id = cc.userid
-             WHERE tci.item_type = 'course'
-        ";
+        // Not linking with the users_source here as we've already ensured that there is a record for applicable users in the parent
+        $itemid_sql =
+            "SELECT tci.id
+               FROM {totara_criteria_item} tci 
+              WHERE tci.criterion_id = :criterionid
+                AND tci.item_type = :itemtype";
 
-        $records = $DB->get_records_sql(
-            $item_to_course_sql . "
-                   AND tcir.criterion_met = 0
-                   AND (cc.status = :complete OR cc.status = :rpl)
-                ",
-            ['complete' => COMPLETION_STATUS_COMPLETE, 'rpl' => COMPLETION_STATUS_COMPLETEVIARPL]
-        );
+        $userid_sql =
+            "SELECT cc.userid
+               FROM {totara_criteria_item} tci 
+               JOIN {course_completions} cc 
+                 ON cc.course = tci.item_id 
+              WHERE tci.criterion_id = :criterionid2
+                AND tci.item_type = :itemtype2
+                AND (cc.status = :statuscomplete OR cc.status = :statusrpl)";
 
-        static::update_criterion_met(1, array_keys($records));
+        // Handle courses that are completed but item_record still indicates 'not met'
+        $sql =
+           "UPDATE {totara_criteria_item_record}
+               SET criterion_met = :newmet, 
+                   timeevaluated = :now
+             WHERE criterion_met = :currentmet
+               AND criterion_item_id IN ({$itemid_sql})
+               AND user_id IN ({$userid_sql})";
 
+        $params = [
+            'now' => $now,
+            'itemtype' => 'course',
+            'criterionid' => $criterion_id,
+            'newmet' => 1,
+            'currentmet' => 0,
+            'itemtype2' => 'course',
+            'criterionid2' => $criterion_id,
+            'statuscomplete' => COMPLETION_STATUS_COMPLETE,
+            'statusrpl' => COMPLETION_STATUS_COMPLETEVIARPL
+        ];
 
-        // Now do the reverse. Todo: deal with timecompleted. That is also part of the check for whether a course is complete.
-        // And if there happens to be an inconsistency between timecompleted and status, is the course considered complete or not?
+        $DB->execute($sql, $params);
 
-        $records = $DB->get_records_sql(
-            $item_to_course_sql . "
-                   AND tcir.criterion_met = 1
-                   AND (cc.status <> :complete AND cc.status <> :rpl)
-                ",
-            ['complete' => COMPLETION_STATUS_COMPLETE, 'rpl' => COMPLETION_STATUS_COMPLETEVIARPL]
-        );
+        // Now do the reverse.
+        // Todo: deal with timecompleted?? Is it part of the check for whether a course is complete.
+        //       And if there happens to be an inconsistency between timecompleted and status, is the course considered complete or not?
 
-        static::update_criterion_met(0, array_keys($records));
+        // We also need to make provision for users without a course_completion record
+        // TODO: Test performance!!!
+         $sql =
+           "UPDATE {totara_criteria_item_record}
+               SET criterion_met = :newmet, 
+                   timeevaluated = :now
+             WHERE criterion_met = :currentmet
+               AND criterion_item_id IN ({$itemid_sql})
+               AND user_id NOT IN ({$userid_sql})";
+        $params['newmet'] = 0;
+        $params['currentmet'] = 1;
+
+        $DB->execute($sql, $params);
     }
 }

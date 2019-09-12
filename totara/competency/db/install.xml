@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="totara/competency/db" VERSION="20190711" COMMENT="XMLDB file for Moodle totara/competency"
+<XMLDB PATH="totara/competency/db" VERSION="20190913" COMMENT="XMLDB file for Moodle totara/competency"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -147,6 +147,7 @@
         <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of the user to evaluate / aggregate"/>
         <FIELD NAME="has_changed" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Was the user's value updated"/>
         <FIELD NAME="process_key" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Key to use when multiple processes uses the same table"/>
+        <FIELD NAME="update_operation_name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the operation responsible for making the last update"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

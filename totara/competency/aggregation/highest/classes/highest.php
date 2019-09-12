@@ -26,43 +26,40 @@ namespace aggregation_highest;
 
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
-use totara_competency\pathway_aggregation;
+use totara_competency\overall_aggregation;
 
-class highest extends pathway_aggregation {
+class highest extends overall_aggregation {
 
     private $scale_values_cache = [];
 
-    protected function do_aggregation() {
-        foreach ($this->get_user_ids() as $user_id) {
-            /**
-             * @var pathway_achievement|null $highest_achievement
-             */
-            $highest_achievement = null;
-            $achieved_via = [];
+    protected function do_aggregation(int $user_id) {
+        /** @var pathway_achievement|null $highest_achievement */
+        $highest_achievement = null;
+        $achieved_via = [];
 
-            foreach ($this->get_pathways() as $pathway) {
-                $achievement = pathway_achievement::get_current($pathway, $user_id);
-                $value = $this->get_scale_value($achievement->scale_value_id);
-                if (!is_null($value)) {
-                    if (is_null($highest_achievement)) {
+        foreach ($this->pathways as $pathway) {
+            $achievement = pathway_achievement::get_current($pathway, $user_id);
+            $value_achieved = $this->get_scale_value($achievement->scale_value_id);
+
+            if (!is_null($value_achieved)) {
+                if (is_null($highest_achievement)) {
+                    $highest_achievement = $achievement;
+                    $achieved_via = [$achievement];
+                } else {
+                    $highest_value = $this->get_scale_value($highest_achievement->scale_value_id);
+
+                    if ($value_achieved->sortorder > $highest_value->sortorder) {
                         $highest_achievement = $achievement;
                         $achieved_via = [$achievement];
-                    } else {
-                        $highest_value = $this->get_scale_value($highest_achievement->scale_value_id);
-                        if ($value->sortorder > $highest_value->sortorder) {
-                            $highest_achievement = $achievement;
-                            $achieved_via = [$achievement];
-                        } else if ($value->sortorder == $highest_value->sortorder) {
-                            $achieved_via[] = $achievement;
-                        }
+                    } else if ($value_achieved->sortorder == $highest_value->sortorder) {
+                        $achieved_via[] = $achievement;
                     }
                 }
             }
+        }
 
-            if (isset($highest_achievement)) {
-                $this->set_achieved_value_id($user_id, $highest_achievement->scale_value_id);
-                $this->set_achieved_via($user_id, $achieved_via);
-            }
+        if (isset($highest_achievement)) {
+            $this->set_user_achievement($user_id, $highest_achievement->scale_value_id, $achieved_via);
         }
     }
 

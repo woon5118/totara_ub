@@ -39,18 +39,24 @@ final class competency_achievement_aggregator {
     /** @var achievement_configuration */
     private $achievement_configuration;
 
-    /** @var pathway_aggregation */
+    /** @var overall_aggregation */
     private $aggregation_instance;
 
     /** @var null|int[] */
     private $proficient_scale_value_ids;
 
+    /** @var competency_aggregator_user_source $user_id_source */
+    protected $user_id_source = null;
+
+
     /**
      * aggregator constructor.
      * @param achievement_configuration $achievement_configuration
+     * @param competency_aggregator_user_source_list $user_id_source
      */
-    public function __construct(achievement_configuration $achievement_configuration) {
+    public function __construct(achievement_configuration $achievement_configuration, competency_aggregator_user_source $user_id_source) {
         $this->achievement_configuration = $achievement_configuration;
+        $this->user_id_source = $user_id_source;
     }
 
     /**
@@ -60,81 +66,63 @@ final class competency_achievement_aggregator {
         return $this->achievement_configuration;
     }
 
-    private function get_aggregation_instance(): pathway_aggregation {
+    private function get_aggregation_instance(): overall_aggregation {
         if (is_null($this->aggregation_instance)) {
             $type = $this->get_achievement_configuration()->get_aggregation_type();
-            $this->aggregation_instance = pathway_aggregation_factory::create($type);
+            $this->aggregation_instance = overall_aggregation_factory::create($type);
             $this->aggregation_instance->set_pathways($this->get_achievement_configuration()->get_active_pathways());
         }
 
         return $this->aggregation_instance;
     }
 
-    public function set_aggregation_instance(pathway_aggregation $aggregation_instance): competency_achievement_aggregator {
+    public function set_aggregation_instance(overall_aggregation $aggregation_instance): competency_achievement_aggregator {
         $this->aggregation_instance = $aggregation_instance;
         return $this;
     }
 
     /**
-     * Aggregate the competency values for a given set of users.
+     * Aggregate the competency values for users marked as having changes
+     * Results will be used to add or update the applicable records in totara_competency_achievement
      *
-     * Will add or update the comp_record entries for the users.
-     *
-     * @param int[] $user_ids
+     * @param int|null $aggregation_time
      */
-    public function aggregate($user_ids) {
+    public function aggregate(?int $aggregation_time = null) {
         global $DB;
-
-        if (empty($user_ids)) {
-            return;
-        }
 
         $competency_id = $this->get_achievement_configuration()->get_competency()->id;
 
-        // We must get this time now rather than as we make the record because otherwise
-        // there is risk of some pathway achievements being completed at the same time slipping through.
-        $aggregation_time = time();
+        if (is_null($aggregation_time)) {
+            $aggregation_time = time();
+        }
 
-        $this->get_aggregation_instance()->set_user_ids($user_ids)->aggregate();
+        $this->user_id_source->archive_non_assigned_achievements($competency_id, $aggregation_time);
+        $user_assignment_records = $this->user_id_source->get_users_to_reaggregate($competency_id, $aggregation_time);
 
-        [$insql, $params] = $DB->get_in_or_equal($user_ids, SQL_PARAMS_NAMED);
+        foreach ($user_assignment_records as $user_assignment_record) {
+            $user_id = $user_assignment_record->user_id;
+            $user_achievement = $this->get_aggregation_instance()->aggregate_for_user($user_id);
 
-        $params['newstatus'] = competency_achievement::ACTIVE_ASSIGNMENT;
-        $params['compid'] = $competency_id;
-
-        $user_assignments = $DB->get_records_sql(
-            'SELECT tacu.id,
-                    tacu.user_id,
-                    tacu.assignment_id,
-                    COALESCE(ca.id, NULL) AS comp_achievement_id,
-                    COALESCE(ca.scale_value_id, NULL) AS scale_value_id
-                 FROM {totara_competency_assignment_users} tacu
-            LEFT JOIN {totara_competency_achievement} ca
-                   ON tacu.user_id = ca.user_id
-                  AND tacu.assignment_id = ca.assignment_id
-                  AND ca.status = :newstatus
-                WHERE tacu.competency_id = :compid
-                  AND tacu.user_id ' . $insql,
-            $params
-        );
-
-        foreach ($user_assignments as $user_assignment) {
-            $value_id = $this->get_aggregation_instance()->get_achieved_value_id($user_assignment->user_id);
-            $achieved_via = $this->get_aggregation_instance()->get_achieved_via($user_assignment->user_id);
-
-            if (is_null($user_assignment->comp_achievement_id)) {
+            if (is_null($user_assignment_record->comp_achievement_id)) {
                 $previous_comp_achievement = null;
             } else {
-                $previous_comp_achievement = new competency_achievement($user_assignment->comp_achievement_id);
+                $previous_comp_achievement = new competency_achievement($user_assignment_record->comp_achievement_id);
             }
 
-            if ($user_assignment->scale_value_id != $value_id || is_null($previous_comp_achievement)) {
+            if ($user_assignment_record->scale_value_id != $user_achievement['scale_value_id'] || is_null($previous_comp_achievement)) {
+                // New achieved value
+                if (!is_null($previous_comp_achievement)) {
+                    $previous_comp_achievement->status = competency_achievement::SUPERSEDED;
+                    $previous_comp_achievement->time_status = $aggregation_time;
+                    $previous_comp_achievement->save();
+                }
+
                 $new_comp_achievement = new competency_achievement();
                 $new_comp_achievement->comp_id = $competency_id;
-                $new_comp_achievement->user_id = $user_assignment->user_id;
-                $new_comp_achievement->assignment_id = $user_assignment->assignment_id;
-                $new_comp_achievement->scale_value_id = $value_id;
-                $new_comp_achievement->proficient = (int) $this->is_proficient($value_id);
+                $new_comp_achievement->user_id = $user_id;
+                $new_comp_achievement->assignment_id = $user_assignment_record->assignment_id;
+                $new_comp_achievement->scale_value_id = $user_achievement['scale_value_id'];
+                $new_comp_achievement->proficient = (int) $this->is_proficient($user_achievement['scale_value_id']);
                 $new_comp_achievement->status = competency_achievement::ACTIVE_ASSIGNMENT;
                 $new_comp_achievement->time_created = $aggregation_time;
                 $new_comp_achievement->time_status = $aggregation_time;
@@ -143,28 +131,23 @@ final class competency_achievement_aggregator {
                 $new_comp_achievement->last_aggregated = $aggregation_time;
                 $new_comp_achievement->save();
 
-                foreach ($achieved_via as $pathway_achievement) {
+                foreach ($user_achievement['achieved_via'] as $pathway_achievement) {
                     $via_record = new \stdClass();
                     $via_record->comp_achievement_id = $new_comp_achievement->id;
                     $via_record->pathway_achievement_id = $pathway_achievement->id;
                     $DB->insert_record('totara_competency_achievement_via', $via_record);
                 }
 
-                if (!is_null($previous_comp_achievement)) {
-                    $previous_comp_achievement->status = competency_achievement::SUPERSEDED;
-                    $previous_comp_achievement->time_status = $aggregation_time;
-                    $previous_comp_achievement->save();
-                }
-
                 $achieved_via_ids = array_map(
                     function (pathway_achievement $achievement) {return $achievement->id;},
-                    $achieved_via
+                    $user_achievement['achieved_via']
                 );
+
                 competency_achievement_updated::create(
                     [
                         'context' => \context_system::instance(),
                         'objectid' => $new_comp_achievement->id,
-                        'relateduserid' => $user_assignment->user_id,
+                        'relateduserid' => $user_id,
                         'other' => ['competency_id' => $competency_id, 'achieved_via_ids' => $achieved_via_ids],
                     ]
                 )->trigger();
@@ -175,36 +158,7 @@ final class competency_achievement_aggregator {
             }
         }
 
-        // Get active comp_records with no associated user assignment record.
-        $params = [
-            'compid' => $this->get_achievement_configuration()->get_competency()->id,
-            'newstatus' => competency_achievement::ACTIVE_ASSIGNMENT,
-        ];
-
-        $to_archive = $DB->get_fieldset_sql(
-            'SELECT ca.id
-            FROM {totara_competency_achievement} ca
-       LEFT JOIN {totara_competency_assignment_users} tacu
-              ON ca.assignment_id = tacu.assignment_id
-             AND ca.user_id = tacu.user_id
-           WHERE tacu.id IS NULL
-             AND ca.comp_id = :compid
-             AND ca.status = :newstatus',
-            $params);
-
-        if (!empty($to_archive)) {
-            [$archiveinsql, $params] = $DB->get_in_or_equal($to_archive, SQL_PARAMS_NAMED);
-            $params['newstatus'] = competency_achievement::ARCHIVED_ASSIGNMENT;
-            $params['timestatus'] = $aggregation_time;
-
-            $DB->execute(
-                'UPDATE {totara_competency_achievement}
-                    SET status = :newstatus,
-                        time_status = :timestatus
-                  WHERE id ' . $archiveinsql,
-                $params
-            );
-        }
+        $user_assignment_records->close();
     }
 
     /**

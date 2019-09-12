@@ -140,6 +140,21 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019082702, 'totara', 'competency');
     }
 
+    if ($oldversion < 2019090600) {
+
+        // Define field process_key to be added to totara_competency_temp_users
+        $table = new xmldb_table('totara_competency_temp_users');
+        $field = new xmldb_field('update_operation_name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+
+        // Conditionally launch add field related_info.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019090600, 'totara', 'competency');
+    }
+
     if ($oldversion < 2019110800) {
         $table = new xmldb_table('totara_assignment_competencies');
         if ($dbman->table_exists($table)) {

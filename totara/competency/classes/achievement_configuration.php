@@ -101,7 +101,7 @@ class achievement_configuration {
      */
     public function set_aggregation_type(string $type): achievement_configuration {
         // Check that the type is valid - this will throw an error if invalid
-        $classname = pathway_aggregation_factory::get_classname($type);
+        $classname = overall_aggregation_factory::get_classname($type);
 
         $this->aggregation_type = $type;
         return $this;

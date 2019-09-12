@@ -33,47 +33,43 @@ class observer {
     public static function course_completed(course_completed $event) {
         global $DB;
 
-        $criterion_item_id = $DB->get_field(
-            'totara_criteria_item',
-            'id',
-            [
-                'item_type' => 'course',
-                'item_id' => $event->courseid
-            ]
-        );
-
-        if (!$criterion_item_id) {
-            // We're not tracking the course.
-            return;
-        }
-
-        $now = time();
-
-        $item_record = $DB->get_record(
-            'totara_criteria_item_record',
-            [
-                'criterion_item_id' => $criterion_item_id,
-                'user_id' => $event->relateduserid,
-            ]
-        );
-
-        if (!$item_record) {
-            // We're not tracking this user for this item.
-            return;
-        }
-
-        course_item_evaluator::update_criterion_met(1, [$item_record->id]);
-
-        // Reload the record, as a new one will have been created.
-
-        $item_record = $DB->get_record(
-            'totara_criteria_item_record',
-            [
-                'criterion_item_id' => $criterion_item_id,
-                'user_id' => $event->relateduserid,
-            ]
-        );
-
-        item_updated::create_with_item_record($criterion_item_id, $item_record)->trigger();
+        // TODO: This is no longer valid - There may be more than one item for a specific course
+        //       To be fixed in TL-22569
+        return;
+//        $criterion_item_id = $DB->get_field(
+//            'totara_criteria_item',
+//            'id',
+//            [
+//                'item_type' => 'course',
+//                'item_id' => $event->courseid
+//            ]
+//        );
+//
+//        if (!$criterion_item_id) {
+//            // We're not tracking the course.
+//            return;
+//        }
+//
+//        $now = time();
+//
+//        $item_record = $DB->get_record(
+//            'totara_criteria_item_record',
+//            [
+//                'criterion_item_id' => $criterion_item_id,
+//                'user_id' => $event->relateduserid,
+//            ]
+//        );
+//
+//        if (!$item_record) {
+//            // We're not tracking this user for this item.
+//            return;
+//        }
+//
+//        // Update the criterion_met for this user
+//        $item_record->criterion_met = 1;
+//        $item_record->timeevaluated = time();
+//        $DB->update_record('totara_criteria_item_record', $item_record);
+//
+//        item_updated::create_with_item_record($criterion_item_id, $item_record)->trigger();
     }
 }

@@ -32,7 +32,7 @@ use core\webapi\type_resolver;
  * Please be aware that it is the responsibility of the query to ensure that the user is allowed to
  * see this.
  */
-class pathway_aggregation implements type_resolver {
+class overall_aggregation implements type_resolver {
 
     /**
      * Resolves a overall achievement aggregation field.
@@ -45,8 +45,8 @@ class pathway_aggregation implements type_resolver {
      */
     public static function resolve(string $field, $aggregation, array $args, execution_context $ec) {
 
-        if (!$aggregation instanceof \totara_competency\pathway_aggregation) {
-            throw new \coding_exception('Only \totara_competency\pathway_aggregation objects are accepted: ' . gettype($aggregation));
+        if (!$aggregation instanceof \totara_competency\overall_aggregation) {
+            throw new \coding_exception('Only \totara_competency\overall_aggregation objects are accepted: ' . gettype($aggregation));
         }
 
         // TODO: capability checks

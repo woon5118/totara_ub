@@ -22,6 +22,7 @@
  */
 
 use totara_competency\entities\competency_assignment_user_log;
+use totara_competency\competency_aggregator_user_source_list;
 use totara_competency\data_providers;
 use totara_competency\models\assignment_actions;
 use totara_competency\expand_task;
@@ -30,11 +31,12 @@ use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;
 use totara_competency\models\activity_log;
 use totara_competency\entities\scale_value;
-use totara_competency\pathway_aggregator;
+use totara_competency\pathway_evaluator;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\competency_achievement_aggregator;
 use totara_competency\base_achievement_detail;
+use totara_competency\pathway_evaluator_user_source_list;
 
 class totara_competency_data_provider_activity_log_testcase extends advanced_testcase {
 
@@ -113,6 +115,7 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
     }
 
     public function test_arrange_log_data_competency_achievement() {
+
         $competency_id = 100;
         $achievement_date = 200;
 
@@ -220,16 +223,21 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
             class_alias(get_class($test_achievement_detail), 'pathway_test_pathway\achievement_detail');
         }
 
-        $pathway_aggregator = new pathway_aggregator($pathway);
-        $pathway_aggregator->aggregate([$user->id]);
+        $now = time();
+
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway, $pw_user_source]);
+        $pathway_evaluator->aggregate($now++);
 
         $achievement_configuration = new achievement_configuration($competency);
-        $competency_aggregator = new competency_achievement_aggregator($achievement_configuration);
-        $competency_aggregator->aggregate([$user->id]);
+
+        $comp_user_source = new competency_aggregator_user_source_list([$user->id], true);
+        $competency_aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
+        $competency_aggregator->aggregate($now++);
 
         // Should trigger an entry in configuration_change.
         // Have put the time in the future to be more sure of it's order in the assertions below.
-        $achievement_configuration->save_aggregation(time() + 1);
+        $achievement_configuration->save_aggregation($now++);
 
         $activity_log_data = data_providers\activity_log::create($user->id, $comp->id)->fetch();
 
@@ -314,8 +322,12 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
             class_alias(get_class($test_achievement_detail), 'pathway_test_pathway\achievement_detail');
         }
 
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
-        (new competency_achievement_aggregator(new achievement_configuration($competency)))->aggregate([$user->id]);
+        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway, $pw_user_source]);
+        $pathway_evaluator->aggregate();
+
+        $comp_user_source = new competency_aggregator_user_source_list([$user->id], true);
+        (new competency_achievement_aggregator(new achievement_configuration($competency), $comp_user_source))->aggregate();
 
         // Now we create an achievement for the other competency, to ensure that this doesn't show up.
         $other_pathway = $totara_competency_generator->create_test_pathway();
@@ -323,8 +335,9 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $other_pathway->set_competency($other_competency);
         $other_pathway->save();
 
-        (new pathway_aggregator($other_pathway))->aggregate([$user->id]);
-        (new competency_achievement_aggregator(new achievement_configuration($other_competency)))->aggregate([$user->id]);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway, $pw_user_source]);
+        $pathway_evaluator->aggregate();
+        (new competency_achievement_aggregator(new achievement_configuration($competency), $comp_user_source))->aggregate();
 
         $this->waitForSecond();
 
@@ -333,8 +346,9 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         (new expand_task($DB))->expand_all();
 
         $pathway->set_test_aggregate_current_value($good);
-        (new pathway_aggregator($pathway))->aggregate([$user->id]);
-        (new competency_achievement_aggregator(new achievement_configuration($competency)))->aggregate([$user->id]);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway, $pw_user_source]);
+        $pathway_evaluator->aggregate();
+        (new competency_achievement_aggregator(new achievement_configuration($competency), $comp_user_source))->aggregate();
 
         $this->waitForSecond();
 

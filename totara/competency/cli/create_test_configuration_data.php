@@ -1,5 +1,6 @@
 <?php
 
+use criteria_linkedcourses\metadata_processor;
 use totara_competency\achievement_configuration;
 use totara_competency\linked_courses;
 /**
@@ -213,4 +214,7 @@ function link_default_preset_to_competencies($competencies) {
         $config = new achievement_configuration($comp);
         $config->link_default_preset();
     }
+
+    printf("\nCreating items for linked course criteria");
+    metadata_processor::update_item_links(null);
 }
