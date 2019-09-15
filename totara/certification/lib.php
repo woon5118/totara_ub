@@ -4055,3 +4055,57 @@ function certif_delete_completion($programid, $userid, $message = '') {
         $message
     );
 }
+
+/**
+ * Returns the users completion as a percentage for the given certification.
+ *
+ * Once certified the user is shown as 100% complete until the recertification window opens.
+ * If you need it to show 100% as long as the user is certified see totara_certification_get_percentage_complete()
+ *
+ * @param \program|int $certiforid
+ * @param int $userid
+ * @return int|null
+ */
+function totara_certification_get_current_percentage_complete($certiforid, int $userid) {
+    $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($certiforid, $userid);
+    $percentage = $progressinfo->get_percentagecomplete();
+    if ($percentage === false) {
+        return null;
+    }
+    return $percentage;
+}
+
+/**
+ * Returns the users completion as a percentage for the given certification.
+ *
+ * Once certified the user is shown as 100% complete until the their certification expires.
+ * If you need it to show their progress while recertifying see totara_certification_get_current_percentage_complete()
+ *
+ * @param program|int $certiforid A program instance for the certification or the certification id.
+ * @param int $userid
+ * @param int $timewindowopens
+ * @param int|null $timecompleted
+ * @param int|null $lasttimecompleted
+ * @return int|null
+ */
+function totara_certification_get_percentage_complete($certiforid, int $userid, int $timewindowopens, ?int $timecompleted, ?int $lasttimecompleted) : ?int {
+    $percentage = 0;
+    if ($timewindowopens < time()) {
+        // The window is open, use the current record.
+        $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($certiforid, $userid);
+        $percentage = $progressinfo->get_percentagecomplete();
+
+        if ($percentage === false) {
+            // You get here if you are not assigned OR if the program has not coursesets/courses.
+            $percentage = null;
+        }
+    } else {
+        // The window is not open
+        if (!empty($lasttimecompleted) || !empty($timecompleted)) {
+            // But they have previously completed or currently completed.
+            $percentage = 100;
+        }
+    }
+    return $percentage;
+}
+

@@ -27,10 +27,17 @@ use totara_reportbuilder\rb\display\base;
 /**
  * Display class intended for certification progress
  *
+ * @deprecated since Totara 13
  * @author Simon Player <simon.player@totaralearning.com>
  * @package totara_certification
  */
 class certif_progress extends base {
+
+    /**
+     * Don't access me directly, use self::get_renderer();
+     * @var \totara_core_renderer
+     */
+    private static $renderer;
 
     /**
      * Handles the display
@@ -43,15 +50,40 @@ class certif_progress extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        static $debuggingshown = false;
+
+        if (!$debuggingshown) {
+            // Debugging shown
+            $debuggingshown = true;
+            debugging(__CLASS__ . ' has been deprecated please use \totara_certification\rb\display\certif_completion_progress');
+        }
+
         $extrafields = self::get_extrafields_row($row, $column);
         $isexport = ($format !== 'html');
 
-        $progress = prog_display_progress($extrafields->programid, $extrafields->userid, $extrafields->certifpath, $isexport);
-        if ($isexport && is_numeric($progress) && isset($extrafields->stringexport) && $extrafields->stringexport) {
-            return get_string('xpercentcomplete', 'totara_core', $progress);
-        } else {
-            return $progress;
+        $percentage = totara_program_get_user_percentage_complete($extrafields->programid, $extrafields->userid);
+
+        if ($isexport) {
+            if ($percentage === null) {
+                if (!empty($extrafields->stringexport)) {
+                    return get_string('notassigned', 'totara_program');
+                }
+                return '';
+            }
+            if (!empty($extrafields->stringexport)) {
+                return get_string('xpercentcomplete', 'totara_core', $percentage);
+            }
+            return $percentage;
         }
+
+        if ($percentage === null) {
+            return get_string('notassigned', 'totara_program');
+        }
+        if (!empty($extrafields->stringexport)) {
+            return get_string('xpercentcomplete', 'totara_core', $percentage);
+        }
+
+        return self::get_renderer()->progressbar($percentage, 'medium', false);
     }
 
     /**
@@ -64,5 +96,18 @@ class certif_progress extends base {
      */
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
         return false;
+    }
+
+    /**
+     * Returns a totara core renderer.
+     *
+     * @return \renderer_base|\totara_core_renderer
+     */
+    private static function get_renderer() {
+        global $PAGE;
+        if (self::$renderer === null) {
+            self::$renderer = $PAGE->get_renderer('totara_core');
+        }
+        return self::$renderer;
     }
 }

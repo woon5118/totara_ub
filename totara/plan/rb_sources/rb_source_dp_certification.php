@@ -155,7 +155,8 @@ class rb_source_dp_certification extends rb_base_source {
                 '(SELECT ' . $DB->sql_concat('userid', 'certifid') . ' AS uniqueid,
                     userid,
                     certifid,
-                    COUNT(id) AS historycount
+                    COUNT(id) AS historycount,
+                    MAX(timecompleted) AS timecompleted
                     FROM {certif_completion_history}
                     WHERE unassigned = 0
                     GROUP BY userid, certifid)',
@@ -201,6 +202,8 @@ class rb_source_dp_certification extends rb_base_source {
      * @return array
      */
     protected function define_columnoptions() {
+        global $DB;
+
         $columnoptions = array();
 
         $columnoptions[] = new rb_column_option(
@@ -403,15 +406,18 @@ class rb_source_dp_certification extends rb_base_source {
             get_string('progressnumeric', 'rb_source_dp_course'),
             "certif_completion.status",
             array(
-                'joins' => array('certif_completion'),
-                'displayfunc' => 'certif_progress',
+                'joins' => array('certif_completion', 'certif_completion_history'),
+                'displayfunc' => 'certif_completion_progress',
                 'defaultheading' => get_string('progress', 'rb_source_dp_course'),
                 'extrafields' => array(
                     'programid' => "base.id",
                     'userid' => "certif_completion.userid",
-                    'certifpath' => "certif_completion.certifpath",
-                    'stringexport' => 0
-                )
+                    'completion' => "certif_completion.timecompleted",
+                    'window' => "certif_completion.timewindowopens",
+                    'histcompletion' => "certif_completion_history.timecompleted",
+                    'stringexport' => 0,
+                ),
+                'nosort' => true,
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -420,15 +426,18 @@ class rb_source_dp_certification extends rb_base_source {
             get_string('progresspercentage', 'rb_source_dp_course'),
             "certif_completion.status",
             array(
-                'joins' => array('certif_completion'),
-                'displayfunc' => 'certif_progress',
+                'joins' => array('certif_completion', 'certif_completion_history'),
+                'displayfunc' => 'certif_completion_progress',
                 'defaultheading' => get_string('progress', 'rb_source_dp_course'),
                 'extrafields' => array(
                     'programid' => "base.id",
                     'userid' => "certif_completion.userid",
-                    'certifpath' => "certif_completion.certifpath",
-                    'stringexport' => 1
-                )
+                    'completion' => "certif_completion.timecompleted",
+                    'window' => "certif_completion.timewindowopens",
+                    'histcompletion' => "certif_completion_history.timecompleted",
+                    'stringexport' => 1,
+                ),
+                'nosort' => true,
             )
         );
 
@@ -768,7 +777,7 @@ class rb_source_dp_certification extends rb_base_source {
      * @return string
      */
     function rb_display_progress($status, $row, $isexport = false) {
-        debugging('rb_source_dp_certification::rb_display_progress has been deprecated since Totara 12.0. Use totara_certification\rb\display\certif_progress::display', DEBUG_DEVELOPER);
+        debugging('rb_source_dp_certification::rb_display_progress has been deprecated since Totara 12.0. Use \totara_certification\rb\display\certif_completion_progress::display', DEBUG_DEVELOPER);
         $progress = prog_display_progress($row->programid, $row->userid, $row->certifpath, $isexport);
         if ($isexport && is_numeric($progress) && isset($row->stringexport) && $row->stringexport) {
             return get_string('xpercentcomplete', 'totara_core', $progress);

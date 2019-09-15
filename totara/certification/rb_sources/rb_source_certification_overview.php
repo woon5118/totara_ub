@@ -716,10 +716,11 @@ class rb_source_certification_overview extends rb_base_source {
             $DB->sql_concat('base.programid', "'|'", 'base.userid'),
             array(
                 'extrafields' => array(
+                    'programid' => "base.programid",
+                    'userid' => "base.userid",
                     'completion' => "certif_completion.timecompleted",
                     'window' => "certif_completion.timewindowopens",
-                    'histpath' => "history.certifpath",
-                    'histcomp' => "history.timecompleted",
+                    'histcompletion' => "history.timecompleted",
                     'stringexport' => 0,
                 ),
                 'displayfunc' => 'certif_completion_progress',
@@ -735,10 +736,11 @@ class rb_source_certification_overview extends rb_base_source {
             $DB->sql_concat('base.programid', "'|'", 'base.userid'),
             array(
                 'extrafields' => array(
+                    'programid' => "base.programid",
+                    'userid' => "base.userid",
                     'completion' => "certif_completion.timecompleted",
                     'window' => "certif_completion.timewindowopens",
-                    'histpath' => "history.certifpath",
-                    'histcomp' => "history.timecompleted",
+                    'histcompletion' => "history.timecompleted",
                     'stringexport' => 1,
                 ),
                 'displayfunc' => 'certif_completion_progress',

@@ -30,8 +30,11 @@ namespace totara_certification\rb\display;
  */
 class certif_completion_progress extends \totara_reportbuilder\rb\display\base {
 
-    /* @var totara_core_renderer $totara_renderer */
-    static $totara_renderer;
+    /**
+     * Don't access me directly, use self::get_renderer()
+     * @var \totara_core_renderer $totara_renderer
+     */
+    private static $renderer;
 
     /**
      * Displays the overall status.
@@ -44,50 +47,37 @@ class certif_completion_progress extends \totara_reportbuilder\rb\display\base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $PAGE;
-
-        $isexport = ($format !== 'html');
         $extrafields = self::get_extrafields_row($row, $column);
 
-        $now = time();
+        $percentage = totara_certification_get_percentage_complete(
+            $extrafields->programid,
+            $extrafields->userid,
+            $extrafields->window,
+            $extrafields->completion,
+            $extrafields->histcompletion
+        );
 
-        if ($extrafields->window < $now) {
-            // The window is open, use the current record.
-            $programid = $extrafields->programid;
-            $userid = $extrafields->userid;
-
-            $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($programid, $userid);
-            $percentage = $progressinfo->get_percentagecomplete();
-
-            if ($percentage === false) {
-                // No tracking, default to 0
-                $percentage = 0;
+        if ($format !== 'html') {
+            if (!empty($extrafields->stringexport)) {
+                return get_string('xpercentcomplete', 'totara_core', (int)$percentage);
             }
-        } else {
-            // The window is not open
-            if (!empty($extrafields->histcompletion) || !empty($extrafields->completion)) {
-                // But they have previously completed or currently completed.
-                $percentage = 100;
-            } else {
-                // They havent had a chance to do anything yet, or did not previously complete.
-                $percentage = 0;
-            }
+            return $percentage;
         }
 
-        if ($isexport) {
-            if (isset($extrafields->stringexport) && $extrafields->stringexport)  {
-                return get_string('xpercentcomplete', 'totara_core', $percentage);
-            } else {
-                return $percentage;
-            }
-        }
+        return self::get_renderer()->progressbar((int) $percentage, 'medium', false);
+    }
 
-        if (empty(self::$totara_renderer)) {
-            self::$totara_renderer = $PAGE->get_renderer('totara_core');
+    /**
+     * Returns an instance of a totara_core_renderer
+     *
+     * @return \totara_core_renderer
+     */
+    private static function get_renderer(): \totara_core_renderer {
+        global $PAGE;
+        if (self::$renderer === null) {
+            self::$renderer = $PAGE->get_renderer('totara_core');
         }
-
-        // Get relevant progress bar and return for display.
-        return self::$totara_renderer->progressbar($percentage, 'medium', $isexport, $percentage . '%');
+        return self::$renderer;
     }
 
     /**

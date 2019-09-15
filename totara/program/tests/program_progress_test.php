@@ -53,7 +53,10 @@ class totara_program_progress_testcase extends reportcache_advanced_testcase {
             public $comp_generator;
 
             /** @var stdClass */
-            public $student, $teacher;
+            public $student;
+
+            /** @var stdClass */
+            public $teacher;
 
             /** @var program */
             public $program1;
@@ -116,6 +119,7 @@ class totara_program_progress_testcase extends reportcache_advanced_testcase {
         }
 
         $that->program1 = $that->program_generator->create_program();
+        $that->program_generator->assign_program($that->program1->id, [$that->student->id]);
 
         $cfgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
         $that->cfids = $cfgenerator->create_multiselect('course', array('score' => array('1', '2', '3')));

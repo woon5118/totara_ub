@@ -451,7 +451,7 @@ final class progressinfo implements \cacheable_object {
      */
     public function aggregate_score_weight() {
 
-        if (empty ($this->criteria)) {
+        if (empty($this->criteria)) {
             // Nothing to aggregate - are on lowest level
             return;
         }

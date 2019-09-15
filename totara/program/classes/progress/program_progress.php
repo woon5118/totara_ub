@@ -26,6 +26,8 @@ namespace totara_program\progress;
 
 defined('MOODLE_INTERNAL') || die();
 
+use \totara_core\progressinfo\progressinfo;
+
 /**
  * Totara program completion class
  * @since Totara 12
@@ -33,31 +35,12 @@ defined('MOODLE_INTERNAL') || die();
 class program_progress {
 
     /**
-     * Returns the progressinfo key prefix for courseset_groups to ensure consistency
-     * As a group doesn't have some identifying attribute, we can only standardize the prefix
-     *
-     * @return string Prefix for courseset_groups
-     */
-    private static function get_coursesetgroup_key_prefix() {
-        return 'coursesetgroup_';
-    }
-
-   /**
-     * Returns the prefix string to use for courseset groups
-     * @param int $id courseset group identifier
-     * @return string
-     */
-    private static function get_coursesetgroup_key($id) {
-        return self::get_coursesetgroup_key_prefix() . $id;
-    }
-
-    /**
      * Return the progress information for the specified program and user
      *
      * @param int $programid Program id
      * @param int $userid User id
      * @throws \coding_exception If the aggregate function does not generate a progressinfo object.
-     * @return \totara_core\progressinfo\progressinfo
+     * @return progressinfo
      */
     public static function get_user_progressinfo_from_id($programid, $userid=null) {
 
@@ -72,7 +55,7 @@ class program_progress {
         }
 
         $data = program_progress_cache::get_progressinfo_from_cache($programid, $userid);
-        if ($data instanceof \totara_core\progressinfo\progressinfo) {
+        if ($data instanceof progressinfo) {
             return $data;
         }
 
@@ -87,10 +70,10 @@ class program_progress {
     /**
      * Return the progress information for the specified program and user
      *
-     * @param program $program Program instance
+     * @param \program|int $program Program instance
      * @param int $userid User id
      * @throws \coding_exception If the aggregate function does not generate a progressinfo object.
-     * @return \totara_core\progressinfo\progressinfo
+     * @return progressinfo
      */
     public static function get_user_progressinfo($program, $userid=null) {
 
@@ -109,7 +92,7 @@ class program_progress {
         }
 
         $data = program_progress_cache::get_progressinfo_from_cache($program->id, $userid);
-        if ($data instanceof \totara_core\progressinfo\progressinfo) {
+        if ($data instanceof progressinfo) {
             return $data;
         }
 
@@ -122,47 +105,62 @@ class program_progress {
     /**
      * Build progressinfo for the program and aggregate the user's progress towards completion
      *
-     * @param program $program Program to build progressinfo for
+     * @param \program $program Program to build progressinfo for
      * @param int $userid
-     * @return \totara_core\progressinfo\progressinfo $progressinfo
+     * @return progressinfo $progressinfo
      */
     private static function build_and_aggregate_progressinfo($program, $userid) {
-        // first check if the whole program has been completed
-        if (prog_is_complete($program->id, $userid)) {
+        // TODO: The check here is not complete. It needs to be smarter.
+        // See the failing tests in test_prog_display_progress_assignment_with_certification()
+        $completion = $program->get_completion_data($userid);
+        if ($completion === false) {
+            // There are no completion records, pretty suss, either not assigned, or assigned but cron has not run.
+            if (!$program->user_is_assigned($userid)) {
+                // Not assigned, fake it all!
+                return progressinfo::from_data(progressinfo::AGGREGATE_ALL, 0, 0);
+            }
+        } else if ($completion->status == STATUS_PROGRAM_COMPLETE) {
             // Create a completed progressinfo, but don't worry about generating the full structure.
             // We don't need it at this point.
-            return \totara_core\progressinfo\progressinfo::from_data(\totara_core\progressinfo\progressinfo::AGGREGATE_ALL, 1, 1);
+            return progressinfo::from_data(progressinfo::AGGREGATE_ALL, 1, 1);
         }
 
-        // Get the program content.
-        $program_content = $program->get_content();
-
+        $path = CERTIFPATH_STD;
         if ($program->certifid) {
             // If this is a certification program get course sets for groups on the path the user is on.
             $path = get_certification_path_user($program->certifid, $userid);
-        } else {
-            // If standard program get the courseset groups (just one path).
-            $path = CERTIFPATH_STD;
         }
-        $courseset_groups = $program_content->get_courseset_groups($path);
+        $courseset_groups = $program->get_content()->get_courseset_groups($path);
 
         // Initialize progressinfo
-        // Aggregation method over courseset groups is always 'ALL'
-        $progressinfo = \totara_core\progressinfo\progressinfo::from_data(\totara_core\progressinfo\progressinfo::AGGREGATE_ALL);
-
-        foreach ($courseset_groups as $idx => $courseset_group) {
-            $groupkey = self::get_coursesetgroup_key($idx);
-            $groupinfo = self::build_courseset_group_progressinfo($courseset_group, $groupkey);
-            $progressinfo->attach_criteria($groupkey, $groupinfo);
-
-            // Set the scores for this user
-            foreach ($courseset_group as $courseset) {
-                $courseset->set_progressinfo_course_scores($groupinfo, $userid);
-            }
-        }
+        $progressinfo = self::build_courseset_groups_progressinfo($userid, $courseset_groups);
 
         // Aggregate score for this user
         $progressinfo->aggregate_score_weight();
+
+        return $progressinfo;
+    }
+
+    /**
+     * @param int $userid
+     * @param array $groups
+     * @return progressinfo
+     */
+    private static function build_courseset_groups_progressinfo(int $userid, array $groups): progressinfo {
+        // Aggregation method over courseset groups is always 'ALL'
+        $progressinfo = progressinfo::from_data(progressinfo::AGGREGATE_ALL, 1);
+
+        foreach ($groups as $idx => $group) {
+            /** @var \course_set[]|\multi_course_set[]|\competency_course_set[]|\recurring_course_set[] $group */
+            $key = 'coursesetgroup_' . $idx;
+            $info = self::build_courseset_group_progressinfo($group, $key);
+            $progressinfo->attach_criteria($key, $info);
+
+            // Set the scores for this user
+            foreach ($group as $courseset) {
+                $courseset->set_progressinfo_course_scores($info, $userid);
+            }
+        }
 
         return $progressinfo;
     }
@@ -171,20 +169,20 @@ class program_progress {
     /**
      * Build progressinfo hierarchy for the courseset group
      *
-     * @param prog_content courseset_group
+     * @param \prog_content courseset_group
      * @param string groupkey progressinfo key
-     * @return totara_progressinfo for aggregation of the courseset groups
+     * @return progressinfo for aggregation of the courseset groups
      */
     private static function build_courseset_group_progressinfo($courseset_group, $groupkey) {
         // ANDed coursesets (ALL aggregation) must be on lower level than ORs (ANY aggregation)
         // as aggregation is done depth first
-        $groupinfo = \totara_core\progressinfo\progressinfo::from_data(\totara_core\progressinfo\progressinfo::AGGREGATE_ALL);
+        $groupinfo = progressinfo::from_data(progressinfo::AGGREGATE_ALL);
 
         // We may not need the OR, but creating it now to have it if we encounter an ORed courseset
-        $orinfo = \totara_core\progressinfo\progressinfo::from_data(\totara_core\progressinfo\progressinfo::AGGREGATE_ANY);
+        $orinfo = progressinfo::from_data(progressinfo::AGGREGATE_ANY);
 
         $andidx = 0;
-        $curinfo = \totara_core\progressinfo\progressinfo::from_data(\totara_core\progressinfo\progressinfo::AGGREGATE_ALL);
+        $curinfo = progressinfo::from_data(progressinfo::AGGREGATE_ALL);
         $curkey = $groupkey . '_and_'.$andidx;
 
         foreach ($courseset_group as $courseset) {
@@ -198,7 +196,7 @@ class program_progress {
                 $orinfo->attach_criteria($curkey, $curinfo);
                 $andidx += 1;
                 $curkey = $groupkey . '_and_'.$andidx;
-                $curinfo = \totara_core\progressinfo\progressinfo::from_data(\totara_core\progressinfo\progressinfo::AGGREGATE_ALL);
+                $curinfo = progressinfo::from_data(progressinfo::AGGREGATE_ALL);
             }
         }
 

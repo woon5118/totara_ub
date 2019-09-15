@@ -1251,6 +1251,7 @@ class program {
      * Return true or false depending on whether or not the specified user has
      * completed this program
      *
+     * @deprecated since Totara 2.7
      * @param int $userid
      * @return bool
      */
@@ -1263,6 +1264,7 @@ class program {
      * Return true if the user has started but not completed this program, false
      * if not
      *
+     * @deprecated since Totara 2.7
      * @param int $userid
      * @return bool
      */
@@ -1435,7 +1437,7 @@ class program {
      * the result as a percentage
      *
      * @param int $userid
-     * @return float
+     * @return int|false
      */
     public function get_progress($userid) {
         $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo($this, $userid);
@@ -1707,9 +1709,12 @@ class program {
 
             if ($prog_completion) {
                 $timedue = $prog_completion->timedue;
-                $startdatestr = ($prog_completion->timecreated != 0
-                                ? $this->display_date_as_text($prog_completion->timecreated)
-                                : get_string('unknown', 'totara_program'));
+                if ($prog_completion->timecreated != 0) {
+                    $startdatestr = $this->display_date_as_text($prog_completion->timecreated);
+                } else {
+                    $startdatestr = get_string('unknown', 'totara_program');
+                }
+
                 if ($iscertif) {
                     $duedatestr = prog_display_duedate($timedue, $this->id, $prog_completion->userid, $certifcompletion->certifpath, $certifcompletion->status);
                 } else {
@@ -1717,14 +1722,19 @@ class program {
                 }
                 $duedatestr .= $request;
 
-                $out .= html_writer::start_tag('div', array('id' => 'progressbar', 'class' => 'programprogress'));
-                $out .= html_writer::tag('div', get_string('dateassigned', 'totara_program') . ': '
-                                . $startdatestr, array('class' => 'item'));
-                $out .= html_writer::tag('div', get_string('duedate', 'totara_program').': '
-                                . $duedatestr, array('class' => 'item'));
-                $out .= html_writer::tag('div', get_string('progress', 'totara_program') . ': '
-                                . prog_display_progress($this->id, $userid), array('class' => 'item'));
-                $out .= html_writer::end_tag('div');
+                $totararenderer = $PAGE->get_renderer('totara_core');
+                $percentage = totara_program_get_user_percentage_complete($this, $userid);
+                if ($percentage !== null) {
+                    $progress = $totararenderer->progressbar($percentage, 'medium', false);
+                } else {
+                    $progress = get_string('notassigned', 'totara_program');
+                }
+
+                $out .= '<div id="progressbar" class="programprogress">';
+                $out .= html_writer::div(get_string('dateassigned_a', 'totara_program', $startdatestr), 'item');
+                $out .= html_writer::div(get_string('duedate_a', 'totara_program', $duedatestr), 'item');
+                $out .= html_writer::div(get_string('progress_a', 'totara_program', $progress), 'item');
+                $out .= '</div>';
             }
         }
 
@@ -1851,6 +1861,7 @@ class program {
     /**
      * Display the due date for a program
      *
+     * @deprecated since Totara 2.7
      * @param int $duedate
      * @param int $userid
      * @param int $certifpath   Optional param telling us the path of the certification
@@ -1881,6 +1892,7 @@ class program {
     /**
      * Display due date for a program with task info
      *
+     * @deprecated since Totara 2.7
      * @param int $duedate
      * @return string
      */

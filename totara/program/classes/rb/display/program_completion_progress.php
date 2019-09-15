@@ -31,8 +31,11 @@ namespace totara_program\rb\display;
  */
 class program_completion_progress extends \totara_reportbuilder\rb\display\base {
 
-    /* @var totara_core_renderer $totara_renderer */
-    static $totara_renderer;
+    /**
+     * Don't access me directly, use self::get_renderer();
+     * @var \totara_core_renderer $renderer
+     */
+    private static $renderer;
 
     /**
      * Displays the program completion progress.
@@ -46,25 +49,19 @@ class program_completion_progress extends \totara_reportbuilder\rb\display\base 
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
 
-        global $PAGE;
-
-        // Get the necessary fields out of the row.
-
         $isexport = ($format !== 'html');
         $extrafields = self::get_extrafields_row($row, $column);
 
-        $percentage = false;
+        $percentage = totara_program_get_user_percentage_complete(
+            $extrafields->programid,
+            $extrafields->userid
+        );
 
-        if (isset($extrafields->programid) && isset($extrafields->userid)) {
-            $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($extrafields->programid, $extrafields->userid);
-            $percentage = $progressinfo->get_percentagecomplete();
-        }
-
-        if ($percentage === false) {
-            // Can't calculate progress, use status instead
-            if (is_null($value)) {
+        if ($percentage === null) {
+            if ($isexport && empty($extrafields->stringexport)) {
                 return '';
             }
+            // Can't calculate progress, use status instead
             if ($value) {
                 return get_string('complete', 'totara_program');
             } else {
@@ -73,18 +70,38 @@ class program_completion_progress extends \totara_reportbuilder\rb\display\base 
         }
 
         if ($isexport) {
-            if (isset($extrafields->stringexport) && $extrafields->stringexport) {
+            if (!empty($extrafields->stringexport)) {
                 return get_string('xpercentcomplete', 'totara_core', $percentage);
             } else {
                 return $percentage;
             }
         }
 
-        if (empty(self::$totara_renderer)) {
-            self::$totara_renderer = $PAGE->get_renderer('totara_core');
-        }
+        return self::get_renderer()->progressbar((int) $percentage, 'medium', false);
+    }
 
-        // Get relevant progress bar and return for display.
-        return self::$totara_renderer->progressbar($percentage, 'medium', $isexport, 'DEFAULTTOOLTIP');
+    /**
+     * Returns an instance of a totara_core_renderer
+     *
+     * @return \totara_core_renderer
+     */
+    private static function get_renderer(): \totara_core_renderer {
+        global $PAGE;
+        if (self::$renderer === null) {
+            self::$renderer = $PAGE->get_renderer('totara_core');
+        }
+        return self::$renderer;
+    }
+
+    /**
+     * Is this column graphable? No!
+     *
+     * @param \rb_column $column
+     * @param \rb_column_option $option
+     * @param \reportbuilder $report
+     * @return bool
+     */
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return false;
     }
 }

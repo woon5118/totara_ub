@@ -68,6 +68,10 @@ class block_totara_program_completion extends block_base {
         $this->page->requires->strings_for_js(array('more', 'less'), 'block_totara_program_completion');
         $this->page->requires->js_call_amd('block_totara_program_completion/block', 'init', $args);
 
+        /** @var totara_core_renderer $renderer */
+        $renderer = $this->page->get_renderer('totara_core');
+        $str_notassigned = new lang_string('notassigned', 'totara_program');
+
         $count = 0;
         $content = '';
         foreach ($programs as $p) {
@@ -85,9 +89,14 @@ class block_totara_program_completion extends block_base {
             $maxreached = !empty($this->config->maxshow) && $count > $this->config->maxshow;
             $rowclass = $maxreached ? "row more more{$this->instance->id}" : "row";
             $programlink = new moodle_url('/totara/program/view.php', array('id' => $p->id));
+            $percentage = totara_program_get_user_percentage_complete($program, $USER->id);
+            $progress = $str_notassigned;
+            if ($percentage !== null) {
+                $progress = $renderer->progressbar($percentage, 'medium', false);
+            }
 
             $name = html_writer::div(html_writer::link($programlink, format_string($program->fullname)), 'name');
-            $value = html_writer::div(prog_display_progress($program->id, $USER->id), 'value');
+            $value = html_writer::div($progress, 'value');
             $content .= html_writer::div($name . $value, $rowclass);
         }
 

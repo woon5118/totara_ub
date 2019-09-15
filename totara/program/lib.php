@@ -241,7 +241,7 @@ function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limi
  * @return  string
  */
 function prog_display_required_programs($userid) {
-    global $CFG, $OUTPUT;
+    global $CFG, $PAGE, $USER;
 
     $count = prog_get_required_programs($userid, '', '', '', true, true);
 
@@ -279,6 +279,10 @@ function prog_display_required_programs($userid) {
     // Add table data
     $programs = prog_get_required_programs($userid, $sort, $table->get_page_start(), $table->get_page_size(), false, true);
 
+    /** @var totara_core_renderer $renderer */
+    $renderer = $PAGE->get_renderer('totara_core');
+    $str_notassigned = new lang_string('notassigned', 'totara_program');
+
     if (!$programs) {
         return '';
     }
@@ -287,10 +291,18 @@ function prog_display_required_programs($userid) {
         if (!prog_is_accessible($p)) {
             continue;
         }
+
+        $percentage = totara_program_get_user_percentage_complete($p, $userid);
+        $progress = $str_notassigned;
+        if ($percentage !== null) {
+            $progress = $renderer->progressbar($percentage, 'medium', false);
+        }
+
         $row = array();
         $row[] = prog_display_summary_widget($p, $userid);
         $row[] = prog_display_duedate($p->duedate, $p->id, $userid);
-        $row[] = prog_display_progress($p->id, $userid);
+        $row[] = (string)$progress;
+
         $table->add_data($row);
         $rowcount++;
     }
@@ -317,6 +329,7 @@ function prog_display_required_programs($userid) {
  * @return  string
  */
 function prog_display_certification_programs($userid) {
+    global $PAGE;
 
     $count = prog_get_certification_programs($userid, '', '', '', true, true, true);
 
@@ -359,11 +372,22 @@ function prog_display_certification_programs($userid) {
         return '';
     }
 
+    /** @var totara_core_renderer $renderer */
+    $renderer = $PAGE->get_renderer('totara_core');
+    $str_notassigned = new lang_string('notassigned', 'totara_program');
+
     $rowcount = 0;
     foreach ($cprograms as $cp) {
         if (!prog_is_accessible($cp)) {
             continue;
         }
+
+        $percentage = totara_program_get_user_percentage_complete($cp, $userid);
+        $progress = $str_notassigned;
+        if ($percentage !== null) {
+            $progress = $renderer->progressbar($percentage, 'medium', false);
+        }
+
         $row = array();
         $row[] = prog_display_summary_widget($cp, $userid);
         if (!empty($cp->timeexpires)) {
@@ -371,7 +395,8 @@ function prog_display_certification_programs($userid) {
         } else {
             $row[] = prog_display_duedate($cp->duedate, $cp->id, $userid, $cp->certifpath, $cp->status);
         }
-        $row[] = prog_display_progress($cp->id, $userid, $cp->certifpath);
+        // This could be improved, see \totara_certification\rb\display\certif_completion_progress::display
+        $row[] = (string)$progress;
         $table->add_data($row);
         $rowcount++;
     }
@@ -2321,7 +2346,6 @@ function prog_display_duedate($duedate, $progid, $userid, $certifpath = null, $c
     return $out;
 }
 
-
 /**
  * Determines and displays the progress of this program for a specified user.
  *
@@ -2335,37 +2359,28 @@ function prog_display_duedate($duedate, $progid, $userid, $certifpath = null, $c
  * @param int $programid
  * @param int $userid
  * @param int $certifpath (defaults to cert for programs)
- * @param bool $export
- * @return  string
+ * @param bool $percentageonly
+ * @return int|string|false
  */
-function prog_display_progress($programid, $userid, $certifpath = CERTIFPATH_CERT, $export = false) {
-    global $DB, $PAGE;
+function prog_display_progress($programid, $userid, $certifpath = null, $percentageonly = false) {
+    global $PAGE;
 
-    $sql = "SELECT pc.*, cc.id AS ccid, prog.certifid
-              FROM {prog_completion} pc
-              JOIN {prog} prog ON prog.id = pc.programid
-         LEFT JOIN {certif_completion} cc ON cc.certifid = prog.certifid AND cc.userid = pc.userid
-             WHERE pc.programid = :programid AND pc.userid = :userid AND pc.coursesetid = 0";
-    $prog_completion = $DB->get_record_sql($sql, array('programid' => $programid, 'userid' => $userid));
-
-    if (empty($prog_completion) ||
-        !empty($prog_completion->certifid) && $prog_completion->status != STATUS_PROGRAM_COMPLETE && empty($prog_completion->ccid)) {
-        $out = get_string('notassigned', 'totara_program');
-        return $out;
+    if ($certifpath) {
+        $percentage = totara_certification_get_current_percentage_complete($programid, $userid);
     } else {
-        $program = new program($programid);
-        $overall_progress = (int)$program->get_progress($userid);
+        $percentage = totara_program_get_user_percentage_complete($programid, $userid);
+    }
+    if ($percentage === null) {
+        // You get here if you are not assigned OR if the program has not coursesets/courses.
+        return get_string('notassigned', 'totara_program');
+    }
+    if ($percentageonly) {
+        return $percentage;
     }
 
-    if ($export) {
-        return $overall_progress;
-    }
-
-    $tooltipstr = 'DEFAULTTOOLTIP';
-
-    // Get relevant progress bar and return for display.
+    /** @var totara_core_renderer $renderer */
     $renderer = $PAGE->get_renderer('totara_core');
-    return $renderer->progressbar($overall_progress, 'medium', false, $tooltipstr);
+    return $renderer->progressbar($percentage, 'medium', false);
 }
 
 /**
@@ -3909,4 +3924,20 @@ function prog_get_tagged_programs($tag, $exclusivemode = false, $fromctx = 0, $c
 
     return new core_tag\output\tagindex($tag, 'totara_program', 'prog', $content,
             $exclusivemode, $fromctx, $ctx, $rec, $page, $totalpages);
+}
+
+/**
+ * Gets a users completion percentage for the given program + user
+ *
+ * @param program|int $programorid Program instance of program id.
+ * @param int $userid
+ * @return int|null
+ */
+function totara_program_get_user_percentage_complete($programorid, int $userid) : ?int {
+    $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($programorid, $userid);
+    $percentage = $progressinfo->get_percentagecomplete();
+    if ($percentage === false) {
+        return null;
+    }
+    return $percentage;
 }
