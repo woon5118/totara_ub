@@ -25,7 +25,7 @@ namespace totara_competency\controllers\profile;
 
 use tassign_competency\entities\competency_framework;
 use tassign_competency\entities\competency_type;
-use totara_mvc\view;
+use totara_mvc\tui_view;
 
 class self_assignment extends base {
 
@@ -38,9 +38,6 @@ class self_assignment extends base {
             $this->require_capability('tassign/competency:assignother', $this->context);
         }
 
-        // TODO Fix it so that tui_component is not requiring this
-        $renderer = $this->page->get_renderer('core');
-
         // Add breadcrumbs.
         $this->add_navigation('Self assignment');
 
@@ -51,11 +48,7 @@ class self_assignment extends base {
             'types' => $this->get_types()
         ];
 
-        $data = [
-            'self_assignment' => $OUTPUT->tui_component('totara_competency/pages/SelfAssignment', $props)
-        ];
-
-        return view::create('totara_competency/profile_self_assignment', $data)
+        return tui_view::create('totara_competency/pages/SelfAssignment', $props)
             ->set_title(get_string('assign_competencies', 'totara_competency'));
     }
 

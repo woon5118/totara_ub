@@ -33,9 +33,8 @@ use totara_competency\achievement_criteria;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
 use totara_competency\plugintypes;
-use totara_core\output\tui_component;
 use totara_mvc\admin_controller;
-use totara_mvc\view;
+use totara_mvc\tui_view;
 
 global $CFG;
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
@@ -95,15 +94,12 @@ class competency_controller extends admin_controller {
         $this->page->set_title($title);
         $this->page->navbar->add($this->competency->display_name);
 
-        return new view(
-            'totara_competency/vue_component',
-            new tui_component('totara_competency/pages/CompetencySummary', [
-                'competency-id' => $this->competency->id,
-                'competency-name' => $this->competency->display_name,
-                'framework-id' => $this->framework->id,
-                'framework-name' => format_string($this->framework->fullname),
-            ])
-        );
+        return new tui_view('totara_competency/pages/CompetencySummary', [
+            'competency-id' => $this->competency->id,
+            'competency-name' => $this->competency->display_name,
+            'framework-id' => $this->framework->id,
+            'framework-name' => format_string($this->framework->fullname),
+        ]);
     }
 
     public function action_edit() {
