@@ -33,6 +33,7 @@ use totara_competency\achievement_criteria;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
 use totara_competency\plugintypes;
+use totara_core\output\tui_component;
 use totara_mvc\admin_controller;
 use totara_mvc\view;
 
@@ -96,7 +97,7 @@ class competency_controller extends admin_controller {
 
         return new view(
             'totara_competency/vue_component',
-            view::core_renderer()->tui_component('totara_competency/pages/CompetencySummary', [
+            new tui_component('totara_competency/pages/CompetencySummary', [
                 'competency-id' => $this->competency->id,
                 'competency-name' => $this->competency->display_name,
                 'framework-id' => $this->framework->id,
