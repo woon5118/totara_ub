@@ -28,14 +28,6 @@ export default {
   data: function() {
     return {};
   },
-
-  computed: {},
-
-  watch: {},
-
-  mounted: function() {},
-
-  methods: {},
 };
 </script>
 <style lang="scss">
@@ -47,9 +39,9 @@ export default {
   &__chart {
     width: calc(100% - 0.5rem);
     margin: 0 0.5rem 1rem 0;
-    padding: 0.5rem;
-    border: 1px #999c9c solid;
-    border-radius: 1rem;
+    padding: 3rem 2rem;
+    border: 1px #e7e7e7 solid;
+    border-radius: 0.3rem;
 
     @media (min-width: $totara_style-screen_sm_min) and (max-width: $totara_style-screen_xl_min) {
       width: $totara_style-screen_sm_min - 0.5rem;
@@ -61,6 +53,3 @@ export default {
   }
 }
 </style>
-<lang-strings>
-  {}
-</lang-strings>

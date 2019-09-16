@@ -1,130 +1,48 @@
 <template>
-  <ChartJs
-    type="doughnut"
-    :data="data"
-    :options="options"
-    :canvas-attributes="canvasAttributes"
-    class="tui-AssignmentProgress__progress-card"
+  <PercentageDoughnut
+    :header="progress.name"
+    :percentage="progress.overall_progress"
+    :label="$str('proficient', 'totara_competency')"
+    :label-font-size="14"
+    :percentage-font-size="30"
+    :square="true"
+    label-color="#000"
+    color="#DA7E31"
+    background-color="#ECECEC"
+    class="tui-assignmentProgress__progress-card"
   />
 </template>
 
 <script>
-import ChartJs from '../presentation/ChartJs';
+import PercentageDoughnut from 'totara_core/presentation/chartjs/PercentageDoughnut';
 
 export default {
-  components: { ChartJs },
+  components: { PercentageDoughnut },
   props: {
     progress: {
       required: true,
       type: Object,
     },
   },
-
-  computed: {
-    options: function() {
-      return {
-        plugins: {
-          doughnutlabel: {
-            labels: [
-              {
-                text: this.progress.overall_progress + '%',
-                font: {
-                  size: '40',
-                  weight: 'bold',
-                },
-                color: '#3f9852',
-              },
-              {
-                text: this.$str('proficient', 'totara_competency'),
-                font: {
-                  size: '24',
-                },
-                color: '#3f9852',
-              },
-              {
-                text: '',
-                font: {
-                  size: '5',
-                },
-              },
-            ],
-          },
-        },
-        tooltips: {
-          enabled: false,
-        },
-        cutoutPercentage: 75,
-        legend: {
-          display: false,
-        },
-        title: {
-          display: true,
-          text: this.truncateTitle(this.progress.name),
-        },
-        layout: {
-          padding: {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-          },
-        },
-      };
-    },
-
-    data: function() {
-      return {
-        labels: [
-          this.$str('proficient', 'totara_competency'),
-          this.$str('not_proficient', 'totara_competency'),
-        ],
-        datasets: [
-          {
-            data: [
-              this.progress.overall_progress,
-              100 - this.progress.overall_progress,
-            ],
-            backgroundColor: ['#3f9852', '#8c8c8c40'],
-          },
-        ],
-      };
-    },
-
-    canvasAttributes: function() {
-      return {
-        width: '100%',
-        height: '100%',
-      };
-    },
-  },
-
-  mounted: function() {},
-
-  methods: {
-    truncateTitle: function(title) {
-      let maxLen = 25;
-      let separator = ' ';
-
-      if (title.length <= maxLen) return title;
-
-      title = title.substr(0, title.lastIndexOf(separator, maxLen));
-
-      return title + '...';
-    },
-  },
 };
 </script>
 <style lang="scss">
-.tui-AssignmentProgress__ {
+.tui-assignmentProgress__ {
   &progress-card {
-    width: 200px;
+    width: 175px;
+    padding: 1rem;
+
+    .tui-chartJs__header {
+      font-size: $totara_style-size_16;
+      padding-bottom: 2rem;
+    }
   }
 }
 </style>
 <lang-strings>
     {
         "totara_competency" : [
-            "proficient", "not_proficient"
+            "proficient"
         ]
     }
 </lang-strings>

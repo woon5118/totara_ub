@@ -1,9 +1,14 @@
 <template>
-  <ChartJs :type="type" :data="data" :options="options" />
+  <ChartJs
+    :type="type"
+    :data="data"
+    :options="options"
+    :header="assignmentProgress.name"
+  />
 </template>
 
 <script>
-import ChartJs from '../presentation/ChartJs';
+import ChartJs from 'totara_core/presentation/chartjs/ChartJs';
 
 /**
  *  To get line chart working properly there is trickery involved.
@@ -38,18 +43,23 @@ export default {
             return [''].indexOf(label.trim());
           },
         },
+
         legend: {
-          position: 'top',
+          position: 'bottom',
           display: true,
-        },
-        title: {
-          display: true,
-          text: this.assignmentProgress.name,
+          labels: {
+            boxWidth: 15,
+            lineWidth: 0,
+            padding: 25,
+          },
         },
       };
 
       if (this.type === 'radar') {
         options.scale = {
+          pointLabels: {
+            fontSize: 12,
+          },
           ticks: {
             beginAtZero: true,
             display: false,
@@ -82,6 +92,7 @@ export default {
               ticks: {
                 beginAtZero: true,
                 display: false,
+                fontSize: 12,
               },
             },
           ],
@@ -90,6 +101,7 @@ export default {
               ticks: {
                 min,
                 max,
+                fontSize: 12,
               },
             },
           ],
@@ -123,8 +135,9 @@ export default {
         datasets: [
           {
             label: this.$str('my_rating', 'totara_competency'), // TODO String
-            backgroundColor: '#3869b150',
+            backgroundColor: '#3869b140',
             borderColor: '#3869b1',
+            borderWidth: 2,
             rawData: [],
             data: [],
             values: [],
@@ -133,8 +146,9 @@ export default {
             label: this.$str('proficient_value', 'totara_competency'),
 
             // For bar charts the area under the line should be transparent
-            backgroundColor: this.type === 'bar' ? 'transparent' : '#cc242850',
+            backgroundColor: this.type === 'bar' ? 'transparent' : '#cc242840',
             borderColor: '#cc2428',
+            borderWidth: 2,
             steppedLine: 'middle',
             rawData: [],
             data: [],
@@ -206,8 +220,6 @@ export default {
         : 'radar';
     },
   },
-
-  mounted: function() {},
 
   methods: {
     shorten: function(str, maxLen, separator = ' ') {
