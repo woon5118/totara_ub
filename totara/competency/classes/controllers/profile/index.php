@@ -23,8 +23,7 @@
 
 namespace totara_competency\controllers\profile;
 
-use totara_core\output\tui_component;
-use totara_mvc\view;
+use totara_mvc\tui_view;
 use user_picture;
 
 
@@ -32,15 +31,8 @@ class index extends base {
 
     public function action() {
 
-        global $OUTPUT;
-
         // Add breadcrumbs.
         $this->add_navigation();
-
-        $title = get_string('competency_profile', 'totara_competency', $this->user->firstname . ' ' . $this->user->lastname);
-
-        // TODO Fix it so that tui_component is not requiring this
-        $renderer = $this->page->get_renderer('core');
 
         $props = [
             'profile-picture' => $this->get_my_profile_picture_url(),
@@ -52,13 +44,8 @@ class index extends base {
             'can-assign' => $this->can_assign()
         ];
 
-        $data = [
-            'title' => $title,
-            'competency_profile' => $OUTPUT->render(new tui_component('totara_competency/pages/CompetencyProfile', $props)),
-        ];
-
-        return view::create('totara_competency/profile_index', $data)
-            ->set_title($title);
+        return tui_view::create('totara_competency/pages/CompetencyProfile', $props)
+            ->set_title(get_string('competency_profile', 'totara_competency'));
     }
 
     protected function get_my_profile_picture_url(int $size = 100): string {

@@ -30,7 +30,6 @@ use totara_mvc\tui_view;
 class self_assignment extends base {
 
     public function action() {
-        global $OUTPUT;
 
         if ($this->is_for_current_user()) {
             $this->require_capability('tassign/competency:assignself', \context_system::instance());

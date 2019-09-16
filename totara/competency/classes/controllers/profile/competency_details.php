@@ -29,10 +29,6 @@ use totara_mvc\tui_view;
 class competency_details extends base {
 
     public function action() {
-        global $OUTPUT;
-
-        // TODO Fix it so that tui_component is not requiring this
-        $renderer = $this->page->get_renderer('core');
 
         // Add breadcrumbs.
         $this->add_navigation(get_string('competencydetails', 'totara_hierarchy'));

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h2 v-text="$str('competency_profile', 'totara_competency')" />
     <Preloader :display="$apollo.loading" />
     <NoCompetencyAssignments
       v-if="noAssignments"
@@ -217,6 +218,6 @@ export default {
 </style>
 <lang-strings>
     {
-       "totara_competency": ["latest_achievement", "assign_competencies", "no_competencies_assigned", "loading"]
+       "totara_competency": ["latest_achievement", "assign_competencies", "no_competencies_assigned", "loading", "competency_profile"]
     }
 </lang-strings>
