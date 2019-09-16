@@ -33,8 +33,8 @@ export default {
     padding: 1rem;
 
     .tui-chartJs__header {
-      font-size: $totara_style-size_16;
       padding-bottom: 2rem;
+      font-size: $totara_style-size_16;
     }
   }
 }
