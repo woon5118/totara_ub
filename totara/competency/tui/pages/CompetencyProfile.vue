@@ -142,7 +142,7 @@ export default {
     },
 
     noAssignments() {
-      return !this.isLoading && !this.filters.length;
+      return !this.$apollo.loading && !this.filters.length;
     },
   },
 
