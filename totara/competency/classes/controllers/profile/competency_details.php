@@ -24,7 +24,7 @@
 namespace totara_competency\controllers\profile;
 
 use totara_competency\entities\competency;
-use totara_mvc\view;
+use totara_mvc\tui_view;
 
 class competency_details extends base {
 
@@ -46,11 +46,7 @@ class competency_details extends base {
             'go-back-link' => (string)$this->get_profile_url(),
         ];
 
-        $data = [
-            'component' => $OUTPUT->tui_component('totara_competency/pages/CompetencyDetail', $props)
-        ];
-
-        return view::create('totara_competency/profile_competency_details', $data)
+        return tui_view::create('totara_competency/pages/CompetencyDetail', $props)
             ->set_title(get_string('competencydetails', 'totara_hierarchy'));
     }
 }

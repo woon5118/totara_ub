@@ -23,6 +23,7 @@
 
 namespace totara_competency\controllers\profile;
 
+use totara_core\output\tui_component;
 use totara_mvc\view;
 use user_picture;
 
@@ -53,7 +54,7 @@ class index extends base {
 
         $data = [
             'title' => $title,
-            'competency_profile' => $OUTPUT->tui_component('totara_competency/pages/CompetencyProfile', $props),
+            'competency_profile' => $OUTPUT->render(new tui_component('totara_competency/pages/CompetencyProfile', $props)),
         ];
 
         return view::create('totara_competency/profile_index', $data)

@@ -24,7 +24,7 @@
 namespace totara_competency\controllers\profile;
 
 use totara_competency\entities\competency;
-use totara_mvc\view;
+use totara_mvc\tui_view;
 
 class activity_log extends base {
 
@@ -45,11 +45,7 @@ class activity_log extends base {
             'starting-tab' => 'log',
         ];
 
-        $data = [
-            'component' => view::core_renderer()->tui_component('totara_competency/pages/CompetencyDetail', $props)
-        ];
-
-        return view::create('totara_competency/profile_competency_details', $data)
+        return tui_view::create('totara_competency/pages/CompetencyDetail', $props)
             ->set_title($page_title);
     }
 }
