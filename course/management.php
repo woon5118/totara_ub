@@ -277,6 +277,9 @@ if ($action !== false && confirm_sesskey()) {
                     echo $renderer->continue_button($continueurl);
                 } else {
                     // Some error in parameters (user is cheating?)
+                    // Totara: Display an error message as user may not be cheating anymore :)
+                    $notification = get_string('deletednot', '', $category->get_formatted_name());
+                    echo $renderer->notification($notification, 'error');
                     $mform->display();
                 }
             } else {

@@ -242,7 +242,7 @@ class helper {
         }
 
         // Delete.
-        if ($category->can_delete_full()) {
+        if ($category->can_delete()) { // Totara: Changed from can_delete_full() to improve performance.
             $actions['delete'] = array(
                 'url' => new \moodle_url($baseurl, array('action' => 'deletecategory')),
                 'icon' => \core\output\flex_icon::get_icon('t/delete', 'core', array('alt' => new \lang_string('delete'))),
