@@ -741,6 +741,7 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
+            'tenantusermanager' => CAP_ALLOW,
         )
     ),
 

@@ -23,6 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2019070901;       // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2019091601;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2017051509;       // Requires this Totara version.
 $plugin->component = 'totara_tenant';  // To check on upgrade, that module sits in correct place

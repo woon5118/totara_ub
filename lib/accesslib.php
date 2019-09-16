@@ -2340,7 +2340,7 @@ function get_default_role_archetype_allows($type, $archetype) {
             'frontpage'      => array(),
             'assessor'       => array(),
             'tenantdomainmanager' => array('coursecreator', 'editingteacher', 'teacher', 'student', 'tenantdomainmanager'),
-            'tenantusermanager' => array(),
+            'tenantusermanager' => array('tenantusermanager'),
         ),
         'override' => array(
             'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user', 'frontpage', 'staffmanager', 'assessor', 'regionalmanager', 'regionaltrainer', 'tenantusermanager', 'tenantdomainmanager'),

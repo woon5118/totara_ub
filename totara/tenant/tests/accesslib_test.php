@@ -589,8 +589,17 @@ class totara_tenant_accesslib_testcase extends advanced_testcase {
         $tenantgenerator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
         $tenantgenerator->enable_tenants();
 
+        $tenantdomainmanager = $DB->get_record('role', ['archetype' => 'tenantdomainmanager']);
+        $tenantusermanager = $DB->get_record('role', ['archetype' => 'tenantusermanager']);
+        $coursecreator = $DB->get_record('role', ['archetype' => 'coursecreator']);
+        $editingteacher = $DB->get_record('role', ['archetype' => 'editingteacher']);
+        $teacher = $DB->get_record('role', ['archetype' => 'teacher']);
+        $student = $DB->get_record('role', ['archetype' => 'student']);
+        $guest = $DB->get_record('role', ['archetype' => 'guest']);
+        $user = $DB->get_record('role', ['archetype' => 'user']);
+
         $this->assertSame(
-            [],
+            [$tenantusermanager->id => $tenantusermanager->id],
             get_default_role_archetype_allows('assign', 'tenantusermanager')
         );
         $this->assertSame(
@@ -601,14 +610,6 @@ class totara_tenant_accesslib_testcase extends advanced_testcase {
             [],
             get_default_role_archetype_allows('switch', 'tenantusermanager')
         );
-
-        $tenantdomainmanager = $DB->get_record('role', ['archetype' => 'tenantdomainmanager']);
-        $coursecreator = $DB->get_record('role', ['archetype' => 'coursecreator']);
-        $editingteacher = $DB->get_record('role', ['archetype' => 'editingteacher']);
-        $teacher = $DB->get_record('role', ['archetype' => 'teacher']);
-        $student = $DB->get_record('role', ['archetype' => 'student']);
-        $guest = $DB->get_record('role', ['archetype' => 'guest']);
-        $user = $DB->get_record('role', ['archetype' => 'user']);
 
         $this->assertSame(
             [$coursecreator->id => $coursecreator->id, $editingteacher->id => $editingteacher->id, $teacher->id => $teacher->id, $student->id => $student->id, $tenantdomainmanager->id => $tenantdomainmanager->id],

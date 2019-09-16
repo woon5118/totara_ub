@@ -104,6 +104,12 @@ Feature: Tenant user manager without isolation
     And "member1" row "Actions" column of "tenant_participants" table should contain "Edit Testovaci Uzivatel"
     And "member1" row "Actions" column of "tenant_participants" table should contain "Delete Testovaci Uzivatel"
 
+    When I navigate to "Assign roles" node in "Tenant"
+    And I follow "Tenant user manager"
+    And I set the field "addselect" to "Testovaci Uzivatel"
+    And I press "Add"
+    Then I navigate to "Tenant participants" node in "Tenant"
+
     When I click on "Delete Testovaci Uzivatel" "link" in the "Testovaci Uzivatel" "table_row"
     And I press "Delete"
     Then I should see "Tenant participants: 1 record shown"
@@ -188,6 +194,13 @@ Feature: Tenant user manager without isolation
     And "member1" row "User Status" column of "tenant_users" table should contain "Active"
     And "member1" row "Actions" column of "tenant_users" table should contain "Edit Testovaci Uzivatel"
     And "member1" row "Actions" column of "tenant_users" table should contain "Delete Testovaci Uzivatel"
+
+    When I navigate to "Assign roles" node in "User management"
+    And I follow "Tenant user manager"
+    And I set the field "addselect" to "Testovaci Uzivatel"
+    And I press "Add"
+    Then I click on "[aria-label='Show admin menu window']" "css_element"
+    And I click on "Users" "link" in the "#quickaccess-popover-content" "css_element"
 
     When I click on "Delete Testovaci Uzivatel" "link" in the "Testovaci Uzivatel" "table_row"
     And I press "Delete"
