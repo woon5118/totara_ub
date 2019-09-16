@@ -818,7 +818,7 @@ which you can just click on.  If that doesn\'t work,
 then cut and paste the address into the address
 line at the top of your web browser window.
 
-Cheers from the \'{$a->sitename}\' administrator,
+If you need help, please contact the site administrator,
 {$a->signoff}';
 $string['expand'] = 'Expand';
 $string['expandall'] = 'Expand all';

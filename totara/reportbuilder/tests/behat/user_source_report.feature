@@ -149,7 +149,7 @@ Feature: Verify functionality of user source report.
 
     When I follow "Unlock Bob1 Learner1"
     And I should see "Account can be unlocked by user, administrator or automatically when resetting or changing password."
-    And I set the "Choose" Totara form field to "Unlock account"
+    And I set the "Choose" Totara form field to "Unlock user account"
     And I press "Update"
     Then I should not see "Unlock Bob1 Learner1"
     And I log out

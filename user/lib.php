@@ -262,7 +262,7 @@ function user_suspend_user(int $userid) {
 
     // DO NOT ABUSE THIS EVENT!
     // No data should be deleted when user gets suspended, use userdata purging instead of event observers.
-    // There removal of bookings of suspended users in Seminar is a data loss bug.
+    // The removal of bookings of suspended users in Seminar is a data loss bug.
     $event = \totara_core\event\user_suspended::create_from_user($user);
     $event->add_record_snapshot('user', $user);
     $event->trigger();

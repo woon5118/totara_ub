@@ -53,7 +53,7 @@ Feature: Tenant account login management without tenant isolation
 
     When I click on "Unlock First User" "link" in the "First User" "table_row"
     And I should see "Account can be unlocked by user, administrator or automatically when resetting or changing password."
-    And I set the "Choose" Totara form field to "Unlock account"
+    And I set the "Choose" Totara form field to "Unlock user account"
     And I press "Update"
     Then "user1" row "Actions" column of "tenant_users" table should not contain "Unlock First User"
     And "user1" row "Actions" column of "tenant_users" table should contain "Manage login of First User"
