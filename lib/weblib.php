@@ -1374,6 +1374,15 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
             $text = html_writer::tag('div', $text, array('class' => 'no-overflow'));
             $options['overflowdiv'] = false; // Only do this once.
         }
+        // Totara: text cleaning must be done at the very end, unsafe filters are the only exception.
+        if ($cleantext) {
+            $text = clean_text($text, FORMAT_HTML, ['allowid' => !empty($options['allowid'])]);
+            $cleantext = false;
+        }
+
+        // This MUST be done AFTER clean_text() otherwise the DOMDocument process is going to
+        // strip out things it considers invalid HTML.
+        // Clean_text encodes these things before we use DOMDocument.
         if (!empty($options['blanktarget'])) {
             // TODO: move this code to JS, see TL-20778
             $domdoc = new DOMDocument();
@@ -1386,7 +1395,7 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
                 }
                 $link->setAttribute('target', '_blank');
                 if (strpos($link->getAttribute('rel'), 'noreferrer') === false) {
-                    $link->setAttribute('rel', trim($link->getAttribute('rel') . ' noreferrer'));
+                    $link->setAttribute('rel', trim($link->getAttribute('rel') . ' noreferrer noopener'));
                 }
             }
 
@@ -1396,11 +1405,6 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
             // this regex to remove those tags.
             $text = trim(preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $domdoc->saveHTML($domdoc->documentElement)));
             $options['blanktarget'] = false; // Only do this once.
-        }
-        // Totara: text cleaning must be done at the very end, unsafe filters are the only exception.
-        if ($cleantext) {
-            $text = clean_text($text, FORMAT_HTML, ['allowid' => !empty($options['allowid'])]);
-            $cleantext = false;
         }
 
         return $text;
