@@ -186,15 +186,7 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
         $ctx = context_module::instance($cm->id);
         $PAGE->set_context($ctx);
 
-        $cap = new stdClass();
-        $cap->contextid = $ctx->id;
-        $cap->roleid = $role->id;
-        $cap->capability = 'totara/core:seedeletedusers';
-        $cap->permission = 1;
-        $cap->timemodified = time();
-        $cap->modifierid = $USER->id;
-
-        $DB->insert_record('role_capabilities', $cap);
+        assign_capability('totara/core:seedeletedusers', CAP_ALLOW, $role->id, $ctx->id);
 
         // Delete user #0
         delete_user($users[0]);

@@ -438,15 +438,7 @@ class mod_facetoface_attendance_helper_testcase extends advanced_testcase {
         $context = context_module::instance($cm->id);
         $PAGE->set_context($context);
 
-        $cap = new stdClass();
-        $cap->contextid = $context->id;
-        $cap->roleid = $role->id;
-        $cap->capability = 'totara/core:seedeletedusers';
-        $cap->permission = 1;
-        $cap->timemodified = time();
-        $cap->modifierid = $USER->id;
-
-        $DB->insert_record('role_capabilities', $cap);
+        assign_capability('totara/core:seedeletedusers', CAP_ALLOW, $role->id, $context->id);
 
         $trainer = $gen->create_user();
         $gen->enrol_user($trainer->id, $e->get_seminar()->get_course(), 'editingteacher');
