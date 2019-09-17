@@ -8064,7 +8064,7 @@ class context_module extends context {
                 foreach (array_keys($subplugins) as $subplugintype) {
                     $paramname = "notlike{$i}";
                     $ignorecomponents[] = $DB->sql_like('component', ":{$paramname}", true, true, true);
-                    $params[$paramname] = "{$subplugintype}_%";
+                    $params[$paramname] = $DB->sql_like_escape("{$subplugintype}_") . "%";
                     $i++;
                 }
             }
