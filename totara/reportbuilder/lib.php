@@ -4706,7 +4706,7 @@ class reportbuilder {
         if ($graph and $graphdata = $graph->render(null,400)) {
             // The SVGGraph supports only one SVG per page when embedding directly,
             // it should be fine here because there are no blocks on this page.
-            $tablehtml = html_writer::div($graphdata, 'rb-report-svggraph') . $tablehtml;
+            $tablehtml = $graphdata . $tablehtml;
         } else {
             $tablehtml = html_writer::div('', 'rb-report-svggraph') . $tablehtml;
         }

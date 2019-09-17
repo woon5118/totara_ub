@@ -139,7 +139,7 @@ final class svggraph extends base {
         $data = $svggraph->Fetch($this->svggraphtype, false, false);
 
         if (strpos($data, 'Zero length axis (min >= max)') === false) {
-            return !empty($data) ? $data : '';
+            return !empty($data) ? \html_writer::div($data, 'rb-report-svggraph') : '';
         }
 
         // Use a workaround to prevent axis problems caused by zero only values.
@@ -160,7 +160,7 @@ final class svggraph extends base {
             $data = self::fix_svg_rtl($data);
         }
 
-        return !empty($data) ? $data : '';
+        return !empty($data) ? \html_writer::div($data, 'rb-report-svggraph') : '';
     }
 
     protected function init_svggraph() {

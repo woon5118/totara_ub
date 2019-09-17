@@ -224,6 +224,24 @@ final class chartjs extends base {
                     'display' => true,
                     'text' => $this->labels[$k],
                 ];
+                $settings['plugins'] = [
+                    'doughnutlabel' => [
+                        'labels' => [
+                            [
+                                'text' => round($val / $chart['total'] * 100, 0) . '%',
+                                'font' => [
+                                    'size' => 100 // this doesn't reflect actual size, but a ratio -- it get scaled down
+                                ]
+                            ],
+                            [
+                                'text' => ''.$val,
+                                'font' => [
+                                    'size' => 66
+                                ]
+                            ]
+                        ]
+                    ]
+                ];
 
                 $charts[] = [
                     'settings' => json_encode([
@@ -233,12 +251,8 @@ final class chartjs extends base {
                             'labels' => [$this->labels[$k], ''],
                             'datasets' => [$chart],
                         ],
-                        'options' => $settings,
-                    ]),
-                    'progressLabel' => [
-                        'title' => round($val / $chart['total'] * 100, 0) . '%',
-                        'subtitle' => ''.$chart['total'],
-                    ]
+                        'options' => $settings
+                    ])
                 ];
             }
         }

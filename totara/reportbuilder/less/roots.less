@@ -21,6 +21,8 @@
 // @author    Brian Barnes <brian.barnes@totaralearning.com>
 // @package   totara_reportbuilder
 
+@reportbuilder_minimum_size: 200px;
+
 .rb-search .mform {
     .mform .fitem .felement label {
         margin-left: @padding-small-horizontal;
@@ -335,35 +337,31 @@ form[id^="toolbarsearch"].mform .fsubmit {
 .rb-chartjs {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    position: relative;
 
-    &--progress {
-        align-items: flex-start;
-
-        .rb-chartjs__chart {
-            max-width: 25%;
+    @supports(display: grid) {
+        & {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(@reportbuilder_minimum_size, 1fr));
+            grid-auto-rows: 1fr;
         }
     }
 
     &__chart {
-        position: relative;
-        flex: 1 1 100%;
-        min-width: 0;
+        margin: 0 1rem;
+        height: 100%;
+        max-width: 100%;
 
-        &__canvas {
-            position: relative;
-            z-index: 1; // put this above the svg label
-        }
+        // Use explicit flex-basis property for IE11 support
+        flex-grow: 1;
+        flex-shrink: 0;
+        flex-basis: 0px;
 
-        &__svg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            max-height: calc(~'100% - 35px'); // 2 * 10px (title padding) + 12px (title font-size) * 1.2 (title line-height)
-
-            bottom: 0;
+        // this is a fallback which will simply
+        // put 4 charts in a row as a fallback when display: grid isn't supported
+        &--progress {
+            margin: 0 1rem;
+            flex-grow: 0;
+            flex-basis: @reportbuilder_minimum_size;
         }
     }
 }
