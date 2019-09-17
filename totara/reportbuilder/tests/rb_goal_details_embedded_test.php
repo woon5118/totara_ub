@@ -66,7 +66,6 @@ class totara_reportbuilder_rb_goal_details_embedded_testcase extends advanced_te
 
         // Test user with view capability can access report.
         assign_capability('totara/hierarchy:viewgoalreport', CAP_ALLOW, $roleuser->id, $syscontext);
-        $syscontext->mark_dirty();
         $this->assertTrue($embeddedobject->is_capable($userid, $report),
                 'user with capability totara/hierarchy:viewgoalreport cannot access report');
         assign_capability('totara/hierarchy:viewgoalreport', CAP_INHERIT, $roleuser->id, $syscontext);

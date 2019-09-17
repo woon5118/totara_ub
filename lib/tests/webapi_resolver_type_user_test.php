@@ -245,7 +245,6 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
         $roleid = $this->getDataGenerator()->create_role([]);
         role_assign($roleid, $user->id, $context);
         assign_capability('moodle/user:editownprofile', CAP_PROHIBIT, $roleid, $context);
-        $context->mark_dirty();
         self::assertSame('<p>This is a test</p>',  user::resolve('description', $user, [], $this->get_execution_context()));
         self::assertSame('<p>This is a test</p>',  user::resolve('description', $user, ['format' => \core\format::FORMAT_HTML], $this->get_execution_context()));
         self::assertSame("This is a test\n",  user::resolve('description', $user, ['format' => \core\format::FORMAT_PLAIN], $this->get_execution_context()));

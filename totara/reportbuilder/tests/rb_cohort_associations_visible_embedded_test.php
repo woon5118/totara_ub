@@ -66,7 +66,6 @@ class totara_reportbuilder_rb_cohort_associations_visible_embedded_testcase exte
 
         // Test user with view capability can access report.
         assign_capability('moodle/cohort:view', CAP_ALLOW, $roleuser->id, $syscontext);
-        $syscontext->mark_dirty();
         $this->assertTrue($embeddedobject->is_capable($userid, $report),
                 'user with capability moodle/cohort:view cannot access report');
         assign_capability('moodle/cohort:view', CAP_INHERIT, $roleuser->id, $syscontext);

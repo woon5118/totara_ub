@@ -394,7 +394,6 @@ class totara_job_webapi_resolver_type_assignment_testcase extends advanced_testc
         $roleid = $this->getDataGenerator()->create_role();
         $this->getDataGenerator()->role_assign($roleid, $user->id, $context->id);
         assign_capability('totara/hierarchy:viewposition', CAP_PROHIBIT, $roleid, $context);
-        $context->mark_dirty();
 
         // User can't view organisations.
         self::assertSame(null, $this->resolve('position', self::create_fake_job_assignment([])));
@@ -436,7 +435,6 @@ class totara_job_webapi_resolver_type_assignment_testcase extends advanced_testc
         $roleid = $this->getDataGenerator()->create_role();
         $this->getDataGenerator()->role_assign($roleid, $user->id, $context->id);
         assign_capability('totara/hierarchy:vieworganisation', CAP_PROHIBIT, $roleid, $context);
-        $context->mark_dirty();
 
         // User can't view organisations.
         self::assertSame(null, $this->resolve('organisation', self::create_fake_job_assignment(['userid' => $user->id])));

@@ -67,7 +67,6 @@ class totara_reportbuilder_rb_completionimport_course_embedded_testcase extends 
 
         // Test user with view capability can access report.
         assign_capability('totara/completionimport:import', CAP_ALLOW, $roleuser->id, $syscontext);
-        $syscontext->mark_dirty();
         $this->assertTrue($embeddedobject->is_capable($userid, $report),
                 'user with capability totara/completionimport:import cannot access report');
         assign_capability('totara/completionimport:import', CAP_INHERIT, $roleuser->id, $syscontext);

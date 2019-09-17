@@ -62,8 +62,6 @@ class totara_reportbuilder_rb_plan_courses_completion_history_embedded_testcase 
         $rolecoursecreator = $DB->get_record('role', array('shortname'=>'coursecreator'));
         role_assign($rolecoursecreator->id, $this->user3->id, $syscontext);
         assign_capability('totara/plan:accessanyplan', CAP_ALLOW, $rolecoursecreator->id, $syscontext);
-
-        $syscontext->mark_dirty();
     }
 
     public function test_is_capable() {

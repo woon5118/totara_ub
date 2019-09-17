@@ -118,8 +118,6 @@ class totara_reportbuilder_rb_plan_programs_embedded_cache_testcase extends repo
         $rolecoursecreator = $DB->get_record('role', array('shortname'=>'coursecreator'));
         role_assign($rolecoursecreator->id, $this->user3->id, $syscontext);
         assign_capability('totara/plan:accessanyplan', CAP_ALLOW, $rolecoursecreator->id, $syscontext);
-
-        $syscontext->mark_dirty();
     }
 
     protected function tearDown() {

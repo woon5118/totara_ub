@@ -157,7 +157,6 @@ class totara_reportbuilder_rb_totarasynclog_embedded_cache_testcase extends repo
 
         // Test user with manage capability can access report.
         assign_capability('tool/totara_sync:manage', CAP_ALLOW, $roleuser->id, $syscontext);
-        $syscontext->mark_dirty();
         $this->assertTrue($embeddedobject->is_capable($userid, $report),
                 'user with capability tool/totara_sync:manage cannot access report');
         assign_capability('tool/totara_sync:manage', CAP_INHERIT, $roleuser->id, $syscontext);

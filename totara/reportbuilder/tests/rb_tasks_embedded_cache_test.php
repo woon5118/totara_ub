@@ -106,8 +106,6 @@ class totara_reportbuilder_rb_tasks_embedded_cache_testcase extends reportcache_
         $rolecoursecreator = $DB->get_record('role', array('shortname'=>'coursecreator'));
         role_assign($rolecoursecreator->id, $this->user3->id, $syscontext);
         assign_capability('totara/message:viewallmessages', CAP_ALLOW, $rolecoursecreator->id, $syscontext);
-
-        $syscontext->mark_dirty();
     }
 
     protected function tearDown() {

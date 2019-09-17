@@ -61,8 +61,6 @@ class totara_reportbuilder_rb_plan_certifications_embedded_testcase extends adva
         $rolecoursecreator = $DB->get_record('role', array('shortname'=>'coursecreator'));
         role_assign($rolecoursecreator->id, $this->user3->id, $syscontext);
         assign_capability('totara/plan:accessanyplan', CAP_ALLOW, $rolecoursecreator->id, $syscontext);
-
-        $syscontext->mark_dirty();
     }
 
     public function test_is_capable() {

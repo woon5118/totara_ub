@@ -66,7 +66,6 @@ class totara_reportbuilder_rb_appraisal_detail_embedded_testcase extends advance
 
         // Test user with capability can access report.
         assign_capability('totara/appraisal:manageappraisals', CAP_ALLOW, $roleuser->id, $syscontext);
-        $syscontext->mark_dirty();
         $this->assertTrue($embeddedobject->is_capable($userid, $report),
                 'user with capability totara/appraisal:manageappraisals cannot access report');
         assign_capability('totara/appraisal:manageappraisals', CAP_INHERIT, $roleuser->id, $syscontext);

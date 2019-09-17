@@ -175,7 +175,6 @@ class totara_job_lib_testcase extends advanced_testcase {
         $this->assertFalse(totara_job_can_edit_job_assignments($user1->id));
         $user_role = $DB->get_record('role', array('shortname'=>'user'), '*', MUST_EXIST);
         assign_capability('totara/hierarchy:assignselfposition', CAP_ALLOW, $user_role->id, $systemcontext->id, true);
-        $systemcontext->mark_dirty();
         $this->assertTrue(totara_job_can_edit_job_assignments($user1->id));
 
         // totara/hierarchy:assignuserposition capability
@@ -188,7 +187,6 @@ class totara_job_lib_testcase extends advanced_testcase {
         assign_capability('totara/hierarchy:assignuserposition', CAP_ALLOW, $sm_role->id, $systemcontext->id, true);
         assign_capability('totara/hierarchy:assignuserposition', CAP_ALLOW, $sm_role->id, $user2context->id, true);
         assign_capability('totara/hierarchy:assignuserposition', CAP_PROHIBIT, $sm_role->id, $user3context->id, true);
-        $systemcontext->mark_dirty();
 
         $this->setUser($user1);
         $this->assertTrue(totara_job_can_edit_job_assignments($user2->id));
@@ -237,14 +235,12 @@ class totara_job_lib_testcase extends advanced_testcase {
         $this->assertFalse(totara_job_can_view_job_assignments($user2, $course));
 
         assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $coursecontext->id, true);
-        $systemcontext->mark_dirty();
         $this->assertTrue(totara_job_can_view_job_assignments($user2, $course));
 
         $roleidx = $this->getDataGenerator()->create_role([]);
         role_assign($roleidx, $user1->id, $user2context);
         assign_capability('moodle/user:viewalldetails', CAP_ALLOW, $roleidx, $user2context->id, true);
         assign_capability('moodle/user:viewdetails', CAP_INHERIT, $roleid, $coursecontext->id, true);
-        $systemcontext->mark_dirty();
         $this->assertTrue(totara_job_can_view_job_assignments($user2, $course));
 
         // Can view outside of a course, as they have a course in common still.
@@ -252,10 +248,8 @@ class totara_job_lib_testcase extends advanced_testcase {
 
         // Reset the caps.
         assign_capability('moodle/user:viewalldetails', CAP_INHERIT, $roleidx, $user2context->id, true);
-        $systemcontext->mark_dirty();
         $this->assertFalse(totara_job_can_view_job_assignments($user2));
         assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleidx, $user2context->id, true);
-        $systemcontext->mark_dirty();
         $this->assertTrue(totara_job_can_view_job_assignments($user2));
     }
 }
