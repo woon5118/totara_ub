@@ -269,7 +269,7 @@ Feature: Seminar Signup Manager Approval
 
     And I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I follow "More info"
+    And I follow "Event info"
     And I should see "Manager Approval"
     But I should see "You don't have permission to signup to this seminar event"
     And I should not see "Request approval"
