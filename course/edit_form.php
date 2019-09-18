@@ -396,6 +396,10 @@ class course_edit_form extends moodleform {
                 $mform->removeElement('newsitems');
             }
         }
+
+        // Called at the end of the definition_after_data, prior to data being set.
+        $hook = new core_course\hook\edit_form_definition_after_data($this, $this->_customdata);
+        $hook->execute();
     }
 
     /**
@@ -440,6 +444,10 @@ class course_edit_form extends moodleform {
         if (!empty($formaterrors) && is_array($formaterrors)) {
             $errors = array_merge($errors, $formaterrors);
         }
+
+        // Called at the end of the validation.
+        $hook = new core_course\hook\edit_form_validation($this, $data, $files, $errors);
+        $hook->execute();
 
         return $errors;
     }
