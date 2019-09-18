@@ -348,7 +348,10 @@ final class helper {
         $select = "parentid = :id1 AND id <> :id2"; // Ignore invalid self-links.
         $params = array('id1' => $record->id, 'id2' => $record->id);
         if ($DB->record_exists_select('totara_navigation', $select, $params)) {
-            return false;
+            // Before we return false, check that the record is a valid parent
+            if ($record->classname !== '\totara_core\totara\menu\item') {
+                return false;
+            }
         }
 
         if ($record->classname === '\totara_core\totara\menu\unused') {
