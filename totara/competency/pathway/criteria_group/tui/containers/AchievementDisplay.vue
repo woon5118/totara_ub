@@ -24,7 +24,9 @@
   <div class="tui-pathwayCriteriaGroup-achievement__group">
     <Preloader :display="$apollo.loading" />
     <div v-for="(component, id) in achievements" :key="id">
-      <component :is="component.component" v-bind="component.props" />
+      <div class="tui-pathwayCriteriaGroup-achievement__group__criteria">
+        <component :is="component.component" v-bind="component.props" />
+      </div>
       <Divider
         v-if="!isLastItem(id, achievements)"
         :label="$str('and', 'totara_competency')"
@@ -103,8 +105,15 @@ export default {
   &__group {
     margin: 1em;
     padding: 1em;
-    border: 1px solid black;
+    border: 1px dashed grey;
     border-radius: 6px;
+
+    &__criteria {
+      margin: 1em;
+      padding: 1em;
+      border: 1px solid black;
+      border-radius: 6px;
+    }
   }
 }
 </style>
