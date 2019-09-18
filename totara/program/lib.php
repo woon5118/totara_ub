@@ -1016,7 +1016,7 @@ function prog_get_programs_search($searchterms, $sort='fullname ASC', $page=0, $
     $params = array_merge($params, $visibilityparams);
     $sql = "SELECT p.*,
                    ctx.id AS ctxid, ctx.path AS ctxpath,
-                   ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
+                   ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel, ctx.tenantid AS ctxtenantid
             FROM {prog} p
             JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_PROGRAM.")
             {$where} AND {$visibilitysql}

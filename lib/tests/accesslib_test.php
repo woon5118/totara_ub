@@ -2071,9 +2071,9 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertEquals((object)['id' => $c1->id], $courses[0]);
 
         // Add a selection of fields, including the context ones with special handling.
-        $courses = get_user_capability_course($cap, $u3->id, true, 'shortname, ctxlevel, ctxdepth, ctxinstance', 'id');
+        $courses = get_user_capability_course($cap, $u3->id, true, 'shortname, ctxlevel, ctxdepth, ctxinstance, ctxtenantid, ctxtenantid', 'id');
         $this->assertEquals((object)['id' => $c1->id, 'shortname' => 'Z', 'ctxlevel' => 50,
-                'ctxdepth' => 3, 'ctxinstance' => $c1->id], $courses[0]);
+                'ctxdepth' => 3, 'ctxinstance' => $c1->id, 'ctxtenantid' => null], $courses[0]);
 
         // Test front page role - user 1 has no roles, but if we change the front page role
         // definition so that it has our capability, then they should see the front page course.

@@ -1190,7 +1190,7 @@ function certif_get_certifications_search($searchterms, $sort='fullname ASC', $p
     $sql = "SELECT cf.id, cf.learningcomptype
              ,p.id as pid,p.fullname,p.visible,p.category,p.icon,p.available,p.availablefrom,p.availableuntil
             ,ctx.id AS ctxid, ctx.path AS ctxpath
-            ,ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
+            ,ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel, ctx.tenantid AS ctxtenantid
             FROM {certif} cf
             JOIN {prog} p ON p.certifid = cf.id AND cf.learningcomptype=".CERTIFTYPE_PROGRAM."
             JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_PROGRAM.")
@@ -1281,7 +1281,7 @@ function certif_get_certifications_page($categoryid="all", $sort="sortorder ASC"
 
     $certifselect = "SELECT $fields, 'certification' AS listtype,
                           ctx.id AS ctxid, ctx.path AS ctxpath,
-                          ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
+                          ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel, ctx.tenantid AS ctxtenantid
                      FROM {certif} cf
                      JOIN {prog} p ON (p.certifid = cf.id)
                      JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = ?)

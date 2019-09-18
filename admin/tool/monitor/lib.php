@@ -125,7 +125,7 @@ function tool_monitor_get_user_courses() {
         $options[0] = get_string('site');
     }
 
-    $fields = 'fullname, visible, ctxid, ctxpath, ctxdepth, ctxlevel, ctxinstance';
+    $fields = 'fullname, visible, ctxid, ctxpath, ctxdepth, ctxlevel, ctxinstance, ctxtenantid';
     if ($courses = get_user_capability_course('tool/monitor:subscribe', null, true, $fields, $orderby)) {
         foreach ($courses as $course) {
             context_helper::preload_from_record($course);
