@@ -595,10 +595,10 @@ class cache implements cache_loader {
      *
      * <code>
      * // This code will add four entries to the cache, one for each url.
-     * $cache->set('main', 'http://moodle.org');
-     * $cache->set('docs', 'http://docs.moodle.org');
-     * $cache->set('tracker', 'http://tracker.moodle.org');
-     * $cache->set('qa', 'http://qa.moodle.net');
+     * $cache->set('main', 'https://www.totaralearning.com');
+     * $cache->set('docs', 'https://docs.totaralearning.com');
+     * $cache->set('tracker', 'https://tracker.totaralms.com');
+     * $cache->set('demo', 'https://demo.totaralearning.com');
      * </code>
      *
      * @param string|int $key The key for the data being requested.
@@ -720,10 +720,10 @@ class cache implements cache_loader {
      * <code>
      * // This code will add four entries to the cache, one for each url.
      * $cache->set_many(array(
-     *     'main' => 'http://moodle.org',
-     *     'docs' => 'http://docs.moodle.org',
-     *     'tracker' => 'http://tracker.moodle.org',
-     *     'qa' => ''http://qa.moodle.net'
+     *     'main' => 'https://www.totaralearning.com',
+     *     'docs' => 'https://help.totaralearning.com',
+     *     'tracker' => 'https://tracker.totaralms.com',
+     *     'demo' => 'https://demo.totaralearning.com'
      * ));
      * </code>
      *
@@ -1458,10 +1458,10 @@ class cache_application extends cache implements cache_loader_with_locking {
      *
      * <code>
      * // This code will add four entries to the cache, one for each url.
-     * $cache->set('main', 'http://moodle.org');
-     * $cache->set('docs', 'http://docs.moodle.org');
-     * $cache->set('tracker', 'http://tracker.moodle.org');
-     * $cache->set('qa', 'http://qa.moodle.net');
+     * $cache->set('main', 'https://www.totaralearning.com');
+     * $cache->set('docs', 'https://docs.totaralearning.com');
+     * $cache->set('tracker', 'https://tracker.totaralms.com');
+     * $cache->set('demo', 'https://demo.totaralearning.com');
      * </code>
      *
      * @param string|int $key The key for the data being requested.
@@ -1491,10 +1491,10 @@ class cache_application extends cache implements cache_loader_with_locking {
      * <code>
      * // This code will add four entries to the cache, one for each url.
      * $cache->set_many(array(
-     *     'main' => 'http://moodle.org',
-     *     'docs' => 'http://docs.moodle.org',
-     *     'tracker' => 'http://tracker.moodle.org',
-     *     'qa' => ''http://qa.moodle.net'
+     *     'main' => 'https://www.totaralearning.com',
+     *     'docs' => 'https://help.totaralearning.com',
+     *     'tracker' => 'https://tracker.totaralms.com',
+     *     'demo' => 'https://demo.totaralearning.com'
      * ));
      * </code>
      *
@@ -1858,10 +1858,10 @@ class cache_session extends cache {
      *
      * <code>
      * // This code will add four entries to the cache, one for each url.
-     * $cache->set('main', 'http://moodle.org');
-     * $cache->set('docs', 'http://docs.moodle.org');
-     * $cache->set('tracker', 'http://tracker.moodle.org');
-     * $cache->set('qa', 'http://qa.moodle.net');
+     * $cache->set('main', 'https://www.totaralearning.com');
+     * $cache->set('docs', 'https://help.totaralearning.com');
+     * $cache->set('tracker', 'https://tracker.totaralms.com');
+     * $cache->set('demo', 'https://demo.totaralearning.com');
      * </code>
      *
      * @param string|int $key The key for the data being requested.
@@ -2045,10 +2045,10 @@ class cache_session extends cache {
      * <code>
      * // This code will add four entries to the cache, one for each url.
      * $cache->set_many(array(
-     *     'main' => 'http://moodle.org',
-     *     'docs' => 'http://docs.moodle.org',
-     *     'tracker' => 'http://tracker.moodle.org',
-     *     'qa' => ''http://qa.moodle.net'
+     *     'main' => 'https://www.totaralearning.com',
+     *     'docs' => 'https://help.totaralearning.com',
+     *     'tracker' => 'https://tracker.totaralms.com',
+     *     'demo' => 'https://demo.totaralearning.com'
      * ));
      * </code>
      *

@@ -46,7 +46,7 @@ abstract class core_role_capability_table_with_risks extends core_role_capabilit
         parent::__construct($context, $id);
 
         $this->allrisks = get_all_risks();
-        $this->risksurl = get_docs_url(s(get_string('risks', 'core_role')));
+        $this->risksurl = get_docs_url('Roles#Roles-Risks'); // Totara: updated to our docs.
 
         $this->allpermissions = array(
             CAP_INHERIT => 'inherit',

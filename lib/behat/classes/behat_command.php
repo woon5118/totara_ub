@@ -40,7 +40,7 @@ class behat_command {
     /**
      * Docs url
      */
-    const DOCS_URL = 'http://docs.moodle.org/dev/Acceptance_testing';
+    const DOCS_URL = 'https://help.totaralearning.com/display/DEV/Behat';
 
     /**
      * Ensures the behat dir exists in moodledata

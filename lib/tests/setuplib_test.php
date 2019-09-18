@@ -40,11 +40,11 @@ class core_setuplib_testcase extends advanced_testcase {
     public function test_get_docs_url_standard() {
         global $CFG;
         if (empty($CFG->docroot)) {
-            $docroot = 'https://docs.moodle.org';
+            $docroot = 'https://help.totaralearning.com';
         } else {
             $docroot = $CFG->docroot;
         }
-        $this->assertRegExp('~^' . preg_quote($docroot, '') . '/\d{2}/' . current_language() . '/course/editing$~',
+        $this->assertRegExp('~^' . preg_quote($docroot, '') . '/display/(TL\d{2}|latest)/course/editing$~',
                 get_docs_url('course/editing'));
     }
 
@@ -52,7 +52,7 @@ class core_setuplib_testcase extends advanced_testcase {
      * Test get_docs_url_standard in the special case of an absolute HTTP URL.
      */
     public function test_get_docs_url_http() {
-        $url = 'http://moodle.org/';
+        $url = 'http://www.totaralearning.com/';
         $this->assertEquals($url, get_docs_url($url));
     }
 
@@ -60,7 +60,7 @@ class core_setuplib_testcase extends advanced_testcase {
      * Test get_docs_url_standard in the special case of an absolute HTTPS URL.
      */
     public function test_get_docs_url_https() {
-        $url = 'https://moodle.org/';
+        $url = 'https://www.totaralearning.com/';
         $this->assertEquals($url, get_docs_url($url));
     }
 

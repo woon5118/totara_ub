@@ -52,7 +52,7 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
      * timezone => int|float|string (optional) timezone modifier used for edge case only.
      *      If not specified, then date is caclulated based on current user timezone.
      *      Note: dst will be calculated for string timezones only
-     *      {@link http://docs.moodle.org/dev/Time_API#Timezone}
+     *      {@link https://help.totaralearning.com/display/DEV/Dates+times+and+timezones#Datestimesandtimezones-Supportedtimezones}
      * step => step to increment minutes by
      * optional => if true, show a checkbox beside the date to turn it on (or off)
      * @var array

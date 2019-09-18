@@ -17,7 +17,7 @@
 /**
  * Classes representing JS event handlers, used by output components.
  *
- * Please see http://docs.moodle.org/en/Developement:How_Moodle_outputs_HTML
+ * Please see https://help.totaralearning.com/display/DEV/Output
  * for an overview.
  *
  * @package core

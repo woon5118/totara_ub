@@ -144,37 +144,6 @@ class core_course_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Renderers a structured array of courses and categories into a nice XHTML tree structure.
-     *
-     * @deprecated since 2.5
-     *
-     * Please see http://docs.moodle.org/dev/Courses_lists_upgrade_to_2.5
-     *
-     * @param array $ignored argument ignored
-     * @return string
-     */
-    public final function course_category_tree(array $ignored) {
-        debugging('Function core_course_renderer::course_category_tree() is deprecated, please use frontpage_combo_list()', DEBUG_DEVELOPER);
-        return $this->frontpage_combo_list();
-    }
-
-    /**
-     * Renderers a category for use with course_category_tree
-     *
-     * @deprecated since 2.5
-     *
-     * Please see http://docs.moodle.org/dev/Courses_lists_upgrade_to_2.5
-     *
-     * @param array $category
-     * @param int $depth
-     * @return string
-     */
-    protected final function course_category_tree_category(stdClass $category, $depth=1) {
-        debugging('Function core_course_renderer::course_category_tree_category() is deprecated', DEBUG_DEVELOPER);
-        return '';
-    }
-
-    /**
      * Render a modchooser.
      *
      * @param renderable $modchooser The chooser.

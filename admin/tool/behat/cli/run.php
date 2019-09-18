@@ -87,7 +87,7 @@ Options:
 Example from Totara root directory:
 \$ php admin/tool/behat/cli/run.php --tags=\"@javascript\"
 
-More info in http://docs.moodle.org/dev/Acceptance_testing#Running_tests
+More info in https://help.totaralearning.com/display/DEV/Behat
 ";
 
 if (!empty($options['help'])) {

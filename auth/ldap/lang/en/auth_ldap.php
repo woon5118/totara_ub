@@ -98,7 +98,7 @@ $string['auth_ldap_usertypeundefined2'] = 'config.user_type not defined or funct
 $string['auth_ldap_version'] = 'The version of the LDAP protocol your server is using.';
 $string['auth_ldap_version_key'] = 'Version';
 $string['auth_ntlmsso'] = 'NTLM SSO';
-$string['auth_ntlmsso_enabled'] = 'Set to yes to attempt Single Sign On with the NTLM domain. <strong>Note:</strong> this requires additional setup on the webserver to work, see <a href="http://docs.moodle.org/en/NTLM_authentication">http://docs.moodle.org/en/NTLM_authentication</a>';
+$string['auth_ntlmsso_enabled'] = 'Set to yes to attempt Single Sign On with the NTLM domain. <strong>Note:</strong> this requires additional setup on the webserver to work, see <a href="https://help.totaralearning.com/display/latest/LDAP+server">https://help.totaralearning.com/display/latest/LDAP+server</a>';
 $string['auth_ntlmsso_enabled_key'] = 'Enable';
 $string['auth_ntlmsso_ie_fastpath'] = 'Set to enable the NTLM SSO fast path (bypasses certain steps if the client\'s browser is MS Internet Explorer).';
 $string['auth_ntlmsso_ie_fastpath_key'] = 'MS IE fast path?';

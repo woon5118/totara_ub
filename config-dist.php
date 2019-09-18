@@ -181,8 +181,14 @@ $CFG->dboptions = array(
 // is accessible via multiple URLs then choose the most natural one
 // that your students would use.  Do not include a trailing slash
 //
-// If you need both intranet and Internet access please read
-// http://docs.moodle.org/en/masquerading
+// What you need to know:
+//  - This is the URL your users will use. If they arrive at Totara through
+//    another URL they will be redirect.
+//  - We strongly recommend you use https, even if you are intending to serve
+//    both the internet and an intranet.
+//  - You cannot use both https and http.
+//  - If you need to reverse proxy, or ssl proxy then see the settings
+//    further down this file for more information.
 
 $CFG->wwwroot   = 'http://example.com/totara';
 

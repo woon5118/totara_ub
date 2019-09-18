@@ -486,7 +486,7 @@ class repository_googledocs extends repository {
         $callbackurl = new moodle_url(self::CALLBACKURL);
 
         $a = new stdClass;
-        $a->docsurl = get_docs_url('Google_OAuth_2.0_setup');
+        $a->docsurl = get_docs_url('OAuth2'); // Totara: updated to our help docs
         $a->callbackurl = $callbackurl->out(false);
 
         $mform->addElement('static', null, '', get_string('oauthinfo', 'repository_googledocs', $a));

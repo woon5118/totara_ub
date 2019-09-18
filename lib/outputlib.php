@@ -17,7 +17,7 @@
 /**
  * Functions for generating the HTML that Moodle should output.
  *
- * Please see http://docs.moodle.org/en/Developement:How_Moodle_outputs_HTML
+ * Please see https://help.totaralearning.com/display/DEV/Output
  * for an overview.
  *
  * @copyright 2009 Tim Hunt
@@ -631,7 +631,7 @@ class theme_config {
             // check if renderers.php file is missnamed renderer.php
             if (is_readable($this->dir.'/renderer.php')) {
                 debugging('Developer hint: '.$this->dir.'/renderer.php should be renamed to ' . $this->dir."/renderers.php.
-                    See: http://docs.moodle.org/dev/Output_renderers#Theme_renderers.", DEBUG_DEVELOPER);
+                    See: https://help.totaralearning.com/display/DEV/Output#Output-overriding_output.", DEBUG_DEVELOPER);
             }
         }
 

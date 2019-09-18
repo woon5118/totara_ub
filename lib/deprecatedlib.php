@@ -511,7 +511,7 @@ function update_log_display_entry($module, $action, $mtable, $field) {
 }
 
 /**
- * @deprecated use the text formatting in a standard way instead (http://docs.moodle.org/dev/Output_functions)
+ * @deprecated use the text formatting in a standard way instead
  *             this was abused mostly for embedding of attachments
  */
 function filter_text($text, $courseid = NULL) {

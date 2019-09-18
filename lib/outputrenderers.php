@@ -17,7 +17,7 @@
 /**
  * Classes for rendering HTML output for Moodle.
  *
- * Please see {@link http://docs.moodle.org/en/Developement:How_Moodle_outputs_HTML}
+ * Please see {@link https://help.totaralearning.com/display/DEV/Output}
  * for an overview.
  *
  * Included in this file are the primary renderer classes:
@@ -691,14 +691,14 @@ class core_renderer extends renderer_base {
         if ($this->page->pagetype == 'site-index') {
             // Special case for site home page - please do not remove
             return '<div class="sitelink">' .
-                   '<a title="Moodle" href="http://moodle.org/">' .
-                   '<img src="' . $this->image_url('moodlelogo') . '" alt="'.get_string('moodlelogo').'" /></a></div>';
+                   '<a title="Totara" href="https://www.totaralearning.com/">' .
+                   '<img src="' . $this->image_url('logo', 'totara_core') . '" alt="'.get_string('totaralogo').'" /></a></div>';
 
         } else if (!empty($CFG->target_release) && $CFG->target_release != $CFG->release) {
             // Special case for during install/upgrade.
             return '<div class="sitelink">'.
-                   '<a title="Moodle" href="http://docs.moodle.org/en/Administrator_documentation" onclick="this.target=\'_blank\'">' .
-                   '<img src="' . $this->image_url('moodlelogo') . '" alt="'.get_string('moodlelogo').'" /></a></div>';
+                   '<a title="Moodle" href="https://help.totaralearning.com/display/latest/" onclick="this.target=\'_blank\'">' .
+                   '<img src="' . $this->image_url('logo', 'totara_core') . '" alt="'.get_string('totaralogo').'" /></a></div>';
 
         } else if ($this->page->course->id == $SITE->id || strpos($this->page->pagetype, 'course-view') === 0) {
             return '<div class="homelink"><a href="' . $CFG->wwwroot . '/">' .

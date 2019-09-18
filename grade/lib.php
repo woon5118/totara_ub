@@ -621,12 +621,10 @@ function print_natural_aggregation_upgrade_notice($courseid, $context, $thispage
 
         $goawayurl = new moodle_url($thispage, $urlparams);
         $hideminmaxbutton = $OUTPUT->single_button($goawayurl, $hidemessage, 'get');
-        $moreinfo = html_writer::link(get_docs_url(get_string('minmaxtouse_link', 'grades')), get_string('moreinfo'),
-            array('target' => '_blank'));
 
         if ($minmaxtouse == GRADE_MIN_MAX_FROM_GRADE_ITEM) {
             // Show the message that there were min/max issues that have been resolved.
-            $message = get_string('minmaxupgradedgrades', 'grades') . ' ' . $moreinfo;
+            $message = get_string('minmaxupgradedgrades', 'grades');
 
             $revertmessage = get_string('upgradedminmaxrevertmessage', 'grades');
             $urlparams = array('id' => $courseid,
@@ -640,7 +638,7 @@ function print_natural_aggregation_upgrade_notice($courseid, $context, $thispage
 
         } else if ($minmaxtouse == GRADE_MIN_MAX_FROM_GRADE_GRADE) {
             // Show the warning that there are min/max issues that have not be resolved.
-            $message = get_string('minmaxupgradewarning', 'grades') . ' ' . $moreinfo;
+            $message = get_string('minmaxupgradewarning', 'grades');
 
             $fixmessage = get_string('minmaxupgradefixbutton', 'grades');
             $urlparams = array('id' => $courseid,
@@ -672,7 +670,7 @@ function print_natural_aggregation_upgrade_notice($courseid, $context, $thispage
             } else {
                 $a->currentversion = $CFG->release;
             }
-            $a->url = get_docs_url('Gradebook_calculation_changes');
+            $a->url = 'https://docs.moodle.org/37/en/Gradebook_calculation_changes';
             $message = get_string('gradebookcalculationswarning', 'grades', $a);
 
             $fixmessage = get_string('gradebookcalculationsfixbutton', 'grades');

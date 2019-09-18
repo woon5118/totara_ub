@@ -71,7 +71,7 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->header();
         $output .= $this->heading(get_string('upgradestalefiles', 'admin'));
         $output .= $this->box_start('generalbox', 'notice');
-        $output .= format_text(get_string('upgradestalefilesinfo', 'admin', get_docs_url('Upgrading')), FORMAT_MARKDOWN);
+        $output .= format_text(get_string('upgradestalefilesinfo', 'admin', get_docs_url('Upgrading+from+Totara')), FORMAT_MARKDOWN);
         $output .= html_writer::empty_tag('br');
         $output .= html_writer::tag('div', $this->single_button($this->page->url, get_string('reload'), 'get'), array('class' => 'buttons'));
         $output .= $this->box_end();
@@ -660,8 +660,7 @@ class core_admin_renderer extends plugin_renderer_base {
 
         $maturitylevel = get_string('maturity' . $maturity, 'admin');
         return $this->warning(
-                    $this->container(get_string('maturitycorewarning', 'admin', $maturitylevel)) .
-                    $this->container($this->doc_link('admin/versions', get_string('morehelp'))),
+                    $this->container(get_string('maturitycorewarning', 'admin', $maturitylevel)),
                 'error');
     }
 

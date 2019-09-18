@@ -370,7 +370,7 @@ $string['creatornewroleid'] = 'Creators\' role in new courses';
 $string['creatornewroleid_help'] = 'If the user does not already have the permission to manage the new course, the user is automatically enrolled using this role.';
 $string['cron'] = 'Cron';
 $string['cron_help'] = 'The cron.php maintenance script assists some of Totara\'s modules to perform tasks on a scheduled basis, such as mailing out copies of new forum posts. A mechanism is required to run the script regularly e.g. every 5 minutes.';
-$string['cron_link'] = 'admin/cron';
+$string['cron_link'] = 'Scheduled+Tasks';
 $string['cronclionly'] = 'Cron execution via command line only';
 $string['cronerrorclionly'] = 'Sorry, internet access to this page has been disabled by the administrator.';
 $string['cronerrorpassword'] = 'Sorry, you have not provided a valid password to access this page';
@@ -972,8 +972,6 @@ $string['releasenoteslink'] = 'For information about this version of Totara, ple
 $string['rememberusername'] = 'Remember username';
 $string['rememberusername_desc'] = 'Enable if you want to store permanent cookies with usernames during user login. Permanent cookies may be considered a privacy issue if used without consent.';
 $string['reportsmanage'] = 'Manage reports';
-$string['requiredentrieschanged'] = '<strong>IMPORTANT - PLEASE READ<br/>(This warning message will only be displayed during this upgrade)</strong><br/>Due to a bug fix, the behaviour of database activities using the \'Required entries\' and \'Required entries before viewing settings\' settings will change. A more detailed explanation of the changes can be read on <a href="http://moodle.org/mod/forum/discuss.php?d=110928" target="_blank">the database module forum</a>. The expected behavior of these settings can also be read on <a href="http://docs.moodle.org/en/Adding/editing_a_database#Required_entries" target="_blank">Moodle Docs</a>.
-<br/><br/>This change affects the following databases in your system: (Please save this list now, and after the upgrade, check that these activities still work the way that the trainer intends.)<br/><strong>{$a->text}</strong><br/>';
 $string['requiremodintro'] = 'Require activity description';
 $string['requiremodintro_desc'] = 'If enabled, users will be forced to enter a description for each activity.';
 $string['requires'] = 'Requires';
@@ -1330,6 +1328,10 @@ $string['wwwroot'] = 'Site www root';
 
 // Deprecated since Moodle 3.2.
 $string['mobile'] = 'Mobile';
+
+// Deprecated since Totara 9.0
+$string['requiredentrieschanged'] = '<strong>IMPORTANT - PLEASE READ<br/>(This warning message will only be displayed during this upgrade)</strong><br/>Due to a bug fix, the behaviour of database activities using the \'Required entries\' and \'Required entries before viewing settings\' settings will change. A more detailed explanation of the changes can be read on <a href="http://moodle.org/mod/forum/discuss.php?d=110928" target="_blank">the database module forum</a>. The expected behavior of these settings can also be read on <a href="http://docs.moodle.org/en/Adding/editing_a_database#Required_entries" target="_blank">Moodle Docs</a>.
+<br/><br/>This change affects the following databases in your system: (Please save this list now, and after the upgrade, check that these activities still work the way that the trainer intends.)<br/><strong>{$a->text}</strong><br/>';
 
 /*
  * @deprecated since Totara 12.0

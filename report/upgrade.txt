@@ -7,5 +7,3 @@ information provided here is intended especially for developers.
 * The report_log_print_graph signature and behaviour has changed to generate charts using
   the new Chart API. The third argument has been renamed to $typeormode and it accepts
   the type (usercourse.png, userday.png) or the mode (today, all).
-
-See http://docs.moodle.org/dev/General_report_plugins for more details and explanation.

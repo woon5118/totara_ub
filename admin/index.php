@@ -103,7 +103,7 @@ unset($url);
 
 $PAGE->set_pagelayout('admin'); // Set a default pagelayout
 
-$documentationlink = '<a href="http://docs.moodle.org/en/Installation">Installation docs</a>';
+$documentationlink = '<a href="https://help.totaralearning.com/display/latest/Installing+Totara">Installation docs</a>';
 
 // Check some PHP server settings
 
@@ -155,7 +155,7 @@ if (!core_tables_exist()) {
     $PAGE->set_popup_notification_allowed(false);
 
     // fake some settings
-    $CFG->docroot = 'http://docs.moodle.org';
+    $CFG->docroot = 'https://help.totaralearning.com';
 
     $strinstallation = get_string('installation', 'install');
 

@@ -17,7 +17,7 @@
 /**
  * Check that, as in the coding guidelines, every to-do comment links to a tracker issue.
  *
- * As required by http://docs.moodle.org/dev/Coding_style.
+ * As required by https://help.totaralearning.com/display/DEV/Coding+style
  *
  * @package    core
  * @copyright  2009 Tim Hunt

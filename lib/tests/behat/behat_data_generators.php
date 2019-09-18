@@ -182,7 +182,7 @@ class behat_data_generators extends behat_base {
     );
 
     /**
-     * Creates the specified element. More info about available elements in http://docs.moodle.org/dev/Acceptance_testing#Fixtures.
+     * Creates the specified element. More info about available elements in https://help.totaralearning.com/display/DEV/Behat.
      *
      * @Given /^the following "(?P<element_string>(?:[^"]|\\")*)" exist:$/
      *

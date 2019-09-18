@@ -645,8 +645,8 @@ function generate_uuid() {
  * 1. In the normal case, $path will be a short relative path 'component/thing',
  * like 'mod/folder/view' 'group/import'. This gets turned into an link to
  * MoodleDocs in the user's language, and for the appropriate Moodle version.
- * E.g. 'group/import' may become 'http://docs.moodle.org/2x/en/group/import'.
- * The 'http://docs.moodle.org' bit comes from $CFG->docroot.
+ * E.g. 'group/import' may become 'https://help.totaralearning.com/2x/en/group/import'.
+ * The 'https://help.totaralearning.com/' bit comes from $CFG->docroot.
  *
  * This is the only option that should be used in standard Moodle code. The other
  * two options have been implemented because they are useful for third-party plugins.
@@ -658,7 +658,7 @@ function generate_uuid() {
  * $CFG->wwwroot to make the link.
  *
  * @param string $path the place to link to. See above for details.
- * @return string The MoodleDocs URL in the user's language. for example @link http://docs.moodle.org/2x/en/$path}
+ * @return string The MoodleDocs URL in the user's language. for example @link https://help.totaralearning.com/}
  */
 function get_docs_url($path = null) {
     global $CFG;
@@ -675,30 +675,46 @@ function get_docs_url($path = null) {
 
     // Otherwise we do the normal case, and construct a MoodleDocs URL relative to $CFG->docroot.
 
-    // Check that $CFG->branch has been set up, during installation it won't be.
-    if (empty($CFG->branch)) {
+    $totaraversion = 'latest';
+    if (empty($CFG->totara_version)) {
+        // Check that $CFG->branch has been set up, during installation it won't be.
         // It's not there yet so look at version.php.
-        include($CFG->dirroot.'/version.php');
+        $TOTARA = new \stdClass;
+        include($CFG->dirroot . '/version.php');
+
+        $totaraversion = $TOTARA->version;
     } else {
         // We can use $CFG->branch and avoid having to include version.php.
-        $branch = $CFG->branch;
+        $totaraversion = $CFG->totara_version;
     }
+
     // ensure branch is valid.
-    if (!$branch) {
+    if (empty($totaraversion)) {
         // We should never get here but in case we do lets set $branch to .
         // the smart one's will know that this is the current directory
         // and the smarter ones will know that there is some smart matching
         // that will ensure people end up at the latest version of the docs.
-        $branch = '.';
+        $totaraversion = 'latest';
     }
+
+    if (strpos($totaraversion, 'dev')) {
+        $totaraversion = 'latest';
+    }
+    if (preg_match('#^(\d+)#', $totaraversion, $matches)) {
+        $totaraversion = 'TL' . $matches[1];
+    }
+
+    /****
+     * Totara does not translate help documentation yet.
     if (empty($CFG->doclang)) {
         $lang = current_language();
     } else {
         $lang = $CFG->doclang;
     }
-    $end = '/' . $branch . '/' . $lang . '/' . $path;
+     */
+    $end = '/' . $totaraversion . '/' . $path;
     if (empty($CFG->docroot)) {
-        return 'https://docs.moodle.org'. $end;
+        return 'https://help.totaralearning.com/display'. $end;
     } else {
         return $CFG->docroot . $end ;
     }

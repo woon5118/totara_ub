@@ -45,8 +45,7 @@ class cachestore_apcu_addinstance_form extends cachestore_addinstance_form {
         $form->addRule('prefix', get_string('prefixinvalid', 'cachestore_apcu'), 'regex', '#^[a-zA-Z0-9\-_]+$#');
         $form->addElement('header', 'apc_notice', get_string('notice', 'cachestore_apcu'));
         $form->setExpanded('apc_notice');
-        $link = get_docs_url('Caching#APC');
-        $form->addElement('html', nl2br(get_string('clusternotice', 'cachestore_apcu', $link)));
+        $form->addElement('html', nl2br(get_string('clusternotice', 'cachestore_apcu')));
     }
 
     /**

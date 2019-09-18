@@ -174,7 +174,7 @@ class core_role_permissions_table extends core_role_capability_table_base {
         global $OUTPUT;
 
         $allrisks = get_all_risks();
-        $risksurl = new moodle_url(get_docs_url(s(get_string('risks', 'core_role'))));
+        $risksurl = new moodle_url(get_docs_url('Roles#Roles-Risks')); // Totara: updated to our docs.
 
         $return = '';
 

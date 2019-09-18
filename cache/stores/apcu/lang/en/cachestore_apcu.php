@@ -22,8 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['clusternotice'] = 'Please be aware that APCu is only a suitable choice for single node sites or caches that can be stored locally.
-For more information, see the <a href="{$a}">APC user cache documentation</a>.';
+$string['clusternotice'] = 'Please be aware that APCu is only a suitable choice for single node sites or caches that can be stored locally.';
 $string['notice'] = 'Notice';
 $string['pluginname'] = 'APC user cache (APCu)';
 $string['prefix'] = 'Prefix';

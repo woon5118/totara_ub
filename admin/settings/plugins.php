@@ -365,7 +365,7 @@ if ($hassiteconfig || $hasmodconfig) {
     // We cannot use $OUTPUT this early, doing so means that we lose the ability
     // to set the page layout on all admin pages.
     // $wsdoclink = $OUTPUT->doc_link('How_to_get_a_security_key');
-    $url = new moodle_url(get_docs_url('How_to_get_a_security_key'));
+    $url = new moodle_url('https://docs.moodle.org/37/en/Security_keys');
     $wsdoclink = html_writer::tag('a', new lang_string('supplyinfo', 'webservice'), array('href'=>$url));
     $temp->add(new admin_setting_configcheckbox('enablewsdocumentation', new lang_string('enablewsdocumentation',
                         'admin'), new lang_string('configenablewsdocumentation', 'admin', $wsdoclink), false));
