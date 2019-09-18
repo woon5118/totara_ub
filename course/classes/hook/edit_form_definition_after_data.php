@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2016 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@ namespace core_course\hook;
  * This hook is called at the end of the definition_after_data step of
  * the course editing form so that other plugins can connect to that
  * specific step.
- *
- * @package core_course\hook
  */
 class edit_form_definition_after_data extends \totara_core\hook\base {
 

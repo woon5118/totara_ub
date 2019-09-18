@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2016 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@ namespace core_course\hook;
  * Course edit form definition complete hook.
  *
  * This hook is called at the end of validation for the course edit form definition, prior to displaying to the user.
- *
- * @package core_course\hook
  */
 class edit_form_validation extends \totara_core\hook\base {
 
@@ -54,19 +52,20 @@ class edit_form_validation extends \totara_core\hook\base {
      * Errors found during form validation up to this point.
      * @var string[]
      */
+    public $errors;
 
     /**
      * The edit_form_definition_complete constructor.
      *
      * @param \course_edit_form $form
-     * @param mixed[] $data
-     * @param array[] $files
-     * @param array[] $errors
+     * @param mixed[] $data Cannot be modified by observers.
+     * @param array[] $files Cannot be modified by observers.
+     * @param array[] $errors Passed by reference so that errors can be injected by observers.
      */
     public function __construct(\course_edit_form $form, array $data, array $files, array &$errors) {
-        $this->form =& $form;
+        $this->form = $form;
         $this->data = $data;
         $this->files = $files;
-        $this->errors =& $errors;
+        $this->errors = $errors;
     }
 }
