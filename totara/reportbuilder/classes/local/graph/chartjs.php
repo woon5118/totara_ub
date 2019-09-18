@@ -86,7 +86,7 @@ final class chartjs extends base {
                 ]
             ];
         } else {
-            $this->chartsettings['cutoutPercentage'] = chartjs::convert_type($this->record->type) === 'doughnut' ? 60 : 0;
+            $this->chartsettings['cutoutPercentage'] = chartjs::convert_type($this->record->type) === 'doughnut' ? 66 : 0;
         }
 
         $this->labels = [];
@@ -157,7 +157,6 @@ final class chartjs extends base {
 
             if ($this->is_pie_chart()) {
                 $this->values[$k]['backgroundColor'][] = $this->colors[$this->processedcount % count($this->colors)];
-                $this->values[$k]['borderColor'][] = $this->colors[$this->processedcount % count($this->colors)];
             }
 
             if (empty($this->record->stacked)) {
@@ -175,6 +174,10 @@ final class chartjs extends base {
         if ($this->record->type === 'progress') {
             $context = $this->get_progress_chart_data($width, $height);
         } else {
+            if ($this->is_pie_chart()) {
+                $this->fix_pie_colors();
+            }
+
             // Since we're using the ChartJS responsive setting, we ignore $width so it will grow correctly
             $context = [
                 'height' => $height,
@@ -215,7 +218,6 @@ final class chartjs extends base {
 
                 $chart['data'] = [$val, $dataset['total'] - $val];
                 $chart['backgroundColor'] = [$this->colors[0], '#8C8C8C'];
-                $chart['borderColor'] = [$this->colors[0], '#8C8C8C'];
 
                 $settings = $this->chartsettings;
                 $settings['title'] = [
@@ -248,6 +250,18 @@ final class chartjs extends base {
         ];
 
         return $context;
+    }
+
+    /**
+     * Fixes pie charts so that they don't have two of the same colour next to each other
+     */
+    private function fix_pie_colors() {
+        $k = $this->processedcount - 1;
+
+        if ($this->processedcount % count($this->colors) === 1) {
+            // Pie charts only have a single series, so we only need to target the first one
+            $this->values[0]['backgroundColor'][$k] = $this->colors[($k + 1) % count($this->colors)];
+        }
     }
 
     protected static function convert_type($type) {
