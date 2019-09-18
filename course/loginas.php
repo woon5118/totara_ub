@@ -35,7 +35,7 @@ require_sesskey();
 
 // Try log in as this user.
 $userid = required_param('user', PARAM_INT);
-$user = $DB->get_record('user', ['id' => $id, 'deleted' => 0]);
+$user = $DB->get_record('user', ['id' => $userid, 'deleted' => 0]);
 
 if ($id and $id != SITEID) {
     $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
@@ -45,6 +45,8 @@ if ($id and $id != SITEID) {
     $course = get_site();
     $context = context_system::instance();
 }
+$PAGE->set_context($context);
+
 if (!\core_user\access_controller::for($user, $course)->can_loginas()) {
     print_error('nologinas');
 }

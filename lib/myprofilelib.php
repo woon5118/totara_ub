@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/totara/job/lib.php');
  *
  * @param \core_user\output\myprofile\tree $tree Tree object
  * @param stdClass $user user object
- * @param bool $iscurrentuser is the user viewing profile, current user ?
+ * @param bool $iscurrentuser ignored, $user->id is compared to $USER->id instead !!!
  * @param stdClass $course course object
  *
  * @return bool
@@ -43,6 +43,8 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     $courseorusercontext = !empty($course) ? context_course::instance($course->id) : $usercontext;
     $courseorsystemcontext = !empty($course) ? context_course::instance($course->id) : $systemcontext;
     $courseid = !empty($course) ? $course->id : SITEID;
+
+    $iscurrentuser = ($USER->id == $user->id);
 
     $contactcategory = new core_user\output\myprofile\category('contact', get_string('userdetails'));
     // No after property specified intentionally. It is a hack to make administration block appear towards the end. Refer MDL-49928.

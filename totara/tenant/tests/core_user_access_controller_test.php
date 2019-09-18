@@ -1105,4 +1105,277 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
     }
+
+    public function test_can_loginas() {
+        global $DB;
+
+        /** @var totara_tenant_generator $tenantgenerator */
+        $tenantgenerator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
+        $tenantgenerator->enable_tenants();
+        $this->setAdminUser();
+
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
+        $user0_0 = $this->getDataGenerator()->create_user(['tenantid' => null]);
+        role_assign($managerrole->id, $user0_0->id, context_system::instance()->id);
+
+        $category0 = $this->getDataGenerator()->create_category();
+        $course0_1 = $this->getDataGenerator()->create_course(['category' => $category0->id]);
+        $user0_1 = $this->getDataGenerator()->create_user(['tenantid' => null]);
+        $user0_2 = $this->getDataGenerator()->create_user(['tenantid' => null]);
+        $this->getDataGenerator()->enrol_user($user0_1->id, $course0_1->id, 'manager');
+
+        $tenant1 = $tenantgenerator->create_tenant();
+        $user1_1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $user1_2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $user1_3 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        role_assign($managerrole->id, $user1_3->id, context_system::instance()->id);
+        $tenantcategory1 = $DB->get_record('course_categories', ['id' => $tenant1->categoryid], '*', MUST_EXIST);
+        $course1_1 = $this->getDataGenerator()->create_course(['category' => $tenantcategory1->id]);
+        $this->getDataGenerator()->enrol_user($user1_1->id, $course1_1->id, 'manager');
+        $this->getDataGenerator()->enrol_user($user1_1->id, $course0_1->id, 'manager');
+        $this->getDataGenerator()->enrol_user($user1_2->id, $course1_1->id, 'manager');
+
+        $tenant2 = $tenantgenerator->create_tenant();
+        $user2_1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $user2_2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $user2_3 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $tenantcategory2 = $DB->get_record('course_categories', ['id' => $tenant2->categoryid], '*', MUST_EXIST);
+        $course2_1 = $this->getDataGenerator()->create_course(['category' => $tenantcategory2->id]);
+        $this->getDataGenerator()->enrol_user($user2_1->id, $course2_1->id, 'manager');
+        $this->getDataGenerator()->enrol_user($user2_1->id, $course1_1->id, 'manager');
+        $this->getDataGenerator()->enrol_user($user2_2->id, $course2_1->id, 'manager');
+
+        $allcourses = $DB->get_records('course', []);
+        $allusers = $DB->get_records('user', []);
+
+        set_config('tenantsisolated', '0');
+
+        $this->setUser($user0_0);
+
+        $this->assertFalse(access_controller::for($user0_0)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user0_1)->can_loginas());
+        $this->assertTrue(access_controller::for($user0_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user0_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user1_1)->can_loginas());
+        $this->assertTrue(access_controller::for($user1_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user1_1)->can_loginas());
+        $this->assertTrue(access_controller::for($user1_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user1_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user1_3)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user2_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user2_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user2_3)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_loginas());
+
+        $this->setUser($user0_1);
+
+        $this->assertFalse(access_controller::for($user0_0)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user0_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user1_1)->can_loginas());
+        $this->assertTrue(access_controller::for($user1_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user1_1)->can_loginas());
+        $this->assertTrue(access_controller::for($user1_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user1_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user1_3)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user2_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user2_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user2_3)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_loginas());
+
+        $this->setUser($user1_3);
+
+        foreach ($allusers as $user) {
+            $this->assertFalse(access_controller::for($user)->can_loginas());
+            foreach ($allcourses as $course) {
+                $this->assertFalse(access_controller::for($user, $course)->can_loginas());
+            }
+        }
+
+        set_config('tenantsisolated', '1');
+
+        $this->setUser($user0_0);
+
+        $this->assertFalse(access_controller::for($user0_0)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user0_1)->can_loginas());
+        $this->assertTrue(access_controller::for($user0_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user0_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user1_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user1_3)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user2_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user2_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_loginas());
+
+        $this->assertTrue(access_controller::for($user2_3)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_loginas());
+
+        $this->setUser($user0_1);
+
+        $this->assertFalse(access_controller::for($user0_0)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_0, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user0_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user1_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user1_3)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user2_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user2_2)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_loginas());
+
+        $this->assertFalse(access_controller::for($user2_3)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_loginas());
+        $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_loginas());
+
+        $this->setUser($user1_3);
+
+        foreach ($allusers as $user) {
+            $this->assertFalse(access_controller::for($user)->can_loginas());
+            foreach ($allcourses as $course) {
+                $this->assertFalse(access_controller::for($user, $course)->can_loginas());
+            }
+        }
+    }
 }

@@ -643,7 +643,7 @@ class access_controller {
     public function can_loginas(): bool {
         global $USER;
         if ($this->userdeleted) {
-            // Deleted users do nto have context, there is no way to login as them.
+            // Deleted users do not have context, there is no way for them to log in.
             return false;
         }
         if ($this->userid == $USER->id) {
@@ -659,12 +659,12 @@ class access_controller {
             return false;
         }
         if (isguestuser($this->userid)) {
-            // Guests not supported here.
+            // Guests not supported here, they should just open a second window in incognito mode.
             return false;
         }
         if (!empty($USER->tenantid)) {
-            // Login as feature is not available to tenant members for security reasons,
-            // it would be colliding with tenant isolation.
+            // Login-as feature is not available to tenant members for security reasons,
+            // it could be compromising tenant isolation.
             return false;
         }
 
@@ -679,12 +679,12 @@ class access_controller {
         }
 
         if ($this->courseid == SITEID) {
-            // This should not happen because the frontpage is ignored in constructor.
+            // This should not happen because the frontpage course is changed to null in constructor.
             return false;
         }
 
         if ($this->context_course->tenantid) {
-            // No login-as in tenant courses, this would be colliding with tenant isolation.
+            // No login-as in tenant courses, this could be compromising tenant isolation.
             return false;
         }
 
@@ -695,20 +695,17 @@ class access_controller {
         }
 
         // Ideally we should use require_login() here to make sure current user can
-        // actually get into the course, but we cannot because it would change the $PAGE,
-        // also we cannot do require_login() here for somebody else.
-        if (!totara_course_is_viewable($course) || !totara_course_is_viewable($course, $this->userid)) {
-            // Both current and target user must be able to see the course
-            // because in Totara status of enrolments depends on course visibility.
-            return false;
-        }
-        if (!has_capability('moodle/course:view', $this->context_course) && !is_enrolled($this->context_course, null, '', true)) {
+        // actually get into the course, but we cannot because it would change the $PAGE.
+        if ((!has_capability('moodle/course:view', $this->context_course) || !totara_course_is_viewable($course))
+            && !is_enrolled($this->context_course, $USER->id, '', true)) {
             // Current user cannot enter the course, it means that the require_login() in course/loginas.php would likely fail.
             return false;
         }
 
+        // We cannot do require_login() for other user, so let's just
+        // check active enrolment which always grants course access.
         if (!is_enrolled($this->context_course, $this->userid, '', true)) {
-            // User needs to be active member of the course,
+            // User needs to be active member of the course which also includes course visibility check,
             // if not they are likely not able to access the contents of the course.
             // We cannot rely on users course:view capability here due to the way how login as works.
             return false;
