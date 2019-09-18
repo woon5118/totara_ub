@@ -63,23 +63,23 @@ $string['aggregationhintnovalue'] = '( Empty )';
 $string['aggregationhintdropped'] = '( Dropped )';
 $string['aggregationhintexcluded'] = '( Excluded )';
 $string['aggregationhintextra'] = '( Extra credit )';
-$string['aggregation_link'] = 'grade/aggregation';
+$string['aggregation_link'] = 'Aggregating Grades'; // Totara: Update to our docs
 $string['aggregationcoef'] = 'Aggregation coefficient';
 $string['aggregationcoefextra'] = 'Extra credit'; // For the header of the table at Edit categories and items page.
 $string['aggregationcoefextra_help'] = 'If the aggregation is **Natural** or **Simple weighted mean** and the extra credit checkbox is ticked, the grade item\'s maximum grade is not added to the category\'s maximum grade. This will result in the possibility of achieving the maximum grade in the category without having the maximum grade in all the grade items. If the site administrator has enabled grades over the maximum, there might be grades over the maximum.
 
 If the aggregation is **Mean of grades (with extra credits)** and the extra credit is set to a value greater than zero, the extra credit is the factor by which the grade is multiplied before adding it to the total after the computation of the mean.';
-$string['aggregationcoefextra_link'] = 'grade/aggregation';
+$string['aggregationcoefextra_link'] = 'Aggregating Grades'; // Totara: Update to our docs
 $string['aggregationcoefextrasum'] = 'Extra credit'; // For the form with checkboxes: Natural or Simple weighted mean.
 $string['aggregationcoefextrasumabbr'] = '+';
 $string['aggregationcoefextrasum_help'] = 'If the extra credit checkbox is ticked, the grade item\'s maximum grade is not added to the category\'s maximum grade, resulting in the possibility of achieving the maximum grade (or grades over the maximum if enabled by the site administrator) in the category without having the maximum grade in all the grade items.';
-$string['aggregationcoefextrasum_link'] = 'grade/aggregation';
+$string['aggregationcoefextrasum_link'] = 'Aggregating Grades'; // Totara: Update to our docs
 $string['aggregationcoefextraweight'] = 'Extra credit weight'; // For the form with input: Mean of grades (with extra credits) only.
 $string['aggregationcoefextraweight_help'] = 'If the extra credit weight is set to a value greater than zero, the grade acts as extra credit during aggregation. The number is the factor by which the grade is multiplied before adding it to the total for the computation of the mean.';
-$string['aggregationcoefextraweight_link'] = 'grade/aggregation';
+$string['aggregationcoefextraweight_link'] = 'Aggregating Grades'; // Totara: Update to our docs
 $string['aggregationcoefweight'] = 'Item weight';
 $string['aggregationcoefweight_help'] = 'The item weight is used in the category aggregation to influence the importance of the item compared with other grade items in the same category.';
-$string['aggregationcoefweight_link'] = 'grade/aggregation';
+$string['aggregationcoefweight_link'] = 'Aggregating Grades'; // Totara: Update to our docs
 $string['aggregationofa'] = 'Aggregation of {$a}';
 $string['aggregationposition'] = 'Aggregation position';
 $string['aggregationposition_help'] = 'This setting determines whether the category and course total columns are displayed first or last in the gradebook reports.';
@@ -104,7 +104,7 @@ $string['bulkcheckboxes'] = 'Bulk checkboxes';
 $string['calculatedgrade'] = 'Calculated grade';
 $string['calculation'] = 'Calculation';
 $string['calculation_help'] = 'A grade calculation is a formula used to determine grades. The formula should start with an equal (=) sign and may use common mathematical operators, such as max, min and sum. If desired, other grade items may be included in the calculation by typing the ID numbers in double square brackets.';
-$string['calculation_link'] = 'grade/calculation';
+$string['calculation_link'] = 'Calculating Grades with Formulas'; // Totara: Update to our docs
 $string['calculationadd'] = 'Add calculation';
 $string['calculationedit'] = 'Edit calculation';
 $string['calculationsaved'] = 'Calculation saved';
@@ -388,7 +388,7 @@ $string['importcsv_help'] = 'Grades can be imported via a CSV file with format a
 * A fieldname containing user identity data is required - either username or ID number or email address.
 
 A file of the correct format can be obtained by first exporting some grades. The file can then be edited and saved as a CSV file.';
-$string['importcsv_link'] = 'grade/import/csv/index';
+$string['importcsv_link'] = 'Import grades';
 $string['importcustom'] = 'Import as custom outcomes (only this course)';
 $string['importerror'] = 'An error occurred, this script wasn\'t called with the right parameters.';
 $string['importfailed'] = 'Import failed. No data was imported.';
@@ -399,7 +399,7 @@ $string['importfrom'] = 'Import from';
 $string['importoutcomenofile'] = 'The uploaded file is empty or corrupted.  Please verify this is a valid file. The problem was detected at line {$a}; this is triggered by the data lines not having as many columns as the first line (the header line) or if the imported file is missing expected headers.  Look at the exported file for an example of a file with valid header.';
 $string['importoutcomes'] = 'Import outcomes';
 $string['importoutcomes_help'] = 'Outcomes can be imported via CSV file with format as for the export outcomes CSV file.';
-$string['importoutcomes_link'] = 'grade/outcome';
+$string['importoutcomes_link'] = 'Outcomes';
 $string['importoutcomesuccess'] = 'Imported outcome "{$a->name}" with ID #{$a->id}';
 $string['importplugins'] = 'Import plugins';
 $string['importpreview'] = 'Import preview';
@@ -464,7 +464,7 @@ $string['min'] = 'Lowest';
 $string['minmaxtouse'] = 'Min and max grades used in calculation';
 $string['minmaxtouse_desc'] = 'This setting determines whether to use the initial minimum and maximum grades from when the grade was given, or the minimum and maximum grades as specified in the settings for the grade item, when calculating the grade displayed in the gradebook. It is recommended that this setting is modified at an off-peak time, as all grades will be recalculated, which may result in a high server load.';
 $string['minmaxtouse_help'] = 'This setting determines whether to use the initial minimum and maximum grades from when the grade was given, or the minimum and maximum grades as specified in the settings for the grade item, when calculating the grade displayed in the gradebook.';
-$string['minmaxtouse_link'] = 'Grades_min_max';
+$string['minmaxtouse_link'] = 'General+Settings+1'; // Totara: updated to our docs
 $string['minmaxupgradedgrades'] = 'Note: Some grades have been changed in order to resolve an inconsistency in the gradebook caused by a change in the minimum and maximum grades used when calculating the grade displayed. It is recommended that the changes are reviewed and accepted.';
 $string['minmaxupgradefixbutton'] = 'Resolve inconsistencies';
 $string['minmaxupgradewarning'] = 'Note: An inconsistency has been detected with some grades due to a change in the minimum and maximum grades used when calculating the grade displayed in the gradebook. It is recommended that the inconsistency is resolved by clicking the button below, though this will result in some grades being changed.';

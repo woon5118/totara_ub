@@ -247,7 +247,7 @@ Database activities have many uses, such as
 
 * A collaborative collection of web links, books, book reviews, journal references etc.
 * For displaying learner-created images, reports, websites, or articles for peer comment and review.';
-$string['modulename_link'] = 'mod/data/view';
+$string['modulename_link'] = 'Database';
 $string['modulenameplural'] = 'Databases';
 $string['more'] = 'More';
 $string['moreurl'] = 'More URL';
@@ -356,7 +356,7 @@ $string['uploadrecords_help'] = 'Entries may be uploaded via text file. The form
 * The first record contains a list of fieldnames defining the format of the rest of the file.
 
 The field enclosure is a character that surrounds each field in each record. It can normally be left unset.';
-$string['uploadrecords_link'] = 'mod/data/import';
+$string['uploadrecords_link'] = 'Database';
 $string['url'] = 'Url';
 $string['usedate'] = 'Include in search.';
 $string['userdataitementries'] = 'Database entries';

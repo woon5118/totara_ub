@@ -54,7 +54,7 @@ $string['displayselect_help'] = 'This setting, together with the file type and w
 * **In pop-up**: The file is displayed in a new browser window without menus or an address bar.
 * **In frame**: The file is displayed within a frame below the navigation bar and file description.
 * **New window**: The file is displayed in a new browser window with menus and an address bar.';
-$string['displayselect_link'] = 'mod/file/mod';
+$string['displayselect_link'] = 'File';
 $string['displayselectexplain'] = 'Choose display type, unfortunately not all types are suitable for all files.';
 $string['dnduploadresource'] = 'Create file resource';
 $string['encryptedcode'] = 'Encrypted code';
@@ -78,7 +78,7 @@ A file may be used:
 * To share presentations given in face-to-face sessions.
 * To include a mini website as a course resource.
 * To provide draft files of certain software programs (eg Photoshop .psd) so learners can edit and submit them for assessment.';
-$string['modulename_link'] = 'mod/resource/view';
+$string['modulename_link'] = 'File';
 $string['modulenameplural'] = 'Files';
 $string['notmigrated'] = 'This legacy resource type ({$a}) was not yet migrated, sorry.';
 $string['optionsheader'] = 'Display options';

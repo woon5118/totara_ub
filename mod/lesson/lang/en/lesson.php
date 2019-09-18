@@ -326,7 +326,7 @@ Lessons may be used
 * For self-directed learning of a new topic.
 * For scenarios or simulations/decision-making exercises.
 * For differentiated revision, with different sets of revision questions depending upon answers given to initial questions.';
-$string['modulename_link'] = 'mod/lesson/view';
+$string['modulename_link'] = 'Lesson';
 $string['modulenameplural'] = 'Lessons';
 $string['move'] = 'Move page';
 $string['movedpage'] = 'Moved page';

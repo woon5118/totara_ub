@@ -70,7 +70,7 @@ $string['messagetemplate_help'] = 'A notification message is sent to subscribers
 * Rule name {rulename}
 * Description {description}
 * Event {eventname}';
-$string['messagetemplate_link'] = 'admin/tool/monitor/managerules';
+$string['messagetemplate_link'] = 'Event Monitoring';
 $string['moduleinstance'] = 'Instance';
 $string['monitorenabled'] = 'Event monitoring is currently enabled. ';
 $string['monitordisabled'] = 'Event monitoring is currently disabled.';

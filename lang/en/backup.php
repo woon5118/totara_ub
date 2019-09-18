@@ -139,7 +139,7 @@ $string['filealiasesrestorefailuresinfo'] = 'Some aliases included in the backup
 $string['filealiasesrestorefailures_help'] = 'Aliases are symbolic links to other files, including those stored in external repositories. In some cases, Totara cannot restore them - for example when restoring the backup at another site or when the referenced file does not exist.
 
 More details and the actual reason of the failure can be found in the restore log file.';
-$string['filealiasesrestorefailures_link'] = 'restore/filealiases';
+$string['filealiasesrestorefailures_link'] = 'File#File-Aliasalias';
 $string['filereferencesincluded'] = 'File references to external contents are included in the backup file. These won\'t work if the backup is restored on a different site.';
 $string['filereferencessamesite'] = 'The backup file is from this site, and so file references can be restored.';
 $string['filereferencesnotsamesite'] = 'The backup file is from a different site, and so file references cannot be restored.';

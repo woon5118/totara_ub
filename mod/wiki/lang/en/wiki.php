@@ -96,12 +96,12 @@ $string['formatcreole'] = 'Creole format';
 $string['formatcreole_help'] = 'Creole is a common wiki markup language with an edit toolbar for inserting appropriate markup.
 
 To create a new page, type the new page name enclosed in double square brackets, for example [[Page 2]].';
-$string['formatcreole_link'] = 'mod/wiki/creole';
+$string['formatcreole_link'] = 'Wiki';
 $string['formatnwiki'] = 'NWiki format';
 $string['formatnwiki_help'] = 'Nwiki is the Mediawiki-like markup language used in the contributed Nwiki module.
 
 To create a new page, type the new page name enclosed in double square brackets, for example [[Page 2]].';
-$string['formatnwiki_link'] = 'mod/wiki/nwiki';
+$string['formatnwiki_link'] = 'Wiki';
 $string['history'] = 'History';
 $string['history_help'] = 'The history lists links to previous versions of the page.';
 $string['html'] = 'HTML';
@@ -140,7 +140,7 @@ Wikis have many uses, such as:
 * For members of a department to plan a scheme of work or meeting agenda together.
 * For learners to collaboratively author an online book, creating content on a topic set by their trainer.
 * As a personal journal for examination notes or revision (using an individual wiki).';
-$string['modulename_link'] = 'mod/wiki/view';
+$string['modulename_link'] = 'Wiki';
 $string['modulenameplural'] = 'Wikis';
 $string['navigation'] = 'Navigation';
 $string['navigationfrom'] = 'This page comes from';

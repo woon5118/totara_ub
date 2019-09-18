@@ -36,7 +36,7 @@ $string['modulename_help'] = 'An IMS content package is a collection of files wh
 Content is usually displayed over several pages, with navigation between the pages. There are various options for displaying content in a pop-up window, with a navigation menu or buttons etc.
 
 An IMS content package may be used for presenting multimedia content and animations.';
-$string['modulename_link'] = 'mod/imscp/view';
+$string['modulename_link'] = 'IMS content package';
 $string['modulenameplural'] = 'IMS content packages';
 $string['navigation'] = 'Navigation';
 $string['page-mod-imscp-x'] = 'Any IMS content package module page';

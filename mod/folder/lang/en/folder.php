@@ -40,7 +40,7 @@ A folder may be used:
 
 * For a series of files on one topic.
 * To provide a shared uploading space for trainers on the course page (keeping the folder hidden so that only trainers can see it).';
-$string['modulename_link'] = 'mod/folder/view';
+$string['modulename_link'] = 'Folder';
 $string['modulenameplural'] = 'Folders';
 $string['newfoldercontent'] = 'New folder content';
 $string['page-mod-folder-x'] = 'Any folder module page';

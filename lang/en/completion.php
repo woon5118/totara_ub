@@ -66,7 +66,7 @@ $string['completion_automatic'] = 'Show activity as complete when conditions are
 $string['completion_help'] = 'If enabled, activity completion is tracked, either manually or automatically, based on certain conditions. Multiple conditions may be set if desired. If so, the activity will only be considered complete when ALL conditions are met.
 
 A tick next to the activity name on the course page indicates when the activity is complete.';
-$string['completion_link'] = 'activity/completion';
+$string['completion_link'] = 'Activity Completion 1';
 $string['completion_manual'] = 'Learners can manually mark the activity as completed';
 $string['completion_none'] = 'Do not indicate activity completion';
 $string['completionactivitydefault'] = 'Use activity default';

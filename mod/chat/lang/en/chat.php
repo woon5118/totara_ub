@@ -94,7 +94,7 @@ Chats are especially useful when the group chatting is not able to meet face-to-
 * Learners out on work placement/in-field deployments getting together to discuss their experiences with each other and their trainer.
 * A question and answer session with an invited speaker in a different location.
 * Sessions to help learners prepare for exams where the trainer, or other learners, would pose sample questions.';
-$string['modulename_link'] = 'mod/chat/view';
+$string['modulename_link'] = 'Chat';
 $string['modulenameplural'] = 'Chats';
 $string['neverdeletemessages'] = 'Never delete messages';
 $string['nextsession'] = 'Next scheduled session';

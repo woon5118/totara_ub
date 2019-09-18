@@ -334,7 +334,7 @@ Forums have many uses, such as:
 * For trainer-only discussions (using a hidden forum).* A help centre where trainers and learners can give advice.
 * A one-on-one support area for private learner-trainer communications (using a forum with separate groups and with one learner per group).
 * For extension activities, for example brain teasers for learners to ponder and suggest solutions to.';
-$string['modulename_link'] = 'mod/forum/view';
+$string['modulename_link'] = 'Forum';
 $string['modulenameplural'] = 'Forums';
 $string['more'] = 'more';
 $string['movedmarker'] = '(Moved)';

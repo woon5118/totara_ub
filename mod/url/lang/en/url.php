@@ -52,7 +52,7 @@ $string['modulename_help'] = 'The URL module enables a trainer to provide a web 
 There are a number of display options for the URL, such as embedded or opening in a new window and advanced options for passing information, such as a learner\'s name, to the URL if required.
 
 Note that URLs can also be added to any other resource or activity type through the text editor.';
-$string['modulename_link'] = 'mod/url/view';
+$string['modulename_link'] = 'URL';
 $string['modulenameplural'] = 'URLs';
 $string['page-mod-url-x'] = 'Any URL module page';
 $string['parameterinfo'] = '&amp;parameter=variable';

@@ -32,12 +32,12 @@ $string['allocationerror'] = 'Allocation error';
 $string['allocationconfigured'] = 'Allocation configured';
 $string['allowedfiletypesforoverallfeedback'] = 'Feedback attachment allowed file types';
 $string['allowedfiletypesforoverallfeedback_help'] = 'Feedback attachment allowed file types can be restricted by entering a comma-separated list of file extensions, for example; MP4, MP3, PNG, JPG. If the field is left empty, then all file types are allowed.';
-$string['allowedfiletypesforoverallfeedback_link'] = 'admin/tool/filetypes/index';
+$string['allowedfiletypesforoverallfeedback_link'] = 'Workshop';
 $string['allowedfiletypesforsubmission'] = 'Submission attachment allowed file types';
 $string['allowedfiletypesforsubmission_help'] = 'Submission attachment allowed file types can be restricted by entering a comma-separated list of file extensions, for example; PNG, JPG, JPEG, GIF. If the field is left empty, then all file types are allowed.
 
 Additional supported file extensions can be configured in the server administration';
-$string['allowedfiletypesforsubmission_link'] = 'admin/tool/filetypes/index';
+$string['allowedfiletypesforsubmission_link'] = 'Workshop';
 $string['allsubmissions'] = 'All submissions ({$a})';
 $string['alreadygraded'] = 'Already graded';
 $string['areaconclusion'] = 'Conclusion text';
@@ -194,7 +194,7 @@ $string['modulename_help'] = 'The workshop activity module enables the collectio
 Learners can submit any digital content (files), such as word-processed documents or spreadsheets and can also type text directly into a field using the text editor.
 
 Submissions are assessed using a multi-criteria assessment form defined by the trainer. The process of peer assessment and understanding the assessment form can be practised in advance with example submissions provided by the trainer, together with a reference assessment. Learners are given the opportunity to assess one or more of their peers\' submissions. Submissions and reviewers may be anonymous if required. Learners obtain two grades in a workshop activity, a grade for their submission and a grade for their assessment of their peers\' submissions. Both grades are recorded in the gradebook.';
-$string['modulename_link'] = 'mod/workshop/view';
+$string['modulename_link'] = 'Workshop';
 $string['modulenameplural'] = 'Workshops';
 $string['mysubmission'] = 'My submission';
 $string['nattachments'] = 'Maximum number of submission attachments';

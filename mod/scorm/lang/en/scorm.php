@@ -272,7 +272,7 @@ SCORM activities may be used:
 
 * For presenting multimedia content and animations.
 * As an assessment tool.';
-$string['modulename_link'] = 'mod/scorm/view';
+$string['modulename_link'] = 'SCORM';
 $string['modulenameplural'] = 'SCORM packages';
 $string['nav'] = 'Show Navigation';
 $string['nav_help'] = 'This setting specifies whether to show or hide the navigation buttons and their position.

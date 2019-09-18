@@ -279,8 +279,8 @@ External tool activities differ from URL resources in a few ways:
 * External tools are context aware i.e. they have access to information about the user who launched the tool, such as institution, course and name.
 * External tools support reading, updating, and deleting grades associated with the activity instance.
 * External tool configurations create a trust relationship between your site and the tool provider, allowing secure communication between them.';
-$string['modulename_link'] = 'mod/lti/view';
-$string['modulename_shortcut_link'] = 'mod/lti/view/custom';
+$string['modulename_link'] = 'External Tool';
+$string['modulename_shortcut_link'] = 'External Tool';
 $string['modulenameplural'] = 'External tools';
 $string['modulenamepluralformatted'] = 'LTI Instances';
 $string['name'] = 'Name';

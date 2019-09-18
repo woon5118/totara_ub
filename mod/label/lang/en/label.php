@@ -46,7 +46,7 @@ Labels may be used
 * To split up a long list of activities with a subheading or an image.
 * To display an embedded sound file or video directly on the course page.
 * To add a short description to a course section.';
-$string['modulename_link'] = 'mod/label/view';
+$string['modulename_link'] = 'Label';
 $string['modulenameplural'] = 'Labels';
 $string['pluginadministration'] = 'Label administration';
 $string['pluginname'] = 'Label';

@@ -48,7 +48,7 @@ A page may be used:
 
 * To present the terms and conditions of a course or a summary of the course syllabus.
 * To embed several videos or sound files together with some explanatory text.';
-$string['modulename_link'] = 'mod/page/view';
+$string['modulename_link'] = 'Page';
 $string['modulenameplural'] = 'Pages';
 $string['optionsheader'] = 'Display options';
 $string['page-mod-page-x'] = 'Any page module page';

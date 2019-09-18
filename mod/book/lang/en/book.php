@@ -32,7 +32,7 @@ A book may be used
 * To display reading material for individual modules/section of the course.
 * As a staff departmental handbook.
 * As a showcase portfolio of learner work.';
-$string['modulename_link'] = 'mod/book/view';
+$string['modulename_link'] = 'Book';
 $string['modulenameplural'] = 'Books';
 $string['pluginname'] = 'Book';
 $string['pluginadministration'] = 'Book administration';

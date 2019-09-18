@@ -84,7 +84,7 @@ A choice activity may be used:
 * As a quick poll to stimulate thinking about a topic.
 * To quickly test learners\' understanding.
 * To facilitate learner decision-making, for example allowing learners to vote on a direction for the course.';
-$string['modulename_link'] = 'mod/choice/view';
+$string['modulename_link'] = 'Choice';
 $string['modulenameplural'] = 'Choices';
 $string['moveselectedusersto'] = 'Move selected users to...';
 $string['multiplenotallowederror'] = 'Multiple answers are not allowed in this choice';

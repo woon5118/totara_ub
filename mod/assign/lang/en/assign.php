@@ -320,7 +320,7 @@ $string['modulename'] = 'Assignment';
 $string['modulename_help'] = 'The assignment activity module enables a trainer to communicate tasks, collect work and provide grades and feedback. Learners can submit any digital content (files), such as word-processed documents, spreadsheets, images, or audio and video clips. Alternatively, or in addition, the assignment may require learners to type text directly into the text editor. An assignment can also be used to remind learners of \'real-world\' assignments they need to complete offline, such as art work, and thus not require any digital content. Learners can submit work individually or as a member of a group.
 
 When reviewing assignments, trainers can leave feedback comments and upload files, such as marked-up learner submissions, documents with comments or spoken audio feedback. Assignments can be graded using a numerical or custom scale or an advanced grading method such as a rubric. Final grades are recorded in the gradebook.';
-$string['modulename_link'] = 'mod/assignment/view';
+$string['modulename_link'] = 'Assignment'; // Totara: updated to our docs.
 $string['modulenameplural'] = 'Assignments';
 $string['moreusers'] = '{$a} more...';
 $string['multiple'] = 'Multiple';

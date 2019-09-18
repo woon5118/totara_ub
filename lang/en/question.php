@@ -116,7 +116,7 @@ Each category has a context which determines where the questions in the category
 * **System context**: Questions available in all courses and activities on the site.
 
 Categories are also used for random questions, as questions are selected from a particular category.';
-$string['editcategories_link'] = 'question/category';
+$string['editcategories_link'] = 'Setup Question Banks#SetupQuestionBanks-Categories';
 $string['editcategory'] = 'Edit category';
 $string['editingcategory'] = 'Editing a category';
 $string['editingquestion'] = 'Editing a question';
@@ -153,7 +153,7 @@ $string['exportfilename'] = 'questions';
 $string['exportnameformat'] = '%Y%m%d-%H%M';
 $string['exportquestions'] = 'Export questions to file';
 $string['exportquestions_help'] = 'This function enables the export of a complete category (and any subcategories) of questions to file. Please note that, depending on the file format selected, some question data and certain question types may not be exported.';
-$string['exportquestions_link'] = 'question/export';
+$string['exportquestions_link'] = 'Adding quiz questions#Addingquizquestions-Exportingquizquestions';
 $string['filecantmovefrom'] = 'The questions files cannot be moved because you do not have permission to remove files from the place you are trying to move questions from.';
 $string['filecantmoveto'] = 'The question files cannot be moved or copied becuase you do not have permission to add files to the place you are trying to move the questions to.';
 $string['fileformat'] = 'File format';
@@ -183,7 +183,7 @@ $string['importingquestions'] = 'Importing {$a} questions from file';
 $string['importparseerror'] = 'Error(s) found parsing the import file. No questions have been imported. To import any good questions try again setting \'Stop on error\' to \'No\'';
 $string['importquestions'] = 'Import questions from file';
 $string['importquestions_help'] = 'This function enables questions in a variety of formats to be imported via text file. Note that the file must use UTF-8 encoding.';
-$string['importquestions_link'] = 'question/import';
+$string['importquestions_link'] = 'Adding quiz questions#Addingquizquestions-Importingquizquestions';
 $string['importwrongfiletype'] = 'The type of the file you selected ({$a->actualtype}) does not match the type expected by this import format ({$a->expectedtype}).';
 $string['invalidarg'] = 'No valid arguments supplied or incorrect server configuration';
 $string['invalidcategoryidforparent'] = 'Invalid category id for parent!';
@@ -246,7 +246,7 @@ $string['page-question-import'] = 'Question import page';
 $string['page-question-export'] = 'Question export page';
 $string['parentcategory'] = 'Parent category';
 $string['parentcategory_help'] = 'The parent category is the one in which the new category will be placed. **Top** means that this category is not contained in any other category. Category contexts are shown in bold type. There must be at least one category in each context.';
-$string['parentcategory_link'] = 'question/category';
+$string['parentcategory_link'] = 'Setup Question Banks#SetupQuestionBanks-Categories';
 $string['parenthesisinproperclose'] = 'Parenthesis before ** is not properly closed in {$a}**';
 $string['parenthesisinproperstart'] = 'Parenthesis before ** is not properly started in {$a}**';
 $string['parsingquestions'] = 'Parsing questions from import file.';
@@ -349,7 +349,7 @@ $string['howquestionsbehave_help'] = 'Learners can interact with the questions i
 Alternatively, you may wish for learners to submit each question as they go along to get immediate feedback, and if they do not get it right immediately, have another try for fewer marks. That would be **Interactive with multiple tries** mode.
 
 Those are probably the two most commonly used modes of behaviour.';
-$string['howquestionsbehave_link'] = 'question/behaviour';
+$string['howquestionsbehave_link'] = 'Question Behaviours';
 $string['importfromcoursefiles'] = '... or choose a course file to import.';
 $string['importfromupload'] = 'Select a file to upload ...';
 $string['includesubcategories'] = 'Also show questions from subcategories';

@@ -214,7 +214,7 @@ $string['modulename'] = 'Survey';
 $string['modulename_help'] = 'The survey activity module provides a number of verified survey instruments that have been found useful in assessing and stimulating learning in online environments. A trainer can use these to gather data from their learners that will help them learn about their participants and reflect on their own training.
 
 Note that these survey tools are pre-populated with questions. Trainers who wish to create their own survey should use the feedback activity module.';
-$string['modulename_link'] = 'mod/survey/view';
+$string['modulename_link'] = 'Survey';
 $string['modulenameplural'] = 'Surveys';
 $string['name'] = 'Name';
 $string['newsurveyresponses'] = 'New survey responses';
@@ -258,7 +258,7 @@ $string['surveytype_help'] = 'There are three available survey types:
 * **Attitudes to Thinking and Learning Survey (ATTLS)**: For measuring the extent to which a person is a \'connected knower\' (tends to find learning more enjoyable, and is often more cooperative, congenial and more willing to build on the ideas of others) or a \'separate knower\' (tends to take a more critical and argumentative stance to learning).
 * **Critical incidents survey**.
 * **Constructivist On-line Learning Environment Survey (COLLES)**: For monitoring the extent to which the interactive capacity of the World Wide Web may be exploited for engaging learners in dynamic learning practices.';
-$string['surveytype_link'] = 'mod/survey/mod';
+$string['surveytype_link'] = 'Survey';
 $string['thanksforanswers'] = 'Thanks for answering this survey, {$a}';
 $string['time'] = 'Time';
 $string['viewsurveyresponses'] = 'View {$a} survey responses';

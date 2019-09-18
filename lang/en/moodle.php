@@ -352,7 +352,7 @@ $string['courselegacyfiles'] = 'Legacy course files';
 $string['courselegacyfiles_help'] = 'The course files area provides some backward compatibility with Totara 1.1 and earlier.  All files in this area are always accessible to all participants in the course (whether you link to them or not) and there is no way to know where any of these files are being used in Totara.
 
 If you use this area to store course files, you can expose yourself to a number of privacy and security issues, as well as experiencing missing files in backups, course imports and any time content is shared or re-used.  It is therefore recommended that you do not use this area unless you really know what you are doing.';
-$string['courselegacyfiles_link'] = 'coursefiles2';
+$string['courselegacyfiles_link'] = 'Repositories'; // Totara: Update to our docs
 $string['courselegacyfilesofcourse'] = 'Legacy course files: {$a}';
 $string['courseoverview'] = 'Course overview';
 $string['courseoverviewgraph'] = 'Course overview graph';
@@ -1660,7 +1660,7 @@ $string['savepreferences'] = 'Save preferences';
 $string['saveto'] = 'Save to';
 $string['scale'] = 'Scale';
 $string['scale_help'] = 'A scale provides a way of evaluating or grading performance in an activity. It is defined by an ordered list of values, ranging from negative to positive, separated by commas, for example; Disappointing, Not good enough, Average, Good, Very good, Excellent!';
-$string['scale_link'] = 'grade/scale';
+$string['scale_link'] = 'Grade Scales';
 $string['scales'] = 'Scales';
 $string['scalescustom'] = 'Custom scales';
 $string['scalescustomcreate'] = 'Add a new scale';
@@ -1668,7 +1668,7 @@ $string['scalescustomno'] = 'No custom scales have been created yet';
 $string['scalesstandard'] = 'Standard scales';
 $string['scalestandard'] = 'Standard scale';
 $string['scalestandard_help'] = 'A standard scale is available site-wide, for all courses.';
-$string['scalestandard_link'] = 'grade/scale';
+$string['scalestandard_link'] = 'Grade Scales';
 $string['scalestip'] = 'To create custom scales, use the \'Scales...\' link in your course administration menu.';
 $string['scalestip2'] = 'To create custom scales, click the Grades link in the course administration menu, then choose Edit, Scales.';
 $string['screenshot'] = 'Screenshot';

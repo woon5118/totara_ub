@@ -170,7 +170,7 @@ Feedback activities may be used
 * To enable participants to sign up for course modules, events etc.
 * For guest surveys of course choices, company policies etc.
 * For anti-bullying surveys in which learners can report incidents anonymously.';
-$string['modulename_link'] = 'mod/feedback/view';
+$string['modulename_link'] = 'Feedback';
 $string['modulenameplural'] = 'Feedback';
 $string['move_item'] = 'Move this question';
 $string['multichoice'] = 'Multiple choice';
