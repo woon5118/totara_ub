@@ -634,6 +634,106 @@ class access_controller {
     }
 
     /**
+     * Can current user login as this user in system or given course?
+     *
+     * NOTE: only real courses and system contexts are supported for login-as.
+     *
+     * @return bool
+     */
+    public function can_loginas(): bool {
+        global $USER;
+        if ($this->userdeleted) {
+            // Deleted users do nto have context, there is no way to login as them.
+            return false;
+        }
+        if ($this->userid == $USER->id) {
+            // Cannot login-as self.
+            return false;
+        }
+        if (\core\session\manager::is_loggedinas()) {
+            // Login-as cannot be chained.
+            return false;
+        }
+        if (is_siteadmin($this->userid)) {
+            // Logging in as admin could lead to privilege escalation, it is strictly forbidden.
+            return false;
+        }
+        if (isguestuser($this->userid)) {
+            // Guests not supported here.
+            return false;
+        }
+        if (!empty($USER->tenantid)) {
+            // Login as feature is not available to tenant members for security reasons,
+            // it would be colliding with tenant isolation.
+            return false;
+        }
+
+        // System level login-as is controlled via capability only.
+        if (!$this->courseid) {
+            return has_capability('moodle/user:loginas', \context_system::instance());
+        }
+
+        // This is a course level login-as, only real courses are allowed.
+        if (!has_capability('moodle/user:loginas', $this->context_course)) {
+            return false;
+        }
+
+        if ($this->courseid == SITEID) {
+            // This should not happen because the frontpage is ignored in constructor.
+            return false;
+        }
+
+        if ($this->context_course->tenantid) {
+            // No login-as in tenant courses, this would be colliding with tenant isolation.
+            return false;
+        }
+
+        $course = $this->get_course();
+        if (!$course) {
+            // This should not happen because we have course context.
+            return false;
+        }
+
+        // Ideally we should use require_login() here to make sure current user can
+        // actually get into the course, but we cannot because it would change the $PAGE,
+        // also we cannot do require_login() here for somebody else.
+        if (!totara_course_is_viewable($course) || !totara_course_is_viewable($course, $this->userid)) {
+            // Both current and target user must be able to see the course
+            // because in Totara status of enrolments depends on course visibility.
+            return false;
+        }
+        if (!has_capability('moodle/course:view', $this->context_course) && !is_enrolled($this->context_course, null, '', true)) {
+            // Current user cannot enter the course, it means that the require_login() in course/loginas.php would likely fail.
+            return false;
+        }
+
+        if (!is_enrolled($this->context_course, $this->userid, '', true)) {
+            // User needs to be active member of the course,
+            // if not they are likely not able to access the contents of the course.
+            // We cannot rely on users course:view capability here due to the way how login as works.
+            return false;
+        }
+
+        // Check if course has SEPARATEGROUPS and user is part of that group.
+        if (!has_capability('moodle/site:accessallgroups', $this->context_course) && groups_get_course_groupmode($course) == SEPARATEGROUPS) {
+            $samegroup = false;
+            if ($groups = groups_get_all_groups($course->id, $USER->id)) {
+                foreach ($groups as $group) {
+                    if (groups_is_member($group->id, $this->userid)) {
+                        $samegroup = true;
+                        break;
+                    }
+                }
+            }
+            if (!$samegroup) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Determine if the current user can see at least one of the groups of the specified user.
      *
      * @param stdClass $course

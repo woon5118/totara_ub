@@ -100,6 +100,8 @@ class participant_details implements \renderable {
         $context = \context_course::instance($course->id);
         $usercontext = \context_user::instance($user->id);
 
+        $access_controller = \core_user\access_controller::for($user, $course);
+
         $countries = get_string_manager()->get_list_of_countries();
 
         $datestring = new \stdClass();
@@ -248,8 +250,7 @@ class participant_details implements \renderable {
             );
         }
 
-        if ($USER->id != $user->id && !$context->tenantid && empty($USER->tenantid) && // Totara: not usable in tenant contexts and by tenant users
-                !\core\session\manager::is_loggedinas() && has_capability('moodle/user:loginas', $context) && !is_siteadmin($user->id)) {
+        if ($access_controller->can_loginas()) {
             $links[] = array(
                 'url' => new \moodle_url('/course/loginas.php?id='. $course->id .'&user='. $user->id .'&sesskey='. sesskey()),
                 'text' => get_string('loginas')

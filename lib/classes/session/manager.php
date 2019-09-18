@@ -895,6 +895,17 @@ class manager {
             return;
         }
 
+        if ($context->contextlevel == CONTEXT_COURSE) {
+            if ($context->instanceid == SITEID) {
+                throw new \coding_exception('Invalid context for login-as, frontpage context not allowed');
+            }
+            if ($context->tenantid) {
+                throw new \coding_exception('Invalid context for login-as, tenant courses are not supported');
+            }
+        } else if ($context->contextlevel != CONTEXT_SYSTEM) {
+            throw new \coding_exception('Invalid context for login-as, only system and course contexts are supported');
+        }
+
         // Totara: we must require real login afterwards for security reasons!
         \totara_core\persistent_login::kill(session_id());
 

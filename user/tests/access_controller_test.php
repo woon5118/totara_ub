@@ -1932,6 +1932,123 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse(access_controller::for($user3)->can_view_field('firstname'));
     }
 
+    public function test_can_loginas() {
+        global $DB;
+
+        // Create some users
+        $learner1 = $this->getDataGenerator()->create_user();
+        $learner2 = $this->getDataGenerator()->create_user();
+        $trainer = $this->getDataGenerator()->create_user();
+        $sitemanager = $this->getDataGenerator()->create_user();
+        $siteadmin1 = $this->getDataGenerator()->create_user();
+        $siteadmin2 = $this->getDataGenerator()->create_user();
+        $deleted = $this->getDataGenerator()->create_user(array('deleted' => 1));
+        $guest = $DB->get_record('user', array('username' => 'guest'));
+
+        // Assign sitewide roles
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        $this->getDataGenerator()->role_assign($managerrole->id, $sitemanager->id);
+        set_config('siteadmins', $siteadmin1->id . ',' . $siteadmin2->id);
+
+        // Create two courses
+        $stdcourse = $this->getDataGenerator()->create_course();
+        $groupedcourse = $this->getDataGenerator()->create_course(array('groupmode' => SEPARATEGROUPS));
+
+        // Enrol learners and trainer
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
+
+        $this->getDataGenerator()->enrol_user($learner1->id, $stdcourse->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($trainer->id, $stdcourse->id, $teacherrole->id);
+
+        $this->getDataGenerator()->enrol_user($learner1->id, $groupedcourse->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($learner2->id, $groupedcourse->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($trainer->id, $groupedcourse->id, $teacherrole->id);
+
+        // For grouped course, set up groups
+        $group1 = $this->getDataGenerator()->create_group(array('courseid' => $groupedcourse->id));
+        $group2 = $this->getDataGenerator()->create_group(array('courseid' => $groupedcourse->id));
+
+        // Assign trainer and learner1 to group1, learner2 to group2
+        groups_add_member($group1->id, $learner1->id);
+        groups_add_member($group1->id, $trainer->id);
+        groups_add_member($group2->id, $learner2->id);
+
+        // Contexts
+        $systemcontext = context_system::instance();
+        $stdcoursecontext = context_course::instance($stdcourse->id);
+        $groupedcoursecontext = context_course::instance($groupedcourse->id);
+
+        // Add loginas capability to editingteacher
+        role_change_permission($teacherrole->id, $systemcontext, 'moodle/user:loginas', CAP_ALLOW);
+
+        // Tests as Admin
+        $this->setUser($siteadmin1);
+
+        // Siteadmin should be able to log in as (almost) anyone in system context
+        self::assertTrue(access_controller::for($learner1)->can_loginas());
+        self::assertTrue(access_controller::for($learner2)->can_loginas());
+        self::assertTrue(access_controller::for($trainer)->can_loginas());
+        self::assertTrue(access_controller::for($sitemanager)->can_loginas());
+        self::assertFalse(access_controller::for($guest)->can_loginas());
+
+        // Target user must not be same user
+        self::assertFalse(access_controller::for($siteadmin1)->can_loginas());
+
+        // Target user must not be another siteadmin
+        self::assertFalse(access_controller::for($siteadmin2)->can_loginas());
+
+        // Target user must not be deleted
+        self::assertFalse(access_controller::for($deleted)->can_loginas());
+
+        // Tests as Site Manager
+        $this->setUser($sitemanager);
+
+        // Site Manager should also be able to log in as (almost) anyone in system context
+        self::assertTrue(access_controller::for($learner1)->can_loginas());
+        self::assertTrue(access_controller::for($learner2)->can_loginas());
+        self::assertTrue(access_controller::for($trainer)->can_loginas());
+        self::assertFalse(access_controller::for($guest)->can_loginas());
+
+        // Site Manager should also be able to log in as enrolees in course context
+        self::assertTrue(access_controller::for($learner1, $stdcourse)->can_loginas());
+        self::assertTrue(access_controller::for($trainer, $stdcourse)->can_loginas());
+        self::assertTrue(access_controller::for($learner1, $groupedcourse)->can_loginas());
+        self::assertTrue(access_controller::for($learner2, $groupedcourse)->can_loginas());
+        self::assertTrue(access_controller::for($trainer, $groupedcourse)->can_loginas());
+
+        // Target user must be enrolled in the course, though
+        self::assertFalse(access_controller::for($learner2, $stdcourse)->can_loginas());
+
+        // Tests as Learner
+        $this->setUser($learner1);
+
+        // Learner1 should not be able to log in as anybody in system or course contexts
+        self::assertFalse(access_controller::for($learner2)->can_loginas());
+        self::assertFalse(access_controller::for($trainer, $stdcourse)->can_loginas());
+        self::assertFalse(access_controller::for($guest)->can_loginas());
+
+        // Tests as Trainer
+        $this->setUser($trainer);
+
+        // Trainer should only be able to login as an enrolee in course context
+        self::assertFalse(access_controller::for($learner2)->can_loginas());
+        self::assertTrue(access_controller::for($learner1, $stdcourse)->can_loginas());
+        self::assertFalse(access_controller::for($learner2, $stdcourse)->can_loginas());
+
+        // In a separated group course, trainer should only be able to login as an enrolee in the same group
+        // Note that an editing trainer could do this, but not a trainer
+        self::assertTrue(access_controller::for($learner1, $groupedcourse)->can_loginas());
+        self::assertFalse(access_controller::for($learner2, $groupedcourse)->can_loginas());
+
+        // Fake being "loggedinas" already
+        $GLOBALS['USER']->realuser = $siteadmin1->id;
+        self::assertFalse(access_controller::for($learner1, $groupedcourse)->can_loginas());
+
+        // Clear that global
+        $GLOBALS['USER']->realuser = null;
+    }
+
     private static function assert_expected_fields(access_controller $controller, $allowed, $notallowed) {
         $wrong = [];
         foreach ($allowed as $field) {

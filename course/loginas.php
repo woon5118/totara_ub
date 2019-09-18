@@ -29,57 +29,24 @@ if ($redirect) {
     redirect(get_login_url());
 }
 
+// User must be logged in.
+require_login();
+require_sesskey();
+
 // Try log in as this user.
 $userid = required_param('user', PARAM_INT);
+$user = $DB->get_record('user', ['id' => $id, 'deleted' => 0]);
 
-require_sesskey();
-$course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
-
-// User must be logged in.
-
-$systemcontext = context_system::instance();
-$coursecontext = context_course::instance($course->id);
-
-require_login();
-
-// Login-as is not supported for tenant contexts and it cannot be used by tenant members.
-if ($coursecontext->tenantid or !empty($USER->tenantid)) {
-    print_error('nologinas');
-}
-
-if (has_capability('moodle/user:loginas', $systemcontext)) {
-    if (is_siteadmin($userid)) {
-        print_error('nologinas');
-    }
-    $context = $systemcontext;
-    $PAGE->set_context($context);
-} else {
+if ($id and $id != SITEID) {
+    $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
     require_login($course);
-    require_capability('moodle/user:loginas', $coursecontext);
-    if (is_siteadmin($userid)) {
-        print_error('nologinas');
-    }
-    if (!is_enrolled($coursecontext, $userid)) {
-        print_error('usernotincourse');
-    }
-    $context = $coursecontext;
-
-    // Check if course has SEPARATEGROUPS and user is part of that group.
-    if (groups_get_course_groupmode($course) == SEPARATEGROUPS &&
-            !has_capability('moodle/site:accessallgroups', $context)) {
-        $samegroup = false;
-        if ($groups = groups_get_all_groups($course->id, $USER->id)) {
-            foreach ($groups as $group) {
-                if (groups_is_member($group->id, $userid)) {
-                    $samegroup = true;
-                    break;
-                }
-            }
-        }
-        if (!$samegroup) {
-            print_error('nologinas');
-        }
-    }
+    $context = context_course::instance($course->id);
+} else {
+    $course = get_site();
+    $context = context_system::instance();
+}
+if (!\core_user\access_controller::for($user, $course)->can_loginas()) {
+    print_error('nologinas');
 }
 
 // Login as this user and return to course home page.

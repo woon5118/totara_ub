@@ -60,10 +60,15 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     $tree->add_category($admincategory);
     $tree->add_category($loginactivitycategory);
 
+    if (empty($course)) {
+        $course = null;
+    }
+    $access_controller = \core_user\access_controller::for($user, $course);
+
     // Add core nodes.
     // Full profile node.
     if (!empty($course)) {
-        $url = user_get_profile_url($user);
+        $url = $access_controller->get_profile_url();
         if ($url) {
             $node = new core_user\output\myprofile\node('miscellaneous', 'fullprofile', get_string('fullprofile'), null, $url);
             $tree->add_node($node);
@@ -129,9 +134,7 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     }
 
     // Login as ...
-    if (!$user->deleted && !$iscurrentuser && !$courseorsystemcontext->tenantid && empty($USER->tenantid) && // Totara: not usable in tenant contexts and by tenant users
-                !\core\session\manager::is_loggedinas() && has_capability('moodle/user:loginas',
-                $courseorsystemcontext) && !is_siteadmin($user->id)) {
+    if ($access_controller->can_loginas()) {
         $url = new moodle_url('/course/loginas.php',
                 array('id' => $courseid, 'user' => $user->id, 'sesskey' => sesskey()));
         $node = new  core_user\output\myprofile\node('administration', 'loginas', get_string('loginas'), null, $url);
