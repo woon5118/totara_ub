@@ -636,7 +636,7 @@ class access_controller {
     /**
      * Can current user login as this user in system or given course?
      *
-     * NOTE: only real courses and system contexts are supported for login-as.
+     * NOTE: Only real courses and system contexts are supported for login-as.
      *
      * @return bool
      */
@@ -680,7 +680,7 @@ class access_controller {
 
         if ($this->courseid == SITEID) {
             // This should not happen because the frontpage course is changed to null in constructor.
-            return false;
+            throw new \coding_exception('Tracked courseid cannot be frontpage course.');
         }
 
         if ($this->context_course->tenantid) {
@@ -688,14 +688,17 @@ class access_controller {
             return false;
         }
 
+        // Load the course.
         $course = $this->get_course();
         if (!$course) {
-            // This should not happen because we have course context.
+            // This should not happen because we have course context, but for whatever reason there is no course record.
+            debugging('Access_controller found course context but no matching course record.', DEBUG_DEVELOPER);
             return false;
         }
 
         // Ideally we should use require_login() here to make sure current user can
         // actually get into the course, but we cannot because it would change the $PAGE.
+        // So instead, check that current user either has ability to view the course or is enrolled.
         if ((!has_capability('moodle/course:view', $this->context_course) || !totara_course_is_viewable($course))
             && !is_enrolled($this->context_course, $USER->id, '', true)) {
             // Current user cannot enter the course, it means that the require_login() in course/loginas.php would likely fail.

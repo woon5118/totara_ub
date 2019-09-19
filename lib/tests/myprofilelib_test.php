@@ -144,6 +144,7 @@ class core_myprofilelib_testcase extends advanced_testcase {
     public function test_core_myprofile_navigation_preference_as_admin() {
         $this->setAdminUser();
         $iscurrentuser = false;
+        // Totara: Login-as requires enrolment.
         $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
 
         core_myprofile_navigation($this->tree, $this->user, $iscurrentuser, $this->course);
@@ -162,6 +163,9 @@ class core_myprofilelib_testcase extends advanced_testcase {
         // Login as link for a user who doesn't have the capability to login as.
         $this->setUser($this->user2);
         $iscurrentuser = false;
+        // Totara: Login-as requires enrolment of current and target user.
+        $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
+        $this->getDataGenerator()->enrol_user($this->user2->id, $this->course->id);
 
         core_myprofile_navigation($this->tree, $this->user, $iscurrentuser, $this->course);
         $reflector = new ReflectionObject($this->tree);

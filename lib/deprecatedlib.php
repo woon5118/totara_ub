@@ -32,6 +32,20 @@ defined('MOODLE_INTERNAL') || die();
 
 /* === Start of deprecated Totara stuff === */
 
+/**
+ * Totara: Capability and conditions check to see if current user can login as another.
+ *
+ * @deprecated since Totara 13.0
+ *
+ * @param \stdClass $target_user user object
+ * @param \stdClass $course course object
+ * @return bool
+ */
+function user_can_loginas($target_user, $course) {
+    debugging('user_can_loginas() has been deprecated, please use \core_user\accesscontroller::can_loginas() instead', DEBUG_DEVELOPER);
+    return \core_user\access_controller::for($target_user, $course)->can_loginas();
+}
+
 /* === End of deprecated Totara specific stuff === */
 
 /* === Functions that needs to be kept longer in deprecated lib than normal time period === */
