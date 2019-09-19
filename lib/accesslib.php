@@ -201,7 +201,7 @@ $ACCESSLIB_PRIVATE->accessdatabyuser = array(); // Holds the cache of $accessdat
  */
 function accesslib_clear_all_caches_for_unit_testing() {
     global $USER;
-    if (!PHPUNIT_TEST) {
+    if (!PHPUNIT_TEST && (!defined('BEHAT_UTIL') || !BEHAT_UTIL) && (!defined('BEHAT_SITE_RUNNING') || !BEHAT_SITE_RUNNING)) {
         throw new coding_exception('You must not call clear_all_caches outside of unit tests.');
     }
 
