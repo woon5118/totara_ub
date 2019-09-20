@@ -174,7 +174,7 @@ class date extends base_form {
      * @return string
      */
     public function getRuleDescription($ruleid, $static=true) {
-        global $CFG, $COHORT_RULE_DATE_OP;
+        global $COHORT_RULE_DATE_OP;
 
         if (!isset($this->operator) || !isset($this->date)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
@@ -184,13 +184,22 @@ class date extends base_form {
         $strvar->desc = $this->description;
 
         $a = '';
+        $stringkey = '';
         if (in_array($this->operator, array_keys(self::$operatorsfixed))) {
             $a = userdate($this->date, get_string('strftimedatetimelong', 'langconfig'));
+            // Unlike the date (no timezone) field, the date/time field "before/after" rule includes current date as well.
+            // So, we need to use different strings here.
+            if ($this->operator == COHORT_RULE_DATE_OP_AFTER_FIXED_DATE) {
+                $stringkey = 'dateisonorafter';
+            } else {
+                $stringkey = 'dateisonorbefore';
+            }
         } else if (in_array($this->operator, array_keys(self::$operatorsdynamic))) {
+            $stringkey = "dateis{$COHORT_RULE_DATE_OP[$this->operator]}";
             $a = $this->date;
         }
 
-        $strvar->vars = get_string("dateis{$COHORT_RULE_DATE_OP[$this->operator]}", 'totara_cohort', $a);
+        $strvar->vars = get_string($stringkey, 'totara_cohort', $a);
 
         return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }

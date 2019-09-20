@@ -41,7 +41,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
     And I select "Join Date" from the "addrulesetmenu" singleselect
     And I set the following fields to these values:
       | fixedordynamic                 | 1                |
-      | beforeaftermenu                | before and on    |
+      | beforeaftermenu                | before or on     |
       | beforeafterdatetime[day]       | 20               |
       | beforeafterdatetime[month]     | 11               |
       | beforeafterdatetime[year]      | 2016             |
@@ -51,10 +51,10 @@ Feature: Apply audience membership rules using before and after criteria for cus
     And I press "Save"
 
     # Check before criteria (check, load, re-save without changes, check).
-    And I should see "is before 20/11/2016, 12:30"
+    And I should see "is before or on 20/11/2016, 12:30"
     And I click on "Edit" "link" in the "ul.cohort-editing_ruleset" "css_element"
     And I press "Save"
-    And I should see "is before 20/11/2016, 12:30"
+    And I should see "is before or on 20/11/2016, 12:30"
 
     # Change user default time zone.
     And I follow "Preferences" in the user menu
@@ -67,7 +67,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
     And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "audience1"
     And I follow "Rule sets"
-    And I should see "is before 19/11/2016, 17:30"
+    And I should see "is before or on 19/11/2016, 17:30"
 
     # Change default time zone.
     And I log out
@@ -81,7 +81,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
     And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "audience1"
     When I follow "Rule sets"
-    Then I should see "is before 19/11/2016, 17:30"
+    Then I should see "is before or on 19/11/2016, 17:30"
 
   Scenario: Check custom fields dates of before and after criteria rule
     Given I log in as "siteman1"
@@ -92,7 +92,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
     And I select "Join Date" from the "addrulesetmenu" singleselect
     And I set the following fields to these values:
       | fixedordynamic                 | 1                   |
-      | beforeaftermenu                | before and on       |
+      | beforeaftermenu                | before or on        |
       | beforeafterdatetime[day]       | 20                  |
       | beforeafterdatetime[month]     | November            |
       | beforeafterdatetime[year]      | 2016                |
@@ -102,7 +102,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
     And I press "Save"
     And I press "Approve changes"
 
-    # User on the same date as "before and on" should be included (In T10 this should be changed).
+    # User on the same date as "before or on" should be included (In T10 this should be changed).
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Sam Student1"
     And I follow "Edit profile"
@@ -181,7 +181,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
     And I should see "Sal Student2"
     And I should see "Sad Student3"
 
-    # Users "on and after" should be included on date and after.
+    # Users "on or after" should be included on date and after.
     And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "audience1"
     And I follow "Rule sets"
@@ -189,7 +189,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
 
     And I set the following fields to these values:
       | fixedordynamic                 | 1                   |
-      | beforeaftermenu                | on and after        |
+      | beforeaftermenu                | on or after         |
       | beforeafterdatetime[day]       | 20                  |
       | beforeafterdatetime[month]     | November            |
       | beforeafterdatetime[year]      | 2016                |

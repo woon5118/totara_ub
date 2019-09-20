@@ -133,16 +133,21 @@ class program_completion_date extends base_selector {
      * @return string
      */
     public function getRuleDescription($ruleid, $static=true) {
-        global $DB, $CFG, $COHORT_RULE_COMPLETION_OP;
+        global $DB, $COHORT_RULE_COMPLETION_OP;
         if (!isset($this->operator) || !isset($this->listofids)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }
 
         $strvar = new \stdClass();
         $strvar->desc = $this->description;
+        $stringkey = '';
         switch ($this->operator) {
             case COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN:
+                $stringkey = 'dateisbefore';
+                $a = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
+                break;
             case COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN:
+                $stringkey = 'dateisonorafter';
                 $a = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
                 break;
             case COHORT_RULE_COMPLETION_OP_BEFORE_PAST_DURATION:
@@ -150,9 +155,10 @@ class program_completion_date extends base_selector {
             case COHORT_RULE_COMPLETION_OP_WITHIN_FUTURE_DURATION:
             case COHORT_RULE_COMPLETION_OP_AFTER_FUTURE_DURATION:
                 $a = $this->date;
+                $stringkey = "dateis{$COHORT_RULE_COMPLETION_OP[$this->operator]}";
                 break;
         }
-        $strvar->join = get_string("dateis{$COHORT_RULE_COMPLETION_OP[$this->operator]}", 'totara_cohort', $a);
+        $strvar->join = get_string($stringkey, 'totara_cohort', $a);
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofids);
         $sqlparams[] = $ruleid;

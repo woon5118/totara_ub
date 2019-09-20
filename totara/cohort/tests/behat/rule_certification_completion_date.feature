@@ -184,7 +184,7 @@ Feature: Test the certification completion date rule in dynamic audiences
       | beforeaftermenu | after      |
       | completiondate  | 20/10/2015 |
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
-    And I should see "User's certification completion date is on and after 20/10/2015 \"Certification 1\"" in the "Ruleset #1" "fieldset"
+    And I should see "User's certification completion date is on or after 20/10/2015 \"Certification 1\"" in the "Ruleset #1" "fieldset"
     When I press "Approve changes"
     And I switch to "Members" tab
     Then I should not see "Learner1 One"
@@ -202,7 +202,7 @@ Feature: Test the certification completion date rule in dynamic audiences
       | beforeaftermenu | after      |
       | completiondate  | 20/10/2050 |
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
-    And I should see "User's certification completion date is on and after 20/10/2050 \"Certification 1\"" in the "Ruleset #1" "fieldset"
+    And I should see "User's certification completion date is on or after 20/10/2050 \"Certification 1\"" in the "Ruleset #1" "fieldset"
     When I press "Approve changes"
     And I switch to "Members" tab
     Then I should not see "Learner1 One"
@@ -227,7 +227,7 @@ Feature: Test the certification completion date rule in dynamic audiences
     When I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I switch to "Rule sets" tab
-    And I should see "User's certification completion date is on and after 20/10/2050 \"Certification 1\"" in the "Ruleset #1" "fieldset"
+    And I should see "User's certification completion date is on or after 20/10/2050 \"Certification 1\"" in the "Ruleset #1" "fieldset"
     And I switch to "Members" tab
     Then I should not see "Learner1 One"
     And I should not see "Learner2 Two"
@@ -244,7 +244,7 @@ Feature: Test the certification completion date rule in dynamic audiences
       | beforeaftermenu | after      |
       | completiondate  | 20/10/2015 |
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
-    And I should see "User's certification completion date is on and after 20/10/2015 \"Certification 1\"" in the "Ruleset #1" "fieldset"
+    And I should see "User's certification completion date is on or after 20/10/2015 \"Certification 1\"" in the "Ruleset #1" "fieldset"
     When I press "Approve changes"
     And I switch to "Members" tab
     Then I should see "Learner1 One"

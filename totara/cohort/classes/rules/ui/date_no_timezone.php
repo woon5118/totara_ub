@@ -68,8 +68,8 @@ class date_no_timezone extends base_form {
         $this->description = $description;
 
         self::$operatorsfixed = [
-            COHORT_RULE_DATE_OP_BEFORE_FIXED_DATE => get_string('datemenufixeddatebeforeandon', 'totara_cohort'),
-            COHORT_RULE_DATE_OP_AFTER_FIXED_DATE  => get_string('datemenufixeddateafterandon', 'totara_cohort')
+            COHORT_RULE_DATE_OP_BEFORE_FIXED_DATE => get_string('datemenufixeddatebefore', 'totara_cohort'),
+            COHORT_RULE_DATE_OP_AFTER_FIXED_DATE  => get_string('datemenufixeddateafter', 'totara_cohort')
         ];
 
         if ($this->rule == 'systemaccess-firstlogin' || $this->rule == 'systemaccess-lastlogin') {
@@ -126,7 +126,7 @@ class date_no_timezone extends base_form {
      * and the bottom row being for before/after/within a fixed present/past duration. A radio button called "fixedordynamic"
      * indicates which one is selected
      *
-     * @param MoodleQuickForm $mform
+     * @param \MoodleQuickForm $mform
      */
     public function addFormFields(&$mform) {
 
@@ -184,7 +184,7 @@ JS;
      * @return string
      */
     public function getRuleDescription($ruleid, $static=true) {
-        global $CFG, $COHORT_RULE_DATE_OP;
+        global $COHORT_RULE_DATE_OP;
 
         if (!isset($this->operator) || !isset($this->date)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
@@ -216,7 +216,7 @@ JS;
      * @return bool
      */
     public function validateResponse() {
-        /** @var core_renderer $OUTPUT */
+        /** @var \core_renderer $OUTPUT */
         global $OUTPUT;
         $form = $this->constructForm();
         if ($data = $form->get_submitted_data()) {
@@ -273,7 +273,7 @@ JS;
     /**
      * Writes the new rule to the database
      *
-     * @param cohort_rule_sqlhandler $sqlhandler
+     * @param \cohort_rule_sqlhandler $sqlhandler
      */
     public function handleDialogUpdate($sqlhandler) {
         $fixedordynamic = required_param('fixedordynamic', PARAM_INT);
@@ -292,7 +292,7 @@ JS;
                 $date = required_param('durationdate', PARAM_INT);
                 break;
             default:
-                return false;
+                return;
         }
         $this->operator = $sqlhandler->operator = $operator;
         $this->date = $sqlhandler->date = $date;
