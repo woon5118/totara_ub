@@ -39,14 +39,14 @@ Feature: Verify functionality of user source report.
     Then I should see "Report Updated"
 
     When I follow "View This Report"
-    Then I should see "User Report: 6 records shown"
+    Then I should see "6 records shown" in the ".rb-record-count" "css_element"
 
   Scenario: Verify editing user record in user source report.
 
     Given I follow "Edit Bob1 Learner1"
     When I set the field "First name" to "Sir Bob1"
     And I press "Save and go back"
-    Then I should see "User Report: 6 records shown"
+    Then I should see "6 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname   | Username | User's Email              | User Status |
       | Sir Bob1 Learner1 | learner1 | bob1.learner1@example.com | Active      |
@@ -56,7 +56,7 @@ Feature: Verify functionality of user source report.
     Given I follow "Manage login of Bob1 Learner1"
     And I set the "Choose" Totara form field to "Suspend user account"
     And I press "Update"
-    Then I should see "User Report: 6 records shown"
+    Then I should see "6 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Suspended   |
@@ -64,7 +64,7 @@ Feature: Verify functionality of user source report.
     When I follow "Manage login of Bob1 Learner1"
     And I set the "Choose" Totara form field to "Activate user account"
     And I press "Update"
-    Then I should see "User Report: 6 records shown"
+    Then I should see "6 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
@@ -75,7 +75,7 @@ Feature: Verify functionality of user source report.
     Then I should see "Delete user"
 
     When I press "Delete"
-    Then I should see "User Report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And I should not see "Bob1 Learner1"
 
   Scenario: Verify confirm new self-registration user in user source report.
@@ -169,7 +169,7 @@ Feature: Verify functionality of user source report.
       | learner3 | C1     | student |
       | learner4 | C1     | student |
     # As admin we can see all the learner's record.
-    Then I should see "User Report: 6 records shown"
+    Then I should see "6 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
@@ -245,7 +245,7 @@ Feature: Verify functionality of user source report.
     When I log in as "learner1"
     And I click on "Reports" in the totara menu
     And I follow "User Report"
-    Then I should see "User Report: 6 records shown"
+    Then I should see "6 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |
@@ -258,7 +258,7 @@ Feature: Verify functionality of user source report.
     When I log in as "learner3"
     And I click on "Reports" in the totara menu
     And I follow "User Report"
-    Then I should see "User Report: 2 records shown"
+    Then I should see "2 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username | User's Email              | User Status |
       | Bob1 Learner1   | learner1 | bob1.learner1@example.com | Active      |

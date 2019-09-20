@@ -50,7 +50,7 @@ Feature: Graphs in Report builder
     And I press "Save changes"
 
     When I click on "View This Report" "link"
-    Then I should see "My user report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And I should see "33.33%"
     And I should see "22.22%"
     And I should see "11.11%"
@@ -63,7 +63,7 @@ Feature: Graphs in Report builder
 
     When I click on "Reports" in the totara menu
     And I follow "My user report"
-    Then I should see "My user report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And I should not see "33.33%"
     And I should not see "22.22%"
     And I should not see "11.11%"
@@ -82,7 +82,7 @@ Feature: Graphs in Report builder
     And I press "Save changes"
 
     When I click on "View This Report" "link"
-    Then I should see "My user report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And I should see "33.33%"
     And I should see "22.22%"
     And I should see "11.11%"
@@ -114,7 +114,7 @@ Feature: Graphs in Report builder
     And I press "Save changes"
 
     When I click on "View This Report" "link"
-    Then I should see "My user report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And I should see "33.33%"
     And I should see "22.22%"
     And I should see "11.11%"
@@ -127,7 +127,7 @@ Feature: Graphs in Report builder
     And I press "Save changes"
 
     When I click on "View This Report" "link"
-    Then I should see "My user report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And I should not see "33.33%"
     And I should not see "22.22%"
     And I should not see "11.11%"

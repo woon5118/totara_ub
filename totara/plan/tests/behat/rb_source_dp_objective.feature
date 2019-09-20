@@ -32,7 +32,7 @@ Feature: Verify the columns of the Record of Learning objectives report source.
   Scenario: Verify the objective date created column is present and correct.
 
     Given I follow "View This Report"
-    Then I should see "RoL Objectives: 1 record shown"
+    Then I should see "1 record shown" in the ".rb-record-count" "css_element"
     # Check the created date. There won't be an updated date.
     And I should see date "today" formatted "%d %b %Y" in the "Objective 1" "table_row"
 
@@ -46,6 +46,6 @@ Feature: Verify the columns of the Record of Learning objectives report source.
     And I navigate to "Manage user reports" node in "Site administration > Reports"
     And I follow "RoL Objectives"
     And I follow "View This Report"
-    Then I should see "RoL Objectives: 1 record shown"
+    Then I should see "1 record shown" in the ".rb-record-count" "css_element"
     # Check the updated date.
     And I should see date "today" formatted "%d %b %Y" in the "//table[@id='report_rol_objectives']/tbody/tr[1]/td[9]" "xpath_element"

@@ -47,7 +47,7 @@ Feature: Test the visibility to see the seminar summary report depending on the 
     Given I log in as "student1"
     And I click on "Reports" in the totara menu
     And I follow "Seminar Sessions"
-    And I should see "Seminar Sessions: 2 records shown"
+    And I should see "2 records shown" in the ".rb-record-count" "css_element"
     And I should see "Course 17392A"
     And I should see "Seminar 17392A"
     And I should see "Course 17392B"
@@ -65,7 +65,7 @@ Feature: Test the visibility to see the seminar summary report depending on the 
     And I log in as "student1"
     And I click on "Reports" in the totara menu
     And I follow "Seminar Sessions"
-    And I should see "Seminar Sessions: 1 record shown"
+    And I should see "1 record shown" in the ".rb-record-count" "css_element"
     And I should see "Course 17392A"
     And I should see "Seminar 17392A"
     And I should not see "Course 17392B"

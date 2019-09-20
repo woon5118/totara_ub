@@ -44,7 +44,7 @@ Feature: Test the basic functionality of the Totara report graph block
     Then I should see "Graph updated"
 
     When I click on "View This Report" "link"
-    Then I should see "My user report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And I should see "Search by"
     And I should see "User's Fullname"
     And I should see "New Zealand"

@@ -121,7 +121,7 @@ Feature: Tenant account login management without tenant isolation
     And I press "Continue"
     Then I should see "You do not have any current learning. For previously completed learning see your Record of Learning."
 
-  Scenario: Teannt login manager resets user password without tenant isolation
+  Scenario: Tenant login manager resets user password without tenant isolation
     Given I log in as "usermanager"
     And I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on "Users" "link" in the "#quickaccess-popover-content" "css_element"

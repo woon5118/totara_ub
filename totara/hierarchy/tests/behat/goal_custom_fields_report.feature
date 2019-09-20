@@ -53,7 +53,7 @@ Feature: Verify I can see all appropriate fields in the goal custom fields repor
 
     # View and check the report contains the right data.
     When I follow "View This Report"
-    Then I should see "Goal Custom Fields report: 2 records shown"
+    Then I should see "2 records shown" in the ".rb-record-count" "css_element"
     And the following should exist in the "report_goal_custom_fields_report" table:
       | User's Fullname | Goal Name       | Personal or Company  | Goal Type | Goal Description                 |
       | Admin User      | Company Goal 1  | Company              | No Type   | Precise and accurate description |
@@ -112,7 +112,7 @@ Feature: Verify I can see all appropriate fields in the goal custom fields repor
 
     # View and check the report contains the right data.
     And I follow "View This Report"
-    Then I should see "Goal Custom Fields report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And the following should exist in the "report_goal_custom_fields_report" table:
       | User's Fullname | Goal Name           | Personal or Company  | Goal Type | Status           | Target date |
       | Admin User      | Company Goal 1      | Company              | No Type   | Goal Assigned    |             |

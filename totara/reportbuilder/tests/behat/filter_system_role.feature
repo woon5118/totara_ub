@@ -59,7 +59,7 @@ Feature: Verify the User System Role filter.
 
     When I click on "Assigned" "radio"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "My User Report: 7 records shown"
+    Then I should see "7 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Guest user      | guest    |
@@ -72,7 +72,7 @@ Feature: Verify the User System Role filter.
 
     When I click on "Not assigned" "radio"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "My User Report: 7 records shown"
+    Then I should see "7 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Guest user      | guest    |
@@ -87,7 +87,7 @@ Feature: Verify the User System Role filter.
     Then I should see "Create a saved search"
     And I set the field "Search Name" to "No role selected"
     And I press "Save changes"
-    Then I should see "My User Report: 7 records shown"
+    Then I should see "7 records shown" in the ".rb-record-count" "css_element"
     And I should see "No role selected" in the "sid" "select"
 
   Scenario: Verify User System User filter with 'any role' option selected.
@@ -98,7 +98,7 @@ Feature: Verify the User System Role filter.
     When I click on "Assigned" "radio"
     And I set the field "user-roleid" to "Any role"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "My User Report: 4 records shown"
+    Then I should see "4 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Bob1 Learner1   | learner1 |
@@ -115,13 +115,13 @@ Feature: Verify the User System Role filter.
     Then I should see "Create a saved search"
     And I set the field "Search Name" to "Assigned any role"
     And I press "Save changes"
-    Then I should see "My User Report: 4 records shown"
+    Then I should see "4 records shown" in the ".rb-record-count" "css_element"
     And I should see "Assigned any role" in the "sid" "select"
 
     When I click on "Not assigned" "radio"
     And I set the field "user-roleid" to "Any role"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "My User Report: 3 records shown"
+    Then I should see "3 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Guest user      | guest    |
@@ -137,7 +137,7 @@ Feature: Verify the User System Role filter.
     Then I should see "Create a saved search"
     And I set the field "Search Name" to "Not assigned any role"
     And I press "Save changes"
-    Then I should see "My User Report: 3 records shown"
+    Then I should see "3 records shown" in the ".rb-record-count" "css_element"
     And I should see "Not assigned any role" in the "sid" "select"
 
   Scenario: Verify User System Role filter with 'assigned' role works.
@@ -149,7 +149,7 @@ Feature: Verify the User System Role filter.
     When I click on "Assigned" "radio"
     And I set the field "user-roleid" to "Site Manager"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "My User Report: 1 record shown"
+    Then I should see "1 record shown"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Bob1 Learner1   | learner1 |
@@ -165,7 +165,7 @@ Feature: Verify the User System Role filter.
     # Check the Course Creator search result.
     When I set the field "user-roleid" to "Course creator"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "My User Report: 2 records shown"
+    Then I should see "2 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Bob2 Learner2   | learner2 |
@@ -181,7 +181,7 @@ Feature: Verify the User System Role filter.
     # Check the Staff Manager search result.
     When I set the field "user-roleid" to "Staff Manager"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "My User Report: 2 records shown"
+    Then I should see "2 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Bob3 Learner3   | learner3 |
@@ -198,7 +198,7 @@ Feature: Verify the User System Role filter.
     Then I should see "Create a saved search"
     And I set the field "Search Name" to "Assigned role 'Staff Manager'"
     And I press "Save changes"
-    Then I should see "My User Report: 2 records shown"
+    Then I should see "2 records shown" in the ".rb-record-count" "css_element"
     And I should see "Assigned role 'Staff Manager'" in the "sid" "select"
 
   Scenario: Verify User System Role filter with 'not assigned' role works.
@@ -210,7 +210,7 @@ Feature: Verify the User System Role filter.
     When I click on "Not assigned" "radio"
     And I set the field "user-roleid" to "Site Manager"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "My User Report: 6 records shown"
+    Then I should see "6 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Guest user      | guest    |
@@ -226,7 +226,7 @@ Feature: Verify the User System Role filter.
     # Check the Course Creator search result.
     When I set the field "user-roleid" to "Course creator"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "My User Report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Guest user      | guest    |
@@ -242,7 +242,7 @@ Feature: Verify the User System Role filter.
     # Check the Staff Manager search result.
     When I set the field "user-roleid" to "Staff Manager"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "My User Report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Guest user      | guest    |
@@ -259,7 +259,7 @@ Feature: Verify the User System Role filter.
     Then I should see "Create a saved search"
     And I set the field "Search Name" to "Not assigned role 'Staff Manager'"
     And I press "Save changes"
-    Then I should see "My User Report: 5 records shown"
+    Then I should see "5 records shown" in the ".rb-record-count" "css_element"
     And I should see "Not assigned role 'Staff Manager'" in the "sid" "select"
 
   Scenario: Verify User System Role filter can be used in embedded reports using the user source.
@@ -288,7 +288,7 @@ Feature: Verify the User System Role filter.
     When I click on "Assigned" "radio"
     And I set the field "user-roleid" to "Any role"
     And I press "id_submitgroupstandard_addfilter"
-    Then I should see "Manage users: 4 records shown"
+    Then I should see "4 records shown" in the ".rb-record-count" "css_element"
     And the "reportbuilder-table" table should contain the following:
       | User's Fullname | Username |
       | Bob1 Learner1   | learner1 |

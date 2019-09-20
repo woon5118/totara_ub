@@ -282,7 +282,7 @@ Feature: Report builder table block
     And I press "Save changes"
     And I press "Stop customising this page"
     And I click on "View full report" "link" in the "Report wo sid" "block"
-    And I should see "User report: 13 records shown"
+    And I should see "13 records shown" in the ".rb-record-count" "css_element"
 
   Scenario: Test view full report link for embedded report block navigation
     # Enable report-based catalogue to be able to select it.
