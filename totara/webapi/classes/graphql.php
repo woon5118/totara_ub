@@ -276,7 +276,7 @@ final class graphql {
 
         // Regular data type.
         $parts = explode('_', $info->parentType->name);
-        if (count($parts) > 1) {
+        if (!self::is_introspection_type($info->parentType->name) && count($parts) > 1) {
             [$component, $name] = self::split_type_name($info->parentType->name);
             if (empty($name)) {
                 throw new \coding_exception('Type resolvers must be named as component_name, e.g. totara_job_job');
@@ -289,6 +289,15 @@ final class graphql {
         }
 
         return \GraphQL\Executor\Executor::defaultFieldResolver($source, $args, $ec, $info);
+    }
+
+    /**
+     * Check if the type name is one used in introspections, which usually starts with two underscores
+     * @param string $name
+     * @return bool
+     */
+    private static function is_introspection_type(string $name): bool {
+        return strpos($name, '__') === 0;
     }
 
     /**

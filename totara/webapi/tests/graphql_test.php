@@ -21,8 +21,13 @@
  * @package totara_webapi
  */
 
+use GraphQL\Error\Debug;
+use GraphQL\Executor\ExecutionResult;
+use GraphQL\Server\Helper;
+use GraphQL\Server\StandardServer;
 use \totara_webapi\graphql;
 use core\webapi\execution_context;
+use totara_webapi\local\util;
 
 class totara_webapi_graphql_testcase extends advanced_testcase {
     public function test_get_schema_file_contents() {
@@ -143,6 +148,68 @@ class totara_webapi_graphql_testcase extends advanced_testcase {
                 ]
             ]
         );
+    }
+
+    public function test_execute_introspection_query() {
+        $schema = graphql::get_schema();
+
+        $server = new StandardServer([
+            'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE,
+            'schema' => $schema,
+            'fieldResolver' => [graphql::class, 'default_resolver'],
+            'rootValue' => graphql::get_server_root($schema),
+            'context' => execution_context::create('dev', null),
+            'errorsHandler' => [util::class, 'graphql_error_handler'],
+        ]);
+
+        $helper = new Helper();
+        $request = $helper->parseRequestParams('POST', self::get_introspection_query_params(), []);
+
+        $response = $server->executeRequest($request);
+        $this->assertInstanceOf(ExecutionResult::class, $response);
+        $this->assertEmpty($response->errors, 'Unexpected errors found in request');
+    }
+
+    private static function get_introspection_query_params(): array {
+        return [
+            'query' => self::get_introspection_query(),
+            'variables' => [],
+            'operationName' => null
+        ];
+    }
+
+    private static function get_introspection_query(): string {
+        // Not getting the types to keep performance impact of this as low as possible.
+        // It should still be enough to test that introspection works.
+        return '
+            query IntrospectionQuery {
+                __schema {
+                    queryType { name }
+                    mutationType { name }
+                    subscriptionType { name }
+                    directives {
+                        name
+                        description
+                        locations
+                        args {
+                            ...InputValue
+                        }
+                    }
+                }
+            }
+        
+            fragment InputValue on __InputValue {
+                name
+                description
+                type { ...TypeRef }
+                defaultValue
+            }
+        
+            fragment TypeRef on __Type {
+                kind
+                name
+            }
+        ';
     }
 
 }
