@@ -7787,7 +7787,7 @@ class context_program extends context {
      * Is this context part of any program? If yes return program context.
      *
      * @param bool $strict true means throw exception if not found, false means return false if not found
-     * @return program_context context of the enclosing program, null if not found or exception
+     * @return context_program context of the enclosing program, null if not found or exception
      */
     public function get_program_context($strict = true) {
         return $this;
@@ -7799,7 +7799,7 @@ class context_program extends context {
      * @static
      * @param int $instanceid
      * @param int $strictness
-     * @return context_program context instance
+     * @return context_program|bool context instance
      */
     public static function instance($instanceid, $strictness = MUST_EXIST) {
         global $DB;
@@ -7836,6 +7836,12 @@ class context_program extends context {
     protected static function create_level_instances() {
         global $DB;
 
+        // Check the program table exists in case this is during an upgrade
+        // to Totara and the table hasn't yet been created.
+        if (!get_config('totara_program', 'version')) {
+            return;
+        }
+
         $sql = 'SELECT p.id, p.category
                   FROM "ttr_prog" p
                  WHERE NOT EXISTS (SELECT cx.id
@@ -7863,17 +7869,14 @@ class context_program extends context {
      * @return string cleanup SQL
      */
     protected static function get_cleanup_sql() {
-        global $DB;
-        $dbman = $DB->get_manager();
-
-        // check the program table exists in case this is during an upgrade
-        // to totara and the table hasn't yet been created
-        $table = new xmldb_table('prog');
-        if (!$dbman->table_exists($table)) {
+        // Check the program table exists in case this is during an upgrade
+        // to Totara and the table hasn't yet been created.
+        if (!get_config('totara_program', 'version')) {
             return 'SELECT c.*
-                    FROM {context} c
-                   WHERE 1=2';
+                      FROM {context} c
+                     WHERE 1=2';
         }
+
         $sql = "
                   SELECT c.*
                     FROM {context} c
@@ -7893,9 +7896,9 @@ class context_program extends context {
     protected static function build_paths($force) {
         global $DB;
 
-        // NOTE: work around problems in program contexts for now.
-        $tables = $DB->get_tables('prog');
-        if (!isset($tables['prog'])) {
+        // Check the program table exists in case this is during an upgrade
+        // to Totara and the table hasn't yet been created.
+        if (!get_config('totara_program', 'version')) {
             return;
         }
 
