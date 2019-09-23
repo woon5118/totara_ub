@@ -107,7 +107,9 @@ export default {
 
   data: function() {
     return {
-      data: {},
+      data: {
+        latest_achievement: null,
+      },
       activeTab: 'charts',
       selectedFilters: {
         status: ACTIVE_ASSIGNMENT,

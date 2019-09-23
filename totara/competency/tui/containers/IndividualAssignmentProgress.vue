@@ -93,6 +93,7 @@ export default {
                 beginAtZero: true,
                 display: false,
                 fontSize: 12,
+                max: 110,
               },
             },
           ],
@@ -135,8 +136,8 @@ export default {
         datasets: [
           {
             label: this.$str('my_rating', 'totara_competency'), // TODO String
-            backgroundColor: '#3869b140',
-            borderColor: '#3869b1',
+            backgroundColor: '#007AB840',
+            borderColor: '#007AB8',
             borderWidth: 2,
             rawData: [],
             data: [],
@@ -146,8 +147,10 @@ export default {
             label: this.$str('proficient_value', 'totara_competency'),
 
             // For bar charts the area under the line should be transparent
-            backgroundColor: this.type === 'bar' ? 'transparent' : '#cc242840',
-            borderColor: '#cc2428',
+            backgroundColor: this.type === 'bar' ? 'transparent' : '#A3971940',
+            borderColor: '#A39719',
+            pointBorderColor: '#A39719',
+            pointBackgroundColor: '#A39719',
             borderWidth: 2,
             steppedLine: 'middle',
             rawData: [],

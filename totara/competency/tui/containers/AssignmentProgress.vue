@@ -7,7 +7,7 @@
     :percentage-font-size="30"
     :square="true"
     label-color="#000"
-    color="#DA7E31"
+    color="#007AB8"
     background-color="#ECECEC"
     class="tui-assignmentProgress__progress-card"
   />
