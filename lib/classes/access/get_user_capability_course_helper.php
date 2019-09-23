@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2017 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_user_capability_course_helper {
+final class get_user_capability_course_helper {
     /**
      * Based on the given user's access data (roles) and system role definitions, works out
      * an array of capability values at each relevant context for the given user and capability.

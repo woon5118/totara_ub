@@ -2028,7 +2028,7 @@ function role_unassign_all_bulk(array $params, $subcontexts = false, $includeman
             }
         }
         unset($ras);
-        unset($sqlparams);
+        unset($sqlinparams);
         unset($resetusers);
     }
 
@@ -3134,7 +3134,7 @@ function get_users_roles(context $context, $userids = [], $checkparentcontexts =
 
     if (!$userids && $checkparentcontexts) {
         debugging('Please do not call get_users_roles() with $checkparentcontexts = true ' .
-                'and $userids array not set. This combination causes large Moodle sites ' .
+                'and $userids array not set. This combination causes large sites ' .
                 'with lots of site-wide role assignemnts to run out of memory.', DEBUG_DEVELOPER);
     }
 
