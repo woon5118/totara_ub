@@ -23,12 +23,16 @@
 <template>
   <div>
     <Preloader :display="$apollo.loading" />
-    <Table :data="achievements.items" :expandable-rows="true">
+    <Table
+      v-if="hasCompetencies"
+      :data="achievements.items"
+      :expandable-rows="true"
+    >
       <template v-slot:HeaderRow="">
         <HeaderCell size="14">
           <h4>{{ $str('competencies', 'criteria_childcompetency') }}</h4>
         </HeaderCell>
-        <HeaderCell size="2">
+        <HeaderCell size="2" class="tui-criteriaChildcompetency__progress">
           <div>
             {{ achievedCompetencies }} / {{ achievements.items.length }}
           </div>
@@ -46,7 +50,6 @@
       <template v-slot:row="{ row, expand }">
         <Cell size="1" style="text-align: center;">
           <CheckSuccess v-if="row.value && row.value.proficient" size="300" />
-          <CheckSuccess v-else size="300" custom-class="ft-state-disabled" />
         </Cell>
 
         <Cell size="13">
@@ -58,16 +61,52 @@
           <span v-if="row.value" v-text="row.value.name" />
         </Cell>
       </template>
-
       <template v-slot:expandContent="{ row }">
         <h4>{{ row.competency.fullname }}</h4>
-        <p v-html="row.competency.description" />
+        <p
+          class="tui-criteriaChildcompetency__summary"
+          v-html="row.competency.description"
+        />
+        <div v-if="row.assigned">
+          <a
+            :href="
+              $url('/totara/competency/profile/details/', {
+                competency_id: row.competency.id,
+                user_id: userId,
+              })
+            "
+            class="btn btn-primary"
+          >
+            {{ $str('view_competency', 'criteria_childcompetency') }}
+          </a>
+        </div>
+        <div v-else>
+          <a
+            href="#"
+            class="btn btn-primary"
+            @click.prevent="assignCompetency(row.competency)"
+          >
+            {{
+              $str(
+                achievements.current_user
+                  ? 'self_assign_competency'
+                  : 'assign_competency',
+                'criteria_childcompetency'
+              )
+            }}
+          </a>
+        </div>
       </template>
     </Table>
+    <div v-else-if="!$apollo.loading">
+      <h4>{{ $str('competencies', 'criteria_childcompetency') }}</h4>
+      <p>{{ $str('no_competencies', 'criteria_childcompetency') }}</p>
+    </div>
   </div>
 </template>
 
 <script>
+import CreateUserAssignmentMutation from '../../../../../competency/webapi/ajax/create_user_assignments.graphql';
 import AchievementsQuery from '../../webapi/ajax/achievements.graphql';
 import Preloader from 'totara_competency/presentation/Preloader';
 import HeaderCell from 'totara_core/presentation/datatable/HeaderCell';
@@ -103,14 +142,16 @@ export default {
   computed: {
     achievedCompetencies() {
       return this.achievements.items.reduce((total, current) => {
-        if (current.value) {
-          if (current.value.proficient) {
-            total += 1;
-          }
+        if (current.value && current.value.proficient) {
+          total += 1;
         }
 
         return total;
       }, 0);
+    },
+
+    hasCompetencies() {
+      return this.achievements.items.length > 0;
     },
   },
 
@@ -131,14 +172,63 @@ export default {
     },
   },
 
-  methods: {},
+  methods: {
+    assignCompetency(competency) {
+      const confirmMsg = `Would you like to assign ${competency.fullname}?`;
+
+      let result = confirm(confirmMsg);
+      if (result) {
+        this.$apollo
+          .mutate({
+            // Query
+            mutation: CreateUserAssignmentMutation,
+            // Parameters
+            variables: {
+              user_id: this.userId,
+              competency_ids: [competency.id],
+            },
+          })
+          .then(({ data }) => {
+            if (data && data.totara_competency_create_user_assignments) {
+              let result = data.totara_competency_create_user_assignments;
+              if (result.length > 0) {
+                this.$apollo.queries.achievements.refetch();
+                alert('Competency has been assigned successfully');
+              }
+              // TODO Handle case when no result is returned
+            }
+          })
+          .catch(error => {
+            alert('Unfortunately there was an error assigning competency');
+            console.log('error');
+            console.error(error);
+          });
+      }
+    },
+  },
 };
 </script>
+<style lang="scss">
+.tui-criteriaChildcompetency {
+  &__summary {
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+
+  &__progress {
+    text-align: right;
+  }
+}
+</style>
 <lang-strings>
   {
     "criteria_childcompetency": [
       "competencies",
-      "required_only"
+      "no_competencies",
+      "required_only",
+      "view_competency",
+      "assign_competency",
+      "self_assign_competency"
     ]
   }
 

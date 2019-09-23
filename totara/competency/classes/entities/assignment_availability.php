@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package totara_criteria
+ * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+ * @package totara_competency
  */
 
-$string['assign_competency'] = 'Assign competency';
-$string['competencies'] = 'Competencies';
-$string['pluginname'] = 'Aggregation of child competencies';
-$string['required_only'] = '{$a} required only';
-$string['self_assign_competency'] = 'Self assign competency';
-$string['updatechildcompetencyitems'] = 'Update child competency criteria items';
-$string['view_competency'] = 'View competency';
+namespace totara_competency\entities;
+
+
+use core\orm\entity\entity;
+
+/**
+ * Competency assignment availability entity
+ *
+ * @property-read int $id ID
+ * @property int $comp_id Related competency id
+ * @property int $availability Assignment availability
+ */
+class assignment_availability extends entity {
+
+    public const TABLE = 'comp_assign_availability';
+}

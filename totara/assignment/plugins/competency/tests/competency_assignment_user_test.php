@@ -22,7 +22,9 @@
  * @category test
  */
 
+use core\orm\query\builder;
 use tassign_competency\entities;
+use tassign_competency\entities\competency_assignment_user_log;
 use tassign_competency\expand_task;
 use tassign_competency\models\assignment_user;
 
@@ -99,6 +101,35 @@ class tassign_competency_competency_assignment_user_testcase extends advanced_te
         $expand_task->expand_all();
 
         $this->assertTrue($assignment_user->has_active_assignments($assignment1->competency_id));
+    }
+
+    public function test_user_has_archived_assignments() {
+
+        $user = $this->getDataGenerator()->create_user();
+
+        $competency = $this->generator()->create_competency();
+        $assignment = $this->generator()->create_user_assignment($competency->id, $user->id, ['status' => entities\assignment::STATUS_ARCHIVED]);
+
+        $this->expand();
+
+        $assignment_user = new assignment_user($user->id);
+
+        $this->assertFalse($assignment_user->has_active_assignments($assignment->competency_id));
+        // This will be false yet, until we create a fake log entry
+        $this->assertFalse($assignment_user->has_archived_assignments($assignment->competency_id));
+
+        // Let's create a fake assignment and see that it works.
+        // Fake log entry
+        builder::table('totara_assignment_competencies_users_log')
+            ->insert([
+                'assignment_id' => $assignment->id,
+                'user_id' => $user->id,
+                'action' => competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED,
+                'created_at' => time(),
+            ]);
+
+        $this->assertFalse($assignment_user->has_active_assignments($assignment->competency_id));
+        $this->assertTrue($assignment_user->has_archived_assignments($assignment->competency_id));
     }
 
     /**

@@ -23,6 +23,8 @@
 
 namespace totara_competency\entities;
 
+use core\collection;
+use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one;
 use totara_competency\achievement_configuration;
 use totara_assignment\entities\hierarchy_item;
@@ -64,6 +66,8 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
  * @property-read string $scale_aggregation_type Scale aggregation type
  * @property-read int[] $assign_availability Assignment creation availabilities
  *
+ * @property-read competency_achievement $achievement
+ * @property-read collection $availability
  *
  * @package tassign_competency\resources
  */
@@ -98,7 +102,7 @@ class competency extends hierarchy_item {
      */
     public function achievement(): has_one {
         return $this->has_one(competency_achievement::class, 'comp_id')
-            ->where_in('status', [0, 1]);
+            ->where_in('status', [competency_achievement::ACTIVE_ASSIGNMENT, competency_achievement::ARCHIVED_ASSIGNMENT]);
     }
 
     public function get_scale_attribute(): scale {
@@ -200,6 +204,15 @@ class competency extends hierarchy_item {
         }
 
         return $this->scale_aggregation_type;
+    }
+
+    /**
+     * Assignment availability related model
+     *
+     * @return has_many
+     */
+    public function availability(): has_many {
+        return $this->has_many(assignment_availability::class, 'comp_id');
     }
 
     /**

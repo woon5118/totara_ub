@@ -25,6 +25,7 @@ namespace tassign_competency\models;
 
 use core\orm\collection;
 use core\orm\entity\repository;
+use core\orm\query\builder;
 use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency_assignment_user;
 use tassign_competency\expand_task;
@@ -43,6 +44,15 @@ class assignment_user {
      */
     public function __construct(int $user_id) {
         $this->user_id = $user_id;
+    }
+
+    /**
+     * Get user id
+     *
+     * @return int
+     */
+    public function get_id() {
+        return $this->user_id;
     }
 
     /**
@@ -86,6 +96,10 @@ class assignment_user {
         return count($this->get_active_assignments_for_competency($competency_id)) > 0;
     }
 
+    public function has_archived_assignments(int $competency_id): bool {
+        return count($this->fetch_archived_assignments($competency_id)) > 0;
+    }
+
     /**
      * Returns active assignments for a single competency
      *
@@ -117,6 +131,23 @@ class assignment_user {
             ->join('totara_assignment_competency_users', 'id', 'assignment_id')
             ->where('totara_assignment_competency_users.user_id', $this->user_id)
             ->where('status', assignment::STATUS_ACTIVE)
+            ->when(!is_null($competency_ids), function (repository $repository) use ($competency_ids) {
+                $repository->where('competency_id', $competency_ids);
+            })
+            ->get();
+    }
+
+    /**
+     * Returns activate assignments for the user
+     *
+     * @param null|array|int $competency_ids
+     * @return collection
+     */
+    private function fetch_archived_assignments($competency_ids = null): collection {
+        return assignment::repository()
+            ->join('totara_assignment_competencies_users_log', 'id', 'assignment_id')
+            ->where('totara_assignment_competencies_users_log.user_id', $this->user_id)
+            ->where('status', assignment::STATUS_ARCHIVED)
             ->when(!is_null($competency_ids), function (repository $repository) use ($competency_ids) {
                 $repository->where('competency_id', $competency_ids);
             })
