@@ -373,4 +373,279 @@ class totara_core_remove_duplicated_tag_testcase extends advanced_testcase {
         $this->assertNotNull($taginstance2);
         $this->assertEquals($taginstance1->tagid, $taginstance2->tagid);
     }
+
+    public function test_for_tl22408_tag_instance_order() {
+        global $CFG, $DB, $USER;
+
+        require_once("{$CFG->dirroot}/totara/core/db/upgradelib.php");
+
+        // Preparing the tags environment
+        $collectionrecord = new \stdClass();
+        $collectionrecord->name = 'TL-22408';
+        $collectionrecord->searchable = 1;
+
+        $newcoll = \core_tag_collection::create($collectionrecord);
+
+        // Add a few area to this tags
+        $tagarea = $DB->get_record(
+            'tag_area',
+            [
+                'component' => 'core',
+                'itemtype' => 'course',
+                'enabled' => 1
+            ]
+        );
+
+        $tagarea->tagcollid = $newcoll->id;
+        $DB->update_record('tag_area', $tagarea);
+
+
+        $gen = $this->getDataGenerator();
+        $course = $gen->create_course();
+        $context = \context_course::instance($course->id);
+
+        $tagnames = [
+            'sa&a',
+            'sa&amp;amp;a',
+            'sa&amp;a',
+        ];
+        
+        foreach ($tagnames as $tagname) {
+            $tagid = $DB->insert_record('tag', [
+                'userid' => $USER->id,
+                'tagcollid' => $newcoll->id,
+                'name' => $tagname,
+                'rawname' => strtoupper($tagname),
+                'isstandard' => 0,
+                'timemodified' => time() - DAYSECS
+            ]);
+            $DB->insert_record('tag_instance', [
+                'tagid' => $tagid,
+                'component' => 'core',
+                'itemtype' => 'course',
+                'itemid' => $course->id,
+                'contextid' => $context->id,
+                'tiuserid' => $USER->id,
+                'timecreated' => time() - DAYSECS - DAYSECS,
+                'timemodified' => time() - DAYSECS
+            ]);
+        }
+
+        totara_core_core_tag_upgrade_tags();
+    }
+
+    public function test_for_tl22408_activity_with_tag() {
+        global $CFG, $DB, $USER;
+
+        require_once("{$CFG->dirroot}/totara/core/db/upgradelib.php");
+
+        // Preparing the tags environment
+        $collectionrecord = new \stdClass();
+        $collectionrecord->name = 'TL-22408';
+        $collectionrecord->searchable = 1;
+
+        $newcoll = \core_tag_collection::create($collectionrecord);
+
+        // Add a few area to this tags
+        $tagarea = $DB->get_record(
+            'tag_area',
+            [
+                'component' => 'core',
+                'itemtype' => 'course',
+                'enabled' => 1
+            ]
+        );
+
+        $tagarea->tagcollid = $newcoll->id;
+        $DB->update_record('tag_area', $tagarea);
+
+
+        $gen = $this->getDataGenerator();
+        $course = $gen->create_course();
+
+        $seminar = $this->getDataGenerator()->create_module('facetoface', ['course' => $course->id]);
+        $context = \context_module::instance($seminar->cmid);
+
+        $tagid = $DB->insert_record('tag', [
+            'userid' => $USER->id,
+            'tagcollid' => $newcoll->id,
+            'name' => 'sa&amp;a',
+            'rawname' => strtoupper('sa&amp;a'),
+            'isstandard' => 0,
+            'timemodified' => time() - 86400
+        ]);
+        $DB->insert_record('tag_instance', [
+            'tagid' => $tagid,
+            'component' => 'core',
+            'itemtype' => 'course_modules',
+            'itemid' => $seminar->id,
+            'contextid' => $context->id,
+            'tiuserid' => $USER->id,
+            'timecreated' => time() - 86400 - 86400,
+            'timemodified' => time() - 86400
+        ]);
+        $DB->insert_record('tag_instance', [
+            'tagid' => $tagid,
+            'component' => 'mod_facetoface',
+            'itemtype' => 'facetoface',
+            'itemid' => $seminar->id,
+            'contextid' => $context->id,
+            'tiuserid' => $USER->id,
+            'timecreated' => time() - 86400 - 86400,
+            'timemodified' => time() - 86400
+        ]);
+        $DB->insert_record('tag_instance', [
+            'tagid' => $DB->insert_record('tag', [
+                'userid' => $USER->id,
+                'tagcollid' => $newcoll->id,
+                'name' => 'sa&amp;&amp;a',
+                'rawname' => strtoupper('sa&amp;&amp;a'),
+                'isstandard' => 0,
+                'timemodified' => time() - 86400
+            ]),
+            'component' => 'core',
+            'itemtype' => 'course',
+            'itemid' => $course->id,
+            'contextid' => \context_course::instance($course->id)->id,
+            'tiuserid' => $USER->id,
+            'timecreated' => time() - 86400 - 86400,
+            'timemodified' => time() - 86400
+        ]);
+        $DB->insert_record('tag_instance', [
+            'tagid' => $DB->insert_record('tag', [
+                'userid' => $USER->id,
+                'tagcollid' => $newcoll->id,
+                'name' => 'sa&a',
+                'rawname' => strtoupper('sa&a'),
+                'isstandard' => 0,
+                'timemodified' => time() - 86400
+            ]),
+            'component' => 'core',
+            'itemtype' => 'course',
+            'itemid' => $course->id,
+            'contextid' => \context_course::instance($course->id)->id,
+            'tiuserid' => $USER->id,
+            'timecreated' => time() - 86400 - 86400,
+            'timemodified' => time() - 86400
+        ]);
+        totara_core_core_tag_upgrade_tags();
+    }
+
+    public function test_for_tl22408_duplicate_tag_in_another_area() {
+        global $CFG, $DB, $USER;
+
+        require_once("{$CFG->dirroot}/totara/core/db/upgradelib.php");
+
+        // Preparing the tags environment
+        $collectionrecord = new \stdClass();
+        $collectionrecord->name = 'TL-22408';
+        $collectionrecord->searchable = 1;
+
+        $newcoll = \core_tag_collection::create($collectionrecord);
+
+        // Add a few area to this tags
+        $course_tagarea = $DB->get_record(
+            'tag_area',
+            [
+                'component' => 'core',
+                'itemtype' => 'course',
+                'enabled' => 1
+            ]
+        );
+
+        $course_tagarea->tagcollid = $newcoll->id;
+        $DB->update_record('tag_area', $course_tagarea);
+
+        $program_tagarea = $DB->get_record(
+            'tag_area',
+            [
+                'component' => 'totara_program',
+                'itemtype' => 'prog',
+                'enabled' => 1
+            ]
+        );
+
+        $program_tagarea->tagcollid = $newcoll->id;
+        $DB->update_record('tag_area', $program_tagarea);
+
+        $gen = $this->getDataGenerator();
+        $course = $gen->create_course();
+        $context = \context_course::instance($course->id);
+
+        $programgenerator = $gen->get_plugin_generator('totara_program');
+        $program = $programgenerator->create_program();
+        $programcontext = \context_program::instance($program->id);
+
+        // Keep track of tagname -> tagid mappings.
+        $tagids = [];
+
+        // Assign a tag to a program
+        $tagname = 'sa&amp;a';
+        $tagid = $DB->insert_record('tag', [
+            'userid' => $USER->id,
+            'tagcollid' => $newcoll->id,
+            'name' => $tagname,
+            'rawname' => strtoupper($tagname),
+            'isstandard' => 0,
+            'timemodified' => time() - DAYSECS
+        ]);
+        $tagids[$tagname] = $tagid;
+        $DB->insert_record('tag_instance', [
+            'tagid' => $tagid,
+            'component' => 'totara_program',
+            'itemtype' => 'prog',
+            'itemid' => $program->id,
+            'contextid' => $programcontext->id,
+            'tiuserid' => $USER->id,
+            'timecreated' => time() - DAYSECS,
+            'timemodified' => time() - DAYSECS
+        ]);
+
+        // Assigns tags to courses, including the program tag
+        $tagnames = [
+            'sa&amp;a',
+            'sa&amp;amp;a',
+            'sa&amp;amp;amp;a',
+            'sa&a',
+        ];
+        foreach ($tagnames as $tagname) {
+            if (!empty($tagids[$tagname])) {
+                $tagid = $tagids[$tagname];
+            } else {
+                $tagid = $DB->insert_record('tag', [
+                    'userid' => $USER->id,
+                    'tagcollid' => $newcoll->id,
+                    'name' => $tagname,
+                    'rawname' => strtoupper($tagname),
+                    'isstandard' => 0,
+                    'timemodified' => time() - DAYSECS
+                ]);
+                $tagids[$tagname] = $tagid;
+            }
+            $DB->insert_record('tag_instance', [
+                'tagid' => $tagid,
+                'component' => 'core',
+                'itemtype' => 'course',
+                'itemid' => $course->id,
+                'contextid' => $context->id,
+                'tiuserid' => $USER->id,
+                'timecreated' => time() - DAYSECS - DAYSECS,
+                'timemodified' => time() - DAYSECS
+            ]);
+        }
+
+        // Add same tag in different collection.
+        $tagname = 'sa&a';
+        $tagid = $DB->insert_record('tag', [
+            'userid' => $USER->id,
+            'tagcollid' => 0,
+            'name' => $tagname,
+            'rawname' => strtoupper($tagname),
+            'isstandard' => 0,
+            'timemodified' => time() - DAYSECS
+        ]);
+        $tagids[$tagname] = $tagid;
+
+        totara_core_core_tag_upgrade_tags();
+    }
 }

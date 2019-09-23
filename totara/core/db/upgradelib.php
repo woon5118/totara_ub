@@ -915,19 +915,20 @@ function totara_core_upgrade_course_images() {
 function totara_core_core_tag_upgrade_tags() {
     global $DB;
 
+    // Load tag_instance + tag name and tagcollid.
     $taginstances = $DB->get_records_sql(
-        "SELECT ti.*
-         FROM {tag_instance} ti
-         INNER JOIN {tag} t ON t.id = ti.tagid
-         WHERE t.isstandard = 0"
+        "SELECT ti.*, t.name, t.tagcollid
+                FROM {tag_instance} ti
+          INNER JOIN {tag} t ON t.id = ti.tagid
+               WHERE t.isstandard = 0"
     );
 
     $tagstobedeleted = [];
+    $taginstancestobedeleted = [];
 
     foreach ($taginstances as $taginstance) {
-        // Current tag that is being used for instance mapping.
-        $tag = $DB->get_record('tag', ['id' => $taginstance->tagid]);
-        $name = $tag->name;
+        $name = $taginstance->name;
+        $originalid = $taginstance->tagid;
 
         // Detect whether tag name changes.
         $name_changed = false;
@@ -944,55 +945,67 @@ function totara_core_core_tag_upgrade_tags() {
             continue;
         }
 
-        $sql = "
-            SELECT t.id FROM {tag} t
-            INNER JOIN {tag_coll} tc ON tc.id = t.tagcollid
-            INNER JOIN {tag_area} ta ON ta.tagcollid = tc.id
-            WHERE t.name = :name
-            AND ta.component = :component
-            AND ta.itemtype = :type
-        ";
+        // This query looks for a tag with the decoded name and the same tagcollid: the "previous" tag.
+        $sql = "SELECT t.id FROM {tag} t 
+                 WHERE t.name = :name 
+                   AND t.tagcollid = :tagcollid";
+        $previoustag = $DB->get_record_sql($sql, ['name' => $name, 'tagcollid' => $taginstance->tagcollid]);
 
-        // Tag component does not allow us to have more than one tags that share a same name in a collection.
-        // Therefore, it should have only one tag with specific '$name' and being a part of
-        // '$component' and '$type'.
-        $previoustag = $DB->get_record_sql(
-            $sql,
-            [
-                'name' => $name,
-                'component' => $taginstance->component,
-                'type' => $taginstance->itemtype
-            ]
-        );
-
+        // IF there is a previous tag, then modify this tag instance to point to it.
         if ($previoustag) {
             if ($taginstance->tagid !== $previoustag->id) {
-                // Previous record is being existed, we need to update this invalid into the previous one.
-                $taginstance->tagid = $previoustag->id;
-                $DB->update_record('tag_instance', $taginstance);
+                // TL-22408 - If there is already an instance of the previous tag, schedule this taginstance to be deleted.
+                // Because there is a unique key on component, itemtype, itemid, tiuserid, tagid.
+                $checkinstance = clone $taginstance;
+                $checkinstance->tagid = $previoustag->id;
+                $checkparams = [
+                    'component' => $checkinstance->component,
+                    'itemtype' => $checkinstance->itemtype,
+                    'itemid' => $checkinstance->itemid,
+                    'tiuserid' => $checkinstance->tiuserid,
+                    'tagid' => $checkinstance->tagid
+                ];
+                $check = $DB->get_record('tag_instance', $checkparams, 'id');
 
-                if (!isset($tagstobedeleted[$tag->id])) {
-                    $tagstobedeleted[$tag->id] = $tag->id;
+                // If taginstance exists for the previous tag, then just delete this old, encoded instance.
+                if ($check) {
+                    $taginstancestobedeleted[$taginstance->id] = $taginstance->id;
+                } else {
+                    // Update this taginstance to reference the previous tag.
+                    $taginstance->tagid = $previoustag->id;
+                    $DB->update_record('tag_instance', $taginstance);
+                }
+
+                if (!isset($tagstobedeleted[$originalid])) {
+                    $tagstobedeleted[$originalid] = $originalid;
                 }
             }
         } else {
-            // No standard tag matches this one, update this non-standard tag.
+            // No other tag matches this one, update this tag and leave the tag instance alone.
+            $tag = $DB->get_record('tag', ['id' => $originalid]);
             $rawname = $tag->rawname;
             while ($rawname !== htmlspecialchars_decode($rawname)) {
                 // We only want it to go back to the very first decoded value (skipping the middle encoded value).
                 $rawname = htmlspecialchars_decode($rawname);
                 $rawname = clean_param($rawname, PARAM_TAG);
             }
+            // Use the decoded name from above.
             $tag->name = $name;
             $tag->rawname = $rawname;
             $DB->update_record('tag', $tag);
         }
     }
 
+    // Now delete the orphaned or redundant tag instances.
+    foreach ($taginstancestobedeleted as $taginstanceid) {
+        $DB->delete_records('tag_instance', ['id' => $taginstanceid]);
+    }
+
+    // Now delete the orphaned tags.
     foreach ($tagstobedeleted as $tagid) {
         if ($DB->record_exists('tag_instance', ['tagid' => $tagid])) {
-            // There are other instances that using these to-be-deleted tags
-            continue;
+            // There are other instances that are using this tag?
+            throw new coding_exception('Tried to delete what we thought was an orphaned tag, but an instance of it exists');
         }
 
         $DB->delete_records('tag', ['id' => $tagid]);
