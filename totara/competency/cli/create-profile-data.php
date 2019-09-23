@@ -265,16 +265,19 @@ Feel free to browse, list of users is below, their password is 12345.
                 'doer' => [
                     'fullname' => 'Complete tasks independently',
                     'description' => 'No need for constant badgering to complete a task',
+                    'parentid' => 1,
                 ],
 
                 'initiative' => [
                     'fullname' => 'Show initiative and come up with ideas',
                     'description' => 'Being able to come up with ideas',
+                    'parentid' => 1,
                 ],
 
                 'collider' => [
                     'fullname' => 'Manage The Large Hadron Collider at CERN',
                     'description' => 'Nothing too complicated, just another box ticked',
+                    'parentid' => 2,
                 ],
             ],
         ],

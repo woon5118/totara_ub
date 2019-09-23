@@ -21,6 +21,10 @@
  * @package totara_criteria
  */
 
+$string['competencies'] = 'Competencies';
+
+
+$string['required_only'] = '{$a} required only';;
 $string['pluginname'] = 'Aggregation of child competencies';
 
 $string['updatechildcompetencyitems'] = 'Update child competency criteria items';

@@ -1,0 +1,21 @@
+type criteria_childcompetency_achievement_item {
+  competency: totara_competency_competency!
+  value: totara_competency_profile_scale_value_progress
+}
+
+type criteria_childcompetency_achievements {
+  aggregation_type: Int!
+  required_items: Int!
+  items: [criteria_childcompetency_achievement_item!]!
+}
+
+extend type Query {
+  """
+  Get all achievements of a specific coursecompletion criteria instance
+  """
+  criteria_childcompetency_achievements(
+    instance_id: core_id!
+    user_id: core_id!
+    assignment_id: core_id!
+  ): criteria_childcompetency_achievements
+}
