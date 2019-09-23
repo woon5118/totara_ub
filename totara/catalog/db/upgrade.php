@@ -74,5 +74,14 @@ function xmldb_totara_catalog_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019061801, 'totara', 'catalog');
     }
 
+    if ($oldversion < 2019092400) {
+        // Force update of catalog items to switch sorttime from timemodified to timecreated.
+
+        $task = new \totara_catalog\task\refresh_catalog_data();
+        $task->execute();
+
+        upgrade_plugin_savepoint(true, 2019092400, 'totara', 'catalog');
+    }
+
     return true;
 }

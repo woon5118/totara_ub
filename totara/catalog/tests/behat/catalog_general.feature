@@ -109,7 +109,8 @@ Feature: Test file for catalog
     And I click on "Find Learning" in the totara menu
     When I follow "Alphabetical"
     And I follow "Latest"
-    Then "Bye Bye Park Shin Hye" "text" should appear before "Bilbo Baggin's Secret Agents" "text"
+    # We've changed timesort to use timecreated so this shouldn't change any more.
+    Then "Bilbo Baggin's Secret Agents" "text" should appear before "Bye Bye Park Shin Hye" "text"
     # Viewing from tile to list
     When I click on "List view" "link"
     Then "span.fa-th-list" "css_element" should exist in the "a.tw-catalogItemStyleToggle__btn_active" "css_element"

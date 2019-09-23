@@ -60,7 +60,7 @@ class totara_catalog_dataholder_testcase extends advanced_testcase {
         $provider_classes = \core_component::get_namespace_classes('totara_catalog', 'totara_catalog\provider');
         $this->assertCount(3, $provider_classes);
         $expected_factory_counts = [
-            'core_course\totara_catalog\course' => 20,
+            'core_course\totara_catalog\course' => 21,
             'totara_certification\totara_catalog\certification' => 17,
             'totara_program\totara_catalog\program' => 16,
         ];

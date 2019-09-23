@@ -80,7 +80,7 @@ class course extends provider {
             $this->config_cache = [
                 'sort'        => [
                     'text' => 'fullname',
-                    'time' => 'timemodified',
+                    'time' => 'timecreated',
                 ],
                 'fts'         => [
                     'high'   => [
