@@ -659,5 +659,35 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019083002, 'totara', 'core');
     }
 
+    if ($oldversion < 2019092400) {
+
+        // Define index roleid-capability-permission (not unique) to be added to role_capabilities.
+        $table = new xmldb_table('role_capabilities');
+        $index = new xmldb_index('roleid-capability-permission', XMLDB_INDEX_NOTUNIQUE, array('roleid', 'capability', 'permission'));
+
+        // Conditionally launch add index roleid-capability-permission.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2019092400, 'totara', 'core');
+    }
+
+    if ($oldversion < 2019092401) {
+
+        // Define index audiencevisible (not unique) to be added to course.
+        $table = new xmldb_table('course');
+        $index = new xmldb_index('audiencevisible', XMLDB_INDEX_NOTUNIQUE, array('audiencevisible'));
+
+        // Conditionally launch add index audiencevisible.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2019092401, 'totara', 'core');
+    }
+
     return true;
 }

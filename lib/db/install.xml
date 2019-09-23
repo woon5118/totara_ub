@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="lib/db" VERSION="20190717" COMMENT="XMLDB file for core Moodle tables"
+<XMLDB PATH="lib/db" VERSION="20190923" COMMENT="XMLDB file for core Moodle tables"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../lib/xmldb/xmldb.xsd"
 >
@@ -114,6 +114,7 @@
         <INDEX NAME="idnumber" UNIQUE="false" FIELDS="idnumber"/>
         <INDEX NAME="shortname" UNIQUE="false" FIELDS="shortname"/>
         <INDEX NAME="sortorder" UNIQUE="false" FIELDS="sortorder"/>
+        <INDEX NAME="audiencevisible" UNIQUE="false" FIELDS="audiencevisible" COMMENT="Used by audience based visibility SQL"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="course_categories" COMMENT="Course categories">
@@ -1167,6 +1168,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="roleid-contextid-capability" UNIQUE="true" FIELDS="roleid, contextid, capability"/>
+        <INDEX NAME="roleid-capability-permission" UNIQUE="false" FIELDS="roleid, capability, permission" COMMENT="Required for has_capability SQL"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="role_names" COMMENT="role names in native strings">

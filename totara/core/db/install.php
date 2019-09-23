@@ -345,5 +345,19 @@ function xmldb_totara_core_install() {
     // When upgrading from Moodle change execution of the context cleanup task to once a day only by default.
     totara_upgrade_context_task_timing();
 
+    // Add indexes that benefit has_capapability_sql on role_capabilities
+    $table = new xmldb_table('role_capabilities');
+    $index = new xmldb_index('roleid-capability-permission', XMLDB_INDEX_NOTUNIQUE, array('roleid', 'capability', 'permission'));
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
+    }
+
+    // Add indexes that benefit has_capapability_sql on course
+    $table = new xmldb_table('course');
+    $index = new xmldb_index('audiencevisible', XMLDB_INDEX_NOTUNIQUE, array('audiencevisible'));
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
+    }
+
     return true;
 }
