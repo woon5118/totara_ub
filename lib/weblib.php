@@ -3904,7 +3904,7 @@ function get_formatted_help_string($identifier, $component, $ajax = false, $a = 
         $data->text = format_text(get_string($identifier.'_help', $component, $a), FORMAT_MARKDOWN, $options);
 
         $helplink = $identifier . '_link';
-        if ($sm->string_exists($helplink, $component)) {  // Link to further info in Moodle docs.
+        if ($sm->string_exists($helplink, $component)) {  // Link to further info in Totara docs.
             $link = get_string($helplink, $component);
             $linktext = get_string('morehelp');
 

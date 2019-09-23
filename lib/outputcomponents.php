@@ -540,6 +540,64 @@ class help_icon implements renderable, templatable {
     }
 }
 
+/**
+ * Data structure representing a help link.
+ *
+ * @since Totara 13.0
+ * @package core
+ * @category output
+ */
+class help_link implements renderable, templatable {
+
+    /**
+     * @var string lang pack identifier (without the "_help" suffix),
+     * both get_string($identifier, $component) and get_string($identifier.'_help', $component)
+     * must exist.
+     */
+    public $identifier;
+
+    /**
+     * @var string Component name, the same as in get_string()
+     */
+    public $component;
+
+    /**
+     * Constructor
+     *
+     * @param string $identifier string for help page title,
+     *  string with _help suffix is used for the actual help text.
+     *  string with _link suffix is used to create a link to further info (if it exists)
+     * @param string $component
+     */
+    public function __construct($identifier, $component) {
+        $this->identifier = $identifier;
+        $this->component  = $component;
+    }
+
+    /**
+     * Export this data so it can be used as the context for a mustache template.
+     *
+     * @param renderer_base $output Used to do a final render of any components that need to be rendered for export.
+     * @return \stdClass
+     */
+    public function export_for_template(renderer_base $output): \stdClass {
+        $title = get_string($this->identifier, $this->component);
+
+        $data = get_formatted_help_string($this->identifier, $this->component, false);
+        $data->linktext = $title;
+        $data->title = get_string('helpprefix2', '', trim($title, ". \t"));
+
+        $data->url = (new moodle_url('/help.php', [
+            'component' => $this->component,
+            'identifier' => $this->identifier,
+            'lang' => current_language()
+        ]))->out(false);
+
+        $data->ltr = !right_to_left();
+        return $data;
+    }
+}
+
 
 /**
  * Data structure representing an icon.

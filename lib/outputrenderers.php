@@ -2037,6 +2037,17 @@ class core_renderer extends renderer_base {
     }
 
     /**
+     * Implementation of user image rendering.
+     *
+     * @since Totara 13
+     * @param help_icon $helpicon A help icon instance
+     * @return string HTML fragment
+     */
+    protected function render_help_link(help_link $helpicon) {
+        return $this->render_from_template('core/help_link', $helpicon->export_for_template($this));
+    }
+
+    /**
      * Returns HTML to display a scale help icon.
      *
      * @param int $courseid

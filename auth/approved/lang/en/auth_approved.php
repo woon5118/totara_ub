@@ -54,6 +54,9 @@ $string['allowpositionfreetext_desc'] = 'Allow self registering users to enter f
 $string['approve'] = 'Approve';
 $string['approvesure'] = 'Are you sure you want to approve this request?';
 $string['approved:approve'] = 'Approve account request';
+$string['approved:approve_help'] = '* Enables users to view, edit and approve signup requests originating from the self-registration approval authentication plugin.
+* Enables users to message users who have signed up but not yet confirmed and/or approved.
+* Users holding this capability will be notified when a new signup occurs, when a signup is automatically approved and when a signup has been confirmed.';
 $string['bulkaction'] = 'Bulk change {$a} requests';
 $string['bulkexec'] = 'Execute';
 $string['bulkactionapprove'] = 'Approve';

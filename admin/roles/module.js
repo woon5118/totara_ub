@@ -150,8 +150,7 @@ M.core_role.init_cap_table_filter = function(Y, tableid, contextid) {
                     lastheading = row;
                 }
                 if (row.hasClass('rolecap')) {
-                    var capname = row.one('.cap-name').get('text') + '|' + row.one('.cap-desc a').get('text').toLowerCase();
-                    if (capname.indexOf(filtertext) >= 0) {
+                    if (row.getData('filter').indexOf(filtertext) >= 0) {
                         this.setVisible(row, true);
                         if (lastheading) {
                             this.setVisible(lastheading, true);

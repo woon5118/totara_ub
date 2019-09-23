@@ -2692,8 +2692,28 @@ function get_all_risks() {
  * @return string the human-readable capability name as a link to Moodle Docs.
  */
 function get_capability_docs_link($capability) {
-    $url = get_docs_url('Capabilities/' . $capability->name);
-    return '<a onclick="this.target=\'docspopup\'" href="' . $url . '">' . get_capability_string($capability->name) . '</a>';
+    global $OUTPUT;
+
+    // Typical capability name is 'plugintype/pluginname:capabilityname'
+    list($type, $name, $capname) = preg_split('|[/:]|', $capability->name);
+
+    if ($type === 'moodle') {
+        $component = 'core_role';
+    } else if ($type === 'quizreport') {
+        //ugly hack!!
+        $component = 'quiz_'.$name;
+    } else {
+        $component = $type.'_'.$name;
+    }
+
+    $identifier = $name.':'.$capname;
+    $identifier_help = $identifier . '_help';
+
+    if (get_string_manager()->string_exists($identifier_help, $component)) {
+        $helplink = new help_link($identifier, $component);
+        return $OUTPUT->render($helplink);
+    }
+    return get_capability_string($capability->name);
 }
 
 /**

@@ -94,6 +94,7 @@ $string['requirepassword_desc'] = 'Require enrolment key in new courses and prev
 $string['role'] = 'Default assigned role';
 $string['self:config'] = 'Configure self enrol instances';
 $string['self:holdkey'] = 'Appear as the self enrolment key holder';
+$string['self:holdkey_help'] = 'Users with this capability will be listed as self enrolment key holders, and welcome emails after self enrolment will show as coming from a keyholder';
 $string['self:manage'] = 'Manage enrolled users';
 $string['self:unenrol'] = 'Unenrol users from course';
 $string['self:unenrolself'] = 'Unenrol self from the course';

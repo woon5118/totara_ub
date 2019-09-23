@@ -64,8 +64,15 @@ $string['tenantsmanage'] = 'Manage tenants';
 $string['tenantsuspended'] = 'Tenant suspended';
 $string['tenant:config'] = 'Create, update and delete';
 $string['tenant:manageparticipants'] = 'Manage tenant participants';
+$string['tenant:manageparticipants_help'] = 'Allows the user to manage tenant participants including migrating users to a tenant';
 $string['tenant:usercreate'] = 'Create tenant users';
+$string['tenant:usercreate_help'] = 'Allows the user to:
+
+* Create new users within a tenant domain
+* Import users into a tenant domain if they are permitted to import users also
+* Approve user requests for a tenant domain from the auth approved plugin if they are also permitted to approve requests';
 $string['tenant:view'] = 'View tenant details';
+$string['tenant:view_help'] = 'Allows the user to view the list of tenants and details for each';
 $string['tenant:viewparticipants'] = 'View participants in tenant domain';
 $string['usermanagement'] = 'User management';
 $string['usermanagers'] = 'User managers';
