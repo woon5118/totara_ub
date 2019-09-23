@@ -163,7 +163,6 @@ abstract class hierarchy_item extends entity {
     /**
      * Returns all children of the current item
      *
-     * @return collection|hierarchy_item[]
      * @return has_many
      */
     public function children(): has_many {

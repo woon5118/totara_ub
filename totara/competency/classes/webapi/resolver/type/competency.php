@@ -28,6 +28,7 @@ use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use tassign_competency\entities\competency as competency_entity;
+use totara_competency\entities\competency as another_competency_entity;
 use totara_competency\formatter\competency_formatter;
 
 /**
@@ -47,7 +48,7 @@ class competency implements type_resolver {
      * @return mixed
      */
     public static function resolve(string $field, $competency, array $args, execution_context $ec) {
-        if (!$competency instanceof competency_entity) {
+        if (!$competency instanceof competency_entity && !$competency instanceof another_competency_entity) {
             throw new \coding_exception('Accepting only entities.');
         }
 

@@ -26,6 +26,7 @@ namespace totara_competency\entities;
 
 use core\orm\collection;
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 
 /**
  * Class competency_achievement
@@ -55,6 +56,15 @@ class competency_achievement extends entity {
 
     /** @var int Status when this record is not the latest for an assignment (either active or archived) */
     public const SUPERSEDED = 2;
+
+    /**
+     * Scale value
+     *
+     * @return belongs_to
+     */
+    public function value(): belongs_to {
+        return $this->belongs_to(scale_value::class, 'scale_value_id');
+    }
 
     /**
      * Get the pathway achievements that led to this competency achievement initially being created.

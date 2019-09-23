@@ -23,6 +23,7 @@
 
 namespace totara_competency\entities;
 
+use core\orm\entity\relations\has_one;
 use totara_competency\achievement_configuration;
 use totara_assignment\entities\hierarchy_item;
 
@@ -90,6 +91,15 @@ class competency extends hierarchy_item {
     /** @var string $scale_aggregation_type */
     private $scale_aggregation_type;
 
+    /**
+     * Related achievement, meant to be used with a user filter
+     *
+     * @return has_one
+     */
+    public function achievement(): has_one {
+        return $this->has_one(competency_achievement::class, 'comp_id')
+            ->where_in('status', [0, 1]);
+    }
 
     public function get_scale_attribute(): scale {
         global $DB;

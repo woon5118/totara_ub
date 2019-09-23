@@ -25,6 +25,7 @@ namespace tassign_competency\entities;
 
 
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 
 /**
  * Assignment entity
@@ -90,6 +91,10 @@ class assignment extends entity {
             self::TYPE_OTHER,
             self::TYPE_SYSTEM
         ];
+    }
+
+    public function competency(): belongs_to {
+        return $this->belongs_to(\totara_competency\entities\competency::class, 'competency_id');
     }
 
     /**
