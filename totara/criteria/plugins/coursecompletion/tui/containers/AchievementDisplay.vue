@@ -52,11 +52,14 @@
         </Cell>
 
         <Cell size="13">
-          <a href="#" @click.prevent="expand()">{{ row.course.name }}</a>
+          <a v-if="row.course" href="#" @click.prevent="expand()">
+            {{ getCourseName(row) }}
+          </a>
+          <template v-else>{{ getCourseName(row) }}</template>
         </Cell>
 
         <Cell size="2">
-          <div class="tui-criteriaCourseCompletion__progress">
+          <div v-if="row.course" class="tui-criteriaCourseCompletion__progress">
             <div class="tui-criteriaCourseCompletion__progress__bar">
               <span :style="width(row)" />
             </div>
@@ -164,6 +167,13 @@ export default {
         width: row.progress + '%',
       };
     },
+    getCourseName(row) {
+      var courseName = this.$str('hidden_course', 'criteria_coursecompletion');
+      if (row.course) {
+        courseName = row.course.name;
+      }
+      return courseName;
+    },
   },
 };
 </script>
@@ -201,6 +211,7 @@ export default {
     "criteria_coursecompletion": [
       "courselink",
       "courses",
+      "hidden_course",
       "progress",
       "coursesrequired"
     ]

@@ -27,7 +27,8 @@ $string['achievementvia'] = 'Course completion';
 $string['addcourses'] = "Add courses";
 $string['courselink'] = 'Go to course';
 $string['courses'] = 'Courses';
-$string['coursesrequired'] = '{$a} required only';;
+$string['coursesrequired'] = '{$a} required only';
+$string['hidden_course'] = 'This course is not available to view';
 $string['progress'] = '{$a}% complete';
 $string['selectcourses'] = "Select courses";
 

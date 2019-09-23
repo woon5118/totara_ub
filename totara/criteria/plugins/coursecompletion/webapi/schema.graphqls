@@ -9,7 +9,7 @@ type criteria_coursecompletion_achievement_course {
 }
 
 type criteria_coursecompletion_achievement_item {
-  course: criteria_coursecompletion_achievement_course!
+  course: criteria_coursecompletion_achievement_course
   progress: Int
 }
 

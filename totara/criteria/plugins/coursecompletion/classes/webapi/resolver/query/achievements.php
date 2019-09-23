@@ -58,7 +58,7 @@ class achievements implements query_resolver {
             // TODO Replace following with a proper course type in TL-22396
 
             $item = [
-                'course' => [],
+                'course' => null,
                 'progress' => 0
             ];
             $completion = new completion_completion(['userid' => $user_id, 'course' => $course_id]);
@@ -67,20 +67,20 @@ class achievements implements query_resolver {
             $course_context = \context_course::instance($course_id);
             $course_record = get_course($course_id);
             $course_in_list = new \course_in_list($course_record);
-            if (!$course_in_list->can_access()) {
-                continue;
+
+            if (totara_course_is_viewable($course_record)) {
+                $string_formatter = new string_field_formatter(format::FORMAT_HTML, $course_context);
+
+                $text_formatter = new text_field_formatter(format::FORMAT_HTML, $course_context);
+                $text_formatter->set_pluginfile_url_options($course_context, 'course', 'summary')
+                    ->set_text_format($course_in_list->summaryformat);
+
+                $item['course'] = [
+                    'name' => $string_formatter->format(get_course_display_name_for_list($course_in_list)),
+                    'summary' => $text_formatter->format($course_in_list->summary),
+                    'url' => course_get_url($course_record)
+                ];
             }
-
-            $string_formatter = new string_field_formatter(format::FORMAT_HTML, $course_context);
-            $text_formatter = new text_field_formatter(format::FORMAT_HTML, $course_context);
-            $text_formatter->set_pluginfile_url_options($course_context, 'course', 'summary')
-                ->set_text_format($course_in_list->summaryformat);
-
-            $item['course'] = [
-                'name' => $string_formatter->format(get_course_display_name_for_list($course_in_list)),
-                'summary' => $text_formatter->format($course_in_list->summary),
-                'url' => course_get_url($course_record)
-            ];
 
             $items[] = $item;
         }
