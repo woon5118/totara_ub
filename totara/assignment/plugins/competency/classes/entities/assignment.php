@@ -67,6 +67,9 @@ class assignment extends entity {
     // assigned automatically by the system due to the continuous tracking functionality
     const TYPE_SYSTEM = 'system';
 
+    // Assignments to account for pre-perform achievements, archived when created...
+    const TYPE_LEGACY = 'legacy';
+
     public const TABLE = 'totara_assignment_competencies';
 
     protected $extra_attributes = [

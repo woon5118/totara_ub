@@ -58,6 +58,7 @@ function totara_competency_install_migrate_achievements() {
     $now = time();
     $all_scale_values = $DB->get_records('comp_scale_values');
     $comp_achievements = [];
+    $comp_assignment = [];
 
     // Each combination of user/competency should have one active achievement record.
     // We've ordered by competency and user so that records for each combination are grouped together.
@@ -74,10 +75,29 @@ function totara_competency_install_migrate_achievements() {
             $first = true;
         }
 
+        // We need to create an assignment record, but only for the first record for a given user and competency
+        if ($first) {
+            $comp_assignment = [
+                'type' => 'legacy',
+                'user_group_type' => 'user',
+                'competency_id' => $history->competencyid,
+                'user_group_id' => $history->userid,
+                'optional' => 0,
+                'status' => 2,
+                'created_by' => 0, // TODO we should make it nullable
+                'created_at' => $history->timemodified,
+                'updated_at' => $history->timemodified,
+                'archived_at' => $now,
+            ];
+
+            // We aren't going to batch assignments, since we'd need to get the assignment id anyway, to insert into achievements...
+            $comp_assignment['id'] = $DB->insert_record('totara_assignment_competencies', $comp_assignment);
+        }
+
         $comp_achievement = new stdClass();
         $comp_achievement->comp_id = $history->competencyid;
         $comp_achievement->user_id = $history->userid;
-        $comp_achievement->assignment_id = 0;
+        $comp_achievement->assignment_id = $comp_assignment['id'] ?? 0; // This should not be 0
         $comp_achievement->scale_value_id = $history->proficiency;
         $comp_achievement->proficient = $all_scale_values[$history->proficiency]->proficient ?? 0;
 

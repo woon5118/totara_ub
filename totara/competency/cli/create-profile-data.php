@@ -1,6 +1,7 @@
 <?php
 
 use core\orm\query\builder;
+use tassign_competency\entities\assignment;
 use tassign_competency\expand_task;
 use tassign_competency\models\assignment_actions;
 use totara_job\job_assignment;
@@ -876,7 +877,6 @@ Feel free to browse, list of users is below, their password is 12345.
         'sj-camp-ground-manager' => [get_user('sj', $data), get_competency('complex', 'camp-ground-manager', $data)],
         'sj-netflix' => [get_user('sj', $data), get_competency('4-value', 'netflix', $data)],
         'sj-shop-keeper' => [get_user('sj', $data), get_competency('4-value', 'shop-keeper', $data)],
-        'sj-machinery-operator' => [get_user('sj', $data), get_competency('4-value', 'machinery-operator', $data)],
         'sj-it' => [get_user('sj', $data), get_competency('4-value', 'it', $data)],
         'sj-sommelier' => [get_user('sj', $data), get_competency('4-value', 'sommelier', $data)],
         'sj-barista' => [get_user('sj', $data), get_competency('4-value', 'barista', $data)],
@@ -904,9 +904,102 @@ Feel free to browse, list of users is below, their password is 12345.
         'sj-innovation' => [get_user('sj', $data), get_competency('bs', 'innovation', $data)],
         'sj-thinking' => [get_user('sj', $data), get_competency('bs', 'thinking', $data)],
         'sj-managing' => [get_user('sj', $data), get_competency('bs', 'managing', $data)],
+        'ss-literate' => [get_user('ss', $data), get_competency('binary', 'literate', $data)],
+        'ss-collider' => [get_user('ss', $data), get_competency('binary', 'collider', $data)],
+        'ss-consultant' => [get_user('ss', $data), get_competency('complex', 'consultant', $data)],
+        'ss-nurse' => [get_user('ss', $data), get_competency('complex', 'nurse', $data)],
+        'ss-administrative-nurse' => [get_user('ss', $data), get_competency('complex', 'administrative-nurse', $data)],
+        'ss-surgeon' => [get_user('ss', $data), get_competency('complex', 'surgeon', $data)],
+        'ss-priest' => [get_user('ss', $data), get_competency('complex', 'priest', $data)],
+        'ss-zoo-keeper' => [get_user('ss', $data), get_competency('complex', 'zoo-keeper', $data)],
+        'ss-camp-ground-manager' => [get_user('ss', $data), get_competency('complex', 'camp-ground-manager', $data)],
+        'ss-netflix' => [get_user('ss', $data), get_competency('4-value', 'netflix', $data)],
+        'ss-shop-keeper' => [get_user('ss', $data), get_competency('4-value', 'shop-keeper', $data)],
+        'ss-machinery-operator' => [get_user('ss', $data), get_competency('4-value', 'machinery-operator', $data)],
+        'ss-bartender' => [get_user('ss', $data), get_competency('4-value', 'bartender', $data)],
+        'ss-mad-preacher' => [get_user('ss', $data), get_competency('4-value', 'mad-preacher', $data)],
+        'ss-lightsaber' => [get_user('ss', $data), get_competency('star-wars', 'lightsaber', $data)],
+        'ss-pod-racer' => [get_user('ss', $data), get_competency('star-wars', 'pod-racer', $data)],
+        'ss-storm-trooper' => [get_user('ss', $data), get_competency('star-wars', 'storm-trooper', $data)],
+        'ss-serving' => [get_user('ss', $data), get_competency('bs', 'serving', $data)],
+        'ss-quality' => [get_user('ss', $data), get_competency('bs', 'quality', $data)],
+        'ss-integrity' => [get_user('ss', $data), get_competency('bs', 'integrity', $data)],
+        'ss-planning' => [get_user('ss', $data), get_competency('bs', 'planning', $data)],
+        'ss-confidence' => [get_user('ss', $data), get_competency('bs', 'confidence', $data)],
+        'ss-influencing' => [get_user('ss', $data), get_competency('bs', 'influencing', $data)],
+        'ss-innovation' => [get_user('ss', $data), get_competency('bs', 'innovation', $data)],
+        'ss-thinking' => [get_user('ss', $data), get_competency('bs', 'thinking', $data)],
+        'ss-managing' => [get_user('ss', $data), get_competency('bs', 'managing', $data)],
+    ];
+
+    // Let's create individual assignments:
+    $legacy_assignments = [
+        'sj-literate' => [get_user('sj', $data), get_competency('binary', 'literate', $data), 1],
+        'sj-doer' => [get_user('sj', $data), get_competency('binary', 'doer', $data), 1],
+        'sj-initiative' => [get_user('sj', $data), get_competency('binary', 'initiative', $data), 1],
+        'sj-collider' => [get_user('sj', $data), get_competency('binary', 'collider', $data), 1],
+        'sj-nurse' => [get_user('sj', $data), get_competency('complex', 'nurse', $data), 1],
+        'sj-administrative-nurse' => [get_user('sj', $data), get_competency('complex', 'administrative-nurse', $data), 1],
+        'sj-zoo-keeper' => [get_user('sj', $data), get_competency('complex', 'zoo-keeper', $data), 1],
+        'sj-camp-ground-manager' => [get_user('sj', $data), get_competency('complex', 'camp-ground-manager', $data), 1],
+        'sj-netflix' => [get_user('sj', $data), get_competency('4-value', 'netflix', $data), 1],
+        'sj-shop-keeper' => [get_user('sj', $data), get_competency('4-value', 'shop-keeper', $data), 1],
+        'sj-sommelier' => [get_user('sj', $data), get_competency('4-value', 'sommelier', $data), 2],
+        'sj-barista' => [get_user('sj', $data), get_competency('4-value', 'barista', $data), 3],
+        'sj-bartender' => [get_user('sj', $data), get_competency('4-value', 'bartender', $data), 1],
+        'sj-mad-preacher' => [get_user('sj', $data), get_competency('4-value', 'mad-preacher', $data), 1],
+        'sj-lightsaber' => [get_user('sj', $data), get_competency('star-wars', 'lightsaber', $data), 2],
+        'sj-pod-racer' => [get_user('sj', $data), get_competency('star-wars', 'pod-racer', $data), 1],
+        'sj-sith-lord' => [get_user('sj', $data), get_competency('star-wars', 'sith-lord', $data), 3],
+        'sj-teeth-whitening' => [get_user('sj', $data), get_competency('arbitrary', 'teeth-whitening', $data), 1],
+        'sj-hoarder' => [get_user('sj', $data), get_competency('arbitrary', 'hoarder', $data), 1],
+        'sj-cc' => [get_user('sj', $data), get_competency('arbitrary', 'cc', $data), 1],
+        'sj-serving' => [get_user('sj', $data), get_competency('bs', 'serving', $data), 1],
+        'sj-quality' => [get_user('sj', $data), get_competency('bs', 'quality', $data), 3],
+        'sj-integrity' => [get_user('sj', $data), get_competency('bs', 'integrity', $data), 1],
+        'sj-problem-solving' => [get_user('sj', $data), get_competency('bs', 'problem-solving', $data), 2],
+        'sj-info-seeking' => [get_user('sj', $data), get_competency('bs', 'info-seeking', $data), 1],
+        'sj-embracing' => [get_user('sj', $data), get_competency('bs', 'embracing', $data), 1],
+        'sj-collaborating' => [get_user('sj', $data), get_competency('bs', 'collaborating', $data), 1],
+        'sj-influencing' => [get_user('sj', $data), get_competency('bs', 'influencing', $data), 2],
+        'sj-innovation' => [get_user('sj', $data), get_competency('bs', 'innovation', $data), 1],
+        'sj-thinking' => [get_user('sj', $data), get_competency('bs', 'thinking', $data), 1],
+        'ss-literate' => [get_user('ss', $data), get_competency('binary', 'literate', $data), 1],
+        'ss-doer' => [get_user('ss', $data), get_competency('binary', 'doer', $data), 1],
+        'ss-initiative' => [get_user('ss', $data), get_competency('binary', 'initiative', $data), 1],
+        'ss-collider' => [get_user('ss', $data), get_competency('binary', 'collider', $data), 1],
+        'ss-consultant' => [get_user('ss', $data), get_competency('complex', 'consultant', $data), 1],
+        'ss-nurse' => [get_user('ss', $data), get_competency('complex', 'nurse', $data), 1],
+        'ss-administrative-nurse' => [get_user('ss', $data), get_competency('complex', 'administrative-nurse', $data), 1],
+        'ss-zoo-keeper' => [get_user('ss', $data), get_competency('complex', 'zoo-keeper', $data), 3],
+        'ss-camp-ground-manager' => [get_user('ss', $data), get_competency('complex', 'camp-ground-manager', $data), 1],
+        'ss-netflix' => [get_user('ss', $data), get_competency('4-value', 'netflix', $data), 4],
+        'ss-shop-keeper' => [get_user('ss', $data), get_competency('4-value', 'shop-keeper', $data), 1],
+        'ss-machinery-operator' => [get_user('ss', $data), get_competency('4-value', 'machinery-operator', $data), 1],
+        'ss-it' => [get_user('ss', $data), get_competency('4-value', 'it', $data), 1],
+        'ss-bartender' => [get_user('ss', $data), get_competency('4-value', 'bartender', $data), 1],
+        'ss-mad-preacher' => [get_user('ss', $data), get_competency('4-value', 'mad-preacher', $data), 1],
+        'ss-pod-racer' => [get_user('ss', $data), get_competency('star-wars', 'pod-racer', $data), 2],
+        'ss-teeth-whitening' => [get_user('ss', $data), get_competency('arbitrary', 'teeth-whitening', $data), 1],
+        'ss-hoarder' => [get_user('ss', $data), get_competency('arbitrary', 'hoarder', $data), 1],
+        'ss-cc' => [get_user('ss', $data), get_competency('arbitrary', 'cc', $data), 2],
+        'ss-drive' => [get_user('ss', $data), get_competency('bs', 'drive', $data), 3],
+        'ss-serving' => [get_user('ss', $data), get_competency('bs', 'serving', $data), 2],
+        'ss-quality' => [get_user('ss', $data), get_competency('bs', 'quality', $data), 1],
+        'ss-integrity' => [get_user('ss', $data), get_competency('bs', 'integrity', $data), 1],
+        'ss-planning' => [get_user('ss', $data), get_competency('bs', 'planning', $data), 1],
+        'ss-confidence' => [get_user('ss', $data), get_competency('bs', 'confidence', $data), 3],
+        'ss-info-seeking' => [get_user('ss', $data), get_competency('bs', 'info-seeking', $data), 1],
+        'ss-communication' => [get_user('ss', $data), get_competency('bs', 'communication', $data), 2],
+        'ss-influencing' => [get_user('ss', $data), get_competency('bs', 'influencing', $data), 1],
+        'ss-innovation' => [get_user('ss', $data), get_competency('bs', 'innovation', $data), 2],
+        'ss-managing' => [get_user('ss', $data), get_competency('bs', 'managing', $data), 1],
     ];
 
     $data['individual_assignments'] = create_user_assignments($user_assignments, $data);
+
+    // Currently they are just the same as user assignments
+    $data['legacy_assignment'] = create_legacy_assignments($legacy_assignments, $data);
 
     // Let's run expand task
     (new expand_task(db()))->expand_all();
@@ -1320,18 +1413,47 @@ function create_audience($attributes) {
     return $audience;
 }
 
-function create_individual_assignment($competency, $user) {
-    return assignment_generator()->create_user_assignment($competency->id, $user->id);
+function create_individual_assignment($competency, $user, bool $legacy = false) {
+    $attributes = [];
+
+    if ($legacy) {
+        $attributes = [
+            'type' => assignment::TYPE_LEGACY,
+            'status' => assignment::STATUS_ARCHIVED,
+            'created_at' => time(),
+            'updated_at' => time(),
+            'archived_at' => time(),
+        ];
+    }
+
+    return assignment_generator()->create_user_assignment($competency->id, $user->id, $attributes);
 }
 
-function create_user_assignments($assignments, $data) {
+function create_user_assignments($assignments, $data, $legacy = false) {
     $res = [];
 
-    foreach ($assignments as $key => [$user, $competency]) {
-        $res[$key] = create_individual_assignment($competency, $user);
+    $assignments = array_map(
+        function(array $item) {
+            if(count($item) == 2) {
+                $item[] = null;
+            }
+
+            return $item;
+        }, $assignments);
+
+    foreach ($assignments as $key => [$user, $competency, $achievement]) {
+        $res[$key] = create_individual_assignment($competency, $user, $legacy);
+
+        if (!is_null($achievement)) {
+            create_achievement_record($user, $res[$key], $achievement);
+        }
     }
 
     return $res;
+}
+
+function create_legacy_assignments($assignments, $data) {
+    return create_user_assignments($assignments, $data, true);
 }
 
 /**
