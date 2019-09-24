@@ -24,9 +24,11 @@
 namespace criteria_coursecompletion\webapi\resolver\query;
 
 use completion_completion;
+use context_course;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use course_in_list;
 use criteria_coursecompletion\coursecompletion;
 use totara_core\formatter\field\string_field_formatter;
 use totara_core\formatter\field\text_field_formatter;
@@ -49,11 +51,15 @@ class achievements implements query_resolver {
 
         $instance_id = $args['instance_id'];
         $user_id = $args['user_id'];
-        $assignment_id = $args['assignment_id'];
+
+        try {
+            $completion_criteria = coursecompletion::fetch($instance_id);
+        } catch (\Exception $exception) {
+            // We just return a complete empty record if there's nothing to return
+            return null;
+        }
 
         $items = [];
-
-        $completion_criteria = coursecompletion::fetch($instance_id);
         foreach ($completion_criteria->get_item_ids() as $course_id) {
             // TODO Replace following with a proper course type in TL-22396
 
@@ -61,14 +67,15 @@ class achievements implements query_resolver {
                 'course' => null,
                 'progress' => 0
             ];
-            $completion = new completion_completion(['userid' => $user_id, 'course' => $course_id]);
-            $item['progress'] = (int)$completion->get_percentagecomplete();
 
-            $course_context = \context_course::instance($course_id);
             $course_record = get_course($course_id);
-            $course_in_list = new \course_in_list($course_record);
-
             if (totara_course_is_viewable($course_record)) {
+                $course_context = context_course::instance($course_id);
+                $course_in_list = new course_in_list($course_record);
+
+                $completion = new completion_completion(['userid' => $user_id, 'course' => $course_id]);
+                $item['progress'] = (int)$completion->get_percentagecomplete();
+
                 $string_formatter = new string_field_formatter(format::FORMAT_HTML, $course_context);
 
                 $text_formatter = new text_field_formatter(format::FORMAT_HTML, $course_context);
@@ -78,7 +85,7 @@ class achievements implements query_resolver {
                 $item['course'] = [
                     'name' => $string_formatter->format(get_course_display_name_for_list($course_in_list)),
                     'summary' => $text_formatter->format($course_in_list->summary),
-                    'url' => course_get_url($course_record)
+                    'url' => (string) course_get_url($course_record)
                 ];
             }
 
