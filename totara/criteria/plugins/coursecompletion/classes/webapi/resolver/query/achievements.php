@@ -55,8 +55,11 @@ class achievements implements query_resolver {
         try {
             $completion_criteria = coursecompletion::fetch($instance_id);
         } catch (\Exception $exception) {
-            // We just return a complete empty record if there's nothing to return
-            return null;
+            return [
+                'aggregation_method' => 0,
+                'required_items' => 0,
+                'items' => []
+            ];
         }
 
         $items = [];
@@ -100,7 +103,8 @@ class achievements implements query_resolver {
         }
 
         return [
-            'aggregation' => $completion_criteria->get_aggregation_method(),
+            'aggregation_method' => $completion_criteria->get_aggregation_method(),
+            'required_items' => $completion_criteria->get_aggregation_params()['req_items'] ?? 1,
             'items' => $items
         ];
     }

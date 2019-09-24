@@ -23,63 +23,72 @@
 <template>
   <div>
     <Preloader :display="$apollo.loading" />
-    <Table :data="achievements.items" :expandable-rows="true">
-      <template v-slot:HeaderRow="">
-        <HeaderCell size="14">
-          <h4>{{ $str('courses', 'criteria_coursecompletion') }}</h4>
-        </HeaderCell>
-        <HeaderCell size="2" class="tui-criteriaCourseCompletion__progress">
-          <div>{{ completedNumberOfCourses }} / {{ numberOfCourses }}</div>
-          <div v-if="achievements.aggregation">
-            {{
-              $str(
-                'courses_required',
-                'criteria_coursecompletion',
-                achievements.aggregation
-              )
-            }}
-          </div>
-        </HeaderCell>
-      </template>
-      <template v-slot:row="{ row, expand }">
-        <Cell size="1" style="text-align: center;">
-          <CheckIcon v-if="row.progress === 100" size="300" />
-        </Cell>
-
-        <Cell size="13">
-          <a v-if="row.course" href="#" @click.prevent="expand()">
-            {{ getCourseName(row) }}
-          </a>
-          <template v-else>{{ getCourseName(row) }}</template>
-        </Cell>
-
-        <Cell size="2">
-          <div v-if="hasProgress(row)" class="progress progress-striped active">
-            <div
-              class="bar"
-              role="progressbar"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              :aria-valuenow="row.progress"
-              :style="width(row)"
-            >
-              <span class="progressbar__text">{{ row.progress }}%</span>
+    <div v-if="!$apollo.loading && !hasCourses">
+      <h4>{{ $str('courses', 'criteria_coursecompletion') }}</h4>
+      <p>There are no courses available to view</p>
+    </div>
+    <template v-if="hasCourses">
+      <Table :data="achievements.items" :expandable-rows="true">
+        <template v-slot:HeaderRow="">
+          <HeaderCell size="14">
+            <h4>{{ $str('courses', 'criteria_coursecompletion') }}</h4>
+          </HeaderCell>
+          <HeaderCell size="2" class="tui-criteriaCourseCompletion__progress">
+            <div>{{ completedNumberOfCourses }} / {{ numberOfCourses }}</div>
+            <div v-if="!hasAggregationAll">
+              {{
+                $str(
+                  'courses_required',
+                  'criteria_coursecompletion',
+                  achievements.required_items
+                )
+              }}
             </div>
-          </div>
-        </Cell>
-      </template>
+          </HeaderCell>
+        </template>
+        <template v-slot:row="{ row, expand }">
+          <Cell size="1" style="text-align: center;">
+            <CheckIcon v-if="row.progress === 100" size="300" />
+          </Cell>
 
-      <template v-slot:expandContent="{ row }">
-        <h4>{{ row.course.name }}</h4>
-        <p
-          class="tui-criteriaCourseCompletion__summary"
-          v-html="row.course.summary"
-        />
-        <a :href="row.course.url" class="btn btn-primary">
-          {{ $str('course_link', 'criteria_coursecompletion') }}
-        </a>
-      </template>
-    </Table>
+          <Cell size="13">
+            <a v-if="row.course" href="#" @click.prevent="expand()">
+              {{ getCourseName(row) }}
+            </a>
+            <template v-else>{{ getCourseName(row) }}</template>
+          </Cell>
+
+          <Cell size="2">
+            <div
+              v-if="hasProgress(row)"
+              class="progress progress-striped active"
+            >
+              <div
+                class="bar"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                :aria-valuenow="row.progress"
+                :style="width(row)"
+              >
+                <span class="progressbar__text">{{ row.progress }}%</span>
+              </div>
+            </div>
+          </Cell>
+        </template>
+
+        <template v-slot:expandContent="{ row }">
+          <h4>{{ row.course.name }}</h4>
+          <p
+            class="tui-criteriaCourseCompletion__summary"
+            v-html="row.course.summary"
+          />
+          <a :href="row.course.url" class="btn btn-primary">
+            {{ $str('course_link', 'criteria_coursecompletion') }}
+          </a>
+        </template>
+      </Table>
+    </template>
   </div>
 </template>
 
@@ -102,10 +111,6 @@ export default {
       required: true,
       type: Number,
     },
-    assignmentId: {
-      required: true,
-      type: Number,
-    },
   },
 
   data: function() {
@@ -120,6 +125,9 @@ export default {
     numberOfCourses() {
       return this.achievements.items.length;
     },
+    hasCourses() {
+      return this.achievements.items.length > 0;
+    },
     completedNumberOfCourses() {
       let complete = 0;
 
@@ -130,6 +138,9 @@ export default {
       });
 
       return complete;
+    },
+    hasAggregationAll() {
+      return this.achievements.aggregation_method === 1;
     },
   },
 
