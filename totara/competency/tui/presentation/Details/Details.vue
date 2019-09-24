@@ -7,7 +7,7 @@
         :key="key"
         :item-key="key"
         :subtitle="
-          item.assignment.archived_at
+          item.assignment.archived_at && item.assignment.type !== 'legacy'
             ? $str('unassigned', 'totara_competency')
             : ''
         "
