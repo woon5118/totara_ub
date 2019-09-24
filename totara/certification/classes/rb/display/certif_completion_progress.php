@@ -64,6 +64,10 @@ class certif_completion_progress extends \totara_reportbuilder\rb\display\base {
             return $percentage;
         }
 
+        if ($percentage === null) {
+            return get_string('notassigned', 'totara_certification');
+        }
+
         return self::get_renderer()->progressbar((int) $percentage, 'medium', false);
     }
 

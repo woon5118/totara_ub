@@ -4062,16 +4062,17 @@ function certif_delete_completion($programid, $userid, $message = '') {
  * Once certified the user is shown as 100% complete until the recertification window opens.
  * If you need it to show 100% as long as the user is certified see totara_certification_get_percentage_complete()
  *
- * @param \program|int $certiforid
+ * @param int $certifid
  * @param int $userid
  * @return int|null
  */
-function totara_certification_get_current_percentage_complete($certiforid, int $userid) {
-    $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($certiforid, $userid);
+function totara_certification_get_current_percentage_complete(int $certifid, int $userid) {
+    $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($certifid, $userid);
     $percentage = $progressinfo->get_percentagecomplete();
     if ($percentage === false) {
         return null;
     }
+
     return $percentage;
 }
 
@@ -4081,22 +4082,28 @@ function totara_certification_get_current_percentage_complete($certiforid, int $
  * Once certified the user is shown as 100% complete until the their certification expires.
  * If you need it to show their progress while recertifying see totara_certification_get_current_percentage_complete()
  *
- * @param program|int $certiforid A program instance for the certification or the certification id.
+ * @param int $certifid The certification id
  * @param int $userid
  * @param int $timewindowopens
  * @param int|null $timecompleted
  * @param int|null $lasttimecompleted
  * @return int|null
  */
-function totara_certification_get_percentage_complete($certiforid, int $userid, int $timewindowopens, ?int $timecompleted, ?int $lasttimecompleted) : ?int {
+function totara_certification_get_percentage_complete(int $certifid, int $userid, int $timewindowopens, ?int $timecompleted, ?int $lasttimecompleted) : ?int {
     $percentage = 0;
+
+    // Check user is assigned
+    if (!\totara_program\utils::user_is_assigned($certifid, $userid)) {
+        return null;
+    }
+
     if ($timewindowopens < time()) {
         // The window is open, use the current record.
-        $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($certiforid, $userid);
+        $progressinfo = \totara_program\progress\program_progress::get_user_progressinfo_from_id($certifid, $userid);
         $percentage = $progressinfo->get_percentagecomplete();
 
         if ($percentage === false) {
-            // You get here if you are not assigned OR if the program has not coursesets/courses.
+            // You get here if you are not assigned OR if the program has no coursesets/courses.
             $percentage = null;
         }
     } else {
@@ -4106,6 +4113,7 @@ function totara_certification_get_percentage_complete($certiforid, int $userid, 
             $percentage = 100;
         }
     }
+
     return $percentage;
 }
 

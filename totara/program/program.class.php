@@ -1635,7 +1635,7 @@ class program {
             $message .= html_writer::tag('p', get_string('viewingxusersprogram', 'totara_program', $user));
         }
 
-        $userassigned = $this->user_is_assigned($userid);
+        $userassigned = \totara_program\utils::user_is_assigned($this->id, $user->id);
 
         if ($userassigned) {
             // Display the reason why this user has been assigned to the program (if it is mandatory for the user).
@@ -2126,22 +2126,7 @@ class program {
             return false;
         }
 
-        // Check if there is a user assignment
-        // (user is assigned to program in admin interface)
-        list($usql, $params) = $DB->get_in_or_equal(array(PROGRAM_EXCEPTION_NONE, PROGRAM_EXCEPTION_RESOLVED));
-        $params[] = $this->id;
-        $params[] = $userid;
-        $record_count = $DB->count_records_select('prog_user_assignment', " exceptionstatus $usql AND programid = ? AND userid = ?", $params);
-        if ($record_count > 0) {
-            return true;
-        }
-
-        // Check if the program is part of a learning plan
-        if ($this->assigned_through_plan($userid)) {
-            return true;
-        }
-
-        return false;
+        return \totara_program\utils::user_is_assigned($this->id, $userid);
     }
 
     /**
@@ -2154,7 +2139,7 @@ class program {
     public function check_user_for_dismissed_exceptions($userid) {
         global $DB;
 
-        $assigned = $this->user_is_assigned($userid);
+        $assigned = \totara_program::user_is_assigned($this->id, $userid);
 
         $params = array('programid' => $this->id, 'userid' => $userid, 'exceptionstatus' => PROGRAM_EXCEPTION_DISMISSED);
         $dismissed = $DB->record_exists('prog_user_assignment', $params);
@@ -2254,7 +2239,7 @@ class program {
         global $DB;
         $reasonlist = '';
 
-        $userassigned = $this->user_is_assigned($user->id);
+        $userassigned = \totara_program\utils::user_is_assigned($this->id, $user->id);
         if ($userassigned) {
             $reasonlist .= $this->display_required_assignment_reason($user->id, false);
         }

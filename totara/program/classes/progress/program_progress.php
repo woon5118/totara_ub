@@ -123,6 +123,9 @@ class program_progress {
             // Create a completed progressinfo, but don't worry about generating the full structure.
             // We don't need it at this point.
             return progressinfo::from_data(progressinfo::AGGREGATE_ALL, 1, 1);
+        } else if (!$program->user_is_assigned($userid)) {
+            // Not assigned and not complete so just return
+            return progressinfo::from_data(progressinfo::AGGREGATE_ALL, 0, 0);
         }
 
         $path = CERTIFPATH_STD;

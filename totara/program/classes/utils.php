@@ -239,4 +239,74 @@ class utils {
         }
         return $timeallowances;
     }
+
+
+    /**
+     * Find if a user is asssigned to a program/certification
+     *
+     * @since Totara 13
+     *
+     * @param int $programid
+     * @param int $userid
+     *
+     * @return bool
+     */
+    public static function user_is_assigned(int $programid, int $userid) :bool {
+        global $DB;
+
+        static $prog_assigned = [];
+        if (PHPUNIT_TEST) {
+            $prog_assigned = [];
+        }
+
+        $key = $programid . '-' . $userid;
+
+        if (!isset($prog_assigned[$key])) {
+            // Update this when we move constants into an autoloaded class, these
+            // are defined in program.class.php which has a lot of extra require calls
+            // PROGRAM_EXCEPTION_RAISED = 1
+            // PROGRAM_EXCEPTION_DISMISSED = 2
+            $statuses = [1,2];
+            list($statussql, $statusparams) = $DB->get_in_or_equal($statuses, SQL_PARAMS_NAMED, null, false);
+
+            $params = [
+                'programid' => $programid,
+                'userid' => $userid
+            ];
+
+            $params = array_merge($params, $statusparams);
+            $result = $DB->record_exists_select('prog_user_assignment', "programid = :programid AND userid = :userid AND exceptionstatus $statussql", $params);
+
+            if ($result === false) {
+                // Check for plan assignment
+                $sql = "SELECT COUNT(*) FROM
+                    {dp_plan} p
+                    JOIN
+                    {dp_plan_program_assign} pa
+                    ON
+                    p.id = pa.planid
+                    WHERE
+                    p.userid = :userid
+                    AND pa.programid = :programid
+                    AND pa.approved = :approved
+                    AND p.status >= :approvedstatus";
+                $params = [
+                    'userid' => $userid,
+                    'programid' => $programid,
+                    'approved' => 50, //DP_APPROVAL_APPROVED,
+                    'approvedstatus' => 50 //DP_PLAN_STATUS_APPROVED
+                ];
+
+                if ($DB->count_records_sql($sql, $params) > 0) {
+                    $result = true;
+                } else {
+                    $result = false;
+                }
+            }
+
+            $prog_assigned[$key] = $result;
+        }
+
+        return $prog_assigned[$key];
+    }
 }

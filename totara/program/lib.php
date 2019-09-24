@@ -2370,6 +2370,7 @@ function prog_display_progress($programid, $userid, $certifpath = null, $percent
     } else {
         $percentage = totara_program_get_user_percentage_complete($programid, $userid);
     }
+
     if ($percentage === null) {
         // You get here if you are not assigned OR if the program has not coursesets/courses.
         return get_string('notassigned', 'totara_program');
@@ -2380,6 +2381,7 @@ function prog_display_progress($programid, $userid, $certifpath = null, $percent
 
     /** @var totara_core_renderer $renderer */
     $renderer = $PAGE->get_renderer('totara_core');
+
     return $renderer->progressbar($percentage, 'medium', false);
 }
 
