@@ -499,10 +499,22 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
      * but only if there is a previous non-null rating that has been achieved.
      */
     public function test_scale_value_none() {
+
+        /** @var tassign_competency_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+
+        $user = $this->getDataGenerator()->create_user();
+        $competency = $assignment_generator->create_competency();
+        $assignment = $assignment_generator->create_assignment([
+            'user_group_type' => 'user',
+            'user_group_id' => $user->id,
+            'competency_id' => $competency->id,
+        ]);
+
         $time = time();
-        $assignment_id = 100;
-        $competency_id = 200;
-        $user_id = 300;
+        $competency_id = $competency->id;
+        $assignment_id = $assignment->id;
+        $user_id = $user->id;
 
         /** @var totara_hierarchy_generator $hierarchy_generator */
         $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
