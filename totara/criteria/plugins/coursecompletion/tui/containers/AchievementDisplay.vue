@@ -28,12 +28,12 @@
         <HeaderCell size="14">
           <h4>{{ $str('courses', 'criteria_coursecompletion') }}</h4>
         </HeaderCell>
-        <HeaderCell size="2">
-          <div>{{ completedCourseAmount }} / {{ courseAmount }}</div>
+        <HeaderCell size="2" class="tui-criteriaCourseCompletion__progress">
+          <div>{{ completedNumberOfCourses }} / {{ numberOfCourses }}</div>
           <div v-if="achievements.aggregation">
             {{
               $str(
-                'coursesrequired',
+                'courses_required',
                 'criteria_coursecompletion',
                 achievements.aggregation
               )
@@ -43,11 +43,6 @@
       </template>
       <template v-slot:row="{ row, expand }">
         <Cell size="1" style="text-align: center;">
-          <CheckIcon
-            v-if="row.progress < 100"
-            size="300"
-            custom-class="ft-state-disabled"
-          />
           <CheckIcon v-if="row.progress === 100" size="300" />
         </Cell>
 
@@ -59,11 +54,17 @@
         </Cell>
 
         <Cell size="2">
-          <div v-if="row.course" class="tui-criteriaCourseCompletion__progress">
-            <div class="tui-criteriaCourseCompletion__progress__bar">
-              <span :style="width(row)" />
+          <div v-if="hasProgress(row)" class="progress progress-striped active">
+            <div
+              class="bar"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              :aria-valuenow="row.progress"
+              :style="width(row)"
+            >
+              <span class="progressbar__text">{{ row.progress }}%</span>
             </div>
-            {{ $str('progress', 'criteria_coursecompletion', row.progress) }}
           </div>
         </Cell>
       </template>
@@ -75,7 +76,7 @@
           v-html="row.course.summary"
         />
         <a :href="row.course.url" class="btn btn-primary">
-          {{ $str('courselink', 'criteria_coursecompletion') }}
+          {{ $str('course_link', 'criteria_coursecompletion') }}
         </a>
       </template>
     </Table>
@@ -109,26 +110,24 @@ export default {
 
   data: function() {
     return {
-      achievements: {},
+      achievements: {
+        items: [],
+      },
     };
   },
 
   computed: {
-    courseAmount() {
-      if (this.achievements.items) {
-        return this.achievements.items.length;
-      }
-      return 0;
+    numberOfCourses() {
+      return this.achievements.items.length;
     },
-    completedCourseAmount() {
+    completedNumberOfCourses() {
       let complete = 0;
-      if (this.achievements.items) {
-        this.achievements.items.forEach(item => {
-          if (item.progress === 100) {
-            complete = complete + 1;
-          }
-        });
-      }
+
+      this.achievements.items.forEach(item => {
+        if (item.progress === 100) {
+          complete = complete + 1;
+        }
+      });
 
       return complete;
     },
@@ -152,16 +151,6 @@ export default {
   },
 
   methods: {
-    getCompletedCourseAmount() {
-      let complete = 0;
-      this.achievements.items.forEach(item => {
-        if (item.progress === 100) {
-          complete = complete + 1;
-        }
-      });
-
-      return complete;
-    },
     width(row) {
       return {
         width: row.progress + '%',
@@ -173,6 +162,9 @@ export default {
         courseName = row.course.name;
       }
       return courseName;
+    },
+    hasProgress(row) {
+      return row.course && row.progress > 0;
     },
   },
 };
@@ -187,21 +179,6 @@ export default {
 
   &__progress {
     text-align: right;
-
-    &__bar {
-      position: relative;
-      width: 100%;
-      height: 4px;
-      background: #a3a3a3;
-    }
-
-    &__bar > span {
-      position: relative;
-      display: block;
-      height: 100%;
-      overflow: hidden;
-      background-color: #287b7c;
-    }
   }
 }
 </style>
@@ -209,11 +186,10 @@ export default {
 <lang-strings>
   {
     "criteria_coursecompletion": [
-      "courselink",
+      "course_link",
       "courses",
       "hidden_course",
-      "progress",
-      "coursesrequired"
+      "courses_required"
     ]
   }
 
