@@ -371,13 +371,21 @@ class assignment {
     }
 
     /**
+     * @return string
+     */
+    public function get_type(): string {
+        return $this->entity->type;
+    }
+
+    /**
      * Get human readable type name which depends on the type and the user_group_type
      *
      * @return string
      */
     public function get_type_name(): string {
         // For all non user admin assignments use the appropriate group name
-        if ($this->entity->type == assignment_entity::TYPE_ADMIN && $this->entity->user_group_type != user_groups::USER) {
+        if ($this->entity->type === assignment_entity::TYPE_ADMIN &&
+            $this->entity->user_group_type !== user_groups::USER) {
             switch ($this->entity->user_group_type) {
                 case user_groups::POSITION:
                 case user_groups::ORGANISATION:
@@ -441,6 +449,8 @@ class assignment {
                 return get_string('continuous_tracking', 'tassign_competency');
             case assignment_entity::TYPE_SELF:
                 return get_string('assignment_type:self', 'tassign_competency');
+            case assignment_entity::TYPE_LEGACY:
+                return get_string('assignment_type:legacy', 'tassign_competency');
             default:
                 return $this->get_user_group_name();
         }

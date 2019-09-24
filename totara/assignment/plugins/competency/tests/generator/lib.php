@@ -345,7 +345,7 @@ class tassign_competency_generator extends component_generator_base {
     protected function logged_user(int $fallback = 2) {
         global $USER;
 
-        return $USER->id ?? $fallback;
+        return $USER->id ?: $fallback;
     }
 
 }

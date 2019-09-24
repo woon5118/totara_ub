@@ -87,6 +87,7 @@ $string['assignment_reason:self'] = 'Self-assigned';
 $string['assignment_reason:system'] = 'Continuous tracking';
 
 $string['assignment_type:admin'] = 'Individual (Admin)';
+$string['assignment_type:legacy'] = 'Legacy assignment';
 $string['assignment_type:self'] = 'Self-assigned';
 $string['assignment_type:other'] = 'Directly assigned';
 $string['assignment_type:system'] = 'Individual (System)';

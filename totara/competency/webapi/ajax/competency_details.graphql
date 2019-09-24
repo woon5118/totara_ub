@@ -16,6 +16,7 @@ query totara_competency_competency_details(
       assignment {
         id
         archived_at(format: DATE)
+        type
         progress_name
       }
       my_value {

@@ -112,7 +112,12 @@ class activity_log {
                     // We don't want to display an empty rating unless there has been a rating before it.
                     continue;
                 }
-                array_unshift($returned_data, $entry->get_achieved_via());
+
+                // We don't want to display "Criteria met" for legacy assignments
+                if ($entry->get_assignment() && $entry->get_assignment()->get_type() !== assignment::TYPE_LEGACY) {
+                    array_unshift($returned_data, $entry->get_achieved_via());
+                }
+
                 $has_rating = true;
             }
             array_unshift($returned_data, $entry);

@@ -32,7 +32,7 @@
     <h4
       v-text="
         $str(
-          'competency_archived_at',
+          'assignment_archived_at',
           'totara_competency',
           assignment.archived_at
         )
@@ -48,6 +48,19 @@
         />
       </div>
     </div>
+
+    <template v-if="myValue && assignment.type">
+      <div
+        v-text="
+          $str('legacy_assignment_rating_discontinued', 'totara_competency')
+        "
+      />
+      <div
+        v-text="
+          $str('legacy_assignment_rating_description', 'totara_competency')
+        "
+      />
+    </template>
   </div>
 </template>
 
@@ -190,8 +203,10 @@ export default {
   {
     "totara_competency": [
       "unassigned",
-      "competency_archived_at",
-      "proficiency_not_achieved"
+      "assignment_archived_at",
+      "proficiency_not_achieved",
+      "legacy_assignment_rating_discontinued",
+      "legacy_assignment_rating_description"
     ]
   }
 </lang-strings>
