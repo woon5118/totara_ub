@@ -48,6 +48,30 @@ class criteria_coursecompletion_webapi_resolver_query_achievements_testcase exte
         $this->assertNull($result);
     }
 
+    public function test_existing_instance_with_non_existing_courses() {
+        $this->setAdminUser();
+
+        $data = $this->create_data();
+
+        $aggregation_method = 0;
+
+        $criteria = new coursecompletion();
+        $criteria->set_aggregation_method($aggregation_method)
+            ->set_item_ids([987, $data->course2->id, 897])
+            ->save();
+
+        $args = ['instance_id' => $criteria->get_id(), 'user_id' => 999];
+
+        $result = achievements::resolve($args, $this->get_execution_context());
+        $this->assertIsArray($result);
+        $this->assertEquals($aggregation_method, $result['aggregation']);
+        $items = $result['items'] ?? [];
+        // Only one course really exists the rest should not be there
+        $this->assertCount(1, $items);
+        $this->assert_course_is_visible($data->course2->fullname, $result);
+    }
+
+
     public function test_courses_without_user_being_enrolled() {
         $this->setAdminUser();
 

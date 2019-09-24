@@ -68,7 +68,14 @@ class achievements implements query_resolver {
                 'progress' => 0
             ];
 
-            $course_record = get_course($course_id);
+            try {
+                $course_record = get_course($course_id);
+            } catch (\Exception $exception) {
+                // Course not found for some reason, maybe it got deleted?
+                // We don't want to return anything in this case.
+                continue;
+            }
+
             if (totara_course_is_viewable($course_record)) {
                 $course_context = context_course::instance($course_id);
                 $course_in_list = new course_in_list($course_record);
