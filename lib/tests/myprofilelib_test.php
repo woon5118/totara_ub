@@ -61,7 +61,7 @@ class core_myprofilelib_testcase extends advanced_testcase {
     public function setUp() {
         // Set the $PAGE->url value so core_myprofile_navigation() doesn't complain.
         global $PAGE;
-        $PAGE->set_url('/test');
+        $PAGE->set_url('/admin/tool/phpunit/index.php');
 
         $this->user = $this->getDataGenerator()->create_user();
         $this->user2 = $this->getDataGenerator()->create_user();

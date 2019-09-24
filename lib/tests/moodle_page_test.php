@@ -202,9 +202,9 @@ class core_moodle_page_testcase extends advanced_testcase {
 
     public function test_initialise_default_pagetype() {
         // Exercise SUT.
-        $this->testpage->initialise_default_pagetype('admin/tool/unittest/index.php');
+        $this->testpage->initialise_default_pagetype('admin/tool/phpunit/index.php');
         // Validated.
-        $this->assertSame('admin-tool-unittest-index', $this->testpage->pagetype);
+        $this->assertSame('admin-tool-phpunit-index', $this->testpage->pagetype);
     }
 
     public function test_initialise_default_pagetype_fp() {
@@ -302,6 +302,13 @@ class core_moodle_page_testcase extends advanced_testcase {
         $this->testpage->set_url('/mod/quiz/attempt.php', array('attempt' => 123, 'page' => 7));
         // Validated.
         $this->assertSame('a-page-type', $this->testpage->pagetype);
+    }
+
+    public function test_set_url_invalid() {
+        global $CFG;
+        $this->testpage->set_url('/test/test.php', array('attempt' => 123, 'page' => 7));
+        $this->assertDebuggingCalled('Incorrect PAGE->set_url() value detected, PHP file does not exist: test/test.php');
+        $this->assertSame($CFG->wwwroot . '/test/test.php?attempt=123&amp;page=7', $this->testpage->url->out());
     }
 
     public function test_set_subpage() {

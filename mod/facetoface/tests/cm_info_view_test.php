@@ -183,7 +183,7 @@ class mod_facetoface_cm_info_view_testcase extends advanced_testcase {
      */
     public function test_facetoface_display_with_multiple_sessions_and_number_of_displaying_seminar_event_is_three(): void {
         global $USER, $CFG, $PAGE;
-        $PAGE->set_url("{$CFG->wwwroot}/hello_world");
+        $PAGE->set_url("/course/view.php");
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -217,7 +217,7 @@ class mod_facetoface_cm_info_view_testcase extends advanced_testcase {
 
         // Unset the smtphosts so that email would not be sent
         $CFG->smtphosts = null;
-        $PAGE->set_url("{$CFG->wwwroot}/hello_world");
+        $PAGE->set_url("/course/view.php");
 
         $this->resetAfterTest(true);
         $this->setAdminUser();

@@ -1357,6 +1357,18 @@ class moodle_page {
         }
         $shorturl = str_replace("$CFG->wwwroot/", '', $fullurl);
 
+        // Totara: make sure the file matching the URL exists.
+        if ($CFG->debugdeveloper) {
+            $file = $shorturl;
+            if (strpos($file, '.php') === false) {
+                $file = rtrim($file, '/');
+                $file .= '/index.php';
+            }
+            if (!file_exists($CFG->dirroot . '/' . $file)) {
+                debugging('Incorrect PAGE->set_url() value detected, PHP file does not exist: ' . $file, DEBUG_DEVELOPER);
+            }
+        }
+
         if (is_null($this->_pagetype)) {
             $this->initialise_default_pagetype($shorturl);
         }

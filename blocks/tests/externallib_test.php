@@ -50,7 +50,7 @@ class core_block_externallib_testcase extends externallib_advanced_testcase {
     public function test_get_course_blocks() {
         global $DB, $PAGE;
 
-        $PAGE->set_url('/test.php');
+        $PAGE->set_url('/admin/tool/phpunit/index.php');
 
         $this->resetAfterTest(true);
 
@@ -87,7 +87,7 @@ class core_block_externallib_testcase extends externallib_advanced_testcase {
     public function test_get_course_blocks_site_home() {
         global $PAGE;
 
-        $PAGE->set_url('/test.php');
+        $PAGE->set_url('/admin/tool/phpunit/index.php');
 
         $this->resetAfterTest(true);
 
@@ -119,7 +119,7 @@ class core_block_externallib_testcase extends externallib_advanced_testcase {
     public function test_get_course_blocks_overrides() {
         global $DB, $CFG, $PAGE;
 
-        $PAGE->set_url('/test.php');
+        $PAGE->set_url('/admin/tool/phpunit/index.php');
 
         $this->resetAfterTest(true);
 
