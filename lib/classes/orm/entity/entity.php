@@ -27,6 +27,7 @@ use coding_exception;
 use core\orm\collection;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
+use core\orm\entity\relations\has_many_through;
 use core\orm\entity\relations\has_one;
 use core\orm\query\builder;
 use stdClass;
@@ -781,6 +782,37 @@ abstract class entity implements \JsonSerializable {
      */
     protected function has_many(string $entity, $foreign_key, $key = 'id'): has_many {
         return new has_many($this, $entity, $foreign_key, $key);
+    }
+
+    /**
+     * Define has many through relationship
+     * Technically it's just a convenience method.
+     *
+     * @param string $entity Entity related class
+     * @param string $intermediate Intermediate model
+     * @param string $intermediate_foreign_key
+     * @param string $foreign_key related entity key to use
+     * @param string $key This model key to use
+     * @param string $intermediate_key Intermediate model key
+     * @return has_many_through
+     */
+    protected function has_many_through(
+        string $entity,
+        string $intermediate,
+        string $intermediate_foreign_key,
+        string $foreign_key,
+        string $key = 'id',
+        string $intermediate_key = 'id'
+    ): has_many_through {
+        return new has_many_through(
+            $this,
+            $intermediate,
+            $entity,
+            $foreign_key,
+            $intermediate_foreign_key,
+            $key,
+            $intermediate_key
+        );
     }
 
     /**

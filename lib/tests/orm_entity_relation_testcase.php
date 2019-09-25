@@ -26,6 +26,7 @@ use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
+use core\orm\entity\relations\has_many_through;
 use core\orm\entity\relations\has_one;
 
 defined('MOODLE_INTERNAL') || die();
@@ -484,6 +485,9 @@ class sample_passport_entity extends entity {
         return $this->belongs_to(sample_parent_entity::class, 'parent_id');
     }
 
+    public function children(): has_many_through {
+        return $this->has_many_through(sample_child_entity::class, sample_parent_entity::class, 'id', 'parent_id', 'parent_id', 'id');
+    }
 }
 
 /**

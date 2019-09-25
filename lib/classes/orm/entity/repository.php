@@ -26,6 +26,7 @@ namespace core\orm\entity;
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\filter\has_filters;
+use core\orm\entity\relations\has_many_through;
 use core\orm\entity\relations\relation;
 use core\orm\lazy_collection;
 use core\orm\paginator;
@@ -437,6 +438,17 @@ class repository {
                 $parent->relations[$relation[0]] = $rel;
 
                 if (!empty($relation[1])) {
+                    // It's not perfect to check for a particular relation here, but it's a limitation of has many through having to select extra things,
+                    // we technically may add a necessary thing here.
+                    // The other option is to move this code to the relation class itself then we'd be able to override it properly on a particular relation class.
+                    // Since it's not a big issue, we'll leave it this way for now, ignoring custom select and notifying devs with a debugging message, not an exception
+                    if ($rel instanceof has_many_through) {
+                        debugging('Specifying columns is not currently supported for has_many_through relations');
+
+                        $parent = $rel->get_repo();
+                        continue;
+                    }
+
                     // Having a foreign key column is required, so let's append it.
                     if (!in_array($rel->get_foreign_key(), $relation[1])) {
                         $relation[1][] = $rel->get_foreign_key();
