@@ -30,6 +30,7 @@
   </div>
   <div v-else>
     <h4
+      v-if="!isLegacy"
       v-text="
         $str(
           'assignment_archived_at',
@@ -41,15 +42,28 @@
     <div class="tui-ScaleDetail__proficient-box">
       <div>Your rating <FlexIcon icon="nav-expand" /></div>
       <div>
-        <span v-if="myValue" v-text="myValue.name" />
-        <span
-          v-else
-          v-text="$str('proficiency_not_achieved', 'totara_competency')"
-        />
+        <template v-if="isLegacy">
+          <span
+            v-if="myValue.proficient"
+            v-text="
+              $str('proficient_on', 'totara_competency', assignment.created_at)
+            "
+          />
+          <span
+            v-else
+            v-text="$str('proficiency_not_achieved', 'totara_competency')"
+          />
+        </template>
+        <template v-else>
+          <span v-if="myValue" v-text="myValue.name" />
+          <span
+            v-else
+            v-text="$str('proficiency_not_achieved', 'totara_competency')"
+          />
+        </template>
       </div>
     </div>
-
-    <template v-if="myValue && assignment.type">
+    <template v-if="myValue && isLegacy">
       <div
         v-text="
           $str('legacy_assignment_rating_discontinued', 'totara_competency')
@@ -97,6 +111,10 @@ export default {
       if (!this.scale.values) return null;
 
       return this.scale.values.find(({ proficient }) => proficient);
+    },
+
+    isLegacy() {
+      return this.assignment.type === 'legacy';
     },
 
     reversedValues() {
@@ -204,6 +222,7 @@ export default {
     "totara_competency": [
       "unassigned",
       "assignment_archived_at",
+      "proficient_on",
       "proficiency_not_achieved",
       "legacy_assignment_rating_discontinued",
       "legacy_assignment_rating_description"

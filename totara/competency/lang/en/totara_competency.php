@@ -133,6 +133,7 @@ $string['pathwaystatusarchived'] = 'Archived';
 $string['proficiency_not_achieved'] = 'Proficiency not achieved';
 $string['not_proficient'] = 'Not proficient';
 $string['proficient'] = 'Proficient';
+$string['proficient_on'] = 'Proficient {$a}';
 $string['proficient_value'] = 'Proficient value';
 $string['removelinkedcourse'] = 'Remove linked course';
 $string['removedlinkedcourse'] = 'Removed linked course';
