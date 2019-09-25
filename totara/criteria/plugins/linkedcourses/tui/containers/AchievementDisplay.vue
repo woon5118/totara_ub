@@ -21,13 +21,15 @@
 -->
 
 <template>
-  <div>
-    <h5>Linked Courses</h5>
-  </div>
+  <CourseAchievementDisplay :achievements="achievements" />
 </template>
 
 <script>
+import AchievementsQuery from '../../webapi/ajax/achievements.graphql';
+import CourseAchievementDisplay from 'totara_criteria/containers/CourseAchievementDisplay';
+
 export default {
+  components: { CourseAchievementDisplay },
   props: {
     instanceId: {
       required: true,
@@ -37,14 +39,30 @@ export default {
       required: true,
       type: Number,
     },
-    assignmentId: {
-      required: true,
-      type: Number,
-    },
   },
 
   data: function() {
-    return {};
+    return {
+      achievements: {
+        items: [],
+      },
+    };
+  },
+
+  apollo: {
+    achievements: {
+      query: AchievementsQuery,
+      context: { batch: true },
+      variables() {
+        return {
+          instance_id: this.instanceId,
+          user_id: this.userId,
+        };
+      },
+      update({ criteria_linkedcourses_achievements: achievements }) {
+        return achievements;
+      },
+    },
   },
 
   methods: {},

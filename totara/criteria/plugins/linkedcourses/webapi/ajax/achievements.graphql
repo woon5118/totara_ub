@@ -1,0 +1,20 @@
+query criteria_linkedcourses_achievements(
+  $instance_id: core_id!
+  $user_id: core_id!
+) {
+  criteria_linkedcourses_achievements(
+    instance_id: $instance_id
+    user_id: $user_id
+  ) {
+    aggregation_method
+    required_items
+    items {
+      course {
+        name
+        summary
+        url
+      }
+      progress
+    }
+  }
+}

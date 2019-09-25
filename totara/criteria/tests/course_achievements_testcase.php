@@ -18,13 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package criteria_coursecompletion
+ * @package totara_criteria
  * @subpackage test
  */
 
 use core\webapi\execution_context;
-use criteria_coursecompletion\coursecompletion;
-use criteria_coursecompletion\webapi\resolver\query\achievements;
+use core\webapi\query_resolver;
+use totara_criteria\criterion;
+use totara_criteria\criterion_not_found_exception;
 use totara_program\task\completions_task;
 
 defined('MOODLE_INTERNAL') || die();
@@ -33,19 +34,29 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests the query to fetch data for a coursecompletion criteria
  */
-class criteria_coursecompletion_webapi_resolver_query_achievements_testcase extends advanced_testcase {
+abstract class totara_criteria_course_achievements_testcase extends advanced_testcase {
 
     private function get_execution_context(string $type = 'dev', ?string $operation = null) {
         return execution_context::create($type, $operation);
     }
+
+    /**
+     * @return criterion
+     */
+    abstract public function get_criterion(): criterion;
+
+    /**
+     * @return string|query_resolver
+     */
+    abstract public function get_resolver_classname(): string;
 
     public function test_non_existing_instance() {
         $this->setAdminUser();
 
         $args = ['instance_id' => 999, 'user_id' => 999];
 
-        $result = achievements::resolve($args, $this->get_execution_context());
-        $this->assertNull($result);
+        $this->expectException(criterion_not_found_exception::class);
+        $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
     }
 
     public function test_existing_instance_with_non_existing_courses() {
@@ -53,18 +64,17 @@ class criteria_coursecompletion_webapi_resolver_query_achievements_testcase exte
 
         $data = $this->create_data();
 
-        $aggregation_method = 0;
-
-        $criteria = new coursecompletion();
-        $criteria->set_aggregation_method($aggregation_method)
+        $criteria = $this->get_criterion()
+            ->set_aggregation_method(criterion::AGGREGATE_ALL)
             ->set_item_ids([987, $data->course2->id, 897])
             ->save();
 
         $args = ['instance_id' => $criteria->get_id(), 'user_id' => 999];
 
-        $result = achievements::resolve($args, $this->get_execution_context());
+        $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
-        $this->assertEquals($aggregation_method, $result['aggregation']);
+        $this->assertEquals(criterion::AGGREGATE_ALL, $result['aggregation_method']);
+        $this->assertEquals(1, $result['required_items']);
         $items = $result['items'] ?? [];
         // Only one course really exists the rest should not be there
         $this->assertCount(1, $items);
@@ -77,18 +87,18 @@ class criteria_coursecompletion_webapi_resolver_query_achievements_testcase exte
 
         $data = $this->create_data();
 
-        $aggregation_method = 0;
+        $aggregation_method = criterion::AGGREGATE_ALL;
 
-        $criteria = new coursecompletion();
-        $criteria->set_aggregation_method($aggregation_method)
+        $criteria = $this->get_criterion()
+            ->set_aggregation_method($aggregation_method)
             ->set_item_ids([$data->course1->id, $data->course2->id, $data->course3->id])
             ->save();
 
         $args = ['instance_id' => $criteria->get_id(), 'user_id' => 999];
 
-        $result = achievements::resolve($args, $this->get_execution_context());
+        $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
-        $this->assertEquals($aggregation_method, $result['aggregation']);
+        $this->assertEquals($aggregation_method, $result['aggregation_method']);
         $items = $result['items'] ?? [];
         // Make sure we get the correct amount
         $this->assertCount(3, $items);
@@ -107,23 +117,25 @@ class criteria_coursecompletion_webapi_resolver_query_achievements_testcase exte
         $this->assert_course_is_visible($data->course3->fullname, $result);
     }
 
-    public function test_aggregation_methods() {
+    public function test_required_items() {
         $this->setAdminUser();
 
         $data = $this->create_data();
 
-        $criteria = (new coursecompletion())
+        $criteria = $this->get_criterion()
+            ->set_aggregation_method(criterion::AGGREGATE_ANY_N)
             ->set_item_ids([$data->course1->id, $data->course2->id, $data->course3->id])
             ->save();
 
-        for ($method = 0; $method < 4; $method++) {
-            $criteria->set_aggregation_method($method)
+        for ($req_items = 1; $req_items < 5; $req_items++) {
+            $criteria->set_aggregation_params(['req_items' => $req_items])
                 ->save();
 
             $args = ['instance_id' => $criteria->get_id(), 'user_id' => 999];
 
-            $result = achievements::resolve($args, $this->get_execution_context());
-            $this->assertEquals($method, $result['aggregation']);
+            $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
+            $this->assertEquals(criterion::AGGREGATE_ANY_N, $result['aggregation_method']);
+            $this->assertEquals($req_items, $result['required_items']);
         }
     }
 
@@ -145,13 +157,13 @@ class criteria_coursecompletion_webapi_resolver_query_achievements_testcase exte
         $task3 = new completions_task();
         $task3->execute();
 
-        $criteria = (new coursecompletion())
+        $criteria = $this->get_criterion()
             ->set_item_ids([$data->course1->id, $data->course2->id, $data->course3->id])
             ->save();
 
         $args = ['instance_id' => $criteria->get_id(), 'user_id' => $user->id];
 
-        $result = achievements::resolve($args, $this->get_execution_context());
+        $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
         // Course 2 should come out as completed
         $this->assert_course_has_progress($data->course1->fullname, 0, $result);
         $this->assert_course_has_progress($data->course2->fullname, 100, $result);
@@ -160,7 +172,7 @@ class criteria_coursecompletion_webapi_resolver_query_achievements_testcase exte
         // Control user should not have completed the course
         $args = ['instance_id' => $criteria->get_id(), 'user_id' => $control_user->id];
 
-        $result = achievements::resolve($args, $this->get_execution_context());
+        $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
         $this->assert_course_has_progress($data->course1->fullname, 0, $result);
         $this->assert_course_has_progress($data->course2->fullname, 0, $result);
         $this->assert_course_has_progress($data->course3->fullname, 0, $result);
@@ -177,7 +189,7 @@ class criteria_coursecompletion_webapi_resolver_query_achievements_testcase exte
 
         $user = $this->getDataGenerator()->create_user();
 
-        $criteria = (new coursecompletion())
+        $criteria = $this->get_criterion()
             ->set_item_ids([$data->course1->id, $data->course2->id, $data->course3->id])
             ->save();
 
@@ -185,7 +197,7 @@ class criteria_coursecompletion_webapi_resolver_query_achievements_testcase exte
 
         $args = ['instance_id' => $criteria->get_id(), 'user_id' => $user->id];
 
-        $result = achievements::resolve($args, $this->get_execution_context());
+        $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
         // The user should only see course 1 and 3
         $this->assert_course_is_visible($data->course1->fullname, $result);
         $this->assert_course_is_visible($data->course2->fullname, $result);
@@ -196,7 +208,7 @@ class criteria_coursecompletion_webapi_resolver_query_achievements_testcase exte
 
         $args = ['instance_id' => $criteria->get_id(), 'user_id' => $user->id];
 
-        $result = achievements::resolve($args, $this->get_execution_context());
+        $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
         // The user should only see course 1 and 3
         $this->assert_course_is_visible($data->course1->fullname, $result);
         $this->assert_course_is_not_visible($data->course2->fullname, $result);
@@ -218,7 +230,7 @@ class criteria_coursecompletion_webapi_resolver_query_achievements_testcase exte
                 $checked = true;
             }
         }
-        $this->assertTrue($checked, 'Progres: Course not found!');
+        $this->assertTrue($checked, 'Progress: Course not found!');
     }
 
     /**

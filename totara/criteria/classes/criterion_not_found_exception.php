@@ -18,35 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package criteria_coursecompletion
- * @subpackage test
+ * @package totara_criteria
  */
 
-use criteria_coursecompletion\coursecompletion;
-use criteria_coursecompletion\webapi\resolver\query\achievements;
-use totara_criteria\criterion;
+namespace totara_criteria;
 
-defined('MOODLE_INTERNAL') || die();
+use moodle_exception;
 
-global $CFG;
-require_once $CFG->dirroot.'/totara/criteria/tests/course_achievements_testcase.php';
+class criterion_not_found_exception extends moodle_exception {
 
-/**
- * Tests the query to fetch data for a coursecompletion criteria
- */
-class criteria_coursecompletion_webapi_query_achievements_testcase extends totara_criteria_course_achievements_testcase {
-
-    /**
-     * @return criterion
-     */
-    public function get_criterion(): criterion {
-        return new coursecompletion();
+    public function __construct() {
+        parent::__construct('criterion_not_found', 'totara_criteria');
     }
 
-    /**
-     * @return string|\core\webapi\query_resolver
-     */
-    public function get_resolver_classname(): string {
-        return achievements::class;
-    }
 }

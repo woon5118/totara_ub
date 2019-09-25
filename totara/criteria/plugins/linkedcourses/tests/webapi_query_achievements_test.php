@@ -18,12 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package criteria_coursecompletion
+ * @package criteria_linkedcourses
  * @subpackage test
  */
 
-use criteria_coursecompletion\coursecompletion;
-use criteria_coursecompletion\webapi\resolver\query\achievements;
+use criteria_linkedcourses\linkedcourses;
+use criteria_linkedcourses\webapi\resolver\query\achievements;
 use totara_criteria\criterion;
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,15 +32,15 @@ global $CFG;
 require_once $CFG->dirroot.'/totara/criteria/tests/course_achievements_testcase.php';
 
 /**
- * Tests the query to fetch data for a coursecompletion criteria
+ * Tests the query to fetch data for a linkedcourse criteria
  */
-class criteria_coursecompletion_webapi_query_achievements_testcase extends totara_criteria_course_achievements_testcase {
+class criteria_linkedcourses_webapi_query_achievements_testcase extends totara_criteria_course_achievements_testcase {
 
     /**
      * @return criterion
      */
     public function get_criterion(): criterion {
-        return new coursecompletion();
+        return new linkedcourses();
     }
 
     /**

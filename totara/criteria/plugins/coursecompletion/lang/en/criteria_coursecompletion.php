@@ -25,10 +25,7 @@ $string['pluginname'] = 'Course completion: Flexible courses';
 
 $string['achievementvia'] = 'Course completion';
 $string['addcourses'] = "Add courses";
-$string['course_link'] = 'Go to course';
 $string['courses'] = 'Courses';
-$string['courses_required'] = '{$a} required only';
-$string['hidden_course'] = 'This course is not available to view';
 $string['selectcourses'] = "Select courses";
 
 $string['error:nocourses'] = 'No courses selected';
