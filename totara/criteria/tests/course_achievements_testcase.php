@@ -53,7 +53,9 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
     public function test_non_existing_instance() {
         $this->setAdminUser();
 
-        $args = ['instance_id' => 999, 'user_id' => 999];
+        $user = $this->getDataGenerator()->create_user();
+
+        $args = ['instance_id' => 999, 'user_id' => $user->id];
 
         $this->expectException(criterion_not_found_exception::class);
         $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
@@ -69,7 +71,7 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
             ->set_item_ids([987, $data->course2->id, 897])
             ->save();
 
-        $args = ['instance_id' => $criteria->get_id(), 'user_id' => 999];
+        $args = ['instance_id' => $criteria->get_id(), 'user_id' => $data->user->id];
 
         $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
@@ -94,7 +96,7 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
             ->set_item_ids([$data->course1->id, $data->course2->id, $data->course3->id])
             ->save();
 
-        $args = ['instance_id' => $criteria->get_id(), 'user_id' => 999];
+        $args = ['instance_id' => $criteria->get_id(), 'user_id' => $data->user->id];
 
         $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
@@ -131,7 +133,7 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
             $criteria->set_aggregation_params(['req_items' => $req_items])
                 ->save();
 
-            $args = ['instance_id' => $criteria->get_id(), 'user_id' => 999];
+            $args = ['instance_id' => $criteria->get_id(), 'user_id' => $data->user->id];
 
             $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
             $this->assertEquals(criterion::AGGREGATE_ANY_N, $result['aggregation_method']);
@@ -203,6 +205,10 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
         $this->assert_course_is_visible($data->course2->fullname, $result);
         $this->assert_course_is_visible($data->course3->fullname, $result);
 
+        // User needs to be able to access the profile
+        $user_role = $DB->get_record('role', ['shortname' => 'user'], '*', MUST_EXIST);
+        assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $user_role->id, context_system::instance()->id, true);
+
         // Now query as a normal user for whom the course 2 should not be visible
         $this->setUser($user);
 
@@ -213,6 +219,39 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
         $this->assert_course_is_visible($data->course1->fullname, $result);
         $this->assert_course_is_not_visible($data->course2->fullname, $result);
         $this->assert_course_is_visible($data->course3->fullname, $result);
+    }
+
+    public function test_profile_capability_is_checked() {
+        global $DB;
+
+        $data = $this->create_data();
+
+        $user_role = $DB->get_record('role', ['shortname' => 'user'], '*', MUST_EXIST);
+        unassign_capability('totara/competency:view_own_profile', $user_role->id, context_system::instance()->id);
+
+        // Now query as a normal user for whom the course 2 should not be visible
+        $this->setUser($data->user);
+
+        $criteria = $this->get_criterion()
+            ->set_item_ids([$data->course1->id, $data->course2->id, $data->course3->id])
+            ->save();
+
+        $args = ['instance_id' => $criteria->get_id(), 'user_id' => $data->user->id];
+
+        try {
+            $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
+            $this->fail('Expected required_capability_exception');
+        } catch (Exception $exception) {
+            $this->assertInstanceOf(required_capability_exception::class, $exception);
+        }
+
+        // User needs to be able to access the profile
+        assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $user_role->id, context_system::instance()->id, true);
+
+        $args = ['instance_id' => $criteria->get_id(), 'user_id' => $data->user->id];
+
+        $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
+        $this->assertNotEmpty($result);
     }
 
     /**
@@ -270,6 +309,7 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
             public $fw1;
             public $comp1;
             public $course1, $course2, $course3;
+            public $user;
         };
 
         /** @var totara_hierarchy_generator $hierarchy_generator */
@@ -297,6 +337,8 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
         $data->course3 = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
         $this->getDataGenerator()->create_module('forum', array('course' => $data->course3->id));
         $this->getDataGenerator()->create_module('forum', array('course' => $data->course3->id));
+
+        $data->user = $this->getDataGenerator()->create_user();
 
         return $data;
     }

@@ -25,14 +25,16 @@ namespace totara_criteria\webapi\resolver\query;
 
 use completion_completion;
 use context_course;
+use context_system;
+use context_user;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use course_in_list;
 use totara_core\formatter\field\string_field_formatter;
 use totara_core\formatter\field\text_field_formatter;
-use totara_criteria\criterion_not_found_exception;
 use totara_criteria\criterion;
+use totara_criteria\criterion_not_found_exception;
 
 /**
  * Fetches all achievements for the course related criteria types
@@ -47,13 +49,19 @@ abstract class course_achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        global $CFG;
+        global $CFG, $USER;
         require_once($CFG->dirroot . '/completion/completion_completion.php');
 
         require_login(null, false, null, false, true);
 
         $instance_id = $args['instance_id'];
         $user_id = $args['user_id'];
+
+        // Currently we only use this for competencies, if the criteria is used
+        // later in other areas like goals this need to be refactored
+        static::is_for_current_user($user_id) ?
+            require_capability('totara/competency:view_own_profile', context_system::instance()) :
+            require_capability('totara/competency:view_other_profile', context_user::instance($user_id));
 
         try {
             $criterion = static::get_criterion();
@@ -107,6 +115,11 @@ abstract class course_achievements implements query_resolver {
             'required_items' => $completion_criteria->get_aggregation_params()['req_items'] ?? 1,
             'items' => $items
         ];
+    }
+
+    public static function is_for_current_user(int $user_id): bool {
+        global $USER;
+        return $user_id > 0 ? $user_id == $USER->id : false;
     }
 
 }
