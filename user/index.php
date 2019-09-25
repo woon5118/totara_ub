@@ -402,6 +402,8 @@ $joins = array("FROM {user} u");
 $wheres = array();
 
 $userfields = array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay');
+// Totara: Participant details uses access_controller, which expects users to have a deleted property (or loads it if not).
+$userfields[] = 'deleted';
 $mainuserfields = user_picture::fields('u', $userfields);
 $extrasql = get_extra_user_fields_sql($context, 'u', '', $userfields);
 
