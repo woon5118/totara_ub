@@ -164,7 +164,6 @@ $string['deletedappraisal'] = 'Appraisal deleted';
 $string['deletedpage'] = 'Page deleted';
 $string['deletedstage'] = 'Stage deleted';
 $string['description'] = 'Description';
-$string['description_help'] = 'When a appraisal description is created the information displays after appraisal name.';
 $string['descriptionstage'] = 'Description';
 $string['descriptionstage_help'] = 'When a description is created the information displays after appraisal stage name.';
 $string['detailreport'] = 'Detail report';
@@ -532,3 +531,6 @@ $string['updatelearnerassignmentstask'] = 'Update learner assignments to apprais
 $string['xmoremissingroles'] = '{$a} more user(s) are also missing roles.';
 $string['youareprintingxsappraisal'] = '<strong>{$a->rolename}\'s version of&nbsp;<a href="{$a->site}/user/view.php?id={$a->userid}">{$a->name}\'s</a> appraisal.</strong>';
 $string['youareviewingxsappraisal'] = '<strong>You are viewing <a href="{$a->site}/user/view.php?id={$a->userid}">{$a->name}\'s</a> appraisal.</strong>';
+
+// Deprecated.
+$string['description_help'] = 'When a appraisal description is created the information displays after appraisal name.';

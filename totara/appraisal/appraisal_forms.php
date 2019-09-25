@@ -59,7 +59,6 @@ class appraisal_edit_form extends moodleform {
             $mform->addHelpButton('name', 'name', 'totara_appraisal');
 
             $mform->addElement('editor', 'description_editor', get_string('description'), null, $TEXTAREA_OPTIONS);
-            $mform->addHelpButton('description_editor', 'description', 'totara_appraisal');
 
             $submittitle = get_string('createappraisal', 'totara_appraisal');
             if ($appraisal->id > 0) {
