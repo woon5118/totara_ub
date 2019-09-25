@@ -21,7 +21,7 @@ Feature: Filter reportbuilder results by multicheck filters on sidebar
     And I log in as "admin"
     # Add multi-check custom field
     And I navigate to "Custom fields" node in "Site administration > Courses"
-    And I click on "Multi-select" "option"
+    And I set the field "Create a new custom field" to "Multi-select"
     And I set the following fields to these values:
       | Full name                   | Multi select |
       | Short name (must be unique) | multiselect  |

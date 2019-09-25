@@ -32,11 +32,11 @@ Feature: Assign a manager to a user via the job assignment page and send message
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | User One |
     And I click on "Search" "button" in the "#region-main" "css_element"
-    And I click on "User One, user1@example.com" "option"
+    And I set the field "potential users" to "User One, user1@example.com"
     And I press "Add"
     And I wait "1" seconds
     And I press "Continue"
@@ -63,14 +63,12 @@ Feature: Assign a manager to a user via the job assignment page and send message
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | User |
     And I click on "Search" "button" in the "#region-main" "css_element"
-    And I click on "User One, user1@example.com" "option"
-    And I click on "User Two, user2@example.com" "option"
+    And I set the field "potential users" to "User One, user1@example.com, User Two, user2@example.com"
     And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     And I set the Seminar signup job assignment to "JA15838 job assignment" for "User One"

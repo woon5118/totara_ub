@@ -37,10 +37,8 @@ Feature: Viewing distinct attendees
 
   Scenario: VDA: Cancellations tab
     When I set the field "Attendee actions" to "Remove users"
-    And I click on "User One, user1@example.com" "option"
-    And I click on "User Two, user2@example.com" "option"
+    And I set the field "Current attendees" to "User One, user1@example.com,User Two, user2@example.com"
     And I press "Remove"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Bulk remove users success - Successfully removed 2 attendees"

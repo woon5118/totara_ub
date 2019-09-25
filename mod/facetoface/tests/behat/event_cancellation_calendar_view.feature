@@ -31,6 +31,7 @@ Feature: Seminar event cancellation calendar views
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test Seminar |
       | Description | Test Seminar |
+    And I turn editing mode off
     And I follow "View all events"
 
     Given I follow "Add event"
@@ -67,10 +68,9 @@ Feature: Seminar event cancellation calendar views
     And I press "Save changes"
 
     Given I click on "Attendees" "link" in the "0 / 29" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I follow "View all events"

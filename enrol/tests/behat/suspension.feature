@@ -90,7 +90,7 @@ Feature: Suspend enrolled course users
     And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Set audience"
     And I follow "Edit members"
-    And I click on "Learner One (learner1@example.com)" "option" in the "#removeselect" "css_element"
+    And I set the field "Current users" to "Learner One (learner1@example.com)"
     And I click on "remove" "button"
     And I log out
 

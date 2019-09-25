@@ -19,32 +19,32 @@ Feature: Course customfields can be created and populated
 
     When I navigate to "Custom fields" node in "Site administration > Courses"
     # Checkbox.
-    And I click on "Checkbox" "option"
+    And I set the field "Create a new custom field" to "Checkbox"
     And I set the following fields to these values:
       | Full name                   | Course checkbox |
       | Short name (must be unique) | checkbox       |
     And I press "Save changes"
     # Date/time
-    And I click on "Date/time" "option"
+    And I set the field "Create a new custom field" to "Date/time"
     And I set the following fields to these values:
       | Full name                   | Course date/time |
       | Short name (must be unique) | datetime        |
       | Include time?               | 1               |
     And I press "Save changes"
     # File
-    And I click on "File" "option"
+    And I set the field "Create a new custom field" to "File"
     And I set the following fields to these values:
       | Full name                   | Course file |
       | Short name (must be unique) | file       |
     And I press "Save changes"
     # Location
-    And I click on "Location" "option"
+    And I set the field "Create a new custom field" to "Location"
     And I set the following fields to these values:
       | Full name                   | Course location |
       | Short name (must be unique) | location       |
     And I press "Save changes"
     # Menu of choices
-    And I click on "Menu of choices" "option"
+    And I set the field "Create a new custom field" to "Menu of choices"
     And I set the following fields to these values:
       | Full name                   | Course menu of choices |
       | Short name (must be unique) | menuofchoices         |
@@ -56,7 +56,7 @@ Feature: Course customfields can be created and populated
       """
     And I press "Save changes"
     # Multi-select
-    And I click on "Multi-select" "option"
+    And I set the field "Create a new custom field" to "Multi-select"
     And I set the following fields to these values:
       | Full name                   | Course multi select |
       | Short name (must be unique) | multiselect        |
@@ -65,19 +65,19 @@ Feature: Course customfields can be created and populated
       | multiselectitem[2][option]  | Tuatara            |
     And I press "Save changes"
     # Text area
-    And I click on "Text area" "option"
+    And I set the field "Create a new custom field" to "Text area"
     And I set the following fields to these values:
       | Full name                   | Course text area |
       | Short name (must be unique) | textarea        |
     And I press "Save changes"
     # Text input
-    And I click on "Text input" "option"
+    And I set the field "Create a new custom field" to "Text input"
     And I set the following fields to these values:
       | Full name                   | Course text input |
       | Short name (must be unique) | textinput        |
     And I press "Save changes"
     # URL
-    And I click on "URL" "option"
+    And I set the field "Create a new custom field" to "URL"
     And I set the following fields to these values:
       | Full name                   | Course address |
       | Short name (must be unique) | url           |

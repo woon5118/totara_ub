@@ -59,8 +59,8 @@ Feature: My Future Bookings seminar sessions report overview
     And I press "Save changes"
 
     And I click on "Attendees" "link" in the "Australia/Perth" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Alice Smith, alice.smith@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Alice Smith, alice.smith@example.com"
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"
@@ -68,8 +68,8 @@ Feature: My Future Bookings seminar sessions report overview
     And I click on "View all events" "link"
 
     And I click on "Attendees" "link" in the "Europe/Prague" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Alice Smith, alice.smith@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Alice Smith, alice.smith@example.com"
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"

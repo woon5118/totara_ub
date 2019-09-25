@@ -76,6 +76,7 @@ Feature: Manage pre-defined rooms
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
+    And I turn editing mode off
     And I follow "View all events"
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -104,14 +105,8 @@ Feature: Manage pre-defined rooms
 
     When I click on "Attendees" "link"
     And I set the field "menuf2f-actions" to "Add users"
-    And I wait "1" seconds
-    And I click on "User One, user1@example.invalid" "option"
-    And I click on "User Two, user2@example.invalid" "option"
-    And I click on "User Three, user3@example.invalid" "option"
-    And I click on "User Four, user4@example.invalid" "option"
-    And I click on "User Five, user5@example.invalid" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "potential users" to "User One, user1@example.invalid, User Two, user2@example.invalid, User Three, user3@example.invalid,User Four, user4@example.invalid,User Five, user5@example.invalid"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     Then I should see "User One"
@@ -123,10 +118,8 @@ Feature: Manage pre-defined rooms
     And I should not see "This session is overbooked"
 
     And I set the field "menuf2f-actions" to "Add users"
-    And I wait "1" seconds
-    And I click on "User Six, user6@example.invalid" "option"
+    And I set the field "potential users" to "User Six, user6@example.invalid"
     And I press exact "add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     Then I should see "User Six"

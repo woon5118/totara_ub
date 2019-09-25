@@ -57,7 +57,9 @@ text < term
     And I click on "Save changes" "button"
 
     And I set the field "addrulesetmenu" to "menu profile"
-    And I click on "A & B" "option" in the "Add rule" "totaradialogue"
+    And I set the following fields to these values:
+      | addrulesetmenu  | menu profile |
+      | id_listofvalues | A & B        |
     And I click on "Save" "button" in the "Add rule" "totaradialogue"
 
     When I press "Approve changes"

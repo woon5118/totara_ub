@@ -9,19 +9,19 @@ Feature: Administrators can manage customs field from the index page
     And I navigate to "Custom fields" node in "Site administration > Courses"
     # Course custom fields
     # Checkbox.
-    And I click on "Checkbox" "option"
+    And I set the field "Create a new custom field" to "Checkbox"
     And I set the following fields to these values:
       | Full name                   | Course checkbox |
       | Short name (must be unique) | coursecheckbox  |
     And I press "Save changes"
     # File
-    And I click on "File" "option"
+    And I set the field "Create a new custom field" to "File"
     And I set the following fields to these values:
       | Full name                   | Course file |
       | Short name (must be unique) | coursefile  |
     And I press "Save changes"
     # Text area
-    And I click on "Text area" "option"
+    And I set the field "Create a new custom field" to "Text area"
     And I set the following fields to these values:
       | Full name                   | Course text area |
       | Short name (must be unique) | coursetextarea   |
@@ -29,19 +29,19 @@ Feature: Administrators can manage customs field from the index page
     # Program custom fields
     And I switch to "Programs / Certifications" tab
     # Checkbox.
-    And I click on "Checkbox" "option"
+    And I set the field "Create a new custom field" to "Checkbox"
     And I set the following fields to these values:
       | Full name                   | Program checkbox |
       | Short name (must be unique) | programcheckbox |
     And I press "Save changes"
     # File
-    And I click on "File" "option"
+    And I set the field "Create a new custom field" to "File"
     And I set the following fields to these values:
       | Full name                   | Program file |
       | Short name (must be unique) | programfile |
     And I press "Save changes"
     # Text area
-    And I click on "Text area" "option"
+    And I set the field "Create a new custom field" to "Text area"
     And I set the following fields to these values:
       | Full name                   | Program text area |
       | Short name (must be unique) | programtextarea  |

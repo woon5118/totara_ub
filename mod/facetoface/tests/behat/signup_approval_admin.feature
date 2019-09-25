@@ -204,10 +204,8 @@ Feature: Seminar Signup Admin Approval
     And I follow "Classroom Connect Activity"
     # Add users
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sammy Sam, sammy@example.com" "option"
-    And I click on "Timmy Tim, timmy@example.com" "option"
-    And I click on "Jimmy Jim, jimmy@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sammy Sam, sammy@example.com,Timmy Tim, timmy@example.com,Jimmy Jim, jimmy@example.com"
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"
@@ -278,8 +276,8 @@ Feature: Seminar Signup Admin Approval
     And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sammy Sam, sammy@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sammy Sam, sammy@example.com"
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"
@@ -313,15 +311,15 @@ Feature: Seminar Signup Admin Approval
 
     # Now remove this user and re-approve
     # Only 1 row should be shown for this user
-    When I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sammy Sam, sammy@example.com" "option"
+    And I set the field "Attendee actions" to "Remove users"
+    And I set the field "Current attendees" to "Sammy Sam, sammy@example.com"
     And I press "Remove"
     And I press "Continue"
     And I press "Confirm"
     Then I should not see "Sammy Sam"
 
-    When I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sammy Sam, sammy@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sammy Sam, sammy@example.com"
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"

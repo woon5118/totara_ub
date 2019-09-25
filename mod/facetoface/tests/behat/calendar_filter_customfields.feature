@@ -123,20 +123,7 @@ Feature: Filter seminar events in calendar by their customfields
 
     # Enable filtering by customfields, not using values (as they depend on id)
     And I navigate to "Global settings" node in "Site administration > Seminars"
-    And I click on "Event: Checkbox" "option"
-    And I click on "Event: Date time" "option"
-    And I click on "Event: Location" "option"
-    And I click on "Event: Menu of choices" "option"
-    And I click on "Event: Multi-select" "option"
-    And I click on "Event: Text input" "option"
-    And I click on "Event: Text area" "option"
-    And I click on "Room: Checkbox" "option"
-    And I click on "Room: Date time" "option"
-    And I click on "Room: Location" "option"
-    And I click on "Room: Menu of choices" "option"
-    And I click on "Room: Multi-select" "option"
-    And I click on "Room: Building" "option"
-    And I click on "Room: Text area" "option"
+    And I set the field "Add calendar filters" to "Event: Checkbox,Event: Date time,Event: Location,Event: Menu of choices,Event: Multi-select,Event: Text input,Event: Text area,Room: Checkbox,Room: Date time,Room: Location,Room: Menu of choices,Room: Multi-select,Room: Building,Room: Text area"
     And I press "Save changes"
 
     # Create rooms

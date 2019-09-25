@@ -42,15 +42,12 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | capacity           | 5    |
     And I press "Save changes"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |
     And I click on "Search" "button" in the "#region-main" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam1 Student1"
@@ -62,6 +59,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
+    And I turn editing mode off
     And I follow "Test seminar2"
     And I follow "Add event"
     And I click on "Delete" "link"
@@ -69,17 +67,12 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | capacity                  | 5   |
     And I press "Save changes"
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |
     And I click on "Search" "button" in the "#region-main" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press exact "add"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press exact "add"
-    And I click on "Sam3 Student3, student3@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I follow "Wait-list"
@@ -117,6 +110,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
+    And I turn editing mode off
     And I follow "Test seminar2"
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -136,17 +130,12 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | capacity                  | 5   |
     And I press "Save changes"
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |
     And I click on "Search" "button" in the "#region-main" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press exact "add"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press exact "add"
-    And I click on "Sam3 Student3, student3@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam1 Student1"
@@ -182,6 +171,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
+    And I turn editing mode off
     And I follow "Test seminar2"
     When I follow "Add event"
     And I click on "Edit session" "link"
@@ -209,6 +199,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar2             |
       | Description | Test seminar2 description |
+    And I turn editing mode off
     And I follow "Test seminar2"
     And I follow "Add event"
     And I click on "Delete" "link"

@@ -29,6 +29,7 @@ Feature: Download a seminar signin sheet
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
+    And I turn editing mode off
     And I follow "Test seminar name"
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -47,11 +48,9 @@ Feature: Download a seminar signin sheet
     And I press "Save changes"
     And I click on the link "Attendees" in row 1
     And I should not see "Download sign-in sheet"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I set the field "sessiondateid" to "10 February 2030, 11:00 AM Australia/Perth"
@@ -70,6 +69,7 @@ Feature: Download a seminar signin sheet
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
+    And I turn editing mode off
     And I follow "Test seminar name"
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -104,11 +104,9 @@ Feature: Download a seminar signin sheet
     And I press "Save changes"
     And I click on the link "Attendees" in row 1
     And I should not see "Download sign-in sheet"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I set the field "sessiondateid" to "9 February 2030, 11:00 AM Australia/Perth"
@@ -127,6 +125,7 @@ Feature: Download a seminar signin sheet
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
+    And I turn editing mode off
     And I follow "Test seminar name"
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -161,11 +160,9 @@ Feature: Download a seminar signin sheet
     And I press "Save changes"
     And I click on the link "Attendees" in row 1
     And I should not see "Download sign-in sheet"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I set the field "sessiondateid" to "10 February 2030, 11:00 AM Australia/Perth"
@@ -184,17 +181,16 @@ Feature: Download a seminar signin sheet
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
+    And I turn editing mode off
     And I follow "Test seminar name"
     And I follow "Add event"
     And I click on "Delete" "link" in the "Select room" "table_row"
     And I press "Save changes"
     And I click on the link "Attendees" in row 1
     And I should not see "Download sign-in sheet"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
     When I press "Confirm"
     Then I should not see "Download sign-in sheet"

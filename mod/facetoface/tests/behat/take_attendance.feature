@@ -34,6 +34,7 @@ Feature: Take attendance for seminar sessions
       | Description | Test seminar description |
       | Completion tracking           | Show activity as complete when conditions are met |
       | completionstatusrequired[100] | 1                                                 |
+    And I turn editing mode off
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the following fields to these values:
@@ -57,20 +58,9 @@ Feature: Take attendance for seminar sessions
     And I press "OK"
     And I press "Save changes"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Sam3 Student3, student3@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Sam4 Student4, student4@example.com" "option"
-    And I press exact "add"
-    # We must wait here, because the refresh may not happen before the save button is clicked otherwise.
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com, Sam4 Student4, student4@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam1 Student1"
@@ -110,7 +100,7 @@ Feature: Take attendance for seminar sessions
     And I click on "Take attendance" "link"
     And I click on "Select Sam1 Student1" "checkbox"
     And I click on "Select Sam2 Student2" "checkbox"
-    And I click on "Fully attended" "option" in the "#menubulkattendanceop" "css_element"
+    And I set the field "and mark as" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     When I navigate to "Course completion" node in "Course administration > Reports"

@@ -45,7 +45,7 @@ Feature: Yet another manual user data purging
     And I navigate to "Completion editor" node in "Course administration"
     And I click on "Edit course completion" "link" in the "One Uno" "table_row"
     And I switch to "Current completion" tab
-    And I click on "Complete" "option"
+    And I set the "Course completion status" Totara form field to "Complete"
     And I wait "2" seconds
     And I set the field "Time completed" to "2019-03-27 00:00"
     And I click on "Done" "button" in the ".ui-datepicker" "css_element"
@@ -62,7 +62,7 @@ Feature: Yet another manual user data purging
     And I should see "One Uno" in the "#certification_membership" "css_element"
 
     And I click on "Edit completion records" "link" in the "One Uno" "table_row"
-    And I click on "Certified, before window opens" "option"
+    And I set the field "Certification completion state" to "Certified, before window opens"
     When I click on "Save changes" "button"
     And I click on "Save changes" "button"
     Then I should see "Completion changes have been saved"
@@ -106,7 +106,7 @@ Feature: Yet another manual user data purging
     And I should see "None" in the "Pending purges" "definition_exact"
 
     And I click on "Select purge type" "button"
-    And I click on "Tahitahi" "option"
+    And I set the field "Purge type" to "Tahitahi"
     And I click on "Purge user data" "button"
     When I click on "Proceed with purge" "button"
     Then I should see "An ad hoc task for manual user data purging was created. You will receive a notification once it has completed successfully."

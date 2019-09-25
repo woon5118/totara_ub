@@ -53,7 +53,7 @@ Feature: Create a large appraisal
     And I create "50" appraisal questions on the page "Page 6"
     And I click on "Appraisal 1" "link" in the ".appraisallist" "css_element"
     And I click on "Assignments" "link"
-    And I click on "Audience" "option" in the "#menugroupselector" "css_element"
+    And I set the field "menugroupselector" to "Audience"
     And I click on "Audience 1 (A1)" "link" in the "assigngrouptreeviewdialog" "totaradialogue"
     And I click on "Save" "button" in the "assigngrouptreeviewdialog" "totaradialogue"
     And I click on "Activate now" "link"

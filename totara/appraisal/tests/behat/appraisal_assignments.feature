@@ -1052,7 +1052,7 @@ Feature: Test reported learners in appraisal assignments
     When I navigate to "Audiences" node in "Site administration > Audiences"
     And I click on "Set 2" "link"
     And I click on "Edit members" "link"
-    And I click on "Manager Two (mtwo@example.com)" "option" in the "#removeselect" "css_element"
+    And I set the field "Current users" to "Manager Two (mtwo@example.com)"
     And I click on "remove" "button"
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"

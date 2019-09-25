@@ -26,7 +26,7 @@ Feature: Glossary entries can be organised in categories
 # Log in as admin and enable autolinking filter
     And I log in as "admin"
     And I navigate to "Plugins > Filters > Manage filters" in site administration
-    And I click on "On" "option" in the "Glossary auto-linking" "table_row"
+    And I set the field with xpath "//table//tr[contains(.,'Glossary auto-linking')]//*[@name='newstate']" to "On"
     And I log out
 # Log in as a teacher and make sure nothing is yet autolinked
     And I log in as "teacher1"
@@ -89,7 +89,7 @@ Feature: Glossary entries can be organised in categories
     And "//h4[contains(.,'EntryCategoryNL')]" "xpath_element" should appear after "//h3[contains(.,'CATEGORYNOLINKS')]" "xpath_element"
     And I should not see "EntryNoCategory"
     And I set the field "hook" to "Not categorised"
-    And I click on "Not categorised" "option" in the "#catmenu select" "css_element"
+    And I set the field "Categories" to "Not categorised"
     And I should see "EntryNoCategory"
     And I should not see "EntryCategoryNL"
     And I should not see "EntryCategoryAL"
@@ -116,7 +116,7 @@ Feature: Glossary entries can be organised in categories
     And I should not see "EntryNoCategory"
     And I should not see "EntryCategoryAL"
     And I should see "EntryCategoryBoth"
-    And I click on "Not categorised" "option" in the "#catmenu select" "css_element"
+    And I set the field "Categories" to "Not categorised"
     And I should see "EntryNoCategory"
     And I should see "EntryCategoryAL"
     And I should not see "EntryCategoryBoth"

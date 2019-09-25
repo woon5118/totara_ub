@@ -64,11 +64,11 @@ Feature: Check My bookings displays the right information for future and past ev
     And I wait "1" seconds
     And I click on "Save changes" "button"
     And I click on "Attendees" "link" in the "Session in progress" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam2 Student2 |
     And I click on "Search" "button" in the "#region-main" "css_element"
-    And I click on "Sam2 Student2, student2@example.com" "option"
+    And I set the field "potential users" to "Sam2 Student2, student2@example.com"
     And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
@@ -100,8 +100,8 @@ Feature: Check My bookings displays the right information for future and past ev
     And I wait "1" seconds
     And I click on "Save changes" "button"
     And I click on "Attendees" "link" in the "Session over" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam2 Student2, student2@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam2 Student2, student2@example.com"
     And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
@@ -196,10 +196,9 @@ Feature: Check My bookings displays the right information for future and past ev
     And I am on "Course 1" course homepage
     And I click on "seminar2" "link"
     And I click on "Attendees" "link" in the "Session over" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press exact "add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     And I log out

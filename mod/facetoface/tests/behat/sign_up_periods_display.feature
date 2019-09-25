@@ -83,7 +83,7 @@ Feature: Seminar sign-up periods display
     And I press "Save changes"
     And I click on "Attendees" "link"
     And I set the field "f2f-actions" to "Add users"
-    And I click on "student@example.com" "option"
+    And I set the field "potential users" to "student@example.com"
     And I press exact "add"
     And I click on "Continue" "button"
     And I click on "Confirm" "button"

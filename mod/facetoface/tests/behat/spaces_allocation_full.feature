@@ -46,8 +46,8 @@ Feature: Allocate spaces in full events
       | capacity           | 1    |
     And I press "Save changes"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I click on "Add" "button" in the ".mod_facetoface-addremove" "css_element"
     And I wait "1" seconds
     And I press "Continue"
@@ -59,7 +59,7 @@ Feature: Allocate spaces in full events
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
-    And I click on "Sam2 Student2" "option"
+    And I set the field "Potential allocations" to "Sam2 Student2"
     When I press "Add"
     Then I should see "This event is now full. You will need to pick another time or talk to the instructor."
     And I should see "Booking full"
@@ -85,7 +85,7 @@ Feature: Allocate spaces in full events
     And I log in as "manager1"
     And I am on "Course 1" course homepage
     And I click on the link "Allocate spaces for team" in row 1
-    And I click on "Sam2 Student2" "option"
+    And I set the field "Potential allocations" to "Sam2 Student2"
     When I press "Add"
     Then I should not see "This event is now full. You will need to pick another time or talk to the instructor."
     And I should see "Booking full"
@@ -101,7 +101,7 @@ Feature: Allocate spaces in full events
     And I should see "Sam2 Student2"
 
     # Confirm to overbook
-    And I click on "All" "option" in the "#menuf2f-select" "css_element"
+    And I set the field "f2f-select" to "All"
     When I select "Confirm" from the "Attendee actions" singleselect
     And I press "Yes"
     Then I should not see "Sam2 Student2"

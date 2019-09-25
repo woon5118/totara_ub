@@ -146,12 +146,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "Fully attended" "option" in the "One Uno" "table_row"
-    And I click on "Fully attended" "option" in the "Two Duex" "table_row"
-    And I click on "Partially attended" "option" in the "Three Toru" "table_row"
-    And I click on "No show" "option" in the "Four Wha" "table_row"
-    And I click on "Not set" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "Fully attended"
+    And I set the field "Two Duex's attendance" to "Fully attended"
+    And I set the field "Three Toru's attendance" to "Partially attended"
+    And I set the field "Four Wha's attendance" to "No show"
+    And I set the field "Five Cinq's attendance" to "Not set"
 
     And I set the field "One Uno's event grade" to ""
     And I set the field "Two Duex's event grade" to "0"
@@ -223,12 +222,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "Fully attended" "option" in the "One Uno" "table_row"
-    And I click on "Fully attended" "option" in the "Two Duex" "table_row"
-    And I click on "Partially attended" "option" in the "Three Toru" "table_row"
-    And I click on "No show" "option" in the "Four Wha" "table_row"
-    And I click on "Not set" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "Fully attended"
+    And I set the field "Two Duex's attendance" to "Fully attended"
+    And I set the field "Three Toru's attendance" to "Partially attended"
+    And I set the field "Four Wha's attendance" to "No show"
+    And I set the field "Five Cinq's attendance" to "Not set"
 
     And I set the field "One Uno's event grade" to ""
     And I set the field "Two Duex's event grade" to "0"
@@ -300,12 +298,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "Not set" "option" in the "One Uno" "table_row"
-    And I click on "No show" "option" in the "Two Duex" "table_row"
-    And I click on "Unable to attend" "option" in the "Three Toru" "table_row"
-    And I click on "Partially attended" "option" in the "Four Wha" "table_row"
-    And I click on "Fully attended" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "Not set"
+    And I set the field "Two Duex's attendance" to "No show"
+    And I set the field "Three Toru's attendance" to "Unable to attend"
+    And I set the field "Four Wha's attendance" to "Partially attended"
+    And I set the field "Five Cinq's attendance" to "Fully attended"
 
     When I click on "Save attendance" "button"
     Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"
@@ -326,12 +323,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "No show" "option" in the "One Uno" "table_row"
-    And I click on "Not set" "option" in the "Two Duex" "table_row"
-    And I click on "Not set" "option" in the "Three Toru" "table_row"
-    And I click on "Not set" "option" in the "Four Wha" "table_row"
-    And I click on "Not set" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "No show"
+    And I set the field "Two Duex's attendance" to "Not set"
+    And I set the field "Three Toru's attendance" to "Not set"
+    And I set the field "Four Wha's attendance" to "Not set"
+    And I set the field "Five Cinq's attendance" to "Not set"
 
     When I click on "Save attendance" "button"
     Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"
@@ -373,12 +369,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "Not set" "option" in the "One Uno" "table_row"
-    And I click on "No show" "option" in the "Two Duex" "table_row"
-    And I click on "Unable to attend" "option" in the "Three Toru" "table_row"
-    And I click on "Partially attended" "option" in the "Four Wha" "table_row"
-    And I click on "Fully attended" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "Not set"
+    And I set the field "Two Duex's attendance" to "No show"
+    And I set the field "Three Toru's attendance" to "Unable to attend"
+    And I set the field "Four Wha's attendance" to "Partially attended"
+    And I set the field "Five Cinq's attendance" to "Fully attended"
 
     When I click on "Save attendance" "button"
     Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"
@@ -399,12 +394,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "No show" "option" in the "One Uno" "table_row"
-    And I click on "Not set" "option" in the "Two Duex" "table_row"
-    And I click on "Not set" "option" in the "Three Toru" "table_row"
-    And I click on "Not set" "option" in the "Four Wha" "table_row"
-    And I click on "Not set" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "No show"
+    And I set the field "Two Duex's attendance" to "Not set"
+    And I set the field "Three Toru's attendance" to "Not set"
+    And I set the field "Four Wha's attendance" to "Not set"
+    And I set the field "Five Cinq's attendance" to "Not set"
 
     When I click on "Save attendance" "button"
     Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"
@@ -448,12 +442,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "Fully attended" "option" in the "One Uno" "table_row"
-    And I click on "Fully attended" "option" in the "Two Duex" "table_row"
-    And I click on "Partially attended" "option" in the "Three Toru" "table_row"
-    And I click on "No show" "option" in the "Four Wha" "table_row"
-    And I click on "Not set" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "Fully attended"
+    And I set the field "Two Duex's attendance" to "Fully attended"
+    And I set the field "Three Toru's attendance" to "Partially attended"
+    And I set the field "Four Wha's attendance" to "No show"
+    And I set the field "Five Cinq's attendance" to "Not set"
 
     And I set the field "One Uno's event grade" to ""
     And I set the field "Two Duex's event grade" to "0"
@@ -525,12 +518,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "Fully attended" "option" in the "One Uno" "table_row"
-    And I click on "Fully attended" "option" in the "Two Duex" "table_row"
-    And I click on "Partially attended" "option" in the "Three Toru" "table_row"
-    And I click on "No show" "option" in the "Four Wha" "table_row"
-    And I click on "Not set" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "Fully attended"
+    And I set the field "Two Duex's attendance" to "Fully attended"
+    And I set the field "Three Toru's attendance" to "Partially attended"
+    And I set the field "Four Wha's attendance" to "No show"
+    And I set the field "Five Cinq's attendance" to "Not set"
 
     And I set the field "One Uno's event grade" to ""
     And I set the field "Two Duex's event grade" to "0"
@@ -602,12 +594,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "Not set" "option" in the "One Uno" "table_row"
-    And I click on "No show" "option" in the "Two Duex" "table_row"
-    And I click on "Unable to attend" "option" in the "Three Toru" "table_row"
-    And I click on "Partially attended" "option" in the "Four Wha" "table_row"
-    And I click on "Fully attended" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "Not set"
+    And I set the field "Two Duex's attendance" to "No show"
+    And I set the field "Three Toru's attendance" to "Unable to attend"
+    And I set the field "Four Wha's attendance" to "Partially attended"
+    And I set the field "Five Cinq's attendance" to "Fully attended"
 
     When I click on "Save attendance" "button"
     Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"
@@ -628,12 +619,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "Partially attended" "option" in the "One Uno" "table_row"
-    And I click on "Not set" "option" in the "Two Duex" "table_row"
-    And I click on "Not set" "option" in the "Three Toru" "table_row"
-    And I click on "No show" "option" in the "Four Wha" "table_row"
-    And I click on "Not set" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "Partially attended"
+    And I set the field "Two Duex's attendance" to "Not set"
+    And I set the field "Three Toru's attendance" to "Not set"
+    And I set the field "Four Wha's attendance" to "No show"
+    And I set the field "Five Cinq's attendance" to "Not set"
 
     When I click on "Save attendance" "button"
     Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"
@@ -675,12 +665,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "Not set" "option" in the "One Uno" "table_row"
-    And I click on "No show" "option" in the "Two Duex" "table_row"
-    And I click on "Unable to attend" "option" in the "Three Toru" "table_row"
-    And I click on "Partially attended" "option" in the "Four Wha" "table_row"
-    And I click on "Fully attended" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "Not set"
+    And I set the field "Two Duex's attendance" to "No show"
+    And I set the field "Three Toru's attendance" to "Unable to attend"
+    And I set the field "Four Wha's attendance" to "Partially attended"
+    And I set the field "Five Cinq's attendance" to "Fully attended"
 
     When I click on "Save attendance" "button"
     Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"
@@ -701,12 +690,11 @@ Feature: Seminar activity completion with passing grade
     And I follow "Attendee"
     And I follow "Take attendance"
 
-    # TODO: TL-20512: replace with `And I set the field "One Uno's attendance" to "Fully attended"`
-    And I click on "Partially attended" "option" in the "One Uno" "table_row"
-    And I click on "Not set" "option" in the "Two Duex" "table_row"
-    And I click on "Not set" "option" in the "Three Toru" "table_row"
-    And I click on "Not set" "option" in the "Four Wha" "table_row"
-    And I click on "No show" "option" in the "Five Cinq" "table_row"
+    And I set the field "One Uno's attendance" to "Partially attended"
+    And I set the field "Two Duex's attendance" to "Not set"
+    And I set the field "Three Toru's attendance" to "Not set"
+    And I set the field "Four Wha's attendance" to "Not set"
+    And I set the field "Five Cinq's attendance" to "No show"
 
     When I click on "Save attendance" "button"
     Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"

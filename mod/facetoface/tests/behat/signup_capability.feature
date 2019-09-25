@@ -28,6 +28,7 @@ Feature: Add seminar attendees without signup capability
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
+    And I turn editing mode off
     And I follow "View all events"
     And I follow "Add event"
     And I press "Save changes"
@@ -46,8 +47,7 @@ Feature: Add seminar attendees without signup capability
     And I follow "Test seminar name"
     And I follow "Attendees"
     And I set the field "menuf2f-actions" to "Add users"
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I click on "Sam2 Student2, student2@example.com" "option"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"
     And I press "Continue"
     When I press "Confirm"

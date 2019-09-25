@@ -171,10 +171,8 @@ Feature: Seminar sessions report overview
       | discountcost         | 2.10              |
     And I press "Save changes"
     And I click on the link "Attendees" in row 1
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press exact "add"
-    And I click on "Sam2 Student2, student2@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
@@ -202,8 +200,8 @@ Feature: Seminar sessions report overview
       | discountcost          | 1.50 |
     And I press "Save changes"
     And I click on the link "Attendees" in row 1
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam3 Student3, student3@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam3 Student3, student3@example.com"
     And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
@@ -238,8 +236,8 @@ Feature: Seminar sessions report overview
     And I click on "Sam5 Student5" "checkbox"
     And I press "Save changes"
     And I follow "Attendees"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam6 Student6, student6@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam6 Student6, student6@example.com"
     And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"
@@ -271,8 +269,8 @@ Feature: Seminar sessions report overview
       | normalcost         | 5.55          |
     And I press "Save changes"
     And I follow "Attendees"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam7 Student7, student7@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam7 Student7, student7@example.com"
     And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"

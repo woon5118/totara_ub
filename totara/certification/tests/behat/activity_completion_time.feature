@@ -72,7 +72,7 @@ Feature: Certification completion date is based on course completion time
     And I press "Save changes"
     And I click on "Attendees" "link"
     And I set the field "Attendee actions" to "Add users"
-    And I click on "Learner One, learner1@example.com" "option"
+    And I set the field "potential users" to "Learner One, learner1@example.com"
     And I press exact "add"
     And I wait "1" seconds
     And I press "Continue"

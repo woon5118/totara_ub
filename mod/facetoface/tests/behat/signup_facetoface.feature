@@ -509,12 +509,8 @@ Feature: Sign up to a seminar
     And I follow "Test seminar name"
     And I follow "Attendees"
     And I set the field "menuf2f-actions" to "Add users"
-    And I wait "1" seconds
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I click on "Sam3 Student3, student3@example.com" "option"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
     And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I set the following fields to these values:
       | Signup input | Apples |
@@ -524,12 +520,8 @@ Feature: Sign up to a seminar
     And I should see "Sam3 Student3" in the "#facetoface_sessions" "css_element"
 
     When I set the field "menuf2f-actions" to "Remove users"
-    And I wait "1" seconds
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I click on "Sam3 Student3, student3@example.com" "option"
+    And I set the field "Current attendees" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
     And I press "Remove"
-    And I wait "1" seconds
     And I press "Continue"
     And I set the following fields to these values:
       | User cancellation input | Three |

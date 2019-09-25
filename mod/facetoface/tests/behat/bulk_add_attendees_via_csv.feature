@@ -26,7 +26,7 @@ Feature: Add seminar attendees in bulk via csv file
 
   Scenario: Upload csv file using 'Automatic' csv delimiter option
     Given I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     And I press "Continue"
@@ -36,7 +36,7 @@ Feature: Add seminar attendees in bulk via csv file
 
   Scenario: Upload csv file using 'Comma' csv delimiter option
     Given I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Comma (,)"
     And I press "Continue"
@@ -46,7 +46,7 @@ Feature: Add seminar attendees in bulk via csv file
 
   Scenario: Upload csv file using 'Semi-colon' csv delimiter option
     Given I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_semicolon.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Semi-colon (;)"
     And I press "Continue"
@@ -56,7 +56,7 @@ Feature: Add seminar attendees in bulk via csv file
 
   Scenario: Upload csv file using 'Colon' csv delimiter option
     Given I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_colon.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Colon (:)"
     And I press "Continue"
@@ -66,7 +66,7 @@ Feature: Add seminar attendees in bulk via csv file
 
   Scenario: Upload csv file using 'Tab' csv delimiter option
     Given I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_tab.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Tab (\t)"
     And I press "Continue"
@@ -76,7 +76,7 @@ Feature: Add seminar attendees in bulk via csv file
 
   Scenario: Upload csv file using 'Pipe' csv delimiter, which is not supported
     Given I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_pipe.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     When I press "Continue"
@@ -84,7 +84,7 @@ Feature: Add seminar attendees in bulk via csv file
 
   Scenario: Upload csv file using 'Automatic' delimiter option with email address and no required custom fields
     Given I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_email_no_customfields.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     And I press "Continue"
@@ -94,7 +94,7 @@ Feature: Add seminar attendees in bulk via csv file
 
   Scenario: Upload csv file using 'Automatic' delimiter option with username and no required custom fields
     Given I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_username_no_customfields.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     And I press "Continue"
@@ -104,7 +104,7 @@ Feature: Add seminar attendees in bulk via csv file
 
   Scenario: Upload csv file using 'Automatic' delimiter option with idnumber and no required custom fields
     Given I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_idnumber_no_customfields.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     And I press "Continue"

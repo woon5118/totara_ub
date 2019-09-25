@@ -30,7 +30,7 @@ Feature: Test the cohort association visibility report source.
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Program #1" "table_row"
     And I switch to "Details" tab
-    And I click on "Enrolled users and members of the selected audiences" "option" in the "#id_audiencevisible" "css_element"
+    And I set the field "Visibility" to "Enrolled users and members of the selected audiences"
     And I click on "Add visible audiences" "button"
     And I click on "Audience #1" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
     And I click on "Audience #2" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
@@ -42,7 +42,7 @@ Feature: Test the cohort association visibility report source.
     And I follow "Miscellaneous"
     And I click on "Settings" "link" in the "Cert #1" "table_row"
     And I switch to "Details" tab
-    And I click on "Enrolled users and members of the selected audiences" "option" in the "#id_audiencevisible" "css_element"
+    And I set the field "Visibility" to "Enrolled users and members of the selected audiences"
     And I click on "Add visible audiences" "button"
     And I click on "Audience #1" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
     And I click on "Audience #2" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
@@ -52,7 +52,7 @@ Feature: Test the cohort association visibility report source.
 
     Given I am on "Course #1" course homepage
     And I navigate to "Edit settings" node in "Course administration"
-    And I click on "Enrolled users and members of the selected audiences" "option" in the "#id_audiencevisible" "css_element"
+    And I set the field "Visibility" to "Enrolled users and members of the selected audiences"
     And I click on "Add visible audiences" "button"
     And I click on "Audience #1" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
     And I click on "OK" "button" in the "course-cohorts-visible-dialog" "totaradialogue"

@@ -50,7 +50,7 @@ Feature: The current course completion record can be edited
     And "RPL Grade" "field" should not exist
 
     # Cancel editing current completion..
-    When I click on "Complete via rpl" "option" in the "#tfiid_status_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Course completion status" Totara form field to "Complete via rpl"
     And I set the following Totara form fields to these values:
       | Time started   | 2011-02-03 04:56                 |
       | Time completed | 2027-07-08 16:34                 |
@@ -65,7 +65,7 @@ Feature: The current course completion record can be edited
     And "RPL Grade" "field" should not exist
 
     # Save "Complete via rpl" (sets data in all fields).
-    When I click on "Complete via rpl" "option" in the "#tfiid_status_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Course completion status" Totara form field to "Complete via rpl"
     And I set the following Totara form fields to these values:
       | Time started   | 2011-02-03 04:56                 |
       | Time completed | 2027-07-08 16:34                 |
@@ -95,7 +95,7 @@ Feature: The current course completion record can be edited
     And the field "RPL Grade (%)" matches value "12.3"
 
     # Save "Complete" (removes the two RPL fields).
-    When I click on "Complete" "option" in the "#tfiid_status_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Course completion status" Totara form field to "Complete"
     And I set the following Totara form fields to these values:
       | Time started   |                  |
       | Time completed | 2022-01-02 01:23 |
@@ -119,7 +119,7 @@ Feature: The current course completion record can be edited
     And "RPL Grade (%)" "field" should not exist
 
     # Save "In progress" (removes the time completed field).
-    When I click on "In progress" "option" in the "#tfiid_status_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Course completion status" Totara form field to "In progress"
     And I set the following Totara form fields to these values:
       | Time started | 2012-05-06 07:19 |
     And I press "Save changes"
@@ -141,7 +141,7 @@ Feature: The current course completion record can be edited
     And "RPL Grade (%)" "field" should not exist
 
     # Save "Not yet started" (removes the time started field).
-    When I click on "Not yet started" "option" in the "#tfiid_status_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Course completion status" Totara form field to "Not yet started"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
     When I click on "Yes" "button"

@@ -54,7 +54,7 @@ Feature: Users completion of courses
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I click on "Choice - Activity Three" "checkbox"
-    And I click on "Miscellaneous / Course 1" "option" in the "#id_criteria_course_value" "css_element"
+    And I set the field "Courses available" to "Miscellaneous / Course 1"
     And I press "Save changes"
     And I log out
 

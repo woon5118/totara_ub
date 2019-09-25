@@ -114,13 +114,9 @@ Feature: Seminar event cancellation status
     Given I log in as "manager1"
     And I am on "Course 1" course homepage
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner Three, learner3@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner Three, learner3@example.com,Learner Four, learner4@example.com"
     And I press "Add"
-    And I wait "1" seconds
-    And I click on "Learner Four, learner4@example.com" "option"
-    And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
 
@@ -221,15 +217,10 @@ Feature: Seminar event cancellation status
     Given I log in as "manager1"
     And I am on "Course 1" course homepage
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Five, learner5@example.com"
     And I press "Add"
-    And I wait "1" seconds
-    And I click on "Learner Five, learner5@example.com" "option"
-    And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
-    And I wait "1" seconds
     And I press "Confirm"
     Then I should see "Learner One" in the "#facetoface_sessions" "css_element"
     And I should see "Learner Three" in the "#facetoface_sessions" "css_element"

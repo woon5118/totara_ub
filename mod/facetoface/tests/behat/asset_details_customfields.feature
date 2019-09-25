@@ -21,32 +21,32 @@ Feature: Check asset details with all possible custom fields
     When I navigate to "Custom fields" node in "Site administration > Seminars"
     And I click on "Asset" "link"
 
-    And I click on "Checkbox" "option"
+    And I set the field "Create a new custom field" to "Checkbox"
     And I set the following fields to these values:
       | Full name                   | Asset checkbox |
       | Short name (must be unique) | checkbox       |
     And I press "Save changes"
 
-    And I click on "Date/time" "option"
+    And I set the field "Create a new custom field" to "Date/time"
     And I set the following fields to these values:
       | Full name                   | Asset date/time |
       | Short name (must be unique) | datetime        |
       | Include time?               | 1               |
     And I press "Save changes"
 
-    And I click on "File" "option"
+    And I set the field "Create a new custom field" to "File"
     And I set the following fields to these values:
       | Full name                   | Asset file |
       | Short name (must be unique) | file       |
     And I press "Save changes"
 
-    And I click on "Location" "option"
+    And I set the field "Create a new custom field" to "Location"
     And I set the following fields to these values:
       | Full name                   | Asset location |
       | Short name (must be unique) | location       |
     And I press "Save changes"
 
-    And I click on "Menu of choices" "option"
+    And I set the field "Create a new custom field" to "Menu of choices"
     And I set the following fields to these values:
       | Full name                   | Asset menu of choices |
       | Short name (must be unique) | menuofchoices         |
@@ -58,7 +58,7 @@ Feature: Check asset details with all possible custom fields
       """
     And I press "Save changes"
 
-    And I click on "Multi-select" "option"
+    And I set the field "Create a new custom field" to "Multi-select"
     And I set the following fields to these values:
       | Full name                   | Asset multi select |
       | Short name (must be unique) | multiselect        |
@@ -67,19 +67,19 @@ Feature: Check asset details with all possible custom fields
       | multiselectitem[2][option]  | Tuatara            |
     And I press "Save changes"
 
-    And I click on "Text area" "option"
+    And I set the field "Create a new custom field" to "Text area"
     And I set the following fields to these values:
       | Full name                   | Asset text area |
       | Short name (must be unique) | textarea        |
     And I press "Save changes"
 
-    And I click on "Text input" "option"
+    And I set the field "Create a new custom field" to "Text input"
     And I set the following fields to these values:
       | Full name                   | Asset text input |
       | Short name (must be unique) | textinput        |
     And I press "Save changes"
 
-    And I click on "URL" "option"
+    And I set the field "Create a new custom field" to "URL"
     And I set the following fields to these values:
       | Full name                   | Asset address |
       | Short name (must be unique) | url           |

@@ -138,10 +138,10 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete older session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "earlier session" "option"
+    And I set the field "Room:" to "earlier session"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "first1 last1, user1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
@@ -169,10 +169,10 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "later session" "option"
+    And I set the field "Room:" to "later session"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "first1 last1, user1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
@@ -202,10 +202,10 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete newer session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "later session" "option"
+    And I set the field "Room:" to "later session"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "first1 last1, user1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
@@ -236,10 +236,10 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "earlier session" "option"
+    And I set the field "Room:" to "earlier session"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "first1 last1, user1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
@@ -268,10 +268,10 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete newer session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "later session" "option"
+    And I set the field "Room:" to "later session"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "first1 last1, user1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
@@ -293,10 +293,10 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "earlier session" "option"
+    And I set the field "Room:" to "earlier session"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "first1 last1, user1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
@@ -339,10 +339,10 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete older session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "earlier session" "option"
+    And I set the field "Room:" to "earlier session"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "first1 last1, user1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
@@ -364,10 +364,10 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "later session" "option"
+    And I set the field "Room:" to "later session"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "first1 last1, user1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
@@ -422,10 +422,10 @@ Feature: Take attendance for a seminar with multiple sessions
       | taker | course1 | teacher |
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I click on "earlier session" "option"
+    And I set the field "Room:" to "earlier session"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "first1 last1, user1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
     And I wait until the page is ready
     And I press "Continue"
@@ -434,7 +434,7 @@ Feature: Take attendance for a seminar with multiple sessions
     When I log in as "taker"
     And I am on "course1" course homepage
     And I click on "seminar1" "link"
-    And I click on "earlier session" "option"
+    And I set the field "Room:" to "earlier session"
     And I click on "Attendees" "link"
     And I switch to "Take attendance" tab
     And I set the field "first1 last1's attendance" to "Fully attended"

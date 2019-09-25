@@ -375,7 +375,12 @@ class behat_general extends behat_base {
         // Gets the node based on the requested selector type and locator.
         $node = $this->get_selected_node($selectortype, $element);
         $this->ensure_node_is_visible($node);
-        $node->click();
+        if ($selectortype === 'option') {
+            // Clicking on an option no longer works
+            throw new DriverException('Clicking on option elements is no longer supported, please use set field instead');
+        } else {
+            $node->click();
+        }
     }
 
     /**
@@ -478,7 +483,12 @@ class behat_general extends behat_base {
         \behat_hooks::set_step_readonly(false);
         $node = $this->get_node_in_container($selectortype, $element, $nodeselectortype, $nodeelement);
         $this->ensure_node_is_visible($node);
-        $node->click();
+        if ($selectortype === 'option') {
+            // Clicking on an option no longer works
+            throw new DriverException('Clicking on option elements is no longer supported, please use set field instead');
+        } else {
+            $node->click();
+        }
     }
 
     /**

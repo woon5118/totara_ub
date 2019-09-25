@@ -28,13 +28,13 @@ Feature: Add seminar attendees in bulk and see results
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
     And I press "Continue"
     When I press "Confirm"
     Then I should see "Uploaded via csv file" in the "John1 Smith1" "table_row"
     And I should see "Also uploaded via csv file" in the "John2 Smith2" "table_row"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
     And I press "Continue"
     Then I should see "2 problem(s) encountered during import."
@@ -50,12 +50,12 @@ Feature: Add seminar attendees in bulk and see results
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users via list of IDs" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via list of IDs"
     And I set the field "idfield" to "ID number"
     And I set the field "csvinput" to "I3"
     And I press "Continue"
     And I press "Confirm"
-    When I click on "Add users via list of IDs" "option" in the "#menuf2f-actions" "css_element"
+    When I set the field "Attendee actions" to "Add users via list of IDs"
     And I set the field "idfield" to "ID number"
     And I set the field "csvinput" to "I3"
     And I press "Continue"
@@ -72,7 +72,7 @@ Feature: Add seminar attendees in bulk and see results
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
     And I press "Continue"
     When I press "Confirm"
@@ -90,7 +90,7 @@ Feature: Add seminar attendees in bulk and see results
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users via list of IDs" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via list of IDs"
     And I set the field "idfield" to "ID number"
     And I set the field "csvinput" to "I3"
     And I press "Continue"
@@ -106,10 +106,8 @@ Feature: Add seminar attendees in bulk and see results
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "John1 Smith1, student1@example.com" "option"
-    And I click on "John2 Smith2, student2@example.com" "option"
-    And I click on "John4 Smith4, student4@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "John1 Smith1, student1@example.com,John2 Smith2, student2@example.com,John4 Smith4, student4@example.com"
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"
@@ -124,8 +122,8 @@ Feature: Add seminar attendees in bulk and see results
     And I should see "John2 Smith2"
 
     # Removing users.
-    When I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "John1 Smith1, student1@example.com" "option"
+    When I set the field "Attendee actions" to "Remove users"
+    And I set the field "Current attendees" to "John1 Smith1, student1@example.com"
     And I press "Remove"
     And I wait "1" seconds
     And I press "Continue"

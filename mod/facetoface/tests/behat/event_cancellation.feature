@@ -27,6 +27,7 @@ Feature: Seminar event cancellation basic
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test Seminar |
       | Description | Test Seminar |
+    And I turn editing mode off
     And I follow "View all events"
 
   # ----------------------------------------------------------------------------
@@ -53,13 +54,9 @@ Feature: Seminar event cancellation basic
     And I press "Save changes"
 
     Given I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I follow "View all events"
@@ -153,13 +150,9 @@ Feature: Seminar event cancellation basic
     And I press "Save changes"
 
     Given I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
 
@@ -228,13 +221,9 @@ Feature: Seminar event cancellation basic
     And I press "Save changes"
 
     Given I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I follow "View all events"
@@ -313,13 +302,9 @@ Feature: Seminar event cancellation basic
     And I press "Save changes"
 
     Given I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
 
@@ -373,13 +358,9 @@ Feature: Seminar event cancellation basic
     And I press "Save changes"
 
     Given I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
 

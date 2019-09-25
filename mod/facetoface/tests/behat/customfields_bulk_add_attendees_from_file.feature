@@ -21,13 +21,13 @@ Feature: Add seminar attendees from csv file with custom fields
     And I navigate to "Custom fields" node in "Site administration > Seminars"
     And I click on "Sign-up" "link"
 
-    And I click on "Checkbox" "option"
+    And I set the field "Create a new custom field" to "Checkbox"
     And I set the following fields to these values:
       | Full name                   | Signup checkbox |
       | Short name (must be unique) | checkbox        |
     And I press "Save changes"
 
-    And I click on "Date/time" "option"
+    And I set the field "Create a new custom field" to "Date/time"
     And I set the following fields to these values:
       | Full name                   | Signup date/time |
       | Short name (must be unique) | datetime         |
@@ -36,7 +36,7 @@ Feature: Add seminar attendees from csv file with custom fields
   @_file_upload
   Scenario: Login as manager, upload csv file with custom fields using bulk add attendees from file and check the result.
 
-    And I click on "Menu of choices" "option"
+    And I set the field "Create a new custom field" to "Menu of choices"
     And I set the following fields to these values:
       | Full name                   | Signup menu of choices |
       | Short name (must be unique) | menuofchoices          |
@@ -48,7 +48,7 @@ Feature: Add seminar attendees from csv file with custom fields
       """
     And I press "Save changes"
 
-    And I click on "Multi-select" "option"
+    And I set the field "Create a new custom field" to "Multi-select"
     And I set the following fields to these values:
       | Full name                   | Signup multi select |
       | Short name (must be unique) | multiselect         |
@@ -57,19 +57,19 @@ Feature: Add seminar attendees from csv file with custom fields
       | multiselectitem[2][option]  | Tuatara             |
     And I press "Save changes"
 
-    And I click on "Text area" "option"
+    And I set the field "Create a new custom field" to "Text area"
     And I set the following fields to these values:
       | Full name                   | Signup text area |
       | Short name (must be unique) | textarea         |
     And I press "Save changes"
 
-    And I click on "Text input" "option"
+    And I set the field "Create a new custom field" to "Text input"
     And I set the following fields to these values:
       | Full name                   | Signup text input |
       | Short name (must be unique) | textinput         |
     And I press "Save changes"
 
-    And I click on "URL" "option"
+    And I set the field "Create a new custom field" to "URL"
     And I set the following fields to these values:
       | Full name                   | Signup address |
       | Short name (must be unique) | url            |
@@ -81,7 +81,7 @@ Feature: Add seminar attendees from csv file with custom fields
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields.csv" file to "CSV text file" filemanager
     And I press "Continue"
     When I press "Confirm"
@@ -121,7 +121,7 @@ Feature: Add seminar attendees from csv file with custom fields
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_columns.csv" file to "CSV text file" filemanager
     And I press "Continue"
     When I press "Confirm"
@@ -138,7 +138,7 @@ Feature: Add seminar attendees from csv file with custom fields
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_invalid_columns2.csv" file to "CSV text file" filemanager
     When I press "Continue"
     Then I should see "Invalid CSV file format - number of columns is not constant!"
@@ -146,7 +146,7 @@ Feature: Add seminar attendees from csv file with custom fields
   @_file_upload
   Scenario: Login as manager, upload csv file with required multi-select custom field using bulk add attendees from file and check the result.
 
-    And I click on "Multi-select" "option"
+    And I set the field "Create a new custom field" to "Multi-select"
     And I set the following fields to these values:
       | Full name                   | Beer        |
       | Short name (must be unique) | multiselect |
@@ -162,7 +162,7 @@ Feature: Add seminar attendees from csv file with custom fields
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_required_customfields.csv" file to "CSV text file" filemanager
     And I press "Continue"
     When I press "Confirm"

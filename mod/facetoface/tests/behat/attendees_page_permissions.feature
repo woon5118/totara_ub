@@ -40,6 +40,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I set the following fields to these values:
       | Seminar - Test seminar name | 1 |
     And I press "Save changes"
+    And I turn editing mode off
     And I follow "View all events"
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -59,15 +60,9 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I press "OK"
     And I press "Save changes"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Sam3 Student3, student3@example.com" "option"
-    And I press exact "add"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
+    And I press "Add"
     # We must wait here, because the refresh may not happen before the save button is clicked otherwise.
     And I wait "1" seconds
     And I press "Continue"
@@ -137,8 +132,8 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
     And I click on "Attendees" "link"
-    And I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Remove users"
+    And I set the field "Current attendees" to "Sam1 Student1, student1@example.com"
     And I press "Remove"
     And I wait "1" seconds
     And I press "Continue"

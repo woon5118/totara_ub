@@ -53,18 +53,18 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam1 Student1 |
     And I click on "Search" "button" in the "#region-main" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press "Add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam1 Student1"
     # View existing attendees in "Users to add" select box
-    When I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     Then I should see "Sam1 Student1, student1@example.com"
 
   Scenario: Add and remove users to a seminar in past
@@ -90,22 +90,20 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam1 Student1 |
     And I click on "Search" "button" in the "#region-main" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam1 Student1"
     # View existing attendees in "Users to add" select box
-    And I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Remove users"
     And I should see "Sam1 Student1, student1@example.com"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Current attendees" to "Sam1 Student1, student1@example.com"
     And I press "Remove"
-    And I wait "1" seconds
     And I press "Continue"
     When I press "Confirm"
     Then I should not see "Sam1 Student1"
@@ -125,10 +123,9 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     And I click on "Wait-list" "link"
@@ -145,7 +142,7 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users via list of IDs" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via list of IDs"
     # By default user is expected to separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
       | User identifier | Username          |
@@ -172,7 +169,7 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users via list of IDs" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via list of IDs"
     # By default user separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
       | User identifier | Email address |
@@ -213,17 +210,16 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
     And I press "Continue"
     And I press "Confirm"
     And I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
 
-    When I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    When I set the field "Attendee actions" to "Remove users"
+    And I set the field "Current attendees" to "Sam1 Student1, student1@example.com"
     And I press "Remove"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam2 Student2"
@@ -253,10 +249,9 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam1 Student1"
@@ -285,10 +280,9 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press exact "add"
-    And I wait "1" seconds
     And I press "Continue"
     Then I should see "1 problem(s) encountered during import."
     When I click on "View results" "link"
@@ -332,7 +326,7 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_invalid_columns.csv" file to "CSV text file" filemanager
     And I press "Continue"
     And I should see "Invalid CSV file format - number of columns is not constant!"
@@ -354,10 +348,8 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam3 Student3, student3@example.com" "option"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
     And I press "Add"
     And I press "Continue"
     And I click on ".attendee-edit-job-assignment" "css_element" in the "Sam3 Student3" "table_row"
@@ -393,7 +385,7 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_with_ja.csv" file to "CSV text file" filemanager
     And I press "Continue"
     When I press "Confirm"
@@ -427,13 +419,12 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |
     And I press "Search"
-    And I click on "Sam1 Student1, sid#1, student1@example.com" "option"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I should see "Sam1 Student1"
     And I should see "student1@example.com"
@@ -442,18 +433,18 @@ Feature: Add - Remove seminar attendees
     Then I should see "Sam1 Student1"
 
     # View existing attendees in "Users to add" select box
-    When I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     Then I should see "Sam1 Student1, sid#1, student1@example.com"
 
     When I press "Continue"
     Then I should see "Please select users before continuing."
 
     When I press "Cancel"
-    And I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Remove users"
     And I set the following fields to these values:
       | searchtext | Sam |
     And I press "Search"
-    And I click on "Sam1 Student1, sid#1, student1@example.com" "option"
+    And I set the field "Current attendees" to "Sam1 Student1, sid#1, student1@example.com"
     And I press "Remove"
     And I wait "1" seconds
     And I press "Continue"
@@ -492,11 +483,11 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |
     And I press "Search"
-    And I click on "Sam1 Student1" "option"
+    And I set the field "potential users" to "Sam1 Student1"
     And I press "Add"
     And I wait "1" seconds
     And I press "Continue"
@@ -506,19 +497,19 @@ Feature: Add - Remove seminar attendees
     And I press "Confirm"
     Then I should see "Sam1 Student1"
 
-  # View existing attendees in "Users to add" select box
-    When I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    # View existing attendees in "Users to add" select box
+    And I set the field "Attendee actions" to "Add users"
     Then I should see "Sam1 Student1"
 
     When I press "Continue"
     Then I should see "Please select users before continuing."
 
     When I press "Cancel"
-    And I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the field "Attendee actions" to "Remove users"
     And I set the following fields to these values:
       | searchtext | Sam |
     And I press "Search"
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Current attendees" to "Sam1 Student1"
     And I press "Remove"
     And I wait "1" seconds
     And I press "Continue"

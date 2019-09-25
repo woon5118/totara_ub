@@ -42,11 +42,11 @@ Feature: Learners can submit assignments again when certification is expired
 
     And I click on "Certification" "link" in the ".tabtree" "css_element"
     And I set the following fields to these values:
-        | activenum | 6 |
-        | windownum | 2 |
-    And I click on "Month(s)" "option" in the "#id_activeperiod" "css_element"
-    And I click on "Month(s)" "option" in the "#id_windowperiod" "css_element"
-    And I click on "Use certification completion date" "option" in the "#id_recertifydatetype" "css_element"
+        | activenum            | 6                                 |
+        | windownum            | 2                                 |
+        | id_activeperiod      | Month(s)                          |
+        | id_windowperiod      | Month(s)                          |
+        | Recertification date | Use certification completion date |
     And I press "Save changes"
     And I click on "Save all changes" "button"
     And I log out

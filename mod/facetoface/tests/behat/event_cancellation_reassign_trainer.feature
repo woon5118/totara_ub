@@ -75,6 +75,7 @@ Feature: Seminar event cancellation trainer can be reassigned
     And I press "OK"
     And I click on "Teacher One" "checkbox"
     When I press "Save changes"
+    And I wait "1" seconds
     Then I should see "Saving this event as it is will cause a scheduling conflict"
     And I click on "Cancel" "button" in the ".modal" "css_element"
     And I log out

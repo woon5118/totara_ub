@@ -54,12 +54,9 @@ Feature: Suspend user in different session times
     And I press "Save changes"
 
     When I click on "Attendees" "link" in the "January" "table_row"
-    And I set the field "menuf2f-actions" to "Add users"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam1 Student1"
@@ -74,12 +71,9 @@ Feature: Suspend user in different session times
     And I press "Save changes"
 
     When I click on "Attendees" "link" in the "Wait-listed" "table_row"
-    And I set the field "menuf2f-actions" to "Add users"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     And I follow "Wait-list"
@@ -107,12 +101,9 @@ Feature: Suspend user in different session times
     And I press "Save changes"
 
     When I click on "Attendees" "link" in the "February" "table_row"
-    And I set the field "menuf2f-actions" to "Add users"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam1 Student1"
@@ -139,12 +130,9 @@ Feature: Suspend user in different session times
     And I press "Save changes"
 
     When I click on "Attendees" "link" in the "March" "table_row"
-    And I set the field "menuf2f-actions" to "Add users"
-    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam1 Student1"

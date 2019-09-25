@@ -95,11 +95,11 @@ Feature: Allocate spaces for team in seminar
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
     When I click on the link "Allocate spaces for team" in row 1
     Then the "Current allocations" select box should contain "Sam1 Student1"
-    When I click on "Sam1 Student1" "option"
+    And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
     And I click on the link "Allocate spaces for team" in row 1
     Then the "Potential allocations" select box should contain "Sam1 Student1"
@@ -110,14 +110,14 @@ Feature: Allocate spaces for team in seminar
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Potential allocations" to "Sam1 Student1"
     When I press "Add"
     Then I should see "1 / 3"
     When I click on the link "Allocate spaces for team" in row 1
     Then the "Current allocations" select box should contain "Sam1 Student1"
     When I set the following fields to these values:
       | replaceallocations         | Yes  |
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
     Then I should see "1 / 3"
     But I click on the link "Allocate spaces for team" in row 1
@@ -130,14 +130,14 @@ Feature: Allocate spaces for team in seminar
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Potential allocations" to "Sam1 Student1"
     When I press "Add"
     Then I should see "1 / 3"
     When I click on the link "Allocate spaces for team" in row 1
     Then the "Current allocations" select box should contain "Sam1 Student1"
     When I set the following fields to these values:
       | replaceallocations         | No  |
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
     Then I should see "0 / 3"
     And I click on the link "Allocate spaces for team" in row 1
@@ -149,7 +149,7 @@ Feature: Allocate spaces for team in seminar
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
     When I click on the link "Allocate spaces for team" in row 1
     Then the "Current allocations" select box should contain "Sam1 Student1"
@@ -176,7 +176,7 @@ Feature: Allocate spaces for team in seminar
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
     Then the "Current allocations" select box should contain "Sam1 Student1 (Self booked)"
-    When I click on "Sam1 Student1" "option"
+    And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
     And I click on the link "Allocate spaces for team" in row 1
     Then the "Current allocations" select box should contain "Sam1 Student1 (Self booked)"
@@ -187,7 +187,7 @@ Feature: Allocate spaces for team in seminar
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
     When I click on the link "Allocate spaces for team" in row 1
     Then the "Current allocations" select box should contain "Sam1 Student1"
@@ -196,7 +196,7 @@ Feature: Allocate spaces for team in seminar
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 2
     Then I should see "Sam1 Student1" in the "Other event(s) in this activity" "optgroup"
-    When I click on "Sam1 Student1" "option" in the "#deallocation" "css_element"
+    And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
     And I click on the link "Allocate spaces for team" in row 2
     But I should see "Sam1 Student1" in the "Other event(s) in this activity" "optgroup"
@@ -207,7 +207,7 @@ Feature: Allocate spaces for team in seminar
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
-    When I click on "Sam1 Student1" "option"
+    When I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
     And I click on the link "Allocate spaces for team" in row 1
     Then the "Current allocations" select box should contain "Sam1 Student1"
@@ -215,7 +215,7 @@ Feature: Allocate spaces for team in seminar
     When I click on "Course 1" "link"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 2
-    When I click on "Sam1 Student1" "option"
+    And I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
     And I click on the link "Allocate spaces for team" in row 2
     Then the "Current allocations" select box should contain "Sam1 Student1"
@@ -239,7 +239,7 @@ Feature: Allocate spaces for team in seminar
     When I click on "Course 1" "link"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 2
-    And I click on "Sam1 Student1" "option" in the "#allocation" "css_element"
+    And I set the field "Potential allocations" to "Sam1 Student1"
     And I press "Add"
     And I click on the link "Allocate spaces for team" in row 2
     Then I should see "Sam1 Student1" in the "This event" "optgroup"
@@ -248,7 +248,7 @@ Feature: Allocate spaces for team in seminar
     When I click on "Course 1" "link"
     And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 2
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Current allocations" to "Sam1 Student1"
     And I press "Remove"
     And I click on the link "Allocate spaces for team" in row 2
     Then I should not see "Sam1 Student1" in the "This event" "optgroup"

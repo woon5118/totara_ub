@@ -40,6 +40,7 @@ Feature: Seminar Event Registration Closure
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test facetoface name        |
       | Description       | Test facetoface description |
+    And I turn editing mode off
     And I click on "Test facetoface name" "link"
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -71,12 +72,9 @@ Feature: Seminar Event Registration Closure
       | registrationtimefinish[minute]  | 00   |
     And I press "Save changes"
     And I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sally Sal, sally@example.com" "option"
-    And I click on "Jelly Jel, jelly@example.com" "option"
-    And I click on "Minny Min, minny@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sally Sal, sally@example.com, Jelly Jel, jelly@example.com, Minny Min, minny@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I follow "Approval required"

@@ -41,7 +41,7 @@ Feature: Activity completion records can be edited
 
     # Create course_modules_completion record.
     When I set the field "Viewed" to "1"
-    And I click on "Completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Activity status" Totara form field to "Completed"
     And I set the "Activity time completed" Totara form field to "2011-02-03 04:56"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -62,7 +62,7 @@ Feature: Activity completion records can be edited
 
     # Update course_modules_completion record.
     When I set the field "Viewed" to "0"
-    And I click on "Completed (did not achieve pass grade)" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Activity status" Totara form field to "Completed (did not achieve pass grade)"
     And I set the "Activity time completed" Totara form field to "2027-07-08 16:34"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -104,7 +104,7 @@ Feature: Activity completion records can be edited
 
     # Create course_modules_completion record.
     When I set the field "Viewed" to "1"
-    And I click on "Completed (achieved pass grade)" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Activity status" Totara form field to "Completed (achieved pass grade)"
     And I set the "Activity time completed" Totara form field to "2011-02-03 04:56"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -123,7 +123,7 @@ Feature: Activity completion records can be edited
 
     # Edit course_modules_completion record.
     When I set the field "Viewed" to "0"
-    And I click on "Completed (did not achieve pass grade)" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Activity status" Totara form field to "Completed (did not achieve pass grade)"
     And I set the "Activity time completed" Totara form field to "2027-07-08 16:34"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -165,7 +165,7 @@ Feature: Activity completion records can be edited
 
     # Create course_modules_completion record.
     When I set the field "Viewed" to "1"
-    And I click on "Completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Activity status" Totara form field to "Completed"
     And I set the "Activity time completed" Totara form field to "2011-02-03 04:56"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -185,7 +185,7 @@ Feature: Activity completion records can be edited
 
     # Edit course_modules_completion record.
     When I set the field "Viewed" to "0"
-    And I click on "Not completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Activity status" Totara form field to "Not completed"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
     When I click on "Yes" "button"

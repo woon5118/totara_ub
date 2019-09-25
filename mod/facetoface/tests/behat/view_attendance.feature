@@ -36,28 +36,28 @@ Feature: Viewing take attendance page with multiple seminar sessions
     And I follow "seminar1"
     And I click on "Attendee" "link" in the "Over" "table_row"
     And I follow "Take attendance"
-    And the field with xpath "//table//tbody//tr[contains(.,'kian bomba')]//select[@class='mod_facetoface__take-attendance__status-picker']" matches value "Not set"
+    And the field "kian bomba's attendance" matches value "Not set"
 
     When I set the field "Take attendance:" to "5"
-    Then the field with xpath "//table//tbody//tr[contains(.,'kian bomba')]//select[@class='mod_facetoface__take-attendance__status-picker']" matches value "Not set"
-    And I click on "Partially attended" "option" in the "kian bomba" "table_row"
+    Then the field "kian bomba's attendance" matches value "Not set"
+    And I set the field "kian bomba's attendance" to "Partially attended"
     And I click on "Save attendance" "button"
 
     When I set the field "Take attendance:" to "4"
-    Then the field with xpath "//table//tbody//tr[contains(.,'kian bomba')]//select[@class='mod_facetoface__take-attendance__status-picker']" matches value "Not set"
-    And I click on "Fully attended" "option" in the "kian bomba" "table_row"
+    Then the field "kian bomba's attendance" matches value "Not set"
+    And I set the field "kian bomba's attendance" to "Fully attended"
     And I click on "Save attendance" "button"
 
     When I set the field "Take attendance:" to "3"
-    Then the field with xpath "//table//tbody//tr[contains(.,'kian bomba')]//select[@class='mod_facetoface__take-attendance__status-picker']" matches value "Not set"
-    And I click on "Unable to attend" "option" in the "kian bomba" "table_row"
+    Then the field "kian bomba's attendance" matches value "Not set"
+    And I set the field "kian bomba's attendance" to "Unable to attend"
     And I click on "Save attendance" "button"
 
     When I set the field "Take attendance" to "5"
-    Then the field with xpath "//table//tbody//tr[contains(.,'kian bomba')]//select[@class='mod_facetoface__take-attendance__status-picker']" matches value "Partially attended"
+    Then the field "kian bomba's attendance" matches value "Partially attended"
 
     When I set the field "Take attendance" to "3"
-    Then the field with xpath "//table//tbody//tr[contains(.,'kian bomba')]//select[@class='mod_facetoface__take-attendance__status-picker']" matches value "Unable to attend"
+    Then the field "kian bomba's attendance" matches value "Unable to attend"
 
     When I set the field "Take attendance" to "4"
-    Then the field with xpath "//table//tbody//tr[contains(.,'kian bomba')]//select[@class='mod_facetoface__take-attendance__status-picker']" matches value "Fully attended"
+    Then the field "kian bomba's attendance" matches value "Fully attended"

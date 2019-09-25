@@ -44,6 +44,7 @@ Feature: Seminar Approval required
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
+    And I turn editing mode off
     And I click on "Test seminar name" "link"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
@@ -69,21 +70,14 @@ Feature: Seminar Approval required
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I click on "Sam3 Student3, student3@example.com" "option"
-    And I click on "Sam4 Student4, student4@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com,Sam4 Student4, student4@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
-    And I wait "1" seconds
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam5 Student5, student5@example.com" "option"
-    And I click on "Sam6 Student6, student6@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam5 Student5, student5@example.com,Sam6 Student6, student6@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
 
@@ -131,6 +125,7 @@ Feature: Seminar Approval required
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
+    And I turn editing mode off
     And I click on "Test seminar name" "link"
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
@@ -156,14 +151,9 @@ Feature: Seminar Approval required
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I click on "Sam2 Student2, student2@example.com" "option"
-    And I click on "Sam3 Student3, student3@example.com" "option"
-    And I click on "Sam4 Student4, student4@example.com" "option"
-    And I click on "Sam5 Student5, student5@example.com" "option"
-    And I click on "Sam6 Student6, student6@example.com" "option"
-    And I press exact "add"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com,Sam4 Student4, student4@example.com,Sam5 Student5, student5@example.com,Sam6 Student6, student6@example.com"
+    And I press "Add"
     And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"

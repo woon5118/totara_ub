@@ -120,10 +120,6 @@ Feature: Test the capability to see and use audience filter for report builder
     And I press "Save changes"
     And I click on "Assignments" "link"
     And I set the field "Add a new" to "Audiences"
-    #And I click on "Audiences" "option" in the "#menucategory_select_dropdown" "css_element"
-    #And I press "Add"
-
-    #And I press "Add audiences to program"
     And I click on "Audience TL-2986" "link"
     And I click on "Ok" "button" in the "Add audiences to program" "totaradialogue"
     Then I should see "4 learner(s) assigned: 4 active, 0 exception(s)"

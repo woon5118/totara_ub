@@ -92,7 +92,7 @@ Feature: Link appraisal with an appraisee job assignment.
     And I should see "Appraiser: Role currently empty"
     And "Start" "button" should not exist
 
-    When I click on "Lethal Henchman in a Bowler Hat" "option"
+    When I set the field "job_id" to "Lethal Henchman in a Bowler Hat"
     Then I should see "Lethal Henchman in a Bowler Hat"
     And I should not see "Select a job assignment to link to this appraisal"
     And I should not see "Nondescript Butler"

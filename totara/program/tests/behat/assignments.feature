@@ -148,7 +148,7 @@ Feature: Users assignments to a program
     And I navigate to "Audiences" node in "Site administration > Audiences"
     And I click on "Audience1" "link"
     And I click on "Edit members" "link"
-    And I click on "fn_002 ln_002 (user002@example.com)" "option" in the "#removeselect" "css_element"
+    And I set the field "Current users" to "fn_002 ln_002 (user002@example.com)"
     And I click on "remove" "button"
     And I run the "\totara_program\task\user_assignments_task" task
 

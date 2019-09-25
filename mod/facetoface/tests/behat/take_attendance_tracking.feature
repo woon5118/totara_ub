@@ -105,8 +105,8 @@ Feature: Take attendance tracking general
     And I should not see "2" in the "kian bomba" "table_row"
     And I should not see "2" in the "loc nguyen" "table_row"
 
-    And I click on "All" "option"
-    And I click on "Fully attended" "option" in the "#menubulkattendanceop" "css_element"
+    And I set the field "Select learners" to "All"
+    And I set the field "and mark as" to "Fully attended"
     When I click on "Save attendance" "button"
     Then I should see "Successfully updated attendance"
     And the following fields match these values:

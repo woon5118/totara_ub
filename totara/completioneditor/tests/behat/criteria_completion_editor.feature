@@ -54,7 +54,7 @@ Feature: Criteria completion records can be edited
 
     # Create course_modules_completion and course_completion_crit_compl records.
     When I set the field "Viewed" to "1"
-    And I click on "Completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Activity status" Totara form field to "Completed"
     And I set the "Activity time completed" Totara form field to "2011-02-03 04:56"
     And I set the field "RPL" to "This is an RPL reason"
     And I press "Save changes"
@@ -84,7 +84,7 @@ Feature: Criteria completion records can be edited
 
     # Update course_modules_completion and course_completion_crit_compl records.
     When I set the field "Viewed" to "0"
-    And I click on "Not completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Activity status" Totara form field to "Not completed"
     And "Activity time completed" "field" should not exist
     And "RPL" "field" should not exist
     And I press "Save changes"
@@ -110,12 +110,12 @@ Feature: Criteria completion records can be edited
 
     # Save and edit separate completion dates - both set.
     When I set the field "Viewed" to "1"
-    And I click on "Use separate completion data" "option" in the "#tfiid_editingmode_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Editing mode" Totara form field to "Use separate completion data"
     Then "RPL" "field" should not exist
-    When I click on "Completed" "option" in the "#tfiid_criteriastatus_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Criteria status" Totara form field to "Completed"
     And I set the "Criteria time completed" Totara form field to "2011-02-03 04:56"
     And I set the field "RPL" to "This is another RPL reason"
-    And I click on "Completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Activity status" Totara form field to "Completed"
     # The line below highlights a bug in Totara forms / behat interaction.
     And I set the "Activity time completed" Totara form field to "2027-07-08 16:34"
     And I press "Save changes"
@@ -132,7 +132,7 @@ Feature: Criteria completion records can be edited
     And the field "RPL" matches value "This is another RPL reason"
 
     # Save and edit separate completion dates - only criteria set.
-    When I click on "Not completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Activity status" Totara form field to "Not completed"
     And I set the field "Viewed" to "0"
     And I set the field "RPL" to "This is yet another RPL reason"
     And I press "Save changes"
@@ -149,8 +149,8 @@ Feature: Criteria completion records can be edited
     And the field "RPL" matches value "This is yet another RPL reason"
 
     # Save and edit separate completion dates - only activity set.
-    When I click on "Completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
-    And I click on "Not completed" "option" in the "#tfiid_criteriastatus_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Activity status" Totara form field to "Completed"
+    And I set the "Criteria status" Totara form field to "Not completed"
     Then "RPL" "field" should not exist
     When I set the field "Viewed" to "1"
     And I set the "Activity time completed" Totara form field to "2011-11-11 11:11"
@@ -168,7 +168,7 @@ Feature: Criteria completion records can be edited
     And "RPL" "field" should not exist
 
     # Save and edit separate completion dates - both set to the same date - results in editor switching to 'Use activity completion'.
-    When I click on "Completed" "option" in the "#tfiid_criteriastatus_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Criteria status" Totara form field to "Completed"
     And I set the field "Viewed" to "1"
     And I set the "Criteria time completed" Totara form field to "2011-11-11 11:11"
     And I set the field "RPL" to "This is the last RPL reason"
@@ -225,7 +225,7 @@ Feature: Criteria completion records can be edited
 
     # Create course_modules_completion and course_completion_crit_compl records.
     When I set the field "Viewed" to "1"
-    And I click on "Completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Activity status" Totara form field to "Completed"
     And I set the "Activity time completed" Totara form field to "2011-02-03 04:56"
     And I set the field "RPL" to "This is an RPL reason"
     And I press "Save changes"
@@ -255,7 +255,7 @@ Feature: Criteria completion records can be edited
 
     # Update course_modules_completion and course_completion_crit_compl records.
     When I set the field "Viewed" to "0"
-    And I click on "Not completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Activity status" Totara form field to "Not completed"
     And "Activity time completed" "field" should not exist
     And "RPL" "field" should not exist
     And I press "Save changes"
@@ -281,12 +281,12 @@ Feature: Criteria completion records can be edited
 
     # Save and edit separate completion dates - both set.
     When I set the field "Viewed" to "1"
-    And I click on "Use separate completion data" "option" in the "#tfiid_editingmode_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Editing mode" Totara form field to "Use separate completion data"
     Then "RPL" "field" should not exist
-    When I click on "Completed" "option" in the "#tfiid_criteriastatus_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Criteria status" Totara form field to "Completed"
     And I set the "Criteria time completed" Totara form field to "2011-02-03 04:56"
     And I set the field "RPL" to "This is another RPL reason"
-    And I click on "Completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    And I set the "Activity status" Totara form field to "Completed"
     And I set the "Activity time completed" Totara form field to "2027-07-08 16:34"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -302,7 +302,7 @@ Feature: Criteria completion records can be edited
     And the field "RPL" matches value "This is another RPL reason"
 
     # Save and edit separate completion dates - only criteria set.
-    When I click on "Not completed" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Activity status" Totara form field to "Not completed"
     And I set the field "Viewed" to "0"
     And I set the field "RPL" to "This is yet another RPL reason"
     And I press "Save changes"
@@ -319,8 +319,8 @@ Feature: Criteria completion records can be edited
     And the field "RPL" matches value "This is yet another RPL reason"
 
     # Save and edit separate completion dates - only activity set.
-    When I click on "Completed (achieved pass grade)" "option" in the "#tfiid_completionstate_totara_completioneditor_form_course_completion" "css_element"
-    When I click on "Not completed" "option" in the "#tfiid_criteriastatus_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Activity status" Totara form field to "Completed (achieved pass grade)"
+    And I set the "Criteria status" Totara form field to "Not completed"
     Then "RPL" "field" should not exist
     When I set the field "Viewed" to "1"
     And I set the "Activity time completed" Totara form field to "2011-11-11 11:11"
@@ -338,7 +338,7 @@ Feature: Criteria completion records can be edited
     And "RPL" "field" should not exist
 
     # Save and edit separate completion dates - both set to the same date - results in editor switching to 'Use activity completion'.
-    When I click on "Completed" "option" in the "#tfiid_criteriastatus_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Criteria status" Totara form field to "Completed"
     And I set the field "Viewed" to "1"
     And I set the "Criteria time completed" Totara form field to "2011-11-11 11:11"
     And I set the field "RPL" to "This is the last RPL reason"
@@ -382,7 +382,7 @@ Feature: Criteria completion records can be edited
     And "RPL" "field" should not exist
 
     # Create course_completion_crit_compl record.
-    When I click on "Completed" "option" in the "#tfiid_criteriastatus_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Criteria status" Totara form field to "Completed"
     Then "RPL" "field" should not exist
     When I set the "Criteria time completed" Totara form field to "2011-02-03 04:56"
     And I press "Save changes"
@@ -403,7 +403,7 @@ Feature: Criteria completion records can be edited
     And "RPL" "field" should not exist
 
     # Update course_modules_completion record.
-    When I click on "Not completed" "option" in the "#tfiid_criteriastatus_totara_completioneditor_form_course_completion" "css_element"
+    When I set the "Criteria status" Totara form field to "Not completed"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
     When I click on "Yes" "button"

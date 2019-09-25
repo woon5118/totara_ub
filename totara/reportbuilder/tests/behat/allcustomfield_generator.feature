@@ -90,6 +90,7 @@ Feature: All customfields column generator
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
+    And I turn editing mode off
     And I follow "View all events"
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -110,10 +111,9 @@ Feature: All customfields column generator
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Sam1 Student1, student1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
+    And I press "add"
     And I press "Continue"
     And I set the following fields to these values:
       | Requests for session organiser | My note                                 |

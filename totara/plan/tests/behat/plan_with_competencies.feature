@@ -99,11 +99,7 @@ Feature: Learner creates learning plan with competencies.
     And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Audience 1"
     And I click on "Edit members" "link" in the ".tabtree" "css_element"
-    And I click on "Bob1 Learner1 (learner1@example.com)" "option"
-    And I click on "Add" "button"
-    And I click on "Dave1 Manager1 (manager1@example.com)" "option"
-    And I click on "Add" "button"
-    And I click on "Admin User (moodle@example.com)" "option"
+    And I set the field "Potential users" to "Bob1 Learner1 (learner1@example.com), Dave1 Manager1 (manager1@example.com), Admin User (moodle@example.com)"
     And I click on "Add" "button"
 
     And I set the following administration settings values:

@@ -19,6 +19,7 @@ Feature: Seminar event notification must not be available for user after it has 
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
+    And I turn editing mode off
     And I follow "View all events"
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -49,8 +50,8 @@ Feature: Seminar event notification must not be available for user after it has 
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Attendees"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Boris Nikolaevich, boris@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Boris Nikolaevich, boris@example.com"
     And I press exact "add"
     When I press "Continue"
     Then I <visibility> "Send booking confirmation to new attendees"
@@ -83,13 +84,13 @@ Feature: Seminar event notification must not be available for user after it has 
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I follow "Attendees"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Boris Nikolaevich, boris@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Boris Nikolaevich, boris@example.com"
     And I press exact "add"
     And I press "Continue"
     And I press "Confirm"
-    And I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Boris Nikolaevich, boris@example.com" "option"
+    And I set the field "Attendee actions" to "Remove users"
+    And I set the field "Current attendees" to "Boris Nikolaevich, boris@example.com"
     And I press "Remove"
     When I press "Continue"
     Then I <visibility> "Notify cancelled attendees"

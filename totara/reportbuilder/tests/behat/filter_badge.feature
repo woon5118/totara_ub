@@ -28,9 +28,7 @@ Feature: Badges report filter
     And I click on "Continue" "button"
     And I switch to "Recipients (0)" tab
     And I click on "Award badge" "button"
-    And I click on "User One (user1@example.com)" "option"
-    And I click on "User Two (user2@example.com)" "option"
-    And I click on "User Three (user3@example.com)" "option"
+    And I set the field "potentialrecipients" to "User One (user1@example.com),User Two (user2@example.com),User Three (user3@example.com)"
     And I click on "Award badge" "button"
 
     # Add a second badge.
@@ -50,7 +48,7 @@ Feature: Badges report filter
     And I click on "Continue" "button"
     And I switch to "Recipients (0)" tab
     And I click on "Award badge" "button"
-    And I click on "User One (user1@example.com)" "option"
+    And I set the field "potentialrecipients" to "User One (user1@example.com)"
     And I click on "Award badge" "button"
 
   Scenario: Test badge report builder filter

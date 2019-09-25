@@ -30,6 +30,7 @@ Feature: Seminar event cancellation rebooking
       | Name                                   | Test Seminar |
       | Description                            | Test Seminar |
       | How many times the user can sign-up?   | 1            |
+    And I turn editing mode off
     And I follow "View all events"
 
     Given I follow "Add event"
@@ -54,13 +55,9 @@ Feature: Seminar event cancellation rebooking
     And I press "Save changes"
 
     Given I click on "Attendees" "link"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I follow "View all events"
@@ -100,13 +97,9 @@ Feature: Seminar event cancellation rebooking
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_600: Mass rebooking after a cancelled event
     Given I click on "Attendees" "link" in the "10 February 2030" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press exact "add"
-    And I wait "1" seconds
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
+    And I press "Add"
     And I press "Continue"
 
     When I follow "View results"
@@ -129,13 +122,9 @@ Feature: Seminar event cancellation rebooking
     And I should see "Cancelled" in the "10 February 2025" "table_row"
 
     When I click on "Attendees" "link" in the "10 February 2030" "table_row"
-    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
-    And I click on "Learner One, learner1@example.com" "option"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
-    And I wait "1" seconds
-    And I click on "Learner Two, learner2@example.com" "option"
-    And I press "Add"
-    And I wait "1" seconds
     And I press "Continue"
     And I press "Confirm"
     And I follow "View all events"
