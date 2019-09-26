@@ -48,8 +48,14 @@ class booking_cancelled extends abstract_signup_event {
      * @param \stdClass $session
      * @param \context_module $context
      * @return booking_cancelled
+     *
+     * @deprecated since Totara 13.0
      */
     public static function create_from_session(\stdClass $session, \context_module $context) {
+
+        debugging('booking_cancelled::create_from_session() function has been deprecated, please use booking_cancelled::create_from_signup() instead',
+            DEBUG_DEVELOPER);
+
         $data = array(
             'context' => $context,
             'other'  => array('sessionid' => $session->id)
@@ -88,7 +94,15 @@ class booking_cancelled extends abstract_signup_event {
      * @return string
      */
     public function get_description() {
-        return "User with id {$this->userid} has cancelled their booking for Session with the id {$this->other['sessionid']}.";
+        if (!empty($this->relateduserid)) {
+            if ((int)$this->userid == (int)$this->relateduserid) {
+                return "User with id {$this->userid} has cancelled their booking for Seminar Event with the id {$this->other['sessionid']}.";
+            } else {
+                return "User with id {$this->relateduserid} has been cancelled for Seminar Event with the id {$this->other['sessionid']} by user with id {$this->userid}.";
+            }
+        } else {
+            return "User with id {$this->userid} cancelled a signup for another user with the signupid {$this->other['signupid']} in Seminar Event with the id {$this->other['sessionid']}";
+        }
     }
 
     /**
@@ -109,22 +123,5 @@ class booking_cancelled extends abstract_signup_event {
     public function get_legacy_logdata() {
         return array($this->courseid, 'facetoface', 'cancel booking', "cancelsignup.php?s={$this->other['sessionid']}",
             $this->other['sessionid'], $this->contextinstanceid);
-    }
-
-    /**
-     * Custom validation.
-     *
-     * @return void
-     */
-    protected function validate_data() {
-        if (self::$preventcreatecall) {
-            throw new \coding_exception('cannot call create() directly, use create_from_session() instead.');
-        }
-
-        if (!isset($this->other['sessionid'])) {
-            throw new \coding_exception('sessionid must be set in $other.');
-        }
-
-        parent::validate_data();
     }
 }

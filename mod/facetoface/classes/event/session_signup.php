@@ -59,6 +59,7 @@ class session_signup extends \core\event\base {
         $data = [
             'context' => $context,
             'objectid' => $signup->get_id(),
+            'relateduserid' => $signup->get_userid(),
             'other' => [
                 'userid' => $signup->get_userid(),
                 'sessionid' => $signup->get_sessionid()
@@ -89,6 +90,7 @@ class session_signup extends \core\event\base {
         $data = array(
             'context' => $context,
             'objectid' => $usersignup->id,
+            'relateduserid' => $usersignup->userid,
             'other' => array(
                 'userid' => $usersignup->userid,
                 'sessionid' => $usersignup->sessionid
@@ -175,6 +177,8 @@ class session_signup extends \core\event\base {
         if (self::$preventcreatecall) {
             throw new \coding_exception('cannot call create() directly, use create_from_instance() instead.');
         }
+
+        // We do not validate relateduserid value as managers/trainers use signup "dummy" records for "reservations" and "allocations".
 
         if (!isset($this->other['userid'])) {
             throw new \coding_exception('userid must be set in $other.');

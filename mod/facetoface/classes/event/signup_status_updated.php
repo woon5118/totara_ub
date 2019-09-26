@@ -56,6 +56,7 @@ class signup_status_updated extends \core\event\base {
         $data = array(
             'context' => $context,
             'objectid' => $signupstatus->get_id(),
+            'relateduserid' => (int)$signup->get_userid(),
             'other' => array(
                 'userid' => (int) $signup->get_userid(),
                 'sessionid' => (int) $signup->get_sessionid(),
@@ -87,6 +88,7 @@ class signup_status_updated extends \core\event\base {
         $data = array(
             'context' => $context,
             'objectid' => $signupstatus->id,
+            'relateduserid' => (int)$signup->userid,
             'other' => array(
                 'userid' => (int) $signup->userid,
                 'sessionid' => (int) $signup->sessionid,
@@ -189,6 +191,8 @@ class signup_status_updated extends \core\event\base {
            throw new \coding_exception('cannot call create() directly, use create_from_signup() instead.');
         }
 
+        // We do not validate relateduserid value as managers/trainers use signup "dummy" records for "reservations" and "allocations".
+
         if (!isset($this->other['userid'])) {
             throw new \coding_exception('userid must be set in $other.');
         }
@@ -196,7 +200,6 @@ class signup_status_updated extends \core\event\base {
         if (!isset($this->other['sessionid'])) {
             throw new \coding_exception('sessionid must be set in $other.');
         }
-
 
         if (!isset($this->other['statuscode']) || !\mod_facetoface\signup\state\state::from_code($this->other['statuscode'])) {
             throw new \coding_exception('statuscode must be set in $other and must be a valid status.');

@@ -58,6 +58,7 @@ abstract class abstract_signup_event extends \core\event\base {
     public static function create_from_signup(signup $signup, \context_module $context) {
         $data = [
             'context' => $context,
+            'relateduserid' => $signup->get_userid(),
             'other'  => [
                 'signupid' => $signup->get_id(),
                 'sessionid' => $signup->get_seminar_event()->get_id()
@@ -107,6 +108,12 @@ abstract class abstract_signup_event extends \core\event\base {
     protected function validate_data() {
         if (static::$preventcreatecall) {
             throw new \coding_exception('cannot call create() directly, use create_from_session() instead.');
+        }
+
+        // We do not validate relateduserid value as managers/trainers use signup "dummy" records for "reservations" and "allocations".
+
+        if (!isset($this->other['signupid'])) {
+            throw new \coding_exception('signupid must be set in $other.');
         }
 
         if (!isset($this->other['sessionid'])) {

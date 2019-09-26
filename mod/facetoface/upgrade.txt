@@ -3,6 +3,14 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* mod_facetoface\event\booking_cancelled::create_from_session() function has been deprecated, please use mod_facetoface\event\booking_cancelled::create_from_signup() instead
+* Added 'relateduserid' optional parameter for the following seminar event triggers:
+  * mod_facetoface\event\booking_booked::create_from_signup()
+  * mod_facetoface\event\booking_cancelled::create_from_signup()
+  * mod_facetoface\event\booking_waitlisted::create_from_signup()
+  * mod_facetoface\event\booking_requested::create_from_signup()
+  * mod_facetoface\event\session_signup::create_from_signup()
+  * mod_facetoface\event\signup_status_updated::create_from_items()
 * facetoface_update_grades() has been rewritten to provide better compatibility with other modules
 * signup_helper::compute_final_grade() has been deprecated; please use grade_helper::get_final_grades() instead
 * signup_helper::compute_final_grade_with_time() has been deprecated; please use grade_helper::get_final_grades() instead

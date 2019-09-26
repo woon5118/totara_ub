@@ -51,7 +51,15 @@ class booking_requested extends abstract_signup_event {
      * @return string
      */
     public function get_description() {
-        return "User with id {$this->userid} has requested booking approval for the Seminar Event with the id {$this->other['sessionid']}.";
+        if (!empty($this->relateduserid)) {
+            if ((int)$this->userid == (int)$this->relateduserid) {
+                return "User with id {$this->userid} has requested booking approval for the Seminar Event with the id {$this->other['sessionid']}.";
+            } else {
+                return "Booking approval requested for user with id {$this->relateduserid} in Seminar Event with id {$this->other['sessionid']} by user with id {$this->userid}.";
+            }
+        } else {
+            return "User with id {$this->userid} requested booking approval for another user with the signupid {$this->other['signupid']} in Seminar Event with the id {$this->other['sessionid']}";
+        }
     }
 
     /**
