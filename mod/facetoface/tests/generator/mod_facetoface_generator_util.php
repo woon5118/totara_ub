@@ -21,7 +21,7 @@
  * @package mod_facetoface
  */
 
-use mod_facetoface\{signup, seminar_event, seminar};
+use mod_facetoface\{signup, seminar_event, seminar, calendar};
 use mod_facetoface\signup\state\{
     attendance_state,
     booked,
@@ -150,6 +150,10 @@ final class mod_facetoface_generator_util {
                 $DB->insert_record('facetoface_asset_dates', $o);
             }
         }
+
+        // Make calendar entries.
+        $seminar_event = new seminar_event($rc->sessionid);
+        calendar::update_entries($seminar_event);
 
         return $rc->id;
     }

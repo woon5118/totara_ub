@@ -737,7 +737,8 @@ function calendar_get_events($tstart, $tend, $users, $groups, $courses, $withdur
     global $DB;
 
     $whereclause = '';
-    $params = array();
+    $params = array('siteid' => SITEID); // Totara: Include siteid in params.
+
     // Quick test.
     if (empty($users) && empty($groups) && empty($courses)) {
         return array();
@@ -808,33 +809,35 @@ function calendar_get_events($tstart, $tend, $users, $groups, $courses, $withdur
         $whereclause .= ' AND e.visible = 1';
     }
 
+    // Totara: Check that either events aren't on the site calendar, or aren't seminar events.
     $sql = "SELECT e.*
               FROM {event} e
          LEFT JOIN {modules} m ON e.modulename = m.name
                 -- Non visible modules will have a value of 0.
-             WHERE (e.modulename <> 'facetoface' OR e.courseid <> " . SITEID . ") AND (m.visible = 1 OR m.visible IS NULL)
+             WHERE (e.modulename <> 'facetoface' OR e.courseid <> :siteid) AND (m.visible = 1 OR m.visible IS NULL)
                    AND $whereclause
           ORDER BY e.timestart";
     $events = $DB->get_records_sql($sql, $params);
 
-    if ($DB->record_exists('event', ['modulename' => 'facetoface', 'course' => SITEID])) {
-        // We have the nasty Seminar events pushed to the frontpage,
+    // Totara: For seminar events on site calendar, load with extra visibility checks.
+    if ($DB->record_exists('event', ['modulename' => 'facetoface', 'courseid' => SITEID])) {
+        // We have Seminar events pushed to the frontpage,
         // we need to use separate access control for them.
-        // Please note that the use of Totara visibility here is not correct,
-        // it should be something more like enrolments instead!
 
+        $params['contextlevel'] = CONTEXT_MODULE;
         list($twhere, $tparams) = totara_visibility_where();
 
         $sql = "SELECT e.*
                   FROM {event} e
                   JOIN {facetoface} sem ON sem.id = e.instance
-                  JOIN {course} course ON c.id = sem.course
+                  JOIN {course} course ON course.id = sem.course
                   JOIN {modules} m ON e.modulename = m.name AND m.visible = 1
-                 WHERE e.modulename = 'facetoface' AND e.courseid = " . SITEID . " AND $twhere
+                  JOIN {context} ctx ON sem.id = ctx.instanceid AND contextlevel = :contextlevel
+                 WHERE e.modulename = 'facetoface' AND e.courseid = :siteid AND $twhere
                        AND $whereclause";
         $params = array_merge($params, $tparams);
         $semevents = $DB->get_records_sql($sql, $params);
-
+        
         if ($semevents) {
             foreach ($semevents as $e) {
                 $events[$e->id] = $e;
@@ -850,12 +853,14 @@ function calendar_get_events($tstart, $tend, $users, $groups, $courses, $withdur
  * Totara function added to handle visibility of activities sitewide calendar entries
  * See T-11534 for more details.
  *
- * @deprecated do not use
+ * @deprecated Since Totara 13.0
  *
  * @param array $events     An array of DB records from the table 'events'
  */
 function calendar_events_check_visibility($events) {
     global $DB;
+
+    debugging('calendar_events_check_visibility() has been deprecated since Totara 13.0, in favour of using totara_visibility_where() when loading events.', DEBUG_DEVELOPER);
 
     foreach ($events as $key => $event) {
         // Checking the module this way in case we need to add more later.

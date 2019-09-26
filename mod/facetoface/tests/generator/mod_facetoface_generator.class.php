@@ -32,6 +32,8 @@ use mod_facetoface\seminar;
 use mod_facetoface\signup;
 use mod_facetoface\signup_helper;
 use mod_facetoface\seminar_event;
+use mod_facetoface\seminar_event_helper;
+use mod_facetoface\calendar;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -215,7 +217,10 @@ class mod_facetoface_generator extends testing_module_generator {
         $seminarevent = new \mod_facetoface\seminar_event();
         $seminarevent->from_record($record);
         $seminarevent->save();
-        \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, $sessiondates);
+        seminar_event_helper::merge_sessions($seminarevent, $sessiondates);
+
+        // Make calendar entries.
+        calendar::update_entries($seminarevent);
 
         return $seminarevent->get_id();
     }

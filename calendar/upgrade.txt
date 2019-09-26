@@ -2,6 +2,7 @@ This files describes API changes in /calendar/* ,
 information provided here is intended especially for developers.
 
 === 13 ===
+* calendar_events_check_visibility has been deprecated in favour of using totara_visibility_where() whenever loading events.
 * core_calendar_renderer::facetoface_print_calendar_session() has been updated to check a user's booking status.
 
 === 10 ===
