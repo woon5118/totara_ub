@@ -24,6 +24,7 @@
 
 use tassign_competency\entities\assignment;
 use totara_assignment\user_groups;
+use totara_competency\entities\competency_achievement;
 use totara_job\rb\source\report_trait;
 
 defined('MOODLE_INTERNAL') || die();
@@ -50,6 +51,8 @@ class rb_source_competency_status extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_competency_status');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_competency_status');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_competency_status');
         $this->usedcomponents[] = 'totara_plan';
         $this->usedcomponents[] = 'totara_hierarchy';
         $this->usedcomponents[] = 'totara_competency';
@@ -66,10 +69,6 @@ class rb_source_competency_status extends rb_base_source {
     }
 
     public static function is_source_ignored() {
-
-        // Todo: Remove this and get reportbuilder column_test passing. To be done in TL-20833.
-        return true;
-
         return !totara_feature_visible('competencies');
     }
 
@@ -169,7 +168,7 @@ class rb_source_competency_status extends rb_base_source {
                 'competency_status',
                 'time_proficient',
                 get_string('proficientdate', 'rb_source_competency_status'),
-                'base.timeproficient',
+                'base.time_proficient',
                 array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
@@ -196,7 +195,7 @@ class rb_source_competency_status extends rb_base_source {
                 'competency',
                 'id',
                 get_string('competencyid', 'rb_source_competency_status'),
-                'base.competencyid',
+                'base.comp_id',
                 array('displayfunc' => 'integer')
             ),
             new rb_column_option(
@@ -285,7 +284,7 @@ class rb_source_competency_status extends rb_base_source {
         );
         // include some standard filters
         $this->add_core_user_filters($filteroptions);
-        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
+        $this->add_totara_job_filters($filteroptions, 'base', 'user_id');
 
         return $filteroptions;
     }
@@ -377,5 +376,42 @@ class rb_source_competency_status extends rb_base_source {
         return $scales;
     }
 
-} // end of rb_source_competency_status class
+    /**
+     * Inject column_test data into database.
+     * @param totara_reportbuilder_column_testcase $testcase
+     */
+    public function phpunit_column_test_add_data(totara_reportbuilder_column_testcase $testcase) {
+        if (!PHPUNIT_TEST) {
+            throw new coding_exception('phpunit_column_test_add_data() cannot be used outside of unit tests');
+        }
+
+        $now = time();
+
+        $assignment = new assignment();
+        $assignment->type = assignment::TYPE_OTHER;
+        $assignment->competency_id = 100;
+        $assignment->user_group_type = 'position';
+        $assignment->user_group_id = 201;
+        $assignment->optional = false;
+        $assignment->created_by = 301;
+        $assignment->created_at = $now;
+        $assignment->updated_at = $now;
+        $assignment->save();
+
+        $achievement = new competency_achievement();
+        $achievement->comp_id = 100;
+        $achievement->user_id = 200;
+        $achievement->assignment_id = $assignment->id;
+        $achievement->scale_value_id = 400;
+        $achievement->proficient = 1;
+        $achievement->status = competency_achievement::ACTIVE_ASSIGNMENT;
+        $achievement->time_created = $now;
+        $achievement->time_proficient = $now;
+        $achievement->time_scale_value = $now;
+        $achievement->time_status = $now;
+        $achievement->last_aggregated = $now;
+        $achievement->save();
+    }
+
+}
 
