@@ -69,8 +69,12 @@ class personal_export_hidden extends \totara_userdata\userdata\item {
      * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
-        $systemcontext = \context_system::instance();
-        if (has_capability('totara/hierarchy:viewownpersonalgoal', $systemcontext, $user)) {
+        $capcontext = \context_system::instance();
+        if ($user->status != target_user::STATUS_DELETED) {
+            $capcontext = \context_user::instance($user->id);
+        }
+
+        if (has_capability('totara/hierarchy:viewownpersonalgoal', $capcontext, $user)) {
             return new \totara_userdata\userdata\export();
         }
 
@@ -94,8 +98,12 @@ class personal_export_hidden extends \totara_userdata\userdata\item {
      * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, \context $context) {
-        $systemcontext = \context_system::instance();
-        if (has_capability('totara/hierarchy:viewownpersonalgoal', $systemcontext, $user)) {
+        $capcontext = \context_system::instance();
+        if ($user->status != target_user::STATUS_DELETED) {
+            $capcontext = \context_user::instance($user->id);
+        }
+
+        if (has_capability('totara/hierarchy:viewownpersonalgoal', $capcontext, $user)) {
             return 0;
         }
 
