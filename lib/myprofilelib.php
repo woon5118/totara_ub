@@ -70,7 +70,8 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     // Add core nodes.
     // Full profile node.
     if (!empty($course)) {
-        $url = $access_controller->get_profile_url();
+        // Use access controller for site (course=null) in order to show full profile.
+        $url = \core_user\access_controller::for($user, null)->get_profile_url();
         if ($url) {
             $node = new core_user\output\myprofile\node('miscellaneous', 'fullprofile', get_string('fullprofile'), null, $url);
             $tree->add_node($node);
