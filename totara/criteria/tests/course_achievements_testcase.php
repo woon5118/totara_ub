@@ -24,6 +24,7 @@
 
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use core_course\user_learning\item;
 use totara_criteria\criterion;
 use totara_criteria\criterion_not_found_exception;
 use totara_program\task\completions_task;
@@ -107,12 +108,13 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
 
         // Make sure the data structure matches our expectation
         foreach ($items as $item) {
-            $this->assertValidKeys(['progress' => null, 'course' => null], $item);
-            $this->assertEquals(0, $item['progress']);
-            $course =  $item['course'];
-            $this->assertValidKeys(['name' => null, 'summary' => null, 'url' => null], $course);
-            $this->assertNotEmpty($course['summary']);
-            $this->assertStringStartsWith('http', $course['url']);
+            $this->assertArrayHasKey('course', $item);
+            /** @var item $course */
+            $course = $item['course'];
+            $this->assertEquals(0, $course->get_progress_percentage());
+            $this->assertNotEmpty($course->fullname);
+            $this->assertNotEmpty($course->description);
+            $this->assertStringStartsWith('http', $course->url_view);
         }
         $this->assert_course_is_visible($data->course1->fullname, $result);
         $this->assert_course_is_visible($data->course2->fullname, $result);
@@ -264,8 +266,10 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
     private function assert_course_has_progress(string $course_name, int $progress, array $result) {
         $checked = false;
         foreach ($result['items'] as $item) {
-            if ($item['course']['name'] == $course_name) {
-                $this->assertEquals($progress, $item['progress'], 'Progress: Course does not have expected progress');
+            /** @var item $course */
+            $course = $item['course'];
+            if ($course->fullname == $course_name) {
+                $this->assertEquals($progress, $course->get_progress_percentage(), 'Progress: Course does not have expected progress');
                 $checked = true;
             }
         }
@@ -282,7 +286,7 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
         $visible_courses = [];
         foreach ($result['items'] as $item) {
             if (!empty($item['course'])) {
-                $visible_courses[] = $item['course']['name'];
+                $visible_courses[] = $item['course']->fullname;
             }
         }
         $this->assertContains($course_name, $visible_courses);
@@ -298,7 +302,7 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
         $visible_courses = [];
         foreach ($result['items'] as $item) {
             if (!empty($item['course'])) {
-                $visible_courses[] = $item['course']['name'];
+                $visible_courses[] = $item['course']->fullname;
             }
         }
         $this->assertNotContains($course_name, $visible_courses);

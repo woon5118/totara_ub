@@ -23,16 +23,11 @@
 
 namespace totara_criteria\webapi\resolver\query;
 
-use completion_completion;
-use context_course;
 use context_system;
 use context_user;
-use core\format;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use course_in_list;
-use totara_core\formatter\field\string_field_formatter;
-use totara_core\formatter\field\text_field_formatter;
+use core_course\user_learning\item;
 use totara_criteria\criterion;
 use totara_criteria\criterion_not_found_exception;
 
@@ -49,7 +44,7 @@ abstract class course_achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        global $CFG, $USER;
+        global $CFG;
         require_once($CFG->dirroot . '/completion/completion_completion.php');
 
         require_login(null, false, null, false, true);
@@ -72,42 +67,19 @@ abstract class course_achievements implements query_resolver {
 
         $items = [];
         foreach ($completion_criteria->get_item_ids() as $course_id) {
-            // TODO Replace following with a proper course type in TL-22396
-
-            $item = [
-                'course' => null,
-                'progress' => 0
-            ];
-
             try {
+                $item = ['course' => null];
                 $course_record = get_course($course_id);
+                // Only add if the user can view the course
+                if (totara_course_is_viewable($course_record)) {
+                    $item['course'] = item::one($user_id, $course_record);
+                }
+                $items[] = $item;
             } catch (\Exception $exception) {
                 // Course not found for some reason, maybe it got deleted?
                 // We don't want to return anything in this case.
                 continue;
             }
-
-            if (totara_course_is_viewable($course_record)) {
-                $course_context = context_course::instance($course_id);
-                $course_in_list = new course_in_list($course_record);
-
-                $completion = new completion_completion(['userid' => $user_id, 'course' => $course_id]);
-                $item['progress'] = (int)$completion->get_percentagecomplete();
-
-                $string_formatter = new string_field_formatter(format::FORMAT_HTML, $course_context);
-
-                $text_formatter = new text_field_formatter(format::FORMAT_HTML, $course_context);
-                $text_formatter->set_pluginfile_url_options($course_context, 'course', 'summary')
-                    ->set_text_format($course_in_list->summaryformat);
-
-                $item['course'] = [
-                    'name' => $string_formatter->format(get_course_display_name_for_list($course_in_list)),
-                    'summary' => $text_formatter->format($course_in_list->summary),
-                    'url' => (string) course_get_url($course_record)
-                ];
-            }
-
-            $items[] = $item;
         }
 
         return [

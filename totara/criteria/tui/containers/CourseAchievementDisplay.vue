@@ -48,7 +48,7 @@
         </template>
         <template v-slot:row="{ row, expand }">
           <Cell size="1" style="text-align: center;">
-            <CheckIcon v-if="row.progress === 100" size="300" />
+            <CheckIcon v-if="isComplete(row)" size="300" />
           </Cell>
 
           <Cell size="13">
@@ -71,14 +71,16 @@
                 :aria-valuenow="row.progress"
                 :style="width(row)"
               >
-                <span class="progressbar__text">{{ row.progress }}%</span>
+                <span class="progressbar__text"
+                  >{{ row.course.progress }}%</span
+                >
               </div>
             </div>
           </Cell>
         </template>
 
         <template v-slot:expandContent="{ row }">
-          <h4>{{ row.course.name }}</h4>
+          <h4>{{ row.course.fullname }}</h4>
           <p
             class="tui-criteriaCourseCompletion__summary"
             v-html="row.course.summary"
@@ -123,7 +125,7 @@ export default {
       let complete = 0;
 
       this.achievements.items.forEach(item => {
-        if (item.progress === 100) {
+        if (item.course && item.course.progress === 100) {
           complete = complete + 1;
         }
       });
@@ -138,16 +140,19 @@ export default {
   methods: {
     width(row) {
       return {
-        width: row.progress + '%',
+        width: row.course.progress + '%',
       };
     },
     getCourseName(row) {
       return row.course
-        ? row.course.name
+        ? row.course.fullname
         : this.$str('hidden_course', 'totara_criteria');
     },
     hasProgress(row) {
-      return row.course && row.progress > 0;
+      return row.course && row.course.progress > 0;
+    },
+    isComplete(row) {
+      return row.course && row.course.progress === 100;
     },
   },
 };

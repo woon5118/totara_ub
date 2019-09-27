@@ -10,11 +10,11 @@ query criteria_linkedcourses_achievements(
     required_items
     items {
       course {
-        name
-        summary
-        url
+        fullname(format: HTML)
+        description(format: HTML)
+        progress
+        url_view
       }
-      progress
     }
   }
 }

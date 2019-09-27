@@ -1,16 +1,5 @@
-"""
-TODO This needs to be replaced by the final course type
-"""
-type criteria_linkedcourses_achievement_course {
-  id: core_id!
-  name: String!
-  summary(format: core_format = HTML): String!
-  url: String!
-}
-
 type criteria_linkedcourses_achievement_item {
-  course: criteria_linkedcourses_achievement_course!
-  progress: Int
+  course: totara_core_learning_item
 }
 
 type criteria_linkedcourses_achievements {
