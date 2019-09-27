@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_sesskey();
 require_login();
 
-$PAGE->set_context(context_user::instance($USER->id));
+$PAGE->set_context(context_system::instance());
 
 /// Get params
 $action = required_param('action', PARAM_ALPHA);

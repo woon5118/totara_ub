@@ -49,9 +49,6 @@ $returnurl = new moodle_url('/totara/reportbuilder/filters.php', array('id' => $
 $config = (new rb_config())->set_nocache(true);
 $report = reportbuilder::create($id, $config, false); // No access control for managing of reports here.
 
-// Check filterheadings and searchcolumnheadings for multilang spans. Need to set context to use format_string.
-$PAGE->set_context(context_user::instance($USER->id));
-
 // Standard source.
 $sourcename = $report->source;
 
