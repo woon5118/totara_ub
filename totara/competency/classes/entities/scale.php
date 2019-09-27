@@ -53,7 +53,7 @@ class scale extends entity {
      * @return collection
      * @throws coding_exception
      */
-    public function get_scale_values_attribute() {
+    protected function get_scale_values_attribute() {
         if (!isset($this->scale_value_cache)) {
             $this->scale_value_cache = scale_value::repository()
                     ->where('scaleid', $this->id)
@@ -64,11 +64,11 @@ class scale extends entity {
         return $this->scale_value_cache;
     }
 
-    public function get_default_value_attribute() {
-        return $this->get_scale_values_attribute()->item($this->defaultid);
+    protected function get_default_value_attribute() {
+        return $this->scale_values->item($this->defaultid);
     }
 
-    public function get_min_proficient_value_attribute() {
-        return $this->get_scale_values_attribute()->item($this->minproficiencyid);
+    protected function get_min_proficient_value_attribute() {
+        return $this->scale_values->item($this->minproficiencyid);
     }
 }

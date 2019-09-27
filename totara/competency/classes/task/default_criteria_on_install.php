@@ -32,6 +32,7 @@ use pathway_criteria_group\criteria_group;
 use pathway_learning_plan\learning_plan;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
+use totara_competency\entities\scale;
 use totara_criteria\criterion;
 
 class default_criteria_on_install extends adhoc_task {
@@ -45,8 +46,34 @@ class default_criteria_on_install extends adhoc_task {
     public function execute() {
         global $COMP_AGGREGATION;
 
-        /** @var competency[]|collection $competencies */
-        $competencies = competency::repository()->with('children')->get();
+        /**
+         * Load any competencies that don't already have an associated overall aggregation type record.
+         *
+         * This should therefore include any competencies from prior to totara_competency.
+         *
+         * If this task is running again after previously failing, it should at least exclude competencies that had
+         * already had criteria added.
+         *
+         * @var competency[]|collection $competencies
+         */
+        $competencies = competency::repository()
+            ->with('children')
+            ->join('totara_competency_scale_aggregation', 'id', '=', 'comp_id', 'left')
+            ->where('totara_competency_scale_aggregation.id', null)
+            ->get();
+
+        /**
+         * Links the frameworks to scales.
+         *
+         * Scales are then loaded below. By having them in one separate array, we reduce having to fetch
+         * them again for each competency.
+         */
+        $framework_to_scale = builder::table('comp_scale_assignments')
+            ->select(['frameworkid', 'scaleid'])
+            ->get();
+
+        /** @var scale[]|collection $scales */
+        $scales = scale::repository()->get();
 
         $linked_course_competencies = builder::table('comp_criteria')
             ->select_raw('DISTINCT competencyid AS comp_id')
@@ -58,17 +85,23 @@ class default_criteria_on_install extends adhoc_task {
             $configuration->set_aggregation_type('first');
             $configuration->save_aggregation();
 
-            if ($this->add_learning_plans()) {
+            if ($this->should_add_learning_plans()) {
                 $lp_pathway = new learning_plan();
                 $lp_pathway->set_competency($competency);
                 $lp_pathway->save();
             }
 
+            $scale_id = $framework_to_scale->item($competency->frameworkid)->scaleid;
+            $min_proficient_value = $scales->item($scale_id)->min_proficient_value;
+
+            $linkedcourses_exist = $linked_course_competencies->item($competency->id);
+            $childcompetencies_exist = $competency->children->count() > 0;
+
             switch ($competency->aggregationmethod) {
                 case $COMP_AGGREGATION['ALL']:
-
-                    $linkedcourses_exist = $linked_course_competencies->item($competency->id);
-                    $childcompetencies_exist = $competency->children->count() > 0;
+                    // If the aggregation method prior to totara_competency being installed was set to 'All', then
+                    // there must be an AND relationship between the linked course and child competency
+                    // pathways. Therefore they should be in the same criteria group.
 
                     if (!$linkedcourses_exist && !$childcompetencies_exist) {
                         continue;
@@ -76,7 +109,7 @@ class default_criteria_on_install extends adhoc_task {
 
                     $group = new criteria_group();
                     $group->set_competency($competency);
-                    $group->set_scale_value($competency->scale->min_proficient_value);
+                    $group->set_scale_value($min_proficient_value);
 
                     if ($linkedcourses_exist) {
                         $linkedcourses = new linkedcourses();
@@ -95,9 +128,9 @@ class default_criteria_on_install extends adhoc_task {
 
                     break;
                 case $COMP_AGGREGATION['ANY']:
-
-                    $linkedcourses_exist = $linked_course_competencies->item($competency->id);
-                    $childcompetencies_exist = $competency->children->count() > 0;
+                    // If the aggregation method prior to totara_competency being installed was set to 'Any', then
+                    // there must be an OR relationship between the linked course and child competency
+                    // pathways. Therefore they should be in the separate criteria groups.
 
                     if ($linkedcourses_exist) {
                         $linkedcourses = new linkedcourses();
@@ -106,7 +139,7 @@ class default_criteria_on_install extends adhoc_task {
 
                         $group1 = new criteria_group();
                         $group1->set_competency($competency);
-                        $group1->set_scale_value($competency->scale->min_proficient_value);
+                        $group1->set_scale_value($min_proficient_value);
                         $group1->add_criterion($linkedcourses);
                         $group1->save();
                     }
@@ -117,7 +150,7 @@ class default_criteria_on_install extends adhoc_task {
 
                         $group2 = new criteria_group();
                         $group2->set_competency($competency);
-                        $group2->set_scale_value($competency->scale->min_proficient_value);
+                        $group2->set_scale_value($min_proficient_value);
                         $group2->add_criterion($childcompetencies);
                         $group2->save();
                     }
@@ -132,13 +165,11 @@ class default_criteria_on_install extends adhoc_task {
         }
     }
 
-    private function add_learning_plans(): bool {
-        global $DB;
-
+    private function should_add_learning_plans(): bool {
         if (totara_feature_disabled('learningplans')) {
             return false;
         }
 
-        return $DB->record_exists('dp_plan_competency_assign', []);
+        return builder::table('dp_plan_competency_assign')->exists();
     }
 }
