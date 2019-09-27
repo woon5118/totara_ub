@@ -25,11 +25,12 @@
 namespace totara_core\webapi\resolver\type;
 
 use core\webapi\execution_context;
+use core\webapi\type_resolver;
 use totara_core\formatter\learning_item_formatter;
 use totara_core\user_learning\item;
-use core\format;
-use core\webapi\type_resolver;
-use coding_exception;
+use totara_core\user_learning\item_base;
+use totara_core\user_learning\item_has_dueinfo;
+use totara_core\user_learning\item_has_progress;
 
 class learning_item implements type_resolver {
 
@@ -37,14 +38,12 @@ class learning_item implements type_resolver {
      * Resolve program fields
      *
      * @param string $field
-     * @param mixed $program
+     * @param item|item_base $item
      * @param array $args
      * @param execution_context $ec
      * @return mixed
      */
     public static function resolve(string $field, $item, array $args, execution_context $ec) {
-        global $CFG;
-
         if (!$item instanceof item) {
              throw new \coding_exception('Only learning_item objects are accepted: ' . gettype($item));
         }
@@ -63,8 +62,24 @@ class learning_item implements type_resolver {
         }
 
         if ($field == 'duedate') {
-            if (empty($item->duedate) || $item->duedate == -1) {
-                $item->duedate = null; // For consistency.
+            // Make sure we have the due date, this is for programs and certifications, also courses inside learning plans.
+            if ($item instanceof item_has_dueinfo) {
+                $item->ensure_duedate_loaded();
+                if (empty($item->duedate) || $item->duedate == -1) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        }
+
+        // Progress actually maps to progress_percentage
+        if ($field == 'progress') {
+            // Make sure we have the percentage in the progress.
+            if ($item instanceof item_has_progress && $item->can_be_completed()) {
+                return $item->get_progress_percentage();
+            } else {
+                return null;
             }
         }
 
@@ -76,8 +91,12 @@ class learning_item implements type_resolver {
         return $formatter->format($field, $format);
     }
 
-    private static function get_item_context($item) {
-        switch ($item->itemtype) {
+    /**
+     * @param item|item_base $item
+     * @return \context_course|\context_program|false
+     */
+    private static function get_item_context(item $item) {
+        switch ($item->get_type()) {
             case 'course':
                 return \context_course::instance($item->id);
                 break;

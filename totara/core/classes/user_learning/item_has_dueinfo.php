@@ -45,4 +45,11 @@ interface item_has_dueinfo {
      * @return \stdClass
      */
     public function export_dueinfo_for_template();
+
+    /**
+     * Returns true if this user learning item has a due date.
+     *
+     * @return bool
+     */
+    public function item_has_duedate();
 }

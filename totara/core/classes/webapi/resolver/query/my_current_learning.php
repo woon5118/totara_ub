@@ -25,17 +25,22 @@
 namespace totara_core\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\query_resolver;
+use totara_core\user_learning\item_base;
 use totara_core\user_learning\item_helper as learning_item_helper;
+use totara_plan\user_learning\item as plan_item;
 
 /**
  * Query to return my programs.
  */
-class my_current_learning implements \core\webapi\query_resolver {
+class my_current_learning implements query_resolver {
+
     /**
      * Returns the user's current learning items.
      *
      * @param array $args
      * @param execution_context $ec
+     * @return array|item_base[]
      */
     public static function resolve(array $args, execution_context $ec) {
         global $USER;
@@ -48,42 +53,16 @@ class my_current_learning implements \core\webapi\query_resolver {
         // Expand the items are required to create a specialised list for this block.
         $items = learning_item_helper::expand_learning_item_specialisations($items);
 
-        /**
-         * The sortorder for content.
-         * @var string
-         */
-        $sortorder = 'fullname';
-
-        \core_collator::asort_objects_by_property($items, $sortorder, \core_collator::SORT_NATURAL);
+        \core_collator::asort_objects_by_property($items, 'fullname', \core_collator::SORT_NATURAL);
 
         // Filter the content to exclude duplications, completed courses and other block specific criteria.
         $items = learning_item_helper::filter_collective_learning_items($USER->id, $items);
 
-        $learningitems = [];
-        // Loop through to add component, any other transformations/pre-formatting can happen here.
-        foreach ($items as $item) {
-            if ($item instanceof \totara_plan\user_learning\item) {
-                // We don't need the plan itself, just the contents.
-                continue;
-            }
+        $learning_items = array_filter($items, function ($item) {
+            // We don't need the plan itself, just the contents.
+            return !$item instanceof plan_item;
+        });
 
-            // Note: Persistant queries are <component>_<type> i.e. core_course_course(id);
-            $item->itemtype = $item->get_type(); // certification, program, course.
-            $item->itemcomponent = $item->get_component(); // totara_certification, totara_program, core_course
-
-            // Make sure we have the due date, this is for programs and certifications, also courses inside learning plans.
-            if ($item->item_has_duedate()) {
-                $item->ensure_duedate_loaded();
-            }
-
-            // Make sure we have the percentage in the progress.
-            if (method_exists($item, 'get_progress_percentage')) {
-                $item->progress = $item->get_progress_percentage();
-            }
-
-            $learningitems[] = $item;
-        }
-
-        return $learningitems;
+        return $learning_items;
     }
 }

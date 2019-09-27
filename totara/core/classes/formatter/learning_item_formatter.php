@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
@@ -23,14 +23,18 @@
 
 namespace totara_core\formatter;
 
-use totara_core\formatter\formatter;
-use totara_core\formatter\field\date_field_formatter;
-use totara_core\formatter\field\string_field_formatter;
-use totara_core\formatter\field\text_field_formatter;
 use core_course\formatter\course_formatter;
-use totara_program\formatter\program_formatter;
 use totara_certification\formatter\certification_formatter;
+use totara_core\formatter\field\date_field_formatter;
+use totara_core\user_learning\item;
+use totara_core\user_learning\item_base;
+use totara_program\formatter\program_formatter;
 
+/**
+ * Formatter for learning items
+ *
+ * @property-read item|item_base $object
+ */
 class learning_item_formatter extends formatter {
 
     protected function get_map(): array {
@@ -73,7 +77,7 @@ class learning_item_formatter extends formatter {
      */
     private function item_inherited_field_formatter($field, $value, $format) {
         $item = (object)['id' => $this->object->id, $field => $value];
-        switch ($this->object->itemtype) {
+        switch ($this->object->get_type()) {
             case 'course':
                 $itemformatter = new course_formatter($item, $this->context);
                 break;
@@ -88,5 +92,25 @@ class learning_item_formatter extends formatter {
         }
 
         return $itemformatter->format($field, $format);
+    }
+
+    protected function has_field(string $field): bool {
+        // Special fields where we do not have a public property
+        if ($field == 'itemtype' || $field == 'itemcomponent') {
+            return true;
+        }
+        return parent::has_field($field);
+    }
+
+    protected function get_field(string $field) {
+        // Special fields where we do not have a public property
+        if ($field == 'itemtype') {
+            return $this->object->get_type();
+        }
+        if ($field == 'itemcomponent') {
+            return $this->object->get_component();
+        }
+
+        return parent::get_field($field);
     }
 }
