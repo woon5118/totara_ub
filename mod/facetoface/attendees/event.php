@@ -22,6 +22,7 @@
 */
 
 use \mod_facetoface\attendees_helper;
+use \mod_facetoface\facilitator_list;
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');

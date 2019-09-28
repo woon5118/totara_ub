@@ -1536,7 +1536,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $url = new moodle_url('/mod/facetoface/reports/facilitators.php', [
             'facilitatorid' => $facilitator->get_id(),
         ]);
-        return $this->render_details_popup_html($facilitator->get_name(), 'facilitator', $url, $backurl, $facilitator->get_fullname_link());
+        return $this->render_details_popup_html($facilitator->get_name(), 'facilitator', $url, $backurl);
     }
 
     /**
@@ -1680,7 +1680,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $popupurl->param('popup', 1);
         $action = new popup_action('click', $popupurl, 'popup', array('width' => 800, 'height' => 600));
         $link = $this->output->action_link($url, s($facilitator->get_name()), $action, array('class' => 'mod_facetoface__sessionlist__facilitator__link'));
-        return html_writer::span($link . $facilitator->get_fullname_link(), 'mod_facetoface__sessionlist__facilitatordetails');
+        return html_writer::span($link, 'mod_facetoface__sessionlist__facilitatordetails');
     }
 
     /**

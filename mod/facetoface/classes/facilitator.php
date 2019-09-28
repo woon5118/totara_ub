@@ -38,7 +38,7 @@ final class facilitator implements seminar_iterator_item {
     /**
      * @var string {event}.eventtype = 'facetofacefacilitator'
      * NOTE: {event}.eventtype is varchar datatype and 20 chars lenght
-    const EVENTTYPE = 'faclitator';
+    const EVENTTYPE = 'facilitator';
      */
     /**
      * @var int {facetoface_facilitator}.id
