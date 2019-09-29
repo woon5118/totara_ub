@@ -41,15 +41,36 @@ $seminar = $seminarevent->get_seminar();
 $cm = $seminar->get_coursemodule();
 $context = $seminar->get_contextmodule($cm->id);
 
+// Allow facilitators to be able to view event details, without being enrolled in the course.
+// Will check everyone else below.
 require_login();
 
-// Print page header.
 $baseurl = new moodle_url('/mod/facetoface/attendees/event.php', ['s' => $seminarevent->get_id()]);
 $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
 
+$user_is_facilitator = false;
+$facilitators = facilitator_list::from_seminarevent($seminarevent->get_id());
+foreach ($facilitators as $f => $facilitator) {
+    if ($facilitator->get_userid() == $USER->id) {
+        $user_is_facilitator = true;
+        break;
+    }
+}
+
+// Anyone who isn't a facilitator must be enrolled or able to view the course.
+if (!$user_is_facilitator) {
+    require_login($seminar->get_course(), false, $cm);
+}
+
+// Generate page header.
 list($allowed_actions, $available_actions, $staff, $admin_requests, $canapproveanyrequest, $cancellations, $requests, $attendees)
     = attendees_helper::get_allowed_available_actions($seminar, $seminarevent, $context);
+// $allowed_actions is already set, so we can now know if the current action is allowed.
+$seminarurl = new moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]);
+if (!$user_is_facilitator && !in_array($action, $allowed_actions)) {
+    redirect($seminarurl);
+}
 
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
@@ -68,7 +89,7 @@ if (!(bool)$seminarevent->get_cancelledstatus()) {
     echo $renderer->render_editevent_button($seminarevent);
 }
 echo $renderer->render_seminar_event($seminarevent, true, false, true);
-echo $renderer->render_action_bar_on_tabpage(new moodle_url('/mod/facetoface/view.php', ['f' => $seminar->get_id()]));
+echo $renderer->render_action_bar_on_tabpage($seminarurl);
 echo $OUTPUT->footer();
 
 \mod_facetoface\event\attendees_viewed::create_from_session((object)['id' => $seminarevent->get_id()], $context, $action)->trigger();

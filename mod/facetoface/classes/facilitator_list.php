@@ -143,6 +143,33 @@ final class facilitator_list  implements \Iterator {
     }
 
     /**
+     * Get all facilitators for a seminar event
+     * NOTE: using in public for learners
+     * @param int $seminareventid
+     * @return facilitator_list
+     */
+    public static function from_seminarevent(int $seminareventid): facilitator_list {
+        global $DB;
+
+        $usernamefields = get_all_user_name_fields(true, 'u');
+
+        $sql = "SELECT ff.*, {$usernamefields}
+                  FROM {facetoface_facilitator} ff
+             LEFT JOIN {user} u ON u.id = ff.userid
+            INNER JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = ff.id
+            INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
+            INNER JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid
+                 WHERE ff.hidden = 0 AND fs.id = :seminareventid";
+        $rs = $DB->get_recordset_sql($sql, ['seminareventid' => $seminareventid]);
+        $list = new static();
+        foreach ($rs as $record) {
+            $facilitator = new facilitator_user($record);
+            $list->add($facilitator);
+        }
+        return $list;
+    }
+
+    /**
      * Get facilitators by seminar session dates
      * NOTE: using in public for learners
      * @param int $sessionid
