@@ -55,6 +55,138 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         // The other thing we're testing here is no exceptions when no competencies exist.
     }
 
+    public function test_competency_without_aggregation_is_processed() {
+        global $DB;
+
+        [$comp, $scale] = $this->generate_comp_and_scale('ALL');
+
+        // We're adding a learning plan so that we have the same conditions as the inverse of this test (below).
+        set_config('enablelearningplans', TOTARA_SHOWFEATURE);
+        $this->add_learning_plan($comp->id);
+
+        // Ensure there definitely isn't aggregation already.
+        $this->assertEquals(0, $DB->count_records('totara_competency_scale_aggregation'));
+
+        $task = new default_criteria_on_install();
+        $task->execute();
+
+        // There now is an aggregation record.
+        $this->assertEquals(1, $DB->count_records('totara_competency_scale_aggregation'));
+
+        // Ensure this is also valid via the API.
+        $competency = new competency($comp);
+        $achievement_configuration = new achievement_configuration($competency);
+        $this->assertEquals('first', $achievement_configuration->get_aggregation_type());
+
+        // Make sure that the learning plan was added.
+        $active_pathways = $achievement_configuration->get_active_pathways();
+        $this->assertCount(1, $active_pathways);
+        $lp_pathway = array_shift($active_pathways);
+        $this->assertInstanceOf(learning_plan::class, $lp_pathway);
+    }
+
+    public function test_competency_with_aggregation_already_is_not_processed() {
+        global $DB;
+
+        [$comp, $scale] = $this->generate_comp_and_scale('ALL');
+
+        // Add aggregation as if this was done in some normal fashion, so use the API.
+        $competency = new competency($comp);
+        $achievement_configuration = new achievement_configuration($competency);
+        $achievement_configuration->set_aggregation_type('first');
+        $achievement_configuration->save_aggregation();
+
+        // We're adding a learning plan and we should see this does not get added afterwards.
+        set_config('enablelearningplans', TOTARA_SHOWFEATURE);
+        $this->add_learning_plan($comp->id);
+
+        // Ensure there definitely is aggregation.
+        $this->assertEquals(1, $DB->count_records('totara_competency_scale_aggregation'));
+
+        $task = new default_criteria_on_install();
+        $task->execute();
+
+        // Still just the one record.
+        $this->assertEquals(1, $DB->count_records('totara_competency_scale_aggregation'));
+
+        // Ensure the API still functions.
+        $competency = new competency($comp);
+        $achievement_configuration = new achievement_configuration($competency);
+        $this->assertEquals('first', $achievement_configuration->get_aggregation_type());
+
+        // That learning plan should not have been added as this competency was not processed as part of install.
+        $active_pathways = $achievement_configuration->get_active_pathways();
+        $this->assertCount(0, $active_pathways);
+    }
+
+    /**
+     * The point of this test is to ensure that our protection against adding more and more data
+     * if the task is run more than once for any reason is adequate.
+     */
+    public function test_one_competency_on_upgrade_run_multiple_times() {
+        global $DB;
+
+        [$comp, $scale] = $this->generate_comp_and_scale('ALL');
+
+        $this->add_a_linked_course($comp);
+        $this->add_a_child_competency($comp);
+
+        $this->assertEquals(0, $DB->count_records('totara_competency_scale_aggregation'));
+
+        $task = new default_criteria_on_install();
+        $task->execute();
+
+        // Parent and child competency will both have aggregation records now.
+        $this->assertEquals(2, $DB->count_records('totara_competency_scale_aggregation'));
+
+        $competency = new competency($comp);
+        $achievement_configuration = new achievement_configuration($competency);
+        $this->assertEquals('first', $achievement_configuration->get_aggregation_type());
+
+        $active_pathways = $achievement_configuration->get_active_pathways();
+        $this->assertCount(1, $active_pathways);
+
+        /** @var criteria_group $group_pathway */
+        $group_pathway = array_shift($active_pathways);
+        $this->assertInstanceOf(criteria_group::class, $group_pathway);
+        $this->assertEquals($scale->minproficiencyid, $group_pathway->get_scale_value()->id);
+
+        $criteria = $group_pathway->get_criteria();
+        $this->assertCount(2, $criteria);
+
+        // Run again.
+        $task = new default_criteria_on_install();
+        $task->execute();
+
+        $this->assertEquals(2, $DB->count_records('totara_competency_scale_aggregation'));
+
+        $competency = new competency($comp);
+        $achievement_configuration = new achievement_configuration($competency);
+        $this->assertEquals('first', $achievement_configuration->get_aggregation_type());
+
+        $active_pathways = $achievement_configuration->get_active_pathways();
+        $this->assertCount(1, $active_pathways);
+        $group_pathway = array_shift($active_pathways);
+        $criteria = $group_pathway->get_criteria();
+        $this->assertCount(2, $criteria);
+
+        // One more time.
+        $task = new default_criteria_on_install();
+        $task->execute();
+
+        $this->assertEquals(2, $DB->count_records('totara_competency_scale_aggregation'));
+
+        $competency = new competency($comp);
+        $achievement_configuration = new achievement_configuration($competency);
+        $this->assertEquals('first', $achievement_configuration->get_aggregation_type());
+
+        $active_pathways = $achievement_configuration->get_active_pathways();
+        $this->assertCount(1, $active_pathways);
+        $group_pathway = array_shift($active_pathways);
+        $criteria = $group_pathway->get_criteria();
+        $this->assertCount(2, $criteria);
+    }
+
     private function add_learning_plan($competency_id = null) {
         /** @var totara_plan_generator $plan_generator */
         $plan_generator = $this->getDataGenerator()->get_plugin_generator('totara_plan');
@@ -543,16 +675,32 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         $this->add_a_linked_course($comp6);
         $this->add_a_child_competency($comp6);
 
+        $comp7 = $totara_hierarchy_generator->create_comp(
+            ['frameworkid' => $compfw2->id, 'aggregationmethod' => $COMP_AGGREGATION['ANY']]
+        );
+        $this->add_a_linked_course($comp7);
+        $this->add_a_child_competency($comp7);
+
+        // For comp7, we're adding the aggregation record already, as if this has been added via the UI
+        // before the install task could be run.
+        $competency7 = new competency($comp7);
+        $achievement_configuration = new achievement_configuration($competency7);
+        $achievement_configuration->set_aggregation_type('first');
+        $achievement_configuration->save_aggregation();
+
+
+
         // There just needs to be one learning plan with one of the competencies
         // and we should be seeing learning plan pathways on all competencies.
         $this->add_learning_plan($comp5->id);
 
-        // Includes 6 parent competencies + 4 child competencies.
-        $this->assertEquals(10, $DB->count_records('comp'));
+        // Includes 7 parent competencies + 5 child competencies.
+        $this->assertEquals(12, $DB->count_records('comp'));
 
         // The point is to test the adhoc task adds this data. If the hierarchy generator starts adding it, we'd want
         // to be able to give it the option to say don't do that.
-        $this->assertEquals(0, $DB->count_records('totara_competency_scale_aggregation'));
+        // There is one scale aggregation record because of comp7, but that should be all.
+        $this->assertEquals(1, $DB->count_records('totara_competency_scale_aggregation'));
         $this->assertEquals(0, $DB->count_records('totara_competency_pathway'));
 
         $task = new default_criteria_on_install();
@@ -712,5 +860,19 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         $criterion = array_shift($criteria);
         $this->assertInstanceOf(childcompetency::class, $criterion);
         $this->assertEquals(criterion::AGGREGATE_ANY_N, $criterion->get_aggregation_method());
+
+        /**
+         * Competency 7.
+         *
+         * Aggregation ANY, includes linked courses and child competencies.
+         *
+         * But this competency had aggregation set before the task ran, so nothing should have been added.
+         */
+
+        $competency7 = new competency($comp7);
+        $achievement_configuration = new achievement_configuration($competency7);
+        $this->assertEquals('first', $achievement_configuration->get_aggregation_type());
+        $active_pathways = $achievement_configuration->get_active_pathways();
+        $this->assertCount(0, $active_pathways);
     }
 }
