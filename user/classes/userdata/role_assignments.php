@@ -186,7 +186,7 @@ class role_assignments extends item {
 
         // For system context just get all role assignments for that user.
         if ($context->contextlevel == CONTEXT_SYSTEM) {
-            $sql = "SELECT {$select_columns}                    
+            $sql = "SELECT {$select_columns}
                       FROM {role_assignments} ra
                       JOIN {role} r ON r.id = ra.roleid
                      WHERE ra.userid = :userid";
@@ -194,8 +194,8 @@ class role_assignments extends item {
                 'userid' => $user->id,
             ];
         } else {
-            $likepathsql = $DB->sql_like('path', ':path');
-            $sql = "SELECT {$select_columns}                    
+            $likepathsql = 'path LIKE :path';
+            $sql = "SELECT {$select_columns}
                       FROM {role_assignments} ra
                       JOIN {context} ctx ON ctx.id = ra.contextid
                       JOIN {role} r ON r.id = ra.roleid

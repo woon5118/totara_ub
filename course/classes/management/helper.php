@@ -874,7 +874,7 @@ class helper {
     public static function get_category_children_visibility($categoryid) {
         global $DB;
         $category = \coursecat::get($categoryid);
-        $select = $DB->sql_like('path', ':path');
+        $select = 'path LIKE :path';
         $path = $category->path . '/%';
 
         $sql = "SELECT c.id, c.visible

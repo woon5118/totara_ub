@@ -1697,7 +1697,7 @@ class core_course_external extends external_api {
                     }
 
                     foreach ($categories as $category) {
-                        $sqlselect = $DB->sql_like('path', ':path') . $additionalselect;
+                        $sqlselect = 'path LIKE :path' . $additionalselect;
                         $sqlparams = array('path' => $category->path.'/%') + $additionalparams; // It will NOT include the specified category.
                         $subcategories = $DB->get_records_select('course_categories', $sqlselect, $sqlparams);
                         $newcategories = $newcategories + $subcategories;   // Both arrays have integer as keys.
