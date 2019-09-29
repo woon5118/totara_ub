@@ -17,20 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package pathway_manual
  */
 
 namespace pathway_manual\webapi\resolver\query;
 
+use context_system;
+use context_user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use totara_competency\entities\scale_value;
+use pathway_manual\data_providers\competency_ratings;
 
-/**
- * tbd
- */
-class achievements implements query_resolver {
+class role_ratings implements query_resolver {
 
     /**
      * @param array $args
@@ -38,26 +37,18 @@ class achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        require_login(null, false,null, false, true);
-
         global $USER;
 
-        $sv3 = new scale_value([
-            'name' => "Scale value 1",
-            'numericscore' => 1,
-            'proficient' => 0
-        ]);
+        require_login(null, false, null, false, true);
 
+        $user_id = $args['user_id'];
+        if ($USER->id == $user_id) {
+            require_capability('totara/competency:view_own_profile', context_system::instance());
+        } else {
+            require_capability('totara/competency:view_other_profile', context_user::instance($user_id));
+        }
 
-        return [
-            [
-                'rater' => $USER,
-                'role' => 'hardcoded',
-                'scale_value' => $sv3,
-                'comment' => 'my comment'
-            ],
-
-        ];
+        return competency_ratings::for_assignment($args['assignment_id'], $user_id)->fetch_role_ratings();
     }
 
 }

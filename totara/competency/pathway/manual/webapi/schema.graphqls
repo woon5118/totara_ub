@@ -1,13 +1,21 @@
-type pathway_manual_achievement {
-  role: String! # manager, self, etc.
-  rater: core_user # user fullname, picture url, etc.
-  scale_value: totara_competency_scale_value # rating value id given
-  comment(format: core_format = HTML): String # comment added on rating
+type pathway_manual_rating {
+    rater: core_user # user fullname, picture url, etc.
+    scale_value: totara_competency_scale_value # rating value id given
+    timestamp(format: core_date_format = TIMESTAMP): core_date! # when the rating was made
+    comment(format: core_format = HTML): String # comment added on rating
+}
+
+type pathway_manual_role_rating {
+    role: String! # manager, self, etc.
+    role_display_name: String! # "Manager", "Your rating" etc
+    has_role: Boolean! # does the current user have this role?
+    latest_rating: pathway_manual_rating
+    default_profile_picture: String # Picture url to use if there is no rating
 }
 
 extend type Query {
-  pathway_manual_achievements(
+  pathway_manual_role_ratings(
     user_id: core_id!
     assignment_id: core_id!
-  ): [pathway_manual_achievement]
+  ): [pathway_manual_role_rating]
 }

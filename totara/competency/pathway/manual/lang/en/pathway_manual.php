@@ -24,9 +24,18 @@
 $string['pluginname'] = 'Manual rating';
 
 $string['achievedviaratingby'] = 'rating by {$a->name} ({$a->role})';
+$string['add_rating'] = 'Add rating';
 $string['addraters'] = 'Add raters';
+$string['comment_wrapper'] = '"{$a}"';
+$string['fullname_date'] = '{$a->name}, {$a->date}';
+$string['no_rating_given'] = 'No rating given';
 $string['raters'] = 'Raters';
+$string['raters_info'] = 'Manual ratings apply to all current assignments for this competency.';
+$string['role_appraiser'] = 'Appraiser';
+$string['role_manager'] = 'Manager';
+$string['role_self'] = 'Self';
 $string['selectraters'] = 'Select raters';
+$string['your_rating'] = 'Your rating';
 
 $string['error:noraters'] = 'No raters selected';
 

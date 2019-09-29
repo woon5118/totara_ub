@@ -24,6 +24,10 @@
 namespace pathway_manual\entities;
 
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
+use core\orm\entity\relations\has_one;
+use totara_assignment\entities\user;
+use totara_competency\entities\scale_value;
 
 /**
  * Class rating
@@ -38,8 +42,30 @@ use core\orm\entity\entity;
  * @property int $assigned_by
  * @property string $assigned_by_role
  * @property string $comment
+ *
+ * @property-read user $assigned_by_user
+ * @property-read scale_value $scale_value
  */
 class rating extends entity {
 
     public const TABLE = 'pathway_manual_rating';
+
+    /**
+     * User who made the rating
+     *
+     * @return belongs_to
+     */
+    public function assigned_by_user(): belongs_to {
+        return $this->belongs_to(user::class, 'assigned_by');
+    }
+
+    /**
+     * Scale value
+     *
+     * @return belongs_to
+     */
+    public function scale_value(): belongs_to {
+        return $this->belongs_to(scale_value::class, 'scale_value_id');
+    }
+
 }

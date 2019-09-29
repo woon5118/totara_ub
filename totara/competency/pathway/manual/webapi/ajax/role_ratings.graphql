@@ -1,0 +1,19 @@
+query pathway_manual_role_ratings($user_id: core_id!, $assignment_id: core_id!) {
+  pathway_manual_role_ratings(user_id: $user_id, assignment_id: $assignment_id) {
+    role
+    role_display_name
+    default_profile_picture
+    has_role
+    latest_rating {
+      rater {
+        fullname
+        profileimageurl
+      }
+      scale_value {
+        name
+      }
+      date: timestamp(format: DATE)
+      comment
+    }
+  }
+}
