@@ -9,10 +9,12 @@ query criteria_coursecompletion_achievements(
     aggregation_method
     required_items
     items {
-      fullname(format: HTML)
-      description(format: HTML)
-      progress
-      url_view
+      course {
+        fullname(format: HTML)
+        description(format: HTML)
+        progress
+        url_view
+      }
     }
   }
 }
