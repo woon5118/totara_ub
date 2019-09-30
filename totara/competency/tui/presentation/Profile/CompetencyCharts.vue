@@ -2,7 +2,7 @@
   <div class="tui-CompetencyCharts">
     <div
       v-for="(item, key) in data.items"
-      :key="key"
+      :key="key + item.name + item.overall_progress"
       class="tui-CompetencyCharts__chart"
     >
       <IndividualAssignmentProgress :assignment-progress="item" />
@@ -23,10 +23,6 @@ export default {
       required: true,
       type: Object,
     },
-  },
-
-  data: function() {
-    return {};
   },
 };
 </script>

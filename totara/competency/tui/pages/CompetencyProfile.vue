@@ -66,7 +66,7 @@ import NoCompetencyAssignments from '../presentation/Profile/NoCompetencyAssignm
 import ProfileHeader from '../presentation/Profile/Header';
 
 const ACTIVE_ASSIGNMENT = 1;
-const ARCHIVED_ASSIGNMENT = 2;
+// const ARCHIVED_ASSIGNMENT = 2;
 
 export default {
   components: {
@@ -166,8 +166,6 @@ export default {
         if (!this.currentProgressData.length) {
           this.currentProgressData = data.items.slice(0);
         }
-
-        this.progressDataLoaded(this.selectedFilters);
       },
     },
   },
@@ -179,11 +177,9 @@ export default {
       }
 
       this.activeTab = tab;
-    },
 
-    progressDataLoaded(filters) {
-      if (filters.status === ARCHIVED_ASSIGNMENT) {
-        this.selectTab('table');
+      if (this.activeTab === 'charts') {
+          this.$apollo.queries.data.refetch();
       }
     },
   },
@@ -204,7 +200,7 @@ export default {
     }
 
     &.active {
-      color: #005ebd;
+      color: #c7c7c7;
     }
   }
 
