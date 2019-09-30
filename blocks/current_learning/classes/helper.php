@@ -30,12 +30,10 @@ class helper {
     /**
      * Calculate the state for an item according to the settings for the block.
      *
-     * - If the due date is in the past                                      => danger + alert flag.
-     * - If: (duedate - warning period) > now < duedate                      => danger.
-     * - If: (duedate - warning period) = now < duedate                      => danger.
-     * - If: (duedate - alert period)   > now < (duedate - warning period)   => warning.
-     * - If: (duedate - alert period)   = now < (duedate - warning period)   => warning.
-     * - If: now < (duedate - alert period)                                  => info.
+     * - If: (duedate - warning period) >= now                               : info.
+     * - If: (duedate - alert period)   >= now > (duedate - warning period)  : warning.
+     * - If: (duedate)                  > now > (duedate - alert period)     : danger.
+     * - If: (duedate) < now            [the due date is in the past]        : danger + alert flag.
      *
      * @param int $duedate The duedate for the item
      * @param \stdClass $config The block config object
@@ -43,6 +41,9 @@ class helper {
      * @return array An array with a state string and flag for warning icon
      */
     public static function get_duedate_state($duedate, $config, $now = null) {
+        if ($config->alertperiod > $config->warningperiod) {
+            throw new \coding_exception('Warning period cannot be before the alert period');
+        }
         if ($now === null) {
             $now = time();
         }
@@ -51,22 +52,22 @@ class helper {
 
         $alert = false;
 
-        if ($now < $alertperiod) {
-            // Not due.
+        if ($warningperiod > $now) {
+            // Out of warning period.
             $state = 'label-info';
-
-        } else if ($now >= $alertperiod && $now < $warningperiod) {
-            // Warning.
+        } else if ($alertperiod > $now && $warningperiod <= $now) {
+            // Within warning period.
             $state = 'label-warning';
-
-        } else if ($now >= $warningperiod && $now < $duedate) {
-            // Alert.
+        } else if ($alertperiod <= $now && $duedate > $now) {
+            // Within alert period.
             $state = 'label-danger';
-
-        } else if ($now >= $duedate) {
+        } else if ($duedate <= $now) {
             // Overdue.
             $state = 'label-danger';
             $alert = true;
+        } else {
+            // Unreachable.
+            throw new \coding_exception('Logically impossible');
         }
 
         return array(

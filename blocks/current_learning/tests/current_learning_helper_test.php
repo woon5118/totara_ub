@@ -26,174 +26,150 @@ defined('MOODLE_INTERNAL') || die();
 class block_current_learning_helper_testcase extends advanced_testcase {
 
     /**
-     * Returns a block config object with alert period at 7 days, and warning period at 6 days.
+     * Test failure scenarios of block_current_learning\helper::get_duedate_state.
+     */
+    public function test_get_duedate_state_throws_exception() {
+        // alertperiod must be less than or equal to warningperiod.
+        $config = new stdClass();
+        $config->alertperiod = DAYSECS * 20;
+        $config->warningperiod = DAYSECS * 10;
+        try {
+            \block_current_learning\helper::get_duedate_state(time() + YEARSECS, $config, time());
+            $this->fail('coding_exception expected when alertperiod > warningperiod');
+        } catch (\coding_exception $ex) {
+            $this->assertContains('Warning period cannot be before the alert period', $ex->getMessage());
+        }
+    }
+
+    /**
+     * Data provider for test_get_duedate_state_returns_correct_states.
      *
-     * @return stdClass
+     * @return array of [ alertperiod, warningperiod, expectation_for_timeframe_1_to_7 ]
      */
-    protected function get_config() {
-        $config = new stdClass;
-        $config->alertperiod = (60 * 60 * 24 * 7);
-        $config->warningperiod = (60 * 60 * 24 * 6);
-        return $config;
+    public function data_get_duedate_state_returns_correct_states() {
+        return [
+            [
+                WEEKSECS,                       // alert = 1 week (default)
+                30 * DAYSECS,                   // warning = 30 days (default)
+                [
+                    ['label-danger', true],     // (1)
+                    ['label-danger', true],     // (2)
+                    ['label-danger', false],    // (3)
+                    ['label-danger', false],    // (4)
+                    ['label-warning', false],   // (5)
+                    ['label-warning', false],   // (6)
+                    ['label-info', false],      // (7)
+                ]
+            ],
+            [
+                10 * DAYSECS,                   // alert = 10 days
+                10 * DAYSECS,                   // warning = alert
+                [
+                    ['label-danger', true],     // (1)
+                    ['label-danger', true],     // (2)
+                    ['label-danger', false],    // (3)
+                    ['label-danger', false],    // (4)
+                    ['label-danger', false],    // (5)
+                    ['label-danger', false],    // (6)
+                    ['label-info', false],      // (7)
+                ]
+            ],
+            [
+                0,                              // alert = 0
+                20 * DAYSECS,                   // warning = 20 days
+                [
+                    ['label-danger', true],     // (1)
+                    ['label-danger', true],     // (2)
+                    ['label-danger', true],     // (3)
+                    ['label-danger', true],     // (4)
+                    ['label-warning', false],   // (5)
+                    ['label-warning', false],   // (6)
+                    ['label-info', false],      // (7)
+                ]
+            ],
+            [
+                0,                              // alert = 0
+                0,                              // warning = 0
+                [
+                    ['label-danger', true],     // (1)
+                    ['label-danger', true],     // (2)
+                    ['label-danger', true],     // (3)
+                    ['label-danger', true],     // (4)
+                    ['label-danger', true],     // (5)
+                    ['label-danger', true],     // (6)
+                    ['label-info', false],      // (7)
+                ]
+            ]
+        ];
     }
 
     /**
-     * Tests that when the due date is in the past we get a danger label, and the alert flag is raised.
+     * Test block_current_learning\helper::get_duedate_state by moving around the due date
+     * to make sure the results of time period (1) through (7) are expected.
      *
-     * If the due date is in the past => danger + alert flag.
+     *          Warning Day      Alert Day      Due date
+     *             |               |               |
+     * Info ------>| Warning ----->| Danger ------>| Danger + Alert ---->
+     * Time ------------------------------------------------------------>
+     *      (7)   (6)     (5)     (4)     (3)     (2)      (1)
+     *
+     * @dataProvider data_get_duedate_state_returns_correct_states
      */
-    public function test_get_duedate_state_for_past_date() {
-
+    public function test_get_duedate_state_returns_correct_states($alertperiod, $warningperiod, $expects) {
+        $config = new stdClass();
+        $config->alertperiod = $alertperiod;
+        $config->warningperiod = $warningperiod;
         $now = time();
-        $duedate = $now - (60 * 60 * 24 * 1);
 
-        $result = \block_current_learning\helper::get_duedate_state($duedate, $this->get_config(), $now);
-        $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing(['state', 'alert'], array_keys($result), 'Resulting array does not contain the expected keys');
-        $this->assertSame('label-danger', $result['state']);
-        $this->assertTrue($result['alert']);
-    }
+        array_splice($expects, 0, 0, '.'); // Make $expects 1-based indexes.
 
-    /**
-     * If: (duedate - warning period) > now < duedate => danger.
-     */
-    public function test_duedate_state_well_within_warning_period() {
-
-        $now = time();
-        $duedate = $now + (60 * 60 * 24 * 1);
-
-        $result = \block_current_learning\helper::get_duedate_state($duedate, $this->get_config(), $now);
-        $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing(['state', 'alert'], array_keys($result), 'Resulting array does not contain the expected keys');
-        $this->assertSame('label-danger', $result['state']);
-        $this->assertFalse($result['alert']);
-    }
-
-    /**
-     * If: (duedate - warning period) > now < duedate => danger.
-     */
-    public function test_duedate_state_just_within_warning_period() {
-
-        $now = time();
-        $config = $this->get_config();
-        $duedate = $now + $config->warningperiod - 60;
-
+        // 1) the due date is in the past : danger + alert flag.
+        $duedate = $now - DAYSECS;
         $result = \block_current_learning\helper::get_duedate_state($duedate, $config, $now);
         $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing(['state', 'alert'], array_keys($result), 'Resulting array does not contain the expected keys');
-        $this->assertSame('label-danger', $result['state']);
-        $this->assertFalse($result['alert']);
-    }
+        $this->assertSame($expects[1][0], $result['state'], '1) result.state');
+        $this->assertSame($expects[1][1], $result['alert'], '1) result.alert');
 
-    /**
-     * If: (duedate - warning period) = now < duedate => danger.
-     */
-    public function test_duedate_state_on_warning_period() {
-
-        $now = time();
-        $config = $this->get_config();
-        $duedate = $now + $config->warningperiod;
-
+        // 2) the due date is right now : danger + alert flag.
+        $duedate = $now;
         $result = \block_current_learning\helper::get_duedate_state($duedate, $config, $now);
         $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing(['state', 'alert'], array_keys($result), 'Resulting array does not contain the expected keys');
-        $this->assertSame('label-danger', $result['state']);
-        $this->assertFalse($result['alert']);
-    }
+        $this->assertSame($expects[2][0], $result['state'], '2) result.state');
+        $this->assertSame($expects[2][1], $result['alert'], '2) result.alert');
 
-    /**
-     * If: (duedate - alert period)   > now < (duedate - warning period)   => warning.
-     */
-    public function test_duedate_state_just_past_warning_period() {
-
-        $now = time();
-        $config = $this->get_config();
-        $duedate = $now + $config->warningperiod + 60;
-
+        // 3) (due date) - now < (alert period) : danger.
+        $duedate = $now + $alertperiod / 2;
         $result = \block_current_learning\helper::get_duedate_state($duedate, $config, $now);
         $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing(['state', 'alert'], array_keys($result), 'Resulting array does not contain the expected keys');
-        $this->assertSame('label-warning', $result['state']);
-        $this->assertFalse($result['alert']);
-    }
+        $this->assertSame($expects[3][0], $result['state'], '3) result.state');
+        $this->assertSame($expects[3][1], $result['alert'], '3) result.alert');
 
-    /**
-     * If: (duedate - alert period)   > now < (duedate - warning period)   => warning.
-     */
-    public function test_duedate_state_just_within_alert_period() {
-
-        $now = time();
-        $config = $this->get_config();
-        $duedate = $now + $config->alertperiod - 60;
-
+        // 4) (due date) - now = (alert period) : danger.
+        $duedate = $now + $alertperiod;
         $result = \block_current_learning\helper::get_duedate_state($duedate, $config, $now);
         $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing(['state', 'alert'], array_keys($result), 'Resulting array does not contain the expected keys');
-        $this->assertSame('label-warning', $result['state']);
-        $this->assertFalse($result['alert']);
-    }
+        $this->assertSame($expects[4][0], $result['state'], '4) result.state');
+        $this->assertSame($expects[4][1], $result['alert'], '4) result.alert');
 
-    /**
-     * If: (duedate - alert period)   = now < (duedate - warning period)   => warning.
-     */
-    public function test_duedate_state_on_alert_period() {
-
-        $now = time();
-        $config = $this->get_config();
-        $duedate = $now + $config->alertperiod;
-
+        // 5) (alert period) < (due date) - now < (warning period) : warning.
+        $duedate = $now + $alertperiod + ($warningperiod - $alertperiod) / 2;
         $result = \block_current_learning\helper::get_duedate_state($duedate, $config, $now);
         $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing(['state', 'alert'], array_keys($result), 'Resulting array does not contain the expected keys');
-        $this->assertSame('label-warning', $result['state']);
-        $this->assertFalse($result['alert']);
-    }
+        $this->assertSame($expects[5][0], $result['state'], '5) result.state');
+        $this->assertSame($expects[5][1], $result['alert'], '5) result.alert');
 
-    /**
-     * If: now < (duedate - alert period) => info.
-     */
-    public function test_duedate_state_just_before_alert_period() {
-
-        $now = time();
-        $config = $this->get_config();
-        $duedate = $now + $config->alertperiod + 60;
-
+        // 6) (alert period) < (due date) - now = (warning period) : warning.
+        $duedate = $now + $warningperiod;
         $result = \block_current_learning\helper::get_duedate_state($duedate, $config, $now);
         $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing(['state', 'alert'], array_keys($result), 'Resulting array does not contain the expected keys');
-        $this->assertSame('label-info', $result['state']);
-        $this->assertFalse($result['alert']);
-    }
+        $this->assertSame($expects[6][0], $result['state'], '6) result.state');
+        $this->assertSame($expects[6][1], $result['alert'], '6) result.alert');
 
-    /**
-     * If: now < (duedate - alert period) => info.
-     */
-    public function test_duedate_state_past_both_periods() {
-
-        $now = time();
-        $config = $this->get_config();
-        $duedate = $now + (60 * 60 * 24 * 8);
-
+        // 7) (warning period) < (due date) - now: info.
+        $duedate = $now + $alertperiod + $warningperiod + DAYSECS;
         $result = \block_current_learning\helper::get_duedate_state($duedate, $config, $now);
         $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing(['state', 'alert'], array_keys($result), 'Resulting array does not contain the expected keys');
-        $this->assertSame('label-info', $result['state']);
-        $this->assertFalse($result['alert']);
-    }
-
-    /**
-     * If: now < (duedate - alert period) => info.
-     */
-    public function test_duedate_state_in_distant_future() {
-
-        $now = time();
-        $config = $this->get_config();
-        $duedate = $now + (60 * 60 * 24 * 90);
-
-        $result = \block_current_learning\helper::get_duedate_state($duedate, $config, $now);
-        $this->assertIsArray($result);
-        $this->assertEqualsCanonicalizing(['state', 'alert'], array_keys($result), 'Resulting array does not contain the expected keys');
-        $this->assertSame('label-info', $result['state']);
-        $this->assertFalse($result['alert']);
+        $this->assertSame($expects[7][0], $result['state'], '7) result.state');
+        $this->assertSame($expects[7][1], $result['alert'], '7) result.alert');
     }
 }
