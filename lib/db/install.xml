@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="lib/db" VERSION="20190923" COMMENT="XMLDB file for core Moodle tables"
+<XMLDB PATH="lib/db" VERSION="20190930" COMMENT="XMLDB file for core Moodle tables"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../lib/xmldb/xmldb.xsd"
 >
@@ -115,6 +115,7 @@
         <INDEX NAME="shortname" UNIQUE="false" FIELDS="shortname"/>
         <INDEX NAME="sortorder" UNIQUE="false" FIELDS="sortorder"/>
         <INDEX NAME="audiencevisible" UNIQUE="false" FIELDS="audiencevisible" COMMENT="Used by audience based visibility SQL"/>
+        <INDEX NAME="category-sortorder" UNIQUE="false" FIELDS="category, sortorder"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="course_categories" COMMENT="Course categories">

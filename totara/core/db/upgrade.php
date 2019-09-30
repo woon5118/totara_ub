@@ -689,5 +689,19 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019092401, 'totara', 'core');
     }
 
+    if ($oldversion < 2019093000) {
+        // Define index category-sortorder (not unique) to be added to course.
+        $table = new xmldb_table('course');
+        $index = new xmldb_index('category-sortorder', XMLDB_INDEX_NOTUNIQUE, array('category', 'sortorder'));
+
+        // Conditionally launch add index category-sortorder.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2019093000, 'totara', 'core');
+    }
+
     return true;
 }

@@ -359,5 +359,12 @@ function xmldb_totara_core_install() {
         $dbman->add_index($table, $index);
     }
 
+    // Add indexes that benefit category management pages
+    $table = new xmldb_table('course');
+    $index = new xmldb_index('category-sortorder', XMLDB_INDEX_NOTUNIQUE, array('category', 'sortorder'));
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
+    }
+
     return true;
 }
