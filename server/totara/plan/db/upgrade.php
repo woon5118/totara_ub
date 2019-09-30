@@ -72,20 +72,6 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017070600, 'totara', 'plan');
     }
 
-    if ($oldversion < 2017112000) {
-        // Update the indexes on the dp_plan_evidence_info_data table.
-        $table = new xmldb_table('dp_plan_evidence_info_data');
-
-        // Define new index to be added.
-        $index = new xmldb_index('dpplanevidinfodata_fieevi_uix', XMLDB_INDEX_UNIQUE, array('fieldid', 'evidenceid'));
-        // Conditionally launch to add index.
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
-        }
-
-        upgrade_plugin_savepoint(true, 2017112000, 'totara', 'plan');
-    }
-
     if ($oldversion < 2018052300) {
         // Clean up orphaned files from any previously deleted evidence.
         totara_plan_upgrade_clean_deleted_evidence_files();
