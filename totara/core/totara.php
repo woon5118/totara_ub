@@ -122,10 +122,11 @@ if (!function_exists('array_key_last')) {
  *
  * @param int|stdClass $courseorid
  * @param int|null     $userid
- *
+ * @param bool|int     $hasactiveenrolment If null the users current enrolment status will be calculated, otherwise this will
+ *                     value will be used. True if the user is known to have a current active enrolment, false if not.
  * @return bool
  */
-function totara_course_is_viewable($courseorid, $userid = null): bool {
+function totara_course_is_viewable($courseorid, $userid = null, bool $hasactiveenrolment = null): bool {
     global $CFG, $DB, $USER;
 
     if ($userid === null) {
@@ -181,7 +182,7 @@ function totara_course_is_viewable($courseorid, $userid = null): bool {
     // If you have an active enrollment and it's COHORT_VISIBLE_ENROLLED || COHORT_VISIBLE_AUDIENCE
     // Cannot use is_enrolled($context, $userid, '', true) here because it calls this function
     // and ends up in an infinite loop.
-    $enrolled = enrol_get_enrolment_end($context->instanceid, $userid);
+    $enrolled = $hasactiveenrolment ?? enrol_get_enrolment_end($context->instanceid, $userid);
     if ($enrolled !== false) {
         return true;
     }

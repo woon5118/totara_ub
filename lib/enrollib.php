@@ -664,16 +664,15 @@ function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder AS
     $params['contextlevel'] = CONTEXT_COURSE;
     $wheres = implode(" AND ", $wheres);
 
-    // Get visibility sql for the courses the user can view.
-    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
-    $wheres .= " AND {$visibilitysql} ";
-    $params = array_merge($params, $visibilityparams);
-
     if (!empty($courseids)) {
         list($courseidssql, $courseidsparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
         $wheres = sprintf("%s AND c.id %s", $wheres, $courseidssql);
         $params = array_merge($params, $courseidsparams);
     }
+
+    // TOTARA: We don't use totara_visibility_where here because the default expectation is that users will be able to see
+    // the courses they are enrolled in.
+    // Therefore we check visibility individually as that is quicker than totara_visibility_where.
 
     //note: we can not use DISTINCT + text fields due to Oracle and MS limitations, that is why we have the subselect there
     $sql = "SELECT $coursefields $ccselect
@@ -694,6 +693,12 @@ function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder AS
     $params['now2']    = $now2;
 
     $courses = $DB->get_records_sql($sql, $params, 0, $limit);
+    foreach ($courses as $courseid => $course) {
+        \context_helper::preload_from_record($course);
+        if (!totara_course_is_viewable($course, $USER->id, true)) {
+            unset($courses[$courseid]);
+        }
+    }
 
     //wow! Is that really all? :-D
 
