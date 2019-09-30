@@ -692,9 +692,15 @@ function xmldb_totara_core_upgrade($oldversion) {
     if ($oldversion < 2019093000) {
         // Define index category-sortorder (not unique) to be added to course.
         $table = new xmldb_table('course');
-        $index = new xmldb_index('category-sortorder', XMLDB_INDEX_NOTUNIQUE, array('category', 'sortorder'));
 
-        // Conditionally launch add index category-sortorder.
+        // First up drop the existing index on category.
+        $index = new xmldb_index('category', XMLDB_INDEX_NOTUNIQUE, array('category'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // And create the new multi column index on category and sortorder.
+        $index = new xmldb_index('category-sortorder', XMLDB_INDEX_NOTUNIQUE, array('category', 'sortorder'));
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
