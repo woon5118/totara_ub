@@ -85,7 +85,7 @@
             class="tui-criteriaCourseCompletion__summary"
             v-html="row.course.summary"
           />
-          <a :href="row.course.url" class="btn btn-primary">
+          <a :href="row.course.url_view" class="btn btn-primary">
             {{ $str('course_link', 'totara_criteria') }}
           </a>
         </template>
