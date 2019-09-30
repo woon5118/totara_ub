@@ -1,6 +1,7 @@
 <?php
 
 use core\orm\query\builder;
+use pathway_manual\manual;
 use tassign_competency\entities\assignment;
 use tassign_competency\expand_task;
 use tassign_competency\models\assignment_actions;
@@ -494,6 +495,144 @@ Feel free to browse, list of users is below, their password is 12345.
 
     foreach ($competencies as $key => $framework) {
         $data['comps'][$key] = create_competency_framework($framework);
+    }
+
+    // Then we need to create some manual job assignments so we have some managers and appraisers etc
+    $job_assignments = [
+        'jm' => [
+            manual::ROLE_MANAGER => [
+                'ut',
+                'sj',
+            ],
+            manual::ROLE_APPRAISER => [
+                'tr',
+            ],
+        ],
+        'ss' => [
+            manual::ROLE_MANAGER => [
+                'tr',
+                'bw',
+            ],
+            manual::ROLE_APPRAISER => [
+                'vp',
+            ],
+        ],
+        'dt' => [
+            manual::ROLE_MANAGER => [
+                'vp',
+                'bo',
+            ],
+            manual::ROLE_APPRAISER => [
+                'gb',
+            ],
+        ],
+        'jt' => [
+            manual::ROLE_MANAGER => [
+                'gb',
+                'gm',
+            ],
+            manual::ROLE_APPRAISER => [
+                'gm',
+            ],
+        ],
+    ];
+
+    foreach ($job_assignments as $user => $assignments) {
+        $data['job_assignments'][$user] = create_manual_job_assignments($user, $assignments, $data);
+    }
+
+    // Then we need to create pathways for the competencies
+    $pathways = [
+        [
+            'type' => 'manual',
+            'attributes' => [
+                'roles' => [
+                    manual::ROLE_SELF,
+                ],
+            ],
+            'competencies' => [
+                'priest' => get_competency('complex', 'priest', $data),
+                'teeth-whitening' => get_competency('arbitrary', 'teeth-whitening', $data),
+                'hoarder' => get_competency('arbitrary', 'hoarder', $data),
+                'netflix' => get_competency('4-value', 'netflix', $data),
+            ],
+        ], [
+            'type' => 'manual',
+            'attributes' => [
+                'roles' => [
+                    manual::ROLE_SELF,
+                    manual::ROLE_MANAGER,
+                ],
+            ],
+            'competencies' => [
+                'doer' => get_competency('binary', 'doer', $data),
+                'hoarder' => get_competency('arbitrary', 'hoarder', $data),
+                'administrative-nurse' => get_competency('complex', 'administrative-nurse', $data),
+                'it' => get_competency('4-value', 'it', $data),
+                'storm-trooper' => get_competency('star-wars', 'storm-trooper', $data),
+                'integrity' => get_competency('bs', 'integrity', $data),
+            ],
+        ], [
+            'type' => 'manual',
+            'attributes' => [
+                'roles' => [
+                    manual::ROLE_SELF,
+                    manual::ROLE_MANAGER,
+                    manual::ROLE_APPRAISER,
+                ],
+            ],
+            'competencies' => [
+                'literate' => get_competency('binary', 'literate', $data),
+                'cc' => get_competency('arbitrary', 'cc', $data),
+                'consultant' => get_competency('complex', 'consultant', $data),
+                'drive' => get_competency('bs', 'drive', $data),
+            ],
+        ], [
+            'type' => 'manual',
+            'attributes' => [
+                'roles' => [
+                    manual::ROLE_MANAGER,
+                    manual::ROLE_APPRAISER,
+                ],
+            ],
+            'competencies' => [
+                'literate' => get_competency('binary', 'literate', $data),
+                'cc' => get_competency('arbitrary', 'cc', $data),
+                'consultant' => get_competency('complex', 'consultant', $data),
+                'shop-keeper' => get_competency('4-value', 'shop-keeper', $data),
+                'lightsaber' => get_competency('star-wars', 'lightsaber', $data),
+                'drive' => get_competency('bs', 'drive', $data),
+            ],
+        ], [
+            'type' => 'manual',
+            'attributes' => [
+                'roles' => [
+                    manual::ROLE_MANAGER,
+                ],
+            ],
+            'competencies' => [
+                'netflix' => get_competency('4-value', 'netflix', $data),
+                'shop-keeper' => get_competency('4-value', 'shop-keeper', $data),
+                'machinery-operator' => get_competency('4-value', 'machinery-operator', $data),
+                'it' => get_competency('4-value', 'it', $data),
+                'sommelier' => get_competency('4-value', 'sommelier', $data),
+                'barista' => get_competency('4-value', 'barista', $data),
+                'bartender' => get_competency('4-value', 'bartender', $data),
+                'mad-preacher' => get_competency('4-value', 'mad-preacher', $data),
+                'teeth-whitening' => get_competency('arbitrary', 'teeth-whitening', $data),
+                'hoarder' => get_competency('arbitrary', 'hoarder', $data),
+                'cc' => get_competency('arbitrary', 'cc', $data),
+                'consultant' => get_competency('complex', 'consultant', $data),
+                'nurse' => get_competency('complex', 'nurse', $data),
+                'administrative-nurse' => get_competency('complex', 'administrative-nurse', $data),
+                'surgeon' => get_competency('complex', 'surgeon', $data),
+                'camp-ground-manager' => get_competency('complex', 'camp-ground-manager', $data),
+            ],
+        ],
+    ];
+
+    foreach ($pathways as $pathway) {
+        $data['pathways'] = create_pathways($pathway, $data);
     }
 
     // Then we need to create a few positions
@@ -1079,6 +1218,111 @@ Feel free to browse, list of users is below, their password is 12345.
         create_achievement_record(...$achievement);
     }
 
+    // Then let's create some manual ratings
+    create_manual_ratings([
+        'jm_binary_literate' => [['self', 'jm', 'low-scale_1']],
+        'jm_binary_doer' => [['self', 'jm', 'low-scale_0']],
+        'jm_complex_consultant' => [['self', 'jm', 'overboard-scale_5']],
+        'jm_complex_administrative-nurse' => [['self', 'jm', 'overboard-scale_1']],
+        'jm_4-value_netflix' => [['self', 'jm', '4-value-scale_0']],
+        'jm_4-value_it' => [['self', 'jm', '4-value-scale_2']],
+        'jm_star-wars_storm-trooper' => [['self', 'jm', 'star-wars_0']],
+        'ss_binary_literate' => [['self', 'ss', 'low-scale_1']],
+        'ss_binary_doer' => [['self', 'ss', 'low-scale_0']],
+        'ss_complex_consultant' => [['self', 'ss', 'overboard-scale_1']],
+        'ss_complex_administrative-nurse' => [['self', 'ss', 'overboard-scale_1']],
+        'ss_complex_priest' => [['self', 'ss', 'overboard-scale_0']],
+        'ss_4-value_netflix' => [['self', 'ss', '4-value-scale_2']],
+        'ss_4-value_it' => [['self', 'ss', '4-value-scale_2']],
+        'ss_star-wars_storm-trooper' => [['self', 'ss', 'star-wars_1']],
+        'dt_binary_literate' => [['self', 'dt', 'low-scale_0']],
+        'dt_complex_consultant' => [['self', 'dt', 'overboard-scale_5']],
+        'dt_complex_administrative-nurse' => [['self', 'dt', 'overboard-scale_4']],
+        'dt_4-value_netflix' => [['self', 'dt', '4-value-scale_1']],
+        'dt_4-value_it' => [['self', 'dt', '4-value-scale_0']],
+        'dt_star-wars_storm-trooper' => [['self', 'dt', 'star-wars_1']],
+        'jt_binary_literate' => [['self', 'jt', 'low-scale_0']],
+        'jt_complex_consultant' => [['self', 'jt', 'overboard-scale_2']],
+        'ut_binary_literate' => [['self', 'ut', 'low-scale_1'], ['manager', 'jm', 'low-scale_0']],
+        'ut_binary_doer' => [['self', 'ut', 'low-scale_0'], ['manager', 'jm', 'low-scale_0']],
+        'ut_complex_consultant' => [['self', 'ut', 'overboard-scale_5'], ['manager', 'jm', 'overboard-scale_1']],
+        'ut_complex_nurse' => [['manager', 'jm', 'overboard-scale_2']],
+        'ut_complex_administrative-nurse' => [['self', 'ut', 'overboard-scale_1'], ['manager', 'jm', 'overboard-scale_3']],
+        'ut_complex_surgeon' => [['manager', 'jm', 'overboard-scale_1']],
+        'ut_complex_camp-ground-manager' => [['manager', 'jm', 'overboard-scale_3']],
+        'ut_4-value_netflix' => [['self', 'ut', '4-value-scale_3'], ['manager', 'jm', '4-value-scale_1']],
+        'ut_4-value_shop-keeper' => [['manager', 'jm', '4-value-scale_1']],
+        'ut_4-value_machinery-operator' => [['manager', 'jm', '4-value-scale_1']],
+        'ut_4-value_it' => [['self', 'ut', '4-value-scale_0'], ['manager', 'jm', '4-value-scale_0']],
+        'ut_4-value_sommelier' => [['manager', 'jm', '4-value-scale_1']],
+        'ut_4-value_barista' => [['manager', 'jm', '4-value-scale_3']],
+        'ut_4-value_bartender' => [['manager', 'jm', '4-value-scale_1']],
+        'ut_4-value_mad-preacher' => [['manager', 'jm', '4-value-scale_3']],
+        'ut_star-wars_lightsaber' => [['manager', 'jm', 'star-wars_4']],
+        'ut_star-wars_storm-trooper' => [['self', 'ut', 'star-wars_3'], ['manager', 'jm', 'star-wars_4']],
+        'sj_binary_literate' => [['self', 'sj', 'low-scale_1'], ['manager', 'jm', 'low-scale_1']],
+        'sj_binary_doer' => [['self', 'sj', 'low-scale_1'], ['manager', 'jm', 'low-scale_1']],
+        'sj_complex_consultant' => [['self', 'sj', 'overboard-scale_2'], ['manager', 'jm', 'overboard-scale_4']],
+        'sj_complex_nurse' => [['manager', 'jm', 'overboard-scale_2']],
+        'sj_complex_administrative-nurse' => [['self', 'sj', 'overboard-scale_2'], ['manager', 'jm', 'overboard-scale_1']],
+        'sj_complex_surgeon' => [['manager', 'jm', 'overboard-scale_5']],
+        'sj_complex_priest' => [['self', 'sj', 'overboard-scale_1']],
+        'sj_complex_camp-ground-manager' => [['manager', 'jm', 'overboard-scale_3']],
+        'sj_4-value_netflix' => [['self', 'sj', '4-value-scale_3'], ['manager', 'jm', '4-value-scale_0']],
+        'sj_4-value_shop-keeper' => [['manager', 'jm', '4-value-scale_2']],
+        'sj_4-value_it' => [['self', 'sj', '4-value-scale_1'], ['manager', 'jm', '4-value-scale_3']],
+        'sj_4-value_sommelier' => [['manager', 'jm', '4-value-scale_3']],
+        'sj_4-value_barista' => [['manager', 'jm', '4-value-scale_0']],
+        'sj_4-value_bartender' => [['manager', 'jm', '4-value-scale_1']],
+        'sj_4-value_mad-preacher' => [['manager', 'jm', '4-value-scale_3']],
+        'sj_star-wars_lightsaber' => [['manager', 'jm', 'star-wars_0']],
+        'sj_star-wars_storm-trooper' => [['self', 'sj', 'star-wars_1'], ['manager', 'jm', 'star-wars_1']],
+        'tr_binary_literate' => [
+            ['self', 'tr', 'low-scale_0'], ['manager', 'ss', 'low-scale_0'], ['appraiser', 'jm', 'low-scale_1']
+        ],
+        'tr_binary_doer' => [['self', 'tr', 'low-scale_1'], ['manager', 'ss', 'low-scale_1']],
+        'tr_complex_consultant' => [
+            ['self', 'tr', 'overboard-scale_5'], ['manager', 'ss', 'overboard-scale_4'], ['appraiser', 'jm', 'overboard-scale_2']
+        ],
+        'tr_complex_nurse' => [['manager', 'ss', 'overboard-scale_2']],
+        'tr_complex_administrative-nurse' => [['self', 'tr', 'overboard-scale_4'], ['manager', 'ss', 'overboard-scale_2']],
+        'tr_complex_surgeon' => [['manager', 'ss', 'overboard-scale_0']],
+        'tr_complex_camp-ground-manager' => [['manager', 'ss', 'overboard-scale_4']],
+        'tr_4-value_netflix' => [['self', 'tr', '4-value-scale_0'], ['manager', 'ss', '4-value-scale_1']],
+        'tr_4-value_shop-keeper' => [['manager', 'ss', '4-value-scale_1'], ['appraiser', 'jm', '4-value-scale_3']],
+        'tr_4-value_machinery-operator' => [['manager', 'ss', '4-value-scale_2']],
+        'tr_4-value_it' => [['self', 'tr', '4-value-scale_1'], ['manager', 'ss', '4-value-scale_1']],
+        'tr_4-value_sommelier' => [['manager', 'ss', '4-value-scale_2']],
+        'tr_4-value_barista' => [['manager', 'ss', '4-value-scale_1']],
+        'tr_4-value_bartender' => [['manager', 'ss', '4-value-scale_0']],
+        'tr_4-value_mad-preacher' => [['manager', 'ss', '4-value-scale_0']],
+        'tr_star-wars_lightsaber' => [['manager', 'ss', 'star-wars_1'], ['appraiser', 'jm', 'star-wars_3']],
+        'tr_star-wars_storm-trooper' => [['self', 'tr', 'star-wars_4'], ['manager', 'ss', 'star-wars_1']],
+        'bo_binary_literate' => [['self', 'bo', 'low-scale_0'], ['manager', 'dt', 'low-scale_1']],
+        'bo_binary_doer' => [['self', 'bo', 'low-scale_0'], ['manager', 'dt', 'low-scale_0']],
+        'bo_complex_consultant' => [['self', 'bo', 'overboard-scale_2'], ['manager', 'dt', 'overboard-scale_4']],
+        'bo_complex_nurse' => [['manager', 'dt', 'overboard-scale_0']],
+        'bo_complex_administrative-nurse' => [['self', 'bo', 'overboard-scale_1'], ['manager', 'dt', 'overboard-scale_5']],
+        'bo_complex_surgeon' => [['manager', 'dt', 'overboard-scale_0']],
+        'bo_complex_camp-ground-manager' => [['manager', 'dt', 'overboard-scale_1']],
+        'bo_4-value_netflix' => [['self', 'bo', '4-value-scale_2'], ['manager', 'dt', '4-value-scale_0']],
+        'bo_4-value_shop-keeper' => [['manager', 'dt', '4-value-scale_1']],
+        'bo_4-value_machinery-operator' => [['manager', 'dt', '4-value-scale_3']],
+        'bo_4-value_it' => [['self', 'bo', '4-value-scale_0'], ['manager', 'dt', '4-value-scale_0']],
+        'bo_4-value_sommelier' => [['manager', 'dt', '4-value-scale_0']],
+        'bo_4-value_barista' => [['manager', 'dt', '4-value-scale_0']],
+        'bo_4-value_bartender' => [['manager', 'dt', '4-value-scale_0']],
+        'bo_4-value_mad-preacher' => [['manager', 'dt', '4-value-scale_2']],
+        'bo_star-wars_lightsaber' => [['manager', 'dt', 'star-wars_2']],
+        'gb_binary_literate' => [
+            ['self', 'gb', 'low-scale_1'], ['manager', 'jt', 'low-scale_0'], ['appraiser', 'dt', 'low-scale_0']
+        ],
+        'gb_binary_doer' => [['self', 'gb', 'low-scale_1'], ['manager', 'jt', 'low-scale_0']],
+        'gb_4-value_sommelier' => [['manager', 'jt', '4-value-scale_0']],
+        'gm_complex_priest' => [['self', 'gm', 'overboard-scale_5']],
+        'gm_4-value_netflix' => [['self', 'gm', '4-value-scale_1'], ['manager', 'jt', '4-value-scale_2']],
+    ], $data);
+
     // Then let's archive some assignments
     $archive = [
         // Theologist POS
@@ -1578,6 +1822,122 @@ function create_achievement_record($user, $assignment, $value) {
         ]);
 }
 
+/**
+ * Manually create job assignments for the specified user
+ *
+ * @param string $user User identifier
+ * @param array $assignments Type of assignment (manager, appraiser, etc..) => List of users
+ * @param $data
+ *
+ * @return array Created assignments
+ */
+function create_manual_job_assignments($user, $assignments, $data) {
+    $manager = get_user($user, $data);
+    $created_assignments = [];
+
+    foreach ($assignments as $type => $users) {
+        foreach ($users as $user) {
+            switch ($type) {
+                case manual::ROLE_MANAGER:
+                    $managerja = job_assignment::create_default($manager->id);
+                    $created_assignments[] = job_assignment::create_default(
+                        get_user($user, $data)->id,
+                        ['managerjaid' => $managerja->id]
+                    );
+                    break;
+                case manual::ROLE_APPRAISER:
+                    $created_assignments[] = job_assignment::create_default(
+                        get_user($user, $data)->id,
+                        ['appraiserid' => $manager->id]
+                    );
+                    break;
+                default:
+                    echo 'Invalid Job Assignment Value: ' . $type;
+            }
+        }
+    }
+
+    return $created_assignments;
+}
+
+/**
+ * Create a pathway for the specified competencies
+ *
+ * @param array $pathway Pathway attributes
+ * @param array $data
+ *
+ * @return array The created pathway data
+ */
+function create_pathways($pathway, $data) {
+    $pathways = $data['pathways'] ?? [];
+
+    $new_pathway = (function () use ($pathway) {
+        switch ($pathway['type']) {
+            case 'manual':
+                return create_manual_rating_pathways($pathway['competencies'], $pathway['attributes']);
+            default:
+                echo "Unknown pathway type \"{$pathway['type']}\", skipping.";
+                return null;
+        }
+    })();
+
+    if ($new_pathway) {
+        $pathways = array_merge($pathways, [$pathway['type'] => $new_pathway]);
+    }
+
+    return $pathways;
+}
+
+/**
+ * Create a manual rating pathway for the specified competencies
+ *
+ * @param array $competencies List of competencies
+ * @param array $attributes Specific data for creating the pathway
+ *
+ * @return array
+ */
+function create_manual_rating_pathways($competencies, $attributes) {
+    $manual_pathways = [];
+    foreach ($competencies as $id => $competency) {
+        $manual_pathways[$id][] = (new manual())
+            ->set_competency(new \totara_competency\entities\competency($competency->id))
+            ->set_roles($attributes['roles'])
+            ->save();
+    }
+    return $manual_pathways;
+}
+
+/**
+ * Create Manual Ratings
+ *
+ * @param array $manual_ratings
+ * @param array $data
+ */
+function create_manual_ratings($manual_ratings, $data) {
+    foreach ($manual_ratings as $key => $values) {
+        [$user, $fw, $comp] = explode('_', $key);
+        $user = get_user($user, $data);
+        $comp = get_competency($fw, $comp, $data);
+
+        $placeholder_comment = "Placeholder Comment: Wow, this person definitely possesses this scale value, no doubt about it!";
+
+        foreach ($values as $rating) {
+            [$scale, $index] = explode('_', $rating[2]);
+            $scale = $data['scales'][$scale];
+            $scale_value_id = array_keys($scale->values)[$index];
+
+            (new \pathway_manual\entities\rating([
+                'user_id' => $user->id,
+                'comp_id' => $comp->id,
+                'assigned_by' => get_user($rating[1], $data)->id,
+                'assigned_by_role' => $rating[0],
+                'scale_value_id' => $scale_value_id,
+                'date_assigned' => time(),
+                'comment' => $rating[3] ?? $placeholder_comment,
+            ]))->save();
+        }
+    }
+}
 
 /**
  * Return an instance of testing data generator
