@@ -39,6 +39,9 @@ class comp_record_status extends base {
             case 1:
                 $string = get_string('archived', 'totara_competency');
                 break;
+            case 2:
+                $string = 'History (superseded by another record)';
+                break;
             default:
                 $string = '';
                 break;
