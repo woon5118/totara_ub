@@ -496,10 +496,10 @@ class core_filterlib_testcase extends advanced_testcase {
     }
 
     private function assert_matches($modinfo) {
-        global $FILTERLIB_PRIVATE, $DB;
+        global $DB;
 
         // Use preload cache...
-        $FILTERLIB_PRIVATE = new stdClass();
+        filter_manager::reset_caches();
         filter_preload_activities($modinfo);
 
         // Get data and check no queries are made.
@@ -510,7 +510,7 @@ class core_filterlib_testcase extends advanced_testcase {
         $this->assertEquals($before, $after);
 
         // Repeat without cache and check it makes queries now.
-        $FILTERLIB_PRIVATE = new stdClass;
+        filter_manager::reset_caches();
         $before = $DB->perf_get_reads();
         $filters1 = filter_get_active_in_context($this->activity1context);
         $filters2 = filter_get_active_in_context($this->activity2context);

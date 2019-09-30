@@ -344,4 +344,13 @@ $definitions = array(
         'simpledata' => true,
         'staticacceleration' => true,
     ),
+
+    // Caches the filters that are active in a context
+    'filter_active' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 10
+    ),
 );

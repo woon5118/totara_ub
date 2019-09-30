@@ -98,12 +98,7 @@ class filter_manager {
      * Resets the caches, usually to be called between unit tests
      */
     public static function reset_caches() {
-        global $FILTERLIB_PRIVATE;
-
-        // Reset the global cache, it stores the filters loaded from the database.
-        if (isset($FILTERLIB_PRIVATE)) {
-            $FILTERLIB_PRIVATE = null;
-        }
+        \cache_helper::purge_by_definition('core', 'filter_active');
         if (self::$singletoninstance) {
             self::$singletoninstance->unload_all_filters();
         }
@@ -763,6 +758,9 @@ function filter_set_global_state($filtername, $state, $move = 0) {
     }
 
     $transaction->allow_commit();
+
+    // Purge the filter_active cache, this may have affected many contexts.
+    \cache_helper::purge_by_definition('core', 'filter_active');
 }
 
 /**
@@ -933,6 +931,9 @@ function filter_set_local_state($filter, $contextid, $state) {
     } else {
         $DB->update_record('filter_active', $rec);
     }
+
+    // Purge the filter_active cache, this may have affected many contexts.
+    \cache_helper::purge_by_definition('core', 'filter_active');
 }
 
 /**
@@ -962,6 +963,9 @@ function filter_set_local_config($filter, $contextid, $name, $value) {
     } else {
         $DB->update_record('filter_config', $rec);
     }
+
+    // Purge the filter_active cache, this may have affected many contexts.
+    \cache_helper::purge_by_definition('core', 'filter_active');
 }
 
 /**
@@ -974,6 +978,8 @@ function filter_set_local_config($filter, $contextid, $name, $value) {
 function filter_unset_local_config($filter, $contextid, $name) {
     global $DB;
     $DB->delete_records('filter_config', array('filter' => $filter, 'contextid' => $contextid, 'name' => $name));
+    // Purge the filter_active cache, this may have affected many contexts.
+    \cache_helper::purge_by_definition('core', 'filter_active');
 }
 
 /**
@@ -1022,17 +1028,12 @@ function filter_get_all_local_settings($contextid) {
  *      array(tex' => array())
  */
 function filter_get_active_in_context($context) {
-    global $DB, $FILTERLIB_PRIVATE;
+    global $DB;
 
-    if (!isset($FILTERLIB_PRIVATE)) {
-        $FILTERLIB_PRIVATE = new stdClass();
-    }
-
-    // Use cache (this is a within-request cache only) if available. See
-    // function filter_preload_activities.
-    if (isset($FILTERLIB_PRIVATE->active) &&
-            array_key_exists($context->id, $FILTERLIB_PRIVATE->active)) {
-        return $FILTERLIB_PRIVATE->active[$context->id];
+    $cache = \cache::make('core', 'filter_active');
+    $filters = $cache->get($context->id);
+    if ($filters !== false) {
+        return $filters;
     }
 
     $contextids = explode('/', trim($context->path, '/'));
@@ -1066,7 +1067,7 @@ function filter_get_active_in_context($context) {
 
     $rs->close();
 
-    $FILTERLIB_PRIVATE->active[$context->id] = $filters;
+    $cache->set($context->id, $filters);
 
     return $filters;
 }
@@ -1078,20 +1079,15 @@ function filter_get_active_in_context($context) {
  * @param course_modinfo $modinfo Course object from get_fast_modinfo
  */
 function filter_preload_activities(course_modinfo $modinfo) {
-    global $DB, $FILTERLIB_PRIVATE;
+    global $DB;
 
-    if (!isset($FILTERLIB_PRIVATE)) {
-        $FILTERLIB_PRIVATE = new stdClass();
-    }
-
-    // Don't repeat preload
-    if (!isset($FILTERLIB_PRIVATE->preloaded)) {
-        $FILTERLIB_PRIVATE->preloaded = array();
-    }
-    if (!empty($FILTERLIB_PRIVATE->preloaded[$modinfo->get_course_id()])) {
+    $cache = \cache::make('core', 'filter_active');
+    $preloaded = $cache->get('preloaded');
+    if (is_array($preloaded) && in_array($modinfo->get_course_id(), $preloaded)) {
+        // We've already loaded this one!
         return;
     }
-    $FILTERLIB_PRIVATE->preloaded[$modinfo->get_course_id()] = true;
+    $preloaded[] = $modinfo->get_course_id();
 
     // Get contexts for all CMs
     $cmcontexts = array();
@@ -1166,14 +1162,13 @@ function filter_preload_activities(course_modinfo $modinfo) {
         }
     }
 
-    // Loop through the contexts to reconstruct filter_active lists for each
-    // cm on the course.
-    if (!isset($FILTERLIB_PRIVATE->active)) {
-        $FILTERLIB_PRIVATE->active = array();
-    }
+    $toset = [
+        'preloaded' => $preloaded
+    ];
+
     foreach ($cmcontextids as $contextid) {
         // Copy course list
-        $FILTERLIB_PRIVATE->active[$contextid] = $courseactive;
+        $toset[$contextid] = $courseactive;
 
         // Are there any changes to the active list?
         if (array_key_exists($contextid, $remainingactives)) {
@@ -1181,11 +1176,11 @@ function filter_preload_activities(course_modinfo $modinfo) {
                 if ($row->active > 0 && empty($banned[$row->filter])) {
                     // If it's marked active for specific context, add entry
                     // (doesn't matter if one exists already).
-                    $FILTERLIB_PRIVATE->active[$contextid][$row->filter] = array();
+                    $toset[$contextid][$row->filter] = array();
                 } else {
                     // If it's marked inactive, remove entry (doesn't matter
                     // if it doesn't exist).
-                    unset($FILTERLIB_PRIVATE->active[$contextid][$row->filter]);
+                    unset($toset[$contextid][$row->filter]);
                 }
             }
         }
@@ -1193,10 +1188,12 @@ function filter_preload_activities(course_modinfo $modinfo) {
 
     // Process all config rows to add config data to these entries.
     foreach ($filterconfigs as $row) {
-        if (isset($FILTERLIB_PRIVATE->active[$row->contextid][$row->filter])) {
-            $FILTERLIB_PRIVATE->active[$row->contextid][$row->filter][$row->name] = $row->value;
+        if (isset($toset[$row->contextid][$row->filter])) {
+            $toset[$row->contextid][$row->filter][$row->name] = $row->value;
         }
     }
+
+    $cache->set_many($toset);
 }
 
 /**
@@ -1263,6 +1260,9 @@ function filter_delete_all_for_filter($filter) {
     unset_all_config_for_plugin('filter_' . $filter);
     $DB->delete_records('filter_active', array('filter' => $filter));
     $DB->delete_records('filter_config', array('filter' => $filter));
+
+    // Purge the filter_active cache, this may have affected many contexts.
+    \cache_helper::purge_by_definition('core', 'filter_active');
 }
 
 /**
@@ -1274,6 +1274,9 @@ function filter_delete_all_for_context($contextid) {
     global $DB;
     $DB->delete_records('filter_active', array('contextid' => $contextid));
     $DB->delete_records('filter_config', array('contextid' => $contextid));
+
+    // Purge the filter_active cache, this may have affected many contexts.
+    \cache_helper::purge_by_definition('core', 'filter_active');
 }
 
 /**

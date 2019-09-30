@@ -757,7 +757,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
     }
 
     public function test_with_cleantext_compatible_filters() {
-        global $CFG, $DB, $PAGE, $FILTERLIB_PRIVATE;
+        global $CFG, $DB, $PAGE;
 
         $file =  $CFG->dirroot . '/filter/multilang/filter.php';
         if (!file_exists($file)) {
@@ -775,8 +775,6 @@ class core_weblib_format_text_testcase extends advanced_testcase {
             'softorder' => '1',
         ]);
 
-        $FILTERLIB_PRIVATE = null;
-
         $filtermanager = filter_manager::instance();
         $filtermanager->setup_page_for_filters($PAGE, $context);
         self::assertTrue($filtermanager->result_is_compatible_with_text_cleaning($context));
@@ -786,8 +784,6 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $filtered = 'English';
 
         self::assertSame($filtered, format_text($text, FORMAT_HTML, ['context' => $context]));
-
-        $FILTERLIB_PRIVATE = null;
     }
 
     public function test_script_tag_persistence() {
