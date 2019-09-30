@@ -2278,8 +2278,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="flagtype" UNIQUE="false" FIELDS="flagtype"/>
         <INDEX NAME="name" UNIQUE="false" FIELDS="name"/>
+        <INDEX NAME="flagtype-expiry-timemodified" UNIQUE="false" FIELDS="flagtype, expiry, timemodified"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="grade_settings" COMMENT="gradebook settings">

@@ -709,5 +709,25 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019093000, 'totara', 'core');
     }
 
+    if ($oldversion < 2019100200) {
+        // Define index flagtype-expiry-timemodified (not unique) to be added to cache_flags.
+        $table = new xmldb_table('cache_flags');
+
+        // First up drop the existing index on flagtype.
+        $index = new xmldb_index('flagtype', XMLDB_INDEX_NOTUNIQUE, array('flagtype'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Add create the new multi column index on flagtype, expiry, and timemodified.
+        $index = new xmldb_index('flagtype-expiry-timemodified', XMLDB_INDEX_NOTUNIQUE, array('flagtype', 'expiry', 'timemodified'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2019100200, 'totara', 'core');
+    }
+
     return true;
 }

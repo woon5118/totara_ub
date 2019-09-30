@@ -372,5 +372,18 @@ function xmldb_totara_core_install() {
         $dbman->add_index($table, $index);
     }
 
+    // Add indexes that benefit all pages
+    $table = new xmldb_table('cache_flags');
+    // First up drop the existing index on flagtype.
+    $index = new xmldb_index('flagtype', XMLDB_INDEX_NOTUNIQUE, array('flagtype'));
+    if ($dbman->index_exists($table, $index)) {
+        $dbman->drop_index($table, $index);
+    }
+    // And create the new multi column index on flagtype, expiry, and timemodified.
+    $index = new xmldb_index('flagtype-expiry-timemodified', XMLDB_INDEX_NOTUNIQUE, array('flagtype', 'expiry', 'timemodified'));
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
+    }
+
     return true;
 }
