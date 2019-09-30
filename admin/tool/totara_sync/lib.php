@@ -172,6 +172,55 @@ function totara_sync_get_element_files() {
 }
 
 /**
+ * Returns and array of element classes.
+ *
+ *  - key = element name
+ *  - value = class name
+ *
+ * This function includes the file containing the class.
+ *
+ * @return array
+ */
+function tool_totara_sync_get_element_classes() {
+    global $CFG;
+
+    // Get all available sync element files
+    $dir = $CFG->dirroot.'/admin/tool/totara_sync/elements/';
+    $pattern = '/(.*?)\.php$/';
+    $files = preg_grep($pattern, scandir($dir));
+    $classes = [];
+    foreach ($files as $file) {
+        $filepath = $dir . $file;
+        $element = basename($filepath, '.php');
+        $elementclass = 'totara_sync_element_' . $element;
+        require_once($filepath);
+        if (!class_exists($elementclass)) {
+            // Skip if the class does not exist
+            continue;
+        }
+
+        $classes[$element] = $elementclass;
+    }
+    return $classes;
+}
+
+/**
+ * Returns true if the user can manage any element,
+ *
+ * @return bool
+ */
+function tool_totara_sync_can_manage_any_element() {
+    $context = \context_system::instance();
+    $classes = tool_totara_sync_get_element_classes();
+    foreach ($classes as $element => $class) {
+        if (has_capability('tool/totara_sync:manage' . $element, $context)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Get sync elements
  *
  * @param boolean $onlyenabled only return enabled elements

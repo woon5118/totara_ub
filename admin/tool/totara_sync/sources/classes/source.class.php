@@ -391,4 +391,51 @@ abstract class totara_sync_source {
 
         throw new totara_sync_exception($this->get_element_name(), 'settings', 'noassociatedelement');
     }
+
+    /**
+     * Add source settings structure.
+     *
+     * @param admin_root $root
+     * @param string $element
+     */
+    public static function add_source_settings_structure(admin_root $root, string $element) {
+        $hasconfig = (defined('static::HAS_CONFIG')) ? static::HAS_CONFIG : false;
+        if (!$hasconfig) {
+            return;
+        }
+        $name =  static::get_source_name();
+        $root->add(
+            $element.'sources',
+            new admin_externalpage(
+                $name,
+                get_string('displayname:' . $name, 'tool_totara_sync'),
+                new moodle_url('/admin/tool/totara_sync/admin/sourcesettings.php', ['element' => $element, 'source' => $name]),
+                'tool/totara_sync:manage' . $element
+            )
+        );
+    }
+
+    /**
+     * Returns true if the user can upload files.
+     *
+     * @return bool
+     */
+    final public static function can_upload_files() {
+        if (defined('static::USES_FILES')) {
+            return static::USES_FILES;
+        }
+        $class = get_called_class();
+        /** @var totara_sync_source $source */
+        $source = new $class();
+        return $source->uses_files();
+    }
+
+    /**
+     * Returns the name of this source.
+     *
+     * @return string
+     */
+    public static function get_source_name() {
+        return get_called_class();
+    }
 }

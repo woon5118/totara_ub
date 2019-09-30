@@ -31,6 +31,9 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/classes/source.class
 abstract class totara_sync_source_comp extends totara_sync_source {
     use \tool_totara_sync\internal\hierarchy\customfield_processor_trait;
 
+    public const HAS_CONFIG = true;
+    public const USES_FILES = true;
+
     /**
      * Fields to be imported.
      *
@@ -84,14 +87,14 @@ abstract class totara_sync_source_comp extends totara_sync_source {
      * @return bool True if configuration is required.
      */
     public function has_config() {
-        return true;
+        return self::HAS_CONFIG;
     }
 
     /**
      * Override in child classes
      */
     public function uses_files() {
-        return true;
+        return self::USES_FILES;
     }
 
     /**
@@ -217,7 +220,7 @@ abstract class totara_sync_source_comp extends totara_sync_source {
         if (!empty($this->config->import_deleted)) {
             $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
         }
-        
+
         /// Add keys
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 

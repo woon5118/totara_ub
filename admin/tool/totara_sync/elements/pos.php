@@ -27,6 +27,12 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
 class totara_sync_element_pos extends totara_sync_hierarchy {
 
+    public const NAME = 'pos';
+
+    public function get_name() {
+        return self::NAME;
+    }
+
     function get_hierarchy() {
         return new position();
     }

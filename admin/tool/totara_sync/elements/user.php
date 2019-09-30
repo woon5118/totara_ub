@@ -27,6 +27,9 @@ require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
 class totara_sync_element_user extends totara_sync_element {
+
+    public const NAME = 'user';
+
     const KEEP_USERS = 0;
     const DELETE_USERS = 1;
     const SUSPEND_USERS = 2;
@@ -34,7 +37,7 @@ class totara_sync_element_user extends totara_sync_element {
     protected $customfieldsdb = array();
 
     function get_name() {
-        return 'user';
+        return self::NAME;
     }
 
     function has_config() {

@@ -27,6 +27,12 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/organisation/lib.php');
 
 class totara_sync_element_org extends totara_sync_hierarchy {
 
+    public const NAME = 'org';
+
+    public function get_name() {
+        return self::NAME;
+    }
+
     function get_hierarchy() {
         return new organisation();
     }

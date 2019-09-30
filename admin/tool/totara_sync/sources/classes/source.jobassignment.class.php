@@ -29,6 +29,9 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/jobassignment.php')
 
 abstract class totara_sync_source_jobassignment extends totara_sync_source {
 
+    public const HAS_CONFIG = true;
+    public const USES_FILES = true;
+
     protected $required_fields = array();
     protected $disabled_fields = array();
     protected $noform_fields = array();
@@ -101,7 +104,7 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
     }
 
     public function uses_files() {
-        return true;
+        return self::USES_FILES;
     }
 
     /**
@@ -110,7 +113,7 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
     public function get_filepath() {}
 
     public function has_config() {
-        return true;
+        return self::HAS_CONFIG;
     }
 
     /**

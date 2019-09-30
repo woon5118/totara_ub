@@ -28,6 +28,9 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/user.php');
 
 abstract class totara_sync_source_user extends totara_sync_source {
 
+    public const HAS_CONFIG = true;
+    public const USES_FILES = true;
+
     protected $fields;
     protected $required_fields;
     protected $customfields, $customfieldtitles;
@@ -107,7 +110,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
      * Override in child classes
      */
     function uses_files() {
-        return true;
+        return self::USES_FILES;
     }
 
     /**
@@ -116,7 +119,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
     function get_filepath() {}
 
     function has_config() {
-        return true;
+        return self::HAS_CONFIG;
     }
 
     /**

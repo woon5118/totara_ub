@@ -27,13 +27,15 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/classes/element.cla
 
 class totara_sync_element_jobassignment extends totara_sync_element {
 
+    public const NAME = 'jobassignment';
+
     public function __construct() {
         $this->syncweighting = 100;
         parent::__construct();
     }
 
     public function get_name() {
-        return 'jobassignment';
+        return self::NAME;
     }
 
     public function has_config() {

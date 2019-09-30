@@ -87,29 +87,12 @@ abstract class totara_sync_element {
      * @return totara_sync_source[]
      */
     function get_sources() {
-        global $CFG;
-
         $elname = $this->get_name();
 
-        // Get all available sync element files
-        $sdir = $CFG->dirroot.'/admin/tool/totara_sync/sources/';
-        $pattern = '/^source_' . $elname . '_(.*?)\.php$/';
-        $sfiles = preg_grep($pattern, scandir($sdir));
-        $sources = array();
-        foreach ($sfiles as $f) {
-            require_once($sdir.$f);
-
-            $basename = basename($f, '.php');
-            $sname = str_replace("source_{$elname}_", '', $basename);
-
-            $sclass = "totara_sync_{$basename}";
-            if (!class_exists($sclass)) {
-                continue;
-            }
-
-            $sources[$sname] = new $sclass;
+        $sources = [];
+        foreach (self::get_source_classes($elname) as $source => $class) {
+            $sources[$source] = new $class();
         }
-
         return $sources;
     }
 
@@ -551,6 +534,18 @@ abstract class totara_sync_element {
     }
 
     /**
+     * Returns true if the file access setting for this element has been set.
+     *
+     * @return bool
+     */
+    public static function has_file_access_been_configured() {
+        $usedefault = get_config(static::class, 'fileaccessusedefaults');
+        $default = get_config('totara_sync', 'fileaccess');
+        $element = get_config(static::class, 'fileaccess');
+        return ((!empty($usedefault) && !empty($default)) || $element !== false);
+    }
+
+    /**
      * Get the value of the filesdir config setting for this element, checking whether default settings
      * should apply.
      *
@@ -570,5 +565,118 @@ abstract class totara_sync_element {
         }
 
         throw new totara_sync_exception($this->get_name(), 'settings', 'filesdirnotset');
+    }
+
+    /**
+     * Adds Totara Sync settings to the admin structure
+     *
+     * @param admin_root $root
+     */
+    public static function add_element_settings_structure(admin_root $root) {
+        if (defined('static::NAME')) {
+            $elementname = static::NAME;
+        } else {
+            debugging('totara_sync_elements should now define a public const called NAME', DEBUG_DEVELOPER);
+            $elementname = substr(get_called_class(), strlen('totara_sync_element_'));
+        }
+
+        $elements = tool_totara_sync_get_element_classes();
+        if (!isset($elements[$elementname])) {
+            debugging('Invalid element name provided', DEBUG_DEVELOPER);
+            return;
+        }
+
+        $enabled = get_config('totara_sync', 'element_' . $elementname . '_enabled');
+
+        if ($enabled) {
+            $context = \context_system::instance();
+            $displayname = get_string('displayname:' . $elementname, 'tool_totara_sync');
+
+            // Elements
+            $root->add(
+                'syncelements',
+                new admin_externalpage(
+                    'syncelement'.$elementname,
+                    $displayname,
+                    new moodle_url('/admin/tool/totara_sync/admin/elementsettings.php', ['element' => $elementname]),
+                    'tool/totara_sync:manage' . $elementname
+                )
+            );
+
+            // Sources
+            $sourcesclasses = self::get_source_classes($elementname);
+            if (!empty($sourcesclasses)) {
+                $root->add('syncsources', new admin_category($elementname.'sources', $displayname));
+                foreach ($sourcesclasses as $sourceclass) {
+                    /** @var string|totara_sync_source $sourceclass */
+                    $sourceclass::add_source_settings_structure($root, $elementname);
+                }
+
+                $create = empty($root->locate('uploadsyncfiles'));
+                $create = $create && has_capability('tool/totara_sync:upload' . $elementname, $context);
+                $create = $create && static::has_file_access_been_configured();
+                if ($create) {
+                    $sourceclass = get_config('totara_sync', 'source_' . $elementname);
+                    if (in_array($sourceclass, $sourcesclasses) && $sourceclass::can_upload_files()) {
+                        /** @var totara_sync_element $element */
+                        $element = new $elements[$elementname]();
+                        if ($element->get_fileaccess() == FILE_ACCESS_UPLOAD) {
+                            self::add_setting_page_uploadsyncfiles($root);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns all of the source classes for this element.
+     *
+     * @param string $element
+     * @return array
+     */
+    final public static function get_source_classes(string $element) {
+        global $CFG;
+
+        // Get all available sync element files
+        $dir = $CFG->dirroot.'/admin/tool/totara_sync/sources/';
+        $pattern = '/^source_' . $element . '_(.*?)\.php$/';
+        $files = preg_grep($pattern, scandir($dir));
+
+        $classes = [];
+        foreach ($files as $file) {
+            require_once($dir . $file);
+
+            $basename = basename($file, '.php');
+            $source = str_replace("source_{$element}_", '', $basename);
+
+            $class = "totara_sync_{$basename}";
+            if (!class_exists($class)) {
+                continue;
+            }
+
+            $classes[$source] = $class;
+        }
+        return $classes;
+    }
+
+    /**
+     * Adds the upload files settings page if it does not already exist.
+     *
+     * @param admin_root $root
+     */
+    final protected static function add_setting_page_uploadsyncfiles(admin_root $root) {
+        if ($root->locate('uploadsyncfiles')) {
+            return;
+        }
+        $root->add(
+            'syncsources',
+            new admin_externalpage(
+                'uploadsyncfiles',
+                get_string('uploadsyncfiles', 'tool_totara_sync'),
+                new moodle_url('/admin/tool/totara_sync/admin/uploadsourcefiles.php'),
+                'tool/totara_sync:manage'
+            )
+        );
     }
 }

@@ -42,10 +42,6 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
         $this->hierarchy = $this->get_hierarchy();
     }
 
-    function get_name() {
-        return $this->hierarchy->shortprefix;
-    }
-
     function has_config() {
         return true;
     }

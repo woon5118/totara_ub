@@ -31,6 +31,9 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/org.php'); // Neede
 abstract class totara_sync_source_org extends totara_sync_source {
     use \tool_totara_sync\internal\hierarchy\customfield_processor_trait;
 
+    public const HAS_CONFIG = true;
+    public const USES_FILES = true;
+
     protected $fields;
 
     function __construct() {
@@ -71,14 +74,14 @@ abstract class totara_sync_source_org extends totara_sync_source {
     }
 
     function has_config() {
-        return true;
+        return self::HAS_CONFIG;
     }
 
     /**
      * Override in child classes
      */
     function uses_files() {
-        return true;
+        return self::USES_FILES;
     }
 
     /**

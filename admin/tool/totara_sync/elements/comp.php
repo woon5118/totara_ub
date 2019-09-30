@@ -33,6 +33,12 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/classes/hierarchy.e
  */
 class totara_sync_element_comp extends totara_sync_hierarchy {
 
+    public const NAME = 'comp';
+
+    public function get_name() {
+        return self::NAME;
+    }
+
     /**
      * @return competency
      */
