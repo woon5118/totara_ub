@@ -36,6 +36,7 @@ $capabilities = [
         'captype' => 'read',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
+            'staffmanager' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         ]
     ],
