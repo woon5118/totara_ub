@@ -486,6 +486,11 @@ $displaycategorylisting = ($viewmode === 'default' || $viewmode === 'combined' |
 $displaycourselisting = ($viewmode === 'default' || $viewmode === 'combined' || $viewmode === 'courses');
 $displaycoursedetail = (isset($courseid));
 
+// TOTARA: Prime the caches for optimal query time.
+if ($displaycategorylisting || $displaycourselisting) {
+    \core_course\management\helper::prime_category_caches($category);
+}
+
 echo $renderer->header();
 
 if (!$courseid && has_capability('totara/completioneditor:editcoursecompletion', $systemcontext)) {

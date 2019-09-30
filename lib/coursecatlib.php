@@ -995,6 +995,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         $list = $DB->get_records_sql($sql, array('contextcourse' => CONTEXT_COURSE) + $params);
 
         foreach ($list as $course) {
+            context_helper::preload_from_record($course);
             if (isset($list[$course->id]->hassummary)) {
                 $list[$course->id]->hassummary = strlen($list[$course->id]->hassummary) > 0;
             }
@@ -1411,7 +1412,6 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $courselist = self::get_course_records($where, $params, $options, true);
             if (!empty($requiredcapabilities)) {
                 foreach ($courselist as $key => $course) {
-                    context_helper::preload_from_record($course);
                     $coursecontext = context_course::instance($course->id);
                     if (!has_all_capabilities($requiredcapabilities, $coursecontext)) {
                         unset($courselist[$key]);
@@ -1613,6 +1613,78 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $cnt = count($courses);
         }
         return $cnt;
+    }
+
+    /**
+     * Preloads category course counts, and visible courses for all requested categories.
+     *
+     * This method primes the caches with a single expensive query. It saves having to make multiple identical expensive queries
+     * for the information at the time that it is needed.
+     *
+     * @param int[] $categoryids
+     */
+    public static function preload_category_courses_and_counts(array $categoryids) {
+        global $DB, $USER, $CFG;
+
+        $sortbit = serialize(['sortorder' => 1]);
+
+        $coursecatcache = cache::make('core', 'coursecat');
+        $countkeys = [];
+        $itemkeys = [];
+        foreach ($categoryids as $categoryid) {
+            $countkeys[$categoryid] = 'lcnt-' . $categoryid . '-';
+            $itemkeys[$categoryid] = 'l-'. $categoryid. '--'. $sortbit;
+        }
+        $counts = $coursecatcache->get_many($countkeys);
+        $items = $coursecatcache->get_many($itemkeys);
+
+        $toload = [];
+        foreach ($categoryids as $categoryid) {
+            if ($counts[$countkeys[$categoryid]] !== false &&
+                $items[$itemkeys[$categoryid]] !== false) {
+                // We've cached both counts and items already, skip on over.
+                continue;
+            }
+            $toload[] = $categoryid;
+        }
+
+        if (empty($toload)) {
+            // Nothing to load, carry on captain.
+            return;
+        }
+
+        // Needed for totara_visibility_where!
+        require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+
+        [$insql, $inparams] = $DB->get_in_or_equal($toload, SQL_PARAMS_NAMED, 'c');
+        [$wheresql, $whereparams] = totara_visibility_where($USER->id);
+
+        // TOTARA: Note that group_concat in MSSQL 2016 and below does not support sorting.
+        // Its not a problem here as the cache is used to load courses by get_course_records() which internally
+        // orders by course.sortorder and doesn't trust the order it gets the id's.
+        $courseids = $DB->sql_group_concat('course.id', ',', 'course.sortorder');
+
+        $sql = "SELECT course.category, COUNT(course.id) AS coursecount, {$courseids} AS courseids
+                  FROM {course} course
+                  JOIN {context} ctx ON ctx.instanceid = course.id AND ctx.contextlevel = 50
+                 WHERE course.category {$insql} AND {$wheresql}
+              GROUP BY course.category";
+        $params = array_merge($inparams, $whereparams);
+        $counts = $DB->get_records_sql($sql, $params);
+
+        foreach ($toload as $categoryid) {
+            if (isset($counts[$categoryid])) {
+                $count = $counts[$categoryid]->coursecount;
+                $courseids = explode(',', $counts[$categoryid]->courseids);
+            } else {
+                $count = 0;
+                $courseids = [];
+            }
+            $cachekey = 'l-'. $categoryid. '--'. $sortbit;
+            $cntcachekey = 'lcnt-'. $categoryid. '-';
+            $coursecatcache->set($cntcachekey, $count);
+            $coursecatcache->set($cachekey, $courseids);
+        }
     }
 
     /**
@@ -2340,7 +2412,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      *
      * Note that this method does not check if all parents are accessible by current user
      *
-     * @return array of category ids
+     * @return int[] of category ids
      */
     public function get_parents() {
         $parents = preg_split('|/|', $this->path, 0, PREG_SPLIT_NO_EMPTY);

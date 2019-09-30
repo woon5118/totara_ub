@@ -938,7 +938,7 @@ class helper {
      * Returns the categories that should be expanded when displaying the interface.
      *
      * @param int|null $withpath If specified a path to require as the parent.
-     * @return \coursecat[] An array of Category ID's to expand.
+     * @return int[] An array of Category ID's to expand.
      */
     public static function get_expanded_categories($withpath = null) {
         if (self::$expandedcategories === null) {
@@ -965,5 +965,45 @@ class helper {
         } else {
             return array($parent);
         }
+    }
+
+    /**
+     * Primes the category course count and visible courses caches for the given category, all top level categories, and all
+     * parent categories of the given category back to the top level.
+     *
+     * @param \coursecat|null $category
+     */
+    public static function prime_category_caches(\coursecat $category = null) {
+        $toload = [];
+        $expanded = [];
+
+        $expand = function($categoryid, $path) use (&$expanded, &$expand) {
+            $expanded[] = $categoryid;
+            foreach (helper::get_expanded_categories($path) as $subcategoryid) {
+                $expand($subcategoryid, $path . '/' . $subcategoryid);
+            }
+        };
+
+        foreach (helper::get_expanded_categories('') as $categoryid) {
+            $expand($categoryid, '/' . $categoryid);
+        }
+
+        if ($category !== null) {
+            $expanded = array_merge($expanded, $category->get_parents(), [$category->id]);
+            $expanded = array_unique($expanded);
+        }
+
+        foreach (\coursecat::get(0)->get_children() as $category) {
+            $toload[] = $category->id;
+        }
+        foreach ($categories = \coursecat::get_many($expanded) as $category) {
+            $toload[] = $category->id;
+            foreach ($category->get_children() as $subcategory) {
+                $toload[] = $subcategory->id;
+            }
+        }
+
+        $toload = array_unique($toload);
+        \coursecat::preload_category_courses_and_counts($toload);
     }
 }

@@ -1317,4 +1317,119 @@ class core_course_management_helper_test extends advanced_testcase {
         $CFG->debug = $olddebug;
     }
 
+    public function test_prime_category_caches() {
+        global $CFG, $DB;
+
+        $default = coursecat::get($CFG->defaultrequestcategory)->id;
+        $sortbit = serialize(['sortorder' => 1]);
+
+        $cache = cache::make('core', 'coursecat');
+        self::assertSame(1, $DB->count_records('course_categories'));
+        self::assertFalse($cache->has('l-'. $default. '--'. $sortbit));
+        self::assertFalse($cache->has('lcnt-'.$default.'-'));
+
+        \core_course\management\helper::prime_category_caches();
+
+        self::assertSame(0, $cache->get('lcnt-'.$default.'-'));
+        self::assertSame([], $cache->get('l-'. $default. '--'. $sortbit));
+
+        $generator = $this->getDataGenerator();
+        $cat1 = $generator->create_category();
+        $cat2 = $generator->create_category();
+        $sub1 = $generator->create_category(array('parent' => $cat1->id));
+        $sub2 = $generator->create_category(array('parent' => $cat1->id));
+        $sub3 = $generator->create_category(array('parent' => $sub1->id));
+        $course1 = $generator->create_course(['category' => $cat2->id]);
+        $course2 = $generator->create_course(['category' => $sub3->id]);
+
+        \core_course\management\helper::prime_category_caches();
+
+        self::assertSame(0, $cache->get('lcnt-'.$default.'-'));
+        self::assertSame([], $cache->get('l-'. $default. '--'. $sortbit));
+
+        $cache->purge();
+
+        \core_course\management\helper::prime_category_caches();
+
+        self::assertSame(0, $cache->get('lcnt-'.$default.'-'));
+        self::assertSame([], $cache->get('l-'. $default. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$cat1->id.'-'));
+        self::assertSame([], $cache->get('l-'. $cat1->id. '--'. $sortbit));
+        self::assertSame('1', $cache->get('lcnt-'.$cat2->id.'-'));
+        self::assertSame([$course1->id], $cache->get('l-'. $cat2->id. '--'. $sortbit));
+        self::assertFalse($cache->get('lcnt-'.$sub1->id.'-'));
+        self::assertFalse($cache->get('l-'. $sub1->id. '--'. $sortbit));
+        self::assertFalse($cache->get('lcnt-'.$sub2->id.'-'));
+        self::assertFalse($cache->get('l-'. $sub2->id. '--'. $sortbit));
+        self::assertFalse($cache->get('lcnt-'.$sub3->id.'-'));
+        self::assertFalse($cache->get('l-'. $sub3->id. '--'. $sortbit));
+
+        $cache->purge();
+
+        \core_course\management\helper::prime_category_caches($sub1);
+
+        self::assertSame(0, $cache->get('lcnt-'.$default.'-'));
+        self::assertSame([], $cache->get('l-'. $default. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$cat1->id.'-'));
+        self::assertSame([], $cache->get('l-'. $cat1->id. '--'. $sortbit));
+        self::assertSame('1', $cache->get('lcnt-'.$cat2->id.'-'));
+        self::assertSame([$course1->id], $cache->get('l-'. $cat2->id. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$sub1->id.'-'));
+        self::assertSame([], $cache->get('l-'. $sub1->id. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$sub2->id.'-'));
+        self::assertSame([], $cache->get('l-'. $sub2->id. '--'. $sortbit));
+        self::assertSame('1', $cache->get('lcnt-'.$sub3->id.'-'));
+        self::assertSame([$course2->id], $cache->get('l-'. $sub3->id. '--'. $sortbit));
+
+        $cache->purge();
+
+        \core_course\management\helper::record_expanded_category(\coursecat::get($cat1->id));
+        \core_course\management\helper::prime_category_caches();
+
+        self::assertSame(0, $cache->get('lcnt-'.$default.'-'));
+        self::assertSame([], $cache->get('l-'. $default. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$cat1->id.'-'));
+        self::assertSame([], $cache->get('l-'. $cat1->id. '--'. $sortbit));
+        self::assertSame('1', $cache->get('lcnt-'.$cat2->id.'-'));
+        self::assertSame([$course1->id], $cache->get('l-'. $cat2->id. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$sub1->id.'-'));
+        self::assertSame([], $cache->get('l-'. $sub1->id. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$sub2->id.'-'));
+        self::assertSame([], $cache->get('l-'. $sub2->id. '--'. $sortbit));
+        self::assertFalse($cache->get('lcnt-'.$sub3->id.'-'));
+        self::assertFalse($cache->get('l-'. $sub3->id. '--'. $sortbit));
+
+        \core_course\management\helper::record_expanded_category(\coursecat::get($sub3->id));
+        \core_course\management\helper::prime_category_caches();
+
+        self::assertSame(0, $cache->get('lcnt-'.$default.'-'));
+        self::assertSame([], $cache->get('l-'. $default. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$cat1->id.'-'));
+        self::assertSame([], $cache->get('l-'. $cat1->id. '--'. $sortbit));
+        self::assertSame('1', $cache->get('lcnt-'.$cat2->id.'-'));
+        self::assertSame([$course1->id], $cache->get('l-'. $cat2->id. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$sub1->id.'-'));
+        self::assertSame([], $cache->get('l-'. $sub1->id. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$sub2->id.'-'));
+        self::assertSame([], $cache->get('l-'. $sub2->id. '--'. $sortbit));
+        self::assertSame('1', $cache->get('lcnt-'.$sub3->id.'-'));
+        self::assertSame([$course2->id], $cache->get('l-'. $sub3->id. '--'. $sortbit));
+
+        $cache->purge();
+
+        \core_course\management\helper::prime_category_caches();
+
+        self::assertSame(0, $cache->get('lcnt-'.$default.'-'));
+        self::assertSame([], $cache->get('l-'. $default. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$cat1->id.'-'));
+        self::assertSame([], $cache->get('l-'. $cat1->id. '--'. $sortbit));
+        self::assertSame('1', $cache->get('lcnt-'.$cat2->id.'-'));
+        self::assertSame([$course1->id], $cache->get('l-'. $cat2->id. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$sub1->id.'-'));
+        self::assertSame([], $cache->get('l-'. $sub1->id. '--'. $sortbit));
+        self::assertSame(0, $cache->get('lcnt-'.$sub2->id.'-'));
+        self::assertSame([], $cache->get('l-'. $sub2->id. '--'. $sortbit));
+        self::assertSame('1', $cache->get('lcnt-'.$sub3->id.'-'));
+        self::assertSame([$course2->id], $cache->get('l-'. $sub3->id. '--'. $sortbit));
+    }
 }
