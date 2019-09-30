@@ -1035,7 +1035,8 @@ function filter_get_active_in_context($context) {
         return $FILTERLIB_PRIVATE->active[$context->id];
     }
 
-    $contextids = str_replace('/', ',', trim($context->path, '/'));
+    $contextids = explode('/', trim($context->path, '/'));
+    [$sql, $params] = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED, 'p');
 
     // The following SQL is tricky. It is explained on
     // http://docs.moodle.org/dev/Filter_enable/disable_by_context
@@ -1043,13 +1044,14 @@ function filter_get_active_in_context($context) {
          FROM (SELECT f.filter, MAX(f.sortorder) AS sortorder
              FROM {filter_active} f
              JOIN {context} ctx ON f.contextid = ctx.id
-             WHERE ctx.id IN ($contextids)
+             WHERE ctx.id {$sql}
              GROUP BY filter
              HAVING MAX(f.active * ctx.depth) > -MIN(f.active * ctx.depth)
          ) active
-         LEFT JOIN {filter_config} fc ON fc.filter = active.filter AND fc.contextid = $context->id
+         LEFT JOIN {filter_config} fc ON fc.filter = active.filter AND fc.contextid = :contextid
          ORDER BY active.sortorder";
-    $rs = $DB->get_recordset_sql($sql);
+    $params['contextid'] = $context->id;
+    $rs = $DB->get_recordset_sql($sql, $params);
 
     // Massage the data into the specified format to return.
     $filters = array();
@@ -1063,6 +1065,8 @@ function filter_get_active_in_context($context) {
     }
 
     $rs->close();
+
+    $FILTERLIB_PRIVATE->active[$context->id] = $filters;
 
     return $filters;
 }
