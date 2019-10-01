@@ -75,11 +75,6 @@ class default_criteria_on_install extends adhoc_task {
         /** @var scale[]|collection $scales */
         $scales = scale::repository()->get();
 
-        $linked_course_competencies = builder::table('comp_criteria')
-            ->select_raw('DISTINCT competencyid AS comp_id')
-            ->where('itemtype', 'coursecompletion')
-            ->get();
-
         foreach ($competencies as $competency) {
             $configuration = new achievement_configuration($competency);
             $configuration->set_aggregation_type('first');
@@ -94,74 +89,42 @@ class default_criteria_on_install extends adhoc_task {
             $scale_id = $framework_to_scale->item($competency->frameworkid)->scaleid;
             $min_proficient_value = $scales->item($scale_id)->min_proficient_value;
 
-            $linkedcourses_exist = $linked_course_competencies->item($competency->id);
-            $childcompetencies_exist = $competency->children->count() > 0;
+            $criterion_aggregation_method = null;
 
             switch ($competency->aggregationmethod) {
                 case $COMP_AGGREGATION['ALL']:
-                    // If the aggregation method prior to totara_competency being installed was set to 'All', then
-                    // there must be an AND relationship between the linked course and child competency
-                    // pathways. Therefore they should be in the same criteria group.
-
-                    if (!$linkedcourses_exist && !$childcompetencies_exist) {
-                        continue;
-                    }
-
-                    $group = new criteria_group();
-                    $group->set_competency($competency);
-                    $group->set_scale_value($min_proficient_value);
-
-                    if ($linkedcourses_exist) {
-                        $linkedcourses = new linkedcourses();
-                        $linkedcourses->set_metadata([(object) ['metakey' => 'linkedtype', 'metavalue' => linkedcourses::LINKTYPE_ALL]]);
-                        $linkedcourses->set_aggregation_method(criterion::AGGREGATE_ALL);
-                        $group->add_criterion($linkedcourses);
-                    }
-
-                    if ($childcompetencies_exist) {
-                        $childcompetencies = new childcompetency();
-                        $childcompetencies->set_aggregation_method(criterion::AGGREGATE_ALL);
-                        $group->add_criterion($childcompetencies);
-                    }
-
-                    $group->save();
-
+                    $criterion_aggregation_method = criterion::AGGREGATE_ALL;
                     break;
                 case $COMP_AGGREGATION['ANY']:
-                    // If the aggregation method prior to totara_competency being installed was set to 'Any', then
-                    // there must be an OR relationship between the linked course and child competency
-                    // pathways. Therefore they should be in the separate criteria groups.
-
-                    if ($linkedcourses_exist) {
-                        $linkedcourses = new linkedcourses();
-                        $linkedcourses->set_metadata([(object) ['metakey' => 'linkedtype', 'metavalue' => linkedcourses::LINKTYPE_ALL]]);
-                        $linkedcourses->set_aggregation_method(criterion::AGGREGATE_ANY_N);
-
-                        $group1 = new criteria_group();
-                        $group1->set_competency($competency);
-                        $group1->set_scale_value($min_proficient_value);
-                        $group1->add_criterion($linkedcourses);
-                        $group1->save();
-                    }
-
-                    if ($childcompetencies_exist) {
-                        $childcompetencies = new childcompetency();
-                        $childcompetencies->set_aggregation_method(criterion::AGGREGATE_ANY_N);
-
-                        $group2 = new criteria_group();
-                        $group2->set_competency($competency);
-                        $group2->set_scale_value($min_proficient_value);
-                        $group2->add_criterion($childcompetencies);
-                        $group2->save();
-                    }
-
+                    $criterion_aggregation_method = criterion::AGGREGATE_ANY_N;
                     break;
                 default:
                     // The only other case here should be OFF, where we don't add any criteria groups, but also
                     // for any unrecognised cases, e.g. from plugins, we won't try to do anything.
                     // No exceptions are necessary here, the user can either fix in the interface later
                     // or some plugin can deal with it if relevant.
+                    // continue 2 as the switch consumes a single continue.
+                    continue 2;
             }
+
+            $linkedcourses = new linkedcourses();
+            $linkedcourses->set_metadata([(object) ['metakey' => 'linkedtype', 'metavalue' => linkedcourses::LINKTYPE_ALL]]);
+            $linkedcourses->set_aggregation_method($criterion_aggregation_method);
+
+            $group1 = new criteria_group();
+            $group1->set_competency($competency);
+            $group1->set_scale_value($min_proficient_value);
+            $group1->add_criterion($linkedcourses);
+            $group1->save();
+
+            $childcompetencies = new childcompetency();
+            $childcompetencies->set_aggregation_method($criterion_aggregation_method);
+
+            $group2 = new criteria_group();
+            $group2->set_competency($competency);
+            $group2->set_scale_value($min_proficient_value);
+            $group2->add_criterion($childcompetencies);
+            $group2->save();
         }
     }
 
