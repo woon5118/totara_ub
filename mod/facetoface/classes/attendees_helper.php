@@ -572,7 +572,7 @@ final class attendees_helper {
         if (has_capability('mod/facetoface:takeattendance', $context)) {
             $allowed_actions[] = 'takeattendance';
 
-            if ($has_attendees && $seminarevent->is_any_attendance_open()) {
+            if ($has_attendees && $seminarevent->is_any_session_attendance_open()) {
                 $available_actions[] = 'takeattendance';
             }
         }

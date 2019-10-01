@@ -283,6 +283,7 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
      * @return array
      */
     public function data_provider_for_get_attendance_taking_status_sane_cases(): array {
+        $not_avail = attendance_taking_status::NOTAVAILABLE;
         $not_end__ = attendance_taking_status::CLOSED_UNTILEND;
         $not_start = attendance_taking_status::CLOSED_UNTILSTART;
         $yes_open_ = attendance_taking_status::OPEN;
@@ -294,73 +295,73 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
             [
                 -YEARSECS,
                 seminar::SESSION_ATTENDANCE_END,
-                [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
+                [ [ $yes_open_, $yes_open_, $yes_open_, $not_avail ], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Over (end)'
             ],
             [
                 -YEARSECS,
                 seminar::SESSION_ATTENDANCE_START,
-                [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
+                [ [ $yes_open_, $yes_open_, $yes_open_, $not_avail ], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Over (start)'
             ],
             [
                 -YEARSECS,
                 seminar::SESSION_ATTENDANCE_UNRESTRICTED,
-                [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
+                [ [ $yes_open_, $yes_open_, $yes_open_, $not_avail ], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Over (any)'
             ],
             [
                 -MINSECS,
                 seminar::SESSION_ATTENDANCE_END,
-                [ [], [ $not_end__, $not_end__ ], [ $not_end__, $not_end__ ] ],
+                [ [ $not_end__, $not_end__, $not_end__, $not_end__ ], [ $not_end__, $not_end__ ], [ $not_end__, $not_end__ ] ],
                 'Ongoing (end)'
             ],
             [
                 -MINSECS,
                 seminar::SESSION_ATTENDANCE_START,
-                [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
+                [ [ $yes_open_, $yes_open_, $yes_open_, $not_avail ], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Ongoing (start)'
             ],
             [
                 -MINSECS,
                 seminar::SESSION_ATTENDANCE_UNRESTRICTED,
-                [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
+                [ [ $yes_open_, $yes_open_, $yes_open_, $not_avail ], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Ongoing (any)'
             ],
             [
                 $near_future,
                 seminar::SESSION_ATTENDANCE_END,
-                [ [], [ $not_end__, $not_end__ ], [ $not_end__, $not_end__ ] ],
+                [ [ $not_end__, $not_end__, $not_end__, $not_end__ ], [ $not_end__, $not_end__ ], [ $not_end__, $not_end__ ] ],
                 'Almost open (end)'
             ],
             [
                 $near_future,
                 seminar::SESSION_ATTENDANCE_START,
-                [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
+                [ [ $yes_open_, $yes_open_, $yes_open_, $not_avail ], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Almost open (start)'
             ],
             [
                 $near_future,
                 seminar::SESSION_ATTENDANCE_UNRESTRICTED,
-                [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
+                [ [ $yes_open_, $yes_open_, $yes_open_, $not_avail ], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Almost open (any)'
             ],
             [
                 YEARSECS,
                 seminar::SESSION_ATTENDANCE_END,
-                [ [], [ $not_end__, $not_end__ ], [ $not_end__, $not_end__ ] ],
+                [ [ $not_end__, $not_end__, $not_end__, $not_end__ ], [ $not_end__, $not_end__ ], [ $not_end__, $not_end__ ] ],
                 'Upcoming (end)'
             ],
             [
                 YEARSECS,
                 seminar::SESSION_ATTENDANCE_START,
-                [ [], [ $not_start, $not_start ], [ $not_start, $not_start ] ],
+                [ [ $not_start, $not_start, $not_start, $not_start ], [ $not_start, $not_start ], [ $not_start, $not_start ] ],
                 'Upcoming (start)'
             ],
             [
                 YEARSECS,
                 seminar::SESSION_ATTENDANCE_UNRESTRICTED,
-                [ [], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
+                [ [ $yes_open_, $yes_open_, $yes_open_, $not_avail ], [ $yes_open_, $yes_open_ ], [ $yes_open_, $allsaved_ ] ],
                 'Upcoming (any)'
             ],
         ];
@@ -428,17 +429,10 @@ class mod_facetoface_seminar_session_testcase extends advanced_testcase {
         }
 
         // Walk though the $expections matrix
-        if (empty($expections[0])) {
-            // Currently, the behaviour where a seminar event does not have any signups is *undefined*
-            // However, it is guaranteed that the function does not return UNKNOWN, NOTAVAILABLE or CANCELLED in the case,
-            // so that the seminar_session::is_attendance_open() function can return a correct state
-            $should_not_be_returned = [ attendance_taking_status::UNKNOWN, attendance_taking_status::NOTAVAILABLE, attendance_taking_status::CANCELLED ];
-            $this->assertNotContains($seminarsession1->get_attendance_taking_status(null, $now, false), $should_not_be_returned, 'event1, false');
-            $this->assertNotContains($seminarsession1->get_attendance_taking_status(null, $now, true), $should_not_be_returned, 'event1, true');
-        } else {
-            $this->assertSame($expections[0][0], $seminarsession1->get_attendance_taking_status(null, $now, false), 'event1, false');
-            $this->assertSame($expections[0][1], $seminarsession1->get_attendance_taking_status(null, $now, true), 'event1, true');
-        }
+        $this->assertSame($expections[0][0], $seminarsession1->get_attendance_taking_status(null, $now, false, false), 'event1, false, false');
+        $this->assertSame($expections[0][1], $seminarsession1->get_attendance_taking_status(null, $now, true, false), 'event1, true, false');
+        $this->assertSame($expections[0][2], $seminarsession1->get_attendance_taking_status(null, $now, false, true), 'event1, false, true');
+        $this->assertSame($expections[0][3], $seminarsession1->get_attendance_taking_status(null, $now, true, true), 'event1, true, true');
         $this->assertSame($expections[1][0], $seminarsession2->get_attendance_taking_status(null, $now, false), 'event2, false');
         $this->assertSame($expections[1][1], $seminarsession2->get_attendance_taking_status(null, $now, true), 'event2, true');
         $this->assertSame($expections[2][0], $seminarsession3->get_attendance_taking_status(null, $now, false), 'event3, false');

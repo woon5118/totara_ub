@@ -231,7 +231,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $sessionrow[] = $this->session_capacity_table_cell($seminarevent, $viewattendees, $signupcount);
 
                 // Event status
-                $sessionrow[] = $this->event_status_table_cell($session, $signupcount);
+                $sessionrow[] = $this->event_status_table_cell($session, $signupcount, 0, $eventattendance);
 
                 if (!$minimal && $viewsignupperiod) {
                     // Sign-up period
@@ -297,7 +297,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                         // Capacity
                         $sessionrow[] = $this->session_capacity_table_cell($seminarevent, $viewattendees, $signupcount, $datescount);
                         // Event status
-                        $sessionrow[] = $this->event_status_table_cell($session, $signupcount, $datescount);
+                        $sessionrow[] = $this->event_status_table_cell($session, $signupcount, $datescount, $eventattendance);
                         if (!$minimal && $viewsignupperiod) {
                             // Sign-up period
                             $sessionrow[] = $this->session_resgistrationperiod_table_cell($seminarevent, $datescount, $displaytimezones);
@@ -611,7 +611,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Create a table cell containing the link to an attendance tracking page.
+     * Create a table cell containing the link to a session attendance tracking page.
      *
      * @param \stdClass $session
      * @param \stdClass $date
@@ -693,11 +693,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param \stdClass $session
      * @param int $signupcount - number currently signed up to this session.
      * @param int $datescount - this determines the rowspan. Count the number of session dates to get this figure.
+     * @param int|null $eventattendance - One of seminar::EVENT_ATTENDANCE_xxx or null to load from the seminar setting.
      * @return html_table_cell
      * @throws coding_exception
      */
-    protected function event_status_table_cell(\stdClass $session, int $signupcount, int $datescount = 0): html_table_cell {
-        [ $event_status, $booking_status, $user_status ] = seminar_event_helper::event_status($session, $signupcount);
+    protected function event_status_table_cell(\stdClass $session, int $signupcount, int $datescount = 0, int $eventattendance = null): html_table_cell {
+        [ $event_status, $booking_status, $user_status ] = seminar_event_helper::event_status($session, $signupcount, false);
         $statuses = \html_writer::tag('li', clean_string($event_status), [ 'class' => 'mod_facetoface__sessionlist__event-status__event']);
         if ($booking_status !== '') {
             $statuses .= \html_writer::tag('li', clean_string($booking_status), [ 'class' => 'mod_facetoface__sessionlist__event-status__booking']);
@@ -706,12 +707,42 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $user_status = get_string('eventstatususerbooking', 'mod_facetoface', $user_status);
             $statuses .= \html_writer::tag('li', clean_string($user_status), [ 'class' => 'mod_facetoface__sessionlist__event-status__user']);
         }
+
+        $attendance_status = $this->event_status_attendance_taking_html($session, $eventattendance);
+        $statuses .= \html_writer::tag('li', $attendance_status, [ 'class' => 'mod_facetoface__sessionlist__event-status__attendance']);
+
         $html = \html_writer::tag('ul', $statuses, [ 'class' => 'mod_facetoface__sessionlist__event-status' ]);
         $sessioncell = new html_table_cell($html);
         if ($datescount > 1) {
             $sessioncell->rowspan = $datescount;
         }
         return $sessioncell;
+    }
+
+    /**
+     * Create a table cell containing the link to an event attendance tracking page.
+     *
+     * @param \stdClass $session
+     * @param integer|null $eventattendance One of seminar::EVENT_ATTENDANCE_xxx, or null to load the seminar setting
+     * @return string of HTML
+     */
+    public function event_status_attendance_taking_html(\stdClass $session, ?int $eventattendance): string {
+        $seminarevent = (new seminar_event())->from_record_with_dates($session, false);
+        $status = $seminarevent->get_attendance_taking_status($eventattendance);
+        // Put the event attendance link only when it is open.
+        if ($status != attendance_taking_status::OPEN && $status != attendance_taking_status::ALLSAVED) {
+            return '';
+        }
+
+        $url = new \moodle_url('/mod/facetoface/attendees/takeattendance.php', ['s' => $session->id]);
+        if ($status == attendance_taking_status::ALLSAVED) {
+            $html = $this->flex_icon('check-circle-success') . get_string('eventattendancetracking:saved', 'mod_facetoface');
+            $state = 'saved';
+        } else {
+            $html = get_string('eventattendancetracking:open', 'mod_facetoface');
+            $state = 'open';
+        }
+        return \html_writer::link($url, $html, ['class' => "mod_facetoface__sessionlist__attendance--{$state}__link"]);
     }
 
     /**

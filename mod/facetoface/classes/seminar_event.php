@@ -24,8 +24,10 @@
 namespace mod_facetoface;
 
 use context_module;
+use mod_facetoface\attendance\attendance_helper;
 use mod_facetoface\signup\condition\event_taking_attendance;
 use mod_facetoface\event\session_cancelled;
+use mod_facetoface\signup\state\booked;
 use mod_facetoface\signup\state\event_cancelled;
 
 defined('MOODLE_INTERNAL') || die();
@@ -1020,55 +1022,106 @@ final class seminar_event implements seminar_iterator_item {
     }
 
     /**
-     * Logic for event->is_attendance_open, there are three possibilities here:
-     *
-     * + Any time, which means that event is able to be taking attendance all the time.
-     * + Time end, which the event is only able to be taking attendnace at when the last session
-     *   is completed.
-     * + Time start, when the first session has started.
+     * Check whether the event attendance taking is available or not.
      *
      * @param int $time
      * @return bool
      */
     public function is_attendance_open(int $time = 0): bool {
-        if (0 !=  $this->cancelledstatus) {
+        return attendance_taking_status::is_available($this->get_attendance_taking_status(null, $time, false, false));
+    }
+
+    /**
+     * Return attendance taking status of the seminar event.
+     *
+     * @param integer|null  $eventattendance One of seminar::EVENT_ATTENDANCE_xxx, or null to load the seminar setting
+     * @param integer       $time           The current timestamp
+     * @param boolean       $checksaved     Set false to not check the status of each attendee
+     * @param boolean       $checkattendees Set true to return NOTAVAILABLE when the session is open but no attendees
+     * @return integer  One of attendance_taking_status constants
+     */
+    public function get_attendance_taking_status(int $eventattendance = null, int $time = 0, bool $checksaved = true, bool $checkattendees = false): int {
+        if (null === $eventattendance) {
+            $seminar = $this->get_seminar();
+            $eventattendance = $seminar->get_attendancetime();
+        }
+        if (0 != $this->get_cancelledstatus()) {
             // A cancelled event should not open for taking attendance.
-            return false;
+            return attendance_taking_status::CANCELLED;
         }
 
         if (0 >= $time) {
             $time = time();
         }
 
-        $seminar = $this->get_seminar();
-        $eventattendance = $seminar->get_attendancetime();
-
         switch ($eventattendance) {
             case seminar::EVENT_ATTENDANCE_FIRST_SESSION_START:
                 // For checking attendance at time start, which apply that number of minutes
                 // before start.
                 $time += event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
-                return $this->is_first_started($time);
+                if (!$this->is_first_started($time)) {
+                    return attendance_taking_status::CLOSED_UNTILSTARTFIRST;
+                }
+                break;
 
             case seminar::EVENT_ATTENDANCE_LAST_SESSION_START:
                 // For checking attendance at time start, which apply that number of minutes
                 // before start.
                 $time += event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
-                return $this->is_last_started($time);
+                if (!$this->is_last_started($time)) {
+                    return attendance_taking_status::CLOSED_UNTILSTARTLAST;
+                }
+                break;
 
             case seminar::EVENT_ATTENDANCE_LAST_SESSION_END:
-                return $this->is_over($time);
+                if (!$this->is_over($time)) {
+                    return attendance_taking_status::CLOSED_UNTILEND;
+                }
+                break;
 
             case seminar::EVENT_ATTENDANCE_UNRESTRICTED:
                 if (!$this->is_sessions()) {
                     // It is a wait-listed event, so attendance is not open.
-                    return false;
+                    return attendance_taking_status::NOTAVAILABLE;
                 }
-                return true;
+                break;
+
+            default:
+                debugging("The event attendance time {$eventattendance} is not valid.", DEBUG_DEVELOPER);
+                return attendance_taking_status::UNKNOWN;
         }
 
-        debugging("The event attendance time {$eventattendance} is not valid.", DEBUG_DEVELOPER);
-        return false;
+        // Skip digging into attendees to improve performance.
+        if (!$checksaved) {
+            return attendance_taking_status::OPEN;
+        }
+
+        $helper = new attendance_helper();
+        $attendees = $helper->get_event_attendees($this->get_id(), false);
+
+        if (empty($attendees)) {
+            if ($checkattendees) {
+                // Taking attendance is not open if no one attends the event.
+                return attendance_taking_status::NOTAVAILABLE;
+            } else {
+                // Taking attendance is open if no one attends the event.
+                return attendance_taking_status::OPEN;
+            }
+        }
+
+        $saved = true;
+        foreach ($attendees as $attendee) {
+            if (!$attendee->statuscode || $attendee->statuscode == booked::get_code()) {
+                $saved = false;
+                break;
+            }
+        }
+
+        if ($saved) {
+            return attendance_taking_status::ALLSAVED;
+        } else {
+            return attendance_taking_status::OPEN;
+        }
     }
 
     /**
@@ -1077,6 +1130,7 @@ final class seminar_event implements seminar_iterator_item {
      * @return bool
      */
     public function is_session_open(int $sessiondateid): bool {
+        debugging('The method ' . __METHOD__ . '() has been deprecated. Please use seminar_session::is_attendance_open() instead.', DEBUG_DEVELOPER);
         $sessions = $this->get_sessions();
         // Check those session dates that is valid or not.
         /** @var seminar_session|null $session */
@@ -1092,6 +1146,19 @@ final class seminar_event implements seminar_iterator_item {
      * @return bool
      */
     public function is_any_attendance_open(int $time = 0, int $sessionattendance = null): bool {
+        debugging('The method ' . __METHOD__ . '() has been deprecated. Please use seminar_event::is_any_session_attendance_open() instead.', DEBUG_DEVELOPER);
+        return $this->is_any_session_attendance_open($time, $sessionattendance);
+    }
+
+    /**
+     * Extended logic for seminar events to handle the case where attendance is open for a session, but not for
+     * the event itself.
+     *
+     * @param int $time Unix timestamp or 0 to use the current time
+     * @param int|null $sessionattendance One of seminar::SESSION_ATTENDANCE_xxx, or null to load the seminar setting
+     * @return bool
+     */
+    public function is_any_session_attendance_open(int $time = 0, int $sessionattendance = null): bool {
         if (0 >= $time) {
             $time = time();
         }
@@ -1126,7 +1193,7 @@ final class seminar_event implements seminar_iterator_item {
                     $seminar = $this->get_seminar();
                 }
                 $sessionattendance = $seminar->fix_up_session_attendance_time($sessionattendance);
-                return $this->is_any_attendance_open($time, $sessionattendance);
+                return $this->is_any_session_attendance_open($time, $sessionattendance);
         }
 
         // No session attendance is open; Try event attendance.

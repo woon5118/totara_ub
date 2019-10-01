@@ -3,6 +3,11 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* A new default column 'Event Attendance' is added to the event reports
+* seminar_event::is_session_open() function has been deprecated, please use seminar_session::is_attendance_open()
+* seminar_event::is_any_attendance_open() function has been deprecated, please use seminar_event::is_any_session_attendance_open()
+* seminar_event::is_attendance_open() function has been updated to use the event attendance taking status
+* mod_facetoface_renderer::event_status_table_cell() function has been updated to take the $eventattendance parameter for the event attendance state
 * mod_facetoface\event\booking_cancelled::create_from_session() function has been deprecated, please use mod_facetoface\event\booking_cancelled::create_from_signup() instead
 * Added 'relateduserid' optional parameter for the following seminar event triggers:
   * mod_facetoface\event\booking_booked::create_from_signup()

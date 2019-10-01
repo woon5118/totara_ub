@@ -362,6 +362,33 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
 
         $columnoptions[] = new rb_column_option(
             'session',
+            'eventattendance',
+            get_string('eventattendance', 'rb_source_facetoface_summary'),
+            "base.id",
+            array(
+                'capability' => 'mod/facetoface:takeattendance',
+                'nosort' => true,
+                'extracontext' => array('link' => false),
+                'displayfunc' => 'f2f_event_attendance',
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'eventattendancelink',
+            get_string('eventattendancelink', 'rb_source_facetoface_summary'),
+            "base.id",
+            array(
+                'capability' => 'mod/facetoface:takeattendance',
+                'nosort' => true,
+                'extracontext' => array('link' => true),
+                'displayfunc' => 'f2f_event_attendance',
+                'defaultheading' => get_string('eventattendance', 'rb_source_facetoface_summary'),
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'session',
             'eventtimecreated',
             get_string('eventtimecreated', 'rb_source_facetoface_events'),
             "base.timecreated",
@@ -622,6 +649,10 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             array(
                 'type' => 'facetoface',
                 'value' => 'namelink',
+            ),
+            array(
+                'type' => 'session',
+                'value' => 'eventattendancelink',
             ),
         );
 

@@ -33,8 +33,21 @@ abstract class attendance_taking_status {
     const UNKNOWN = 0;
     const CLOSED_UNTILEND = -1;
     const CLOSED_UNTILSTART = -2;
+    const CLOSED_UNTILSTARTFIRST = self::CLOSED_UNTILSTART;
+    const CLOSED_UNTILSTARTLAST = -3; // valid only for seminar event
     const NOTAVAILABLE = -10;
     const CANCELLED = -11;
     const OPEN = 1;
     const ALLSAVED = 2;
+
+    /**
+     * Return true if attendance tracking is available.
+     *
+     * @param integer $value one of attendance_taking_status constants
+     * @return boolean
+     */
+    public static function is_available(int $value): bool {
+        // Any natural number is success. Any negative number is failre.
+        return $value > 0;
+    }
 }

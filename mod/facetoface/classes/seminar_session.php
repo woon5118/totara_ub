@@ -349,24 +349,25 @@ final class seminar_session implements seminar_iterator_item {
     }
 
     /**
-     * Checking whether the session is open for taking attendance or not.
+     * Check whether the session attendance taking is available or not.
      *
      * @param int $time
      * @return bool
      */
     public function is_attendance_open(int $time = 0): bool {
-        return $this->get_attendance_taking_status(null, $time, false) > 0;
+        return attendance_taking_status::is_available($this->get_attendance_taking_status(null, $time, false, false));
     }
 
     /**
-     * Return attendance_taking_status.
+     * Return attendance taking status of the seminar session.
      *
      * @param integer|null  $sessionattendance One of seminar::SESSION_ATTENDANCE_xxx, or null to load the seminar setting
      * @param integer       $time           The current timestamp
-     * @param boolean       $checksaved     Set true to see if all attendees are taken or not
+     * @param boolean       $checksaved     Set false to not check the status of each attendee
+     * @param boolean       $checkattendees Set true to return NOTAVAILABLE when the session is open but no attendees
      * @return integer  One of attendance_taking_status constants
      */
-    public function get_attendance_taking_status(int $sessionattendance = null, int $time = 0, bool $checksaved = true): int {
+    public function get_attendance_taking_status(int $sessionattendance = null, int $time = 0, bool $checksaved = true, bool $checkattendees = false): int {
         $seminarevent = $this->get_seminar_event();
         if (null === $sessionattendance) {
             $seminar = $seminarevent->get_seminar();
@@ -435,6 +436,16 @@ final class seminar_session implements seminar_iterator_item {
 
         $helper = new attendance_helper();
         $attendees = $helper->get_attendees($seminarevent->get_id(), $this->get_id());
+
+        if (empty($attendees)) {
+            if ($checkattendees) {
+                // Taking attendance is not open if no one attends the event.
+                return attendance_taking_status::NOTAVAILABLE;
+            } else {
+                // Taking attendance is open if no one attends the event.
+                return attendance_taking_status::OPEN;
+            }
+        }
 
         $saved = true;
         foreach ($attendees as $attendee) {

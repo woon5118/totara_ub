@@ -177,7 +177,8 @@ final class take_attendance_tracking implements attendance_tracking {
      */
     private function is_disable_bulk_action(): bool {
         if ($this->options['selected-sessiondate-id'] > 0) {
-            return $this->seminarevent->is_session_open($this->options['selected-sessiondate-id']);
+            $session = new seminar_session($this->options['selected-sessiondate-id']);
+            return !$session->is_attendance_open();
         }
         // Disabled will happen when seminar_event is not open for attendance.
         return !$this->seminarevent->is_attendance_open();

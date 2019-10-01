@@ -23,7 +23,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar, seminar_event, seminar_session};
+use mod_facetoface\{attendance_taking_status, seminar, seminar_event, seminar_session, signup};
+use mod_facetoface\signup\state\fully_attended;
 
 class mod_facetoface_seminar_event_testcase extends advanced_testcase {
     /**
@@ -138,7 +139,8 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                         'finish' => $time + (3600 * 8)
                     ]
                 ],
-                false
+                false,
+                array_fill(0, 8, attendance_taking_status::CLOSED_UNTILEND)
             ],
             [
                 seminar::EVENT_ATTENDANCE_FIRST_SESSION_START,
@@ -153,7 +155,17 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                         'finish' => $time + (3600 * 6)
                     ]
                 ],
-                true
+                true,
+                [
+                    attendance_taking_status::OPEN,
+                    attendance_taking_status::OPEN,
+                    attendance_taking_status::OPEN,
+                    attendance_taking_status::NOTAVAILABLE,
+                    attendance_taking_status::OPEN,
+                    attendance_taking_status::OPEN,
+                    attendance_taking_status::ALLSAVED,
+                    attendance_taking_status::ALLSAVED,
+                ]
             ],
             [
                 seminar::EVENT_ATTENDANCE_FIRST_SESSION_START,
@@ -164,7 +176,8 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                         'finish' => $time + (3600 * 2)
                     ]
                 ],
-                false
+                false,
+                array_fill(0, 8, attendance_taking_status::CLOSED_UNTILSTARTFIRST)
             ],
             [
                 seminar::EVENT_ATTENDANCE_LAST_SESSION_END,
@@ -179,34 +192,47 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                         'finish' => $time + (3600 * 6)
                     ]
                 ],
-                true
+                true,
+                [
+                    attendance_taking_status::OPEN,
+                    attendance_taking_status::OPEN,
+                    attendance_taking_status::OPEN,
+                    attendance_taking_status::NOTAVAILABLE,
+                    attendance_taking_status::OPEN,
+                    attendance_taking_status::OPEN,
+                    attendance_taking_status::ALLSAVED,
+                    attendance_taking_status::ALLSAVED,
+                ]
             ],
             // this is a wait-listed event, and attendance should be opened
-            [seminar::EVENT_ATTENDANCE_UNRESTRICTED, $time - (3600 * 24), [], false],
+            [
+                seminar::EVENT_ATTENDANCE_UNRESTRICTED,
+                $time - (3600 * 24),
+                [],
+                false,
+                array_fill(0, 8, attendance_taking_status::NOTAVAILABLE)
+            ],
         ];
     }
 
     /**
      * Test suite to check whether the event has open for attendance base on: sessions time against
      * current time.
+     * Also test the attendance taking status is_attendance_open() function depends on.
      *
      * @dataProvider provide_data_for_attendance
      * @param int $eventattendance
      * @param int $time
      * @param array $sessions
-     * @param bool $expected
+     * @param bool $expectedopen
+     * @param int[] $expectedstate
      */
     public function test_is_attendance_open(int $eventattendance, int $time,
-                                                   array $sessions, bool $expected): void {
-        $this->resetAfterTest(true);
-
+                                                   array $sessions, bool $expectedopen, array $expectedstates): void {
         $gen = $this->getDataGenerator();
         $course = $gen->create_course();
-
-        $s = new seminar();
-        $s->set_course($course->id);
-        $s->set_attendancetime($eventattendance);
-        $s->save();
+        $f2f = $this->getDataGenerator()->create_module('facetoface', array('course' => $course->id, 'attendancetime' => $eventattendance));
+        $s = new seminar($f2f->id);
 
         $event = new seminar_event();
         $event->set_facetoface($s->get_id());
@@ -220,17 +246,35 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
             $d->save();
         }
 
-        $rs = $event->is_attendance_open($time);
-        $this->assertEquals($expected, $rs);
+        $this->assertSame($expectedopen, $event->is_attendance_open($time));
+        $this->assertSame($expectedstates[0], $event->get_attendance_taking_status(null, $time, false, false));
+        $this->assertSame($expectedstates[1], $event->get_attendance_taking_status(null, $time, false, true));
+        $this->assertSame($expectedstates[2], $event->get_attendance_taking_status(null, $time, true, false));
+        $this->assertSame($expectedstates[3], $event->get_attendance_taking_status(null, $time, true, true));
+
+        // Create a user, sign up, take attendance while bypassing all the restrictions of state transition.
+        $user = $gen->create_user();
+        $gen->enrol_user($user->id, $course->id);
+        $signup = signup::create($user->id, $event);
+        $signup->save();
+
+        $rc = new ReflectionClass($signup);
+        $method = $rc->getMethod('update_status');
+        $method->setAccessible(true);
+        $method->invoke($signup, new fully_attended($signup));
+
+        $this->assertSame($expectedopen, $event->is_attendance_open($time));
+        $this->assertSame($expectedstates[4], $event->get_attendance_taking_status(null, $time, false, false));
+        $this->assertSame($expectedstates[5], $event->get_attendance_taking_status(null, $time, false, true));
+        $this->assertSame($expectedstates[6], $event->get_attendance_taking_status(null, $time, true, false));
+        $this->assertSame($expectedstates[7], $event->get_attendance_taking_status(null, $time, true, true));
     }
 
     /**
      * Test suite of checking the calculation of 'attendance open' when the event is cancelled.
-     * @return void
+     * Also test the attendance taking status is_attendance_open() function depends on.
      */
     public function test_is_attendance_open_for_cancelled_event(): void {
-        $this->resetAfterTest();
-
         $gen = $this->getDataGenerator();
         $course = $gen->create_course();
 
@@ -251,5 +295,6 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
         $s->save();
 
         $this->assertFalse($event->is_attendance_open(time()));
+        $this->assertSame(attendance_taking_status::CANCELLED, $event->get_attendance_taking_status(null, time()));
     }
 }
