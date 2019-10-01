@@ -45,4 +45,13 @@ $tasks = array(
         'dayofweek' => '*',
         'month' => '*'
     ),
+    array(
+        'classname' => 'totara_reportbuilder\task\remove_orphaned_embedded_reports',
+        'blocking' => 0,
+        'minute' => '23',
+        'hour' => '5',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
 );

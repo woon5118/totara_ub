@@ -675,6 +675,7 @@ $string['recordstoviewdescription'] = 'The reports will only display records rel
 $string['recordsperpage'] = 'Number of records per page';
 $string['refreshcachetask'] = 'Refresh report cache';
 $string['reloadreport'] = 'Report settings have been reset';
+$string['remove_orphaned_embedded_reports'] = 'Remove orphaned embedded reports';
 $string['report'] = 'Report';
 $string['report:cachelast'] = 'Report data last updated: {$a}';
 $string['report:cachenext'] = 'Next update due: {$a}';

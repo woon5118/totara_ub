@@ -1216,10 +1216,11 @@ class reportbuilder {
      * Searches codebase for report builder source files and returns a list
      *
      * @param bool $includenonselectable If true then include sources even if they can't be used in custom reports (for testing)
+     * @param bool $include_ignored If true then include sources even if they have explicitly asked to be ignored
      * @return array Associative array of all available sources, formatted
      *               to be used in a select element.
      */
-    public static function get_source_list($includenonselectable = false) {
+    public static function get_source_list($includenonselectable = false, $include_ignored = false) {
         $output = array();
 
         foreach (self::find_source_dirs() as $dir) {
@@ -1237,7 +1238,7 @@ class reportbuilder {
                         //     $classname = 'rb_source_' . $source;
                         //     if (class_exists($classname) && $classname::is_source_ignored()) {
                         // in the future.
-                        if (self::is_source_class_ignored($source)) {
+                        if (!$include_ignored && self::is_source_class_ignored($source)) {
                             continue;
                         }
                     }
