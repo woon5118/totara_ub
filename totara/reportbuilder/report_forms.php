@@ -1140,6 +1140,32 @@ class report_builder_edit_performance_form extends moodleform {
         $mform->setType('initialdisplay', PARAM_INT);
         $mform->setDefault('initialdisplay', RB_INITIAL_DISPLAY_SHOW);
         $mform->addHelpButton('initialdisplay', 'initialdisplay', 'totara_reportbuilder');
+
+        // Export format settings.
+        $mform->addElement('header', 'exportperformance', get_string('exportperformancesettings_heading', 'totara_reportbuilder'));
+        $mform->setExpanded('exportperformance');
+        $mform->addElement('checkbox', 'overrideexportoptions', get_string('overrideexportoptions', 'totara_reportbuilder'));
+        $mform->addHelpButton('overrideexportoptions', 'overrideexportoptions', 'totara_reportbuilder');
+
+        $mform->setDefault('overrideexportoptions', $report->overrideexportoptions);
+
+        $activeexportoptions = $report->get_report_export_options();
+
+        $exportgroup = array();
+        foreach (reportbuilder::get_all_general_export_options(true) as $exporttype => $exportname) {
+            $exportgroup[] = $mform->createElement('advcheckbox', "exportoptions[{$exporttype}]", '', $exportname, null, array(0, 1));
+            if (isset($activeexportoptions[$exporttype])) {
+                $mform->setDefault("exportoptions[{$exporttype}]", 1);
+            }
+        }
+        $mform->addGroup($exportgroup, 'exportoptions', get_string('exportoptions', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
+        $mform->disabledIf('exportoptions', 'overrideexportoptions', 'notchecked');
+
+        if (!has_capability('totara/reportbuilder:overrideexportoptions', context_system::instance())) {
+            $mform->freeze('overrideexportoptions');
+            $mform->freeze('exportoptions');
+        }
+
         $mform->addElement('header', 'cachingperformance', get_string('reportbuildercache_heading', 'totara_reportbuilder'));
         $mform->setExpanded('cachingperformance');
         $problems = $report->get_caching_problems();

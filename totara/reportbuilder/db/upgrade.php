@@ -630,5 +630,19 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019090300, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2019101500) {
+        // Define field overrideexportoptions to be added to report_builder.
+        $table = new xmldb_table('report_builder');
+        $field = new xmldb_field('overrideexportoptions', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'showtotalcount');
+
+        // Conditionally launch add field overrideexportoptions.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2019101500, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

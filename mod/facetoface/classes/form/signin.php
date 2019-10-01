@@ -39,7 +39,7 @@ class signin extends \moodleform {
             $options[$date->id] = get_string('sessionstartdatewithtime', 'mod_facetoface', $dateobject);
         }
 
-        $select = reportbuilder_get_export_options(null, true);
+        $select = \reportbuilder::get_all_general_export_options();
         if (count($select) == 0 || count($options) == 0) {
             // Something happened which should not.
             // No export options - don't show form.

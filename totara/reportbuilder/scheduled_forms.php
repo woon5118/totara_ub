@@ -63,7 +63,7 @@ class scheduled_reports_new_form extends moodleform {
         $mform->setType('reportid', PARAM_INT);
 
         // Export type options.
-        $exportformatselect = reportbuilder_get_export_options($format);
+        $exportformatselect = $report->get_report_export_options($format);
 
         $exporttofilesystemenabled = false;
         if (get_config('reportbuilder', 'exporttofilesystem') == 1) {
@@ -327,10 +327,10 @@ class scheduled_reports_add_form extends moodleform {
 
             if ($sources[$report->source]->scheduleable) {
                 try {
-                    if ($report->embedded) {
-                        $reportobject = reportbuilder::create($report->id);
+                    $reportobject = reportbuilder::create($report->id);
+                    if (!empty($reportobject->get_report_export_options())) {
+                        $reportselect[$report->id] = format_string($report->fullname);
                     }
-                    $reportselect[$report->id] = format_string($report->fullname);
                 } catch (moodle_exception $e) {
                     if ($e->errorcode != "nopermission") {
                         // The embedded report creation failed, almost certainly due to a failed is_capable check.

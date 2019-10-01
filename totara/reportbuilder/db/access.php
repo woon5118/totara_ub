@@ -74,5 +74,14 @@ $capabilities = array(
             'manager' => CAP_ALLOW,
             'user' => CAP_ALLOW
         )
+    ),
+    // Ability to override export formats at report level.
+    'totara/reportbuilder:overrideexportoptions' => array(
+        'riskbitmask' => RISK_PERSONAL | RISK_CONFIG,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
     )
 );

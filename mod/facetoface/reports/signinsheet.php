@@ -32,7 +32,7 @@ $sessiondateid = optional_param('sessiondateid', 0, PARAM_INT);
 
 $PAGE->set_url('/mod/facetoface/reports/signinsheet.php', array('sessiondateid' => $sessiondateid));
 
-$formatoptions = reportbuilder_get_export_options(null, true);
+$formatoptions = reportbuilder::get_all_general_export_options();
 $sessiondate   = $DB->get_record('facetoface_sessions_dates', array('id' => $sessiondateid));
 if (!$sessiondate || !array_key_exists($format, $formatoptions)) {
     require_login();

@@ -373,7 +373,9 @@ $string['exportfilesystempath_help'] = 'Absolute file system path to a writeable
 
 **Warning!** Make sure to configure a correct system path if you are going to export reports to file system.';
 $string['exportods'] = 'Export in ODS format';
-$string['exportoptions'] = 'Format export options';
+$string['exportoptiondisabled'] = 'Disabled: {$a}';
+$string['exportoptions'] = 'Export formats';
+$string['exportperformancesettings_heading'] = 'Export Performance Settings';
 $string['exportpdf_landscape'] = 'Export in PDF (Landscape) format';
 $string['exportpdf_mramlimitexceeded'] = 'Notice: Ram memory limit exceeded! Probably the report being exported is too big, as it took almost {$a} MB of ram memory to create it, please consider reducing the size of the report, applying filters or splitting the report in several files.';
 $string['exportpdf_portrait'] = 'Export in PDF (Portrait) format';
@@ -635,6 +637,10 @@ $string['otherrecipients'] = 'Other recipients';
 $string['otherrecipient:systemusers'] = 'User: {$a}';
 $string['otherrecipient:emailexternalusers'] = 'External email: {$a}';
 $string['otherrecipient:audiences'] = 'Audience: {$a}';
+$string['overrideexportoptions'] = 'Override export formats';
+$string['overrideexportoptions_help'] = 'For system performance reasons, when exporting or scheduling large reports (e.g. 10,000 records) it is recommended that PDF and Excel formats are disabled. 
+
+Use this setting to override the site-level defined \'Export format options\' and ensure this report has sensible export formats.';
 $string['pdffont'] = 'PDF export font';
 $string['pdffont_help'] = 'When exporting a report from the report builder as a PDF this is the font that will be used. If appropriate default is selected Totara will select a font that is suitable for the users language.';
 $string['pdflandscapeformat'] = 'PDF format (landscape)';
@@ -678,6 +684,7 @@ $string['reportbuilder:createscheduledreports'] = 'Create scheduled reports';
 $string['reportbuilder:manageembeddedreports'] = 'Create, edit and reset report builder embedded reports';
 $string['reportbuilder:managereports'] = 'Create, edit and delete report builder reports';
 $string['reportbuilder:managescheduledreports'] = 'Manage scheduled reports';
+$string['reportbuilder:overrideexportoptions'] = 'Override export formats at report level';
 $string['reportbuilder:overridescheduledfrequency'] = 'Override minimum scheduled report frequency';
 $string['reportbuilderaccessmode'] = 'Access Mode';
 $string['reportbuilderaccessmode_help'] = 'Access controls are used to restrict which users can view the report.
@@ -789,11 +796,13 @@ $string['reportbuilderdialogfilter_help'] = 'This filter allows you to filter in
 
 Once a framework item has been selected you can use the **Include children?** checkbox to choose whether to match only that item, or match that item and any sub-items belonging to that item.';
 $string['reportbuilderexportoptions'] = 'Report Export Settings';
-$string['reportbuilderexportoptions_help'] = 'Report export settings allows a user to specify the export options that are available for users at the bottom of a report page. This setting affects all Report builder reports.
+$string['reportbuilderexportoptions_help'] = 'Use these settings to specify the export formats that are available for users on report pages and in scheduled reports. The setting affects all Report Builder reports.
 
-When multiple options are selected the user can choose their preferred options from the export dropdown menu.
+Selected formats will appear in the export dropdown menu.
 
-When no options are selected the export function is disabled.';
+When no formats are selected the export dropdown is disabled.
+
+Users with the \'totara/reportbuilder:overrideexportoptions\' capability can override the setting at a report level.';
 $string['reportbuilderexporttofilesystem'] = 'Enable exporting to file system';
 $string['reportbuilderexporttofilesystem_help'] = 'Exporting to file system allows reports to be saved to a directory on the web server\'s file system, instead of only emailing the report to the user scheduling the report.
 

@@ -28,6 +28,7 @@ information provided here is intended especially for developers.
   To extract column names, please use 'name' property of the result array.
 * Removed no longer used ajax/graph.php file
 * Updated default colours for report graphs
+* Deprecated reportbuilder_get_export_options(), please use reportbuilder::get_all_general_export_options()
 
 === 12.0 ===
 

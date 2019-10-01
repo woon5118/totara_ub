@@ -235,7 +235,7 @@ trait report_schedule_trait {
             get_string('format', 'rb_source_scheduled_reports'),
             'select',
             [
-                'selectchoices' => reportbuilder_get_export_options(),
+                'selectchoices' => \reportbuilder::get_all_general_export_options(),
                 'simplemode' => true,
             ]
         );

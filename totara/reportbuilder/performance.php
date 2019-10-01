@@ -84,6 +84,16 @@ if ($fromform = $mform->get_data()) {
     } else {
         $todb->initialdisplay = isset($fromform->initialdisplay) ? $fromform->initialdisplay : 0;
     }
+
+    // Export options.
+    if (has_capability('totara/reportbuilder:overrideexportoptions', context_system::instance())) {
+        $todb->overrideexportoptions = empty($fromform->overrideexportoptions) ? 0 : 1;
+
+        foreach (reportbuilder::get_all_general_export_options(true) as $exporttype => $exportname) {
+            $report->update_setting($report->_id, 'exportoption', $exporttype, $fromform->exportoptions[$exporttype]);
+        }
+    }
+
     $todb->timemodified = time();
     $DB->update_record('report_builder', $todb);
 

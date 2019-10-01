@@ -251,6 +251,11 @@ class reportbuilder {
     protected $usercanaccess;
 
     /**
+     * @var bool $overrideexportoptions True to allow report specific export format options
+     */
+    public $overrideexportoptions = false;
+
+    /**
      * Please use {@link reportbuilder::can_display_total_count()}
      * Don't access this property outside of the Report Builder API.
      * It should be considered private. It is public only because of the report form requirements.
@@ -436,6 +441,7 @@ class reportbuilder {
         $this->defaultsortcolumn = $report->defaultsortcolumn;
         $this->defaultsortorder = $report->defaultsortorder;
         $this->showtotalcount = (!empty($report->showtotalcount) && !empty(get_config('totara_reportbuilder', 'allowtotalcount')));
+        $this->overrideexportoptions = empty($report->overrideexportoptions) ? false : true;
         $this->useclonedb = $report->useclonedb;
         $this->embedded = $report->embedded;
         $this->cache = $report->cache;
@@ -1440,6 +1446,93 @@ class reportbuilder {
         return true;
     }
 
+    /**
+     * Get report specific export option settings for this report
+     *
+     * NOTE: these settings are only applied if overrideexportoptions is set
+     *
+     * @return array
+     */
+    public function get_report_export_settings() : array {
+        $reportexportformats = array();
+        foreach (self::get_all_general_export_options(true) as $shortname => $exportoption) {
+            if (!empty($this->get_setting($this->_id, 'exportoption', $shortname))) {
+                $reportexportformats[$shortname] = $exportoption;
+            }
+        }
+
+        return $reportexportformats;
+    }
+
+    /**
+     * Get the report export options
+     *
+     * Returns an array of export options available to the report. This could be the general report builder options,
+     * 'reportbuilder | exportoptions' or if 'overrideexportoptions' is set, the format options defined.
+     *
+     * Only options returned here can be used for the report.
+     *
+     * @param string $currentoption
+     * @return array (export format => localised name of export option)
+     */
+    public function get_report_export_options(string $currentoption = null) : array {
+        if ($this->overrideexportoptions) {
+            // We are using report specific export options.
+            $options = $this->get_report_export_settings();
+
+            if ($currentoption) {
+                // If $currentoption is valid and not already added to the options, add it.
+                $alloptions = self::get_all_general_export_options(true);
+                if (!isset($options[$currentoption]) && isset($alloptions[$currentoption])) {
+                    $options[$currentoption] = get_string('exportoptiondisabled', 'totara_reportbuilder', $alloptions[$currentoption]);
+                }
+            }
+
+            return $options;
+        }
+
+        return self::get_all_general_export_options(false, $currentoption);
+    }
+
+    /**
+     * Returns available export options for reportbuilder.
+     *
+     *
+     * @param bool $all True to include all available export options or false for only those included in exportoptions config
+     * @param string $currentoption optional option that is displayed even if not enabled in settings
+     * @return array (export format => localised name of export option)
+     */
+    public static function get_all_general_export_options(bool $all = false, string $currentoption = null) : array {
+        $exportoptions = get_config('reportbuilder', 'exportoptions');
+        $exportoptions = !empty($exportoptions) ? explode(',', $exportoptions) : array();
+
+        // Normalise option names.
+        foreach ($exportoptions as $key => $option) {
+            $exportoptions[$key] =  \totara_core\tabexport_writer::normalise_format($option);
+        }
+
+        $alloptions = \totara_core\tabexport_writer::get_export_options();
+        $select = array();
+        foreach ($alloptions as $type => $name) {
+            if (!$all) {
+                if (!in_array($type, $exportoptions)) {
+                    continue;
+                }
+            }
+
+            $select[$type] = $name;
+        }
+
+        // Add current option.
+        // This allows existing scheduled reports to work even if export options change.
+        if ($currentoption) {
+            if (isset($alloptions[$currentoption]) and !isset($select[$currentoption])) {
+                $select[$currentoption] = get_string('exportoptiondisabled', 'totara_reportbuilder', $alloptions[$currentoption]);
+            }
+        }
+
+        return $select;
+    }
 
     /**
      * Looks up the saved search ID specified and attempts to restore
@@ -6190,9 +6283,22 @@ function reportbuilder_send_scheduled_report($sched) {
         }
     }
 
+    try {
+        $report = reportbuilder_get_schduled_report($sched, $reportrecord);
+    } catch (moodle_exception $e) {
+        if ($e->errorcode === "nopermission") {
+            mtrace("Error: Scheduled report {$sched->id} could not be created because user is not allowed to access it");
+            return false;
+        } else {
+            mtrace("Error: Scheduled report {$sched->id} could not be created, unknown exception: " . get_class($e));
+            return false;
+        }
+    }
+
     $format = \totara_core\tabexport_writer::normalise_format($sched->format);
-    $options = reportbuilder_get_export_options(null);
+    $options = $report->get_report_export_options();
     $formats = \totara_core\tabexport_writer::get_export_classes();
+
     if (!isset($formats[$format]) or !isset($options[$format])) {
         mtrace("Error: Scheduled report {$sched->id} uses unknown or disabled format '{$sched->format}'");
         return false;
@@ -6214,17 +6320,6 @@ function reportbuilder_send_scheduled_report($sched) {
         }
     }
 
-    try {
-        $report = reportbuilder_get_schduled_report($sched, $reportrecord);
-    } catch (moodle_exception $e) {
-        if ($e->errorcode === "nopermission") {
-            mtrace("Error: Scheduled report {$sched->id} could not be created because user is not allowed to access it");
-            return false;
-        } else {
-            mtrace("Error: Scheduled report {$sched->id} could not be created, unknown exception: " . get_class($e));
-            return false;
-        }
-    }
     $tempfile = reportbuilder_export_schduled_report($sched, $report, $writerclassname);
     if (!$tempfile) {
         mtrace("Error: Scheduled report {$sched->id} could not be created");
@@ -6872,39 +6967,14 @@ function reportbuilder_rename_data($table, $source, $oldtype, $oldvalue, $newtyp
  *
  * NOTE: there was a second parameter $includefusion = false, it was removed in Totara 13
  *
+ * @deprecated Since Toara 13.0
  * @param string $currentoption optional option that is displayed even if not enabled in settings
  * @return array (export format => localised name of export option)
  */
 function reportbuilder_get_export_options($currentoption = null) {
-    $exportoptions = get_config('reportbuilder', 'exportoptions');
-    $exportoptions = !empty($exportoptions) ? explode(',', $exportoptions) : array();
+    debugging("reportbuilder_get_export_options() is a deprecated. Please use reportbuilder::get_all_general_export_options()", DEBUG_DEVELOPER);
 
-    $enabled = array();
-    foreach ($exportoptions as $option) {
-        $option = \totara_core\tabexport_writer::normalise_format($option);
-        if ($option) {
-            $enabled[$option] = true;
-        }
-    }
-
-    $select = array();
-    $alloptions = \totara_core\tabexport_writer::get_export_options();
-    foreach ($alloptions as $type => $name) {
-        if (!isset($enabled[$type])) {
-            continue;
-        }
-        $select[$type] = $name;
-    }
-
-    // Add current option,
-    // this allows existing scheduled reports to work even if export options change.
-    if ($currentoption) {
-        if (isset($alloptions[$currentoption]) and !isset($select[$currentoption])) {
-            $select[$currentoption] = $alloptions[$currentoption];
-        }
-    }
-
-    return $select;
+    return reportbuilder::get_all_general_export_options(false, $currentoption);
 }
 
 /**

@@ -434,7 +434,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $extparams[$param->name] = $param->value;
         }
 
-        $export = new report_builder_export_form($url, compact('id', 'sid', 'extparams'), 'post', '', array('id' => 'rb_export_form'));
+        $export = new report_builder_export_form($url, compact('id', 'sid', 'extparams', 'report'), 'post', '', array('id' => 'rb_export_form'));
         $export->display();
     }
 
