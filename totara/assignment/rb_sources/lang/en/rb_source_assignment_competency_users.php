@@ -21,7 +21,6 @@
  * @package totara_assignment
  */
 
-$string['sourcetitle'] = 'Competency assignments (users)';
 $string['label:assignment_created_by'] = 'Who assigned';
 $string['label:assignment_created_at'] = 'When assigned';
 $string['label:cohort'] = 'Audience Name';
@@ -45,6 +44,9 @@ $string['label:organisation_type'] = 'Organisation Type';
 $string['label:organisation_type_id'] = 'Organisation Type ID';
 $string['label:organisation_name'] = 'Organisation Name';
 $string['label:organisation_idnumber'] = 'Organisation ID Number';
+$string['sourcelabel'] = 'Competencies';
+$string['sourcesummary'] = 'Show users who are assigned to competencies.';
+$string['sourcetitle'] = 'Competency assignments (users)';
 $string['type_assignment'] = 'Assignments';
 $string['type_assignment_created_by'] = 'Who assigned';
 $string['type_competency'] = 'Competency';
