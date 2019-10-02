@@ -25,6 +25,7 @@ namespace totara_webapi;
 
 use core\webapi\execution_context;
 use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
 use GraphQL\Utils\BuildSchema;
@@ -207,6 +208,53 @@ final class graphql {
             $type->config['serialize'] = [$classname, 'serialize'];
             $type->config['parseValue'] = [$classname, 'parse_value'];
             $type->config['parseLiteral'] = [$classname, 'parse_literal'];
+        }
+
+        // Add support for resolving type at runtime - aka interface type.
+        $resolvers = \core_component::get_namespace_classes('webapi\resolver\type', 'core\webapi\interface_resolver');
+        foreach ($resolvers as $classname) {
+            $parts = explode('\\', $classname);
+
+            $component = reset($parts);
+            $name = end($parts);
+
+            $interfacename = "{$component}_{$name}";
+            $type = $schema->getType($interfacename);
+
+            if (!$type) {
+                debugging(
+                    "GraphQL interface '{$interfacename}' described by class {$classname} " .
+                    "is not defined in GraphQL schema",
+                    DEBUG_DEVELOPER
+                );
+                continue;
+            }
+
+            if (!($type instanceof \GraphQL\Type\Definition\InterfaceType)) {
+                debugging(
+                    "GraphQL interface '{$interfacename}' described by class {$classname} " .
+                    "collides with another type in GraphQL schema",
+                    DEBUG_DEVELOPER
+                );
+                continue;
+            }
+
+            $fn = function ($object_value, $context, ResolveInfo $info) use ($classname) {
+                $typestr = call_user_func_array([$classname, 'resolve'], [$object_value, $context, $info]);
+
+                if (!class_exists($typestr)) {
+                    // Not a class returned.
+                    return $typestr;
+                }
+
+                $parts = explode("\\", $typestr);
+                $component = reset($parts);
+                $innertype = array_pop($parts);
+
+                return "{$component}_{$innertype}";
+            };
+
+            $type->config['resolveType'] = $fn;
         }
 
         return $schema;
