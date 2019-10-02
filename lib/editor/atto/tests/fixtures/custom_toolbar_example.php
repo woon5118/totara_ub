@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/lib/editor/atto/lib.php');
 // Behat test fixture only.
 defined('BEHAT_SITE_RUNNING') || die('Only available on Behat test server');
 
-$PAGE->set_url('/lib/editor/atto/tests/fixtures/override_plugins_example.php');
+$PAGE->set_url('/lib/editor/atto/tests/fixtures/custom_toolbar_example.php');
 $PAGE->set_context(context_system::instance());
 
 echo $OUTPUT->header();

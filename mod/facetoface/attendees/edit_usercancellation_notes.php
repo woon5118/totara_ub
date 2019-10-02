@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 $userid    = required_param('userid', PARAM_INT); // Facetoface cancellation user ID.
 $sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
 
-$url = new moodle_url('/mod/facetoface/attendees/edit_usercancellation_notes', array('userid' => $userid, 'sessionid' => $sessionid));
+$url = new moodle_url('/mod/facetoface/attendees/edit_usercancellation_notes.php', array('userid' => $userid, 'sessionid' => $sessionid));
 $returnurlparams = array('s' => $sessionid, 'backtoallsessions' => 1);
 $returnurl = new moodle_url('/mod/facetoface/attendees/cancellations.php', $returnurlparams);
 

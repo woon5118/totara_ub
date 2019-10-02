@@ -117,7 +117,7 @@ if ($canmanage) {
 } else {
     $detailsstr = get_string($prefix . 'details', 'totara_hierarchy');
     $url_params = array('prefix' => $prefix, 'frameworkid' => $frameworkid);
-    $PAGE->set_url(new moodle_url('/totara/hierarchy/index', $url_params));
+    $PAGE->set_url(new moodle_url('/totara/hierarchy/index.php', $url_params));
     $PAGE->set_context($sitecontext);
     $PAGE->set_pagelayout('admin');
     $PAGE->set_title($detailsstr);

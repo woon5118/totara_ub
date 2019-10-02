@@ -72,7 +72,7 @@ if ($confirm) {
 
 $context = context_course::instance($course->id);
 $PAGE->set_context($context);
-$PAGE->set_url('/enrol/f2fidrect/withdraw.php', array('eid' => $eid));
+$PAGE->set_url('/enrol/totara_facetoface/withdraw.php', array('eid' => $eid));
 $PAGE->set_title($course->fullname);
 $PAGE->set_heading($course->fullname);
 

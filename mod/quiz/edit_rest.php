@@ -48,7 +48,7 @@ $newheading = optional_param('newheading', '', PARAM_TEXT);
 $shuffle    = optional_param('newshuffle', 0, PARAM_INT);
 $page       = optional_param('page', '', PARAM_INT);
 $ids        = optional_param('ids', '', PARAM_SEQUENCE);
-$PAGE->set_url('/mod/quiz/edit-rest.php',
+$PAGE->set_url('/mod/quiz/edit_rest.php',
         array('quizid' => $quizid, 'class' => $class));
 
 require_sesskey();

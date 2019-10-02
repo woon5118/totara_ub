@@ -51,7 +51,7 @@ if ($chapterid) {
     $chapter = false;
 }
 
-$PAGE->set_url('/mod/book/print.php', array('id'=>$id, 'chapterid'=>$chapterid));
+$PAGE->set_url('/mod/book/tool/print/index.php', array('id'=>$id, 'chapterid'=>$chapterid));
 
 // Use "embedded" instead of "print" because themes may show top
 // header bar and navbar even on print style - which is inconsistent
