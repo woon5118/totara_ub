@@ -179,7 +179,7 @@ export default {
       this.activeTab = tab;
 
       if (this.activeTab === 'charts') {
-          this.$apollo.queries.data.refetch();
+        this.$apollo.queries.data.refetch();
       }
     },
   },

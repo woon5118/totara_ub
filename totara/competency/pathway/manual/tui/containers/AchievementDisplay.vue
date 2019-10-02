@@ -181,9 +181,9 @@ export default {
 <style lang="scss">
 .tui-pathwayManual-achievementDisplay {
   &__row {
-    border-bottom: 1px solid #dde1e5;
     padding-top: 1em;
     padding-bottom: 1em;
+    border-bottom: 1px solid #dde1e5;
 
     @media (min-width: $totara_style-screen_sm_min) {
       display: flex;
