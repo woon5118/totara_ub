@@ -515,6 +515,7 @@ $string['errornonnumeric'] = 'The value has to be a number.';
 $string['errorsetting'] = 'Could not save setting:';
 $string['errorwithsettings'] = 'Some settings were not changed due to an error.';
 $string['eventadminsettingchanged'] = 'Admin settings changed';
+$string['eventadminclideletescriptexec'] = 'Admin CLI script execution, records deleted';
 $string['eventshandlersinuse'] = 'The following plugins in your system are using Events 1 API deprecated handlers: \'{$a}\'. Please, update them to use Events 2 API. See https://docs.moodle.org/dev/Event_2#Event_dispatching_and_observers.';
 $string['everyonewhocan'] = 'Everyone who can \'{$a}\'';
 $string['exceptions'] = 'exceptions';

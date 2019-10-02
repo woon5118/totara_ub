@@ -126,8 +126,8 @@ $sql = "FROM {course_completions}
              {$time_where}
          AND userid NOT IN (
                  SELECT ue.userid 
-                   FROM mdl_user_enrolments ue 
-             INNER JOIN mdl_enrol e ON e.id = ue.enrolid 
+                   FROM {user_enrolments} ue 
+             INNER JOIN {enrol} e ON e.id = ue.enrolid 
                   WHERE e.courseid = :subcourseid 
                     AND ue.status = :enrolment_status
              ) 
@@ -155,6 +155,10 @@ if ($input == get_string('clianswerno', 'admin')) {
 // Do delete.
 $delete_sql = "DELETE " . $sql;
 $DB->execute($delete_sql, $parameters);
+
+// Trigger event.
+$event = \core\event\admin_cli_delete_script_exec::create_from_cli(basename(__FILE__), $options, "remove {$count->affected} records");
+$event->trigger();
 
 // And purge all the completion caches.
 cache::make('core', 'completion')->purge();
