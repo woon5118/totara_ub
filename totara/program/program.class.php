@@ -1635,7 +1635,7 @@ class program {
             $message .= html_writer::tag('p', get_string('viewingxusersprogram', 'totara_program', $user));
         }
 
-        $userassigned = \totara_program\utils::user_is_assigned($this->id, $user->id);
+        $userassigned = \totara_program\utils::user_is_assigned($this->id, $userid);
 
         if ($userassigned) {
             // Display the reason why this user has been assigned to the program (if it is mandatory for the user).
@@ -2117,11 +2117,9 @@ class program {
      * Checks if a user is assigned to a program
      *
      * @param int $userid
-     * @param bool Returns true if a learner is assigned to a program
+     * @return bool Returns true if a learner is assigned to a program
      */
     public function user_is_assigned($userid) {
-        global $DB;
-
         if (!$userid) {
             return false;
         }
@@ -2139,7 +2137,7 @@ class program {
     public function check_user_for_dismissed_exceptions($userid) {
         global $DB;
 
-        $assigned = \totara_program::user_is_assigned($this->id, $userid);
+        $assigned = \totara_program\utils::user_is_assigned($this->id, $userid);
 
         $params = array('programid' => $this->id, 'userid' => $userid, 'exceptionstatus' => PROGRAM_EXCEPTION_DISMISSED);
         $dismissed = $DB->record_exists('prog_user_assignment', $params);

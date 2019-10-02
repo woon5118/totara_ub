@@ -1273,9 +1273,6 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
      * Test that assigned users can access and gain enrolment in courses.
      */
     public function test_user_is_assigned() {
-
-        $this->resetAfterTest();
-
         $courses = [];
         $users = [];
         for ($i = 0; $i < 2; $i++) {
@@ -1298,11 +1295,20 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
 
         foreach ($users as $user) {
             $this->assertTrue($program->user_is_assigned($user->id));
+            $this->assertTrue(\totara_program\utils::user_is_assigned($program->id, $user->id));
         }
+
         $this->assertFalse($program->user_is_assigned($unassigneduser->id));
+        $this->assertFalse(\totara_program\utils::user_is_assigned($program->id, $unassigneduser->id));
 
         $this->assertFalse($program->user_is_assigned(0));
+        $this->assertFalse(\totara_program\utils::user_is_assigned($program->id, 0));
+
         $this->assertFalse($program->user_is_assigned(-1));
+        $this->assertFalse(\totara_program\utils::user_is_assigned($program->id, -1));
+
+        $this->assertFalse($program->user_is_assigned(null));
+        $this->assertFalse(\totara_program\utils::user_is_assigned($program->id, null));
     }
 
     /**

@@ -292,7 +292,8 @@ function prog_display_required_programs($userid) {
             continue;
         }
 
-        $percentage = totara_program_get_user_percentage_complete($p, $userid);
+        // Cannot pass $p object here because it is not an instance of program class.
+        $percentage = totara_program_get_user_percentage_complete($p->id, $userid);
         $progress = $str_notassigned;
         if ($percentage !== null) {
             $progress = $renderer->progressbar($percentage, 'medium', false);
@@ -382,7 +383,8 @@ function prog_display_certification_programs($userid) {
             continue;
         }
 
-        $percentage = totara_program_get_user_percentage_complete($cp, $userid);
+        // Cannot pass $cp object here because it is not an instance of program class.
+        $percentage = totara_program_get_user_percentage_complete($cp->id, $userid);
         $progress = $str_notassigned;
         if ($percentage !== null) {
             $progress = $renderer->progressbar($percentage, 'medium', false);

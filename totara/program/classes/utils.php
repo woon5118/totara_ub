@@ -242,17 +242,20 @@ class utils {
 
 
     /**
-     * Find if a user is asssigned to a program/certification
-     *
-     * @since Totara 13
+     * Find if a user is assigned to a program/certification
      *
      * @param int $programid
-     * @param int $userid
+     * @param int|null $userid
      *
      * @return bool
      */
-    public static function user_is_assigned(int $programid, int $userid) :bool {
+    public static function user_is_assigned(int $programid, ?int $userid) :bool {
         global $DB;
+
+        // Check needed for backwards compatibility with program::user_is_assigned method.
+        if (!$userid) {
+            return false;
+        }
 
         static $prog_assigned = [];
         if (PHPUNIT_TEST) {
