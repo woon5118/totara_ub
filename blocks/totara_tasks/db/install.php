@@ -36,7 +36,9 @@ function xmldb_block_totara_tasks_install() {
         'subpagepattern' => $mypageid,
         'defaultweight' => 1,
         'configdata' => '',
-        'defaultregion' => 'content'
+        'defaultregion' => 'content',
+        'timecreated' => time(),
+        'timemodified' => time(),
     );
 
     $blockinstance->id = $DB->insert_record('block_instances', $blockinstance);

@@ -109,6 +109,13 @@ class search_base_activity_testcase extends advanced_testcase {
             $this->generator->teardown();
             $this->generator = null;
         }
+
+        // Totara: release memory
+        $this->search = null;
+        $this->generator = null;
+        $this->engine = null;
+        $this->contexts = null;
+        $this->forums = null;
     }
 
     /**

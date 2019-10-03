@@ -96,6 +96,8 @@ function xmldb_totara_dashboard_install() {
         $blockinstance['pagetypepattern'] = 'totara-dashboard-' . $dashboardid; // Determines the dashboard the block is included on.
         $blockinstance['subpagepattern'] = 'default'; // Indicates this is the site wide default, not a user dashboard.
         $blockinstance['configdata'] = '';
+        $blockinstance['timecreated'] = time();
+        $blockinstance['timemodified'] = time();
 
         // Add the block instances.
         $biid = $DB->insert_record('block_instances', $blockinstance);

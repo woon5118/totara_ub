@@ -37,6 +37,8 @@ function xmldb_block_totara_alerts_install() {
         'defaultweight' => 1,
         'configdata' => '',
         'defaultregion' => 'content',
+        'timecreated' => time(),
+        'timemodified' => time(),
     );
 
     $blockinstance->id = $DB->insert_record('block_instances', $blockinstance);

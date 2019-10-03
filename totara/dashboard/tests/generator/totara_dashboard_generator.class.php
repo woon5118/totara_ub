@@ -111,6 +111,8 @@ class totara_dashboard_generator extends component_generator_base {
         $blockinstance->defaultregion = !empty($region) ? $region : $page->blocks->get_default_region();
         $blockinstance->defaultweight = $weight;
         $blockinstance->configdata = '';
+        $blockinstance->timecreated = '';
+        $blockinstance->timemodified = '';
         $blockinstance->id = $DB->insert_record('block_instances', $blockinstance);
 
         // Ensure the block context is created.

@@ -37,6 +37,8 @@ function xmldb_block_totara_quicklinks_install() {
     $blockinstance->defaultregion = 'side-post';
     $blockinstance->defaultweight = 1;
     $blockinstance->configdata = '';
+    $blockinstance->timecreated = time();
+    $blockinstance->timemodified = time();
     $blockinstance->id = $DB->insert_record('block_instances', $blockinstance);
 
     // Ensure the block context is created.
