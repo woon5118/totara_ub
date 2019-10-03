@@ -49,7 +49,6 @@ function(ajax, notification, Loader) {
         };
 
         this.criterionKey = '';  // Unique key to use in bubbled event
-        this.linkedTypeKey = 'linkedtype'; // Metadata key for linked type
 
         this.endpoints = {
             detail: 'criteria_linkedcourses_get_detail',
@@ -71,21 +70,7 @@ function(ajax, notification, Loader) {
                     return;
                 }
 
-                // Linkedtype changed
-                if (e.target.closest('[data-tw-criterionLinkedCourses-linkedType-changed]')) {
-                    e.preventDefault();
-
-                    var newType = e.target.closest('[data-tw-criterionLinkedCourses-linkedType-changed]').value;
-
-                    if (that.getLinkedType(that.criterion.metadata) !== newType) {
-                        that.setLinkedType(newType);
-
-                        that.triggerEvent('update', {criterion: that.criterion});
-                        that.triggerEvent('dirty', {});
-                    }
-
-                // Aggregation method changed
-                } else if (e.target.closest('[data-tw-criterionLinkedCourses-aggregationMethod-changed]')) {
+                if (e.target.closest('[data-tw-criterionLinkedCourses-aggregationMethod-changed]')) {
                     e.preventDefault();
 
                     var newMethod = e.target.closest('[data-tw-criterionLinkedCourses-aggregationMethod-changed]').value;
@@ -164,9 +149,6 @@ function(ajax, notification, Loader) {
                     that.criterion.id = id;
                     that.criterionKey = key;
 
-                    // Set the linked type
-                    that.setLinkedType(that.getLinkedType(instance.metadata));
-
                     // Aggregation
                     that.setAggregationMethod(instance.aggregation.method);
                     that.setAggregationCount(instance.aggregation.reqitems);
@@ -192,10 +174,7 @@ function(ajax, notification, Loader) {
                 resolve({
                     results: {
                         id: 0,
-                        metadata: [{
-                            metakey: that.linkedTypeKey,
-                            metavalue: '1'
-                        }],
+                        metadata: [],
                         aggregation:{
                             method: 1,
                             reqitems: 1
@@ -203,47 +182,6 @@ function(ajax, notification, Loader) {
                     }
                 });
             });
-        },
-
-        /**
-         * Get the linked type metadata value
-         * @param {[Object]} metadata Set of metakey/metavalue metadata pairs
-         * @return {string | undefined} Linked type
-         */
-        getLinkedType: function(metadata) {
-            for (var a = 0; a < metadata.length; a++) {
-                if (metadata[a].metakey == this.linkedTypeKey) {
-                    return metadata[a].metavalue;
-                }
-            }
-
-            return undefined;
-        },
-
-        /**
-         * Set the linked type metadata value
-         *
-         * @param {int} linkedType New linked type
-         */
-        setLinkedType: function(linkedType) {
-            var typeNode = this.widget.querySelector('[data-tw-criterionLinkedCourses-linkedType-changed="' + linkedType + '"]'),
-                fnd = false;
-
-            for (var a = 0; a < this.criterion.metadata.length; a++) {
-                if (this.criterion.metadata[a].metakey == this.linkedTypeKey) {
-                    fnd = true;
-                    this.criterion.metadata[a].metavalue = linkedType;
-                    break;
-                }
-            }
-
-            if (!fnd) {
-                this.criterion.metadata.push({metakey: this.linkedTypeKey, metavalue: linkedType});
-            }
-
-            if (typeNode) {
-                typeNode.checked = true;
-            }
         },
 
         /**

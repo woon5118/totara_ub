@@ -108,7 +108,6 @@ class default_criteria_on_install extends adhoc_task {
             }
 
             $linkedcourses = new linkedcourses();
-            $linkedcourses->set_metadata([(object) ['metakey' => 'linkedtype', 'metavalue' => linkedcourses::LINKTYPE_ALL]]);
             $linkedcourses->set_aggregation_method($criterion_aggregation_method);
 
             $group1 = new criteria_group();

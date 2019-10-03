@@ -46,19 +46,19 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
             [
                 'plugin_type' => 'linkedcourses',
                 'aggregation_method' => linkedcourses::AGGREGATE_ALL,
-                'metadata' => ['linkedtype' => linkedcourses::LINKTYPE_MANDATORY],
+                'metadata' => [],
             ],
             [
                 'plugin_type' => 'linkedcourses',
                 'aggregation_method' => linkedcourses::AGGREGATE_ANY_N,
                 'aggregation_params' => json_encode(['req_items' => 1]),
-                'metadata' => ['linkedtype' => linkedcourses::LINKTYPE_ALL],
+                'metadata' => [],
             ],
             [
                 'plugin_type' => 'linkedcourses',
                 'aggregation_method' => linkedcourses::AGGREGATE_ANY_N,
                 'aggregation_params' => json_encode(['req_items' => 2]),
-                'metadata' => ['linkedtype' => linkedcourses::LINKTYPE_ALL],
+                'metadata' => [],
             ],
         ];
 
@@ -96,7 +96,7 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
     }
 
     /**
-     * Verify the linkedtype metadata in the database
+     * Verify the metadata in the database
      */
     private function verify_saved_metadata(int $criterion_id, array $expected_pairs) {
         global $DB;
@@ -210,11 +210,10 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
         $this->assertSame(3, count($rows));
 
         // Now remove some metadata
-        $cc->remove_metadata(['linkedtype']);
+        unset($expected->metadata['newkey']);
+        $cc->remove_metadata(['newkey']);
+        $cc->save();
         $this->verify_saved_metadata($cc->get_id(), $expected->metadata);
-
-        unset($expected->metadata['linkedtype']);
-        $this->verify_instance($expected, $cc);
 
         // Test saving with removal only
         $cc->save();

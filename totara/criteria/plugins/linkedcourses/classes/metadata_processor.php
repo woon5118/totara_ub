@@ -42,7 +42,6 @@ class metadata_processor {
         global $DB;
 
         // Get all linkedcourses criteria linked to a specific or any competency .
-        // Include linktype to avoid having to do a separate select just to get it
         $competency_where = '';
         $competency_params = [];
 
@@ -56,8 +55,7 @@ class metadata_processor {
         // inexpensive as possible
         $select_criteria_sql =
             "SELECT pcgc.criterion_id AS criterion_id,
-                    cp.comp_id AS comp_id,
-                    tcm.metavalue AS linktype
+                    cp.comp_id AS comp_id
                FROM {pathway_criteria_group_criterion} pcgc
                JOIN {pathway_criteria_group} pcg
                  ON pcg.id = pcgc.criteria_group_id
@@ -66,17 +64,13 @@ class metadata_processor {
                 AND cp.path_type = :path_type
                 AND cp.status = :path_status
                     $competency_where
-               JOIN {totara_criteria_metadata} tcm
-                 ON pcgc.criterion_id = tcm.criterion_id
-              WHERE pcgc.criterion_type = :plugintype
-                AND tcm.metakey = :keyname";
+              WHERE pcgc.criterion_type = :plugintype";
         $select_criteria_params = array_merge(
             $competency_params,
             [
                 'path_type' => 'criteria_group',
                 'path_status' => pathway::PATHWAY_STATUS_ACTIVE,
                 'plugintype' => 'linkedcourses',
-                'keyname' => 'linkedtype'
             ]
         );
 
@@ -123,20 +117,18 @@ class metadata_processor {
 
                 // Make sure all courses have items
                 foreach ($linked_courses_records as $linked_courses_record) {
-                    if (self::should_link_course_to_criterion($criterion, $linked_courses_record)) {
-                        if (!isset($items[$linked_courses_record->id])) {
-                            $criterion_has_changed = true;
+                    if (!isset($items[$linked_courses_record->id])) {
+                        $criterion_has_changed = true;
 
-                            $item = new \stdClass();
-                            $item->criterion_id = $criterion->criterion_id;
-                            $item->item_type = 'course';
-                            $item->item_id = $linked_courses_record->id;
-                            $DB->insert_record('totara_criteria_item', $item);
-                        }
-
-                        // Unset as we'll be deleting any left over in $items since they'll be considered not needed.
-                        unset($items[$linked_courses_record->id]);
+                        $item = new \stdClass();
+                        $item->criterion_id = $criterion->criterion_id;
+                        $item->item_type = 'course';
+                        $item->item_id = $linked_courses_record->id;
+                        $DB->insert_record('totara_criteria_item', $item);
                     }
+
+                    // Unset as we'll be deleting any left over in $items since they'll be considered not needed.
+                    unset($items[$linked_courses_record->id]);
                 }
 
                 if (!empty($items)) {
@@ -169,15 +161,4 @@ class metadata_processor {
         }
     }
 
-    private static function should_link_course_to_criterion($criterion, $linked_course): bool {
-        if ($criterion->linktype == linkedcourses::LINKTYPE_ALL) {
-            return true;
-        }
-
-        if ($criterion->linktype == linkedcourses::LINKTYPE_MANDATORY) {
-            return ($linked_course->linktype == linkedcourses::LINKTYPE_MANDATORY);
-        }
-
-        throw new \coding_exception('Invalid linktype');
-    }
 }

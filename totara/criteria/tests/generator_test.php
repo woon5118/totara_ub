@@ -113,7 +113,6 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 'method' => criterion::AGGREGATE_ALL,
                 'req_items' => 1,
             ],
-            'linkedtype' => linkedcourses::LINKTYPE_MANDATORY,
         ];
 
         $this->validate_linkedcourses($lc, $record);
@@ -130,7 +129,6 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 'method' => criterion::AGGREGATE_ALL,
                 'req_items' => 1,
             ],
-            'linkedtype' => linkedcourses::LINKTYPE_MANDATORY,
         ];
 
         $lc = $generator->create_linkedcourses($record);
@@ -149,7 +147,6 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 'method' => criterion::AGGREGATE_ANY_N,
                 'req_items' => 2,
             ],
-            'linkedtype' => linkedcourses::LINKTYPE_ALL,
         ];
 
         $lc = $generator->create_linkedcourses($record);
@@ -281,13 +278,6 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 $this->assertEquals(['req_items' => $record['aggregation']['req_items']], $lc->get_aggregation_params());
             }
         }
-
-        // Linked type
-        $rows = $DB->get_records('totara_criteria_metadata');
-        $this->assertEquals(1, count($rows));
-
-        $metadata = $lc->get_metadata();
-        $this->assertEquals($record['linkedtype'], $metadata[linkedcourses::METADATA_LINKTYPE_KEY]);
     }
 
     /**

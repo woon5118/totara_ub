@@ -48,18 +48,7 @@ class linkedcourses_display extends criterion_display {
      * @return string[]
      */
     protected function get_display_configuration_items(): array {
-        $str_mandatory = ucfirst(get_string('mandatory', 'totara_competency'));
-        $str_all = ucfirst(get_string('all', 'totara_competency'));
-
-        $linkedtype = '';
-        foreach ($this->criterion->get_metadata() as $metakey => $metaval) {
-            if ($metakey == linkedcourses::METADATA_LINKTYPE_KEY) {
-                $linkedtype = ($metaval == linkedcourses::LINKTYPE_MANDATORY ? $str_mandatory : $str_all);
-                break;
-            }
-        }
-
-        return empty($linkedtype) ? [] : [$linkedtype];
+        return [];
     }
 
 }

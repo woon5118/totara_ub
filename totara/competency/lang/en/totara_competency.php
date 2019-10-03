@@ -106,7 +106,6 @@ $string['linkdefaultpreset'] = 'Link default preset';
 $string['linkedcourses'] = 'Linked courses';
 $string['linkedcoursessaved'] = 'Linked courses have been saved';
 $string['linkedcourses_mustsavechange'] = 'Changes must be saved before they will be applied';
-$string['linkedtype'] = 'Link type';
 $string['loading'] = 'Loading...';
 $string['managetypes_aggregation'] = 'Manage aggregation types';
 $string['managetypes_pathway'] = 'Manage pathway types';

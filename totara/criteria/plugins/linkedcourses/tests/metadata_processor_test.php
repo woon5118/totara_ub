@@ -30,10 +30,8 @@ use totara_competency\linked_courses;
 
 class criteria_linkedcourses_metadata_processor_testcase extends advanced_testcase {
 
-    private function set_up_pathway_with_linked_courses_criteria($competency, $linktype = linkedcourses::LINKTYPE_ALL) {
+    private function set_up_pathway_with_linked_courses_criteria($competency) {
         $linked_course_criterion = new linkedcourses();
-        $linktype = ['metakey' => linkedcourses::METADATA_LINKTYPE_KEY, 'metavalue' => $linktype];
-        $linked_course_criterion->set_metadata([$linktype]);
 
         $pathway = new criteria_group();
         $pathway->set_competency($competency);
@@ -201,31 +199,4 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
         $this->assertEquals(0, $DB->count_records('totara_criteria_item'));
     }
 
-    public function test_update_item_links_with_mandatory_only() {
-        global $DB;
-
-        /** @var totara_hierarchy_generator $hierarchy_generator */
-        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
-        $compfw = $hierarchy_generator->create_comp_frame([]);
-        $comp = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
-        $competency = new competency($comp->id);
-
-        $this->set_up_pathway_with_linked_courses_criteria($competency, linkedcourses::LINKTYPE_MANDATORY);
-
-        $mandatory = $this->getDataGenerator()->create_course();
-        $optional = $this->getDataGenerator()->create_course();
-        linked_courses::set_linked_courses(
-            $competency->id,
-            [['id' => $mandatory->id, 'linktype' => PLAN_LINKTYPE_MANDATORY], ['id' => $optional->id, 'linktype' => PLAN_LINKTYPE_OPTIONAL]]
-        );
-
-        metadata_processor::update_item_links($competency->id);
-        $this->assertSame(1, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
-        $this->assertSame(1, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
-
-        $items = $DB->get_records('totara_criteria_item');
-        $this->assertCount(1, $items);
-
-        $this->assertCount(1, $DB->get_records('totara_criteria_item', ['item_id' => $mandatory->id]));
-    }
 }

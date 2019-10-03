@@ -75,7 +75,6 @@ class totara_criteria_generator extends component_generator_base {
      *          'method' => criterion::AGGREGATE_ALL, // Optional Aggregation method - defaults to ALL
      *          'req_items' => 1, // Optional number of required items. Only used with AGGREGATE_ANY_N. Defaults to 1
      *      ]
-     *      'linkedtype' => linkedcourses::LINKTYPE_MANDATORY,   // Optional linkedtype. Defaults to mandatory linked courses
      *  ]
      *
      * @param array $data Criterion data
@@ -87,11 +86,6 @@ class totara_criteria_generator extends component_generator_base {
         $data['aggregation'] = $data['aggregation'] ?? [];
         $instance->set_aggregation_method($data['aggregation']['method'] ?? criterion::AGGREGATE_ALL);
         $instance->set_aggregation_params(['req_items' => $data['aggregation']['req_items'] ?? 1]);
-
-        $instance->add_metadata([[
-            'metakey' => linkedcourses::METADATA_LINKTYPE_KEY,
-            'metavalue' => $data['linkedtype'] ?? linkedcourses::LINKTYPE_MANDATORY,
-        ]]);
 
         $instance->save();
 

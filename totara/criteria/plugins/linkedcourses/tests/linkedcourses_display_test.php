@@ -54,14 +54,12 @@ class criteria_linkedcourses_display_testcase extends \advanced_testcase {
                 'aggregation' => [
                     'method' => criterion::AGGREGATE_ALL,
                 ],
-                'linkedtype' => linkedcourses::LINKTYPE_MANDATORY,
             ],
             [
                 'aggregation' => [
                     'method' => criterion::AGGREGATE_ANY_N,
                     'req_items' => 2
                 ],
-                'linkedtype' => linkedcourses::LINKTYPE_ALL,
             ],
         ];
     }
@@ -71,34 +69,29 @@ class criteria_linkedcourses_display_testcase extends \advanced_testcase {
      *
      * @dataProvider data_provider_test_configuration
      */
-    public function test_configuration($aggregation, $linkedtype) {
+    public function test_configuration($aggregation) {
         $data = $this->setup_data();
 
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $creation_params = [];
         $creation_params['aggregation'] = $aggregation;
-        $creation_params['linkedtype'] = $linkedtype;
 
         $cc = $generator->create_linkedcourses($creation_params);
         $display_configuration = (new linkedcourses_display($cc))->get_configuration();
 
-        if ($linkedtype == linkedcourses::LINKTYPE_MANDATORY) {
-            $expected_linkedtype = ucfirst(get_string('mandatory', 'totara_competency'));
-        } else {
-            $expected_linkedtype = ucfirst(get_string('all', 'totara_competency'));
-        }
-
         $expected = (object)[
             'item_type' => get_string('linkedcourses', 'criteria_linkedcourses'),
             'item_aggregation' => get_string('completeall', 'totara_criteria'),
-            'items' => [$expected_linkedtype],
+            'items' => [],
         ];
 
         if ($aggregation['method'] == criterion::AGGREGATE_ANY_N) {
-            $expected->item_aggregation = get_string('aggregate_any',
+            $expected->item_aggregation = get_string(
+                'aggregate_any',
                 'totara_criteria',
-                (object)['x' => $aggregation['req_items'] ?? 1]);
+                (object)['x' => $aggregation['req_items'] ?? 1]
+            );
         }
 
         $this->assertEqualsCanonicalizing($expected, $display_configuration);

@@ -105,8 +105,7 @@ class achievement_criteria {
         }
 
         $crit = new linkedcourses();
-        $crit->set_aggregation_method(criterion::AGGREGATE_ALL)
-            ->set_metadata([['metakey' => linkedcourses::METADATA_LINKTYPE_KEY, 'metavalue' => linkedcourses::LINKTYPE_MANDATORY]]);
+        $crit->set_aggregation_method(criterion::AGGREGATE_ALL);
 
         $pw = new criteria_group();
         $pw->set_sortorder(3)

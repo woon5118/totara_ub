@@ -34,13 +34,6 @@ require_once($CFG->dirroot . '/totara/plan/lib.php');
  */
 class linkedcourses extends criterion {
 
-    /** Link type consts */
-    const LINKTYPE_OPTIONAL = linked_courses::LINKTYPE_OPTIONAL;
-    const LINKTYPE_MANDATORY = linked_courses::LINKTYPE_MANDATORY;
-    const LINKTYPE_ALL = 2;
-
-    const METADATA_LINKTYPE_KEY = 'linkedtype';
-
     /**
      * Get the type of items stored in this criterion
      */
@@ -106,44 +99,13 @@ class linkedcourses extends criterion {
     /**
      * Export detail for viewing this criterion
      *
-     * @return Array
+     * @return array
      */
     public function export_view_detail(): array {
-        $result = [
+        return [
             'title' => get_string('linkedcourses', 'criteria_linkedcourses'),
-            'items' => ['name' => $this->export_view_linkedtype()],
             'aggregation' => $this->export_view_aggregation(),
         ];
-
-        return $result;
-    }
-
-
-    /**
-     * Export linkedtype
-     *
-     * @return string Linked type
-     */
-    private function export_view_linkedtype(): string {
-        return $this->get_summarized_linkedtyped();
-    }
-
-    /**
-     * Get a summarized linked type
-     *
-     * @return string
-     */
-     private function get_summarized_linkedtype(): string {
-        $str_mandatory = ucfirst(get_string('mandatory', 'totara_competency'));
-        $str_all = ucfirst(get_string('all', 'totara_competency'));
-
-        foreach ($this->get_metadata() as $metakey => $metaval) {
-            if ($metakey == static::METADATA_LINKTYPE_KEY) {
-                return $metaval == static::LINKTYPE_MANDATORY ? $str_mandatory : $str_all;
-            }
-        }
-
-        return '';
     }
 
 }

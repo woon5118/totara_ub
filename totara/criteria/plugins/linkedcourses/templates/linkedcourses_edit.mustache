@@ -34,7 +34,6 @@
         * data-core-autoinitialise-amd: AMD to be linked to template
         * data-tw-criterionLinkedCourses: Target for linked courses criterion
         * data-tw-criterionLinkedCourses-detail: Target for detail section
-        * data-tw-criterionLinkedCourses-linkedType-changed: Trigger when user changes linkedType value
         * data-tw-criterionLinkedCourses-aggregation: Target for aggregation section
         * data-tw-criterionLinkedCourses-aggregationMethod: int, Section for the specific aggregation method
         * data-tw-criterionLinkedCourses-aggregationMethod-changed: Trigger when user changes aggregation method
@@ -50,37 +49,6 @@
      data-core-autoinitialise="true"
      data-core-autoinitialise-amd="criteria_linkedcourses/linkedcourses"
      data-tw-loader-target="">
-
-    <div data-tw-criterionLinkedCourses-detail="">
-        <div class="tw-criterion-label">
-            {{#str}}linkedtype, totara_competency{{/str}}
-        </div>
-        <div class="tw-criterion-value">
-            <div>
-                <input type="radio"
-                       id="tw_criterionLinkedCourses_linkedType_mandatory__{{key}}"
-                       name="tw_criterionLinkedCourses_linkedType__{{key}}"
-                       value="1"
-                       data-tw-criterionLinkedCourses-linkedType-changed="1"/>
-                <label for="tw_criterionLinkedCourses_linkedType_mandatory__{{key}}">
-                    <span>{{#str}}mandatory, totara_competency{{/str}}</span>
-                </label>
-                <span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
-            </div>
-
-            <div>
-                <input type="radio"
-                       id="tw_criterionLinkedCourses_linkedType_all__{{key}}"
-                       name="tw_criterionLinkedCourses_linkedType__{{key}}"
-                       value="2"
-                       data-tw-criterionLinkedCourses-linkedType-changed="2"/>
-                <label for="tw_criterionLinkedCourses_linkedType_all__{{key}}">
-                    <span>{{#str}}all, totara_competency{{/str}}</span>
-                </label>
-                <span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
-            </div>
-        </div>
-    </div>
 
     <div data-tw-criterionLinkedCourses-aggregation="">
         <div class="tw-criterion-label">

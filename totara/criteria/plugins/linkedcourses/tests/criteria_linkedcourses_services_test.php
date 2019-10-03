@@ -47,7 +47,6 @@ class criteria_linkedcourses_services_testcase extends advanced_testcase {
                 'method' => criterion::AGGREGATE_ANY_N,
                 'req_items' => 2,
             ],
-            'linkedtype' => linkedcourses::LINKTYPE_ALL,
         ];
 
         $data->criterion = $generator->create_linkedcourses($record);
@@ -59,12 +58,7 @@ class criteria_linkedcourses_services_testcase extends advanced_testcase {
         $data = $this->setup_data();
 
         $expected_result = [
-            'metadata' => [
-                [
-                    'metakey' => linkedcourses::METADATA_LINKTYPE_KEY,
-                    'metavalue' => linkedcourses::LINKTYPE_ALL,
-                ],
-            ],
+            'metadata' => [],
             'aggregation' => [
                 'method' => criterion::AGGREGATE_ANY_N,
                 'reqitems' => 2,
