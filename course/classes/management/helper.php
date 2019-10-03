@@ -1021,7 +1021,7 @@ class helper {
         foreach (\coursecat::get(0)->get_children() as $category) {
             $toload[] = $category->id;
         }
-        foreach ($categories = \coursecat::get_many($expanded) as $category) {
+        foreach (\coursecat::get_many($expanded) as $category) {
             $toload[] = $category->id;
             foreach ($category->get_children() as $subcategory) {
                 $toload[] = $subcategory->id;

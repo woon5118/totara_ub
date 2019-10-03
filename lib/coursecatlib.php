@@ -284,6 +284,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         foreach ($categories as $id => $result) {
             if ($result === false) {
                 $toload[] = $id;
+                unset($categories[$id]);
             }
         }
         if (!empty($toload)) {
@@ -293,8 +294,17 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             foreach ($records as $record) {
                 $categories[$record->id] = new coursecat($record);
                 $toset[$record->id] = $categories[$record->id];
+                unset($toload[$record->id]);
             }
             $coursecatrecordcache->set_many($toset);
+
+            // Check that we successfully loaded all categories.
+            if (!empty($toload)) {
+                // OK there are categories we think exist that do not, someone forgot to purge a cache.
+                // Probably the expanded categories cache, but we can't be sure.
+                $cache = \cache::make('core', 'userselections');
+                $cache->delete('categorymanagementexpanded');
+            }
         }
         return $categories;
     }
