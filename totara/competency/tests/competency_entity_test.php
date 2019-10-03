@@ -86,7 +86,7 @@ class totara_competency_entity_testcase extends \advanced_testcase {
         $this->assertInstanceOf(has_many_through::class, $competency->scale());
 
         // Let's assert that correct scale has been returned
-        $this->assertEquals($scale->id, $competency->scale->first()->id);
+        $this->assertEquals($scale->id, $competency->scale->id);
 
         // Test that another competency returns only one scale correctly
         $this->assertEquals($another_scale->id, $another_competency->scale()->one(true)->id);

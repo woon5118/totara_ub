@@ -23,168 +23,82 @@
 
 namespace totara_competency\models;
 
-use coding_exception;
 use core\orm\collection;
 use core\orm\entity\repository;
-use core\orm\query\builder;
-use core\orm\query\subquery;
+use totara_competency\entities\competency;
 use totara_competency\entities\scale as scale_entity;
-use totara_competency\entities\scale_value;
 
-class scale {
-
-    /**
-     * @var scale_entity
-     */
-    protected $entity;
+class scale extends entity_model {
 
     /**
-     * @var collection
+     * Scale constructor. It's here for the purpose of type-hint
+     *
+     * @param scale_entity $entity
      */
-    protected $values = null;
-
     public function __construct(scale_entity $entity) {
-        if (!$entity->exists()) {
-            throw new coding_exception('Can load only existing entities');
-        }
-
-        $this->entity = $entity;
+        parent::__construct($entity);
     }
 
-    public static function find_by_id(array $id, $with_values = true): self {
-        $model = new static(static::scale_repository()->find_or_fail($id));
-
-        if ($with_values) {
-            $model->load_values();
-        }
-
-        return $model;
+    /**
+     * Load scale by ID
+     *
+     * @param int $id Ids to load scales by
+     * @param bool $with_values A flag to load scale values
+     * @return scale
+     */
+    public static function find_by_id(int $id, $with_values = true): self {
+        return static::find_by_ids([$id], $with_values)->first();
     }
 
-    public static function find_by_ids(array $ids, $with_values = true): collection {
-
-        $ids = static::sanitize_ids($ids);
-
-        $scales = static::scale_repository()->where('id', $ids)->get();
-
-        $values = $with_values ? static::preload_values($scales) : new collection();
-
-        $models = $scales->map(function(scale_entity $scale) use ($with_values, $values) {
-            $model = new static($scale);
-
-            if ($with_values) {
-                static::assign_preloaded_values($model, $values);
-            }
-
-            return $model;
-        });
-
-        return $models;
-    }
-
-    public static function find_by_competency_ids(array $ids): collection {
-        // We'll need to fetch required scales
-
-
-        $subquery = builder::table('comp')
-            ->select_raw('distinct frameworkid')
-            ->where('id', static::sanitize_ids($ids));
-
-        $scale_ids = static::scale_repository()
-            ->select('id')
-            ->join('comp_scale_assignments', 'id', 'scaleid')
-            ->where('comp_scale_assignments.frameworkid', 'in', $subquery)
-            ->get()
-            ->pluck('id');
-
-        return static::find_by_ids($scale_ids);
-    }
-
-    public static function find_by_competency_id(int $id, $with_values = true): self {
-        $model = new static(static::scale_repository()
-            ->join('comp_scale_assignments', 'id', 'scaleid')
-            ->join('comp', 'comp_scale_assignments.frameworkid', 'frameworkid')
-            ->where('comp.id', $id)
-            ->one(true));
-
-        if ($with_values) {
-            $model->load_values();
-        }
-
-        return $model;
-    }
-
-    protected static function scale_repository(): repository {
+    /**
+     * Load scales by IDs
+     *
+     * @param int[] $ids Ids to load scales by
+     * @param bool $with_values A flag to load scale values
+     * @return collection
+     */
+    public static function find_by_ids(array $ids, bool $with_values = true): collection {
         return scale_entity::repository()
-            ->select('*')
-            ->add_select((new subquery(function(builder $builder) {
-                $builder->from('comp_scale_values')
-                    ->select('id')
-                    ->where_field('scaleid', 'comp_scale.id')
-                    ->where('proficient', 1)
-                    ->when(true, function (repository $repository) {
-                        $subquery = builder::table('comp_scale_values')
-                            ->select('max(sortorder)')
-                            ->where_field('scaleid', 'comp_scale.id')
-                            ->where('proficient', 1);
-
-                        $repository->where('sortorder', $subquery);
-                    });
-            }))->as('min_proficient_value_id'));
+            ->where('id', 'in', static::sanitize_ids($ids))
+            ->when($with_values, function(repository $repository) {
+                $repository->with('values');
+            })
+            ->get()
+            ->transform_to(static::class);
     }
 
-    protected function load_values() {
-        $this->values = scale_value::repository()
-            ->where('scaleid', $this->get_id())
-            ->order_by('sortorder', 'desc')
-            ->get();
-
-        return $this;
+    /**
+     * Load scales by competency ids
+     *
+     * @param int[] $ids Competency IDs
+     * @param bool $with_values A flag to load scale values
+     * @return collection
+     */
+    public static function find_by_competency_ids(array $ids, bool $with_values = false): collection {
+       return static::find_by_ids((new collection(competency::repository()
+            ->where('id', 'in', static::sanitize_ids($ids))
+            ->with('scale')
+            ->get()
+            ->pluck('scale')))->pluck('id'), $with_values);
     }
 
-    protected static function preload_values(collection $scales) {
-        return scale_value::repository()
-            ->where('scaleid', $scales->pluck('id'))
-            ->order_by('sortorder', 'desc')
-            ->get();
+    /**
+     * Load scales by competency id
+     *
+     * @param int $id Competency ID
+     * @param bool $with_values A flag to load scale values
+     * @return scale
+     */
+    public static function find_by_competency_id(int $id, bool $with_values = true): ?self {
+        return static::find_by_competency_ids([$id])->first();
     }
 
-    protected static function assign_preloaded_values(self $scale, collection $values) {
-        $scale->values = $values->filter('scaleid', $scale->get_id());
-
-        return $scale;
-    }
-
-    public function get_id(): int {
-        return $this->entity->id;
-    }
-
-    public function to_array(): array {
-        return $this->entity->to_array();
-    }
-
-    public function __get($name) {
-
-        if ($name == 'values') {
-            return $this->values ?? new collection();
-        }
-
-        return $this->entity->get_attribute($name);
-    }
-
-    public function has_attribute($name) {
-
-        if ($name == 'values') {
-            return !! ($this->values ?? false);
-        }
-
-        return $this->entity()->has_attribute($name);
-    }
-
-    public function entity(): scale_entity {
-        return $this->entity;
-    }
-
+    /**
+     * Filter out bad ids if any
+     *
+     * @param array $ids
+     * @return array
+     */
     protected static function sanitize_ids(array $ids): array {
         return array_unique(array_filter(array_map('intval', $ids), function ($id) {
             return $id > 0;

@@ -27,6 +27,7 @@ namespace totara_competency\entities;
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\entity;
+use core\orm\entity\relations\has_many;
 
 /**
  * Resource competency_scale
@@ -48,6 +49,16 @@ class scale extends entity {
     public const TABLE = 'comp_scale';
 
     private $scale_value_cache;
+
+    /**
+     * Values for this scale
+     *
+     * @return has_many
+     */
+    public function values(): has_many {
+        return $this->has_many(scale_value::class, 'scaleid')
+            ->order_by('sortorder', 'desc');
+    }
 
     /**
      * @return collection
