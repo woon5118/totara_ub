@@ -120,17 +120,31 @@ if (!function_exists('array_key_last')) {
  * This function is ideal for checking a single course.
  * If you need to perform bulk checks consider using totara_visibility_where or like function instead.
  *
+ * This function uses a request lifetime cache and stores the result of checks for the current user.
+ * This is done because its common to check a users enrolled courses.
+ * The outcome is not cached for other users as that is not a common check.
+ *
  * @param int|stdClass $courseorid
  * @param int|null     $userid
- * @param bool|int     $hasactiveenrolment If null the users current enrolment status will be calculated, otherwise this will
- *                     value will be used. True if the user is known to have a current active enrolment, false if not.
  * @return bool
  */
-function totara_course_is_viewable($courseorid, $userid = null, bool $hasactiveenrolment = null): bool {
+function totara_course_is_viewable($courseorid, $userid = null): bool {
     global $CFG, $DB, $USER;
 
     if ($userid === null) {
         $userid = $USER->id;
+    }
+
+    $cache = false;
+    $cachekey = false;
+    if ($userid == $USER->id) {
+        $cachekey = is_object($courseorid) ? $courseorid->id : $courseorid;
+        // We use the userid as an identifier as if that changes we need a separate cache.
+        $cache = \cache::make('totara_core', 'totara_course_is_viewable', ['userid' => $userid]);
+        $result = $cache->get($cachekey);
+        if (is_int($result)) {
+            return (bool)$result;
+        }
     }
 
     if (!is_object($courseorid) || !isset($courseorid->visible) || !isset($courseorid->audiencevisible)) {
@@ -145,6 +159,7 @@ function totara_course_is_viewable($courseorid, $userid = null, bool $hasactivee
         $course = $DB->get_record_sql($sql, ['courseid' => $courseorid, 'contextlevel' => CONTEXT_COURSE]);
 
         if (!$course) {
+            // The course doesn't exist?!
             return false;
         }
 
@@ -158,36 +173,58 @@ function totara_course_is_viewable($courseorid, $userid = null, bool $hasactivee
 
     // Enforce tenant separation.
     if ($context->is_user_access_prevented($userid)) {
+        if ($cache) {
+            $cache->set($cachekey, 0);
+        }
         return false;
     }
 
     if (empty($CFG->audiencevisibility)) {
         // Traditional visibility is EASY!
-        return ($course->visible || has_capability($hiddencap, $context, $userid));
+        $result = ($course->visible || has_capability($hiddencap, $context, $userid));
+        if ($cache) {
+            $cache->set($cachekey, $result ? 1 : 0);
+        }
+        return $result;
     }
 
     if ($course->audiencevisible == COHORT_VISIBLE_ALL) {
+        if ($cache) {
+            $cache->set($cachekey, 1);
+        }
         return true;
     }
 
     if (has_any_capability([$hiddencap, $manageaudienceviscap], $context, $userid)) {
         // They can see it.
+        if ($cache) {
+            $cache->set($cachekey, 1);
+        }
         return true;
     }
 
     if ($course->audiencevisible == COHORT_VISIBLE_NOUSERS) {
+        if ($cache) {
+            $cache->set($cachekey, 0);
+        }
         return false;
     }
 
     // If you have an active enrollment and it's COHORT_VISIBLE_ENROLLED || COHORT_VISIBLE_AUDIENCE
     // Cannot use is_enrolled($context, $userid, '', true) here because it calls this function
     // and ends up in an infinite loop.
-    $enrolled = $hasactiveenrolment ?? enrol_get_enrolment_end($context->instanceid, $userid);
+    $enrolled = enrol_get_enrolment_end($context->instanceid, $userid);
     if ($enrolled !== false) {
+        if ($cache) {
+            $cache->set($cachekey, 1);
+        }
         return true;
     }
 
     if ($course->audiencevisible == COHORT_VISIBLE_ENROLLED) {
+        if ($cache) {
+            $cache->set($cachekey, 0);
+        }
         return false;
     }
 
@@ -203,7 +240,11 @@ function totara_course_is_viewable($courseorid, $userid = null, bool $hasactivee
         'userid'   => $userid,
         'type'     => COHORT_ASSN_ITEMTYPE_COURSE,
     ];
-    return $DB->record_exists_sql($sql, $params);
+    $result = $DB->record_exists_sql($sql, $params);
+    if ($cache) {
+        $cache->set($cachekey, $result ? 1 : 0);
+    }
+    return $result;
 }
 
 /**

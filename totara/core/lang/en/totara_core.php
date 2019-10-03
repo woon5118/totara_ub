@@ -65,6 +65,7 @@ $string['cachedef_completion_progressinfo'] = 'Completion progressinfo cache';
 $string['cachedef_flex_icons'] = 'Flex icons';
 $string['cachedef_hookwatchers'] = 'Hook watchers';
 $string['cachedef_quickaccessmenu'] = 'Admin menu preferences cache';
+$string['cachedef_totara_course_is_viewable'] = 'Totara course is viewable request cache';
 $string['calendar'] = 'Calendar';
 $string['cannotdownloadtotaralanguageupdatelist'] = 'Cannot download list of language updates from download.totaralms.com';
 $string['cannotundeleteuser'] = 'Cannot undelete user';

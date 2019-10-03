@@ -58,4 +58,11 @@ $definitions = array(
         'staticacceleration' => true,
         'staticaccelerationsize' => 10
     ),
+
+    // A request lifetime cache for the outcome of totara_course_is_viewable for the current user.
+    'totara_course_is_viewable' => array(
+        'mode' => cache_store::MODE_REQUEST,
+        'simplekeys' => true,
+        'simpledata' => true
+    )
 );

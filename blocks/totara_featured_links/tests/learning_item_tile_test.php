@@ -105,7 +105,7 @@ class block_totara_featured_links_learning_item_tile_testcase extends test_helpe
 
         $tiledata = $this->create_save_content_tile();
 
-        /* @var block_totara_featured_links\tile\learning_item $tilenocourse */
+        /* @var block_totara_featured_links\tile\course_tile $tilenocourse */
         $tilenocourse = $tiledata['tilenocourse'];
         $this->assertFalse($tilenocourse->get_course());
     }
@@ -127,13 +127,13 @@ class block_totara_featured_links_learning_item_tile_testcase extends test_helpe
     }
 
     public function test_user_can_view_content() {
-        global $DB;
+        global $DB, $USER;
 
         $tiledata = $this->create_save_content_tile();
 
         $this->setUser();
 
-        /* @var block_totara_featured_links\tile\learning_item $tile */
+        /* @var block_totara_featured_links\tile\course_tile $tile */
         $tile = $tiledata['tile'];
         $course = $tiledata['course'];
 
@@ -141,6 +141,8 @@ class block_totara_featured_links_learning_item_tile_testcase extends test_helpe
 
         $course->visible = '0';
         $DB->update_record('course', $course);
+        cache_helper::purge_by_definition('totara_core', 'totara_course_is_viewable', ['userid' => $USER->id]);
+
         $tile->get_course(true); // Reload the course data.
 
         $this->assertFalse($this->call_protected_method($tile, 'user_can_view_content'));

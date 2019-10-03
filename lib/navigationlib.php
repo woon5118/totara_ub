@@ -1510,7 +1510,7 @@ class global_navigation extends navigation_node {
      * @return array An array of navigation_nodes one for each course
      */
     protected function load_all_courses($categoryids = null) {
-        global $CFG, $DB, $SITE;
+        global $CFG, $DB, $SITE, $USER;
 
         // Work out the limit of courses.
         $limit = 20;
@@ -1528,9 +1528,6 @@ class global_navigation extends navigation_node {
 
         // Will be the return of our efforts
         $coursenodes = array();
-
-        // Take into account the visibility of courses.
-        list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'c.id', 'c.visible', 'c.audiencevisible');
 
         // Check if we need to show categories.
         if ($this->show_categories()) {
@@ -1576,16 +1573,14 @@ class global_navigation extends navigation_node {
             if (count($fullfetch)) {
                 // First up fetch all of the courses in categories where we know that we are going to
                 // need the majority of courses.
+                $ccselect = context_helper::get_preload_record_columns_sql('ctx');
                 list($categoryids, $categoryparams) = $DB->get_in_or_equal($fullfetch, SQL_PARAMS_NAMED, 'lcategory');
-                $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
-                $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
                 $categoryparams['contextlevel'] = CONTEXT_COURSE;
-                $sql = "SELECT c.id, c.sortorder, c.visible, c.audiencevisible, c.fullname, c.shortname, c.category $ccselect
-                            FROM {course} c
-                                $ccjoin
-                            WHERE c.category {$categoryids} AND {$visibilitysql}
-                        ORDER BY c.sortorder ASC";
-                $categoryparams = array_merge($categoryparams, $visibilityparams);
+                $sql = "SELECT c.id, c.sortorder, c.visible, c.audiencevisible, c.fullname, c.shortname, c.category, {$ccselect}
+                          FROM {course} c
+                     LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)
+                         WHERE c.category {$categoryids}
+                      ORDER BY c.sortorder ASC";
                 $coursesrs = $DB->get_recordset_sql($sql, $categoryparams);
                 foreach ($coursesrs as $course) {
                     if ($course->id == $SITE->id) {
@@ -1601,6 +1596,10 @@ class global_navigation extends navigation_node {
                     if (!$this->can_add_more_courses_to_category($course->category)) {
                         continue;
                     }
+                    context_helper::preload_from_record($course);
+                    if (!totara_course_is_viewable($course)) {
+                        continue;
+                    }
                     $coursenodes[$course->id] = $this->add_course($course);
                 }
                 $coursesrs->close();
@@ -1609,16 +1608,14 @@ class global_navigation extends navigation_node {
             if (count($partfetch)) {
                 // Next we will work our way through the categories where we will likely only need a small
                 // proportion of the courses.
+                $ccselect = context_helper::get_preload_record_columns_sql('ctx');
                 foreach ($partfetch as $categoryid) {
-                    $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
-                    $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
-                    $sql = "SELECT c.id, c.sortorder, c.visible, c.audiencevisible, c.fullname, c.shortname, c.category $ccselect
-                                FROM {course} c
-                                    $ccjoin
-                                WHERE c.category = :categoryid AND {$visibilitysql}
-                            ORDER BY c.sortorder ASC";
+                    $sql = "SELECT c.id, c.sortorder, c.visible, c.audiencevisible, c.fullname, c.shortname, c.category, {$ccselect}
+                              FROM {course} c
+                         LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)
+                             WHERE c.category = :categoryid
+                          ORDER BY c.sortorder ASC";
                     $courseparams = array('categoryid' => $categoryid, 'contextlevel' => CONTEXT_COURSE);
-                    $courseparams = array_merge($courseparams, $visibilityparams);
                     $coursesrs = $DB->get_recordset_sql($sql, $courseparams, 0, $limit * 5);
                     foreach ($coursesrs as $course) {
                         if ($course->id == $SITE->id) {
@@ -1635,6 +1632,10 @@ class global_navigation extends navigation_node {
                         if (!$this->can_add_more_courses_to_category($course->category)) {
                             break;
                         }
+                        context_helper::preload_from_record($course);
+                        if (!totara_course_is_viewable($course)) {
+                            continue;
+                        }
                         $coursenodes[$course->id] = $this->add_course($course);
                     }
                     $coursesrs->close();
@@ -1642,16 +1643,14 @@ class global_navigation extends navigation_node {
             }
         } else {
             // Prepare the SQL to load the courses and their contexts
+            $ccselect = context_helper::get_preload_record_columns_sql('ctx');
             list($courseids, $courseparams) = $DB->get_in_or_equal(array_keys($this->addedcourses), SQL_PARAMS_NAMED, 'lc', false);
-            $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
-            $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
             $courseparams['contextlevel'] = CONTEXT_COURSE;
-            $sql = "SELECT c.id, c.sortorder, c.visible, c.audiencevisible, c.fullname, c.shortname, c.category $ccselect
-                        FROM {course} c
-                            $ccjoin
-                        WHERE c.id {$courseids} AND {$visibilitysql}
-                    ORDER BY c.sortorder ASC";
-            $courseparams = array_merge($courseparams, $visibilityparams);
+            $sql = "SELECT c.id, c.sortorder, c.visible, c.audiencevisible, c.fullname, c.shortname, c.category, {$ccselect}
+                      FROM {course} c
+                 LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)
+                     WHERE c.id {$courseids}
+                  ORDER BY c.sortorder ASC";
             $coursesrs = $DB->get_recordset_sql($sql, $courseparams);
             foreach ($coursesrs as $course) {
                 if ($course->id == $SITE->id) {
@@ -1660,6 +1659,10 @@ class global_navigation extends navigation_node {
                 }
                 if ($this->page->course && ($this->page->course->id == $course->id)) {
                     // Don't include the currentcourse in this nodelist - it's displayed in the Current course node
+                    continue;
+                }
+                context_helper::preload_from_record($course);
+                if (!totara_course_is_viewable($course)) {
                     continue;
                 }
                 $coursenodes[$course->id] = $this->add_course($course);

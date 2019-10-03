@@ -695,7 +695,7 @@ function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder AS
     $courses = $DB->get_records_sql($sql, $params, 0, $limit);
     foreach ($courses as $courseid => $course) {
         \context_helper::preload_from_record($course);
-        if (!totara_course_is_viewable($course, $USER->id, true)) {
+        if (!totara_course_is_viewable($course, $USER->id)) {
             unset($courses[$courseid]);
         }
     }

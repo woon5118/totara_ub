@@ -158,6 +158,9 @@ class course_visibility_with_audience_test extends advanced_testcase {
         }
 
         $CFG->audiencevisibility = 1;
+        // We've changed audience visibility, we need to purge the totara_course_is_viewable request cache.
+        cache_helper::purge_all();
+
         for ($i = 0; $i < 6; $i++) {
             $existence = $get_setup_courses_data($users[$i]->id, $context);
             $this->assertEquals($expects_yes_audience[$i], $existence, $users[$i]->username);
