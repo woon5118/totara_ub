@@ -722,6 +722,17 @@ class sample_child_entity extends entity {
         return $this->belongs_to(sample_child_entity::class, 'type');
     }
 
+    public function passport(): has_one_through {
+        return $this->has_one_through(
+            sample_passport_entity::class,
+            sample_parent_entity::class,
+            'id',
+            'parent_id',
+            'parent_id',
+            'id'
+        );
+    }
+
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = 'updated_at';
 }

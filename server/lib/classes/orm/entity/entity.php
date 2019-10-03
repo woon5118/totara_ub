@@ -845,6 +845,37 @@ abstract class entity implements \JsonSerializable {
     }
 
     /**
+     * Define has one through relationship
+     * Technically it's just a convenience method.
+     *
+     * @param string $entity Entity related class
+     * @param string $intermediate Intermediate model
+     * @param string $intermediate_foreign_key
+     * @param string $foreign_key related entity key to use
+     * @param string $key This model key to use
+     * @param string $intermediate_key Intermediate model key
+     * @return has_one_through
+     */
+    protected function has_one_through(
+        string $entity,
+        string $intermediate,
+        string $intermediate_foreign_key,
+        string $foreign_key,
+        string $key = 'id',
+        string $intermediate_key = 'id'
+    ): has_one_through {
+        return new has_one_through(
+            $this,
+            $intermediate,
+            $entity,
+            $foreign_key,
+            $intermediate_foreign_key,
+            $key,
+            $intermediate_key
+        );
+    }
+
+    /**
      * Define has one relationship
      * Technically it's just a convenience method.
      *
