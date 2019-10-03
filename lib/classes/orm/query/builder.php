@@ -1165,13 +1165,15 @@ final class builder extends builder_base implements interacts_with_query, intera
     /**
      * Fetch raw records from the database
      *
+     * @param bool $unkeyed Do not key the results by the first column.
      * @return array[]
      */
-    public function fetch(): array {
+    public function fetch(bool $unkeyed = false): array {
         $query_builder = query::from_builder($this);
         $query_parts = $this->log_query(...$query_builder->build());
+        $function = $unkeyed ? 'get_records_sql_unkeyed' : 'get_records_sql';
 
-        return $this->map_results(self::get_db()->get_records_sql(...$query_parts));
+        return $this->map_results(self::get_db()->{$function}(...$query_parts));
     }
 
     /**
@@ -1214,10 +1216,11 @@ final class builder extends builder_base implements interacts_with_query, intera
     /**
      * Get items from the database
      *
+     * @param bool $unkeyed Do not key the results by the first column.
      * @return collection
      */
-    public function get(): collection {
-        return new collection($this->fetch());
+    public function get(bool $unkeyed = false): collection {
+        return new collection($this->fetch($unkeyed));
     }
 
     /**

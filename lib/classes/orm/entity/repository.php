@@ -359,7 +359,7 @@ class repository {
                     // The other option is to move this code to the relation class itself then we'd be able to override it properly on a particular relation class.
                     // Since it's not a big issue, we'll leave it this way for now, ignoring custom select and notifying devs with a debugging message, not an exception
                     if ($rel instanceof has_many_through) {
-                        debugging('Specifying columns is not currently supported for has_many_through relations');
+                        debugging('Specifying columns is not currently supported for has_many(one)_through relations');
 
                         $parent = $rel->get_repo();
                         continue;

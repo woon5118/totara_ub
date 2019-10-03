@@ -59,9 +59,9 @@ class has_many_through extends relation {
     public function __construct(entity $entity, string $intermediate,
         string $related,
         string $foreign_key,
-        string $intermediate_foreign_key,
-        string $key,
-        string $intermediate_key = 'id'
+        string $intermediate_key,
+        string $key = 'id',
+        string $intermediate_foreign_key ='id'
     ) {
         $this->intermediate_foreign_key = $intermediate_foreign_key;
         $this->intermediate_key = $intermediate_key;
@@ -143,7 +143,7 @@ class has_many_through extends relation {
      * @param array $attributes Attributes to update
      * @return $this
      */
-    public function update(array $attributes) {
+    public function update($attributes) {
         // Let's get IDS to delete
         $ids = $this->repo->select('id')->get()->pluck('id');
 

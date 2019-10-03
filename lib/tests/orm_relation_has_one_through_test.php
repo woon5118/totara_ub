@@ -22,6 +22,7 @@
  * @category test
  */
 
+use core\orm\collection;
 use core\orm\entity\repository;
 
 defined('MOODLE_INTERNAL') || die();
@@ -35,36 +36,28 @@ require_once($CFG->libdir . '/tests/orm_entity_relation_testcase.php');
  * @package core
  * @group orm
  */
-class core_orm_relation_has_many_through_test extends orm_entity_relation_testcase {
+class core_orm_relation_has_one_through_test extends orm_entity_relation_testcase {
 
     public function test_it_eager_loads_has_many_through() {
         $this->create_sample_records();
 
         $parents = sample_parent_entity::repository()
-            ->where('id', [3, 4, 5]) // We select the subset of records 3 and 4 have siblings 5 doesn't
-            ->with('siblings')
+            ->where('id', [1, 2, 3]) // We select the subset of records 3 and 4 have siblings 5 doesn't
+            ->with('a_sibling')
             ->get();
 
         // We should have 3 parents
         $this->assertCount(3, $parents);
 
-        // Assert siblings for this entry
-        $this->assertCount(2, $siblings = $parents->find('id', 3)->siblings);
-        $this->assertEqualsCanonicalizing(['Apple Mac Pro', 'Hp Workstation'], $siblings->pluck('name'));
+        // Assert first
+        $this->assertEquals('Red Mi Note 7', $parents->find('id', 1)->a_sibling->name);
 
-        // Assert siblings for this entry
-        $this->assertCount(3, $siblings = $parents->find('id', 4)->siblings);
-        $this->assertEqualsCanonicalizing(
-            [
-                'Electronica vintage soviet calculator',
-                'Commodore vintage calculator',
-                'Sinclair Cambridge Programmable vintage calculator',
-            ],
-            $siblings->pluck('name')
-        );
+        // Assert second
+        $this->assertEquals('Red Mi Note 7', $parents->find('id', 2)->a_sibling->name);
 
-        // Assert siblings for this entry
-        $this->assertCount(0, $parents->find('id', 5)->siblings);
+        // Assert third
+        $this->assertEquals('Apple iPhone XS', $parents->find('id', 3)->a_sibling->name);
+
     }
 
     public function test_it_lazy_loads_has_many_through() {
@@ -72,20 +65,12 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
 
         $parent = new sample_parent_entity(4);
 
-        $this->assertFalse($parent->relation_loaded('siblings'));
+        $this->assertFalse($parent->relation_loaded('a_sibling'));
 
         $query_count = $this->db()->perf_get_reads();
 
-        $this->assertCount(3, $parent->siblings);
-
-        $this->assertEqualsCanonicalizing(
-            [
-                'Electronica vintage soviet calculator',
-                'Commodore vintage calculator',
-                'Sinclair Cambridge Programmable vintage calculator',
-            ],
-            $parent->siblings->pluck('name')
-        );
+        $this->assertInstanceOf(sample_sibling_entity::class, $parent->a_sibling);
+        $this->assertEquals('Apple iPhone XR', $parent->a_sibling->name);
 
         // Let's check that we are not executing unnecessary queries
         $this->assertEquals($query_count + 1, $this->db()->perf_get_reads());
@@ -99,31 +84,22 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
             0, $this->db()->count_records(sample_sibling_entity::TABLE)
         );
         $this->assertGreaterThan(
-            0, $this->db()->count_records(sample_child_entity::TABLE)
+            0, $this->db()->count_records(sample_pivot_entity::TABLE)
         );
 
         $empty = new sample_parent_entity([]);
 
-        $this->assertEmpty($empty->children);
-        $this->assertEmpty($empty->children()->get());
-
-        $this->assertEmpty($empty->siblings);
-        $this->assertEmpty($empty->siblings()->get());
+        $this->assertEmpty($empty->a_sibling);
+        $this->assertEmpty($empty->a_sibling()->get());
 
         // Let's make sure we have an item without related things
         $entity = sample_parent_entity::repository()
             ->where('name', 'Bluetooth speakers')
-            ->with('children')
-            ->with('siblings')
+            ->with('a_sibling')
             ->one();
 
-        $this->assertTrue($entity->relation_loaded('children'));
-        $this->assertEmpty($entity->children->all());
-        $this->assertEmpty($entity->children()->get());
-
-        $this->assertTrue($entity->relation_loaded('siblings'));
-        $this->assertEmpty($entity->siblings->all());
-        $this->assertEmpty($entity->siblings()->get());
+        $this->assertTrue($entity->relation_loaded('a_sibling'));
+        $this->assertEmpty($entity->a_sibling()->get());
     }
 
     public function test_it_handles_lazy_dynamic_conditions() {
@@ -135,8 +111,8 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
             ->one();
 
         $this->assertEquals(
-            'Sinclair Cambridge Programmable vintage calculator',
-            $entity->siblings()->where('name', 'Sinclair Cambridge Programmable vintage calculator')->one(true)->name
+            'Apple iPhone XR',
+            $entity->a_sibling()->where('name', 'Apple iPhone XR')->one(true)->name
         );
     }
 
@@ -144,18 +120,21 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
         $this->create_sample_records();
 
         // Let's load the one that doesn't have any items in it.
-        $entity = sample_parent_entity::repository()
+        $parents = sample_parent_entity::repository()
             ->with([
-                'siblings' => function (repository $repository) {
-                    $repository->where('type', '<', 1);
+                'a_sibling' => function (repository $repository) {
+                    $repository->where('type', '>=', 1);
                 }
             ])
-            ->where('name', 'Calculators')
-            ->one();
+            ->get();
 
-        $this->assertEquals(
-            'Commodore vintage calculator',
-            $entity->siblings->first()->name
+        $this->assertEqualsCanonicalizing(
+            [
+                'Red Mi Note 7',
+                'Red Mi Note 7',
+                'Apple iPhone XR',
+            ],
+            collection::new($parents->pluck('a_sibling'))->pluck('name')
         );
     }
 
@@ -165,11 +144,11 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
         // Let's load the one that doesn't have any items in it.
         $entity = sample_parent_entity::repository()
             ->with([
-                'siblings:name,type' => function (repository $repository) {
+                'a_sibling:name,type' => function (repository $repository) {
                     $repository->where('type', '>', 1);
                 }
             ])
-            ->where('name', 'Calculators')
+            ->where('name', 'Tablets')
             ->one();
 
         $this->assertDebuggingCalled('Specifying columns is not currently supported for has_many(one)_through relations');
@@ -178,10 +157,10 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
         $queries_count = $this->db()->perf_get_reads();
 
         // Id will be automatically prepended if not specified.
-        $this->assertGreaterThan(0, $entity->siblings->first()->id);
-        $this->assertEquals('Electronica vintage soviet calculator', $entity->siblings->first()->name);
-        $this->assertEquals('2', $entity->siblings->first()->type);
-        $this->assertEquals('10', $entity->siblings->first()->child_id);
+        $this->assertGreaterThan(0, $entity->a_sibling->id);
+        $this->assertEquals('Red Mi Note 7', $entity->a_sibling->name);
+        $this->assertEquals('3', $entity->a_sibling->type);
+        $this->assertEquals('1', $entity->a_sibling->child_id);
 
         $this->assertEquals($queries_count, $this->db()->perf_get_reads());
     }
@@ -199,37 +178,30 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('This relation does not allow saving models...');
 
-        $parent->siblings()->save(new sample_sibling_entity(['name' => 'Sample child']));
+        $parent->a_sibling()->save(new sample_sibling_entity(['name' => 'Sample child']));
     }
 
     public function test_it_can_bulk_delete_related_models() {
         $this->create_sample_records();
 
         $parent = sample_parent_entity::repository()
-            ->where('name', 'Calculators')
-            ->with('siblings')
+            ->where('name', 'Tablets')
+            ->with('a_sibling')
             ->order_by('id')
             ->first();
 
         $total = sample_sibling_entity::repository()
             ->count();
 
-        $parent->siblings()
-            ->where('name', '!=', 'Electronica vintage soviet calculator')
+        $parent->a_sibling()
             ->delete();
 
         $this->assertEquals(
-            $total - 2,
+            $total - 1,
             sample_sibling_entity::repository()->count()
         );
 
-        $sibling = sample_sibling_entity::repository()
-            ->join([sample_child_entity::TABLE, 'children'], 'child_id', 'id')
-            ->where('children.parent_id', $parent->id)
-            ->one();
-
-        $this->assertNotNull($sibling);
-        $this->assertEquals('Electronica vintage soviet calculator', $sibling->name);
+        $this->assertNull($parent->a_sibling()->order_by('id')->first());
     }
 
     public function test_it_can_bulk_update_related_models() {
@@ -238,7 +210,7 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
         $parent = sample_parent_entity::repository()
             ->order_by('id')
             ->where('name', 'Calculators')
-            ->with('siblings')
+            ->with('a_sibling')
             ->first();
 
         $this->assertEmpty(
@@ -247,19 +219,16 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
                 ->get()
         );
 
-        $parent->siblings()
-            ->where('name', '!=', 'Commodore vintage calculator')
+        $parent->a_sibling()
             ->update([
                 'type' => 96
             ]);
 
         $this->assertEquals(
-            ['Electronica vintage soviet calculator', 'Sinclair Cambridge Programmable vintage calculator'],
+            'Apple iPhone XR',
             sample_sibling_entity::repository()
                 ->where('type', 96)
-                ->order_by('name')
-                ->get()
-                ->pluck('name')
+                ->one()->name
         );
     }
 
@@ -274,7 +243,7 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
                 ->get()
         );
 
-        $parent->siblings()
+        $parent->a_sibling()
             ->update([
                 'type' => 96
             ]);
@@ -293,9 +262,8 @@ class core_orm_relation_has_many_through_test extends orm_entity_relation_testca
 
         $count = sample_sibling_entity::repository()->count();
 
-        $parent->siblings()->delete();
+        $parent->a_sibling()->delete();
 
         $this->assertEquals($count, sample_sibling_entity::repository()->count());
     }
-
 }

@@ -28,6 +28,7 @@ use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_many_through;
 use core\orm\entity\relations\has_one;
+use core\orm\entity\relations\has_one_through;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -76,7 +77,9 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
     protected function create_tables() {
         $this->create_parent_table()
             ->create_child_table()
-            ->create_passport_table();
+            ->create_passport_table()
+            ->create_sibling_table()
+            ->create_pivot_table();
     }
 
     /**
@@ -112,7 +115,7 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
      * @return $this
      */
     protected function drop_parent_table() {
-        return $this->drop_table(sample_parent_entity::class);
+        return $this->drop_table(sample_parent_entity::TABLE);
     }
 
     /**
@@ -150,7 +153,7 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
      * @return $this
      */
     protected function drop_passport_table() {
-        return $this->drop_table(sample_passport_entity::class);
+        return $this->drop_table(sample_passport_entity::TABLE);
     }
 
     /**
@@ -189,7 +192,77 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
      * @return $this
      */
     protected function drop_child_table() {
-        return $this->drop_table(sample_child_entity::class);
+        return $this->drop_table(sample_child_entity::TABLE);
+    }
+
+    /**
+     * Create table for sample_parent_entity::class
+     *
+     * @return $this
+     */
+    protected function create_sibling_table() {
+        $name = sample_sibling_entity::TABLE;
+
+        if ($this->db_man()->table_exists($name)) {
+            return $this;
+        }
+
+        $table = new xmldb_table($name);
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, 'John Doe');
+        $table->add_field('type', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('child_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $this->db_man()->create_table($table);
+
+        return $this;
+    }
+
+    /**
+     * Drop table for sample_child_entity::class
+     *
+     * @return $this
+     */
+    protected function drop_sibling_table() {
+        return $this->drop_table(sample_sibling_entity::TABLE);
+    }
+    /**
+     * Create table for sample_parent_entity::class
+     *
+     * @return $this
+     */
+    protected function create_pivot_table() {
+        $name = sample_pivot_entity::TABLE;
+
+        if ($this->db_man()->table_exists($name)) {
+            return $this;
+        }
+
+        $table = new xmldb_table($name);
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('parent_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('sibling_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('type', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('meta', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $this->db_man()->create_table($table);
+
+        return $this;
+    }
+
+    /**
+     * Drop table for sample_child_entity::class
+     *
+     * @return $this
+     */
+    protected function drop_pivot_table() {
+        return $this->drop_table(sample_pivot_entity::TABLE);
     }
 
     /**
@@ -214,7 +287,9 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
     protected function drop_tables() {
         return $this->drop_child_table()
             ->drop_parent_table()
-            ->drop_passport_table();
+            ->drop_passport_table()
+            ->drop_sibling_table()
+            ->drop_pivot_table();
     }
 
     /**
@@ -392,6 +467,87 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
                     'created_at' => 0, // Now
                     'updated_at' => 0, // Now
                 ],
+            ],
+
+            sample_sibling_entity::class => [
+                [
+                    'name' => 'Red Mi Note 7',
+                    'child_id' => 1,
+                    'type' => 3,
+                ],
+                [
+                    'name' => 'HTC Desire',
+                    'child_id' => 1,
+                ],
+                [
+                    'name' => 'Red Mi Note 9',
+                    'child_id' => 2,
+                ],
+                [
+                    'name' => 'HTC Desire 5',
+                    'child_id' => 2,
+                    'type' => 3,
+                ],
+                [
+                    'name' => 'Apple iPhone XS',
+                    'child_id' => 3,
+                ],
+                [
+                    'name' => 'Apple iPhone XR',
+                    'child_id' => 3,
+                    'type' => 2,
+                ],
+                [
+                    'name' => 'Asus Tablet',
+                    'child_id' => 4,
+                ],
+                [
+                    'name' => 'Asus Giant Tablet',
+                    'child_id' => 4,
+                ],
+                [
+                    'name' => 'Apple Mac Pro',
+                    'child_id' => 9,
+                ],
+                [
+                    'name' => 'Hp Workstation',
+                    'child_id' => 9,
+                ],
+                [
+                    'name' => 'Electronica vintage soviet calculator',
+                    'child_id' => 10,
+                    'type' => 2,
+                ],
+                [
+                    'name' => 'Commodore vintage calculator',
+                    'child_id' => 11,
+                ],
+                [
+                    'name' => 'Sinclair Cambridge Programmable vintage calculator',
+                    'child_id' => 12,
+                    'type' => 1,
+                ],
+            ],
+
+            // These actually make less sense than the other ones
+            // It's many to many essentially at the moment is used to test weird combination of has one through
+            sample_pivot_entity::class => [
+                [
+                    'parent_id' => 1,
+                    'sibling_id' => 1,
+                ],
+                [
+                    'parent_id' => 2,
+                    'sibling_id' => 1,
+                ],
+                [
+                    'parent_id' => 3,
+                    'sibling_id' => 5,
+                ],
+                [
+                    'parent_id' => 4,
+                    'sibling_id' => 6,
+                ],
             ]
         ];
     }
@@ -424,6 +580,8 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
  * @property int $created_at
  * @property int $updated_at
  * @property-read collection $children Children items
+ * @property-read collection $siblings Children sibling items
+ * @property-read sample_sibling_entity $a_sibling First sibling item connected using a pivot table
  * @property-read sample_passport_entity $passport Passport entity
  */
 class sample_parent_entity extends entity {
@@ -440,6 +598,31 @@ class sample_parent_entity extends entity {
      */
     public function passport(): has_one {
         return $this->has_one(sample_passport_entity::class, 'parent_id');
+    }
+
+    /**
+     * Sample siblings
+     *
+     * @return has_many_through
+     */
+    public function siblings(): has_many_through {
+        return $this->has_many_through(sample_sibling_entity::class, sample_child_entity::class, 'parent_id', 'child_id');
+    }
+
+    /**
+     * Return a sibling if it exists
+     *
+     * @return has_one_through
+     */
+    public function a_sibling(): has_one_through {
+        return $this->has_one_through(
+            sample_sibling_entity::class,
+            sample_pivot_entity::class,
+            'sibling_id',
+            'id',
+            'id',
+            'parent_id'
+        );
     }
 
     /**
@@ -514,4 +697,56 @@ class sample_child_entity extends entity {
 
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = 'updated_at';
+}
+
+/**
+ * This is a sample sibling entity
+ *
+ * Class sample_sibling_entity
+ */
+class sample_sibling_entity extends entity {
+
+    public const TABLE = 'test__sample_sibling';
+
+    /**
+     * Child this sibling belongs to
+     *
+     * @return belongs_to
+     */
+    public function child(): belongs_to {
+        return $this->belongs_to(sample_child_entity::class, 'child_id');
+    }
+
+}
+
+/**
+ * This is a sample sibling entity
+ *
+ * Class sample_sibling_entity
+ *
+ * @property-read sample_sibling_entity $sibling Related sibling model
+ * @property-read sample_parent_entity $parent Related parent model
+ */
+class sample_pivot_entity extends entity {
+
+    public const TABLE = 'test__sample_pivot';
+
+    /**
+     * Child this sibling belongs to
+     *
+     * @return belongs_to
+     */
+    public function sibling(): belongs_to {
+        return $this->belongs_to(sample_sibling_entity::class, 'sibling_id');
+    }
+
+    /**
+     * Child this sibling belongs to
+     *
+     * @return belongs_to
+     */
+    public function parent(): belongs_to {
+        return $this->belongs_to(sample_parent_entity::class, 'parent_id');
+    }
+
 }
