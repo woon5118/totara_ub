@@ -907,4 +907,80 @@ class core_coursecatlib_testcase extends advanced_testcase {
         $this->assertArrayHasKey($data['visible_nousers']->id, $courses);
         $this->assertEquals('visible_nousers', $courses[$data['visible_nousers']->id]->fullname);
     }
+
+    public function test_get_many() {
+        $generator = $this->getDataGenerator();
+        $a = $generator->create_category(['parent' => 0, 'idnumber' => 'a']);
+        $a_a = $generator->create_category(['parent' => $a->id, 'idnumber' => 'a-a']);
+        $a_a_a = $generator->create_category(['parent' => $a_a->id, 'idnumber' => 'a-a-a']);
+        $a_a_b = $generator->create_category(['parent' => $a_a->id, 'idnumber' => 'a-a-b']);
+        $a_b = $generator->create_category(['parent' => $a->id, 'idnumber' => 'a-b']);
+        $a_b_a = $generator->create_category(['parent' => $a_b->id, 'idnumber' => 'a-b-a']);
+        $b = $generator->create_category(['parent' => 0, 'idnumber' => 'b']);
+        $b_a = $generator->create_category(['parent' => $b->id, 'idnumber' => 'b-a']);
+        $b_a_a = $generator->create_category(['parent' => $b_a->id, 'idnumber' => 'b-a-a']);
+
+        $getidnumbers = function ($categories) {
+            $idnumbers = array_map(function ($category) {
+                return $category->idnumber;
+            }, $categories);
+            asort($idnumbers);
+            return array_values($idnumbers);
+        };
+
+        // Test none
+        $result = \coursecat::get_many([]);
+        self::assertSame([], $result);
+
+        // Test single
+        $result = \coursecat::get_many([$b->id]);
+        self::assertSame(['b'], $getidnumbers($result));
+
+        // Test multiple
+        $result = \coursecat::get_many([$a->id, $b->id]);
+        self::assertSame(['a', 'b'], $getidnumbers($result));
+
+        // Test children without parent.
+        $result = \coursecat::get_many([$a_a_a->id]);
+        self::assertSame(['a-a-a'], $getidnumbers($result));
+        $result = \coursecat::get_many([$a_a_b->id, $a_b_a->id]);
+        self::assertSame(['a-a-b', 'a-b-a'], $getidnumbers($result));
+
+        // Test requesting a deleted category returns only existing categories.
+        \coursecat::get($a_a_b->id)->delete_full(false);
+        $result = \coursecat::get_many([$a_a_b->id, $b->id, $a_b_a->id]);
+        self::assertSame(['a-b-a', 'b'], $getidnumbers($result));
+
+        // Expand some categories
+        $cat_b = \coursecat::get($b->id);
+        $cat_a_b_a = \coursecat::get($a_b_a->id);
+        \core_course\management\helper::record_expanded_category($cat_b);
+        \core_course\management\helper::record_expanded_category($cat_a_b_a);
+        self::assertSame([(int)$b->id, (int)$a->id], \core_course\management\helper::get_expanded_categories(''));
+
+        // We need to purge the static property between the API and the cache, otherwise we test nothing.
+        $property = new ReflectionProperty(\core_course\management\helper::class, 'expandedcategories');
+        $property->setAccessible(true);
+        $property->setValue(null);
+
+        // Test the expanded cache does not get purged unnecessarily.
+        $result = \coursecat::get_many([$a_b_a->id]);
+        self::assertSame(['a-b-a'], $getidnumbers($result));
+        self::assertSame([(int)$b->id, (int)$a->id], \core_course\management\helper::get_expanded_categories(''));
+
+        $property->setValue(null); // Clear that static propery between each test.
+
+        // Test the expanded cache does not get cleared when loading.
+        cache::make('core', 'coursecatrecords')->purge();
+        $result = \coursecat::get_many([$a_b_a->id]);
+        self::assertSame(['a-b-a'], $getidnumbers($result));
+        self::assertSame([(int)$b->id, (int)$a->id], \core_course\management\helper::get_expanded_categories(''));
+
+        $property->setValue(null); // Clear that static propery between each test.
+
+        // Test the expanded cache gets cleared if we request something that does not exist.
+        $result = \coursecat::get_many([$a_a_b->id, $b->id, $a_b_a->id]);
+        self::assertSame(['a-b-a', 'b'], $getidnumbers($result));
+        self::assertSame([], \core_course\management\helper::get_expanded_categories(''));
+    }
 }

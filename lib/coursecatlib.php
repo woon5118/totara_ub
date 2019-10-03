@@ -288,18 +288,21 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             }
         }
         if (!empty($toload)) {
+            $loaded = [];
             list($where, $params) = $DB->get_in_or_equal($toload, SQL_PARAMS_NAMED);
             $records = self::get_records('cc.id '.$where, $params);
             $toset = array();
             foreach ($records as $record) {
                 $categories[$record->id] = new coursecat($record);
                 $toset[$record->id] = $categories[$record->id];
-                unset($toload[$record->id]);
+                $loaded[] = $record->id;
             }
-            $coursecatrecordcache->set_many($toset);
+            if (!empty($toset)) {
+                $coursecatrecordcache->set_many($toset);
+            }
 
             // Check that we successfully loaded all categories.
-            if (!empty($toload)) {
+            if (!empty(array_diff($toload, $loaded))) {
                 // OK there are categories we think exist that do not, someone forgot to purge a cache.
                 // Probably the expanded categories cache, but we can't be sure.
                 $cache = \cache::make('core', 'userselections');
