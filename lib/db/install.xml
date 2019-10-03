@@ -2567,6 +2567,7 @@
         <KEY NAME="parentcontextid" TYPE="foreign" FIELDS="parentcontextid" REFTABLE="context" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
+        <INDEX NAME="blockname" UNIQUE="false" FIELDS="blockname"/>
         <INDEX NAME="parentcontextid-showinsubcontexts-pagetypepattern-subpagepattern" UNIQUE="false" FIELDS="parentcontextid, showinsubcontexts, pagetypepattern, subpagepattern"/>
       </INDEXES>
     </TABLE>

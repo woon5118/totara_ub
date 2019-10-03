@@ -385,5 +385,12 @@ function xmldb_totara_core_install() {
         $dbman->add_index($table, $index);
     }
 
+    // Add index that benefit all pages.
+    $table = new xmldb_table('block_instances');
+    $index = new xmldb_index('blockname', XMLDB_INDEX_NOTUNIQUE, array('blockname'));
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
+    }
+
     return true;
 }

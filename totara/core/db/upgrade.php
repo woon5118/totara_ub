@@ -729,5 +729,19 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019100200, 'totara', 'core');
     }
 
+    if ($oldversion < 2019100300) {
+        // Define index blockname (not unique) to be added to block_instances.
+        $table = new xmldb_table('block_instances');
+        $index = new xmldb_index('blockname', XMLDB_INDEX_NOTUNIQUE, array('blockname'));
+
+        // Conditionally launch add index blockname.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2019100300, 'totara', 'core');
+    }
+
     return true;
 }
