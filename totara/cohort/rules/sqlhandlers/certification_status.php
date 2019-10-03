@@ -247,9 +247,18 @@ class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler
 
         list($sqlin, $params) = $DB->get_in_or_equal($this->listofids, SQL_PARAMS_NAMED, $paramprefix);
 
-        $operator = $iscertified ? '=' : '!=';
+        if (count($this->listofids) == 1) {
+            if ($iscertified) {
+                $sqlstart = "EXISTS (SELECT 1";
+            } else {
+                $sqlstart = "NOT EXISTS (SELECT 1";
+            }
+        } else {
+            $operator = $iscertified ? '=' : '!=';
+            $sqlstart = "{$this->certcount} {$operator} (SELECT count(DISTINCT(p.id))";
+        }
 
-        $sql = "{$this->certcount} {$operator} (SELECT count(DISTINCT(p.id))
+        $sql = "$sqlstart
                           FROM {prog} p
                           JOIN {certif} c ON c.id = p.certifid
                      LEFT JOIN {certif_completion} cc ON cc.certifid = c.id
@@ -281,7 +290,13 @@ class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler
 
         list($sqlin, $params) = $DB->get_in_or_equal($this->listofids, SQL_PARAMS_NAMED, $paramprefix);
 
-        $expired_sql = "{$this->certcount} = (SELECT count(DISTINCT(p.id))
+        if (count($this->listofids) == 1) {
+            $sqlstart = "EXISTS (SELECT 1";
+        } else {
+            $sqlstart = "{$this->certcount} = (SELECT count(DISTINCT(p.id))";
+        }
+
+        $expired_sql = "$sqlstart
                               FROM {prog} p
                               JOIN {certif} c ON c.id = p.certifid
                          LEFT JOIN {certif_completion} cc ON cc.certifid = c.id
@@ -347,7 +362,13 @@ class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler
 
         list($sqlin, $params) = $DB->get_in_or_equal($this->listofids, SQL_PARAMS_NAMED, 'as_'.$this->ruleid);
 
-        $sql = "{$this->certcount} = (SELECT count(DISTINCT(p.id))
+        if (count($this->listofids) == 1) {
+            $sqlstart = "EXISTS (SELECT 1";
+        } else {
+            $sqlstart = "{$this->certcount} = (SELECT count(DISTINCT(p.id))";
+        }
+
+        $sql = "$sqlstart
                           FROM {prog_user_assignment} pua
                           JOIN {prog} p ON p.id = pua.programid
                          WHERE p.id {$sqlin}
