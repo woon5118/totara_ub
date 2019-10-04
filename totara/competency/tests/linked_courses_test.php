@@ -23,6 +23,7 @@
  */
 
 use criteria_linkedcourses\task\update_linked_course_items_adhoc;
+use totara_competency\event\linked_courses_updated;
 use totara_competency\linked_courses;
 
 class totara_competency_linked_courses_testcase extends advanced_testcase {
@@ -53,8 +54,6 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
 
         $linked_courses = linked_courses::get_linked_courses($comp->id);
         $this->assertEmpty($linked_courses);
-
-        $this->verify_adhoc_task($comp->id);
     }
 
     public function test_get_and_set_linked_courses_some() {
@@ -140,19 +139,33 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
         $this->assertEquals(PLAN_LINKTYPE_OPTIONAL, $course->linktype);
     }
 
-    /**
-     * Verify adhoc task has been created
-     *
-     * @param int $comp_id
-     */
-    private function verify_adhoc_task(int $comp_id) {
-        global $DB;
+    public function test_get_and_set_linked_courses_event_is_fired() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/plan/lib.php');
 
-        $tasks = $DB->get_records('task_adhoc', ['classname' => '\\'.update_linked_course_items_adhoc::class]);
-        $this->assertCount(1, $tasks);
-        $task = reset($tasks);
-        $task_data = json_decode($task->customdata, true);
-        $this->assertArrayHasKey('competency_id', $task_data);
-        $this->assertEquals($task_data['competency_id'], $comp_id);
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $compfw = $hierarchy_generator->create_comp_frame([]);
+        $comp1 = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+
+        $sink = $this->redirectEvents();
+
+        linked_courses::set_linked_courses(
+            $comp1->id,
+            [
+                ['id' => $course1->id, 'linktype' => PLAN_LINKTYPE_MANDATORY],
+                ['id' => $course2->id, 'linktype' => PLAN_LINKTYPE_MANDATORY]
+            ]
+        );
+
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = array_shift($events);
+        $this->assertInstanceOf(linked_courses_updated::class, $event);
+        $this->assertEquals($comp1->id, $event->get_data()['objectid']);
     }
+
 }

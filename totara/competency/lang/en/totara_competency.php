@@ -91,6 +91,7 @@ $string['disabled'] = 'Disabled';
 $string['done'] = 'Done';
 $string['enabled'] = 'Enabled';
 $string['editcompetency'] = 'Edit comptency: {$a}';
+$string['event:linked_courses_updated'] = 'Linked courses updated';
 $string['framework'] = 'Framework';
 $string['fullname'] = 'Full name';
 $string['general'] = 'General';

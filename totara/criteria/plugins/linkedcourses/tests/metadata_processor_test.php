@@ -131,26 +131,10 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
             [['id' => $keep->id, 'linktype' => PLAN_LINKTYPE_MANDATORY], ['id' => $remove->id, 'linktype' => PLAN_LINKTYPE_MANDATORY]]
         );
 
-        metadata_processor::update_item_links($competency->id);
-        $this->assertSame(1, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
-        $this->assertSame(1, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
-
         $items = $DB->get_records('totara_criteria_item');
         $this->assertCount(2, $items);
-        $keep_item_id = null;
-        $remove_item_id = null;
-        $add_item_id = null;
-        foreach($items as $item) {
-            if ($item->item_id == $keep->id) {
-                $keep_item_id = $item->id;
-            } else if ($item->item_id == $remove->id) {
-                $remove_item_id = $item->id;
-            } else {
-                $this->fail('Extra item added');
-            }
-        }
-        $this->assertNotNull($keep_item_id);
-        $this->assertNotNull($remove_item_id);
+        $item_ids = array_column($items, 'item_id');
+        $this->assertEqualsCanonicalizing([$keep->id, $remove->id], $item_ids);
 
         // At this point, we keep the $keep course, add $add. $remove gets removed.
         linked_courses::set_linked_courses(
@@ -158,28 +142,10 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
             [['id' => $keep->id, 'linktype' => PLAN_LINKTYPE_MANDATORY], ['id' => $add->id, 'linktype' => PLAN_LINKTYPE_MANDATORY]]
         );
 
-        // Wait a sec to ensure timestamps are different
-        $this->waitForSecond();
-        metadata_processor::update_item_links($competency->id);
-        $this->assertSame(2, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
-        $this->assertSame(2, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
-
         $items = $DB->get_records('totara_criteria_item');
         $this->assertCount(2, $items);
-
-        foreach($items as $item) {
-            if ($item->item_id == $add->id) {
-                $add_item_id = $item->id;
-            }
-
-            // Ensure that the $keep_item's row wasn't replaced
-            if ($item->item_id == $keep->id) {
-                $this->assertEquals($item->id, $keep_item_id);
-            }
-        }
-
-        // Make sure the $add item was added
-        $this->assertNotNull($add_item_id);
+        $item_ids = array_column($items, 'item_id');
+        $this->assertEqualsCanonicalizing([$keep->id, $add->id], $item_ids);
 
         // Final step. Remove all courses from linked.
         // The idea of this test is to check it does remove when there are zero courses linked rather
@@ -189,13 +155,6 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
             $competency->id,
             []
         );
-
-        // Wait a sec to ensure timestamps are different
-        $this->waitForSecond();
-        metadata_processor::update_item_links($competency->id);
-        $this->assertSame(3, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
-        $this->assertSame(3, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
-
         $this->assertEquals(0, $DB->count_records('totara_criteria_item'));
     }
 

@@ -28,6 +28,7 @@ use core\orm\query\builder;
 use core\task\adhoc_task;
 use criteria_childcompetency\childcompetency;
 use criteria_linkedcourses\linkedcourses;
+use criteria_linkedcourses\metadata_processor as linked_courses_metadata_processor;
 use pathway_criteria_group\criteria_group;
 use pathway_learning_plan\learning_plan;
 use totara_competency\achievement_configuration;
@@ -125,6 +126,9 @@ class default_criteria_on_install extends adhoc_task {
             $group2->add_criterion($childcompetencies);
             $group2->save();
         }
+
+        // Make sure all linked courses are synced
+        linked_courses_metadata_processor::update_item_links(null);
     }
 
     private function should_add_learning_plans(): bool {

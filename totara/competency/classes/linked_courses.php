@@ -26,6 +26,7 @@ namespace totara_competency;
 
 use core\task\manager as task_manager;
 use criteria_linkedcourses\task\update_linked_course_items_adhoc;
+use totara_competency\event\linked_courses_updated;
 
 /**
  * Class linked_courses
@@ -152,10 +153,7 @@ class linked_courses {
         }
         $DB->delete_records_list('comp_criteria', 'id', $delete_ids);
 
-        // Call the adhoc task to update the criterion_items for linkedcourses criteria in achievement paths
-        $adhoctask = new update_linked_course_items_adhoc();
-        $adhoctask->set_custom_data(['competency_id' => $competency_id]);
-        $adhoctask->set_component('totara_competency');
-        task_manager::queue_adhoc_task($adhoctask);
+        $event = linked_courses_updated::create_from_competency($competency_id);
+        $event->trigger();
     }
 }
