@@ -695,6 +695,8 @@ final class helper {
         );
 
         $transaction->allow_commit();
+
+        self::prune_completion_caches($courseid, $userid);
     }
 
     /**
@@ -763,6 +765,8 @@ final class helper {
         );
 
         $transaction->allow_commit();
+
+        self::prune_completion_caches($info->course, $info->userid);
     }
 
     /**
@@ -799,6 +803,27 @@ final class helper {
         );
 
         $transaction->allow_commit();
+
+        self::prune_completion_caches($info->course, $info->userid);
+    }
+
+    /**
+     * Delete the stale completion cache of the specific course and the user.
+     *
+     * @param int $courseid
+     * @param int $userid
+     */
+    public static function prune_completion_caches($courseid, $userid) {
+        $key = $userid . '_' . $courseid;
+        // Remove cache for the user and the course.
+        $cache = \cache::make('core', 'completion');
+        $cache->delete($key);
+        $cache = \cache::make('core', 'coursecompletion');
+        $cache->delete($key);
+        $cache = \cache::make('totara_core', 'completion_progressinfo');
+        // Note that the cache key of completion_progressinfo is different to the others.
+        $key = $courseid . '_' . $userid;
+        $cache->delete($key);
     }
 
     /**

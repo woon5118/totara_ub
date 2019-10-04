@@ -156,6 +156,11 @@ if ($input == get_string('clianswerno', 'admin')) {
 $delete_sql = "DELETE " . $sql;
 $DB->execute($delete_sql, $parameters);
 
+// And purge all the completion caches.
+cache::make('core', 'completion')->purge();
+cache::make('core', 'coursecompletion')->purge();
+cache::make('totara_core', 'completion_progressinfo')->purge();
+
 // Check our work.
 $count = $DB->get_record_sql($select_sql, $parameters);
 if ($count->affected > 0) {
