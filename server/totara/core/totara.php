@@ -2318,3 +2318,31 @@ function totara_get_clone_db($reconnect = false) {
 
     return $db;
 }
+
+/**
+ * Todo: Remove this, replacing with method for determining whether a given product is enabled.
+ *
+ * This is an interrim function for being able to check if perform is enabled during development.
+ *
+ * This will be replaced by some other system for checking if perform is enabled.
+ *
+ * Test this by putting something in your config file like:
+ * $CFG->products = 'learn';
+ * or
+ * $CFG->products = 'learn,perform';
+ *
+ * Just like this function, that config setting probably won't stick around either.
+ */
+function is_perform_enabled(): bool {
+    $products = get_config('', 'products');
+    if (empty($products)) {
+        // If the config was not defined or is empty, just say yes. Easier for dev and testing that way.
+        return true;
+    }
+
+    if (strpos($products, 'perform') !== false) {
+        return true;
+    }
+
+    return false;
+}

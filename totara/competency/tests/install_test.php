@@ -472,4 +472,94 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals($achievement->time_created, $assignment->created_at);
         $this->assertEquals($achievement->time_created, $assignment->updated_at);
     }
+
+    /**
+     * Same as test_current_and_historic_comp_record. We're just disabling perform.
+     *
+     * There should be no difference when perform is disabled.
+     */
+    public function test_current_and_historic_comp_record_perform_disabled() {
+        global $DB;
+
+        // These next two lines involve interim ways of disabling perform.
+        set_config('products', 'learn');
+        $this->assertFalse(is_perform_enabled());
+
+        $comp_record = $this->add_comp_record(100, 200, 5, 300, 400);
+
+        // The comp_record did not get migrated. This is because it is already supposed to have an
+        // equivalent in comp_record_history.
+        // This assertion just confirms that we do not allow for this invalid data state.
+        $achievements = $DB->get_records('totara_competency_achievement');
+        $this->assertCount(0, $achievements);
+
+        // This is the comp_history_record representing the current state.
+        $comp_record_history1 = $this->add_comp_record_history(
+            $comp_record->competencyid,
+            $comp_record->userid,
+            $comp_record->proficiency,
+            $comp_record->timemodified + 1
+        );
+
+        // This is the the historic comp_record_history.
+        $comp_record_history2 = $this->add_comp_record_history(
+            $comp_record->competencyid,
+            $comp_record->userid,
+            // It's not the same scale value as the one in comp_record.
+            $comp_record->proficiency + 1,
+            // It has the same timemodified as the current comp_record
+            // And the other history record doesn't match, even though that one is the right one.
+            // We're doing this because timemodified isn't reliable anyway.
+            $comp_record->timemodified
+        );
+
+        $this->setCurrentTimeStart();
+
+        totara_competency_install_migrate_achievements();
+
+        $achievements = $DB->get_records('totara_competency_achievement', null, 'time_created ASC');
+        $this->assertCount(2, $achievements);
+
+        // Let's check that only one assignment was created for the first record
+        $assignments = $DB->get_records('totara_assignment_competencies');
+        $this->assertCount(1, $assignments);
+
+        $assignment = array_pop($assignments);
+
+        $achievement1 = array_pop($achievements);
+        $this->assertEquals($comp_record_history1->userid, $achievement1->user_id);
+        $this->assertEquals($comp_record_history1->competencyid, $achievement1->comp_id);
+        $this->assertEquals($assignment->id, $achievement1->assignment_id);
+        $this->assertEquals($comp_record_history1->proficiency, $achievement1->scale_value_id);
+        $this->assertEquals(0, $achievement1->proficient);
+        $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement1->status);
+        $this->assertEquals($comp_record_history1->timemodified, $achievement1->time_created);
+        $this->assertEquals($comp_record_history1->timemodified, $achievement1->time_status);
+        $this->assertEquals($comp_record_history1->timemodified, $achievement1->time_scale_value);
+        $this->assertNull($achievement1->time_proficient);
+        $this->assertTimeCurrent($achievement1->last_aggregated);
+
+        $achievement2 = array_pop($achievements);
+        $this->assertEquals($comp_record_history2->userid, $achievement2->user_id);
+        $this->assertEquals($comp_record_history2->competencyid, $achievement2->comp_id);
+        $this->assertEquals($assignment->id, $achievement2->assignment_id);
+        $this->assertEquals($comp_record_history2->proficiency, $achievement2->scale_value_id);
+        $this->assertEquals(0, $achievement2->proficient);
+        $this->assertEquals(competency_achievement::SUPERSEDED, $achievement2->status);
+        $this->assertEquals($comp_record_history2->timemodified, $achievement2->time_created);
+        $this->assertEquals($comp_record_history2->timemodified, $achievement2->time_status);
+        $this->assertEquals($comp_record_history2->timemodified, $achievement2->time_scale_value);
+        $this->assertNull($achievement2->time_proficient);
+        $this->assertTimeCurrent($achievement2->last_aggregated);
+
+        $this->assertEquals($comp_record_history1->userid, $assignment->user_group_id); // In this case user group id is user id
+        $this->assertEquals('user', $assignment->user_group_type); // User group type is user
+        $this->assertEquals(0, $assignment->optional); // Can't remember what optional means
+        $this->assertEquals(2, $assignment->status); // Assignment archived
+        $this->assertEquals($comp_record_history1->competencyid, $assignment->competency_id);
+        $this->assertEquals($achievement1->assignment_id, $assignment->id);
+        $this->assertEquals(0, $assignment->created_by); // TODO this should be null
+        $this->assertEquals($comp_record_history1->timemodified, $assignment->created_at);
+        $this->assertEquals($comp_record_history1->timemodified, $assignment->updated_at);
+    }
 }

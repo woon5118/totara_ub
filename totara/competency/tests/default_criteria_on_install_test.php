@@ -550,4 +550,89 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assertCount(0, $active_pathways);
     }
+
+    /**
+     * Similar to the above multiple competencies test. But doing so with perform disabled.
+     */
+    public function test_when_perform_disabled() {
+        global $COMP_AGGREGATION;
+
+        // These next two lines involve interim ways of disabling perform.
+        set_config('products', 'learn');
+        $this->assertFalse(is_perform_enabled());
+
+        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
+        $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+
+        $scale1 = $totara_hierarchy_generator->create_scale('comp');
+        $scale2 = $totara_hierarchy_generator->create_scale('comp');
+
+        $compfw1 = $totara_hierarchy_generator->create_comp_frame(['scale' => $scale1->id]);
+        $comp1 = $totara_hierarchy_generator->create_comp(
+            ['frameworkid' => $compfw1->id, 'aggregationmethod' => $COMP_AGGREGATION['ALL']]
+        );
+        $comp2 = $totara_hierarchy_generator->create_comp(
+            ['frameworkid' => $compfw1->id, 'aggregationmethod' => $COMP_AGGREGATION['ANY']]
+        );
+
+        $compfw2 = $totara_hierarchy_generator->create_comp_frame(['scale' => $scale2->id]);
+
+        $comp3 = $totara_hierarchy_generator->create_comp(
+            ['frameworkid' => $compfw2->id, 'aggregationmethod' => $COMP_AGGREGATION['OFF']]
+        );
+
+        /**
+         * Not adding any learning plans. The learning plan pathways should be added anyway.
+         */
+
+        $task = new default_criteria_on_install();
+        $task->execute();
+
+        /**
+         * Competency 1.
+         *
+         * Aggregation ALL.
+         */
+
+        $competency1 = new competency($comp1);
+        $achievement_configuration = new achievement_configuration($competency1);
+        $this->assertEquals('first', $achievement_configuration->get_aggregation_type());
+
+        $active_pathways = $achievement_configuration->get_active_pathways();
+        $this->assertCount(3, $active_pathways);
+        $lp_pathway = array_shift($active_pathways);
+        $this->assertInstanceOf(learning_plan::class, $lp_pathway);
+        $this->assert_group_pathways($active_pathways, $scale1->minproficiencyid, criterion::AGGREGATE_ALL);
+
+        /**
+         * Competency 2.
+         *
+         * Aggregation ANY.
+         */
+
+        $competency2 = new competency($comp2);
+        $achievement_configuration = new achievement_configuration($competency2);
+        $this->assertEquals('first', $achievement_configuration->get_aggregation_type());
+
+        $active_pathways = $achievement_configuration->get_active_pathways();
+        $this->assertCount(3, $active_pathways);
+        $lp_pathway = array_shift($active_pathways);
+        $this->assertInstanceOf(learning_plan::class, $lp_pathway);
+        $this->assert_group_pathways($active_pathways, $scale1->minproficiencyid, criterion::AGGREGATE_ANY_N);
+
+        /**
+         * Competency 3.
+         *
+         * Aggregation OFF.
+         */
+
+        $competency3 = new competency($comp3);
+        $achievement_configuration = new achievement_configuration($competency3);
+        $this->assertEquals('first', $achievement_configuration->get_aggregation_type());
+
+        $active_pathways = $achievement_configuration->get_active_pathways();
+        $this->assertCount(1, $active_pathways);
+        $lp_pathway = array_shift($active_pathways);
+        $this->assertInstanceOf(learning_plan::class, $lp_pathway);
+    }
 }
