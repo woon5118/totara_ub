@@ -114,7 +114,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
         $instance->set_scale_value(reset($data->scalevalues));
-        $instance->set_aggregation_method(criteria_group::AGGREGATE_ALL);
 
         // Check no existing pathway rows
         $this->validate_num_rows([
@@ -154,7 +153,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $instance = new criteria_group();
         $instance->set_competency($data->comp);
-        $instance->set_aggregation_method(criteria_group::AGGREGATE_ALL);
         $instance->set_scale_value(reset($data->scalevalues));
         $instance->add_criterion($data->cc[1]);
         $instance->save();
@@ -171,8 +169,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $pw_row = $DB->get_record('totara_competency_pathway', ['id' => $pw_id]);
         $critgrp_row = $DB->get_record('pathway_criteria_group', ['id' => $instance_id]);
-
-        $this->assertEquals(criteria_group::AGGREGATE_ALL, $critgrp_row->aggregation_method);
 
         // Sleeping 1 second to ensure timestamps are different
         sleep(1);
@@ -279,7 +275,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $instance = new criteria_group();
         $instance->set_competency($data->comp);
-        $instance->set_aggregation_method(criteria_group::AGGREGATE_ALL);
         $instance->set_scale_value(reset($data->scalevalues));
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
@@ -368,7 +363,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $instance = new criteria_group();
         $instance->set_competency($data->comp);
-        $instance->set_aggregation_method(criteria_group::AGGREGATE_ALL);
         $instance->set_scale_value(reset($data->scalevalues));
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
@@ -421,8 +415,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $instance = new criteria_group();
         $instance->set_competency($data->comp);
-        $instance->set_aggregation_method(criteria_group::AGGREGATE_ANY_N);
-        $instance->set_aggregation_params(['req_items' => 2]);
         $instance->set_scale_value(reset($data->scalevalues));
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
@@ -523,41 +515,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
     }
 
     /**
-     * The user must complete any of two criteria. They complete one.
-     *
-     * The related info should include the one completed and not the other.
-     */
-    public function test_aggregate_current_value_achievement_details_one_satisfied() {
-        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
-        $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
-        $scale = $totara_hierarchy_generator->create_scale('comp');
-        $scale = new scale($scale);
-        $value1 = $scale->scale_values->first();
-
-        $criteria_group = new criteria_group();
-        $criteria_group->set_aggregation_method(criterion::AGGREGATE_ANY_N);
-        $criteria_group->set_scale_value($value1);
-
-        $mock_criterion1 = $this->getMockBuilder(criterion::class)
-            ->setMethods(['aggregate'])
-            ->getMockForAbstractClass();
-        $mock_criterion1->method('aggregate')->willReturn(true);
-
-        $mock_criterion2 = $this->getMockBuilder(criterion::class)
-            ->setMethods(['aggregate'])
-            ->getMockForAbstractClass();
-        $mock_criterion2->method('aggregate')->willReturn(false);
-
-        $criteria_group->add_criterion($mock_criterion1);
-        $criteria_group->add_criterion($mock_criterion2);
-
-        $details = $criteria_group->aggregate_current_value(100);
-
-        $this->assertEquals($value1->id, $details->get_scale_value_id());
-        $this->assertEquals([get_class($mock_criterion1)], $details->get_related_info());
-    }
-
-    /**
      * The user needed to complete any of two criteria. They complete both.
      *
      * Both criteria are recorded in related info.
@@ -570,7 +527,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $value1 = $scale->scale_values->first();
 
         $criteria_group = new criteria_group();
-        $criteria_group->set_aggregation_method(criterion::AGGREGATE_ANY_N);
         $criteria_group->set_scale_value($value1);
 
         $mock_criterion1 = $this->getMockBuilder(criterion::class)
@@ -605,7 +561,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $value1 = $scale->scale_values->first();
 
         $criteria_group = new criteria_group();
-        $criteria_group->set_aggregation_method(criterion::AGGREGATE_ALL);
         $criteria_group->set_scale_value($value1);
 
         $mock_criterion1 = $this->getMockBuilder(criterion::class)

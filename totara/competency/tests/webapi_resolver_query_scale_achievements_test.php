@@ -104,8 +104,6 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
             $ids = [];
             for ($i = 1; $i <= $pathway_amount; $i ++) {
                 $criteria_group = new criteria_group_entity();
-                $criteria_group->aggregation_method = 1;
-                $criteria_group->aggregation_params = '[]';
                 $criteria_group->scale_value_id = $scale_value->id;
                 $criteria_group->save();
 

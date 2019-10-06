@@ -37,19 +37,7 @@ use totara_criteria\criterion_factory;
  */
 class criteria_group extends pathway {
 
-    /**
-     * Types of aggregation available in groups
-     */
-    public const AGGREGATE_ALL = 1;
-    public const AGGREGATE_ANY_N = 2;
-
     public const CLASSIFICATION = self::PATHWAY_SINGLE_VALUE;
-
-    /** @var int */
-    private $aggregation_method = self::AGGREGATE_ALL;
-
-    /** @var array $aggregation_params Optional aggregation method parameters (e.g. min number of criteria) */
-    private $aggregation_params = [];
 
     /** @var scale_value Scale value completion of the criteria in this group leads to */
     private $scale_value;
@@ -85,9 +73,6 @@ class criteria_group extends pathway {
         if (!empty($row->scale_value_id)) {
             $this->set_scale_value(new scale_value($row->scale_value_id));
         }
-
-        $this->set_aggregation_method($row->aggregation_method);
-        $this->set_aggregation_params($row->aggregation_params);
 
         $this->fetch_criteria();
     }
@@ -147,14 +132,6 @@ class criteria_group extends pathway {
             }
         }
 
-        $current_row = $DB->get_record('pathway_criteria_group', ['id' => $this->get_path_instance_id()]);
-
-        if ($this->get_aggregation_method() != $current_row->aggregation_method ||
-            json_encode($this->get_aggregation_params()) != $current_row->aggregation_params) {
-
-            return true;
-        }
-
         return false;
     }
 
@@ -185,8 +162,6 @@ class criteria_group extends pathway {
 
         // Create new criteria_group instance
         $record = new \stdClass();
-        $record->aggregation_method = $this->get_aggregation_method();
-        $record->aggregation_params = json_encode($this->get_aggregation_params());
         $record->scale_value_id = $this->get_scale_value()->id;
         $record->status = static::PATHWAY_STATUS_ACTIVE;
         $record->timemodified = time();
@@ -321,54 +296,6 @@ class criteria_group extends pathway {
     /****************************************************************************
      * Getters and setters
      ****************************************************************************/
-
-    /**
-     * Get aggregation method
-     *
-     * @return int Aggregation method
-     */
-    public function get_aggregation_method(): int {
-        return $this->aggregation_method;
-    }
-
-    /**
-     * Set criteria_group aggregation method
-     *
-     * @param int Aggregation method
-     * @return $this
-     */
-    public function set_aggregation_method(int $aggregation_method): pathway {
-        $this->aggregation_method = $aggregation_method;
-        return $this;
-    }
-
-    /**
-     * Get aggregation parameters
-     *
-     * @return array Aggregation parameters
-     */
-    public function get_aggregation_params(): array {
-        return $this->aggregation_params;
-    }
-
-    /**
-     * Set the aggregation parameters to use
-     *
-     * @param  array | string $aggregation_params. This can be passed as array or json encoded string
-     * @return $this
-     */
-    public function set_aggregation_params($params): pathway {
-        if (is_string($params)) {
-            // Json encoded
-            $this->aggregation_params = json_decode($params, true);
-        } else if (!is_null($params) && !is_array($params)) {
-            $this->aggregation_params = (array)$params;
-        } else {
-            $this->aggregation_params = $params;
-        }
-
-        return $this;
-    }
 
     /**
      * Returns the scale value associated with this pathway.
@@ -617,32 +544,17 @@ class criteria_group extends pathway {
 
         $achievement_detail = new achievement_detail();
 
-        $result = $this->aggregation_method == static::AGGREGATE_ALL;
+        $result = true;
         foreach ($this->criteria as $criterion) {
             $crit_satisfied = $criterion->aggregate($user_id);
             if ($crit_satisfied) {
                 $achievement_detail->add_completed_criterion($criterion);
             }
-            switch ($this->aggregation_method) {
-                case static::AGGREGATE_ALL:
-                    $result = $result && $crit_satisfied;
-                    // If any criterion not yet satisfied by the user, we can stop
-                    if (!$result) {
-                        break 2;
-                    }
-                    break;
 
-                case static::AGGREGATE_ANY_N:
-                    // Todo: Is there is supposed to a be a minimum number of any criteria satisfied here?
-                    $result = $result || $crit_satisfied;
-                    // If $result is true at this point, we could stop looping as we know they have
-                    // satisfied aggregation. However, we do also need to record all criteria that we satisfied.
-                    break;
-
-                default:
-                    // Invalid aggregation method
-                    $result = false;
-                    break 2;
+            $result = $result && $crit_satisfied;
+            // If any criterion not yet satisfied by the user, we can stop
+            if (!$result) {
+                break 1;
             }
         }
 

@@ -30,8 +30,6 @@ use core\orm\entity\relations\has_many;
 /**
  * Pathway per competency
  *
- * @property int $aggregation_method
- * @property string $aggregation_params
  * @property int $scale_value_id
  *
  * @property-read array|criteria_group_criterion[] $criterions

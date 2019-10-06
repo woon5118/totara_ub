@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="totara/hierarchy/pathway/criteria_group/db" VERSION="20190711" COMMENT="Database layer definition for a criteria_group pathway"
+<XMLDB PATH="totara/hierarchy/pathway/criteria_group/db" VERSION="20191007" COMMENT="Database layer definition for a criteria_group pathway"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -7,8 +7,6 @@
     <TABLE NAME="pathway_criteria_group" COMMENT="Criteria group pathway definition">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="aggregation_method" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Aggregation method"/>
-        <FIELD NAME="aggregation_params" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional parameters required by the aggregation method"/>
         <FIELD NAME="scale_value_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Scale value achieved when all criteria are satisfied"/>
       </FIELDS>
       <KEYS>

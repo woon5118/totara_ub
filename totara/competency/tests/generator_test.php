@@ -155,12 +155,6 @@ class totara_competency_generator_testcase extends \advanced_testcase {
         $this->assertEquals($cg->get_path_instance_id(), $cgrow->id);
         $this->assertEquals($cg->get_scale_value()->get_attribute('id'), $cgrow->scale_value_id);
 
-        $expected_agg = $record['aggregation_method'] ?? criteria_group::AGGREGATE_ALL;
-        $this->assertEquals($expected_agg, $cgrow->aggregation_method);
-
-        $expected_agg_params = json_encode(['req_items' => $record['req_items'] ?? 1]);
-        $this->assertEquals($expected_agg_params, $cgrow->aggregation_params);
-
         $rows = $DB->get_records('pathway_criteria_group_criterion');
         $this->assertEquals(count($record['criteria']), count($rows));
 

@@ -65,8 +65,6 @@ class pathway_criteria_group_webapi_resolver_query_achievements_testcase extends
         $criterion_amount = 1;
         foreach ($scale_values as $scale_value) {
             $criteria_group = new criteria_group_entity();
-            $criteria_group->aggregation_method = 1;
-            $criteria_group->aggregation_params = '[]';
             $criteria_group->scale_value_id = $scale_value->id;
             $criteria_group->save();
 

@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2019071100;       // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2019071101;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016120505;       // Requires this Moodle version.
 $plugin->component = 'pathway_criteria_group'; // To check on upgrade, that module sits in correct place

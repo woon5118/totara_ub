@@ -75,9 +75,6 @@ class totara_competency_generator extends component_generator_base {
             $instance->set_scale_value(new scale_value($data['scale_value']));
         }
 
-        $instance->set_aggregation_method($data['aggregation'] ?? criteria_group::AGGREGATE_ALL);
-        $instance->set_aggregation_params(['req_items' => $data['req_items'] ?? 1]);
-
         foreach ($data['criteria'] as $criterion) {
             $instance->add_criterion($criterion);
         }

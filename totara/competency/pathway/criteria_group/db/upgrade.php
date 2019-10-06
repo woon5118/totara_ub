@@ -34,6 +34,28 @@ function xmldb_pathway_criteria_group_upgrade($oldversion) {
 
     // Totara 13 branching line.
 
+    // TODO Remove all upgrade before we release
+    if ($oldversion < 2019071101) {
+        // Define field aggregation_method to be dropped from pathway_criteria_group.
+        $table = new xmldb_table('pathway_criteria_group');
+
+        $field = new xmldb_field('aggregation_method');
+
+        // Conditionally launch drop field aggregation_method.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('aggregation_params');
+
+        // Conditionally launch drop field aggregation_params.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2019071101, 'pathway', 'criteria_group');
+    }
 
     return true;
 }

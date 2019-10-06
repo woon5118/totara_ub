@@ -26,6 +26,7 @@ use pathway_criteria_group\criteria_group;
 use totara_competency\pathway;
 use criteria_coursecompletion\coursecompletion;
 use totara_competency\achievement_configuration;
+use totara_criteria\criterion;
 
 class pathway_criteria_group_course_completion_integration_testcase extends advanced_testcase {
 
@@ -57,7 +58,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $pathway->set_status(pathway::PATHWAY_STATUS_ACTIVE);
 
         $course_completion_criteria = new coursecompletion();
-        $course_completion_criteria->set_aggregation_method(criteria_group::AGGREGATE_ALL);
+        $course_completion_criteria->set_aggregation_method(coursecompletion::AGGREGATE_ALL);
         $course_completion_criteria->add_items([$course1->id]);
 
         $pathway->add_criterion($course_completion_criteria);
@@ -153,7 +154,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $pathway->set_status(pathway::PATHWAY_STATUS_ACTIVE);
 
         $course_completion_criteria = new coursecompletion();
-        $course_completion_criteria->set_aggregation_method(criteria_group::AGGREGATE_ALL);
+        $course_completion_criteria->set_aggregation_method(coursecompletion::AGGREGATE_ALL);
         $course_completion_criteria->add_items([$course1->id]);
 
         $pathway->add_criterion($course_completion_criteria);
