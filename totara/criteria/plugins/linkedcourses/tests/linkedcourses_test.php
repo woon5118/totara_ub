@@ -46,19 +46,19 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
             [
                 'plugin_type' => 'linkedcourses',
                 'aggregation_method' => linkedcourses::AGGREGATE_ALL,
-                'metadata' => [],
+                'metadata' => ['compid' => 1],
             ],
             [
                 'plugin_type' => 'linkedcourses',
                 'aggregation_method' => linkedcourses::AGGREGATE_ANY_N,
                 'aggregation_params' => json_encode(['req_items' => 1]),
-                'metadata' => [],
+                'metadata' => ['compid' => 1],
             ],
             [
                 'plugin_type' => 'linkedcourses',
                 'aggregation_method' => linkedcourses::AGGREGATE_ANY_N,
                 'aggregation_params' => json_encode(['req_items' => 2]),
-                'metadata' => [],
+                'metadata' => ['compid' => 1],
             ],
         ];
 
@@ -226,7 +226,8 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
         $cc->add_metadata([['metakey' => 'many1', 'metavalue' => 'first of many'], ['metakey' => 'many2', 'metavalue' => 'second of many']]);
         $cc->remove_metadata(['newkey']);
 
-        $expected->metadata = ['many1' => 'first of many', 'many2' => 'second of many'];
+        $expected->metadata['many1'] = 'first of many';
+        $expected->metadata['many2'] = 'second of many';
         $cc->save();
         $this->verify_instance($expected, $cc);
         $this->verify_saved_metadata($cc->get_id(), $expected->metadata);

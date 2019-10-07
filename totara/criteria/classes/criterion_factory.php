@@ -31,7 +31,7 @@ use totara_competency\plugintypes;
 class criterion_factory {
 
     /**
-     * Instantiate an instance of the specified crition type
+     * Instantiate an instance of the specified criterion type
      *
      * @param string $type Criterion type to instantiate
      * @return criterion of the requested type

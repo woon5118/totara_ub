@@ -76,6 +76,7 @@ class criteria_linkedcourses_display_testcase extends \advanced_testcase {
 
         $creation_params = [];
         $creation_params['aggregation'] = $aggregation;
+        $creation_params['competency'] = 1;
 
         $cc = $generator->create_linkedcourses($creation_params);
         $display_configuration = (new linkedcourses_display($cc))->get_configuration();

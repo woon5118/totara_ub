@@ -23,6 +23,7 @@
 
 namespace criteria_childcompetency;
 
+use totara_competency\entities\competency;
 use totara_criteria\competency_item_evaluator;
 use totara_criteria\criterion;
 
@@ -35,7 +36,7 @@ class childcompetency extends criterion {
      * Get the type of items stored in this criterion
      */
     protected function get_items_type() {
-        return '';
+        return 'competency';
     }
 
     /**
@@ -48,21 +49,44 @@ class childcompetency extends criterion {
     }
 
     /**
-     * Does this criterion have associated metadata
-     *
-     * @return bool
-     */
-    public function has_metadata(): bool {
-        return false;
-    }
-
-    /**
      * Return the display class for this criterion
      *
      * @return string Class to use for displaying
      */
     protected function get_display_class(): string {
         return childcompetency_display::class;
+    }
+
+    /*******************************************************************************************************
+     * Retrieve and Save
+     *******************************************************************************************************/
+
+    /**
+     * Validate the criterion attributes
+     * A childcompetency should contain the competency metadata
+     * @return string|null Error description
+     */
+    protected function validate(): ?string {
+        $comp_id = $this->get_competency_id();
+        return is_null($comp_id) ? 'Competency id metadata is required in childcompetency criteria' : null;
+    }
+
+    /**
+     * Update derived items
+     * An item is added for each child competency
+     */
+    public function update_items(): criterion {
+        global $DB;
+
+        $comp_id = $this->get_competency_id();
+        if (is_null($comp_id)) {
+            throw new \coding_exception('Competency id must be set before items are updated');
+        }
+
+        $child_competencies = $DB->get_fieldset_select('comp', 'id', 'parentid = :parentid', ['parentid' => $comp_id]);
+        $this->set_item_ids($child_competencies);
+
+        return $this;
     }
 
 

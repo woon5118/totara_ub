@@ -44,10 +44,12 @@ function(ajax, notification, Loader) {
          */
         this.criterion = {
             type: 'childcompetency',
+            metadata: [],
             aggregation: {},
         };
 
         this.criterionKey = '';  // Unique key to use in bubbled event
+        this.competencyKey = 'compid'; // Metadata key for competency id
 
         this.endpoints = {
             detail: 'criteria_childcompetency_get_detail',
@@ -147,6 +149,7 @@ function(ajax, notification, Loader) {
                     // Not doing this earlier to prevent setting criterion attributes if
                     // something went wrong (e.g. invalid id, etc.)
                     that.criterion.id = id;
+                    that.criterion.metadata = instance.metadata;
                     that.criterionKey = key;
 
                     // Aggregation
@@ -168,12 +171,23 @@ function(ajax, notification, Loader) {
          * @return {Promise}
          */
         createEmptyCriterion: function() {
-            var that = this;
+            // TODO: Fix when converting to vue - for now depending on the fact that the comp-id is on the document
+            var that = this,
+                compIdWgt = document.querySelector('[data-comp-id]'),
+                compId = 1;
+
+            if (compIdWgt) {
+                compId = compIdWgt.getAttribute('data-comp-id') ? compIdWgt.getAttribute('data-comp-id') : 1;
+            }
 
             return new Promise(function(resolve) {
                 resolve({
                     results: {
                         id: 0,
+                        metadata: [{
+                            metakey: that.competencyKey,
+                            metavalue: compId
+                        }],
                         aggregation:{
                             method: 1,
                             reqitems: 1

@@ -49,6 +49,14 @@ class external extends \external_api {
     public static function get_detail_returns() {
         return new \external_single_structure(
             [
+                'metadata' => new \external_multiple_structure(
+                    new \external_single_structure(
+                        [
+                            'metakey' => new \external_value(PARAM_TEXT, 'Metadata key'),
+                            'metavalue' => new \external_value(PARAM_TEXT, 'Metadata value'),
+                        ]),
+                    'Child competency metadata'
+                ),
                 'aggregation' => new \external_single_structure(
                     [
                         'method' => new \external_value(PARAM_INT, 'Aggregation method'),

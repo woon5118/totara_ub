@@ -109,6 +109,7 @@ class default_criteria_on_install extends adhoc_task {
             }
 
             $linkedcourses = new linkedcourses();
+            $linkedcourses->set_competency_id($competency->id);
             $linkedcourses->set_aggregation_method($criterion_aggregation_method);
 
             $group1 = new criteria_group();
@@ -119,6 +120,7 @@ class default_criteria_on_install extends adhoc_task {
 
             $childcompetencies = new childcompetency();
             $childcompetencies->set_aggregation_method($criterion_aggregation_method);
+            $childcompetencies->set_competency_id($competency->id);
 
             $group2 = new criteria_group();
             $group2->set_competency($competency);

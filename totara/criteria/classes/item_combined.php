@@ -46,7 +46,7 @@ abstract class item_combined {
         $this->mark_temp_users_updated($criterion->get_id(), $last_evaluated);
 
         $criterion->set_last_evaluated($now)
-            ->save_last_evalated();
+            ->save_last_evaluated();
     }
 
     abstract protected function update_criterion_completion(criterion $criterion);

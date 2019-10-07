@@ -34,7 +34,7 @@ class criteria_onactivate_display_testcase extends \advanced_testcase {
         /** @var totara_competency_generator $competency_generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
-        $cc = $generator->create_onactivate();
+        $cc = $generator->create_onactivate(['competency' => 1]);
         $display_configuration = (new onactivate_display($cc))->get_configuration();
 
         $expected = (object)[

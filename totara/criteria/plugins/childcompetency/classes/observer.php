@@ -35,7 +35,7 @@ use totara_competency\pathway;
 class observer {
 
     public static function competency_created(competency_created $event) {
-        // Update the items fpr the new competency's parent
+        // Update the items for the new competency's parent
         $competency = new competency($event->objectid);
         if (!empty($competency->parentid)) {
             items_processor::update_items($competency->parentid);

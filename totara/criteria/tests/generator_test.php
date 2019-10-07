@@ -22,9 +22,11 @@
  * @package totara_criteria
  */
 
+use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
+use totara_competency\linked_courses;
 use totara_criteria\criterion;
 
 class totara_criteria_generator_testcase extends \advanced_testcase {
@@ -53,6 +55,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
     public function test_coursecompletion_generator_all_single_course() {
         $data = $this->setup_data();
 
+        /** @var \totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $record = ['courseids' => [$data->courses[1]->id]];
@@ -67,6 +70,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
     public function test_coursecompletion_generator_all_multi_courses() {
         $data = $this->setup_data();
 
+        /** @var \totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $record = [
@@ -85,6 +89,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
     public function test_coursecompletion_generator_any_multi_courses() {
         $data = $this->setup_data();
 
+        /** @var \totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $record = [
@@ -104,15 +109,17 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
      * Test linkedcourses generator defaults
      */
     public function test_linkedcourses_generator_defaults() {
+        /** @var \totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
-        $lc = $generator->create_linkedcourses();
+        $lc = $generator->create_linkedcourses(['competency' => 1]);
 
         $record = [
             'aggregation' => [
                 'method' => criterion::AGGREGATE_ALL,
                 'req_items' => 1,
             ],
+            'competency' => 1,
         ];
 
         $this->validate_linkedcourses($lc, $record);
@@ -122,6 +129,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
      * Test linkedcourses generator requiring all mandatory linked courses
      */
     public function test_linkedcourses_generator_all_mandatory() {
+        /** @var \totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $record = [
@@ -129,10 +137,10 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 'method' => criterion::AGGREGATE_ALL,
                 'req_items' => 1,
             ],
+            'competency' => 1,
         ];
 
         $lc = $generator->create_linkedcourses($record);
-
         $this->validate_linkedcourses($lc, $record);
     }
 
@@ -140,6 +148,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
      * Test linkedcourses generator requiring some linked courses
      */
     public function test_linkedcourses_generator_some() {
+        /** @var \totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $record = [
@@ -147,9 +156,50 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 'method' => criterion::AGGREGATE_ANY_N,
                 'req_items' => 2,
             ],
+            'competency' => 1,
         ];
 
         $lc = $generator->create_linkedcourses($record);
+
+        $this->validate_linkedcourses($lc, $record);
+    }
+
+
+    /**
+     * Test linkedcourses generator with courses linked to the competency
+     */
+    public function test_linkedcourses_generator_with_courses() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/plan/lib.php');
+
+        /** @var \totara_competency_generator $comp_generator */
+        $comp_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $comp = $comp_generator->create_competency();
+
+        linked_courses::set_linked_courses($comp->id, [
+            ['id' => 1001, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ['id' => 1002, 'linktype' => linked_courses::LINKTYPE_OPTIONAL],
+            ['id' => 1003, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+        ]);
+
+        /** @var \totara_criteria_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $record = [
+            'aggregation' => [
+                'method' => criterion::AGGREGATE_ANY_N,
+                'req_items' => 2,
+            ],
+            'competency' => $comp->id,
+        ];
+
+        $lc = $generator->create_linkedcourses($record);
+
+        $record['items'] = [
+            ['item_type' => 'course', 'item_id' => 1001],
+            ['item_type' => 'course', 'item_id' => 1002],
+            ['item_type' => 'course', 'item_id' => 1003],
+        ];
 
         $this->validate_linkedcourses($lc, $record);
     }
@@ -159,10 +209,9 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
      * Test onactivate generator
      */
     public function test_onactivate_generator() {
+        /** @var \totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-
-        $oa = $generator->create_onactivate();
-
+        $oa = $generator->create_onactivate(['competency' => 1]);
         $this->validate_onactivate($oa);
     }
 
@@ -171,15 +220,17 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
      * Test childcompetency generator defaults
      */
     public function test_childcompetency_generator_defaults() {
+        /** @var \totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
-        $cc = $generator->create_childcompetency();
+        $cc = $generator->create_childcompetency(['competency' => 1]);
 
         $record = [
             'aggregation' => [
                 'method' => criterion::AGGREGATE_ALL,
                 'req_items' => 1,
             ],
+            'competency' => 1,
         ];
 
         $this->validate_childcompetency($cc, $record);
@@ -189,6 +240,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
      * Test childcompetency generator requiring all child competencies
      */
     public function test_childcompetency_generator_all_mandatory() {
+        /** @var \totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $record = [
@@ -196,6 +248,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 'method' => criterion::AGGREGATE_ALL,
                 'req_items' => 1,
             ],
+            'competency' => 12,
         ];
 
         $cc = $generator->create_childcompetency($record);
@@ -207,6 +260,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
      * Test childcompetency generator requiring some child competencies
      */
     public function test_childcompetency_generator_some() {
+        /** @var \totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $record = [
@@ -214,12 +268,48 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 'method' => criterion::AGGREGATE_ANY_N,
                 'req_items' => 2,
             ],
+            'competency' => 123,
         ];
 
         $cc = $generator->create_childcompetency($record);
 
         $this->validate_childcompetency($cc, $record);
     }
+
+    /**
+     * Test childcompetency generator with existing child competencies
+     */
+    public function test_childcompetency_generator_with_children() {
+        /** @var \totara_competency_generator $comp_generator */
+        $comp_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
+        $parent_comp = $comp_generator->create_competency();
+        $child_comp = [];
+        foreach ([1, 2] as $child) {
+            $child_comp[$child] = $comp_generator->create_competency(null, null, null, ['parentid' => $parent_comp->id]);
+        }
+
+        /** @var \totara_criteria_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $record = [
+            'aggregation' => [
+                'method' => criterion::AGGREGATE_ANY_N,
+                'req_items' => 2,
+            ],
+            'competency' => $parent_comp->id,
+        ];
+
+        $cc = $generator->create_childcompetency($record);
+
+        $record['items'] = [
+            ['item_type' => 'competency', 'item_id' => $child_comp[1]->id],
+            ['item_type' => 'competency', 'item_id' => $child_comp[2]->id],
+        ];
+
+        $this->validate_childcompetency($cc, $record);
+    }
+
 
 
 
@@ -278,6 +368,17 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 $this->assertEquals(['req_items' => $record['aggregation']['req_items']], $lc->get_aggregation_params());
             }
         }
+
+        // Linked type
+        $rows = $DB->get_records('totara_criteria_metadata');
+        $this->assertEquals(1, count($rows));
+
+        $metadata = $lc->get_metadata();
+        $this->assertEquals($record['competency'], $metadata[criterion::METADATA_COMPETENCY_KEY]);
+
+        if (isset($record['items'])) {
+            $this->validate_items($record['items']);
+        }
     }
 
     /**
@@ -288,10 +389,12 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
     private function validate_onactivate(onactivate $oa) {
         global $DB;
 
-        $rows = $DB->get_records('totara_criteria');
-        $this->assertEquals(1, count($rows));
-        $row = reset($rows);
+        $row = $DB->get_record('totara_criteria', []);
         $this->assertEquals($oa->get_id(), $row->id);
+
+        $row = $DB->get_record('totara_criteria_item', []);
+        $this->assertEquals('onactivate', $row->item_type);
+        $this->assertEquals($oa->get_competency_id(), $row->item_id);
     }
 
     /**
@@ -303,9 +406,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
     private function validate_childcompetency(\criteria_childcompetency\childcompetency $cc, array $record) {
         global $DB;
 
-        $rows = $DB->get_records('totara_criteria');
-        $this->assertEquals(1, count($rows));
-        $row = reset($rows);
+        $row = $DB->get_record('totara_criteria', []);
         $this->assertEquals($cc->get_id(), $row->id);
 
         // Aggregation
@@ -316,6 +417,37 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 $this->assertEquals(['req_items' => $record['aggregation']['req_items']], $cc->get_aggregation_params());
             }
         }
+
+        // Competency
+        $row = $DB->get_record('totara_criteria_metadata', []);
+
+        $metadata = $cc->get_metadata();
+        $this->assertEquals($record['competency'], $metadata[criterion::METADATA_COMPETENCY_KEY]);
+
+        // Items
+        if (isset($record['items'])) {
+            $this->validate_items($record['items']);
+        }
     }
 
+    /**
+     * Validate that the expected records were created in totara_criteria_item
+     *
+     * @param array $expected_items
+     */
+    private function validate_items(array $expected_items) {
+        global $DB;
+
+        $item_rows = $DB->get_records('totara_criteria_item');
+        $this->assertEquals(count($expected_items), count($item_rows));
+        foreach ($item_rows as $row) {
+            foreach ($expected_items as $key => $expected) {
+                if ($row->item_type == $expected['item_type'] && $row->item_id == $expected['item_id']) {
+                    unset($expected_items[$key]);
+                    break;
+                }
+            }
+        }
+        $this->assertEmpty($expected_items);
+    }
 }

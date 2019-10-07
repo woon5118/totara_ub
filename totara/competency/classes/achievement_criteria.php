@@ -61,9 +61,10 @@ class achievement_criteria {
      * Returned structure same as for competency specific pathways
      *
      * @param scale $scale Scale containing the default value and lowest proficient value
+     * @param int $comp_id Competency id
      * @return array of pathways
      */
-    public static function get_default_pathways(scale $scale): array {
+    public static function get_default_pathways(scale $scale, ?int $comp_id = null): array {
 
         // Manager rating
         // Self rating
@@ -106,6 +107,9 @@ class achievement_criteria {
 
         $crit = new linkedcourses();
         $crit->set_aggregation_method(criterion::AGGREGATE_ALL);
+        if (!is_null($comp_id)) {
+            $crit->set_competency_id($comp_id);
+        }
 
         $pw = new criteria_group();
         $pw->set_sortorder(3)
@@ -114,6 +118,10 @@ class achievement_criteria {
         $pathways[] = $pw;
 
         $crit = new onactivate();
+        if (!is_null($comp_id)) {
+            $crit->set_competency_id($comp_id);
+        }
+
         $pw = new criteria_group();
         $pw->set_sortorder(4)
             ->set_scale_value(new scale_value($scale->get_attribute('defaultid')))

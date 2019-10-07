@@ -22,6 +22,7 @@
  */
 
 use criteria_childcompetency\childcompetency;
+use totara_criteria\criterion;
 
 class criteria_childcompetency_testcase extends \advanced_testcase {
 
@@ -34,6 +35,8 @@ class criteria_childcompetency_testcase extends \advanced_testcase {
         $data = new class() {
             /** @var [\stdClass] instancerows */
             public $instancerows = [];
+            /** @var [\stdClass] metadatarows */
+            public $metadatarows = [];
         };
 
         $tests = [
@@ -57,9 +60,18 @@ class criteria_childcompetency_testcase extends \advanced_testcase {
             // First the criterion
             $tst['criterion_modified'] = time();
             $criterion_id = $DB->insert_record('totara_criteria', $tst, true, false);
-        }
+            $data->instancerows[$criterion_id] = $DB->get_record('totara_criteria', ['id' => $criterion_id]);
 
-        $data->instancerows = $DB->get_records('totara_criteria', ['plugin_type' => 'childcompetency']);
+            // Then the metadata
+            $tst_metadata = [
+                'criterion_id' => $criterion_id,
+                'metakey' => criterion::METADATA_COMPETENCY_KEY,
+                'metavalue' => 23,
+            ];
+            $DB->insert_record('totara_criteria_metadata', $tst_metadata);
+
+            $data->metadatarows[$criterion_id] = $DB->get_records('totara_criteria_metadata', ['criterion_id' => $criterion_id]);
+        }
 
         return $data;
     }
@@ -82,7 +94,7 @@ class criteria_childcompetency_testcase extends \advanced_testcase {
         $this->assertEqualsCanonicalizing($expected->metadata ?? [], $actual->get_metadata());
     }
 
-     /**
+    /**
      * Test constructor without attributes
      */
     public function test_constructor_no_attributes() {
@@ -110,6 +122,7 @@ class criteria_childcompetency_testcase extends \advanced_testcase {
                 'plugin_type' => 'childcompetency',
                 'aggregation_method' => $row->aggregation_method,
                 'aggregation_params' => json_decode($row->aggregation_params, true) ?? [],
+                'metadata' => ['compid' => 23],
             ];
 
             $cc = childcompetency::fetch($row->id);
@@ -156,13 +169,11 @@ class criteria_childcompetency_testcase extends \advanced_testcase {
         foreach ($data->instancerows as $id => $row) {
             $expected = $row;
             $expected->items = [];
-            $expected->metadata = [];
+            $expected->metadata = $data->metadatarows[$row->id];
 
             $actual = childcompetency::dump_criterion_configuration($id);
             $this->assertEqualsCanonicalizing($expected, $actual);
         }
    }
 
-
-    // TODO: test aggregate
 }

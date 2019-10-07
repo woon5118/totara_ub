@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,9 @@ use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
+use totara_competency\plugintypes;
 use totara_criteria\criterion;
+use totara_criteria\criterion_factory;
 
 /**
  * Coursecompletion criterion generator.
@@ -74,7 +76,8 @@ class totara_criteria_generator extends component_generator_base {
      *      'aggregation' => [
      *          'method' => criterion::AGGREGATE_ALL, // Optional Aggregation method - defaults to ALL
      *          'req_items' => 1, // Optional number of required items. Only used with AGGREGATE_ANY_N. Defaults to 1
-     *      ]
+     *      ],
+     *      'competency' => 1,   // Id of competency whose child competencies should be achieved
      *  ]
      *
      * @param array $data Criterion data
@@ -87,6 +90,11 @@ class totara_criteria_generator extends component_generator_base {
         $instance->set_aggregation_method($data['aggregation']['method'] ?? criterion::AGGREGATE_ALL);
         $instance->set_aggregation_params(['req_items' => $data['aggregation']['req_items'] ?? 1]);
 
+        if (!empty($data['competency'])) {
+            $instance->set_competency_id($data['competency']);
+        }
+
+        $instance->update_items();
         $instance->save();
 
         // Re-read the instance to ensure all default values are also set
@@ -96,11 +104,20 @@ class totara_criteria_generator extends component_generator_base {
     /**
      * Create an onactivate criterion
      *
+     *  Data
+     *  [
+     *      'competency' => 1,   // Id of competency whose child competencies should be achieved
+     *  ]
+     *
      * @return criterion
      */
-    public function create_onactivate() {
+    public function create_onactivate(array $data = []) {
         $instance = new onactivate();
+        if (!empty($data['competency'])) {
+            $instance->set_competency_id($data['competency']);
+        }
 
+        $instance->update_items();
         $instance->save();
 
         // Re-read the instance to ensure all default values are also set
@@ -115,7 +132,8 @@ class totara_criteria_generator extends component_generator_base {
      *      'aggregation' => [
      *          'method' => criterion::AGGREGATE_ALL, // Optional Aggregation method - defaults to ALL
      *          'req_items' => 1, // Optional number of required items. Only used with AGGREGATE_ANY_N. Defaults to 1
-     *      ]
+     *      ],
+     *      'competency' => 1,   // Id of competency whose child competencies should be achieved
      *  ]
      *
      * @param array $data Criterion data
@@ -128,46 +146,62 @@ class totara_criteria_generator extends component_generator_base {
         $instance->set_aggregation_method($data['aggregation']['method'] ?? criterion::AGGREGATE_ALL);
         $instance->set_aggregation_params(['req_items' => $data['aggregation']['req_items'] ?? 1]);
 
+        if (!empty($data['competency'])) {
+            $instance->set_competency_id($data['competency']);
+        }
+
+        $instance->update_items();
         $instance->save();
 
         // Re-read the instance to ensure all default values are also set
         return childcompetency::fetch($instance->get_id());
     }
 
-}
-
-class totara_criteria_test_item_evaluator {
-    use \totara_criteria\item_evaluator;
-
     /**
-     * @var int How many times this update_item_records method was called.
-     */
-    private static $called = 0;
-
-    /**
-     * The method you might be testing.
+     * Create a test criterion
      *
-     * We'll count how many times this is called.
-     *
-     * Please call the reset_times_called() method on this class at the end of the test.
+     * @return criterion
      */
-    public static function update_item_records() {
-        self::$called++;
-    }
-
-    /**
-     * The number of times that the update_item_records() method was called.
-     *
-     * @return int
-     */
-    public static function get_times_called(): int {
-        return self::$called;
-    }
-
-    /**
-     * Call this at the end of the test when using this class.
-     */
-    public static function reset_times_called() {
-        self::$called = 0;
+    public function create_test_criterion(string $plugin): criterion {
+        plugintypes::enable_plugin($plugin, 'criteria', 'totara_criteria');
+        $criterion = criterion_factory::create($plugin);
+        $criterion->update_items();
+        return $criterion;
     }
 }
+
+
+//class totara_criteria_test_item_evaluator extends item_evaluator {
+//
+//    /**
+//     * @var int How many times this update_item_records method was called.
+//     */
+//    private static $called = 0;
+//
+//    /**
+//     * The method you might be testing.
+//     *
+//     * We'll count how many times this is called.
+//     *
+//     * Please call the reset_times_called() method on this class at the end of the test.
+//     */
+//    public static function update_item_records() {
+//        self::$called++;
+//    }
+//
+//    /**
+//     * The number of times that the update_item_records() method was called.
+//     *
+//     * @return int
+//     */
+//    public static function get_times_called(): int {
+//        return self::$called;
+//    }
+//
+//    /**
+//     * Call this at the end of the test when using this class.
+//     */
+//    public static function reset_times_called() {
+//        self::$called = 0;
+//    }
+//}

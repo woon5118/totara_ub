@@ -227,7 +227,7 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         $config = $data->config;
 
         /** @var totara_competency_generator $competency_generator */
-        $def_pathways = achievement_criteria::get_default_pathways($competency->scale);
+        $def_pathways = achievement_criteria::get_default_pathways($competency->scale, $competency->id);
 
         $pathways = $config->get_active_pathways();
 

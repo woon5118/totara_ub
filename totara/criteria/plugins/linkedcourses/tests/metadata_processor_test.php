@@ -32,6 +32,7 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
 
     private function set_up_pathway_with_linked_courses_criteria($competency) {
         $linked_course_criterion = new linkedcourses();
+        $linked_course_criterion->set_competency_id($competency->id);
 
         $pathway = new criteria_group();
         $pathway->set_competency($competency);
@@ -68,6 +69,7 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
         $competency = new competency($comp->id);
 
         $linked_course_criterion = new linkedcourses();
+        $linked_course_criterion->set_competency_id($comp->id);
 
         $pathway = new criteria_group();
         $pathway->set_competency($competency);

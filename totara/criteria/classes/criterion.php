@@ -34,6 +34,8 @@ abstract class criterion {
     const AGGREGATE_ALL = 1;
     const AGGREGATE_ANY_N = 2;
 
+    const METADATA_COMPETENCY_KEY = 'compid';
+
     /** @var int $id */
     private $id;
 
@@ -83,6 +85,7 @@ abstract class criterion {
         $instance->set_id($id);
         $instance->set_aggregation_method($record->aggregation_method ?? static::AGGREGATE_ALL);
         $instance->set_aggregation_params($record->aggregation_params ?? []);
+        $instance->set_last_evaluated($record->last_evaluated);
 
         $instance->fetch_items();
         $instance->fetch_metadata();
@@ -147,6 +150,10 @@ abstract class criterion {
      * @return $this
      */
     public function set_aggregation_method(int $aggregation_method): criterion {
+        if (!in_array($aggregation_method, [static::AGGREGATE_ALL, static::AGGREGATE_ANY_N])) {
+            throw new \coding_exception('Invalid aggregation method used');
+        }
+
         $this->aggregation_method = $aggregation_method;
 
         return $this;
@@ -160,7 +167,7 @@ abstract class criterion {
      * @return array Aggregation parameters
      */
     public function get_aggregation_params(): array {
-        return $this->aggregation_params;
+        return $this->aggregation_params ?? [];
     }
 
     /**
@@ -300,6 +307,31 @@ abstract class criterion {
     }
 
     /**
+     * Set the associated competency
+     * @param int $competency_id
+     */
+    public function set_competency_id(int $competency_id): criterion {
+        $this->add_metadata([
+            (object)['metakey' => self::METADATA_COMPETENCY_KEY, 'metavalue' => $competency_id],
+        ]);
+        return $this;
+    }
+
+    /**
+     * Get the associated competency
+     * @return int?null
+     */
+    public function get_competency_id(): ?int {
+        foreach ($this->get_metadata() as $metakey => $metaval) {
+            if ($metakey == static::METADATA_COMPETENCY_KEY) {
+                return $metaval;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get last_evaluated
      *
      * @return ?int
@@ -311,9 +343,9 @@ abstract class criterion {
     /**
      * Set last_evaluated
      *
-     * @param int $last_evaluated
+     * @param int|null $last_evaluated
      */
-    public function set_last_evaluated(int $last_evaluated): criterion {
+    public function set_last_evaluated(?int $last_evaluated): criterion {
         $this->last_evaluated = $last_evaluated;
         return $this;
     }
@@ -465,12 +497,25 @@ abstract class criterion {
     }
 
     /**
+     * Validate the criterion attributes
+     * @return string|null Error description
+     */
+    protected function validate(): ?string {
+        return null;
+    }
+
+    /**
      * Save this criterion and all its items
      *
      * @return $this
      */
     public function save(): criterion {
         global $DB;
+
+        $err_message = $this->validate();
+        if (!is_null($err_message)) {
+            throw new \coding_exception($err_message);
+        }
 
         if (!$this->is_dirty()) {
             return $this;
@@ -487,6 +532,9 @@ abstract class criterion {
             $DB->update_record('totara_criteria', $record);
         } else {
             $this->set_id($DB->insert_record('totara_criteria', $record));
+            if (empty($this->item_ids)) {
+                $this->update_items();
+            }
         }
 
         $this->save_items();
@@ -513,6 +561,11 @@ abstract class criterion {
             $DB->delete_records_list('totara_criteria_item', 'id', $current_items);
         }
     }
+
+    /**
+     * Update derived items (e.g. currently linked courses, current child competencies, etc.)
+     */
+    abstract public function update_items(): criterion;
 
     /**
      * Save the metadata of this criterion
@@ -589,7 +642,7 @@ abstract class criterion {
      *
      * @return $this
      */
-    public function save_last_evalated(): criterion {
+    public function save_last_evaluated(): criterion {
         global $DB;
 
         // Not doing anything if not saved previously or last_evaluated not yet set

@@ -44,10 +44,12 @@ function(Loader) {
          */
         this.criterion = {
             type: 'onactivate',
+            metadata: [],
             id: 0,
         };
 
         this.criterionKey = '';
+        this.competencyKey = 'competency'; // Metadata key for competency id
     }
 
     CriterionOnActivate.prototype = {
@@ -63,16 +65,27 @@ function(Loader) {
 
         /**
          * Retrieve the criterion detail and bubble it up to the parent
-         * @return {Promis}
+         * As this criterion is linked to the competency, we use the competency id on the document instead of making an additional API call to get the detail
+         * @return {Promise}
          */
         getDetail: function() {
             var that = this,
-                criterionNode = this.widget.closest('[data-tw-criterion-key]');
+                criterionNode = this.widget.closest('[data-tw-criterion-key]'),
+                compIdNode = document.querySelector('[data-comp-id]'),
+                compId = 1;
 
             return new Promise(function(resolve) {
                 if (criterionNode) {
                     that.criterionKey = criterionNode.hasAttribute('data-tw-criterion-key') ? criterionNode.getAttribute('data-tw-criterion-key') : 0;
                     that.criterion.id = criterionNode.hasAttribute('data-tw-criterion-id') ? criterionNode.getAttribute('data-tw-criterion-id') : 0;
+                }
+
+                if (compIdNode) {
+                    compId = compIdNode.getAttribute('data-comp-id') ? compIdNode.getAttribute('data-comp-id') : 1;
+                    that.criterion.metadata = [{
+                        metakey: that.competencyKey,
+                        metavalue: compId
+                    }];
                 }
 
                 that.triggerEvent('update', {criterion: that.criterion});

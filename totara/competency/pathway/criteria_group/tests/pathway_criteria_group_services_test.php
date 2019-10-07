@@ -168,8 +168,8 @@ if ($error) {
                     'id' => 0,
                     'metadata' => [
                         [
-                            'metakey' => "linktype",
-                            'metavalue' => "2"
+                            'metakey' => "compid",
+                            'metavalue' => $data->comp->id,
                         ],
                     ],
                     'type' => "linkedcourses",

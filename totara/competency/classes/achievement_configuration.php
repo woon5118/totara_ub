@@ -175,7 +175,7 @@ class achievement_configuration {
 
         $transaction = $DB->start_delegated_transaction();
 
-        $pathways = achievement_criteria::get_default_pathways($this->get_competency()->scale);
+        $pathways = achievement_criteria::get_default_pathways($this->get_competency()->scale, $this->get_competency()->id);
         foreach ($pathways as $pw) {
             $pw->set_competency($this->competency);
             $pw->set_status(pathway::PATHWAY_STATUS_ACTIVE);

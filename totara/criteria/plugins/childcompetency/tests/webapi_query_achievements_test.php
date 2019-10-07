@@ -303,13 +303,6 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
     }
 
     public function create_data() {
-        // Create child competency criterion
-        $criterion = $this->generator()->create_childcompetency([
-            'aggregation' => [
-                'method' => criterion::AGGREGATE_ALL,
-            ],
-        ]);
-
         $competencies = [];
         $assignments = [];
 
@@ -327,6 +320,15 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
 
         $competencies[] = $this->assignment_generator()->create_competency(['parentid' => $competencies[1]->id], $competencies[0]->frameworkid);
         $competencies[] = $this->assignment_generator()->create_competency();
+
+        // Create child competency criterion
+        $criterion = $this->generator()->create_childcompetency([
+            'aggregation' => [
+                'method' => criterion::AGGREGATE_ALL,
+            ],
+            'competency' => $competencies[0]->id,
+        ]);
+
 
         $user = $this->getDataGenerator()->create_user();
 

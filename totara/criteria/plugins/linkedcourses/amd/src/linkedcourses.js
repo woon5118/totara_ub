@@ -49,6 +49,7 @@ function(ajax, notification, Loader) {
         };
 
         this.criterionKey = '';  // Unique key to use in bubbled event
+        this.competencyKey = 'compid'; // Metadata key for competency id
 
         this.endpoints = {
             detail: 'criteria_linkedcourses_get_detail',
@@ -168,13 +169,24 @@ function(ajax, notification, Loader) {
          * @return {Promise}
          */
         createEmptyCriterion: function() {
-            var that = this;
+            var that = this,
+                compIdWgt = document.querySelector('[data-comp-id]'),
+                compId = 1;
+
+            if (compIdWgt) {
+                compId = compIdWgt.getAttribute('data-comp-id') ? compIdWgt.getAttribute('data-comp-id') : 1;
+            }
 
             return new Promise(function(resolve) {
                 resolve({
                     results: {
                         id: 0,
-                        metadata: [],
+                        metadata: [
+                            {
+                                metakey: that.competencyKey,
+                                metavalue: compId
+                            }
+                        ],
                         aggregation:{
                             method: 1,
                             reqitems: 1

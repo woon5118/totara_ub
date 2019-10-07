@@ -65,7 +65,7 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
             $data->competencies[$compname] = $competency_generator->create_competency($compname, null, null, $comp_record);
 
             if (isset($compdata['with_criteria']) && $compdata['with_criteria']) {
-                $cc = $criteria_generator->create_childcompetency();
+                $cc = $criteria_generator->create_childcompetency(['competency' => $data->competencies[$compname]->id]);
 
                 $cg_record = [
                     'comp_id' => $data->competencies[$compname]->id,
@@ -192,14 +192,20 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
                JOIN {totara_criteria} tc
                  ON tc.id = pcgc.criterion_id
                 AND tc.plugin_type = pcgc.criterion_type
-              WHERE pw.comp_id = :compid
+               JOIN {totara_criteria_metadata} tcm
+                 ON tcm.criterion_id = tc.id
+                AND tcm.metakey = :metakey
+                AND tcm.metavalue = :compid
+              WHERE pw.comp_id = :compid2
                 AND pw.path_type = :pathtype
                 AND status = :activestatus";
         $params = [
             'compid' => $comp_id,
+            'compid2' => $comp_id,
             'pathtype' => 'criteria_group',
             'activestatus' => pathway::PATHWAY_STATUS_ACTIVE,
             'criteriontype' => 'childcompetency',
+            'metakey' => criterion::METADATA_COMPETENCY_KEY,
         ];
 
         $rows = $DB->get_records_sql($sql, $params);
@@ -207,6 +213,8 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
     }
 
     private function build_items_sql(int $comp_id): array {
+        global $DB;
+
         $sql =
             "SELECT tci.id,
                     tci.item_id

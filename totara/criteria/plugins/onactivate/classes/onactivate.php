@@ -23,6 +23,7 @@
 
 namespace criteria_onactivate;
 
+use totara_criteria\assignment_item_evaluator;
 use totara_criteria\criterion;
 
 /**
@@ -35,7 +36,7 @@ class onactivate extends criterion {
      * V1 - Assuming that a criterion can only store items of a single type
      */
     protected function get_items_type() {
-        return '';
+        return 'onactivate';
     }
 
     /**
@@ -57,15 +58,6 @@ class onactivate extends criterion {
     }
 
     /**
-     * Does this criterion have associated metadata
-     *
-     * @return bool
-     */
-    public function has_metadata(): bool {
-        return false;
-    }
-
-    /**
      * Is this a single-use criterion type
      *
      * @return bool
@@ -83,13 +75,49 @@ class onactivate extends criterion {
         return onactivate_display::class;
     }
 
+    /*******************************************************************************************************
+     * Retrieve and Save
+     *******************************************************************************************************/
+
+    /**
+     * Validate the criterion attributes
+     * onactivate criteria should contain the competency metadata
+     * @return string|null Error description
+     */
+    protected function validate(): ?string {
+        foreach ($this->get_metadata() as $metakey => $metaval) {
+            if ($metakey == criterion::METADATA_COMPETENCY_KEY && !empty($metaval)) {
+                return null;
+            }
+        }
+
+        return 'Competency id metadata is required in onactivate criteria';
+    }
+
+    /**
+     * Update derived items
+     * We create a single item with the competency_id as item_id to allow for the rest of the process
+     * to work in the same manner as all other plugins
+     */
+    public function update_items(): criterion {
+        global $DB;
+
+        $comp_id = $this->get_competency_id();
+        if (is_null($comp_id)) {
+            throw new \coding_exception('Competency id must be set before items are updated');
+        }
+
+        $this->set_item_ids([$comp_id]);
+
+        return $this;
+    }
+
 
     /************************************************************************************
      * Evaluation
      ************************************************************************************/
 
     public static function item_evaluator(): string {
-        // Todo
         return '';
     }
 
@@ -114,6 +142,7 @@ class onactivate extends criterion {
      * @return string View template's name
      */
     public function get_view_template(): string {
-        return 'criteria_onactivate/onactivate';
+        // Todo
+        return '';
     }
 }

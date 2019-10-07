@@ -46,31 +46,30 @@ class metadata_processor {
         $competency_params = [];
 
         if (!is_null($competency_id)) {
-            $competency_where = ' AND cp.comp_id = :comp_id';
+            $competency_where = ' AND tcm_comp.metavalue = :comp_id';
             $competency_params = ['comp_id' => $competency_id];
         }
 
         // Although we need to perform the actions per competency,
         // not doing an order on the query but rather in code to keep the query as
         // inexpensive as possible
+        // Although we need to perform the actions per competency,
+        // not doing an order on the query but rather in code to keep the query as
+        // inexpensive as possible
         $select_criteria_sql =
-            "SELECT pcgc.criterion_id AS criterion_id,
-                    cp.comp_id AS comp_id
-               FROM {pathway_criteria_group_criterion} pcgc
-               JOIN {pathway_criteria_group} pcg
-                 ON pcg.id = pcgc.criteria_group_id
-               JOIN {totara_competency_pathway} cp
-                 ON cp.path_instance_id = pcg.id
-                AND cp.path_type = :path_type
-                AND cp.status = :path_status
+            "SELECT tc.id AS criterion_id,
+                    tcm_comp.metavalue AS comp_id
+               FROM {totara_criteria} tc
+               JOIN {totara_criteria_metadata} tcm_comp
+                 ON tc.id = tcm_comp.criterion_id
+                AND tcm_comp.metakey = :compkey
                     $competency_where
-              WHERE pcgc.criterion_type = :plugintype";
+              WHERE tc.plugin_type = :plugintype";
         $select_criteria_params = array_merge(
             $competency_params,
             [
-                'path_type' => 'criteria_group',
-                'path_status' => pathway::PATHWAY_STATUS_ACTIVE,
                 'plugintype' => 'linkedcourses',
+                'compkey' => criterion::METADATA_COMPETENCY_KEY,
             ]
         );
 

@@ -36,21 +36,31 @@ class criteria_onactivate_testcase extends \advanced_testcase {
         $data = new class() {
             /** @var [\stdClass] instancerows */
             public $instancerows = [];
+            /** @var [\stdClass] metadatarows */
+            public $metadatarows = [];
         };
 
         $records = [];
         for ($i = 0; $i < 3; $i++) {
-            $records[] = [
+            $record = [
                 'plugin_type' => 'onactivate',
                 'aggregation_method' => criterion::AGGREGATE_ALL,
                 'criterion_modified' => time()
             ];
+
+            $criterion_id = $DB->insert_record('totara_criteria', $record, true, false);
+            $data->instancerows[$criterion_id] = $DB->get_record('totara_criteria', ['id' => $criterion_id]);
+
+            // Then the metadata
+            $tst_metadata = [
+                'criterion_id' => $criterion_id,
+                'metakey' => criterion::METADATA_COMPETENCY_KEY,
+                'metavalue' => 45,
+            ];
+            $DB->insert_record('totara_criteria_metadata', $tst_metadata);
+
+            $data->metadatarows[$criterion_id] = $DB->get_records('totara_criteria_metadata', ['criterion_id' => $criterion_id]);
         }
-
-        $DB->insert_records('totara_criteria', $records);
-        $data->instancerows = $DB->get_records('totara_criteria', ['plugin_type' => 'onactivate']);
-
-        $this->assertSame(3, count($data->instancerows));
 
         return $data;
     }
@@ -107,7 +117,7 @@ class criteria_onactivate_testcase extends \advanced_testcase {
                 'aggregation_params' => [],
                 'items_type' => '',
                 'item_ids' => [],
-                'metadata' => [],
+                'metadata' => ['compid' => 45],
             ];
 
             $cc = onactivate::fetch($row->id);
@@ -138,6 +148,10 @@ class criteria_onactivate_testcase extends \advanced_testcase {
 
         $row = $DB->get_record('totara_criteria', ['id' => $id]);
         $this->assertFalse($row);
+        $rows = $DB->get_records('totara_criteria_item', ['criterion_id' => $id]);
+        $this->assertSame(0, count($rows));
+        $rows = $DB->get_records('totara_criteria_metadata', ['criterion_id' => $id]);
+        $this->assertSame(0, count($rows));
     }
 
     /**
@@ -150,13 +164,11 @@ class criteria_onactivate_testcase extends \advanced_testcase {
         foreach ($data->instancerows as $id => $row) {
             $expected = $row;
             $expected->items = [];
-            $expected->metadata = [];
+            $expected->metadata = $data->metadatarows[$row->id];
 
             $actual = onactivate::dump_criterion_configuration($id);
             $this->assertEqualsCanonicalizing($expected, $actual);
         }
    }
 
-
-    // TODO: test aggregate
 }

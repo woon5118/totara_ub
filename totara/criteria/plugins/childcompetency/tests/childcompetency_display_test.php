@@ -38,6 +38,7 @@ class criteria_childcompetency_display_testcase extends \advanced_testcase {
             'aggregation' => [
                 'method' => criterion::AGGREGATE_ALL,
             ],
+            'competency' => 1,
         ];
 
         $cc = $generator->create_childcompetency($record);
@@ -65,6 +66,7 @@ class criteria_childcompetency_display_testcase extends \advanced_testcase {
                 'method' => criterion::AGGREGATE_ANY_N,
                 'req_items' => 3,
             ],
+            'competency' => 1,
         ];
 
         $cc = $generator->create_childcompetency($record);

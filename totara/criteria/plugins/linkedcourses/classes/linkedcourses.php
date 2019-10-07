@@ -38,7 +38,7 @@ class linkedcourses extends criterion {
      * Get the type of items stored in this criterion
      */
     protected function get_items_type() {
-        return '';
+        return 'course';
     }
 
     /**
@@ -58,6 +58,47 @@ class linkedcourses extends criterion {
     protected function get_display_class(): string {
         return linkedcourses_display::class;
     }
+
+    /*******************************************************************************************************
+     * Retrieve and Save
+     *******************************************************************************************************/
+
+    /**
+     * Validate the criterion attributes
+     * linkedcourse criteria should contain the competency metadata
+     * @return string|null Error description
+     */
+    protected function validate(): ?string {
+        foreach ($this->get_metadata() as $metakey => $metaval) {
+            if ($metakey == criterion::METADATA_COMPETENCY_KEY && !empty($metaval)) {
+                return null;
+            }
+        }
+
+        return 'Competency id metadata is required in linkedcourses criteria';
+    }
+
+    /**
+     * Update derived items
+     * An item is added for each currently linked course - This is in anticipation of merging of TL-22455
+     */
+    public function update_items(): criterion {
+        global $DB;
+
+        $comp_id = $this->get_competency_id();
+        if (is_null($comp_id)) {
+            throw new \coding_exception('Competency id must be set before items are updated');
+        }
+
+        $linked_courses = $DB->get_fieldset_select('comp_criteria',
+            'iteminstance',
+            'competencyid = :compid AND itemtype = :itemtype',
+            ['compid' => $comp_id, 'itemtype' => 'coursecompletion']);
+        $this->set_item_ids($linked_courses);
+
+        return $this;
+    }
+
 
     /************************************************************************************
      * Evaluation

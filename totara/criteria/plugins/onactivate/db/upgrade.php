@@ -34,5 +34,39 @@ function xmldb_criteria_onactivate_upgrade($oldversion) {
 
     // Totara 13 branching line.
 
+    if ($oldversion < 2019100201) {
+        global $DB;
+
+        // We now store the competency id in metadata - updating existing data
+        $sql =
+            "INSERT INTO {totara_criteria_metadata}
+             (criterion_id, metakey, metavalue)
+             SELECT tc.id, :metadatakey, tcp.comp_id
+               FROM {totara_criteria} tc
+               JOIN {pathway_criteria_group_criterion} pcgc
+                 ON pcgc.criterion_type = tc.plugin_type
+                AND pcgc.criterion_id = tc.id
+               JOIN {totara_competency_pathway} tcp
+                 ON tcp.path_type = :pathtype
+                AND tcp.path_instance_id = pcgc.criteria_group_id
+              WHERE tc.plugin_type = :criteriatype
+                AND tc.id NOT IN (
+                    SELECT criterion_id
+                      FROM {totara_criteria_metadata}
+                     WHERE metakey = :metadatakey2 
+                )";
+        $params = [
+            'metadatakey' => \totara_criteria\criterion::METADATA_COMPETENCY_KEY,
+            'pathtype' => 'criteria_group',
+            'criteriatype' => 'onactivate',
+            'metadatakey2' => \totara_criteria\criterion::METADATA_COMPETENCY_KEY,
+        ];
+
+        $DB->execute($sql, $params);
+
+        // Assign savepoint reached.
+        upgrade_plugin_savepoint(true, 2019100201, 'criteria', 'onactivate');
+    }
+
     return true;
 }

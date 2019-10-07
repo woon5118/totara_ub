@@ -40,7 +40,9 @@ class criteria_linkedcourses_webapi_query_achievements_testcase extends totara_c
      * @return criterion
      */
     public function get_criterion(): criterion {
-        return new linkedcourses();
+        $lc = new linkedcourses();
+        $lc->set_competency_id(1);
+        return $lc;
     }
 
     /**

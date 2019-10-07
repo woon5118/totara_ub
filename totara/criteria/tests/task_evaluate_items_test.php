@@ -38,6 +38,7 @@ class totara_criteria_task_evaluate_items_testcase extends advanced_testcase {
     }
 
     public function test_one_enabled_plugins() {
+        $this->markTestSkipped('Task to be deleted');
         $task = new evaluate_items();
 
         // To load the totara_criteria_test_item_evaluator class.
@@ -54,6 +55,7 @@ class totara_criteria_task_evaluate_items_testcase extends advanced_testcase {
     }
 
     public function test_duplicate_item_evaluators() {
+        $this->markTestSkipped('Task to be deleted');
         $task = new evaluate_items();
 
         // To load the totara_criteria_test_item_evaluator class.
@@ -74,6 +76,7 @@ class totara_criteria_task_evaluate_items_testcase extends advanced_testcase {
     }
 
     public function test_different_item_evaluators() {
+        $this->markTestSkipped('Task to be deleted');
         $task = new evaluate_items();
 
         // To load the totara_criteria_test_item_evaluator class.

@@ -28,14 +28,15 @@ use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\pathway;
+use totara_criteria\criterion;
 
 class items_processor {
 
     /**
-     * Update the criterion items so that a criterion_item exists for each direct child competency of the pathway's
+     * Update the criterion items so that a criterion_item exist for each direct child competency of the appicable
      * competency
      *
-     * @param ?int $competency_id If null, update items for all competencies with childcompetency criteria
+     * @param int $competency_id If null, update items for all competencies with childcompetency criteria
      */
     public static function update_items(?int $competency_id = null) {
         global $DB;
@@ -45,38 +46,32 @@ class items_processor {
         $competency_params = [];
 
         if (!is_null($competency_id)) {
-            $competency_where = ' AND cp.comp_id = :comp_id';
+            $competency_where = ' AND tcm.metavalue = :comp_id';
             $competency_params = ['comp_id' => $competency_id];
         }
+
+        $sql =
+            "SELECT tc.id, 
+                    tcm.metavalue as comp_id
+               FROM {totara_criteria} tc 
+               JOIN {totara_criteria_metadata} tcm 
+                 ON tcm.criterion_id = tc.id 
+                AND tcm.metakey = :metakey
+              WHERE tc.plugin_type = :plugintype
+                    $competency_where";
 
         // Although we need to perform the actions per competency,
         // not doing an order by on the query but rather in code to
         // keep the query as inexpensive as possible
-        $sql =
-            "SELECT pcgc.criterion_id,
-                    cp.comp_id
-               FROM {pathway_criteria_group_criterion} pcgc
-               JOIN {pathway_criteria_group} pcg
-                 ON pcg.id = pcgc.criteria_group_id
-               JOIN {totara_competency_pathway} cp
-                 ON cp.path_instance_id = pcg.id
-                AND cp.path_type = :path_type
-                AND cp.status = :path_status
-                    $competency_where
-              WHERE pcgc.criterion_type = :plugintype";
         $params = array_merge(
             $competency_params,
-            [
-                'path_type' => 'criteria_group',
-                'path_status' => pathway::PATHWAY_STATUS_ACTIVE,
-                'plugintype' => 'childcompetency',
-            ]
+            ['metakey' => criterion::METADATA_COMPETENCY_KEY, 'plugintype' => 'childcompetency']
         );
 
         $criteria_rows = $DB->get_records_sql_menu($sql, $params);
 
-        // TODO: Is it necessary to ensure there are no items ??
         if (empty($criteria_rows)) {
+            // Nothing to do
             return;
         }
 
