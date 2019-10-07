@@ -65,7 +65,7 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
  * @method static competency_repository repository()
  *
  * @property-read competency $parent Parent item
- * @property-read collection $scale Scale associated with this competency
+ * @property-read scale $scale Scale associated with this competency
  * @property-read comp_type $comp_type Competency type
  * @property-read customfields $customfields Custom fields
  * @property-read string $scale_aggregation_type Scale aggregation type

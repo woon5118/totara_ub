@@ -24,9 +24,10 @@
 namespace totara_competency\models\profile;
 
 use core\orm\collection;
+use stdClass;
 use totara_assignment\entities\user;
-use totara_competency\data_providers\progress as progress_provider;
-use totara_competency\models\basic_model;
+use totara_competency\data_providers\assignments;
+use totara_competency\entities\competency_achievement;
 
 /**
  * Class profile_progress
@@ -46,20 +47,130 @@ use totara_competency\models\basic_model;
  * @property-read string $latest_achievement Latest achieved competency name (if any)
  * @package totara_competency\models
  */
-class progress extends basic_model {
+class progress {
 
-    public static function for(int $user_id, $filters = []) {
-        $profile_progress = new static();
+    /**
+     * User class
+     *
+     * @var stdClass
+     */
+    protected $user;
 
-        $progress = progress_provider::for($user_id)
-            ->set_filters($filters)
-            ->fetch();
+    /**
+     * Progress items
+     *
+     * @var collection
+     */
+    protected $items;
 
-        $profile_progress->set_attribute('user', $progress->get_user()->to_the_origins())
-            ->set_attribute('items', $progress->build_progress_data_per_user_group())
-            ->set_attribute('filters', $progress->build_filters())
-            ->set_attribute('latest_achievement', $progress->get_latest_achievement() ? $progress->get_latest_achievement()->competency_name : null);
+    /**
+     * Filters
+     *
+     * @var array
+     */
+    protected $filters;
 
-        return $profile_progress;
+    /**
+     * Latest achieved competency name
+     *
+     * @var string|null
+     */
+    protected $latest_achievement;
+
+    /**
+     * Array of attributes available for public (read-only) access
+     *
+     * @var array
+     */
+    protected $public_attributes = [
+        'user',
+        'items',
+        'filters',
+        'latest_achievement',
+    ];
+
+    /**
+     * Progress item for a user
+     *
+     * @param int $user_id
+     * @param array $filters
+     */
+    public function __construct(int $user_id, array $filters = []) {
+        // To build this information we need:
+
+        $assignments = assignments::for($user_id)->set_filters($filters)->fetch();
+
+        // This converts user to an stdClass, there is a stupid hardcoded check for stdClasses
+        $this->user = $assignments->get_user()->to_the_origins();
+
+        $this->items = item::build_from_assignments_provider($assignments);
+
+        $this->filters = filter::build_from_assignments_provider(assignments::for($user_id)->fetch());
+
+        $this->latest_achievement = $this->get_latest_achievement_name($user_id);
+    }
+
+    /**
+     * Glorified constructor
+     *
+     * @param int $user_id
+     * @param array $filters
+     * @return static
+     */
+    public static function for(int $user_id, array $filters = []) {
+        return new static($user_id, $filters);
+    }
+
+    /**
+     * Attributes getter
+     * Allows read-only access to a subset of properties
+     *
+     * @param $name
+     * @return mixed|null
+     */
+    public function __get($name) {
+        if (in_array($name, $this->public_attributes)) {
+            return $this->{$name};
+        }
+
+        return null;
+    }
+
+    /**
+     * Return that publicly available attributes are set
+     *
+     * @param $name
+     * @return bool
+     */
+    public function __isset($name) {
+        return in_array($name, $this->public_attributes);
+    }
+
+    /**
+     * Attribute setter, just throws an exception
+     *
+     * @param $name
+     * @param $value
+     */
+    public function __set($name, $value) {
+        throw new \coding_exception('Progress is a read only model');
+    }
+
+    /**
+     * Get latest achieved competency name for a given user id
+     *
+     * @param int $user_id
+     * @return string
+     */
+    protected function get_latest_achievement_name(int $user_id): ?string {
+        $achievement = competency_achievement::repository()
+            ->with('competency')
+            ->where('proficient', true)
+            ->where('status', [competency_achievement::ACTIVE_ASSIGNMENT, competency_achievement::ARCHIVED_ASSIGNMENT])
+            ->where('user_id', $user_id)
+            ->order_by('time_created', 'desc')
+            ->first();
+
+        return $achievement->competency->fullname ?? null;
     }
 }

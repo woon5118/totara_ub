@@ -23,19 +23,36 @@
 
 namespace totara_competency\webapi\resolver\query;
 
-use core\webapi\execution_context;
-use totara_competency\data_providers\competency_progress;
-use totara_core\advanced_feature;
+use context_user;
+use core\webapi\query_resolver;
+use totara_assignment\entities\user;
 
-class profile_competency_progress extends profile_resolver {
-    public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
+abstract class profile_resolver implements query_resolver {
 
-        return competency_progress::for(static::authorize($args['user_id'] ?? null))
-            ->set_filters($args['filters'] ?? [])
-            ->set_order($args['order'] ?? null)
-            ->fetch()
-            ->get()
-            ->all();
+    /**
+     * Authorize given user, returns user id, or throws an exception if the user is not authorized
+     *
+     * @param null $user_id
+     * @return int|null
+     */
+    public static function authorize($user_id = null) {
+        if (is_null($user_id)) {
+            throw new \coding_exception('User id is required');
+        }
+
+        $user_id = intval($user_id);
+
+        if (!$authorized_user = user::logged_in()) {
+            require_login();
+        }
+
+        $capability = $authorized_user->id === $user_id
+            ? 'totara/competency:view_own_profile'
+            : 'totara/competency:view_other_profile';
+
+        require_capability($capability, context_user::instance($user_id));
+
+        return $user_id;
     }
+
 }

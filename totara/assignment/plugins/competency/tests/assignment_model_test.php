@@ -68,14 +68,19 @@ class tassign_competency_assignment_model_testcase extends assignment_model_base
         $task = new expand_task($GLOBALS['DB']);
         $task->expand_all();
 
+        // This is to force-reload the assigned users, otherwise only cached results will be returned
+        $assignment->get_entity()->load_relation('assignment_users');
         /** @var competency_assignment_user $user */
         $users = $assignment->get_assigned_users();
+
         $this->assertEquals(1, $users->count());
         $user = $users->first();
         $this->assertEquals($assignment->get_id(), $user->assignment_id);
         $this->assertEquals($data->user1->id, $user->user_id);
         $this->assertEquals($data->comp1->id, $user->competency_id);
 
+        // This is to force-reload the assigned users, otherwise only cached results will be returned
+        $assignment2->get_entity()->load_relation('assignment_users');
         $users = $assignment2->get_assigned_users();
         $this->assertEquals(1, $users->count());
         $user = $users->first();

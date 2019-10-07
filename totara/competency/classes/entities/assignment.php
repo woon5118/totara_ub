@@ -23,8 +23,12 @@
 
 namespace totara_competency\entities;
 
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use core\orm\entity\relations\has_many;
+use core\orm\entity\relations\has_one;
+use totara_assignment\entities\user;
 
 /**
  * Assignment entity
@@ -36,13 +40,17 @@ use core\orm\entity\relations\belongs_to;
  * @property bool $optional Optional flag
  * @property int $status Assignment status eg (0 - draft, 1 - published, etc)
  * @property-read string progress_name Assignment name
- * @property-read string human_status Human readable assignment status
  * @property int $created_by ID of the created user
  * @property int $created_at Created at timestamp
  * @property int $updated_at Updated at timestamp
  * @property int $archived_at Archived at timestamp
  *
  * @property-read string $status_name Textual representation of status int
+ * @property-read competency_achievement $current_achievement Current achievement
+ * @property-read competency $competency
+ * @property-read user $assigner
+ * @property-read collection $assignment_users
+ * @property-read competency_assignment_user $assignment_user
  *
  * @method static assignment_repository repository()
  *
@@ -50,25 +58,28 @@ use core\orm\entity\relations\belongs_to;
  */
 class assignment extends entity {
 
-    const STATUS_DRAFT = 0;
-    const STATUS_ACTIVE = 1;
-    const STATUS_ARCHIVED = 2;
+    public const STATUS_DRAFT = 0;
+    public const STATUS_ACTIVE = 1;
+    public const STATUS_ARCHIVED = 2;
 
-    const STATUS_NAME_DRAFT = 'draft';
-    const STATUS_NAME_ACTIVE = 'active';
-    const STATUS_NAME_ARCHIVED = 'archived';
+    public const STATUS_NAME_DRAFT = 'draft';
+    public const STATUS_NAME_ACTIVE = 'active';
+    public const STATUS_NAME_ARCHIVED = 'archived';
 
     // assigned by admin users via the interface
-    const TYPE_ADMIN = 'admin';
+    public const TYPE_ADMIN = 'admin';
+
     // assigned by the user themselves
-    const TYPE_SELF = 'self';
-    // assigend by other users, like managers, for a user
-    const TYPE_OTHER = 'other';
+    public const TYPE_SELF = 'self';
+
+    // assigned by other users, like managers, for a user
+    public const TYPE_OTHER = 'other';
+
     // assigned automatically by the system due to the continuous tracking functionality
-    const TYPE_SYSTEM = 'system';
+    public const TYPE_SYSTEM = 'system';
 
     // Assignments to account for pre-perform achievements, archived when created...
-    const TYPE_LEGACY = 'legacy';
+    public const TYPE_LEGACY = 'legacy';
 
     public const TABLE = 'totara_assignment_competencies';
 
@@ -94,6 +105,56 @@ class assignment extends entity {
 
     public function competency(): belongs_to {
         return $this->belongs_to(\totara_competency\entities\competency::class, 'competency_id');
+    }
+
+    /**
+     * Current competency achievements
+     *
+     * @return has_many
+     */
+    public function current_achievements(): has_many {
+        return $this->has_many(competency_achievement::class, 'assignment_id')
+            ->where('status', 'in', [competency_achievement::ACTIVE_ASSIGNMENT, competency_achievement::ARCHIVED_ASSIGNMENT]);
+    }
+
+    /**
+     * Current competency achievement
+     * This is meant to be used with a user filter, otherwise it will just give you a first random achievement
+     *
+     * @return has_one
+     */
+    public function current_achievement(): has_one {
+        return $this->has_one(competency_achievement::class, 'assignment_id')
+            ->where('status', 'in', [competency_achievement::ACTIVE_ASSIGNMENT, competency_achievement::ARCHIVED_ASSIGNMENT]);
+    }
+
+    /**
+     * One assignment user
+     *
+     * This is meant to be used with the user filter, otherwise you'd just get a first random user...
+     *
+     * @return has_one
+     */
+    public function assignment_user(): has_one {
+        return $this->has_one(competency_assignment_user::class, 'assignment_id');
+    }
+
+    /**
+     * All assignment users
+     *
+     * @return has_many
+     */
+    public function assignment_users(): has_many {
+        return $this->has_many(competency_assignment_user::class, 'assignment_id');
+    }
+
+    /**
+     * Get the user who created the assignment
+     *
+     * @return belongs_to
+     */
+    public function assigner(): belongs_to {
+        return $this->belongs_to(user::class, 'created_by');
     }
 
     /**
@@ -128,20 +189,4 @@ class assignment extends entity {
         }
         return $name;
     }
-
-    // TODO This is part of the model, existing code should be changed
-    protected function get_human_status_attribute() {
-        switch ($this->status) {
-            case assignment::STATUS_ACTIVE:
-                return get_string('status:active-alt', 'tassign_competency');
-            case assignment::STATUS_ARCHIVED:
-                return get_string('status:archived-alt', 'tassign_competency');
-            case assignment::STATUS_DRAFT:
-                return get_string('status:draft', 'tassign_competency');
-            default:
-                debugging('Unknown assignment status: ' . $this->status, DEBUG_DEVELOPER);
-                return 'Unknown';
-        }
-    }
-
 }

@@ -90,7 +90,7 @@ class scale extends entity_model {
      * @return scale
      */
     public static function find_by_competency_id(int $id, bool $with_values = true): ?self {
-        return static::find_by_competency_ids([$id])->first();
+        return static::find_by_competency_ids([$id], $with_values)->first();
     }
 
     /**

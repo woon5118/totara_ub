@@ -11,6 +11,7 @@
             ? $str('unassigned', 'totara_competency')
             : ''
         "
+
         :active="key === 0"
         :name="item.assignment.progress_name"
       >

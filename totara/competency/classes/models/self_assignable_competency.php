@@ -26,12 +26,11 @@ namespace totara_competency\models;
 use coding_exception;
 use core\orm\collection;
 use totara_competency\entities\competency;
-use totara_competency\entities\competency as competency_entity;
 
 class self_assignable_competency {
 
     /**
-     * @var competency_entity
+     * @var competency
      */
     protected $entity;
 
@@ -40,16 +39,16 @@ class self_assignable_competency {
      */
     protected $user_assignments = [];
 
-    private function __construct(competency_entity $entity) {
+    private function __construct(competency $entity) {
         $this->entity = $entity;
     }
 
     public static function load_by_id(int $id): self {
-        $entity = new competency_entity($id);
+        $entity = new competency($id);
         return new static($entity);
     }
 
-    public static function load_by_entity(competency_entity $entity): self {
+    public static function load_by_entity(competency $entity): self {
         if (!$entity->exists()) {
             throw new coding_exception('Can load only existing entities');
         }

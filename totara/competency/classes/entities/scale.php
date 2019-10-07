@@ -23,10 +23,10 @@
 
 namespace totara_competency\entities;
 
-
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 
 /**
@@ -43,6 +43,7 @@ use core\orm\entity\relations\has_many;
  * @property_read scale_value $default_value
  * @property_read scale_value $min_proficient_value
  * @property-read scale_value[]|collection $scale_values
+ * @property-read collection $values
  */
 class scale extends entity {
 
@@ -75,11 +76,21 @@ class scale extends entity {
         return $this->scale_value_cache;
     }
 
-    protected function get_default_value_attribute() {
-        return $this->scale_values->item($this->defaultid);
+    /**
+     * Default value for this scale
+     *
+     * @return belongs_to
+     */
+    public function default_value(): belongs_to {
+        return $this->belongs_to(scale_value::class, 'defaultid');
     }
 
-    protected function get_min_proficient_value_attribute() {
-        return $this->scale_values->item($this->minproficiencyid);
+    /**
+     * Min proficient value for this scale
+     *
+     * @return belongs_to
+     */
+    public function min_proficient_value(): belongs_to {
+        return $this->belongs_to(scale_value::class, 'minproficiencyid');
     }
 }

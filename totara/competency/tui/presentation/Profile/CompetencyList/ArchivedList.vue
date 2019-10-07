@@ -11,14 +11,14 @@
         class="tui-ArchivedCompetencyList__assignments-list tui-ArchivedCompetencyList__assignments-list-padded"
       >
         <li v-for="(item, key) in props.row.items" :key="key">
-          <span v-text="item.assignment.progress_name" />
+          <span v-if="item.assignment" v-text="item.assignment.progress_name" />
         </li>
       </ul>
     </template>
     <template v-slot:column-archived-date="props">
       <ul class="tui-ArchivedCompetencyList__assignments-list">
         <li v-for="(item, key) in props.row.items" :key="key">
-          <span v-text="item.assignment.archived_at" />
+          <span v-if="item.assignment" v-text="item.assignment.archived_at" />
         </li>
       </ul>
     </template>

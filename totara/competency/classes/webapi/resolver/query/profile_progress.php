@@ -23,40 +23,14 @@
 
 namespace totara_competency\webapi\resolver\query;
 
-use context_system;
-use context_user;
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
-use totara_assignment\entities\user;
 use totara_competency\models\profile\progress as progress_model;
 use totara_core\advanced_feature;
 
-class profile_progress implements query_resolver {
-
+class profile_progress extends profile_resolver {
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('competency_assignment');
+
         return progress_model::for(static::authorize($args['user_id'] ?? null), $args['filters'] ?? []);
     }
-
-    public static function authorize($user_id = null) {
-        advanced_feature::require('competency_assignment');
-        
-        if (is_null($user_id)) {
-            throw new \coding_exception('User id is required');
-        }
-
-        $user_id = intval($user_id);
-
-        if (!$authorized_user = user::logged_in()) {
-            require_login();
-        }
-
-        $capability = $authorized_user->id === $user_id
-            ? 'totara/competency:view_own_profile'
-            : 'totara/competency:view_other_profile';
-
-        require_capability($capability, context_user::instance($user_id));
-
-        return $user_id;
-    }
-
 }

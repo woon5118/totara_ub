@@ -90,6 +90,10 @@ class totara_competency_entity_testcase extends \advanced_testcase {
 
         // Test that another competency returns only one scale correctly
         $this->assertEquals($another_scale->id, $another_competency->scale()->one(true)->id);
+
+        $comps = competency::repository()
+            ->with('scale')
+            ->get();
     }
 
     public function test_it_has_custom_fields_attribute() {

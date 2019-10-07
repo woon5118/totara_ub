@@ -41,6 +41,7 @@ use totara_assignment\entities\hierarchy_item;
 use totara_assignment\entities\user;
 use totara_assignment\filter\hierarchy_item_visible;
 use totara_assignment\user_groups;
+use totara_competency\models\profile\proficiency_value;
 
 class assignment {
 
@@ -128,7 +129,7 @@ class assignment {
 
     /**
      * Deletes the assignment and all associated records like user relation and logs entries
-     * Deleting ther assignment is only possible if it's a DRAFT or ARCHIVED assignment.
+     * Deleting their assignment is only possible if it's a DRAFT or ARCHIVED assignment.
      * Triggers deletion events.
      *
      * @throws coding_exception
@@ -172,7 +173,7 @@ class assignment {
             $this->entity->delete();
         });
 
-        // TODO Delete related competency records
+        // TODO Delete related competency records?
 
         $event->trigger();
     }
@@ -325,13 +326,12 @@ class assignment {
     }
 
     /**
-     * @return collection|competency_assignment_user[]
+     * Get assigned users
+     *
+     * @return collection
      */
     public function get_assigned_users(): collection {
-        // Get all user records for this assignment
-        return competency_assignment_user::repository()
-            ->where('assignment_id', $this->entity->id)
-            ->get();
+        return $this->entity->assignment_users;
     }
 
     public function is_active(): bool {
@@ -358,19 +358,7 @@ class assignment {
      * @return competency
      */
     public function get_competency(): competency {
-        if ($this->competency) {
-            return $this->competency;
-        } elseif ($this->entity->has_attribute('competency')) {
-            $this->competency = $this->entity->competency;
-        } else {
-            $this->competency = competency::repository()->find($this->entity->competency_id);
-
-            if (!$this->competency) {
-                throw new \moodle_exception('Requested competency does not exist');
-            }
-        }
-
-        return $this->get_competency();
+        return $this->entity->competency;
     }
 
     /**
@@ -406,6 +394,14 @@ class assignment {
         }
 
         return $type_name;
+    }
+
+    public function get_my_value(): ?proficiency_value {
+        return proficiency_value::my_value($this->entity);
+    }
+
+    public function get_min_value(): proficiency_value {
+        return proficiency_value::min_value($this->entity);
     }
 
     /**
@@ -459,6 +455,20 @@ class assignment {
         }
     }
 
+    public function get_human_status() {
+        switch ($this->entity->status) {
+            case assignment_entity::STATUS_ACTIVE:
+                return get_string('status:active-alt', 'tassign_competency');
+            case assignment_entity::STATUS_ARCHIVED:
+                return get_string('status:archived-alt', 'tassign_competency');
+            case assignment_entity::STATUS_DRAFT:
+                return get_string('status:draft', 'tassign_competency');
+            default:
+                debugging('Unknown assignment status: ' . $this->entity->status, DEBUG_DEVELOPER);
+                return 'Unknown';
+        }
+    }
+
     /**
      * Gets human readable reason for assignment, we show
      * - the fullname of the assigner and role
@@ -495,10 +505,7 @@ class assignment {
     }
 
     public function get_assigner(): ?user {
-        if ($this->entity->created_by > 0) {
-            return user::repository()->find($this->entity->created_by);
-        }
-        return null;
+        return $this->entity->assigner;
     }
 
     /**
@@ -511,39 +518,102 @@ class assignment {
         switch ($field) {
             case 'status_name':
                 return $this->get_status_name();
+
             case 'type_name':
                 return $this->get_type_name();
+
             case 'user_group':
                 return $this->get_user_group();
+
             case 'progress_name':
                 return $this->get_progress_name();
+
+            case 'human_status':
+                return $this->get_human_status();
+
             case 'reason_assigned':
                 return $this->get_reason_assigned();
+
             case 'competency':
                 return $this->get_competency();
+
+            case 'assignment':
+                return $this;
+
+            case 'my_value':
+                return $this->get_my_value();
+
+            case 'min_value':
+                return $this->get_min_value();
+
+            /** @noinspection PhpMissingBreakStatementInspection */
+            case 'assigned_at':
+                if ($this->entity->relation_loaded('assignment_user')) {
+                    // The relation might be loaded, but the related model does not always exist,
+                    // for example there is no assignment user for archived assignments...
+                    return $this->entity->assignment_user->created_at ?? null;
+                }
             default:
-                if ($this->entity->has_attribute($field)) {
+                if (isset($this->entity->{$field})) {
                     return $this->entity->$field;
                 }
-                break;
+                return null;
         }
-
-        throw new coding_exception('Unknown assignment field '.$field);
     }
 
+    /**
+     * Get underlying entity
+     *
+     * @return assignment_entity
+     */
+    public function get_entity(): assignment_entity {
+        return $this->entity;
+    }
+
+    /**
+     * Check whether the model has a field
+     *
+     * @param string $field
+     * @return bool
+     */
     public function has_field(string $field): bool {
         $extra_fields = [
             'user_group',
             'competency',
             'status_name',
+            'human_status',
             'type_name',
             'progress_name',
             'reason_assigned',
+            'assignment',
+            'my_value',
+            'min_value',
+            'proficient',
+            'archived_at',
+            'assigned_at'
         ];
-        return in_array($field, $extra_fields)
-            || $this->entity->has_attribute($field);
+
+        return in_array($field, $extra_fields) || isset($this->entity->{$field});
     }
 
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function __get($name) {
+        return $this->get_field($name);
+    }
+
+    public function __isset($name) {
+        return $this->has_field($name);
+    }
+
+    /**
+     * Convert model to array, this currently converts only an entity to array
+     * TODO consider wrapping it into whatever that might want to convert it to array differently.
+     *
+     * @return array
+     */
     public function to_array(): array {
         return $this->entity->to_array();
     }

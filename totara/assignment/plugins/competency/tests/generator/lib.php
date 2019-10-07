@@ -21,6 +21,7 @@
  * @package tassign_competency
  */
 
+use tassign_competency\models\assignment_actions;
 use totara_competency\entities\assignment;
 use totara_assignment\user_groups;
 use totara_job\job_assignment;
@@ -135,6 +136,20 @@ class tassign_competency_generator extends component_generator_base {
         return $this->create_assignment($attributes);
     }
 
+    /***
+     * Create self assignment for a given user and competency
+     *
+     * @param int|null $competency_id ID of the competency to create an assignment for, if not supplied it will be created
+     * @param int|null $user_id User ID or null to whip up a new user
+     * @param array $attributes Record attributes
+     * @return stdClass
+     */
+    public function create_self_assignment(?int $competency_id = null, ?int $user_id = null, array $attributes = []) {
+        $attributes['type'] = assignment::TYPE_SELF;
+
+        return $this->create_user_assignment($competency_id, $user_id, $attributes);
+    }
+
     /**
      * Create a new competency assignment
      *
@@ -160,6 +175,22 @@ class tassign_competency_generator extends component_generator_base {
         ], $attributes);
 
         return (object) array_merge(['id' => $this->db()->insert_record('totara_assignment_competencies', (object) $attributes)], $attributes);
+    }
+
+    /**
+     * Archive assignment
+     *
+     * @param $assignment
+     * @param bool $continue_tracking
+     *
+     * @return array Archived assignment ids
+     */
+    public function archive_assignment($assignment, $continue_tracking = true) {
+        if (is_object($assignment)) {
+            $assignment = $assignment->id;
+        }
+
+        return assignment_actions::create()->archive($assignment, $continue_tracking);
     }
 
     /**
@@ -242,7 +273,7 @@ class tassign_competency_generator extends component_generator_base {
 
             job_assignment::create([
                 'userid' => $id ,
-                'idnumber' => 'ja_for_' . $id,
+                'idnumber' => "ja_for_pos_{$id}_user_{$organisation->id}",
                 'fullname' => 'Job assignment numero ' . $id,
                 'organisationid' => $organisation->id
             ]);
@@ -271,7 +302,7 @@ class tassign_competency_generator extends component_generator_base {
 
             job_assignment::create([
                 'userid' => $id ,
-                'idnumber' => 'ja_for_' . $id,
+                'idnumber' => "ja_for_pos_{$id}_user_{$position->id}",
                 'fullname' => 'Job assignment numero ' . $id,
                 'positionid' => $position->id
             ]);

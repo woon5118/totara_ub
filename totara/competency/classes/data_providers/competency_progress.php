@@ -23,20 +23,16 @@
 
 namespace totara_competency\data_providers;
 
-
-use stdClass;
-use totara_competency\entities\assignment;
-use core\orm\collection;
-use tassign_competency\models\assignment as assignment_model;
+use core\collection;
+use tassign_competency\models\assignment;
+use totara_competency\models\profile\competency_progress as competency_progress_model;
 
 class competency_progress extends user_data_provider {
 
     /**
-     * Progress object
-     *
-     * @var progress
+     * @var assignments
      */
-    protected $progress = null;
+    protected $assignments;
 
     /**
      * Order of items to load
@@ -45,96 +41,51 @@ class competency_progress extends user_data_provider {
      */
     protected $order = null;
 
-
-    public static function for_progress(progress $progress) {
-        return static::for($progress->get_user())->set_progress($progress);
-    }
-
-    public function set_progress(progress $progress) {
-        $this->progress = $progress;
-
-        return $this;
-    }
-
+    /**
+     * Set column to order by
+     *
+     * @param string|null $order
+     * @return $this
+     */
     public function set_order(string $order = null) {
         $this->order = $order;
 
         return $this;
     }
 
+    /**
+     * Fetch competency progress data from the database
+     *
+     * @return competency_progress
+     */
     public function fetch() {
-        if (!$this->progress) {
-            $this->set_progress(progress::for($this->user));
+        if (!$this->assignments) {
+            $this->assignments = assignments::for($this->get_user());
         }
 
         $this->set_filters($this->filters);
 
-        if (!$this->progress->fetched) {
-            $this->progress->fetch();
-        }
+        $this->assignments->fetch();
+        $this->fetched = true;
+        $this->items = competency_progress_model::build_from_assignments($this->assignments->get());
 
-        return $this->build_competency_progress_list();
+        return $this->filter()->order();
     }
 
-    public function fetch_for_competency(int $competency_id) {
-        $this->set_filters([
-            'competency_id' => $competency_id,
-        ]);
-
-        return $this->fetch()->get()->first();
-    }
-
-    protected function build_competency_progress_list() {
-        $competencies = [];
-
-        foreach ($this->progress->get_assignments()->get() as $assignment) {
-            $id = $assignment->competency_id;
-            $competencies[$id] = $this->build_competency_progress_object($assignment, $competencies[$id] ?? null);
-        }
-
-        $this->items = new collection($competencies);
-
-        return $this->filter_progress()->order_progress();
-    }
-
-    protected function build_competency_progress_object(assignment $assignment, ?stdClass $current = null) {
-        if (!$current) {
-            $current = (object) [
-                'competency' => $assignment->competency,
-                'achievement' => $assignment->achievement,
-                'my_value' => $assignment->achievement->scale_value ?? null,
-                'assignments' => []
-            ];
-        }
-
-        $current->assignments[] = assignment_model::load_by_entity($assignment);
-
-        return $current;
-    }
-
-    protected function order_progress() {
-
-        $latestAssignment = function($assignments, $field) {
-            $maxDate = 0;
-            foreach ($assignments as $assignment) {
-                if ($assignment->get_field($field) > $maxDate) {
-                    $maxDate = $assignment->get_field($field);
-                }
-            }
-
-            return $maxDate;
-        };
+    protected function order() {
 
         switch ($this->order) {
             case 'recently-assigned': // TODO const?
-                $this->items->sort(function ($a, $b) use ($latestAssignment) {
-                    return $latestAssignment($b->assignments, 'assigned_at') <=> $latestAssignment($a->assignments, 'assigned_at');
+                $this->items->sort(function ($a, $b) {
+                    return $this->get_latest_assignment_by_field($b->assignments, 'assigned_at') <=>
+                        $this->get_latest_assignment_by_field($a->assignments, 'assigned_at');
                 });
                 break;
 
             case 'recently-archived':
-                $this->items->sort(function ($a, $b) use ($latestAssignment) {
-                    return $latestAssignment($b->assignments, 'archived_at') <=> $latestAssignment($a->assignments, 'archived_at');
+                $this->items->sort(function ($a, $b) {
+                    return $this->get_latest_assignment_by_field($b->assignments, 'archived_at') <=>
+                        $this->get_latest_assignment_by_field($a->assignments, 'archived_at');
                 });
                 break;
 
@@ -154,7 +105,17 @@ class competency_progress extends user_data_provider {
         return $this;
     }
 
-    protected function filter_progress() {
+    protected function get_latest_assignment_by_field(collection $assignments, string $field) {
+        return $assignments->reduce(function(int $maxDate, assignment $assignment) use ($field) {
+            if ($assignment->get_field($field) > $maxDate) {
+                $maxDate = $assignment->get_field($field);
+            }
+
+            return $maxDate;
+        }, 0);
+    }
+
+    protected function filter() {
         $filters = array_filter($this->filters, function($key) {
             return in_array($key, ['proficient']);
         }, ARRAY_FILTER_USE_KEY);
@@ -192,12 +153,13 @@ class competency_progress extends user_data_provider {
     public function set_filters(array $filters) {
         parent::set_filters($filters);
 
-        $progress_filters = array_filter($filters, function($key) {
+        // This filters are proxied to the assignments data provider
+        $ass_progress = array_filter($filters, function($key) {
             return in_array($key, ['status', 'type', 'user_group_type', 'user_group_id', 'search', 'competency_id']);
         }, ARRAY_FILTER_USE_KEY);
 
-        if ($this->progress) {
-            $this->progress->set_filters($progress_filters);
+        if ($this->assignments) {
+            $this->assignments->set_filters($ass_progress);
         }
 
         return $this;

@@ -24,12 +24,10 @@
 namespace totara_competency\webapi\resolver\query;
 
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
-use totara_competency\data_providers\competency_progress;
+use totara_competency\models\profile\competency_progress;
 use totara_core\advanced_feature;
 
-class profile_competency_details implements query_resolver {
-
+class profile_competency_details extends profile_resolver {
     public static function resolve(array $args, execution_context $ec) {
         advanced_feature::require('competency_assignment');
 
@@ -40,23 +38,7 @@ class profile_competency_details implements query_resolver {
             throw new \coding_exception('Competency id is required');
         }
 
-        $progress = competency_progress::for($args['user_id']);
-        $progress = $progress->fetch_for_competency($args['competency_id']);
-
-        return (object) [
-            'competency' => $progress->competency,
-            'items' => array_map(function($assignment) {
-                $proficient = $assignment->has_field('achievement') ? ($assignment->get_field('achievement')->scale_value->proficient ?? false) : false;
-
-                return( (object) [
-                    'assignment' => $assignment,
-                    'competency' => $assignment->get_competency(),
-                    'proficient' => boolval($proficient),
-                    'my_value' => $assignment->has_field('achievement') ? $assignment->get_field('achievement')->scale_value : null,
-                    'min_value' => $assignment->get_competency()->scale->min_proficient_value ?? null,
-                ]);
-            }, $progress->assignments),
-        ];
+        return competency_progress::build_for_competency(static::authorize($args['user_id'] ?? null), $args['competency_id']);
     }
 
 }

@@ -23,7 +23,6 @@
 
 namespace totara_competency\data_providers;
 
-
 use totara_assignment\entities\user;
 use core\orm\collection;
 use core\orm\entity\entity;
@@ -162,20 +161,14 @@ abstract class user_data_provider {
     }
 
     /**
-     * Stupid workaround
+     * Set a collection of items
      *
-     * @param entity $entity Entity
-     * @param string $property Property name to assign
-     * @param mixed $value Value to assign to the property
-     * @return entity
+     * @param collection $items
+     * @return $this
      */
-    protected function append_property_to_entity(entity $entity, $property, $value) {
-        $class = get_class($entity);
+    protected function set_items(collection $items) {
+        $this->items = $items;
 
-        $obj = $entity->to_array();
-
-        $obj[$property] = $value;
-
-        return new $class($obj, false, true);
+        return $this;
     }
 }
