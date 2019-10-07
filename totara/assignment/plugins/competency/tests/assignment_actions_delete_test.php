@@ -57,7 +57,7 @@ class tassign_competency_actions_delete_testcase extends tassign_competency_assi
 
         // DO THE DELETE ACTION
         $affected_ids = $model->delete([$assignment1->id, $assignment2->id, $assignment2->id]);
-        $this->assertEquals([$assignment1->id, $assignment2->id], $affected_ids);
+        $this->assertEqualsCanonicalizing([$assignment1->id, $assignment2->id], $affected_ids);
 
         $count = entities\assignment::repository()
             ->where('id', [$assignment1->id, $assignment2->id])
@@ -100,7 +100,7 @@ class tassign_competency_actions_delete_testcase extends tassign_competency_assi
 
         $model = new assignment_actions();
         $affected_ids = $model->delete($assignment1->id);
-        $this->assertEquals([$assignment1->id], $affected_ids);
+        $this->assertEqualsCanonicalizing([$assignment1->id], $affected_ids);
 
         $assignment2->refresh();
 

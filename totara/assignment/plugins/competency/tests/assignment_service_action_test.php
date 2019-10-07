@@ -110,7 +110,7 @@ class tassign_competency_assignment_action_service_testcase extends advanced_tes
         $result = $res['data'] ?? null;
 
         $this->assertWebserviceSuccess($res);
-        $this->assertEquals([$assignment1->id, $assignment2->id], $result);
+        $this->assertEqualsCanonicalizing([$assignment1->id, $assignment2->id], $result);
 
         $assignment1->refresh();
         $assignment2->refresh();
@@ -152,7 +152,7 @@ class tassign_competency_assignment_action_service_testcase extends advanced_tes
         $this->assertWebserviceSuccess($res);
 
         // assignment 3 is not in the result as it could not be archived
-        $this->assertEquals([$assignment1->id, $assignment2->id], $result);
+        $this->assertEqualsCanonicalizing([$assignment1->id, $assignment2->id], $result);
 
         $assignment1->refresh();
         $assignment2->refresh();
@@ -234,7 +234,7 @@ class tassign_competency_assignment_action_service_testcase extends advanced_tes
         $result = $res['data'] ?? null;
 
         $this->assertWebserviceSuccess($res);
-        $this->assertEquals([$assignment1->id, $assignment2->id], $result);
+        $this->assertEqualsCanonicalizing([$assignment1->id, $assignment2->id], $result);
 
         $assignment1->refresh();
         $assignment2->refresh();
@@ -274,7 +274,7 @@ class tassign_competency_assignment_action_service_testcase extends advanced_tes
         $result = $res['data'] ?? null;
 
         $this->assertWebserviceSuccess($res);
-        $this->assertEquals([$assignment1->id], $result);
+        $this->assertEqualsCanonicalizing([$assignment1->id], $result);
 
         $assignment1->refresh();
         $assignment2->refresh();
