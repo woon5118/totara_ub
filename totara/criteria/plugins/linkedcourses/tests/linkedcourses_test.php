@@ -46,19 +46,19 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
             [
                 'plugin_type' => 'linkedcourses',
                 'aggregation_method' => linkedcourses::AGGREGATE_ALL,
-                'metadata' => ['compid' => 1],
+                'metadata' => ['competency_id' => 1],
             ],
             [
                 'plugin_type' => 'linkedcourses',
                 'aggregation_method' => linkedcourses::AGGREGATE_ANY_N,
                 'aggregation_params' => json_encode(['req_items' => 1]),
-                'metadata' => ['compid' => 1],
+                'metadata' => ['competency_id' => 1],
             ],
             [
                 'plugin_type' => 'linkedcourses',
                 'aggregation_method' => linkedcourses::AGGREGATE_ANY_N,
                 'aggregation_params' => json_encode(['req_items' => 2]),
-                'metadata' => ['compid' => 1],
+                'metadata' => ['competency_id' => 1],
             ],
         ];
 

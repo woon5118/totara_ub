@@ -65,6 +65,23 @@ class linked_courses {
     }
 
     /**
+     * Returns array of course ids.
+     *
+     * @param int $competency_id
+     * @return int[] keyed by course id.
+     */
+    public static function get_linked_course_ids($competency_id): array {
+        global $DB;
+
+        $linked_course_ids = $DB->get_fieldset_select('comp_criteria',
+            'iteminstance',
+            'competencyid = :competencyid AND itemtype = :itemtype',
+            ['competencyid' => $competency_id, 'itemtype' => 'coursecompletion']);
+
+        return $linked_course_ids;
+    }
+
+    /**
      * Allows setting of which courses are linked to a given competency.
      *
      * Overwrites previous linked courses for the given competency.

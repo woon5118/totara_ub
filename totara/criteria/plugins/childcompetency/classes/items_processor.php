@@ -33,7 +33,7 @@ use totara_criteria\criterion;
 class items_processor {
 
     /**
-     * Update the criterion items so that a criterion_item exist for each direct child competency of the appicable
+     * Update the criterion items so that a criterion_item exist for each direct child competency of the applicable
      * competency
      *
      * @param int $competency_id If null, update items for all competencies with childcompetency criteria

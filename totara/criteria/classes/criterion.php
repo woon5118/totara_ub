@@ -34,7 +34,7 @@ abstract class criterion {
     const AGGREGATE_ALL = 1;
     const AGGREGATE_ANY_N = 2;
 
-    const METADATA_COMPETENCY_KEY = 'compid';
+    const METADATA_COMPETENCY_KEY = 'competency_id';
 
     /** @var int $id */
     private $id;

@@ -122,7 +122,7 @@ class criteria_childcompetency_testcase extends \advanced_testcase {
                 'plugin_type' => 'childcompetency',
                 'aggregation_method' => $row->aggregation_method,
                 'aggregation_params' => json_decode($row->aggregation_params, true) ?? [],
-                'metadata' => ['compid' => 23],
+                'metadata' => ['competency_id' => 23],
             ];
 
             $cc = childcompetency::fetch($row->id);

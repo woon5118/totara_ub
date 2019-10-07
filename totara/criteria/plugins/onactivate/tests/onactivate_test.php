@@ -117,7 +117,7 @@ class criteria_onactivate_testcase extends \advanced_testcase {
                 'aggregation_params' => [],
                 'items_type' => '',
                 'item_ids' => [],
-                'metadata' => ['compid' => 45],
+                'metadata' => ['competency_id' => 45],
             ];
 
             $cc = onactivate::fetch($row->id);

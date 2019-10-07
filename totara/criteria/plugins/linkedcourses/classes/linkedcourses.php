@@ -90,10 +90,7 @@ class linkedcourses extends criterion {
             throw new \coding_exception('Competency id must be set before items are updated');
         }
 
-        $linked_courses = $DB->get_fieldset_select('comp_criteria',
-            'iteminstance',
-            'competencyid = :compid AND itemtype = :itemtype',
-            ['compid' => $comp_id, 'itemtype' => 'coursecompletion']);
+        $linked_courses = linked_courses::get_linked_course_ids($comp_id);
         $this->set_item_ids($linked_courses);
 
         return $this;

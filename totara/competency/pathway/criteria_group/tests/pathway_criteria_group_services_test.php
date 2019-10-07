@@ -168,7 +168,7 @@ if ($error) {
                     'id' => 0,
                     'metadata' => [
                         [
-                            'metakey' => "compid",
+                            'metakey' => "competency_id",
                             'metavalue' => $data->comp->id,
                         ],
                     ],
