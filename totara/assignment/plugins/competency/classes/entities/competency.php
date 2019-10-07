@@ -26,6 +26,7 @@ namespace tassign_competency\entities;
 
 use totara_assignment\entities\hierarchy_item;
 use totara_assignment\user_groups;
+use totara_competency\entities\competency as other_competency_entity;
 
 /**
  * Class competency
@@ -53,7 +54,7 @@ use totara_assignment\user_groups;
  * @property-read array $assigned_user_groups
  * @property-read int $children_count
  * @property-read int $assignments_count
- * @property-read int $assign_availability
+ * @property-read array $assign_availability
  * @property-read array $custom_fields
  *
  * @method static competency_repository repository()
@@ -105,7 +106,7 @@ class competency extends hierarchy_item {
      *
      * @return array Of assignment availability types
      */
-    public function get_assign_availability_attribute(): array {
+    protected function get_assign_availability_attribute(): array {
         // This is copied from totara/competency/classes/entities/competency.php
         // TODO sort out way to not have this duplicated
         global $DB;
@@ -118,11 +119,55 @@ class competency extends hierarchy_item {
     }
 
     /**
+     * Can this competency be assigned via the given assignment type?
+     * This should only be used to check low level flags on the competency.
+     * Any other condition checks should be done in the assignment model.
+     *
+     * @param string $assignment_type see constants in the assignment entity
+     * @return bool
+     */
+    public function can_assign(string $assignment_type) {
+        switch ($assignment_type) {
+            case assignment::TYPE_SELF:
+                $assignable = $this->can_assign_self();
+                break;
+            case assignment::TYPE_OTHER:
+                $assignable = $this->can_assign_other();
+                break;
+            default:
+                // For all other types we don't have a flag yet,
+                // so we default to be able to assign
+                $assignable = true;
+                break;
+        }
+
+        return $assignable;
+    }
+
+    /**
+     * Can this competency be assigned by users for themselves?
+     *
+     * @return bool
+     */
+    public function can_assign_self(): bool {
+        return in_array(other_competency_entity::ASSIGNMENT_CREATE_SELF, $this->assign_availability);
+    }
+
+    /**
+     * Can this competency be assigned by other users?
+     *
+     * @return bool
+     */
+    public function can_assign_other(): bool {
+        return in_array(other_competency_entity::ASSIGNMENT_CREATE_OTHER, $this->assign_availability);
+    }
+
+    /**
      * Retrieve all custom field definitions and values for this competency
      *
      * @return array of customfield objects, the following is returned: type, title, value
      */
-    public function get_custom_fields_attribute(): array {
+    protected function get_custom_fields_attribute(): array {
         // This is copied from totara/competency/classes/entities/competency.php
         // TODO sort out way to not have this duplicated
         global $DB, $CFG;

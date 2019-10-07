@@ -23,11 +23,14 @@
  */
 
 use core\orm\collection;
+use core\orm\query\builder;
 use core\webapi\execution_context;
+use tassign_competency\assignment_create_exception;
 use tassign_competency\entities\assignment as assignment_entity;
 use tassign_competency\entities\competency_assignment_user;
 use tassign_competency\models\assignment as assignment_model;
 use totara_assignment\user_groups;
+use totara_competency\entities\competency as competency_entity;
 use totara_competency\webapi\resolver\mutation\create_user_assignments;
 use totara_job\job_assignment;
 
@@ -78,12 +81,32 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
         create_user_assignments::resolve($args, $this->get_execution_context());
     }
 
+    public function test_user_cannot_assign_to_self_without_assignable_flag() {
+        $data = $this->create_data();
+
+        $this->setUser($data->user1);
+
+        $expected_comp_ids = [$data->comp1->id, $data->comp2->id];
+
+        $args = [
+            'user_id' => $data->user1->id,
+            'competency_ids' => $expected_comp_ids,
+        ];
+
+        $this->expectException(assignment_create_exception::class);
+        $this->expectExceptionMessage('Competency cannot be be assigned by given type');
+        create_user_assignments::resolve($args, $this->get_execution_context());
+    }
+
     public function test_user_can_assign_to_self() {
         $data = $this->create_data();
 
         $this->setUser($data->user1);
 
         $expected_comp_ids = [$data->comp1->id, $data->comp2->id];
+
+        $this->set_self_assignable($data->comp1->id);
+        $this->set_self_assignable($data->comp2->id);
 
         $args = [
             'user_id' => $data->user1->id,
@@ -113,6 +136,27 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
         $this->assertCount(2, $user_assignments);
     }
 
+    public function test_manager_cannot_assign_to_other_user_without_assignable_flag() {
+        $data = $this->create_data();
+
+        // User is now managing another user and can assign competencies for them
+        $manager_job = job_assignment::create(['userid' => $data->user1->id, 'idnumber' => 1]);
+        job_assignment::create(['userid' => $data->user2->id, 'idnumber' => 2, 'managerjaid' => $manager_job->id]);
+
+        $this->setUser($data->user1);
+
+        $expected_comp_ids = [$data->comp1->id, $data->comp2->id];
+
+        $args = [
+            'user_id' => $data->user2->id,
+            'competency_ids' => $expected_comp_ids,
+        ];
+
+        $this->expectException(assignment_create_exception::class);
+        $this->expectExceptionMessage('Competency cannot be be assigned by given type');
+        create_user_assignments::resolve($args, $this->get_execution_context());
+    }
+
     public function test_manager_can_assign_to_team_member() {
         $data = $this->create_data();
 
@@ -123,6 +167,9 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
         $this->setUser($data->user1);
 
         $expected_comp_ids = [$data->comp1->id, $data->comp2->id];
+
+        $this->set_other_assignable($data->comp1->id);
+        $this->set_other_assignable($data->comp2->id);
 
         $args = [
             'user_id' => $data->user2->id,
@@ -164,6 +211,9 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
         $this->setUser($data->user1);
 
         $expected_comp_ids = [$data->comp1->id, $data->comp2->id];
+
+        $this->set_other_assignable($data->comp1->id);
+        $this->set_other_assignable($data->comp2->id);
 
         $args = [
             'user_id' => $data->user2->id,
@@ -214,6 +264,22 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
      */
     protected function generator() {
         return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+    }
+
+    private function set_self_assignable($comp_id) {
+        builder::table('comp_assign_availability')
+            ->insert([
+                'comp_id' => $comp_id,
+                'availability' => competency_entity::ASSIGNMENT_CREATE_SELF
+            ]);
+    }
+
+    private function set_other_assignable($comp_id) {
+        builder::table('comp_assign_availability')
+            ->insert([
+                'comp_id' => $comp_id,
+                'availability' => competency_entity::ASSIGNMENT_CREATE_OTHER
+            ]);
     }
 
 }

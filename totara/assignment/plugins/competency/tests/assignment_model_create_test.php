@@ -22,6 +22,7 @@
  * @category test
  */
 
+use core\orm\query\builder;
 use tassign_competency\assignment_create_exception;
 use tassign_competency\entities\assignment as assignment_entity;
 use tassign_competency\entities\competency as competency_entity;
@@ -256,6 +257,74 @@ class tassign_competency_assignment_model_create_testcase extends assignment_mod
         assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
     }
 
+    public function test_can_create_with_other_type_if_assignable() {
+        $this->setAdminUser();
+
+        $data = $this->create_data();
+
+        $comp_id = $data->comp1->id;
+        $this->set_other_assignable($data->comp1->id);
+
+        $type = assignment_entity::TYPE_OTHER;
+        $user_group_type = user_groups::USER;
+        $user_group_id = $data->user1->id;
+        $status = assignment_entity::STATUS_ACTIVE;
+
+        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $this->assertInstanceOf(assignment_model::class, $assignment);
+    }
+
+    public function test_cannot_create_with_other_type_if_not_assignable() {
+        $this->setAdminUser();
+
+        $data = $this->create_data();
+
+        $comp_id = $data->comp1->id;
+        $type = assignment_entity::TYPE_OTHER;
+        $user_group_type = user_groups::USER;
+        $user_group_id = $data->user1->id;
+        $status = assignment_entity::STATUS_ACTIVE;
+
+        $this->expectException(assignment_create_exception::class);
+        $this->expectExceptionMessage('Competency cannot be be assigned by given type');
+
+        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+    }
+
+    public function test_can_create_with_self_type_if_assignable() {
+        $this->setAdminUser();
+
+        $data = $this->create_data();
+
+        $comp_id = $data->comp1->id;
+        $this->set_self_assignable($data->comp1->id);
+
+        $type = assignment_entity::TYPE_SELF;
+        $user_group_type = user_groups::USER;
+        $user_group_id = $data->user1->id;
+        $status = assignment_entity::STATUS_ACTIVE;
+
+        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $this->assertInstanceOf(assignment_model::class, $assignment);
+    }
+
+    public function test_cannot_create_with_self_type_if_not_assignable() {
+        $this->setAdminUser();
+
+        $data = $this->create_data();
+
+        $comp_id = $data->comp1->id;
+        $type = assignment_entity::TYPE_SELF;
+        $user_group_type = user_groups::USER;
+        $user_group_id = $data->user1->id;
+        $status = assignment_entity::STATUS_ACTIVE;
+
+        $this->expectException(assignment_create_exception::class);
+        $this->expectExceptionMessage('Competency cannot be be assigned by given type');
+
+        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+    }
+
     public function test_cannot_create_for_deleted_user() {
         $this->setAdminUser();
 
@@ -320,6 +389,8 @@ class tassign_competency_assignment_model_create_testcase extends assignment_mod
 
         // Now change the type which should result in a new assignment
         $type = assignment_entity::TYPE_OTHER;
+
+        $this->set_other_assignable($comp_id);
 
         $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
@@ -479,6 +550,22 @@ class tassign_competency_assignment_model_create_testcase extends assignment_mod
         $this->assertEquals(user_groups::COHORT, $user_group->get_type());
         $this->assertEquals($user_group_id, $user_group->get_id());
         $this->assertFalse($user_group->is_deleted());
+    }
+
+    private function set_self_assignable($comp_id) {
+        builder::table('comp_assign_availability')
+            ->insert([
+                'comp_id' => $comp_id,
+                'availability' => \totara_competency\entities\competency::ASSIGNMENT_CREATE_SELF
+            ]);
+    }
+
+    private function set_other_assignable($comp_id) {
+        builder::table('comp_assign_availability')
+            ->insert([
+                'comp_id' => $comp_id,
+                'availability' => \totara_competency\entities\competency::ASSIGNMENT_CREATE_OTHER
+            ]);
     }
 
 }

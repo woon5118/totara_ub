@@ -42,6 +42,7 @@ use totara_assignment\entities\hierarchy_item;
 use totara_assignment\entities\user;
 use totara_assignment\filter\hierarchy_item_visible;
 use totara_assignment\user_groups;
+use totara_competency\entities\competency as other_competency_entity;
 
 class assignment {
 
@@ -238,6 +239,10 @@ class assignment {
         $allowed_user_only_types = [assignment_entity::TYPE_OTHER, assignment_entity::TYPE_SYSTEM, assignment_entity::TYPE_SELF];
         if ($user_group_type !== user_groups::USER && in_array($type, $allowed_user_only_types, true)) {
             throw new assignment_create_exception('Invalid combination of type and user_group_type given');
+        }
+
+        if (!$competency->can_assign($type)) {
+            throw new assignment_create_exception('Competency cannot be be assigned by given type');
         }
 
         $class = "totara_assignment\\entities\\{$user_group_type}";
