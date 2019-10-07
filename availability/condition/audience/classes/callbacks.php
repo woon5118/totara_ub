@@ -23,6 +23,8 @@
 
 namespace availability_audience;
 
+use core_availability\frontend;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -55,31 +57,22 @@ class callbacks {
 
         foreach ($module_records as $record) {
             $availability = $record->availability;
-            $availability_data = json_decode($availability);
-            $changed = false;
-
-            foreach ($availability_data->c as $key => $condition) {
-                if ($condition->type == 'audience' && $condition->cohort == $cohortid) {
-                    unset($availability_data->c[$key]);
-                    unset($availability_data->showc[$key]);
-                    $changed = true;
+            // Remove all matching conditions from the availability json.
+            if (!empty($availability)) {
+                $changed = false;
+                $encoded = frontend::for_each_condition_in_availability_json($availability, function ($condition) use ($cohortid, &$changed) {
+                    if ($condition->type == 'audience' && $condition->cohort == $cohortid) {
+                        $changed = true;
+                        // Tell the caller to remove this condition.
+                        return false;
+                    }
+                    return true;
+                });
+                // The condition has changed.
+                if ($changed) {
+                    $updated_records[] = array('id' => $record->id, 'availability' => $encoded);
+                    $courses[$record->course] = $record->course;
                 }
-            }
-
-            // The condition has changed.
-            if ($changed) {
-                // Reindex arrays
-                $availability_data->c = array_values($availability_data->c);
-                $availability_data->showc = array_values($availability_data->showc);
-
-                if (!empty($availability_data->c)) {
-                    $encoded = json_encode($availability_data);
-                } else {
-                    $encoded = '';
-                }
-
-                $updated_records[] = array('id' => $record->id, 'availability' => $encoded);
-                $courses[$record->course] = $record->course;
             }
         }
 

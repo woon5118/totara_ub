@@ -49,7 +49,11 @@ M.availability_hierarchy_organisation.form.getNode = function(json) {
     html += '<select id="avail-organisation" name="' + selectName + '">';
     if (organisation > 0) {
         if (typeof this.conditionConfig !== 'undefined') {
-            html += '<option value=' + organisation + '>' + this.conditionConfig.organisationNames[organisation].fullname + '</option>';
+            if (typeof this.conditionConfig.organisationNames[organisation] !== 'undefined') {
+                html += '<option value=' + organisation + '>' + this.conditionConfig.organisationNames[organisation].fullname + '</option>';
+            } else {
+                organisation = 0;
+            }
         }
     }
     html += '</select>';
