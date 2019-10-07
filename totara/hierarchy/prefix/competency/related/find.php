@@ -66,7 +66,7 @@ if ($showhidden && !has_capability('totara/hierarchy:updatecompetencyframeworks'
 $search = optional_param('search', false, PARAM_BOOL);
 
 // Setup page
-admin_externalpage_setup('competencymanage', '', array(), '/totara/hierarchy/prefix/competency/related/add.php');
+admin_externalpage_setup('competencymanage', '', array(), '/totara/hierarchy/prefix/competency/related/find.php');
 
 $alreadyselected = array();
 if ($alreadyrelated = comp_relation_get_relations($compid)) {

@@ -41,7 +41,7 @@ $report = reportbuilder::create($summaryreportid, null, true);
 $fullname = $report->fullname;
 
 // Start page output.
-$PAGE->set_url('/totara/hierarchy/rb_source/goalsummaryselector.php', array('summaryreportid' => $summaryreportid));
+$PAGE->set_url('/totara/hierarchy/rb_sources/goalsummaryselector.php', array('summaryreportid' => $summaryreportid));
 $PAGE->set_totara_menu_selected('\totara_core\totara\menu\myreports');
 $PAGE->set_pagelayout('noblocks');
 $heading = get_string('goals', 'totara_hierarchy');
