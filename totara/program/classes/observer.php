@@ -393,7 +393,8 @@ class totara_program_observer {
 
         require_once($CFG->dirroot . '/totara/program/lib.php');
 
-        prog_assignments_firstlogin($DB->get_record('user', array('id' => $event->objectid)));
+        $userid = $event->objectid;
+        prog_assignments_firstlogin($userid);
 
         return true;
     }

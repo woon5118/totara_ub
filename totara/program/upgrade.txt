@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Added type hinting to prog_assignments_firstlogin function in totara/program/lib.php to force the first argument to
+  be of type integer.
 * Refactored several core program and certification functions. Most program and certification functions are now
   completely separate - you should use the functions specific to the object you are manipulating.
 * The following functions were added:

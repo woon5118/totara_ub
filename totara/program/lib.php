@@ -1557,10 +1557,10 @@ function prog_courseset_group_complete($courseset_group, $userid, $updatecomplet
  *
  * Used by program_hourly_cron and observer for first user login event.
  *
- * @param int $user User object to check first firstlogin for
+ * @param int $userid User ID to check first login for
  * @return boolean True if all the update_learner_assignments() succeeded or there was nothing to do
  */
-function prog_assignments_firstlogin($user) {
+function prog_assignments_firstlogin(int $userid) {
     global $DB;
 
     // NOTE: in theory this might get called multiple times at the same time,
@@ -1583,7 +1583,7 @@ function prog_assignments_firstlogin($user) {
         WHERE
             pfua.userid = ?
             AND pa.completionevent = ?"
-    , array($user->id, COMPLETION_EVENT_FIRST_LOGIN));
+    , array($userid, COMPLETION_EVENT_FIRST_LOGIN));
     // Group the future assignments by 'programid'.
     $pending_by_program = totara_group_records($rs, 'programid');
 
