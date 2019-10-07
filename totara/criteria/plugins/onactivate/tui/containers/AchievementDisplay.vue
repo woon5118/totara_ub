@@ -22,7 +22,7 @@
 
 <template>
   <div>
-    <h5>On Activate</h5>
+    <h4>{{ $str('achievement_display', 'criteria_onactivate') }}</h4>
   </div>
 </template>
 
@@ -54,3 +54,11 @@ export default {
   methods: {},
 };
 </script>
+
+<lang-strings>
+{
+  "criteria_onactivate": [
+    "achievement_display"
+  ]
+}
+</lang-strings>
