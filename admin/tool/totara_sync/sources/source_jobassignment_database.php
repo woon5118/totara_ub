@@ -40,6 +40,12 @@ class totara_sync_source_jobassignment_database extends totara_sync_source_jobas
         parent::config_save($data);
     }
 
+    public function validate_settings($data, $files = []) {
+        $errors = parent::validate_settings($data, $files);
+        $errors = array_merge($errors, $this->validate_settings_database_details($data, $files));
+        return $errors;
+    }
+
     /**
      * @return bool False as database sources do not use files.
      */

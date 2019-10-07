@@ -67,8 +67,8 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         $mform->addElement('text', 'database_dbhost', get_string('dbhost', 'tool_totara_sync'));
         $mform->setType('database_dbhost', PARAM_HOST);
         $mform->addElement('text', 'database_dbuser', get_string('dbuser', 'tool_totara_sync'));
-        $mform->addRule('database_dbuser', get_string('err_required', 'form'), 'required');
         $mform->setType('database_dbuser', PARAM_ALPHANUMEXT);
+        $mform->addHelpButton('database_dbuser', 'dbuser', 'tool_totara_sync');
         $mform->addElement('password', 'database_dbpass', get_string('dbpass', 'tool_totara_sync'));
         $mform->setType('database_dbpass', PARAM_RAW);
         $mform->addElement('text', 'database_dbport', get_string('dbport', 'tool_totara_sync'));
@@ -84,7 +84,7 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         //Javascript include
         local_js([TOTARA_JS_DIALOG]);
 
-        $PAGE->requires->strings_for_js(['dbtestconnectsuccess', 'dbtestconnectfail'], 'tool_totara_sync');
+        $PAGE->requires->strings_for_js(['dbtestconnecting', 'dbtestconnectsuccess', 'dbtestconnectfail'], 'tool_totara_sync');
 
         $jsmodule = [
                 'name' => 'totara_syncdatabaseconnect',
@@ -121,6 +121,14 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         $this->set_config('database_dbtable', $data->{'database_dbtable'});
 
         parent::config_save($data);
+    }
+
+    public function validate_settings($data, $files = []) {
+        $errors = parent::validate_settings($data, $files);
+        if ($data['database_dbtype'] !== 'sqlsrv' && empty($data['database_dbuser'])) {
+            $errors['database_dbuser'] = get_string('err_required', 'form');
+        }
+        return $errors;
     }
 
     /**

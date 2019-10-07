@@ -236,6 +236,7 @@ $string['willcreateduplicatejobidnumber'] = 'User \'{$a->useridnumber}\' has ano
 $string['dbtype'] = 'Database type';
 $string['dbname'] = 'Database name';
 $string['dbuser'] = 'Database user';
+$string['dbuser_help'] = 'Most database types require a valid database username in order to establish connection. This does not apply to Microsoft SQL server, which can use other authentication methods.';
 $string['dbpass'] = 'Database password';
 $string['dbhost'] = 'Database hostname';
 $string['dbport'] = 'Database port';
@@ -247,6 +248,7 @@ $string['cannotconnectdbsettings'] = 'Cannot connect to database, please check s
 $string['dbmissingcolumnx'] = 'Remote database table does not contain field(s) "{$a}"';
 $string['dbmissingtablex'] = 'Remote database table "{$a}" does not exist';
 $string['dbtestconnection'] = 'Test database connection';
+$string['dbtestconnecting'] = 'Connecting...';
 $string['dbtestconnectsuccess'] = 'Successfully connected to database';
 $string['dbtestconnectfail'] = 'Failed to connect to database';
 

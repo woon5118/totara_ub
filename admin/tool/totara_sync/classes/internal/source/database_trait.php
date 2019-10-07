@@ -55,8 +55,8 @@ trait database_trait {
         $mform->addElement('text', 'database_dbhost', get_string('dbhost', 'tool_totara_sync'));
         $mform->setType('database_dbhost', PARAM_HOST);
         $mform->addElement('text', 'database_dbuser', get_string('dbuser', 'tool_totara_sync'));
-        $mform->addRule('database_dbuser', get_string('err_required', 'form'), 'required');
         $mform->setType('database_dbuser', PARAM_ALPHANUMEXT);
+        $mform->addHelpButton('database_dbuser', 'dbuser', 'tool_totara_sync');
         $mform->addElement('password', 'database_dbpass', get_string('dbpass', 'tool_totara_sync'));
         $mform->setType('database_dbpass', PARAM_RAW);
         $mform->addElement('text', 'database_dbport', get_string('dbport', 'tool_totara_sync'));
@@ -78,7 +78,7 @@ trait database_trait {
         //Javascript include
         local_js(array(TOTARA_JS_DIALOG));
 
-        $PAGE->requires->strings_for_js(array('dbtestconnectsuccess', 'dbtestconnectfail'), 'tool_totara_sync');
+        $PAGE->requires->strings_for_js(array('dbtestconnecting', 'dbtestconnectsuccess', 'dbtestconnectfail'), 'tool_totara_sync');
 
         $jsmodule = array(
             'name' => 'totara_syncdatabaseconnect',
@@ -111,6 +111,21 @@ trait database_trait {
         $this->set_config('database_dbport', $data->{'database_dbport'});
         $this->set_config('database_dbtable', $data->{'database_dbtable'});
         $this->set_config('database_dateformat', $data->{'database_dateformat'});
+    }
+
+    /**
+     * Validates configuration settings for this source.
+     *
+     * @param array $data Data submitted via the moodle form.
+     * @param array $files Files submitted via the moodle form.
+     * @return string[] Containing errors found during validation.
+     */
+    public function validate_settings_database_details($data, $files = []) {
+        $errors = [];
+        if ($data['database_dbtype'] !== 'sqlsrv' && empty($data['database_dbuser'])) {
+            $errors['database_dbuser'] = get_string('err_required', 'form');
+        }
+        return $errors;
     }
 
     /**
