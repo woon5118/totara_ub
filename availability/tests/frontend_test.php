@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
- * @package core_course
+ * @package core_availability
  */
 
 
@@ -523,5 +523,55 @@ class frontend_testcase extends advanced_testcase {
             }
             $this->fail('Unexpected exception ' . get_class($e) . ' thrown');
         }
+    }
+
+    /**
+     * Test frontend::for_each_condition_in_availability_json() with removing some conditions.
+     */
+    public function test_for_each_condition_in_availability_json() {
+        $noop = function ($condition) {
+            return true;
+        };
+        $eraser = function ($condition) {
+            return false;
+        };
+
+        $jsons = [
+            '{"op":"&","c":[{"op":"|","c":[{"type":"audience","cohort":"3"},{"type":"audience","cohort":"1"},{"type":"completion","cm":1,"e":4}]},{"type":"audience","cohort":"1"},{"type":"audience","cohort":"5"}],"showc":[true,false,true]}',
+            '{"op":"&","c":[{"op":"|","c":[{"type":"audience","cohort":"3"},{"type":"completion","cm":1,"e":4}]},{"type":"audience","cohort":"5"}],"showc":[true,true]}'
+        ];
+        $result = frontend::for_each_condition_in_availability_json($jsons[0], function ($condition) {
+            if ($condition->type == 'audience' && $condition->cohort == 1) {
+                return false;
+            }
+            return true;
+        });
+        $this->assertEquals($jsons[1], $result);
+        $this->assertEquals('', frontend::for_each_condition_in_availability_json($jsons[0], $eraser));
+
+        $jsons = [
+            '{"op":"|","c":[{"op":"&","c":[{"type":"audience","cohort":"3"},{"type":"completion","cm":1,"e":1},{"type":"audience","cohort":"4"},{"op":"&","c":[{"type":"audience","cohort":"1"},{"op":"!|","c":[{"op":"|","c":[{"op":"!&","c":[{"type":"hierarchy_position","position":"5"}]},{"type":"hierarchy_organisation","organisation":"9"}]},{"type":"audience","cohort":"2"}]},{"type":"hierarchy_organisation","organisation":"6"}]}]},{"type":"hierarchy_position","position":"5"},{"type":"hierarchy_organisation","organisation":"3"},{"type":"audience","cohort":"5"}],"show":true}',
+            '{"op":"|","c":[{"op":"&","c":[{"type":"completion","cm":1,"e":1},{"type":"audience","cohort":"4"},{"op":"&","c":[{"type":"audience","cohort":"1"},{"type":"hierarchy_organisation","organisation":"6"}]}]},{"type":"hierarchy_organisation","organisation":"3"},{"type":"audience","cohort":"5"}],"show":true}',
+        ];
+        $result = frontend::for_each_condition_in_availability_json($jsons[0], function ($condition) {
+            if ($condition->type == 'audience' && ($condition->cohort == 2 || $condition->cohort == 3)) {
+                return false;
+            }
+            if ($condition->type == 'hierarchy_position' && $condition->position == 5) {
+                return false;
+            }
+            if ($condition->type == 'hierarchy_organisation' && $condition->organisation == 9) {
+                return false;
+            }
+            return true;
+        });
+        $this->assertEquals($jsons[1], $result);
+        $this->assertEquals('', frontend::for_each_condition_in_availability_json($jsons[0], $eraser));
+
+        $this->assertFalse(frontend::for_each_condition_in_availability_json('42', $noop));
+        $this->assertFalse(frontend::for_each_condition_in_availability_json('invalid format', $noop));
+        $this->assertFalse(frontend::for_each_condition_in_availability_json('"invalid format"', $noop));
+        $this->assertFalse(frontend::for_each_condition_in_availability_json('[{}]', $noop));
+        $this->assertFalse(frontend::for_each_condition_in_availability_json('{"invalid_format":true}', $noop));
     }
 }

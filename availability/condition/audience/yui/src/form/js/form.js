@@ -48,7 +48,11 @@ M.availability_audience.form.getNode = function(json) {
     html += '<select id="avail-audience" name="' + selectName + '">';
     if (cohort > 0) {
         if (typeof this.dialogConfig !== 'undefined') {
-            html += '<option value=' + cohort + '>' + this.dialogConfig.audienceNames[cohort].name + '</option>';
+            if (typeof this.dialogConfig.audienceNames[cohort] !== 'undefined') {
+                html += '<option value=' + cohort + '>' + this.dialogConfig.audienceNames[cohort].name + '</option>';
+            } else {
+                cohort = 0;
+            }
         }
     }
     html += '</select>';

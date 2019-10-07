@@ -1,6 +1,13 @@
 This files describes API changes in /availability/*.
 The information here is intended only for developers.
 
+=== 13 ===
+
+* The following event observers have been removed; please remove any dependencies:
+  - availability_audience\callbacks::cohort_deleted
+  - availability_hierarchy_organisation\callbacks::organisation_deleted
+  - availability_hierarchy_position\callbacks::position_deleted
+
 === 10 ===
 
 * Condition plugins must replace the CSS selector "#fitem_id_availabilityconditionsjson" with ".availability-field".

@@ -114,7 +114,10 @@ class condition extends \core_availability\condition {
         global $DB;
 
         $positionname = $DB->get_field('pos', 'fullname', array('id' => $this->positionid));
-        $positionname = format_string($positionname);
+        if ($positionname === false) {
+            $positionname = get_string('missing', 'availability_hierarchy_position');
+        }
+        $positionname = s($positionname);
 
         if ($not) {
             return get_string('notassignedtoposx', 'availability_hierarchy_position', $positionname);

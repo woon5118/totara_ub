@@ -35,67 +35,14 @@ class callbacks {
      * deleted
      *
      * @param \core\event\cohort_deleted $event Event data
+     * @deprecated since Totara 11.20, 12.11, 13
      */
     public static function cohort_deleted(\core\event\cohort_deleted $event) {
-        global $DB;
-
-        // Cohort id.
-        $cohortid = $event->objectid;
-
-        $audiencetypelikesql = $DB->sql_like('availability', ':likeparam');
-        $audienceidlikesql = $DB->sql_like('availability', ':likeparam2');
-        $params = array('likeparam' => '%"type":"audience"%', 'likeparam2' => '%"cohort":"'.$cohortid.'"%');
-
-        $sql = "SELECT id, course, availability FROM {course_modules} WHERE availability != '' AND {$audiencetypelikesql} AND {$audienceidlikesql}";
-
-        $module_records = $DB->get_records_sql($sql, $params);
-
-        $updated_records = array();
-        $courses = array();
-
-        foreach ($module_records as $record) {
-            $availability = $record->availability;
-            $availability_data = json_decode($availability);
-            $changed = false;
-
-            foreach ($availability_data->c as $key => $condition) {
-                if ($condition->type == 'audience' && $condition->cohort == $cohortid) {
-                    unset($availability_data->c[$key]);
-                    unset($availability_data->showc[$key]);
-                    $changed = true;
-                }
-            }
-
-            // The condition has changed.
-            if ($changed) {
-                // Reindex arrays
-                $availability_data->c = array_values($availability_data->c);
-                $availability_data->showc = array_values($availability_data->showc);
-
-                if (!empty($availability_data->c)) {
-                    $encoded = json_encode($availability_data);
-                } else {
-                    $encoded = '';
-                }
-
-                $updated_records[] = array('id' => $record->id, 'availability' => $encoded);
-                $courses[$record->course] = $record->course;
-            }
-        }
-
-        // Update course module records
-        foreach ($updated_records as $update) {
-            // Do this fast!
-            $DB->update_record_raw('course_modules', $update, true);
-        }
-
-        // Rebuild the course caches for any of the courses
-        // we changed
-        foreach ($courses as $courseid) {
-            rebuild_course_cache($courseid, true);
-        }
-
-        unset($updated_records);
-        unset($courses);
+        /*
+         * Deleting an audience should not remove the activity restrictions related to that audience.
+         * This behaviour could inadvertently allow people to access and complete activities that they should not.
+         * As a result, this event observer has been removed and the functionality is no longer available.
+         */
+        debugging('The event observer '.__CLASS__.' is no longer used. Please remove this class from events.php.', DEBUG_DEVELOPER);
     }
 }

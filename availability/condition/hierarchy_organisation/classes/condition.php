@@ -113,7 +113,10 @@ class condition extends \core_availability\condition {
         global $DB;
 
         $organisationname = $DB->get_field('org', 'fullname', array('id' => $this->organisationid));
-        $organisationname = format_string($organisationname);
+        if ($organisationname === false) {
+            $organisationname = get_string('missing', 'availability_hierarchy_organisation');
+        }
+        $organisationname = s($organisationname);
 
         if ($not) {
             return get_string('notassignedtoorgx', 'availability_hierarchy_organisation', $organisationname);

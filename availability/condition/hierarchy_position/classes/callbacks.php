@@ -36,66 +36,14 @@ class callbacks {
      * deleted.
      *
      * @param \hierarchy_position\event\position_deleted $event Event data
+     * @deprecated since Totara 11.20, 12.11, 13
      */
     public static function position_deleted(\hierarchy_position\event\position_deleted $event) {
-        global $DB;
-
-        // Position ID.
-        $posid = $event->objectid;
-
-        $postypelikesql = $DB->sql_like('availability', ':likeparam');
-        $posidlikesql = $DB->sql_like('availability', ':likeparam2');
-        $params = array('likeparam' => '%"type":"hierarchy_position"%', 'likeparam2' => '%"position":"'.$posid.'"%');
-
-        $sql = "SELECT * FROM {course_modules} WHERE availability != '' AND {$postypelikesql} AND {$posidlikesql}";
-
-        $module_records = $DB->get_records_sql($sql, $params);
-
-        $updated_records = array();
-        $courses = array();
-
-        foreach ($module_records as $record) {
-            $availability = $record->availability;
-            $availability_data = json_decode($availability);
-            $changed = false;
-
-            foreach ($availability_data->c as $key => $condition) {
-                if ($condition->type == 'hierarchy_position' && $condition->position == $posid) {
-                    unset($availability_data->c[$key]);
-                    unset($availability_data->showc[$key]);
-                    $changed = true;
-                }
-            }
-
-            // The condition has changed.
-            if ($changed) {
-                // Reindex arrays
-                $availability_data->c = array_values($availability_data->c);
-                $availability_data->showc = array_values($availability_data->showc);
-
-                if (!empty($availability_data->c)) {
-                    $encoded = json_encode($availability_data);
-                } else {
-                    $encoded = '';
-                }
-
-                $updated_records[] = array('id' => $record->id, 'availability' => $encoded);
-                $courses[$record->course] = $record->course;
-            }
-        }
-
-        // Update course module records
-        foreach ($updated_records as $update) {
-            $DB->update_record('course_modules', $update, true);
-        }
-
-        // Rebuild the course caches for any of the courses
-        // we changed
-        foreach ($courses as $courseid) {
-            rebuild_course_cache($courseid, true);
-        }
-
-        unset($updated_records);
-        unset($courses);
+        /*
+         * Deleting a position should not remove the activity restrictions related to that position.
+         * This behaviour could inadvertently allow people to access and complete activities that they should not.
+         * As a result, this event observer has been removed and the functionality is no longer available.
+         */
+        debugging('The event observer '.__CLASS__.' is no longer used. Please remove this class from events.php.', DEBUG_DEVELOPER);
     }
 }
