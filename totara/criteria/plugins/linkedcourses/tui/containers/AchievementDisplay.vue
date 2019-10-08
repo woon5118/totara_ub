@@ -60,6 +60,7 @@ export default {
         };
       },
       update({ criteria_linkedcourses_achievements: achievements }) {
+        this.$emit('loaded');
         return achievements;
       },
     },

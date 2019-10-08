@@ -22,23 +22,25 @@
 
 <template>
   <div>
-    <Preloader :display="$apollo.loading" />
     <div
       v-for="(component, id) in achievements"
       :key="id"
       class="tui-totaraCompetency-achievementPathDisplay__group"
     >
-      <component :is="component.component" v-bind="component.props" />
+      <component
+        :is="component.component"
+        v-bind="component.props"
+        @loaded="itemLoaded"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import AchievementPathsQuery from '../../webapi/ajax/achievement_paths.graphql';
-import Preloader from 'totara_competency/presentation/Preloader';
 
 export default {
-  components: { Preloader },
+  components: {},
   props: {
     userId: {
       required: true,
@@ -53,12 +55,26 @@ export default {
   data: function() {
     return {
       achievements: [],
+      itemsLoaded: null,
     };
   },
 
   computed: {
     assignmentId() {
       return parseInt(this.assignment.id);
+    },
+
+    numberOfItems() {
+      return this.achievements.length;
+    },
+  },
+
+  watch: {
+    itemsLoaded: function(newLoading) {
+      // If all items are loaded
+      if (newLoading === this.numberOfItems) {
+        this.$emit('loaded');
+      }
     },
   },
 
@@ -87,6 +103,10 @@ export default {
           });
         });
 
+        if (newAchievementComponents.length === 0) {
+          this.$emit('loaded');
+        }
+
         return newAchievementComponents;
       },
     },
@@ -95,6 +115,9 @@ export default {
   methods: {
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.toLowerCase().slice(1);
+    },
+    itemLoaded() {
+      this.itemsLoaded += 1;
     },
   },
 };

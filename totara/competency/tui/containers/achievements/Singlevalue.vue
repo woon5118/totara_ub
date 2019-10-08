@@ -22,12 +22,15 @@
 
 <template>
   <div>
-    <Preloader :display="$apollo.loading" />
     <h3>{{ $str('complete_criteria', 'totara_competency') }}</h3>
     <div v-for="(achievement, id) in achievements" :key="id">
       <h4>{{ achievement.scale_value.name }}</h4>
       <div v-for="(item, itemid) in achievement.items" :key="itemid">
-        <component :is="item.component" v-bind="item.props" />
+        <component
+          :is="item.component"
+          v-bind="item.props"
+          @loaded="itemLoaded"
+        />
         <Divider
           v-if="!isLastItem(itemid, achievement.items)"
           :label="$str('or', 'totara_competency')"
@@ -40,10 +43,10 @@
 <script>
 import ScaleAchievementsQuery from '../../../webapi/ajax/scale_achievements.graphql';
 import Divider from 'totara_competency/presentation/common/Divider';
-import Preloader from 'totara_competency/presentation/Preloader';
 
 export default {
-  components: { Divider, Preloader },
+  components: { Divider },
+
   props: {
     userId: {
       required: true,
@@ -60,7 +63,31 @@ export default {
     return {
       achievements: [],
       achievementComponents: [],
+      itemsLoaded: 0,
     };
+  },
+
+  computed: {
+    numberOfItems() {
+      let count = 0;
+
+      if (this.achievements.length > 0) {
+        this.achievements.forEach(achievement => {
+          count += achievement.items.length;
+        });
+      }
+
+      return count;
+    },
+  },
+
+  watch: {
+    itemsLoaded: function(newLoading) {
+      // If all items are loaded
+      if (newLoading === this.numberOfItems) {
+        this.$emit('loaded');
+      }
+    },
   },
 
   apollo: {
@@ -104,6 +131,10 @@ export default {
   methods: {
     isLastItem(id, items) {
       return id === items.length - 1;
+    },
+
+    itemLoaded() {
+      this.itemsLoaded += 1;
     },
   },
 };

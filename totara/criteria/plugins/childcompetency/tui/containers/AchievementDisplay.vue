@@ -22,7 +22,6 @@
 
 <template>
   <div>
-    <Preloader :display="$apollo.loading" />
     <Table
       v-if="hasCompetencies"
       :data="achievements.items"
@@ -108,14 +107,13 @@
 <script>
 import CreateUserAssignmentMutation from '../../../../../competency/webapi/ajax/create_user_assignments.graphql';
 import AchievementsQuery from '../../webapi/ajax/achievements.graphql';
-import Preloader from 'totara_competency/presentation/Preloader';
 import HeaderCell from 'totara_core/presentation/datatable/HeaderCell';
 import Cell from 'totara_core/presentation/datatable/Cell';
 import CheckSuccess from 'totara_core/presentation/icons/common/CheckSuccess';
 import Table from 'totara_core/presentation/datatable/Table';
 
 export default {
-  components: { CheckSuccess, Cell, HeaderCell, Preloader, Table },
+  components: { CheckSuccess, Cell, HeaderCell, Table },
 
   props: {
     instanceId: {
@@ -139,6 +137,7 @@ export default {
       },
     };
   },
+
   computed: {
     achievedCompetencies() {
       return this.achievements.items.reduce((total, current) => {
@@ -167,6 +166,7 @@ export default {
         };
       },
       update({ criteria_childcompetency_achievements: achievements }) {
+        this.$emit('loaded');
         return achievements;
       },
     },

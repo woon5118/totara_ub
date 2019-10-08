@@ -22,7 +22,6 @@
 
 <template>
   <div>
-    <Preloader :display="$apollo.loading" />
     <div v-if="!$apollo.loading && !hasCourses">
       <h4>{{ $str('courses', 'totara_criteria') }}</h4>
       <p>{{ $str('no_courses', 'totara_criteria') }}</p>
@@ -95,14 +94,13 @@
 </template>
 
 <script>
-import Preloader from 'totara_competency/presentation/Preloader';
 import Cell from 'totara_core/presentation/datatable/Cell';
 import CheckIcon from 'totara_core/presentation/icons/common/CheckSuccess';
 import HeaderCell from 'totara_core/presentation/datatable/HeaderCell';
 import Table from 'totara_core/presentation/datatable/Table';
 
 export default {
-  components: { Preloader, Cell, CheckIcon, HeaderCell, Table },
+  components: { Cell, CheckIcon, HeaderCell, Table },
   props: {
     achievements: {
       required: true,

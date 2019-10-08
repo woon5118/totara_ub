@@ -14,13 +14,27 @@
         :active="key === 0"
         :name="item.assignment.progress_name"
       >
-        <ScaleDetail
-          :competency-id="competencyId"
-          :user-id="userId"
-          :my-value="item.my_value"
-          :assignment="item.assignment"
-        />
-        <AchievementDisplay :user-id="userId" :assignment="item.assignment" />
+        <Preloader :display="!displayToggle[key]" />
+        <div
+          :class="
+            displayToggle[key] && displayToggle[key] === true
+              ? 'tui-Details__show'
+              : 'tui-Details__hide'
+          "
+        >
+          <ScaleDetail
+            :competency-id="competencyId"
+            :user-id="userId"
+            :my-value="item.my_value"
+            :assignment="item.assignment"
+            @loaded="scaleDetailsLoaded(key)"
+          />
+          <AchievementDisplay
+            :user-id="userId"
+            :assignment="item.assignment"
+            @loaded="achievementDisplayLoaded(key)"
+          />
+        </div>
       </Tab>
     </Tabs>
     <hr />
@@ -32,9 +46,10 @@ import Tab from './Tab';
 import Tabs from './Tabs';
 import ScaleDetail from './ScaleDetail';
 import AchievementDisplay from 'totara_competency/containers/AchievementDisplay';
+import Preloader from 'totara_competency/presentation/Preloader';
 
 export default {
-  components: { ScaleDetail, AchievementDisplay, Tab, Tabs },
+  components: { ScaleDetail, AchievementDisplay, Tab, Tabs, Preloader },
   props: {
     userId: {
       required: true,
@@ -50,14 +65,50 @@ export default {
     },
   },
 
+  data: function() {
+    return {
+      loadedScaleDetails: {},
+      loadedAchievementDisplay: {},
+      displayToggle: {},
+    };
+  },
+
   computed: {},
+
+  methods: {
+    canDisplay(itemKey) {
+      return (
+        this.loadedScaleDetails[itemKey] &&
+        this.loadedAchievementDisplay[itemKey]
+      );
+    },
+    scaleDetailsLoaded(itemKey) {
+      this.$set(this.loadedScaleDetails, itemKey, true);
+      this.updateDisplayToggle(itemKey);
+    },
+    achievementDisplayLoaded(itemKey) {
+      this.$set(this.loadedAchievementDisplay, itemKey, true);
+      this.updateDisplayToggle(itemKey);
+    },
+    updateDisplayToggle(itemKey) {
+      this.$set(this.displayToggle, itemKey, this.canDisplay(itemKey));
+    },
+  },
 };
 </script>
 <style lang="scss">
-.tui-Details__ {
-  &description {
+.tui-Details {
+  &__description {
     padding-top: $totara_style_spacing_2;
     padding-bottom: $totara_style_spacing_4;
+  }
+
+  &__show {
+    display: block;
+  }
+
+  &__hide {
+    display: none;
   }
 }
 </style>

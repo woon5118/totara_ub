@@ -23,6 +23,7 @@
 
 $string['assign_competency'] = 'Assign competency';
 $string['competencies'] = 'Competencies';
+$string['no_competencies'] = 'There are no child competencies available to view';
 $string['pluginname'] = 'Aggregation of child competencies';
 $string['required_only'] = '{$a} required only';
 $string['self_assign_competency'] = 'Self assign competency';

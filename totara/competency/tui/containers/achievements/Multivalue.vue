@@ -26,6 +26,7 @@
       :is="component"
       :user-id="userId"
       :assignment-id="assignmentId"
+      @loaded="isLoaded"
     />
   </div>
 </template>
@@ -58,6 +59,10 @@ export default {
     this.component = tui.asyncComponent(compPath);
   },
 
-  methods: {},
+  methods: {
+    isLoaded() {
+      this.$emit('loaded');
+    },
+  },
 };
 </script>

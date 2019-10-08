@@ -22,10 +22,13 @@
 
 <template>
   <div class="tui-pathwayCriteriaGroup-achievement__group">
-    <Preloader :display="$apollo.loading" />
     <div v-for="(component, id) in achievements" :key="id">
       <div class="tui-pathwayCriteriaGroup-achievement__group__criteria">
-        <component :is="component.component" v-bind="component.props" />
+        <component
+          :is="component.component"
+          v-bind="component.props"
+          @loaded="itemLoaded"
+        />
       </div>
       <Divider
         v-if="!isLastItem(id, achievements)"
@@ -38,10 +41,9 @@
 <script>
 import CriteriaGroupAchievementsQuery from '../../webapi/ajax/achievements.graphql';
 import Divider from 'totara_competency/presentation/common/Divider';
-import Preloader from 'totara_competency/presentation/Preloader';
 
 export default {
-  components: { Divider, Preloader },
+  components: { Divider },
   props: {
     instanceId: {
       required: true,
@@ -60,7 +62,23 @@ export default {
   data: function() {
     return {
       achievements: [],
+      itemsLoaded: 0,
     };
+  },
+
+  computed: {
+    numberOfItems() {
+      return this.achievements.length;
+    },
+  },
+
+  watch: {
+    itemsLoaded: function(newLoading) {
+      // If all items are loaded
+      if (newLoading === this.numberOfItems) {
+        this.$emit('loaded');
+      }
+    },
   },
 
   apollo: {
@@ -95,6 +113,10 @@ export default {
   methods: {
     isLastItem(id, items) {
       return id === items.length - 1;
+    },
+
+    itemLoaded() {
+      this.itemsLoaded += 1;
     },
   },
 };

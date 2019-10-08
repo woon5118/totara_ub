@@ -43,6 +43,10 @@ export default {
     return {};
   },
 
+  mounted() {
+    this.$emit('loaded');
+  },
+
   methods: {},
 };
 </script>

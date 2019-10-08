@@ -172,7 +172,10 @@ export default {
           assignment_id: this.assignmentId,
         };
       },
-      update: roles => roles.pathway_manual_role_ratings,
+      update({ pathway_manual_role_ratings: roles }) {
+        this.$emit('loaded');
+        return roles;
+      },
     },
   },
 };

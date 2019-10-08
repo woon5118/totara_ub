@@ -133,6 +133,7 @@ export default {
         };
       },
       update({ totara_competency_scale: scale }) {
+        this.$emit('loaded');
         return scale;
       },
     },
