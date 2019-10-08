@@ -14,12 +14,10 @@
         :active="key === 0"
         :name="item.assignment.progress_name"
       >
-        <Preloader :display="!displayToggle[key]" />
+        <Preloader :display="!displayTabContent[key]" />
         <div
           :class="
-            displayToggle[key] && displayToggle[key] === true
-              ? 'tui-Details__show'
-              : 'tui-Details__hide'
+            displayTabContent[key] ? 'tui-Details__show' : 'tui-Details__hide'
           "
         >
           <ScaleDetail
@@ -27,12 +25,12 @@
             :user-id="userId"
             :my-value="item.my_value"
             :assignment="item.assignment"
-            @loaded="scaleDetailsLoaded(key)"
+            @loaded="setScaleDetailsLoaded(key)"
           />
           <AchievementDisplay
             :user-id="userId"
             :assignment="item.assignment"
-            @loaded="achievementDisplayLoaded(key)"
+            @loaded="setAchievementDisplayLoaded(key)"
           />
         </div>
       </Tab>
@@ -67,31 +65,60 @@ export default {
 
   data: function() {
     return {
-      loadedScaleDetails: {},
-      loadedAchievementDisplay: {},
-      displayToggle: {},
+      isScaleDetailsLoaded: {},
+      isAchievementDisplayLoaded: {},
+      displayTabContent: {},
     };
   },
 
   computed: {},
 
   methods: {
-    canDisplay(itemKey) {
+    /**
+     * Returns true if all childitems of the tab are finished loading
+     *
+     * @param itemKey
+     */
+    canDisplayTabContent(itemKey) {
       return (
-        this.loadedScaleDetails[itemKey] &&
-        this.loadedAchievementDisplay[itemKey]
+        this.isScaleDetailsLoaded[itemKey] &&
+        this.isAchievementDisplayLoaded[itemKey]
       );
     },
-    scaleDetailsLoaded(itemKey) {
-      this.$set(this.loadedScaleDetails, itemKey, true);
-      this.updateDisplayToggle(itemKey);
+
+    /**
+     * Sets loading state of scaleDetails for given item,
+     * triggering the display of the content when all items are loaded
+     *
+     * @param itemKey
+     */
+    setScaleDetailsLoaded(itemKey) {
+      this.$set(this.isScaleDetailsLoaded, itemKey, true);
+      this.updateTabContentDisplayToggle(itemKey);
     },
-    achievementDisplayLoaded(itemKey) {
-      this.$set(this.loadedAchievementDisplay, itemKey, true);
-      this.updateDisplayToggle(itemKey);
+
+    /**
+     * Sets loading state of scaleDetails for given item,
+     * triggering the display of the content when all items are loaded
+     *
+     * @param itemKey
+     */
+    setAchievementDisplayLoaded(itemKey) {
+      this.$set(this.isAchievementDisplayLoaded, itemKey, true);
+      this.updateTabContentDisplayToggle(itemKey);
     },
-    updateDisplayToggle(itemKey) {
-      this.$set(this.displayToggle, itemKey, this.canDisplay(itemKey));
+
+    /**
+     * Set display toggle for tab to true if all chil components are loaded
+     *
+     * @param itemKey
+     */
+    updateTabContentDisplayToggle(itemKey) {
+      this.$set(
+        this.displayTabContent,
+        itemKey,
+        this.canDisplayTabContent(itemKey)
+      );
     },
   },
 };

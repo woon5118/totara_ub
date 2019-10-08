@@ -105,6 +105,11 @@ export default {
           });
         });
 
+        // Make sure event is fired even if there are no items
+        if (newAchievementComponents.length === 0) {
+          this.$emit('loaded');
+        }
+
         return newAchievementComponents;
       },
     },

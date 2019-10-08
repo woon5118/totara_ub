@@ -100,15 +100,17 @@ export default {
         };
       },
       update({ totara_competency_scale_achievements: achievements }) {
-        var newAchievements = [];
+        let newAchievements = [];
+        let numberOfItems = 0;
 
         achievements.forEach(achievement => {
-          var newAchievement = {
+          let newAchievement = {
             scale_value: achievement.scale_value,
             items: [],
           };
           achievement.items.forEach(item => {
             let compPath = `pathway_${item.pathway_type}/containers/AchievementDisplay`;
+            numberOfItems += 1;
 
             newAchievement.items.push({
               component: tui.asyncComponent(compPath),
@@ -119,6 +121,11 @@ export default {
               },
             });
           });
+
+          // Make sure event is fired even if there are no items
+          if (numberOfItems === 0) {
+            this.$emit('loaded');
+          }
 
           newAchievements.push(newAchievement);
         });
