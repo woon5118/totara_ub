@@ -37,7 +37,14 @@ The polyfill code was copied from https://developer.mozilla.org/en-US/docs/
 * CustomEvent
 * Element - closest, matches, remove
 * Object - assign
-* String - startsWith, endsWith
+* String - startsWith, endsWith, includes
+* Array - find, findIndex, includes
+* NodeList - forEach
+* Object - entries, values
+* Number - isFinite, isInteger, isNaN, parseFloat, parseInt
 
 1. copy public domain code from the Mozilla site into lib/javascript_polyfill/src/other_ie11.js
-2. update list above if new polyfill added 
+2. using Object.getOwnPropertyDescriptor, check if the method matches
+   `{ writable: true, enumerable: false, configurable: true }`.
+   if it does, update the polyfill to define the method using `createMethodProperty()`
+3. update list above if new polyfill added
