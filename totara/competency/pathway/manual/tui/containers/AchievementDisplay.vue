@@ -60,13 +60,20 @@
           >
             {{ role.latest_rating.date }}
           </div>
-          <div v-else class="tui-pathwayManual-achievementDisplay__rating_date">
+          <div
+            v-if="!raterPurged(role)"
+            class="tui-pathwayManual-achievementDisplay__rating_date"
+          >
             {{
               $str('fullname_date', 'pathway_manual', {
                 name: role.latest_rating.rater.fullname,
                 date: role.latest_rating.date,
               })
             }}
+          </div>
+          <div v-else>
+            {{ role.latest_rating.date }}
+            <em>{{ $str('rater_details_removed', 'pathway_manual') }}</em>
           </div>
           <div
             v-if="hasComment(role)"
@@ -126,6 +133,10 @@ export default {
       return role.latest_rating != null;
     },
 
+    raterPurged(role) {
+      return role.latest_rating.rater == null;
+    },
+
     hasComment(role) {
       return role.latest_rating.comment != null;
     },
@@ -140,17 +151,33 @@ export default {
     },
 
     getProfilePhotoUrl(role) {
-      if (this.hasRating(role)) {
+      if (this.hasRating(role) && !this.raterPurged(role)) {
         return role.latest_rating.rater.profileimageurl;
       }
       return role.default_profile_picture;
     },
 
     getUserName(role) {
-      if (this.hasRating(role)) {
-        return role.latest_rating.rater.fullname;
+      if (!this.hasRating(role)) {
+        return this.$str('no_rating_given', 'pathway_manual');
+      } else if (this.raterPurged(role)) {
+        return this.$str('rater_details_removed', 'pathway_manual');
       }
-      return this.$str('no_rating_given', 'pathway_manual');
+      return role.latest_rating.rater.fullname;
+    },
+
+    getNameAndDate(role) {
+      if (this.raterPurged(role)) {
+        return this.$str(
+          'date_rater_details_removed',
+          'pathway_manual',
+          role.latest_rating.date
+        );
+      }
+      return this.$str('fullname_date', 'pathway_manual', {
+        name: role.latest_rating.rater.fullname,
+        date: role.latest_rating.date,
+      });
     },
 
     getPhotoClass(role) {
@@ -246,6 +273,7 @@ export default {
       "comment_wrapper",
       "fullname_date",
       "no_rating_given",
+      "rater_details_removed",
       "raters",
       "raters_info"
     ]

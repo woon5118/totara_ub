@@ -29,20 +29,22 @@ use totara_competency\base_achievement_detail;
 class achievement_detail extends base_achievement_detail {
 
     public function get_achieved_via_strings(): array {
-        global $DB;
-
         if (empty($this->related_info)) {
             return [];
         }
 
         $rating = new rating($this->related_info['rating_id']);
-        $rater = $DB->get_record('user', ['id' => $rating->assigned_by]);
-
-        $string = get_string(
-            'achievedviaratingby',
-            'pathway_manual',
-            ['name' => fullname($rater), 'role' => $rating->assigned_by_role]
-        );
+        $rater = $rating->assigned_by_user;
+        if ($rater) {
+            $string = get_string('rating_by', 'pathway_manual', [
+                'name' => fullname((object) $rater->to_array()),
+                'role' => get_string("role_{$rating->assigned_by_role}", 'pathway_manual'),
+            ]);
+        } else {
+            // The user data for the rater has been purged or user has been deleted.
+            $role = get_string("role_{$rating->assigned_by_role}_prefix", 'pathway_manual');
+            $string = get_string('rating_by_removed', 'pathway_manual', $role);
+        }
 
         return [$string];
     }

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package pathway_manual;
  */
 
@@ -25,8 +26,8 @@ namespace pathway_manual\entities;
 
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
-use core\orm\entity\relations\has_one;
 use totara_assignment\entities\user;
+use totara_competency\entities\competency;
 use totara_competency\entities\scale_value;
 
 /**
@@ -56,14 +57,14 @@ class rating extends entity {
      * @return belongs_to
      */
     public function assigned_by_user(): belongs_to {
-        return $this->belongs_to(user::class, 'assigned_by');
+        return $this->belongs_to(user::class, 'assigned_by')
+            ->where('deleted', 0);
     }
 
-    /**
-     * Scale value
-     *
-     * @return belongs_to
-     */
+    public function competency(): belongs_to {
+        return $this->belongs_to(competency::class, 'comp_id');
+    }
+
     public function scale_value(): belongs_to {
         return $this->belongs_to(scale_value::class, 'scale_value_id');
     }

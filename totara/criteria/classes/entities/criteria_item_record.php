@@ -17,41 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_competency
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @package totara_criteria
  */
 
-namespace totara_competency\entities;
+namespace totara_criteria\entities;
 
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 
 /**
- * Pathway per competency
+ * One users record for a criteria item
  *
- * @property int $comp_id
- * @property int $sortorder
- * @property string $path_type
- * @property int $path_instance_id
- * @property int $status
- * @property int $pathway_modified
+ * @property int $user_id
+ * @property int $criterion_item_id
+ * @property int $criterion_met true/false
+ * @property int $timeevaluated
  *
- * @property-read competency $competency
+ * @property-read criteria_item $item
  */
-class pathway extends entity {
+class criteria_item_record extends entity {
 
-    public const UPDATED_TIMESTAMP = 'pathway_modified';
-    public const SET_UPDATED_WHEN_CREATED = true;
+    public const TABLE = 'totara_criteria_item_record';
 
-    public const TABLE = 'totara_competency_pathway';
-
-    /**
-     * Each pathway has a competency associated wit it!
-     *
-     * @return belongs_to
-     */
-    public function competency(): belongs_to {
-        return $this->belongs_to(competency::class, 'comp_id');
+    public function item(): belongs_to {
+        return $this->belongs_to(criteria_item::class, 'criterion_item_id');
     }
 
 }

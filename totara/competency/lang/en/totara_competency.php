@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Totara competency';
+$string['pluginname'] = 'Competencies';
 
 $string['achievementpathsetup'] = 'Achievement paths setup';
 $string['achievementpaths'] = 'Achievement paths';
@@ -166,4 +166,6 @@ $string['updatecompachievements'] = 'Update competency achievements';
 $string['user_group_type:cohort'] = 'Audience';
 $string['user_group_type:position'] = 'Position';
 $string['user_group_type:organisation'] = 'Organisation';
+$string['userdataitemachievement'] = 'Achievement records';
+$string['userdataitemachievement_help'] = 'When purging, the user\'s achievement data will be removed. However, after purging is complete, the records may be added back again if they still meet the criteria. For instance, if a user has completed a course that is linked to a competency, then an achievement record will be created again despite being purged previously.';
 $string['viewing'] = 'Viewing';

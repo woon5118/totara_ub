@@ -23,9 +23,9 @@
 
 namespace tassign_competency\userdata;
 
+use core\orm\query\builder;
 use tassign_competency\entities;
 use totara_assignment\user_groups;
-use core\orm\query\builder;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
@@ -39,6 +39,23 @@ defined('MOODLE_INTERNAL') || die();
  * need to be purged as well.
  */
 class assignment_user extends item {
+
+    /**
+     * Get main Frankenstyle component name (core subsystem or plugin).
+     * This is used for UI purposes to group items into components.
+     */
+    public static function get_main_component() {
+        return 'totara_competency';
+    }
+
+    /**
+     * Returns sort order.
+     *
+     * @return int
+     */
+    public static function get_sortorder() {
+        return 0; // 1st item of 6 in the 'Competencies' list.
+    }
 
     /**
      * Can user data of this item data be purged from system?

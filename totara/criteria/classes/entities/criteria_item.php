@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
- * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package totara_pathway
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @package totara_criteria
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace totara_criteria\entities;
 
-$plugin->version  = 2019070303;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'pathway_manual'; // To check on upgrade, that module sits in correct place
+use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
+
+/**
+ * One users record for a criteria item
+ *
+ * @property int $criterion_id
+ * @property string $item_type
+ * @property int $item_id
+ *
+ * @property-read criterion $criterion
+ */
+class criteria_item extends entity {
+
+    public const TABLE = 'totara_criteria_item';
+
+    public function criterion(): belongs_to {
+        return $this->belongs_to(criterion::class, 'criterion_id');
+    }
+
+}

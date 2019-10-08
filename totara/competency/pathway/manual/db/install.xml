@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="totara/hierarchy/pathway/criteria_group/db" VERSION="20190711" COMMENT="Database layer definition for a criteria_manual pathway"
+<XMLDB PATH="totara/hierarchy/pathway/criteria_group/db" VERSION="20191002" COMMENT="Database layer definition for a criteria_manual pathway"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -32,7 +32,7 @@
         <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of user that is the subject of this rating"/>
         <FIELD NAME="scale_value_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="date_assigned" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="assigned_by" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of user who set this rating"/>
+        <FIELD NAME="assigned_by" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id of user who set this rating"/>
         <FIELD NAME="assigned_by_role" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Machine readable name of role"/>
         <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Comment left when a rating is given"/>
       </FIELDS>

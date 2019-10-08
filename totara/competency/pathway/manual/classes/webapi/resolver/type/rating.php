@@ -50,7 +50,11 @@ class rating implements type_resolver {
 
         switch ($field) {
             case 'rater':
-                return (object) $rating->assigned_by_user->to_array();
+                $rater = $rating->assigned_by_user;
+                if ($rater) {
+                    return (object) $rater->to_array();
+                }
+                return null;
             case 'scale_value':
                 return $rating->scale_value;
             case 'timestamp':

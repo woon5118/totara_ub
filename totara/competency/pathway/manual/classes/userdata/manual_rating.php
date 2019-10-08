@@ -1,8 +1,8 @@
 <?php
-/**
+/*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,23 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Andrew McGhie <andrew.mcghie@totaralearning.com>
- * @package totara_hierarchy
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @package pathway_manual
  */
 
-namespace hierarchy_competency\userdata;
+namespace pathway_manual\userdata;
 
+use core\orm\entity\repository;
+use pathway_manual\entities\rating;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 
-/**
- * Class competency_evidence
- * handles the data for the progress the user has made on a competency
- */
-class competency_evidence extends item {
+defined('MOODLE_INTERNAL') || die();
+
+abstract class manual_rating extends item {
 
     /**
      * Get main Frankenstyle component name (core subsystem or plugin).
@@ -42,15 +42,6 @@ class competency_evidence extends item {
     }
 
     /**
-     * Returns sort order.
-     *
-     * @return int
-     */
-    public static function get_sortorder() {
-        return 1; // 2nd item of 6 in the 'Competencies' list.
-    }
-
-    /**
      * Can user data of this item data be purged from system?
      *
      * @param int $userstatus target_user::STATUS_ACTIVE, target_user::STATUS_DELETED or target_user::STATUS_SUSPENDED
@@ -58,27 +49,6 @@ class competency_evidence extends item {
      */
     public static function is_purgeable(int $userstatus) {
         return true;
-    }
-
-    /**
-     * Purge user data for this item.
-     *
-     * NOTE: Remember that context record does not exist for deleted users any more,
-     *       it is also possible that we do not know the original user context id.
-     *
-     * @param target_user $user
-     * @param \context $context restriction for purging e.g., system context for everything, course context for purging one course
-     * @return int result self::RESULT_STATUS_SUCCESS, self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
-     */
-    protected static function purge(target_user $user, \context $context) {
-        global $DB;
-        $DB->delete_records('comp_record_history', ['userid' => $user->id]);
-        $DB->delete_records('comp_record', ['userid' => $user->id]);
-        $DB->delete_records('block_totara_stats', [
-            'userid' => $user->id,
-            'eventtype' => STATS_EVENT_COMP_ACHIEVED
-        ]);
-        return self::RESULT_STATUS_SUCCESS;
     }
 
     /**
@@ -95,25 +65,36 @@ class competency_evidence extends item {
      *
      * @param target_user $user
      * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @return export result object
      */
     protected static function export(target_user $user, \context $context) {
-        global $DB;
-        $export = new export();
-        $export->data = $DB->get_records('comp_record', ['userid' => $user->id]);
-        foreach ($export->data as &$record) {
-            $record->history = $DB->get_records('comp_record_history', [
-                'userid' => $user->id,
-                'competencyid' => $record->competencyid
-            ]);
+        $query = static::rating_query($user->id)
+            ->order_by('id')
+            ->with(['competency', 'scale_value']);
+
+        $data = [];
+        foreach ($query->get() as $rating) {
+            /** @var rating $rating */
+            $data[] = [
+                'id'               => (int) $rating->id,
+                'competency_id'    => (int) $rating->competency->id,
+                'competency_name'  => \core_text::entities_to_utf8(format_string($rating->competency->fullname)),
+                'scale_value_id'   => (int) $rating->scale_value_id,
+                'scale_value_name' => \core_text::entities_to_utf8(format_string($rating->scale_value->name)),
+                'date_assigned'    => (int) $rating->date_assigned,
+                'assigned_by'      => (int) $rating->assigned_by,
+                'assigned_by_role' => \core_text::entities_to_utf8(format_string($rating->assigned_by_role)),
+                'comment'          => \core_text::entities_to_utf8(format_string($rating->comment)),
+            ];
         }
+
+        $export = new export();
+        $export->data = [static::get_name() => $data];
         return $export;
     }
 
-
     /**
      * Can user data of this item be somehow counted?
-     * How much data is there?
      *
      * @return bool
      */
@@ -129,7 +110,15 @@ class competency_evidence extends item {
      * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, \context $context) {
-        global $DB;
-        return $DB->count_records('comp_record', ['userid' => $user->id]);
+        return static::rating_query($user->id)->count();
     }
+
+    /**
+     * Manual rating repository query for what data set to perform actions on
+     *
+     * @param int $user_id
+     * @return repository
+     */
+    abstract protected static function rating_query(int $user_id): repository;
+
 }

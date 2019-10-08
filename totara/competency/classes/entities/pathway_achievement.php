@@ -24,9 +24,10 @@
 
 namespace totara_competency\entities;
 
-
-use totara_competency\pathway;
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
+use totara_competency\entities\pathway as pathway_entity;
+use totara_competency\pathway;
 
 /**
  * Class pathway_achievement
@@ -39,6 +40,9 @@ use core\orm\entity\entity;
  * @property int $last_aggregated
  * @property int $status
  * @property string $related_info
+ *
+ * @property-read pathway_entity $pathway
+ * @property-read scale_value $scale_value
  */
 class pathway_achievement extends entity {
 
@@ -102,4 +106,13 @@ class pathway_achievement extends entity {
 
         return $this;
     }
+
+    public function pathway(): belongs_to {
+        return $this->belongs_to(pathway_entity::class, 'pathway_id');
+    }
+
+    public function scale_value(): belongs_to {
+        return $this->belongs_to(scale_value::class, 'scale_value_id');
+    }
+
 }

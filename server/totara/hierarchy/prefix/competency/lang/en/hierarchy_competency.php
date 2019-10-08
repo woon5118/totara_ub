@@ -48,6 +48,8 @@ $string['eventupdatedtype'] = 'Updated Competency Type';
 $string['eventvieweditem'] = 'Viewed Competency';
 $string['pluginname'] = 'Competency Hierarchies';
 $string['settings'] = 'Competency settings';
-$string['userdataitemcompetency_evidence'] = 'Competency status records';
-$string['userdataitemcompetency_progress'] = 'Competency progress records';
+$string['userdataitemcompetency_evidence'] = 'Competency status records (legacy)';
+$string['userdataitemcompetency_evidence_help'] = 'Prior to Totara version 13, competency records were stored differently. This data item refers only to data created in an older version.';
+$string['userdataitemcompetency_progress'] = 'Competency progress records (legacy)';
+$string['userdataitemcompetency_progress_help'] = 'Prior to Totara version 13, competency records were stored differently. This data item refers only to data created in an older version.';
 

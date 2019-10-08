@@ -132,5 +132,33 @@ function xmldb_pathway_manual_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019070302, 'pathway', 'manual');
     }
 
+    if ($oldversion < 2019070304) {
+        // Changes to pathway_manual_rating table
+        $table = new xmldb_table('pathway_manual_rating');
+
+        // Temporarily remove key
+        $key = new xmldb_key('patmanrat_fk_assiby');
+        if ($dbman->key_exists($table, $key)) {
+            $dbman->drop_key($table, $key);
+        }
+
+        // Temporarily remove index
+        $index = new xmldb_index('assigned_by', XMLDB_INDEX_NOTUNIQUE, array('assigned_by'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Allow 'assigned_by' field to be nullable
+        $field = new xmldb_field('assigned_by');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $dbman->change_field_notnull($table, $field);
+
+        // Add key back
+        $table->add_key('patmanrat_fk_assiby', XMLDB_KEY_FOREIGN, array('assigned_by'), 'user', array('id'));
+
+        // Criteria_group savepoint reached.
+        upgrade_plugin_savepoint(true, 2019070303, 'pathway', 'manual');
+    }
+
     return true;
 }

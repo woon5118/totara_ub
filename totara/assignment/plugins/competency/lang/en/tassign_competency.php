@@ -234,4 +234,4 @@ $string['user_groups_empty'] = 'No user groups added';
 $string['user_groups_selected'] = 'user groups';
 
 $string['userdataitemassignment_user'] = 'Competency assignments';
-$string['userdataitemassignment_user_help'] = 'This includes individual assignments and assignments due to the user being a member of an audience, being in a position or in an organisation.';
+$string['userdataitemassignment_user_help'] = 'This includes individual assignments and assignments due to the user being a member of an audience, being in a position or in an organisation. When purging, any achievement data associated with the assignments will also be purged (even if these data items are not selected). After purging, group-based assignments may be dynamically created again, if they user still meets the criteria for the assignment (by being a member of a group).';

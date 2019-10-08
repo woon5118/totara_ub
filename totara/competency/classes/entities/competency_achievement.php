@@ -43,6 +43,9 @@ use core\orm\entity\relations\belongs_to;
  * @property int $time_proficient
  * @property int $time_scale_value
  * @property int $last_aggregated
+ *
+ * @property-read competency $competency
+ * @property-read scale_value $value
  */
 class competency_achievement extends entity {
 
@@ -56,6 +59,15 @@ class competency_achievement extends entity {
 
     /** @var int Status when this record is not the latest for an assignment (either active or archived) */
     public const SUPERSEDED = 2;
+
+    /**
+     * Competency
+     *
+     * @return belongs_to
+     */
+    public function competency(): belongs_to {
+        return $this->belongs_to(competency::class, 'comp_id');
+    }
 
     /**
      * Scale value

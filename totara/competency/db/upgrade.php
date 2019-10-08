@@ -120,5 +120,25 @@ function xmldb_totara_competency_upgrade($oldversion) {
         // Competency savepoint reached.
         upgrade_plugin_savepoint(true, 2019082701, 'totara', 'competency');
     }
+
+    if ($oldversion < 2019082702) {
+        $table = new xmldb_table('totara_competency_achievement_via');
+
+        // Define key comachvia_comach_fk (foreign) to be added to totara_competency_achievement_via.
+        $key = new xmldb_key('comachvia_comach_fk', XMLDB_KEY_FOREIGN, array('comp_achievement_id'), 'totara_competency_achievement', array('id'), 'cascade');
+
+        // Launch add key comachvia_comach_fk.
+        $dbman->add_key($table, $key);
+
+        // Define key comachvia_pwach_fk (foreign) to be added to totara_competency_achievement_via.
+        $key = new xmldb_key('comachvia_pwach_fk', XMLDB_KEY_FOREIGN, array('pathway_achievement_id'), 'totara_competency_pathway_achievement', array('id'), 'cascade');
+
+        // Launch add key comachvia_pwach_fk.
+        $dbman->add_key($table, $key);
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019082702, 'totara', 'competency');
+    }
+
     return true;
 }

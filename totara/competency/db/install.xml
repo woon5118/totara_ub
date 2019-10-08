@@ -79,6 +79,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="comachvia_comach_fk" TYPE="foreign" FIELDS="comp_achievement_id" REFTABLE="totara_competency_achievement" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="comachvia_pwach_fk" TYPE="foreign" FIELDS="pathway_achievement_id" REFTABLE="totara_competency_pathway_achievement" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="totara_competency_configuration_change" COMMENT="Record of changes to criteria configuration of competency">
