@@ -33,6 +33,7 @@ use totara_competency\achievement_criteria;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
 use totara_competency\plugintypes;
+use totara_core\advanced_feature;
 use totara_mvc\admin_controller;
 use totara_mvc\tui_view;
 
@@ -99,6 +100,7 @@ class competency_controller extends admin_controller {
             'competency-name' => $this->competency->display_name,
             'framework-id' => $this->framework->id,
             'framework-name' => format_string($this->framework->fullname),
+            'perform-enabled' => advanced_feature::visible('perform'),
         ]);
     }
 
@@ -214,6 +216,8 @@ class competency_controller extends admin_controller {
      * @return array
      */
     private function export_achievementpaths_edit() {
+        advanced_feature::require('perform');
+
         $comp_agg_type = $this->competency->scale_aggregation_type ?: 'highest';
 
         $results = [

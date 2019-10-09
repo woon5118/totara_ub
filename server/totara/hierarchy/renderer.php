@@ -776,11 +776,14 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             get_string('competencytablinkedcourses', 'totara_hierarchy')
         );
 
-        $tabs[] = new \tabobject(
-            'editachievementpaths',
-            !empty($id) ? new \moodle_url('/totara/competency/competency_edit.php', ['id' => $id, 's' => 'achievementpaths']) : null,
-            get_string('competencytabachievementpaths', 'totara_hierarchy')
-        );
+        if (\totara_core\advanced_feature::visible('perform')) {
+            // Ability to edit achievement criteria is only available if perform is enabled.
+            $tabs[] = new \tabobject(
+                'editachievementpaths',
+                !empty($id) ? new \moodle_url('/totara/competency/competency_edit.php', ['id' => $id, 's' => 'achievementpaths']) : null,
+                get_string('competencytabachievementpaths', 'totara_hierarchy')
+            );
+        }
         // Ensure the current tab is selected and activated.
         foreach ($tabs as $tab) {
             if ($tab->id === $section) {
