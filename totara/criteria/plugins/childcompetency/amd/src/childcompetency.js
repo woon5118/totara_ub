@@ -49,7 +49,7 @@ function(ajax, notification, Loader) {
         };
 
         this.criterionKey = '';  // Unique key to use in bubbled event
-        this.competencyKey = 'compid'; // Metadata key for competency id
+        this.competencyKey = 'competency_id'; // Metadata key for competency id
 
         this.endpoints = {
             detail: 'criteria_childcompetency_get_detail',

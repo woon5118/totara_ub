@@ -49,7 +49,7 @@ function(ajax, notification, Loader) {
         };
 
         this.criterionKey = '';  // Unique key to use in bubbled event
-        this.competencyKey = 'compid'; // Metadata key for competency id
+        this.competencyKey = 'competency_id'; // Metadata key for competency id
 
         this.endpoints = {
             detail: 'criteria_linkedcourses_get_detail',
@@ -148,6 +148,7 @@ function(ajax, notification, Loader) {
                     // Not doing this earlier to prevent setting criterion attributes if
                     // something went wrong (e.g. invalid id, etc.)
                     that.criterion.id = id;
+                    that.criterion.metadata = instance.metadata;
                     that.criterionKey = key;
 
                     // Aggregation

@@ -49,7 +49,7 @@ function(Loader) {
         };
 
         this.criterionKey = '';
-        this.competencyKey = 'competency'; // Metadata key for competency id
+        this.competencyKey = 'competency_id'; // Metadata key for competency id
     }
 
     CriterionOnActivate.prototype = {

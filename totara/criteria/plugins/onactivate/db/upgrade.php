@@ -21,6 +21,8 @@
  * @package torara_criteria
  */
 
+use totara_criteria\criterion;
+
 /**
  * Local database upgrade script
  *
@@ -34,7 +36,7 @@ function xmldb_criteria_onactivate_upgrade($oldversion) {
 
     // Totara 13 branching line.
 
-    if ($oldversion < 2019100201) {
+    if ($oldversion < 2019100900) {
         global $DB;
 
         // We now store the competency id in metadata - updating existing data
@@ -56,16 +58,16 @@ function xmldb_criteria_onactivate_upgrade($oldversion) {
                      WHERE metakey = :metadatakey2 
                 )";
         $params = [
-            'metadatakey' => \totara_criteria\criterion::METADATA_COMPETENCY_KEY,
+            'metadatakey' => criterion::METADATA_COMPETENCY_KEY,
             'pathtype' => 'criteria_group',
             'criteriatype' => 'onactivate',
-            'metadatakey2' => \totara_criteria\criterion::METADATA_COMPETENCY_KEY,
+            'metadatakey2' => criterion::METADATA_COMPETENCY_KEY,
         ];
 
         $DB->execute($sql, $params);
 
         // Assign savepoint reached.
-        upgrade_plugin_savepoint(true, 2019100201, 'criteria', 'onactivate');
+        upgrade_plugin_savepoint(true, 2019100900, 'criteria', 'onactivate');
     }
 
     return true;

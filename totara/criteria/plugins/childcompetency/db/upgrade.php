@@ -29,14 +29,14 @@ use totara_criteria\criterion;
  * @param   integer $oldversion Current (pre-upgrade) local db version timestamp
  * @return  boolean $result
  */
-function xmldb_criteria_linkedcourses_upgrade($oldversion) {
+function xmldb_criteria_childcompetency_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 
     // Totara 13 branching line.
 
-    if ($oldversion < 2019100901) {
+    if ($oldversion < 2019100902) {
         global $DB;
 
         // We now store the competency id in metadata - updating existing data
@@ -60,14 +60,14 @@ function xmldb_criteria_linkedcourses_upgrade($oldversion) {
         $params = [
             'metadatakey' => criterion::METADATA_COMPETENCY_KEY,
             'pathtype' => 'criteria_group',
-            'criteriatype' => 'linkedcourses',
+            'criteriatype' => 'childcompetency',
             'metadatakey2' => criterion::METADATA_COMPETENCY_KEY,
         ];
 
         $DB->execute($sql, $params);
 
         // Assign savepoint reached.
-        upgrade_plugin_savepoint(true, 2019100901, 'criteria', 'linkedcourses');
+        upgrade_plugin_savepoint(true, 2019100902, 'criteria', 'childcompetency');
     }
 
     return true;
