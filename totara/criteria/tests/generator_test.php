@@ -286,7 +286,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
         $parent_comp = $comp_generator->create_competency();
         $child_comp = [];
         foreach ([1, 2] as $child) {
-            $child_comp[$child] = $comp_generator->create_competency(null, null, null, ['parentid' => $parent_comp->id]);
+            $child_comp[$child] = $comp_generator->create_competency(null, null, ['parentid' => $parent_comp->id]);
         }
 
         /** @var \totara_criteria_generator $generator */

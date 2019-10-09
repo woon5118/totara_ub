@@ -62,7 +62,7 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
 
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        $data->comp = $competency_generator->create_competency('Test competency', $framework->id, $data->scale->id);
+        $data->comp = $competency_generator->create_competency('Test competency', $framework->id);
 
         // Some courses
         for ($i = 1; $i <= 5; $i++) {
@@ -124,15 +124,10 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
 
         $pathways = [];
 
-        $pw = $competency_generator->create_manual(['comp_id' =>$data->comp->id,
-            'sortorder' => 1,
-            'roles' => [manual::ROLE_MANAGER]]);
+        $pw = $competency_generator->create_manual($data->comp, [manual::ROLE_MANAGER]);
         $pathways[$pw->get_id()] = $pw;
 
-        $pw = $competency_generator->create_criteria_group(['comp_id' =>$data->comp->id,
-            'sortorder' => 2,
-            'scale_value_id' => $data->scalevalues[4]->id,
-            'criteria' => [$cc]]);
+        $pw = $competency_generator->create_criteria_group($data->comp, $cc, $data->scalevalues[4]->id, null, null, 2);
         $pathways[$pw->get_id()] = $pw;
 
         $operationname = 'totara_competency_achievement_criteria';

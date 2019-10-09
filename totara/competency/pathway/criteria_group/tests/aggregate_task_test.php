@@ -69,23 +69,13 @@ class pathway_criteria_group_aggregate_task_testcase extends advanced_testcase {
     }
 
     public function test_no_users_assigned() {
-
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $competency = $competency_generator->create_competency();
         $criteria = $this->get_mock_criteria();
 
-        $criteria_group = $competency_generator->create_criteria_group(
-            [
-                'comp_id' => $competency->id,
-                'scale_value' => $competency->scale->scale_values->first()->id,
-                'criteria' => [$criteria]
-            ]
-        );
+        $criteria_group = $competency_generator->create_criteria_group($competency, $criteria);
 
         $task = new aggregate();
         $this->assertEmpty($task->get_users_requiring_aggregation($criteria_group->get_id()));
@@ -102,22 +92,13 @@ class pathway_criteria_group_aggregate_task_testcase extends advanced_testcase {
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-
         $competency = $competency_generator->create_competency();
         $criteria = $this->get_mock_criteria();
 
         $user = $this->getDataGenerator()->create_user();
         $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        $criteria_group = $competency_generator->create_criteria_group(
-            [
-                'comp_id' => $competency->id,
-                'scale_value' => $competency->scale->scale_values->first()->id,
-                'criteria' => [$criteria]
-            ]
-        );
+        $criteria_group = $competency_generator->create_criteria_group($competency, $criteria);
 
         $task = new aggregate();
         $this->assertEmpty($task->get_users_requiring_aggregation($criteria_group->get_id()));
@@ -142,22 +123,13 @@ class pathway_criteria_group_aggregate_task_testcase extends advanced_testcase {
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-
         $competency = $competency_generator->create_competency();
         $criteria = $this->get_mock_criteria();
 
         $user = $this->getDataGenerator()->create_user();
         $assignment_ids = $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        $criteria_group = $competency_generator->create_criteria_group(
-            [
-                'comp_id' => $competency->id,
-                'scale_value' => $competency->scale->scale_values->first()->id,
-                'criteria' => [$criteria]
-            ]
-        );
+        $criteria_group = $competency_generator->create_criteria_group($competency, $criteria);
 
         (new \tassign_competency\models\assignment_actions())->archive($assignment_ids);
         (new \tassign_competency\expand_task($DB))->expand_all();
@@ -176,22 +148,13 @@ class pathway_criteria_group_aggregate_task_testcase extends advanced_testcase {
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-
         $competency = $competency_generator->create_competency();
         $criteria = $this->get_mock_criteria();
 
         $user = $this->getDataGenerator()->create_user();
         $assignment_ids = $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        $criteria_group = $competency_generator->create_criteria_group(
-            [
-                'comp_id' => $competency->id,
-                'scale_value' => $competency->scale->scale_values->first()->id,
-                'criteria' => [$criteria]
-            ]
-        );
+        $criteria_group = $competency_generator->create_criteria_group($competency, $criteria);
 
         $task = new aggregate();
         $task->execute();

@@ -22,15 +22,15 @@
  * @package totara_criteria
  */
 
+use totara_competency\entities\scale;
 use totara_competency\pathway;
+use totara_competency\entities\competency as competency_entity;
 use pathway_criteria_group\criteria_group;
 use totara_criteria\criterion;
 
 class totara_competency_generator_testcase extends \advanced_testcase {
 
     private function setup_data() {
-        global $DB;
-
         $data = new class() {
             public $comp;
             public $scale;
@@ -39,6 +39,7 @@ class totara_competency_generator_testcase extends \advanced_testcase {
             public $cc;
         };
 
+        /** @var totara_hierarchy_generator $hierarchygenerator */
         $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $data->scale = $hierarchygenerator->create_scale(
             'comp',
@@ -51,14 +52,11 @@ class totara_competency_generator_testcase extends \advanced_testcase {
                 5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
             ]
         );
-        $rows = $DB->get_records('comp_scale_values', ['scaleid' => $data->scale->id], 'sortorder');
-        $data->scalevalues = [];
-        foreach ($rows as $row) {
-            $data->scalevalues[$row->sortorder] = $row;
-        }
+        $data->scale = new scale($data->scale->id);
+        $data->scalevalues = $data->scale->scale_values->all();
 
         $framework = $hierarchygenerator->create_comp_frame(['scale' => $data->scale->id]);
-        $data->comp = $hierarchygenerator->create_comp(['frameworkid' => $framework->id]);
+        $data->comp = new competency_entity($hierarchygenerator->create_comp(['frameworkid' => $framework->id])->id);
 
         for ($i = 1; $i <= 5; $i++) {
             $record = [
@@ -94,39 +92,35 @@ class totara_competency_generator_testcase extends \advanced_testcase {
      * Test criteria_group generator with single criteria
      */
     public function test_generator_criteria_group_single_criteria() {
-
         $data = $this->setup_data();
+        /** @var totara_competency_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $record = [
+        $cg = $generator->create_criteria_group($data->comp, $data->cc[1], $data->scalevalues[1]);
+
+        $this->validate_criteria_group($cg, [
             'comp_id' => $data->comp->id,
             'scale_value_id' => $data->scalevalues[1]->id,
             'criteria' => [$data->cc[1]],
-        ];
-
-        $cg = $generator->create_criteria_group($record);
-
-        $this->validate_criteria_group($cg, $record);
+        ]);
     }
 
     /**
      * Test criteria_group generator for active with multiple criteria
      */
     public function test_generator_criteria_group_active_multi_criteria() {
-
         $data = $this->setup_data();
+        /** @var totara_competency_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $record = [
+        $cg = $generator->create_criteria_group($data->comp, [$data->cc[1], $data->cc[2]], $data->scalevalues[2]);
+
+        $this->validate_criteria_group($cg, [
             'comp_id' => $data->comp->id,
             'scale_value_id' => $data->scalevalues[2]->id,
             'status' => pathway::PATHWAY_STATUS_ACTIVE,
             'criteria' => [$data->cc[1], $data->cc[2]],
-        ];
-
-        $cg = $generator->create_criteria_group($record);
-
-        $this->validate_criteria_group($cg, $record);
+        ]);
     }
 
 

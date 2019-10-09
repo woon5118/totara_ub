@@ -49,10 +49,9 @@ class observer {
         // Check if the user is assigned to this competency.
         $assigned = competency_assignment_user::repository()
             ->where('competency_id', $competency_id)
-            ->where('user_id', $user_id)
-            ->one();
+            ->where('user_id', $user_id);
 
-        if (is_null($assigned)) {
+        if (!$assigned->exists()) {
             return;
         }
 

@@ -99,7 +99,7 @@ class totara_competency_webapi_resolver_query_competency_overview_testcase exten
         $comp_idnumber = 'COMP1ID';
         $comp_description = '<span>Competency Description</span>';
 
-        $comp = $this->generator()->create_competency($comp_name, null, null, [
+        $comp = $this->generator()->create_competency($comp_name, null, [
             'idnumber' => $comp_idnumber,
             'description' => $comp_description,
         ]);

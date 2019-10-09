@@ -68,6 +68,7 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
  *
  * @property-read competency_achievement $achievement
  * @property-read collection $availability
+ * @property-read pathway[] $pathways
  *
  * @package tassign_competency\resources
  */
@@ -229,4 +230,14 @@ class competency extends hierarchy_item {
               WHERE comp_id = :compid';
         return $DB->get_fieldset_sql($sql, ['compid' => $this->id]);
     }
+
+    /**
+     * Configured pathways for this competency
+     *
+     * @return has_many
+     */
+    public function pathways(): has_many {
+        return $this->has_many(pathway::class, 'comp_id');
+    }
+
 }

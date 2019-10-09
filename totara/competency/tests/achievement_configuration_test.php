@@ -1,5 +1,6 @@
 <?php
 
+use pathway_manual\manual;
 use totara_competency\achievement_configuration;
 use totara_competency\achievement_criteria;
 use totara_competency\entities\competency;
@@ -164,23 +165,13 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         // For now just testing that there is a row - empty content is tested later
 
         // Generate some configuration data
+        /** @var totara_competency_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $record = [
-            'comp_id' => $data->comp->id,
-            'sortorder' => 1,
-            'roles' => ['manager']
-        ];
-        $manual = $generator->create_manual($record);
+        $manual = $generator->create_manual($data->comp, [manual::ROLE_MANAGER], 1);
 
         $scale_value = $data->comp->scale->scale_values->first();
-        $record = [
-            'comp_id' => $data->comp->id,
-            'sortorder' => 2,
-            'scale_value_id' => $scale_value->id,
-            'criteria' => [$data->cc[1], $data->cc[2]],
-        ];
-        $cg = $generator->create_criteria_group($record);
+        $cg = $generator->create_criteria_group($data->comp, [$data->cc[1], $data->cc[2]], $scale_value, null, null, 2);
 
         // Dump the populated configuration - Use an action_time value to allow us to retrieve the correct entry
         $action_time = 123;
