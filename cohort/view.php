@@ -27,7 +27,6 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
 
 $id        = required_param('id', PARAM_INT);
-$delete    = optional_param('delete', false, PARAM_BOOL);
 $confirm   = optional_param('confirm', false, PARAM_BOOL);
 $clone     = optional_param('clone', false, PARAM_BOOL);
 $cancelurl = optional_param('cancelurl', false, PARAM_LOCALURL);
@@ -41,7 +40,7 @@ if (!$cohort) {
 $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
 $PAGE->set_context($context);
 
-$url = new moodle_url('/cohort/view.php', array('id' => $id, 'delete' => $delete,
+$url = new moodle_url('/cohort/view.php', array('id' => $id,
     'confirm' => $confirm, 'clone' => $clone, 'cancelurl' => $cancelurl));
 if ($context->contextlevel == CONTEXT_SYSTEM) {
     admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
@@ -64,35 +63,6 @@ if (!$cancelurl) {
     $nourl = new moodle_url("$CFG->wwwroot/cohort/view.php", array('id'=>$cohort->id));
 } else {
     $nourl = new moodle_url($cancelurl);
-}
-
-if ($delete && $cohort->id && $canedit) {
-    if ($confirm and confirm_sesskey()) {
-        // Get current roles assigned to this cohort.
-        $roles = totara_get_cohort_roles($cohort->id);
-        // Get members of the cohort.
-        $members = totara_get_members_cohort($cohort->id);
-        $memberids = array_keys($members);
-        // Unassign members from roles.
-        totara_unset_role_assignments_cohort($roles, $cohort->id, $memberids);
-
-        $result = cohort_delete_cohort($cohort);
-        \core\notification::success(get_string('successfullydeleted', 'totara_cohort'));
-        redirect($returnurl->out());
-    }
-
-    $yesurl = new moodle_url('/cohort/view.php', array('id'=>$cohort->id, 'delete'=>1, 'confirm'=>1,'sesskey'=>sesskey()));
-
-    $strheading = get_string('delcohort', 'totara_cohort');
-    totara_cohort_navlinks($cohort->id, format_string($cohort->name), $strheading);
-    echo $OUTPUT->header();
-
-    $buttoncontinue = new single_button($yesurl, get_string('yes'), 'post');
-    $buttoncancel   = new single_button($nourl, get_string('no'), 'post');
-    echo $OUTPUT->confirm(get_string('delconfirm', 'totara_cohort', format_string($cohort->name)), $buttoncontinue, $buttoncancel);
-
-    echo $OUTPUT->footer();
-    die();
 }
 
 if ($clone && $cohort->id && $canedit) {
@@ -246,7 +216,7 @@ if ($canedit) {
     $cloneurl = new moodle_url("/cohort/view.php", array('id' => $cohort->id, 'clone' => 1));
     echo $OUTPUT->single_button($cloneurl, get_string('clonethiscohort', 'totara_cohort'));
     if (!$DB->record_exists('tenant', ['cohortid' => $cohort->id])) {
-        $delurl = new moodle_url("/cohort/view.php", array('id' => $cohort->id, 'delete' => 1));
+        $delurl = new moodle_url("/cohort/delete.php", array('id' => $cohort->id, 'context' => $context->id));
         echo $OUTPUT->single_button($delurl, get_string('deletethiscohort', 'totara_cohort'));
     }
 }

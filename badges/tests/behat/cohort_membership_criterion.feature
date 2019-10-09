@@ -57,9 +57,9 @@ Feature: Verify badge issue based on cohort / audience completion criterion.
 
     Given I navigate to "Audiences" node in "Site administration > Audiences"
     When I click on "Delete" "link" in the "Audience 2" "table_row"
-    Then I should see "Do you really want to delete audience 'Audience 2'?"
+    Then I should see "Delete audience: Audience 2 (A2)"
 
-    When I press "Yes"
+    When I press "Delete"
     Then I should see "Successfully deleted audience"
     And I should not see "Audience 2"
 
@@ -86,16 +86,16 @@ Feature: Verify badge issue based on cohort / audience completion criterion.
     # Delete the audiences so all the badge criteria is missing.
     Given I navigate to "Audiences" node in "Site administration > Audiences"
     When I click on "Delete" "link" in the "Audience 1" "table_row"
-    Then I should see "Do you really want to delete audience 'Audience 1'?"
+    Then I should see "Delete audience: Audience 1 (A1)"
 
-    When I press "Yes"
+    When I press "Delete"
     Then I should see "Successfully deleted audience"
     And I should not see "Audience 1"
 
     When I click on "Delete" "link" in the "Audience 2" "table_row"
-    Then I should see "Do you really want to delete audience 'Audience 2'?"
+    Then I should see "Delete audience: Audience 2 (A2)"
 
-    When I press "Yes"
+    When I press "Delete"
     Then I should see "Successfully deleted audience"
     And I should not see "Audience 2"
 
