@@ -62,12 +62,13 @@ class first_login_assignments_task extends \core\task\scheduled_task {
 
         $pending_users = $DB->get_records_sql($pending_user_sql);
         foreach ($pending_users as $pending_user) {
-            // Skip update if the program is not accessible for the user.
-
-            if ((!empty($pending_user->certifid) &&
-                totara_program_is_viewable($pending_user->programid, $pending_user->userid)) ||
-                totara_certification_is_viewable($pending_user->programid, $pending_user->userid)) {
+            if (empty($pending_user->certifid)) {
+                // Skip update if the program is not accessible to the user.
+                if (totara_program_is_viewable($pending_user->programid, $pending_user->userid)) {
                     prog_assignments_firstlogin($pending_user->userid);
+                }
+            } else if (totara_certification_is_viewable($pending_user->programid, $pending_user->userid)) {
+                prog_assignments_firstlogin($pending_user->userid);
             }
         }
     }
