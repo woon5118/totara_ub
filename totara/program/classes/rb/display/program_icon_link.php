@@ -66,12 +66,12 @@ class program_icon_link extends base {
 
         if ($assigned && $accessible) {
             $url = new \moodle_url('/totara/program/required.php', array('id' => $prog->id, 'userid' => $user->id));
-            $html = $OUTPUT->action_link($url, $icon . $prog->fullname);
+            $html = $OUTPUT->action_link($url, $icon . $value);
         } else if ($accessible) {
             $url = new \moodle_url('/totara/program/view.php', array('id' => $prog->id));
-            $html = $OUTPUT->action_link($url, $icon . $prog->fullname);
+            $html = $OUTPUT->action_link($url, $icon . $value);
         } else {
-            $html = $icon . $prog->fullname;
+            $html = $icon . $value;
         }
 
         return $html;
