@@ -605,7 +605,6 @@ function enrol_round_time_for_query() {
 function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder ASC',
                               $limit = 0, $courseids = []) {
     global $DB, $USER, $CFG;
-    require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
     // Guest account does not have any courses
     if (isguestuser() or !isloggedin()) {
@@ -836,7 +835,6 @@ function enrol_user_sees_own_courses($user = null) {
  */
 function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NULL, $sort = 'visible DESC,sortorder ASC') {
     global $DB, $CFG;
-    require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
     // Guest account does not have any courses
     if (isguestuser($userid) or empty($userid)) {
@@ -914,13 +912,9 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
     $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
     $params['contextlevel'] = CONTEXT_COURSE;
 
-    $visibilitysql = '';
-    $visibilityparams = array();
-    if ($onlyactive) {
-        // Take into account the visibility of the courses.
-        list($visibilitysql, $visibilityparams) = totara_visibility_where($userid, 'c.id', 'c.visible', 'c.audiencevisible');
-        $visibilitysql = "AND {$visibilitysql}";
-    }
+    // TOTARA: We don't use totara_visibility_where here because the default expectation is that users will be able to see
+    // the courses they are enrolled in.
+    // Therefore we check visibility individually as that is quicker than totara_visibility_where.
 
     //note: we can not use DISTINCT + text fields due to Oracle and MS limitations, that is why we have the subselect there
     $sql = "SELECT $coursefields $ccselect
@@ -932,12 +926,17 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
                  $subwhere
                    ) en ON (en.courseid = c.id)
            $ccjoin
-             WHERE c.id <> :siteid $visibilitysql
+             WHERE c.id <> :siteid
           $orderby";
     $params['userid']  = $userid;
-    $params = array_merge($params, $visibilityparams);
 
     $courses = $DB->get_records_sql($sql, $params);
+    foreach ($courses as $courseid => $course) {
+        context_helper::preload_from_record($course);
+        if ($onlyactive && !totara_course_is_viewable($course, $userid)) {
+            unset($courses[$courseid]);
+        }
+    }
 
     return $courses;
 }
