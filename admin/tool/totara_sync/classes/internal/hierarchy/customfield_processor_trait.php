@@ -114,22 +114,28 @@ trait customfield_processor_trait {
                 $value = null;
             }
 
-            if (!isset($sourcerow['typeidnumber']) || $sourcerow['typeidnumber'] === '') {
+            // Get mapped values for idnumber and typeidnumber
+            $typeidnumberfieldname = !empty($this->config->fieldmapping_typeidnumber) ?
+                $this->config->fieldmapping_typeidnumber : 'typeidnumber';
+            $idnumberfieldname = !empty($this->config->fieldmapping_idnumber) ?
+                $this->config->fieldmapping_idnumber : 'idnumber';
+
+            if (!isset($sourcerow[$typeidnumberfieldname]) || $sourcerow[$typeidnumberfieldname] === '') {
                 // We need to check empty and not isset here. Otherwise if we're saving empty fields on csv, any custom field
                 // that is not valid for a given type would throw an error.
                 if (!empty($value)) {
-                    $this->addlog(get_string('customfieldsnotype', 'tool_totara_sync', $sourcerow['idnumber']), 'error', 'customfieldprocessing');
+                    $this->addlog(get_string('customfieldsnotype', 'tool_totara_sync', $sourcerow[$idnumberfieldname]), 'error', 'customfieldprocessing');
                 }
                 continue;
             }
 
-            if ($customfield->get_typeidnumber() !== $sourcerow['typeidnumber']) {
+            if ($customfield->get_typeidnumber() !== $sourcerow[$typeidnumberfieldname]) {
                 if (!empty($value)) {
                     // We'll need to check later whether there was a valid type and column name. If there was only this
                     // invalid one, then we should log this.
                     $a = new \stdClass();
                     $a->columnname = $columnname;
-                    $a->typeidnumber = $sourcerow['typeidnumber'];
+                    $a->typeidnumber = $sourcerow[$typeidnumberfieldname];
                     $invalidtypes[] = $a;
                 }
                 continue;
@@ -181,7 +187,7 @@ trait customfield_processor_trait {
                     continue 2;
                 }
             }
-            $invalidtype->idnumber = $sourcerow['idnumber'];
+            $invalidtype->idnumber = $sourcerow[$idnumberfieldname];
             // By this point, we found no valid combination of type id number and column name.
             $this->addlog(get_string('customfieldinvalidmaptype', 'tool_totara_sync', $invalidtype), 'error', 'customfieldprocessing');
         }
