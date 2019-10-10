@@ -127,6 +127,7 @@ class advanced_feature {
             'goals',
             'learningplans',
             'myteam',
+            'perform', // TODO Replace this temporary feature
             'positions',
             'programs',
             'recordoflearning',
