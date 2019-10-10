@@ -883,23 +883,25 @@ class competency extends hierarchy {
         $mform->addElement('hidden', 'evidencecount', 0);
         $mform->setType('evidencecount', PARAM_INT);
 
-        // Assignment Availability required in
-        $checkboxGroup = array();
-        $checkboxGroup[] =& $mform->createElement('advcheckbox',
-            'assignavailself',
-            'assignavail',
-            get_string('competencyassignavailabilityself', 'totara_hierarchy'),
-            array('group' => 'tw_comp_assign_avail')
-        );
-        $checkboxGroup[] =& $mform->createElement('advcheckbox',
-            'assignavailother',
-            'assignavail',
-            get_string('competencyassignavailabilityother', 'totara_hierarchy'),
-            array('group' => 'tw_comp_assign_avail')
-        );
+        if (advanced_feature::visible('perform')) {
+            // Assignment Availability required in
+            $checkboxGroup = array();
+            $checkboxGroup[] =& $mform->createElement('advcheckbox',
+                'assignavailself',
+                'assignavail',
+                get_string('competencyassignavailabilityself', 'totara_hierarchy'),
+                array('group' => 'tw_comp_assign_avail')
+            );
+            $checkboxGroup[] =& $mform->createElement('advcheckbox',
+                'assignavailother',
+                'assignavail',
+                get_string('competencyassignavailabilityother', 'totara_hierarchy'),
+                array('group' => 'tw_comp_assign_avail')
+            );
 
-        $mform->addGroup($checkboxGroup, 'assignavail', get_string('competencyassignavailability', 'totara_hierarchy'), array('<br />'), false);
-        $mform->addHelpButton('assignavail', 'competencyassignavailability', 'totara_hierarchy');
+            $mform->addGroup($checkboxGroup, 'assignavail', get_string('competencyassignavailability', 'totara_hierarchy'), array('<br />'), false);
+            $mform->addHelpButton('assignavail', 'competencyassignavailability', 'totara_hierarchy');
+        }
     }
 
     /**
@@ -922,13 +924,15 @@ class competency extends hierarchy {
 
         // Properly format assignment availability from individual form values into a single array
         $item->assignavailability = $item->assignavailability ?? [];
-        $checkbox_mappings = [
-            'assignavailself' => self::ASSIGNMENT_CREATE_SELF,
-            'assignavailother' => self::ASSIGNMENT_CREATE_OTHER,
-        ];
-        foreach ($checkbox_mappings as $checkbox => $availability) {
-            if (isset($item->$checkbox) && $item->$checkbox && !in_array($availability, $item->assignavailability)) {
-                $item->assignavailability[] = $availability;
+        if (!advanced_feature::disabled('perform')) {
+            $checkbox_mappings = [
+                'assignavailself' => self::ASSIGNMENT_CREATE_SELF,
+                'assignavailother' => self::ASSIGNMENT_CREATE_OTHER,
+            ];
+            foreach ($checkbox_mappings as $checkbox => $availability) {
+                if (isset($item->$checkbox) && $item->$checkbox && !in_array($availability, $item->assignavailability)) {
+                    $item->assignavailability[] = $availability;
+                }
             }
         }
 
@@ -1189,20 +1193,26 @@ class competency extends hierarchy {
      * @return array Array of heading and query field maps
      */
     protected function get_export_fields() {
-        return array_merge(parent::get_export_fields(), [
+        $fields = array_merge(parent::get_export_fields(), [
             'aggregationmethod' => 'hierarchy.aggregationmethod',
-            'assignavailability' =>
-                "CASE 
-                    WHEN assign_availability_self.availability IS NULL AND assign_availability_other.availability IS NULL
-                        THEN 'none'
-                    WHEN assign_availability_self.availability IS NOT NULL AND assign_availability_other.availability IS NOT NULL
-                        THEN 'any'
-                    WHEN assign_availability_self.availability IS NOT NULL
-                        THEN 'self'
-                    WHEN assign_availability_other.availability IS NOT NULL
-                        THEN 'other'
-                END",
         ]);
+        if (advanced_feature::visible('perform')) {
+            $fields = array_merge($fields, [
+                'assignavailability' =>
+                    "CASE 
+                        WHEN assign_availability_self.availability IS NULL AND assign_availability_other.availability IS NULL
+                            THEN 'none'
+                        WHEN assign_availability_self.availability IS NOT NULL AND assign_availability_other.availability IS NOT NULL
+                            THEN 'any'
+                        WHEN assign_availability_self.availability IS NOT NULL
+                            THEN 'self'
+                        WHEN assign_availability_other.availability IS NOT NULL
+                            THEN 'other'
+                    END",
+            ]);
+        }
+
+        return $fields;
     }
 
     /**
@@ -1212,15 +1222,18 @@ class competency extends hierarchy {
      */
     protected function get_export_join_def() {
         $def = parent::get_export_join_def();
-        $availabilities = [
-            self::ASSIGNMENT_CREATE_SELF => 'self',
-            self::ASSIGNMENT_CREATE_OTHER => 'other',
-        ];
-        foreach ($availabilities as $value => $text) {
-            $def['from'] .= " LEFT JOIN (
-                SELECT comp_id, availability FROM {comp_assign_availability} WHERE availability = :{$text}_value
-            ) assign_availability_{$text} ON assign_availability_{$text}.comp_id = hierarchy.id";
-            $def['params'][$text . '_value'] = $value;
+
+        if (advanced_feature::visible('perform')) {
+            $availabilities = [
+                self::ASSIGNMENT_CREATE_SELF => 'self',
+                self::ASSIGNMENT_CREATE_OTHER => 'other',
+            ];
+            foreach ($availabilities as $value => $text) {
+                $def['from'] .= " LEFT JOIN (
+                    SELECT comp_id, availability FROM {comp_assign_availability} WHERE availability = :{$text}_value
+                ) assign_availability_{$text} ON assign_availability_{$text}.comp_id = hierarchy.id";
+                $def['params'][$text . '_value'] = $value;
+            }
         }
         return $def;
     }
@@ -1229,6 +1242,7 @@ class competency extends hierarchy {
      * Retrieve the specific hierarchy item from the database
      *
      * @param int $id Id of the item to retrieve
+     * @return stdClass
      */
     function retrieve_hierarchy_item($id) {
         if ($item = parent::retrieve_hierarchy_item($id)) {
@@ -1308,6 +1322,10 @@ class competency extends hierarchy {
      * @param array $availabilities
      */
     protected function save_assignment_availabilities(int $comp_id, array $availabilities) {
+        if (advanced_feature::disabled('perform')) {
+            return;
+        }
+
         builder::get_db()->transaction(function () use ($comp_id, $availabilities) {
             builder::table('comp_assign_availability')
                 ->where('comp_id', $comp_id)

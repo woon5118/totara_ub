@@ -22,6 +22,7 @@
  */
 
 use tool_totara_sync\internal\hierarchy\customfield;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -61,8 +62,11 @@ abstract class totara_sync_source_comp extends totara_sync_source {
             'typeidnumber',
             'timemodified',
             'aggregationmethod',
-            'assignavailability',
         ];
+
+        if (advanced_feature::visible('perform')) {
+            $this->fields[] = 'assignavailability';
+        }
 
         $this->hierarchy_customfields = customfield::get_all(new competency());
     }

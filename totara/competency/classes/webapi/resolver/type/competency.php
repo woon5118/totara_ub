@@ -30,6 +30,7 @@ use core\webapi\type_resolver;
 use tassign_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency as another_competency_entity;
 use totara_competency\formatter\competency_formatter;
+use totara_core\advanced_feature;
 
 /**
  * Organisation hierarchy type.
@@ -79,11 +80,18 @@ class competency implements type_resolver {
 
         // Some fields need an extra capability check when format is RAW
         if (in_array($field, ['shortname', 'fullname']) && $format == format::FORMAT_RAW) {
-            return has_capability('totara/hierarchy:updateorganisation', $context);
+            return has_capability('totara/hierarchy:updatecompetency', $context)
+                || has_capability('totara/hierarchy:createcompetency', $context);
         }
 
         if ($field === 'description' && $format == format::FORMAT_RAW) {
-            return has_capability('totara/hierarchy:updateorganisation', $context);
+            return has_capability('totara/hierarchy:updatecompetency', $context)
+                || has_capability('totara/hierarchy:createcompetency', $context);
+        }
+
+        if ($field == 'assign_availability') {
+            // This field should show up on perform only
+            return advanced_feature::visible('perform');
         }
 
         return true;
