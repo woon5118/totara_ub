@@ -146,7 +146,7 @@ class external extends \external_api {
     }
 
     public static function get_categories() {
-        advanced_feature::require('perform');
+        advanced_feature::require('competencies');
 
         global $DB;
 
