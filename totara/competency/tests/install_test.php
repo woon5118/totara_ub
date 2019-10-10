@@ -22,6 +22,7 @@
  */
 
 use totara_competency\entities\competency_achievement;
+use totara_core\advanced_feature;
 
 class totara_competency_install_testcase extends advanced_testcase {
 
@@ -481,9 +482,8 @@ class totara_competency_install_testcase extends advanced_testcase {
     public function test_current_and_historic_comp_record_perform_disabled() {
         global $DB;
 
-        // These next two lines involve interim ways of disabling perform.
-        set_config('products', 'learn');
-        $this->assertFalse(is_perform_enabled());
+        set_config('enableperform', advanced_feature::DISABLED);
+        $this->assertTrue(advanced_feature::disabled('perform'));
 
         $comp_record = $this->add_comp_record(100, 200, 5, 300, 400);
 

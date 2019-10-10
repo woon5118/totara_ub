@@ -34,6 +34,7 @@ use pathway_learning_plan\learning_plan;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
+use totara_core\advanced_feature;
 use totara_criteria\criterion;
 
 class default_criteria_on_install extends adhoc_task {
@@ -134,7 +135,7 @@ class default_criteria_on_install extends adhoc_task {
     }
 
     private function should_add_learning_plans(): bool {
-        if (!is_perform_enabled()) {
+        if (advanced_feature::disabled('perform')) {
             // If perform isn't enabled, we'll need to add the learning plan pathway here since users will not be able
             // to access an interface to add them themselves if they need them.
             return true;

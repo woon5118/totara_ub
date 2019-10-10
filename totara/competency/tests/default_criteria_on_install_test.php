@@ -29,6 +29,7 @@ use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_criteria\criterion;
 use totara_competency\task\default_criteria_on_install;
+use totara_core\advanced_feature;
 
 class totara_competency_default_criteria_on_install_testcase extends advanced_testcase {
 
@@ -557,9 +558,8 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
     public function test_when_perform_disabled() {
         global $COMP_AGGREGATION;
 
-        // These next two lines involve interim ways of disabling perform.
-        set_config('products', 'learn');
-        $this->assertFalse(is_perform_enabled());
+        set_config('enableperform', advanced_feature::DISABLED);
+        $this->assertTrue(advanced_feature::disabled('perform'));
 
         /** @var totara_hierarchy_generator $totara_hierarchy_generator */
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
