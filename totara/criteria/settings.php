@@ -21,19 +21,30 @@
  * @package totara_criteria
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
 if ($hassiteconfig) {
-    $ADMIN->add('modules', new admin_category('totara_criteria', get_string('pluginname', 'totara_criteria')));
+    $ADMIN->add(
+        'modules',
+        new admin_category(
+            'totara_criteria',
+            get_string('pluginname', 'totara_criteria'),
+            !advanced_feature::visible('perform')
+        )
+    );
 
     $ADMIN->add(
         'totara_criteria',
         new admin_externalpage(
             'totara_criteria-managetypes',
             get_string('managetypes', 'totara_criteria'),
-            new moodle_url("/totara/criteria/managetypes.php")
+            new moodle_url("/totara/criteria/managetypes.php"),
+            ['moodle/site:config'],
+            !advanced_feature::visible('perform')
         )
     );
 }

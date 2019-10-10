@@ -28,70 +28,162 @@
     // Positions.
 use totara_core\advanced_feature;
 
-$ADMIN->add('positions', new admin_externalpage('positionmanage', get_string('positionmanage', 'totara_hierarchy'),
+$ADMIN->add(
+    'positions',
+    new admin_externalpage(
+        'positionmanage',
+        get_string('positionmanage', 'totara_hierarchy'),
         "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=position",
-        array('totara/hierarchy:viewpositionframeworks'), advanced_feature::is_disabled('positions')));
-
-    $ADMIN->add('positions', new admin_externalpage('positiontypemanage', get_string('managepositiontypes', 'totara_hierarchy'),
-        "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=position",
-        array('totara/hierarchy:createpositiontype', 'totara/hierarchy:updatepositiontype', 'totara/hierarchy:deletepositiontype'),
+        ['totara/hierarchy:viewpositionframeworks'],
         advanced_feature::is_disabled('positions')
-    ));
+    )
+);
 
-    // Organisations.
-    $ADMIN->add('organisations', new admin_externalpage('organisationmanage', get_string('organisationmanage', 'totara_hierarchy'),
-            "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=organisation",
-            array('totara/hierarchy:vieworganisationframeworks')));
+$ADMIN->add(
+    'positions',
+    new admin_externalpage(
+        'positiontypemanage',
+        get_string('managepositiontypes', 'totara_hierarchy'),
+        "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=position",
+        [
+            'totara/hierarchy:createpositiontype',
+            'totara/hierarchy:updatepositiontype',
+            'totara/hierarchy:deletepositiontype'
+        ],
+        advanced_feature::is_disabled('positions')
+    )
+);
 
-    $ADMIN->add('organisations', new admin_externalpage('organisationtypemanage', get_string('manageorganisationtypes', 'totara_hierarchy'),
-            "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=organisation",
-            array('totara/hierarchy:createorganisationtype', 'totara/hierarchy:updateorganisationtype', 'totara/hierarchy:deleteorganisationtype')));
+// Organisations.
+$ADMIN->add(
+    'organisations',
+    new admin_externalpage(
+        'organisationmanage',
+        get_string('organisationmanage', 'totara_hierarchy'),
+        "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=organisation",
+        ['totara/hierarchy:vieworganisationframeworks']
+    )
+);
 
-    // To make sure the competency pages come before the assignment pages in the menu
-    // check if the assignment page is already there as the settings could have been parsed
-    // in a different order.
-    // Unfortunately there does not seem to be a better way to sort it than this.
-    if ($ADMIN->locate('competency_assignment')) {
-        $before = 'competency_assignment';
-    } else if ($ADMIN->locate('hierarchy_competency_settings')) {
-        $before = 'hierarchy_competency_settings';
-    } else {
-        $before = null;
-    }
+$ADMIN->add(
+    'organisations',
+    new admin_externalpage(
+        'organisationtypemanage',
+        get_string('manageorganisationtypes', 'totara_hierarchy'),
+        "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=organisation",
+        [
+            'totara/hierarchy:createorganisationtype',
+            'totara/hierarchy:updateorganisationtype',
+            'totara/hierarchy:deleteorganisationtype'
+        ]
+    )
+);
 
-    // Competencies.
-    $ADMIN->add('competencies', new admin_externalpage('competencymanage', get_string('competencymanage', 'totara_hierarchy'),
+// To make sure the competency pages come before the assignment pages in the menu
+// check if the assignment page is already there as the settings could have been parsed
+// in a different order.
+// Unfortunately there does not seem to be a better way to sort it than this.
+if ($ADMIN->locate('competency_assignment')) {
+    $before = 'competency_assignment';
+} else if ($ADMIN->locate('hierarchy_competency_settings')) {
+    $before = 'hierarchy_competency_settings';
+} else {
+    $before = null;
+}
+
+// Competencies.
+$ADMIN->add(
+    'competencies',
+    new admin_externalpage(
+        'competencymanage',
+        get_string('competencymanage', 'totara_hierarchy'),
         "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=competency",
-        array('totara/hierarchy:viewcompetencyscale', 'totara/hierarchy:viewcompetencyframeworks'),
+        [
+            'totara/hierarchy:viewcompetencyscale',
+            'totara/hierarchy:viewcompetencyframeworks'
+        ],
         advanced_feature::is_disabled('competencies')
-    ), $before);
+    ),
+    $before
+);
 
-    $ADMIN->add('competencies', new admin_externalpage('competencytypemanage', get_string('managecompetencytypes', 'totara_hierarchy'),
+$ADMIN->add(
+    'competencies',
+    new admin_externalpage(
+        'competencytypemanage',
+        get_string('managecompetencytypes', 'totara_hierarchy'),
         "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=competency",
-        array('totara/hierarchy:createcompetencytype', 'totara/hierarchy:updatecompetencytype', 'totara/hierarchy:deletecompetencytype'),
+        [
+            'totara/hierarchy:createcompetencytype',
+            'totara/hierarchy:updatecompetencytype',
+            'totara/hierarchy:deletecompetencytype'
+        ],
         advanced_feature::is_disabled('competencies')
-    ), $before);
+    ),
+    $before
+);
 
-    \hierarchy_competency\admin_settings::load_or_create_settings_page($ADMIN);
+\hierarchy_competency\admin_settings::load_or_create_settings_page($ADMIN);
 
 // Goals.
-    $ADMIN->add('goals', new admin_externalpage('goalmanage', get_string('goalmanage', 'totara_hierarchy'),
-            "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=goal",
-            array('totara/hierarchy:creategoalframeworks', 'totara/hierarchy:updategoalframeworks', 'totara/hierarchy:deletegoalframeworks',
-                  'totara/hierarchy:creategoal', 'totara/hierarchy:updategoal', 'totara/hierarchy:deletegoal',
-                  'totara/hierarchy:creategoalscale', 'totara/hierarchy:updategoalscale', 'totara/hierarchy:deletegoalscale'),
-            advanced_feature::is_disabled('goals')));
+$ADMIN->add(
+    'goals',
+    new admin_externalpage(
+        'goalmanage',
+        get_string('goalmanage', 'totara_hierarchy'),
+        "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=goal",
+        [
+            'totara/hierarchy:creategoalframeworks',
+            'totara/hierarchy:updategoalframeworks',
+            'totara/hierarchy:deletegoalframeworks',
+            'totara/hierarchy:creategoal',
+            'totara/hierarchy:updategoal',
+            'totara/hierarchy:deletegoal',
+            'totara/hierarchy:creategoalscale',
+            'totara/hierarchy:updategoalscale',
+            'totara/hierarchy:deletegoalscale'
+        ],
+        advanced_feature::is_disabled('goals')
+    )
+);
 
-    $ADMIN->add('goals', new admin_externalpage('companygoaltypemanage', get_string('managecompanygoaltypes', 'totara_hierarchy'),
-            "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=goal&class=company",
-            array('totara/hierarchy:creategoaltype', 'totara/hierarchy:updategoaltype', 'totara/hierarchy:deletegoaltype'),
-            advanced_feature::is_disabled('goals')));
+$ADMIN->add(
+    'goals',
+    new admin_externalpage(
+        'companygoaltypemanage',
+        get_string('managecompanygoaltypes', 'totara_hierarchy'),
+        "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=goal&class=company",
+        [
+            'totara/hierarchy:creategoaltype',
+            'totara/hierarchy:updategoaltype',
+            'totara/hierarchy:deletegoaltype'
+        ],
+        advanced_feature::is_disabled('goals')
+    )
+);
 
-    $ADMIN->add('goals', new admin_externalpage('personalgoaltypemanage', get_string('managepersonalgoaltypes', 'totara_hierarchy'),
-            "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=goal&class=personal",
-            array('totara/hierarchy:creategoaltype', 'totara/hierarchy:updategoaltype', 'totara/hierarchy:deletegoaltype'),
-            advanced_feature::is_disabled('goals')));
+$ADMIN->add(
+    'goals',
+    new admin_externalpage(
+        'personalgoaltypemanage',
+        get_string('managepersonalgoaltypes', 'totara_hierarchy'),
+        "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=goal&class=personal",
+        [
+            'totara/hierarchy:creategoaltype',
+            'totara/hierarchy:updategoaltype',
+            'totara/hierarchy:deletegoaltype'
+        ],
+        advanced_feature::is_disabled('goals')
+    )
+);
 
-    $ADMIN->add('goals', new admin_externalpage('goalreport', get_string('goalreports', 'totara_hierarchy'),
-            "{$CFG->wwwroot}/totara/hierarchy/prefix/goal/reports.php",
-            array('totara/hierarchy:viewgoalreport'), advanced_feature::is_disabled('goals')));
+$ADMIN->add(
+    'goals',
+    new admin_externalpage(
+        'goalreport',
+        get_string('goalreports', 'totara_hierarchy'),
+        "{$CFG->wwwroot}/totara/hierarchy/prefix/goal/reports.php",
+        ['totara/hierarchy:viewgoalreport'],
+        advanced_feature::is_disabled('goals')
+    )
+);

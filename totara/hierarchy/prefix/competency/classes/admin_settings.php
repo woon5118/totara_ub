@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 use admin_root;
 use admin_settingpage;
 use lang_string;
+use totara_core\advanced_feature;
 
 class admin_settings {
 
@@ -38,7 +39,7 @@ class admin_settings {
      * to get the settings page and add their settings to it.
      *
      * @param admin_root $menu
-     * @return admin_settingpage
+     * @return admin_settingpage|null
      */
     public static function load_or_create_settings_page(admin_root $menu): admin_settingpage {
         // If it's not already there create it
@@ -47,7 +48,8 @@ class admin_settings {
             $settings_page = new admin_settingpage(
                 'hierarchy_competency_settings',
                 new lang_string('settings', 'hierarchy_competency'),
-                []
+                [],
+                !advanced_feature::visible('competencies')
             );
 
             $menu->add('competencies', $settings_page);

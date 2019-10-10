@@ -21,19 +21,30 @@
  * @package totara_competency
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
 if ($hassiteconfig) {
-    $ADMIN->add('modules', new admin_category('totara_competency', get_string('pluginname', 'totara_competency')));
+    $ADMIN->add(
+        'modules',
+        new admin_category(
+            'totara_competency',
+            get_string('pluginname', 'totara_competency'),
+            !advanced_feature::visible('perform')
+        )
+    );
 
     $ADMIN->add(
         'totara_competency',
         new admin_externalpage(
             'totara_competency_aggregation-managetypes',
             get_string('managetypes_aggregation', 'totara_competency'),
-            new moodle_url("/totara/competency/managetypes.php", ['plugin' => 'aggregation'])
+            new moodle_url("/totara/competency/managetypes.php", ['plugin' => 'aggregation']),
+            ['moodle/site:config'],
+            !advanced_feature::visible('perform')
         )
     );
 
@@ -42,7 +53,9 @@ if ($hassiteconfig) {
         new admin_externalpage(
             'totara_competency_pathway-managetypes',
             get_string('managetypes_pathway', 'totara_competency'),
-            new moodle_url("/totara/competency/managetypes.php", ['plugin' => 'pathway'])
+            new moodle_url("/totara/competency/managetypes.php", ['plugin' => 'pathway']),
+            ['moodle/site:config'],
+            !advanced_feature::visible('perform')
         )
     );
 }

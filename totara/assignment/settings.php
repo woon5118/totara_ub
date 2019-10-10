@@ -25,6 +25,7 @@
 
 use tassign_competency\admin_setting_continuous_tracking;
 use tassign_competency\admin_setting_unassign_behaviour;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -38,7 +39,8 @@ $ADMIN->add(
         'competency_assignment',
         get_string('title:index', 'tassign_competency'),
         "{$CFG->wwwroot}/totara/assignment/plugins/competency/index.php",
-        "tassign/competency:manage"
+        "tassign/competency:manage",
+        !advanced_feature::visible('perform')
     )
 );
 $ADMIN->add(
@@ -48,7 +50,7 @@ $ADMIN->add(
         get_string('title:users', 'tassign_competency'),
         "{$CFG->wwwroot}/totara/assignment/plugins/competency/users.php",
         "tassign/competency:manage",
-        true
+        !advanced_feature::visible('perform')
     )
 );
 $ADMIN->add(
@@ -58,33 +60,35 @@ $ADMIN->add(
         get_string('title:create', 'tassign_competency'),
         "{$CFG->wwwroot}/totara/assignment/plugins/competency/create.php",
         "tassign/competency:manage",
-        true
+        !advanced_feature::visible('perform')
     )
 );
 
-$settings_page = \hierarchy_competency\admin_settings::load_or_create_settings_page($ADMIN);
-if (!is_array($settings_page->req_capability)) {
-    $settings_page->req_capability = [$settings_page->req_capability];
-}
-$settings_page->req_capability[] = 'tassign/competency:manage';
-$settings_page->req_capability = array_unique($settings_page->req_capability);
+if (advanced_feature::visible('perform')) {
+    $settings_page = \hierarchy_competency\admin_settings::load_or_create_settings_page($ADMIN);
+    if (!is_array($settings_page->req_capability)) {
+        $settings_page->req_capability = [$settings_page->req_capability];
+    }
+    $settings_page->req_capability[] = 'tassign/competency:manage';
+    $settings_page->req_capability = array_unique($settings_page->req_capability);
 
-if ($ADMIN->fulltree) {
-    $settings_page->add(new admin_setting_heading(
-        'tassign_competency/heading',
-        new lang_string('settings:unassignment:header', 'tassign_competency'),
-        new lang_string('settings:unassignment:text', 'tassign_competency')
-    ));
+    if ($ADMIN->fulltree) {
+        $settings_page->add(new admin_setting_heading(
+            'tassign_competency/heading',
+            new lang_string('settings:unassignment:header', 'tassign_competency'),
+            new lang_string('settings:unassignment:text', 'tassign_competency')
+        ));
 
-    $settings_page->add(new admin_setting_unassign_behaviour(
-        admin_setting_unassign_behaviour::NAME,
-        new lang_string('settings:unassign_behaviour', 'tassign_competency'),
-        new lang_string('settings:unassign_behaviour:description', 'tassign_competency')
-    ));
+        $settings_page->add(new admin_setting_unassign_behaviour(
+            admin_setting_unassign_behaviour::NAME,
+            new lang_string('settings:unassign_behaviour', 'tassign_competency'),
+            new lang_string('settings:unassign_behaviour:description', 'tassign_competency')
+        ));
 
-    $settings_page->add(new admin_setting_continuous_tracking(
-        'tassign_competency/continuous_tracking',
-        new lang_string('settings:continuous_tracking', 'tassign_competency'),
-        new lang_string('settings:continuous_tracking:description', 'tassign_competency')
-    ));
+        $settings_page->add(new admin_setting_continuous_tracking(
+            'tassign_competency/continuous_tracking',
+            new lang_string('settings:continuous_tracking', 'tassign_competency'),
+            new lang_string('settings:continuous_tracking:description', 'tassign_competency')
+        ));
+    }
 }
