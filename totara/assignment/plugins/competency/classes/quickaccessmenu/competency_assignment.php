@@ -23,12 +23,17 @@
 
 namespace tassign_competency\quickaccessmenu;
 
+use totara_core\advanced_feature;
 use \totara_core\quickaccessmenu\group;
 use \totara_core\quickaccessmenu\item;
 use totara_core\quickaccessmenu\provider;
 
 class competency_assignment implements provider {
     public static function get_items(): array {
+        if (!advanced_feature::visible('perform')) {
+            return [];
+        }
+
         return [
             item::from_provider(
                 'competency_assignment',

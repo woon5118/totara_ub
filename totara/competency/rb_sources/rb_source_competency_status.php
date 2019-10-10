@@ -25,6 +25,7 @@
 use tassign_competency\entities\assignment;
 use totara_assignment\user_groups;
 use totara_competency\entities\competency_achievement;
+use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
 
 defined('MOODLE_INTERNAL') || die();
@@ -69,7 +70,7 @@ class rb_source_competency_status extends rb_base_source {
     }
 
     public static function is_source_ignored() {
-        return !totara_feature_visible('competencies');
+        return !advanced_feature::visible('competencies');
     }
 
     //
@@ -159,99 +160,115 @@ class rb_source_competency_status extends rb_base_source {
                 'scale_value_name',          // Value.
                 get_string('scalevalue', 'rb_source_competency_status'), // Name.
                 'scale_values.name',    // Field.
-                array('joins' => 'scale_values',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text',
-                      'displayfunc' => 'format_string') // Options.
+                [
+                    'joins' => 'scale_values',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
+                ] // Options.
             ),
             new rb_column_option(
                 'competency_status',
                 'time_proficient',
                 get_string('proficientdate', 'rb_source_competency_status'),
                 'base.time_proficient',
-                array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
+                [
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
+                ]
             ),
             new rb_column_option(
                 'competency',
                 'fullname',
                 get_string('competencyname', 'rb_source_competency_status'),
                 'competency.fullname',
-                array('joins' => 'competency',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text',
-                      'displayfunc' => 'format_string')
+                [
+                    'joins' => 'competency',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
+                ]
             ),
             new rb_column_option(
                 'competency',
                 'idnumber',
-                get_string('competencyid', 'rb_source_competency_status'),
+                get_string('competencyidnumber', 'rb_source_competency_status'),
                 'competency.idnumber',
-                array('joins' => 'competency',
-                      'displayfunc' => 'plaintext',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                [
+                    'joins' => 'competency',
+                    'displayfunc' => 'plaintext',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
+                ]
             ),
             new rb_column_option(
                 'competency',
                 'id',
                 get_string('competencyid', 'rb_source_competency_status'),
                 'base.comp_id',
-                array('displayfunc' => 'integer')
-            ),
-            new rb_column_option(
-                'assignment',
-                'assignment_type',
-                get_string('label:assignment_type', 'rb_source_assignment_competency_users'),
-                "(
-                    CASE WHEN type = '".assignment::TYPE_ADMIN."' AND user_group_type <> '".user_groups::USER."'
-                    THEN user_group_type
-                    ELSE type END
-                )",
                 [
-                    'joins' => 'assignment',
-                    'displayfunc' => 'display_assignment_type',
-                ]
-            ),
-            new rb_column_option(
-                'assignment',
-                'user_group',
-                get_string('label:user_group', 'rb_source_assignment_competency_users'),
-                'assignment.user_group_type',
-                [
-                    'joins' => ['assignment_cohorts', 'assignment_positions', 'assignment_organisations', 'auser'],
-                    'displayfunc' => 'display_user_group',
-                    'extrafields' => [
-                        'user_group_type' => 'assignment.user_group_type',
-                        'user_id' => 'auser.id',
-                        'user_firstname' => 'auser.firstname',
-                        'user_lastname' => 'auser.lastname',
-                        'user_firstnamephonetic' => 'auser.firstnamephonetic',
-                        'user_lastnamephonetic' => 'auser.lastnamephonetic',
-                        'user_middlename' => 'auser.middlename',
-                        'user_alternatename' => 'auser.alternatename',
-                        'user_idnumber' => 'auser.idnumber',
-                        'pos_id' => 'assignment_positions.id',
-                        'pos_name' => 'assignment_positions.fullname',
-                        'pos_idnumber' => 'assignment_positions.idnumber',
-                        'org_id' => 'assignment_organisations.id',
-                        'org_name' => 'assignment_organisations.fullname',
-                        'org_idnumber' => 'assignment_organisations.idnumber',
-                        'coh_id' => 'assignment_cohorts.id',
-                        'coh_name' => 'assignment_cohorts.name',
-                        'coh_idnumber' => 'assignment_cohorts.idnumber',
-                    ],
-                ]
-            ),
-            new rb_column_option(
-                'competency_status',
-                'status',
-                'Assignment status',
-                'base.status',
-                [
-                    'displayfunc' => 'comp_record_status',
+                    'displayfunc' => 'integer'
                 ]
             ),
         );
+
+        if (advanced_feature::visible('perform')) {
+            $columnoptions = array_merge($columnoptions, [
+                new rb_column_option(
+                    'assignment',
+                    'assignment_type',
+                    get_string('label:assignment_type', 'rb_source_assignment_competency_users'),
+                    "(
+                        CASE WHEN type = '".assignment::TYPE_ADMIN."' AND user_group_type <> '".user_groups::USER."'
+                        THEN user_group_type
+                        ELSE type END
+                    )",
+                    [
+                        'joins' => 'assignment',
+                        'displayfunc' => 'display_assignment_type',
+                    ]
+                ),
+                new rb_column_option(
+                    'assignment',
+                    'user_group',
+                    get_string('label:user_group', 'rb_source_assignment_competency_users'),
+                    'assignment.user_group_type',
+                    [
+                        'joins' => ['assignment_cohorts', 'assignment_positions', 'assignment_organisations', 'auser'],
+                        'displayfunc' => 'display_user_group',
+                        'extrafields' => [
+                            'user_group_type' => 'assignment.user_group_type',
+                            'user_id' => 'auser.id',
+                            'user_firstname' => 'auser.firstname',
+                            'user_lastname' => 'auser.lastname',
+                            'user_firstnamephonetic' => 'auser.firstnamephonetic',
+                            'user_lastnamephonetic' => 'auser.lastnamephonetic',
+                            'user_middlename' => 'auser.middlename',
+                            'user_alternatename' => 'auser.alternatename',
+                            'user_idnumber' => 'auser.idnumber',
+                            'pos_id' => 'assignment_positions.id',
+                            'pos_name' => 'assignment_positions.fullname',
+                            'pos_idnumber' => 'assignment_positions.idnumber',
+                            'org_id' => 'assignment_organisations.id',
+                            'org_name' => 'assignment_organisations.fullname',
+                            'org_idnumber' => 'assignment_organisations.idnumber',
+                            'coh_id' => 'assignment_cohorts.id',
+                            'coh_name' => 'assignment_cohorts.name',
+                            'coh_idnumber' => 'assignment_cohorts.idnumber',
+                        ],
+                    ]
+                ),
+                new rb_column_option(
+                    'competency_status',
+                    'status',
+                    'Assignment status',
+                    'base.status',
+                    [
+                        'displayfunc' => 'comp_record_status',
+                    ]
+                ),
+            ]);
+        }
 
         // include some standard columns
         $this->add_core_user_columns($columnoptions);

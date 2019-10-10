@@ -24,6 +24,7 @@
 namespace tassign_competency\controllers;
 
 use context;
+use totara_core\advanced_feature;
 use totara_mvc\admin_controller;
 
 class base extends admin_controller {
@@ -37,6 +38,8 @@ class base extends admin_controller {
      * @return context
      */
     protected function setup_context(): context {
+        advanced_feature::require('perform');
+
         return \context_system::instance();
     }
 }

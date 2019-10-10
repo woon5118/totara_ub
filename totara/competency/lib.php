@@ -23,6 +23,7 @@
 
 use core_user\output\myprofile\node;
 use core_user\output\myprofile\tree;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,6 +38,9 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool
  */
 function totara_competency_myprofile_navigation(tree $tree, $user, $this_user, $course) {
+    if (!advanced_feature::visible('perform')) {
+        return true;
+    }
 
     $capability = $this_user ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';
     $can_view = has_capability($capability, context_user::instance($user->id));

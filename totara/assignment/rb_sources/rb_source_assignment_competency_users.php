@@ -23,6 +23,7 @@
 
 use tassign_competency\entities\assignment;
 use totara_assignment\user_groups;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -76,8 +77,7 @@ class rb_source_assignment_competency_users extends rb_base_source {
      * @return boolean If the report should be ignored of not.
      */
     public static function is_source_ignored() {
-        return false;
-        //return !totara_feature_visible('assignment');
+        return !advanced_feature::visible('perform');
     }
 
     /**

@@ -27,6 +27,7 @@ $string['sourcesummary'] = 'Learners progress on their assigned competencies.';
 $string['sourcetitle'] = 'Competency Status (Perform)';
 
 $string['competencyid'] = 'Competency ID';
+$string['competencyidnumber'] = 'Competency ID Number';
 $string['competencyname'] = 'Competency Name';
 $string['completiondate'] = 'Completion date';
 $string['scalevalue'] = 'Competency rating';

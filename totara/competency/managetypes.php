@@ -26,11 +26,13 @@ require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir.'/tablelib.php');
 
 use totara_competency\plugintypes;
+use totara_core\advanced_feature;
 
 $plugin = required_param('plugin', PARAM_ALPHANUM);
 $actiontype = optional_param('type', '', PARAM_ALPHANUMEXT);
 $action = optional_param('action', '', PARAM_ALPHA);
 
+advanced_feature::require('perform');
 require_login();
 $systemcontext = context_system::instance();
 require_capability('moodle/site:config', $systemcontext);

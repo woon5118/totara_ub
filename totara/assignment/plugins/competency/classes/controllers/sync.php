@@ -28,6 +28,7 @@ use context_system;
 use core\output\notification;
 use moodle_url;
 use tassign_competency\task\expand_assignment_task;
+use totara_core\advanced_feature;
 use totara_mvc\controller;
 
 class sync extends controller {
@@ -62,6 +63,8 @@ class sync extends controller {
      * @return context
      */
     protected function setup_context(): context {
+        advanced_feature::require('perform');
+
         return context_system::instance();
     }
 }
