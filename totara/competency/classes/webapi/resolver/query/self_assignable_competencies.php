@@ -30,6 +30,7 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use totara_assignment\entities\user;
 use totara_competency\data_providers\self_assignable_competencies as provider;
+use totara_core\advanced_feature;
 
 /**
  * Query to return competencies available for self assignment.
@@ -57,6 +58,8 @@ class self_assignable_competencies implements query_resolver {
     }
 
     protected static function authorize(array $args) {
+        advanced_feature::require('perform');
+
         require_login();
 
         require_capability('totara/hierarchy:viewcompetency', context_system::instance());

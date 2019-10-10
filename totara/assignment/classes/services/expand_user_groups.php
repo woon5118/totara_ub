@@ -28,6 +28,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use totara_assignment\expanded_users;
+use totara_core\advanced_feature;
 use totara_core\basket\session_basket;
 
 defined('MOODLE_INTERNAL') || die();
@@ -76,6 +77,8 @@ class expand_user_groups extends \external_api {
      * @return array
      */
     public static function index(array $baskets, array $filters, int $page, string $order, string $direction) {
+        advanced_feature::require('perform');
+
         require_capability('moodle/cohort:view', \context_system::instance());
         require_capability('totara/hierarchy:viewposition', \context_system::instance());
         require_capability('totara/hierarchy:vieworganisation', \context_system::instance());

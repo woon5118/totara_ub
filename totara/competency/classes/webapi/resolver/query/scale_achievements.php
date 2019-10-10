@@ -30,6 +30,7 @@ use tassign_competency\entities\assignment;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
+use totara_core\advanced_feature;
 
 /**
  * Returns items for each scale value, which could be criteria groups
@@ -44,6 +45,8 @@ class scale_achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('perform');
+
         require_login(null, false, null, false, true);
 
         $pathways = self::get_active_single_value_types($args['assignment_id']);

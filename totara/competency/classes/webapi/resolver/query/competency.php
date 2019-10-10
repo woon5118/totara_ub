@@ -27,6 +27,7 @@ use context_system;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use tassign_competency\entities\competency as competency_entity;
+use totara_core\advanced_feature;
 
 /**
  * Query to return a single competency.
@@ -41,10 +42,7 @@ class competency implements query_resolver {
      * @return competency_entity
      */
     public static function resolve(array $args, execution_context $ec) {
-        // Basic sanity check, GraphQL does this for us, but other can call resolve.
-        if (!isset($args['competency_id'])) {
-            throw new \coding_exception('A required parameter (competency_id) was missing');
-        }
+        advanced_feature::require('competencies');
 
         require_login();
         require_capability('totara/hierarchy:viewcompetency', context_system::instance());

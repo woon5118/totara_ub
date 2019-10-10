@@ -26,6 +26,7 @@ namespace tassign_competency\webapi\resolver\query;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use tassign_competency\models\assignment as assignment_model;
+use totara_core\advanced_feature;
 
 /**
  * Query to return a single competency.
@@ -40,6 +41,8 @@ class assignment implements query_resolver {
      * @return assignment_model
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('perform');
+
         require_login();
 
         return assignment_model::load_by_id($args['assignmentid']);

@@ -27,9 +27,7 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
-use tassign_competency\entities\helpers\hierarchy_crumbtrail_helper;
-use totara_reportbuilder\rb\display\format_string;
-use totara_reportbuilder\rb\display\format_text;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -80,6 +78,8 @@ class position extends \external_api {
      * @return array
      */
     public static function index(array $filters, int $page, string $order, string $direction) {
+        advanced_feature::require('positions');
+
         require_capability('totara/hierarchy:viewposition', \context_system::instance());
 
         if (!array_key_exists('visible', $filters)) {
@@ -136,6 +136,7 @@ class position extends \external_api {
      * @return array
      */
     public static function show(int $id, array $options) {
+        advanced_feature::require('positions');
         require_capability('totara/hierarchy:viewposition', \context_system::instance());
 
         /** @var \totara_assignment\entities\position $item */

@@ -24,10 +24,10 @@
 
 namespace totara_competency;
 
-use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\course;
 use totara_competency\entities\scale;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -45,6 +45,9 @@ class external extends \external_api {
     }
 
     public static function get_scale(int $comp_id): int {
+        // TODO could be competency generic
+        advanced_feature::require('perform');
+
         $competency = new competency($comp_id);
         return $competency->scale->id;
     }
@@ -66,6 +69,9 @@ class external extends \external_api {
     }
 
     public static function get_scale_values(int $scale_id): array {
+        // TODO could be competency generic
+        advanced_feature::require('perform');
+
         $results = [];
 
         $scale = new scale($scale_id);
@@ -107,6 +113,8 @@ class external extends \external_api {
     }
 
     public static function get_pathways(int $comp_id) {
+        advanced_feature::require('perform');
+
         $config = new achievement_configuration(new competency($comp_id));
         $pathways = $config->get_active_pathways();
 
@@ -138,6 +146,8 @@ class external extends \external_api {
     }
 
     public static function get_categories() {
+        advanced_feature::require('perform');
+
         global $DB;
 
         // Todo: things like capability checks and format strings. Also on courses. Also, look for internal functions that get this stuff for us.
@@ -184,6 +194,8 @@ class external extends \external_api {
      * @return array
      */
     public static function get_courses(array $filters, int $page, string $order, string $direction) {
+        advanced_feature::require('competencies');
+
         global $CFG;
         require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
@@ -271,6 +283,8 @@ class external extends \external_api {
      * @return array
      */
     public static function get_linked_courses(int $competency_id) {
+        advanced_feature::require('competencies');
+
         global $CFG;
         require_once($CFG->dirroot . '/totara/plan/lib.php');
 
@@ -328,6 +342,8 @@ class external extends \external_api {
      *   'linktype' which contains either of constants, PLAN_LINKTYPE_OPTIONAL or PLAN_LINKTYPE_MANDATORY.
      */
     public static function set_linked_courses(int $competency_id, $courses) {
+        advanced_feature::require('competencies');
+
         // Todo: permission checks on courses being visible. Also on being able to administer competency.
         linked_courses::set_linked_courses($competency_id, $courses);
     }
@@ -348,6 +364,8 @@ class external extends \external_api {
     }
 
     public static function link_default_preset(int $comp_id): string {
+        advanced_feature::require('perform');
+
         $config = new achievement_configuration(new competency($comp_id));
         $config->link_default_preset();
 
@@ -369,6 +387,8 @@ class external extends \external_api {
     }
 
     public static function get_definition_template(string $type) {
+        advanced_feature::require('perform');
+
         return pathway_factory::create($type)
             -> export_pathway_edit_template();
     }
@@ -399,6 +419,8 @@ class external extends \external_api {
     }
 
     public static function get_summary_template(string $type, int $id) {
+        advanced_feature::require('perform');
+
         return pathway_factory::fetch($type, $id)
             -> export_pathway_view_template();
     }
@@ -426,6 +448,8 @@ class external extends \external_api {
     }
 
     public static function delete_pathways(string $comp_id, array $pathways, int $action_time) {
+        advanced_feature::require('perform');
+
         $config = new achievement_configuration(new competency($comp_id));
         return $config->delete_pathways($pathways, $action_time);
     }
@@ -447,6 +471,8 @@ class external extends \external_api {
     }
 
     public static function has_singleuse_criteria(int $comp_id): string {
+        advanced_feature::require('perform');
+
         $config = new achievement_configuration(new competency($comp_id));
         return $config->has_singleuse_criteria();
     }
@@ -469,6 +495,8 @@ class external extends \external_api {
     }
 
     public static function set_overall_aggregation(int $comp_id, string $type, int $action_time): string {
+        advanced_feature::require('perform');
+
         $config = new achievement_configuration(new competency($comp_id));
         $old_type = $config ->get_aggregation_type();
 
@@ -484,4 +512,4 @@ class external extends \external_api {
         return new \external_value(PARAM_ALPHANUMEXT, 'Aggregation type');
     }
 
-  }
+}

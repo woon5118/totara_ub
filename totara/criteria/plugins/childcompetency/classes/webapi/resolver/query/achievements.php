@@ -34,6 +34,7 @@ use criteria_childcompetency\childcompetency;
 use tassign_competency\entities\assignment;
 use tassign_competency\models\assignment_user;
 use totara_competency\entities\competency;
+use totara_core\advanced_feature;
 use totara_criteria\criterion_not_found_exception;
 
 /**
@@ -47,6 +48,7 @@ class achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('perform');
 
         $instance_id = $args['instance_id'];
         $user_id = $args['user_id'];

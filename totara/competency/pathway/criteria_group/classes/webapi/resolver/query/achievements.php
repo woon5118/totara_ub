@@ -26,6 +26,7 @@ namespace pathway_criteria_group\webapi\resolver\query;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
+use totara_core\advanced_feature;
 
 /**
  * Fetches all criterions within the given group
@@ -38,6 +39,8 @@ class achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('perform');
+
         require_login(null, false, null, false, true);
 
         $instance_id = $args['instance_id'];

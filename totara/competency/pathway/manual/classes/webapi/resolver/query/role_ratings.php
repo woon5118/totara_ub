@@ -28,6 +28,7 @@ use context_user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use pathway_manual\data_providers\competency_ratings;
+use totara_core\advanced_feature;
 
 class role_ratings implements query_resolver {
 
@@ -37,6 +38,8 @@ class role_ratings implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('perform');
+
         global $USER;
 
         require_login(null, false, null, false, true);

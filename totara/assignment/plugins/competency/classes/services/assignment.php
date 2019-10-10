@@ -33,6 +33,7 @@ use tassign_competency\assignment_create_exception;
 use tassign_competency\baskets;
 use tassign_competency\entities;
 use tassign_competency\models;
+use totara_core\advanced_feature;
 use totara_core\basket\session_basket;
 
 defined('MOODLE_INTERNAL') || die();
@@ -87,6 +88,8 @@ class assignment extends \external_api {
      * @return array
      */
     public static function index(array $filters, int $page, string $order_by, string $order_dir) {
+        advanced_feature::require('perform');
+
         require_capability('tassign/competency:view', \context_system::instance());
 
         $order_dir = (strtolower($order_dir) == 'asc') ? 'ASC' : 'DESC';
@@ -160,6 +163,8 @@ class assignment extends \external_api {
      * @return array
      */
     public static function create(string $basket_id, array $user_groups, int $status) {
+        advanced_feature::require('perform');
+
         require_capability('tassign/competency:manage', \context_system::instance());
 
         try {
@@ -227,6 +232,8 @@ class assignment extends \external_api {
      * @return array
      */
     public static function create_from_baskets(string $basket_id, array $user_groups, int $status) {
+        advanced_feature::require('perform');
+
         require_capability('tassign/competency:manage', \context_system::instance());
 
         try {
@@ -290,6 +297,8 @@ class assignment extends \external_api {
      * @param int $status
      */
     private static function create_notification(collection $assignments, int $expected_assignments_count, int $status) {
+        advanced_feature::require('perform');
+
         $assignment_created = count($assignments);
         $skipped = abs($expected_assignments_count - $assignment_created);
 
@@ -376,6 +385,8 @@ class assignment extends \external_api {
      * @return array
      */
     public static function action(string $action, ?string $basket_key, ?int $assignment_id, array $extra) {
+        advanced_feature::require('perform');
+
         require_capability('tassign/competency:manage', \context_system::instance());
 
         if (is_null($basket_key) && is_null($assignment_id) || !is_null($basket_key) && !is_null($assignment_id)) {

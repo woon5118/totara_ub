@@ -24,7 +24,7 @@
 
 namespace criteria_linkedcourses;
 
-use criteria_linkedcourses\linkedcourses;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -42,6 +42,8 @@ class external extends \external_api {
     }
 
     public static function get_detail(int $id) {
+        advanced_feature::require('perform');
+
         return linkedcourses::fetch($id)
             -> export_edit_detail();
 

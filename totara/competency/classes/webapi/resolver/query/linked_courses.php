@@ -26,10 +26,13 @@ namespace totara_competency\webapi\resolver\query;
 use context_system;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use totara_core\advanced_feature;
 
 class linked_courses implements query_resolver {
 
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('competencies');
+
         require_login();
         require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 

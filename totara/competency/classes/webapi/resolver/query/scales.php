@@ -28,6 +28,7 @@ use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use totara_competency\models\scale as scale_model;
+use totara_core\advanced_feature;
 
 /**
  * Query to return a single competency.
@@ -42,6 +43,7 @@ class scales implements query_resolver {
      * @return collection
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('perform');
 
         if (!isset($args['id']) && !isset($args['competency_id']) || isset($args['id']) && isset($args['competency_id'])) {
             throw new \coding_exception('Please provide either scale id OR competency id');

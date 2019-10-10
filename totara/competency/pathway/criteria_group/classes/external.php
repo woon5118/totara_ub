@@ -32,7 +32,7 @@ use totara_competency\entities\configuration_change;
 use totara_competency\entities\scale_value;
 use totara_competency\pathway;
 use totara_competency\plugintypes;
-use totara_criteria\criterion;
+use totara_core\advanced_feature;
 use totara_criteria\criterion_factory;
 
 class external extends \external_api {
@@ -106,6 +106,8 @@ class external extends \external_api {
 
     // TODO: Make this part of the graphQL configuration mutators
     public static function create(int $comp_id, int $sortorder, int $scalevalue, array $criteria, int $action_time) {
+        advanced_feature::require('perform');
+
         // If there are no criteria linked to this pathway, don't create
         if (empty($criteria)) {
             return 0;
@@ -207,6 +209,7 @@ class external extends \external_api {
     }
 
     public static function update(int $id, int $sortorder, array $criteria, int $action_time) {
+        advanced_feature::require('perform');
 
         $pathway = criteria_group::fetch($id);
 
@@ -280,6 +283,8 @@ class external extends \external_api {
     }
 
     public static function get_criteria_types() {
+        advanced_feature::require('perform');
+
         $results = [];
 
         $types = plugintypes::get_enabled_plugins('criteria', 'totara_criteria');

@@ -29,6 +29,7 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use totara_assignment\entities\user;
 use totara_competency\models\profile\progress as progress_model;
+use totara_core\advanced_feature;
 
 class profile_progress implements query_resolver {
 
@@ -37,6 +38,8 @@ class profile_progress implements query_resolver {
     }
 
     public static function authorize($user_id = null) {
+        advanced_feature::require('perform');
+        
         if (is_null($user_id)) {
             throw new \coding_exception('User id is required');
         }

@@ -29,6 +29,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use tassign_competency\entities;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -85,6 +86,8 @@ class competency extends \external_api {
      * @return array
      */
     public static function index(array $filters = [], int $page = 0, string $order_by = '', string $order_dir = '') {
+        advanced_feature::require('perform');
+
         require_capability('tassign/competency:view', \context_system::instance());
 
         if (!array_key_exists('visible', $filters)) {
@@ -148,6 +151,8 @@ class competency extends \external_api {
      * @return array
      */
     public static function show(int $id, array $options) {
+        advanced_feature::require('perform');
+        
         require_capability('tassign/competency:view', \context_system::instance());
 
         /** @var entities\competency $competency */

@@ -23,7 +23,7 @@
 
 namespace criteria_childcompetency;
 
-use criteria_childcompetency\childcompetency;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -41,9 +41,10 @@ class external extends \external_api {
     }
 
     public static function get_detail(int $id) {
+        advanced_feature::require('perform');
+
         return childcompetency::fetch($id)
             -> export_edit_detail();
-
     }
 
     public static function get_detail_returns() {

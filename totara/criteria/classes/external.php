@@ -24,6 +24,8 @@
 
 namespace totara_criteria;
 
+use totara_core\advanced_feature;
+
 class external extends \external_api {
 
     /** get_definition_template */
@@ -36,6 +38,8 @@ class external extends \external_api {
     }
 
     public static function get_definition_template(string $type) {
+        advanced_feature::require('perform');
+
         return criterion_factory::create($type)
             -> export_criterion_edit_template();
     }

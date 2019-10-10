@@ -28,6 +28,7 @@ use context_user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use core_course\user_learning\item;
+use totara_core\advanced_feature;
 use totara_criteria\criterion;
 use totara_criteria\criterion_not_found_exception;
 
@@ -44,6 +45,8 @@ abstract class course_achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('perform');
+
         global $CFG;
         require_once($CFG->dirroot . '/completion/completion_completion.php');
 

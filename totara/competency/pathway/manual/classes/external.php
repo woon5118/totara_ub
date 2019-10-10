@@ -27,11 +27,9 @@ namespace pathway_manual;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
-use totara_competency\entities\pathway_achievement;
-use totara_competency\entities\scale_value;
 use totara_competency\pathway;
-use totara_competency\pathway_factory;
 use totara_competency\scale_provider;
+use totara_core\advanced_feature;
 
 class external extends \external_api {
 
@@ -45,6 +43,8 @@ class external extends \external_api {
     }
 
     public static function get_detail(int $id) {
+        advanced_feature::require('perform');
+
         $pathway = manual::fetch($id);
         return $pathway->export_edit_detail();
     }
@@ -101,6 +101,8 @@ class external extends \external_api {
      * @return array
      */
     public static function get_roles(array $filters, int $page, string $order, string $direction) {
+        advanced_feature::require('perform');
+
         $roles = manual::get_all_valid_roles();
 
         if (!empty($filters['ids'])) {
@@ -199,6 +201,8 @@ class external extends \external_api {
     }
 
     public static function create(int $comp_id, int $sortorder, array $roles, string $action_time) {
+        advanced_feature::require('perform');
+
         $competency = new competency($comp_id);
         $config = new achievement_configuration($competency);
 
@@ -243,6 +247,8 @@ class external extends \external_api {
     }
 
     public static function update(int $id, int $sortorder, array $roles, string $action_time) {
+        advanced_feature::require('perform');
+
         $pathway = manual::fetch($id);
         $config = new achievement_configuration($pathway->get_competency());
 

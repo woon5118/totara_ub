@@ -28,6 +28,7 @@ use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\pathway;
+use totara_core\advanced_feature;
 
 class external extends \external_api {
     /** create */
@@ -42,6 +43,8 @@ class external extends \external_api {
     }
 
     public static function create(int $comp_id, int $sortorder, string $action_time) {
+        advanced_feature::require('perform');
+
         $competency = new competency($comp_id);
         $config = new achievement_configuration($competency);
 
@@ -80,6 +83,8 @@ class external extends \external_api {
     }
 
     public static function update(int $id, int $sortorder, string $action_time) {
+        advanced_feature::require('perform');
+
         $pathway = learning_plan::fetch($id);
         $config = new achievement_configuration($pathway->get_competency());
 
