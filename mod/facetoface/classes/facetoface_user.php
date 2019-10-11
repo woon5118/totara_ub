@@ -57,13 +57,13 @@ class facetoface_user extends \core_user {
 
         // Just return the cached user object.
         if (!empty(self::$facetofaceuser)) {
-            return self::$facetofaceuser;
+            return clone self::$facetofaceuser;
         }
 
         self::$facetofaceuser = parent::get_noreply_user();
         self::$facetofaceuser->maildisplay = 1;
         // Unset emailstop to make sure support message is sent.
         self::$facetofaceuser->emailstop = 0;
-        return self::$facetofaceuser;
+        return clone self::$facetofaceuser;
     }
 }
