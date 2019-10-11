@@ -273,6 +273,7 @@ $string['eventupdateadmin'] = 'Admin user group updated';
 $string['eventupdateauth'] = 'Authentication methods updated';
 $string['exportformat'] = 'Export format';
 $string['facetoface'] = 'Seminar';
+$string['feature_not_available'] = 'Feature {$a} is not available.';
 $string['findcourses'] = 'Find Courses';
 $string['findlearning'] = 'Find Learning';
 $string['flexibleicons'] = 'Flexible icons';

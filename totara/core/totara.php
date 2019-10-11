@@ -23,6 +23,8 @@
  * @subpackage totara_core
  */
 
+use totara_core\advanced_feature;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -30,10 +32,6 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once($CFG->dirroot . '/totara/core/deprecatedlib.php');
 
 define('PUBLIC_KEY_PATH', $CFG->dirroot . '/totara_public.pem');
-define('TOTARA_SHOWFEATURE', 1);
-define('TOTARA_HIDEFEATURE', 2);
-define('TOTARA_DISABLEFEATURE', 3);
-
 define('COHORT_ALERT_NONE', 0);
 define('COHORT_ALERT_AFFECTED', 1);
 define('COHORT_ALERT_ALL', 2);
@@ -2138,80 +2136,6 @@ function totara_idnumber_exists($table, $idnumber, $itemid = 0) {
     }
 
     return $duplicate;
-}
-
-/**
- * List of strings which can be used with 'totara_feature_*() functions'.
- *
- * Update this list if you add/remove settings in admin/settings/subsystems.php.
- *
- * @return array Array of strings of supported features (should have a matching "enable{$feature}" config setting).
- */
-function totara_advanced_features_list() {
-    return array(
-        'goals',
-        'competencies',
-        'appraisals',
-        'feedback360',
-        'learningplans',
-        'programs',
-        'certifications',
-        'totaradashboard',
-        'reportgraphs',
-        'myteam',
-        'recordoflearning',
-        'positions',
-    );
-}
-
-/**
- * Check the state of a particular Totara feature against the specified state.
- *
- * Used by the totara_feature_*() functions to see if some Totara functionality is visible/hidden/disabled.
- *
- * @param string $feature Name of the feature to check, must match options from {@link totara_advanced_features_list()}.
- * @param integer $stateconstant State to check, must match one of TOTARA_*FEATURE constants defined in this file.
- * @return bool True if the feature's config setting is in the specified state.
- */
-function totara_feature_check_state($feature, $stateconstant) {
-    global $CFG;
-
-    if (!in_array($feature, totara_advanced_features_list())) {
-        throw new coding_exception("'{$feature}' not supported by Totara feature checking code.");
-    }
-
-    $cfgsetting = "enable{$feature}";
-    return (isset($CFG->$cfgsetting) && $CFG->$cfgsetting == $stateconstant);
-}
-
-/**
- * Check to see if a feature is set to be visible in Advanced Features
- *
- * @param string $feature The name of the feature from the list in {@link totara_feature_check_support()}.
- * @return bool True if the feature is set to be visible.
- */
-function totara_feature_visible($feature) {
-    return totara_feature_check_state($feature, TOTARA_SHOWFEATURE);
-}
-
-/**
- * Check to see if a feature is set to be disabled in Advanced Features
- *
- * @param string $feature The name of the feature from the list in {@link totara_feature_check_support()}.
- * @return bool True if the feature is disabled.
- */
-function totara_feature_disabled($feature) {
-    return totara_feature_check_state($feature, TOTARA_DISABLEFEATURE);
-}
-
-/**
- * Check to see if a feature is set to be hidden in Advanced Features
- *
- * @param string $feature The name of the feature from the list in {@link totara_feature_check_support()}.
- * @return bool True if the feature is hidden.
- */
-function totara_feature_hidden($feature) {
-    return totara_feature_check_state($feature, TOTARA_HIDEFEATURE);
 }
 
 /**

@@ -22,6 +22,8 @@
  * @subpackage totara_core
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 function totara_generate_email_user($email) {
@@ -242,4 +244,104 @@ function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $s
 
     $renderer = $PAGE->get_renderer('totara_core');
     echo $renderer->scheduled_reports($scheduledreports, $showoptions, $addform);
+}
+
+/**
+ * TOTARA_SHOWFEATURE has been deprecated in favour of \totara_core\advanced_feature::ENABLED
+ *
+ * @deprecated since Totara 13
+ */
+define('TOTARA_SHOWFEATURE', advanced_feature::ENABLED);
+
+/**
+ * TOTARA_HIDEFEATURE has been deprecated, hidden is not supported anymore, use only enabled or disabled
+ *
+ * @deprecated since Totara 13
+ */
+define('TOTARA_HIDEFEATURE', 2);
+
+/**
+ * TOTARA_DISABLEFEATURE has been deprecated in favour of \totara_core\advanced_feature::DISABLED
+ *
+ * @deprecated since Totara 13
+ */
+define('TOTARA_DISABLEFEATURE', advanced_feature::DISABLED);
+
+/**
+ * List of strings which can be used with 'totara_feature_*() functions'.
+ *
+ * Update this list if you add/remove settings in admin/settings/subsystems.php.
+ *
+ * @deprecated since Totara 13
+ * @return array Array of strings of supported features (should have a matching "enable{$feature}" config setting).
+ */
+function totara_advanced_features_list() {
+    debugging('totara_advanced_features_list() has been deprecated in favour of \totara_core\advanced_feature::get_available().', DEBUG_DEVELOPER);
+
+    return advanced_feature::get_available();
+}
+
+/**
+ * Check the state of a particular Totara feature against the specified state.
+ *
+ * Used by the totara_feature_*() functions to see if some Totara functionality is visible/hidden/disabled.
+ *
+ * @deprecated since Totara 13
+ * @param string $feature Name of the feature to check, must match options from {@link \totara_core\advanced_feature::get_available()}.
+ * @param integer $stateconstant State to check, must match one of TOTARA_*FEATURE constants defined in this file.
+ * @return bool True if the feature's config setting is in the specified state.
+ */
+function totara_feature_check_state($feature, $stateconstant) {
+    debugging('totara_feature_check_state() has been deprecated in favour of \totara_core\advanced_feature::* functions.', DEBUG_DEVELOPER);
+
+    switch ($stateconstant) {
+        case advanced_feature::ENABLED:
+            return advanced_feature::is_enabled($feature);
+        case advanced_feature::DISABLED:
+            return advanced_feature::is_disabled($feature);
+        case advanced_feature::HIDDEN:
+            return totara_feature_hidden($feature);
+        default:
+            throw new coding_exception('Unknown state constant for feature check');
+    }
+}
+
+/**
+ * Check to see if a feature is set to be visible in Advanced Features
+ *
+ * @deprecated since Totara 13
+ * @param string $feature The name of the feature from the list in {@link totara_feature_check_support()}.
+ * @return bool True if the feature is set to be visible.
+ */
+function totara_feature_visible($feature) {
+    debugging('totara_feature_visible() has been deprecated in favour of \totara_core\advanced_feature::is_enabled().', DEBUG_DEVELOPER);
+
+    return advanced_feature::is_enabled($feature);
+}
+
+/**
+ * Check to see if a feature is set to be disabled in Advanced Features
+ *
+ * @deprecated since Totara 13
+ * @param string $feature The name of the feature from the list in {@link totara_feature_check_support()}.
+ * @return bool True if the feature is disabled.
+ */
+function totara_feature_disabled($feature) {
+    debugging('totara_feature_disabled() has been deprecated in favour of \totara_core\advanced_feature::is_disabled().', DEBUG_DEVELOPER);
+
+    return advanced_feature::is_disabled($feature);
+}
+
+/**
+ * Check to see if a feature is set to be hidden in Advanced Features
+ * Hidden is not supported anymore, use only enabled or disabled!
+ *
+ * @deprecated since Totara 13
+ * @param string $feature The name of the feature from the list in {@link totara_feature_check_support()}.
+ * @return bool True if the feature is hidden.
+ */
+function totara_feature_hidden($feature) {
+    debugging('Hiding features is not supported anymore, features can only be enabled or disabled.', DEBUG_DEVELOPER);
+
+    return advanced_feature::check($feature, TOTARA_HIDEFEATURE);
 }
