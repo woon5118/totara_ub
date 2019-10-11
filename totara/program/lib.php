@@ -578,6 +578,15 @@ function prog_get_category_breadcrumbs($categoryid, $viewtype = 'program') {
  *
  * Similar to prog_get_programs, but allows paging
  *
+ * @param string|int $categoryid Either a category id or 'all' for everything
+ * @param string     $sort       A field and direction to sort by
+ * @param string     $fields     The additional fields to return
+ * @param int        $totalcount Reference for the total number of programs
+ * @param string     $limitfrom  The program number to start from
+ * @param string     $limitnum   The number of programs to limit to
+ * @param string     $type       Type 'program' or 'certification'
+ *
+ * @return array
  */
 function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
                           $fields="p.id,p.sortorder,p.shortname,p.fullname,p.summary,p.visible",
@@ -609,16 +618,21 @@ function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
                           {$ctxjoin}
                     WHERE {$typesql} {$categoryselect} AND {$visibilitysql} ORDER BY {$sort}";
 
+    $allvisibleprograms = $DB->get_records_sql($select, $params);
+
+    // Nothing to see, set $totalcount to 0 and return.
+    if (!$allvisibleprograms) {
+        $totalcount = 0;
+        return [];
+    }
+
+    $totalcount = count($allvisibleprograms);
+
     if (!$limitfrom) {
         $limitfrom = 0;
     }
 
-    $visibleprograms = $DB->get_records_sql($select, $params, $limitfrom, $limitnum);
-
-    $totalcount = 0;
-    if ($visibleprograms) {
-        $totalcount = count($visibleprograms);
-    }
+    $visibleprograms = array_slice($allvisibleprograms, $limitfrom, $limitnum, true);
 
     return $visibleprograms;
 }

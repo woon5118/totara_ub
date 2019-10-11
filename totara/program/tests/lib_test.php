@@ -2710,4 +2710,35 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals($user2->id, $latestlog->userid);
         $this->assertStringStartsWith('Testing pass prog_set_status_complete', $latestlog->description);
     }
+
+    public function test_prog_get_programs_page() {
+        /* @var totara_program_generator $programgenerator */
+        $programgenerator = self::getDataGenerator()->get_plugin_generator('totara_program');
+
+        $category = self::getDataGenerator()->create_category(['parent' => 0]);
+
+        $programdata = ['category' => $category->id];
+        $prog1 = $programgenerator->create_program($programdata);
+        $prog2 = $programgenerator->create_program($programdata);
+        $prog3 = $programgenerator->create_program($programdata);
+        $prog4 = $programgenerator->create_program($programdata);
+        $prog5 = $programgenerator->create_program($programdata);
+        $prog6 = $programgenerator->create_program($programdata);
+        $prog7 = $programgenerator->create_program($programdata);
+
+        $page1 = prog_get_programs_page($category->id, 'p.sortorder ASC', 'p.id', $totalcount, 0 * 3, 3);
+        self::assertEquals(7, $totalcount);
+        self::assertCount(3, $page1);
+        self::assertEquals([$prog1->id, $prog2->id, $prog3->id], array_keys($page1));
+
+        $page2 = prog_get_programs_page($category->id, 'p.sortorder ASC', 'p.id', $totalcount, 1 * 3, 3);
+        self::assertEquals(7, $totalcount);
+        self::assertCount(3, $page2);
+        self::assertEquals([$prog4->id, $prog5->id, $prog6->id], array_keys($page2));
+
+        $page3 = prog_get_programs_page($category->id, 'p.sortorder ASC', 'p.id', $totalcount, 2 * 3, 3);
+        self::assertEquals(7, $totalcount);
+        self::assertCount(1, $page3);
+        self::assertEquals([$prog7->id], array_keys($page3));
+    }
 }
