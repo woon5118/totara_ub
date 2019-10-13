@@ -38,75 +38,98 @@ class competency_item_evaluator extends item_evaluator {
          ******************************************************************************************/
         $criterion_id = $criterion->get_id();
 
-        // Not linking with the users_source here as we've already ensured that there is a record for applicable users in the parent
-        // Due to MySQL not allowing the table being updated to appear in a sub query, we need to do the updating in separate steps
+        // Not linking with the users_source here as we've already ensured that there is a record for each applicable users in the parent
 
-        // First item_records shown as 'not met' but user is proficient in the child competency
+        // Due to MySQL not allowing the table being updated and MSSQL not allowing '(column1, column2) IN' in a where clause,
+        // first selecting items to update and then updating them
 
-        $sql =
-            "UPDATE {totara_criteria_item_record}
-               SET criterion_met = :newmet, 
-                   timeevaluated = :now
-             WHERE criterion_met = :currentmet
-               AND (criterion_item_id, user_id) IN ( 
-                    SELECT tci.id, p.user_id
-                      FROM {totara_criteria_item} tci
-                      JOIN (
-                           SELECT tca.comp_id, tca.user_id, MAX(tca.proficient) AS proficient
-                             FROM {totara_competency_achievement} tca
-                            WHERE tca.status = :achievementstatus
-                            GROUP BY tca.comp_id, tca.user_id
-                              HAVING MAX(tca.proficient) = :isproficient) p
-                        ON tci.item_id = p.comp_id
-                     WHERE tci.criterion_id = :criterionid
-                       AND tci.item_type = :itemtype)";
+        // Find all item records where the currently indicated 'criterion_met' is wrong
+        // Doing it in 2 sets as there can be a huge number of assigned users which may result in very large arrays
+        // TODO: Need to do stress testing here with huge number of assigned users
 
-        $params = [
-            'newmet' => 1,
-            'now' => $now,
+        // First users marked as not having met the criteria, but have satisfied all
+        $select_sql = "
+            SELECT tcir.id
+              FROM {totara_criteria_item} tci
+              JOIN {totara_criteria_item_record} tcir
+                ON tcir.criterion_item_id = tci.id
+              JOIN (
+                   SELECT tca.comp_id, tca.user_id, MAX(tca.proficient) AS proficient
+                     FROM {totara_competency_achievement} tca
+                    WHERE tca.status = :achievementstatus
+                    GROUP BY tca.comp_id, tca.user_id
+                      HAVING MAX(tca.proficient) = :isproficient) p
+                ON tci.item_id = p.comp_id
+               AND tcir.user_id = p.user_id
+             WHERE tci.criterion_id = :criterionid
+               AND tci.item_type = :itemtype
+               AND tcir.criterion_met = :currentmet";
+
+        $select_params = [
             'achievementstatus' => competency_achievement::ACTIVE_ASSIGNMENT,
-            'itemtype' => 'competency',
-            'currentmet' => 0,
             'isproficient' => 1,
             'criterionid' => $criterion_id,
+            'itemtype' => 'competency',
+            'currentmet' => 0,
         ];
 
-        $DB->execute($sql, $params);
+        $nowmet = $DB->get_fieldset_sql($select_sql, $select_params);
+        if (!empty($nowmet)) {
+            [$user_sql, $user_params] = $DB->get_in_or_equal($nowmet, SQL_PARAMS_NAMED);
 
-        // Now item_records shown as 'met' but user is not proficient in the child competency
-        $params['newmet'] = 0;
-        $params['currentmet'] = 1;
-        $params['isproficient'] = 0;
+            // Now update item_records with the correct proficient value
+            $update_sql =
+                "UPDATE {totara_criteria_item_record}
+                   SET criterion_met = :newmet, 
+                       timeevaluated = :now
+                 WHERE id {$user_sql}";
 
-        $DB->execute($sql, $params);
+            $update_params = array_merge($user_params, ['newmet' => 1, 'now' => $now]);
+            $DB->execute($update_sql, $update_params);
+        }
 
-        // Now item_records shown as 'met' but no existing achievement record for the child competencies
+        // Now users marked as 'criterion_met' but doesn't actually satisfy the criteria
+        // (only difference in select_sql is the use of left join to handle cases where the user doesn't have an achievement record anymore)
 
-        $sql =
-            "UPDATE {totara_criteria_item_record}
-               SET criterion_met = :newmet, 
-                   timeevaluated = :now
-             WHERE criterion_met = :currentmet
-               AND criterion_item_id IN ( 
-                    SELECT tci.id
-                      FROM {totara_criteria_item} tci
-                 LEFT JOIN {totara_competency_achievement} tca
-                        ON tci.item_id = tca.comp_id
-                       AND tca.status = :achievementstatus
-                     WHERE tci.criterion_id = :criterionid
-                       AND tci.item_type = :itemtype
-                       AND tca.id IS NULL)";
+        $select_sql = "
+            SELECT tcir.id
+              FROM {totara_criteria_item} tci
+              JOIN {totara_criteria_item_record} tcir
+                ON tcir.criterion_item_id = tci.id
+         LEFT JOIN (
+                   SELECT tca.comp_id, tca.user_id, MAX(tca.proficient) AS proficient
+                     FROM {totara_competency_achievement} tca
+                    WHERE tca.status = :achievementstatus
+                    GROUP BY tca.comp_id, tca.user_id) p
+                ON tci.item_id = p.comp_id
+               AND tcir.user_id = p.user_id
+             WHERE tci.criterion_id = :criterionid
+               AND tci.item_type = :itemtype
+               AND tcir.criterion_met = :currentmet
+               AND (p.proficient IS NULL OR p.proficient = :isproficient)";
 
-        $params = [
-            'newmet' => 0,
-            'now' => $now,
+        $select_params = [
             'achievementstatus' => competency_achievement::ACTIVE_ASSIGNMENT,
+            'isproficient' => 0,
+            'criterionid' => $criterion_id,
             'itemtype' => 'competency',
             'currentmet' => 1,
-            'criterionid' => $criterion_id,
         ];
 
-        $DB->execute($sql, $params);
+        $notmet = $DB->get_fieldset_sql($select_sql, $select_params);
+        if (!empty($notmet)) {
+            [$user_sql, $user_params] = $DB->get_in_or_equal($notmet, SQL_PARAMS_NAMED);
+
+            // Now update item_records with the correct proficient value
+            $update_sql =
+                "UPDATE {totara_criteria_item_record}
+                   SET criterion_met = :newmet, 
+                       timeevaluated = :now
+                 WHERE id {$user_sql}";
+
+            $update_params = array_merge($user_params, ['newmet' => 0, 'now' => $now]);
+            $DB->execute($update_sql, $update_params);
+        }
     }
 
 }
