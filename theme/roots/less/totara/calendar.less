@@ -314,7 +314,9 @@
         }
     }
     td {
-        width: (100/7)*1%;
+        /* stylelint-disable csstree/validator */
+        width: (100/7)*1%; // TODO TL-22640
+        /* stylelint-enable */
     }
 }
 
@@ -338,7 +340,9 @@
             overflow: hidden;
         }
         &.days-in-week-7 th {
-            max-width: percentage(1/7); // 14.2857%;
+            /* stylelint-disable csstree/validator */
+            max-width: percentage(1/7); // 14.2857%; TODO TL-22640
+            /* stylelint-enable */
 
         }
     }

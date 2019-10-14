@@ -140,7 +140,9 @@
     .content {
         .popover-content;
         margin-top: 5px;
-        background-color: (lighten(@popover-bg, 10%));
+        /* stylelint-disable csstree/validator */
+        background-color: (lighten(@popover-bg, 10%)); // TODO TL-22640
+        /* stylelint-enable */
     }
 }
 

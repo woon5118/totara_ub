@@ -72,7 +72,9 @@
     clear: both;
     display: none; // Should not display on handheld devices.
     background-color: @totara-menu-dropdown-bg;
-    margin: 0 (floor(@grid-gutter-width / 2) * -1); // Boostrap core uses this type of minus margin approach.
+    /* stylelint-disable csstree/validator */
+    margin: 0 (floor(@grid-gutter-width / 2) * -1); // Boostrap core uses this type of minus margin approach - TODO TL-22640
+    /* stylelint-enable */
 }
 
 .totara-menu-subnav-list {

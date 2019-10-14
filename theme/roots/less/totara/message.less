@@ -357,7 +357,9 @@
         border: 1px dotted @popover-border-color;
         border-radius: @border-radius-base;
         margin-top: 5px;
-        background-color: (lighten(@popover-bg, 10%));
+        /* stylelint-disable csstree/validator */
+        background-color: (lighten(@popover-bg, 10%)); // TODO TL-22640
+        /* stylelint-enable */
     }
     #newmessagelinks {
         margin: 5px 14px;
