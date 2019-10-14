@@ -3788,7 +3788,7 @@ class reportbuilder {
      * @return int One of self::FETCHMETHOD_*
      */
     public static function get_default_fetch_method() {
-        $default = get_config('totara_reportbuidler', 'defaultfetchmethod');
+        $default = get_config('totara_reportbuilder', 'defaultfetchmethod');
         if ($default !== false) {
             $default = (int)$default;
             if ($default === self::FETCHMETHOD_STANDARD_RECORDSET) {

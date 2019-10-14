@@ -1645,7 +1645,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         if ($DB->recommends_counted_recordset()) {
             $default = reportbuilder::FETCHMETHOD_COUNTED_RECORDSET;
         }
-        $plugin = 'totara_reportbuidler';
+        $plugin = 'totara_reportbuilder';
         $setting = 'defaultfetchmethod';
 
         $method = new ReflectionMethod(reportbuilder::class, 'get_fetch_method');
@@ -1684,7 +1684,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_default_fetch_method() {
-        $plugin = 'totara_reportbuidler';
+        $plugin = 'totara_reportbuilder';
         $setting = 'defaultfetchmethod';
 
         self::assertEmpty(get_config($plugin, $setting));
