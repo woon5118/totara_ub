@@ -24,6 +24,8 @@
 
 use totara_competency\entities\competency_achievement;
 use totara_criteria\competency_item_evaluator;
+use totara_criteria\criterion;
+use totara_criteria\entities\criterion as criterion_item;
 
 class totara_criteria_competency_item_evaluator_testcase extends advanced_testcase {
 
@@ -35,8 +37,14 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
     private function create_item(int $comp_id): int {
         global $DB;
 
+        $criterion = new criterion_item();
+        $criterion->plugin_type = 'test';
+        $criterion->aggregation_method = criterion::AGGREGATE_ALL;
+        $criterion->criterion_modified = time();
+        $criterion->save();
+
         $item = new stdClass();
-        $item->criterion_id = 1;
+        $item->criterion_id = $criterion->id;
         $item->item_type = 'competency';
         $item->item_id = $comp_id;
         return $DB->insert_record('totara_criteria_item', $item);

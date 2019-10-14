@@ -29,6 +29,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_criterion_id" TYPE="foreign" FIELDS="criterion_id" REFTABLE="totara_criteria" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="totara_criteria_item_record" COMMENT="Record regarding whether a user met a specific criterion item or not">
@@ -42,7 +43,7 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="crititmrec_fk_user" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="crititmrec_fk_itm" TYPE="foreign" FIELDS="criterion_item_id" REFTABLE="totara_criteria_item" REFFIELDS="id"/>
+        <KEY NAME="crititmrec_fk_itm" TYPE="foreign" FIELDS="criterion_item_id" REFTABLE="totara_criteria_item" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="crititmrec_ev_ix" UNIQUE="false" FIELDS="timeevaluated"/>
@@ -57,6 +58,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_criterion__meta_id" TYPE="foreign" FIELDS="criterion_id" REFTABLE="totara_criteria" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
     </TABLE>
   </TABLES>

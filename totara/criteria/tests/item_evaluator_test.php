@@ -22,6 +22,9 @@
  * @package totara_criteria
  */
 
+use totara_criteria\criterion;
+use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entities\criterion_item as criterion_item_entity;
 use totara_criteria\item_evaluator;
 
 class totara_criteria_item_evaluator_testcase extends advanced_testcase {
@@ -40,19 +43,29 @@ class totara_criteria_item_evaluator_testcase extends advanced_testcase {
     public function test_create_item_records_many_users() {
         global $DB;
 
-        $item_id = 101;
+        $criterion = new criterion_entity();
+        $criterion->plugin_type = 'test';
+        $criterion->aggregation_method = criterion::AGGREGATE_ALL;
+        $criterion->criterion_modified = time();
+        $criterion->save();
+
+        $item = new criterion_item_entity();
+        $item->criterion_id = $criterion->id;
+        $item->item_type = 'test';
+        $item->item_id = 999;
+        $item->save();
 
         // Not only will it accept any item id, but also any user ids.
         $user_ids = [201, 202, 203];
 
-        item_evaluator::create_item_records($item_id, $user_ids);
+        item_evaluator::create_item_records($item->id, $user_ids);
 
         $item_records = $DB->get_records('totara_criteria_item_record');
         $this->assertCount(3, $item_records);
 
         foreach ($item_records as $item_record) {
             $this->assertEquals('0', $item_record->criterion_met);
-            $this->assertEquals($item_id, $item_record->criterion_item_id);
+            $this->assertEquals($item->id, $item_record->criterion_item_id);
             $this->assertContains($item_record->user_id, $user_ids);
 
             // Todo: Changed this for now.... Used to be: This is 0 because it has not yet been evaluated.

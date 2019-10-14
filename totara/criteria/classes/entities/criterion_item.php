@@ -24,27 +24,24 @@
 namespace totara_criteria\entities;
 
 
-use core\orm\collection;
 use core\orm\entity\entity;
-use core\orm\entity\relations\has_many;
+use core\orm\entity\relations\belongs_to;
 
 /**
  * One criterion
  *
- * @property string $plugin_type
- * @property int $aggregation_method
- * @property string $aggregation_params
- * @property int $criterion_modified
- * @property int $last_evaluated
+ * @property int $criterion_id
+ * @property string $item_type
+ * @property int $item_id
  *
- * @property-read collection|criterion_item[] $items
+ * @property-read criterion $criterion
  */
-class criterion extends entity {
+class criterion_item extends entity {
 
-    public const TABLE = 'totara_criteria';
+    public const TABLE = 'totara_criteria_item';
 
-    public function items(): has_many {
-        return $this->has_many(criterion_item::class, 'criterion_id');
+    public function criterion(): belongs_to {
+        return $this->belongs_to(criterion::class, 'criterion_id');
     }
 
 }

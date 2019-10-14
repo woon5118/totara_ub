@@ -24,6 +24,7 @@
 
 use totara_criteria\course_item_evaluator;
 use totara_criteria\criterion;
+use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\item_evaluator;
 
 class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
@@ -37,12 +38,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $record = new stdClass();
-        // No need for an actual criterion in this test case.
-        $record->criterion_id = 0;
-        $record->item_type = 'course';
-        $record->item_id = $course->id;
-        $DB->insert_record('totara_criteria_item', $record);
+        $this->create_course_criterion_item($course);
 
         course_item_evaluator::update_item_records();
 
@@ -55,12 +51,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $record = new stdClass();
-        // No need for an actual criterion in this test case.
-        $record->criterion_id = 0;
-        $record->item_type = 'course';
-        $record->item_id = $course->id;
-        $item_id = $DB->insert_record('totara_criteria_item', $record);
+        $item_id = $this->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -89,12 +80,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $record = new stdClass();
-        // No need for an actual criterion in this test case.
-        $record->criterion_id = 0;
-        $record->item_type = 'course';
-        $record->item_id = $course->id;
-        $item_id = $DB->insert_record('totara_criteria_item', $record);
+        $item_id = $this->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -127,12 +113,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $record = new stdClass();
-        // No need for an actual criterion in this test case.
-        $record->criterion_id = 0;
-        $record->item_type = 'course';
-        $record->item_id = $course->id;
-        $item_id = $DB->insert_record('totara_criteria_item', $record);
+        $item_id = $this->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -153,12 +134,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $record = new stdClass();
-        // No need for an actual criterion in this test case.
-        $record->criterion_id = 0;
-        $record->item_type = 'course';
-        $record->item_id = $course->id;
-        $item_id = $DB->insert_record('totara_criteria_item', $record);
+        $item_id = $this->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -208,12 +184,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $record = new stdClass();
-        // No need for an actual criterion in this test case.
-        $record->criterion_id = 0;
-        $record->item_type = 'course';
-        $record->item_id = $course->id;
-        $item_id = $DB->insert_record('totara_criteria_item', $record);
+        $item_id = $this->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -242,12 +213,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $record = new stdClass();
-        // No need for an actual criterion in this test case.
-        $record->criterion_id = 0;
-        $record->item_type = 'course';
-        $record->item_id = $course->id;
-        $item_id = $DB->insert_record('totara_criteria_item', $record);
+        $item_id = $this->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -276,12 +242,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $record = new stdClass();
-        // No need for an actual criterion in this test case.
-        $record->criterion_id = 0;
-        $record->item_type = 'course';
-        $record->item_id = $course->id;
-        $item_id = $DB->insert_record('totara_criteria_item', $record);
+        $item_id = $this->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -323,5 +284,25 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $this->assertCount(1, $item_records);
         $item_record = array_pop($item_records);
         $this->assertEquals('0', $item_record->criterion_met);
+    }
+
+    /**
+     * @param stdClass $course
+     * @return bool|int
+     */
+    private function create_course_criterion_item(stdClass $course) {
+        global $DB;
+
+        $criterion = new criterion_entity();
+        $criterion->plugin_type = 'test';
+        $criterion->aggregation_method = criterion::AGGREGATE_ALL;
+        $criterion->criterion_modified = time();
+        $criterion->save();
+
+        $record = new stdClass();
+        $record->criterion_id = $criterion->id;
+        $record->item_type = 'course';
+        $record->item_id = $course->id;
+        return $DB->insert_record('totara_criteria_item', $record);
     }
 }
