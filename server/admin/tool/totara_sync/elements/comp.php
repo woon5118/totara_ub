@@ -21,6 +21,8 @@
  * @package tool_totara_sync
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/classes/hierarchy.element.class.php');
@@ -75,21 +77,23 @@ class totara_sync_element_comp extends totara_sync_hierarchy {
         }
 
         // For new items, check aggregationmethod is not null.
-        $sql = "SELECT s.idnumber
+        if (advanced_feature::is_disabled('perform')) {
+            $sql = "SELECT s.idnumber
                   FROM {{$synctable}} s 
              LEFT JOIN {comp} c 
                     ON s.idnumber = c.idnumber 
                  WHERE c.id IS NULL 
                    AND s.aggregationmethod IS NULL";
-        if ($idnumbers = $DB->get_fieldset_sql($sql)) {
-            foreach($idnumbers as $idnumber) {
-                $this->addlog(
-                    get_string('aggregrationmethodmusthavevalue','tool_totara_sync', $idnumber),
-                    'error',
-                    'checksanity'
-                );
+            if ($idnumbers = $DB->get_fieldset_sql($sql)) {
+                foreach ($idnumbers as $idnumber) {
+                    $this->addlog(
+                        get_string('aggregrationmethodmusthavevalue', 'tool_totara_sync', $idnumber),
+                        'error',
+                        'checksanity'
+                    );
+                }
+                return false;
             }
-            return false;
         }
 
         return true;

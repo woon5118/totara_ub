@@ -179,7 +179,7 @@ class manual extends pathway {
 
         $DB->delete_records('pathway_manual_role', ['path_manual_id' => $this->get_path_instance_id()]);
         $DB->delete_records('pathway_manual', ['id' => $this->get_path_instance_id()]);
-        $this->set_path_instance_id(0);
+        $this->set_path_instance_id(null);
     }
 
     /****************************************************************************

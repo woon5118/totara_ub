@@ -53,7 +53,6 @@ class external extends \external_api {
 
         $pathway = new learning_plan();
         $pathway->set_competency($competency)
-            ->set_status(pathway::PATHWAY_STATUS_ACTIVE)
             ->set_sortorder($sortorder)
             ->save();
 

@@ -21,6 +21,8 @@
  * @package tool_totara_sync
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -636,6 +638,8 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
     }
 
     public function test_sync_assign_availability_empty_field() {
+        advanced_feature::enable('perform');
+        
         global $DB;
 
         $this->create_competency();

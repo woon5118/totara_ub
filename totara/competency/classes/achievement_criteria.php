@@ -24,13 +24,10 @@
 
 namespace totara_competency;
 
-use criteria_linkedcourses\criteria_linkedcourses;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
 use pathway_criteria_group\criteria_group;
 use pathway_manual\manual;
-use totara_competency\pathway_aggregation_factory;
-use totara_competency\plugintypes;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
 use totara_criteria\criterion;

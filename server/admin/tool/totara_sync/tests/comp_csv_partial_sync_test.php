@@ -22,6 +22,7 @@
  */
 
 use totara_competency\entities\competency;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -238,21 +239,27 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
      * Assignment availability for competencies is located in a seperate table, so make sure it is synced to correctly
      */
     public function test_sync_assign_availability() {
+        advanced_feature::enable('perform');
+
+        // Reset the elements as activating the feaure affects the fields
+        $this->element = new totara_sync_element_comp();
+        $this->element->source = new totara_sync_source_comp_csv();
+
         $this->element->set_config('sourceallrecords', 1);
         $this->element->set_config('csvsaveemptyfields', 0);
 
         // Test creating
         $csv = implode("\n", [
-            "idnumber,shortname,fullname,frameworkidnumber,timemodified,aggregationmethod,assignavailability",
-            "0,0,0,OFW1,0,1,",
-            "1,1,1,OFW1,0,1,none",
-            "2,2,2,OFW1,0,1,self",
-            "3,3,3,OFW1,0,1,other",
-            "4,4,4,OFW1,0,1,any",
-            "5,5,5,OFW1,0,1,",
-            "6,6,6,OFW1,0,1,1",
-            "7,7,7,OFW1,0,1,2",
-            "8,8,8,OFW1,0,1,any",
+            "idnumber,shortname,fullname,frameworkidnumber,timemodified,assignavailability",
+            "0,0,0,OFW1,0,",
+            "1,1,1,OFW1,0,none",
+            "2,2,2,OFW1,0,self",
+            "3,3,3,OFW1,0,other",
+            "4,4,4,OFW1,0,any",
+            "5,5,5,OFW1,0,",
+            "6,6,6,OFW1,0,1",
+            "7,7,7,OFW1,0,2",
+            "8,8,8,OFW1,0,any",
         ]);
         $this->element->source->set_csv_in_memory($csv);
         $this->assertTrue($this->element->sync());
@@ -279,16 +286,16 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
 
         // Test updating, where empty values are ignored
         $csv = implode("\n", [
-            "idnumber,shortname,fullname,frameworkidnumber,timemodified,aggregationmethod,assignavailability",
-            "0,0,0,OFW1,1,1,any",
-            "1,1,1,OFW1,1,1,none",
-            "2,2,2,OFW1,1,1,",
-            "3,3,3,OFW1,1,1,self",
-            "4,4,4,OFW1,1,1,",
-            "5,5,5,OFW1,1,1,none",
-            "6,6,6,OFW1,1,1,",
-            "7,7,7,OFW1,1,1,2",
-            "8,8,8,OFW1,1,1,other",
+            "idnumber,shortname,fullname,frameworkidnumber,timemodified,assignavailability",
+            "0,0,0,OFW1,1,any",
+            "1,1,1,OFW1,1,none",
+            "2,2,2,OFW1,1,",
+            "3,3,3,OFW1,1,self",
+            "4,4,4,OFW1,1,",
+            "5,5,5,OFW1,1,none",
+            "6,6,6,OFW1,1,",
+            "7,7,7,OFW1,1,2",
+            "8,8,8,OFW1,1,other",
         ]);
         $this->element->source->set_csv_in_memory($csv);
         $this->assertTrue($this->element->sync());

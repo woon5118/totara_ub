@@ -21,14 +21,15 @@
  * @package totara_competency
  */
 
+use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
+use criteria_linkedcourses\linkedcourses;
 use pathway_criteria_group\criteria_group;
-use totara_competency\achievement_configuration;
+use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\entities\competency;
-use totara_competency\entities\scale_value;
-use totara_competency\pathway;
-use totara_criteria\criterion;
 use totara_competency\entities\scale;
+use totara_competency\entities\scale_value;
+use totara_criteria\criterion;
 
 class pathway_criteria_group_testcase extends \advanced_testcase {
 
@@ -581,4 +582,73 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $this->assertNull($details->get_scale_value_id());
         $this->assertEqualsCanonicalizing([], $details->get_related_info());
     }
+
+    /**
+     * Test dump_pathway_configuration
+     */
+    public function test_archive_empty_pathways() {
+        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
+        $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $scale = $totara_hierarchy_generator->create_scale('comp');
+        $scale = new scale($scale);
+        $value1 = $scale->scale_values->first();
+
+        $framework = $totara_hierarchy_generator->create_comp_frame(['scale' => $scale->id]);
+        $comp = $totara_hierarchy_generator->create_comp(['frameworkid' => $framework->id]);
+        $competency_entity = new competency($comp);
+
+        $criterion1 = new linkedcourses();
+        $criterion1->set_aggregation_method(criterion::AGGREGATE_ALL)
+            ->set_competency_id($competency_entity->id);
+
+        $criterion2 = new childcompetency();
+        $criterion2->set_aggregation_method(criterion::AGGREGATE_ALL)
+            ->set_competency_id($competency_entity->id);
+
+        $group1 = new criteria_group();
+        $group1->set_competency($competency_entity);
+        $group1->set_scale_value($value1);
+        $group1->add_criterion($criterion1);
+        $group1->add_criterion($criterion2);
+        $group1->save();
+
+        $criterion3 = new childcompetency();
+        $criterion3->set_aggregation_method(criterion::AGGREGATE_ALL)
+            ->set_competency_id($competency_entity->id);
+
+        $group2 = new criteria_group();
+        $group2->set_competency($competency_entity);
+        $group2->set_scale_value($value1);
+        $group2->add_criterion($criterion3);
+        $group2->save();
+
+        $this->assertFalse($group1->is_archived());
+        $this->assertFalse($group2->is_archived());
+
+        // Archive with all groups still having items
+        criteria_group::archive_empty_pathways();
+
+        $group1_reloaded = criteria_group::fetch($group1->get_id());
+        $group2_reloaded = criteria_group::fetch($group2->get_id());
+        $this->assertFalse($group1_reloaded->is_archived());
+        $this->assertFalse($group2_reloaded->is_archived());
+
+        // Now delete the last item of group2
+        $criterion3->delete();
+
+        // Manually delete all criterion entities
+        criteria_group_criterion_entity::repository()
+            ->where('criteria_group_id', $group2->get_path_instance_id())
+            ->delete();
+
+        // This should archive group2 as it does not have any criterions left
+        criteria_group::archive_empty_pathways();
+
+        $group1_reloaded = criteria_group::fetch($group1->get_id());
+        $group2_reloaded = criteria_group::fetch($group2->get_id());
+        $this->assertFalse($group1_reloaded->is_archived());
+        $this->assertTrue($group2_reloaded->is_archived());
+        $this->assertNull($group2_reloaded->get_path_instance_id());
+    }
+
 }

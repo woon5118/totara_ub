@@ -84,7 +84,6 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
 
         $pathway->set_competency($competency);
         $pathway->set_sortorder(1);
-        $pathway->set_status(pathway::PATHWAY_STATUS_ACTIVE);
         $pathway->save();
 
         return $pathway;
@@ -366,9 +365,7 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         $task->execute();
 
         // Now archive the pathway.
-        // Todo: Maybe this isn't the right way. Maybe there needs to be a method like set_as_archived which does all the work.
-        $pathway->set_status(pathway::PATHWAY_STATUS_ARCHIVED);
-        $pathway->activate_changes(); // Todo: Or just account for archived in this one.
+        $pathway->delete();
 
         $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
         $this->assertCount(0, $user_ids);

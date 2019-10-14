@@ -61,11 +61,13 @@ abstract class totara_sync_source_comp extends totara_sync_source {
             'parentidnumber',
             'typeidnumber',
             'timemodified',
-            'aggregationmethod',
         ];
 
+        // For non-perform we do show the old aggregation method for competencies
         if (advanced_feature::is_enabled('perform')) {
             $this->fields[] = 'assignavailability';
+        } else {
+            $this->fields[] = 'aggregationmethod';
         }
 
         $this->hierarchy_customfields = customfield::get_all(new competency());

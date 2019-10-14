@@ -55,7 +55,6 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         /** @var \totara_competency\entities\scale_value $expected_value1 */
         $expected_value1 = $competency1->scale->scale_values->first();
         $pathway->set_scale_value($expected_value1);
-        $pathway->set_status(pathway::PATHWAY_STATUS_ACTIVE);
 
         $course_completion_criteria = new coursecompletion();
         $course_completion_criteria->set_aggregation_method(coursecompletion::AGGREGATE_ALL);
@@ -151,7 +150,6 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         /** @var \totara_competency\entities\scale_value $expected_value1 */
         $expected_value1 = $competency1->scale->scale_values->first();
         $pathway->set_scale_value($expected_value1);
-        $pathway->set_status(pathway::PATHWAY_STATUS_ACTIVE);
 
         $course_completion_criteria = new coursecompletion();
         $course_completion_criteria->set_aggregation_method(coursecompletion::AGGREGATE_ALL);

@@ -30,6 +30,7 @@
  */
 
 use core\orm\query\builder;
+use hierarchy_competency\event\competency_updated;
 use totara_core\advanced_feature;
 
 require_once("{$CFG->dirroot}/totara/hierarchy/lib.php");
@@ -845,7 +846,13 @@ class competency extends hierarchy {
 
         $frameworkid = $this->frameworkid;
 
-          // Get the name of the framework's scale. (Note this code expects there
+        // Get all aggregation methods
+        $aggregations = array();
+        foreach (self::COMP_AGGREGATION as $title => $key) {
+            $aggregations[$key] = get_string('aggregationmethod'.$key, 'totara_hierarchy');
+        }
+
+        // Get the name of the framework's scale. (Note this code expects there
         // to be only one scale per framework, even though the DB structure
         // allows there to be multiple since we're using a go-between table)
         $scaledesc = $DB->get_field_sql("
@@ -858,10 +865,11 @@ class competency extends hierarchy {
                 AND a.scaleid = s.id
         ", array($frameworkid));
 
-        // Not used by Perform anymore. Storing default 'ALL' for now
-        // TODO: deprecate strings: aggregationmethod'.$key, aggregationmethod
-        $mform->addElement('hidden', 'aggregationmethod', self::AGGREGATION_METHOD_ALL);
-        $mform->setType('aggregationmethod', PARAM_INT);
+        if (advanced_feature::is_disabled('perform')) {
+            $mform->addElement('select', 'aggregationmethod', get_string('aggregationmethod', 'totara_hierarchy'), $aggregations);
+            $mform->addHelpButton('aggregationmethod', 'competencyaggregationmethod', 'totara_hierarchy');
+            $mform->addRule('aggregationmethod', get_string('aggregationmethod', 'totara_hierarchy'), 'required', null);
+        }
 
         $mform->addElement('static', 'scalename', get_string('scale'), ($scaledesc) ? format_string($scaledesc) : get_string('none'));
         $mform->addHelpButton('scalename', 'competencyscale', 'totara_hierarchy');
@@ -912,7 +920,7 @@ class competency extends hierarchy {
 
         // Properly format assignment availability from individual form values into a single array
         $item->assignavailability = $item->assignavailability ?? [];
-        if (!advanced_feature::is_disabled('perform')) {
+        if (!advanced_feature::is_enabled('perform')) {
             $checkbox_mappings = [
                 'assignavailself' => self::ASSIGNMENT_CREATE_SELF,
                 'assignavailother' => self::ASSIGNMENT_CREATE_OTHER,
@@ -1137,14 +1145,6 @@ class competency extends hierarchy {
             $transaction = $DB->start_delegated_transaction();
         }
 
-        // Probably no longer needed for perform. Keeping it in for the moment
-        if (isset($newitem->aggregationmethod) && $olditem->aggregationmethod != $newitem->aggregationmethod) {
-            $now = time();
-            $sql = "UPDATE {comp_record} SET reaggregate = ? WHERE competencyid = ?";
-            $params = array($now, $itemid);
-            $DB->execute($sql, $params);
-        }
-
         $updateditem = parent::update_hierarchy_item($itemid, $newitem, false, false, $removedesc);
 
         if ($updateditem && isset($newitem->assignavailability)) {
@@ -1157,8 +1157,7 @@ class competency extends hierarchy {
 
         // Raise an event to let other parts of the system know.
         if ($triggerevent) {
-                $eventclass = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_updated";
-            $eventclass::create_from_instance($updateditem)->trigger();
+            competency_updated::create_from_old_and_new($updateditem, $olditem)->trigger();
         }
 
         return $updateditem;
@@ -1181,10 +1180,14 @@ class competency extends hierarchy {
      * @return array Array of heading and query field maps
      */
     protected function get_export_fields() {
-        $fields = array_merge(parent::get_export_fields(), [
-            'aggregationmethod' => 'hierarchy.aggregationmethod',
-        ]);
-        if (advanced_feature::is_enabled('perform')) {
+        $fields = parent::get_export_fields();
+        // Show aggregation for non-perform,
+        // Show assign availability for perform
+        if (!advanced_feature::is_enabled('perform')) {
+            $fields = array_merge($fields, [
+                'aggregationmethod' => 'hierarchy.aggregationmethod',
+            ]);
+        } else {
             $fields = array_merge($fields, [
                 'assignavailability' =>
                     "CASE 

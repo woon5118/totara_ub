@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
@@ -17,12 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package totara_competency
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2019101500;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'totara_competency'; // To check on upgrade, that module sits in correct place
+$observers = [
+    [
+        'eventname' => \hierarchy_competency\event\competency_updated::class,
+        'callback' => \totara_competency\observer\competency::class.'::updated',
+    ],
+];

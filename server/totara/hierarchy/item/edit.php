@@ -117,6 +117,8 @@ if ($itemform->is_cancelled()) {
         redirect($CFG->wwwroot . "/totara/hierarchy/type/change.php?prefix=$prefix&amp;frameworkid={$item->frameworkid}&amp;page={$page}&typeid={$itemnew->typeid}&amp;itemid={$itemnew->id}");
     }
 
+    $itemold = $DB->get_record('comp', array('id' => $itemnew->id));
+
     $itemnew->timemodified = time();
     $itemnew->usermodified = $USER->id;
 
@@ -162,8 +164,8 @@ if ($itemform->is_cancelled()) {
         $eventclass = "\\hierarchy_{$prefix}\\event\\{$prefix}_created";
         $eventclass::create_from_instance($itemnew)->trigger();
     } else if ($notificationtext === 'updated') {
-        $eventclass = "\\hierarchy_{$prefix}\\event\\{$prefix}_updated";
-        $eventclass::create_from_instance($itemnew)->trigger();
+        $event = \hierarchy_competency\event\competency_updated::create_from_old_and_new($itemnew, $itemold);
+        $event->trigger();
     }
 
     \core\notification::add(get_string($notificationtext . $prefix, 'totara_hierarchy', format_string($itemnew->fullname)), $notificationtype);

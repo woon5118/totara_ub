@@ -148,7 +148,6 @@ class external extends \external_api {
 
         $pathway->set_competency($competency);
         $pathway->set_scale_value(new scale_value($scalevalue));
-        $pathway->set_status(pathway::PATHWAY_STATUS_ACTIVE);
         $pathway->set_sortorder($sortorder);
         $pathway->replace_criteria($criterion_array);
         $pathway->save();

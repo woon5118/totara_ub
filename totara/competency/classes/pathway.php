@@ -25,7 +25,6 @@
 namespace totara_competency;
 
 
-use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale_value;
 
@@ -154,33 +153,25 @@ abstract class pathway {
             throw new \coding_exception('Unknown Competency');
         }
 
-        // Don't allow changing anything but active records
-        if (!$this->is_active()) {
-            throw new \coding_exception('Only active pathways may be updated');
-        }
-
         $this->ensure_sortorder_exists();
 
         // Check whether anything changed
         if (empty($this->get_id()) || $this->configuration_is_dirty()) {
-            $this->save_configuration();
-
-            if (!$this->is_active()) {
-                // Configuration no longer exists (e.g. when last criteria is removed from criteria_group)
-                // or something went wrong
-
-                return $this;
+            if ($this->is_active()) {
+                $this->save_configuration();
             }
         } else if (!empty($this->get_id())) {
-            $old_sortorder = $DB->get_field('totara_competency_pathway', 'sortorder',  ['id' => $this->get_id()]);
-            if ($old_sortorder == $this->get_sortorder()) {
-                // Nothing changed on the pathway itself
+            $old_record = $DB->get_record('totara_competency_pathway', ['id' => $this->get_id()]);
+            // Only save if certain values change
+            if ($old_record->sortorder == $this->get_sortorder()
+                && $old_record->status == $this->get_status()
+                && $old_record->path_instance_id == $this->get_path_instance_id()
+            ) {
                 return $this;
             }
         }
 
         // If we get here, we have either a new pathway or something changed
-
         $record = new \stdClass();
         $record->comp_id = $this->competency->id;
         $record->sortorder = $this->get_sortorder();
@@ -225,27 +216,9 @@ abstract class pathway {
         // Configuration is deleted
         $this->delete_configuration();
         $this->set_status(static::PATHWAY_STATUS_ARCHIVED);
-        $this->update_status(static::PATHWAY_STATUS_ARCHIVED);
+        $this->save();
 
         return $this;
-    }
-
-    /**
-     * Change the status in the database
-     *
-     * @param int $status Status to persist to the database
-     */
-    private function update_status(int $status) {
-        global $DB;
-
-        $DB->update_record(
-            'totara_competency_pathway',
-            [
-                'id' => $this->get_id(),
-                'status' => $status,
-                'pathway_modified' => time(),
-            ]
-        );
     }
 
     /**
@@ -253,8 +226,6 @@ abstract class pathway {
      *
      */
     final public function delete() {
-        global $DB;
-
         if ($this->is_active()) {
             return $this->archive();
         }
@@ -410,7 +381,7 @@ abstract class pathway {
      * @return $this
      * @throws \coding_exception
      */
-    public function set_status(int $status): pathway {
+    protected function set_status(int $status): pathway {
         switch ($status) {
             case static::PATHWAY_STATUS_ACTIVE:
             case static::PATHWAY_STATUS_ARCHIVED:
@@ -648,4 +619,5 @@ abstract class pathway {
      * @return base_achievement_detail as implemented by the pathway plugin in question
      */
     abstract public function aggregate_current_value(int $user_id): base_achievement_detail;
+
 }

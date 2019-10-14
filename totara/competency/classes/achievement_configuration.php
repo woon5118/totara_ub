@@ -27,8 +27,6 @@ namespace totara_competency;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\configuration_history;
-use totara_competency\entities\scale_value;
-use totara_competency\pathway;
 
 /**
  * Class containing all relvant configuration information for a specific competency
@@ -178,7 +176,6 @@ class achievement_configuration {
         $pathways = achievement_criteria::get_default_pathways($this->get_competency()->scale, $this->get_competency()->id);
         foreach ($pathways as $pw) {
             $pw->set_competency($this->competency);
-            $pw->set_status(pathway::PATHWAY_STATUS_ACTIVE);
             $pw->save();
         }
 
@@ -336,4 +333,5 @@ class achievement_configuration {
 
         return json_encode($dumpobj);
     }
+
 }

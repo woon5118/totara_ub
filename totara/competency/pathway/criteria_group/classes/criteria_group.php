@@ -24,7 +24,12 @@
 
 namespace pathway_criteria_group;
 
+use core\orm\entity\repository;
+use core\orm\query\builder;
+use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
+use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\base_achievement_detail;
+use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\pathway;
 use totara_competency\plugintypes;
 use totara_competency\entities\scale_value;
@@ -68,13 +73,15 @@ class criteria_group extends pathway {
         }
 
         // Get group information
-        $row = $DB->get_record('pathway_criteria_group', ['id' => $this->get_path_instance_id()], '*', MUST_EXIST);
+        $row = $DB->get_record('pathway_criteria_group', ['id' => $this->get_path_instance_id()]);
+        // A group could be empty
+        if ($row) {
+            if (!empty($row->scale_value_id)) {
+                $this->set_scale_value(new scale_value($row->scale_value_id));
+            }
 
-        if (!empty($row->scale_value_id)) {
-            $this->set_scale_value(new scale_value($row->scale_value_id));
+            $this->fetch_criteria();
         }
-
-        $this->fetch_criteria();
     }
 
     /**
@@ -153,6 +160,10 @@ class criteria_group extends pathway {
 
         // If there are no criteria - delete this pathway
         if (count($this->get_criteria()) == 0) {
+            // It's already archived, don't do anything in this case
+            if (!$this->is_active()) {
+                return $this;
+            }
             // First 'save' the criteria - which will delete the now removed criteria
             $this->save_criteria();
 
@@ -582,4 +593,35 @@ class criteria_group extends pathway {
 
         return false;
     }
+
+    /**
+     * Archive empty pathways, means all pathways with no criteria
+     *
+     * @return void
+     */
+    public static function archive_empty_pathways() {
+        // Clean up empty pathways
+        builder::get_db()->transaction(function () {
+            // Find and delete criteria group pathway records which are empty
+            $empty_pathway_ids = pathway_entity::repository()
+                ->select('id')
+                ->left_join([criteria_group_entity::TABLE, 'cg'], 'path_instance_id', 'id')
+                ->left_join([criteria_group_criterion_entity::TABLE, 'cgc'], 'path_instance_id', 'criteria_group_id')
+                ->where('path_type', 'criteria_group')
+                ->where(function (builder $builder) {
+                    // We want to get archive any pathway which is empty,
+                    // has no group linked or empty groups
+                    $builder->or_where('cg.id', null)->or_where('cgc.id', null);
+                })
+                ->group_by('id')
+                ->get()
+                ->pluck('id');
+
+            foreach ($empty_pathway_ids as $empty_pathway_id) {
+                $pathway = pathway_factory::fetch('criteria_group', $empty_pathway_id);
+                $pathway->delete();
+            }
+        });
+    }
+
 }

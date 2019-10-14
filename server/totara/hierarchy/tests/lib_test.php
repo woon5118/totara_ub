@@ -27,6 +27,8 @@
  * PhpUnit tests for hierarchy/lib.php
  */
 
+use totara_core\advanced_feature;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -947,10 +949,10 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
         $this->assertSame($exp_line, $act_line);
     }
 
-    function test_export_data() {
-        global $CFG;
+    public function test_export_data() {
+        advanced_feature::disable('perform');
 
-        $this->resetAfterTest(true);
+        global $CFG;
 
         $this->competency->export_data('csv', false, $CFG->dataroot . '/a.aa');
         $this->verify_export_files_equal($CFG->dirroot . '/totara/hierarchy/tests/fixtures/export_comp_hierarchy_fw1.csv', $CFG->dataroot . '/a.aa', ['timemodified']);
@@ -961,6 +963,19 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
         unlink($CFG->dataroot . '/b.bb');
     }
 
+    public function test_export_data_with_assignments() {
+        advanced_feature::enable('perform');
+
+        global $CFG;
+
+        $this->competency->export_data('csv', false, $CFG->dataroot . '/a.aa');
+        $this->verify_export_files_equal($CFG->dirroot . '/totara/hierarchy/tests/fixtures/export_comp_hierarchy_fw1_assignments.csv', $CFG->dataroot . '/a.aa', ['timemodified']);
+        unlink($CFG->dataroot . '/a.aa');
+
+        $this->competency->export_data('csv', true, $CFG->dataroot . '/b.bb');
+        $this->verify_export_files_equal($CFG->dirroot . '/totara/hierarchy/tests/fixtures/export_comp_hierarchy_all_assignments.csv', $CFG->dataroot . '/b.bb', ['timemodified']);
+        unlink($CFG->dataroot . '/b.bb');
+    }
 
     /* TODO
     function test_get_next_child_sortthread() {

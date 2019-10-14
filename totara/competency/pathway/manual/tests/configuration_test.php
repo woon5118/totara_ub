@@ -236,7 +236,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
         ]);
 
         $this->assertTrue($manual->is_archived());
-        $this->assertTrue(empty($manual->get_path_instance_id()));
+        $this->assertNull($manual->get_path_instance_id());
 
         $updated_pw_row = $DB->get_record('totara_competency_pathway', ['id' => $pw_id]);
         $this->assertEquals(pathway::PATHWAY_STATUS_ARCHIVED, $updated_pw_row->status);

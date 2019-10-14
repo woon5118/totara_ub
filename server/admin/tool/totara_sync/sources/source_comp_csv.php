@@ -239,7 +239,7 @@ class totara_sync_source_comp_csv extends totara_sync_source_comp {
                 }
             }
 
-            if ($row['aggregationmethod'] === '' && !$csvsaveemptyfields) {
+            if (!isset($row['aggregationmethod']) || $row['aggregationmethod'] === '' && !$csvsaveemptyfields) {
                 // Empty because we don't want to update anything is fine.
                 $row['aggregationmethod'] = null;
             } else {

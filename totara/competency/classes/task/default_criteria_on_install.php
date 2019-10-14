@@ -34,6 +34,7 @@ use pathway_learning_plan\learning_plan;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
+use totara_competency\legacy_aggregation;
 use totara_core\advanced_feature;
 use totara_criteria\criterion;
 
@@ -89,43 +90,9 @@ class default_criteria_on_install extends adhoc_task {
             $scale_id = $framework_to_scale->item($competency->frameworkid)->scaleid;
             $min_proficient_value = $scales->item($scale_id)->min_proficient_value;
 
-            $criterion_aggregation_method = null;
-
-            switch ($competency->aggregationmethod) {
-                case $COMP_AGGREGATION['ALL']:
-                    $criterion_aggregation_method = criterion::AGGREGATE_ALL;
-                    break;
-                case $COMP_AGGREGATION['ANY']:
-                    $criterion_aggregation_method = criterion::AGGREGATE_ANY_N;
-                    break;
-                default:
-                    // The only other case here should be OFF, where we don't add any criteria groups, but also
-                    // for any unrecognised cases, e.g. from plugins, we won't try to do anything.
-                    // No exceptions are necessary here, the user can either fix in the interface later
-                    // or some plugin can deal with it if relevant.
-                    // continue 2 as the switch consumes a single continue.
-                    continue 2;
-            }
-
-            $linkedcourses = new linkedcourses();
-            $linkedcourses->set_competency_id($competency->id);
-            $linkedcourses->set_aggregation_method($criterion_aggregation_method);
-
-            $group1 = new criteria_group();
-            $group1->set_competency($competency);
-            $group1->set_scale_value($min_proficient_value);
-            $group1->add_criterion($linkedcourses);
-            $group1->save();
-
-            $childcompetencies = new childcompetency();
-            $childcompetencies->set_aggregation_method($criterion_aggregation_method);
-            $childcompetencies->set_competency_id($competency->id);
-
-            $group2 = new criteria_group();
-            $group2->set_competency($competency);
-            $group2->set_scale_value($min_proficient_value);
-            $group2->add_criterion($childcompetencies);
-            $group2->save();
+            $aggregation = new legacy_aggregation($competency);
+            $aggregation->create_default_criteria(new linkedcourses(), $min_proficient_value)
+                ->create_default_criteria(new childcompetency(), $min_proficient_value);
         }
 
         // Make sure all linked courses are synced

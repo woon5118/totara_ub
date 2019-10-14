@@ -70,7 +70,6 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         $group->add_criterion($mock_criterion);
         $group->set_competency($competency);
         $group->set_scale_value($scale_value);
-        $group->set_status(pathway::PATHWAY_STATUS_ACTIVE);
         $group->save();
 
         $pathways = aggregation_helper::get_pathways_containing_criterion_item($criterion_item_id, pathway::PATHWAY_STATUS_ACTIVE);
