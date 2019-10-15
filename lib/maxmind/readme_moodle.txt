@@ -16,15 +16,17 @@ Installation
 ------------
 
 1) Download the latest versions of GeoIP2-php and MaxMind-DB-Reader-php
-wget https://github.com/maxmind/GeoIP2-php/archive/v2.6.0.zip
-wget https://github.com/maxmind/MaxMind-DB-Reader-php/archive/v1.1.3.zip
+download release from https://github.com/maxmind/GeoIP2-php/releases
+download release from https://github.com/maxmind/MaxMind-DB-Reader-php/releases
 
 2) Unzip the archives
-unzip v2.6.0.zip
-unzip v1.1.3.zip
 
 3) Move the source code directories into place
-mv GeoIP2-php-2.6.0/src/ /path/to/moodle/lib/maxmind/GeoIp2/
-mv MaxMind-DB-Reader-php-1.1.3/src/MaxMind/ /path/to/moodle/lib/maxmind/MaxMind/
+replace /lib/maxmind/GeoIp2/ with /src/
+replace /lib/maxmind/MaxMind/ with /src/MaxMind/
 
 4) Run unit tests on iplookup/tests/geoip_test.php with PHPUNIT_LONGTEST defined.
+
+5) run: php totara/core/dev/fix_file_permissions.php --fix
+
+6) update /lib/thirdpartylibs.xml
