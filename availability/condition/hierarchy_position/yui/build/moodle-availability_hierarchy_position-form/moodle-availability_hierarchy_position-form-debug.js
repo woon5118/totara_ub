@@ -51,11 +51,7 @@ M.availability_hierarchy_position.form.getNode = function(json) {
     html += '<select id="avail-position" name="' + selectName + '">';
     if (position > 0) {
         if (typeof this.conditionConfig !== 'undefined') {
-            if (typeof this.conditionConfig.positionNames[position] !== 'undefined') {
-                html += '<option value=' + position + '>' + this.conditionConfig.positionNames[position].fullname + '</option>';
-            } else {
-                position = 0;
-            }
+            html += '<option value=' + position + '>' + this.conditionConfig.positionNames[position].fullname + '</option>';
         }
     }
     html += '</select>';

@@ -86,7 +86,6 @@ class frontend extends \core_availability\frontend {
                     if ($condition->type == 'audience') {
                         $ids[$condition->cohort] = $condition->cohort;
                     }
-                    return true;
                 }
             );
 

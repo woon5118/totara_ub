@@ -42,8 +42,6 @@ defined('MOODLE_INTERNAL') || die();
 abstract class frontend {
     // Totara: Limit maximum depth to reasonably deep; see report_validation_errors() for more info
     const AVAILABILITY_JSON_MAX_DEPTH = 300;
-    // Give a validator more depth.
-    const AVAILABILITY_JSON_MAX_DEPTH_EXTRA = self::AVAILABILITY_JSON_MAX_DEPTH * 3 / 2;
 
     /**
      * Decides whether this plugin should be available in a given course. The
@@ -220,52 +218,31 @@ abstract class frontend {
      * Parse JSON and recursively iterate conditions in its array
      *
      * @param string $availability_json JSON string of {course_modules}.availability
-     * @param callable $callback callback function that takes $condition parameter
-     *                           If the function returns false, the condition will be removed
-     * @return string|false new JSON string, empty string if no conditions, or false on failure
+     * @param callable $callback A callback function that takes $condition parameter
+     * @return void
      */
-    public static function for_each_condition_in_availability_json(string $availability_json, $callback) {
-        $availability = json_decode($availability_json, false, self::AVAILABILITY_JSON_MAX_DEPTH_EXTRA);
-        if (!is_object($availability) || !isset($availability->c)) {
-            return false;
+    protected static function for_each_condition_in_availability_json($availability_json, $callback) {
+        $availability = json_decode($availability_json, false, self::AVAILABILITY_JSON_MAX_DEPTH * 3 / 2);
+        if (is_object($availability)) {
+            self::for_each_condition_in_availability($availability, $callback);
         }
-        if (self::for_each_condition_in_availability($availability, $callback) === false) {
-            return '';
-        }
-        return json_encode($availability, 0, self::AVAILABILITY_JSON_MAX_DEPTH_EXTRA);
     }
 
     /**
-     * Helper function to recursively iterate conditions in the $availability->c array
+     * Recursively iterate conditions in its array
      *
-     * @param \stdClass $availability part of {course_modules}.availability as a referenced object
-     * @param callable $callback
-     * @see frontend::for_each_condition_in_availability_json()
-     * @return bool return false to tell the caller to remove the condition
+     * @param \stdClass $availability part of {course_modules}.availability
+     * @param callable $callback A callback function that takes $condition parameter
+     * @return void
      */
-    private static function for_each_condition_in_availability(\stdClass &$availability, $callback) {
-        foreach ($availability->c as $key => &$single_or_set) {
-            $preserve = true;
+    private static function for_each_condition_in_availability($availability, $callback) {
+        foreach ($availability->c as $single_or_set) {
             if (isset($single_or_set->c)) {
-                $preserve = self::for_each_condition_in_availability($single_or_set, $callback);
+                self::for_each_condition_in_availability($single_or_set, $callback);
             } else {
                 $condition = $single_or_set;
-                $preserve = call_user_func($callback, $condition);
-            }
-            if ($preserve === false) {
-                unset($availability->c[$key]);
-                if (isset($availability->showc)) {
-                    unset($availability->showc[$key]);
-                }
+                call_user_func($callback, $condition);
             }
         }
-        if (empty($availability->c)) {
-            return false;
-        }
-        $availability->c = array_values($availability->c);
-        if (isset($availability->showc)) {
-            $availability->showc = array_values($availability->showc);
-        }
-        return true;
     }
 }

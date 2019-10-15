@@ -121,9 +121,6 @@ class condition extends \core_availability\condition {
         global $DB;
 
         $cohortname = $DB->get_field('cohort', 'name', array('id' => $this->cohortid));
-        if ($cohortname === false) {
-            $cohortname = get_string('missing', 'availability_audience');
-        }
         $cohortname = format_string($cohortname);
 
         if ($not) {

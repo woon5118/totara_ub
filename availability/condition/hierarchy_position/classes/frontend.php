@@ -87,7 +87,6 @@ class frontend extends \core_availability\frontend {
                     if ($condition->type == 'hierarchy_position') {
                         $ids[$condition->position] = $condition->position;
                     }
-                    return true;
                 }
             );
 
