@@ -36,9 +36,8 @@ class competency_edit_form extends item_edit_form {
         $item = $this->_customdata['item'];
 
         // Get all aggregation methods
-        global $COMP_AGGREGATION;
         $aggregations = array();
-        foreach ($COMP_AGGREGATION as $title => $key) {
+        foreach (\competency::COMP_AGGREGATION as $title => $key) {
             $aggregations[$key] = get_string('aggregationmethod'.$key, 'totara_hierarchy');
         }
 

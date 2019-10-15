@@ -171,7 +171,7 @@ class update_competencies_task extends \core\task\scheduled_task {
      * @return moodle_recordset
      */
     private function load_users(): moodle_recordset {
-        global $DB, $COMP_AGGREGATION;
+        global $DB;
 
         $sql = "
             SELECT DISTINCT cr.userid as id
@@ -186,7 +186,7 @@ class update_competencies_task extends \core\task\scheduled_task {
 
         $params = [
             'timestarted' => $this->timestarted,
-            'aggregationmethod' => $COMP_AGGREGATION['OFF']
+            'aggregationmethod' => \competency::AGGREGATION_METHOD_OFF
         ];
 
         return $DB->get_recordset_sql($sql, $params);
@@ -220,7 +220,7 @@ class update_competencies_task extends \core\task\scheduled_task {
      * @return array
      */
     private function load_evidence_records_to_aggregate(int $userid, int $frameworkid, int $depthlevel): array {
-        global $DB, $COMP_AGGREGATION;
+        global $DB;
 
         // Grab all competency evidence items for a depth level
         //
@@ -314,7 +314,7 @@ class update_competencies_task extends \core\task\scheduled_task {
             'depthlevel' => $depthlevel,
             'depthlevel1' => $depthlevel,
             'timestarted' => $this->timestarted,
-            'aggregationmethod' => $COMP_AGGREGATION['OFF'],
+            'aggregationmethod' => \competency::AGGREGATION_METHOD_OFF,
             'userid' => $userid
         ];
 
@@ -356,8 +356,6 @@ class update_competencies_task extends \core\task\scheduled_task {
      * @return void
      */
     private function aggregate_competency_evidence_items(int $userid, array $evidence_records, ?job_assignment $job_assignment): void {
-        global $COMP_AGGREGATION;
-
         foreach ($evidence_records as $competencyid => $records) {
             if (debugging()) {
                 mtrace('Aggregating competency items evidence for user '.$userid.' for competency '.$competencyid);
@@ -394,7 +392,7 @@ class update_competencies_task extends \core\task\scheduled_task {
 
                 // Handle different aggregation types.
                 switch ($record->aggregationmethod) {
-                    case $COMP_AGGREGATION['ALL']:
+                    case \competency::AGGREGATION_METHOD_ALL:
                         if (!$item_value || $item_value->sortorder > $min_value->sortorder) {
                             // Learner is not yet proficient so no action required.
                             $aggregated_status = null;
@@ -408,7 +406,7 @@ class update_competencies_task extends \core\task\scheduled_task {
                             $aggregated_status = $min_value->id;
                         }
                         break;
-                    case $COMP_AGGREGATION['ANY']:
+                    case \competency::AGGREGATION_METHOD_ANY:
                         if ($current_value && $current_value->sortorder <= $min_value->sortorder) {
                             // Proficiency level has already been set - don't update it.
                             $aggregated_status = null;

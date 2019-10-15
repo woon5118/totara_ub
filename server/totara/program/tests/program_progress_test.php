@@ -647,9 +647,6 @@ class totara_program_progress_testcase extends reportcache_advanced_testcase {
      * No user progress
      */
     public function test_get_user_progressinfo_single_competency_courseset_any() {
-
-        global $COMP_AGGREGATION;
-
         $this->resetAfterTest(true);
         $that = $this->setup_common();
 
@@ -657,7 +654,7 @@ class totara_program_progress_testcase extends reportcache_advanced_testcase {
         /** @var totara_hierarchy_generator $hierarchygenerator */
         $hierarchygenerator = $that->data_generator->get_plugin_generator('totara_hierarchy');
         $competencyframework = $hierarchygenerator->create_comp_frame(array());
-        $competencydata = array('frameworkid' => $competencyframework->id, 'aggregationmethod' => $COMP_AGGREGATION['ANY']);
+        $competencydata = array('frameworkid' => $competencyframework->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_ANY);
         $competency = $hierarchygenerator->create_comp($competencydata);
         // Completions for courses 2 and 3 will be assigned to this competency.
         $hierarchygenerator->assign_linked_course_to_competency($competency, $that->courses[2]);
@@ -979,9 +976,6 @@ class totara_program_progress_testcase extends reportcache_advanced_testcase {
      * Expected progress = ((0.5 + 0.75) + max(1, 0.25))/3 ==> 75%
      */
     public function test_program_progress_multi_courseset_competency() {
-
-        global $COMP_AGGREGATION;
-
         $this->resetAfterTest(true);
         $that = $this->setup_common();
 
@@ -989,7 +983,7 @@ class totara_program_progress_testcase extends reportcache_advanced_testcase {
         /** @var totara_hierarchy_generator $hierarchygenerator */
         $hierarchygenerator = $that->data_generator->get_plugin_generator('totara_hierarchy');
         $competencyframework = $hierarchygenerator->create_comp_frame(array());
-        $competencydata = array('frameworkid' => $competencyframework->id, 'aggregationmethod' => $COMP_AGGREGATION['ANY']);
+        $competencydata = array('frameworkid' => $competencyframework->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_ANY);
         $competency = $hierarchygenerator->create_comp($competencydata);
         // Completions for courses 7 and 8 will be assigned to this competency.
         $hierarchygenerator->assign_linked_course_to_competency($competency, $that->courses[7]);

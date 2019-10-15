@@ -940,8 +940,7 @@ class totara_hierarchy_generator extends component_generator_base {
             // Get a default value for the agreggation method.
             // This variable is used to build the select menu
             // in the hierarchy form.
-            global $COMP_AGGREGATION;
-            $record['aggregationmethod'] = $COMP_AGGREGATION['ALL'];
+            $record['aggregationmethod'] = \competency::AGGREGATION_METHOD_ALL;
         }
 
         if (!isset($record['proficiencyexpected'])) {

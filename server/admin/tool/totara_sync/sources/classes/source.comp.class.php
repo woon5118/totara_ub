@@ -259,22 +259,20 @@ abstract class totara_sync_source_comp extends totara_sync_source {
      * a constant.
      */
     protected function parse_aggregationmethod($fromsource) {
-        global $COMP_AGGREGATION;
-
         $result = null;
 
         if (is_number($fromsource)) {
             // We expect it will be one of the integers representing the aggregation method.
             $number = (int) $fromsource;
-            if (in_array($number, $COMP_AGGREGATION)) {
+            if (in_array($number, competency::COMP_AGGREGATION)) {
                 $result = $number;
             }
         } else {
             // We also allow for the English names for the values as used in code.
             // We cannot use language strings as these can change.
             $word = core_text::strtoupper($fromsource);
-            if (isset($COMP_AGGREGATION[$word])) {
-                $result = $COMP_AGGREGATION[$word];
+            if (isset(competency::COMP_AGGREGATION[$word])) {
+                $result = competency::COMP_AGGREGATION[$word];
             }
         }
 

@@ -184,13 +184,13 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
     }
 
     private function generate_comp_and_scale($aggregation_method) {
-        global $DB, $COMP_AGGREGATION;
+        global $DB;
 
         /** @var totara_hierarchy_generator $totara_hierarchy_generator */
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $compfw = $totara_hierarchy_generator->create_comp_frame([]);
         $comp = $totara_hierarchy_generator->create_comp(
-            ['frameworkid' => $compfw->id, 'aggregationmethod' => $COMP_AGGREGATION[$aggregation_method]]
+            ['frameworkid' => $compfw->id, 'aggregationmethod' => \competency::COMP_AGGREGATION[$aggregation_method]]
         );
 
         $scale_assignment = $DB->get_record('comp_scale_assignments', ['frameworkid' => $compfw->id]);
@@ -422,7 +422,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
      * configurations.
      */
     public function test_multiple_competencies_on_upgrade() {
-        global $DB, $COMP_AGGREGATION;
+        global $DB;
 
         /** @var totara_hierarchy_generator $totara_hierarchy_generator */
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
@@ -432,24 +432,24 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $compfw1 = $totara_hierarchy_generator->create_comp_frame(['scale' => $scale1->id]);
         $comp1 = $totara_hierarchy_generator->create_comp(
-            ['frameworkid' => $compfw1->id, 'aggregationmethod' => $COMP_AGGREGATION['ALL']]
+            ['frameworkid' => $compfw1->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_ALL]
         );
         $comp2 = $totara_hierarchy_generator->create_comp(
-            ['frameworkid' => $compfw1->id, 'aggregationmethod' => $COMP_AGGREGATION['ALL']]
+            ['frameworkid' => $compfw1->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_ALL]
         );
 
         $compfw2 = $totara_hierarchy_generator->create_comp_frame(['scale' => $scale2->id]);
 
         $comp3 = $totara_hierarchy_generator->create_comp(
-            ['frameworkid' => $compfw2->id, 'aggregationmethod' => $COMP_AGGREGATION['OFF']]
+            ['frameworkid' => $compfw2->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_OFF]
         );
 
         $comp4 = $totara_hierarchy_generator->create_comp(
-            ['frameworkid' => $compfw2->id, 'aggregationmethod' => $COMP_AGGREGATION['ANY']]
+            ['frameworkid' => $compfw2->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_ANY]
         );
 
         $comp5 = $totara_hierarchy_generator->create_comp(
-            ['frameworkid' => $compfw2->id, 'aggregationmethod' => $COMP_AGGREGATION['ANY']]
+            ['frameworkid' => $compfw2->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_ANY]
         );
 
         // For comp5, we're adding the aggregation record already, as if this has been added via the UI
@@ -556,8 +556,6 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
      * Similar to the above multiple competencies test. But doing so with perform disabled.
      */
     public function test_when_perform_disabled() {
-        global $COMP_AGGREGATION;
-
         set_config('enableperform', advanced_feature::DISABLED);
         $this->assertTrue(advanced_feature::disabled('perform'));
 
@@ -569,16 +567,16 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $compfw1 = $totara_hierarchy_generator->create_comp_frame(['scale' => $scale1->id]);
         $comp1 = $totara_hierarchy_generator->create_comp(
-            ['frameworkid' => $compfw1->id, 'aggregationmethod' => $COMP_AGGREGATION['ALL']]
+            ['frameworkid' => $compfw1->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_ALL]
         );
         $comp2 = $totara_hierarchy_generator->create_comp(
-            ['frameworkid' => $compfw1->id, 'aggregationmethod' => $COMP_AGGREGATION['ANY']]
+            ['frameworkid' => $compfw1->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_ANY]
         );
 
         $compfw2 = $totara_hierarchy_generator->create_comp_frame(['scale' => $scale2->id]);
 
         $comp3 = $totara_hierarchy_generator->create_comp(
-            ['frameworkid' => $compfw2->id, 'aggregationmethod' => $COMP_AGGREGATION['OFF']]
+            ['frameworkid' => $compfw2->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_OFF]
         );
 
         /**

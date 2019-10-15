@@ -38,25 +38,6 @@ require_once("{$CFG->dirroot}/totara/core/utils.php");
 require_once("{$CFG->dirroot}/totara/core/js/lib/setup.php");
 
 /**
- * Competency aggregation methods
- *
- * These are mapped to lang strings in the competency lang file
- * with the key as a suffix e.g. for ALL, 'aggregationmethod1'
- */
-global $COMP_AGGREGATION;
-$COMP_AGGREGATION = array(
-    'ALL'       => 1,
-    'ANY'       => 2,
-    'OFF'       => 3,
-/*
-    'UNIT'      => 4,
-    'FRACTION'  => 5,
-    'SUM'       => 6,
-    'AVERAGE'   => 7,
-*/
-);
-
-/**
  * Oject that holds methods and attributes for competency operations.
  * @abstract
  */
@@ -77,6 +58,15 @@ class competency extends hierarchy {
     public const ASSIGNMENT_CREATE_SELF = 1;
     public const ASSIGNMENT_CREATE_OTHER = 2;
 
+    public const AGGREGATION_METHOD_ALL = 1;
+    public const AGGREGATION_METHOD_ANY = 2;
+    public const AGGREGATION_METHOD_OFF = 3;
+
+    public const COMP_AGGREGATION = [
+        'ALL' => competency::AGGREGATION_METHOD_ALL,
+        'ANY' => competency::AGGREGATION_METHOD_ANY,
+        'OFF' => competency::AGGREGATION_METHOD_OFF,
+    ];
 
     /**
      * Get template
@@ -855,9 +845,7 @@ class competency extends hierarchy {
 
         $frameworkid = $this->frameworkid;
 
-        global $COMP_AGGREGATION;
-
-        // Get the name of the framework's scale. (Note this code expects there
+          // Get the name of the framework's scale. (Note this code expects there
         // to be only one scale per framework, even though the DB structure
         // allows there to be multiple since we're using a go-between table)
         $scaledesc = $DB->get_field_sql("
@@ -872,7 +860,7 @@ class competency extends hierarchy {
 
         // Not used by Perform anymore. Storing default 'ALL' for now
         // TODO: deprecate strings: aggregationmethod'.$key, aggregationmethod
-        $mform->addElement('hidden', 'aggregationmethod', $COMP_AGGREGATION['ALL']);
+        $mform->addElement('hidden', 'aggregationmethod', self::AGGREGATION_METHOD_ALL);
         $mform->setType('aggregationmethod', PARAM_INT);
 
         $mform->addElement('static', 'scalename', get_string('scale'), ($scaledesc) ? format_string($scaledesc) : get_string('none'));

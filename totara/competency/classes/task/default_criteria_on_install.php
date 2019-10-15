@@ -46,8 +46,6 @@ class default_criteria_on_install extends adhoc_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        global $COMP_AGGREGATION;
-
         /**
          * Load any competencies that don't already have an associated overall aggregation type record.
          *
