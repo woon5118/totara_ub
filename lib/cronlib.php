@@ -61,139 +61,14 @@ function cron_run() {
     // Run all scheduled tasks.
     while (!\core\task\manager::static_caches_cleared_since($timenow) &&
            $task = \core\task\manager::get_next_scheduled_task($timenow)) {
-
-        // Emulate normal session - we use admin account by default
-        cron_setup_user();
-
-        $fullname = $task->get_name() . ' (' . get_class($task) . ')';
-        mtrace('Execute scheduled task: ' . $fullname);
-        cron_trace_time_and_memory();
-        $predbqueries = null;
-        $predbqueries = $DB->perf_get_queries();
-        $pretime      = microtime(1);
-        try {
-            get_mailer('buffer');
-            cron_prepare_core_renderer();
-            $task->execute();
-            if ($DB->is_transaction_started()) {
-                throw new coding_exception("Task left transaction open");
-            }
-            if (isset($predbqueries)) {
-                mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-                mtrace("... used " . (microtime(1) - $pretime) . " seconds");
-            }
-            mtrace('Scheduled task complete: ' . $fullname);
-            \core\task\manager::scheduled_task_complete($task);
-        } catch (Exception $e) {
-            if ($DB && $DB->is_transaction_started()) {
-                error_log('Database transaction aborted automatically in ' . get_class($task));
-                $DB->force_transaction_rollback();
-            }
-            if (isset($predbqueries)) {
-                mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-                mtrace("... used " . (microtime(1) - $pretime) . " seconds");
-            }
-            mtrace('Scheduled task failed: ' . $fullname . ',' . $e->getMessage());
-            if ($CFG->debugdeveloper) {
-                 if (!empty($e->debuginfo)) {
-                    mtrace("Debug info:");
-                    mtrace($e->debuginfo);
-                }
-                mtrace("Backtrace:");
-                mtrace(format_backtrace($e->getTrace(), true));
-            }
-
-            // Totara: we do need to know what went wrong and where!!!
-            $info = get_exception_info($e);
-            $logerrmsg = "Scheduled task exception: " . $task->get_name() . " - " . $info->message . ' Debug: ' . $info->debuginfo .
-                "\n" . format_backtrace($info->backtrace, true);
-            error_log($logerrmsg);
-
-            \core\task\manager::scheduled_task_failed($task);
-        } finally {
-            cron_prepare_core_renderer(true);
-        }
-        get_mailer('close');
+        cron_run_inner_scheduled_task($task);
         unset($task);
     }
 
     // Run all adhoc tasks.
     while (!\core\task\manager::static_caches_cleared_since($timenow) &&
            $task = \core\task\manager::get_next_adhoc_task($timenow)) {
-
-        if ($userid = $task->get_userid()) {
-            // This task has a userid specified.
-            if ($user = \core_user::get_user($userid)) {
-                // User found. Check that they are suitable.
-                try {
-                    \core_user::require_active_user($user, true, true);
-                } catch (moodle_exception $e) {
-                    mtrace("User {$userid} cannot be used to run an adhoc task: " . get_class($task) . ". Cancelling task.");
-                    $user = null;
-                }
-            } else {
-                // Unable to find the user for this task.
-                // A user missing in the database will never reappear.
-                mtrace("User {$userid} could not be found for adhoc task: " . get_class($task) . ". Cancelling task.");
-            }
-
-            if (empty($user)) {
-                // A user missing in the database will never reappear so the task needs to be failed to ensure that locks are removed,
-                // and then removed to prevent future runs.
-                // A task running as a user should only be run as that user.
-                \core\task\manager::adhoc_task_failed($task);
-                $DB->delete_records('task_adhoc', ['id' => $task->get_id()]);
-
-                return;
-            }
-
-            cron_setup_user($user);
-        } else {
-            // Emulate normal session - we use admin account by default
-            cron_setup_user();
-        }
-
-        mtrace("Execute adhoc task: " . get_class($task));
-        cron_trace_time_and_memory();
-        $predbqueries = null;
-        $predbqueries = $DB->perf_get_queries();
-        $pretime      = microtime(1);
-        try {
-            get_mailer('buffer');
-            cron_prepare_core_renderer();
-            $task->execute();
-            if ($DB->is_transaction_started()) {
-                throw new coding_exception("Task left transaction open");
-            }
-            if (isset($predbqueries)) {
-                mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-                mtrace("... used " . (microtime(1) - $pretime) . " seconds");
-            }
-            mtrace("Adhoc task complete: " . get_class($task));
-            \core\task\manager::adhoc_task_complete($task);
-        } catch (Exception $e) {
-            if ($DB && $DB->is_transaction_started()) {
-                error_log('Database transaction aborted automatically in ' . get_class($task));
-                $DB->force_transaction_rollback();
-            }
-            if (isset($predbqueries)) {
-                mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
-                mtrace("... used " . (microtime(1) - $pretime) . " seconds");
-            }
-            mtrace("Adhoc task failed: " . get_class($task) . "," . $e->getMessage());
-            if ($CFG->debugdeveloper) {
-                 if (!empty($e->debuginfo)) {
-                    mtrace("Debug info:");
-                    mtrace($e->debuginfo);
-                }
-                mtrace("Backtrace:");
-                mtrace(format_backtrace($e->getTrace(), true));
-            }
-            \core\task\manager::adhoc_task_failed($task);
-        } finally {
-            cron_prepare_core_renderer(true);
-        }
-        get_mailer('close');
+        cron_run_inner_adhoc_task($task);
         unset($task);
     }
 
@@ -203,6 +78,156 @@ function cron_run() {
     mtrace('Cron completed at ' . date('H:i:s') . '. Memory used ' . display_size(memory_get_usage()) . '.');
     $difftime = microtime_diff($starttime, microtime());
     mtrace("Execution took ".$difftime." seconds");
+
+    // Switch back to admin account to get consistent results.
+    cron_setup_user();
+}
+
+/**
+ * Shared code that handles running of a single scheduled task within the cron.
+ *
+ * Not intended for calling directly outside of this library!
+ *
+ * @param \core\task\scheduled_task $task
+ */
+function cron_run_inner_scheduled_task(\core\task\scheduled_task $task) {
+    global $CFG, $DB;
+
+    // Emulate normal session - we use admin account by default
+    cron_setup_user();
+
+    $fullname = $task->get_name() . ' (' . get_class($task) . ')';
+    mtrace('Execute scheduled task: ' . $fullname);
+    cron_trace_time_and_memory();
+    $predbqueries = null;
+    $predbqueries = $DB->perf_get_queries();
+    $pretime = microtime(1);
+    try {
+        get_mailer('buffer');
+        cron_prepare_core_renderer();
+        $task->execute();
+        if ($DB->is_transaction_started()) {
+            throw new coding_exception("Task left transaction open");
+        }
+        if (isset($predbqueries)) {
+            mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
+            mtrace("... used " . (microtime(1) - $pretime) . " seconds");
+        }
+        mtrace('Scheduled task complete: ' . $fullname);
+        \core\task\manager::scheduled_task_complete($task);
+    } catch (Exception $e) {
+        if ($DB && $DB->is_transaction_started()) {
+            error_log('Database transaction aborted automatically in ' . get_class($task));
+            $DB->force_transaction_rollback();
+        }
+        if (isset($predbqueries)) {
+            mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
+            mtrace("... used " . (microtime(1) - $pretime) . " seconds");
+        }
+        mtrace('Scheduled task failed: ' . $fullname . ',' . $e->getMessage());
+        if ($CFG->debugdeveloper) {
+            if (!empty($e->debuginfo)) {
+                mtrace("Debug info:");
+                mtrace($e->debuginfo);
+            }
+            mtrace("Backtrace:");
+            mtrace(format_backtrace($e->getTrace(), true));
+        }
+
+        // Totara: we do need to know what went wrong and where!!!
+        $info = get_exception_info($e);
+        $logerrmsg = "Scheduled task exception: " . $task->get_name() . " - " . $info->message . ' Debug: ' . $info->debuginfo .
+            "\n" . format_backtrace($info->backtrace, true);
+        error_log($logerrmsg);
+
+        \core\task\manager::scheduled_task_failed($task);
+    } finally {
+        cron_prepare_core_renderer(true);
+    }
+    get_mailer('close');
+}
+
+/**
+ * Shared code that handles running of a single adhoc task within the cron.
+ *
+ * @param \core\task\adhoc_task $task
+ */
+function cron_run_inner_adhoc_task(\core\task\adhoc_task $task) {
+    global $DB, $CFG;
+    mtrace("Execute adhoc task: " . get_class($task));
+    cron_trace_time_and_memory();
+    $predbqueries = null;
+    $predbqueries = $DB->perf_get_queries();
+    $pretime      = microtime(1);
+
+    if ($userid = $task->get_userid()) {
+        // This task has a userid specified.
+        if ($user = \core_user::get_user($userid)) {
+            // User found. Check that they are suitable.
+            try {
+                \core_user::require_active_user($user, true, true);
+            } catch (moodle_exception $e) {
+                mtrace("User {$userid} cannot be used to run an adhoc task: " . get_class($task) . ". Cancelling task.");
+                $user = null;
+            }
+        } else {
+            // Unable to find the user for this task.
+            // A user missing in the database will never reappear.
+            mtrace("User {$userid} could not be found for adhoc task: " . get_class($task) . ". Cancelling task.");
+        }
+
+        if (empty($user)) {
+            // A user missing in the database will never reappear so the task needs to be failed to ensure that locks are removed,
+            // and then removed to prevent future runs.
+            // A task running as a user should only be run as that user.
+            \core\task\manager::adhoc_task_failed($task);
+            $DB->delete_records('task_adhoc', ['id' => $task->get_id()]);
+
+            return;
+        }
+
+        cron_setup_user($user);
+    } else {
+        // Use admin account if no user known.
+        cron_setup_user();
+    }
+
+    try {
+        get_mailer('buffer');
+        cron_prepare_core_renderer();
+        $task->execute();
+        if ($DB->is_transaction_started()) {
+            throw new coding_exception("Task left transaction open");
+        }
+        if (isset($predbqueries)) {
+            mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
+            mtrace("... used " . (microtime(1) - $pretime) . " seconds");
+        }
+        mtrace("Adhoc task complete: " . get_class($task));
+        \core\task\manager::adhoc_task_complete($task);
+    } catch (Exception $e) {
+        if ($DB && $DB->is_transaction_started()) {
+            error_log('Database transaction aborted automatically in ' . get_class($task));
+            $DB->force_transaction_rollback();
+        }
+        if (isset($predbqueries)) {
+            mtrace("... used " . ($DB->perf_get_queries() - $predbqueries) . " dbqueries");
+            mtrace("... used " . (microtime(1) - $pretime) . " seconds");
+        }
+        mtrace("Adhoc task failed: " . get_class($task) . "," . $e->getMessage());
+        if ($CFG->debugdeveloper) {
+            if (!empty($e->debuginfo)) {
+                mtrace("Debug info:");
+                mtrace($e->debuginfo);
+            }
+            mtrace("Backtrace:");
+            mtrace(format_backtrace($e->getTrace(), true));
+        }
+        \core\task\manager::adhoc_task_failed($task);
+    } finally {
+        cron_prepare_core_renderer(true);
+    }
+    get_mailer('close');
 }
 
 /**
