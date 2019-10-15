@@ -1,13 +1,9 @@
-Description of Html2Text library import into Moodle
-
-Please note that we override some mb_* functions in Html2Text's namespace at
-run time. Until Html2Text adds some sort of fallback for the mb_* functions
-(or we make mbstring a hard requirement) we are forced to do this so that people
-running PHP without mbstring don't see nasty undefined function errors.
+Description of Html2Text library import
 
 Instructions
 ------------
-1. Clone https://github.com/mtibben/html2text.git into an unrelated directory
+1. Download release from https://github.com/mtibben/html2text/releases and unzip
 2. Copy /path/to/html2text/src/Html2Text.php to lib/html2text/
+3. Run: php totara/core/dev/fix_file_permissions.php --fix
+4. Update lib/thirdpartylibs.xml
 
-Imported from: https://github.com/mtibben/html2text.git
