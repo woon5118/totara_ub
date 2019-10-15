@@ -270,5 +270,19 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019090300, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2019101600) {
+
+        // Changing nullability of field aggregationmethod on table comp to null.
+        $table = new xmldb_table('comp');
+        $field = new xmldb_field('aggregationmethod', XMLDB_TYPE_INTEGER, '2', null, false, null, null, 'visible');
+
+        // Launch change of nullability for field aggregationmethod.
+        $dbman->change_field_notnull($table, $field);
+
+        // Hierarchy savepoint reached.
+        upgrade_plugin_savepoint(true, 2019101600, 'totara', 'hierarchy');
+    }
+
+
     return true;
 }
