@@ -71,4 +71,10 @@ class core_markdown_testcase extends basic_testcase {
         $actual = str_replace("\n", '', markdown_to_html($text));
         $this->assertSame($result, $actual);
     }
+
+    public function test_tabs() {
+        $text = "a\tbb\tccc\tя\tюэ\t水\tabcd\tabcde\tabcdef";
+        $result = "<p>a   bb  ccc я   юэ  水   abcd    abcde   abcdef</p>\n";
+        $this->assertSame($result, markdown_to_html($text));
+    }
 }
