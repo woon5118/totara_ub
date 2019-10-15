@@ -20,7 +20,7 @@
  * @author Simon Player <simon.player@totaralearning.com>
  * @package availability_hierarchy_position
  */
-define(['jquery', 'core/config'], function($, mdlcfg) {
+define(['jquery'], function($) {
 
     var _cache = {};
 

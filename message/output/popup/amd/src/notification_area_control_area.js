@@ -33,10 +33,6 @@ define(['jquery', 'core/templates', 'core/notification', 'core/custom_interactio
         CAN_RECEIVE_FOCUS: 'input:not([type="hidden"]), a[href], button, textarea, select, [tabindex]',
     };
 
-    var TEMPLATES = {
-        NOTIFICATION: 'message_popup/notification_content_item',
-    };
-
     /**
      * Constructor for ControlArea
      *

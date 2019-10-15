@@ -23,6 +23,8 @@
  * @package totara_hierarchy
  */
 
+/* eslint-disable no-implicit-globals */
+
 define(['jquery', 'core/config', 'core/str'], function ($, config, strings) {
 
     /* global totaraDialog

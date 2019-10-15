@@ -25,9 +25,9 @@ define(['jquery', 'core/str', 'core/config', 'core/yui'], function($, mdlstrings
         /**
          * module initialisation method called by php js_call_amd()
          */
-        init : function(args) {
+        init : function() {
             // We need to make sure that the confirm notification is loaded.
-            Y.use('moodle-core-notification-confirm', function(Y) {
+            Y.use('moodle-core-notification-confirm', function() {
                 $('.problemaggregation a').on('click', function (e) {
                     e.preventDefault();
                     modalConfirm($(this).attr('href'), 'fixconfirmsome');

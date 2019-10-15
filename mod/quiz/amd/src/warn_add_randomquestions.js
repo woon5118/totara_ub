@@ -23,7 +23,7 @@
 /**
  * This file defines the functionality of addrandomform
  */
-define(['jquery', 'core/config'], function($, mdlconfig) {
+define(['jquery'], function($) {
     var totara_category_counts;
 
     var warn_add_randomquestions = {

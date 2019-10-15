@@ -25,7 +25,7 @@ define(['jquery', 'core/str', 'core/yui'], function($, mdlstrings, Y) {
         /**
          * module initialisation method called by php js_call_amd()
          */
-        init : function(args) {
+        init : function() {
             $('.problemaggregation a').on('click', function (e) {
                 e.preventDefault();
                 modalConfirm($(this).attr('href'), 'fixconfirmsome');
@@ -43,7 +43,7 @@ define(['jquery', 'core/str', 'core/yui'], function($, mdlstrings, Y) {
         requiredstrings.push({key: scope, component: 'totara_completioneditor'});
         mdlstrings.get_strings(requiredstrings).done(function(strings) {
             // We need to make sure that the confirm notification is loaded.
-            Y.use('moodle-core-notification-confirm', function(Y) {
+            Y.use('moodle-core-notification-confirm', function() {
                 var confirm = new M.core.confirm({
                     title        : strings[0],
                     question     : strings[1],

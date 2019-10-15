@@ -31,7 +31,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
     /* global totaraSingleSelectDialog totaraMultiSelectDialogRbFilter */
 
-    var disable_filter_controls = function(event) {
+    var disable_filter_controls = function() {
         var name = $(this).attr('name');
 
         if (typeof name === 'undefined') {

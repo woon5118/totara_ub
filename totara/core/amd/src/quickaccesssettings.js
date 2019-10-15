@@ -176,7 +176,7 @@ define(['core/templates', 'core/str', 'core/ajax'], function(template, str, ajax
                     itemList.insertAdjacentHTML('beforeend', item);
                     template.runTemplateJS();
                 });
-            }).fail(function(res) {
+            }).fail(function() {
                 window.location.reload();
             });
 

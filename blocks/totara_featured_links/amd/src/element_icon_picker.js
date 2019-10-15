@@ -85,12 +85,12 @@ define([
                     $(this).addClass('selected');
                     $('#icon-picker-selected-icon').html($(this).attr('data-flex-icon-identifier'));
                 });
-                root.on(ModalEvents.shown, function(e) {
+                root.on(ModalEvents.shown, function() {
                     $('.icon-picker-item.selected').removeClass('selected');
                     var selected = $('input[name="' + name + '"]').val();
                     $('[data-flex-icon-identifier="' + selected + '"]').addClass('selected');
                 });
-                root.on(ModalEvents.yes, function(e) {
+                root.on(ModalEvents.yes, function() {
                     var selectedIcon = $('.selected').attr('data-flex-icon-identifier');
                     if (!selectedIcon) {
                         return;

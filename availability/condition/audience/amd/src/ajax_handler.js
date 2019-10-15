@@ -54,7 +54,7 @@ define(['jquery', 'core/config'], function($, mdlcfg) {
             }
 
             function getCourse() {
-                var vars = {}, hash;
+                var hash;
                 var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
 
                 // Loop through all of the variables searching for course.

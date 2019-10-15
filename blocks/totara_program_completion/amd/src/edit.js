@@ -114,6 +114,8 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlconfig, mdlstrings
 
             TotaraDialog_handler_blockprograms.prototype = new totaraDialog_handler_treeview_multiselect();
 
+            /* eslint-disable no-unused-vars */
+
             /**
              * Add a row to a table on the calling page.
              * Also hides the dialog and any no item notice.
@@ -161,6 +163,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlconfig, mdlstrings
                     this._dialog.hide();
                 }
             };
+            /* eslint-enable */
 
             /**
              * Checks if the item id exists.
@@ -220,7 +223,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlconfig, mdlstrings
                 var itemid = row.data('progid');
 
                 // Remove the item from the array of items.
-                this.program_items = $.grep(this.program_items, function (element, x) {
+                this.program_items = $.grep(this.program_items, function (element) {
                     return (element == itemid);
                 }, true);
 

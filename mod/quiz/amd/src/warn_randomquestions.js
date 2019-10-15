@@ -23,7 +23,7 @@
 /**
  * This file defines the functionality of mod/quiz/edit
  */
-define(['jquery', 'core/config'], function($, mdlconfig) {
+define(['jquery'], function($) {
     var totara_random_category_selectors;
 
     var warn_randomquestions = {

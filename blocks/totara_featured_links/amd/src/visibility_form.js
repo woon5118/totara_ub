@@ -26,7 +26,6 @@ define(['jquery'], function ($) {
         'preset_showing',
         'tile_rules_showing'
     ];
-    var form_id_suffix;
 
     var check_aggregation = function (id_suffix) {
         var num = 0;
@@ -69,7 +68,6 @@ define(['jquery'], function ($) {
 
     return {
         init: function (id_suffix) {
-            form_id_suffix = id_suffix;
             $.each(checkboxes, function (index, value) {
                 $('#tfiid_' + value + '_' + id_suffix).on('change', function () {
                     check_aggregation(id_suffix);

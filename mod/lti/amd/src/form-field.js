@@ -80,8 +80,6 @@ define(['jquery'],
                     break;
                 case FormField.TYPES.EDITOR:
                     if ($.type(value.text) !== 'undefined') {
-                        /* global tinyMCE:false */
-
                         // Set text in editor's editable content, if applicable.
                         // Check if it is an Atto editor.
                         var attoEditor = $(this.selector + 'editable');

@@ -23,7 +23,7 @@
  * Manager job assignment selector adaptor for auto-complete form element.
  * @module auth_approved/manager-selector
  */
-define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notification) {
+define(['jquery', 'core/ajax'], function($, ajax) {
     return /** @alias module:auth_approved/manager-selector */ {
         processResults: function(selector, data) {
             // Mangle the results into an array of objects.

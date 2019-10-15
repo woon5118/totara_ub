@@ -149,7 +149,7 @@ define(['jquery',
     var initTooltips = function() {
         var tooltipSelector = instanceselector+' [data-toggle="tooltip"]';
         $(tooltipSelector).tooltip();
-        $(instanceselector+' .current-learning-content').on('block_current_learning:content_updated', function(event) {
+        $(instanceselector+' .current-learning-content').on('block_current_learning:content_updated', function() {
             $(tooltipSelector).tooltip();
         });
     };

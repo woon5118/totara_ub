@@ -440,7 +440,7 @@ define(['jquery'], function ($) {
                 self.input_latitude.val(e.latLng.lat());
                 self.input_longitude.val(e.latLng.lng());
             });
-            this.map.addListener('zoom_changed', function (e) {
+            this.map.addListener('zoom_changed', function () {
                 self.input_zoom.val(self.map.getZoom());
             });
         } else {

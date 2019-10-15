@@ -20,6 +20,8 @@
  * @package totara_form
  */
 
+/* eslint-disable no-unused-vars */
+
 /**
  * File manager JS stuff.
  *
