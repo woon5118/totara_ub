@@ -1,10 +1,13 @@
-Description of MatthiasMullie\Minify import into Moodle
+Description of MatthiasMullie\Minify import
 
-1) Download https://github.com/matthiasmullie/minify/archive/1.3.51.zip and unzip
+1) Download release from https://github.com/matthiasmullie/minify/releases and unzip
 
-mv minify-1.3.51/src /path/to/moodle/lib/minify/matthiasmullie-minify/
-mv minify-1.3.51/data /path/to/moodle/lib/minify/matthiasmullie-minify/
+replace /src/ and /data/ subdirectories in /lib/minify/matthiasmullie-minify/
 
-2) Download https://github.com/matthiasmullie/path-converter/archive/1.1.0.zip and unzip
+2) Download https://github.com/matthiasmullie/path-converter/releases and unzip
 
-mv path-converter-1.1.0/src/ /path/to/moodle/lib/minify/matthiasmullie-pathconverter/
+replace /src/ subdirectory in /lib/minify/matthiasmullie-pathconverter/
+
+3) update /lib/thirdpartylibs.xml
+
+4/ run: php totara/core/dev/fix_file_permissions.php --fix
