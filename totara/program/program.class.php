@@ -2462,6 +2462,9 @@ class program {
             );
         }
         // There have not being any files uploaded so return the default default image.
+        $files = array_values(array_filter($files, function($file) {
+            return !$file->is_directory();
+        }));
         if (empty($files)) {
             if ($this->is_certif()) {
                 $component = 'totara_certification';
@@ -2471,9 +2474,6 @@ class program {
             $url = $OUTPUT->image_url('defaultimage', $component);
             return $url->out();
         }
-        $files = array_values(array_filter($files, function($file) {
-            return !$file->is_directory();
-        }));
         assert(count($files) <= 1, 'There should only be one image for the program but there was ' . count($files));
         $file = moodle_url::make_pluginfile_url(
             $files[0]->get_contextid(),
