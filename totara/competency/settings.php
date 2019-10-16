@@ -33,7 +33,7 @@ if ($hassiteconfig) {
         new admin_category(
             'totara_competency',
             get_string('pluginname', 'totara_competency'),
-            !advanced_feature::visible('perform')
+            !advanced_feature::is_enabled('perform')
         )
     );
 
@@ -44,7 +44,7 @@ if ($hassiteconfig) {
             get_string('managetypes_aggregation', 'totara_competency'),
             new moodle_url("/totara/competency/managetypes.php", ['plugin' => 'aggregation']),
             ['moodle/site:config'],
-            !advanced_feature::visible('perform')
+            !advanced_feature::is_enabled('perform')
         )
     );
 
@@ -55,7 +55,7 @@ if ($hassiteconfig) {
             get_string('managetypes_pathway', 'totara_competency'),
             new moodle_url("/totara/competency/managetypes.php", ['plugin' => 'pathway']),
             ['moodle/site:config'],
-            !advanced_feature::visible('perform')
+            !advanced_feature::is_enabled('perform')
         )
     );
 }

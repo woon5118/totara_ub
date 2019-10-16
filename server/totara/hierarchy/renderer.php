@@ -776,7 +776,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             get_string('competencytablinkedcourses', 'totara_hierarchy')
         );
 
-        if (\totara_core\advanced_feature::visible('perform')) {
+        if (\totara_core\advanced_feature::is_enabled('perform')) {
             // Ability to edit achievement criteria is only available if perform is enabled.
             $tabs[] = new \tabobject(
                 'editachievementpaths',

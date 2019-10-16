@@ -64,7 +64,7 @@ abstract class totara_sync_source_comp extends totara_sync_source {
             'aggregationmethod',
         ];
 
-        if (advanced_feature::visible('perform')) {
+        if (advanced_feature::is_enabled('perform')) {
             $this->fields[] = 'assignavailability';
         }
 

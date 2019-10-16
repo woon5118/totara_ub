@@ -77,7 +77,7 @@ class rb_source_assignment_competency_users extends rb_base_source {
      * @return boolean If the report should be ignored of not.
      */
     public static function is_source_ignored() {
-        return !advanced_feature::visible('perform');
+        return !advanced_feature::is_enabled('perform');
     }
 
     /**

@@ -871,7 +871,7 @@ class competency extends hierarchy {
         $mform->addElement('hidden', 'evidencecount', 0);
         $mform->setType('evidencecount', PARAM_INT);
 
-        if (advanced_feature::visible('perform')) {
+        if (advanced_feature::is_enabled('perform')) {
             // Assignment Availability required in
             $checkboxGroup = array();
             $checkboxGroup[] =& $mform->createElement('advcheckbox',
@@ -912,7 +912,7 @@ class competency extends hierarchy {
 
         // Properly format assignment availability from individual form values into a single array
         $item->assignavailability = $item->assignavailability ?? [];
-        if (!advanced_feature::disabled('perform')) {
+        if (!advanced_feature::is_disabled('perform')) {
             $checkbox_mappings = [
                 'assignavailself' => self::ASSIGNMENT_CREATE_SELF,
                 'assignavailother' => self::ASSIGNMENT_CREATE_OTHER,
@@ -1184,7 +1184,7 @@ class competency extends hierarchy {
         $fields = array_merge(parent::get_export_fields(), [
             'aggregationmethod' => 'hierarchy.aggregationmethod',
         ]);
-        if (advanced_feature::visible('perform')) {
+        if (advanced_feature::is_enabled('perform')) {
             $fields = array_merge($fields, [
                 'assignavailability' =>
                     "CASE 
@@ -1211,7 +1211,7 @@ class competency extends hierarchy {
     protected function get_export_join_def() {
         $def = parent::get_export_join_def();
 
-        if (advanced_feature::visible('perform')) {
+        if (advanced_feature::is_enabled('perform')) {
             $availabilities = [
                 self::ASSIGNMENT_CREATE_SELF => 'self',
                 self::ASSIGNMENT_CREATE_OTHER => 'other',
@@ -1310,7 +1310,7 @@ class competency extends hierarchy {
      * @param array $availabilities
      */
     protected function save_assignment_availabilities(int $comp_id, array $availabilities) {
-        if (advanced_feature::disabled('perform')) {
+        if (advanced_feature::is_disabled('perform')) {
             return;
         }
 

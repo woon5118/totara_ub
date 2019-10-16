@@ -133,7 +133,7 @@ class default_criteria_on_install extends adhoc_task {
     }
 
     private function should_add_learning_plans(): bool {
-        if (advanced_feature::disabled('perform')) {
+        if (advanced_feature::is_disabled('perform')) {
             // If perform isn't enabled, we'll need to add the learning plan pathway here since users will not be able
             // to access an interface to add them themselves if they need them.
             return true;

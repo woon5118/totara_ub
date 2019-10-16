@@ -100,7 +100,7 @@ class competency_controller extends admin_controller {
             'competency-name' => $this->competency->display_name,
             'framework-id' => $this->framework->id,
             'framework-name' => format_string($this->framework->fullname),
-            'perform-enabled' => advanced_feature::visible('perform'),
+            'perform-enabled' => advanced_feature::is_enabled('perform'),
         ]);
     }
 

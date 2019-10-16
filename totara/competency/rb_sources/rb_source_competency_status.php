@@ -70,7 +70,7 @@ class rb_source_competency_status extends rb_base_source {
     }
 
     public static function is_source_ignored() {
-        return !advanced_feature::visible('competencies');
+        return !advanced_feature::is_enabled('competencies');
     }
 
     //
@@ -212,7 +212,7 @@ class rb_source_competency_status extends rb_base_source {
             ),
         );
 
-        if (advanced_feature::visible('perform')) {
+        if (advanced_feature::is_enabled('perform')) {
             $columnoptions = array_merge($columnoptions, [
                 new rb_column_option(
                     'assignment',

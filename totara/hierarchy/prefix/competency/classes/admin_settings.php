@@ -49,7 +49,7 @@ class admin_settings {
                 'hierarchy_competency_settings',
                 new lang_string('settings', 'hierarchy_competency'),
                 [],
-                !advanced_feature::visible('competencies')
+                !advanced_feature::is_enabled('competencies')
             );
 
             $menu->add('competencies', $settings_page);

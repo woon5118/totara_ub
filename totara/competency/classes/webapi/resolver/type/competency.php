@@ -91,7 +91,7 @@ class competency implements type_resolver {
 
         if ($field == 'assign_availability') {
             // This field should show up on perform only
-            return advanced_feature::visible('perform');
+            return advanced_feature::is_enabled('perform');
         }
 
         return true;

@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool
  */
 function totara_competency_myprofile_navigation(tree $tree, $user, $this_user, $course) {
-    if (!advanced_feature::visible('perform')) {
+    if (!advanced_feature::is_enabled('perform')) {
         return true;
     }
 
