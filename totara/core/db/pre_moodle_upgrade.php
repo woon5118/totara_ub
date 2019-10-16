@@ -74,3 +74,15 @@ foreach ($tables as $tablename) {
         $dbman->drop_table($table);
     }
 }
+
+// Undo calendar index changes.
+$table = new xmldb_table('event');
+$field = new xmldb_field('categoryid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'format');
+$index = new xmldb_index('groupid-courseid-categoryid-visible-userid', XMLDB_INDEX_NOTUNIQUE, array('groupid', 'courseid', 'categoryid', 'visible', 'userid'));
+if ($dbman->index_exists($table, $index)) {
+    $dbman->drop_index($table, $index);
+}
+$index = new xmldb_index('groupid-courseid-visible-userid', XMLDB_INDEX_NOTUNIQUE, array('groupid', 'courseid', 'visible', 'userid'));
+if (!$dbman->index_exists($table, $index)) {
+    $dbman->add_index($table, $index);
+}

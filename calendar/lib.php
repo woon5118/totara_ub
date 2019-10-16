@@ -790,6 +790,9 @@ function calendar_get_events($tstart, $tend, $users, $groups, $courses, $withdur
         return array();
     }
 
+    // Totara: For now ignore all category events introduced in Moodle 3.4
+    $whereclause .= " AND e.categoryid = 0";
+
     if($withduration) {
         $timeclause = '(e.timestart >= '.$tstart.' OR e.timestart + e.timeduration > '.$tstart.') AND e.timestart <= '.$tend;
     }

@@ -1918,6 +1918,28 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2017091000.00);
     }
 
+    if ($oldversion < 2017092900.00) {
+        // Totara: not used, records with non-zero value are ignored
+
+        // Define field categoryid to be added to event.
+        $table = new xmldb_table('event');
+        $field = new xmldb_field('categoryid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'format');
+
+        // Conditionally launch add field categoryid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add the categoryid key.
+        $key = new xmldb_key('categoryid', XMLDB_KEY_FOREIGN, array('categoryid'), 'course_categories', array('id'));
+        $dbman->add_key($table, $key);
+
+        // Totara: do not change indexes
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2017092900.00);
+    }
+
     if ($oldversion < 2017101000.01) {
         // Totara: not used, any existing value is ignored
 
