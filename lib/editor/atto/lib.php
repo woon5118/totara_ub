@@ -267,6 +267,7 @@ class atto_page_hack {
     public $yuimodules;
     public $jsmodules;
     public $requiredstrings = array();
+    protected $onetimeitemsoutput = [];
 
     public function __construct($oldpage) {
         $this->oldpage = $oldpage;
@@ -312,6 +313,15 @@ class atto_page_hack {
         } else {
             debugging('Unexpected $PAGE->requires->js_module() in Atto init: ' . var_export($module, true), DEBUG_DEVELOPER);
         }
+    }
+
+    public function should_create_one_time_item_now($thing) {
+        if (isset($this->onetimeitemsoutput[$thing])) {
+            return false;
+        }
+
+        $this->onetimeitemsoutput[$thing] = true;
+        return true;
     }
 
     public function __call($name , array $arguments) {
