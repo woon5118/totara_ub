@@ -1145,6 +1145,8 @@ class core_plugin_manager {
             'gradeexport_fusion',
             'repository_picasa',
             'portfolio_picasa',
+            // Moodle 3.4 merge skipped.
+            'tool_analytics', 'tool_httpsreplace', 'report_insights', 'mlbackend_php', 'mlbackend_python',
 
             // Moodle merge 3.3 removals.
             'block_myoverview', 'repository_onedrive',

@@ -351,7 +351,7 @@ function totara_upgrade_course_completion_remove_duplicates($table, $uniques, $f
 }
 
 /**
- * Uninstall Moodle plugins removed in 3.1 - 3.3 and Totara 13 plugins.
+ * Uninstall Moodle plugins removed in 3.1 - 3.4 and Totara 13 plugins.
  */
 function totara_core_upgrade_delete_moodle_plugins() {
     global $DB;
@@ -364,6 +364,8 @@ function totara_core_upgrade_delete_moodle_plugins() {
         'gradeexport_fusion',
         'repository_picasa',
         'portfolio_picasa',
+        // Moodle 3.4 merge skipped.
+        'tool_analytics', 'tool_httpsreplace', 'report_insights', 'mlbackend_php', 'mlbackend_python',
 
         // Moodle 3.3 removals.
         'repository_onedrive',
